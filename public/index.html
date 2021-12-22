@@ -1,17 +1,42 @@
 <!DOCTYPE html>
 <html lang="">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <!-- CDN预解析 -->
+    <% if( htmlWebpackPlugin.options.dnsPrefetch && htmlWebpackPlugin.options.dnsPrefetch.open){ %>
+    <% for (const dns of Object.values(htmlWebpackPlugin.options.dnsPrefetch.dns)) { %> <%if(dns){%>
+    <link rel="dns-prefetch" href="<%= dns %>" />
+    <% } } } %>
+
+    <!-- 使用CDN的CSS文件 -->
+    <% for (const css of Object.values(htmlWebpackPlugin.options.cdnCss)) { %> <%if(css){%>
+    <link rel="stylesheet" href="<%= css %>" />
+    <% } }%>
+
+    <link rel="stylesheet" id="theme" href="./default.css" />
+
+    <!-- 使用CDN的JS文件 -->
+    <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
+    <link rel="preload" href="<%= js %>" as="script" />
+    <% } }%>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_3026563_cjrdgwrbdyf.css" />
   </head>
+
   <body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>
+        We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without
+        JavaScript enabled. Please enable it to continue.
+      </strong>
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
+    <script src="<%= js %>"></script>
+    <% } }%>
   </body>
 </html>
