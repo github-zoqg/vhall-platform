@@ -31,6 +31,8 @@
     "vue-router": "^3.5.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^15.0.0",
+		"@commitlint/config-conventional": "^15.0.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
@@ -50,7 +52,7 @@
   },
   "gitHooks": {
     "pre-commit": "lint-staged",
-    "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    "commit-msg": "commitlint -E GIT_PARAMS"
   },
   "lint-staged": {
     "*.{js,jsx,vue}": [
