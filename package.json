@@ -21,7 +21,7 @@
     "format": "prettier --write './src/**/*.(vue|js|css|less|jsx)' './scripts/**/*.js' './vue-configs/**/*.js'",
     "lint": "node_modules/.bin/vue-cli-service lint --no-fix",
     "lint:fix": "node_modules/.bin/vue-cli-service lint",
-    "demo": "cross-env NODE_ENV=development node scripts/cli-service.js serve --project=demo --client=live-pc"
+    "demo": "cross-env NODE_ENV=development && node scripts/cli-service.js serve --project=demo --client=live-pc"
   },
   "dependencies": {
     "core-js": "^3.6.5",

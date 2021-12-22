@@ -1,0 +1,124 @@
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+p,
+table,
+caption,
+th,
+td,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+menu {
+  margin: 0;
+  padding: 0;
+}
+.vmp-basic-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.vmp-basic-layout .vmp-basic-hd {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+}
+.vmp-basic-layout .vmp-basic-bd {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+.vmp-basic-layout .vmp-basic-left {
+  width: 60px;
+}
+.vmp-basic-layout .vmp-basic-center {
+  flex: 1;
+}
+.vmp-basic-layout .vmp-basic-right {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+}
+.vmp-basic-layout .vmp-basic-right .vmp-basic-right__hd {
+  height: 260px;
+}
+.vmp-basic-layout .vmp-basic-right .vmp-basic-right__bd {
+  flex: 1;
+}
+.vmp-aside {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  height: 100%;
+}
+.vmp-icon-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-weight: normal;
+  margin: 12px 0;
+}
+.vmp-icon-text span.text {
+  font-size: 12px;
+  user-select: none;
+}
+.vmp-icon-text i {
+  user-select: none;
+}
+.vmp-icon-text:hover {
+  cursor: pointer;
+}
+.vmp-icon-text.selected span.text,
+.vmp-icon-text.selected i {
+  color: #fc5659;
+}
+.vmp-icon-text.disable span.text,
+.vmp-icon-text.disable i {
+  color: #777777;
+}
+.vmp-basic-layout .vmp-basic-hd {
+  background: #434343;
+}
+.vmp-basic-layout .vmp-basic-center {
+  background: #2d2d2d;
+}
+.vmp-basic-layout .vmp-basic-right {
+  border-left: 1px solid #1f1f1f;
+}
+.vmp-basic-layout .vmp-basic-right .vmp-basic-right__hd {
+  background-color: #2d2d2d;
+}
+.vmp-basic-layout .vmp-basic-right .vmp-basic-right__bd {
+  background-color: #434343;
+}
+.vmp-aside {
+  background: #434343;
+  border-left: 1px solid #3a3a48;
+  border-top: 1px solid #353535;
+}

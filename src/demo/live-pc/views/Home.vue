@@ -1,18 +1,28 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
+  <vmp-basic-layout>
+    <template v-slot:vmp-header></template>
+
+    <template v-slot:vmp-center>
+      <h2><vmp-aside></vmp-aside></h2>
+    </template>
+
+    <template v-slot:vmp-right-hd>
+      <h2>视频区域</h2>
+    </template>
+
+    <template v-slot:vmp-right-bd>
+      <h2>聊天区域</h2>
+    </template>
+  </vmp-basic-layout>
 </template>
 
 <script>
-  // @ is an alias to /src
-  import HelloWorld from '../components/HelloWorld.vue';
+  import VmpBasicLayout from '@/packages/basic-layout';
 
   export default {
     name: 'Home',
     components: {
-      HelloWorld
+      VmpBasicLayout
     }
   };
 </script>

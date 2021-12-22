@@ -49,7 +49,7 @@ const sharedConfig = {
       }
     },
     // 启用 CSS modules for all css / pre-processor files.
-    modules: false
+    requireModuleExtension: true
   },
   // 设置是否在开发环境下每次保存代码时都启用eslint验证
   lintOnSave: 'warning',
