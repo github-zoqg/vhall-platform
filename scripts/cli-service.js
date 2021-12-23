@@ -45,18 +45,19 @@ async function runLoop(project, cmdOptions) {
 
 async function runSingle(project, client, cmdOption) {
   const cmdStr = `node_modules${path.sep}.bin${path.sep}vue-cli-service ${cmdOption}`;
-  spinner.color = 'magenta';
-  const boldText = ` ${project}/${client} `;
+  // spinner.color = 'magenta';
+  // const boldText = ` ${project}/${client} `;
   // 进度开始
-  spinner.start(
-    `${chalk.magenta('项目')}${chalk.magenta.bold(boldText)} ${chalk.magenta('编译开始')}\r\n`
-  );
+  // spinner.start(
+  //   `${chalk.magenta('项目')}${chalk.magenta.bold(boldText)} ${chalk.magenta('编译开始')}\r\n`
+  // );
+
   // console.log(chalk.bold.bgBlue(` cmd `), chalk.bold.green(`${cmdStr}`));
   // 执行命令
   execSync(cmdStr, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit' });
 
   // 执行成功
-  spinner.succeed(
-    `${chalk.magenta('项目')}${chalk.magenta.bold(boldText)} ${chalk.magenta('编译结束')}\r\n`
-  );
+  // spinner.succeed(
+  //   `${chalk.magenta('项目')}${chalk.magenta.bold(boldText)} ${chalk.magenta('编译结束')}\r\n`
+  // );
 }

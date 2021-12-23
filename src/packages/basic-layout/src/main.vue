@@ -6,7 +6,9 @@
     </div>
     <div class="vmp-basic-bd">
       <!-- 左侧容器 -->
-      <div class="vmp-basic-left" id="leftAside"></div>
+      <div class="vmp-basic-left">
+        <slot name="vmp-left-aside"></slot>
+      </div>
       <!-- 中间区域 -->
       <div class="vmp-basic-center">
         <slot name="vmp-center"></slot>

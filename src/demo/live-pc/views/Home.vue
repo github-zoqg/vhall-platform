@@ -2,9 +2,14 @@
   <vmp-basic-layout>
     <template v-slot:vmp-header></template>
 
-    <template v-slot:vmp-center>
-      <h2><vmp-aside></vmp-aside></h2>
+    <!-- 左侧区域 -->
+    <template v-slot:vmp-left-aside>
+      <aside class="vmp-aside">
+        <vmp-aside-menu cuid="asideMenu"></vmp-aside-menu>
+      </aside>
     </template>
+
+    <template v-slot:vmp-center>中间区域</template>
 
     <template v-slot:vmp-right-hd>
       <h2>视频区域</h2>
