@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "/****/": "-------------demo开发----------------",
+    "demo": "cross-env NODE_ENV=development && node scripts/cli-service.js serve --project=demo --client=live-pc",
     "/---/": "-------------saas业务线相关命令----------------",
     "serve": "npm run serve:saas:live-pc",
     "serve:saas:live-pc": "cross-env NODE_ENV=development node scripts/cli-service.js serve --project=saas --client=live-pc",
-    "serve:saas:watch-h5": "cross-env NODE_ENV=production node scripts/cli-service.js serve --project=saas --client=watch-h5",
-    "serve:saas:watch-pc": "cross-env NODE_ENV=production node scripts/cli-service.js serve --project=saas --client=watch-pc",
-    "serve:saas:admin": "cross-env NODE_ENV=production node scripts/cli-service.js serve --project=saas --client=admin",
-    "serve:saas:console": "cross-env NODE_ENV=production node scripts/cli-service.js serve --project=saas --client=console",
+    "serve:saas:watch-h5": "cross-env NODE_ENV=development node scripts/cli-service.js serve --project=saas --client=watch-h5",
+    "serve:saas:watch-pc": "cross-env NODE_ENV=development node scripts/cli-service.js serve --project=saas --client=watch-pc",
+    "serve:saas:admin": "cross-env NODE_ENV=development node scripts/cli-service.js serve --project=saas --client=admin",
+    "serve:saas:console": "cross-env NODE_ENV=development node scripts/cli-service.js serve --project=saas --client=console",
     "build:saas:live-pc": "cross-env NODE_ENV=production node scripts/cli-service.js build --project=saas --client=live-pc",
     "build:saas:watch-h5": "cross-env NODE_ENV=production node scripts/cli-service.js build --project=saas --client=watch-h5",
     "build:saas:watch-pc": "cross-env NODE_ENV=production node scripts/cli-service.js build --project=saas --client=watch-pc",
@@ -20,8 +22,7 @@
     "help:lint": "node_modules/.bin/vue-cli-service help lint",
     "format": "prettier --write './src/**/*.(vue|js|css|less|jsx)' './scripts/**/*.js' './vue-configs/**/*.js'",
     "lint": "node_modules/.bin/vue-cli-service lint --no-fix",
-    "lint:fix": "node_modules/.bin/vue-cli-service lint",
-    "demo": "cross-env NODE_ENV=development && node scripts/cli-service.js serve --project=demo --client=live-pc"
+    "lint:fix": "node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.6.5",

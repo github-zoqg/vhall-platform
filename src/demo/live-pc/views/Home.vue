@@ -1,11 +1,13 @@
 <template>
   <vmp-basic-layout>
-    <template v-slot:vmp-header></template>
+    <template v-slot:vmp-header>
+      <vmp-container cuid="headerContainer"></vmp-container>
+    </template>
 
     <!-- 左侧区域 -->
     <template v-slot:vmp-left-aside>
       <aside class="vmp-aside">
-        <vmp-aside-menu cuid="asideMenu"></vmp-aside-menu>
+        <vmp-container cuid="asideMenu"></vmp-container>
       </aside>
     </template>
 

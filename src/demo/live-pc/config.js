@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import VmpContainer from '@/packages/container';
-import VmpAsideMenu from '@/packages/aside-menu';
 import VmpIconText from '@/packages/icon-text';
+import serverRegisterMixin from '@/packages/mixins/server-register';
 Vue.use(VmpContainer);
-Vue.use(VmpAsideMenu);
 Vue.use(VmpIconText);
+// 全局混入注册逻辑
+Vue.mixin(serverRegisterMixin);
 
 const layoutConfig = {
   liveType: 'common',
@@ -28,18 +29,11 @@ const serverConfig = {
       icon: 'iconfont icon-DOCUMENT',
       text: 'i18n.asideMenu.document'
     },
-    onapis: {
-      handleClick: {
-        cuid: 'wbIconText',
-        method: 'onSelected',
-        args: { a: 1 }
-      }
-    },
-    emitapis: {
-      'wbIconText:onSelected': {
-        cuid: 'wbIconText',
-        method: 'onSelected',
-        args: { a: 1 }
+    emitClick: {
+      sendToServer: false,
+      command: 'wbIconText:setSelectedState',
+      messsage: {
+        arg: false
       }
     }
   },
@@ -50,12 +44,30 @@ const serverConfig = {
       kind: 'whiteboard',
       icon: 'iconfont icon-Whiteboard',
       text: 'i18n.asideMenu.whiteBoard'
-    }
+    },
+    emitClick: [
+      {
+        cuid: 'docIconText',
+        method: 'setSelectedState',
+        args: [false]
+      }
+    ]
   },
   // 左侧导航菜单
   asideMenu: {
-    component: 'VmpAsideMenu',
+    component: 'VmpContainer',
+    options: {
+      className: 'vmp-aside-menu'
+    },
     children: ['docIconText', 'wbIconText']
+  },
+  // 顶部容器
+  headerContainer: {
+    component: 'VmpContainer',
+    options: {
+      className: 'vmp-header-container'
+    }
+    // children: []
   }
 };
 

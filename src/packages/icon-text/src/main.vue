@@ -3,7 +3,7 @@
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
-    :class="className"
+    :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
     :data-kind="options.kind"
     @click="handleClick"
   >
@@ -16,22 +16,17 @@
 <script>
   export default {
     name: 'VmpIconText',
-    props: {
-      cuid: String
-    },
     data() {
       return {
         className: '',
+        selected: false,
+        disable: false,
         options: {
           kind: '',
           icon: '',
           text: ''
         }
       };
-    },
-    created() {
-      // 注册到服务池
-      this.$serverPool.set(this.cuid, this);
     },
     mounted() {
       this.initConfig();
@@ -43,19 +38,18 @@
         if (!widget) return;
         this.options = widget.options;
       },
-      emitSelected() {
-        alert(this.cuid);
+      // 设置选中转态
+      setSelectedState(val) {
+        this.selected = val;
       },
+      // 设置可用状态
+      setDisableState(val) {
+        this.disable = val;
+      },
+      // click事件
       handleClick: function (event) {
-        // console.log('args', args);
-        const api = this.$serverConfig[this.cuid].emitapis;
-        if (api && api.emitClick) {
-          // EventSDk.send(api.emitClick);
-          console.log(api.emitClick);
-        }
-      },
-      dubleClick: function () {
-        //
+        if (this.disable) return false;
+        // EventQueue.add(`${this.cuid}:emitClick`);
       }
     }
   };
