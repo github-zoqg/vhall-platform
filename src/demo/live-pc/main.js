@@ -1,9 +1,9 @@
 window.$service = new Map();
 import Vue from 'vue';
 import App from './App.vue';
+import './config';
 import { initI18n } from '@/packages/locales/index.js';
 import router from './router';
-import './config';
 
 Vue.config.productionTip = false;
 

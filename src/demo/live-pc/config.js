@@ -1,15 +1,17 @@
 import Vue from 'vue';
 import VmpContainer from '@/packages/container';
 import VmpIconText from '@/packages/icon-text';
+import VmpLanguageChoice from '@/packages/language-choice';
 import serverRegisterMixin from '@/packages/mixins/server-register';
 Vue.use(VmpContainer);
 Vue.use(VmpIconText);
+Vue.use(VmpLanguageChoice);
+
 // 全局混入注册逻辑
 Vue.mixin(serverRegisterMixin);
 
 const layoutConfig = {
-  liveType: 'common',
-  lang: 'en',
+  lang: 'zh',
   styles: {
     background: 'lightgreen',
     color: '#fff',
@@ -21,11 +23,42 @@ const layoutConfig = {
 
 // 服务配置
 const serverConfig = {
+  // 顶部容器
+  headerContainer: {
+    component: 'VmpContainer',
+    options: {
+      className: 'vmp-header-container'
+    },
+    children: ['languageChoice']
+  },
+  // 左侧导航菜单
+  asideMenu: {
+    component: 'VmpContainer',
+    options: {
+      className: 'vmp-aside-menu'
+    },
+    children: ['docIconText', 'wbIconText']
+  },
+  // 语言选择
+  languageChoice: {
+    component: 'VmpLanguageChoice',
+    options: {
+      choices: [
+        {
+          value: 'zh',
+          label: 'i18n.languageChoice.zh'
+        },
+        {
+          value: 'en',
+          label: 'i18n.languageChoice.en'
+        }
+      ]
+    }
+  },
   // 文档菜单
   docIconText: {
     component: 'VmpIconText',
     options: {
-      kind: 'document',
       icon: 'iconfont icon-DOCUMENT',
       text: 'i18n.asideMenu.document'
     },
@@ -41,7 +74,6 @@ const serverConfig = {
   wbIconText: {
     component: 'VmpIconText',
     options: {
-      kind: 'whiteboard',
       icon: 'iconfont icon-Whiteboard',
       text: 'i18n.asideMenu.whiteBoard'
     },
@@ -52,25 +84,9 @@ const serverConfig = {
         args: [false]
       }
     ]
-  },
-  // 左侧导航菜单
-  asideMenu: {
-    component: 'VmpContainer',
-    options: {
-      className: 'vmp-aside-menu'
-    },
-    children: ['docIconText', 'wbIconText']
-  },
-  // 顶部容器
-  headerContainer: {
-    component: 'VmpContainer',
-    options: {
-      className: 'vmp-header-container'
-    }
-    // children: []
   }
 };
 
 window.$serverPool = Vue.prototype.$serverPool = new Map();
-Vue.prototype.$serverConfig = serverConfig;
-Vue.prototype.$layoutConfig = layoutConfig;
+window.$serverConfig = Vue.prototype.$serverConfig = serverConfig;
+window.$layoutConfig = Vue.prototype.$layoutConfig = layoutConfig;

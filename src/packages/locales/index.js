@@ -10,7 +10,7 @@ Vue.use(VueI18n);
 export function initI18n(lang = 'zh') {
   const lan = localStorage.getItem('lang');
   const i18n = new VueI18n({
-    locale: lan || lang,
+    locale: lan || window.$layoutConfig?.lang || lang,
     messages: {
       zh: require('./zh-CN.js'),
       en: require('./en-US.js')

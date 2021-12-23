@@ -4,12 +4,11 @@
     :ref="cuid"
     class="vmp-icon-text"
     :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
-    :data-kind="options.kind"
     @click="handleClick"
   >
-    <i :class="options.icon" style="font-size: 28px"></i>
+    <i :class="icon" style="font-size: 28px"></i>
     <span class="text">
-      {{ options.text.startsWith('i18n') ? $t(options.text) : options.text }}
+      {{ text.startsWith('i18n') ? $t(text) : text }}
     </span>
   </div>
 </template>
@@ -21,11 +20,9 @@
         className: '',
         selected: false,
         disable: false,
-        options: {
-          kind: '',
-          icon: '',
-          text: ''
-        }
+        kind: '',
+        icon: '',
+        text: ''
       };
     },
     mounted() {
@@ -35,8 +32,28 @@
       // 初始化配置
       initConfig() {
         const widget = this.$serverConfig && this.$serverConfig[this.cuid];
-        if (!widget) return;
-        this.options = widget.options;
+        if (widget && widget.options) {
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('className')) {
+            this.className = widget.options.className;
+          }
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('selected')) {
+            this.selected = widget.options.selected;
+          }
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('disable')) {
+            this.disable = widget.options.disable;
+          }
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('icon')) {
+            this.icon = widget.options.icon;
+          }
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('text')) {
+            this.text = widget.options.text;
+          }
+        }
       },
       // 设置选中转态
       setSelectedState(val) {
@@ -47,7 +64,7 @@
         this.disable = val;
       },
       // click事件
-      handleClick: function (event) {
+      handleClick: function () {
         if (this.disable) return false;
         // EventQueue.add(`${this.cuid}:emitClick`);
       }
