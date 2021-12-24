@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "/****/": "-------------demo开发----------------",
-    "demo": "node scripts/cli-service.js serve --project=demo --client=live-pc --mode=test",
+    "demo": "node scripts/cli-service.js serve --project=demo --client=live-pc",
     "demo:build": "node scripts/cli-service.js build --project=demo --client=live-pc",
     "/---/": "-------------saas业务线相关命令----------------",
     "serve": "npm run serve:saas:live-pc",
