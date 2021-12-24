@@ -1,4 +1,3 @@
-import { runInContext } from 'lodash';
 import eventQueue from './eventQueue.js';
 import serverPool from './serverPool.js';
 

@@ -1,16 +1,17 @@
 <template>
-  <div
+  <a
+    href="javascript:;"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
     :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
     @click="handleClick"
   >
-    <i :class="icon" style="font-size: 28px"></i>
+    <i :class="icon"></i>
     <span class="text">
       {{ text.startsWith('i18n') ? $t(text) : text }}
     </span>
-  </div>
+  </a>
 </template>
 <script>
   export default {
@@ -76,3 +77,45 @@
     }
   };
 </script>
+<style lang="less">
+  .vmp-icon-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    color: #ececec;
+    margin-top: 20px;
+
+    span.text {
+      font-size: 12px;
+      user-select: none;
+    }
+    i {
+      user-select: none;
+      display: block;
+      width: 23px;
+      height: 23px;
+      margin: 0 auto;
+      padding-bottom: 6px;
+      font-size: 22px;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &.selected {
+      span.text,
+      i {
+        color: #fc5659;
+      }
+    }
+
+    &.disable {
+      span.text,
+      i {
+        color: #777777;
+      }
+    }
+  }
+</style>

@@ -4,9 +4,9 @@ import serverPool from './serverPool';
 
 const platformsSDK = {
   install(vue) {
-    vue.prototype.$dispatcher = dispatcher;
-    vue.prototype.$event = eventQueue;
-    vue.prototype.$serverPool = serverPool;
+    window.$dispatcher = vue.prototype.$dispatcher = dispatcher;
+    window.$event = vue.prototype.$event = eventQueue;
+    window.$serverPool = vue.prototype.$serverPool = serverPool;
   }
 };
 
