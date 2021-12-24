@@ -30,7 +30,7 @@ const sharedConfig = {
     }
   },
   chainWebpack: config => {
-    config.resolve.alias.set('@', resolve('src'));
+    config.resolve.alias.set('@', path.resolve('src'));
   },
   css: {
     // 是否使用css分离插件 ExtractTextPlugin
