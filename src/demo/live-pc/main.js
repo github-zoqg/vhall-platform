@@ -8,9 +8,11 @@ import router from './router';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './assets/icon-font/iconfont.css';
+import platformsSDK from '@/core';
 
 Vue.use(ElementUI);
 Vue.config.productionTip = false;
+Vue.use(platformsSDK);
 
 // 挂载i18n
 const i18n = initI18n('zh');
