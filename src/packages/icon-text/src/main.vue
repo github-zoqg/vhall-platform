@@ -66,6 +66,11 @@
       // click事件
       handleClick: function () {
         if (this.disable) return false;
+        this.$event.send({
+          cuid: 'wbIconText',
+          method: 'emitClick'
+        });
+
         // EventQueue.add(`${this.cuid}:emitClick`);
       }
     }

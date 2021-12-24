@@ -82,6 +82,11 @@ const serverConfig = {
         cuid: 'docIconText',
         method: 'setSelectedState',
         args: [false]
+      },
+      {
+        cuid: 'docIconText',
+        method: 'setDisableState',
+        args: [false]
       }
     ]
   }
