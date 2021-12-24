@@ -1,3 +1,7 @@
+<!--
+通用容器组件
+用途：此组件用于实现有一个div为根元素的容器.
+-->
 <template>
   <div :class="[className]">
     <component
@@ -10,7 +14,6 @@
 </template>
 
 <script>
-  // 通用容器组件
   export default {
     name: 'VmpContainer',
     props: {

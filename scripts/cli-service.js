@@ -7,10 +7,6 @@ const ora = require('ora');
 const btool = require('./btool');
 const { execSync } = require('child_process');
 
-// 是否生产环境
-const isProd = process.env.NODE_ENV === 'production';
-console.log(chalk.bold.bgBlue(` NODE_ENV `), chalk.bold.blue(`${process.env.NODE_ENV}`));
-
 const argv = process.argv;
 // console.log(chalk.bold.bgBlue(` process.argv `), argv);
 // 检查参数的有效性
@@ -21,6 +17,7 @@ if (!btool.checkValidArgs(argv)) {
 // 执行编译命令
 const cmdArgs = Array.prototype.slice.call(argv, 2);
 const cmdOption = cmdArgs.join(' ');
+
 const args = btool.parseArgv(argv);
 const { project, client } = args;
 const spinner = ora();
