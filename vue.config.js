@@ -51,6 +51,12 @@ const sharedConfig = {
     // 启用 CSS modules for all css / pre-processor files.
     requireModuleExtension: true
   },
+  pluginOptions: {
+    'style-resources-loader': {
+      preProcessor: 'less',
+      patterns: [resolve('/src/packages/common/css/common.less')]
+    }
+  },
   // 设置是否在开发环境下每次保存代码时都启用eslint验证
   lintOnSave: 'warning',
   // 不使用thread-loader, 否则有很大概率编译不通过

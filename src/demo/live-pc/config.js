@@ -1,11 +1,16 @@
 import Vue from 'vue';
 import VmpContainer from '@/packages/container';
+import VmpAirContainer from '@/packages/air-container';
 import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
+import VmpHeaderLeft from '@/packages/header-left';
 import serverRegisterMixin from '@/packages/mixins/server-register';
+
 Vue.use(VmpContainer);
+Vue.use(VmpAirContainer);
 Vue.use(VmpIconText);
 Vue.use(VmpLanguageChoice);
+Vue.use(VmpHeaderLeft);
 
 // 全局混入注册逻辑
 Vue.mixin(serverRegisterMixin);
@@ -24,12 +29,20 @@ const layoutConfig = {
 // 服务配置
 const serverConfig = {
   // 顶部容器
-  headerContainer: {
-    component: 'VmpContainer',
-    options: {
-      className: 'vmp-header-container'
-    },
-    children: ['languageChoice']
+  rootHeader: {
+    component: 'VmpAirContainer',
+    children: ['pannelHeaderLeft', 'pannelHeaderRight']
+  },
+  pannelHeaderLeft: {
+    component: 'VmpAirContainer',
+    children: ['compHeaderLeft']
+  },
+  pannelHeaderRight: {
+    component: 'VmpAirContainer',
+    children: ['compLanguageChoice']
+  },
+  compHeaderLeft: {
+    component: 'VmpHeaderLeft'
   },
   // 左侧导航菜单
   asideMenu: {
@@ -39,8 +52,8 @@ const serverConfig = {
     },
     children: ['docIconText', 'wbIconText']
   },
-  // 语言选择
-  languageChoice: {
+  // 语言选择组件
+  compLanguageChoice: {
     component: 'VmpLanguageChoice',
     options: {
       choices: [

@@ -17,8 +17,6 @@
     <link rel="stylesheet" href="<%= css %>" />
     <% } }%>
 
-    <link rel="stylesheet" id="theme" href="./default.css" />
-
     <!-- 使用CDN的JS文件 -->
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <link rel="preload" href="<%= js %>" as="script" />
