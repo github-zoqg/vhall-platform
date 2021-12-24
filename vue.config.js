@@ -85,4 +85,7 @@ if (['serve', 'build'].includes(cmd)) {
 
   // 导出
   module.exports = vueConfig;
+  return;
 }
+
+module.exports = sharedConfig;
