@@ -1,7 +1,7 @@
 <template>
   <div :class="[className]">
     <component
-      v-for="item of widgets"
+      v-for="item of subWidgets"
       :is="item.component"
       :key="item.cuid"
       :cuid="item.cuid"
@@ -18,26 +18,31 @@
     },
     computed: {
       className() {
-        return (
-          this.cuid &&
-          this.$serverConfig &&
-          this.$serverConfig[this.cuid] &&
-          this.$serverConfig[this.cuid].options &&
-          this.$serverConfig[this.cuid].options.className
-        );
+        let arr = [];
+        let outCls = this.widget && this.widget.className;
+        if (outCls && typeof outCls === 'string') {
+          arr.push(outCls);
+        } else if (Array.isArray(outCls)) {
+          arr = arr.concat(outCls);
+        }
+        let innCls = this.widget && this.widget.options && this.widget.options.className;
+        if (innCls && typeof innCls === 'string') {
+          arr.push(innCls);
+        } else if (Array.isArray(innCls)) {
+          arr = arr.concat(innCls);
+        }
+        return Array.from(new Set(arr)).join(' ');
       },
-      widgets() {
+      subWidgets() {
         const rlt = [];
-        if (this.cuid && this.$serverConfig && this.$serverConfig[this.cuid]) {
-          const list = this.$serverConfig[this.cuid].children || [];
-          for (const cuid of list) {
-            const widget = this.$serverConfig[cuid];
-            if (widget && widget.component) {
-              rlt.push({
-                cuid,
-                component: widget.component
-              });
-            }
+        const list = (this.widget && this.widget.children) || [];
+        for (const cuid of list) {
+          const subWidget = window.$serverConfig[cuid];
+          if (subWidget && subWidget.component) {
+            rlt.push({
+              cuid,
+              component: subWidget.component
+            });
           }
         }
         return rlt;

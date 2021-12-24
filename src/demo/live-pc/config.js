@@ -28,29 +28,70 @@ const layoutConfig = {
 
 // 服务配置
 const serverConfig = {
-  // 顶部容器
-  rootHeader: {
+  /*** 布局定义start */
+  // 根节点
+  layerRoot: {
     component: 'VmpAirContainer',
+    children: ['layerHeader', 'layerBody']
+  },
+  // 顶部header容器
+  layerHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-hd',
     children: ['pannelHeaderLeft', 'pannelHeaderRight']
   },
+  // 中间主区域容器
+  layerBody: {
+    component: 'VmpContainer',
+    options: {
+      className: 'vmp-basic-bd'
+    },
+    children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
+  },
+  layerBodyLeft: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-left',
+    children: ['comAsideMenu']
+  },
+  layerBodyCenter: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-center'
+  },
+  layerBodyRight: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-right',
+    children: ['layerBodyRightHeader', 'layerBodyRightBody']
+  },
+  layerBodyRightHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-right__hd'
+  },
+  layerBodyRightBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-right__bd'
+  },
+  /*** 布局定义end */
+
+  /**** 组件定义 */
+  // 顶部左侧容器
   pannelHeaderLeft: {
     component: 'VmpAirContainer',
     children: ['compHeaderLeft']
   },
+  // 顶部右侧容器
   pannelHeaderRight: {
     component: 'VmpAirContainer',
     children: ['compLanguageChoice']
   },
+  // 顶部左侧组件
   compHeaderLeft: {
     component: 'VmpHeaderLeft'
   },
   // 左侧导航菜单
-  asideMenu: {
+  comAsideMenu: {
     component: 'VmpContainer',
-    options: {
-      className: 'vmp-aside-menu'
-    },
-    children: ['docIconText', 'wbIconText']
+    className: 'vmp-aside-menu',
+    children: ['comDocMenu', 'comWbMenu']
   },
   // 语言选择组件
   compLanguageChoice: {
@@ -69,42 +110,29 @@ const serverConfig = {
     }
   },
   // 文档菜单
-  docIconText: {
+  comDocMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont icon-DOCUMENT',
+      icon: 'iconfont iconwendang',
       text: 'i18n.asideMenu.document'
-    },
-    emitClick: {
-      sendToServer: false,
-      command: 'wbIconText:setSelectedState',
-      messsage: {
-        arg: false
-      }
     }
   },
   // 白板菜单
-  wbIconText: {
+  comWbMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont icon-Whiteboard',
+      icon: 'iconfont iconbaiban',
       text: 'i18n.asideMenu.whiteBoard'
     },
     emitClick: [
       {
-        cuid: 'docIconText',
+        cuid: 'comWbMenu',
         method: 'setSelectedState',
-        args: [false]
-      },
-      {
-        cuid: 'docIconText',
-        method: 'setDisableState',
-        args: [false]
+        args: [true]
       }
     ]
   }
 };
 
-window.$serverPool = Vue.prototype.$serverPool = new Map();
 window.$serverConfig = Vue.prototype.$serverConfig = serverConfig;
 window.$layoutConfig = Vue.prototype.$layoutConfig = layoutConfig;
