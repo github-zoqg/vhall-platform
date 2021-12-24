@@ -3,7 +3,10 @@ const chalk = require('chalk');
 const _ = require('lodash');
 const btool = require('./scripts/btool');
 const resolve = dir => path.join(__dirname, dir);
+
+// 是否生产环境
 const isProd = process.env.NODE_ENV === 'production';
+console.log(chalk.bold.bgBlue(`环境 NODE_ENV `), chalk.bold.blue(`${process.env.NODE_ENV}`));
 
 /**
  * 基础配置，静态统一配置
