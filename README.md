@@ -7,6 +7,12 @@
 1. 该工程是中台前端多项目集合。
 2. 所有项项目统一使用 vue2.x 开发,为了兼容 IE11。
 3. 所有项目统一结构（见工程结构项目说明）。
+4. 名词解释：
+
+```text
+lob: Line-of-Business 业务线
+project: 项目
+```
 
 ---
 
@@ -33,7 +39,7 @@ project
 │    │
 │    ├────lite # 轻享项目 （结构参考sass）
 │    │
-│    ├────saas # 直播项
+│    ├────saas # saas业务线
 │    │    ├────admin # 后台管理项目
 │    │    │    ├────...
 │    │    │    ├────...
@@ -141,6 +147,9 @@ npm run lint
 
 ## 检查代码是否符合规则并自动修复
 npm run lint:fix
+
+##统一执行命令
+node scripts/cli-service.js build --lob=${业务线} --project=${项目} --mode=${环境}
 ```
 
 &emsp; 更多命令参考 package.json 中的 scripts 配置
@@ -192,7 +201,7 @@ htmlConfig: {
 }
 ````
 4、多页面支持
- 配置文件：vue-configs/业务线/dev(prod).config.js
+ 配置文件：vue-configs/[lob业务线)]/[mode].config.js
 `````js
 'live-pc': {
     pages: {

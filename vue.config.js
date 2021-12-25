@@ -71,8 +71,15 @@ const sharedConfig = {
   })
 };
 
+// 解析参数成key-value形式：
+// {
+//   _: ['serve'],
+//   lob: 'demo',
+//   project: 'live-pc',
+//   mode: 'development'
+// };
 const argv = btool.parseArgv(process.argv);
-const cmd = argv._[0];
+const cmd = argv._[0]; // 命令
 if (['serve', 'build'].includes(cmd)) {
   // 根据参数获取专用配置信息
   const specialConfig = btool.createSpecialConfig(process.argv);
