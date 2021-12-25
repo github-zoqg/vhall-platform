@@ -80,5 +80,8 @@
   "files.eol": "\n",
   "path-intellisense.mappings": {
     "@": "${workspaceRoot}/src"
-  }
+  },
+  "i18n-ally.localesPaths": [
+    "src/packages/locales"
+  ]
 }
