@@ -4,13 +4,13 @@ export default {
   },
   computed: {
     widget() {
-      return this.cuid && window.$serverConfig && window.$serverConfig[this.cuid];
+      return this.cuid && this.$serverConfig && this.$serverConfig[this.cuid];
     }
   },
   created() {
     //  注册服务到服务池
-    if (this.cuid && window.$middleEventSdk) {
-      window.$middleEventSdk.serverPool.set(this.cuid, this);
+    if (this.cuid && this.$serverPool) {
+      this.$serverPool.set(this.cuid, this);
     }
   }
 };
