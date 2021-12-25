@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import { initGlobal, i18n } from './core';
+import(`./assets/styles/skins/${window.$globalConfig.skin}.less`);
 
 // 初始化
 initGlobal();

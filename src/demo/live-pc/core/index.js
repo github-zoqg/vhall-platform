@@ -3,8 +3,9 @@ import { initUse } from './use';
 import { initMixin } from './mixin';
 import { initI18n } from './locales';
 
+initConfig();
+
 export function initGlobal() {
-  initConfig();
   initUse();
   initMixin();
 }

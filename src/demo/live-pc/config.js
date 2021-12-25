@@ -1,12 +1,6 @@
 export const globalConfig = {
   lang: 'zh',
-  styles: {
-    background: 'lightgreen',
-    color: '#fff',
-    margin: '10px',
-    padding: '10px',
-    'border-radius': '6px'
-  }
+  skin: 'new-year'
 };
 
 // 服务配置

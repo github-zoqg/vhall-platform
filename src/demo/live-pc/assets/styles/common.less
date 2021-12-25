@@ -1,4 +1,3 @@
-/* 全局颜色 */
 // 主颜色和高亮颜色
 @main-color: #1e89e4;
 // 表格头部颜色
@@ -96,6 +95,20 @@
     margin-right: 10px;
     color: @icon-btn-color;
   }
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#app {
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
 }
 
 html {
@@ -715,24 +728,6 @@ button.el-button.el-button--white-primary {
       position: relative;
       display: flex;
       flex-direction: column;
-    }
-  }
-}
-.vmp-basic-layout {
-  .vmp-basic-hd {
-    background: #434343;
-  }
-  .vmp-basic-center {
-    background: #2d2d2d;
-  }
-  .vmp-basic-right {
-    border-left: 1px solid #1f1f1f;
-
-    .vmp-basic-right__hd {
-      background-color: #2d2d2d;
-    }
-    .vmp-basic-right__bd {
-      background-color: #434343;
     }
   }
 }
