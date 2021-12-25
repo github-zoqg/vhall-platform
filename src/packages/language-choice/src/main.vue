@@ -2,7 +2,7 @@ e
 <!-- 主题选择组件 -->
 <template>
   <div class="vmp-language-choice">
-    <span>选择语言:</span>
+    <span>{{ $t('i18n.languageChoice.label') }}</span>
     <select class="vmp-language-choice__select" v-model="lang" @change="handleChange">
       <option v-for="item of choices" :value="item.value" :key="item.value">
         {{ item.label.startsWith('i18n') ? $t(item.label) : item.label }}
@@ -15,6 +15,7 @@ e
     name: 'VmpLanguageChoice',
     data() {
       return {
+        label: '',
         lang: '',
         choices: []
       };
@@ -55,3 +56,14 @@ e
     }
   };
 </script>
+<style lang="less">
+  .vmp-language-choice {
+    display: inline-block;
+    color: #fff;
+    font-size: 12px;
+  }
+  .vmp-language-choice__select {
+    color: #fff;
+    margin: 0 12px 0 6px;
+  }
+</style>

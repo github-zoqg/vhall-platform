@@ -1,6 +1,7 @@
 module.exports = {
   i18n: {
     languageChoice: {
+      label: 'language Choice',
       zh: '中文',
       en: 'English'
     },

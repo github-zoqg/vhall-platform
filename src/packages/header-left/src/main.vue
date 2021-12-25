@@ -9,7 +9,7 @@
       </div>
     </div>
     <!---->
-    <div class="delay-icon">
+    <div class="nopdelay-icon">
       <img
         src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
         alt=""
@@ -63,3 +63,78 @@
     }
   };
 </script>
+<style lang="less">
+  .vmp-header-left {
+    display: flex;
+    height: 100%;
+    margin-left: 20px;
+    justify-content: flex-start;
+    align-items: center;
+
+    .vhall-room-name {
+      font-size: 16px;
+      color: #fff;
+      line-height: 22px;
+      max-width: 720px;
+      margin-right: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .vhall-room-id-container {
+      height: 20px;
+      border-radius: 2px;
+      border: 1px solid #979797;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+      flex-direction: row;
+      -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+      justify-content: space-between;
+      padding-right: 3px;
+    }
+
+    .vhall-room-id-icon {
+      width: 22px;
+      height: 20px;
+      background: #979797;
+      font-size: 12px;
+      color: #fff;
+      line-height: 19px;
+      text-align: center;
+    }
+    .vhall-room-id {
+      width: 100%;
+      height: 20px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #999;
+      line-height: 20px;
+      padding-left: 2px;
+      text-align: center;
+    }
+    .vhall-room-id-copy {
+      width: 19px;
+      height: 19px;
+      color: #999;
+      line-height: 20px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .nopdelay-icon {
+      height: 34px;
+      margin-left: 4px;
+      margin-top: 3px;
+
+      img {
+        display: inline-block;
+        width: 100%;
+        height: 28px;
+      }
+    }
+  }
+</style>

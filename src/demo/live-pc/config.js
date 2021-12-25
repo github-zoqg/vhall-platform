@@ -1,21 +1,4 @@
-import Vue from 'vue';
-import VmpContainer from '@/packages/container';
-import VmpAirContainer from '@/packages/air-container';
-import VmpIconText from '@/packages/icon-text';
-import VmpLanguageChoice from '@/packages/language-choice';
-import VmpHeaderLeft from '@/packages/header-left';
-import serverRegisterMixin from '@/packages/mixins/server-register';
-
-Vue.use(VmpContainer);
-Vue.use(VmpAirContainer);
-Vue.use(VmpIconText);
-Vue.use(VmpLanguageChoice);
-Vue.use(VmpHeaderLeft);
-
-// 全局混入注册逻辑
-Vue.mixin(serverRegisterMixin);
-
-const layoutConfig = {
+export const globalConfig = {
   lang: 'zh',
   styles: {
     background: 'lightgreen',
@@ -27,7 +10,7 @@ const layoutConfig = {
 };
 
 // 服务配置
-const serverConfig = {
+export const serverConfig = {
   /*** 布局定义start */
   // 根节点
   layerRoot: {
@@ -80,7 +63,8 @@ const serverConfig = {
   },
   // 顶部右侧容器
   pannelHeaderRight: {
-    component: 'VmpAirContainer',
+    component: 'VmpContainer',
+    className: 'vmp-header-right',
     children: ['compLanguageChoice']
   },
   // 顶部左侧组件
@@ -133,6 +117,3 @@ const serverConfig = {
     ]
   }
 };
-
-window.$serverConfig = Vue.prototype.$serverConfig = serverConfig;
-window.$layoutConfig = Vue.prototype.$layoutConfig = layoutConfig;
