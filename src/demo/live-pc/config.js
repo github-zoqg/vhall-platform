@@ -94,7 +94,19 @@ export const serverConfig = {
     options: {
       icon: 'iconfont iconwendang',
       text: 'i18n.asideMenu.document'
-    }
+    },
+    emitClick: [
+      {
+        cuid: 'comDocMenu',
+        method: 'setSelectedState',
+        args: [true]
+      },
+      {
+        cuid: 'comWbMenu',
+        method: 'setSelectedState',
+        args: [false]
+      }
+    ]
   },
   // 白板菜单
   comWbMenu: {
@@ -104,6 +116,11 @@ export const serverConfig = {
       text: 'i18n.asideMenu.whiteBoard'
     },
     emitClick: [
+      {
+        cuid: 'comDocMenu',
+        method: 'setSelectedState',
+        args: [false]
+      },
       {
         cuid: 'comWbMenu',
         method: 'setSelectedState',
