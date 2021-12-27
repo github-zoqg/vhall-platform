@@ -68,9 +68,8 @@ export const serverConfig = {
   },
   // 左侧导航菜单
   comAsideMenu: {
-    component: 'VmpContainer',
-    className: 'vmp-aside-menu',
-    children: ['comDocMenu', 'comWbMenu']
+    component: 'VmpAsideMenu',
+    children: ['comDocMenu', 'comWbMenu', 'comShareDesktopMenu', 'comMediaPlayMenu']
   },
   // 语言选择组件
   compLanguageChoice: {
@@ -97,14 +96,9 @@ export const serverConfig = {
     },
     emitClick: [
       {
-        cuid: 'comDocMenu',
+        cuid: 'comAsideMenu',
         method: 'setSelectedState',
-        args: [true]
-      },
-      {
-        cuid: 'comWbMenu',
-        method: 'setSelectedState',
-        args: [false]
+        args: ['comDocMenu']
       }
     ]
   },
@@ -117,14 +111,33 @@ export const serverConfig = {
     },
     emitClick: [
       {
-        cuid: 'comDocMenu',
+        cuid: 'comAsideMenu',
         method: 'setSelectedState',
-        args: [false]
-      },
+        args: ['comWbMenu']
+      }
+    ]
+  },
+  // 桌面共享
+  comShareDesktopMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'iconfont iconzhuomiangongxiang',
+      text: 'i18n.asideMenu.shareDesktop',
+      disable: true
+    }
+  },
+  // 插播文件
+  comMediaPlayMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'iconfont iconwangyechabo_icon',
+      text: 'i18n.asideMenu.mediaPlay'
+    },
+    emitClick: [
       {
-        cuid: 'comWbMenu',
+        cuid: 'comAsideMenu',
         method: 'setSelectedState',
-        args: [true]
+        args: ['comMediaPlayMenu']
       }
     ]
   },
