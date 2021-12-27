@@ -13,7 +13,7 @@ module.exports = {
       document: '文档',
       whiteBoard: '白板',
       shareDesktop: '桌面共享',
-      mediaPlay: '媒体播放'
+      mediaPlay: '插播文件'
     }
   }
 };
