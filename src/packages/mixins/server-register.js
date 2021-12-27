@@ -9,7 +9,7 @@ export default {
   },
   created() {
     //  注册服务到服务池
-    if (this.cuid && window.$middleEventSdk) {
+    if (this.cuid && this.componentType !== 'CONTAINER' && window.$middleEventSdk) {
       window.$middleEventSdk.serverPool.set(this.cuid, this);
     }
   }

@@ -17,7 +17,13 @@
   export default {
     name: 'VmpContainer',
     props: {
-      cuid: String
+      cuid: String,
+      componentType: {
+        type: String,
+        default: () => {
+          return 'CONTAINER'; // 容器类型
+        }
+      }
     },
     computed: {
       className() {
