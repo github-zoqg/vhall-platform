@@ -92,7 +92,6 @@ const sharedConfig = {
 // };
 const argv = btool.parseArgv(process.argv);
 const cmd = argv._[0];
-console.log('---argv---', argv);
 
 // 打包分析
 if (argv.analyze) {
