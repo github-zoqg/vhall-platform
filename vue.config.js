@@ -3,6 +3,7 @@ const chalk = require('chalk');
 const _ = require('lodash');
 const btool = require('./scripts/btool');
 const resolve = dir => path.join(__dirname, dir);
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 // 是否生产环境
 const isProd = process.env.NODE_ENV === 'production';
@@ -26,7 +27,11 @@ const sharedConfig = {
     // 防止将某些 import 的包(package)打包到 bundle 中
     externals: {
       vue: 'Vue',
-      'vue-router': 'VueRouter'
+      'vue-router': 'VueRouter',
+      'vue-i18n': 'VueI18n',
+      moment: 'moment',
+      'element-ui': 'ELEMENT',
+      'vhall-sass-domain': 'middleDomain'
     }
   },
   chainWebpack: config => {
@@ -67,7 +72,14 @@ const sharedConfig = {
   devServer: Object.assign({
     port: 8080,
     host: '0.0.0.0',
-    contentBase: [resolve('public'), resolve('src/packages/theme-chalk')]
+    contentBase: [resolve('public'), resolve('src/packages/theme-chalk')],
+    proxy: {
+      '/mock': {
+        target: 'http://yapi.vhall.domain',
+        changeOrigin: true,
+        pathRewrite: { '^/mock': '/mock/749' }
+      }
+    }
   })
 };
 
@@ -79,7 +91,28 @@ const sharedConfig = {
 //   mode: 'development'
 // };
 const argv = btool.parseArgv(process.argv);
-const cmd = argv._[0]; // 命令
+const cmd = argv._[0];
+console.log('---argv---', argv);
+
+// 打包分析
+if (argv.analyze) {
+  sharedConfig.configureWebpack.plugins || (sharedConfig.configureWebpack.plugins = []);
+  sharedConfig.configureWebpack.plugins.push(
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'server',
+      analyzerHost: '127.0.0.1',
+      analyzerPort: 9001,
+      reportFilename: 'report.html',
+      defaultSizes: 'parsed',
+      openAnalyzer: true,
+      generateStatsFile: false,
+      statsFilename: 'stats.json',
+      statsOptions: null,
+      logLevel: 'info'
+    })
+  );
+}
+
 if (['serve', 'build'].includes(cmd)) {
   // 根据参数获取专用配置信息
   const specialConfig = btool.createSpecialConfig(process.argv);

@@ -32,7 +32,8 @@ export const serverConfig = {
   },
   layerBodyCenter: {
     component: 'VmpContainer',
-    className: 'vmp-basic-center'
+    className: 'vmp-basic-center',
+    children: ['comPcPlayer']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -109,5 +110,9 @@ export const serverConfig = {
         args: [true]
       }
     ]
+  },
+  // 播放器
+  comPcPlayer: {
+    component: 'VmpPcPlayer'
   }
 };

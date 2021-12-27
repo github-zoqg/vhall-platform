@@ -9,6 +9,7 @@ import VmpAirContainer from '@/packages/air-container';
 import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
+import VmpPcPlayer from '@/packages/pc-player';
 
 // 全局注册组件
 export function initUse() {
@@ -18,4 +19,5 @@ export function initUse() {
   Vue.use(VmpIconText);
   Vue.use(VmpLanguageChoice);
   Vue.use(VmpHeaderLeft);
+  Vue.use(VmpPcPlayer);
 }
