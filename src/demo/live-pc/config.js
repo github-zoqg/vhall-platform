@@ -4,6 +4,7 @@ import VmpAirContainer from '@/packages/air-container';
 import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
+import VmpPcPlayer from '@/packages/pc-player';
 import serverRegisterMixin from '@/packages/mixins/server-register';
 
 Vue.use(VmpContainer);
@@ -11,6 +12,7 @@ Vue.use(VmpAirContainer);
 Vue.use(VmpIconText);
 Vue.use(VmpLanguageChoice);
 Vue.use(VmpHeaderLeft);
+Vue.use(VmpPcPlayer);
 
 // 全局混入注册逻辑
 Vue.mixin(serverRegisterMixin);
@@ -55,7 +57,8 @@ const serverConfig = {
   },
   layerBodyCenter: {
     component: 'VmpContainer',
-    className: 'vmp-basic-center'
+    className: 'vmp-basic-center',
+    children: ['comPcPlayer']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -131,6 +134,10 @@ const serverConfig = {
         args: [true]
       }
     ]
+  },
+  // 播放器
+  comPcPlayer: {
+    component: 'VmpPcPlayer'
   }
 };
 
