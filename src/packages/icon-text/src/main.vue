@@ -67,7 +67,10 @@
       // click事件
       handleClick: function () {
         if (this.disable) return false;
-        window.$middleEventSdk?.event?.send(`${this.cuid}:emitClick`);
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitClick'
+        });
       }
     }
   };

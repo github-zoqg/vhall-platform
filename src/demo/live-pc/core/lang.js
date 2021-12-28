@@ -12,8 +12,8 @@ export function initI18n(lang = 'zh') {
   const i18n = new VueI18n({
     locale: lan || window.$globalConfig?.lang || lang,
     messages: {
-      zh: require('./zh-CN.js'),
-      en: require('./en-US.js')
+      zh: require('../languages/zh-CN.js'),
+      en: require('../languages/en-US.js')
     }
   });
   return i18n;

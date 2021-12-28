@@ -46,9 +46,9 @@ e
             this.lang = widget.options.lang;
           }
         }
-        if (!this.lang) {
-          this.lang = window.$layoutConfig.lang;
-        }
+        // if (!this.lang) {
+        //   this.lang = window.$layoutConfig.lang;
+        // }
       },
       handleChange: function () {
         window.location.reload();

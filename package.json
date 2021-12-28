@@ -5,6 +5,7 @@
   "scripts": {
     "/****/": "-------------demo开发----------------",
     "demo": "node scripts/cli-service.js serve --lob=demo --project=live-pc --mode=development",
+    "build:demo:live-pc": "node scripts/cli-service.js build --lob=demo --project=live-pc",
     "/---/": "-------------saas业务线相关命令----------------",
     "serve": "npm run serve:saas:live-pc",
     "serve:saas:live-pc": "node scripts/cli-service.js serve --lob=saas --project=live-pc",
@@ -18,7 +19,6 @@
     "build:saas:admin": "node scripts/cli-service.js build --lob=saas --project=admin",
     "build:saas:console": "node scripts/cli-service.js build --lob=saas --project=console",
     "build:saas:all": "node scripts/cli-service.js build --lob=saas --project=all",
-    "build": "",
     "/***/": "-------------其它命令----------------",
     "help:lint": "node_modules/.bin/vue-cli-service help lint",
     "format": "prettier --write './src/**/*.(vue|js|css|less|jsx)' './scripts/**/*.js' './vue-configs/**/*.js'",

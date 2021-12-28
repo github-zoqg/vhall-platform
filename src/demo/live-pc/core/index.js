@@ -1,7 +1,7 @@
 import { initConfig } from './config';
 import { initUse } from './use';
 import { initMixin } from './mixin';
-import { initI18n } from './locales';
+import { initI18n } from './lang';
 
 initConfig();
 
