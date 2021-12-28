@@ -59,12 +59,6 @@ const sharedConfig = {
     // 启用 CSS modules for all css / pre-processor files.
     requireModuleExtension: true
   },
-  pluginOptions: {
-    'style-resources-loader': {
-      preProcessor: 'less',
-      patterns: [resolve('/src/packages/common/css/common.less')]
-    }
-  },
   // 设置是否在开发环境下每次保存代码时都启用eslint验证
   lintOnSave: 'warning',
   // 不使用thread-loader, 否则有很大概率编译不通过
@@ -92,6 +86,15 @@ const sharedConfig = {
 // };
 const argv = btool.parseArgv(process.argv);
 const cmd = argv._[0];
+
+if (!sharedConfig.pluginOptions) {
+  sharedConfig.pluginOptions = {};
+}
+
+sharedConfig.pluginOptions['style-resources-loader'] = {
+  preProcessor: 'less',
+  patterns: [resolve(`/src/${argv.lob}/${argv.project}/assets/styles/variables.less`)]
+};
 
 // 打包分析
 if (argv.analyze) {
