@@ -388,7 +388,7 @@
 }
 
 .hljs-link {
-  text-decoration: underline;
+  /* text-decoration: underline; */
 }
 
 /* 代码高亮 */

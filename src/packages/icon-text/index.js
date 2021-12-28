@@ -1,8 +1,8 @@
-import VmpAsideMenu from './src/main';
+import VmpIconText from './src/main';
 
 /* istanbul ignore next */
-VmpAsideMenu.install = function (Vue) {
-  Vue.component(VmpAsideMenu.name, VmpAsideMenu);
+VmpIconText.install = function (Vue) {
+  Vue.component(VmpIconText.name, VmpIconText);
 };
 
-export default VmpAsideMenu;
+export default VmpIconText;
