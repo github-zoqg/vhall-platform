@@ -1,0 +1,35 @@
+module.exports = {
+  root: true,
+  env: {
+    node: true
+  },
+  extends: [
+    'plugin:vue/essential',
+    '@vue/standard'
+  ],
+  parserOptions: {
+    parser: 'babel-eslint',
+    project: "tsconfig.json"
+  },
+  globals: {
+    BMap: true,
+    Vhall: true,
+    VhallInteraction: true,
+    VhallRTC: true,
+    VhallPlayer: true,
+    VHall_Questionnaire_Service: true,
+    VHall_Questionnaire_Const: true,
+    VHPublisher: true,
+    VHDocSDK: true,
+    VhallChat: true,
+    VhallReport: true,
+    $: true,
+    wx: true,
+    WeixinJSBridge: true
+  },
+  rules: {
+    'eqeqeq': 0,
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+  }
+}

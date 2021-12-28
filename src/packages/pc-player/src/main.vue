@@ -20,7 +20,7 @@
       this.playerServer.getPlayerConfig();
     },
     mounted() {
-      // this.initPlayer();
+      this.initPlayer();
     },
     methods: {
       // 初始化播放器配置项
@@ -69,14 +69,14 @@
             this.playerServer.openControls(false);
             this.playerServer.openUI(false);
 
-            // if (this.isLive) {
-            //   resolve();
-            // } else {
-            //   this.playerServer.on(VhallPlayer.LOADED, () => {
-            //     this.loaded = true;
-            //     resolve();
-            //   });
-            // }
+            if (this.isLive) {
+              resolve();
+            } else {
+              // this.playerServer.on(VhallPlayer.LOADED, () => {
+              //   this.loaded = true;
+              //   resolve();
+              // });
+            }
           });
         });
       },
