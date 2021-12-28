@@ -46,7 +46,8 @@ export const serverConfig = {
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__bd'
+    className: 'vmp-basic-right__bd',
+    children: ['comChat']
   },
   /*** 布局定义end */
 
@@ -144,5 +145,9 @@ export const serverConfig = {
   // 播放器
   comPcPlayer: {
     component: 'VmpPcPlayer'
+  },
+  //聊天组件
+  comChat: {
+    component: 'VmpChat'
   }
 };
