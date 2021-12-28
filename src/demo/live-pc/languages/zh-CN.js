@@ -14,6 +14,14 @@ module.exports = {
       whiteBoard: '白板',
       shareDesktop: '桌面共享',
       mediaPlay: '插播文件'
+    },
+    player: {
+      original: '原画',
+      fhd: '超清',
+      hd: '高清',
+      sd: '标清',
+      audio: '音频',
+      speed: '倍速'
     }
   }
 };

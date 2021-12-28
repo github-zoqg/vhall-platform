@@ -14,6 +14,14 @@ module.exports = {
       whiteBoard: 'board',
       shareDesktop: 'desktop',
       mediaPlay: 'play'
+    },
+    player: {
+      original: 'Original',
+      fhd: 'FHD',
+      hd: 'HD',
+      sd: 'SD',
+      audio: 'Audio',
+      speed: 'Speed'
     }
   }
 };

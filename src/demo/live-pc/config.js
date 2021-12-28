@@ -143,6 +143,9 @@ export const serverConfig = {
   },
   // 播放器
   comPcPlayer: {
-    component: 'VmpPcPlayer'
+    component: 'VmpPcPlayer',
+    options: {
+      text: 'i18n.player'
+    }
   }
 };
