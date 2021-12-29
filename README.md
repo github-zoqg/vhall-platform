@@ -10,7 +10,6 @@
 4. 名词解释：
 
 ```text
-lob: Line-of-Business 业务线
 project: 项目
 ```
 
@@ -32,34 +31,22 @@ project
 │    └────...
 │
 ├── src
-│    ├────demo # demo业务线
-│    │    ├────live-pc # PC直播
-│    │    │    ├────...
+│    ├────demo-live # demoPC直播项目
+│    │    ├────...
 │    │
-│    ├────saas # saas业务线
-│    │    │
-│    │    ├────live-pc # 直播PC端
-│    │    │    ├────...
-│    │    │    ├────...
-│    │    │    └────...
-│    │    │
-│    │    ├────watch-h5 # 观看H5端
-│    │    │    ├────...
-│    │    │    ├────...
-│    │    │    └────...
-│    │    │
-│    │    └────watch-pc # 观看pc端
-│    │    │    ├────...
-│    │    │    ├────...
-│    │    │    └────...
+│    ├────saas-live # saasPC直播端
+│    │    ├────...
+│    │    ├────...
+│    │    ├────main.js  #项目入口文件
+│    │    ├────package.json #项目的name、version配置
+│    │    ├────webpack.base.config #项目共用配置
+│    │    ├────webpack.dev.config #项目开发环境配置
+│    │    └────webpack.prod.config #项目生产环境配置
 │    │
-├── vue-configs  # 项目编译配置文件
-│    ├────demo
-│    │    ├────development.config.js
-│    │    └────prodution.config.js
-│    ├────sass  # 配置文件相关
-│    │    ├────development.config.js  // 与环境变量NODE_ENV对应
-│    │    └────prodution.config.js
+│    ├────saas-watch # saasPC观看端
+│    │    ├────...
+│    │    ├────...
+│    │    └────...
 │    │
 ├── .browserslistrc #目标浏览器配置
 ├── .editorconifg #编辑器规范配置
@@ -97,14 +84,14 @@ project
 
 ```shell
 
-## [demo/live-pc]项目启动
+## [demo-live]项目启动
 yarn demo
 
-## [saas/live-pc]项目启动
-yarn run serve 或 yarn run serve:saas:live-pc
+## [saas-live]项目启动
+yarn run serve 或 yarn run serve:saas-live
 
-## [zhike/live-pc]项目启动
-yarn run serve:zhike:live-pc
+## [zhike-live]项目启动
+yarn run serve:zhike-live
 
 ## ...
 
@@ -114,14 +101,11 @@ yarn run serve:zhike:live-pc
 
 ```shell
 
-## 编译[demo/live-pc]项目
-npm run build:demo:live-pc
+## 编译[demo-live]项目
+npm run build:demo-live
 
-## 编译[saas/live-pc]项目
-npm run build:saas:live-pc
-
-## 编译saas业务线的全部项目
-npm run build:saas:all
+## 编译[saas-live]项目
+npm run build:saas-live
 
 ```
 
@@ -139,7 +123,7 @@ npm run lint
 npm run lint:fix
 
 ##统一执行命令
-node scripts/cli-service.js build --lob=${业务线} --project=${项目} --mode=${环境}
+node scripts/cli-service.js build --project=${项目} --mode=${环境}
 ```
 
 &emsp; 更多命令参考 package.json 中的 scripts 配置
@@ -181,66 +165,11 @@ export const globalConfig = {
 ## 编译配置及多页面支持
 
 1、根目录下的 vue.config.js 是全局共用配置，里面定义了全局共用配置内容。  
-2、所有业务线的专有配置都在 vue-configs 目录下，其中 default.config.js 是专有缺省配置。  
-3、每个业务线/应用端的项目最终配置，都是 全局共用配置+ 专有缺省配置 + 专有个性配置 合并而成。
-合并采用方式：不同配置增量合并，对于相同子项，后面的配置会覆盖前面的配置。  
-例如：
-如果专有缺省配置内容如下
-
-```js
-htmlConfig: {
-    cdnJs: {
-      vue: '//cdn.jsdelivr.net/npm/vue@3.2.24/dist/vue.global.min.js',
-      VueRouter:'//cdn.jsdelivr.net/npm/vue-router@4.0.12/dist/vue-router.global.min.js'
-    }
-}
-```
-
-如果专有个性配置内容如下：
-
-```js
-htmlConfig: {
-    cdnJs: {
-      VueRouter: '',
-      Vuex:'https://cdn.jsdelivr.net/npm/vuex@4.0.2/dist/vuex.global.min.js'
-    }
-    ...
-}
-```
-
-那么合并后的结果是：
-
-```js
-htmlConfig: {
-    cdnJs: {
-      vue: '//cdn.jsdelivr.net/npm/vue@3.2.24/dist/vue.global.min.js',
-      VueRouter: '', // 内容为空的cdn文件不会嵌入html中（可以用来排除某些专项不需要的缺省cdn文件）
-      Vuex:'https://cdn.jsdelivr.net/npm/vuex@4.0.2/dist/vuex.global.min.js'
-    }
-
-}
-```
-
-4、配置文件：vue-configs/[lob 业务线)]/[mode].config.js
-
-```js
- live-pc: {
-    pages: {
-      index: { // 页面key
-        entry: 'main.js', //入口
-      },
-      second: {
-        entry: 'second.js',
-        filename: 'second.html', //文件名，可选。不填写默认是 ${页面key}.html
-        htmlConfig: {
-          cdnJs: {
-            vue: '//cdn.jsdelivr.net/npm/vue@3.2.24/dist/vue.global.js'
-          }
-        }
-      }
-    }
-  }
-```
+2、每个项目的专有配置都在项目自己的根目录下，形如 webpack.[env].config.js。  
+3、默认支持多页面，所有配置参数可参考官方文档：
+<a href="https://cli.vuejs.org/zh/config/">Vue Cli Config</a>。  
+4、每个项目最终配置，都是 全局共用配置+ 专有个性配置 合并而成。  
+合并采用方式：不同配置增量合并，对于相同子项，后面的配置会覆盖前面的配置。
 
 ---
 
