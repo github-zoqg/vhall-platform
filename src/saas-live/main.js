@@ -1,15 +1,13 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
-import { initGlobal, i18n } from './core';
-import(`./assets/styles/skins/${window.$globalConfig.skin}.less`);
-import moment from 'moment';
+import { initGlobalAPI, i18n } from './core';
+import(`./assets/styles/skins/${window.$globalConfig.currentSkin}.less`);
 import './domain';
 
 // 初始化
-initGlobal();
+initGlobalAPI();
 
-Vue.prototype.$moment = moment;
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
