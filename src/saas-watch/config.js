@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'layerFooter']
   },
   // 顶部header容器
   layerHeader: {
@@ -23,7 +23,12 @@ export const serverConfig = {
     options: {
       className: 'vmp-basic-bd'
     },
-    children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
+    children: ['layerBodyCenter', 'layerBodyRight']
+  },
+  // 底部主区域容器
+  layerFooter: {
+    component: 'VmpFooter',
+    className: 'vmp-footer'
   },
   layerBodyLeft: {
     component: 'VmpContainer',
@@ -33,7 +38,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comPcPlayer']
+    children: ['comPcPlayer', 'comFooterTools']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -145,6 +150,14 @@ export const serverConfig = {
   // 播放器
   comPcPlayer: {
     component: 'VmpPcPlayer'
+  },
+  // 底部
+  comFooter: {
+    component: 'VmpFooter'
+  },
+  // 底部工具栏（如人数， 热度等）
+  comFooterTools: {
+    component: 'VmpFooterTools'
   },
   //聊天组件
   comChat: {
