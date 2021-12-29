@@ -28,13 +28,13 @@
     computed: {
       className() {
         let arr = [];
-        let outCls = this.widget && this.widget.className;
+        let outCls = this.widget?.className;
         if (outCls && typeof outCls === 'string') {
           arr.push(outCls);
         } else if (Array.isArray(outCls)) {
           arr = arr.concat(outCls);
         }
-        let innCls = this.widget && this.widget.options && this.widget.options.className;
+        let innCls = this.widget?.options?.className;
         if (innCls && typeof innCls === 'string') {
           arr.push(innCls);
         } else if (Array.isArray(innCls)) {

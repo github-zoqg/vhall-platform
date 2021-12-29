@@ -9,6 +9,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/lives/room/:id',
+    component: Home,
+    name: 'LiveRoom',
+    meta: { title: '直播间' }
   }
   // {
   //   path: '/about',

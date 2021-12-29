@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-basic-layout">
-    <div class="vmp-basic-container">
+    <div class="vmp-basic-container" v-if="isInit">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
   </div>
@@ -10,28 +10,34 @@
   import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
   export default {
     name: 'Home',
-    data() {},
+    data() {
+      return {
+        isInit: false
+      };
+    },
     beforeCreate() {
       this.roomInitGroupServer = useRoomInitGroupServer();
     },
     created() {
-      this.setToken();
+      // 初始化直播房间
       this.initSendLive();
     },
     methods: {
-      setToken() {
-        localStorage.setItem(
-          'token',
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODMyNDgsImV4cCI6MTY0MzI3NTI0OCwidXNlcl9pZCI6IjE2NDIyNzcwIiwicGxhdGZvcm0iOiI3IiwiY2giOiJiIiwiYnVzaW5lc3NfYWNjb3VudF9pZCI6IiJ9.zBKTqqn4EEmLKHduBlUfsmqMMU1I3vPmBfjfGR1cXfo'
-        );
-      },
-      initSendLive() {
-        this.roomInitGroupServer.initSendLive({
-          webinarId: 693742622,
+      // 初始化直播房间
+      async initSendLive() {
+        const { id } = this.$route.params;
+        const { token } = this.$route.query;
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+        await this.roomInitGroupServer.initSendLive({
+          webinarId: id,
           requestHeaders: {
             token: localStorage.getItem('token')
           }
         });
+        // 初始化完成
+        this.isInit = true;
       },
       initChatSDK() {
         this.msgServer = contextServer.get('msgServer');
