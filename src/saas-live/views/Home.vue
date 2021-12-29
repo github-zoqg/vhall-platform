@@ -1,18 +1,29 @@
 <template>
-  <div class="vmp-basic-layout">
-    <div class="vmp-basic-container" v-if="isInit">
+  <div
+    class="vmp-basic-layout"
+    v-loading="state === 0"
+    element-loading-text="加载中..."
+    element-loading-background="rgba(255, 255, 255, 0.1)"
+  >
+    <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
+    <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
   </div>
 </template>
 
 <script>
+  import MsgTip from './MsgTip.vue';
   import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
   export default {
     name: 'Home',
+    components: {
+      MsgTip
+    },
     data() {
       return {
-        isInit: false
+        state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败
+        errMsg: ''
       };
     },
     beforeCreate() {
@@ -30,14 +41,21 @@
         if (token) {
           localStorage.setItem('token', token);
         }
-        await this.roomInitGroupServer.initSendLive({
-          webinarId: id,
-          requestHeaders: {
-            token: localStorage.getItem('token')
-          }
-        });
-        // 初始化完成
-        this.isInit = true;
+        try {
+          await this.roomInitGroupServer.initSendLive({
+            webinarId: id,
+            requestHeaders: {
+              token: localStorage.getItem('token')
+            }
+          });
+          // 初始化完成
+          this.state = 1;
+        } catch (ex) {
+          console.log('---ex--');
+          console.log(ex);
+          this.state = 2;
+          this.errMsg = ex.msg;
+        }
       },
       initChatSDK() {
         this.msgServer = contextServer.get('msgServer');
