@@ -59,6 +59,7 @@ textarea {
   width: 100%;
   height: 50px;
   line-height: 50px;
+  background-color: #434343;
   z-index: 12;
   justify-content: space-between;
   border-bottom: 1px solid #353535;
@@ -132,31 +133,4 @@ textarea {
 .vmp-header-right {
   flex: 1;
   text-align: right;
-}
-.vmp-basic-layout select {
-  background: #777;
-}
-.vmp-basic-layout .vmp-basic-hd {
-  background-image: linear-gradient(to right, #880203, #b30304);
-  background-color: #b30304;
-  background-repeat: no-repeat;
-  border-bottom: 0;
-}
-.vmp-basic-layout .vmp-basic-left {
-  background: #880203;
-  border-top: 0;
-}
-.vmp-basic-layout .vmp-icon-text {
-  text-decoration: none;
-}
-.vmp-basic-layout .vmp-icon-text:hover {
-  color: #defc56;
-}
-.vmp-basic-layout .vmp-icon-text.selected span.text,
-.vmp-basic-layout .vmp-icon-text.selected i {
-  color: #defc56;
-}
-.vmp-header-left .vhall-room-id,
-.vmp-header-left .vhall-room-id-copy {
-  color: #fff;
 }
