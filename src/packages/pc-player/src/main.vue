@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-player-container">
-    <div id="vmp-player" class="vmp-player">pc端播放器组件</div>
+    <div id="vmp-player" class="vmp-player"></div>
   </div>
 </template>
 <script>
@@ -17,10 +17,12 @@
       this.playerServer = usePlayerServer();
     },
     created() {
-      this.playerServer.getPlayerConfig();
+      // this.playerServer.getPlayerConfig();
     },
     mounted() {
-      this.initPlayer();
+      setTimeout(() => {
+        this.initPlayer();
+      }, 1000);
     },
     methods: {
       // 初始化播放器配置项
@@ -74,7 +76,7 @@
             } else {
               // this.playerServer.on(VhallPlayer.LOADED, () => {
               //   this.loaded = true;
-              //   resolve();
+              resolve();
               // });
             }
           });
