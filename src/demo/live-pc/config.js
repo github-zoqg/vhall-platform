@@ -46,7 +46,8 @@ export const serverConfig = {
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__bd'
+    className: 'vmp-basic-right__bd',
+    children: ['comChat']
   },
   /*** 布局定义end */
 
@@ -147,5 +148,9 @@ export const serverConfig = {
     options: {
       text: 'i18n.player'
     }
+  },
+  //聊天组件
+  comChat: {
+    component: 'VmpChat'
   }
 };
