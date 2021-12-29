@@ -44,7 +44,7 @@
     methods: {
       // 初始化配置
       initConfig() {
-        const widget = this.$serverConfig && this.$serverConfig[this.cuid];
+        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
         if (widget && widget.options) {
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('className')) {
@@ -86,7 +86,6 @@
         const clipboard = new this.$clipboard('.vhall-room-id-copy');
         clipboard.on('success', e => {
           this.$message.success(this.$t('i18n.usual.copySucceeded'));
-          e.clearSelection();
           clipboard.destroy();
         });
         clipboard.on('error', e => {
@@ -146,7 +145,7 @@
       height: 20px;
       font-size: 12px;
       font-weight: 400;
-      // color: #999;
+      color: #999;
       line-height: 20px;
       padding-left: 2px;
       text-align: center;
@@ -160,9 +159,8 @@
       cursor: pointer;
     }
     .nopdelay-icon {
-      height: 34px;
+      line-height: 34px;
       margin-left: 4px;
-      margin-top: 3px;
 
       img {
         display: inline-block;

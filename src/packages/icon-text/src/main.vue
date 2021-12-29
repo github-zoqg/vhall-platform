@@ -31,7 +31,7 @@
     methods: {
       // 初始化配置
       initConfig() {
-        const widget = this.$serverConfig?.[this.cuid];
+        const widget = window.$serverConfig?.[this.cuid];
         if (widget && widget.options) {
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('className')) {
