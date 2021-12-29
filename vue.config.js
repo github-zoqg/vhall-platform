@@ -24,8 +24,6 @@ const cmd = argv._[0];
  * 共享配置
  */
 const sharedConfig = {
-  // 相对路径
-  publicPath: './',
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
     devtool: isProd ? false : '#cheap-module-eval-source-map',
@@ -82,17 +80,17 @@ const sharedConfig = {
     // 配置全局less变量
     'style-resources-loader': {
       preProcessor: 'less',
-      patterns: [resolve(`/src/${argv.lob}/${argv.project}/assets/styles/variables.less`)]
+      patterns: [resolve(`/src/${argv.project}/assets/styles/variables.less`)]
     }
   },
   // 设置是否在开发环境下每次保存代码时都启用eslint验证
   lintOnSave: 'warning',
   // 不使用thread-loader, 否则有很大概率编译不通过
   parallel: false,
-  devServer: Object.assign({
+  devServer: {
     port: 8080,
     host: '0.0.0.0',
-    contentBase: [resolve('public'), resolve('src/packages/theme-chalk')],
+    contentBase: resolve('public'),
     proxy: {
       '/mock': {
         target: 'http://yapi.vhall.domain',
@@ -100,12 +98,12 @@ const sharedConfig = {
         pathRewrite: { '^/mock': '/mock/749' }
       }
     }
-  })
+  }
 };
 
 if (['serve', 'build'].includes(cmd)) {
   // 根据参数获取专用配置信息
-  const specialConfig = btool.createSpecialConfig(process.argv);
+  const specialConfig = btool.createSpecialConfig(argv.project);
 
   // 合并配置
   const vueConfig = _.merge(sharedConfig, specialConfig);
@@ -128,8 +126,8 @@ if (['serve', 'build'].includes(cmd)) {
     );
   }
 
-  // console.log(chalk.bold.bgBlue(` vueConfig `));
-  // console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
+  console.log(chalk.bold.bgBlue(` vueConfig `));
+  console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
 
   // 导出
   module.exports = vueConfig;
