@@ -1,6 +1,8 @@
 <template>
   <div class="vmp-player-container">
-    <div id="vmp-player" class="vmp-player"></div>
+    <div class="vmp-player-box">
+      <div id="vmp-player" class="vmp-player"></div>
+    </div>
   </div>
 </template>
 <script>
@@ -30,7 +32,7 @@
         let params = {
           appId: 'fd8d3653', // 应用ID，必填
           accountId: 'visit_v1475340793824301056', // 第三方用户ID，必填
-          token: 'access:fd8d3653:643a92ee55dd7b56', // access_token，必填
+          token: 'access:fd8d3653:0aee932c80346aa5', // access_token，必填
           videoNode: 'vmp-player',
           type: 'vod', // live 直播  vod 点播  必填
           poster: '',
@@ -52,7 +54,7 @@
           },
           vodOption: {
             forceMSE: true,
-            recordId: 'f3e6eae5'
+            recordId: '4d46dd71'
           },
           peer5Option: {
             open: false,
@@ -131,16 +133,17 @@
 </script>
 <style lang="less" scoped>
   .vmp-player-container {
-    width: 100%;
-    background: #ccc;
     padding-top: 56.25%;
-    position: relative;
-    .vmp-player {
+    .vmp-player-box {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+    }
+    .vmp-player {
       height: 100%;
       width: 100%;
+      border-radius: 4px;
     }
   }
 </style>
