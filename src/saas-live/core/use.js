@@ -12,6 +12,7 @@ import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
+import VmpDocUne from '@/packages/doc-une';
 
 // 全局注册组件
 export function initUse() {
@@ -24,4 +25,5 @@ export function initUse() {
   Vue.use(VmpHeaderLeft);
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
+  Vue.use(VmpDocUne);
 }
