@@ -153,6 +153,15 @@ export const serverConfig = {
   },
   // 文档白板组件
   comDocUne: {
-    component: 'VmpDocUne'
+    component: 'VmpDocUne',
+    children: ['comDocToolbar']
+  },
+  // 文档工具栏
+  comDocToolbar: {
+    component: 'VmpDocToolbar'
+  },
+  // 画笔工具栏
+  comDocPencilbar: {
+    component: 'VmpDocPencilbar'
   }
 };

@@ -9,26 +9,26 @@
     render(createElement, { props }) {
       let widgets = [];
       if (props.cuid && window.$serverConfig && window.$serverConfig[props.cuid]) {
-         const list = window.$serverConfig[props.cuid].children || [];
-          for (const cuid of list) {
-            const widget = window.$serverConfig[cuid];
-            if (widget && widget.component) {
-              widgets.push({
-                cuid,
-                component: widget.component
-              });
-            }
+        const list = props.oneself ? [props.cuid] : window.$serverConfig[props.cuid].children || [];
+        for (const cuid of list) {
+          const widget = window.$serverConfig[cuid];
+          if (widget && widget.component) {
+            widgets.push({
+              cuid,
+              component: widget.component
+            });
           }
+        }
       }
       return widgets.map(item => {
-       return createElement(
-            item.component,
-            {
-              props: {
-                cuid: item.cuid
-              }
+        return createElement(
+          item.component,
+          {
+            props: {
+              cuid: item.cuid
             }
-          )
+          }
+        )
       })
     },
     props: {
@@ -36,6 +36,12 @@
         type: String,
         default() {
           return ''
+        }
+      },
+      oneself: {
+        type: Boolean,
+        default() {
+          return false
         }
       }
     }
