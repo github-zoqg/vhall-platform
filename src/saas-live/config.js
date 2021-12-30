@@ -33,7 +33,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comPcPlayer']
+    children: ['comDocUne']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,7 +42,8 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
+    className: 'vmp-basic-right__hd',
+    children: ['comPcPlayer']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -149,5 +150,9 @@ export const serverConfig = {
   //聊天组件
   comChat: {
     component: 'VmpChat'
+  },
+  // 文档白板组件
+  comDocUne: {
+    component: 'VmpDocUne'
   }
 };
