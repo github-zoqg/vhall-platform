@@ -1,37 +1,61 @@
 <template>
-  <div class="vmp-basic-layout">
-    <div class="vmp-basic-container">
+  <div
+    class="vmp-basic-layout"
+    v-loading="state === 0"
+    element-loading-text="加载中..."
+    element-loading-background="rgba(255, 255, 255, 0.1)"
+  >
+    <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
+    <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
   </div>
 </template>
 
 <script>
+  import MsgTip from './MsgTip.vue';
   import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
   export default {
     name: 'Home',
-    data() {},
+    components: {
+      MsgTip
+    },
+    data() {
+      return {
+        state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败
+        errMsg: ''
+      };
+    },
     beforeCreate() {
       this.roomInitGroupServer = useRoomInitGroupServer();
     },
     created() {
-      this.setToken();
+      // 初始化直播房间
       this.initSendLive();
     },
     methods: {
-      setToken() {
-        localStorage.setItem(
-          'token',
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODMyNDgsImV4cCI6MTY0MzI3NTI0OCwidXNlcl9pZCI6IjE2NDIyNzcwIiwicGxhdGZvcm0iOiI3IiwiY2giOiJiIiwiYnVzaW5lc3NfYWNjb3VudF9pZCI6IiJ9.zBKTqqn4EEmLKHduBlUfsmqMMU1I3vPmBfjfGR1cXfo'
-        );
-      },
-      initSendLive() {
-        this.roomInitGroupServer.initSendLive({
-          webinarId: 693742622,
-          requestHeaders: {
-            token: localStorage.getItem('token')
-          }
-        });
+      // 初始化直播房间
+      async initSendLive() {
+        const { id } = this.$route.params;
+        const { token } = this.$route.query;
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+        try {
+          await this.roomInitGroupServer.initSendLive({
+            webinarId: id,
+            requestHeaders: {
+              token: localStorage.getItem('token')
+            }
+          });
+          // 初始化完成
+          this.state = 1;
+        } catch (ex) {
+          console.log('---ex--');
+          console.log(ex);
+          this.state = 2;
+          this.errMsg = ex.msg;
+        }
       },
       initChatSDK() {
         this.msgServer = contextServer.get('msgServer');

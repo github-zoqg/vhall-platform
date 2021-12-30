@@ -35,7 +35,7 @@ e
         if (lan) {
           this.lang = lan;
         }
-        const widget = this.$serverConfig && this.$serverConfig[this.cuid];
+        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
         if (widget && widget.options) {
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('choices')) {
@@ -65,5 +65,6 @@ e
   .vmp-language-choice__select {
     color: #fff;
     margin: 0 12px 0 6px;
+    background-color: #777;
   }
 </style>
