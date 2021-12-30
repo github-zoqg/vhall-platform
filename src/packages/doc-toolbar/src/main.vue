@@ -3,20 +3,27 @@
   <div class="vmp-doc-toolbar">
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
-      <div class="choose-document">选择文档</div>
+      <div v-show="showChooseDocBtn" class="choose-document">
+        {{ $t('i18n.usual.chooseDocument') }}
+      </div>
+
       <div class="audience-visible">
-        <span style="margin-right: 5px">观众可见</span>
+        <span style="margin-right: 5px">{{ $t('i18n.usual.audienceVisible') }}</span>
         <el-switch v-model="value1" active-color="#13ce66"></el-switch>
       </div>
     </div>
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
       <!-- 选择 -->
-      <div class="vmp-icon-item" title="选择"><i class="iconfont iconxuanze"></i></div>
+      <div class="vmp-icon-item" :title="$t('i18n.usual.choose')">
+        <i class="iconfont iconxuanze"></i>
+      </div>
       <!-- 橡皮擦 -->
-      <div class="vmp-icon-item" title="橡皮擦"><i class="iconfont iconxiangpica"></i></div>
+      <div class="vmp-icon-item" :title="$t('i18n.usual.eraser')">
+        <i class="iconfont iconxiangpica"></i>
+      </div>
       <!-- 画笔 -->
-      <div class="vmp-icon-item has-corner" title="画笔">
+      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.pencil')">
         <i class="iconfont iconhuabi"></i>
         <vmp-pencil-popup
           itemType="pen"
@@ -26,7 +33,7 @@
         ></vmp-pencil-popup>
       </div>
       <!-- 荧光笔 -->
-      <div class="vmp-icon-item has-corner" title="荧光笔">
+      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.highlighter')">
         <i class="iconfont iconjiguangbi"></i>
         <vmp-pencil-popup
           itemType="pen"
@@ -36,7 +43,7 @@
         ></vmp-pencil-popup>
       </div>
       <!-- 形状 -->
-      <div class="vmp-icon-item has-corner" title="形状">
+      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.shape')">
         <i class="iconfont icontuxing"></i>
         <vmp-pencil-popup
           itemType="shape"
@@ -46,7 +53,7 @@
         ></vmp-pencil-popup>
       </div>
       <!-- 文字 -->
-      <div class="vmp-icon-item has-corner" title="文字">
+      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.text')">
         <i class="iconfont iconwenzi"></i>
         <vmp-pencil-popup
           itemType="text"
@@ -60,9 +67,13 @@
     </div>
     <!-- 右：全屏、文档章节等信息-->
     <div class="vmp-doc-toolbar__ft">
-      <div class="vmp-icon-item" title="文档缩略图"><i class="iconfont iconsuolvetu"></i></div>
-      <div class="vmp-icon-item" title="全屏"><i class="iconfont iconquanping"></i></div>
-      <div class="vmp-icon-item" title="关闭" v-if="hasCloseBtn">
+      <div v-show="showThumbnailBtn" class="vmp-icon-item" :title="$t('i18n.usual.docThumb')">
+        <i class="iconfont iconsuolvetu"></i>
+      </div>
+      <div class="vmp-icon-item" :title="$t('i18n.usual.fullscreen')">
+        <i class="iconfont iconquanping"></i>
+      </div>
+      <div class="vmp-icon-item" :title="$t('i18n.usual.close')" v-if="hasCloseBtn">
         <i class="iconfont iconguanbi2"></i>
       </div>
     </div>
@@ -124,7 +135,9 @@
           { value: '#FF9B9E', title: '粉色' }
         ]),
         // 是否有关闭按钮
-        hasCloseBtn: true
+        hasCloseBtn: true,
+        showChooseDocBtn: true,
+        showThumbnailBtn: true
       };
     },
     mounted() {
@@ -139,6 +152,15 @@
           if (widget.options.hasOwnProperty('hasCloseBtn')) {
             this.hasCloseBtn = widget.options.hasCloseBtn;
           }
+        }
+      },
+      showAtMode(v) {
+        if (v === 'board') {
+          this.showChooseDocBtn = false;
+          this.showThumbnailBtn = false;
+        } else {
+          this.showChooseDocBtn = true;
+          this.showThumbnailBtn = true;
         }
       }
     }
