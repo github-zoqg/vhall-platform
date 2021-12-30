@@ -22,8 +22,10 @@ export const sessionOrLocal = {
 };
 window.testSess = sessionOrLocal;
 // 判断是否IE
-export function isIE () {
-  return (!!window.ActiveXObject || 'ActiveXObject' in window || navigator.userAgent.indexOf('Edge') > -1);
+export function isIE() {
+  return (
+    !!window.ActiveXObject || 'ActiveXObject' in window || navigator.userAgent.indexOf('Edge') > -1
+  );
 }
 
 export function browserDetect() {
@@ -31,11 +33,17 @@ export function browserDetect() {
   const chromeResult = chromeReg.exec(navigator.userAgent);
   const safariReg = /(\d+\.\d)?(?:\.\d)?\s+safari\/?(\d+\.\d+)?/i;
   const safariResult = navigator.userAgent.match(safariReg);
-  return chromeResult ? !(chromeResult.length == 0 || chromeResult[1] < 61) : !(!safariResult || safariResult.length == 0 || parseInt(safariResult[1].split('.').join('')) < 121);
+  return chromeResult
+    ? !(chromeResult.length == 0 || chromeResult[1] < 61)
+    : !(
+        !safariResult ||
+        safariResult.length == 0 ||
+        parseInt(safariResult[1].split('.').join('')) < 121
+      );
 }
 
 // 尺寸重置
-export function resize () {
+export function resize() {
   if (isIE()) {
     const evt = window.document.createEvent('UIEvents');
     evt.initUIEvent('resize', true, false, window, 0);
@@ -55,7 +63,7 @@ export const debounce = (function () {
   };
 })();
 
-export function calculateAudioLevel (level) {
+export function calculateAudioLevel(level) {
   let audioLevelValue = 1;
   if (level > 0 && level <= 0.04) {
     audioLevelValue = 1;
@@ -71,7 +79,7 @@ export function calculateAudioLevel (level) {
   return audioLevelValue;
 }
 
-export function calculateNetworkStatus (status) {
+export function calculateNetworkStatus(status) {
   let netWorkStatus = 2;
   if (status >= 0 && status <= 2) {
     netWorkStatus = 2;
@@ -212,7 +220,8 @@ export function checkUploadType(file, that, type = 1) {
 export function getQueryString(name) {
   const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
   const r = window.location.search.substr(1).match(reg);
-  if (r != null) return unescape(r[2]); return null;
+  if (r != null) return unescape(r[2]);
+  return null;
 }
 /**
  * @description 区分浏览器类型 是微信还是普通浏览器
@@ -231,8 +240,8 @@ export const browserType = () => {
 
 /**
  * 计算uuid唯一标识
-*/
-export function uuid () {
+ */
+export function uuid() {
   const chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
   const uuid = [];
   let i;
@@ -242,14 +251,14 @@ export function uuid () {
 
   for (i = 0; i < 36; i++) {
     if (!uuid[i]) {
-      r = 0 | Math.random() * 16;
-      uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+      r = 0 | (Math.random() * 16);
+      uuid[i] = chars[i == 19 ? (r & 0x3) | 0x8 : r];
     }
   }
   return uuid.join('');
 }
 
-export function windowVersion () {
+export function windowVersion() {
   const version = navigator.userAgent;
   if (version.indexOf('Windows') != -1) {
     if (version.indexOf('Windows NT 10.0') != -1) {
@@ -263,4 +272,3 @@ export function windowVersion () {
     return 'ios';
   }
 }
-

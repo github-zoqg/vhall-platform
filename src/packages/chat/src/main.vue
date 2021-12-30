@@ -1,39 +1,38 @@
 <template>
-  <div class="c-vmp-chat"
-       :class="{assistant :assistantType}"
-       @mouseenter="mouseenter"
-       @mouseleave="mouseleave">
-    <div class="chat-content"
-         ref="chatContent">
-      <div class="chat-content-scroll"
-           ref="scroll">
-        <msg-item v-for="msg in chatList"
-                  :key="msg.msgId"
-                  :msg="msg"
-                  :roleName="roleName"
-                  @lotteryCheck="lotteryCheck"
-                  @questionnaireCheck="questionnaireCheck"
-                  @previewImg="previewImg">
-        </msg-item>
+  <div
+    class="vmp-chat-container"
+    :class="{ assistant: assistantType }"
+    @mouseenter="mouseenter"
+    @mouseleave="mouseleave"
+  >
+    <div class="chat-content" ref="chatContent">
+      <div class="chat-content-scroll" ref="scroll">
+        <msg-item
+          v-for="msg in chatList"
+          :key="msg.msgId"
+          :msg="msg"
+          :roleName="roleName"
+          @lotteryCheck="lotteryCheck"
+          @questionnaireCheck="questionnaireCheck"
+          @previewImg="previewImg"
+        ></msg-item>
       </div>
     </div>
 
     <!--提示-->
-    <div class='tip' v-show="showTip" @click="scrollTo">{{tipMsg}}</div>
+    <div class="tip" v-show="showTip" @click="scrollTo">{{ tipMsg }}</div>
 
     <div class="chat-bottom">
       <!-- 上传图片预览 -->
-      <div v-show="uploadActive"
-           class="chat-img-box">
-        <div class="chat-img"
-             v-for="(url, index) in imgUrls"
-             :key="index">
-          <img width="100%"
-               height="100%"
-               :src="url + '?x-oss-process=image/resize,m_lfit,h_34,w_34'"
-               alt />
-          <i class="img-close"
-             @click="deleteImg(index)"></i>
+      <div v-show="uploadActive" class="chat-img-box">
+        <div class="chat-img" v-for="(url, index) in imgUrls" :key="index">
+          <img
+            width="100%"
+            height="100%"
+            :src="url + '?x-oss-process=image/resize,m_lfit,h_34,w_34'"
+            alt
+          />
+          <i class="img-close" @click="deleteImg(index)"></i>
         </div>
       </div>
 
@@ -42,62 +41,69 @@
         <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
       </div>
       <!-- 过滤 -->
-      <chat-filter v-if="roleName != 2"
-                   :roomId="roomId"
-                   :webinarId="webinarId"
-                   :allBanned="allBanned"
-                   ref="chatFilter"
-                   :chatFilterUrl="chatFilterUrl"
-                   :isAssistant='assistantType'></chat-filter>
+      <chat-filter
+        v-if="roleName != 2"
+        :roomId="roomId"
+        :webinarId="webinarId"
+        :allBanned="allBanned"
+        ref="chatFilter"
+        :chatFilterUrl="chatFilterUrl"
+        :isAssistant="assistantType"
+      ></chat-filter>
 
       <div class="chat-control-wrap">
-        <span class="iconfont iconbiaoqing"
-              @click.stop="toggleEmoji"></span>
-        <el-upload v-if="roleName != '2'"
-                   class="avatar-uploader"
-                   :headers="headersVo"
-                   :action="`${$baseUrl}/v3/commons/upload/index`"
-                   :show-file-list="false"
-                   name="resfile"
-                   :before-upload="onExceed"
-                   :data="{
+        <span class="iconfont iconbiaoqing" @click.stop="toggleEmoji"></span>
+        <el-upload
+          v-if="roleName != '2'"
+          class="avatar-uploader"
+          :headers="headersVo"
+          :action="`${$baseUrl}/v3/commons/upload/index`"
+          :show-file-list="false"
+          name="resfile"
+          :before-upload="onExceed"
+          :data="{
             path: `${roomId}/img`,
             type: 'image',
             interact_token: interact_token
           }"
-                   accept=".jpg, .jpeg, .png, .bmp"
-                   :on-success="uploadSuccess"
-                   :on-error="uploadError">
+          accept=".jpg, .jpeg, .png, .bmp"
+          :on-success="uploadSuccess"
+          :on-error="uploadError"
+        >
           <i :class="['iconfont', 'icontupianliaotian', uploadActive ? 'active' : '']"></i>
         </el-upload>
-        <a v-if="roleName != '2' && plugin.audit.show"
-           class="iconfont iconguolv"
-           @click="toggleChatFilter"></a>
+        <a
+          v-if="roleName != '2' && plugin.audit.show"
+          class="iconfont iconguolv"
+          @click="toggleChatFilter"
+        ></a>
       </div>
       <div class="chat-input-wrap">
-        <input v-if="!inputStatus.disable && !chatLoginStatus"
-               ref="chatInput"
-               accept="image/jpg, image/png, image/jpeg, image/bmp"
-               :placeholder="inputStatus.placeholder"
-               :disabled="inputStatus.disable"
-               type="text"
-               maxlength="140"
-               v-model="inputValue"
-               @keyup.enter="sendMsgThrottle"
-               @keyup.delete="backspace" />
-        <div v-if="(roleName != 1 && inputStatus.disable) || chatLoginStatus"
-             class="input-placeholder">
+        <input
+          v-if="!inputStatus.disable && !chatLoginStatus"
+          ref="chatInput"
+          accept="image/jpg, image/png, image/jpeg, image/bmp"
+          :placeholder="inputStatus.placeholder"
+          :disabled="inputStatus.disable"
+          type="text"
+          maxlength="140"
+          v-model="inputValue"
+          @keyup.enter="sendMsgThrottle"
+          @keyup.delete="backspace"
+        />
+        <div
+          v-if="(roleName != 1 && inputStatus.disable) || chatLoginStatus"
+          class="input-placeholder"
+        >
           {{ inputStatus.placeholder }}
         </div>
-        <div v-show="chatLoginStatus"
-             class="chat-input-login">
+        <div v-show="chatLoginStatus" class="chat-input-login">
           <span @click="clickCallLogin">登录</span>
           参与互动
         </div>
-        <button :class="{assistant: assistantType}" @click="sendMsgThrottle">发送</button>
+        <button :class="{ assistant: assistantType }" @click="sendMsgThrottle">发送</button>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -215,11 +221,11 @@
         headToken: sessionOrLocal.get('token', 'localStorage') || '',
         assistantType: this.$route.query.assistantType,
         //聊天消息列表
-        chatList:chatList,
+        chatList: chatList,
         // @用户
         atList: [],
         //角色名
-        roleName:'',
+        roleName: '',
 
         // 提示开关
         showTip: false,
@@ -230,24 +236,27 @@
         inputValue: '',
         // 输入框状态
         inputStatus: {
-          placeholder:'参与聊天',
+          placeholder: '参与聊天',
           disable: false
         },
         //是否被禁言
-        isBanned:false,
+        isBanned: false,
         //是否全体禁言
-        allBanned:false,
+        allBanned: false,
         // 聊天是否需要登录
-        chatLoginStatus: false,
+        chatLoginStatus: false
       };
     },
     computed: {
-      headersVo: function() {
+      headersVo: function () {
         const vo = { token: this.headToken, platform: 7, 'request-id': uuid() };
         // 获取参数
         const wIdIndex0 = window.location.href.lastIndexOf('/');
         const wIdIndex1 = window.location.href.lastIndexOf('?');
-        const wId = window.location.href.substring(wIdIndex0 + 1, wIdIndex1 > 0 ? wIdIndex1 : window.location.href.length);
+        const wId = window.location.href.substring(
+          wIdIndex0 + 1,
+          wIdIndex1 > 0 ? wIdIndex1 : window.location.href.length
+        );
         if (window.sessionStorage.getItem(`V3_WAP_US_${wId}`)) {
           vo['gray-id'] = window.sessionStorage.getItem(`V3_WAP_US_${wId}`);
         }
@@ -273,8 +282,7 @@
         }, 50);
       },
       allBanned: {
-        handler(val) {
-        },
+        handler(val) {},
         immediate: true
       },
       isBanned: {
@@ -284,13 +292,20 @@
               this.roleName == '1'
                 ? '参与聊天'
                 : this.roleName != '2'
-                  ? (this.isBanned ? '您已被禁言' : '参与聊天')
-                  : this.allBanned
-                    ? '全员禁言中'
-                    : this.isBanned
-                      ? '您已被禁言'
-                      : '参与聊天',
-            disable: this.roleName == '1' ? false : (this.roleName != '2' ? this.isBanned : this.isBanned || this.allBanned)
+                ? this.isBanned
+                  ? '您已被禁言'
+                  : '参与聊天'
+                : this.allBanned
+                ? '全员禁言中'
+                : this.isBanned
+                ? '您已被禁言'
+                : '参与聊天',
+            disable:
+              this.roleName == '1'
+                ? false
+                : this.roleName != '2'
+                ? this.isBanned
+                : this.isBanned || this.allBanned
           };
         }
       },
@@ -317,7 +332,6 @@
     methods: {
       //初始化数据
       initInputStatus() {
-
         let placeholder = '参与聊天';
         let disable = false;
 
@@ -329,7 +343,7 @@
         //如果是全体禁言
         if (this.allBanned) {
           placeholder = '全员禁言中';
-          disable = true
+          disable = true;
         }
 
         if ([1, '1'].includes(this.roleName)) {
@@ -341,25 +355,15 @@
         this.inputStatus.disable = disable;
       },
       //鼠标移入的时候的响应
-      mouseenter(){
-
-      },
+      mouseenter() {},
       //鼠标移出的时候的响应
-      mouseleave(){
-
-      },
+      mouseleave() {},
       //抽奖情况检查
-      lotteryCheck(){
-
-      },
+      lotteryCheck() {},
       //问卷情况检查
-      questionnaireCheck(){
-
-      },
+      questionnaireCheck() {},
       //图片预览处理
-      previewImg(){
-
-      },
+      previewImg() {},
       resizeScroll() {
         const chatDom = document.querySelector('.chat-content-scroll');
         const scrollHeight = chatDom.scrollHeight + 100;
@@ -399,8 +403,12 @@
         if (this.roleName == 2) {
           // 嵌入会调用 watchEmbedInit —— 房间初始化；
           // 用户若已登录，获取userInfo中nick_name；若未登录，获取init房间初始化接口中join
-          const userInfo = sessionOrLocal.get('userInfo') ? JSON.parse(sessionOrLocal.get('userInfo')) : {};
-          const rmJoin = sessionOrLocal.get('v3_rm_join') ? JSON.parse(sessionOrLocal.get('v3_rm_join')) : {};
+          const userInfo = sessionOrLocal.get('userInfo')
+            ? JSON.parse(sessionOrLocal.get('userInfo'))
+            : {};
+          const rmJoin = sessionOrLocal.get('v3_rm_join')
+            ? JSON.parse(sessionOrLocal.get('v3_rm_join'))
+            : {};
           console.log('用户信息userInfo', userInfo);
           console.log('参会房间信息join_info', rmJoin);
           if (userInfo && userInfo.nick_name) {
@@ -418,7 +426,9 @@
         window.clearTimeout(this.sendTimeOut);
 
         const { checkHasKeyword, sendMsg } = this.chatServer;
-        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow')) ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name : '';
+        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
+          ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
+          : '';
         this.sendTimeOut = setTimeout(() => {
           const inputValue = this.trimPlaceHolder('reply');
           if (this.inputStatus.disable) {
@@ -430,7 +440,10 @@
           const data = {};
           if (inputValue) {
             data.type = 'text';
-            data.barrageTxt = inputValue.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
+            data.barrageTxt = inputValue
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/\n/g, '<br/>');
             data.text_content = inputValue;
           }
           if (this.uploadActive) {
@@ -454,7 +467,7 @@
           }
           const context = {
             nickname: name, // 昵称
-            avatar: (userInfo && userInfo.avatar) ? userInfo.avatar : '', // 头像
+            avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
             role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
             replyMsg: this.replyMsg, // 回复消息
             atList: this.atList // @用户列表
@@ -475,7 +488,7 @@
           }
           if (this.roleName != 2 || (this.roleName == 2 && filterStatus)) {
             if (this.atList.length && data.text_content) {
-              this.atList.forEach((a) => {
+              this.atList.forEach(a => {
                 data.text_content = data.text_content.replace(`@${a.nickName}`, `***${a.nickName}`);
               });
             }
@@ -483,10 +496,11 @@
             sendMsg({ data, context });
             // this.chatSDK.emit(data, context);
 
-            window.vhallReport && window.vhallReport.report('CHAT', {
-              event: JSON.stringify(data),
-              market_tools_id: this.roleName
-            });
+            window.vhallReport &&
+              window.vhallReport.report('CHAT', {
+                event: JSON.stringify(data),
+                market_tools_id: this.roleName
+              });
           }
           this.imgUrls = [];
           this.inputValue = '';
@@ -499,7 +513,6 @@
       },
       // 发送聊天节流
       sendMsgThrottle() {
-
         if (this.roleName != 2) {
           this.sendMsg();
           return;
@@ -546,7 +559,7 @@
             this.atList = this.atList.filter(n => n.nickName != nickName);
             this.inputValue = this.inputValue.replace(userName, '');
           } else {
-            this.atList = this.atList.filter((a) => {
+            this.atList = this.atList.filter(a => {
               const atIndex = this.inputValue.indexOf(`@${a.nickName} `);
               return atIndex != -1;
             });
@@ -561,7 +574,8 @@
             this.inputValue = this.inputValue.replace(replyUserName, '');
             this.replyMsg = {};
           } else {
-            (this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) == -1) && (this.replyMsg = {});
+            this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) == -1 &&
+              (this.replyMsg = {});
           }
         }
       },
@@ -571,15 +585,16 @@
       },
       trimPlaceHolder(type) {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
-      },
+      }
     }
   };
 </script>
 
 <style scoped lang="less">
-  .c-vmp-chat {
+  .vmp-chat-container {
     width: 100%;
-    height: 100%;
+    /* 临时修改下高度，后续自定义菜单出来，会移除掉 */
+    height: calc(100% - 50px);
     position: relative;
     //background: @bg-dark-section;
 
@@ -711,10 +726,10 @@
           }
         }
         .chat-audit {
-          background-image: url("./images/auditing.png");
+          background-image: url('./images/auditing.png');
           &:hover {
             background-size: 95%;
-            background-image: url("./images/auditing-hover.png");
+            background-image: url('./images/auditing-hover.png');
           }
         }
         .avatar-uploader {
@@ -821,7 +836,7 @@
             position: absolute;
             width: 15px;
             height: 15px;
-            background: url("./images/img-del.png") no-repeat;
+            background: url('./images/img-del.png') no-repeat;
             background-size: contain;
             top: 0px;
             right: 0px;
@@ -849,6 +864,5 @@
         left: 0;
       }
     }
-
   }
 </style>

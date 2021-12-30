@@ -6,10 +6,7 @@ import getAvatar from '../js/get-avatar';
 import { throttle } from 'lodash';
 import { contextServer } from 'vhall-sass-domain';
 
-const pcDevice = [
-  'pc_browser',
-  'desktop'
-];
+const pcDevice = ['pc_browser', 'desktop'];
 
 const identity = [
   {
@@ -30,7 +27,7 @@ const identity = [
   }
 ];
 
-function returnName (data) {
+function returnName(data) {
   const obj = identity.find(item => item.code == data);
   return obj.name ? obj.name : data;
 }
@@ -40,7 +37,7 @@ const eventMixin = {
     this.msgServer = contextServer.get('msgServer');
   },
   methods: {
-    listenEvents () {
+    listenEvents() {
       const throttleChatMsg = throttle(() => {
         if (this.chatList.length > 200) {
           this.chatList = this.chatList.slice(-200);
@@ -63,7 +60,10 @@ const eventMixin = {
         console.log('============收到聊天消息==============111=');
         console.log(msg);
         if (!msg.data.barrageTxt && msg.data.text_content) {
-          msg.data.barrageTxt = msg.data.text_content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
+          msg.data.barrageTxt = msg.data.text_content
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br/>');
         }
         if (msg.data.text_content) {
           msg.data.text_content = textToEmojiText(msg.data.text_content);
@@ -92,8 +92,11 @@ const eventMixin = {
             item = this.chatList[this.chatList.length - 1];
           }
           if (msg.context.atList && msg.context.atList.length && msg.data.text_content) {
-            msg.context.atList.forEach((a) => {
-              msg.data.text_content = msg.data.text_content.replace(`***${a.nickName}`, `@${a.nickName}`);
+            msg.context.atList.forEach(a => {
+              msg.data.text_content = msg.data.text_content.replace(
+                `***${a.nickName}`,
+                `@${a.nickName}`
+              );
             });
           }
           throttleChatMsg(); // 解决17618
@@ -237,7 +240,10 @@ const eventMixin = {
                         nickName: '抽奖',
                         avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
                         content: {
-                          text_content: res.data.lottery_status == 1 && res.data.win == 1 ? '恭喜您中奖了！' : '很遗憾，您没有中奖！',
+                          text_content:
+                            res.data.lottery_status == 1 && res.data.win == 1
+                              ? '恭喜您中奖了！'
+                              : '很遗憾，您没有中奖！',
                           msg: msg,
                           userId: this.userId,
                           Show: res.data.lottery_status == 1 && res.data.win == 1
@@ -249,7 +255,10 @@ const eventMixin = {
                   }, Math.random() * 5);
                 }, 5000);
               }
-              if (_localLotteryId && _localLotteryId.split(',').length == msg.actual_lottery_number) {
+              if (
+                _localLotteryId &&
+                _localLotteryId.split(',').length == msg.actual_lottery_number
+              ) {
                 msg.lottery_winners = _localLotteryId;
                 if (this.delayFun) {
                   window.clearTimeout(this.delayFun);
@@ -269,19 +278,25 @@ const eventMixin = {
               type: msg.type
             });
             this.chatList.push(data);
-            window.vhallReport && window.vhallReport.report('LOTTERY', {
-              question_id: index >= 0 ? 1 : 0,
-              answer_id: msg.lottery_id
-            });
+            window.vhallReport &&
+              window.vhallReport.report('LOTTERY', {
+                question_id: index >= 0 ? 1 : 0,
+                answer_id: msg.lottery_id
+              });
           }
           // 打赏成功
           if (msg.data.type == 'reward_pay_ok') {
             const data = new Msg({
               avatar: getAvatar(msg.data.rewarder_avatar),
-              nickName: msg.data.rewarder_nickname.length > 8 ? msg.data.rewarder_nickname.substr(0, 8) + '...' : msg.data.rewarder_nickname,
+              nickName:
+                msg.data.rewarder_nickname.length > 8
+                  ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+                  : msg.data.rewarder_nickname,
               type: 'reward_pay_ok',
               content: {
-                text_content: msg.data.reward_describe ? msg.data.reward_describe : '很精彩，赞一个！',
+                text_content: msg.data.reward_describe
+                  ? msg.data.reward_describe
+                  : '很精彩，赞一个！',
                 num: msg.data.reward_amount
               },
               sendId: this.userId,
@@ -332,7 +347,11 @@ const eventMixin = {
           if (msg.type == 'questionnaire_push') {
             EventBus.$emit('questionnaireCheck', msg.questionnaire_id);
             const text =
-              msg.room_role == '3' ? `助理${msg.nick_name}` : msg.room_role == '4' ? `嘉宾${msg.nick_name}` : '主持人';
+              msg.room_role == '3'
+                ? `助理${msg.nick_name}`
+                : msg.room_role == '4'
+                ? `嘉宾${msg.nick_name}`
+                : '主持人';
             const data = new Msg({
               nickName: '问卷',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -504,28 +523,34 @@ const eventMixin = {
             return false;
           }
           // console.warn('派发的消息，查看数据类型和数据', msg, msg.type);
-          if (msg.type == 'live_over') { // 直播结束消息进入小组需要保活，不在这里处理
+          if (msg.type == 'live_over') {
+            // 直播结束消息进入小组需要保活，不在这里处理
             return;
           }
           EventBus.$emit(msg.type, msg);
         });
-        this.msgServer.$on('ROOM_MSG', msg => {
-          if (typeof msg !== 'object') {
-            msg = JSON.parse(msg);
-          }
-          try {
-            if (msg.data && typeof msg.data !== 'object') {
-              msg.data = JSON.parse(msg.data);
+        this.msgServer.$on(
+          'ROOM_MSG',
+          msg => {
+            if (typeof msg !== 'object') {
+              msg = JSON.parse(msg);
             }
-          } catch (e) {
-            console.log(e);
-          }
-          // console.log('==========房间消息========1===', msg);
-          Object.assign(msg, msg.data);
-          if (msg.type == 'live_over') { // 直播结束消息进入小组需要保活，不在这里处理
-            EventBus.$emit(msg.type, msg);
-          }
-        }, true);
+            try {
+              if (msg.data && typeof msg.data !== 'object') {
+                msg.data = JSON.parse(msg.data);
+              }
+            } catch (e) {
+              console.log(e);
+            }
+            // console.log('==========房间消息========1===', msg);
+            Object.assign(msg, msg.data);
+            if (msg.type == 'live_over') {
+              // 直播结束消息进入小组需要保活，不在这里处理
+              EventBus.$emit(msg.type, msg);
+            }
+          },
+          true
+        );
       } else if (this.playerType != 'live') {
         this.msgServer.$on('ROOM_MSG', msg => {
           if (typeof msg !== 'object') {
@@ -559,10 +584,15 @@ const eventMixin = {
             EventBus.$emit('reward_pay_ok', msg);
             const rewardData = new Msg({
               avatar: getAvatar(msg.data.rewarder_avatar),
-              nickName: msg.data.rewarder_nickname.length > 8 ? msg.data.rewarder_nickname.substr(0, 8) + '...' : msg.data.rewarder_nickname,
+              nickName:
+                msg.data.rewarder_nickname.length > 8
+                  ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+                  : msg.data.rewarder_nickname,
               type: 'reward_pay_ok',
               content: {
-                text_content: msg.data.reward_describe ? msg.data.reward_describe : '很精彩，赞一个！',
+                text_content: msg.data.reward_describe
+                  ? msg.data.reward_describe
+                  : '很精彩，赞一个！',
                 num: msg.data.reward_amount
               },
               sendId: this.userId,
@@ -592,8 +622,16 @@ const eventMixin = {
         console.log(msg);
         if (window.sessionStorage.getItem('ssoEnabled') == 1) {
           const kickId = window.sessionStorage.getItem('kickId');
-          const kickMark = `${window.sessionStorage.getItem('kickMark')}${this.$route.params.il_id}`;
-          console.log(kickMark, kickId, msg.context.kick_id, msg.context.kick_mark, '账号相同，需要踢出之前的账号11111111111');
+          const kickMark = `${window.sessionStorage.getItem('kickMark')}${
+            this.$route.params.il_id
+          }`;
+          console.log(
+            kickMark,
+            kickId,
+            msg.context.kick_id,
+            msg.context.kick_mark,
+            '账号相同，需要踢出之前的账号11111111111'
+          );
           if (kickId == msg.context.kick_id && kickMark != msg.context.kick_mark) {
             this.$emit('singleLogin');
           }
@@ -624,7 +662,7 @@ const eventMixin = {
         this.onlineUsers = Number(baseOnlineNumber) + Number(msg.uv);
       });
       // 自定义消息
-      this.msgServer.$on('CUSTOM_MSG', (msg) => {
+      this.msgServer.$on('CUSTOM_MSG', msg => {
         if (typeof msg !== 'object') {
           msg && (msg = JSON.parse(msg));
         }
@@ -642,7 +680,7 @@ const eventMixin = {
         }
       });
       // @本用户的msgItem元素
-      EventBus.$on('scrollElement', (el) => {
+      EventBus.$on('scrollElement', el => {
         this.showTip = true;
         this.elements.push(el);
         this.tipMsg = this.replyElement ? '有多条未读消息' : '有人@你';
@@ -660,14 +698,14 @@ const eventMixin = {
         this.replyElement = null;
       });
       // 有人回复本用户
-      EventBus.$on('replyMsg', (e) => {
+      EventBus.$on('replyMsg', e => {
         if (this.userId != e.msg.sendId) return;
         this.showTip = true;
         this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
         this.replyElement = e.el;
       });
       // 计时暂停
-      EventBus.$on('timer_pause', (msg) => {
+      EventBus.$on('timer_pause', msg => {
         const text = msg.data.role_name == 3 ? '助理' : msg.data.role_name == 1 ? '主持人' : '嘉宾';
         const data = new Msg({
           nickName: '计时器',
@@ -682,10 +720,14 @@ const eventMixin = {
       });
       EventBus.$on('room_channel_change', this.handleChannelChange);
 
-      window.addEventListener('resize', () => {
-        this.refresh();
-        this.scrollBottom();
-      }, true);
+      window.addEventListener(
+        'resize',
+        () => {
+          this.refresh();
+          this.scrollBottom();
+        },
+        true
+      );
     }
   }
 };
