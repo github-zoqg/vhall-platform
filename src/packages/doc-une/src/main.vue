@@ -1,15 +1,10 @@
 <template>
-  <div class="doc-une">
-    <div class="doc-une__toolbar">
-      <div class="doc-une__toolbar-hd">
-        <el-button size="mini">选择文档</el-button>
-        <el-switch>观众课件</el-switch>
-      </div>
-      <div class="doc-une__toolbar-bd">各种画笔工具</div>
-      <div class="doc-une__toolbar-ft">全屏等按扭</div>
+  <div class="vmp-doc-une">
+    <div class="vmp-doc-une__hd">
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div>
-    <div class="doc-une__content">
-      <div class="doc-une-placeholder">
+    <div class="vmp-doc-une__content">
+      <div class="vmp-doc-une-placeholder">
         <i class="iconfont iconzanwuwendang"></i>
         <span>暂未分享任何文档</span>
       </div>
@@ -18,11 +13,68 @@
 </template>
 <script>
   export default {
-    name: 'VmpDocUne'
+    name: 'VmpDocUne',
+    data() {
+      return {
+        cuids: []
+      };
+    },
+    created() {},
+    mounted() {
+      console.log('----文档---');
+      console.log(this.cuid);
+      this.cuids = window.$serverConfig[this.cuid].children;
+      console.log(this.cuids);
+    },
+    methods: {
+      // initDocSDK() {
+      //   // 防止销毁
+      //   if (!this.docServer) {
+      //     this.docServer = useDocServer();
+      //   }
+      // },
+      /**
+       * 初始化文档容器
+       * type 文档类型： document 文档, borad 白板
+       * cid 容器Id
+       * documentId 文档id,在主讲人状态时，是演示的文档ID,其他角色时，是创建文档/白板的UUID
+       */
+      // initContainer(type = 'document', cid, documentId, noDispatch = false) {
+      //   // if (this.isInGroup) {
+      //   //   noDispatch = true // 后期优化,,在小组内组长不派发
+      //   // }
+      //   console.log('初始化容器的参数===========', cid, documentId);
+      //   if (type === 'document') {
+      //     const opts = {
+      //       id: cid,
+      //       docId: documentId,
+      //       elId: cid, // div 容器 必须
+      //       width: parseFloat(this.docBoxStyle.width), // div 宽度，像素单位，数值型不带px 必须
+      //       height: parseFloat(this.docBoxStyle.height), // div 高度，像素单位，数值型不带px 必须
+      //       noDispatch: noDispatch
+      //     };
+      //     this.docServer.createDocument(opts);
+      //     this.docServer.setControlStyle(this.styleOpts);
+      //   } else {
+      //     this.boardId = cid;
+      //     const opts = {
+      //       id: cid,
+      //       elId: cid, // div 容器 必须
+      //       width: parseFloat(this.boardBoxStyle.width), // div 宽度，像素单位，数值型不带px 必须
+      //       height: parseFloat(this.boardBoxStyle.height), // div 高度，像素单位，数值型不带px 必须
+      //       backgroundColor: '#FFFFFF',
+      //       noDispatch: noDispatch
+      //     };
+      //     this.docServer.createBoard(opts);
+      //     this.docServer.setControlStyle(this.styleOpts);
+      //   }
+      //   // return Promise.resolve()
+      // }
+    }
   };
 </script>
 <style lang="less">
-  .doc-une {
+  .vmp-doc-une {
     position: absolute;
     top: 0;
     left: 0;
@@ -31,24 +83,15 @@
     display: flex;
     flex-direction: column;
     color: #fff;
-    .doc-une__toolbar {
-      height: 50px;
+    .vmp-doc-une__hd {
       width: 100%;
-      background: #2d2d2d;
-      border-bottom: 1px solid #1f1f1f;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 2;
+      height: 50px;
+      box-sizing: border-box;
     }
-    .doc-une__content {
+    .vmp-doc-une__content {
       flex: 1;
     }
-    .doc-une-placeholder {
+    .vmp-doc-une-placeholder {
       height: 100%;
       width: 100%;
       display: flex;
