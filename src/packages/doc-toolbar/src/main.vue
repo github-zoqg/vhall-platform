@@ -1,29 +1,146 @@
 <template>
+  <!-- 文档工具栏 -->
   <div class="vmp-doc-toolbar">
+    <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
       <div class="choose-document">选择文档</div>
       <div class="audience-visible">
-        <span>观众可见</span>
-        <el-switch v-model="value1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        <span style="margin-right: 5px">观众可见</span>
+        <el-switch v-model="value1" active-color="#13ce66"></el-switch>
       </div>
     </div>
-    <div class="vmp-doc-toolbar__bd"></div>
+    <!-- 中：画笔相关工具 -->
+    <div class="vmp-doc-toolbar__bd">
+      <!-- 选择 -->
+      <div class="vmp-icon-item" title="选择"><i class="iconfont iconxuanze"></i></div>
+      <!-- 橡皮擦 -->
+      <div class="vmp-icon-item" title="橡皮擦"><i class="iconfont iconxiangpica"></i></div>
+      <!-- 画笔 -->
+      <div class="vmp-icon-item has-corner" title="画笔">
+        <i class="iconfont iconhuabi"></i>
+        <vmp-pencil-popup
+          itemType="pen"
+          :dval="7"
+          :itemArr="sizeArr"
+          :colorArr="colorArr"
+        ></vmp-pencil-popup>
+      </div>
+      <!-- 荧光笔 -->
+      <div class="vmp-icon-item has-corner" title="荧光笔">
+        <i class="iconfont iconjiguangbi"></i>
+        <vmp-pencil-popup
+          itemType="pen"
+          :dval="7"
+          :itemArr="sizeArr"
+          :colorArr="colorArr"
+        ></vmp-pencil-popup>
+      </div>
+      <!-- 形状 -->
+      <div class="vmp-icon-item has-corner" title="形状">
+        <i class="iconfont icontuxing"></i>
+        <vmp-pencil-popup
+          itemType="shape"
+          dval="setCircle"
+          :itemArr="shapeArr"
+          :colorArr="colorArr"
+        ></vmp-pencil-popup>
+      </div>
+      <!-- 文字 -->
+      <div class="vmp-icon-item has-corner" title="文字">
+        <i class="iconfont iconwenzi"></i>
+        <vmp-pencil-popup
+          itemType="text"
+          :dval="18"
+          :itemArr="fontArr"
+          :colorArr="colorArr"
+        ></vmp-pencil-popup>
+      </div>
+      <!-- 清除 -->
+      <div class="vmp-icon-item" title="清除"><i class="iconfont iconqingkong"></i></div>
+    </div>
+    <!-- 右：全屏、文档章节等信息-->
     <div class="vmp-doc-toolbar__ft">
-      <div class="tool-btn document-fullscreen"><i class="iconfont iconquanping"></i></div>
-      <div class="tool-btn document-thumbnail"><i class="iconfont iconsuolvetu"></i></div>
+      <div class="vmp-icon-item" title="文档缩略图"><i class="iconfont iconsuolvetu"></i></div>
+      <div class="vmp-icon-item" title="全屏"><i class="iconfont iconquanping"></i></div>
+      <div class="vmp-icon-item" title="关闭" v-if="hasCloseBtn">
+        <i class="iconfont iconguanbi2"></i>
+      </div>
     </div>
   </div>
 </template>
 <script>
+  import VmpPencilPopup from './popup.vue';
+
   export default {
     name: 'VmpDocToolbar',
+    components: {
+      VmpPencilPopup
+    },
     data() {
       return {
-        value1: true
+        value1: true,
+        sizeArr: [
+          { label: '4', value: 4 },
+          { label: '7', value: 7 },
+          { label: '10', value: 10 },
+          { label: '13', value: 13 }
+        ],
+        fontArr: [
+          { label: '小', value: 14, showSize: '12' },
+          { label: '中', value: 18, showSize: '16' },
+          { label: '大', value: 30, showSize: '18' },
+          { label: '超', value: 48, showSize: '20' }
+        ],
+        shapeArr: [
+          { label: '圆形', value: 'setCircle', icon: 'iconfont iconyuanxing' },
+          {
+            label: '四边形',
+            value: 'setSquare',
+            icon: 'iconfont iconzhengfangxing'
+          },
+          {
+            label: '单向箭头',
+            value: 'setSingleArrow',
+            icon: 'iconfont iconjiantou'
+          },
+          {
+            label: '双向箭头',
+            value: 'setDoubleArrow',
+            icon: 'iconfont iconshuangjiantou'
+          }
+        ],
+        colorArr: Object.freeze([
+          { value: '#FFFFFF', title: '白色' },
+          { value: '#9B9B9B', title: '浅灰' },
+          { value: '#2E3038', title: '深灰' },
+          { value: '#000000', title: '黑色' },
+          { value: '#FD2C0A', title: '红色' },
+          { value: '#FF6E00', title: '橙色' },
+          { value: '#FFD400', title: '黄色' },
+          { value: '#98CD47', title: '绿色' },
+          { value: '#01D6D1', title: '青色' },
+          { value: '#0097F0', title: '蓝色' },
+          { value: '#8B6DC2', title: '紫色' },
+          { value: '#FF9B9E', title: '粉色' }
+        ]),
+        // 是否有关闭按钮
+        hasCloseBtn: true
       };
     },
     mounted() {
-      console.log(this);
+      this.initConfig();
+    },
+    methods: {
+      // 初始化配置
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('hasCloseBtn')) {
+            this.hasCloseBtn = widget.options.hasCloseBtn;
+          }
+        }
+      }
     }
   };
 </script>
@@ -58,6 +175,10 @@
       text-align: center;
       margin-left: 16px;
       cursor: pointer;
+      &:hover {
+        background: #fc5659;
+        border-color: #fc5659;
+      }
     }
     .audience-visible {
       font-size: 12px;
@@ -71,32 +192,69 @@
       align-items: center;
       margin-left: 20px;
       position: relative;
+
+      .el-switch .el-switch__core {
+        border-color: #ddd !important;
+        background-color: #2d2d2d !important;
+        &::after {
+          background-color: #ddd;
+        }
+      }
+      .el-switch.is-checked .el-switch__core {
+        border-color: #13ce66 !important;
+        background-color: #13ce66 !important;
+      }
     }
   }
   .vmp-doc-toolbar__bd {
     flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
   }
   .vmp-doc-toolbar__ft {
     display: flex;
     flex-direction: row;
-    margin-right: 0px;
+    margin-right: 10px;
+  }
 
-    .tool-btn {
-      height: 36px;
-      width: 36px;
-      margin-left: 3px;
-      border-radius: 4px;
-      text-align: center;
-      vertical-align: middle;
-      position: relative;
-      line-height: 36px;
-      cursor: pointer;
+  .vmp-icon-item {
+    height: 36px;
+    width: 36px;
+    margin-left: 3px;
+    border-radius: 4px;
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    line-height: 36px;
+    cursor: pointer;
+    z-index: 100;
+
+    i {
+      font-size: 17px;
+      color: #dadada;
     }
-    .document-fullscreen {
-      z-index: 100;
+
+    &:hover {
+      background: #000;
+      .vmp-pencil-popup {
+        display: block;
+      }
     }
-    .document-thumbnail {
-      z-index: 18;
+    &.has-corner {
+      margin-right: 3px;
     }
+  }
+  .vmp-icon-item.has-corner::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    border: 4px solid transparent;
+    border-left-color: #dadada;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
   }
 </style>
