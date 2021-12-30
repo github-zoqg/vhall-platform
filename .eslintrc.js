@@ -4,6 +4,22 @@ module.exports = {
     node: true,
     browser: true
   },
+  globals: {
+    BMap: true,
+    Vhall: true,
+    VhallInteraction: true,
+    VhallRTC: true,
+    VhallPlayer: true,
+    VHall_Questionnaire_Service: true,
+    VHall_Questionnaire_Const: true,
+    VHPublisher: true,
+    VHDocSDK: true,
+    VhallChat: true,
+    VhallReport: true,
+    $: true,
+    wx: true,
+    WeixinJSBridge: true
+  },
   extends: [
     'plugin:vue/essential', // vue2核心的lint的规则
     'eslint:recommended', // eslint的建议规则，参考：https://eslint.bootcss.com/docs/rules/

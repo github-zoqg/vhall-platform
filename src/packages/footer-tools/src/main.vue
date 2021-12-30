@@ -13,7 +13,6 @@
     width: 100%;
     height: 56px;
     background: #434343;
-    // z-index: 2;
     line-height: 56px;
     color: #fff;
     text-align: center;
