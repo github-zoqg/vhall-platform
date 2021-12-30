@@ -1,6 +1,6 @@
 export const globalConfig = {
   lang: 'zh',
-  skin: 'new-year'
+  skin: 'default'
 };
 
 // 服务配置
@@ -158,10 +158,9 @@ export const serverConfig = {
   },
   // 文档工具栏
   comDocToolbar: {
-    component: 'VmpDocToolbar'
-  },
-  // 画笔工具栏
-  comDocPencilbar: {
-    component: 'VmpDocPencilbar'
+    component: 'VmpDocToolbar',
+    options: {
+      hasCloseBtn: false //是否有关闭按钮
+    }
   }
 };

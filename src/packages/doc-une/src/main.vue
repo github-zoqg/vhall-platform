@@ -15,17 +15,9 @@
   export default {
     name: 'VmpDocUne',
     data() {
-      return {
-        cuids: []
-      };
+      return {};
     },
     created() {},
-    mounted() {
-      console.log('----文档---');
-      console.log(this.cuid);
-      this.cuids = window.$serverConfig[this.cuid].children;
-      console.log(this.cuids);
-    },
     methods: {
       // initDocSDK() {
       //   // 防止销毁

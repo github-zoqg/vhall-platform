@@ -14,7 +14,6 @@ import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
 import VmpDocToolbar from '@/packages/doc-toolbar';
-import VmpDocPencilbar from '@/packages/doc-pencilbar';
 
 // 全局注册组件
 export function initUse() {
@@ -29,5 +28,4 @@ export function initUse() {
   Vue.use(VmpChat);
   Vue.use(VmpDocUne);
   Vue.use(VmpDocToolbar);
-  Vue.use(VmpDocPencilbar);
 }
