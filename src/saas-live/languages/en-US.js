@@ -2,7 +2,19 @@ module.exports = {
   i18n: {
     usual: {
       copySucceeded: 'Copy succeeded！',
-      copyFailed: 'Copy failed !'
+      copyFailed: 'Copy failed !',
+      close: 'close',
+      fullscreen: 'fullscreen',
+      chooseDocument: 'choose doc',
+      audienceVisible: 'audience visible',
+      choose: 'choose',
+      eraser: 'eraser',
+      pencil: 'pencil',
+      highlighter: 'highlighter',
+      shape: 'shape',
+      text: 'text',
+      clear: 'clear',
+      docThumb: 'document thumbnail'
     },
     languageChoice: {
       label: 'language Choice',

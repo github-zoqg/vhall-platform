@@ -94,13 +94,19 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconwendang',
-      text: 'i18n.asideMenu.document'
+      text: 'i18n.asideMenu.document',
+      selected: true
     },
     emitClick: [
       {
         cuid: 'comAsideMenu',
         method: 'setSelectedState',
         args: ['comDocMenu']
+      },
+      {
+        cuid: 'comDocToolbar',
+        method: 'showAtMode',
+        args: ['document']
       }
     ]
   },
@@ -116,6 +122,11 @@ export const serverConfig = {
         cuid: 'comAsideMenu',
         method: 'setSelectedState',
         args: ['comWbMenu']
+      },
+      {
+        cuid: 'comDocToolbar',
+        method: 'showAtMode',
+        args: ['board']
       }
     ]
   },
