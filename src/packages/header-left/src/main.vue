@@ -1,10 +1,10 @@
 <template>
   <div class="vmp-header-left">
-    <div title="测试直播" class="vhall-room-name">测试直播</div>
+    <div :title="subject" class="vhall-room-name">{{ subject }}</div>
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
-      <div id="vhall-room-id-copy-val" class="vhall-room-id">846642264</div>
-      <div data-clipboard-text="846642264" class="vhall-room-id-copy">
+      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ id }}</div>
+      <div :data-clipboard-text="id" class="vhall-room-id-copy" @click="handleCopy">
         <i class="iconfont iconfuzhi"></i>
       </div>
     </div>
@@ -18,6 +18,7 @@
   </div>
 </template>
 <script>
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpHeaderLeft',
     data() {
@@ -27,8 +28,15 @@
         disable: false,
         kind: '',
         icon: '',
-        text: ''
+        text: '',
+        subject: '', // 直播名称
+        id: '' // 房间id
       };
+    },
+    created() {
+      const { watchInitData } = contextServer.get('roomBaseServer').state;
+      this.subject = watchInitData?.webinar?.subject || '';
+      this.id = watchInitData?.webinar?.id || '';
     },
     mounted() {
       this.initConfig();
@@ -36,7 +44,7 @@
     methods: {
       // 初始化配置
       initConfig() {
-        const widget = this.$serverConfig && this.$serverConfig[this.cuid];
+        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
         if (widget && widget.options) {
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('className')) {
@@ -59,6 +67,31 @@
             this.text = widget.options.text;
           }
         }
+      },
+      // 负责roomId
+      handleCopy() {
+        // this.$vhall_paas_port({
+        //   k: 110000,
+        //   data: {
+        //     business_uid: this.userInfo.third_party_user_id,
+        //     user_id: '',
+        //     webinar_id: this.webinar_id,
+        //     refer: '',
+        //     s: '',
+        //     report_extra: {},
+        //     ref_url: '',
+        //     req_url: ''
+        //   }
+        // });
+        const clipboard = new this.$clipboard('.vhall-room-id-copy');
+        clipboard.on('success', e => {
+          this.$message.success(this.$t('i18n.usual.copySucceeded'));
+          clipboard.destroy();
+        });
+        clipboard.on('error', e => {
+          this.$message.error(this.$t('i18n.usual.copyFailed'));
+          clipboard.destroy();
+        });
       }
     }
   };
@@ -126,9 +159,8 @@
       cursor: pointer;
     }
     .nopdelay-icon {
-      height: 34px;
+      line-height: 34px;
       margin-left: 4px;
-      margin-top: 3px;
 
       img {
         display: inline-block;

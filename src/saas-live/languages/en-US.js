@@ -1,5 +1,9 @@
 module.exports = {
   i18n: {
+    usual: {
+      copySucceeded: 'Copy succeeded！',
+      copyFailed: 'Copy failed !'
+    },
     languageChoice: {
       label: 'language Choice',
       zh: '中文',

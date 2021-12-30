@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-basic-layout">
     <div class="vmp-basic-container">
-      <h2>PC观看端</h2>
+      <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
   </div>
 </template>
@@ -26,12 +26,19 @@
         );
       },
       initSendLive() {
-        this.roomInitGroupServer.initSendLive({
-          webinarId: 693742622,
-          requestHeaders: {
-            token: localStorage.getItem('token')
-          }
+        this.roomInitGroupServer.initReceiveLive({
+          webinar_id: '649692238',
+          webinarId: '649692238',
+          visitor_id: '',
+          refer: '',
+          record_id: ''
         });
+        // this.roomInitGroupServer.initSendLive({
+        //   webinarId: 693742622,
+        //   requestHeaders: {
+        //     token: localStorage.getItem('token')
+        //   }
+        // });
       },
       initChatSDK() {
         this.msgServer = contextServer.get('msgServer');
@@ -42,3 +49,48 @@
     }
   };
 </script>
+<style lang="less">
+  // 媒体查询分辨率下效果
+  @media screen and (min-width: 1920px) {
+    .vmp-basic-bd {
+      max-width: 1658px;
+    }
+  }
+
+  @media screen and (min-width: 1706px) {
+    .vmp-basic-bd {
+      max-width: 1658px;
+    }
+  }
+
+  @media screen and (min-width: 1388px) and (max-width: 1705px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
+
+  @media screen and (max-width: 1387px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
+
+  @media screen and (max-width: 1440px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
+
+  @media screen and (max-width: 1366px) {
+    .vmp-basic-bd {
+      max-width: 1103px;
+    }
+  }
+
+  @media screen and (max-width: 1151px) {
+    // 浏览器中部最小间距，低于此分辨率1151px滚动条
+    .vmp-basic-bd {
+      max-width: 1103px;
+    }
+  }
+</style>
