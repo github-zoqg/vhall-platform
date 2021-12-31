@@ -70,9 +70,10 @@
     display: flex;
     flex-direction: column;
     color: #fff;
+    flex: 1;
     .vmp-doc-une__hd {
       width: 100%;
-      height: 50px;
+      // height: 50px;
       box-sizing: border-box;
     }
     .vmp-doc-une__content {
