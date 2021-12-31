@@ -115,13 +115,37 @@
        * 得到用户状态是否被禁言/踢出
        */
       getUserStatus() {
-        return new Promise((resolve, reject) => {
-          this.$fetch('getToolStatus', {
-            room_id: this.roomId
-          }).then(res => {
-            resolve(res.data);
-          });
+        return Promise.resolve({
+          all_banned: 0,
+          auto_speak: 0,
+          definition: '',
+          doc_permission: '16422770',
+          group_id: 0,
+          hd_definition: 360,
+          is_adi_watch_doc: 0,
+          is_banned: 0,
+          is_board: 0,
+          is_desktop: 0,
+          is_doc: 0,
+          is_handsup: 0,
+          is_host_in_group: 0,
+          is_kicked: 0,
+          is_open_switch: 0,
+          join_role: 0,
+          layout: '',
+          main_screen: '16422770',
+          presentation_screen: '',
+          push_definition: 360,
+          question_status: 0,
+          screen_definition: '',
+          speaker_list: [],
+          start_type: 1
         });
+        // return this.$fetch('getToolStatus', {
+        //   room_id: this.roomId
+        // }).then(res => {
+        //   return res.data;
+        // });
       },
       /**
        * 禁言/取消禁言
