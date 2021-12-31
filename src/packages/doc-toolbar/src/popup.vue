@@ -46,24 +46,28 @@
   export default {
     name: 'VmpPencilPopup',
     props: {
+      // 初始值
       dval: {
         type: Number || String,
         default: () => {
           return '';
         }
       },
+      // 某项类型
       itemType: {
         type: String,
         default: () => {
           return 'pen';
         }
       },
+      // 某项可选数组
       itemArr: {
         type: Array,
         default: () => {
           return [];
         }
       },
+      // 颜色可选数组
       colorArr: {
         type: Array,
         default: () => {
@@ -77,16 +81,16 @@
         colorValue: '#FD2C0A'
       };
     },
+
     methods: {
+      // 选择某项
       handleItem(val) {
         this.itemValue = val;
       },
+      // 选择颜色
       handleColor(val) {
         this.colorValue = val;
       }
-    },
-    mounted() {
-      console.log(this);
     }
   };
 </script>

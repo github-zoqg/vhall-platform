@@ -34,7 +34,9 @@
     async created() {
       // 初始化直播房间
       await this.initSendLive();
-      roomState();
+      await roomState();
+      // 初始化完成
+      this.state = 1;
     },
     methods: {
       // 初始化直播房间
@@ -51,8 +53,6 @@
               token: localStorage.getItem('token')
             }
           });
-          // 初始化完成
-          this.state = 1;
         } catch (ex) {
           console.log('---ex--');
           console.log(ex);
