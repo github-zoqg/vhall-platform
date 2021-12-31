@@ -13,6 +13,7 @@
 </template>
 
 <script>
+  import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
   import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
   export default {
@@ -28,10 +29,12 @@
     },
     beforeCreate() {
       this.roomInitGroupServer = useRoomInitGroupServer();
+      this.msgServer = contextServer.get('msgServer');
     },
-    created() {
+    async created() {
       // 初始化直播房间
-      this.initSendLive();
+      await this.initSendLive();
+      roomState();
     },
     methods: {
       // 初始化直播房间
@@ -56,12 +59,6 @@
           this.state = 1;
           this.errMsg = ex.msg;
         }
-      },
-      initChatSDK() {
-        this.msgServer = contextServer.get('msgServer');
-        this.msgServer.init().then(res => {
-          console.log('聊天实例创建', res);
-        });
       }
     }
   };
