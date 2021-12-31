@@ -172,9 +172,6 @@
     width: 100%;
     background: #2d2d2d;
     border-bottom: 1px solid #1f1f1f;
-    position: absolute;
-    top: 0;
-    left: 0;
     display: flex;
     flex-direction: row;
     align-items: center;

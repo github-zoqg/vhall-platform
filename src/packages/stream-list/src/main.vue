@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-list"></div>
+  <div class="vmp-stream-list">
+    <div class="vmp-stream-list_stream-box">
+      <vmp-stream-remote></vmp-stream-remote>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -16,4 +20,16 @@
   };
 </script>
 
-<style lang="scss"></style>
+<style lang="less">
+  .vmp-stream-list {
+    height: 80px;
+    width: 100%;
+    background-color: #242424;
+    display: flex;
+    justify-content: center;
+  }
+  .vmp-stream-list_stream-box {
+    width: 142px;
+    height: 80px;
+  }
+</style>
