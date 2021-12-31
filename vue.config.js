@@ -1,3 +1,6 @@
+/***
+ * 配置官方参考链接：https://cli.vuejs.org/zh/config/
+ */
 const path = require('path');
 const chalk = require('chalk');
 const _ = require('lodash');
@@ -54,23 +57,26 @@ const sharedConfig = {
   chainWebpack: config => {
     config.resolve.alias.set('@', path.resolve('src'));
   },
+  // 向 CSS 相关的 loader 传递选项
+  // 可支持 css\postcss\sass\less\stylus-loader
   css: {
-    // 是否使用css分离插件 ExtractTextPlugin
-    extract: false,
+    // 是否将组件中的 CSS 提取至一个独立的 CSS 文件中
+    extract: true,
     // 开启 CSS source maps?
     sourceMap: false,
     // css预设器
     loaderOptions: {
       less: {
         lessOptions: loaderContext => {
-          const { resourcePath, rootContext } = loaderContext;
-          console.log('resourcePath:', resourcePath);
-          console.log('rootContext:', rootContext);
-          // const relativePath = path.relative(rootContext, resourcePath);
           return {
             javascriptEnabled: true
           };
         }
+      },
+      // PostCSS 是一个用 JavaScript 工具和插件转换 CSS 代码的工具. https://www.postcss.com.cn/
+      postcss: {
+        // autoprefixer插件自动补全浏览器前缀
+        plugins: [require('autoprefixer')]
       }
     },
     // 启用 CSS modules for all css / pre-processor files.
