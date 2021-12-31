@@ -154,10 +154,6 @@ export const serverConfig = {
       }
     ]
   },
-  // 播放器
-  comPcPlayer: {
-    component: 'VmpPcPlayer'
-  },
   //聊天组件
   comChat: {
     component: 'VmpChat'
