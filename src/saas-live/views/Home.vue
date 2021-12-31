@@ -53,7 +53,7 @@
         } catch (ex) {
           console.log('---ex--');
           console.log(ex);
-          this.state = 2;
+          this.state = 1;
           this.errMsg = ex.msg;
         }
       },

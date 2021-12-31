@@ -1,4 +1,4 @@
-function getAvatar (avatar) {
+function getAvatar(avatar) {
   if (!avatar) {
     return 'https://cnstatic01.e.vhall.com/3rdlibs/vhall-static/img/default_avatar.png';
   }

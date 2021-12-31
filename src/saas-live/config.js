@@ -1,6 +1,6 @@
 export const globalConfig = {
   lang: 'zh',
-  skin: 'new-year'
+  skin: 'default'
 };
 
 // 服务配置
@@ -33,7 +33,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comPcPlayer']
+    children: ['comDocUne']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,7 +42,8 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
+    className: 'vmp-basic-right__hd',
+    children: ['comPcPlayer']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -93,13 +94,19 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconwendang',
-      text: 'i18n.asideMenu.document'
+      text: 'i18n.asideMenu.document',
+      selected: true
     },
     emitClick: [
       {
         cuid: 'comAsideMenu',
         method: 'setSelectedState',
         args: ['comDocMenu']
+      },
+      {
+        cuid: 'comDocToolbar',
+        method: 'showAtMode',
+        args: ['document']
       }
     ]
   },
@@ -115,6 +122,11 @@ export const serverConfig = {
         cuid: 'comAsideMenu',
         method: 'setSelectedState',
         args: ['comWbMenu']
+      },
+      {
+        cuid: 'comDocToolbar',
+        method: 'showAtMode',
+        args: ['board']
       }
     ]
   },
@@ -149,5 +161,17 @@ export const serverConfig = {
   //聊天组件
   comChat: {
     component: 'VmpChat'
+  },
+  // 文档白板组件
+  comDocUne: {
+    component: 'VmpDocUne',
+    children: ['comDocToolbar']
+  },
+  // 文档工具栏
+  comDocToolbar: {
+    component: 'VmpDocToolbar',
+    options: {
+      hasCloseBtn: false //是否有关闭按钮
+    }
   }
 };
