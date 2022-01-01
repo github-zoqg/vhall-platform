@@ -81,7 +81,7 @@
     align-items: center;
     font-size: 12px;
     color: #ececec;
-    margin-top: 20px;
+    padding: 10px 0px;
 
     span.text {
       font-size: 12px;
