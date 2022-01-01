@@ -63,7 +63,9 @@
         ></vmp-pencil-popup>
       </div>
       <!-- 清除 -->
-      <div class="vmp-icon-item" title="清除"><i class="iconfont iconqingkong"></i></div>
+      <div class="vmp-icon-item" title="清除" @click="handleClear">
+        <i class="iconfont iconqingkong"></i>
+      </div>
     </div>
     <!-- 右：全屏、文档章节等信息-->
     <div class="vmp-doc-toolbar__ft">
@@ -81,7 +83,7 @@
 </template>
 <script>
   import VmpPencilPopup from './popup.vue';
-
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpDocToolbar',
     components: {
@@ -140,6 +142,9 @@
         showThumbnailBtn: true
       };
     },
+    beforeCreate() {
+      this.docServer = contextServer.get('docServer');
+    },
     mounted() {
       this.initConfig();
     },
@@ -161,6 +166,11 @@
         } else {
           this.showChooseDocBtn = true;
           this.showThumbnailBtn = true;
+        }
+      },
+      handleClear() {
+        if (this.docServer) {
+          this.docServer.clear();
         }
       }
     }
