@@ -1,14 +1,6 @@
-<!--
- * @Author: your name
- * @Date: 2022-01-01 15:30:12
- * @LastEditTime: 2022-01-02 11:44:48
- * @LastEditors: Please set LastEditors
- * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- * @FilePath: /middle-platform/src/packages/setting-box/src/main.vue
--->
 <template>
   <el-dialog
-    :title="$t(title)"
+    :title="$t('check_device.check_device_1000')"
     :visible.sync="dialogVisible"
     :before-close="handleClose"
     width="450px"
@@ -20,11 +12,15 @@
           alt=""
           class="check-icon"
         />
-        <div class="check-text">{{ $t(checkTipText) }}</div>
+        <div class="check-text">{{ $t('check_device.check_device_1003') }}</div>
       </div>
       <div slot="footer" class="dialog-footer message-box__btns">
-        <el-button @click="dialogVisible = false">{{ $t(cancelCheck) }}</el-button>
-        <el-button type="primary" @click="dialogVisible = false">{{ $t(startCheck) }}</el-button>
+        <el-button @click="dialogVisible = false">
+          {{ $t('check_device.check_device_1002') }}
+        </el-button>
+        <el-button type="primary" @click="dialogVisible = false">
+          {{ $t('check_device.check_device_1001') }}
+        </el-button>
       </div>
     </div>
   </el-dialog>
@@ -35,9 +31,6 @@
     data() {
       return {
         dialogVisible: true,
-        startCheck: '',
-        cancelCheck: '',
-        checkTipText: '',
         title: '',
         subject: '', // 直播名称
         id: '' // 房间id

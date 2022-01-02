@@ -9,7 +9,7 @@
   >
     <i :class="icon"></i>
     <span class="text">
-      {{ text.startsWith('i18n') ? $t(text) : text }}
+      {{ $t(text) }}
     </span>
   </a>
 </template>
