@@ -9,7 +9,7 @@ module.exports = {
       audienceVisible: 'audience visible',
       choose: 'choose',
       eraser: 'eraser',
-      pencil: 'pencil',
+      pen: 'pen',
       highlighter: 'highlighter',
       shape: 'shape',
       text: 'text',

@@ -15,55 +15,65 @@
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
       <!-- 选择 -->
-      <div class="vmp-icon-item" :title="$t('i18n.usual.choose')">
+      <div
+        class="vmp-icon-item"
+        :title="$t('i18n.usual.choose')"
+        :class="{ selected: currentBrush === 'select' }"
+        @click="handleBoardTool('select')"
+      >
         <i class="iconfont iconxuanze"></i>
       </div>
-      <!-- 橡皮擦 -->
-      <div class="vmp-icon-item" :title="$t('i18n.usual.eraser')">
-        <i class="iconfont iconxiangpica"></i>
-      </div>
       <!-- 画笔 -->
-      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.pencil')">
+      <div
+        class="vmp-icon-item has-corner"
+        :title="$t('i18n.usual.pen')"
+        :class="{ selected: currentBrush === 'pen' }"
+        @click="handleBoardTool('pen')"
+      >
         <i class="iconfont iconhuabi"></i>
-        <vmp-pencil-popup
-          itemType="pen"
-          :dval="7"
-          :itemArr="sizeArr"
-          :colorArr="colorArr"
-        ></vmp-pencil-popup>
+        <vmp-pen-popup></vmp-pen-popup>
       </div>
       <!-- 荧光笔 -->
-      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.highlighter')">
+      <div
+        class="vmp-icon-item has-corner"
+        :title="$t('i18n.usual.highlighter')"
+        :class="{ selected: currentBrush === 'highlighter' }"
+        @click="handleBoardTool('highlighter')"
+      >
         <i class="iconfont iconjiguangbi"></i>
-        <vmp-pencil-popup
-          itemType="pen"
-          :dval="7"
-          :itemArr="sizeArr"
-          :colorArr="colorArr"
-        ></vmp-pencil-popup>
+        <vmp-highlighter-popup></vmp-highlighter-popup>
       </div>
       <!-- 形状 -->
-      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.shape')">
+      <div
+        class="vmp-icon-item has-corner"
+        :title="$t('i18n.usual.shape')"
+        :class="{ selected: currentBrush === 'shape' }"
+        @click="handleBoardTool('shape')"
+      >
         <i class="iconfont icontuxing"></i>
-        <vmp-pencil-popup
-          itemType="shape"
-          dval="setCircle"
-          :itemArr="shapeArr"
-          :colorArr="colorArr"
-        ></vmp-pencil-popup>
+        <vmp-shape-popup></vmp-shape-popup>
       </div>
-      <!-- 文字 -->
-      <div class="vmp-icon-item has-corner" :title="$t('i18n.usual.text')">
+      <!-- 文本 -->
+      <div
+        class="vmp-icon-item has-corner"
+        :title="$t('i18n.usual.text')"
+        :class="{ selected: currentBrush === 'text' }"
+        @click="handleBoardTool('text')"
+      >
         <i class="iconfont iconwenzi"></i>
-        <vmp-pencil-popup
-          itemType="text"
-          :dval="18"
-          :itemArr="fontArr"
-          :colorArr="colorArr"
-        ></vmp-pencil-popup>
+        <vmp-text-popup></vmp-text-popup>
+      </div>
+      <!-- 橡皮擦 -->
+      <div
+        class="vmp-icon-item"
+        :title="$t('i18n.usual.eraser')"
+        :class="{ selected: currentBrush === 'eraser' }"
+        @click="handleBoardTool('eraser')"
+      >
+        <i class="iconfont iconxiangpica"></i>
       </div>
       <!-- 清除 -->
-      <div class="vmp-icon-item" title="清除" @click="handleClear">
+      <div class="vmp-icon-item" :title="$t('i18n.usual.clear')" @click="handleBoardTool('clear')">
         <i class="iconfont iconqingkong"></i>
       </div>
     </div>
@@ -82,64 +92,58 @@
   </div>
 </template>
 <script>
-  import VmpPencilPopup from './popup.vue';
+  import VmpPenPopup from './pen-popup.vue';
+  import VmpHighlighterPopup from './highlighter-popup.vue';
+  import VmpShapePopup from './shape-popup.vue';
+  import VmpTextPopup from './text-popup.vue';
   import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpDocToolbar',
     components: {
-      VmpPencilPopup
+      VmpPenPopup,
+      VmpHighlighterPopup,
+      VmpShapePopup,
+      VmpTextPopup
+    },
+    provide() {
+      return {
+        pen: this.pen,
+        highlighter: this.highlighter,
+        shape: this.shape,
+        text: this.text,
+        changeTool: this.changeTool
+      };
     },
     data() {
       return {
-        value1: true,
-        sizeArr: [
-          { label: '4', value: 4 },
-          { label: '7', value: 7 },
-          { label: '10', value: 10 },
-          { label: '13', value: 13 }
-        ],
-        fontArr: [
-          { label: '小', value: 14, showSize: '12' },
-          { label: '中', value: 18, showSize: '16' },
-          { label: '大', value: 30, showSize: '18' },
-          { label: '超', value: 48, showSize: '20' }
-        ],
-        shapeArr: [
-          { label: '圆形', value: 'setCircle', icon: 'iconfont iconyuanxing' },
-          {
-            label: '四边形',
-            value: 'setSquare',
-            icon: 'iconfont iconzhengfangxing'
-          },
-          {
-            label: '单向箭头',
-            value: 'setSingleArrow',
-            icon: 'iconfont iconjiantou'
-          },
-          {
-            label: '双向箭头',
-            value: 'setDoubleArrow',
-            icon: 'iconfont iconshuangjiantou'
-          }
-        ],
-        colorArr: Object.freeze([
-          { value: '#FFFFFF', title: '白色' },
-          { value: '#9B9B9B', title: '浅灰' },
-          { value: '#2E3038', title: '深灰' },
-          { value: '#000000', title: '黑色' },
-          { value: '#FD2C0A', title: '红色' },
-          { value: '#FF6E00', title: '橙色' },
-          { value: '#FFD400', title: '黄色' },
-          { value: '#98CD47', title: '绿色' },
-          { value: '#01D6D1', title: '青色' },
-          { value: '#0097F0', title: '蓝色' },
-          { value: '#8B6DC2', title: '紫色' },
-          { value: '#FF9B9E', title: '粉色' }
-        ]),
         // 是否有关闭按钮
         hasCloseBtn: true,
         showChooseDocBtn: true,
-        showThumbnailBtn: true
+        showThumbnailBtn: true,
+        //
+        value1: true,
+        // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
+        currentBrush: 'pen',
+        // 画笔状态
+        pen: {
+          size: 7, // 粗细
+          color: '#FD2C0A' // 颜色
+        },
+        //荧光笔
+        highlighter: {
+          size: 7, // 粗细
+          color: '#FD2C0A' //颜色
+        },
+        // 形状
+        shape: {
+          kind: 'setCircle', //
+          color: '#FD2C0A' //颜色
+        },
+        // 文本
+        text: {
+          size: 18, // 字号
+          color: '#FD2C0A' //颜色
+        }
       };
     },
     beforeCreate() {
@@ -159,6 +163,99 @@
           }
         }
       },
+
+      /**
+       *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
+       */
+      changeTool(brush, key, value) {
+        console.log(brush, ';', key, ';', value);
+        const currentContainerId = this.docServer.state.docInstance.currentCid;
+        this.currentBrush = brush;
+        if (key) {
+          this[brush][key] = value;
+        }
+        switch (brush) {
+          // 选择
+          case 'select': {
+            this.docServer.cancelDrawable({ id: currentContainerId });
+            break;
+          }
+          // 画笔
+          case 'pen': {
+            console.log('-------设置画笔---');
+            this.docServer.setPen({ id: currentContainerId });
+            this.docServer.setStrokeWidth({
+              id: currentContainerId,
+              width: this.pen.size
+            });
+            this.docServer.setStroke({
+              id: this.currentContainerId,
+              color: this.pen.color
+            });
+            break;
+          }
+          // 荧光笔
+          case 'highlighter': {
+            this.docServer.setHighlighters({ id: currentContainerId });
+            this.docServer.setStrokeWidth({
+              id: currentContainerId,
+              width: this.highlighter.size
+            });
+            this.docServer.setStroke({
+              id: this.currentContainerId,
+              color: this.highlighter.color
+            });
+            break;
+          }
+          case 'shape': {
+            this.docServer[this.shape.kind]({ id: currentContainerId });
+            this.docServer.setStroke({
+              id: this.currentContainerId,
+              color: this.shape.color
+            });
+            break;
+          }
+          case 'text': {
+            this.docServer.setText({ id: currentContainerId });
+            this.docServer.setStrokeWidth({
+              id: currentContainerId,
+              width: this.text.size
+            });
+            this.docServer.setStroke({
+              id: this.currentContainerId,
+              color: this.text.color
+            });
+            break;
+          }
+          case 'eraser': {
+            this.docServer.setEraser({
+              id: this.currentContainerId
+            });
+            break;
+          }
+        }
+      },
+      /**
+       * 切换画板工具
+       */
+      async handleBoardTool(brush) {
+        if (brush === 'clear') {
+          // TODO 提示文本进行国际化处理
+          try {
+            await this.$confirm('确定要清空白板么？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            });
+            this.docServer.clear();
+          } catch (err) {
+            console.log(err);
+          }
+          return;
+        }
+
+        this.changeTool(brush);
+      },
       showAtMode(v) {
         if (v === 'board') {
           this.showChooseDocBtn = false;
@@ -166,11 +263,6 @@
         } else {
           this.showChooseDocBtn = true;
           this.showThumbnailBtn = true;
-        }
-      },
-      handleClear() {
-        if (this.docServer) {
-          this.docServer.clear();
         }
       }
     }
@@ -267,9 +359,12 @@
 
     &:hover {
       background: #000;
-      .vmp-pencil-popup {
+      .vmp-brush-popup {
         display: block;
       }
+    }
+    &.selected {
+      background: #000;
     }
     &.has-corner {
       margin-right: 3px;
