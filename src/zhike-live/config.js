@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'comCheckDevice']
   },
   // 顶部header容器
   layerHeader: {
@@ -179,6 +179,16 @@ export const serverConfig = {
   // 本地流
   comStreamLocal: {
     component: 'VmpStreamLocal'
+  },
+  //设备检测
+  comCheckDevice: {
+    component: 'VmpCheckDevice',
+    options: {
+      title: 'i18n.checkDevice.title',
+      startCheck: 'i18n.checkDevice.startCheck',
+      cancelCheck: 'i18n.checkDevice.cancelCheck',
+      checkTipText: 'i18n.checkDevice.checkTipText'
+    }
   },
   // 聊天菜单
   comChatMenu: {
