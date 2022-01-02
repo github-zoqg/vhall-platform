@@ -1,5 +1,5 @@
 <template>
-  <span :id="cuid" :ref="cuid" :title="$t(title)" :class="icon"></span>
+  <span :id="cuid" :ref="cuid" :title="$t(title)" class="icon--func" :class="icon"></span>
 </template>
 <script>
   // import { contextServer } from 'vhall-sass-domain';
