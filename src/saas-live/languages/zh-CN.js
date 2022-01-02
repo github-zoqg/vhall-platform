@@ -9,7 +9,7 @@ module.exports = {
       audienceVisible: '观众可见',
       choose: '选择',
       eraser: '橡皮擦',
-      pencil: '画笔',
+      pen: '画笔',
       highlighter: '荧光笔',
       shape: '形状',
       text: '文本',

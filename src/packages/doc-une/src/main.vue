@@ -1,6 +1,7 @@
 <template>
   <div class="vmp-doc-une">
     <div class="vmp-doc-une__hd">
+      <!-- 这里配置的是文档工具栏 -->
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div>
     <div class="vmp-doc-une__content">
@@ -24,7 +25,7 @@
     name: 'VmpDocUne',
     data() {
       return {
-        currentId: '',
+        currentContainerId: '',
         fileOrboardList: []
       };
     },
@@ -39,7 +40,7 @@
           if (this.docServer) {
             const { width, height } = this.setStageSize();
             this.docServer.setSize(width, height, {
-              id: this.currentId
+              id: this.currentContainerId
             });
           }
         });
@@ -86,7 +87,7 @@
         await this.$nextTick();
         this.docServer.createBoard(opts);
         this.docServer.selectContainer({ id: elId });
-        this.currentId = elId;
+        this.currentContainerId = elId;
       }
     },
     mounted() {
