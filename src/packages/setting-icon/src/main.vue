@@ -26,8 +26,6 @@
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
         if (widget && widget.options) {
-          // this.icon = widget.options.icon;
-          // this.title = widget.options.title;
           Object.assign(this.$data, widget.options);
         }
       }
