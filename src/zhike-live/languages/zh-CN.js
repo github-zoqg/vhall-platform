@@ -40,6 +40,12 @@ module.exports = {
     },
     fullIcon: {
       title: '全屏'
+    },
+    checkDevice: {
+      title: '设备检测',
+      startCheck: '开始检测',
+      cancelCheck: '不检测',
+      checkTipText: '为了保证优质的直播质量，建议您优先进行设备检测，是否检测？'
     }
   }
 };
