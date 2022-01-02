@@ -64,7 +64,7 @@ export const serverConfig = {
   pannelHeaderRight: {
     component: 'VmpContainer',
     className: 'vmp-header-right vmp-header-func',
-    children: ['comSettingIcon', 'comFullIcon']
+    children: ['comSettingIcon', 'comFullIcon', 'comUserSettingBox']
   },
   // 顶部左侧组件
   compHeaderLeft: {
@@ -236,6 +236,13 @@ export const serverConfig = {
     options: {
       icon: 'iconfont icon-icon-quanping',
       title: 'i18n.fullIcon.title'
+    }
+  },
+  comUserSettingBox: {
+    component: 'VmpUserSettingBox',
+    options: {
+      icon: 'iconfont icon-faqiduanshezhi',
+      title: 'i18n.settingIcon.title'
     }
   }
 };
