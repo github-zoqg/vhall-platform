@@ -174,8 +174,26 @@ export const serverConfig = {
   comStreamList: {
     component: 'VmpStreamList'
   },
+  // 远端流
+  comStreamRemote: {
+    component: 'VmpStreamRemote',
+    emitClickExchange: [
+      {
+        cuid: 'ps.surface',
+        method: 'exchange',
+        args: ['comStreamRemote']
+      }
+    ]
+  },
   // 本地流
   comStreamLocal: {
-    component: 'VmpStreamLocal'
+    component: 'VmpStreamLocal',
+    emitClickExchange: [
+      {
+        cuid: 'ps.surface',
+        method: 'exchange',
+        args: ['comStreamLocal']
+      }
+    ]
   }
 };

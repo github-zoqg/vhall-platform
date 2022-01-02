@@ -1,5 +1,10 @@
 import { contextServer, useDocServer } from 'vhall-sass-domain';
-export default async function () {
+
+export const store = {
+  streamRemote: {}
+};
+
+export async function roomInit() {
   const msgServer = contextServer.get('msgServer');
   const docServer = useDocServer();
   const interactiveServer = contextServer.get('interactiveServer');

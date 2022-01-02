@@ -1,5 +1,6 @@
 <template>
   <div class="vmp-stream-local">
+    local
     <section class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
         <el-tooltip :content="videoStatus ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -70,7 +71,12 @@
     methods: {
       muteDevice() {},
       speakOff() {},
-      exchange() {},
+      exchange() {
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitClickExchange'
+        });
+      },
       fullScreen() {}
     }
   };

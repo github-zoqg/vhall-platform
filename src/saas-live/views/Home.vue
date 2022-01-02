@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import roomState from '../headless/room-state.js';
+  import { roomInit } from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
   import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
   export default {
@@ -34,7 +34,7 @@
     async created() {
       // 初始化直播房间
       await this.initSendLive();
-      await roomState();
+      await roomInit();
       // 初始化完成
       this.state = 1;
     },
