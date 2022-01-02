@@ -4,11 +4,11 @@
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
       <div v-show="showChooseDocBtn" class="choose-document">
-        {{ $t('i18n.usual.chooseDocument') }}
+        {{ $t('usual.chooseDocument') }}
       </div>
 
       <div class="audience-visible">
-        <span style="margin-right: 5px">{{ $t('i18n.usual.audienceVisible') }}</span>
+        <span style="margin-right: 5px">{{ $t('usual.audienceVisible') }}</span>
         <el-switch v-model="value1" active-color="#13ce66"></el-switch>
       </div>
     </div>
@@ -17,7 +17,7 @@
       <!-- 选择 -->
       <div
         class="vmp-icon-item"
-        :title="$t('i18n.usual.choose')"
+        :title="$t('usual.choose')"
         :class="{ selected: currentBrush === 'select' }"
         @click="handleBoardTool('select')"
       >
@@ -26,7 +26,7 @@
       <!-- 画笔 -->
       <div
         class="vmp-icon-item has-corner"
-        :title="$t('i18n.usual.pen')"
+        :title="$t('usual.pen')"
         :class="{ selected: currentBrush === 'pen' }"
         @click="handleBoardTool('pen')"
       >
@@ -36,7 +36,7 @@
       <!-- 荧光笔 -->
       <div
         class="vmp-icon-item has-corner"
-        :title="$t('i18n.usual.highlighter')"
+        :title="$t('usual.highlighter')"
         :class="{ selected: currentBrush === 'highlighter' }"
         @click="handleBoardTool('highlighter')"
       >
@@ -46,7 +46,7 @@
       <!-- 形状 -->
       <div
         class="vmp-icon-item has-corner"
-        :title="$t('i18n.usual.shape')"
+        :title="$t('usual.shape')"
         :class="{ selected: currentBrush === 'shape' }"
         @click="handleBoardTool('shape')"
       >
@@ -56,7 +56,7 @@
       <!-- 文本 -->
       <div
         class="vmp-icon-item has-corner"
-        :title="$t('i18n.usual.text')"
+        :title="$t('usual.text')"
         :class="{ selected: currentBrush === 'text' }"
         @click="handleBoardTool('text')"
       >
@@ -66,26 +66,26 @@
       <!-- 橡皮擦 -->
       <div
         class="vmp-icon-item"
-        :title="$t('i18n.usual.eraser')"
+        :title="$t('usual.eraser')"
         :class="{ selected: currentBrush === 'eraser' }"
         @click="handleBoardTool('eraser')"
       >
         <i class="iconfont iconxiangpica"></i>
       </div>
       <!-- 清除 -->
-      <div class="vmp-icon-item" :title="$t('i18n.usual.clear')" @click="handleBoardTool('clear')">
+      <div class="vmp-icon-item" :title="$t('usual.clear')" @click="handleBoardTool('clear')">
         <i class="iconfont iconqingkong"></i>
       </div>
     </div>
     <!-- 右：全屏、文档章节等信息-->
     <div class="vmp-doc-toolbar__ft">
-      <div v-show="showThumbnailBtn" class="vmp-icon-item" :title="$t('i18n.usual.docThumb')">
+      <div v-show="showThumbnailBtn" class="vmp-icon-item" :title="$t('usual.docThumb')">
         <i class="iconfont iconsuolvetu"></i>
       </div>
-      <div class="vmp-icon-item" :title="$t('i18n.usual.fullscreen')">
+      <div class="vmp-icon-item" :title="$t('usual.fullscreen')">
         <i class="iconfont iconquanping"></i>
       </div>
-      <div class="vmp-icon-item" :title="$t('i18n.usual.close')" v-if="hasCloseBtn">
+      <div class="vmp-icon-item" :title="$t('usual.usual_1002')" v-if="hasCloseBtn">
         <i class="iconfont iconguanbi2"></i>
       </div>
     </div>
