@@ -80,11 +80,11 @@ export const serverConfig = {
       choices: [
         {
           value: 'zh',
-          label: 'i18n.languageChoice.zh'
+          label: 'language_choice.language_choice_1001'
         },
         {
           value: 'en',
-          label: 'i18n.languageChoice.en'
+          label: 'language_choice.language_choice_1002'
         }
       ]
     }
@@ -94,7 +94,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconwendang',
-      text: 'i18n.asideMenu.document',
+      text: 'aside_menu.aside_menu_1000',
       selected: true
     },
     emitClick: [
@@ -115,7 +115,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconbaiban',
-      text: 'i18n.asideMenu.whiteBoard'
+      text: 'aside_menu.aside_menu_1001'
     },
     emitClick: [
       {
@@ -135,7 +135,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconzhuomiangongxiang',
-      text: 'i18n.asideMenu.shareDesktop',
+      text: 'aside_menu.aside_menu_1002',
       disable: true
     }
   },
@@ -144,7 +144,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconwangyechabo_icon',
-      text: 'i18n.asideMenu.mediaPlay'
+      text: 'aside_menu.aside_menu_1003'
     },
     emitClick: [
       {

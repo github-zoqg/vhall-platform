@@ -1,11 +1,10 @@
-e
 <!-- 主题选择组件 -->
 <template>
   <div class="vmp-language-choice">
-    <span>{{ $t('i18n.languageChoice.label') }}</span>
+    <span>{{ $t('language_choice.language_choice_1000') }}</span>
     <select class="vmp-language-choice__select" v-model="lang" @change="handleChange">
       <option v-for="item of choices" :value="item.value" :key="item.value">
-        {{ item.label.startsWith('i18n') ? $t(item.label) : item.label }}
+        {{ $t(item.label) }}
       </option>
     </select>
   </div>
