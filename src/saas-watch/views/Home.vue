@@ -27,8 +27,8 @@
       },
       initSendLive() {
         this.roomInitGroupServer.initReceiveLive({
-          webinar_id: '649692238',
-          webinarId: '649692238',
+          webinar_id: '876395481',
+          webinarId: '876395481',
           visitor_id: '',
           refer: '',
           record_id: ''
