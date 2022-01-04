@@ -1,5 +1,5 @@
 <template>
-  <div v-if="preImgShow" :class="['vhall-chat-slide-wrapper', opacity ? '' : 'hide']">
+  <div v-if="preImgShow" :class="['vmp-img-preview-wrap', opacity ? '' : 'hide']">
     <div class="slide-group">
       <div class="slide" v-for="(img, index) in imgs" :key="index">
         <img :src="img" alt />
@@ -21,6 +21,7 @@
   import Slide from '@better-scroll/slide';
   BScroll.use(Slide);
   export default {
+    name: 'VmpImgPreview',
     props: {
       imgs: {
         required: true,
@@ -46,8 +47,9 @@
     },
     mounted() {},
     methods: {
+      //初始化
       init() {
-        this.slideScroll = new BScroll('.vhall-chat-slide-wrapper', {
+        this.slideScroll = new BScroll('.vmp-img-preview-wrap', {
           scrollX: true,
           scrollY: false,
           click: true,
@@ -61,6 +63,7 @@
           stopPropagation: true
         });
       },
+      //显示图片预览
       show() {
         this.preImgShow = true;
         clearTimeout(this.showTimer);
@@ -68,10 +71,12 @@
           this.init();
         }, 200);
       },
+      //隐藏图片预览
       hide() {
         this.preImgShow = false;
         this.opacity = 0;
       },
+      //向前
       goToPre() {
         clearTimeout(this.preTimer);
         this.preTimer = setTimeout(() => {
@@ -80,6 +85,7 @@
           console.log('index', this.currentIndex);
         }, 200);
       },
+      //向后
       goToNext() {
         clearTimeout(this.nextTimer);
         this.nextTimer = setTimeout(() => {
@@ -87,6 +93,7 @@
           this._getIndex();
         }, 200);
       },
+      //去具体的页面
       goToPage() {
         this.slideScroll.refresh();
         console.log('arguments', arguments);
@@ -94,6 +101,7 @@
         this.opacity = 1;
         this._getIndex();
       },
+      //获取当前的图片
       _getIndex() {
         this.currentIndex = this.slideScroll.getCurrentPage().pageX;
       }
@@ -101,7 +109,7 @@
   };
 </script>
 <style lang="less">
-  .vhall-chat-slide-wrapper {
+  .vmp-img-preview-wrap {
     width: 840px;
     height: 500px;
     position: fixed;

@@ -1,11 +1,11 @@
 <template>
-  <div class="c-msg-item">
+  <div class="vmp-chat-msg-item">
     <!--消息发送时间-->
-    <div v-if="msg.showTime" class="msg-item-showtime">{{ msg.showTime }}</div>
+    <div v-if="msg.showTime" class="vmp-chat-msg-item__showtime">{{ msg.showTime }}</div>
     <!--消息主体-->
-    <div :class="['msg-item', msg.type]">
+    <div :class="['msg-item-template', msg.type]">
       <template v-if="['welcome_msg'].includes(msg.type)">
-        <div v-if="msg.nickName !== '' && msg.content !== ''" class="welcome-msg">
+        <div v-if="msg.nickName !== '' && msg.content !== ''" class="msg-item-template--welcome">
           <span>{{ msg.nickName }}</span>
           {{ msg.content }}
         </div>
@@ -38,13 +38,7 @@
         </div>
       </template>
 
-      <template
-        v-if="
-          !['welcome_msg', 'reward_pay_ok', 'gift_send_success', 'free_gift_send'].includes(
-            msg.type
-          )
-        "
-      >
+      <template v-if="!checkIsNotRegularMessage(msg.type)">
         <div class="avatar-wrap" @click="setPersonStatus($event, msg)">
           <img class="chat-avatar" width="26" height="26" :src="msg.avatar" alt />
           <img
@@ -73,7 +67,7 @@
           <template v-if="['text', 'image'].includes(msg.type)">
             <p
               v-if="msg.replyMsg && msg.replyMsg.content && msg.replyMsg.content.text_content"
-              class="replymsg-content_body"
+              class="reply-msg-content--body"
               v-html="
                 `${msg.replyMsg.nickName || msg.replyMsg.nick_name} : ${
                   msg.replyMsg.content.text_content
@@ -203,6 +197,13 @@
         return function (type) {
           return mapList.some(val => val === type);
         };
+      },
+      //检查是否是非常规消息(比如欢迎语，红包，礼物)
+      checkIsNotRegularMessage() {
+        const mapList = ['welcome_msg', 'reward_pay_ok', 'gift_send_success', 'free_gift_send'];
+        return function (type) {
+          return mapList.some(val => val === type);
+        };
       }
     },
     filters: {
@@ -280,17 +281,17 @@
         this.msg.atList.find(u => userInfo.third_party_user_id == u.accountId) &&
         !this.msg.isHistoryMsg
       ) {
-        EventBus.$emit('scrollElement', this.$el);
+        this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
         clearTimeout(this.tipTimer);
         this.tipTimer = setTimeout(() => {
-          EventBus.$emit('closeTip');
+          this.$emit('dispatchEvent', { type: 'closeTip' });
         }, 10000);
       }
       if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
-        EventBus.$emit('replyMsg', { el: this.$el, msg: this.msg.replyMsg });
+        this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
         clearTimeout(this.tipTimer);
         this.tipTimer = setTimeout(() => {
-          EventBus.$emit('closeTip');
+          this.$emit('dispatchEvent', { type: 'closeTip' });
         }, 10000);
       }
     },
@@ -315,7 +316,7 @@
         // 嘉宾和助理只能操作观众
         if ((this.roleName == 3 || this.roleName == 4) && msg.roleName != 2) {
           EventBus.$emit(
-            'tangram_set_person_status_in_chat',
+            'set_person_status_in_chat',
             event.target,
             msg.sendId,
             msg.count,
@@ -330,7 +331,7 @@
           return;
         }
         EventBus.$emit(
-          'tangram_set_person_status_in_chat',
+          'set_person_status_in_chat',
           event.target,
           msg.sendId,
           msg.count,
@@ -343,9 +344,9 @@
   };
 </script>
 <style lang="less">
-  .c-msg-item {
+  .vmp-chat-msg-item {
     pointer-events: auto;
-    .msg-item-showtime {
+    &__showtime {
       padding: 0 0 12px 0;
       font-size: 12px;
       color: #888888;
@@ -353,33 +354,34 @@
       justify-content: center;
       align-items: center;
     }
-    .welcome-msg {
-      width: 270px;
-      padding: 6px 10px 7px 10px;
-      border-radius: 30px;
-      background-color: #202020;
-      text-align: center;
-      color: #bcbcbc;
-      font-size: 12px;
-      box-sizing: border-box;
-      margin: 0 auto 12px auto;
-      span {
-        color: #4da1ff;
-        display: inline-block;
-        width: 70px;
-        overflow: hidden;
-        height: 16px;
-        line-height: 14px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        vertical-align: middle;
-      }
-    }
-    .msg-item {
+
+    .msg-item-template {
       margin: 0 10px 0 12px;
       padding: 0 0 12px 0;
       display: flex;
       align-items: center;
+      &--welcome {
+        width: 270px;
+        padding: 6px 10px 7px 10px;
+        border-radius: 30px;
+        background-color: #202020;
+        text-align: center;
+        color: #bcbcbc;
+        font-size: 12px;
+        box-sizing: border-box;
+        margin: 0 auto 12px auto;
+        span {
+          color: #4da1ff;
+          display: inline-block;
+          width: 70px;
+          overflow: hidden;
+          height: 16px;
+          line-height: 14px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          vertical-align: middle;
+        }
+      }
       .avatar-wrap {
         position: relative;
         overflow: hidden;
@@ -450,7 +452,7 @@
             }
           }
         }
-        .replymsg-content_body {
+        .reply-msg-content--body {
           word-break: break-all;
           color: #dddddd;
           line-height: 18px;

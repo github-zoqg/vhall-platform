@@ -13,14 +13,14 @@
       </p>
       <a
         v-if="!isAssistant"
-        class="vmp-chat-filter--btn"
+        class="vmp-chat-filter__button"
         :href="filterUrl"
         target="_blank"
         @click="sendMsgFilter"
       >
         开启手动过滤
       </a>
-      <a v-if="isAssistant" class="vmp-chat-filter--btn" @click="sendMsgToAssistant">
+      <a v-if="isAssistant" class="vmp-chat-filter__button" @click="sendMsgToAssistant">
         开启手动过滤
       </a>
     </div>
@@ -29,7 +29,10 @@
 
 <script>
   import EventBus from '../js/Events.js';
+  import { useChatServer } from 'vhall-sass-domain';
+  import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   export default {
+    mixins: [dataReportMixin],
     props: {
       webinarId: {
         required: true
@@ -55,6 +58,9 @@
         userId: ''
       };
     },
+    beforeCreate() {
+      this.chatServer = useChatServer();
+    },
     mounted() {
       this.filterUrl = this.chatFilterUrl;
       // 全体禁言
@@ -67,67 +73,41 @@
       });
     },
     methods: {
+      //根据复选框的状态来决定是否开启/关闭全体禁言
       handleChange(e) {
         this.setAllBanned(e.target.checked);
       },
+      //切换聊天审核模态窗展示
       toggleShow() {
         this.chatFilterShow = !this.chatFilterShow;
       },
+      //开启 / 关闭 全体禁言
       setAllBanned(flag) {
-        this.$fetch('setAllBanned', {
+        let params = {
           room_id: this.roomId,
           status: flag ? 1 : 0
-        })
+        };
+        this.chatServer
+          .setAllBanned(params)
           .then(res => {
-            this.$vhall_paas_port({
-              k: flag ? 110116 : 110117,
-              data: {
-                business_uid: this.userId,
-                user_id: '',
-                webinar_id: this.webinarId,
-                refer: '',
-                s: '',
-                report_extra: {},
-                ref_url: '',
-                req_url: ''
-              }
+            this.buriedPointReport(flag ? 110116 : 110117, {
+              business_uid: this.userId,
+              webinar_id: this.webinarId
             });
             return res;
-            // this.bannedAll = !this.bannedAll
           })
           .catch(error => {
             this.$message.error(error.msg);
           });
       },
       sendMsgFilter() {
-        this.$vhall_paas_port({
-          k: 110118,
-          data: {
-            business_uid: this.userId,
-            user_id: '',
-            webinar_id: this.webinarId,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
+        this.buriedPointReport(110118, { business_uid: this.userId, webinar_id: this.webinarId });
       },
+      /**
+       * 开启手动过滤
+       * */
       sendMsgToAssistant() {
-        this.$vhall_paas_port({
-          k: 110118,
-          data: {
-            business_uid: this.userId,
-            user_id: '',
-            webinar_id: this.webinarId,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
+        this.buriedPointReport(110118, { business_uid: this.userId, webinar_id: this.webinarId });
         EventBus.$emit('chatFilterUrl', this.filterUrl);
       }
     }
@@ -160,7 +140,7 @@
       }
     }
 
-    &--btn {
+    &__button {
       display: block;
       color: #4da1ff;
       text-align: right;

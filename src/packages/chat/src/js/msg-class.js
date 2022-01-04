@@ -1,21 +1,23 @@
 let count = 0;
 export default class Msg {
-  constructor({
-    avatar = '',
-    sendId = '',
-    nickName = '',
-    type = 'text',
-    showTime = '',
-    roleName = '',
-    content = {},
-    sendTime = '',
-    client = '',
-    replyMsg = {},
-    msgId = '',
-    channel = '',
-    atList = [],
-    isHistoryMsg = false
-  }) {
+  constructor(params = {}) {
+    let {
+      avatar = '',
+      sendId = '',
+      nickName = '',
+      type = 'text',
+      showTime = '',
+      roleName = '',
+      content = {},
+      sendTime = '',
+      client = '',
+      replyMsg = {},
+      msgId = '',
+      channel = '',
+      atList = [],
+      isHistoryMsg = false
+    } = params;
+
     // 用户id
     this.type = type;
     this.avatar = avatar;

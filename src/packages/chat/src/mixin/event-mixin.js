@@ -680,30 +680,30 @@ const eventMixin = {
         }
       });
       // @本用户的msgItem元素
-      EventBus.$on('scrollElement', el => {
-        this.showTip = true;
-        this.elements.push(el);
-        this.tipMsg = this.replyElement ? '有多条未读消息' : '有人@你';
-      });
+      // EventBus.$on('scrollElement', el => {
+      //   this.showTip = true;
+      //   this.elements.push(el);
+      //   this.tipMsg = this.replyElement ? '有多条未读消息' : '有人@你';
+      // });
       // 关闭提示
-      EventBus.$on('closeTip', () => {
-        this.showTip = false;
-        this.tipMsg = '';
-      });
-      // 清空@列表
-      EventBus.$on('clearElements', () => {
-        this.elements = [];
-        this.showTip = false;
-        this.tipMsg = '';
-        this.replyElement = null;
-      });
+      // EventBus.$on('closeTip', () => {
+      //   this.showTip = false;
+      //   this.tipMsg = '';
+      // });
+      // // 清空@列表
+      // EventBus.$on('clearElements', () => {
+      //   this.elements = [];
+      //   this.showTip = false;
+      //   this.tipMsg = '';
+      //   this.replyElement = null;
+      // });
       // 有人回复本用户
-      EventBus.$on('replyMsg', e => {
-        if (this.userId != e.msg.sendId) return;
-        this.showTip = true;
-        this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
-        this.replyElement = e.el;
-      });
+      // EventBus.$on('replyMsg', e => {
+      //   if (this.userId != e.msg.sendId) return;
+      //   this.showTip = true;
+      //   this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
+      //   this.replyElement = e.el;
+      // });
       // 计时暂停
       EventBus.$on('timer_pause', msg => {
         const text = msg.data.role_name == 3 ? '助理' : msg.data.role_name == 1 ? '主持人' : '嘉宾';
@@ -719,15 +719,6 @@ const eventMixin = {
         this.chatList.push(data);
       });
       EventBus.$on('room_channel_change', this.handleChannelChange);
-
-      window.addEventListener(
-        'resize',
-        () => {
-          this.refresh();
-          this.scrollBottom();
-        },
-        true
-      );
     }
   }
 };
