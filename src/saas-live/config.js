@@ -59,10 +59,26 @@ export const serverConfig = {
     children: ['compHeaderLeft']
   },
   // 顶部右侧容器
+  // pannelHeaderRight: {
+  //   component: 'VmpContainer',
+  //   className: 'vmp-header-right',
+  //   children: ['compLanguageChoice']
+  // },
+  // // 顶部右侧容器
   pannelHeaderRight: {
-    component: 'VmpContainer',
-    className: 'vmp-header-right',
-    children: ['compLanguageChoice']
+    component: 'VmpHeaderRight',
+    emitClickStartLive: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'startPush'
+      }
+    ],
+    emitClickEndLive: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'stopPush'
+      }
+    ]
   },
   // 顶部左侧组件
   compHeaderLeft: {
@@ -188,11 +204,26 @@ export const serverConfig = {
   // 本地流
   comStreamLocal: {
     component: 'VmpStreamLocal',
+    // 窗口切换事件
     emitClickExchange: [
       {
         cuid: 'ps.surface',
         method: 'exchange',
         args: ['comStreamLocal']
+      }
+    ],
+    // 推流完成事件
+    emitClickPublishComplate: [
+      {
+        cuid: 'pannelHeaderRight',
+        method: 'handlePublishComplate'
+      }
+    ],
+    // 停止推流完成事件
+    emitClickUnpublishComplate: [
+      {
+        cuid: 'pannelHeaderRight',
+        method: 'handleUnpublishComplate'
       }
     ]
   }
