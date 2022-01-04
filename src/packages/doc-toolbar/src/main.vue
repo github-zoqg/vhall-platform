@@ -9,7 +9,7 @@
 
       <div class="audience-visible">
         <span style="margin-right: 5px">{{ $t('usual.audienceVisible') }}</span>
-        <el-switch v-model="value1" active-color="#13ce66"></el-switch>
+        <el-switch v-model="switchStatus" active-color="#13ce66"></el-switch>
       </div>
     </div>
     <!-- 中：画笔相关工具 -->
@@ -121,7 +121,7 @@
         showChooseDocBtn: true,
         showThumbnailBtn: true,
         //
-        value1: true,
+        switchStatus: true,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
         currentBrush: 'pen',
         // 画笔状态
@@ -151,6 +151,7 @@
     },
     mounted() {
       this.initConfig();
+      this.recoverLastState();
     },
     methods: {
       // 初始化配置
@@ -256,8 +257,19 @@
 
         this.changeTool(brush);
       },
-      showAtMode(v) {
-        if (v === 'board') {
+      /**
+       *  刷新或者退出重进恢复上次的状态
+       */
+      recoverLastState: async function () {
+        const { switch_status } = await this.docServer.getContainerInfo();
+        this.switchStatus = Boolean(switch_status);
+      },
+      /**
+       * 切换到 文档还是白板
+       * @param type:文档：document， 白板：board
+       */
+      async switchTo(type = 'document') {
+        if (type === 'board') {
           this.showChooseDocBtn = false;
           this.showThumbnailBtn = false;
         } else {
