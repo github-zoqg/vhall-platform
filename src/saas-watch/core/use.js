@@ -17,6 +17,8 @@ import VmpDocToolbar from '@/packages/doc-toolbar';
 import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
+import VmpFooter from '@/packages/footer';
+import VmpFooterTools from '@/packages/footer-tools';
 
 // 全局注册组件
 export function initUse() {
@@ -34,4 +36,6 @@ export function initUse() {
   Vue.use(VmpStreamList);
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);
+  Vue.use(VmpFooter);
+  Vue.use(VmpFooterTools);
 }
