@@ -1,5 +1,6 @@
 <template>
   <div class="vmp-stream-remote">
+    remote{{ index }}
     <!-- 鼠标 hover 遮罩层 -->
     <section class="vmp-stream-remote__shadow-box">
       <p class="vmp-stream-remote__shadow-first-line">
@@ -24,7 +25,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
-            @click="speakOff()"
+            @click="speakOff"
             v-if="roleName != 1 && role != 20"
           ></span>
         </el-tooltip>
@@ -34,7 +35,7 @@
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_qiehuan"
             v-if="!isFullScreen"
-            @click="exchange()"
+            @click="exchange"
           ></span>
         </el-tooltip>
         <el-tooltip content="全屏" placement="bottom">
@@ -48,7 +49,7 @@
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
             v-if="roleName != 1"
-            @click="speakOff()"
+            @click="speakOff"
           ></span>
         </el-tooltip>
       </p>
@@ -61,7 +62,15 @@
     name: 'VmpStreamRemote',
 
     data() {
-      return {};
+      return {
+        streamId: 1111222
+      };
+    },
+
+    props: {
+      index: {
+        require: true
+      }
     },
 
     mounted() {},
@@ -69,7 +78,16 @@
     methods: {
       muteDevice() {},
       speakOff() {},
-      exchange() {}
+      exchange() {
+        if (this.$listeners.exchange) {
+          this.$emit('exchange', this.index);
+          return false;
+        }
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitClickExchange'
+        });
+      }
     }
   };
 </script>
