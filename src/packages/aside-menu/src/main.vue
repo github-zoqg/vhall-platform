@@ -7,10 +7,10 @@
   export default {
     name: 'VmpAsideMenu',
     methods: {
-      setSelectedState(cuid) {
-        window.$serverConfig[this.cuid].children?.forEach(element => {
-          window.$middleEventSdk.serverPool.get(element).setSelectedState(element === cuid);
-        });
+      switchTo(kind) {
+        for (const vn of this.$children) {
+          vn.setSelectedState(vn.kind === kind);
+        }
       }
     }
   };

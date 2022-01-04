@@ -4,6 +4,7 @@
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
+    :data-kind="kind"
     :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
     @click="handleClick"
   >
@@ -19,6 +20,7 @@
     data() {
       return {
         className: '',
+        kind: '',
         selected: false,
         disable: false,
         icon: '',
@@ -36,6 +38,10 @@
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('className')) {
             this.className = widget.options.className;
+          }
+          // eslint-disable-next-line
+          if (widget.options.hasOwnProperty('kind')) {
+            this.kind = widget.options.kind;
           }
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('selected')) {

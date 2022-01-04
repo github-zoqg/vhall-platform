@@ -2,6 +2,7 @@
 node_modules
 /dist
 .history
+middle-event-sdk
 
 
 # local env files

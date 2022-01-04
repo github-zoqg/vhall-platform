@@ -95,17 +95,22 @@ export const serverConfig = {
     options: {
       icon: 'iconfont iconwendang',
       text: 'aside_menu.aside_menu_1000',
-      selected: true
+      kind: 'document'
     },
     emitClick: [
       {
         cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comDocMenu']
+        method: 'switchTo',
+        args: ['document']
+      },
+      {
+        cuid: 'comDocUne',
+        method: 'switchTo',
+        args: ['document']
       },
       {
         cuid: 'comDocToolbar',
-        method: 'showAtMode',
+        method: 'switchTo',
         args: ['document']
       }
     ]
@@ -115,17 +120,23 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconbaiban',
-      text: 'aside_menu.aside_menu_1001'
+      text: 'aside_menu.aside_menu_1001',
+      kind: 'board'
     },
     emitClick: [
       {
         cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comWbMenu']
+        method: 'switchTo',
+        args: ['board']
+      },
+      {
+        cuid: 'comDocUne',
+        method: 'switchTo',
+        args: ['board']
       },
       {
         cuid: 'comDocToolbar',
-        method: 'showAtMode',
+        method: 'switchTo',
         args: ['board']
       }
     ]
@@ -161,7 +172,19 @@ export const serverConfig = {
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    children: ['comDocToolbar']
+    children: ['comDocToolbar'],
+    emitSwitchTo: [
+      {
+        cuid: 'comAsideMenu',
+        method: 'switchTo',
+        args: ['$0'] // 获取动态参数的第一个
+      },
+      {
+        cuid: 'comDocToolbar',
+        method: 'switchTo',
+        args: ['$0']
+      }
+    ]
   },
   // 文档工具栏
   comDocToolbar: {
