@@ -1,26 +1,30 @@
 <template>
-  <div class="vhall-chat-user-control_bg" v-show="isShow" @click.capture="isShow = false">
-    <div class="vhall-chat-user-control" :style="style">
-      <div class="setspeak" @click="reply(count)">
+  <div class="vmp-chat-user-control-wrap" v-show="isShow" @click.capture="isShow = false">
+    <div class="vmp-chat-user-control" :style="style">
+      <div class="vmp-chat-user-control__item" @click="reply(count)">
         <i></i>
         <span>回复</span>
       </div>
       <div
-        :class="this.atList.find(u => u.nickName == this.nickName) ? 'setkick disabled' : 'setkick'"
+        :class="
+          this.atList.find(u => u.nickName == this.nickName)
+            ? 'vmp-chat-user-control__item disabled'
+            : 'vmp-chat-user-control__item'
+        "
         @click="atUser(accountId)"
       >
         <i></i>
         <span>@TA</span>
       </div>
-      <div class="setspeak" @click="deleteMsg(count)" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="deleteMsg(count)" v-if="godMode">
         <i></i>
         <span>删除</span>
       </div>
-      <div class="setspeak" @click="setBanned" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode">
         <i></i>
         <span>{{ userStatus.is_banned ? '取消禁言' : '禁言' }}</span>
       </div>
-      <div class="setkick" @click="setKicked" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="setKicked" v-if="godMode">
         <i></i>
         <span>{{ userStatus.is_kicked ? '取消踢出' : '踢出' }}</span>
       </div>
@@ -29,7 +33,11 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
+  import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
+  import { useChatServer } from 'vhall-sass-domain';
+
   export default {
+    mixins: [dataReportMixin],
     props: {
       roomId: {
         required: true
@@ -60,15 +68,17 @@
         assistantType: ''
       };
     },
+    beforeCreate() {
+      this.chatServer = useChatServer();
+    },
     created() {
       this.assistantType = this.$route.query.assistantType;
     },
     mounted() {
       EventBus.$on(
-        'tangram_set_person_status_in_chat',
+        'set_person_status_in_chat',
         async (el, accountId, count, nickName, godMode, roleName) => {
-          console.warn(accountId, count, '???1111111');
-          if (accountId == this.userId) return; // 不能点击自己
+          if (accountId === this.userId) return; // 不能点击自己
           this.accountId = accountId;
           this.count = count;
           this.userStatus = await this.getUserStatus();
@@ -98,10 +108,10 @@
       calculate(el) {
         const rect = el.getBoundingClientRect();
         const clientHeight = this.getClientHeight();
-        const modalHeigt = this.godMode ? 152 : 68;
-        if (clientHeight - rect.bottom < modalHeigt) {
+        const modalHeight = this.godMode ? 152 : 68;
+        if (clientHeight - rect.bottom < modalHeight) {
           this.style = {
-            top: `${rect.top - modalHeigt}px`,
+            top: `${rect.top - modalHeight}px`,
             left: `${rect.left}px`
           };
         } else {
@@ -152,23 +162,15 @@
        */
       setBanned() {
         const nextStatus = this.userStatus.is_banned ? 0 : 1;
-        this.$fetch('setBanned', {
+        const params = {
           receive_account_id: this.accountId,
           status: nextStatus,
           room_id: this.roomId
-        });
-        this.$vhall_paas_port({
-          k: 110122,
-          data: {
-            business_uid: this.userId,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
+        };
+        this.chatServer.setBanned(params);
+        this.buriedPointReport(110122, {
+          business_uid: this.userId,
+          webinar_id: this.$route.params.il_id
         });
       },
       /**
@@ -198,23 +200,15 @@
           // center: true
         })
           .then(() => {
-            this.$fetch('setKickOut', {
+            const params = {
               room_id: this.roomId,
               receive_account_id: this.accountId,
               status: nextStatus
-            }).then(() => {
-              this.$vhall_paas_port({
-                k: 110123,
-                data: {
-                  business_uid: this.userId,
-                  user_id: '',
-                  webinar_id: this.$route.params.il_id,
-                  refer: '',
-                  s: '',
-                  report_extra: {},
-                  ref_url: '',
-                  req_url: ''
-                }
+            };
+            this.chatServer.setKicked(params).then(() => {
+              this.buriedPointReport(110123, {
+                business_uid: this.userId,
+                webinar_id: this.$route.params.il_id
               });
               EventBus.$emit('kicked_in_chat', { nextStatus, accountId: this.accountId });
             });
@@ -243,7 +237,7 @@
   };
 </script>
 <style lang="less">
-  .vhall-chat-user-control_bg {
+  .vmp-chat-user-control-wrap {
     position: fixed;
     top: 0;
     left: 0;
@@ -251,17 +245,17 @@
     right: 0;
     background-color: transparent;
     z-index: 900;
-    .vhall-chat-user-control {
+    .vmp-chat-user-control {
       position: absolute;
       width: 96px;
       padding: 6px 0;
       background-color: #ffffff;
       border-radius: 4px;
-      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
       overflow: hidden;
       box-sizing: border-box;
       cursor: pointer;
-      & > div {
+      &__item {
         font-size: 14px;
         height: 28px;
         color: #666666;

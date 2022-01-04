@@ -8,6 +8,7 @@
           :key="msg.msgId"
           :msg="msg"
           :roleName="roleName"
+          @dispatchEvent="msgEventHandleDisPatch"
           @lotteryCheck="lotteryCheck"
           @questionnaireCheck="questionnaireCheck"
           @previewImg="previewImg"
@@ -65,8 +66,8 @@
           @keyup.delete="backspace"
         />
         <div
-          v-if="(roleName != 1 && inputStatus.disable) || chatLoginStatus"
-          class="input-placeholder"
+          v-if="(roleName !== 1 && inputStatus.disable) || chatLoginStatus"
+          class="chat-input-placeholder"
         >
           {{ inputStatus.placeholder }}
         </div>
@@ -102,10 +103,12 @@
 
   import { sessionOrLocal } from './js/utils';
   import { useChatServer } from 'vhall-sass-domain';
+  import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
+  import { debounce } from 'lodash';
 
   export default {
     name: 'VmpChat',
-    mixins: [eventMixin],
+    mixins: [eventMixin, dataReportMixin],
     components: {
       MsgItem,
       Emoji,
@@ -191,9 +194,9 @@
         immediate: true,
         deep: true
       },
-      'chatList.length'(newval) {
+      'chatList.length'(newVal) {
         setTimeout(() => {
-          if (newval) {
+          if (newVal) {
             this.resizeScroll();
             this.$emit('chatUpdata');
           }
@@ -228,7 +231,7 @@
         }
       },
       replyMsg() {
-        if (Object.keys(this.replyMsg || {}).length == 0) {
+        if (Object.keys(this.replyMsg || {}).length === 0) {
           this.inputValue = this.trimPlaceHolder('reply');
         } else {
           this.inputValue = this.inputValue
@@ -252,8 +255,12 @@
       this.initChatLoginStatus();
       // 口令登录显示  自身显示消息
       this.initCodeLoginMessage();
+      this.debounceResizeScroll = debounce(this.resizeScroll, 500);
+      window.addEventListener('resize', this.debounceResizeScroll, true);
     },
-    destroyed() {},
+    destroyed() {
+      window.removeEventListener('resize', this.debounceResizeScroll);
+    },
     methods: {
       init() {
         this.$nextTick(() => {
@@ -319,6 +326,12 @@
           this.chatList.push(msg);
         });
       },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.pageConfig.page = 0;
+        this.chatServer.clearHistoryMsg();
+        this.getHistoryMsg();
+      },
       // 获取历史消息
       getHistoryMsg() {
         const { getHistoryMsg } = this.chatServer;
@@ -339,8 +352,8 @@
       //问卷情况检查
       questionnaireCheck() {},
       // 子组件预览聊天图片
-      previewImg(index, imgs) {
-        this.previewImgList = imgs.map(item => item.split('?')[0]);
+      previewImg(index, images) {
+        this.previewImgList = images.map(item => item.split('?')[0]);
         if (this.assistantType) {
           return EventBus.$emit('imgPreview', { list: this.previewImgList, index });
         }
@@ -353,13 +366,12 @@
       //重置滚动条到最底部
       resizeScroll() {
         const chatDom = document.querySelector('.chat-content-scroll');
-        const scrollHeight = chatDom.scrollHeight + 100;
-        chatDom.scrollTop = scrollHeight;
+        chatDom.scrollTop = chatDom.scrollHeight + 100;
       },
       //滚动到底部
       scrollTo() {
         this.resizeScroll();
-        EventBus.$emit('clearElements');
+        this.onClearElementsHandle();
       },
       // 切换表情显示
       toggleEmoji() {
@@ -388,7 +400,7 @@
       // 获取菜单列表
       getMenuList(val) {
         const vo = val;
-        if (this.roleName == 2) {
+        if (this.roleName === 2) {
           // 嵌入会调用 watchEmbedInit —— 房间初始化；
           // 用户若已登录，获取userInfo中nick_name；若未登录，获取init房间初始化接口中join
           const userInfo = sessionOrLocal.get('userInfo')
@@ -397,8 +409,6 @@
           const rmJoin = sessionOrLocal.get('v3_rm_join')
             ? JSON.parse(sessionOrLocal.get('v3_rm_join'))
             : {};
-          console.log('用户信息userInfo', userInfo);
-          console.log('参会房间信息join_info', rmJoin);
           if (userInfo && userInfo.nick_name) {
             vo.nick_name = userInfo.nick_name;
           }
@@ -454,7 +464,7 @@
           } else {
             name = joinDefaultName;
           }
-          if (this.roleName == 2 && this.join_name) {
+          if (this.roleName === 2 && this.join_name) {
             name = this.join_name;
           }
           const context = {
@@ -469,7 +479,7 @@
             filterStatus = checkHasKeyword(inputValue);
           }
 
-          if (this.roleName != 2 || (this.roleName == 2 && filterStatus)) {
+          if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
             if (this.atList.length && data.text_content) {
               this.atList.forEach(a => {
                 data.text_content = data.text_content.replace(`@${a.nickName}`, `***${a.nickName}`);
@@ -496,7 +506,7 @@
       },
       // 发送聊天节流
       sendMsgThrottle() {
-        if (this.roleName != 2) {
+        if (this.roleName !== 2) {
           this.sendMsg();
           return;
         }
@@ -589,22 +599,14 @@
       reply(count) {
         this.inputValue = '';
         this.atList = [];
-        this.$vhall_paas_port({
-          k: 110119,
-          data: {
-            business_uid: this.userId,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
+        //数据上报
+        this.buriedPointReport(110119, {
+          business_uid: this.userId,
+          webinar_id: this.$route.params.il_id
         });
         this.replyMsg =
           this.chatList.find(chatMsg => {
-            return chatMsg.count == count;
+            return chatMsg.count === count;
           }) || {};
         this.$refs.chatInput.focus();
       },
@@ -612,7 +614,7 @@
       deleteMsg(count) {
         const msgToDelete =
           this.chatList.find(chatMsg => {
-            return chatMsg.count == count;
+            return chatMsg.count === count;
           }) || {};
 
         setTimeout(() => {
@@ -621,49 +623,34 @@
             msg_id: msgToDelete.msgId,
             room_id: this.roomId
           };
-          this.$fetch('deleteMsg', params).then(res => {
-            this.$vhall_paas_port({
-              k: 110121,
-              data: {
-                business_uid: this.userId,
-                user_id: '',
-                webinar_id: this.$route.params.il_id,
-                refer: '',
-                s: '',
-                report_extra: {},
-                ref_url: '',
-                req_url: ''
-              }
+          this.chatServer.deleteMessage(params).then(res => {
+            this.buriedPointReport(110121, {
+              business_uid: this.userId,
+              webinar_id: this.$route.params.il_id
             });
             const _index = this.chatList.findIndex(chatMsg => {
-              return chatMsg.count == count;
+              return chatMsg.count === count;
             });
-            console.warn('222222222222', count, _index);
             _index !== -1 && this.chatList.splice(_index, 1);
             return res;
           });
         }, 3000); // 优化 17532
       },
+      //@用户
       atUser(accountId) {
         this.replyMsg = {};
-        this.$vhall_paas_port({
-          k: 110120,
-          data: {
-            business_uid: this.userId,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
+        //数据上报
+        this.buriedPointReport(110120, {
+          business_uid: this.userId,
+          webinar_id: this.$route.params.il_id
         });
-        const msgToAt =
-          this.chatList.find(chatMsg => {
-            return chatMsg.sendId == accountId;
-          }) || {};
-        if (!this.atList.find(u => u.accountId == msgToAt.sendId)) {
+        //找到at的消息
+        const msgToAt = this.chatList.find(chatMsg => chatMsg.sendId === accountId) || {};
+        //是否不在atList里
+        const notInAtList = !this.atList.find(u => u.accountId === msgToAt.sendId);
+
+        //如果没在atList里，则加入到atList
+        if (notInAtList) {
           this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickName} `;
           this.$refs.chatInput.focus();
           const currentIndex = this.$refs.chatInput.selectionStart || 0;
@@ -673,6 +660,49 @@
             index: currentIndex
           });
         }
+      },
+      /**
+       * 事件处理分发
+       * */
+      msgEventHandleDisPatch(params = {}) {
+        let { type = '', el = null, msg = '' } = params;
+        console.log(msg);
+        switch (type) {
+          case 'scrollElement':
+            this.onScrollElementHandle(el);
+            break;
+          case 'closeTip':
+            this.onCloseTipHandle();
+            break;
+          case 'replyMsg':
+            this.onReplyMsg(el);
+            break;
+        }
+      },
+      //清空艾特数组
+      onClearElementsHandle() {
+        this.elements = [];
+        this.showTip = false;
+        this.tipMsg = '';
+        this.replyElement = null;
+      },
+      //滚动到@本用户的msgItem元素
+      onScrollElementHandle(el) {
+        this.showTip = true;
+        this.elements.push(el);
+        this.tipMsg = this.replyElement ? '有多条未读消息' : '有人@你';
+      },
+      //关闭提示
+      onCloseTipHandle() {
+        this.showTip = false;
+        this.tipMsg = '';
+      },
+      //有人回复本用户
+      onReplyMsg(e) {
+        if (this.userId != e.msg.sendId) return;
+        this.showTip = true;
+        this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
+        this.replyElement = e.el;
       }
     }
   };
@@ -680,6 +710,7 @@
 
 <style scoped lang="less">
   .vmp-chat-container {
+    @active-color: #fc5659;
     width: 100%;
     /* 临时修改下高度，后续自定义菜单出来，会移除掉 */
     height: calc(100% - 50px);
@@ -757,7 +788,6 @@
     }
     .chat-operate-bar {
       display: flex;
-      /*height: 81px;*/
       flex-direction: column;
       padding: 10px;
       border-top: 1px solid #3a3a48;
@@ -776,14 +806,14 @@
           margin-left: 10px;
         }
         .iconfont {
-          color: #999999;
+          color: #999;
           font-size: 19px;
           cursor: pointer;
           &.active {
-            color: #fc5659;
+            color: @active-color;
           }
           &:hover {
-            color: #fc5659;
+            color: @active-color;
             cursor: pointer;
           }
           &.pic-disabled {
@@ -795,7 +825,7 @@
         }
         .icon-common {
           width: 24px;
-          color: #999999;
+          color: #999;
           height: 24px;
           font-size: 18px;
           background-size: 100%;
@@ -809,7 +839,7 @@
           margin-left: 0;
           margin-bottom: 1px;
           &:hover {
-            color: #fc5659;
+            color: @active-color;
             cursor: pointer;
           }
         }
@@ -841,7 +871,7 @@
             background: #999999;
           }
         }
-        .input-placeholder {
+        .chat-input-placeholder {
           flex: 1;
           border-top-left-radius: 4px;
           border-bottom-left-radius: 4px;
@@ -869,7 +899,7 @@
             color: #aaa;
           }
           span:first-of-type {
-            color: #fc5659;
+            color: @active-color;
             cursor: pointer;
             font-size: 12px !important;
           }
@@ -894,7 +924,7 @@
             background: #999999;
           } */
           &:hover {
-            background: #fc5659;
+            background: @active-color;
           }
         }
       }
@@ -930,7 +960,7 @@
             margin-right: 0;
           }
           &:hover {
-            border: 1px solid #fc5659;
+            border: 1px solid @active-color;
             .img-close {
               display: block;
             }

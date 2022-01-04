@@ -27,6 +27,9 @@ const handleTime = date => {
     return '';
   }
 };
+/**
+ * 补零
+ * */
 function padZero(str) {
   str = String(str);
   return str.length == 1 ? `0${str}` : str;
