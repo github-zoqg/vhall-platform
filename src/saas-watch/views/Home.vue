@@ -1,49 +1,55 @@
 <template>
-  <div class="vmp-basic-layout">
-    <div class="vmp-basic-container">
+  <div
+    class="vmp-basic-layout"
+    v-loading="state === 0"
+    element-loading-text="加载中..."
+    element-loading-background="rgba(255, 255, 255, 0.1)"
+  >
+    <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
   </div>
 </template>
 
 <script>
-  import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
+  import { useRoomInitGroupServer } from 'vhall-sass-domain';
+  import roomState from '../headless/room-state.js';
   export default {
     name: 'Home',
-    data() {},
+    data() {
+      return {
+        state: 0
+      };
+    },
     beforeCreate() {
       this.roomInitGroupServer = useRoomInitGroupServer();
     },
-    created() {
-      this.setToken();
-      this.initSendLive();
+    async created() {
+      try {
+        console.log('%c---初始化直播房间 开始', 'color:blue');
+        // 初始化直播房间
+        await this.initReceiveLive();
+        await roomState();
+        console.log('%c---初始化直播房间 完成', 'color:blue');
+        this.state = 1;
+      } catch (ex) {
+        console.error('---初始化直播房间出现异常--');
+        // console.error(ex);
+        // this.state = 2;
+        // this.errMsg = ex.msg;
+      }
     },
     methods: {
-      setToken() {
-        localStorage.setItem(
-          'token',
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODMyNDgsImV4cCI6MTY0MzI3NTI0OCwidXNlcl9pZCI6IjE2NDIyNzcwIiwicGxhdGZvcm0iOiI3IiwiY2giOiJiIiwiYnVzaW5lc3NfYWNjb3VudF9pZCI6IiJ9.zBKTqqn4EEmLKHduBlUfsmqMMU1I3vPmBfjfGR1cXfo'
-        );
-      },
-      initSendLive() {
-        this.roomInitGroupServer.initReceiveLive({
-          webinar_id: '876395481',
-          webinarId: '876395481',
+      initReceiveLive() {
+        const { id } = this.$route.params;
+        return this.roomInitGroupServer.initReceiveLive({
+          webinarId: id,
           visitor_id: '',
           refer: '',
-          record_id: ''
-        });
-        // this.roomInitGroupServer.initSendLive({
-        //   webinarId: 693742622,
-        //   requestHeaders: {
-        //     token: localStorage.getItem('token')
-        //   }
-        // });
-      },
-      initChatSDK() {
-        this.msgServer = contextServer.get('msgServer');
-        this.msgServer.init().then(res => {
-          console.log('聊天实例创建', res);
+          record_id: '',
+          requestHeaders: {
+            token: localStorage.getItem('token') || ''
+          }
         });
       }
     }
