@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import { roomInit } from '../headless/room-state.js';
+  import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
   import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
   export default {
