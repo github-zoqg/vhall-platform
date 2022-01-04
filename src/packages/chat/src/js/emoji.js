@@ -157,8 +157,7 @@ function combinationStr(arr) {
 }
 function textToEmojiText(str) {
   const arr = textToEmoji(str);
-  const result = combinationStr(arr);
-  return result;
+  return combinationStr(arr);
 }
 const emojiToPath = key => `${emojiUrl}/Expression_${faceArr[key]}@2x.png`;
 export { getEmojiList, textToEmojiText, emojiToPath, textToEmoji, faceArr };

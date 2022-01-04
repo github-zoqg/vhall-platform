@@ -1,5 +1,5 @@
 <template>
-  <span :id="cuid" :ref="cuid" :title="$t(title)" :class="icon"></span>
+  <span :id="cuid" :ref="cuid" :title="$t(title)" class="icon--func" :class="icon"></span>
 </template>
 <script>
   // import { contextServer } from 'vhall-sass-domain';
@@ -26,8 +26,6 @@
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
         if (widget && widget.options) {
-          // this.icon = widget.options.icon;
-          // this.title = widget.options.title;
           Object.assign(this.$data, widget.options);
         }
       }

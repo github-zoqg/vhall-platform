@@ -85,11 +85,11 @@
         // });
         const clipboard = new this.$clipboard('.vhall-room-id-copy');
         clipboard.on('success', e => {
-          this.$message.success(this.$t('i18n.usual.copySucceeded'));
+          this.$message.success(this.$t('usual.copySucceeded'));
           clipboard.destroy();
         });
         clipboard.on('error', e => {
-          this.$message.error(this.$t('i18n.usual.copyFailed'));
+          this.$message.error(this.$t('usual.copyFailed'));
           clipboard.destroy();
         });
       }

@@ -52,7 +52,7 @@
         chatFilterShow: false,
         bannedAll: this.allBanned,
         filterUrl: '',
-        userId: window.sessionStorage.getItem('userInfo').third_party_user_id || ''
+        userId: ''
       };
     },
     mounted() {
@@ -92,6 +92,7 @@
                 req_url: ''
               }
             });
+            return res;
             // this.bannedAll = !this.bannedAll
           })
           .catch(error => {

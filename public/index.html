@@ -21,7 +21,6 @@
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <link rel="preload" href="<%= js %>" as="script" />
     <% } }%>
-    <link rel="stylesheet" href="//at.alicdn.com/t/font_3026563_cjrdgwrbdyf.css" />
   </head>
 
   <body>

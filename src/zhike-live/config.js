@@ -64,7 +64,7 @@ export const serverConfig = {
   pannelHeaderRight: {
     component: 'VmpContainer',
     className: 'vmp-header-right vmp-header-func',
-    children: ['comSettingIcon', 'comFullIcon']
+    children: ['comSettingIcon', 'comFullIcon', 'comUserSettingBox']
   },
   // 顶部左侧组件
   compHeaderLeft: {
@@ -184,10 +184,7 @@ export const serverConfig = {
   comCheckDevice: {
     component: 'VmpCheckDevice',
     options: {
-      title: 'i18n.checkDevice.title',
-      startCheck: 'i18n.checkDevice.startCheck',
-      cancelCheck: 'i18n.checkDevice.cancelCheck',
-      checkTipText: 'i18n.checkDevice.checkTipText'
+      title: 'check_device.check_device_1000'
     }
   },
   // 聊天菜单
@@ -195,7 +192,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont icon-duoseicon_liaotian',
-      text: 'i18n.asideMenu.chat',
+      text: 'aside_menu.aside_menu_1004',
       selected: true
     }
   },
@@ -204,7 +201,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont icon-icon_chengyuan',
-      text: 'i18n.asideMenu.member'
+      text: 'aside_menu.aside_menu_1007'
     }
   },
   // 数据菜单
@@ -212,7 +209,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont icon-shuju_icon',
-      text: 'i18n.asideMenu.bigData'
+      text: 'aside_menu.aside_menu_1005'
     }
   },
   // 分享菜单
@@ -220,7 +217,7 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont icon-fenxiangxiaoguo-',
-      text: 'i18n.asideMenu.share'
+      text: 'aside_menu.aside_menu_1006'
     }
   },
   //设置按钮
@@ -228,14 +225,21 @@ export const serverConfig = {
     component: 'VmpSettingIcon',
     options: {
       icon: 'iconfont icon-faqiduanshezhi',
-      title: 'i18n.settingIcon.title'
+      title: 'setting_icon.setting_icon_1000'
     }
   },
   comFullIcon: {
     component: 'VmpSettingIcon',
     options: {
       icon: 'iconfont icon-icon-quanping',
-      title: 'i18n.fullIcon.title'
+      title: 'full_icon.full_icon_1000'
+    }
+  },
+  comUserSettingBox: {
+    component: 'VmpUserSettingBox',
+    options: {
+      icon: 'iconfont icon-faqiduanshezhi',
+      title: '设备检测'
     }
   }
 };

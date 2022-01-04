@@ -1,10 +1,6 @@
 <template>
-  <div
-    class="vmp-chat-container"
-    :class="{ assistant: assistantType }"
-    @mouseenter="mouseenter"
-    @mouseleave="mouseleave"
-  >
+  <div class="vmp-chat-container" :class="{ assistant: assistantType }">
+    <!-- 消息主体区域 -->
     <div class="chat-content" ref="chatContent">
       <div class="chat-content-scroll" ref="scroll">
         <msg-item
@@ -20,27 +16,14 @@
     </div>
 
     <!--提示-->
-    <div class="tip" v-show="showTip" @click="scrollTo">{{ tipMsg }}</div>
+    <div class="chat-tip" v-show="showTip" @click="scrollTo">{{ tipMsg }}</div>
 
-    <div class="chat-bottom">
-      <!-- 上传图片预览 -->
-      <div v-show="uploadActive" class="chat-img-box">
-        <div class="chat-img" v-for="(url, index) in imgUrls" :key="index">
-          <img
-            width="100%"
-            height="100%"
-            :src="url + '?x-oss-process=image/resize,m_lfit,h_34,w_34'"
-            alt
-          />
-          <i class="img-close" @click="deleteImg(index)"></i>
-        </div>
-      </div>
-
+    <div class="chat-operate-bar">
       <!-- 表情选择 -->
-      <div class="emoji-wrapper">
+      <div class="chat-operate-bar__emoji-wrap">
         <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
       </div>
-      <!-- 过滤 -->
+      <!-- 聊天过滤 -->
       <chat-filter
         v-if="roleName != 2"
         :roomId="roomId"
@@ -53,31 +36,21 @@
 
       <div class="chat-control-wrap">
         <span class="iconfont iconbiaoqing" @click.stop="toggleEmoji"></span>
-        <el-upload
-          v-if="roleName != '2'"
-          class="avatar-uploader"
-          :headers="headersVo"
-          :action="`${$baseUrl}/v3/commons/upload/index`"
-          :show-file-list="false"
-          name="resfile"
-          :before-upload="onExceed"
-          :data="{
-            path: `${roomId}/img`,
-            type: 'image',
-            interact_token: interact_token
-          }"
-          accept=".jpg, .jpeg, .png, .bmp"
-          :on-success="uploadSuccess"
-          :on-error="uploadError"
-        >
-          <i :class="['iconfont', 'icontupianliaotian', uploadActive ? 'active' : '']"></i>
-        </el-upload>
+        <!-- 聊天图片上传 -->
+        <vmp-chat-img-upload
+          class="chat-img-upload"
+          ref="chatImgUpload"
+          :room-id="roomId"
+          :role-name="roleName"
+          :disable="inputStatus.disable"
+        ></vmp-chat-img-upload>
         <a
           v-if="roleName != '2' && plugin.audit.show"
           class="iconfont iconguolv"
           @click="toggleChatFilter"
         ></a>
       </div>
+      <!--聊天输入框-->
       <div class="chat-input-wrap">
         <input
           v-if="!inputStatus.disable && !chatLoginStatus"
@@ -103,6 +76,15 @@
         </div>
         <button :class="{ assistant: assistantType }" @click="sendMsgThrottle">发送</button>
       </div>
+      <img-preview ref="imgPreview" :imgs="previewImgList"></img-preview>
+      <chat-user-control
+        :roomId="roomId"
+        :userId="userId"
+        :reply="reply"
+        @deleteMsg="deleteMsg"
+        :atUser="atUser"
+        :atList="atList"
+      ></chat-user-control>
     </div>
   </div>
 </template>
@@ -113,125 +95,41 @@
   import ImgPreview from './components/img-preview';
   import ChatFilter from './components/chat-filter';
   import ChatUserControl from './components/chat-user-control';
+  import VmpChatImgUpload from './components/chat-img-upload';
 
   import EventBus from './js/Events.js';
   import eventMixin from './mixin/event-mixin';
-  import uploadMixin from './mixin/upload-mixin';
 
-  import { sessionOrLocal, uuid } from './js/utils';
+  import { sessionOrLocal } from './js/utils';
   import { useChatServer } from 'vhall-sass-domain';
 
   export default {
     name: 'VmpChat',
-    mixins: [eventMixin, uploadMixin],
+    mixins: [eventMixin],
     components: {
       MsgItem,
       Emoji,
       ImgPreview,
       ChatFilter,
-      ChatUserControl
-    },
-    props: {
-      welcomeInfo: {
-        required: false
-      },
-      join_name: {
-        type: String
-      },
-      // 是否分屏
-      splited: {
-        required: false,
-        default: false
-      },
-
-      playerType: {
-        required: false
-      },
-      token: {
-        required: false
-      },
-      appId: {
-        required: true
-      },
-      // 打开手动过滤地址需要
-      webinarId: {
-        required: false
-      },
-      // 是否全体禁言
-      allBanned: {
-        required: true
-      },
-      // 是否被禁言
-      isBanned: {
-        required: true
-      },
-      channelId: {
-        type: [Number, String],
-        default: ''
-      },
-      roomId: {
-        type: [Number, String],
-        default: -1
-      },
-      roleName: {
-        required: true
-      },
-      // 图片上传需要
-      vssToken: {
-        type: [Boolean, String],
-        default: ''
-      },
-      userId: {
-        type: [Number, String],
-        default: ''
-      },
-      chatFilterData: {
-        required: false // 聊天过滤的数组
-      },
-      chatFilterUrl: {
-        required: true // 聊天过滤的跳转url
-      },
-      showControl: {
-        type: Boolean,
-        default: true
-      },
-      plugin: {
-        type: Object,
-        // eslint-disable-next-line vue/require-valid-default-prop
-        default: {
-          image: false,
-          emoji: false,
-          audit: {
-            show: true,
-            src: 'javascript:;'
-          }
-        }
-      },
-      isEmbed: {
-        required: false // 是否为潜入页
-      }
+      ChatUserControl,
+      VmpChatImgUpload
     },
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
       return {
-        // 助理的时候进行使用
-        interact_token: sessionOrLocal.get('interact_token') || '',
-        // 请求token
-        headToken: sessionOrLocal.get('token', 'localStorage') || '',
+        //是否是助理
         assistantType: this.$route.query.assistantType,
         //聊天消息列表
         chatList: chatList,
         // @用户
         atList: [],
-        //角色名
-        roleName: '',
-
+        // 预览图片列表
+        previewImgList: [],
         // 提示开关
         showTip: false,
         // 提示文字
         tipMsg: '',
-
         // 输入框的值
         inputValue: '',
         // 输入框状态
@@ -239,30 +137,50 @@
           placeholder: '参与聊天',
           disable: false
         },
-        //是否被禁言
-        isBanned: false,
-        //是否全体禁言
-        allBanned: false,
         // 聊天是否需要登录
-        chatLoginStatus: false
+        chatLoginStatus: false,
+        //欢迎信息
+        welcomeInfo: {
+          required: false
+        },
+        //参会角色身份
+        join_name: {
+          type: String
+        },
+        //活动id 打开手动过滤地址需要
+        webinarId: '',
+        // 是否全体禁言
+        allBanned: false,
+        // 是否被禁言
+        isBanned: false,
+        //频道id
+        channelId: '',
+        //todo 测试用，后续删掉 房间号
+        roomId: 'lss_8434acc2',
+        //用户角色
+        roleName: '',
+        //用户id
+        userId: '',
+        // 聊天过滤的跳转url
+        chatFilterUrl: '',
+        //插件
+        plugin: {
+          image: false,
+          emoji: false,
+          audit: {
+            show: true,
+            src: 'javascript:;'
+          }
+        },
+        //是否为嵌入页
+        isEmbed: false,
+        //分页配置
+        pageConfig: {
+          page: 0
+        }
       };
     },
-    computed: {
-      headersVo: function () {
-        const vo = { token: this.headToken, platform: 7, 'request-id': uuid() };
-        // 获取参数
-        const wIdIndex0 = window.location.href.lastIndexOf('/');
-        const wIdIndex1 = window.location.href.lastIndexOf('?');
-        const wId = window.location.href.substring(
-          wIdIndex0 + 1,
-          wIdIndex1 > 0 ? wIdIndex1 : window.location.href.length
-        );
-        if (window.sessionStorage.getItem(`V3_WAP_US_${wId}`)) {
-          vo['gray-id'] = window.sessionStorage.getItem(`V3_WAP_US_${wId}`);
-        }
-        return vo;
-      }
-    },
+    computed: {},
     watch: {
       welcomeInfo: {
         handler(val) {
@@ -282,7 +200,7 @@
         }, 50);
       },
       allBanned: {
-        handler(val) {},
+        handler() {},
         immediate: true
       },
       isBanned: {
@@ -328,9 +246,32 @@
     created() {
       this.initInputStatus();
     },
+    mounted() {
+      this.init();
+      // 1--是需要登录才能参与互动   0--不登录也能参与互动
+      this.initChatLoginStatus();
+      // 口令登录显示  自身显示消息
+      this.initCodeLoginMessage();
+    },
     destroyed() {},
     methods: {
-      //初始化数据
+      init() {
+        this.$nextTick(() => {
+          this.pageConfig.page = 0;
+          this.getHistoryMsg();
+        });
+
+        EventBus.$on('group_channel-change', msg => {
+          console.log('开始接受消息-------------------------', msg);
+          this.getHistoryMsg();
+        });
+        setTimeout(() => {
+          this.chatSDK = window.chatSDK;
+          //todo 替换掉EventBus，拆为全局信令以及父子组件通信事件
+          this.listenEvents();
+        }, 1000);
+      },
+      //初始化聊天输入框数据
       initInputStatus() {
         let placeholder = '参与聊天';
         let disable = false;
@@ -354,21 +295,68 @@
         this.inputStatus.placeholder = placeholder;
         this.inputStatus.disable = disable;
       },
-      //鼠标移入的时候的响应
-      mouseenter() {},
-      //鼠标移出的时候的响应
-      mouseleave() {},
+      //初始检查是否要登录才可以参与互动
+      initChatLoginStatus() {
+        if (sessionStorage.getItem('watch')) {
+          if (JSON.parse(sessionStorage.getItem('moduleShow')).modules.chat_login.show == 0) {
+            if (sessionStorage.getItem('userInfo') || this.isEmbed) {
+              // 登录状态
+              this.chatLoginStatus = false;
+            } else {
+              // 非登录状态
+              this.chatLoginStatus = true;
+              this.inputStatus.placeholder = '登录后参与互动';
+            }
+          } else {
+            this.chatLoginStatus = false;
+          }
+        }
+      },
+      //初始化口令登录自身显示的消息
+      initCodeLoginMessage() {
+        EventBus.$on('codeText', msg => {
+          // 口令登录显示  自身显示消息
+          this.chatList.push(msg);
+        });
+      },
+      // 获取历史消息
+      getHistoryMsg() {
+        const { getHistoryMsg } = this.chatServer;
+
+        const params = {
+          room_id: this.roomId,
+          pos: Number(this.pageConfig.page) * 50,
+          limit: 50
+        };
+
+        getHistoryMsg(params, '发起端').then(result => {
+          this.pageConfig.page = Number(this.pageConfig.page) + 1;
+          console.log(result);
+        });
+      },
       //抽奖情况检查
       lotteryCheck() {},
       //问卷情况检查
       questionnaireCheck() {},
-      //图片预览处理
-      previewImg() {},
+      // 子组件预览聊天图片
+      previewImg(index, imgs) {
+        this.previewImgList = imgs.map(item => item.split('?')[0]);
+        if (this.assistantType) {
+          return EventBus.$emit('imgPreview', { list: this.previewImgList, index });
+        }
+        this.$refs.imgPreview.show();
+        clearTimeout(this.previewTimer);
+        this.previewTimer = setTimeout(() => {
+          this.$refs.imgPreview.goToPage(index, 0, 0);
+        }, 400);
+      },
+      //重置滚动条到最底部
       resizeScroll() {
         const chatDom = document.querySelector('.chat-content-scroll');
         const scrollHeight = chatDom.scrollHeight + 100;
         chatDom.scrollTop = scrollHeight;
       },
+      //滚动到底部
       scrollTo() {
         this.resizeScroll();
         EventBus.$emit('clearElements');
@@ -429,12 +417,15 @@
         const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
           ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
           : '';
+        //子组件里上传的图片
+        const imgUrls = this.getUploadImg();
+
         this.sendTimeOut = setTimeout(() => {
           const inputValue = this.trimPlaceHolder('reply');
           if (this.inputStatus.disable) {
             return;
           }
-          if ((!inputValue || (inputValue && !inputValue.trim())) && !this.uploadActive) {
+          if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
             return this.$message.warning('内容不能为空');
           }
           const data = {};
@@ -446,8 +437,9 @@
               .replace(/\n/g, '<br/>');
             data.text_content = inputValue;
           }
-          if (this.uploadActive) {
-            data.image_urls = this.imgUrls;
+          //如果有聊天图片
+          if (imgUrls.length) {
+            data.image_urls = imgUrls;
             data.type = 'image';
           }
           const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
@@ -472,20 +464,11 @@
             replyMsg: this.replyMsg, // 回复消息
             atList: this.atList // @用户列表
           };
-          console.log('获取当前的本地用户信息 -context', context);
-          // data.role_name = this.roleName
           let filterStatus = true;
           if (sessionStorage.getItem('watch')) {
-            // if (this.chatFilterData && this.chatFilterData.length > 0) {
-            //   this.chatFilterData.map(item => {
-            //     if (inputValue.includes(item.name)) {
-            //       filterStatus = false;
-            //     }
-            //   });
-            // }
-
             filterStatus = checkHasKeyword(inputValue);
           }
+
           if (this.roleName != 2 || (this.roleName == 2 && filterStatus)) {
             if (this.atList.length && data.text_content) {
               this.atList.forEach(a => {
@@ -494,7 +477,6 @@
             }
 
             sendMsg({ data, context });
-            // this.chatSDK.emit(data, context);
 
             window.vhallReport &&
               window.vhallReport.report('CHAT', {
@@ -502,7 +484,8 @@
                 market_tools_id: this.roleName
               });
           }
-          this.imgUrls = [];
+          //清空一下子组件里上传的图片
+          this.clearUploadImg();
           this.inputValue = '';
           this.replyMsg = {};
           this.$refs.emoji.isShow = false;
@@ -543,7 +526,7 @@
           });
         }
       },
-      backspace(e) {
+      backspace() {
         if (!this.inputValue) {
           this.atList = [];
           return;
@@ -579,12 +562,117 @@
           }
         }
       },
+      /**
+       * 聊天上传图片组件相关逻辑
+       * */
+      //获取子组件上传的聊天图片
+      getUploadImg() {
+        const ref = this.$refs && this.$refs['chatImgUpload'] ? this.$refs['chatImgUpload'] : null;
+        return ref ? ref.getImgUrls() : [];
+      },
+      //清空子组件上传的聊天图片
+      clearUploadImg() {
+        const ref = this.$refs && this.$refs['chatImgUpload'] ? this.$refs['chatImgUpload'] : null;
+        ref && ref.clearImgUrls();
+      },
+      /**
+       * 聊天上传图片组件相关逻辑结束
+       * */
       //唤起登录
       clickCallLogin() {
-        this.$parent.NoLogin();
+        //todo 待发送信令，唤起登录
       },
-      trimPlaceHolder(type) {
+      trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
+      },
+      //回复消息
+      reply(count) {
+        this.inputValue = '';
+        this.atList = [];
+        this.$vhall_paas_port({
+          k: 110119,
+          data: {
+            business_uid: this.userId,
+            user_id: '',
+            webinar_id: this.$route.params.il_id,
+            refer: '',
+            s: '',
+            report_extra: {},
+            ref_url: '',
+            req_url: ''
+          }
+        });
+        this.replyMsg =
+          this.chatList.find(chatMsg => {
+            return chatMsg.count == count;
+          }) || {};
+        this.$refs.chatInput.focus();
+      },
+      //删除消息（主持人，助理）
+      deleteMsg(count) {
+        const msgToDelete =
+          this.chatList.find(chatMsg => {
+            return chatMsg.count == count;
+          }) || {};
+
+        setTimeout(() => {
+          const params = {
+            channel_id: msgToDelete.channel,
+            msg_id: msgToDelete.msgId,
+            room_id: this.roomId
+          };
+          this.$fetch('deleteMsg', params).then(res => {
+            this.$vhall_paas_port({
+              k: 110121,
+              data: {
+                business_uid: this.userId,
+                user_id: '',
+                webinar_id: this.$route.params.il_id,
+                refer: '',
+                s: '',
+                report_extra: {},
+                ref_url: '',
+                req_url: ''
+              }
+            });
+            const _index = this.chatList.findIndex(chatMsg => {
+              return chatMsg.count == count;
+            });
+            console.warn('222222222222', count, _index);
+            _index !== -1 && this.chatList.splice(_index, 1);
+            return res;
+          });
+        }, 3000); // 优化 17532
+      },
+      atUser(accountId) {
+        this.replyMsg = {};
+        this.$vhall_paas_port({
+          k: 110120,
+          data: {
+            business_uid: this.userId,
+            user_id: '',
+            webinar_id: this.$route.params.il_id,
+            refer: '',
+            s: '',
+            report_extra: {},
+            ref_url: '',
+            req_url: ''
+          }
+        });
+        const msgToAt =
+          this.chatList.find(chatMsg => {
+            return chatMsg.sendId == accountId;
+          }) || {};
+        if (!this.atList.find(u => u.accountId == msgToAt.sendId)) {
+          this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickName} `;
+          this.$refs.chatInput.focus();
+          const currentIndex = this.$refs.chatInput.selectionStart || 0;
+          this.atList.push({
+            nickName: msgToAt.nickName,
+            accountId: msgToAt.sendId,
+            index: currentIndex
+          });
+        }
       }
     }
   };
@@ -667,7 +755,7 @@
       bottom: 84px;
       cursor: pointer;
     }
-    .chat-bottom {
+    .chat-operate-bar {
       display: flex;
       /*height: 81px;*/
       flex-direction: column;
@@ -732,16 +820,9 @@
             background-image: url('./images/auditing-hover.png');
           }
         }
-        .avatar-uploader {
+        .chat-img-upload {
           flex: 1;
         }
-        // .iconbiaoqing {
-        //   color: #999;
-        //   &:hover {
-        //     color: #fc5659;
-        //     cursor: pointer;
-        //   }
-        // }
       }
       .chat-input-wrap {
         display: flex;
