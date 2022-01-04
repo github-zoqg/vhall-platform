@@ -32,11 +32,19 @@
       this.msgServer = contextServer.get('msgServer');
     },
     async created() {
-      // 初始化直播房间
-      await this.initSendLive();
-      await roomState();
-      // 初始化完成
-      this.state = 1;
+      try {
+        console.log('%c---初始化直播房间 开始', 'color:blue');
+        // 初始化直播房间
+        await this.initSendLive();
+        await roomState();
+        console.log('%c---初始化直播房间 完成', 'color:blue');
+        this.state = 1;
+      } catch (ex) {
+        console.error('---初始化直播房间出现异常--');
+        console.error(ex);
+        this.state = 2;
+        this.errMsg = ex.msg;
+      }
     },
     methods: {
       // 初始化直播房间
@@ -46,19 +54,12 @@
         if (token) {
           localStorage.setItem('token', token);
         }
-        try {
-          await this.roomInitGroupServer.initSendLive({
-            webinarId: id,
-            requestHeaders: {
-              token: localStorage.getItem('token')
-            }
-          });
-        } catch (ex) {
-          console.log('---ex--');
-          console.log(ex);
-          this.state = 1;
-          this.errMsg = ex.msg;
-        }
+        await this.roomInitGroupServer.initSendLive({
+          webinarId: id,
+          requestHeaders: {
+            token: localStorage.getItem('token')
+          }
+        });
       }
     }
   };
