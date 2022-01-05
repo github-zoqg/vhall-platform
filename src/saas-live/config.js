@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'dlgDocList']
   },
   // 顶部header容器
   layerHeader: {
@@ -200,14 +200,37 @@ export const serverConfig = {
         method: 'switchTo',
         args: ['$0']
       }
+    ],
+    // 打开对话框
+    emitOpenDocList: [
+      {
+        cuid: 'dlgDocList',
+        method: 'show'
+      }
     ]
   },
   // 文档工具栏
   comDocToolbar: {
     component: 'VmpDocToolbar',
+    children: ['comFullscreenIcon']
+  },
+  // 全屏按钮
+  comFullscreenIcon: {
+    component: 'VmpIconItem',
     options: {
-      hasCloseBtn: false //是否有关闭按钮
-    }
+      icon: 'iconfont iconquanping',
+      title: 'doc.doc_1010'
+    },
+    emitClick: [
+      {
+        cuid: 'comDocUne',
+        method: 'fullscreen'
+      }
+    ]
+  },
+  //文档列表对话框
+  dlgDocList: {
+    component: 'VmpDocDlglist'
   },
   // 上麦流列表
   comStreamList: {
