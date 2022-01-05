@@ -6,6 +6,20 @@ const path = require('path');
 const pathConfig = require('../../scripts/path-config');
 const pkg = require('./package.json');
 
+/**
+ * 解析命令后面的参数
+ * @param {*} argv
+ * @returns
+ */
+const parseArgv = argv => {
+  const rawArgv = argv.slice(2);
+  return require('minimist')(rawArgv);
+};
+
+const argv = process.argv;
+const args = parseArgv(argv);
+const { buildVersion } = args;
+
 const htmlConfig = {
   // cdn js
   cdnJs: {
@@ -28,7 +42,7 @@ const htmlConfig = {
   cdnCss: {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    iconfont: '//static-component.vhall.com/iconfont/zhike/v1/pc/iconfont.css'
+    iconfont: '//static-component.vhall.com/iconfont/saas/v1/pc-lives/iconfont.css'
   },
   // dns-prefetch
   dnsPrefetch: {
@@ -39,8 +53,14 @@ const htmlConfig = {
   }
 };
 
+let outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name);
+
+if (buildVersion) {
+  outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name, pkg.version);
+}
+
 module.exports = {
-  outputDir: path.join(pathConfig.ROOT, 'dist', pkg.name),
+  outputDir: outputDir,
   pages: {
     index: {
       entry: path.join(pathConfig.SRC, pkg.name, 'main.js'),
