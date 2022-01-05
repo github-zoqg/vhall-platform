@@ -5,13 +5,13 @@
         <i class="iconfont iconmeitishezhi"></i>
         设置
       </div>
-      <div class="vmp-footer-tools-left-online">
+      <div class="vmp-footer-tools-left-online" v-if="roomBaseState.watchInitData.online.show">
         <i class="iconfont iconzaixianrenshu"></i>
-        <onlineNum></onlineNum>
+        {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools-left-hot">
+      <div class="vmp-footer-tools-left-hot" v-if="roomBaseState.watchInitData.pv.show">
         <i class="iconfont iconzaixianrenshu"></i>
-        <hotNum></hotNum>
+        {{ hotNum | formatHotNum }}
       </div>
     </div>
     <div class="vmp-footer-tools-right">
@@ -20,13 +20,22 @@
   </div>
 </template>
 <script>
-  import onlineNum from '../../components/online.vue';
-  import hotNum from '../../components/hot.vue';
+  import { contextServer } from 'vhall-sass-domain';
+  import onlineMixin from './js/mixins';
   export default {
     name: 'VmpFooterTools',
-    components: {
-      onlineNum,
-      hotNum
+    mixins: [onlineMixin],
+    data() {
+      return {
+        roomBaseState: null
+      };
+    },
+    beforeCreate() {
+      this.msgServer = contextServer.get('msgServer');
+      this.roomBaseServer = contextServer.get('roomBaseServer');
+    },
+    created() {
+      this.roomBaseState = this.roomBaseServer.state;
     }
   };
 </script>
