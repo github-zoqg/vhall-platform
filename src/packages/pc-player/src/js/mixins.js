@@ -12,24 +12,64 @@ const playerMixins = {
   methods: {
     // 试看的权限
     getShiPreview() {
-      const authType = this.watchInitData.webinar.verify;
+      const { webinar } = this.roomBaseState.watchInitData;
+      const authType = webinar.verify;
       if (authType == 1) {
-        return this.watchInitData.webinar.verify_tip || '输入密码';
+        return webinar.verify_tip || '输入密码';
       } else if (authType == 2) {
-        return this.watchInitData.webinar.verify_tip || '输入手机号/邮箱/工号';
+        return webinar.verify_tip || '输入手机号/邮箱/工号';
       } else if (authType == 3) {
-        return this.watchInitData.webinar.verify_tip || '付费';
+        return webinar.verify_tip || '付费';
       } else if (authType == 4) {
-        return this.watchInitData.webinar.verify_tip || '输入邀请码';
+        return webinar.verify_tip || '输入邀请码';
       } else if (authType == 6) {
         return 6;
       }
     },
+    getListenPlayer() {
+      //  直播开始
+      this.playerServer.on(VhallPlayer.PLAY, () => {
+        // 监听播放状态
+        this.isLiving = true;
+        this.isShowPoster = false;
+        console.warn('PLAY');
+      });
+      this.playerServer.on(VhallPlayer.PAUSE, () => {
+        // 监听暂停状态
+        this.isLiving = false;
+        console.warn('PAUSE');
+      });
+      // 视频清晰度发生改变----卡顿切换清晰度时触发
+      this.playerServer.on(VhallPlayer.DEFINITION_CHANGE, e => {
+        console.warn('DEFINITION_CHANGE');
+        this.loading = true;
+      });
+      this.playerServer.on(VhallPlayer.LOADEDMETADATA, e => {
+        console.warn('LOADEDMETADATA');
+      });
+      this.playerServer.on(VhallPlayer.LAG_REPORT, e => {
+        console.warn('LAG_REPORT');
+        this.loading = false;
+      });
+      this.playerServer.on(VhallPlayer.LOADED, () => {
+        this.loading = false;
+      });
+      this.playerServer.on(VhallPlayer.ERROR, e => {
+        this.loading = false;
+        console.log('播放器sdk VhallPlayer.ERROR事件', e);
+      });
+      this.playerServer.on(VhallPlayer.ENDED, () => {
+        // 监听暂停状态
+        console.log('播放完毕');
+        this.isShowPoster = true;
+        this.$emit('BackEnd', true); // 暖场视频需要参数
+      });
+    },
     // 设置默认视频清晰度
     setDefaultQuality() {
       let defaultDefinition;
-      if (window.sessionStorage.getItem('localQualityValue')) {
-        defaultDefinition = window.sessionStorage.getItem('localQualityValue');
+      if (sessionStorage.getItem('localQualityValue')) {
+        defaultDefinition = sessionStorage.getItem('localQualityValue');
       } else {
         defaultDefinition = this.definitionConfig;
       }
@@ -45,13 +85,9 @@ const playerMixins = {
         this.qualitysList = qualityList;
       }
       // 如果过当前有设置过清晰度，就用缓存，否则就有接口返回
-      if (window.sessionStorage.getItem('localQualityValue')) {
+      if (sessionStorage.getItem('localQualityValue')) {
         this.$nextTick(() => {
-          this.$set(
-            this.currentQualitys,
-            'def',
-            window.sessionStorage.getItem('localQualityValue')
-          );
+          this.$set(this.currentQualitys, 'def', sessionStorage.getItem('localQualityValue'));
         });
       }
       let exist = false; // 设置变量 查看时候在sdk转码列表内
@@ -74,15 +110,17 @@ const playerMixins = {
     },
     // 获取倍速列表和当前倍速
     getInitSpeed() {
-      this.UsableSpeed = this.playerServer.getUsableSpeed(() => {
+      const UsableSpeed = this.playerServer.getUsableSpeed(() => {
         console.log('获取倍速失败');
       });
-      console.log('获取倍速', this.UsableSpeed);
-      this.UsableSpeed = this.UsableSpeed.filter(value => {
-        return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
-      });
-      if (window.sessionStorage.getItem('localSpeedValue')) {
-        this.currentSpeed = window.sessionStorage.getItem('localSpeedValue');
+      console.log('获取倍速', UsableSpeed);
+      this.UsableSpeed =
+        UsableSpeed &&
+        UsableSpeed.filter(value => {
+          return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
+        });
+      if (sessionStorage.getItem('localSpeedValue')) {
+        this.currentSpeed = sessionStorage.getItem('localSpeedValue');
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
         if (suc) {
@@ -104,9 +142,14 @@ const playerMixins = {
       });
       if (sucess) {
         console.log('设置画质成功--------', item);
+        if (item.def == 'a') {
+          this.audioStatus = true;
+        } else {
+          this.audioStatus = false;
+        }
         this.isSetQuality = true;
         this.currentQualitys = item;
-        window.sessionStorage.setItem('localQualityValue', item.def);
+        sessionStorage.setItem('localQualityValue', item.def);
         this.setChange();
       }
     },
@@ -119,7 +162,7 @@ const playerMixins = {
       });
       if (sucess) {
         console.log('设置倍速成功--------', item);
-        window.sessionStorage.setItem('localSpeedValue', item);
+        sessionStorage.setItem('localSpeedValue', item);
         this.isSetSpeed = true;
         this.currentSpeed = item;
         this.setChange();
