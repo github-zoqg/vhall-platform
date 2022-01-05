@@ -62,6 +62,7 @@
       this.chatServer = useChatServer();
     },
     mounted() {
+      //todo 考虑放配置或者domain
       this.filterUrl = this.chatFilterUrl;
       // 全体禁言
       EventBus.$on('disable_all', () => {
@@ -82,6 +83,7 @@
         this.chatFilterShow = !this.chatFilterShow;
       },
       //开启 / 关闭 全体禁言
+      //todo domain负责这部分逻辑，以及上报
       setAllBanned(flag) {
         let params = {
           room_id: this.roomId,

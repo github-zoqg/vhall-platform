@@ -75,6 +75,7 @@
       this.assistantType = this.$route.query.assistantType;
     },
     mounted() {
+      //todo 待改为信令
       EventBus.$on(
         'set_person_status_in_chat',
         async (el, accountId, count, nickName, godMode, roleName) => {
@@ -89,6 +90,7 @@
           this.roleName = roleName;
         }
       );
+      //todo 待改为信令
       // 监听客户端踢出操作
       EventBus.$on('assistantKickoutCallback', msg => {
         if (msg.type == 0) return;
@@ -122,7 +124,7 @@
         }
       },
       /**
-       * 得到用户状态是否被禁言/踢出
+       * todo domain提供的服务 得到用户状态是否被禁言/踢出
        */
       getUserStatus() {
         return Promise.resolve({
@@ -159,6 +161,7 @@
       },
       /**
        * 禁言/取消禁言
+       * todo domain提供的服务
        */
       setBanned() {
         const nextStatus = this.userStatus.is_banned ? 0 : 1;
@@ -175,6 +178,7 @@
       },
       /**
        * 踢出/取消踢出
+       * todo domain提供的服务
        */
       setKicked() {
         const nextStatus = this.userStatus.is_kicked ? 0 : 1;

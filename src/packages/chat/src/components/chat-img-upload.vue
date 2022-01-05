@@ -62,7 +62,7 @@
         imgUrls: [],
         //上传图片请求的token
         headToken: sessionOrLocal.get('token', 'localStorage') || '',
-        //互动token
+        //todo 互动token从domain里拿
         interact_token: sessionOrLocal.get('interact_token') || '',
         //todo 暂时写死，后续替换 上传图片地址
         action: `https://t-saas-dispatch.vhall.com/v3/commons/upload/index`
@@ -89,7 +89,7 @@
       }
     },
     methods: {
-      //上传图片前置处理
+      //todo 可以升级为知客的上传多张 上传图片前置处理
       beforeUpload() {
         if (this.disable) {
           this.$message.error('您已被禁言');
