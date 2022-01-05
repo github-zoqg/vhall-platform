@@ -20,6 +20,7 @@ import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
 import VmpBasicRightContainer from '@/packages/basic-right-container';
+import VmpBasicCenterContainer from '@/packages/basic-center-container';
 
 // 全局注册组件
 export function initUse() {
@@ -40,4 +41,5 @@ export function initUse() {
   Vue.use(VmpFooter);
   Vue.use(VmpFooterTools);
   Vue.use(VmpBasicRightContainer);
+  Vue.use(VmpBasicCenterContainer);
 }
