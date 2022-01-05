@@ -40,9 +40,9 @@ export const serverConfig = {
     className: 'vmp-basic-center',
     children: ['comPcPlayer', 'comFooterTools']
   },
+
   layerBodyRight: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-right',
+    component: 'VmpBasicRightContainer',
     children: ['layerBodyRightHeader', 'layerBodyRightBody']
   },
   layerBodyRightHeader: {
