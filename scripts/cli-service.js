@@ -16,8 +16,10 @@ if (!btool.checkValidArgs(argv)) {
 
 // 解析参数成数组形式：[ 'serve', '--project=live-pc', '--mode=development' ]
 const cmdArgs = Array.prototype.slice.call(argv, 2);
+
 // 转成命令选项为字符串: 'serve --project=live-pc --mode=development'
 const cmdOption = cmdArgs.join(' ');
+const cmdOptionVersion = `${cmdOption} --buildVersion=true`;
 
 // 解析参数成key-value形式：
 // {
@@ -29,7 +31,12 @@ const args = btool.parseArgv(argv);
 const { project } = args;
 
 const spinner = ora();
+
+//默认规则打包
 runSingle(project, cmdOption);
+
+//单独处理版本
+runSingle(project, cmdOptionVersion);
 
 // 执行单条
 async function runSingle(project, cmdOption) {
