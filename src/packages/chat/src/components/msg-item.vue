@@ -246,7 +246,7 @@
       }
     },
     mounted() {
-      // 实现@用户
+      //todo 可以考虑domaint提供统一的处理 实现@用户
       if (!this.msg.atList.length) {
         this.msgContent = this.msg.content.text_content;
       } else {
@@ -306,9 +306,10 @@
         this.$emit('questionnaireCheck', questionnaire_id);
       },
       // 预览图片
-      previewImg(e, index, imgs) {
-        this.$emit('previewImg', index, imgs);
+      previewImg(e, index, images) {
+        this.$emit('previewImg', index, images);
       },
+      //todo domain负责
       setPersonStatus(event, msg) {
         if (!msg.sendId) {
           return;

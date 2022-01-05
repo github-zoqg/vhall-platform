@@ -1,177 +1,171 @@
 <template>
-  <div v-if="preImgShow" :class="['vmp-img-preview-wrap', opacity ? '' : 'hide']">
-    <div class="slide-group">
-      <div class="slide" v-for="(img, index) in imgs" :key="index">
-        <img :src="img" alt />
-      </div>
-    </div>
-    <div v-show="preShow" class="slide-control slide-pre" @click.stop="goToPre">
-      <i class="iconfont iconzuofanye"></i>
-    </div>
-    <div v-show="nextShow" class="slide-control slide-next" @click.stop="goToNext">
-      <i class="iconfont iconyoufanye"></i>
-    </div>
-    <div class="slide-close" @click="hide">
-      <i class="iconfont iconguanbi"></i>
+  <div class="vmp-chat-preview-img" @click.self="closePreview" v-show="previewImgShow">
+    <div class="preview-img__container">
+      <swiper ref="mySwiper" :options="swiperOptions">
+        <swiper-slide v-for="(img, index) in images" :key="index">
+          <div class="preview-img__box">
+            <img :src="img" alt="" />
+          </div>
+        </swiper-slide>
+        <div slot="pagination" class="preview-img__pagination"></div>
+        <span
+          v-if="images.length !== 1"
+          slot="button-next"
+          class="preview-img__button preview-img__button-next hide icon iconfont iconzuofanye"
+        ></span>
+        <span
+          v-if="images.length !== 1"
+          slot="button-prev"
+          class="preview-img__button preview-img__button-prev hide icon iconfont iconyoufanye"
+        ></span>
+      </swiper>
+      <span
+        class="preview-img__close-icon icon iconfont iconguanbi_icon"
+        @click="closePreview"
+      ></span>
     </div>
   </div>
 </template>
 <script>
-  import BScroll from '@better-scroll/core';
-  import Slide from '@better-scroll/slide';
-  BScroll.use(Slide);
+  import 'swiper/dist/css/swiper.css';
+  import { swiper, swiperSlide } from 'vue-awesome-swiper';
+
   export default {
     name: 'VmpImgPreview',
+    components: {
+      swiper,
+      swiperSlide
+    },
     props: {
-      imgs: {
+      images: {
         required: true,
-        default() {
-          return [];
-        }
+        type: Array,
+        default: () => []
       }
     },
     data() {
       return {
-        preImgShow: false,
-        currentIndex: 0,
-        opacity: 0
+        swiperOptions: {
+          pagination: {
+            el: '.preview-img__pagination',
+            type: 'fraction'
+          },
+          navigation: {
+            prevEl: '.preview-img__button-next',
+            nextEl: '.preview-img__button-prev'
+          },
+          autoplay: {
+            disableOnInteraction: false
+          }
+        },
+        //预览图片显示
+        previewImgShow: true
       };
     },
-    computed: {
-      preShow() {
-        return this.imgs.length > 1 && this.currentIndex !== 0;
-      },
-      nextShow() {
-        return this.imgs.length > 1 && this.imgs.length !== this.currentIndex + 1;
-      }
+    mounted() {
+      this.init();
     },
-    mounted() {},
     methods: {
-      //初始化
       init() {
-        this.slideScroll = new BScroll('.vmp-img-preview-wrap', {
-          scrollX: true,
-          scrollY: false,
-          click: true,
-          slide: {
-            loop: false,
-            threshold: 100,
-            listenFlick: false
-          },
-          momentum: false,
-          bounce: true,
-          stopPropagation: true
-        });
+        //保存当前的swiper实例引用
+        this.swiper = this.$refs.mySwiper.swiper;
+        // 鼠标移入显示前进后退按钮
+        this.swiper.el.onmouseover = () => {
+          this.swiper.navigation.$nextEl.removeClass('hide');
+          this.swiper.navigation.$prevEl.removeClass('hide');
+          this.swiper.autoplay.stop();
+        };
+        // 鼠标移入隐藏前进后退按钮
+        this.swiper.el.onmouseout = () => {
+          this.swiper.navigation.$nextEl.addClass('hide');
+          this.swiper.navigation.$prevEl.addClass('hide');
+          this.swiper.autoplay.start();
+        };
       },
-      //显示图片预览
-      show() {
-        this.preImgShow = true;
-        clearTimeout(this.showTimer);
-        this.showTimer = setTimeout(() => {
-          this.init();
-        }, 200);
+      //todo 有时间解决下图片闪一下的问题 跳转到指定的图片
+      jumpToTargetImg(index) {
+        console.log(index);
+        this.swiper.slideTo(index, 0);
       },
-      //隐藏图片预览
-      hide() {
-        this.preImgShow = false;
-        this.opacity = 0;
-      },
-      //向前
-      goToPre() {
-        clearTimeout(this.preTimer);
-        this.preTimer = setTimeout(() => {
-          this.slideScroll.prev();
-          this._getIndex();
-          console.log('index', this.currentIndex);
-        }, 200);
-      },
-      //向后
-      goToNext() {
-        clearTimeout(this.nextTimer);
-        this.nextTimer = setTimeout(() => {
-          this.slideScroll.next();
-          this._getIndex();
-        }, 200);
-      },
-      //去具体的页面
-      goToPage() {
-        this.slideScroll.refresh();
-        console.log('arguments', arguments);
-        this.slideScroll.goToPage.apply(this.slideScroll, arguments);
-        this.opacity = 1;
-        this._getIndex();
-      },
-      //获取当前的图片
-      _getIndex() {
-        this.currentIndex = this.slideScroll.getCurrentPage().pageX;
+      closePreview() {
+        this.$emit('closeImgPreview');
       }
     }
   };
 </script>
 <style lang="less">
-  .vmp-img-preview-wrap {
-    width: 840px;
-    height: 500px;
+  .vmp-chat-preview-img {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background: #666;
-    z-index: 1000;
-    box-sizing: border-box;
-    overflow: hidden;
+    top: 0;
+    left: 0;
+    z-index: 11;
+  }
+  .preview-img__container {
+    width: 800px;
+    height: 450px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    position: relative;
+  }
+  .preview-img__box {
+    width: 800px;
+    height: 450px;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: scale-down;
+      font-family: 'object-fit: scale-down;';
+    }
+  }
+  .preview-img__close-icon {
+    font-size: 12px;
+    color: #ffffff;
+    position: absolute;
+    right: 0;
+    top: -22px;
+    cursor: pointer;
+  }
+  .preview-img__pagination {
+    color: #ffffff;
+    line-height: 40px;
+    font-size: 14px;
+    height: 40px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    text-shadow: 2px 2px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+    border-radius: 0 0 4px 4px;
     text-align: center;
+  }
+  .preview-img__button {
+    position: absolute;
+    top: 50%;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    margin-top: -16px;
+    z-index: 2;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 16px;
+    background-color: rgba(0, 0, 0, 0.6);
+    transition: opacity 500ms;
+    &-next {
+      left: 16px;
+    }
+    &-prev {
+      right: 16px;
+    }
     &.hide {
       opacity: 0;
-    }
-    .slide-group {
-      white-space: nowrap;
-      .slide {
-        height: 100%;
-        box-sizing: border-box;
-        width: 840px;
-        height: 500px;
-        padding: 30px;
-        float: left;
-        display: flex;
-        align-items: center;
-        & > img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
-    }
-    .slide-control {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 27px;
-      height: 35px;
-      cursor: pointer;
-      background-color: #474747;
-      & > i {
-        line-height: 35px;
-        font-size: 26px;
-        color: #ffffff;
-      }
-      &.slide-pre {
-        left: 30px;
-      }
-      &.slide-next {
-        right: 30px;
-      }
-    }
-    .slide-close {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      width: 28px;
-      height: 28px;
-      line-height: 28px;
-      cursor: pointer;
-      color: #ffffff;
-      font-size: 28px;
     }
   }
 </style>

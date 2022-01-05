@@ -183,7 +183,13 @@ export const serverConfig = {
   },
   //聊天组件
   comChat: {
-    component: 'VmpChat'
+    component: 'VmpChat',
+    options: {
+      //是否有图片上传按钮
+      hasImgUpload: true,
+      //是否有聊天操作按钮
+      hasChatOperateBtn: false
+    }
   },
   // 文档白板组件
   comDocUne: {

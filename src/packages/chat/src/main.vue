@@ -37,14 +37,41 @@
 
       <div class="chat-control-wrap">
         <span class="iconfont iconbiaoqing" @click.stop="toggleEmoji"></span>
-        <!-- 聊天图片上传 -->
-        <vmp-chat-img-upload
-          class="chat-img-upload"
-          ref="chatImgUpload"
-          :room-id="roomId"
-          :role-name="roleName"
-          :disable="inputStatus.disable"
-        ></vmp-chat-img-upload>
+        <template v-if="chatOptions && chatOptions.hasChatOperateBtn">
+          <!--观看端聊天过滤-->
+          <span class="icon iconfont iconmeitishezhi" @click.stop="onClickFilterSetting"></span>
+          <!-- 过滤设置 -->
+          <ul v-show="isFilterShow" class="chat-operate-bar__chat-filter-wrap">
+            <li class="filter-item">
+              <el-checkbox
+                class="filter-item__checkbox"
+                @change="onClickOnlyShowSponsor"
+                v-model="filterStatus.onlyShowSponsor"
+              >
+                只看主办方
+              </el-checkbox>
+            </li>
+            <li class="filter-item">
+              <el-checkbox
+                class="filter-item__checkbox"
+                @change="onClickShieldingEffects"
+                v-model="filterStatus.isShieldingEffects"
+              >
+                屏蔽特效
+              </el-checkbox>
+            </li>
+          </ul>
+        </template>
+        <template v-if="chatOptions && chatOptions.hasImgUpload">
+          <!-- 聊天图片上传 -->
+          <vmp-chat-img-upload
+            class="chat-img-upload"
+            ref="chatImgUpload"
+            :room-id="roomId"
+            :role-name="roleName"
+            :disable="inputStatus.disable"
+          ></vmp-chat-img-upload>
+        </template>
         <a
           v-if="roleName != '2' && plugin.audit.show"
           class="iconfont iconguolv"
@@ -77,7 +104,15 @@
         </div>
         <button :class="{ assistant: assistantType }" @click="sendMsgThrottle">发送</button>
       </div>
-      <img-preview ref="imgPreview" :imgs="previewImgList"></img-preview>
+      <template v-if="chatOptions && chatOptions.hasImgUpload">
+        <!--图片预览-->
+        <img-preview
+          ref="imgPreview"
+          v-if="imgPreviewVisible"
+          :images="previewImgList"
+          @closeImgPreview="onClosePreviewImg"
+        ></img-preview>
+      </template>
       <chat-user-control
         :roomId="roomId"
         :userId="userId"
@@ -102,7 +137,7 @@
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer } from 'vhall-sass-domain';
+  import { useChatServer, contextServer } from 'vhall-sass-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { debounce } from 'lodash';
 
@@ -120,7 +155,9 @@
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
+      const roomBaseState = contextServer.get('roomBaseServer').state;
       return {
+        roomBaseState,
         //是否是助理
         assistantType: this.$route.query.assistantType,
         //聊天消息列表
@@ -180,6 +217,19 @@
         //分页配置
         pageConfig: {
           page: 0
+        },
+        //图片预览弹窗是否可见
+        imgPreviewVisible: false,
+        //聊天配置
+        chatOptions: {},
+        //观看端的过滤配置模态窗是否显示
+        isFilterShow: false,
+        //过滤状态集合
+        filterStatus: {
+          //只看主办方
+          onlyShowSponsor: false,
+          //屏蔽特效
+          isShieldingEffects: false
         }
       };
     },
@@ -250,6 +300,8 @@
       this.initInputStatus();
     },
     mounted() {
+      //初始化配置
+      this.initConfig();
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
@@ -262,6 +314,13 @@
       window.removeEventListener('resize', this.debounceResizeScroll);
     },
     methods: {
+      // 初始化配置
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          this.chatOptions = widget.options;
+        }
+      },
       init() {
         this.$nextTick(() => {
           this.pageConfig.page = 0;
@@ -319,7 +378,7 @@
           }
         }
       },
-      //初始化口令登录自身显示的消息
+      //todo 信令完成这个或者domain 初始化口令登录自身显示的消息
       initCodeLoginMessage() {
         EventBus.$on('codeText', msg => {
           // 口令登录显示  自身显示消息
@@ -347,22 +406,29 @@
           console.log(result);
         });
       },
-      //抽奖情况检查
+      //todo domain负责 抽奖情况检查
       lotteryCheck() {},
-      //问卷情况检查
+      //todo domain负责 问卷情况检查
       questionnaireCheck() {},
-      // 子组件预览聊天图片
+      /**
+       * 聊天图片预览
+       * */
+      // 预览聊天图片
       previewImg(index, images) {
+        //处理掉图片携带的查询参数，只保留主要链接
         this.previewImgList = images.map(item => item.split('?')[0]);
-        if (this.assistantType) {
-          return EventBus.$emit('imgPreview', { list: this.previewImgList, index });
-        }
-        this.$refs.imgPreview.show();
-        clearTimeout(this.previewTimer);
-        this.previewTimer = setTimeout(() => {
-          this.$refs.imgPreview.goToPage(index, 0, 0);
-        }, 400);
+        this.imgPreviewVisible = true;
+        this.$nextTick(() => {
+          this.$refs.imgPreview.jumpToTargetImg(index);
+        });
       },
+      //关闭预览图片弹窗之后的处理
+      onClosePreviewImg() {
+        this.imgPreviewVisible = false;
+      },
+      /**
+       * 聊天图片预览结束
+       * */
       //重置滚动条到最底部
       resizeScroll() {
         const chatDom = document.querySelector('.chat-content-scroll');
@@ -397,7 +463,7 @@
       toggleChatFilter() {
         this.$refs.chatFilter.toggleShow();
       },
-      // 获取菜单列表
+      //todo domain负责 获取菜单列表
       getMenuList(val) {
         const vo = val;
         if (this.roleName === 2) {
@@ -419,7 +485,7 @@
           console.log('自定义菜单...', this.welcome_vo);
         }
       },
-      // 发送消息
+      //todo domain负责组装 发送消息
       sendMsg(callback) {
         window.clearTimeout(this.sendTimeOut);
 
@@ -487,12 +553,6 @@
             }
 
             sendMsg({ data, context });
-
-            window.vhallReport &&
-              window.vhallReport.report('CHAT', {
-                event: JSON.stringify(data),
-                market_tools_id: this.roleName
-              });
           }
           //清空一下子组件里上传的图片
           this.clearUploadImg();
@@ -610,7 +670,7 @@
           }) || {};
         this.$refs.chatInput.focus();
       },
-      //删除消息（主持人，助理）
+      //todo domain负责 删除消息（主持人，助理）
       deleteMsg(count) {
         const msgToDelete =
           this.chatList.find(chatMsg => {
@@ -636,7 +696,7 @@
           });
         }, 3000); // 优化 17532
       },
-      //@用户
+      //todo domain负责 @用户
       atUser(accountId) {
         this.replyMsg = {};
         //数据上报
@@ -703,12 +763,42 @@
         this.showTip = true;
         this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
         this.replyElement = e.el;
+      },
+      // 过滤设置点击事件
+      onClickFilterSetting() {
+        this.isFilterShow = !this.isFilterShow;
+        // 如果表情弹窗开启，则关闭
+        if (this.$refs.emoji.isShow) {
+          this.$refs.emoji.toggleShow();
+        }
+      },
+      // 只看主办方点击事件
+      onClickOnlyShowSponsor(status) {
+        let message = status ? this.$t('已开启只看主办方') : this.$t('已关闭只看主办方');
+        this.$message({
+          message: message,
+          showClose: true,
+          // duration: 0,
+          type: 'success',
+          customClass: 'zdy-info-box'
+        });
+      },
+      // 隐藏特效点击事件
+      onClickShieldingEffects(status) {
+        let message = status ? this.$t('已屏蔽特效') : this.$t('已开启特效');
+        this.$message({
+          message: message,
+          showClose: true,
+          // duration: 0,
+          type: 'success',
+          customClass: 'zdy-info-box'
+        });
       }
     }
   };
 </script>
 
-<style scoped lang="less">
+<style lang="less">
   .vmp-chat-container {
     @active-color: #fc5659;
     width: 100%;
@@ -967,12 +1057,57 @@
           }
         }
       }
-      .emoji-wrapper {
+      &__emoji-wrap {
         width: 294px;
         position: absolute;
         top: 0;
         transform: translateY(-100%);
         left: 0;
+      }
+      &__chat-filter-wrap {
+        width: 120px;
+        height: 80px;
+        padding: 4px 0;
+        background-color: #383838;
+        box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+        border-radius: 4px;
+        position: absolute;
+        top: -11px;
+        transform: translateY(-100%);
+        .iconmeitishezhi {
+          font-size: 19px;
+          color: #999;
+          margin-left: 10px;
+          margin-bottom: 1px;
+          &:hover {
+            color: @active-color;
+            cursor: pointer;
+          }
+        }
+        .filter-item {
+          height: 40px;
+          line-height: 40px;
+          padding-left: 15px;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          &:hover {
+            .filter-item__label {
+              color: #e6e6e6;
+            }
+          }
+        }
+        .filter-item__checkbox {
+          display: inline-block;
+          margin-right: 8px;
+          position: relative;
+          color: #999999;
+          font-size: 14px;
+        }
+        .el-checkbox__label {
+          font-size: 14px;
+          color: #999999;
+        }
       }
     }
   }
