@@ -3,7 +3,7 @@
   <div class="vmp-doc-toolbar">
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
-      <div v-show="showChooseDocBtn" class="choose-document">
+      <div v-show="showChooseDocBtn" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}
       </div>
 
@@ -14,80 +14,83 @@
     </div>
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
-      <!-- 选择 -->
-      <div
-        class="vmp-icon-item"
-        :title="$t('usual.choose')"
-        :class="{ selected: currentBrush === 'select' }"
-        @click="handleBoardTool('select')"
-      >
-        <i class="iconfont iconxuanze"></i>
-      </div>
-      <!-- 画笔 -->
-      <div
-        class="vmp-icon-item has-corner"
-        :title="$t('usual.pen')"
-        :class="{ selected: currentBrush === 'pen' }"
-        @click="handleBoardTool('pen')"
-      >
-        <i class="iconfont iconhuabi"></i>
-        <vmp-pen-popup></vmp-pen-popup>
-      </div>
-      <!-- 荧光笔 -->
-      <div
-        class="vmp-icon-item has-corner"
-        :title="$t('usual.highlighter')"
-        :class="{ selected: currentBrush === 'highlighter' }"
-        @click="handleBoardTool('highlighter')"
-      >
-        <i class="iconfont iconjiguangbi"></i>
-        <vmp-highlighter-popup></vmp-highlighter-popup>
-      </div>
-      <!-- 形状 -->
-      <div
-        class="vmp-icon-item has-corner"
-        :title="$t('usual.shape')"
-        :class="{ selected: currentBrush === 'shape' }"
-        @click="handleBoardTool('shape')"
-      >
-        <i class="iconfont icontuxing"></i>
-        <vmp-shape-popup></vmp-shape-popup>
-      </div>
-      <!-- 文本 -->
-      <div
-        class="vmp-icon-item has-corner"
-        :title="$t('usual.text')"
-        :class="{ selected: currentBrush === 'text' }"
-        @click="handleBoardTool('text')"
-      >
-        <i class="iconfont iconwenzi"></i>
-        <vmp-text-popup></vmp-text-popup>
-      </div>
-      <!-- 橡皮擦 -->
-      <div
-        class="vmp-icon-item"
-        :title="$t('usual.eraser')"
-        :class="{ selected: currentBrush === 'eraser' }"
-        @click="handleBoardTool('eraser')"
-      >
-        <i class="iconfont iconxiangpica"></i>
-      </div>
-      <!-- 清除 -->
-      <div class="vmp-icon-item" :title="$t('usual.clear')" @click="handleBoardTool('clear')">
-        <i class="iconfont iconqingkong"></i>
+      <div class="vmp-doc-toolbar__brush">
+        <!-- 选择 -->
+        <div
+          class="vmp-icon-item"
+          :title="$t('usual.choose')"
+          :class="{ selected: currentBrush === 'select' }"
+          @click="handleBoardTool('select')"
+        >
+          <i class="iconfont iconxuanze"></i>
+        </div>
+        <!-- 画笔 -->
+        <div
+          class="vmp-icon-item has-corner"
+          :title="$t('usual.pen')"
+          :class="{ selected: currentBrush === 'pen' }"
+          @click="handleBoardTool('pen')"
+        >
+          <i class="iconfont iconhuabi"></i>
+          <vmp-pen-popup></vmp-pen-popup>
+        </div>
+        <!-- 荧光笔 -->
+        <div
+          class="vmp-icon-item has-corner"
+          :title="$t('usual.highlighter')"
+          :class="{ selected: currentBrush === 'highlighter' }"
+          @click="handleBoardTool('highlighter')"
+        >
+          <i class="iconfont iconjiguangbi"></i>
+          <vmp-highlighter-popup></vmp-highlighter-popup>
+        </div>
+        <!-- 形状 -->
+        <div
+          class="vmp-icon-item has-corner"
+          :title="$t('usual.shape')"
+          :class="{ selected: currentBrush === 'shape' }"
+          @click="handleBoardTool('shape')"
+        >
+          <i class="iconfont icontuxing"></i>
+          <vmp-shape-popup></vmp-shape-popup>
+        </div>
+        <!-- 文本 -->
+        <div
+          class="vmp-icon-item has-corner"
+          :title="$t('usual.text')"
+          :class="{ selected: currentBrush === 'text' }"
+          @click="handleBoardTool('text')"
+        >
+          <i class="iconfont iconwenzi"></i>
+          <vmp-text-popup></vmp-text-popup>
+        </div>
+        <!-- 橡皮擦 -->
+        <div
+          class="vmp-icon-item"
+          :title="$t('usual.eraser')"
+          :class="{ selected: currentBrush === 'eraser' }"
+          @click="handleBoardTool('eraser')"
+        >
+          <i class="iconfont iconxiangpica"></i>
+        </div>
+        <!-- 清除 -->
+        <div class="vmp-icon-item" :title="$t('usual.clear')" @click="handleBoardTool('clear')">
+          <i class="iconfont iconqingkong"></i>
+        </div>
+
+        <!-- 退出全屏 -->
+        <div
+          class="vmp-icon-item vmp-icon-item--exitFullscreen"
+          :title="$t('usual.clear')"
+          @click="fullscreen"
+        >
+          <i class="iconfont iconquanpingguanbi"></i>
+        </div>
       </div>
     </div>
     <!-- 右：全屏、文档章节等信息-->
     <div class="vmp-doc-toolbar__ft">
-      <div v-show="showThumbnailBtn" class="vmp-icon-item" :title="$t('usual.docThumb')">
-        <i class="iconfont iconsuolvetu"></i>
-      </div>
-      <div class="vmp-icon-item" :title="$t('usual.fullscreen')">
-        <i class="iconfont iconquanping"></i>
-      </div>
-      <div class="vmp-icon-item" :title="$t('usual.usual_1002')" v-if="hasCloseBtn">
-        <i class="iconfont iconguanbi2"></i>
-      </div>
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div>
   </div>
 </template>
@@ -114,6 +117,7 @@
         changeTool: this.changeTool
       };
     },
+    inject: ['fullscreen', 'openDocDlglist'],
     data() {
       return {
         // 是否有关闭按钮
@@ -346,6 +350,13 @@
     align-items: center;
     justify-content: center;
   }
+
+  .vmp-doc-toolbar__brush {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
   .vmp-doc-toolbar__ft {
     display: flex;
     flex-direction: row;
@@ -392,5 +403,8 @@
     border-left-color: #dadada;
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+  .vmp-icon-item--exitFullscreen {
+    display: none;
   }
 </style>

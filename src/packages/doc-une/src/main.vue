@@ -1,11 +1,13 @@
 <template>
-  <div class="vmp-doc-une">
+  <div class="vmp-doc-une" :class="{ 'vmp-doc-une--fullscreen': isFullscreen }" ref="docWrapper">
+    <!-- 这里配置的是文档工具栏 -->
     <div class="vmp-doc-une__hd">
-      <!-- 这里配置的是文档工具栏 -->
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div>
-    <div class="vmp-doc-une__content">
-      <div ref="docInner" class="vmp-doc-inner">
+
+    <!-- 文档白板内容区 -->
+    <div ref="docContent" class="vmp-doc-une__content">
+      <div class="vmp-doc-inner">
         <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
         <div
           v-for="item of fileOrboardList"
@@ -26,12 +28,20 @@
   </div>
 </template>
 <script>
+  import screenfull from 'screenfull';
   import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpDocUne',
+    provide() {
+      return {
+        fullscreen: this.fullscreen,
+        openDocDlglist: this.openDocDlglist
+      };
+    },
     data() {
       return {
         allComplete: false,
+        isFullscreen: false, //是否全屏
         selectDoc: {}, // 当前操作的文档
         fileOrboardList: [] // 从服务器获取的文档列表
       };
@@ -40,7 +50,7 @@
       this.docServer = contextServer.get('docServer');
     },
     created() {
-      this.docServer && this.initDocEvents();
+      this.initEvents();
     },
     computed: {
       currentContainerId() {
@@ -48,8 +58,16 @@
       }
     },
     methods: {
+      /**
+       * 全屏
+       */
+      fullscreen() {
+        screenfull.toggle(this.$refs.docWrapper);
+      },
       resize() {
-        let { width, height } = this.$refs.docInner.getBoundingClientRect();
+        let { width, height } = screenfull.isFullscreen
+          ? this.$refs.docWrapper.getBoundingClientRect()
+          : this.$refs.docContent.getBoundingClientRect();
         let w = null,
           h = null;
         if (width / height > 16 / 9) {
@@ -70,7 +88,20 @@
         // this.$refs.docBoxEl.style.width = `${w}px`;
         if (this.docServer) this.docServer.setSize(w, h);
       },
-      initDocEvents() {
+      /**
+       * 初始化各种事件
+       */
+      initEvents() {
+        window.addEventListener('resize', this.resize);
+
+        // 全屏/退出全屏事件
+        screenfull.onchange(() => {
+          console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+          this.isFullscreen = screenfull.isFullscreen;
+        });
+
+        if (!this.docServer) return;
+        // PaaS提供的文档事件
         this.docServer.on(window.VHDocSDK.Event.ALL_COMPLETE, () => {
           if (process.env.NODE_ENV !== 'production') console.debug('所有文档加载完成');
           // const list = this.$doc.getLiveAllCids();
@@ -252,11 +283,19 @@
             };
           }
         }
+      },
+      /**
+       * 打开选择文档列表
+       */
+      openDocDlglist() {
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitOpenDocList'
+        });
       }
     },
     mounted() {
       this.resize();
-      window.addEventListener('resize', this.resize);
 
       // 清空
       // this.docServer.resetContainer();
@@ -315,6 +354,34 @@
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+  }
+
+  // 文档全屏时
+  .vmp-doc-une.vmp-doc-une--fullscreen {
+    .vmp-doc-une__hd {
+      position: absolute;
+      width: auto;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 102;
+    }
+    .vmp-doc-toolbar {
+      background: transparent;
+      border-color: transparent;
+    }
+    .vmp-doc-toolbar__hd,
+    .vmp-doc-toolbar__ft {
+      display: none;
+    }
+    .vmp-doc-toolbar__brush {
+      background: #1a1a1a;
+      padding: 2px 10px;
+      border-radius: 100px;
+    }
+    .vmp-icon-item--exitFullscreen {
+      display: block;
     }
   }
 </style>
