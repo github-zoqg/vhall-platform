@@ -1,7 +1,7 @@
 <template>
-  <div class="vmp-stream-local" :class="{ 'vmp-stream-local_publish': isStreamPublished }">
+  <div class="vmp-stream-local" :class="{ 'vmp-stream-local__publish': isStreamPublished }">
     <div
-      class="vmp-stream-local_stream-box"
+      class="vmp-stream-local__stream-box"
       :id="`stream-${roomBaseState.watchInitData.join_info.third_party_user_id}`"
     ></div>
     <section class="vmp-stream-local__shadow-box">
@@ -201,14 +201,14 @@
     height: 100%;
     position: relative;
   }
-  .vmp-stream-local_publish {
+  .vmp-stream-local__publish {
     &:hover {
       .vmp-stream-local__shadow-box {
         display: flex;
       }
     }
   }
-  .vmp-stream-local_stream-box {
+  .vmp-stream-local__stream-box {
     width: 100%;
     height: 100%;
   }

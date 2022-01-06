@@ -36,18 +36,13 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-center',
-    children: ['comPcPlayer', 'comFooterTools']
+    component: 'VmpBasicCenterContainer',
+    children: ['comStreamList', 'comPcPlayer', 'comFooterTools']
   },
+
   layerBodyRight: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-right',
-    children: ['layerBodyRightHeader', 'layerBodyRightBody']
-  },
-  layerBodyRightHeader: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
+    component: 'VmpBasicRightContainer',
+    children: ['layerBodyRightBody']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -146,6 +141,16 @@ export const serverConfig = {
         args: ['comMediaPlayMenu']
       }
     ]
+  },
+  comStreamList: {
+    component: 'VmpStreamList',
+    children: ['comStreamLocal', 'comStreamRemote']
+  },
+  comStreamLocal: {
+    component: 'VmpStreamLocal'
+  },
+  comStreamRemote: {
+    component: 'VmpStreamRemote'
   },
   // 播放器
   comPcPlayer: {

@@ -134,7 +134,7 @@
     name: 'VmpDocDlglist',
     data() {
       return {
-        dialogVisible: true,
+        dialogVisible: false,
         title: '',
         subject: '', // 直播名称
         id: '', // 房间id
