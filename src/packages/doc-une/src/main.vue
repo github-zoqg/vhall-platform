@@ -29,9 +29,9 @@
       </div>
 
       <!-- 文档操作栏: 翻页、放大、缩小、还原、拖拽 -->
-      <ul class="vmp-doc-pagebar" v-show="showPagebar">
+      <ul class="vmp-doc-pagebar" @click="handlePage" v-show="showPagebar">
         <li
-          data-value="zoomReset"
+          data-value="prevStep"
           title="上一步"
           class="doc-pagebar__opt iconfont iconzuofanye"
         ></li>
@@ -41,14 +41,14 @@
           <span class="page-total">10</span>
         </li>
         <li
-          data-value="zoomReset"
+          data-value="nextStep"
           title="下一步"
           class="doc-pagebar__opt iconfont iconyoufanye"
         ></li>
-        <li data-value="zoomReset" title="放大" class="doc-pagebar__opt iconfont iconfangda"></li>
-        <li data-value="zoomReset" title="缩小" class="page-tool iconfont iconsuoxiao"></li>
-        <li data-value="zoomReset" title="还原" class="page-tool iconfont iconhuanyuan"></li>
-        <li data-value="move" title="移动" class="page-tool iconfont iconyidong"></li>
+        <li data-value="zoomIn" title="放大" class="doc-pagebar__opt iconfont iconfangda"></li>
+        <li data-value="zoomOut" title="缩小" class="doc-pagebar__opt iconfont iconsuoxiao"></li>
+        <li data-value="zoomReset" title="还原" class="doc-pagebar__opt iconfont iconhuanyuan"></li>
+        <li data-value="move" title="移动" class="doc-pagebar__opt iconfont iconyidong"></li>
       </ul>
     </div>
   </div>
@@ -74,7 +74,6 @@
     },
     computed: {
       showPagebar() {
-        console.log('-----计算 this.selectDoc:', this.selectDoc);
         return this.selectDoc.cid && this.selectDoc.is_board == 1 && !this.isFullscreen;
       }
     },
@@ -136,9 +135,8 @@
           if (process.env.NODE_ENV !== 'production') console.debug('所有文档加载完成');
           // const list = this.$doc.getLiveAllCids();
           // if (list.includes(this.previewInfo.elId)) this.previewInfo.canOperate = true;
-
-          console.log('this.selectDoc:', this.selectDoc);
-          console.log('this.isFullscreen :', this.isFullscreen);
+          // console.log('this.selectDoc:', this.selectDoc);
+          // console.log('this.isFullscreen :', this.isFullscreen);
           this.allComplete = true;
         });
       },
@@ -161,15 +159,12 @@
         };
         item.cid = elId;
         item.is_board = is_board;
-        console.log('--item--', item);
-        console.log('--selectDoc--', this.selectDoc);
         this.fileOrboardList.push({ ...item });
         await this.$forceUpdate();
         await this.$nextTick();
 
         // 创建
         if (Number(is_board) === 1) {
-          console.log('--创建文档--');
           try {
             this.docServer.createDocument(options);
             this.docServer.selectContainer({ id: elId });
@@ -191,7 +186,6 @@
             } else if (Number(status_jpeg) === 200) {
               temp = { slideIndex: converted_page, slidesTotal: converted_page_jpeg };
             }
-            console.log('显示文档');
             this.selectDoc = {
               cid: elId,
               is_board: 1,
@@ -349,14 +343,33 @@
         this.fileOrboardList = board ? [board] : [];
         this.addNewFile({ docId, type }, 1);
       },
-      handlePage(type) {
+      /**
+       * 页面操作工具
+       * @param {*} e
+       */
+      handlePage(e) {
         if (!this.selectDoc.cid || this.is_board === 2) {
           return;
         }
+        if (e.target.nodeName === 'UL') return;
+        const type =
+          e.target.dataset.value ||
+          e.target.parentNode.dataset.value ||
+          e.target.parentNode.parentNode.dataset.value ||
+          null;
+        if (!type) return;
         if (!this.allComplete) {
           return this.$message.warning('请文档加载完成以后再操作');
         }
         switch (type) {
+          // 放大
+          case 'zoomIn':
+            this.docServer.zoomIn();
+            break;
+          // 缩小
+          case 'zoomOut':
+            this.docServer.zoomOut();
+            break;
           // 还原
           case 'zoomReset':
             this.docServer.zoomReset({ id: this.selectDoc.cid });
@@ -457,7 +470,7 @@
           color: #fc5659;
         }
       }
-      .page-tool {
+      .doc-pagebar__opt {
         padding: 7px 10px;
       }
     }
