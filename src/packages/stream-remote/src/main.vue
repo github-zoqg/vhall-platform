@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-stream-remote">
-    remote{{ index }}
+    <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- 鼠标 hover 遮罩层 -->
     <section class="vmp-stream-remote__shadow-box">
       <p class="vmp-stream-remote__shadow-first-line">
@@ -58,26 +58,49 @@
 </template>
 
 <script>
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpStreamRemote',
-
     data() {
-      return {
-        streamId: 1111222
-      };
+      return {};
     },
-
     props: {
-      index: {
+      stream: {
         require: true
       }
     },
-
-    mounted() {},
-
+    beforeCreate() {
+      this.interactiveServer = contextServer.get('interactiveServer');
+    },
+    mounted() {
+      this.subscribeRemoteStream();
+    },
     methods: {
+      subscribeRemoteStream() {
+        const opt = {
+          streamId: this.stream.streamId, // 远端流ID，必填
+          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
+        };
+        this.interactiveServer
+          .subscribeStream(opt)
+          .then(e => {
+            console.log('订阅成功----', e);
+            // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
+            setTimeout(() => {
+              const list = document.getElementsByTagName('video');
+              for (const item of list) {
+                item.play();
+              }
+            }, 2000);
+          })
+          .catch(e => {
+            console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
+          });
+      },
       muteDevice() {},
       speakOff() {},
+      fullScreen() {},
       exchange() {
         if (this.$listeners.exchange) {
           this.$emit('exchange', this.index);
@@ -98,6 +121,15 @@
     height: 100%;
     background-color: #fff;
     position: relative;
+    &:hover {
+      .vmp-stream-remote__shadow-box {
+        display: flex;
+      }
+    }
+  }
+  .vmp-stream-remote__container {
+    width: 100%;
+    height: 100%;
   }
   // 遮罩层样式
   .vmp-stream-remote__shadow-box {
@@ -107,7 +139,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
