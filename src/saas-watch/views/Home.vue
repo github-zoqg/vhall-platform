@@ -39,6 +39,15 @@
         // this.errMsg = ex.msg;
       }
     },
+    mounted() {
+      // 派发推流事件
+      setTimeout(() => {
+        window.$middleEventSdk?.event?.send({
+          cuid: 'comStreamLocal',
+          method: 'startPush'
+        });
+      }, 3000);
+    },
     methods: {
       initReceiveLive() {
         const { id } = this.$route.params;
