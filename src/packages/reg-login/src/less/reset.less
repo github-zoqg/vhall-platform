@@ -1,0 +1,217 @@
+/*云盾色值*/
+/deep/.vmp-yundun-captcha {
+  border-radius: 4px !important;
+  .yidun.yidun--light.yidun--float.yidun--jigsaw {
+    width: 100% !important;
+  }
+  /deep/ .yidun .yidun_control {
+    border-radius: 4px !important;
+    border-color: #ccc;
+    background: #fff;
+    .yidun_tips {
+      color: #888888;
+      line-height: 38px;
+    }
+    // .yidun_slider {
+    //   &:hover {
+    //     background-color: #3562FA;
+    //   }
+    // }
+    &.yidun_control--moving .yidun_slide_indicator {
+      border-color: #3562fa;
+      background-color: #f0f1fe;
+    }
+  }
+  .yidun.yidun--light.yidun--success.yidun--jigsaw
+    .yidun_control
+    .yidun_slide_indicator {
+    border-color: #3562fa;
+    background-color: #f0f1fe;
+  }
+  .yidun.yidun--light.yidun--success.yidun--jigsaw {
+    .yidun_control .yidun_slider {
+      background-color: #3562fa;
+    }
+    .yidun_slide_indicator {
+      border-color: #3562fa !important;
+      background-color: #f0f1fe !important;
+    }
+  }
+  .yidun.yidun--light .yidun_top__right {
+    line-height: normal;
+  }
+  .yidun.yidun--light .yidun_tips__text {
+    vertical-align: unset;
+  }
+}
+
+/deep/.vmp-login__form__common {
+  /*文本框样式*/
+  .el-input__inner {
+    border: none;
+    border-radius: unset;
+    border-bottom: 1px solid #dcdfe6;
+    padding: 0 0;
+    &:hover {
+      border-color: #999;
+    }
+    &:focus {
+      border-color: #999;
+    }
+    &::-webkit-input-placeholder {
+      /* WebKit, Blink, Edge */
+      color: #999999;
+    }
+    &:-moz-placeholder {
+      /* Mozilla Firefox 4 to 18 */
+      color: #999999;
+    }
+    &::-moz-placeholder {
+      /* Mozilla Firefox 19+ */
+      color: #999999;
+    }
+    &:-ms-input-placeholder {
+      /* Internet Explorer 10-11 */
+      color: #999999;
+    }
+  }
+  .el-form-item {
+    margin-bottom: 16px;
+    &.is-error {
+      margin-bottom: 24px;
+      .el-input__inner {
+        border-color: #fb3a32;
+      }
+    }
+  }
+
+  /* 验证码 */
+  .vmp-wrap-code {
+    position: relative;
+    /deep/.el-input__suffix {
+      margin-right: 80px;
+    }
+  }
+  .vmp-code-btn {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    height: 40px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 40px;
+    text-align: right;
+    &.disabled {
+      cursor: not-allowed;
+      color: #999999;
+    }
+    &.start {
+      cursor: pointer;
+      color: #fb3a32;
+    }
+    &.pending {
+      cursor: not-allowed;
+      color: #999999;
+    }
+    &.show-border {
+      width: 103px;
+      height: 34px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      text-align: center;
+      line-height: 34px;
+      right: 0;
+      &.disabled {
+        color: #1a1a1a;
+      }
+      &.start {
+        background: #fb3a32;
+        color: #ffffff;
+      }
+      &.pending {
+        color: #1a1a1a;
+      }
+    }
+  }
+
+  /*自动登录 - 链接*/
+  .vmp-box__link {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    line-height: 20px;
+    .vmp-box__auto {
+      font-size: 14px;
+      font-weight: 400;
+      color: #999999;
+      line-height: 20px;
+      &.vmp-box__checked {
+        cursor: pointer;
+      }
+    }
+    .vmp-box__forget {
+      margin-left: auto;
+    }
+    .vmp-box-checkbox {
+      margin-right: 8px;
+    }
+  }
+
+  /*大型按钮*/
+  .length-max {
+    width: 100%;
+    height: 40px;
+    border-radius: 20px;
+  }
+  button.el-button.vmp-red-button {
+    background: #fb3a32;
+    color: #ffffff;
+    border: 1px solid #fb3a32;
+    &:hover {
+      color: #fff;
+      background: #fc615b;
+      border: 1px solid #fc615b;
+    }
+    &:focus {
+      color: #fff;
+      background: #fb3a32;
+      border: 1px solid #fb3a32;
+    }
+    &:active {
+      background: #e2332c;
+      border: 1px solid #e2332c;
+    }
+    &.is-disabled {
+      background: #f09d99;
+      border: 1px solid #f09d99;
+      cursor: not-allowed;
+      color: #fff;
+      &:hover,
+      &:focus,
+      &:active {
+        background: #f09d99;
+        border: 1px solid #f09d99;
+      }
+    }
+  }
+
+  /* 立即注册链接 */
+  .vmp-reg__link {
+    cursor: pointer;
+    text-decoration: unset;
+    margin: 14px auto 0 auto;
+    &.vhsaas-default {
+      /*margin: 50px auto 0 auto;*/
+      margin: 12px auto 0 auto;
+    }
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+    color: #3562fa;
+    line-height: 20px;
+  }
+}
