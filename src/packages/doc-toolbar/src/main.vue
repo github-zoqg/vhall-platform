@@ -280,6 +280,8 @@
           this.showChooseDocBtn = true;
           this.showThumbnailBtn = true;
         }
+        // 需要重新设置一下笔刷工具
+        this.changeTool(this.currentBrush);
       }
     }
   };

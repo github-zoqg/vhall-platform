@@ -26,10 +26,13 @@ const cmd = argv._[0];
 function createSharedConfig() {
   //是否需要构建单独版本
   let publicPath = '/';
+  let BASE_URL = '/middle';
+
   if (process.env.NODE_ENV === 'production') {
     const pkg = require(resolve(`/src/${argv.project}/package.json`));
     if (argv.buildVersion) {
       publicPath = `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${pkg.name}/${pkg.version}`;
+      BASE_URL = `/middle/${pkg.version}`;
     } else {
       publicPath = `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${pkg.name}`;
     }
@@ -60,7 +63,7 @@ function createSharedConfig() {
       plugins: [
         new webpack.DefinePlugin({
           'process.env': {
-            BASE_URL: argv.buildVersion ? `/middle/${pkg.version}` : '/middle' // 路由base
+            BASE_URL: BASE_URL
           }
         })
       ]
