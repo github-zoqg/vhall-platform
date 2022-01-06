@@ -1,8 +1,9 @@
 <template>
-  <div v-show="isShow" class="vhsaas-chat-emoji">
+  <div v-show="isShow" class="vmp-chat-emoji">
     <img
       v-for="item in emojiList"
       :key="item.value"
+      class="vmp-chat-emoji__img"
       width="24"
       height="24"
       :src="item.src"
@@ -13,6 +14,7 @@
 <script>
   import { getEmojiList } from '../js/emoji';
   export default {
+    name: 'VmpChatEmoji',
     data() {
       return {
         isShow: false,
@@ -38,21 +40,18 @@
   };
 </script>
 <style lang="less">
-  .vhsaas-chat-emoji {
+  .vmp-chat-emoji {
     width: 100%;
-    box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
     background: #f7f7f7;
-    padding: 6px;
+    padding: 2px;
     border: 1px #afafaf solid;
     border-radius: 4px;
-    & > img {
+    &__img {
       width: 24px;
       height: 24px;
-      padding: 2px;
       display: block;
-      box-sizing: border-box;
       cursor: pointer;
       &:hover {
         border-radius: 2px;

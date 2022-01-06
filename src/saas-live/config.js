@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'dlgDocList']
   },
   // 顶部header容器
   layerHeader: {
@@ -111,17 +111,22 @@ export const serverConfig = {
     options: {
       icon: 'iconfont iconwendang',
       text: 'aside_menu.aside_menu_1000',
-      selected: true
+      kind: 'document'
     },
     emitClick: [
       {
         cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comDocMenu']
+        method: 'switchTo',
+        args: ['document']
+      },
+      {
+        cuid: 'comDocUne',
+        method: 'switchTo',
+        args: ['document']
       },
       {
         cuid: 'comDocToolbar',
-        method: 'showAtMode',
+        method: 'switchTo',
         args: ['document']
       }
     ]
@@ -131,17 +136,23 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont iconbaiban',
-      text: 'aside_menu.aside_menu_1001'
+      text: 'aside_menu.aside_menu_1001',
+      kind: 'board'
     },
     emitClick: [
       {
         cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comWbMenu']
+        method: 'switchTo',
+        args: ['board']
+      },
+      {
+        cuid: 'comDocUne',
+        method: 'switchTo',
+        args: ['board']
       },
       {
         cuid: 'comDocToolbar',
-        method: 'showAtMode',
+        method: 'switchTo',
         args: ['board']
       }
     ]
@@ -172,19 +183,60 @@ export const serverConfig = {
   },
   //聊天组件
   comChat: {
-    component: 'VmpChat'
+    component: 'VmpChat',
+    options: {
+      //是否有图片上传按钮
+      hasImgUpload: true,
+      //是否有聊天操作按钮
+      hasChatOperateBtn: false
+    }
   },
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    children: ['comDocToolbar']
+    children: ['comDocToolbar'],
+    emitSwitchTo: [
+      {
+        cuid: 'comAsideMenu',
+        method: 'switchTo',
+        args: ['$0'] // 获取动态参数的第一个
+      },
+      {
+        cuid: 'comDocToolbar',
+        method: 'switchTo',
+        args: ['$0']
+      }
+    ],
+    // 打开对话框
+    emitOpenDocList: [
+      {
+        cuid: 'dlgDocList',
+        method: 'show'
+      }
+    ]
   },
   // 文档工具栏
   comDocToolbar: {
     component: 'VmpDocToolbar',
+    children: ['comFullscreenIcon']
+  },
+  // 全屏按钮
+  comFullscreenIcon: {
+    component: 'VmpIconItem',
     options: {
-      hasCloseBtn: false //是否有关闭按钮
-    }
+      icon: 'iconfont iconquanping',
+      title: 'doc.doc_1010'
+    },
+    emitClick: [
+      {
+        cuid: 'comDocUne',
+        method: 'fullscreen'
+      }
+    ]
+  },
+  //文档列表对话框
+  dlgDocList: {
+    component: 'VmpDocDlglist'
   },
   // 上麦流列表
   comStreamList: {

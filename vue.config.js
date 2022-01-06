@@ -23,10 +23,17 @@ console.log(chalk.bold.bgBlue(`环境 NODE_ENV `), chalk.bold.blue(`${process.en
 const argv = btool.parseArgv(process.argv);
 const cmd = argv._[0];
 
+let pkg = {};
+
 /**
  * 共享配置
  */
 const sharedConfig = {
+  publicPath:
+    process.env.NODE_ENV == 'development'
+      ? './'
+      : `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${pkg.name}/${pkg.version}`,
+  // assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
     devtool: isProd ? false : '#cheap-module-eval-source-map',
@@ -49,7 +56,7 @@ const sharedConfig = {
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
-          BASE_URL: '/middle' // 路由base
+          BASE_URL: argv.buildVersion ? `/middle/${pkg.version}` : '/middle' // 路由base
         }
       })
     ]
@@ -108,6 +115,9 @@ const sharedConfig = {
 };
 
 if (['serve', 'build'].includes(cmd)) {
+  //是否需要构建单独版本
+  pkg = require(resolve(`/src/${argv.project}/package.json`));
+
   // 根据参数获取专用配置信息
   const specialConfig = btool.createSpecialConfig(argv.project);
 

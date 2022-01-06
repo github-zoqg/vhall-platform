@@ -3,6 +3,7 @@ export const zh = {
     copySucceeded: '复制成功！',
     copyFailed: '复制失败！',
     close: '关闭',
+    upload: '上传',
     fullscreen: '全屏',
     chooseDocument: '选择文档',
     audienceVisible: '观众可见',
@@ -14,6 +15,9 @@ export const zh = {
     text: '文本',
     clear: '清除',
     docThumb: '文档缩略图'
+  },
+  doc_list: {
+    doclib: '资料库'
   },
   language_choice: {
     language_choice_1000: '选择语言',
@@ -52,6 +56,7 @@ export const en = {
     copySucceeded: 'Copy succeeded！',
     copyFailed: 'Copy failed !',
     close: 'close',
+    upload: 'upload',
     fullscreen: 'fullscreen',
     chooseDocument: 'choose doc',
     audienceVisible: 'audience visible',
@@ -63,6 +68,9 @@ export const en = {
     text: 'text',
     clear: 'clear',
     docThumb: 'document thumbnail'
+  },
+  doc_list: {
+    doclib: 'document library'
   },
   language_choice: {
     language_choice_1000: 'language Choice',

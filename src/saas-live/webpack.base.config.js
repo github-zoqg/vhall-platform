@@ -6,6 +6,20 @@ const path = require('path');
 const pathConfig = require('../../scripts/path-config');
 const pkg = require('./package.json');
 
+/**
+ * 解析命令后面的参数
+ * @param {*} argv
+ * @returns
+ */
+const parseArgv = argv => {
+  const rawArgv = argv.slice(2);
+  return require('minimist')(rawArgv);
+};
+
+const argv = process.argv;
+const args = parseArgv(argv);
+const { buildVersion } = args;
+
 const htmlConfig = {
   // cdn js
   cdnJs: {
@@ -13,8 +27,7 @@ const htmlConfig = {
     VueRouter: '//t-alistatic01.e.vhall.com/3rdlibs/vue-router/3.5.2/vue-router.min.js',
     Moment: '//cnstatic01.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
-    MiddleEventSdk:
-      '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.0.1/index.min.js',
+    MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.1.0/index.js',
     MiddleDomain:
       '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.0.0/dist/lib/middleDomain.js',
     ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
@@ -39,8 +52,14 @@ const htmlConfig = {
   }
 };
 
+let outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name);
+
+if (buildVersion) {
+  outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name, pkg.version);
+}
+
 module.exports = {
-  outputDir: path.join(pathConfig.ROOT, 'dist', pkg.name),
+  outputDir: outputDir,
   pages: {
     index: {
       entry: path.join(pathConfig.SRC, pkg.name, 'main.js'),

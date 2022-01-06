@@ -1,30 +1,16 @@
 <template>
-  <a
-    href="javascript:;"
-    :id="cuid"
-    :ref="cuid"
-    class="vmp-icon-text"
-    :data-kind="kind"
-    :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
-    @click="handleClick"
-  >
+  <div class="vmp-icon-item" :class="className" :title="$t(title)" v-if="show" @click="handleClick">
     <i :class="icon"></i>
-    <span class="text">
-      {{ $t(text) }}
-    </span>
-  </a>
+  </div>
 </template>
 <script>
   export default {
-    name: 'VmpIconText',
+    name: 'VmpIconItem',
     data() {
       return {
-        className: '',
-        kind: '',
-        selected: false,
-        disable: false,
         icon: '',
-        text: ''
+        title: '',
+        show: true
       };
     },
     mounted() {
@@ -40,38 +26,21 @@
             this.className = widget.options.className;
           }
           // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('kind')) {
-            this.kind = widget.options.kind;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('selected')) {
-            this.selected = widget.options.selected;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('disable')) {
-            this.disable = widget.options.disable;
+          if (widget.options.hasOwnProperty('title')) {
+            this.title = widget.options.title;
           }
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('icon')) {
             this.icon = widget.options.icon;
           }
           // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('text')) {
-            this.text = widget.options.text;
+          if (widget.options.hasOwnProperty('show')) {
+            this.show = widget.options.show;
           }
         }
       },
-      // 设置选中转态
-      setSelectedState(val) {
-        this.selected = val;
-      },
-      // 设置可用状态
-      setDisableState(val) {
-        this.disable = val;
-      },
       // click事件
       handleClick: function () {
-        if (this.disable) return false;
         window.$middleEventSdk?.event?.send({
           cuid: this.cuid,
           method: 'emitClick'
