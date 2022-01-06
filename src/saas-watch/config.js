@@ -66,7 +66,7 @@ export const serverConfig = {
   pannelHeaderRight: {
     component: 'VmpContainer',
     className: 'vmp-header-right',
-    children: ['compLanguageChoice']
+    children: ['compLanguageChoice', 'compRegLogin']
   },
   // 顶部左侧组件
   compHeaderLeft: {
@@ -162,5 +162,10 @@ export const serverConfig = {
   //聊天组件
   comChat: {
     component: 'VmpChat'
+  },
+  // 登录注册组件
+  compRegLogin: {
+    component: 'VmpRegLogin',
+    children: ['dlgDocList']
   }
 };

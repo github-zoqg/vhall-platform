@@ -19,7 +19,7 @@ import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
-
+import VmpRegLogin from '@/packages/reg-login';
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -38,4 +38,5 @@ export function initUse() {
   Vue.use(VmpStreamRemote);
   Vue.use(VmpFooter);
   Vue.use(VmpFooterTools);
+  Vue.use(VmpRegLogin);
 }
