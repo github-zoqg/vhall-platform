@@ -2,23 +2,44 @@
   <div class="vmp-chat-container" :class="{ assistant: assistantType }">
     <!-- 消息主体区域 -->
     <div class="chat-content" ref="chatContent">
-      <div class="chat-content-scroll" ref="scroll">
-        <msg-item
-          v-for="msg in chatList"
-          :key="msg.msgId"
-          :msg="msg"
-          :roleName="roleName"
-          @dispatchEvent="msgEventHandleDisPatch"
-          @lotteryCheck="lotteryCheck"
-          @questionnaireCheck="questionnaireCheck"
-          @previewImg="previewImg"
-        ></msg-item>
+      <overlay-scrollbars
+        ref="chatMessageAreaScroll"
+        :options="overlayScrollBarsOptions"
+        style="height: 100%"
+      >
+        <template v-for="msg in chatList">
+          <msg-item
+            :key="msg.msgId"
+            :msg="msg"
+            :roleName="roleName"
+            @dispatchEvent="msgEventHandleDisPatch"
+            @lotteryCheck="lotteryCheck"
+            @questionnaireCheck="questionnaireCheck"
+            @previewImg="previewImg"
+          ></msg-item>
+        </template>
+        <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
+        <p
+          v-if="configList['ui.hide_chat_history'] === '1' && !chatList.length"
+          class="chat-content__get-list-btn-container"
+        >
+          <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
+        </p>
+      </overlay-scrollbars>
+      <div v-if="configList['ui.hide_chat_history'] !== '1'" class="chat-content__tip-box">
+        <div
+          v-show="
+            unReadMessageCount !== 0 &&
+            (isHasUnreadNormalMsg || isHasUnreadAtMeMsg || isHasUnreadReplyMsg)
+          "
+          class="chat-content__tip-box-content"
+          @click="scrollToTarget"
+        >
+          {{ tipMsg }}
+          <span class="iconfont iconyourennijiantou"></span>
+        </div>
       </div>
     </div>
-
-    <!--提示-->
-    <div class="chat-tip" v-show="showTip" @click="scrollTo">{{ tipMsg }}</div>
-
     <div class="chat-operate-bar">
       <!-- 表情选择 -->
       <div class="chat-operate-bar__emoji-wrap">
@@ -139,7 +160,6 @@
   import { sessionOrLocal } from './js/utils';
   import { useChatServer, contextServer } from 'vhall-sass-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { debounce } from 'lodash';
 
   export default {
     name: 'VmpChat',
@@ -158,6 +178,30 @@
       const roomBaseState = contextServer.get('roomBaseServer').state;
       return {
         roomBaseState,
+        //滚动插件配置
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        },
+        //todo 待替换
+        configList: {
+          'ui.hide_chat_history': '2'
+        },
+        //未读消息数量
+        unReadMessageCount: 0,
+        //是否有常规未读消息
+        isHasUnreadNormalMsg: false,
+        //是否有@我的未读消息
+        isHasUnreadAtMeMsg: false,
+        //是否有未读的回复消息
+        isHasUnreadReplyMsg: false,
+        //是否正在执行动画
+        animationRunning: false,
         //是否是助理
         assistantType: this.$route.query.assistantType,
         //聊天消息列表
@@ -244,13 +288,14 @@
         immediate: true,
         deep: true
       },
-      'chatList.length'(newVal) {
-        setTimeout(() => {
-          if (newVal) {
-            this.resizeScroll();
-            this.$emit('chatUpdata');
+      chatList: {
+        deep: true,
+        handler() {
+          // 如果滚动条未滚动至最底部
+          if (this.osInstance.scroll().ratio.y !== 1) {
+            this.unReadMessageCount++;
           }
-        }, 50);
+        }
       },
       allBanned: {
         handler() {},
@@ -307,12 +352,10 @@
       this.initChatLoginStatus();
       // 口令登录显示  自身显示消息
       this.initCodeLoginMessage();
-      this.debounceResizeScroll = debounce(this.resizeScroll, 500);
-      window.addEventListener('resize', this.debounceResizeScroll, true);
+      //初始化聊天区域滚动组件
+      this.initScroll();
     },
-    destroyed() {
-      window.removeEventListener('resize', this.debounceResizeScroll);
-    },
+    destroyed() {},
     methods: {
       // 初始化配置
       initConfig() {
@@ -429,15 +472,79 @@
       /**
        * 聊天图片预览结束
        * */
-      //重置滚动条到最底部
-      resizeScroll() {
-        const chatDom = document.querySelector('.chat-content-scroll');
-        chatDom.scrollTop = chatDom.scrollHeight + 100;
+      initScroll() {
+        this.osInstance = this.$refs.chatMessageAreaScroll.osInstance();
+        const that = this;
+        this.overlayScrollBarsOptions.callbacks = {
+          onHostSizeChanged: function () {
+            if (that.doScroll) {
+              that.performScroll();
+            }
+          },
+          onContentSizeChanged: function () {
+            if (that.doScroll) {
+              that.performScroll();
+            }
+          },
+          onScroll: that.setDoScroll,
+          onInitialized: that.setDoScroll,
+          onOverflowChanged: function (e) {
+            if (e.y) {
+              that.performScroll();
+            }
+          },
+          onScrollStop: this.handleScrollStop
+        };
+        this.osInstance.options(this.overlayScrollBarsOptions);
+      },
+      setDoScroll() {
+        this.$nextTick(() => {
+          if (!this.animationRunning) {
+            this.doScroll = this.osInstance.scroll().ratio.y === 1;
+          } else {
+            this.doScroll = true;
+          }
+        });
+      },
+      performScroll() {
+        this.$nextTick(() => {
+          this.animationRunning = true;
+          const delayTime = this.configList['ui.hide_chat_history'] === '1' ? 0 : 250;
+          this.osInstance.scrollStop().scroll({ y: '100%' }, delayTime, 'linear', () => {
+            this.animationRunning = false;
+          });
+        });
       },
       //滚动到底部
-      scrollTo() {
-        this.resizeScroll();
-        this.onClearElementsHandle();
+      handleScrollStop() {
+        if (this.osInstance.scroll().ratio.y === 1) {
+          this.unReadMessageCount = 0;
+          this.isHasUnreadNormalMsg = false;
+          this.isHasUnreadAtMeMsg = false;
+          this.isHasUnreadReplyMsg = false;
+        }
+      },
+      //滚动到目标处
+      scrollToTarget() {
+        this.animationRunning = true;
+        const delayTime = this.configList['ui.hide_chat_history'] === '1' ? 0 : 250;
+        this.osInstance.scrollStop().scroll(
+          {
+            el: this.osInstance.getElements().content.children[
+              this.chatList.length - this.badgeNumber
+            ],
+            block: { y: 'end' }
+          },
+          delayTime,
+          'linear',
+          () => {
+            this.animationRunning = false;
+            this.badgeNumber = 0;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadAtMeMsg = false;
+            this.isHasUnreadReplyMsg = false;
+          }
+        );
       },
       // 切换表情显示
       toggleEmoji() {
@@ -739,13 +846,6 @@
             break;
         }
       },
-      //清空艾特数组
-      onClearElementsHandle() {
-        this.elements = [];
-        this.showTip = false;
-        this.tipMsg = '';
-        this.replyElement = null;
-      },
       //滚动到@本用户的msgItem元素
       onScrollElementHandle(el) {
         this.showTip = true;
@@ -801,6 +901,7 @@
 <style lang="less">
   .vmp-chat-container {
     @active-color: #fc5659;
+    @font-error: #fb3a32;
     width: 100%;
     /* 临时修改下高度，后续自定义菜单出来，会移除掉 */
     height: calc(100% - 50px);
@@ -835,29 +936,41 @@
       left: 0;
       right: 0;
       bottom: 91px;
-      padding-top: 10px;
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 10px;
-        background-color: #434343;
+      padding: 10px 0 20px 0;
+      &__get-list-btn-container {
+        display: block;
+        text-align: center;
+        padding-top: 10px;
       }
-      ::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: #434343;
-        // border: 1px solid #434343;
+      &__get-list-btn {
+        cursor: pointer;
+        color: #3562fa;
+        font-size: 14px;
       }
-      ::-webkit-scrollbar-thumb {
-        border: 1px solid #fff;
+      &__tip-box {
+        position: absolute;
+        z-index: 1;
+        bottom: 5px;
+        left: 50%;
+        transform: translate(-50%, 0);
       }
-      ::-webkit-scrollbar-track {
-        border-radius: 5px;
-        background-color: #434343;
-      }
-      .chat-content-scroll {
-        height: 100%;
-        position: relative;
-        overflow-y: auto;
-        transform: all 0.3s;
+      &__tip-box-content {
+        padding: 0 14px;
+        line-height: 28px;
+        border-radius: 14px;
+        background-color: #363636;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        color: @font-error;
+        font-size: 14px;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        .iconyourennijiantou {
+          font-size: 12px;
+          margin-left: 6px;
+        }
       }
     }
     .tip {
