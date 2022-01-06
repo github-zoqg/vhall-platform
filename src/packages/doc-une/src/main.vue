@@ -64,6 +64,9 @@
       fullscreen() {
         screenfull.toggle(this.$refs.docWrapper);
       },
+      /**
+       * 屏幕缩放
+       */
       resize() {
         let { width, height } = screenfull.isFullscreen
           ? this.$refs.docWrapper.getBoundingClientRect()
@@ -136,6 +139,7 @@
 
         // 创建
         if (Number(is_board) === 1) {
+          console.log('--创建文档--');
           try {
             this.docServer.createDocument(options);
             this.docServer.selectContainer({ id: elId });
@@ -146,9 +150,10 @@
               slidesTotal,
               converted_page,
               converted_page_jpeg
-            } = await this.this.docServer.loadDoc({
+            } = await this.docServer.loadDoc({
               docId: item.docId,
-              id: elId
+              id: elId,
+              docType: item.type
             });
             let temp = {};
             if (Number(status) === 200) {
@@ -156,13 +161,14 @@
             } else if (Number(status_jpeg) === 200) {
               temp = { slideIndex: converted_page, slidesTotal: converted_page_jpeg };
             }
+            console.log('显示文档');
             this.selectDoc = {
               cid: elId,
               is_board: 1,
               ...temp
             };
           } catch (e) {
-            // 移除失败的容器
+            // 移除失败的容器fileOrboardList
             this.fileOrboardList = this.fileOrboardList.filter(item => item.elId === elId);
             console.error(e);
             // roomApi.report(this.$store.getters.roomId, e)
@@ -268,11 +274,11 @@
           console.log('切换到文档 item:', item);
           if (item) {
             console.log('选中文档');
-            const result = await this.docServer.selectContainer({
+            await this.docServer.selectContainer({
               id: item.cid,
               noDispatch: false
             });
-            console.log('选中文档result:', result);
+            this.selectDoc = item;
           } else {
             this.docServer.selectContainer({
               id: '',
@@ -292,6 +298,25 @@
           cuid: this.cuid,
           method: 'emitOpenDocList'
         });
+      },
+      /**
+       * 演示文档
+       * @param docId 文档id
+       * @param type 演示类型：1：静态文档（jpg） 2：动态文档(PPT)
+       */
+      demonstrate(docId, type) {
+        console.log('演示文档:', docId, ';type=', type);
+        // 保留白板删除其它的文档
+        const board = this.fileOrboardList.find(item => {
+          return item.is_board === 2;
+        });
+        for (let item of this.fileOrboardList) {
+          if (item.is_board === 1) {
+            this.docServer.destroyContainer({ id: item.cid });
+          }
+        }
+        this.fileOrboardList = board ? [board] : [];
+        this.addNewFile({ docId, type }, 1);
       }
     },
     mounted() {
