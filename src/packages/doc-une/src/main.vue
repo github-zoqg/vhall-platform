@@ -8,13 +8,16 @@
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div class="vmp-doc-inner">
-        <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
-        <div
-          v-for="item of fileOrboardList"
-          :id="item.cid"
-          :key="item.cid"
-          :style="{ visibility: item.cid == selectDoc.cid ? 'visible' : 'hidden' }"
-        ></div>
+        <div style="width: 0; height: 0">
+          <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
+          <div
+            v-for="item of fileOrboardList"
+            :id="item.cid"
+            :key="item.cid"
+            class="doc-box"
+            :style="{ visibility: item.cid == selectDoc.cid ? 'visible' : 'hidden' }"
+          ></div>
+        </div>
       </div>
 
       <!-- 没有文档时的占位组件 -->
@@ -24,6 +27,29 @@
           <span>暂未分享任何文档</span>
         </div>
       </div>
+
+      <!-- 文档操作栏: 翻页、放大、缩小、还原、拖拽 -->
+      <ul class="vmp-doc-pagebar" v-show="showPagebar">
+        <li
+          data-value="zoomReset"
+          title="上一步"
+          class="doc-pagebar__opt iconfont iconzuofanye"
+        ></li>
+        <li class="page-number">
+          <span class="page-index">7</span>
+          <span class="page-split">/</span>
+          <span class="page-total">10</span>
+        </li>
+        <li
+          data-value="zoomReset"
+          title="下一步"
+          class="doc-pagebar__opt iconfont iconyoufanye"
+        ></li>
+        <li data-value="zoomReset" title="放大" class="doc-pagebar__opt iconfont iconfangda"></li>
+        <li data-value="zoomReset" title="缩小" class="page-tool iconfont iconsuoxiao"></li>
+        <li data-value="zoomReset" title="还原" class="page-tool iconfont iconhuanyuan"></li>
+        <li data-value="move" title="移动" class="page-tool iconfont iconyidong"></li>
+      </ul>
     </div>
   </div>
 </template>
@@ -46,16 +72,17 @@
         fileOrboardList: [] // 从服务器获取的文档列表
       };
     },
+    computed: {
+      showPagebar() {
+        console.log('-----计算 this.selectDoc:', this.selectDoc);
+        return this.selectDoc.cid && this.selectDoc.is_board == 1 && !this.isFullscreen;
+      }
+    },
     beforeCreate() {
       this.docServer = contextServer.get('docServer');
     },
     created() {
       this.initEvents();
-    },
-    computed: {
-      currentContainerId() {
-        return this.docServer?.state.docInstance.currentCid;
-      }
     },
     methods: {
       /**
@@ -109,6 +136,9 @@
           if (process.env.NODE_ENV !== 'production') console.debug('所有文档加载完成');
           // const list = this.$doc.getLiveAllCids();
           // if (list.includes(this.previewInfo.elId)) this.previewInfo.canOperate = true;
+
+          console.log('this.selectDoc:', this.selectDoc);
+          console.log('this.isFullscreen :', this.isFullscreen);
           this.allComplete = true;
         });
       },
@@ -226,6 +256,7 @@
         }
         if (active != 0) {
           // this.$store.commit('setSideActive', item.is_board == 1 ? 'file' : 'board');
+          console.log('-------恢复文档item:', item);
           this.selectDoc = item;
           this.docServer.selectContainer({ id: item.cid, noDispatch: false });
 
@@ -317,6 +348,24 @@
         }
         this.fileOrboardList = board ? [board] : [];
         this.addNewFile({ docId, type }, 1);
+      },
+      handlePage(type) {
+        if (!this.selectDoc.cid || this.is_board === 2) {
+          return;
+        }
+        if (!this.allComplete) {
+          return this.$message.warning('请文档加载完成以后再操作');
+        }
+        switch (type) {
+          // 还原
+          case 'zoomReset':
+            this.docServer.zoomReset({ id: this.selectDoc.cid });
+            break;
+          // 移动
+          case 'move':
+            this.docServer.move({ id: this.selectDoc.cid });
+            break;
+        }
       }
     },
     mounted() {
@@ -376,9 +425,41 @@
       right: 0;
       bottom: 0;
       overflow: hidden;
+
+      .doc-box {
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        overflow: visible !important;
+      }
+    }
+
+    .vmp-doc-pagebar {
+      user-select: none;
+      position: absolute;
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      bottom: 20px;
+      padding: 3px 16px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 30px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
+      color: #f7f7f7;
+      line-height: 1;
+      font-size: 14px;
+      .iconfont {
+        cursor: pointer;
+
+        &:hover {
+          color: #fc5659;
+        }
+      }
+      .page-tool {
+        padding: 7px 10px;
+      }
     }
   }
 
