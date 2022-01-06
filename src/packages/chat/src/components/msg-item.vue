@@ -2,7 +2,7 @@
   <div class="vmp-chat-msg-item">
     <!--消息发送时间-->
     <div v-if="msg.showTime" class="vmp-chat-msg-item__showtime">{{ msg.showTime }}</div>
-    <!--消息主体-->
+    <!--常规消息-->
     <div :class="['msg-item-template', msg.type]">
       <template v-if="['welcome_msg'].includes(msg.type)">
         <div v-if="msg.nickName !== '' && msg.content !== ''" class="msg-item-template--welcome">
@@ -11,32 +11,33 @@
         </div>
       </template>
 
-      <template v-if="['reward_pay_ok'].includes(msg.type)">
-        <div class="msg-reward gift" :class="Math.random() * 10 > 1 ? 'purpose' : 'red'">
-          <p>
-            <span class="user-name">{{ msg.nickName | filterName }}</span>
-            <span class="gift-name">
-              打赏{{ msg.content.num }}元,{{ msg.content.text_content | filterContext }}
-            </span>
-            <img
-              class="award-img"
-              style="display: block; width: 32px; height: 38px"
-              src="../images/red-package.png"
-              alt
-            />
-          </p>
+      <!-- 礼物、打赏 -->
+      <div
+        v-if="['reward_pay_ok', 'gift_send_success', 'free_gift_send'].includes(msg.type)"
+        class="msg-item-template__interact-tools"
+      >
+        <div class="interact-tools-content">
+          <span v-show="msg.nickName" class="interact-tools-content__nick-name">
+            {{ msg.nickName }}
+          </span>
+          <span>
+            {{ msg.type === 'reward_pay_ok' ? '打赏了红包' : `送出${msg.content.gift_name}` }}
+          </span>
+          <img
+            class="interact-tools-content__img"
+            :class="{
+              'interact-tools-content__img-scale': msg.content.source_status === '0',
+              'interact-tools-content__img-reward': !msg.content.gift_url
+            }"
+            :src="msg.content.gift_url || require('../images/red-package-1.png')"
+            alt="礼物"
+          />
+          <br v-if="msg.type === 'reward_pay_ok'" />
+          <span v-if="msg.type === 'reward_pay_ok'" style="color: #fa9a32">
+            {{ msg.content.text_content }}
+          </span>
         </div>
-      </template>
-
-      <template v-if="['gift_send_success', 'free_gift_send'].includes(msg.type)">
-        <div class="msg-reward gift" :class="Math.random() * 10 > 1 ? 'purpose' : 'red'">
-          <p>
-            <span class="user-name">{{ msg.nickName | filterName }}</span>
-            <span class="gift-name">送出一个{{ msg.content.gift_name | filterName }}</span>
-            <img class="gift-img" :src="msg.content.gift_url" alt />
-          </p>
-        </div>
-      </template>
+      </div>
 
       <template v-if="!checkIsNotRegularMessage(msg.type)">
         <div class="avatar-wrap" @click="setPersonStatus($event, msg)">
@@ -92,7 +93,7 @@
                 height="34"
                 v-for="(img, index) in msg.replyMsg.content.image_urls"
                 :key="index"
-                :src="img + '?x-oss-process=image/resize,m_lfit,h_34,w_34'"
+                :src="img"
                 alt="聊天图片加载失败"
               />
             </p>
@@ -101,14 +102,14 @@
               class="msg-content_body"
               v-html="
                 msg.replyMsg && msg.replyMsg.content
-                  ? `<span style='color:#4DA1FF;'>回复:</span> ${this.msgContent}`
+                  ? `<span style='color:#fa9a32;'>回复:</span> ${this.msgContent}`
                   : this.msgContent
               "
             ></p>
             <p v-if="msg.content.image_urls" class="msg-content_chat-img-wrapper">
               <span
                 v-if="msg.replyMsg && msg.replyMsg.content && !msg.content.text_content"
-                style="color: #4da1ff; vertical-align: middle"
+                style="color: #fa9a32; vertical-align: middle"
               >
                 回复:
               </span>
@@ -176,7 +177,8 @@
     },
     data() {
       return {
-        msgContent: ''
+        msgContent: '',
+        isEmbed: false
       };
     },
     computed: {
@@ -207,6 +209,7 @@
       }
     },
     filters: {
+      //名称过长的转换
       filterName(val) {
         if (val && val.length > 8) {
           return val.substr(0, 8) + '...';
@@ -214,6 +217,7 @@
           return val;
         }
       },
+      //抽奖文字过长的转换
       filterContext(val) {
         if (val && val.length > 6) {
           return val.substr(0, 6) + '...';
@@ -221,6 +225,7 @@
           return val;
         }
       },
+      //角色转换
       roleFilter(value) {
         let ret = '';
         switch (Number(value)) {
@@ -241,8 +246,34 @@
         }
         return ret;
       },
+      //角色标签样式
       roleClassFilter(value) {
-        return value == '1' ? 'host' : value == '3' ? 'assistant' : 'guest';
+        //主持人
+        if ([1, '1'].includes(value)) {
+          return 'host';
+        }
+        //助理
+        if ([3, '3'].includes(value)) {
+          return 'assistant';
+        }
+        //游客
+        return 'guest';
+      },
+      //消息里的角色样式
+      roleClassFilterForMsg(value) {
+        //主持人
+        if ([1, '1'].includes(value)) {
+          return 'host';
+        }
+        //助理
+        if ([3, '3'].includes(value)) {
+          return 'assistant';
+        }
+        //游客
+        if ([4, '4'].includes(value)) {
+          return 'guest';
+        }
+        return '';
       }
     },
     mounted() {
@@ -346,19 +377,23 @@
 </script>
 <style lang="less">
   .vmp-chat-msg-item {
+    @font-dark-low: #999;
+    @font-dark-normal: #e6e6e6;
+    @bg-dark-normal: #1a1a1a;
+    @font-link: #3562fa;
     pointer-events: auto;
+
     &__showtime {
-      padding: 0 0 12px 0;
-      font-size: 12px;
-      color: #888888;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: @font-dark-low;
+      line-height: 20px;
     }
 
     .msg-item-template {
       margin: 0 10px 0 12px;
-      padding: 0 0 12px 0;
+      padding-top: 20px;
       display: flex;
       align-items: center;
       &--welcome {
@@ -479,7 +514,15 @@
           .msg-content_chat-img {
             vertical-align: middle;
             margin-right: 8px;
+            margin-bottom: 8px;
             cursor: pointer;
+            -o-object-fit: cover;
+            object-fit: cover;
+
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            overflow: hidden;
           }
         }
         .emoji-img {
@@ -551,6 +594,42 @@
           width: 16px;
           height: 16px;
           background: url('../images/red.png') no-repeat center;
+        }
+      }
+      &__interact-tools {
+        /* 红包、打赏 */
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        .interact-tools-content {
+          margin-top: 20px;
+          line-height: 20px;
+          padding: 5px 16px;
+          background-color: #222222;
+          border-radius: 15px;
+          color: @font-dark-normal;
+          font-size: 14px;
+          text-align: center;
+          > span {
+            float: left;
+          }
+          &__nick-name {
+            color: @font-dark-low;
+            border-radius: 9px;
+            padding: 0 4px;
+            font-size: 14px;
+            line-height: 20px;
+          }
+          &__img {
+            height: 18px;
+            padding-left: 7px;
+            &-scale {
+              transform: scale(1.4);
+            }
+            &-reward {
+              transform: scale(0.8);
+            }
+          }
         }
       }
     }

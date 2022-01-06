@@ -15,71 +15,79 @@
       <div style="height: 448px">
         <!-- 当前直播列表 -->
         <div class="vmp-doc-cur" v-show="mode === 1">
-          <div class="vmp-doc-cur__hd">
-            <el-button @click="handleUpload">{{ $t('usual.upload') }}</el-button>
-            <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
+          <!-- 无数据 -->
+          <div class="vmp-doc-cur__empty" v-show="dataList.length === 0">
+            <img src="/static/img/no-file.png" />
+            <p>您还没有文档，快来上传吧</p>
+            <div>
+              <el-button type="primary" @click="handleUpload">{{ $t('usual.upload') }}</el-button>
+              <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
+            </div>
+          </div>
+          <!-- 有数据 -->
+          <div class="vmp-doc-cur__inner" v-show="dataList.length > 0">
+            <div class="vmp-doc-cur__hd">
+              <el-button type="primary" @click="handleUpload">{{ $t('usual.upload') }}</el-button>
+              <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
 
-            <el-tooltip placement="right">
-              <div slot="content">
-                <div class="help-tips">
-                  <p>1.支持的文档格式： doc/docx,xls/xlsx,ppt</p>
-                  <p>/pptx,pdf,jpeg/jpg,png,bmp</p>
-                  <p>2.单份文档不能超过200页,不超过100M</p>
-                  <p>3.如果ppt格式转换失败或文档打开失败请尝试</p>
-                  <p>用office转为pdf后上传</p>
-                  <p>4.直播过程中发现PPT自动翻页，请检查源文件</p>
-                  <p>是否设置自动放映</p>
-                  <p>5.文档转换较慢，请于直播前从资料管理-文档</p>
-                  <p>管理上传文档</p>
-                  <p>6.动态版文档转码时间较长，请耐心等待，可选</p>
-                  <p>择静态版（无动画效果）快速演示</p>
+              <el-tooltip placement="right">
+                <div slot="content">
+                  <div class="help-tips">
+                    <p>1.支持的文档格式： doc/docx,xls/xlsx,ppt</p>
+                    <p>/pptx,pdf,jpeg/jpg,png,bmp</p>
+                    <p>2.单份文档不能超过200页,不超过100M</p>
+                    <p>3.如果ppt格式转换失败或文档打开失败请尝试</p>
+                    <p>用office转为pdf后上传</p>
+                    <p>4.直播过程中发现PPT自动翻页，请检查源文件</p>
+                    <p>是否设置自动放映</p>
+                    <p>5.文档转换较慢，请于直播前从资料管理-文档</p>
+                    <p>管理上传文档</p>
+                    <p>6.动态版文档转码时间较长，请耐心等待，可选</p>
+                    <p>择静态版（无动画效果）快速演示</p>
+                  </div>
                 </div>
-              </div>
-              <i style="margin-left: 5px" class="el-tooltip iconfont iconicon_help_m"></i>
-            </el-tooltip>
+                <i style="margin-left: 5px" class="el-tooltip iconfont iconicon_help_m"></i>
+              </el-tooltip>
 
-            <el-input style="width: 220px; float: right" placeholder="请输入文档名称"></el-input>
-          </div>
-          <div class="vmp-doc-cur__bd">
-            <el-table :data="dataList" style="width: 100%" height="336px">
-              <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
-              <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
-              <el-table-column prop="page" label="页码"></el-table-column>
-              <el-table-column prop="address" label="进度"></el-table-column>
-              <el-table-column label="操作" width="200">
-                <template slot-scope="scope">
-                  <el-button
-                    v-if="scope.row.status_jpeg == 200 || scope.row.transcoded"
-                    @click="demonstrate(scope.row.document_id, 2)"
-                    size="mini"
-                    type="text"
-                  >
-                    演示
-                  </el-button>
-                  <el-button
-                    v-if="
-                      scope.row.ext.indexOf('ppt') != -1 &&
-                      (scope.row.status_jpeg == 200 || scope.row.transcoded)
-                    "
-                    @click="demonstrate(scope.row.document_id, 1)"
-                    size="mini"
-                    type="text"
-                  >
-                    动画版演示
-                  </el-button>
-                  <el-button
-                    @click="handleDeleteDoc(scope.row.id, scope.$index, scope.row.isLocalUpload)"
-                    size="mini"
-                    type="text"
-                  >
-                    删除
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="vmp-doc-cur__ft">
-            <div>观众可见</div>
+              <el-input style="width: 220px; float: right" placeholder="请输入文档名称"></el-input>
+            </div>
+            <div class="vmp-doc-cur__bd">
+              <el-table :data="dataList" style="width: 100%" height="336px">
+                <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
+                <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
+                <el-table-column prop="page" label="页码"></el-table-column>
+                <el-table-column prop="address" label="进度"></el-table-column>
+                <el-table-column label="操作" width="200">
+                  <template slot-scope="scope">
+                    <el-button
+                      v-if="scope.row.status_jpeg == 200 || scope.row.transcoded"
+                      @click="demonstrate(scope.row.document_id, 2)"
+                      size="mini"
+                      type="text"
+                    >
+                      演示
+                    </el-button>
+                    <el-button
+                      v-if="
+                        scope.row.ext.indexOf('ppt') != -1 &&
+                        (scope.row.status_jpeg == 200 || scope.row.transcoded)
+                      "
+                      @click="demonstrate(scope.row.document_id, 1)"
+                      size="mini"
+                      type="text"
+                    >
+                      动画版演示
+                    </el-button>
+                    <el-button @click="handleDeleteDoc(scope.row)" size="mini" type="text">
+                      删除
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div class="vmp-doc-cur__ft">
+              <div>观众可见</div>
+            </div>
           </div>
         </div>
 
@@ -178,11 +186,47 @@
         // 只要数量大于0，即是全选
         this.isCheckAll = selection && selection.length > 0;
       },
-      demonstrate() {},
+      /**
+       * 演示文档
+       */
+      demonstrate(documentId, type) {
+        this.dialogVisible = false;
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitDemonstrateDoc',
+          params: [documentId, type]
+        });
+      },
       /***
        * 删除文档
        */
-      handleDeleteDoc() {},
+      async handleDeleteDoc(row) {
+        // TODO 提示文本进行国际化处理
+        try {
+          await this.$confirm('删除后将会影响文档演示和观看，确定删除？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          });
+          const result = await this.docServer.delDocList({
+            tag: 1,
+            ids: row.id,
+            webinar_id: row.webinar_id,
+            room_id: this.roomBaseServer.state.watchInitData.interact.room_id
+          });
+          if (result && result.code === 200) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            });
+            this.handleDoccurSearch();
+          } else {
+            this.$message.error('删除失败');
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      },
       /**
        * 点击资料库按钮
        */
@@ -272,33 +316,47 @@
   };
 </script>
 <style lang="less">
-  .help-tips p {
-    line-height: 20px;
-  }
-  .vmp-doc-cur {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    .vmp-doc-cur__bd {
-      padding-top: 10px;
-    }
-    .vmp-doc-cur__ft {
+  .vmp-doc-list {
+    .vmp-doc-cur__empty {
+      height: 346px;
       display: flex;
-      flex-direction: row;
-    }
-  }
-  .vmp-doc-lib {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-
-    .vmp-doc-lib__ft {
-      margin: 12px 0 24px 0;
-      display: flex;
-      flex-direction: row;
+      flex-direction: column;
       align-items: center;
-      .vmp-doc-lib__ft-tip {
-        flex: 1;
+      justify-content: center;
+      p {
+        line-height: 60px;
+        font-size: 14px;
+        color: #999;
+      }
+    }
+    .help-tips p {
+      line-height: 20px;
+    }
+    .vmp-doc-cur {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      .vmp-doc-cur__bd {
+        padding-top: 10px;
+      }
+      .vmp-doc-cur__ft {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+    .vmp-doc-lib {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      .vmp-doc-lib__ft {
+        margin: 12px 0 24px 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .vmp-doc-lib__ft-tip {
+          flex: 1;
+        }
       }
     }
   }
