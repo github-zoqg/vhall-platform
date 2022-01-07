@@ -1,3 +1,32 @@
+@theme-red: #fb3a32;
+@theme-title-color: #333333;
+.vmp-reg-login__son__tab {
+  text-align: left;
+  line-height: initial;
+  margin: 0 0 26px 0;
+  span {
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: top;
+    height: 30px;
+    font-size: 22px;
+    font-weight: 400;
+    color: @theme-title-color;
+    line-height: 30px;
+    &.active {
+      color: @theme-red;
+      border-bottom: 2px solid @theme-red;
+      border-radius: 1px;
+      &.no-border {
+        border-bottom: 0;
+        font-size: 22px;
+        font-weight: 400;
+        color: #333333;
+        line-height: 30px;
+      }
+    }
+  }
+}
 /*云盾色值*/
 /deep/.vmp-yundun-captcha {
   border-radius: 4px !important;
@@ -44,7 +73,7 @@
     vertical-align: unset;
   }
 }
-
+/* 表单内样式 */
 /deep/.vmp-login__form__common {
   /*文本框样式*/
   .el-input__inner {
@@ -154,6 +183,13 @@
     }
     .vmp-box__forget {
       margin-left: auto;
+      a {
+        cursor: pointer;
+        text-decoration: unset;
+        font-size: 14px;
+        font-weight: 400;
+        color: #3562fa;
+      }
     }
     .vmp-box-checkbox {
       margin-right: 8px;
@@ -212,6 +248,33 @@
     font-size: 14px;
     font-weight: 400;
     color: #3562fa;
+    line-height: 20px;
+  }
+
+
+  /*复选选中效果重置*/
+  .el-checkbox__input {
+    line-height: unset;
+  }
+  .el-checkbox__input.is-checked .el-checkbox__inner,
+  .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: #fb3a32;
+    border-color: #fb3a32;
+  }
+  .el-checkbox__inner:hover {
+    border-color: #fb3a32;
+  }
+  .el-checkbox__input.is-focus .el-checkbox__inner {
+    border-color: #fb3a32;
+  }
+  .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
+    background-color: #fb3a32;
+    border-color: #fb3a32;
+  }
+  .el-checkbox__input.is-checked+.el-checkbox__label {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999;
     line-height: 20px;
   }
 }

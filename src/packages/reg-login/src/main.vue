@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-reg-login">
-    <span @click="open({ openReg: 1, loginType: '1-1' })">登录&注册</span>
+    <span @click.stop.prevent="open({ openReg: 1, loginType: '1-1' })">登录&注册</span>
     <el-dialog
       :custom-class="`vmp-reg-login__dialog ${!isMobile ? 'platform__pc' : 'platform__wap'}`"
       :visible.sync="visible"
@@ -10,7 +10,7 @@
       <!-- 标题栏插槽 -->
       <template slot="title" v-if="!isMobile">
         <div class="title">
-          <i class="iconfont icon-close" @click="close"></i>
+          <i class="iconfont icon-close" @click.stop.prevent="handleClose"></i>
         </div>
       </template>
       <!-- 可能场景：
@@ -23,31 +23,47 @@
         7、手机号验证码登录 & 账号密码登录；
         8、账号密码登录 & 手机号验证码登录 & 注册
         9、手机号验证码登录 & 账号密码登录 & 注册； -->
-      <template v-if="options.openReg == 1 && activeTag == 'reg'">
-        <reg ref="regDom" @handleLink="emitLinkChange"></reg>
+      <template v-if="options.openReg == 1">
+        <reg
+          ref="regDom"
+          v-if="activeTag == 'reg'"
+          @handleLink="emitLinkChange"
+          @closeParent="closeParent"
+        ></reg>
       </template>
-      <template v-if="options.loginType != '0-0' && activeTag != 'reg'">
+      <template v-if="options.loginType != '0-0'">
         <!-- 验证码 和 密码 登录并存  -->
-        <div class="vmp-reg-login__tab" v-if="options.loginType == '1-1'">
-          <span :class="activeTag == 'code' ? 'active' : ''" @click="handleChangeTag('code')">
+        <div class="vmp-reg-login__tab" v-if="options.loginType == '1-1' && activeTag != 'reg'">
+          <span
+            :class="activeTag == 'code' ? 'active' : ''"
+            @click.stop.prevent="handleChangeTag('code')"
+          >
             验证码登录
           </span>
           <em>|</em>
-          <span :class="activeTag == 'pwd' ? 'active' : ''" @click="handleChangeTag('pwd')">
+          <span
+            :class="activeTag == 'pwd' ? 'active' : ''"
+            @click.stop.prevent="handleChangeTag('pwd')"
+          >
             密码登录
           </span>
         </div>
+
         <code-login
-          v-if="panelShows[0] == 1 && activeTag == 'code'"
+          v-if="panelShows[0] == 1 && activeTag == 'code' && activeTag != 'reg'"
           :showToReg="options.openReg"
           :showThirdLogin="true"
+          ref="codeDom"
           @handleLink="emitLinkChange"
+          @closeParent="closeParent"
         ></code-login>
         <pwd-login
-          v-if="panelShows[1] == 1 && activeTag == 'pwd'"
+          v-if="panelShows[1] == 1 && activeTag == 'pwd' && activeTag != 'reg'"
           :showToReg="options.openReg"
           :showThirdLogin="true"
+          ref="pwdDom"
           @handleLink="emitLinkChange"
+          @closeParent="closeParent"
         ></pwd-login>
       </template>
     </el-dialog>
@@ -148,7 +164,12 @@
         this.visible = true;
       },
       // 关闭弹出框
-      close() {
+      handleClose() {
+        this.$refs[`${this.activeTag}Dom`] && this.$refs[`${this.activeTag}Dom`].resetForm(); // 重置子表单
+        console.log('主界面关闭按钮触发，子组件表单重置');
+        this.visible = false;
+      },
+      closeParent() {
         this.visible = false;
       },
       // handleChangeTag 切换登录-tag选项卡
@@ -205,6 +226,7 @@
     }
     &.platform__pc {
       border-radius: 4px;
+      min-height: 480px;
       .vmp-reg-login__tab {
         text-align: left;
         line-height: initial;
