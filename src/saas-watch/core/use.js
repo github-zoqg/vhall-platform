@@ -19,6 +19,8 @@ import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
+import VmpPraise from '@/packages/praise';
+import VmpNoticeList from '@/packages/notice';
 import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
 
@@ -40,6 +42,8 @@ export function initUse() {
   Vue.use(VmpStreamRemote);
   Vue.use(VmpFooter);
   Vue.use(VmpFooterTools);
+  Vue.use(VmpPraise);
+  Vue.use(VmpNoticeList);
   Vue.use(VmpBasicRightContainer);
   Vue.use(VmpBasicCenterContainer);
 }
