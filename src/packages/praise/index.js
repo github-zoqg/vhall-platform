@@ -1,4 +1,4 @@
-import PcPrise from './src/pcMain';
+import PcPrise from './src/main';
 
 /* istanbul ignore next */
 PcPrise.install = function (Vue) {

@@ -10,6 +10,7 @@ import VmpAsideMenu from '@/packages/aside-menu';
 import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
+import VmpHeaderWatch from '@/packages/header-watch-pc';
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
@@ -20,7 +21,8 @@ import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
 import VmpPraise from '@/packages/praise';
-import VmpNoticeList from '@/packages/notice';
+import VmpNoticeList from '@/packages/notice'; // 公告列表
+import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
 import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
 
@@ -33,6 +35,7 @@ export function initUse() {
   Vue.use(VmpIconText);
   Vue.use(VmpLanguageChoice);
   Vue.use(VmpHeaderLeft);
+  Vue.use(VmpHeaderWatch);
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
   Vue.use(VmpDocUne);
@@ -44,6 +47,7 @@ export function initUse() {
   Vue.use(VmpFooterTools);
   Vue.use(VmpPraise);
   Vue.use(VmpNoticeList);
+  Vue.use(VmpNoticeColumn);
   Vue.use(VmpBasicRightContainer);
   Vue.use(VmpBasicCenterContainer);
 }
