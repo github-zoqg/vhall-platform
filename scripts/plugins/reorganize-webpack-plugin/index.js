@@ -28,7 +28,7 @@ class ReorganizeWebpackPlugin {
           chalk.bold.green('[ReorganizePlugin] reorganize the all resource in dist dir')
       );
       const { dist, project, version, resoucePrefix } = this.options;
-      console.log(this.options);
+      // console.log(this.options);
       // {
       //   resoucePrefix: '//t-alistatic01.e.vhall.com/common-static/saas-live',
       //   dist: '/Users/yangxinyuan/vhall/fork-middle-platform/dist',
@@ -41,14 +41,13 @@ class ReorganizeWebpackPlugin {
       fs.ensureDirSync(path.join(dockerPath, version));
       fs.ensureDirSync(cloudPath);
 
-      // 读取目录工程目录
+      // 读取工程目录
       const files = fs.readdirSync(projectPath);
       for (const filename of files) {
         if (['docker', 'cloud-0', 'cloud'].includes(filename)) {
           continue;
         }
         const fPath = path.join(projectPath, filename);
-        console.log('fPath:', fPath);
         // 找到html文件处理后写入不同的目录
         if (path.extname(filename).toLowerCase() === '.html') {
           let content = fs.readFileSync(fPath, 'utf-8');
@@ -76,7 +75,7 @@ class ReorganizeWebpackPlugin {
           let content = fs.readFileSync(filePath, 'utf-8');
           content = content.replace(patternForStatic, '"../static/');
           if (basedir.indexOf(version) > -1) {
-            content = content.replace(patternForRouter, `base: \\"/middle/${version}\\",`);
+            content = content.replace(patternForRouter, `base: "/middle/${version}",`);
           }
           fs.writeFileSync(filePath, content, 'utf-8');
         }

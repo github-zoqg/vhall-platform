@@ -10,8 +10,8 @@ const resolve = dir => path.join(__dirname, dir);
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ReorganizePlugin = require('./scripts/plugins/reorganize-webpack-plugin');
 
-// 是否生产环境
-const isProd = process.env.NODE_ENV === 'production';
+// 是否开发环境
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 console.log(chalk.bold.bgBlue(`环境 NODE_ENV `), chalk.bold.blue(`${process.env.NODE_ENV}`));
 
 // 解析参数成key-value形式：
@@ -32,10 +32,10 @@ const sharedConfig = {
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool: isProd ? false : '#cheap-module-eval-source-map',
+    devtool: isDev ? '#cheap-module-eval-source-map' : false,
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
-      hints: isProd ? 'warning' : false,
+      hints: isDev ? false : 'warning',
       maxAssetSize: 512000, // 整数类型（以字节为单位）
       maxEntrypointSize: 400000 // 整数类型（以字节为单位）
     },
@@ -60,7 +60,9 @@ const sharedConfig = {
   },
   chainWebpack: config => {
     config.resolve.alias.set('@', path.resolve('src'));
-
+    if (!isDev) {
+      config.optimization.minimize(true);
+    }
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
       // 编译结束后重新组织编译结果
       config.plugin('reorganize').use(
