@@ -1,6 +1,5 @@
 export const globalConfig = {
-  lang: 'zh',
-  skin: 'default'
+  lang: 'zh'
 };
 
 // 服务配置
