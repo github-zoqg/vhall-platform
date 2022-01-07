@@ -1,5 +1,12 @@
 <template>
   <div class="vmp-reg-login">
+    <!-- TODO 举例触发入口
+    open() => 默认 验证码登录 & 密码登录 & 注册；
+    open({ openReg: 0}) => 验证码登录 & 密码登录，建议传参 { openReg: 0， loginType: '1-1'}
+    open({ openReg: 0， loginType: '1-0'}) 验证码登录
+    open({ openReg: 0， loginType: '0-1'}) 密码登录
+    open({ loginType: '0-1'}) 密码登录 & 注册； 建议传参 { openReg: 1， loginType: '1-1'}
+     -->
     <span @click.stop.prevent="open({ openReg: 1, loginType: '1-1' })">登录&注册</span>
     <el-dialog
       :custom-class="`vmp-reg-login__dialog ${!isMobile ? 'platform__pc' : 'platform__wap'}`"
@@ -8,7 +15,7 @@
       :show-close="false"
     >
       <!-- 标题栏插槽 -->
-      <template slot="title" v-if="!isMobile">
+      <template slot="title" v-if="!isMobile && options.loginType == '1-1'">
         <div class="title">
           <i class="iconfont icon-close" @click.stop.prevent="handleClose"></i>
         </div>
@@ -52,6 +59,7 @@
         <code-login
           v-if="panelShows[0] == 1 && activeTag == 'code' && activeTag != 'reg'"
           :showToReg="options.openReg"
+          :sonTitle="options.loginType == '1-0' ? '验证码登录' : ''"
           :showThirdLogin="true"
           ref="codeDom"
           @handleLink="emitLinkChange"
@@ -60,6 +68,7 @@
         <pwd-login
           v-if="panelShows[1] == 1 && activeTag == 'pwd' && activeTag != 'reg'"
           :showToReg="options.openReg"
+          :sonTitle="options.loginType == '0-1' ? '密码登录' : ''"
           :showThirdLogin="true"
           ref="pwdDom"
           @handleLink="emitLinkChange"
@@ -191,17 +200,13 @@
   };
 </script>
 <style lang="less" scoped>
-  @theme-red: #fb3a32;
-  @theme-title-color: #333333;
+  @import url('less/theme.less');
   .vmp-reg-login {
     display: inline-flex;
     text-align: right;
   }
   /deep/.el-dialog.vmp-reg-login__dialog {
-    width: 90%;
     height: auto;
-    max-width: 380px;
-    max-height: 526px;
     .el-dialog__header {
       padding: 0 32px;
       height: 60px;
@@ -225,6 +230,9 @@
       padding: 0 0;
     }
     &.platform__pc {
+      width: 380px;
+      max-width: 380px;
+      max-height: 526px;
       border-radius: 4px;
       min-height: 480px;
       .vmp-reg-login__tab {
@@ -238,12 +246,12 @@
           height: 30px;
           font-size: 22px;
           font-weight: 400;
-          color: @theme-title-color;
+          color: #333333;
           line-height: 30px;
           padding-bottom: 4px;
           &.active {
-            color: @theme-red;
-            border-bottom: 2px solid @theme-red;
+            color: @theme;
+            border-bottom: 2px solid @theme;
             border-radius: 1px;
             &.no-border {
               border-bottom: 0;
@@ -266,6 +274,47 @@
       }
     }
     &.platform__wap {
+      width: 80%;
+      max-width: 335px;
+      border-radius: 16px;
+      max-height: 526px;
+      .vmp-reg-login__tab {
+        text-align: left;
+        line-height: initial;
+        margin: 0 32px 20px 32px;
+        span {
+          cursor: pointer;
+          display: inline-block;
+          vertical-align: top;
+          height: 30px;
+          font-size: 22px;
+          font-weight: 400;
+          color: #333333;
+          line-height: 30px;
+          padding-bottom: 4px;
+          &.active {
+            color: @theme;
+            border-bottom: 2px solid @theme;
+            border-radius: 1px;
+            &.no-border {
+              border-bottom: 0;
+              font-size: 22px;
+              font-weight: 400;
+              color: #333333;
+              line-height: 30px;
+            }
+          }
+        }
+        em {
+          font-style: normal;
+          display: inline-block;
+          vertical-align: top;
+          padding: 0 16px;
+          font-size: 16px;
+          line-height: 22px;
+          margin-top: 4px;
+        }
+      }
     }
   }
 </style>

@@ -1,5 +1,8 @@
 <template>
   <div class="vmp-code-login">
+    <div class="vmp-reg-login__son__tab" v-if="sonTitle">
+      <span>{{ sonTitle }}</span>
+    </div>
     <el-form
       ref="ruleForm"
       key="codeLoginForm"
@@ -9,9 +12,9 @@
       class="vmp-login__form__common"
     >
       <!-- 手机号 -->
-      <el-form-item prop="usernames">
+      <el-form-item prop="phone">
         <el-input
-          v-model.trim="ruleForm.usernames"
+          v-model.trim="ruleForm.phone"
           clearable
           :maxlength="11"
           placeholder="请输入手机号"
@@ -29,23 +32,37 @@
           type="captcha"
           :maxlength="6"
           placeholder="动态验证码"
+          @blur="autoLoginSetMargin"
         ></el-input>
+        <!--
+          start: 默认态，红色。条件：手机号 & 图片验证码 校验通过，当前倒计时结束 或 倒计时未开启。
+          disabled: 禁用态，灰色。条件：手机号 或 图片验证码 校验失败。
+          pending: 验证码发送中，灰色。条件：手机号 & 图片验证码 校验通过，当前倒计时进行中。
+         -->
         <span
           type="danger"
-          :disabled="buttonControl == 'disabled'"
-          :class="['vmp-code-btn show-border', buttonControl]"
+          :disabled="btnDisabled || isDownTime"
+          :class="[
+            'vmp-code-btn show-border',
+            {
+              start: !btnDisabled && !isDownTime,
+              disabled: btnDisabled,
+              pending: !btnDisabled && isDownTime
+            }
+          ]"
           @click.stop.prevent="handleSendCode"
         >
-          获取验证码 {{ time }}
+          {{ isDownTime ? `${time}s` : '获取验证码' }}
         </span>
       </el-form-item>
       <!-- 其它  -->
       <el-form-item>
         <div
           :class="[
-            'vmp-box__link',
-            'vmp-box__msg__error',
-            { 'vmp-box__link__error': captchaError }
+            'vmp-box__link vmp-box__code__link',
+            {
+              'vmp-box__height__max': isMaxHeight
+            }
           ]"
         >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
@@ -78,6 +95,12 @@
       ThirdLoginLink
     },
     props: {
+      sonTitle: {
+        required: false,
+        default() {
+          return '';
+        }
+      },
       showToReg: {
         required: true,
         default() {
@@ -108,27 +131,17 @@
     },
     data() {
       const validatePhone = (rule, value, callback) => {
-        this.phoneError = value === '' || !/^1[0-9]{10}$/.test(value);
-        this.isShowPhoneErr = value === '' || !/^1[0-9]{10}$/.test(value);
         if (value === '') {
-          this.buttonControl = 'disabled'; // 验证失败，禁用
           callback('请输入手机号');
         } else {
           if (!/^1[0-9]{10}$/.test(value)) {
-            this.buttonControl = 'disabled'; // 验证失败，禁用
             callback(new Error('请输入正确的手机号'));
           } else {
-            if (this.phoneKey) {
-              this.buttonControl = 'start'; // 验证成功，启用
-            } else {
-              this.buttonControl = 'disabled';
-            }
             callback();
           }
         }
       };
       const validateCaptchas = (rule, value, callback) => {
-        this.captchaError = value === '';
         if (value === '') {
           callback(new Error('请输入动态验证码'));
         } else {
@@ -139,11 +152,11 @@
         isMobile: false, // 是否是手机端展示(true - 手机端；false - PC浏览器)
         options: {},
         ruleForm: {
-          usernames: '', // 验证码登录时，表示手机号
+          phone: '', // 验证码登录时，表示手机号
           captchas: '' // 短信验证码
         },
         ruleFormRules: {
-          usernames: [{ required: true, validator: validatePhone, trigger: 'blur' }],
+          phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
           captchas: [{ required: true, validator: validateCaptchas, trigger: 'blur' }]
         },
         cap: null, // 云盾本身
@@ -151,13 +164,49 @@
         captchaVal: null, // 图片验证码值
         timeInterval: null,
         time: 60, // 验证码倒计时
-        autoLoginStatus: false // 账户的自动登录
+        autoLoginStatus: false, // 账户的自动登录
+        isMaxHeight: false, // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
+        btnDisabled: true, // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
+        isDownTime: false // 倒计时计时情况下，isDownTime为true。否则为false。
       };
+    },
+    watch: {
+      'ruleForm.captchas': function () {
+        this.autoLoginSetMargin();
+      },
+      'ruleForm.phone': function () {
+        this.codeBtnDisabledCheck();
+      }
     },
     methods: {
       // 切换至注册面板
       handleToReg() {
         this.$emit('handleLink', 'reg');
+      },
+      // 间距设定
+      autoLoginSetMargin() {
+        let captchasFlag = false;
+        this.$refs.ruleForm.validateField('captchas', function (res) {
+          captchasFlag = !res;
+        });
+        this.isMaxHeight = !captchasFlag;
+      },
+      // 控制发送验证码是否禁用状态
+      codeBtnDisabledCheck() {
+        if (this.ruleForm.phone) {
+          let phoneFlag = false;
+          this.$refs.ruleForm.validateField('phone', function (res) {
+            phoneFlag = !res;
+          });
+          if (phoneFlag && this.captchaVal) {
+            // 如果当前手机号验证通过，并且图形验证码已选取，获取验证码按钮可点击
+            this.btnDisabled = false;
+          } else {
+            this.btnDisabled = true; // 获取验证码不可点击
+          }
+        } else {
+          this.btnDisabled = true; // 获取验证码不可点击
+        }
       },
       // 调起图片验证码
       callCaptcha(element, success, failure) {
@@ -199,6 +248,7 @@
             function (that, err, data) {
               if (data) {
                 that.captchaVal = data.validate;
+                that.codeBtnDisabledCheck();
               } else {
                 console.log('#codeLoginCaptcha --- call-success图片验证码', err);
               }
@@ -231,10 +281,10 @@
         // TODO 模拟数据
         this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
       },
-      // 发送验证码
+      // 发送验证码 - 按钮点击
       handleSendCode() {
         let phoneFlag = false;
-        this.$refs.ruleForm.validateField('usernames', function (res) {
+        this.$refs.ruleForm.validateField('phone', function (res) {
           console.log('校验结果：', !res);
           phoneFlag = !res;
         });
@@ -259,7 +309,7 @@
           // const sendCode = ['/v4/ucenter-login-reg/code/send', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
           const params = {
             type: 1, // 1手机  2邮箱
-            data: this.ruleForm.usernames,
+            data: this.ruleForm.phone,
             validate: this.captchaVal, // 图形验证码数据
             scene_id: 7 // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码
           };
@@ -277,11 +327,13 @@
                 }
                 this.timeInterval = setInterval(() => {
                   if (this.time > 0) {
+                    this.isDownTime = true;
                     this.time--;
                   } else {
                     if (this.timeInterval) {
                       clearInterval(this.timeInterval);
                       this.timeInterval = null;
+                      this.isDownTime = false;
                       // 验证码发送完成后，重置图片选择框
                       if (!this.captchaVal) {
                         this.reloadCaptha();
@@ -322,11 +374,13 @@
           }
           this.timeInterval = setInterval(() => {
             if (this.time > 0) {
+              this.isDownTime = true;
               this.time--;
             } else {
               if (this.timeInterval) {
                 clearInterval(this.timeInterval);
                 this.timeInterval = null;
+                this.isDownTime = false;
                 // 验证码发送完成后，重置图片选择框
                 if (!this.captchaVal) {
                   this.reloadCaptha();
@@ -345,7 +399,7 @@
             const cUserLogin = ['/v4/ucenter-login-reg/consumer/login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
             const params = {
               way: 2, // 手机号验证码登录
-              phone: this.ruleForm.usernames,
+              phone: this.ruleForm.phone,
               code: this.ruleForm.captchas, // 动态密码【快捷登录（短信验证码登录）必传】
               remember: Number(this.autoLoginStatus)
             };
@@ -471,12 +525,13 @@
         this.resetForm();
         this.$emit('closeParent', 'code');
       },
+      // 重置当前表单 - 通用api
       resetForm() {
         // 数据重置
         this.$refs.ruleForm && this.$refs.ruleForm.resetFields();
         this.reloadCaptha();
       },
-      // init组件入口
+      // init组件入口 - 通用api
       init(params = {}) {
         // 组件加载初始化默认数据
         this.isMobile =
@@ -505,6 +560,6 @@
 <style lang="less" scoped>
   @import url('../less/reset.less');
   .vmp-code-login {
-    padding: 0 32px;
+    padding: 0 32px 24px 32px;
   }
 </style>

@@ -1,5 +1,8 @@
 <template>
   <div class="vmp-pwd-login">
+    <div class="vmp-reg-login__son__tab" v-if="sonTitle">
+      <span>{{ sonTitle }}</span>
+    </div>
     <el-form
       ref="ruleForm"
       key="pwdLoginForm"
@@ -27,13 +30,23 @@
           v-model.trim="ruleForm.password"
           clearable
           placeholder="请输入登录密码"
+          @blur="autoLoginSetMargin"
         ></el-input>
       </el-form-item>
       <!-- 其它 -->
       <el-form-item>
-        <div :class="['vmp-box__link']">
+        <div
+          :class="[
+            'vmp-box__link vmp-box__pwd__link',
+            {
+              'vmp-box__height__max': isMaxHeight
+            }
+          ]"
+        >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
-          <span @click="autoLoginStatus = !autoLoginStatus">自动登录</span>
+          <span class="vmp-box__auto vmp-box__checked" @click="autoLoginStatus = !autoLoginStatus">
+            自动登录
+          </span>
           <span class="vmp-box__auto vmp-box__forget">
             <a :href="forgetUrl" target="_blank">忘记密码</a>
           </span>
@@ -63,6 +76,12 @@
       ThirdLoginLink
     },
     props: {
+      sonTitle: {
+        required: false,
+        default() {
+          return '';
+        }
+      },
       showToReg: {
         required: true,
         default() {
@@ -132,8 +151,14 @@
         time: 60, // 验证码倒计时
         autoLoginStatus: false, // 账户的自动登录
         forgetUrl: 'javascript:void(0);', // 忘记密码链接入口
-        loginKeyVo: null // 对象
+        loginKeyVo: null, // 对象
+        isMaxHeight: false // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
       };
+    },
+    watch: {
+      'ruleForm.password': function () {
+        this.autoLoginSetMargin();
+      }
     },
     methods: {
       // 切换至注册面板
@@ -148,6 +173,13 @@
       },
       handleEye() {
         this.loginPwdShow = !this.loginPwdShow;
+      },
+      autoLoginSetMargin() {
+        let passwordFlag = false;
+        this.$refs.ruleForm.validateField('password', function (res) {
+          passwordFlag = !res;
+        });
+        this.isMaxHeight = !passwordFlag;
       },
       // 调起图片验证码
       callCaptcha(element, success, failure) {
@@ -509,6 +541,6 @@
 <style lang="less" scoped>
   @import url('../less/reset.less');
   .vmp-pwd-login {
-    padding: 0 32px;
+    padding: 0 32px 24px 32px;
   }
 </style>

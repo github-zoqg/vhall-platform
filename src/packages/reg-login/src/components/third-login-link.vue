@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-third-layout" v-if="options.qqPath || options.wxPath">
-    <p class="vmp-third-remark">其他登录方式</p>
+    <p :class="`vmp-third-remark height__${way}`">其他登录方式</p>
     <div class="vmp-login__way">
       <div class="vmp-login__third">
         <a :href="options.qqPath" class="vmp-login__qq" title="QQ登录" v-if="options.qqPath"></a>
@@ -29,6 +29,13 @@
         default() {
           return null;
         }
+      },
+      way: {
+        required: false,
+        default() {
+          // 传入值范围 max -- padding增加8px；min -- padding不增加。
+          return 'max';
+        }
       }
     },
     data() {
@@ -47,7 +54,8 @@
         };
         console.log('动态设置的第三方请求地址....');
       },
-      setDefaultPath() {
+      // 统一默认入口
+      init() {
         console.log('默认第三方请求地址....');
         // TODO 后端请求域名 - 待确定如何书写
         const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
@@ -62,7 +70,7 @@
       }
     },
     created() {
-      this.setDefaultPath();
+      this.init();
     }
   };
 </script>
@@ -72,13 +80,18 @@
     margin-top: auto;
   }
   .vmp-third-remark {
-    margin-top: 8px;
     text-align: center;
     height: 17px;
     font-size: 12px;
     font-weight: 400;
     color: #999999;
     line-height: 17px;
+    &.height__max {
+      padding-top: 8px;
+    }
+    &.height__min {
+      padding-top: 0;
+    }
   }
   .vmp-login__way {
     margin-top: 8px;

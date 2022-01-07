@@ -68,7 +68,7 @@
           class="vmp-register__login__link"
           @click.stop.prevent="handleToLogin"
         >
-          登录
+          去登录
         </a>
       </el-form-item>
       <!-- 注册密码
@@ -105,9 +105,9 @@
         </a>
       </el-form-item> -->
       <el-button class="vmp-red-button length-max vmp-register-btn" round @click="handleRegister">
-        立即注册
+        {{ isMobile ? '注册' : '立即注册' }}
       </el-button>
-      <div class="auto-login register-checked">
+      <div class="register-checked" v-if="!isMobile">
         <el-checkbox v-model="checked">
           我已阅读并同意
           <a
@@ -117,6 +117,19 @@
             rel="noopener noreferrer"
           >
             服务条款及隐私协议
+          </a>
+        </el-checkbox>
+      </div>
+      <div class="register-checked" v-else>
+        <el-checkbox v-model="checked">
+          同意并遵守
+          <a
+            href="https://t.e.vhall.com/home/vhallapi/serviceterms"
+            target="_blank"
+            class="vmp-register__to__link"
+            rel="noopener noreferrer"
+          >
+            《服务条款》
           </a>
         </el-checkbox>
       </div>
@@ -602,7 +615,7 @@
 <style lang="less" scoped>
   @import url('../less/reset.less');
   .vmp-register {
-    padding: 0 32px;
+    padding: 0 32px 24px 32px;
   }
   /deep/.vmp-register__pwd__box {
     position: relative;
@@ -633,6 +646,12 @@
     text-align: left;
     vertical-align: middle;
     line-height: 20px;
+    /deep/.el-checkbox__label {
+      font-size: 14px;
+      font-weight: 400;
+      color: #999999;
+      line-height: 20px;
+    }
     .el-checkbox {
       display: flex;
       white-space: normal;
