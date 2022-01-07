@@ -99,7 +99,7 @@
   import VmpHighlighterPopup from './highlighter-popup.vue';
   import VmpShapePopup from './shape-popup.vue';
   import VmpTextPopup from './text-popup.vue';
-  import { contextServer } from 'vhall-sass-domain';
+  import { contextServer } from 'middleDomain';
   export default {
     name: 'VmpDocToolbar',
     components: {

@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { RoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpHeaderLeft',
     data() {
@@ -34,7 +34,7 @@
       };
     },
     created() {
-      const { watchInitData } = contextServer.get('roomBaseServer').state;
+      const { watchInitData } = new RoomBaseServer().state;
       this.subject = watchInitData?.webinar?.subject || '';
       this.id = watchInitData?.webinar?.id || '';
     },

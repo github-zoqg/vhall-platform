@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { MsgServer, RoomBaseServer } from 'middleDomain';
   import onlineMixin from './js/mixins';
   export default {
     name: 'VmpFooterTools',
@@ -31,8 +31,8 @@
       };
     },
     beforeCreate() {
-      this.msgServer = contextServer.get('msgServer');
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.msgServer = new MsgServer();
+      this.roomBaseServer = new RoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;

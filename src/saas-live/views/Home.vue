@@ -15,7 +15,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { Domain } from 'vhall-sass-domain';
+  import { Domain, useMsgServer } from 'middleDomain';
   export default {
     name: 'Home',
     components: {
@@ -51,14 +51,20 @@
           localStorage.setItem('token', token);
         }
         new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction']
-        }).initRoom({
-          webinarId: id, //活动id
-          clientType: 'send', //客户端类型
+          plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token
+            token: token || localStorage.getItem('token')
+          },
+          initRoom: {
+            webinarId: id, //活动id
+            clientType: 'send' //客户端类型
           }
         });
+        // 初始化房间
+        // await domainInstance.initRoom({
+        //   webinarId: id, //活动id
+        //   clientType: 'send' //客户端类型
+        // });
       }
     }
   };

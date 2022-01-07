@@ -58,7 +58,7 @@
 </template>
 
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { contextServer } from 'middleDomain';
   export default {
     name: 'VmpStreamRemote',
     data() {
