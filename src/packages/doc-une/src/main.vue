@@ -15,13 +15,13 @@
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ visibility: item.cid == selectDoc.cid ? 'visible' : 'hidden' }"
+            :style="{ visibility: item.cid == currentDoc.cid ? 'visible' : 'hidden' }"
           ></div>
         </div>
       </div>
 
       <!-- 没有文档时的占位组件 -->
-      <div class="vmp-doc-placeholder" v-show="!selectDoc.cid">
+      <div class="vmp-doc-placeholder" v-show="!currentDoc.cid">
         <div class="vmp-doc-placeholder__inner">
           <i class="iconfont iconzanwuwendang"></i>
           <span>暂未分享任何文档</span>
@@ -36,9 +36,9 @@
           class="doc-pagebar__opt iconfont iconzuofanye"
         ></li>
         <li class="page-number">
-          <span class="page-index">7</span>
+          <span class="page-index">{{ pageNum }}</span>
           <span class="page-split">/</span>
-          <span class="page-total">10</span>
+          <span class="page-total">{{ pageTotal }}</span>
         </li>
         <li
           data-value="nextStep"
@@ -68,13 +68,30 @@
       return {
         allComplete: false,
         isFullscreen: false, //是否全屏
-        selectDoc: {}, // 当前操作的文档
-        fileOrboardList: [] // 从服务器获取的文档列表
+        // 从服务器获取的文档列表
+        fileOrboardList: [],
+        // 当前操作的文档
+        currentDoc: {}
       };
     },
     computed: {
+      eId() {
+        return this.currentDoc?.cid;
+      },
       showPagebar() {
-        return this.selectDoc.cid && this.selectDoc.is_board == 1 && !this.isFullscreen;
+        return this.currentDoc.cid && this.currentDoc.is_board == 1 && !this.isFullscreen;
+      },
+      pageTotal() {
+        return this.currentDoc?.slidesTotal || 1;
+      },
+      pageNum() {
+        return this.currentDoc?.slideIndex || 0 + 1;
+      }
+    },
+    watch: {
+      currentDoc(val) {
+        console.log('---currentDoc----');
+        console.log(val);
       }
     },
     beforeCreate() {
@@ -131,13 +148,109 @@
 
         if (!this.docServer) return;
         // PaaS提供的文档事件
+
+        // 所有文档加载完成事件
         this.docServer.on(window.VHDocSDK.Event.ALL_COMPLETE, () => {
           if (process.env.NODE_ENV !== 'production') console.debug('所有文档加载完成');
           // const list = this.$doc.getLiveAllCids();
           // if (list.includes(this.previewInfo.elId)) this.previewInfo.canOperate = true;
-          // console.log('this.selectDoc:', this.selectDoc);
+          // console.log('this.currentDoc:', this.currentDoc);
           // console.log('this.isFullscreen :', this.isFullscreen);
           this.allComplete = true;
+        });
+        this.docServer.on(VHDocSDK.Event.DOCUMENT_LOAD_COMPLETE, data => {
+          console.log('===================文档加载完成===================');
+          // this.isPageShow = true
+          // this.currentDoc.slidesTotal = data.info.slidesTotal;
+          // this.currentDoc.slideIndex = data.info.slideIndex;
+          // console.log('this.currentDoc:', this.currentDoc);
+          // const res = this.docServer.getThumbnailList({ id: this.eId });
+          // console.log('---res----:', res);
+          // const thumbnailList = res[0] ? res[0].list : [];
+          // EventBus.$emit('documenet_load_complete', thumbnailList);
+        });
+        // 文档翻页事件
+        this.docServer.on(VHDocSDK.Event.PAGE_CHANGE, data => {
+          console.log('===================文档翻页====================');
+          this.currentDoc.slidesTotal = data.info.slidesTotal;
+          this.currentDoc.slideIndex = data.info.slideIndex;
+          console.log('this.currentDoc:', this.currentDoc);
+        });
+
+        this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
+          // if (this.hasDocPermission) return;
+          console.log('==========控制文档开关=============', status);
+        });
+
+        this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
+          // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
+          //   return;
+          // }
+          console.log('===================创建容器====================', data);
+          // this.docInfo.docContainerShow = true;
+          // this.docInfo.docShowType = data.type;
+          // this.cids.push(data.id);
+          // this.$nextTick(() => {
+          //   this.initWidth(data.type);
+          //   this.initContainer(data.type, data.id, '');
+          // });
+        });
+
+        this.docServer.on(VHDocSDK.Event.DELETE_CONTAINER, data => {
+          // if (this.roleName != 1 && this.liveStatus != 1) {
+          //   return;
+          // }
+          console.log('===============删除容器=======================', data);
+          // const index = this.cids.indexOf(data.id);
+          // if (index > -1) {
+          //   this.cids.splice(index, 1);
+          //   this.docServer.destroyContainer({ id: data.id });
+          // }
+          // if (this.currentCid == data.id) {
+          //   this.currentCid = '';
+          //   this.docInfo.docShowType = '';
+          // }
+        });
+
+        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
+          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
+          //   return;
+          // }
+          console.log('===============选择容器=======================', data);
+          // this.docInfo.docShowType = data.id.split('-')[0];
+          // this.currentCid = data.id;
+          // // 判断容器是否存在
+          // if (this.cids.indexOf(data.id) > -1) {
+          //   this.activeContainer(data.id);
+          // } else {
+          //   this.cids.push(data.id);
+          //   await this.$nextTick();
+          //   this.initWidth(data.type);
+          //   this.initContainer(data.type, data.id, '');
+          //   this.activeContainer(data.id);
+          // }
+          // EventBus.$emit('docInfo', this.docInfo);
+          // console.log('a9');
+
+          // this.docServer.setControlStyle(this.styleOpts);
+        });
+
+        this.docServer.on(VHDocSDK.Event.DOCUMENT_NOT_EXIT, ({ cid, docId }) => {
+          console.log('====================文档不存在或已删除=================', cid);
+          // if (cid == this.currentCid) {
+          //   this.$message({
+          //     type: 'error',
+          //     message: '文档不存在或已删除'
+          //   });
+          //   this.deleteTimer = setTimeout(() => {
+          //     this.docId = '';
+          //     const index = this.cids.indexOf(cid);
+          //     this.cids.splice(index, 1);
+          //     this.docServer.destroyContainer({ id: this.currentCid });
+          //     this.currentCid = '';
+          //     this.docInfo.docShowType = '';
+          //   }, 3000); // 其他地方调用回将值重新传入
+          // }
         });
       },
       /**
@@ -186,7 +299,7 @@
             } else if (Number(status_jpeg) === 200) {
               temp = { slideIndex: converted_page, slidesTotal: converted_page_jpeg };
             }
-            this.selectDoc = {
+            this.currentDoc = {
               cid: elId,
               is_board: 1,
               ...temp
@@ -210,7 +323,7 @@
               }
             });
             this.docServer.selectContainer({ id: elId });
-            this.selectDoc = {
+            this.currentDoc = {
               cid: elId,
               is_board: 2
             };
@@ -250,10 +363,9 @@
         }
         if (active != 0) {
           // this.$store.commit('setSideActive', item.is_board == 1 ? 'file' : 'board');
-          console.log('-------恢复文档item:', item);
-          this.selectDoc = item;
+          this.currentDoc = Object.assign({}, item);
+          console.log('恢复this.currentDoc：', this.currentDoc);
           this.docServer.selectContainer({ id: item.cid, noDispatch: false });
-
           window.$middleEventSdk?.event?.send({
             cuid: this.cuid,
             method: 'emitSwitchTo',
@@ -287,7 +399,7 @@
           });
           if (item) {
             await this.docServer.selectContainer({ id: item.cid, noDispatch: false });
-            this.selectDoc = item;
+            this.currentDoc = item;
           } else {
             this.addNewFile({}, 2);
           }
@@ -296,23 +408,12 @@
           const item = this.fileOrboardList.find(item => {
             return item.is_board === 1;
           });
-          console.log('切换到文档 item:', item);
-          if (item) {
-            console.log('选中文档');
-            await this.docServer.selectContainer({
-              id: item.cid,
-              noDispatch: false
-            });
-            this.selectDoc = item;
-          } else {
-            this.docServer.selectContainer({
-              id: '',
-              noDispatch: false
-            });
-            this.selectDoc = {
-              is_board: 1
-            };
-          }
+          await this.docServer.selectContainer({
+            id: item?.cid ? item.cid : '',
+            noDispatch: false
+          });
+          this.currentDoc = item ? item : { is_board: 1 };
+          console.log('切换到文档 this.currentDoc:', this.currentDoc);
         }
       },
       /**
@@ -348,7 +449,7 @@
        * @param {*} e
        */
       handlePage(e) {
-        if (!this.selectDoc.cid || this.is_board === 2) {
+        if (!this.currentDoc.cid || this.is_board === 2) {
           return;
         }
         if (e.target.nodeName === 'UL') return;
@@ -362,6 +463,12 @@
           return this.$message.warning('请文档加载完成以后再操作');
         }
         switch (type) {
+          case 'prevStep':
+            this.docServer.prevStep({ id: this.currentDoc.cid });
+            break;
+          case 'nextStep':
+            this.docServer.nextStep({ id: this.currentDoc.cid });
+            break;
           // 放大
           case 'zoomIn':
             this.docServer.zoomIn();
@@ -372,11 +479,11 @@
             break;
           // 还原
           case 'zoomReset':
-            this.docServer.zoomReset({ id: this.selectDoc.cid });
+            this.docServer.zoomReset({ id: this.currentDoc.cid });
             break;
           // 移动
           case 'move':
-            this.docServer.move({ id: this.selectDoc.cid });
+            this.docServer.move({ id: this.currentDoc.cid });
             break;
         }
       }
