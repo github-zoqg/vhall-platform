@@ -2181,6 +2181,11 @@ async-validator@~1.8.1:
   dependencies:
     babel-runtime "6.x"
 
+async@*:
+  version "3.2.2"
+  resolved "https://r2.cnpmjs.org/async/-/async-3.2.2.tgz#2eb7671034bb2194d45d30e31e24ec7e7f9670cd"
+  integrity sha512-H0E+qZaDEfx/FY4t7iLRv1W2fFI6+pyCeTw1uN20AQPiwqwM6ojPxHxdLv4z8hi2DtnW9BOckSspLucW7pIE5g==
+
 async@^2.6.2:
   version "2.6.3"
   resolved "https://registry.npmmirror.com/async/download/async-2.6.3.tgz#d72625e2344a3656e3a3ad4fa749fa83299d82ff"
@@ -4692,8 +4697,8 @@ from2@^2.1.0:
 
 fs-extra@^10.0.0:
   version "10.0.0"
-  resolved "https://rg.cnpmjs.org/fs-extra/download/fs-extra-10.0.0.tgz#9ff61b655dde53fb34a82df84bb214ce802e17c1"
-  integrity sha1-n/YbZV3eU/s0qC34S7IUzoAuF8E=
+  resolved "https://r2.cnpmjs.org/fs-extra/-/fs-extra-10.0.0.tgz#9ff61b655dde53fb34a82df84bb214ce802e17c1"
+  integrity sha512-C5owb14u9eJwizKGdchcDUQeFtlSHHthBk8pbX9Vc1PFZrLombudjDnNns88aYslCyF6IY5SUw3Roz6xShcEIQ==
   dependencies:
     graceful-fs "^4.2.0"
     jsonfile "^6.0.1"
@@ -4707,6 +4712,13 @@ fs-extra@^7.0.1:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
     universalify "^0.1.0"
+
+fs-walk@^0.0.2:
+  version "0.0.2"
+  resolved "https://r2.cnpmjs.org/fs-walk/-/fs-walk-0.0.2.tgz#2210385bdbc32ab51933cee502ef18516797604d"
+  integrity sha512-JURMv21QJsEOt3Rnyq/8N5ujhtG/b/4lWANzZclr9HkTM5qfUycOChQJByQ8xHH4oP66o+8n5/8fis6SVlus7A==
+  dependencies:
+    async "*"
 
 fs-write-stream-atomic@^1.0.8:
   version "1.0.10"
@@ -7076,6 +7088,16 @@ os-tmpdir@~1.0.2:
   version "1.0.2"
   resolved "https://registry.nlark.com/os-tmpdir/download/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
+
+overlayscrollbars-vue@^0.2.2:
+  version "0.2.2"
+  resolved "https://r2.cnpmjs.org/overlayscrollbars-vue/-/overlayscrollbars-vue-0.2.2.tgz#4a3d4eaf09dbbaae8c52ff0e9219909075eb920e"
+  integrity sha512-JpDkM+fkNp7YbZxZNf9cbSWCa1tylaSUkmdhux+qtVFekH4zpZpM8+GRtOgs7YDDWyVNPkUBQ8FnMRMoBNfoJw==
+
+overlayscrollbars@^1.13.1:
+  version "1.13.1"
+  resolved "https://r2.cnpmjs.org/overlayscrollbars/-/overlayscrollbars-1.13.1.tgz#0b840a88737f43a946b9d87875a2f9e421d0338a"
+  integrity sha512-gIQfzgGgu1wy80EB4/6DaJGHMEGmizq27xHIESrzXq0Y/J0Ay1P3DWk6tuVmEPIZH15zaBlxeEJOqdJKmowHCQ==
 
 p-finally@^1.0.0:
   version "1.0.0"

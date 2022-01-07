@@ -158,11 +158,22 @@ export const serverConfig = {
   },
   // 底部
   comFooter: {
-    component: 'VmpFooter'
+    component: 'VmpFooter',
+    emitClickMediaCheck: {
+      cuid: 'comMediaCheck',
+      method: 'showSetting'
+    }
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
-    component: 'VmpFooterTools'
+    component: 'VmpFooterTools',
+    children: ['comNotice', 'comPraise']
+  },
+  comPraise: {
+    component: 'VmpPraise'
+  },
+  comNotice: {
+    component: 'VmpNoticeList'
   },
   //聊天组件
   comChat: {
