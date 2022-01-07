@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-footer-tools">
     <div class="vmp-footer-tools-left">
-      <div class="vmp-footer-tools-left-setting">
+      <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="iconfont iconmeitishezhi"></i>
         设置
       </div>
@@ -15,13 +15,17 @@
       </div>
     </div>
     <div class="vmp-footer-tools-right">
-      <div class="vmp-footer-tools-right-like">点赞</div>
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
+    </div>
+    <div class="vmp-footer-tools-center">
+      <handup></handup>
     </div>
   </div>
 </template>
 <script>
   import { contextServer } from 'vhall-sass-domain';
   import onlineMixin from './js/mixins';
+  import handup from './handup.vue';
   export default {
     name: 'VmpFooterTools',
     mixins: [onlineMixin],
@@ -30,12 +34,32 @@
         roomBaseState: null
       };
     },
+    components: {
+      handup
+    },
+    computed: {
+      isInteractLive() {
+        const { watchInitData } = this.roomBaseState;
+        return (
+          (watchInitData.webinar.mode == 3 || watchInitData.webinar.mode == 6) &&
+          watchInitData.webinar.type == 1
+        );
+      }
+    },
     beforeCreate() {
       this.msgServer = contextServer.get('msgServer');
       this.roomBaseServer = contextServer.get('roomBaseServer');
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
+    },
+    methods: {
+      settingShow() {
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitClickMediaCheck' // TODO 设置媒体的弹窗方法
+        });
+      }
     }
   };
 </script>
@@ -48,6 +72,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 24px;
+    position: relative;
     &-left {
       display: flex;
       align-items: center;
@@ -68,6 +93,12 @@
       > div {
         margin-left: 16px;
       }
+    }
+    &-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 </style>

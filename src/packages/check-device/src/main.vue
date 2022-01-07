@@ -47,6 +47,9 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
+      },
+      showSetting() {
+        this.dialogVisible = true;
       }
     }
   };
