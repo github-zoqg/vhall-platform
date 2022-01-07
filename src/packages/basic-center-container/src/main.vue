@@ -11,6 +11,8 @@
     <!-- 插播 -->
     <!-- 底部控制栏 -->
     <vmp-air-container :cuid="childrenComp[2]" :oneself="true"></vmp-air-container>
+    <!-- 滚动的公告 -->
+    <vmp-air-container :cuid="childrenComp[3]" :oneself="true"></vmp-air-container>
   </div>
 </template>
 

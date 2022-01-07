@@ -2,7 +2,7 @@
   <div class="vmp-notice-list" v-if="noticeNum">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
-      <div class="vmp-notice-list-icon-img" @click="isShowNotice = true">
+      <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
         <img src="./images/notice-icon.png" alt="" />
       </div>
     </div>
@@ -29,6 +29,7 @@
   </div>
 </template>
 <script>
+  import { contextServer, useNoticeServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -40,30 +41,73 @@
       return {
         noticeNum: 1,
         isShowNotice: false, //是否显示公告列表
-        noticeList: [
-          {
-            created_at: '2010-11-12 10:10',
-            content: {
-              content: '111111111111111'
-            }
-          },
-          {
-            created_at: '2010-11-12 10:11',
-            content: {
-              content: '22222222222'
-            }
-          },
-          {
-            created_at: '2010-11-12 10:15',
-            content: {
-              content: '333333333'
-            }
-          }
-        ]
+        noticeList: [],
+        pageInfo: {
+          pos: 0,
+          limit: 10,
+          pageNum: 1
+        },
+        totalPages: 0,
+        total: 0
       };
     },
+    beforeCreate() {
+      this.msgServer = contextServer.get('msgServer');
+      this.noticeServer = useNoticeServer();
+      this.roomBaseServer = contextServer.get('roomBaseServer');
+    },
+    created() {
+      this.roomBaseState = this.roomBaseServer.state;
+      console.log(this.roomBaseState, '===zhangxiao===???');
+      this.initNotice();
+    },
     methods: {
-      moreLoadData() {}
+      initNotice() {
+        // 公告消息
+        this.msgServer.$on('ROOM_MSG', msg => {
+          let msgs = JSON.parse(msg.data);
+          if (msgs.type == 'room_announcement') {
+            this.noticeNum++;
+            this.noticeList.unshift({
+              created_at: msgs.push_time,
+              content: {
+                content: msgs.room_announcement_text
+              }
+            });
+          }
+        });
+      },
+      getNoticeHistoryList() {
+        this.isShowNotice = true;
+        this.getNoticeList(false);
+      },
+      getNoticeList(flag) {
+        const { getNoticeList } = this.noticeServer;
+        const { watchInitData } = this.roomBaseState;
+        const params = {
+          room_id: watchInitData.interact.room_id,
+          is_cache: 1,
+          ...this.pageInfo
+        };
+
+        getNoticeList({ params, flag }).then(result => {
+          const { backData: res, state } = result;
+          if (res.code == 200 && res.data) {
+            this.noticeList = state.noticeList;
+            this.totalPages = state.totalPages;
+            this.total = state.total;
+            this.noticeNum = state.total;
+          }
+        });
+      },
+      moreLoadData() {
+        if (this.pageInfo.pageNum >= this.totalPages) {
+          return false;
+        }
+        this.pageInfo.pageNum++;
+        this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
+        this.getNoticeList(true);
+      }
     }
   };
 </script>
