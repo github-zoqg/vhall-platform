@@ -5,6 +5,7 @@ const path = require('path');
 const chalk = require('chalk');
 const ora = require('ora');
 const btool = require('./btool');
+const pathConfig = require('./path-config');
 const { execSync } = require('child_process');
 
 const argv = process.argv;
@@ -17,10 +18,6 @@ if (!btool.checkValidArgs(argv)) {
 // 解析参数成数组形式：[ 'serve', '--project=live-pc', '--mode=development' ]
 const cmdArgs = Array.prototype.slice.call(argv, 2);
 
-// 转成命令选项为字符串: 'serve --project=live-pc --mode=development'
-const cmdOption = cmdArgs.join(' ');
-const cmdOptionVersion = `${cmdOption} --buildVersion=true`;
-
 // 解析参数成key-value形式：
 // {
 //   _: ['serve'],
@@ -28,15 +25,19 @@ const cmdOptionVersion = `${cmdOption} --buildVersion=true`;
 //   mode: 'development'
 // };
 const args = btool.parseArgv(argv);
+// 获取项目名
 const { project } = args;
+// 获取项目的package.json
+const projectPkg = require(path.join(pathConfig.SRC, project, 'package.json'));
+// 补充版本号
+cmdArgs.push(`--version=${projectPkg.version}`);
+// 转成命令选项为字符串: 'serve --project=live-pc --mode=development --version=1.0.0'
+const cmdOption = cmdArgs.join(' ');
 
 const spinner = ora();
 
 //默认规则打包
 runSingle(project, cmdOption);
-
-//单独处理版本
-runSingle(project, cmdOptionVersion);
 
 // 执行单条
 async function runSingle(project, cmdOption) {
