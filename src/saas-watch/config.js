@@ -15,7 +15,7 @@ export const serverConfig = {
   layerHeader: {
     component: 'VmpContainer',
     className: 'vmp-basic-hd',
-    children: ['pannelHeaderLeft', 'pannelHeaderRight']
+    children: ['comHeaderWatch']
   },
   // 中间主区域容器
   layerBody: {
@@ -37,7 +37,7 @@ export const serverConfig = {
   },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    children: ['comStreamList', 'comPcPlayer', 'comFooterTools']
+    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
   },
 
   layerBodyRight: {
@@ -156,6 +156,10 @@ export const serverConfig = {
   comPcPlayer: {
     component: 'VmpPcPlayer'
   },
+  // 顶部
+  comHeaderWatch: {
+    component: 'VmpHeaderWatch'
+  },
   // 底部
   comFooter: {
     component: 'VmpFooter',
@@ -174,6 +178,9 @@ export const serverConfig = {
   },
   comNotice: {
     component: 'VmpNoticeList'
+  },
+  comNoticeColumn: {
+    component: 'VmpNoticeColumn'
   },
   //聊天组件
   comChat: {

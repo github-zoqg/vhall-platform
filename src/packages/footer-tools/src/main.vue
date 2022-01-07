@@ -84,6 +84,9 @@
           vertical-align: bottom;
         }
       }
+      &-setting {
+        cursor: pointer;
+      }
     }
     &-right {
       display: flex;
