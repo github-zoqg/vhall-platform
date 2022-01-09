@@ -79,7 +79,7 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   @iconpath: '../images';
   .vmp-third-layout {
     margin-top: auto;
