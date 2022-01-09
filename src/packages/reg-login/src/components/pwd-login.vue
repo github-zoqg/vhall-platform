@@ -16,12 +16,12 @@
         <el-input
           v-model.trim="ruleForm.account"
           clearable
-          placeholder="请输入手机号/邮箱"
+          :placeholder="$t('login.login_1010')"
         ></el-input>
       </el-form-item>
       <!-- 图片验证码 -->
       <el-form-item v-show="captchaIsShow">
-        <div id="pwdLoginCaptcha" class="vmp-yundun-captcha"></div>
+        <div id="pwdLoginCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 请输入登录密码 -->
       <el-form-item prop="password">
@@ -29,7 +29,7 @@
           type="password"
           v-model.trim="ruleForm.password"
           clearable
-          placeholder="请输入登录密码"
+          :placeholder="$t('login.login_1011')"
           @blur="autoLoginSetMargin"
         ></el-input>
       </el-form-item>
@@ -45,14 +45,14 @@
         >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
           <span class="vmp-box__auto vmp-box__checked" @click="autoLoginStatus = !autoLoginStatus">
-            自动登录
+            {{ $t('login.login_1005') }}
           </span>
           <span class="vmp-box__auto vmp-box__forget">
-            <a :href="forgetUrl" target="_blank">忘记密码</a>
+            <a :href="forgetUrl" target="_blank">{{ $t('login.login_1012') }}</a>
           </span>
         </div>
-        <el-button class="vmp-red-button length-max vmp-login-btn" @click="handlePwdLogin">
-          登录
+        <el-button type="primary" round class="length-max vmp-login-btn" @click="handlePwdLogin">
+          {{ $t('nav.nav_1005') }}
         </el-button>
         <a
           href="javascript:void(0)"
@@ -60,7 +60,7 @@
           v-if="options.showToReg == 1"
           @click="handleToReg"
         >
-          立即注册
+          {{ $t('register.register_1005') }}
         </a>
       </el-form-item>
       <!-- 第三方登录 -->
@@ -114,7 +114,7 @@
       const validAccount = (rule, value, callback) => {
         this.accError = value === '';
         if (value === '') {
-          callback(new Error('请输入手机号/邮箱'));
+          callback(new Error(this.$t('login.login_1010')));
         } else {
           callback();
         }
@@ -123,9 +123,9 @@
         const pattern = /^([0-9a-zA-Z_`!~@#$%^*+=,.?;'":)(}{/\\|<>&[-]|]){6,30}$/;
         this.mailError = value === '' || !pattern.exec(value);
         if (value === '') {
-          callback(new Error('请输入登录密码'));
+          callback(new Error(this.$t('login.login_1011')));
         } else if (!pattern.exec(value)) {
-          callback(new Error('账号密码错误'));
+          callback(new Error(this.$t('login.login_1013')));
         } else {
           callback();
         }
@@ -192,6 +192,7 @@
             mode: 'float',
             width: 270,
             // TODO 网易易顿多语言字段 lang
+            lang: window.$globalConfig.currentLang,
             onReady(instance) {
               console.log('instance', instance);
             },
@@ -261,7 +262,7 @@
         if (this.captchaIsShow && !this.captchaVal) {
           // 开启了图片验证码展示，但是当前未选择图形码
           this.$message({
-            message: '图形码错误',
+            message: this.$t('account.account_1028'),
             showClose: true,
             // duration: 0,
             type: 'error',
@@ -292,7 +293,7 @@
               } else {
                 console.log('获取账号检测接口结果错误', res);
                 this.$message({
-                  message: '登录失败',
+                  message: res.msg || this.$t('login.login_1021'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -303,7 +304,7 @@
             .catch(res => {
               console.log('获取账号检测接口结果错误', res);
               this.$message({
-                message: '登录失败',
+                message: res.msg || this.$t('login.login_1021'),
                 showClose: true,
                 // duration: 0,
                 type: 'error',
@@ -318,8 +319,8 @@
       },
       // 获取密钥，便于密码计算
       getLoginKey() {
-        /*  // TODO 真实逻辑
-        const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+        /*  // TODO 真实逻辑  */
+        // const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('getLoginKey', {})
           .then(async res => {
             if (res.code == 200 && res.data) {
@@ -327,7 +328,7 @@
             } else {
               console.log('获取密码密钥失败', res);
               this.$message({
-                message: '登录失败',
+                message: res.msg || this.$t('login.login_1021'),
                 showClose: true,
                 // duration: 0,
                 type: 'error',
@@ -338,19 +339,19 @@
           .catch(res => {
             console.log('获取密码密钥失败', res);
             this.$message({
-              message: '登录失败',
+              message: res.msg || this.$t('login.login_1021'),
               showClose: true,
               // duration: 0,
               type: 'error',
               customClass: 'zdy-info-box'
             });
-          }); */
+          });
         // TODO 模拟数据
-        this.loginKeyVo = {
+        /* this.loginKeyVo = {
           public_key:
             '-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC0O8nqq9sX460V0T6+sQTGZKBWoMUhELEmYDB1rDfvKZ6x4yt0Q6Xna45K/ZQKaRuwPCDqKxjtX/tyL4azLvJl+KWMaPMmsjdO5O8cDgIdoGscDD+jvF/kQdqhpvyz5kVK/8ZWxnyvTDsWHKJz4WO2m+zSxXFEgn1AjZShI6ofVQIDAQAB-----END PUBLIC KEY-----',
           uuid: '972201070353222848'
-        };
+        }; */
       },
       handleEncryptPassword(password) {
         let retPassword = '';
@@ -371,10 +372,10 @@
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
             await this.getLoginKey();
-            /* // TODO 真实逻辑
+            /* // TODO 真实逻辑  */
             const retPassword = this.handleEncryptPassword(this.ruleForm.password);
             // 账号密码登录 [http://yapi.vhall.domain/project/740/interface/api/45707]
-            const cUserLogin = ['/v4/ucenter-login-reg/consumer/login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+            // const cUserLogin = ['/v4/ucenter-login-reg/consumer/login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
             const params = {
               way: 1, // 账号密码登录
               account: this.ruleForm.account,
@@ -397,7 +398,7 @@
                   this.getCUserInfo();
                 } else {
                   this.$message({
-                    message: '登录失败',
+                    message: res.msg || this.$t('login.login_1021'),
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -412,7 +413,7 @@
               .catch(res => {
                 console.warn('登录失败', res);
                 this.$message({
-                  message: '登录失败',
+                  message: res.msg || this.$t('login.login_1021'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -422,19 +423,19 @@
                 if (this.captchaIsShow && !this.captchaVal) {
                   this.reloadCaptha();
                 }
-              }); */
+              });
             // TODO 模拟数据
-            const token =
+            /*  const token =
               'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE0ODc1MDgsImV4cCI6MTY0NDA3OTUwOCwidXNlcl9pZCI6IjEwMjI3NyIsInBsYXRmb3JtIjoiNyIsImNoIjoiYyIsImJ1c2luZXNzX2FjY291bnRfaWQiOiIifQ.H5g0DDCzTDKQirrwu33-CtZcHwIxrD8kkqDEyp0_iM8';
             localStorage.setItem('token', token || '');
-            this.getCUserInfo();
+            this.getCUserInfo(); */
           }
         });
       },
       // 获取C端登录后用户信息
       getCUserInfo() {
-        /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递
-        const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+        /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递  */
+        // const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('cUserInfo', {})
           .then(res => {
             if (res.code == 200) {
@@ -452,9 +453,9 @@
           .catch(res => {
             console.warn('获取C端登录后用户信息失败', res);
             localStorage.setItem('userInfo', '');
-          }); */
+          });
         // 模拟逻辑
-        localStorage.setItem(
+        /* localStorage.setItem(
           'userInfo',
           JSON.stringify({
             code: 200,
@@ -505,7 +506,7 @@
           })
         );
         this.resetForm();
-        this.$emit('closeParent', 'code');
+        this.$emit('closeParent', 'code'); */
       },
       resetForm() {
         // 数据重置
@@ -538,7 +539,7 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   @import url('../styles/reset.less');
   .vmp-pwd-login {
     padding: 0 32px 24px 32px;

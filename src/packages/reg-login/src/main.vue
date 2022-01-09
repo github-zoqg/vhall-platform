@@ -45,21 +45,21 @@
             :class="activeTag == 'code' ? 'active' : ''"
             @click.stop.prevent="handleChangeTag('code')"
           >
-            验证码登录
+            {{ $t('login.login_1003') }}
           </span>
           <em>|</em>
           <span
             :class="activeTag == 'pwd' ? 'active' : ''"
             @click.stop.prevent="handleChangeTag('pwd')"
           >
-            密码登录
+            {{ $t('login.login_1004') }}
           </span>
         </div>
 
         <code-login
           v-if="panelShows[0] == 1 && activeTag == 'code' && activeTag != 'reg'"
           :showToReg="options.openReg"
-          :sonTitle="options.loginType == '1-0' ? '验证码登录' : ''"
+          :sonTitle="options.loginType == '1-0' ? $t('login.login_1003') : ''"
           :showThirdLogin="true"
           ref="codeDom"
           @handleLink="emitLinkChange"
@@ -68,7 +68,7 @@
         <pwd-login
           v-if="panelShows[1] == 1 && activeTag == 'pwd' && activeTag != 'reg'"
           :showToReg="options.openReg"
-          :sonTitle="options.loginType == '0-1' ? '密码登录' : ''"
+          :sonTitle="options.loginType == '0-1' ? $t('login.login_1004') : ''"
           :showThirdLogin="true"
           ref="pwdDom"
           @handleLink="emitLinkChange"
@@ -187,13 +187,12 @@
     }
   };
 </script>
-<style lang="less" scoped>
-  @import url('styles/theme.less');
+<style lang="less">
   .vmp-reg-login {
     display: inline-flex;
     text-align: right;
   }
-  /deep/.el-dialog.vmp-reg-login__dialog {
+  .el-dialog.vmp-reg-login__dialog {
     height: auto;
     .el-dialog__header {
       padding: 0 32px;
@@ -202,11 +201,9 @@
         height: 16px;
         line-height: 60px;
         i {
-          // TODO： i这个标签的样式需要删掉
           display: inline-block;
           width: 16px;
           height: 16px;
-          background: pink;
           color: #666;
           &:hover {
             cursor: pointer;

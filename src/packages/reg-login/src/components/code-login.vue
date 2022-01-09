@@ -17,12 +17,12 @@
           v-model.trim="ruleForm.phone"
           clearable
           :maxlength="11"
-          placeholder="请输入手机号"
+          :placeholder="$t('account.account_1025')"
         ></el-input>
       </el-form-item>
       <!-- 图片验证码 -->
       <el-form-item>
-        <div id="codeLoginCaptcha" class="vmp-yundun-captcha"></div>
+        <div id="codeLoginCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
       <el-form-item prop="captchas" class="vmp-wrap-code">
@@ -31,7 +31,7 @@
           clearable
           type="captcha"
           :maxlength="6"
-          placeholder="动态验证码"
+          :placeholder="$t('account.account_1029')"
           @blur="autoLoginSetMargin"
         ></el-input>
         <!--
@@ -52,7 +52,7 @@
           ]"
           @click.stop.prevent="handleSendCode"
         >
-          {{ isDownTime ? `${time}s` : '获取验证码' }}
+          {{ isDownTime ? $t('account.account_1031', { n: time }) : $t('account.account_1030') }}
         </span>
       </el-form-item>
       <!-- 其它  -->
@@ -67,11 +67,11 @@
         >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
           <span class="vmp-box__auto vmp-box__checked" @click="autoLoginStatus = !autoLoginStatus">
-            自动登录
+            {{ $t('login.login_1005') }}
           </span>
         </div>
-        <el-button class="vmp-red-button length-max vmp-login-btn" @click="handleCodeLogin">
-          登录
+        <el-button type="primary" round class="length-max vmp-login-btn" @click="handleCodeLogin">
+          {{ $t('nav.nav_1005') }}
         </el-button>
         <a
           href="javascript:void(0)"
@@ -79,7 +79,7 @@
           v-if="options.showToReg == 1"
           @click="handleToReg"
         >
-          立即注册
+          {{ $t('register.register_1005') }}
         </a>
       </el-form-item>
       <!-- 第三方登录 -->
@@ -132,10 +132,10 @@
     data() {
       const validatePhone = (rule, value, callback) => {
         if (value === '') {
-          callback('请输入手机号');
+          callback(this.$t('account.account_1025'));
         } else {
           if (!/^1[0-9]{10}$/.test(value)) {
-            callback(new Error('请输入正确的手机号'));
+            callback(new Error(this.$t('account.account_1069')));
           } else {
             callback();
           }
@@ -143,7 +143,7 @@
       };
       const validateCaptchas = (rule, value, callback) => {
         if (value === '') {
-          callback(new Error('请输入动态验证码'));
+          callback(new Error(this.$t('account.account_1070')));
         } else {
           callback();
         }
@@ -219,6 +219,7 @@
             mode: 'float',
             width: 270,
             // TODO 网易易顿多语言字段 lang
+            lang: window.$globalConfig.currentLang,
             onReady(instance) {
               console.log('instance', instance);
             },
@@ -263,7 +264,7 @@
       },
       // 获取图形验证码key
       getCapthaId() {
-        /* TODO 真实逻辑*/
+        /* TODO 真实逻辑
         // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('getCapthaId', {})
           .then(res => {
@@ -276,15 +277,15 @@
           .catch(res => {
             console.warn('获取图形验证码key失败', res);
             this.captchaKey = '';
-          });
+          });*/
         // TODO 模拟数据
-        // this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
+        this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
       },
       // 发送验证码 - 按钮点击
       handleSendCode() {
         let phoneFlag = false;
         this.$refs.ruleForm.validateField('phone', function (res) {
-          console.log('校验结果：', !res);
+          // console.log('校验结果：', !res);
           phoneFlag = !res;
         });
         if (!phoneFlag) {
@@ -292,7 +293,7 @@
         }
         if (!this.captchaVal) {
           this.$message({
-            message: '图片验证码错误',
+            message: this.$t('login.login_1017'),
             showClose: true,
             // duration: 0,
             type: 'error',
@@ -344,7 +345,7 @@
               } else {
                 if (!this.captchaVal) {
                   this.$message({
-                    message: '发送失败',
+                    message: this.$t('chat.chat_1011'),
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -358,7 +359,7 @@
               console.warn('发送短信验证码失败', res);
               if (!this.captchaVal) {
                 this.$message({
-                  message: '发送失败',
+                  message: this.$t('chat.chat_1011'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -414,7 +415,7 @@
                   this.getCUserInfo();
                 } else {
                   this.$message({
-                    message: '登录失败',
+                    message: res.msg || this.$t('login.login_1021'),
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -429,7 +430,7 @@
               .catch(res => {
                 console.warn('登录失败', res);
                 this.$message({
-                  message: '登录失败',
+                  message: res.msg || this.$t('login.login_1021'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -556,7 +557,7 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   @import url('../styles/reset.less');
   .vmp-code-login {
     padding: 0 32px 24px 32px;

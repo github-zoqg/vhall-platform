@@ -61,7 +61,7 @@ export const serverConfig = {
   pannelHeaderRight: {
     component: 'VmpContainer',
     className: 'vmp-header-right',
-    children: ['compLanguageChoice', 'compRegLogin']
+    children: ['compLanguageChoice']
   },
   // 顶部左侧组件
   compHeaderLeft: {
@@ -171,7 +171,7 @@ export const serverConfig = {
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    children: ['comNotice', 'comPraise']
+    children: ['comNotice', 'comPraise', 'compRegLogin']
   },
   comPraise: {
     component: 'VmpPraise'

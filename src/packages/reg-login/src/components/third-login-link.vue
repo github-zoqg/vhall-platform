@@ -1,13 +1,18 @@
 <template>
   <div class="vmp-third-layout" v-if="options.qqPath || options.wxPath">
-    <p :class="`vmp-third-remark height__${way}`">其他登录方式</p>
+    <p :class="`vmp-third-remark height__${way}`">{{ $t('login.login_1008') }}</p>
     <div class="vmp-login__way">
       <div class="vmp-login__third">
-        <a :href="options.qqPath" class="vmp-login__qq" title="QQ登录" v-if="options.qqPath"></a>
+        <a
+          :href="options.qqPath"
+          class="vmp-login__qq"
+          :title="$t('login.login_1009')"
+          v-if="options.qqPath"
+        ></a>
         <a
           :href="options.wxPath"
           class="vmp-login__wechat"
-          title="微信登录"
+          :title="$t('login.login_1032')"
           v-if="options.wxPath"
         ></a>
       </div>

@@ -1,4 +1,3 @@
-@import url('./theme.less');
 .vmp-reg-login__son__tab {
   text-align: left;
   line-height: initial;
@@ -26,57 +25,8 @@
     }
   }
 }
-/*云盾色值*/
-/deep/.vmp-yundun-captcha {
-  .yidun-fallback__tip {
-    color: #999;
-  }
-  border-radius: 4px !important;
-  .yidun.yidun--light.yidun--float.yidun--jigsaw {
-    width: 100% !important;
-  }
-  /deep/ .yidun .yidun_control {
-    border-radius: 4px !important;
-    border-color: #ccc;
-    background: #fff;
-    .yidun_tips {
-      color: #888888;
-      line-height: 38px;
-    }
-    // .yidun_slider {
-    //   &:hover {
-    //     background-color: #3562FA;
-    //   }
-    // }
-    &.yidun_control--moving .yidun_slide_indicator {
-      border-color: #3562fa;
-      background-color: #f0f1fe;
-    }
-  }
-  .yidun.yidun--light.yidun--success.yidun--jigsaw
-    .yidun_control
-    .yidun_slide_indicator {
-    border-color: #3562fa;
-    background-color: #f0f1fe;
-  }
-  .yidun.yidun--light.yidun--success.yidun--jigsaw {
-    .yidun_control .yidun_slider {
-      background-color: #3562fa;
-    }
-    .yidun_slide_indicator {
-      border-color: #3562fa !important;
-      background-color: #f0f1fe !important;
-    }
-  }
-  .yidun.yidun--light .yidun_top__right {
-    line-height: normal;
-  }
-  .yidun.yidun--light .yidun_tips__text {
-    vertical-align: unset;
-  }
-}
 /* 表单内样式 */
-/deep/.vmp-login__form__common {
+.vmp-login__form__common {
   /*文本框样式*/
   .el-input__inner {
     border: none;
@@ -119,7 +69,7 @@
   /* 验证码 */
   .vmp-wrap-code {
     position: relative;
-    /deep/.el-input__suffix {
+    .el-input__suffix {
       margin-right: 80px;
     }
   }
@@ -215,44 +165,6 @@
     }
   }
 
-  /*大型按钮*/
-  .length-max {
-    width: 100%;
-    height: 40px;
-    border-radius: 20px;
-  }
-  button.el-button.vmp-red-button {
-    background: @theme;
-    color: #ffffff;
-    border: 1px solid @theme;
-    &:hover {
-      color: #fff;
-      background: @theme-btn__hover;
-      border: 1px solid @theme-btn__hover;
-    }
-    &:focus {
-      color: #fff;
-      background: @theme;
-      border: 1px solid @theme;
-    }
-    &:active {
-      background: @theme-btn__active;
-      border: 1px solid @theme-btn__active;
-    }
-    &.is-disabled {
-      background: @theme-btn__disabled;
-      border: 1px solid @theme-btn__disabled;
-      cursor: not-allowed;
-      color: #fff;
-      &:hover,
-      &:focus,
-      &:active {
-        background: @theme-btn__disabled;
-        border: 1px solid @theme-btn__disabled;
-      }
-    }
-  }
-
   /* 立即注册链接 */
   .vmp-reg__link {
     cursor: pointer;
@@ -267,33 +179,6 @@
     font-size: 14px;
     font-weight: 400;
     color: #3562fa;
-    line-height: 20px;
-  }
-
-
-  /*复选选中效果重置*/
-  .el-checkbox__input {
-    line-height: unset;
-  }
-  .el-checkbox__input.is-checked .el-checkbox__inner,
-  .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-    background-color: @theme;
-    border-color: @theme;
-  }
-  .el-checkbox__inner:hover {
-    border-color: @theme;
-  }
-  .el-checkbox__input.is-focus .el-checkbox__inner {
-    border-color: @theme;
-  }
-  .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
-    background-color: @theme;
-    border-color: @theme;
-  }
-  .el-checkbox__input.is-checked+.el-checkbox__label {
-    font-size: 14px;
-    font-weight: 400;
-    color: #999;
     line-height: 20px;
   }
 }

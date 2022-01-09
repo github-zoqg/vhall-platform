@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
+import languages from '../languages/index.js';
 
 Vue.use(VueI18n);
 
@@ -11,8 +12,8 @@ export function initI18n() {
   const i18n = new VueI18n({
     locale: window.$globalConfig.currentLang,
     messages: {
-      zh: require('../languages/zh-CN.js'),
-      en: require('../languages/en-US.js')
+      zh: languages.zh,
+      en: languages.en
     }
   });
   return i18n;

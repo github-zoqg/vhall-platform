@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-register">
     <div class="vmp-reg-login__son__tab">
-      <span>注册新用户</span>
+      <span>{{ $t('register.register_1002') }}</span>
     </div>
     <el-form
       key="ruleForm"
@@ -15,7 +15,7 @@
       <el-form-item prop="phone">
         <el-input
           v-model.trim="ruleForm.phone"
-          placeholder="请输入手机号"
+          :placeholder="$t('account.account_1025')"
           :maxlength="11"
           clearable
           auto-complete="off"
@@ -24,7 +24,7 @@
       </el-form-item>
       <!-- 验证码 -->
       <el-form-item>
-        <div id="regCaptcha" class="vmp-yundun-captcha"></div>
+        <div id="regCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
       <el-form-item prop="captchas" class="vmp-wrap-code">
@@ -33,7 +33,7 @@
           clearable
           type="captcha"
           :maxlength="6"
-          placeholder="动态验证码"
+          :placeholder="$t('account.account_1029')"
         ></el-input>
         <!--
           start: 默认态，红色。条件：手机号 & 图片验证码 校验通过，当前倒计时结束 或 倒计时未开启。
@@ -53,7 +53,7 @@
           ]"
           @click.stop.prevent="handleSendCode"
         >
-          {{ isDownTime ? `${time}s` : '获取验证码' }}
+          {{ isDownTime ? $t('account.account_1031', { n: time }) : $t('account.account_1030') }}
         </span>
       </el-form-item>
       <el-form-item prop="password" class="vmp-register__pwd__box">
@@ -61,42 +61,42 @@
           type="password"
           v-model.trim="ruleForm.password"
           clearable
-          placeholder="设置密码（选填，6-30个字符）"
+          :placeholder="$t('register.register_1007')"
         ></el-input>
         <a
           href="javascript:void(0)"
           class="vmp-register__login__link"
           @click.stop.prevent="handleToLogin"
         >
-          去登录
+          {{ $t('nav.nav_1005') }}
         </a>
       </el-form-item>
-      <el-button class="vmp-red-button length-max vmp-register-btn" round @click="handleRegister">
-        {{ isMobile ? '注册' : '立即注册' }}
+      <el-button type="primary" round class="length-max vmp-register-btn" @click="handleRegister">
+        {{ $t('register.register_1013') }}
       </el-button>
       <div class="register-checked" v-if="!isMobile">
         <el-checkbox v-model="checked">
-          我已阅读并同意
+          {{ $t('register.register_1008') }}
           <a
             href="https://t.e.vhall.com/home/vhallapi/serviceterms"
             target="_blank"
             class="vmp-register__to__link"
             rel="noopener noreferrer"
           >
-            服务条款及隐私协议
+            {{ $t('register.register_1011') }}
           </a>
         </el-checkbox>
       </div>
       <div class="register-checked" v-else>
         <el-checkbox v-model="checked">
-          同意并遵守
+          {{ $t('login.login_1030') }}
           <a
             href="https://t.e.vhall.com/home/vhallapi/serviceterms"
             target="_blank"
             class="vmp-register__to__link"
             rel="noopener noreferrer"
           >
-            《服务条款》
+            {{ $t('login.login_1031') }}
           </a>
         </el-checkbox>
       </div>
@@ -110,10 +110,10 @@
     data() {
       const validateRegPhone = async (rule, value, callback) => {
         if (value === '') {
-          callback(new Error('请输入手机号'));
+          callback(new Error(this.$t('account.account_1025')));
         } else {
           if (!/^1[0-9]{10}$/.test(value)) {
-            callback(new Error('请输入正确的手机号'));
+            callback(new Error(this.$t('account.account_1069')));
           } else {
             /* // TODO 真实逻辑 */
             // const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
@@ -124,7 +124,7 @@
               .then(async res => {
                 // 检测结果：check_result 0账号未锁定 1账号锁定; account_exist 账号是否存在：1存在 0不存在
                 if (res.code == 200 && res.data && res.data.account_exist > 0) {
-                  callback(new Error('请输入正确的手机号'));
+                  callback(new Error(this.$t('register.register_1006')));
                 } else {
                   callback();
                 }
@@ -139,7 +139,7 @@
       };
       const validateCaptchas = (rule, value, callback) => {
         if (value === '') {
-          callback(new Error('请输入动态验证码'));
+          callback(new Error(this.$t('account.account_1070')));
         } else {
           callback();
         }
@@ -152,7 +152,7 @@
           callback(); // 允许为空
         } else if (!pattern.exec(value)) {
           // callback(new Error('6-30位不包含空格及特殊符号的密码！'))
-          callback(new Error('请设置登录密码（6-30位字符）'));
+          callback(new Error(this.$t('login.login_1014')));
         } else {
           callback();
         }
@@ -233,6 +233,7 @@
             mode: 'float',
             width: 270,
             // TODO 网易易顿多语言字段 lang
+            lang: window.$globalConfig.currentLang,
             onReady(instance) {
               console.log('instance', instance);
             },
@@ -306,7 +307,7 @@
         }
         if (!this.captchaVal) {
           this.$message({
-            message: '图片验证码错误',
+            message: this.$t('login.login_1017'),
             showClose: true,
             // duration: 0,
             type: 'error',
@@ -358,7 +359,7 @@
               } else {
                 if (!this.captchaVal) {
                   this.$message({
-                    message: '发送失败',
+                    message: this.$t('chat.chat_1011'),
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -372,7 +373,7 @@
               console.warn('发送短信验证码失败', res);
               if (!this.captchaVal) {
                 this.$message({
-                  message: '发送失败',
+                  message: this.$t('chat.chat_1011'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -415,7 +416,7 @@
             } else {
               console.log('获取密码密钥失败', res);
               this.$message({
-                message: '登录失败',
+                message: res.msg || this.$t('register.register_1010'),
                 showClose: true,
                 // duration: 0,
                 type: 'error',
@@ -426,7 +427,7 @@
           .catch(res => {
             console.log('获取密码密钥失败', res);
             this.$message({
-              message: '登录失败',
+              message: res.msg || this.$t('register.register_1010'),
               showClose: true,
               // duration: 0,
               type: 'error',
@@ -460,7 +461,7 @@
           if (valid) {
             if (!this.captchaVal) {
               this.$message({
-                message: '图片验证码错误',
+                message: this.$t('login.login_1023'),
                 showClose: true,
                 // duration: 0,
                 type: 'error',
@@ -470,7 +471,7 @@
             }
             if (!this.checked) {
               this.$message({
-                message: '请先勾选协议',
+                message: this.$t('register.register_1003'),
                 showClose: true,
                 // duration: 0,
                 type: 'error',
@@ -498,7 +499,7 @@
               .then(res => {
                 if (res.code == 200) {
                   this.$message({
-                    message: '注册成功',
+                    message: this.$t('register.register_1009'),
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -508,7 +509,7 @@
                 } else {
                   console.log('注册失败', res);
                   this.$message({
-                    message: '注册失败',
+                    message: res.msg || this.$t('register.register_1010'),
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -519,7 +520,7 @@
               .catch(res => {
                 console.log('注册失败', res);
                 this.$message({
-                  message: '注册失败',
+                  message: res.msg || this.$t('register.register_1010'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -558,12 +559,12 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   @import url('../styles/reset.less');
   .vmp-register {
     padding: 0 32px 24px 32px;
   }
-  /deep/.vmp-register__pwd__box {
+  .vmp-register__pwd__box {
     position: relative;
     margin-bottom: 40px !important; /*此处固定高度不变*/
     .el-form-item__error {
@@ -592,7 +593,7 @@
     text-align: left;
     vertical-align: middle;
     line-height: 20px;
-    /deep/.el-checkbox__label {
+    .el-checkbox__label {
       font-size: 14px;
       font-weight: 400;
       color: #999999;
