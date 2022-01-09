@@ -171,7 +171,7 @@ export const serverConfig = {
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    children: ['comNotice', 'comPraise']
+    children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
   comPraise: {
     component: 'VmpPraise'
@@ -185,5 +185,10 @@ export const serverConfig = {
   //聊天组件
   comChat: {
     component: 'VmpChat'
+  },
+  // 登录注册组件
+  compRegLogin: {
+    component: 'VmpRegLogin',
+    children: ['dlgDocList']
   }
 };

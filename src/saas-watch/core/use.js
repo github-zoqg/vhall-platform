@@ -20,6 +20,7 @@ import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
+import VmpRegLogin from '@/packages/reg-login';
 import VmpPraise from '@/packages/praise';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
@@ -45,6 +46,7 @@ export function initUse() {
   Vue.use(VmpStreamRemote);
   Vue.use(VmpFooter);
   Vue.use(VmpFooterTools);
+  Vue.use(VmpRegLogin);
   Vue.use(VmpPraise);
   Vue.use(VmpNoticeList);
   Vue.use(VmpNoticeColumn);
