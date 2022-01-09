@@ -9,7 +9,19 @@
 
       <div class="audience-visible">
         <span style="margin-right: 5px">{{ $t('usual.audienceVisible') }}</span>
-        <el-switch v-model="switchStatus" active-color="#13ce66"></el-switch>
+        <div class="audience-visible__swith">
+          <el-switch
+            v-model="switchStatus"
+            active-color="#13ce66"
+            @change="audienceVisibleChange"
+          ></el-switch>
+          <!-- 提示 -->
+          <div class="audience-tip" v-show="showAudienceTip">
+            <div class="audience-tip__arrow"></div>
+            <span @click="showAudienceTip = false" class="iconfont iconguanbi1"></span>
+            如果想让观众看到文档/白板内容， 必须开启“观众可见”开关
+          </div>
+        </div>
       </div>
     </div>
     <!-- 中：画笔相关工具 -->
@@ -121,11 +133,11 @@
     inject: ['fullscreen', 'openDocDlglist'],
     data() {
       return {
+        showAudienceTip: true,
         // 当前工具适配容器类型
         suit: '', // 文档：document ， 白板： board
-
-        //
-        switchStatus: true,
+        // 观众是否可见
+        switchStatus: false,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
         currentBrush: 'pen',
         // 画笔状态
@@ -279,6 +291,16 @@
           // 需要重新设置一下笔刷工具
           this.changeTool(this.currentBrush);
         }
+      },
+      /**
+       * 观众可见切换
+       */
+      audienceVisibleChange() {
+        if (this.switchStatus) {
+          this.docServer.switchOnContainer();
+        } else {
+          this.docServer.switchOffContainer();
+        }
       }
     }
   };
@@ -405,5 +427,47 @@
   }
   .vmp-icon-item--exitFullscreen {
     display: none;
+  }
+
+  .audience-visible__swith {
+    z-index: 2;
+  }
+  .audience-tip {
+    position: absolute;
+    top: 40px;
+    width: 192px;
+    word-break: break-all;
+    background: #ff9b00;
+    border-radius: 4px;
+    line-height: 20px;
+    padding: 9px 14px;
+    color: #fff;
+    box-sizing: content-box;
+    user-select: none;
+
+    span.iconfont {
+      position: absolute;
+      top: 2px;
+      right: 5px;
+      color: #fffdef;
+      width: 15px;
+      height: 15px;
+      font-size: 12px;
+      display: block;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .audience-tip__arrow {
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border-width: 0 8px 8px;
+      border-style: solid;
+      border-color: transparent transparent #ff9b00;
+      top: -8px;
+      left: 10px;
+    }
   }
 </style>
