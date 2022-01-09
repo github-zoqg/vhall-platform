@@ -61,8 +61,8 @@ const sharedConfig = {
   chainWebpack: config => {
     config.resolve.alias.set('@', path.resolve('src'));
     // 输出js文件增加hash防止缓存
-    config.output.filename('static/js/[name].[chunkhash:8].js').end();
-    config.output.chunkFilename('static/js/[name].[chunkhash:8].js').end();
+    config.output.filename('static/js/[name].[hash:8].js').end();
+    config.output.chunkFilename('static/js/[name].[hash:8].js').end();
 
     if (!isDev) {
       config.optimization.minimize(true);

@@ -3,7 +3,7 @@
   <div class="vmp-doc-toolbar">
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
-      <div v-show="showChooseDocBtn" class="choose-document" @click="openDocDlglist">
+      <div v-show="suit === 'document'" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}
       </div>
 
@@ -110,6 +110,7 @@
     },
     provide() {
       return {
+        getSuit: () => this.suit,
         pen: this.pen,
         highlighter: this.highlighter,
         shape: this.shape,
@@ -120,10 +121,9 @@
     inject: ['fullscreen', 'openDocDlglist'],
     data() {
       return {
-        // 是否有关闭按钮
-        hasCloseBtn: true,
-        showChooseDocBtn: true,
-        showThumbnailBtn: true,
+        // 当前工具适配容器类型
+        suit: '', // 文档：document ， 白板： board
+
         //
         switchStatus: true,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
@@ -159,15 +159,7 @@
     },
     methods: {
       // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('hasCloseBtn')) {
-            this.hasCloseBtn = widget.options.hasCloseBtn;
-          }
-        }
-      },
+      initConfig() {},
 
       /**
        *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
@@ -187,7 +179,7 @@
           }
           // 画笔
           case 'pen': {
-            console.log('-------设置画笔---');
+            console.log('-------设置画笔 this.pen:', this.pen);
             this.docServer.setPen({ id: currentContainerId });
             this.docServer.setStrokeWidth({
               id: currentContainerId,
@@ -256,9 +248,10 @@
           } catch (err) {
             console.log(err);
           }
+          // 还需要重设当前画笔
+          this.changeTool(this.currentBrush);
           return;
         }
-
         this.changeTool(brush);
       },
       /**
@@ -273,15 +266,19 @@
        * @param type:文档：document， 白板：board
        */
       async switchTo(type = 'document') {
-        if (type === 'board') {
-          this.showChooseDocBtn = false;
-          this.showThumbnailBtn = false;
-        } else {
-          this.showChooseDocBtn = true;
-          this.showThumbnailBtn = true;
+        // 当前工具适配容器类型
+        this.suit = type;
+        console.log('this.suit: ', this.suit);
+        console.log(
+          'this.docServer?.state.docInstance.currentCid:',
+          this.docServer?.state.docInstance.currentCid
+        );
+
+        // 当前容器不能为空，否则设置画笔会报错
+        if (this.docServer?.state.docInstance.currentCid) {
+          // 需要重新设置一下笔刷工具
+          this.changeTool(this.currentBrush);
         }
-        // 需要重新设置一下笔刷工具
-        this.changeTool(this.currentBrush);
       }
     }
   };
