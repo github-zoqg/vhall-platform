@@ -217,9 +217,9 @@ export const serverConfig = {
   // 文档工具栏
   comDocToolbar: {
     component: 'VmpDocToolbar',
-    children: ['comFullscreenIcon']
+    children: ['comFullscreenIcon', 'comDocThumbnailIcon']
   },
-  // 全屏按钮
+  // 文档全屏按钮
   comFullscreenIcon: {
     component: 'VmpIconItem',
     options: {
@@ -233,6 +233,22 @@ export const serverConfig = {
       }
     ]
   },
+  // 文档缩略图按钮
+  comDocThumbnailIcon: {
+    component: 'VmpIconItem',
+    options: {
+      icon: 'iconfont iconsuolvetu',
+      title: 'usual.docThumb',
+      kind: 'document'
+    },
+    emitClick: [
+      {
+        cuid: 'comDocUne',
+        method: 'onThumbnailToggle'
+      }
+    ]
+  },
+
   //文档列表对话框
   dlgDocList: {
     component: 'VmpDocDlglist',
