@@ -137,7 +137,7 @@
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, contextServer } from 'vhall-sass-domain';
+  import { useChatServer, RoomBaseServer } from 'middleDomain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { debounce } from 'lodash';
 
@@ -155,7 +155,7 @@
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
-      const roomBaseState = contextServer.get('roomBaseServer').state;
+      const roomBaseState = new RoomBaseServer().state;
       return {
         roomBaseState,
         //是否是助理

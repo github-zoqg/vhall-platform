@@ -4,7 +4,7 @@ import { textToEmojiText } from '../js/emoji';
 import { handleTime } from '../js/handle-time';
 import getAvatar from '../js/get-avatar';
 import { throttle } from 'lodash';
-import { contextServer } from 'vhall-sass-domain';
+import { MsgServer } from 'middleDomain';
 
 const pcDevice = ['pc_browser', 'desktop'];
 
@@ -34,7 +34,7 @@ function returnName(data) {
 
 const eventMixin = {
   beforeCreate() {
-    this.msgServer = contextServer.get('msgServer');
+    this.msgServer = new MsgServer();
   },
   methods: {
     listenEvents() {

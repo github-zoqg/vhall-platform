@@ -171,7 +171,7 @@
   </div>
 </template>
 <script>
-  import { usePlayerServer, contextServer } from 'vhall-sass-domain';
+  import { usePlayerServer, contextServer } from 'middleDomain';
   import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';

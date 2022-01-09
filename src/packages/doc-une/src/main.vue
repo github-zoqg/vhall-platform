@@ -55,7 +55,7 @@
 </template>
 <script>
   import screenfull from 'screenfull';
-  import { contextServer } from 'vhall-sass-domain';
+  import { contextServer } from 'middleDomain';
   export default {
     name: 'VmpDocUne',
     provide() {

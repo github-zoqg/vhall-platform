@@ -137,7 +137,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { contextServer } from 'middleDomain';
   export default {
     name: 'VmpDocDlglist',
     data() {

@@ -54,7 +54,7 @@ function createSharedConfig() {
         'vue-i18n': 'VueI18n',
         moment: 'moment',
         'element-ui': 'ELEMENT',
-        'vhall-sass-domain': 'middleDomain'
+        middleDomain: 'middleDomain'
       },
       // 插件
       plugins: [
