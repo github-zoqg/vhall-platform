@@ -1,12 +1,24 @@
 <!-- 主题选择组件 -->
 <template>
   <div class="vmp-language-choice">
-    <span>{{ $t('language_choice.language_choice_1000') }}</span>
-    <select class="vmp-language-choice__select" v-model="lang" @change="handleChange">
-      <option v-for="item of choices" :value="item.value" :key="item.value">
-        {{ $t(item.label) }}
-      </option>
-    </select>
+    <el-dropdown @command="handleChangeLang" trigger="click" placement="bottom">
+      <div class="vmp-language-choice-lang">
+        <span class="vmp-language-choice-lang-icon">
+          <i class="iconfont iconicon_help_m" :style="{ color: themeClass.pageBg }"></i>
+        </span>
+        <p :style="{ color: themeClass.pageBg }">简体中文</p>
+      </div>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item
+          :command="item.type"
+          :key="index"
+          :class="{ active: item.type == lang }"
+          v-for="(item, index) in languageList"
+        >
+          {{ item.label }}
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
   </div>
 </template>
 <script>
@@ -14,9 +26,21 @@
     name: 'VmpLanguageChoice',
     data() {
       return {
+        themeClass: {
+          pageBg: '#3562fa'
+        },
         label: '',
-        lang: '',
-        choices: []
+        lang: 'zh',
+        languageList: [
+          {
+            type: 'zh',
+            label: '简体中文'
+          },
+          {
+            type: 'cn',
+            label: '英文'
+          }
+        ]
       };
     },
     mounted() {
@@ -49,7 +73,7 @@
         //   this.lang = window.$layoutConfig.lang;
         // }
       },
-      handleChange: function () {
+      handleChangeLang: function () {
         window.location.reload();
       }
     }
@@ -58,12 +82,29 @@
 <style lang="less">
   .vmp-language-choice {
     display: inline-block;
-    color: #fff;
+    color: @font-error-low;
     font-size: 12px;
-  }
-  .vmp-language-choice__select {
-    color: #fff;
-    margin: 0 12px 0 6px;
-    background-color: #777;
+    padding-right: 24px;
+    &-lang {
+      text-align: center;
+      cursor: pointer;
+      &-icon {
+        i {
+          font-size: 16px;
+        }
+      }
+      p {
+        font-size: 14px;
+        line-height: 14px;
+        padding-top: 5px;
+      }
+      &:hover {
+        i,
+        p {
+          cursor: pointer;
+          color: @font-high-light-normal !important;
+        }
+      }
+    }
   }
 </style>
