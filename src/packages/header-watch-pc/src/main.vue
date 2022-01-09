@@ -8,19 +8,32 @@
     </div>
     <div class="vmp-header-watch-center">
       <div class="vmp-header-watch-center-title">
-        {{ webinarInfo.subject }}
-        <span class="vmp-header-watch-center-title-living">
-          <img src="./images/live-white.gif" alt="" />
-          <label>直播</label>
+        {{ webinarInfo.subject | splitLenStr(40) }}
+        <span
+          v-if="webinarInfo.type != 6"
+          :class="
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
+            webinarInfo.type
+          "
+        >
+          <img v-if="webinarInfo.type == 1" src="./images/live-white.gif" alt="" />
+          <label>{{ webinarInfo.type | webinarFilter }}</label>
         </span>
-        <!-- <span class="vmp-header-watch-center-title-subscribe"></span> -->
+        <span
+          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
+          class="vmp-header-watch-center-title-delay"
+        >
+          <img :src="noDelayIconUrl" alt="" />
+        </span>
       </div>
       <div class="vmp-header-watch-center-host">
         <a href="">主办方：{{ webinarInfo.userinfo.nickname }}</a>
         <span>{{ webinarInfo.start_time }}</span>
       </div>
     </div>
-    <div class="vmp-header-watch-right"></div>
+    <div class="vmp-header-watch-right">
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
+    </div>
   </div>
 </template>
 <script>
@@ -29,8 +42,19 @@
     name: 'VmpHeaderWatch',
     data() {
       return {
+        noDelayIconUrl:
+          '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
         webinarInfo: {} //活动的信息
       };
+    },
+    filters: {
+      webinarFilter(val) {
+        const webinarArr = ['直播', '预约', '结束', '点播', '回放'];
+        return webinarArr[val - 1];
+      },
+      splitLenStr(name, len) {
+        return name && name.length > len ? name.substring(0, len) + '...' : name;
+      }
     },
     beforeCreate() {
       this.roomBaseServer = contextServer.get('roomBaseServer');
@@ -75,7 +99,7 @@
       color: @font-dark-normal;
       &-title {
         font-size: 18px;
-        &-living {
+        &-tags {
           padding: 0 8px;
           height: 20px;
           border-radius: 10px;
@@ -100,6 +124,33 @@
             margin: 2px 0 2px 0;
           }
         }
+        &-tags_1 {
+          background: @bg-error-light;
+        }
+        &-tags_2 {
+          background: @bg-subscribe-normal;
+        }
+        &-tags_3 {
+          background: @bg-end-normal;
+        }
+        &-tags_4 {
+          background: @bg-demand-normal;
+        }
+        &-tags_5 {
+          background: @bg-playback-normal;
+        }
+        &-delay {
+          display: inline-block;
+          width: 66px;
+          height: 28px;
+          margin-left: 8px;
+          vertical-align: middle;
+          img {
+            height: 100%;
+            width: 100%;
+            object-fit: scale-down;
+          }
+        }
       }
       &-host {
         font-size: 14px;
@@ -114,6 +165,10 @@
           padding-left: 8px;
         }
       }
+    }
+    &-right {
+      display: flex;
+      padding-right: 32px;
     }
   }
 </style>

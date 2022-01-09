@@ -26,6 +26,10 @@ import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
 import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
+import VmpShare from '@/packages/share'; // 观看端分享
+import VmpAttention from '@/packages/attention-watch'; // 观看端关注
+import VmpOfficial from '@/packages/official-watch-pc'; // 观看端公众号
+import VmpWatchLogin from '@/packages/watch-person-login'; // 观看端公众号
 
 // 全局注册组件
 export function initUse() {
@@ -52,4 +56,8 @@ export function initUse() {
   Vue.use(VmpNoticeColumn);
   Vue.use(VmpBasicRightContainer);
   Vue.use(VmpBasicCenterContainer);
+  Vue.use(VmpShare);
+  Vue.use(VmpAttention);
+  Vue.use(VmpOfficial);
+  Vue.use(VmpWatchLogin);
 }
