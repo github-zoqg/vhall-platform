@@ -1,17 +1,33 @@
 <template>
-  <div class="vmp-icon-item" :class="className" :title="$t(title)" v-if="show" @click="handleClick">
+  <div
+    class="vmp-icon-item"
+    :class="className"
+    :title="$t(title)"
+    v-show="show"
+    @click="handleClick"
+  >
     <i :class="icon"></i>
   </div>
 </template>
 <script>
   export default {
     name: 'VmpIconItem',
+    inject: ['getSuit'],
     data() {
       return {
+        kind: 'all', // 所有:all,  文档：document ， 白板： board
         icon: '',
-        title: '',
-        show: true
+        title: ''
       };
+    },
+    computed: {
+      show() {
+        if (this.kind === 'all') return true;
+        if (typeof this.getSuit === 'function') {
+          return this.kind === this.getSuit();
+        }
+        return false;
+      }
     },
     mounted() {
       this.initConfig();
@@ -34,8 +50,8 @@
             this.icon = widget.options.icon;
           }
           // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('show')) {
-            this.show = widget.options.show;
+          if (widget.options.hasOwnProperty('kind')) {
+            this.kind = widget.options.kind;
           }
         }
       },

@@ -15,13 +15,13 @@
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ visibility: item.cid == currentDoc.cid ? 'visible' : 'hidden' }"
+            :style="{ visibility: item.cid == cid ? 'visible' : 'hidden' }"
           ></div>
         </div>
       </div>
 
       <!-- 没有文档时的占位组件 -->
-      <div class="vmp-doc-placeholder" v-show="!currentDoc.cid">
+      <div class="vmp-doc-placeholder" v-show="!cid">
         <div class="vmp-doc-placeholder__inner">
           <i class="iconfont iconzanwuwendang"></i>
           <span>暂未分享任何文档</span>
@@ -50,6 +50,20 @@
         <li data-value="zoomReset" title="还原" class="doc-pagebar__opt iconfont iconhuanyuan"></li>
         <li data-value="move" title="移动" class="doc-pagebar__opt iconfont iconyidong"></li>
       </ul>
+
+      <!-- 文档缩略图 -->
+      <ul class="vmp-doc-thumbnailbar" @click="handleThumbnail" v-show="thumbnailShow">
+        <li
+          class="doc-thumbnailbar__opt"
+          v-for="(item, index) in thumbnailList"
+          :key="'thum' + index"
+          :data-value="index"
+          :class="{ selected: slideIndex === index }"
+        >
+          <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
+          <img :src="item" />
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -68,30 +82,29 @@
       return {
         allComplete: false,
         isFullscreen: false, //是否全屏
+        thumbnailShow: false, // 文档缩略是否显示
         // 从服务器获取的文档列表
         fileOrboardList: [],
-        // 当前操作的文档
-        currentDoc: {}
+        // 缩略图列表
+        thumbnailList: [],
+
+        // 当前文档或白板的信息start (为什么不用一个对象？有的时候不触发数据变化，暂时不知道原因)
+        is_board: 1, // 1:文档，2白板 。 默认文档
+        cid: null, //容器id
+        slideIndex: 0,
+        slidesTotal: 1
+        // 当前文档或白板的信息end
       };
     },
     computed: {
-      eId() {
-        return this.currentDoc?.cid;
-      },
       showPagebar() {
-        return this.currentDoc.cid && this.currentDoc.is_board == 1 && !this.isFullscreen;
+        return this.cid && this.is_board == 1 && !this.isFullscreen;
       },
       pageTotal() {
-        return this.currentDoc?.slidesTotal || 1;
+        return this.slidesTotal || 1;
       },
       pageNum() {
-        return this.currentDoc?.slideIndex || 0 + 1;
-      }
-    },
-    watch: {
-      currentDoc(val) {
-        console.log('---currentDoc----');
-        console.log(val);
+        return Number(this.slideIndex || 0) + 1;
       }
     },
     beforeCreate() {
@@ -134,6 +147,13 @@
         // this.$refs.docBoxEl.style.width = `${w}px`;
         if (this.docServer) this.docServer.setSize(w, h);
       },
+
+      /**
+       * 缩略图切换
+       */
+      onThumbnailToggle() {
+        this.thumbnailShow = !this.thumbnailShow;
+      },
       /**
        * 初始化各种事件
        */
@@ -154,27 +174,24 @@
           if (process.env.NODE_ENV !== 'production') console.debug('所有文档加载完成');
           // const list = this.$doc.getLiveAllCids();
           // if (list.includes(this.previewInfo.elId)) this.previewInfo.canOperate = true;
-          // console.log('this.currentDoc:', this.currentDoc);
+          // console.log('this.cid:', this.cid);
           // console.log('this.isFullscreen :', this.isFullscreen);
           this.allComplete = true;
         });
         this.docServer.on(VHDocSDK.Event.DOCUMENT_LOAD_COMPLETE, data => {
           console.log('===================文档加载完成===================');
           // this.isPageShow = true
-          // this.currentDoc.slidesTotal = data.info.slidesTotal;
-          // this.currentDoc.slideIndex = data.info.slideIndex;
-          // console.log('this.currentDoc:', this.currentDoc);
-          // const res = this.docServer.getThumbnailList({ id: this.eId });
+          this.slidesTotal = data.info.slidesTotal;
+          this.slideIndex = data.info.slideIndex;
+          const res = this.docServer.getThumbnailList();
           // console.log('---res----:', res);
-          // const thumbnailList = res[0] ? res[0].list : [];
-          // EventBus.$emit('documenet_load_complete', thumbnailList);
+          this.thumbnailList = res && res[0] ? res[0].list : [];
         });
         // 文档翻页事件
         this.docServer.on(VHDocSDK.Event.PAGE_CHANGE, data => {
           console.log('===================文档翻页====================');
-          this.currentDoc.slidesTotal = data.info.slidesTotal;
-          this.currentDoc.slideIndex = data.info.slideIndex;
-          console.log('this.currentDoc:', this.currentDoc);
+          this.slidesTotal = data.info.slidesTotal;
+          this.slideIndex = data.info.slideIndex;
         });
 
         this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
@@ -259,7 +276,7 @@
        * @param is_board  1文档  2白板
        */
       async addNewFile(item, is_board = 1) {
-        console.log('-------addNewFile-----item:');
+        console.log('-------addNewFile-----');
         this.allComplete = false;
         const { width, height } = this.docViewRect;
         const elId = this.docServer.createUUID(Number(is_board) === 1 ? 'document' : 'board');
@@ -268,7 +285,13 @@
           elId,
           id: elId,
           width,
-          height
+          height,
+          option: {
+            // 初始画笔
+            graphicType: window.VHDocSDK.GRAPHIC.PEN,
+            stroke: '#FD2C0A',
+            strokeWidth: 7
+          }
         };
         item.cid = elId;
         item.is_board = is_board;
@@ -279,8 +302,8 @@
         // 创建
         if (Number(is_board) === 1) {
           try {
-            this.docServer.createDocument(options);
-            this.docServer.selectContainer({ id: elId });
+            await this.docServer.createDocument(options);
+            await this.docServer.selectContainer({ id: elId });
             const {
               status,
               status_jpeg,
@@ -293,17 +316,17 @@
               id: elId,
               docType: item.type
             });
-            let temp = {};
+
             if (Number(status) === 200) {
-              temp = { slideIndex, slidesTotal };
+              this.slideIndex = slideIndex;
+              this.slidesTotal = slidesTotal;
             } else if (Number(status_jpeg) === 200) {
-              temp = { slideIndex: converted_page, slidesTotal: converted_page_jpeg };
+              this.slideIndex = converted_page;
+              this.slidesTotal = converted_page_jpeg;
             }
-            this.currentDoc = {
-              cid: elId,
-              is_board: 1,
-              ...temp
-            };
+
+            this.cid = elId;
+            this.is_board = 1;
           } catch (e) {
             // 移除失败的容器fileOrboardList
             this.fileOrboardList = this.fileOrboardList.filter(item => item.elId === elId);
@@ -315,18 +338,11 @@
           try {
             await this.docServer.createBoard({
               ...options,
-              backgroundColor: '#fff',
-              option: {
-                graphicType: window.VHDocSDK.GRAPHIC.PEN,
-                stroke: '#FD2C0A',
-                strokeWidth: 7
-              }
+              backgroundColor: '#fff'
             });
-            this.docServer.selectContainer({ id: elId });
-            this.currentDoc = {
-              cid: elId,
-              is_board: 2
-            };
+            await this.docServer.selectContainer({ id: elId });
+            this.cid = elId;
+            this.is_board = 2;
           } catch (e) {
             // 移除失败的容器
             this.fileOrboardList = this.fileOrboardList.filter(item => item.elId === elId);
@@ -342,34 +358,37 @@
         this.allComplete = false;
         let { cid, active, docId, is_board } = item;
         const { width, height } = this.docViewRect;
-        // 需要找到激活的文档
+        if (!width || !height) console.error('创建文档容器错误', cid, docId, width, height);
+        const options = {
+          elId: cid,
+          docId: docId,
+          width: width,
+          height: height,
+          noDispatch: false,
+          option: {
+            graphicType: window.VHDocSDK.GRAPHIC.PEN,
+            stroke: '#FD2C0A',
+            strokeWidth: 7
+          }
+        };
+
         if (Number(is_board) === 1) {
-          if (!width || !height) console.error('创建文档容器错误', cid, docId, width, height);
-          await this.docServer.createDocument({
-            elId: cid,
-            docId: docId,
-            width: width,
-            height: height,
-            noDispatch: true
-          });
+          await this.docServer.createDocument(options);
         } else {
           await this.docServer.createBoard({
-            elId: cid,
-            width: width,
-            height: height,
-            backgroundColor: item.backgroundColor || '#fff',
-            noDispatch: true
+            ...options,
+            backgroundColor: item.backgroundColor || '#fff'
           });
         }
         if (active != 0) {
-          // this.$store.commit('setSideActive', item.is_board == 1 ? 'file' : 'board');
-          this.currentDoc = Object.assign({}, item);
-          console.log('恢复this.currentDoc：', this.currentDoc);
-          this.docServer.selectContainer({ id: item.cid, noDispatch: false });
+          this.cid = cid;
+          this.is_board = Number(is_board);
+          await this.docServer.selectContainer({ id: this.cid, noDispatch: false });
+
           window.$middleEventSdk?.event?.send({
             cuid: this.cuid,
             method: 'emitSwitchTo',
-            params: [item.is_board === 1 ? 'document' : 'board']
+            params: [is_board === 1 ? 'document' : 'board']
           });
         }
       },
@@ -377,6 +396,7 @@
        *  刷新或者退出重进恢复上次的文档
        */
       recoverLastDocs: async function () {
+        console.log('刷新或者退出重进恢复上次的文档');
         // 获取远端所有所有容器列表
         const { list } = await this.docServer.getContainerInfo();
         this.fileOrboardList = list;
@@ -392,28 +412,30 @@
        * @param type:文档：document， 白板：board
        */
       async switchTo(type = 'document') {
-        if (type === 'board') {
-          // 切换到白板
-          const item = this.fileOrboardList.find(item => {
-            return item.is_board === 2;
-          });
-          if (item) {
-            await this.docServer.selectContainer({ id: item.cid, noDispatch: false });
-            this.currentDoc = item;
-          } else {
-            this.addNewFile({}, 2);
-          }
-        } else if (type === 'document') {
-          // 切换到文档
-          const item = this.fileOrboardList.find(item => {
-            return item.is_board === 1;
-          });
+        console.log('切换到。。。:', type);
+
+        // 缩略图栏隐藏
+        this.thumbnailShow = false;
+        // 文档：is_board=1 ，白板 文档：is_board=2
+        const is_board = type === 'board' ? 2 : type === 'document' ? 1 : null;
+        if (!is_board) return;
+        this.id_board = is_board;
+
+        // 查找当前列表是否存在文档或白板
+        const item = this.fileOrboardList.find(item => {
+          return Number(item.is_board) === is_board;
+        });
+        if (item) {
+          // 如果存在，设置当文档或白板
           await this.docServer.selectContainer({
-            id: item?.cid ? item.cid : '',
+            id: item.cid,
             noDispatch: false
           });
-          this.currentDoc = item ? item : { is_board: 1 };
-          console.log('切换到文档 this.currentDoc:', this.currentDoc);
+          this.cid = item.cid;
+        }
+
+        if (!item && is_board === 2) {
+          this.addNewFile({}, 2);
         }
       },
       /**
@@ -449,7 +471,7 @@
        * @param {*} e
        */
       handlePage(e) {
-        if (!this.currentDoc.cid || this.is_board === 2) {
+        if (!this.cid || this.is_board === 2) {
           return;
         }
         if (e.target.nodeName === 'UL') return;
@@ -464,10 +486,14 @@
         }
         switch (type) {
           case 'prevStep':
-            this.docServer.prevStep({ id: this.currentDoc.cid });
+            if (this.slideIndex > 0) {
+              this.docServer.prevStep({ id: this.cid });
+            }
             break;
           case 'nextStep':
-            this.docServer.nextStep({ id: this.currentDoc.cid });
+            if (this.slideIndex < this.slidesTotal - 1) {
+              this.docServer.nextStep({ id: this.cid });
+            }
             break;
           // 放大
           case 'zoomIn':
@@ -479,13 +505,32 @@
             break;
           // 还原
           case 'zoomReset':
-            this.docServer.zoomReset({ id: this.currentDoc.cid });
+            this.docServer.zoomReset({ id: this.cid });
             break;
           // 移动
           case 'move':
-            this.docServer.move({ id: this.currentDoc.cid });
+            this.docServer.move({ id: this.cid });
             break;
         }
+      },
+
+      /**
+       * 缩略图点击
+       */
+      handleThumbnail(e) {
+        if (!this.cid || this.is_board === 2) {
+          return;
+        }
+        if (e.target.nodeName === 'UL') return;
+        const index =
+          e.target.dataset.value ||
+          e.target.parentNode.dataset.value ||
+          e.target.parentNode.parentNode.dataset.value ||
+          null;
+        if (!index) return;
+        const page = Number(index) + 1;
+        this.docServer.gotoPage({ id: this.cid, page });
+        this.slideIndex = page - 1;
       }
     },
     mounted() {
@@ -536,6 +581,10 @@
           font-size: 137px;
           color: #7c7c7c;
         }
+        span {
+          color: #999999;
+          line-height: 22px;
+        }
       }
     }
     .vmp-doc-inner {
@@ -580,6 +629,56 @@
       .doc-pagebar__opt {
         padding: 7px 10px;
       }
+    }
+  }
+  .vmp-doc-thumbnailbar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 144px;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: scroll;
+
+    li.doc-thumbnailbar__opt {
+      height: 63px;
+      width: 110px;
+      margin-top: 15px;
+      position: relative;
+
+      &.selected {
+        box-shadow: 0 0 0 2px #f57274;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    li.doc-thumbnailbar__opt:not(.selected) {
+      &:hover {
+        box-shadow: 0 0 0 2px #f3686b;
+      }
+    }
+    li:last-child {
+      margin-bottom: 20px;
+    }
+    .doc-thumbnailbar-seq {
+      display: block;
+      min-width: 20px;
+      height: 14px;
+      background: #000;
+      opacity: 0.7;
+      color: #fff;
+      font-size: 12px;
+      line-height: 14px;
+      text-align: center;
+      position: absolute;
+      left: 0;
+      bottom: 0;
     }
   }
 
