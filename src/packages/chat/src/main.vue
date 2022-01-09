@@ -1,7 +1,11 @@
 <template>
   <div class="vmp-chat-container" :class="{ assistant: assistantType }">
     <!-- 消息主体区域 -->
-    <div class="chat-content" ref="chatContent">
+    <div
+      class="chat-content"
+      ref="chatContent"
+      :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
+    >
       <overlay-scrollbars
         ref="chatMessageAreaScroll"
         :options="overlayScrollBarsOptions"
@@ -41,99 +45,24 @@
       </div>
     </div>
     <div class="chat-operate-bar">
-      <!-- 表情选择 -->
-      <div class="chat-operate-bar__emoji-wrap">
-        <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
-      </div>
-      <!-- 聊天过滤 -->
-      <chat-filter
-        v-if="roleName != 2"
-        :roomId="roomId"
-        :webinarId="webinarId"
-        :allBanned="allBanned"
-        ref="chatFilter"
-        :chatFilterUrl="chatFilterUrl"
-        :isAssistant="assistantType"
-      ></chat-filter>
-
-      <div class="chat-control-wrap">
-        <span class="iconfont iconbiaoqing" @click.stop="toggleEmoji"></span>
-        <template v-if="chatOptions && chatOptions.hasChatOperateBtn">
-          <!--观看端聊天过滤-->
-          <span class="icon iconfont iconmeitishezhi" @click.stop="onClickFilterSetting"></span>
-          <!-- 过滤设置 -->
-          <ul v-show="isFilterShow" class="chat-operate-bar__chat-filter-wrap">
-            <li class="filter-item">
-              <el-checkbox
-                class="filter-item__checkbox"
-                @change="onClickOnlyShowSponsor"
-                v-model="filterStatus.onlyShowSponsor"
-              >
-                只看主办方
-              </el-checkbox>
-            </li>
-            <li class="filter-item">
-              <el-checkbox
-                class="filter-item__checkbox"
-                @change="onClickShieldingEffects"
-                v-model="filterStatus.isShieldingEffects"
-              >
-                屏蔽特效
-              </el-checkbox>
-            </li>
-          </ul>
-        </template>
-        <template v-if="chatOptions && chatOptions.hasImgUpload">
-          <!-- 聊天图片上传 -->
-          <vmp-chat-img-upload
-            class="chat-img-upload"
-            ref="chatImgUpload"
-            :room-id="roomId"
-            :role-name="roleName"
-            :disable="inputStatus.disable"
-          ></vmp-chat-img-upload>
-        </template>
-        <a
-          v-if="roleName != '2' && plugin.audit.show"
-          class="iconfont iconguolv"
-          @click="toggleChatFilter"
-        ></a>
-      </div>
-      <!--聊天输入框-->
-      <div class="chat-input-wrap">
-        <input
-          v-if="!inputStatus.disable && !chatLoginStatus"
-          ref="chatInput"
-          accept="image/jpg, image/png, image/jpeg, image/bmp"
-          :placeholder="inputStatus.placeholder"
-          :disabled="inputStatus.disable"
-          type="text"
-          maxlength="140"
-          v-model="inputValue"
-          @keyup.enter="sendMsgThrottle"
-          @keyup.delete="backspace"
-        />
-        <div
-          v-if="(roleName !== 1 && inputStatus.disable) || chatLoginStatus"
-          class="chat-input-placeholder"
-        >
-          {{ inputStatus.placeholder }}
-        </div>
-        <div v-show="chatLoginStatus" class="chat-input-login">
-          <span @click="clickCallLogin">登录</span>
-          参与互动
-        </div>
-        <button :class="{ assistant: assistantType }" @click="sendMsgThrottle">发送</button>
-      </div>
-      <template v-if="chatOptions && chatOptions.hasImgUpload">
-        <!--图片预览-->
-        <img-preview
-          ref="imgPreview"
-          v-if="imgPreviewVisible"
-          :images="previewImgList"
-          @closeImgPreview="onClosePreviewImg"
-        ></img-preview>
-      </template>
+      <chat-operate-bar
+        ref="chatOperator"
+        :chat-options="chatOptions"
+        :room-id="roomId"
+        :role-name="roleName"
+        :input-status="inputStatus"
+        :webinar-id="webinarId"
+        :all-banned="allBanned"
+        :chat-list="chatList"
+        :chat-login-status="chatLoginStatus"
+        @updateHeight="chatOperateBarHeightChange"
+      ></chat-operate-bar>
+      <img-preview
+        ref="imgPreview"
+        v-if="imgPreviewVisible"
+        :images="previewImgList"
+        @closeImgPreview="onClosePreviewImg"
+      ></img-preview>
       <chat-user-control
         :roomId="roomId"
         :userId="userId"
@@ -148,11 +77,9 @@
 
 <script>
   import MsgItem from './components/msg-item.vue';
-  import Emoji from './components/emoji.vue';
   import ImgPreview from './components/img-preview';
-  import ChatFilter from './components/chat-filter';
   import ChatUserControl from './components/chat-user-control';
-  import VmpChatImgUpload from './components/chat-img-upload';
+  import ChatOperateBar from './components/chat-operate-bar';
 
   import EventBus from './js/Events.js';
   import eventMixin from './mixin/event-mixin';
@@ -166,11 +93,9 @@
     mixins: [eventMixin, dataReportMixin],
     components: {
       MsgItem,
-      Emoji,
       ImgPreview,
-      ChatFilter,
       ChatUserControl,
-      VmpChatImgUpload
+      ChatOperateBar
     },
     data() {
       this.chatServer = useChatServer();
@@ -266,15 +191,8 @@
         imgPreviewVisible: false,
         //聊天配置
         chatOptions: {},
-        //观看端的过滤配置模态窗是否显示
-        isFilterShow: false,
-        //过滤状态集合
-        filterStatus: {
-          //只看主办方
-          onlyShowSponsor: false,
-          //屏蔽特效
-          isShieldingEffects: false
-        }
+        //底部操作栏高度
+        operatorHeight: 91
       };
     },
     computed: {},
@@ -472,6 +390,7 @@
       /**
        * 聊天图片预览结束
        * */
+      /** 消息区域滚动处理 */
       initScroll() {
         this.osInstance = this.$refs.chatMessageAreaScroll.osInstance();
         const that = this;
@@ -546,30 +465,7 @@
           }
         );
       },
-      // 切换表情显示
-      toggleEmoji() {
-        if (this.chatLoginStatus) {
-          this.$message.warning('未登录');
-          return;
-        }
-
-        if (this.inputStatus.disable) {
-          this.$message.warning('您已被禁言');
-          return;
-        }
-        this.$refs.emoji.toggleShow();
-      },
-      // 子组件输入表情
-      emojiInput(value) {
-        if (this.inputStatus.disable) {
-          return;
-        }
-        this.inputValue += value;
-      },
-      //切换聊天过滤显示
-      toggleChatFilter() {
-        this.$refs.chatFilter.toggleShow();
-      },
+      /** 消息区域滚动处理结束 */
       //todo domain负责 获取菜单列表
       getMenuList(val) {
         const vo = val;
@@ -739,43 +635,17 @@
           }
         }
       },
-      /**
-       * 聊天上传图片组件相关逻辑
-       * */
-      //获取子组件上传的聊天图片
-      getUploadImg() {
-        const ref = this.$refs && this.$refs['chatImgUpload'] ? this.$refs['chatImgUpload'] : null;
-        return ref ? ref.getImgUrls() : [];
-      },
-      //清空子组件上传的聊天图片
-      clearUploadImg() {
-        const ref = this.$refs && this.$refs['chatImgUpload'] ? this.$refs['chatImgUpload'] : null;
-        ref && ref.clearImgUrls();
-      },
-      /**
-       * 聊天上传图片组件相关逻辑结束
-       * */
-      //唤起登录
-      clickCallLogin() {
-        //todo 待发送信令，唤起登录
-      },
+      //处理聊天内容
       trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
       //回复消息
       reply(count) {
-        this.inputValue = '';
-        this.atList = [];
-        //数据上报
         this.buriedPointReport(110119, {
           business_uid: this.userId,
           webinar_id: this.$route.params.il_id
         });
-        this.replyMsg =
-          this.chatList.find(chatMsg => {
-            return chatMsg.count === count;
-          }) || {};
-        this.$refs.chatInput.focus();
+        this.$refs.chatOperator.handleReply(count);
       },
       //todo domain负责 删除消息（主持人，助理）
       deleteMsg(count) {
@@ -805,28 +675,12 @@
       },
       //todo domain负责 @用户
       atUser(accountId) {
-        this.replyMsg = {};
         //数据上报
         this.buriedPointReport(110120, {
           business_uid: this.userId,
           webinar_id: this.$route.params.il_id
         });
-        //找到at的消息
-        const msgToAt = this.chatList.find(chatMsg => chatMsg.sendId === accountId) || {};
-        //是否不在atList里
-        const notInAtList = !this.atList.find(u => u.accountId === msgToAt.sendId);
-
-        //如果没在atList里，则加入到atList
-        if (notInAtList) {
-          this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickName} `;
-          this.$refs.chatInput.focus();
-          const currentIndex = this.$refs.chatInput.selectionStart || 0;
-          this.atList.push({
-            nickName: msgToAt.nickName,
-            accountId: msgToAt.sendId,
-            index: currentIndex
-          });
-        }
+        this.$refs.chatOperator.handleAtUser(accountId);
       },
       /**
        * 事件处理分发
@@ -859,40 +713,15 @@
       },
       //有人回复本用户
       onReplyMsg(e) {
-        if (this.userId != e.msg.sendId) return;
+        if (this.userId !== e.msg.sendId) return;
         this.showTip = true;
         this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
         this.replyElement = e.el;
       },
-      // 过滤设置点击事件
-      onClickFilterSetting() {
-        this.isFilterShow = !this.isFilterShow;
-        // 如果表情弹窗开启，则关闭
-        if (this.$refs.emoji.isShow) {
-          this.$refs.emoji.toggleShow();
-        }
-      },
-      // 只看主办方点击事件
-      onClickOnlyShowSponsor(status) {
-        let message = status ? this.$t('已开启只看主办方') : this.$t('已关闭只看主办方');
-        this.$message({
-          message: message,
-          showClose: true,
-          // duration: 0,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
-      },
-      // 隐藏特效点击事件
-      onClickShieldingEffects(status) {
-        let message = status ? this.$t('已屏蔽特效') : this.$t('已开启特效');
-        this.$message({
-          message: message,
-          showClose: true,
-          // duration: 0,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
+      //todo 聊天区域高度变化
+      chatOperateBarHeightChange(operatorHeight) {
+        this.operatorHeight = operatorHeight;
+        this.$refs.chatOperator.updateOverlayScrollbar();
       }
     }
   };
@@ -903,10 +732,8 @@
     @active-color: #fc5659;
     @font-error: #fb3a32;
     width: 100%;
-    /* 临时修改下高度，后续自定义菜单出来，会移除掉 */
-    height: calc(100% - 50px);
+    height: 100%;
     position: relative;
-    //background: @bg-dark-section;
 
     &.assistant {
       background: #323232;
@@ -931,12 +758,12 @@
       }
     }
     .chat-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 91px;
-      padding: 10px 0 20px 0;
+      position: relative;
+      ::v-deep .vmp-chat-msg-item {
+        &:last-child {
+          padding-bottom: 20px;
+        }
+      }
       &__get-list-btn-container {
         display: block;
         text-align: center;
@@ -988,240 +815,6 @@
       right: 0;
       bottom: 84px;
       cursor: pointer;
-    }
-    .chat-operate-bar {
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-      border-top: 1px solid #3a3a48;
-      background-color: #2d2d2d;
-      position: absolute;
-      box-sizing: border-box;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      .chat-control-wrap {
-        display: flex;
-        align-items: center;
-        /*height: 20px;*/
-        margin-bottom: 7px;
-        & > * {
-          margin-left: 10px;
-        }
-        .iconfont {
-          color: #999;
-          font-size: 19px;
-          cursor: pointer;
-          &.active {
-            color: @active-color;
-          }
-          &:hover {
-            color: @active-color;
-            cursor: pointer;
-          }
-          &.pic-disabled {
-            pointer-events: none;
-          }
-          &.icontupianliaotian {
-            font-size: 18px;
-          }
-        }
-        .icon-common {
-          width: 24px;
-          color: #999;
-          height: 24px;
-          font-size: 18px;
-          background-size: 100%;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-
-        .iconbiaoqing {
-          font-size: 19px;
-          color: #999;
-          margin-left: 0;
-          margin-bottom: 1px;
-          &:hover {
-            color: @active-color;
-            cursor: pointer;
-          }
-        }
-        .chat-audit {
-          background-image: url('./images/auditing.png');
-          &:hover {
-            background-size: 95%;
-            background-image: url('./images/auditing-hover.png');
-          }
-        }
-        .chat-img-upload {
-          flex: 1;
-        }
-      }
-      .chat-input-wrap {
-        display: flex;
-        height: 34px;
-        position: relative;
-        input {
-          flex: 1;
-          border-top-left-radius: 4px;
-          border-bottom-left-radius: 4px;
-          border: none;
-          background: rgba(84, 84, 84, 1);
-          outline: none;
-          padding-left: 12px;
-          color: #b8bbca;
-          &:focus + button {
-            background: #999999;
-          }
-        }
-        .chat-input-placeholder {
-          flex: 1;
-          border-top-left-radius: 4px;
-          border-bottom-left-radius: 4px;
-          border: none;
-          background: rgba(84, 84, 84, 1);
-          outline: none;
-          padding-left: 12px;
-          color: #b8bbca;
-          font-size: 14px;
-          line-height: 34px;
-        }
-        .chat-input-login {
-          position: absolute;
-          // width: 100%;
-          height: 34px;
-          line-height: 34px;
-          top: 0;
-          left: 9px;
-          z-index: 2;
-          color: #aaa;
-          font-size: 12px;
-          background: #545454;
-          span {
-            font-size: 12px !important;
-            color: #aaa;
-          }
-          span:first-of-type {
-            color: @active-color;
-            cursor: pointer;
-            font-size: 12px !important;
-          }
-        }
-        button {
-          &.assistant {
-            width: 58px;
-            flex-basis: initial;
-          }
-          flex-basis: 20%;
-          width: 20%;
-          text-align: center;
-          line-height: 34px;
-          border-top-right-radius: 4px;
-          border-bottom-right-radius: 4px;
-          background: rgba(153, 153, 153, 1);
-          cursor: pointer;
-          color: #fff;
-          border: none;
-          outline: none;
-          /* &:active {
-            background: #999999;
-          } */
-          &:hover {
-            background: @active-color;
-          }
-        }
-      }
-      .chat-img-box {
-        padding: 8px;
-        background: #3f3f3f;
-        position: absolute;
-        top: -50px;
-        left: 7%;
-        box-sizing: border-box;
-        .chat-img {
-          float: left;
-          width: 34px;
-          height: 34px;
-          margin-right: 8px;
-          position: relative;
-          box-sizing: border-box;
-          cursor: pointer;
-          .img-close {
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            background: url('./images/img-del.png') no-repeat;
-            background-size: contain;
-            top: 0px;
-            right: 0px;
-            display: none;
-          }
-          & > img {
-            display: block;
-          }
-          &:last-child {
-            margin-right: 0;
-          }
-          &:hover {
-            border: 1px solid @active-color;
-            .img-close {
-              display: block;
-            }
-          }
-        }
-      }
-      &__emoji-wrap {
-        width: 294px;
-        position: absolute;
-        top: 0;
-        transform: translateY(-100%);
-        left: 0;
-      }
-      &__chat-filter-wrap {
-        width: 120px;
-        height: 80px;
-        padding: 4px 0;
-        background-color: #383838;
-        box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
-        border-radius: 4px;
-        position: absolute;
-        top: -11px;
-        transform: translateY(-100%);
-        .iconmeitishezhi {
-          font-size: 19px;
-          color: #999;
-          margin-left: 10px;
-          margin-bottom: 1px;
-          &:hover {
-            color: @active-color;
-            cursor: pointer;
-          }
-        }
-        .filter-item {
-          height: 40px;
-          line-height: 40px;
-          padding-left: 15px;
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          &:hover {
-            .filter-item__label {
-              color: #e6e6e6;
-            }
-          }
-        }
-        .filter-item__checkbox {
-          display: inline-block;
-          margin-right: 8px;
-          position: relative;
-          color: #999999;
-          font-size: 14px;
-        }
-        .el-checkbox__label {
-          font-size: 14px;
-          color: #999999;
-        }
-      }
     }
   }
 </style>
