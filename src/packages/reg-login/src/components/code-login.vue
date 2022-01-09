@@ -25,7 +25,7 @@
         <div id="codeLoginCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-wrap-code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -43,7 +43,7 @@
           type="danger"
           :disabled="btnDisabled || isDownTime"
           :class="[
-            'vmp-code-btn show-border',
+            'vmp-reg-login__code__btn vmp-reg-login__show__border',
             {
               start: !btnDisabled && !isDownTime,
               disabled: btnDisabled,
@@ -59,23 +59,31 @@
       <el-form-item>
         <div
           :class="[
-            'vmp-box__link vmp-box__code__link',
+            'vmp-reg-login-box__link vmp-reg-login-box__code__link',
             {
-              'vmp-box__height__max': isMaxHeight
+              'vmp-reg-login-box__height__max': isMaxHeight
             }
           ]"
         >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
-          <span class="vmp-box__auto vmp-box__checked" @click="autoLoginStatus = !autoLoginStatus">
+          <span
+            class="vmp-reg-login-box__auto vmp-reg-login-box__checked"
+            @click="autoLoginStatus = !autoLoginStatus"
+          >
             {{ $t('login.login_1005') }}
           </span>
         </div>
-        <el-button type="primary" round class="length-max vmp-login-btn" @click="handleCodeLogin">
+        <el-button
+          type="primary"
+          round
+          class="length-max vmp-reg-login__login__btn"
+          @click="handleCodeLogin"
+        >
           {{ $t('nav.nav_1005') }}
         </el-button>
         <a
           href="javascript:void(0)"
-          class="vmp-reg__link"
+          class="vmp-reg-login__reg__link"
           v-if="options.showToReg == 1"
           @click="handleToReg"
         >

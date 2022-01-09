@@ -37,26 +37,34 @@
       <el-form-item>
         <div
           :class="[
-            'vmp-box__link vmp-box__pwd__link',
+            'vmp-reg-login-box__link vmp-reg-login-box__pwd__link',
             {
-              'vmp-box__height__max': isMaxHeight
+              'vmp-reg-login-box__height__max': isMaxHeight
             }
           ]"
         >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
-          <span class="vmp-box__auto vmp-box__checked" @click="autoLoginStatus = !autoLoginStatus">
+          <span
+            class="vmp-reg-login-box__auto vmp-reg-login-box__checked"
+            @click="autoLoginStatus = !autoLoginStatus"
+          >
             {{ $t('login.login_1005') }}
           </span>
-          <span class="vmp-box__auto vmp-box__forget">
+          <span class="vmp-reg-login-box__auto vmp-reg-login-box__forget">
             <a :href="forgetUrl" target="_blank">{{ $t('login.login_1012') }}</a>
           </span>
         </div>
-        <el-button type="primary" round class="length-max vmp-login-btn" @click="handlePwdLogin">
+        <el-button
+          type="primary"
+          round
+          class="length-max vmp-reg-login__login__btn"
+          @click="handlePwdLogin"
+        >
           {{ $t('nav.nav_1005') }}
         </el-button>
         <a
           href="javascript:void(0)"
-          class="vmp-reg__link"
+          class="vmp-reg-login__reg__link"
           v-if="options.showToReg == 1"
           @click="handleToReg"
         >

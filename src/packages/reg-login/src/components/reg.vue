@@ -27,7 +27,7 @@
         <div id="regCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-wrap-code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -44,7 +44,7 @@
           type="danger"
           :disabled="btnDisabled || isDownTime"
           :class="[
-            'vmp-code-btn show-border',
+            'vmp-reg-login__code__btn vmp-reg-login__show__border',
             {
               start: !btnDisabled && !isDownTime,
               disabled: btnDisabled,
@@ -71,10 +71,15 @@
           {{ $t('nav.nav_1005') }}
         </a>
       </el-form-item>
-      <el-button type="primary" round class="length-max vmp-register-btn" @click="handleRegister">
+      <el-button
+        type="primary"
+        round
+        class="length-max vmp-reg-login__register__btn"
+        @click="handleRegister"
+      >
         {{ $t('register.register_1013') }}
       </el-button>
-      <div class="register-checked" v-if="!isMobile">
+      <div class="vmp-reg-login__register__checked" v-if="!isMobile">
         <el-checkbox v-model="checked">
           {{ $t('register.register_1008') }}
           <a
@@ -87,7 +92,7 @@
           </a>
         </el-checkbox>
       </div>
-      <div class="register-checked" v-else>
+      <div class="vmp-reg-login__register__checked" v-else>
         <el-checkbox v-model="checked">
           {{ $t('login.login_1030') }}
           <a
@@ -586,10 +591,10 @@
       line-height: 20px;
     }
   }
-  .vmp-register-btn {
+  .vmp-reg-login__register__btn {
     margin-bottom: 8px;
   }
-  .register-checked {
+  .vmp-reg-login__register__checked {
     text-align: left;
     vertical-align: middle;
     line-height: 20px;
