@@ -71,39 +71,6 @@
           去登录
         </a>
       </el-form-item>
-      <!-- 注册密码
-      <el-form-item :class="['vhsaas-box__pwd', 'vhsaas-box__msg__error']" prop="password">
-        <pwd-input
-          v-model.trim="ruleForm.password"
-          clearable
-          :placeholder="!isPasswordFocus ? '设置密码（选填，6-30个字符）' : ''"
-          :maxlength="30"
-          auto-complete="off"
-          onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
-          style="ime-mode: disabled"
-          :isPasswordVisible="!regPwdShow"
-          @focus="handleFocus('isPasswordFocus')"
-          @blur="handleBlur('isPasswordFocus')"
-        >
-          <span slot="suffix" class="closePwd" @click="passWordType">
-            <i
-              v-show="regPwdShow"
-              slot="suffix"
-              style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
-              class="iconfont iconyincang_icon"
-            ></i>
-            <i
-              v-show="!regPwdShow"
-              slot="suffix"
-              style="display: inline-block; font-size: 12px; margin-right: 5px; cursor: pointer"
-              class="iconfont iconxianshi_icon"
-            ></i>
-          </span>
-        </pwd-input>
-        <a href="javascript:void(0)" class="vhsaas-reg__login" @click.stop.prevent="handleToLogin">
-          登录
-        </a>
-      </el-form-item> -->
       <el-button class="vmp-red-button length-max vmp-register-btn" round @click="handleRegister">
         {{ isMobile ? '注册' : '立即注册' }}
       </el-button>
@@ -137,59 +104,40 @@
   </div>
 </template>
 <script>
-  // import PwdInput from './pwd-input.vue';
   export default {
     name: 'VmpRegister',
-    components: {
-      // PwdInput
-    },
+    components: {},
     data() {
       const validateRegPhone = async (rule, value, callback) => {
-        this.regPhoneFlag = value === '' || !/^1[0-9]{10}$/.test(value);
         if (value === '') {
-          this.regBtnControl = 'disabled'; // 验证失败，禁用
-          this.isShowRegPhoneErr = true;
           callback(new Error('请输入手机号'));
         } else {
           if (!/^1[0-9]{10}$/.test(value)) {
-            this.regBtnControl = 'disabled'; // 验证失败，禁用
-            this.isShowRegPhoneErr = true;
             callback(new Error('请输入正确的手机号'));
           } else {
-            /* try {
-              const result = await this.$vhallapi.nav.loginCheck({
-                account: this.ruleForm.phone,
-                channel: 'C'
-              });
-              if (result && result.code === 200) {
+            /* // TODO 真实逻辑 */
+            // const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+            this.$fetch('loginCheck', {
+              account: value,
+              channel: 'C' // B端用户还是C端用户
+            })
+              .then(async res => {
                 // 检测结果：check_result 0账号未锁定 1账号锁定; account_exist 账号是否存在：1存在 0不存在
-                if (result.data.account_exist > 0) {
-                  this.regPhoneFlag = true;
-                  this.regBtnControl = 'disabled';
-                  this.isShowRegPhoneErr = true;
+                if (res.code == 200 && res.data && res.data.account_exist > 0) {
                   callback(new Error('请输入正确的手机号'));
                 } else {
-                  this.isShowRegPhoneErr = false;
-                  if (this.phoneKey) {
-                    this.regPhoneFlag = false;
-                    this.regBtnControl = 'start'; // 验证成功，启用
-                  } else {
-                    this.regPhoneFlag = true;
-                    this.regBtnControl = 'disabled';
-                  }
                   callback();
                 }
-              }
-            } catch (e) {
-              console.log(e);
-              callback();
-            } */
-            callback();
+              })
+              .catch(res => {
+                console.log('验证手机号是否存在', res);
+                callback(new Error('请输入正确的手机号'));
+              });
+            // callback();
           }
         }
       };
       const validateCaptchas = (rule, value, callback) => {
-        this.captchaError = value === '';
         if (value === '') {
           callback(new Error('请输入动态验证码'));
         } else {
@@ -329,8 +277,8 @@
       },
       // 获取图形验证码key
       getCapthaId() {
-        /* TODO 真实逻辑
-        // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
+        /* TODO 真实逻辑 */
+        // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('getCapthaId', {})
           .then(res => {
             if (res && res.data && res.data.captchaid) {
@@ -343,15 +291,13 @@
             console.warn('获取图形验证码key失败', res);
             this.captchaKey = '';
           });
-        */
         // TODO 模拟数据
-        this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
+        // this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
       },
       // 发送验证码
       handleSendCode() {
         let phoneFlag = false;
         this.$refs.ruleForm.validateField('phone', function (res) {
-          // console.log('手机号校验结果：', !res);
           phoneFlag = !res;
         });
         if (!phoneFlag) {
@@ -371,7 +317,7 @@
         }
         // TODO 模拟知晓当前biz_id内容，后续待调整！！！
         if (phoneFlag) {
-          /*  // TODO 真实逻辑 发送验证码 - 成功倒计时
+          /*  // TODO 真实逻辑 发送验证码 - 成功倒计时  */
           // yapi: http://yapi.vhall.domain/project/740/interface/api/45695
           // const sendCode = ['/v4/ucenter-login-reg/code/send', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
           const params = {
@@ -434,8 +380,8 @@
                 });
                 this.reloadCaptha();
               }
-            }); */
-          if (this.timeInterval) {
+            });
+          /*  if (this.timeInterval) {
             clearInterval(this.timeInterval);
             this.timeInterval = null;
           }
@@ -455,13 +401,13 @@
               }
               this.time = 60;
             }
-          }, 1000);
+          }, 1000); */
         }
       },
       // 获取密钥，便于密码计算
       getLoginKey() {
-        /*  // TODO 真实逻辑
-        const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+        /*  // TODO 真实逻辑  */
+        // const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('getLoginKey', {})
           .then(async res => {
             if (res.code == 200 && res.data) {
@@ -486,13 +432,13 @@
               type: 'error',
               customClass: 'zdy-info-box'
             });
-          }); */
-        // TODO 模拟数据
+          });
+        /* // TODO 模拟数据
         this.loginKeyVo = {
           public_key:
             '-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC0O8nqq9sX460V0T6+sQTGZKBWoMUhELEmYDB1rDfvKZ6x4yt0Q6Xna45K/ZQKaRuwPCDqKxjtX/tyL4azLvJl+KWMaPMmsjdO5O8cDgIdoGscDD+jvF/kQdqhpvyz5kVK/8ZWxnyvTDsWHKJz4WO2m+zSxXFEgn1AjZShI6ofVQIDAQAB-----END PUBLIC KEY-----',
           uuid: '972201070353222848'
-        };
+        }; */
       },
       handleEncryptPassword(password) {
         let retPassword = '';
@@ -534,12 +480,12 @@
             }
             // 验证通过，触发注册
             await this.getLoginKey();
-            /* // TODO 真实逻辑
+            /* // TODO 真实逻辑  */
             const retPassword = this.ruleForm.password
               ? this.handleEncryptPassword(this.ruleForm.password)
               : '';
             // C端用户注册 [http://yapi.vhall.domain/project/740/interface/api/45704]
-            const cUserRegister = ['/v4/ucenter-login-reg/consumer/register', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+            // const cUserRegister = ['/v4/ucenter-login-reg/consumer/register', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
             const params = {
               source: 2,
               way: 2, // （默认2）1=账号密码注册|2=手机号验证码注册
@@ -579,15 +525,15 @@
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
-              }); */
-            this.$message({
+              });
+            /* this.$message({
               message: '注册成功',
               showClose: true,
               // duration: 0,
               type: 'error',
               customClass: 'zdy-info-box'
             });
-            this.handleToLogin();
+            this.handleToLogin(); */
           }
         });
       },
@@ -613,7 +559,7 @@
   };
 </script>
 <style lang="less" scoped>
-  @import url('../less/reset.less');
+  @import url('../styles/reset.less');
   .vmp-register {
     padding: 0 32px 24px 32px;
   }

@@ -103,17 +103,6 @@
           return '1-1';
         }
       },
-      loginSort: {
-        required: true,
-        default() {
-          /* loginSort取值范围：
-             0 验证码登录在前；
-             1 密码登录在前。
-             PS: 只有loginType 等于 '1-1' 时有效
-          */
-          return 0;
-        }
-      },
       openReg: {
         required: true,
         default() {
@@ -161,8 +150,7 @@
         this.options = {
           ...{
             openReg: this.openReg,
-            loginType: this.loginType,
-            loginSort: this.loginSort
+            loginType: this.loginType
           },
           ...params
         };
@@ -200,7 +188,7 @@
   };
 </script>
 <style lang="less" scoped>
-  @import url('less/theme.less');
+  @import url('styles/theme.less');
   .vmp-reg-login {
     display: inline-flex;
     text-align: right;

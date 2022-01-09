@@ -272,8 +272,8 @@
           this.nextLogin();
         } else {
           // 如果没有选择过图形码，走账号检测判断
-          /* // TODO 真实逻辑
-          const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+          /* // TODO 真实逻辑 */
+          // const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
           this.$fetch('loginCheck', {
             account: this.ruleForm.username,
             channel: 'C' // B端用户还是C端用户
@@ -309,11 +309,11 @@
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
-            }); */
-          // TODO 模拟逻辑
+            });
+          /*  // TODO 模拟逻辑
           this.captchaIsShow = false;
           // 非异常情况下，触发登录逻辑
-          this.nextLogin();
+          this.nextLogin(); */
         }
       },
       // 获取密钥，便于密码计算
@@ -539,7 +539,7 @@
   };
 </script>
 <style lang="less" scoped>
-  @import url('../less/reset.less');
+  @import url('../styles/reset.less');
   .vmp-pwd-login {
     padding: 0 32px 24px 32px;
   }

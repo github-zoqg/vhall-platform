@@ -263,7 +263,7 @@
       },
       // 获取图形验证码key
       getCapthaId() {
-        /* TODO 真实逻辑
+        /* TODO 真实逻辑*/
         // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('getCapthaId', {})
           .then(res => {
@@ -277,9 +277,8 @@
             console.warn('获取图形验证码key失败', res);
             this.captchaKey = '';
           });
-        */
         // TODO 模拟数据
-        this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
+        // this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
       },
       // 发送验证码 - 按钮点击
       handleSendCode() {
@@ -304,7 +303,7 @@
         }
         // TODO 模拟知晓当前biz_id内容，后续待调整！！！
         if (phoneFlag) {
-          /*  // TODO 真实逻辑 发送验证码 - 成功倒计时
+          /*  // TODO 真实逻辑 发送验证码 - 成功倒计时 */
           // yapi: http://yapi.vhall.domain/project/740/interface/api/45695
           // const sendCode = ['/v4/ucenter-login-reg/code/send', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
           const params = {
@@ -367,8 +366,8 @@
                 });
                 this.reloadCaptha();
               }
-            }); */
-          if (this.timeInterval) {
+            });
+          /*  if (this.timeInterval) {
             clearInterval(this.timeInterval);
             this.timeInterval = null;
           }
@@ -388,15 +387,15 @@
               }
               this.time = 60;
             }
-          }, 1000);
+          }, 1000); */
         }
       },
       // 点击登录 - 验证码登录
       handleCodeLogin() {
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
-            /*// TODO 真实逻辑 验证码登录 [http://yapi.vhall.domain/project/740/interface/api/45707]
-            const cUserLogin = ['/v4/ucenter-login-reg/consumer/login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+            /*// TODO 真实逻辑 验证码登录 [http://yapi.vhall.domain/project/740/interface/api/45707] */
+            // const cUserLogin = ['/v4/ucenter-login-reg/consumer/login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
             const params = {
               way: 2, // 手机号验证码登录
               phone: this.ruleForm.phone,
@@ -440,19 +439,19 @@
                 if (!this.captchaVal) {
                   this.reloadCaptha();
                 }
-              }); */
-            // TODO 模拟数据
+              });
+            /* // TODO 模拟数据
             const token =
               'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE0ODc1MDgsImV4cCI6MTY0NDA3OTUwOCwidXNlcl9pZCI6IjEwMjI3NyIsInBsYXRmb3JtIjoiNyIsImNoIjoiYyIsImJ1c2luZXNzX2FjY291bnRfaWQiOiIifQ.H5g0DDCzTDKQirrwu33-CtZcHwIxrD8kkqDEyp0_iM8';
             localStorage.setItem('token', token || '');
-            this.getCUserInfo();
+            this.getCUserInfo(); */
           }
         });
       },
       // 获取C端登录后用户信息
       getCUserInfo() {
-        /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递
-        const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+        /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递  */
+        // const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
         this.$fetch('cUserInfo', {})
           .then(res => {
             if (res.code == 200) {
@@ -470,8 +469,8 @@
           .catch(res => {
             console.warn('获取C端登录后用户信息失败', res);
             localStorage.setItem('userInfo', '');
-          }); */
-        // 模拟逻辑
+          });
+        /* // 模拟逻辑
         localStorage.setItem(
           'userInfo',
           JSON.stringify({
@@ -523,7 +522,7 @@
           })
         );
         this.resetForm();
-        this.$emit('closeParent', 'code');
+        this.$emit('closeParent', 'code'); */
       },
       // 重置当前表单 - 通用api
       resetForm() {
@@ -558,7 +557,7 @@
   };
 </script>
 <style lang="less" scoped>
-  @import url('../less/reset.less');
+  @import url('../styles/reset.less');
   .vmp-code-login {
     padding: 0 32px 24px 32px;
   }
