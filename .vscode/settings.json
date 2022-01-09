@@ -81,7 +81,6 @@
   "path-intellisense.mappings": {
     "@": "${workspaceRoot}/src"
   },
-  "i18n-ally.localesPaths": [
-    "src/packages/locales"
-  ]
+  "js/ts.implicitProjectConfig.checkJs": true,
+  "i18n-ally.localesPaths": ["src/packages/locales"]
 }

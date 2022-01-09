@@ -236,7 +236,14 @@ export const serverConfig = {
   },
   //文档列表对话框
   dlgDocList: {
-    component: 'VmpDocDlglist'
+    component: 'VmpDocDlglist',
+    emitDemonstrateDoc: [
+      {
+        cuid: 'comDocUne',
+        method: 'demonstrate',
+        args: ['$0', '$1']
+      }
+    ]
   },
   // 上麦流列表
   comStreamList: {

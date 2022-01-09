@@ -67,6 +67,7 @@ module.exports = {
       filename: 'index.html',
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
+      version: pkg.version,
       ...htmlConfig
     }
   }
