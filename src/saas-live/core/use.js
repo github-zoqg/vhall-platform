@@ -17,6 +17,7 @@ import VmpDocDlglist from '@/packages/doc-dlglist';
 import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
+import VmpMediaCheck from '@/packages/media-check';
 
 // 全局注册组件
 export function initUse() {
@@ -36,4 +37,5 @@ export function initUse() {
   Vue.use(VmpStreamList);
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);
+  Vue.use(VmpMediaCheck);
 }
