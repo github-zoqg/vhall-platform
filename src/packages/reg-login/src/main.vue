@@ -116,6 +116,7 @@
             navigator.userAgent
           );
         this.options = {
+          ...this.options,
           ...params
         };
         console.log('打开登录&注册弹框，初始预设值为', this.options);

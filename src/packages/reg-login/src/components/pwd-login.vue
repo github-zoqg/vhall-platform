@@ -453,7 +453,7 @@
               this.resetForm();
               this.$emit('handleClose', 'code');
               // 刷新页面
-              // this.$router.go(0);
+              this.$router.go(0);
             } else {
               localStorage.setItem('userInfo', '');
             }
