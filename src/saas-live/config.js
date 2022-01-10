@@ -114,19 +114,9 @@ export const serverConfig = {
     },
     emitClick: [
       {
-        cuid: 'comAsideMenu',
+        cuid: ['comAsideMenu', 'comDocToolbar', 'comDocUne'],
         method: 'switchTo',
-        args: ['document']
-      },
-      {
-        cuid: 'comDocUne',
-        method: 'switchTo',
-        args: ['document']
-      },
-      {
-        cuid: 'comDocToolbar',
-        method: 'switchTo',
-        args: ['document']
+        args: 'document'
       }
     ]
   },
@@ -140,19 +130,9 @@ export const serverConfig = {
     },
     emitClick: [
       {
-        cuid: 'comAsideMenu',
+        cuid: ['comAsideMenu', 'comDocToolbar', 'comDocUne'],
         method: 'switchTo',
-        args: ['board']
-      },
-      {
-        cuid: 'comDocUne',
-        method: 'switchTo',
-        args: ['board']
-      },
-      {
-        cuid: 'comDocToolbar',
-        method: 'switchTo',
-        args: ['board']
+        args: 'board'
       }
     ]
   },
@@ -198,25 +178,23 @@ export const serverConfig = {
   comDocUne: {
     component: 'VmpDocUne',
     children: ['comDocToolbar'],
-    emitSwitchTo: [
+    emitSwitchTo: {
+      cuid: ['comAsideMenu', 'comDocToolbar'], //同名方法,同样的参数可以合并
+      method: 'switchTo',
+      args: ['$0'] // 获取动态参数的第一个
+    },
+    emitDefault: [
       {
-        cuid: 'comAsideMenu',
+        cuid: ['comAsideMenu', 'comDocToolbar'],
         method: 'switchTo',
-        args: ['$0'] // 获取动态参数的第一个
-      },
-      {
-        cuid: 'comDocToolbar',
-        method: 'switchTo',
-        args: ['$0']
+        args: 'document'
       }
     ],
     // 打开对话框
-    emitOpenDocList: [
-      {
-        cuid: 'dlgDocList',
-        method: 'show'
-      }
-    ]
+    emitOpenDocList: {
+      cuid: 'dlgDocList',
+      method: 'show'
+    }
   },
   // 文档工具栏
   comDocToolbar: {

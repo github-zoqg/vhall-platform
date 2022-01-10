@@ -7,7 +7,7 @@
       </div>
       <div
         :class="
-          this.atList.find(u => u.nickName == this.nickName)
+          this.atList.find(u => u.nickName === this.nickName)
             ? 'vmp-chat-user-control__item disabled'
             : 'vmp-chat-user-control__item'
         "
@@ -106,6 +106,7 @@
     },
     methods: {
       deleteMsg(count) {
+        console.log(count, '要删除的count');
         this.$emit('deleteMsg', count);
       },
       calculate(el) {

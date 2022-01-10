@@ -24,13 +24,16 @@
         </template>
         <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
         <p
-          v-if="configList['ui.hide_chat_history'] === '1' && !chatList.length"
+          v-if="[1, '1'].includes(configList['ui.hide_chat_history']) && !chatList.length"
           class="chat-content__get-list-btn-container"
         >
           <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
         </p>
       </overlay-scrollbars>
-      <div v-if="configList['ui.hide_chat_history'] !== '1'" class="chat-content__tip-box">
+      <div
+        v-if="![1, '1'].includes(configList['ui.hide_chat_history'])"
+        class="chat-content__tip-box"
+      >
         <div
           v-show="
             unReadMessageCount !== 0 &&
@@ -54,6 +57,7 @@
         :webinar-id="webinarId"
         :all-banned="allBanned"
         :chat-list="chatList"
+        :at-list="atList"
         :chat-login-status="chatLoginStatus"
         @updateHeight="chatOperateBarHeightChange"
       ></chat-operate-bar>
@@ -100,9 +104,7 @@
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
-      const roomBaseState = contextServer.get('roomBaseServer').state;
       return {
-        roomBaseState,
         //滚动插件配置
         overlayScrollBarsOptions: {
           resize: 'none',
@@ -113,10 +115,23 @@
             autoHideDelay: 200
           }
         },
-        //todo 待替换
-        configList: {
-          'ui.hide_chat_history': '2'
-        },
+        /** domain中读取的数据 */
+        //配置列表
+        configList: {},
+        //活动id 打开手动过滤地址需要
+        webinarId: '',
+        //直播的类型，直播，回放
+        playerType: '',
+        //房间号
+        roomId: '',
+        //用户角色
+        roleName: '',
+        //用户id
+        userId: '',
+        //聊天消息列表
+        chatList: chatList,
+        /** domain中读取的数据结束 */
+        /** 消息提示 */
         //未读消息数量
         unReadMessageCount: 0,
         //是否有常规未读消息
@@ -125,13 +140,12 @@
         isHasUnreadAtMeMsg: false,
         //是否有未读的回复消息
         isHasUnreadReplyMsg: false,
+        /** 消息提示结束 */
         //是否正在执行动画
         animationRunning: false,
         //是否是助理
         assistantType: this.$route.query.assistantType,
-        //聊天消息列表
-        chatList: chatList,
-        // @用户
+        //todo 可以放入domain @用户
         atList: [],
         // 预览图片列表
         previewImgList: [],
@@ -139,8 +153,6 @@
         showTip: false,
         // 提示文字
         tipMsg: '',
-        // 输入框的值
-        inputValue: '',
         // 输入框状态
         inputStatus: {
           placeholder: '参与聊天',
@@ -152,26 +164,10 @@
         welcomeInfo: {
           required: false
         },
-        //参会角色身份
-        join_name: {
-          type: String
-        },
-        //活动id 打开手动过滤地址需要
-        webinarId: '',
         // 是否全体禁言
         allBanned: false,
         // 是否被禁言
         isBanned: false,
-        //频道id
-        channelId: '',
-        //todo 测试用，后续删掉 房间号
-        roomId: 'lss_8434acc2',
-        //用户角色
-        roleName: '',
-        //用户id
-        userId: '',
-        // 聊天过滤的跳转url
-        chatFilterUrl: '',
         //插件
         plugin: {
           image: false,
@@ -209,6 +205,7 @@
       chatList: {
         deep: true,
         handler() {
+          console.log(this.chatList, '当前的聊天列表');
           // 如果滚动条未滚动至最底部
           if (this.osInstance.scroll().ratio.y !== 1) {
             this.unReadMessageCount++;
@@ -242,29 +239,20 @@
                 : this.isBanned || this.allBanned
           };
         }
-      },
-      replyMsg() {
-        if (Object.keys(this.replyMsg || {}).length === 0) {
-          this.inputValue = this.trimPlaceHolder('reply');
-        } else {
-          this.inputValue = this.inputValue
-            ? `回复${this.replyMsg.nickName}: ${this.trimPlaceHolder('reply')}`
-            : `回复${this.replyMsg.nickName}: `;
-        }
-      },
-      inputValue(newValue) {
-        if (!newValue) {
-          this.replyMsg = {};
-        }
       }
     },
-    beforeCreate() {},
+    beforeCreate() {
+      this.roomBaseServer = contextServer.get('roomBaseServer');
+      console.log(this.roomBaseServer.state, 'roomBaseState');
+    },
     created() {
       this.initInputStatus();
     },
     mounted() {
       //初始化配置
       this.initConfig();
+      //初始化视图数据，domain里取
+      this.initViewData();
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
@@ -281,6 +269,17 @@
         if (widget && widget.options) {
           this.chatOptions = widget.options;
         }
+      },
+      //初始化视图数据
+      initViewData() {
+        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        this.configList = configList;
+        this.webinarId = webinar.id;
+        this.playerType = webinar.type;
+        this.roomId = interact.room_id;
+        this.roleName = join_info.role_name;
+        this.userId = join_info.user_id;
       },
       init() {
         this.$nextTick(() => {
@@ -364,7 +363,7 @@
 
         getHistoryMsg(params, '发起端').then(result => {
           this.pageConfig.page = Number(this.pageConfig.page) + 1;
-          console.log(result);
+          return result;
         });
       },
       //todo domain负责 抽奖情况检查
@@ -428,7 +427,7 @@
       performScroll() {
         this.$nextTick(() => {
           this.animationRunning = true;
-          const delayTime = this.configList['ui.hide_chat_history'] === '1' ? 0 : 250;
+          const delayTime = [1, '1'].includes(this.configList['ui.hide_chat_history']) ? 0 : 250;
           this.osInstance.scrollStop().scroll({ y: '100%' }, delayTime, 'linear', () => {
             this.animationRunning = false;
           });
@@ -446,11 +445,11 @@
       //滚动到目标处
       scrollToTarget() {
         this.animationRunning = true;
-        const delayTime = this.configList['ui.hide_chat_history'] === '1' ? 0 : 250;
+        const delayTime = [1, '1'].includes(this.configList['ui.hide_chat_history']) ? 0 : 250;
         this.osInstance.scrollStop().scroll(
           {
             el: this.osInstance.getElements().content.children[
-              this.chatList.length - this.badgeNumber
+              this.chatList.length - this.unReadMessageCount
             ],
             block: { y: 'end' }
           },
@@ -458,7 +457,7 @@
           'linear',
           () => {
             this.animationRunning = false;
-            this.badgeNumber = 0;
+            this.unReadMessageCount = 0;
             this.isHasUnreadNormalMsg = false;
             this.isHasUnreadAtMeMsg = false;
             this.isHasUnreadReplyMsg = false;
@@ -488,158 +487,7 @@
           console.log('自定义菜单...', this.welcome_vo);
         }
       },
-      //todo domain负责组装 发送消息
-      sendMsg(callback) {
-        window.clearTimeout(this.sendTimeOut);
-
-        const { checkHasKeyword, sendMsg } = this.chatServer;
-        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
-          ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
-          : '';
-        //子组件里上传的图片
-        const imgUrls = this.getUploadImg();
-
-        this.sendTimeOut = setTimeout(() => {
-          const inputValue = this.trimPlaceHolder('reply');
-          if (this.inputStatus.disable) {
-            return;
-          }
-          if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
-            return this.$message.warning('内容不能为空');
-          }
-          const data = {};
-          if (inputValue) {
-            data.type = 'text';
-            data.barrageTxt = inputValue
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n/g, '<br/>');
-            data.text_content = inputValue;
-          }
-          //如果有聊天图片
-          if (imgUrls.length) {
-            data.image_urls = imgUrls;
-            data.type = 'image';
-          }
-          const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-          console.warn('获取当前的本地用户信息', userInfo);
-          let name = '';
-          if (userInfo) {
-            if (userInfo.nickname) {
-              name = userInfo.nickname;
-            } else {
-              name = userInfo.nick_name;
-            }
-          } else {
-            name = joinDefaultName;
-          }
-          if (this.roleName === 2 && this.join_name) {
-            name = this.join_name;
-          }
-          const context = {
-            nickname: name, // 昵称
-            avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
-            role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
-            replyMsg: this.replyMsg, // 回复消息
-            atList: this.atList // @用户列表
-          };
-          let filterStatus = true;
-          if (sessionStorage.getItem('watch')) {
-            filterStatus = checkHasKeyword(inputValue);
-          }
-
-          if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-            if (this.atList.length && data.text_content) {
-              this.atList.forEach(a => {
-                data.text_content = data.text_content.replace(`@${a.nickName}`, `***${a.nickName}`);
-              });
-            }
-
-            sendMsg({ data, context });
-          }
-          //清空一下子组件里上传的图片
-          this.clearUploadImg();
-          this.inputValue = '';
-          this.replyMsg = {};
-          this.$refs.emoji.isShow = false;
-
-          this.atList = [];
-          callback && callback();
-        }, 300);
-      },
-      // 发送聊天节流
-      sendMsgThrottle() {
-        if (this.roleName !== 2) {
-          this.sendMsg();
-          return;
-        }
-        if (this.chatGap > 0) {
-          this.lock = sessionStorage.getItem('chatLock');
-          if (this.lock && this.lock == 'true') {
-            this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
-          }
-        } else {
-          this.sendMsg(() => {
-            window.clearInterval(this.chatGapInterval);
-            this.lock = sessionStorage.getItem('chatLock');
-            this.chatGap = this.delayTime(this.onlineUsers);
-            this.chatGapInterval = window.setInterval(() => {
-              if (this.chatGap > 0) {
-                if (!this.lock || this.lock == 'false') {
-                  sessionStorage.setItem('chatLock', true);
-                } else {
-                  this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
-                }
-                this.chatGap = this.chatGap - 1;
-              } else {
-                window.clearInterval(this.chatGapInterval);
-                sessionStorage.setItem('chatLock', false);
-              }
-            }, 1000);
-          });
-        }
-      },
-      backspace() {
-        if (!this.inputValue) {
-          this.atList = [];
-          return;
-        }
-        const currentIndex = this.$refs.chatInput.selectionStart;
-        const firstPart = this.inputValue.substring(0, currentIndex);
-        const lastIndex = firstPart.lastIndexOf('@');
-        if (lastIndex != -1) {
-          const userName = this.inputValue.substring(lastIndex, currentIndex);
-          const nickName = userName.replace('@', '');
-          // 删除整个@过的用户名逻辑
-          if (this.atList.find(u => u.nickName == nickName)) {
-            this.atList = this.atList.filter(n => n.nickName != nickName);
-            this.inputValue = this.inputValue.replace(userName, '');
-          } else {
-            this.atList = this.atList.filter(a => {
-              const atIndex = this.inputValue.indexOf(`@${a.nickName} `);
-              return atIndex != -1;
-            });
-          }
-        }
-        // 删除要回复的用户名逻辑
-        const lastReplyIndex = firstPart.lastIndexOf('回复');
-        if (lastReplyIndex != -1) {
-          const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          console.log(`回复${this.replyMsg.nickName}:` == replyUserName);
-          if (`回复${this.replyMsg.nickName}:` == replyUserName) {
-            this.inputValue = this.inputValue.replace(replyUserName, '');
-            this.replyMsg = {};
-          } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) == -1 &&
-              (this.replyMsg = {});
-          }
-        }
-      },
-      //处理聊天内容
-      trimPlaceHolder() {
-        return this.inputValue.replace(/^[回复].+[:]\s/, '');
-      },
-      //回复消息
+      //回复消息处理
       reply(count) {
         this.buriedPointReport(110119, {
           business_uid: this.userId,
@@ -674,6 +522,7 @@
         }, 3000); // 优化 17532
       },
       //todo domain负责 @用户
+      //@用户处理
       atUser(accountId) {
         //数据上报
         this.buriedPointReport(110120, {
@@ -718,7 +567,7 @@
         this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
         this.replyElement = e.el;
       },
-      //todo 聊天区域高度变化
+      //底部输入框输入较多内容，聊天区域也调整高度
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
         this.$refs.chatOperator.updateOverlayScrollbar();
@@ -759,7 +608,7 @@
     }
     .chat-content {
       position: relative;
-      ::v-deep .vmp-chat-msg-item {
+      .vmp-chat-msg-item {
         &:last-child {
           padding-bottom: 20px;
         }

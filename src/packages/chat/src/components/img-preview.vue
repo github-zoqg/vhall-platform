@@ -84,7 +84,6 @@
       },
       //todo 有时间解决下图片闪一下的问题 跳转到指定的图片
       jumpToTargetImg(index) {
-        console.log(index);
         this.swiper.slideTo(index, 0);
       },
       closePreview() {
