@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { useRoomInitGroupServer } from 'vhall-sass-domain';
+  import { useRoomInitGroupServer } from 'middleDomain';
   import roomState from '../headless/room-state.js';
   export default {
     name: 'Home',

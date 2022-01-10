@@ -85,7 +85,7 @@
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, contextServer } from 'vhall-sass-domain';
+  import { useChatServer, useRoomBaseServer } from 'middleDomain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
 
   export default {
@@ -100,7 +100,7 @@
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
-      const roomBaseState = contextServer.get('roomBaseServer').state;
+      const roomBaseState = useRoomBaseServer().state;
       return {
         roomBaseState,
         //滚动插件配置
@@ -354,15 +354,13 @@
       },
       // 获取历史消息
       getHistoryMsg() {
-        const { getHistoryMsg } = this.chatServer;
-
         const params = {
           room_id: this.roomId,
           pos: Number(this.pageConfig.page) * 50,
           limit: 50
         };
 
-        getHistoryMsg(params, '发起端').then(result => {
+        this.chatServer.getHistoryMsg(params, '发起端').then(result => {
           this.pageConfig.page = Number(this.pageConfig.page) + 1;
           console.log(result);
         });
@@ -492,7 +490,7 @@
       sendMsg(callback) {
         window.clearTimeout(this.sendTimeOut);
 
-        const { checkHasKeyword, sendMsg } = this.chatServer;
+        const { checkHasKeyword } = this.chatServer;
         const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
           ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
           : '';
@@ -555,7 +553,7 @@
               });
             }
 
-            sendMsg({ data, context });
+            this.chatServer.sendMsg({ data, context });
           }
           //清空一下子组件里上传的图片
           this.clearUploadImg();

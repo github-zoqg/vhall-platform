@@ -15,7 +15,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { useRoomInitGroupServer } from 'vhall-sass-domain';
+  import { Domain } from 'middleDomain';
   export default {
     name: 'Home',
     components: {
@@ -26,9 +26,6 @@
         state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败
         errMsg: ''
       };
-    },
-    beforeCreate() {
-      this.roomInitGroupServer = useRoomInitGroupServer();
     },
     async created() {
       try {
@@ -47,18 +44,27 @@
     },
     methods: {
       // 初始化直播房间
-      async initSendLive() {
+      initSendLive() {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
-        await this.roomInitGroupServer.initSendLive({
-          webinarId: id,
+        return new Domain({
+          plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: localStorage.getItem('token')
+            token: token || localStorage.getItem('token')
+          },
+          initRoom: {
+            webinarId: id, //活动id
+            clientType: 'send' //客户端类型
           }
         });
+        // 初始化房间
+        // await domainInstance.initRoom({
+        //   webinarId: id, //活动id
+        //   clientType: 'send' //客户端类型
+        // });
       }
     }
   };

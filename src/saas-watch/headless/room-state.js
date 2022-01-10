@@ -4,7 +4,7 @@ import {
   useRoomBaseServer,
   useDocServer,
   useInteractiveServer
-} from 'vhall-sass-domain';
+} from 'middleDomain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
