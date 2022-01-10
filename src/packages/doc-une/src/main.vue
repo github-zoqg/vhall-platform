@@ -402,6 +402,13 @@
         this.fileOrboardList = list;
         // 执行nextTick让div的id绑定完成
         await this.$nextTick();
+        if (list.length === 0) {
+          window.$middleEventSdk?.event?.send({
+            cuid: this.cuid,
+            method: 'emitDefault'
+          });
+          return;
+        }
         list.forEach(item => {
           this.createDocumentOrBorad(item);
         });
@@ -412,7 +419,7 @@
        * @param type:文档：document， 白板：board
        */
       async switchTo(type = 'document') {
-        console.log('切换到。。。:', type);
+        console.log('doc-une 切换到。。。:', type);
 
         // 缩略图栏隐藏
         this.thumbnailShow = false;
@@ -432,9 +439,13 @@
             noDispatch: false
           });
           this.cid = item.cid;
+          return;
         }
 
-        if (!item && is_board === 2) {
+        // 如果不存在
+        if (is_board === 1) {
+          this.cid = '';
+        } else if (is_board === 2) {
           this.addNewFile({}, 2);
         }
       },
