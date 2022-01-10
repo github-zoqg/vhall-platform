@@ -15,7 +15,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { Domain, useMsgServer } from 'middleDomain';
+  import { Domain } from 'middleDomain';
   export default {
     name: 'Home',
     components: {
@@ -32,7 +32,7 @@
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         await this.initSendLive();
-        // await roomState();
+        await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
       } catch (ex) {
@@ -44,13 +44,13 @@
     },
     methods: {
       // 初始化直播房间
-      async initSendLive() {
+      initSendLive() {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
-        new Domain({
+        return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
             token: token || localStorage.getItem('token')

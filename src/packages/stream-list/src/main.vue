@@ -5,7 +5,7 @@
       :class="{ 'vmp-stream-list__main-screen': accountId !== mainScreen }"
     >
       <div class="vmp-stream-list__remote-container-h">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+        <!-- <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container> -->
       </div>
     </div>
     <template v-if="streamList.length">
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import { contextServer } from 'middleDomain';
+  import { useInteractiveServer } from 'middleDomain';
   export default {
     name: 'VmpStreamList',
 
@@ -38,7 +38,7 @@
     },
 
     beforeCreate() {
-      this.interactiveServer = contextServer.get('interactiveServer');
+      this.interactiveServer = useInteractiveServer();
     },
 
     created() {
@@ -49,7 +49,7 @@
 
     methods: {
       getStreamList() {
-        this.streamList = this.interactiveServer.state.interactiveInstance.currentStreams;
+        // this.streamList = this.interactiveServer.state.interactiveInstance.currentStreams;
         console.log('------streamlist------', this.streamList);
       },
       exchange(compName) {

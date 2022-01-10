@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-  import { RoomBaseServer } from 'middleDomain';
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpHeaderLeft',
     data() {
@@ -34,7 +34,7 @@
       };
     },
     created() {
-      const { watchInitData } = new RoomBaseServer().state;
+      const { watchInitData } = useRoomBaseServer().state;
       this.subject = watchInitData?.webinar?.subject || '';
       this.id = watchInitData?.webinar?.id || '';
     },

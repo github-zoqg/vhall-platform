@@ -9,7 +9,8 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'dlgDocList']
+    // children: ['layerHeader', 'layerBody', 'dlgDocList']
+    children: ['layerHeader', 'layerBody']
   },
   // 顶部header容器
   layerHeader: {
@@ -23,7 +24,8 @@ export const serverConfig = {
     options: {
       className: 'vmp-basic-bd'
     },
-    children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
+    // children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
+    children: ['layerBodyLeft', 'layerBodyRight']
   },
   layerBodyLeft: {
     component: 'VmpContainer',
@@ -34,6 +36,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
     children: ['comStreamList', 'comDocUne']
+    // children: ['comStreamList']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,8 +45,8 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd',
-    children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd'
+    // children: ['comStreamLocal']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',

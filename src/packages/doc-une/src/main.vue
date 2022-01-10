@@ -55,7 +55,7 @@
 </template>
 <script>
   import screenfull from 'screenfull';
-  import { contextServer } from 'middleDomain';
+  import { useDocServer } from 'middleDomain';
   export default {
     name: 'VmpDocUne',
     provide() {
@@ -79,7 +79,7 @@
       }
     },
     beforeCreate() {
-      this.docServer = contextServer.get('docServer');
+      this.docServer = useDocServer();
     },
     created() {
       this.initEvents();

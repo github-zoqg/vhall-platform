@@ -137,7 +137,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'middleDomain';
+  import { useRoomBaseServer, useDocServer } from 'middleDomain';
   export default {
     name: 'VmpDocDlglist',
     data() {
@@ -159,8 +159,8 @@
       };
     },
     beforeCreate() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
-      this.docServer = contextServer.get('docServer');
+      this.roomBaseServer = useRoomBaseServer();
+      this.docServer = useDocServer();
     },
     mounted() {
       this.handleDoccurSearch();

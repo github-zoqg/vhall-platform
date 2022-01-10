@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-  import { MsgServer, RoomBaseServer } from 'middleDomain';
+  import { useMsgServer, useRoomBaseServer } from 'middleDomain';
   import onlineMixin from './js/mixins';
   export default {
     name: 'VmpFooterTools',
@@ -31,8 +31,8 @@
       };
     },
     beforeCreate() {
-      this.msgServer = new MsgServer();
-      this.roomBaseServer = new RoomBaseServer();
+      this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;

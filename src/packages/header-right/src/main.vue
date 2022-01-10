@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { RoomBaseServer } from 'middleDomain';
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpHeaderRight',
     data() {
@@ -31,7 +31,7 @@
       };
     },
     created() {
-      this.roomBaseServer = new RoomBaseServer();
+      this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
     },
     mounted() {
