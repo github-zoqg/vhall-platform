@@ -158,7 +158,23 @@ export const serverConfig = {
   },
   // 顶部
   comHeaderWatch: {
-    component: 'VmpHeaderWatch'
+    component: 'VmpHeaderWatch',
+    children: ['compLanguageChoice', 'comOfficial', 'comAttention', 'comShare', 'comWatchLogin']
+  },
+  comOfficial: {
+    component: 'VmpOfficial'
+  },
+  comAttention: {
+    component: 'VmpAttention'
+  },
+  comShare: {
+    component: 'VmpShare',
+    options: {
+      isInviteShare: false //分享是否展示邀请卡
+    }
+  },
+  comWatchLogin: {
+    component: 'VmpWatchLogin'
   },
   // 底部
   comFooter: {

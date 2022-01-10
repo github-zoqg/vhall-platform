@@ -184,10 +184,14 @@ export const serverConfig = {
   comChat: {
     component: 'VmpChat',
     options: {
+      //平台类型(可选值为live,watch,h5)
+      platformType: 'live',
       //是否有图片上传按钮
       hasImgUpload: true,
-      //是否有聊天操作按钮
-      hasChatOperateBtn: false
+      //是否有聊天过滤按钮（屏蔽特效,只看主办方）
+      hasChatFilterBtn: false,
+      //是否有发言限频率倒计时(观看端可能会有)
+      hasChatLimitFrequency: false
     }
   },
   // 文档白板组件

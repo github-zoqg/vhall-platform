@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { useChatServer } from 'vhall-sass-domain';
+  import { useChatServer, contextServer } from 'vhall-sass-domain';
 
   export default {
     mixins: [dataReportMixin],
@@ -70,6 +70,7 @@
     },
     beforeCreate() {
       this.chatServer = useChatServer();
+      this.roomBaseServer = contextServer.get('roomBaseServer');
     },
     created() {
       this.assistantType = this.$route.query.assistantType;
@@ -127,37 +128,13 @@
        * todo domain提供的服务 得到用户状态是否被禁言/踢出
        */
       getUserStatus() {
-        return Promise.resolve({
-          all_banned: 0,
-          auto_speak: 0,
-          definition: '',
-          doc_permission: '16422770',
-          group_id: 0,
-          hd_definition: 360,
-          is_adi_watch_doc: 0,
-          is_banned: 0,
-          is_board: 0,
-          is_desktop: 0,
-          is_doc: 0,
-          is_handsup: 0,
-          is_host_in_group: 0,
-          is_kicked: 0,
-          is_open_switch: 0,
-          join_role: 0,
-          layout: '',
-          main_screen: '16422770',
-          presentation_screen: '',
-          push_definition: 360,
-          question_status: 0,
-          screen_definition: '',
-          speaker_list: [],
-          start_type: 1
-        });
-        // return this.$fetch('getToolStatus', {
-        //   room_id: this.roomId
-        // }).then(res => {
-        //   return res.data;
-        // });
+        return this.roomBaseServer
+          .getRoomToolStatus({
+            room_id: this.roomId
+          })
+          .then(res => {
+            return res.data;
+          });
       },
       /**
        * 禁言/取消禁言

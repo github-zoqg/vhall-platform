@@ -8,14 +8,15 @@
   padding: 24px 32px 20px 32px; /*跟此间距不同时，在各自业务里重置*/
 }
 .el-dialog__body {
-  padding: 0 32px;
+  padding: 0 32px 24px 32px;
   min-height: 124px;
 }
 .el-dialog__headerbtn {
-  top: 32px;
+  top: 30px;
   right: 32px;
   height: 16px;
   .el-dialog__close {
+    font-size: 18px;
     color: @font-light-second;
   }
 }
@@ -634,31 +635,22 @@
   padding: 0 0;
 }
 .el-dropdown-menu {
-  background-color: @bg-dark-section !important;
-  color: @font-light-low !important;
+  background-color: #383838;
   border: none !important;
   top: 48px;
   padding: 5px 0 !important;
   .el-dropdown-menu__item {
     height: 28px;
     line-height: 28px;
+    color: #ccc;
   }
   .el-dropdown-menu__item:hover {
-    background-color: @border-bormal;
+    background-color: #444;
     color: @font-dark-normal !important;
   }
 }
-.el-popper[x-placement^='bottom'] .popper__arrow {
-  border-bottom-color: transparent;
-}
-.el-popper[x-placement^='bottom'] .popper__arrow::after {
-  border-bottom-color: @popper-normal;
-}
-.el-popper[x-placement^='top'] .popper__arrow {
-  border-top-color: transparent;
-}
-.el-popper[x-placement^='top'] .popper__arrow::after {
-  border-top-color: @popper-normal;
+.el-popper .popper__arrow {
+  display: none;
 }
 // 重置slider
 .el-slider.is-vertical .el-slider__runway {

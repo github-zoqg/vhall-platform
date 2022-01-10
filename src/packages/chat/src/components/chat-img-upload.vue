@@ -151,8 +151,8 @@
       padding: 8px;
       background: #3f3f3f;
       position: absolute;
-      top: -50px;
-      left: 7%;
+      top: -60px;
+      left: 5%;
       box-sizing: border-box;
       .vmp-chat-img-preview {
         float: left;
