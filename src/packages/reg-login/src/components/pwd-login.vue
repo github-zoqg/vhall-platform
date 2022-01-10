@@ -248,7 +248,7 @@
         if (!this.captchaKey) {
           /* TODO 真实逻辑
           // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
-          this.$fetch('getCapthaId', {})
+          return this.$fetch('getCapthaId', {})
             .then(res => {
               if (res && res.data && res.data.captchaid) {
                 this.captchaKey = res.data.captchaid || '';
@@ -281,55 +281,60 @@
           this.nextLogin();
         } else {
           // 如果没有选择过图形码，走账号检测判断
-          /* // TODO 真实逻辑 */
-          // const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-          this.$fetch('loginCheck', {
-            account: this.ruleForm.username,
-            channel: 'C' // B端用户还是C端用户
-          })
-            .then(async res => {
-              if (res.code == 200 && res.data && res.data.check_result == 1) {
-                this.captchaIsShow = true;
-                // 账号被锁定 再次登录需要图片验证)
-                await this.getCapthaId();
-                // 默认图片验证码加载
-                this.reloadCaptha();
-              } else if (res.code == 200) {
-                this.captchaIsShow = false;
-                // 非异常情况下，触发登录逻辑
-                this.nextLogin();
-              } else {
-                console.log('获取账号检测接口结果错误', res);
-                this.$message({
-                  message: res.msg || this.$t('login.login_1021'),
-                  showClose: true,
-                  // duration: 0,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
+          this.$refs.ruleForm.validate(async valid => {
+            // 表单验证通过，方才检验，减少多余的请求发送
+            if (valid) {
+              /* // TODO 真实逻辑 */
+              // const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+              this.$fetch('loginCheck', {
+                account: this.ruleForm.username,
+                channel: 'C' // B端用户还是C端用户
+              })
+                .then(async res => {
+                  if (res.code == 200 && res.data && res.data.check_result == 1) {
+                    this.captchaIsShow = true;
+                    // 账号被锁定 再次登录需要图片验证)
+                    await this.getCapthaId();
+                    // 默认图片验证码加载
+                    this.reloadCaptha();
+                  } else if (res.code == 200) {
+                    this.captchaIsShow = false;
+                    // 非异常情况下，触发登录逻辑
+                    this.nextLogin();
+                  } else {
+                    console.log('获取账号检测接口结果错误', res);
+                    this.$message({
+                      message: res.msg || this.$t('login.login_1021'),
+                      showClose: true,
+                      // duration: 0,
+                      type: 'error',
+                      customClass: 'zdy-info-box'
+                    });
+                  }
+                })
+                .catch(res => {
+                  console.log('获取账号检测接口结果错误', res);
+                  this.$message({
+                    message: res.msg || this.$t('login.login_1021'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'error',
+                    customClass: 'zdy-info-box'
+                  });
                 });
-              }
-            })
-            .catch(res => {
-              console.log('获取账号检测接口结果错误', res);
-              this.$message({
-                message: res.msg || this.$t('login.login_1021'),
-                showClose: true,
-                // duration: 0,
-                type: 'error',
-                customClass: 'zdy-info-box'
-              });
-            });
-          /*  // TODO 模拟逻辑
-          this.captchaIsShow = false;
-          // 非异常情况下，触发登录逻辑
-          this.nextLogin(); */
+              /*  // TODO 模拟逻辑
+              this.captchaIsShow = false;
+              // 非异常情况下，触发登录逻辑
+              this.nextLogin(); */
+            }
+          });
         }
       },
       // 获取密钥，便于密码计算
       getLoginKey() {
         /*  // TODO 真实逻辑  */
         // const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getLoginKey', {})
+        return this.$fetch('getLoginKey', {})
           .then(async res => {
             if (res.code == 200 && res.data) {
               this.loginKeyVo = res.data;
@@ -342,6 +347,9 @@
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
+              if (this.captchaIsShow && !this.captchaVal) {
+                this.reloadCaptha();
+              }
             }
           })
           .catch(res => {
@@ -353,6 +361,9 @@
               type: 'error',
               customClass: 'zdy-info-box'
             });
+            if (this.captchaIsShow && !this.captchaVal) {
+              this.reloadCaptha();
+            }
           });
         // TODO 模拟数据
         /* this.loginKeyVo = {

@@ -285,7 +285,7 @@
       getCapthaId() {
         /* TODO 真实逻辑 */
         // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getCapthaId', {})
+        return this.$fetch('getCapthaId', {})
           .then(res => {
             if (res && res.data && res.data.captchaid) {
               this.captchaKey = res.data.captchaid || '';
@@ -414,7 +414,7 @@
       getLoginKey() {
         /*  // TODO 真实逻辑  */
         // const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getLoginKey', {})
+        return this.$fetch('getLoginKey', {})
           .then(async res => {
             if (res.code == 200 && res.data) {
               this.loginKeyVo = res.data;

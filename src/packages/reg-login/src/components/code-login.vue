@@ -274,7 +274,7 @@
       getCapthaId() {
         /* TODO 真实逻辑
         // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getCapthaId', {})
+        return this.$fetch('getCapthaId', {})
           .then(res => {
             if (res && res.data && res.data.captchaid) {
               this.captchaKey = res.data.captchaid || '';
