@@ -111,7 +111,7 @@
   import VmpHighlighterPopup from './highlighter-popup.vue';
   import VmpShapePopup from './shape-popup.vue';
   import VmpTextPopup from './text-popup.vue';
-  import { contextServer } from 'middleDomain';
+  import { useDocServer } from 'middleDomain';
   export default {
     name: 'VmpDocToolbar',
     components: {
@@ -163,7 +163,7 @@
       };
     },
     beforeCreate() {
-      this.docServer = contextServer.get('docServer');
+      this.docServer = useDocServer();
     },
     mounted() {
       this.initConfig();

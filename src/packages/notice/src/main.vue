@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-  import { contextServer, useNoticeServer } from 'vhall-sass-domain';
+  import { useMsgServer, useNoticeServer, useBoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -52,9 +52,9 @@
       };
     },
     beforeCreate() {
-      this.msgServer = contextServer.get('msgServer');
+      this.msgServer = useMsgServer();
       this.noticeServer = useNoticeServer();
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useBoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;

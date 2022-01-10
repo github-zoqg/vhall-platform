@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpHeaderWatch',
     data() {
@@ -57,7 +57,7 @@
       }
     },
     beforeCreate() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;

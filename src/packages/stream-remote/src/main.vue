@@ -58,7 +58,7 @@
 </template>
 
 <script>
-  import { contextServer } from 'middleDomain';
+  import { useInteractiveServer } from 'middleDomain';
   export default {
     name: 'VmpStreamRemote',
     data() {
@@ -70,7 +70,7 @@
       }
     },
     beforeCreate() {
-      this.interactiveServer = contextServer.get('interactiveServer');
+      this.interactiveServer = useInteractiveServer();
     },
     mounted() {
       this.subscribeRemoteStream();

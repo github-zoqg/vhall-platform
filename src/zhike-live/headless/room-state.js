@@ -1,12 +1,9 @@
-import { contextServer, useDocServer } from 'vhall-sass-domain';
+import { useMsgServer, useDocServer, useInteractiveServer } from 'middleDomain';
 export default async function () {
-  const msgServer = contextServer.get('msgServer');
+  const msgServer = useMsgServer();
   const docServer = useDocServer();
-  const interactiveServer = contextServer.get('interactiveServer');
-  const roomBaseServer = contextServer.get('roomBaseServer');
-
-  contextServer.set('docServer', docServer);
-
+  const interactiveServer = useInteractiveServer();
+  const roomBaseServer = useMsgServer();
   await msgServer.init();
   await interactiveServer.init();
   await docServer.init({

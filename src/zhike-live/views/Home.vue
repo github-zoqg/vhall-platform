@@ -15,7 +15,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
+  import { useRoomInitGroupServer, useMsgServer } from 'middleDomain';
   export default {
     name: 'Home',
     components: {
@@ -29,7 +29,7 @@
     },
     beforeCreate() {
       this.roomInitGroupServer = useRoomInitGroupServer();
-      this.msgServer = contextServer.get('msgServer');
+      this.msgServer = useMsgServer();
     },
     async created() {
       // 初始化直播房间
