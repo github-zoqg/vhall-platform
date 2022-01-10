@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerFooter']
+    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -50,6 +50,12 @@ export const serverConfig = {
     children: ['comChat']
   },
   /*** 布局定义end */
+
+  /*** 所有弹窗集合 */
+  comAllDialog: {
+    component: 'VmpAirContainer',
+    children: ['compRegLogin']
+  },
 
   /**** 组件定义 */
   // 顶部左侧容器
@@ -174,7 +180,13 @@ export const serverConfig = {
     }
   },
   comWatchLogin: {
-    component: 'VmpWatchLogin'
+    component: 'VmpWatchLogin',
+    emitClickLogin: [
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 底部
   comFooter: {
@@ -204,7 +216,6 @@ export const serverConfig = {
   },
   // 登录注册组件
   compRegLogin: {
-    component: 'VmpRegLogin',
-    children: ['dlgDocList']
+    component: 'VmpRegLogin'
   }
 };

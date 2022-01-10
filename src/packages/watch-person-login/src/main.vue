@@ -18,7 +18,10 @@
     },
     methods: {
       goLogin() {
-        console.log('登陆弹窗');
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitClickLogin'
+        });
       }
     }
   };
