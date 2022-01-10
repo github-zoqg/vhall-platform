@@ -117,43 +117,25 @@
           .createLocalVideoStream({
             videoNode: `stream-${this.roomBaseState.watchInitData.join_info.third_party_user_id}`
           })
-          .then(streamId => {
-            this.localStreamId = streamId;
+          .then(data => {
+            this.localStreamId = data.streamId;
             this.isStreamCreated = true;
           });
       },
       // 推流
       async publishLocalStream() {
-        await this.interactiveServer
-          .publishStream({
-            streamId: this.localStreamId,
-            accountId: this.roomBaseState.watchInitData.join_info.third_party_user_id
-          })
-          .then(() => {
-            this.isStreamPublished = true;
-          });
+        await this.interactiveServer.publishStream().then(() => {
+          this.isStreamPublished = true;
+        });
       },
       // 开启旁路
       async startBroadCast() {
         const options1 = {
-          roomId: this.roomBaseState.watchInitData.interact.room_id, // 直播房间ID，必填：实例化sdk的时候传就可以
           adaptiveLayoutMode:
-            VhallRTC[sessionStorage.getItem('layout')] ||
-            VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE,
-          profile: VhallRTC.BROADCAST_VIDEO_PROFILE_1080P_1,
-          border: {
-            // 旁路边框属性
-            width: 2,
-            color: '0x1a1a1a'
-          }
+            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
         };
 
-        const options2 = {
-          precastPic: false,
-          backgroundColor: '0x1a1a1a'
-        };
-
-        await this.interactiveServer.startBroadCast(options1, options2).catch(async () => {
+        await this.interactiveServer.startBroadCast(options1).catch(async () => {
           // 等待 1000ms 重试
           await this.sleep(1000);
           await this.startBroadCast();
@@ -165,11 +147,17 @@
           return;
         }
         this._setBroadCastScreenCount++;
-        await this.interactiveServer.setBroadCastScreen(this.localStreamId).catch(async () => {
-          // 等待 50ms 重试
-          await this.sleep(50);
-          await this.setBroadCastScreen();
-        });
+        await this.interactiveServer
+          .setBroadCastScreen(this.localStreamId)
+          .then(res => {
+            console.log('设置主屏成功', res);
+          })
+          .catch(async error => {
+            console.log('设置主屏失败', error);
+            // 等待 50ms 重试
+            await this.sleep(50);
+            await this.setBroadCastScreen();
+          });
       },
       // 结束推流
       stopPush() {
