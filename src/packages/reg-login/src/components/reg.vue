@@ -520,6 +520,10 @@
                     type: 'error',
                     customClass: 'zdy-info-box'
                   });
+                  // 重新渲染验证码
+                  if (!this.captchaVal) {
+                    this.reloadCaptha();
+                  }
                 }
               })
               .catch(res => {
@@ -531,6 +535,10 @@
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
+                // 重新渲染验证码
+                if (!this.captchaVal) {
+                  this.reloadCaptha();
+                }
               });
             /* this.$message({
               message: '注册成功',
