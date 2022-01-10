@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpHeaderLeft',
     data() {
@@ -34,7 +34,7 @@
       };
     },
     created() {
-      const { watchInitData } = contextServer.get('roomBaseServer').state;
+      const { watchInitData } = useRoomBaseServer().state;
       this.subject = watchInitData?.webinar?.subject || '';
       this.id = watchInitData?.webinar?.id || '';
     },
@@ -84,11 +84,11 @@
         //   }
         // });
         const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        clipboard.on('success', e => {
+        clipboard.on('success', () => {
           this.$message.success(this.$t('usual.copySucceeded'));
           clipboard.destroy();
         });
-        clipboard.on('error', e => {
+        clipboard.on('error', () => {
           this.$message.error(this.$t('usual.copyFailed'));
           clipboard.destroy();
         });

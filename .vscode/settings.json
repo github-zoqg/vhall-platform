@@ -82,5 +82,8 @@
     "@": "${workspaceRoot}/src"
   },
   "js/ts.implicitProjectConfig.checkJs": true,
-  "i18n-ally.localesPaths": ["src/packages/locales"]
+  "i18n-ally.localesPaths": [
+    "src/packages/locales"
+  ],
+  "vue-i18n.i18nPaths": ""
 }

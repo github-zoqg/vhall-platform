@@ -69,7 +69,7 @@
 </template>
 <script>
   import screenfull from 'screenfull';
-  import { contextServer } from 'vhall-sass-domain';
+  import { useDocServer } from 'middleDomain';
   export default {
     name: 'VmpDocUne',
     provide() {
@@ -108,7 +108,7 @@
       }
     },
     beforeCreate() {
-      this.docServer = contextServer.get('docServer');
+      this.docServer = useDocServer();
     },
     created() {
       this.initEvents();
@@ -253,7 +253,7 @@
         });
 
         this.docServer.on(VHDocSDK.Event.DOCUMENT_NOT_EXIT, ({ cid, docId }) => {
-          console.log('====================文档不存在或已删除=================', cid);
+          console.log('====================文档不存在或已删除=================', cid, docId);
           // if (cid == this.currentCid) {
           //   this.$message({
           //     type: 'error',

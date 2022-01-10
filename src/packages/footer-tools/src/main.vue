@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useMsgServer, useRoomBaseServer } from 'middleDomain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   export default {
@@ -47,8 +47,8 @@
       }
     },
     beforeCreate() {
-      this.msgServer = contextServer.get('msgServer');
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;

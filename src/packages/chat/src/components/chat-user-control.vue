@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { useChatServer, contextServer } from 'vhall-sass-domain';
+  import { useChatServer, useRoomBaseServer } from 'middleDomain';
 
   export default {
     mixins: [dataReportMixin],
@@ -70,7 +70,7 @@
     },
     beforeCreate() {
       this.chatServer = useChatServer();
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.assistantType = this.$route.query.assistantType;

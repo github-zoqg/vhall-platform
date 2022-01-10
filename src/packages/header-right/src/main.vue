@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpHeaderRight',
     data() {
@@ -31,8 +31,8 @@
       };
     },
     created() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
-      this.roomBaseState = contextServer.get('roomBaseServer').state;
+      this.roomBaseServer = useRoomBaseServer();
+      this.roomBaseState = this.roomBaseServer.state;
     },
     mounted() {
       this.calculateLiveDuration();

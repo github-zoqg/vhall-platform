@@ -29,7 +29,7 @@
 
 <script>
   import EventBus from '../js/Events.js';
-  import { useChatServer } from 'vhall-sass-domain';
+  import { useChatServer } from 'middleDomain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   export default {
     mixins: [dataReportMixin],
