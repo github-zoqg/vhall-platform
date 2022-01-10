@@ -1,17 +1,17 @@
 <template>
   <div class="vmp-third-layout" v-if="options.qqPath || options.wxPath">
     <p :class="`vmp-third-remark height__${way}`">{{ $t('login.login_1008') }}</p>
-    <div class="vmp-login__way">
-      <div class="vmp-login__third">
+    <div class="vmp-third__login__way">
+      <div class="vmp-third__login__third">
         <a
           :href="options.qqPath"
-          class="vmp-login__qq"
+          class="vmp-third__login__qq"
           :title="$t('login.login_1009')"
           v-if="options.qqPath"
         ></a>
         <a
           :href="options.wxPath"
-          class="vmp-login__wechat"
+          class="vmp-third__login__wechat"
           :title="$t('login.login_1032')"
           v-if="options.wxPath"
         ></a>
@@ -98,10 +98,10 @@
       padding-top: 0;
     }
   }
-  .vmp-login__way {
+  .vmp-third__login__way {
     margin-top: 8px;
   }
-  .vmp-login__third {
+  .vmp-third__login__third {
     text-align: center;
     line-height: 30px;
     a {
@@ -113,7 +113,7 @@
       cursor: pointer;
     }
   }
-  .vmp-login__qq {
+  .vmp-third__login__qq {
     background: url('@{iconpath}/qq@2x.png') center center no-repeat;
     background-size: 100% 100%;
     margin-right: 16px;
@@ -122,7 +122,7 @@
       background-size: 100% 100%;
     }
   }
-  .vmp-login__wechat {
+  .vmp-third__login__wechat {
     background: url('@{iconpath}/wechat@2x.png') center center no-repeat;
     background-size: 100% 100%;
     &:hover {
