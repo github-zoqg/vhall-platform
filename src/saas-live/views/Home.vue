@@ -56,7 +56,7 @@
             token: token || localStorage.getItem('token')
           },
           initRoom: {
-            webinarId: id, //活动id
+            webinar_id: id, //活动id
             clientType: 'send' //客户端类型
           }
         });

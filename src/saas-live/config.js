@@ -45,8 +45,8 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
-    // children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd',
+    children: ['comStreamLocal']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
