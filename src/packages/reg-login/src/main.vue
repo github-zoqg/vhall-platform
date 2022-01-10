@@ -6,8 +6,7 @@
     open({ openReg: 0， loginType: '1-0'}) 验证码登录
     open({ openReg: 0， loginType: '0-1'}) 密码登录
     open({ loginType: '0-1'}) 密码登录 & 注册； 建议传参 { openReg: 1， loginType: '1-1'}
-     -->
-    <span @click.stop.prevent="open({ openReg: 1, loginType: '1-1' })">登录&注册</span>
+    <span @click.stop.prevent="open({ openReg: 1, loginType: '1-1' })">登录&注册</span> -->
     <el-dialog
       :custom-class="`vmp-reg-login__dialog ${!isMobile ? 'platform__pc' : 'platform__wap'}`"
       :visible.sync="visible"
@@ -17,7 +16,7 @@
       <!-- 标题栏插槽 -->
       <template slot="title" v-if="!isMobile && options.loginType == '1-1'">
         <div class="title">
-          <i class="iconfont icon-close" @click.stop.prevent="handleClose"></i>
+          <i class="iconfont iconzuofanye" @click.stop.prevent="handleClose"></i>
         </div>
       </template>
       <!-- 可能场景：
@@ -89,45 +88,14 @@
       CodeLogin,
       PwdLogin
     },
-    // !!! 当前界面通过props的入参，最终以data中定义的options为准
-    props: {
-      loginType: {
-        required: true,
-        default() {
-          /* loginType取值范围：
-             0-0 不开启登录；
-             1-0 只开启验证码登录；
-             0-1 只开启密码登录；
-             1-1 开启验证码登录 & 开启密码登录。
-          */
-          return '1-1';
-        }
-      },
-      openReg: {
-        required: true,
-        default() {
-          /* openReg取值范围：
-            0 不支持注册。
-            1 支持注册。
-          */
-          return 1;
-        }
-      },
-      showThirdLogin: {
-        required: true,
-        default() {
-          /* showThirdLogin 是否展示第三方登录-取值范围
-             0 -- 不开启第三方登录功能；
-             1 -- 开启第三方登录功能。
-          */
-          return 0;
-        }
-      }
-    },
     data() {
       return {
         isMobile: false, // 是否是手机端展示(true - 手机端；false - PC浏览器)
-        options: {}, // !!! 当前界面通过props的入参，最终以这个options里记录的为准
+        options: {
+          loginType: '1-1', // loginType取值范围：[ 0-0 不开启登录；1-0 只开启验证码登录； 0-1 只开启密码登录； 1-1 开启验证码登录 & 开启密码登录。]
+          openReg: 1, // [0 不支持注册；1 支持注册。]
+          showThirdLogin: 1 // showThirdLogin 是否展示第三方登录-取值范围[0 -- 不开启第三方登录功能；1 -- 开启第三方登录功能。]
+        }, // !!! 当前界面通过props的入参，最终以这个options里记录的为准
         visible: false, // 默认不展示弹出框
         activeTag: null // activeTag 取值范围：code表示验证码登录；pwd表示密码登录
       };
@@ -148,10 +116,6 @@
             navigator.userAgent
           );
         this.options = {
-          ...{
-            openReg: this.openReg,
-            loginType: this.loginType
-          },
           ...params
         };
         console.log('打开登录&注册弹框，初始预设值为', this.options);

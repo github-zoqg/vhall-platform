@@ -553,13 +553,13 @@
           ...params
         };
         console.log('注册init', this.options);
+        await this.getCapthaId();
         await this.$nextTick();
         // 默认图片验证码加载
         this.reloadCaptha();
       }
     },
-    async created() {
-      await this.getCapthaId();
+    created() {
       this.init();
     }
   };

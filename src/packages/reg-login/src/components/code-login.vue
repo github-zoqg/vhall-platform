@@ -540,7 +540,7 @@
         this.reloadCaptha();
       },
       // init组件入口 - 通用api
-      init(params = {}) {
+      async init(params = {}) {
         // 组件加载初始化默认数据
         this.isMobile =
           /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
@@ -555,12 +555,12 @@
           ...params
         };
         console.log('验证码登录init', this.options);
+        await this.getCapthaId();
         // 默认图片验证码加载
         this.reloadCaptha();
       }
     },
-    async created() {
-      await this.getCapthaId();
+    created() {
       this.init();
     }
   };

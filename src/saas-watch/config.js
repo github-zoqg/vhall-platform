@@ -188,7 +188,6 @@ export const serverConfig = {
   },
   // 登录注册组件
   compRegLogin: {
-    component: 'VmpRegLogin',
-    children: ['dlgDocList']
+    component: 'VmpRegLogin'
   }
 };
