@@ -25,14 +25,21 @@
       this.emojiList = getEmojiList();
     },
     mounted() {
-      document.addEventListener('click', () => {
-        this.isShow = false;
-      });
+      document.addEventListener('click', this.closeModal);
+    },
+    beforeDestroy() {
+      document.removeEventListener('click', this.closeModal);
     },
     methods: {
+      //关闭表情模态窗
+      closeModal() {
+        this.isShow = false;
+      },
+      //切换表情模态窗显示
       toggleShow() {
         this.isShow = !this.isShow;
       },
+      //选中了表情的处理
       selectEmoji(item) {
         this.$emit('emojiInput', item.name);
       }

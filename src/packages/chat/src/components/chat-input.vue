@@ -11,6 +11,7 @@
         @input="inputHandle"
         @keydown.stop="onkeydownHandle($event)"
         @keyup.stop="onKeyUpHandle($event)"
+        @keyup.delete="onDeleteHandle"
       ></textarea>
       <span v-show="showWordLimit" class="textarea-box__textarea-show-limit">
         <i
@@ -76,6 +77,11 @@
       chatList: {
         type: Array,
         default: () => []
+      },
+      //todo 建议放入domain @列表
+      atList: {
+        type: Array,
+        default: () => []
       }
     },
     data() {
@@ -94,8 +100,6 @@
         imgUrls: [],
         //回复消息
         replyMsg: {},
-        //@的列表
-        atList: [],
         //todo 也可以考虑domain提供 平台类型(可选值为live,watch,h5)
         platformType: this.chatOptions.platformType || ''
       };
@@ -189,6 +193,48 @@
       onKeyUpHandle(event) {
         event.stopPropagation();
       },
+      //删除输入文字的处理
+      onDeleteHandle() {
+        //todo 因为暂时只有发起端可以@和回复用户
+        if (this.platformType && this.platformType !== 'live') {
+          return;
+        }
+        if (!this.inputValue) {
+          this.atList.splice(0, this.atList.length);
+          return;
+        }
+        const currentIndex = this.$refs.chatTextarea.selectionStart;
+        const firstPart = this.inputValue.substring(0, currentIndex);
+        const lastIndex = firstPart.lastIndexOf('@');
+        if (lastIndex !== -1) {
+          const userName = this.inputValue.substring(lastIndex, currentIndex);
+          const nickName = userName.replace('@', '');
+          // 删除整个@过的用户名逻辑
+          if (this.atList.find(u => u.nickName === nickName)) {
+            let tempList = this.atList.filter(n => n.nickName !== nickName);
+            this.atList.splice(0, this.atList.length, ...tempList);
+            this.inputValue = this.inputValue.replace(userName, '');
+          } else {
+            let tempList = this.atList.filter(a => {
+              const atIndex = this.inputValue.indexOf(`@${a.nickName} `);
+              return atIndex !== -1;
+            });
+            this.atList.splice(0, this.atList.length, ...tempList);
+          }
+        }
+        // 删除要回复的用户名逻辑
+        const lastReplyIndex = firstPart.lastIndexOf('回复');
+        if (lastReplyIndex !== -1) {
+          const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
+          if (`回复${this.replyMsg.nickName}:` === replyUserName) {
+            this.inputValue = this.inputValue.replace(replyUserName, '');
+            this.replyMsg = {};
+          } else {
+            this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) === -1 &&
+              (this.replyMsg = {});
+          }
+        }
+      },
       /** 发送聊天消息 */
       sendMsg(callback) {
         this.sendTimeOut && window.clearTimeout(this.sendTimeOut);
@@ -275,7 +321,8 @@
           this.clearImgUrls();
           this.inputValue = '';
           this.replyMsg = {};
-          this.atList = [];
+          //todo 建议移入domain  清空一下@列表，但是保持引用
+          this.atList.splice(0, this.atList.length);
           callback && callback();
         }, 300);
       },
@@ -340,7 +387,7 @@
       //处理回复消息
       reply(count) {
         this.inputValue = '';
-        this.atList = [];
+        this.atList.splice(0, this.atList.length);
         this.replyMsg =
           this.chatList.find(chatMsg => {
             return chatMsg.count === count;
@@ -399,13 +446,13 @@
       text-align: left;
       border-radius: 20px;
       position: relative;
-      ::v-deep > .textarea-box__textarea.os-host-overflow {
+      .textarea-box__textarea.os-host-overflow {
         overflow: visible !important;
       }
-      ::v-deep .os-scrollbar-vertical {
+      .os-scrollbar-vertical {
         right: -8px;
       }
-      ::v-deep .os-host-textarea {
+      .os-host-textarea {
         min-height: 20px;
       }
       .textarea-box__textarea {

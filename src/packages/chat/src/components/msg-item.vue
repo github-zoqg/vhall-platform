@@ -135,7 +135,7 @@
 
         <!-- 抽奖、问答、签到、问卷、红包 -->
         <div
-          v-if="msg.interactStatus && !msg.type == 'red_envelope_ok'"
+          v-if="msg.interactStatus && !(msg.type == 'red_envelope_ok' && isEmbed)"
           class="msg-item-template__interact"
         >
           <div class="msg-item-template__interact-content">

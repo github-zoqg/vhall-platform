@@ -72,6 +72,7 @@
         :input-status="inputStatus"
         :chat-options="chatOptions"
         :chat-list="chatList"
+        :at-list="atList"
         @clearUploadImg="clearUploadImg"
         @getUploadImg="updateImgUrls"
         @inputHeightChange="chatInputHeightChangeHandle"
@@ -141,6 +142,11 @@
       },
       //聊天消息列表
       chatList: {
+        type: Array,
+        default: () => []
+      },
+      //@列表
+      atList: {
         type: Array,
         default: () => []
       }
@@ -375,16 +381,6 @@
           color: @active-color;
           cursor: pointer;
         }
-      }
-      .chat-audit {
-        background-image: url('../images/auditing.png');
-        &:hover {
-          background-size: 95%;
-          background-image: url('../images/auditing-hover.png');
-        }
-      }
-      .chat-img-upload {
-        flex: 1;
       }
     }
     .operate-container__input-bar {
