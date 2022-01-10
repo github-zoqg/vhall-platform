@@ -14,7 +14,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useMsgServer, useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpNoticeColumn',
     data() {
@@ -24,8 +24,8 @@
       };
     },
     beforeCreate() {
-      this.msgServer = contextServer.get('msgServer');
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.initNotice();

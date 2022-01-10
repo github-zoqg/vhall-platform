@@ -85,7 +85,7 @@
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
   import ChatFilter from './chat-filter';
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -146,7 +146,7 @@
       }
     },
     data() {
-      const roomBaseState = contextServer.get('roomBaseServer').state;
+      const roomBaseState = useRoomBaseServer().state;
       return {
         roomBaseState,
         //显示观众的过滤设置

@@ -171,7 +171,7 @@
   </div>
 </template>
 <script>
-  import { usePlayerServer, contextServer } from 'middleDomain';
+  import { usePlayerServer, useRoomBaseServer } from 'middleDomain';
   import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
@@ -259,7 +259,7 @@
       }
     },
     created() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
       this.getWebinerStatus();
       this.listenEvents();

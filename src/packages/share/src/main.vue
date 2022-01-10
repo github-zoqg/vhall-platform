@@ -59,7 +59,7 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRroomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpShare',
     data() {
@@ -76,7 +76,7 @@
       };
     },
     beforeCreate() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRroomBaseServer();
     },
     mounted() {
       this.initConfig();

@@ -47,7 +47,7 @@
 
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
-  import { useChatServer, contextServer } from 'vhall-sass-domain';
+  import { useChatServer, useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpChatInput',
     props: {
@@ -79,7 +79,7 @@
       }
     },
     data() {
-      const roomBaseState = contextServer.get('roomBaseServer').state;
+      const roomBaseState = useRoomBaseServer().state;
       return {
         roomBaseState,
         //聊天输入框的值

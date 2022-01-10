@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  import { useRoomInitGroupServer, contextServer } from 'vhall-sass-domain';
+  import { useRoomInitGroupServer, useMsgServer } from 'middleDomain';
   export default {
     name: 'Home',
     data() {},
@@ -34,7 +34,7 @@
         });
       },
       initChatSDK() {
-        this.msgServer = contextServer.get('msgServer');
+        this.msgServer = useMsgServer();
         this.msgServer.init().then(res => {
           console.log('聊天实例创建', res);
         });

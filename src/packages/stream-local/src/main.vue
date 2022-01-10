@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import { contextServer } from 'middleDomain';
+  import { useInteractiveServer, useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -78,8 +78,8 @@
     created() {
       // 设置主屏的次数，限制递归次数
       this._setBroadCastScreenCount = 0;
-      this.interactiveServer = contextServer.get('interactiveServer');
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.interactiveServer = useInteractiveServer();
+      this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
     },
     async mounted() {},
