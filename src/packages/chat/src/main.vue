@@ -205,7 +205,7 @@
       chatList: {
         deep: true,
         handler() {
-          console.log(this.chatList,'当前的聊天列表');
+          console.log(this.chatList, '当前的聊天列表');
           // 如果滚动条未滚动至最底部
           if (this.osInstance.scroll().ratio.y !== 1) {
             this.unReadMessageCount++;

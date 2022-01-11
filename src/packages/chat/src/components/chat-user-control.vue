@@ -106,7 +106,7 @@
     },
     methods: {
       deleteMsg(count) {
-        console.log(count,'要删除的count');
+        console.log(count, '要删除的count');
         this.$emit('deleteMsg', count);
       },
       calculate(el) {
