@@ -95,18 +95,19 @@
       // 监听客户端踢出操作
       EventBus.$on('assistantKickoutCallback', msg => {
         if (msg.type == 0) return;
-        this.$fetch('setKickOut', {
-          room_id: this.roomId,
-          receive_account_id: msg.data.room_join_id,
-          status: 1
-        }).then(() => {
-          EventBus.$emit('kicked_in_chat', { nextStatus: 1, accountId: this.accountId });
-        });
+        this.chatServer
+          .setKicked({
+            room_id: this.roomId,
+            receive_account_id: msg.data.room_join_id,
+            status: 1
+          })
+          .then(() => {
+            EventBus.$emit('kicked_in_chat', { nextStatus: 1, accountId: this.accountId });
+          });
       });
     },
     methods: {
       deleteMsg(count) {
-        console.log(count, '要删除的count');
         this.$emit('deleteMsg', count);
       },
       calculate(el) {

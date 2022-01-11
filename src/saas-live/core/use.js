@@ -18,6 +18,7 @@ import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
 import VmpMediaCheck from '@/packages/media-check';
+import VmpMemberList from '@/packages/member-list';
 
 // 全局注册组件
 export function initUse() {
@@ -38,4 +39,5 @@ export function initUse() {
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);
   Vue.use(VmpMediaCheck);
+  Vue.use(VmpMemberList);
 }

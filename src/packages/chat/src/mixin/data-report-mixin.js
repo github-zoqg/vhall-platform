@@ -1,6 +1,6 @@
 const dataReportMixin = {
   methods: {
-    //埋点上报
+    //todo 埋点上报应该由domain提供
     buriedPointReport(code, sourceData = {}) {
       let defaultData = {
         business_uid: this.userId,
