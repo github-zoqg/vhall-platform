@@ -3,16 +3,14 @@
     <el-dialog :visible.sync="dialogVisible" :before-close="handleClose" width="800px">
       <!-- 标题栏 -->
       <template slot="title">
-        <div>
-          <span v-show="mode === 2" @click="handleDoclibCancel">
-            <i class="iconfont iconzuofanye"></i>
-          </span>
-          <span>{{ $t('usual.chooseDocument') }}</span>
-        </div>
+        <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
+          <i class="iconfont iconzuofanye"></i>
+        </span>
+        <span>{{ $t('usual.chooseDocument') }}</span>
       </template>
 
       <!-- 内容区域 -->
-      <div style="height: 448px">
+      <div style="height: 480px">
         <!-- 当前直播列表 -->
         <div class="vmp-doc-cur" v-show="mode === 1">
           <!-- 无数据 -->
@@ -49,10 +47,18 @@
                 <i style="margin-left: 5px" class="el-tooltip iconfont iconicon_help_m"></i>
               </el-tooltip>
 
-              <el-input style="width: 220px; float: right" placeholder="请输入文档名称"></el-input>
+              <el-input
+                style="width: 220px; float: right"
+                placeholder="请输入文档名称"
+                v-model="docSearchKey"
+                clearable
+                @keydown.enter.stop.native="handleDocSearch"
+              >
+                <i slot="prefix" class="el-input__icon el-icon-search" @click="handleDocSearch"></i>
+              </el-input>
             </div>
             <div class="vmp-doc-cur__bd">
-              <el-table :data="dataList" style="width: 100%" height="336px">
+              <el-table :data="dataList" style="width: 100%" height="370px">
                 <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
                 <el-table-column prop="page" label="页码"></el-table-column>
@@ -86,7 +92,14 @@
               </el-table>
             </div>
             <div class="vmp-doc-cur__ft">
-              <div>观众可见</div>
+              <span>观众可见</span>
+              <el-switch
+                class="vmp-doc-cur__switch"
+                v-model="switchStatus"
+                width="28"
+                active-color="#fb3a32"
+              ></el-switch>
+              <span>默认开启，文档演示将自动对观众可见</span>
             </div>
           </div>
         </div>
@@ -112,7 +125,7 @@
             <el-table
               ref="doclibTable"
               :data="doclibList"
-              height="336px"
+              height="350px"
               style="width: 100%; margin-top: 10px"
               @selection-change="handleChangeSelection"
               @select-all="handleChangeSelectall"
@@ -148,7 +161,11 @@
         id: '', // 房间id
         mode: 1, //模式，默认1:当前直播列表 ，2：资料库列表
 
+        // 观众可见
+        switchStatus: true,
         // 当前活动文档列表相关
+        isLoading: false,
+        docSearchKey: '',
         dataList: [],
 
         // 资料库文档列表相关
@@ -163,7 +180,18 @@
       this.docServer = contextServer.get('docServer');
     },
     mounted() {
-      this.handleDoccurSearch();
+      this.handleDocSearch();
+    },
+    watch: {
+      docSearchKey(val) {
+        if (val == '') {
+          this.handleDocSearch();
+        } else {
+          this.dataList = this.dataList.filter(item => {
+            return item.file_name.indexOf(val) > -1;
+          });
+        }
+      }
     },
     methods: {
       show() {
@@ -219,7 +247,7 @@
               message: '删除成功',
               type: 'success'
             });
-            this.handleDoccurSearch();
+            this.handleDocSearch();
           } else {
             this.$message.error('删除失败');
           }
@@ -237,19 +265,29 @@
       /**
        * 当前活动下文档查询
        */
-      async handleDoccurSearch() {
-        const result = await this.docServer.getWebinarDocList({
-          pos: 0,
-          limit: 10,
-          file_name: '',
-          type: 2,
-          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
-          room_id: this.roomBaseServer.state.watchInitData.interact.room_id
-        });
-        if (result && result.code === 200) {
-          this.dataList = result.data.list;
-        } else {
-          this.$message.error('查询失败');
+      async handleDocSearch() {
+        if (this.isLoading) {
+          return false;
+        }
+
+        this.isLoading = true;
+        try {
+          const result = await this.docServer.getWebinarDocList({
+            pos: 0,
+            limit: 200,
+            type: 2,
+            webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+            room_id: this.roomBaseServer.state.watchInitData.interact.room_id
+          });
+          if (result && result.code === 200) {
+            this.dataList = result.data.list;
+          } else {
+            this.$message.error('查询失败');
+          }
+          this.isLoading = false;
+        } catch (ex) {
+          this.isLoading = false;
+          this.$message.error('查询失败~');
         }
       },
       /**
@@ -297,7 +335,7 @@
             // 关闭资料列表返回到当前活动文档列表
             this.handleDoclibCancel();
             // 更新当前活动文档列表
-            this.handleDoccurSearch();
+            this.handleDocSearch();
           } else {
             this.$message.error('关联失败');
           }
@@ -318,7 +356,7 @@
 <style lang="less">
   .vmp-doc-list {
     .vmp-doc-cur__empty {
-      height: 346px;
+      height: 380px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -338,19 +376,47 @@
       height: 100%;
       .vmp-doc-cur__bd {
         padding-top: 10px;
+
+        .el-button.el-button--text {
+          color: #666;
+          border: 0;
+          margin-left: 0;
+          font-size: 14px;
+          padding: 2px 8px;
+        }
       }
       .vmp-doc-cur__ft {
         display: flex;
         flex-direction: row;
+        line-height: 20px;
+        font-size: 12px;
+        padding-top: 15px;
+      }
+      .vmp-doc-cur__switch {
+        margin: 0 8px;
+
+        .el-switch__core {
+          height: 16px;
+
+          &:after {
+            width: 12px;
+            height: 12px;
+          }
+        }
+      }
+
+      .vmp-doc-cur__switch.el-switch.is-checked .el-switch__core::after {
+        margin-left: -14px;
       }
     }
+
     .vmp-doc-lib {
       display: flex;
       flex-direction: column;
       height: 100%;
 
       .vmp-doc-lib__ft {
-        margin: 12px 0 24px 0;
+        margin: 15px 0 24px 0;
         display: flex;
         flex-direction: row;
         align-items: center;
