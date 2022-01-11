@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-input">
-    <div class="vmp-chat-input__textarea-box">
+    <div class="vmp-chat-input__textarea-box" v-show="!inputStatus.disable && !chatLoginStatus">
       <textarea
         id="chat-textarea"
         ref="chatTextarea"
@@ -99,9 +99,7 @@
         //聊天里临时选择的图片
         imgUrls: [],
         //回复消息
-        replyMsg: {},
-        //todo 也可以考虑domain提供 平台类型(可选值为live,watch,h5)
-        platformType: this.chatOptions.platformType || ''
+        replyMsg: {}
       };
     },
     computed: {
@@ -112,6 +110,10 @@
       //用户角色
       roleName() {
         return this.roomBaseState.watchInitData.join_info.role_name;
+      },
+      //在线人数
+      onlineUsers() {
+        return this.roomBaseState.watchInitData.pv.show;
       }
     },
     watch: {
@@ -175,7 +177,6 @@
               // 三行的时候显示字数限制，否则不显示
               this.showLimit = chatTextAreaHeight > 40;
 
-              //todo 触发父元素绑定的高度发生变化事件
               this.$emit('inputHeightChange');
             }
           });
@@ -195,10 +196,6 @@
       },
       //删除输入文字的处理
       onDeleteHandle() {
-        //todo 因为暂时只有发起端可以@和回复用户
-        if (this.platformType && this.platformType !== 'live') {
-          return;
-        }
         if (!this.inputValue) {
           this.atList.splice(0, this.atList.length);
           return;
@@ -328,6 +325,10 @@
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
+        //如果没有登录，则不能发消息
+        if (this.chatLoginStatus) {
+          return;
+        }
         if (this.roleName !== 2) {
           this.sendMsg();
           return;
@@ -497,7 +498,7 @@
       color: @font-dark-normal;
       line-height: 20px;
       padding: 10px 12px;
-      text-align: left;
+      text-align: center;
       border-radius: 20px;
       .textarea-placeholder_no-login {
         color: #666666;

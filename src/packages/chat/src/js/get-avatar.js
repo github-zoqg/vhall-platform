@@ -1,9 +1,10 @@
 /**
  * 获取头像
  * */
+import defaultAvatar from '../images/my-dark@2x.png';
 function getAvatar(avatar) {
   if (!avatar) {
-    return 'https://cnstatic01.e.vhall.com/3rdlibs/vhall-static/img/default_avatar.png';
+    return defaultAvatar;
   }
   if (/^data:image/.test(avatar)) {
     return avatar;

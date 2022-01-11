@@ -47,7 +47,10 @@ export const serverConfig = {
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
-    children: ['comChat']
+    children: [
+      'comMemberList'
+      // 'comChat'
+    ]
   },
   /*** 布局定义end */
 
@@ -164,15 +167,25 @@ export const serverConfig = {
   comChat: {
     component: 'VmpChat',
     options: {
-      //平台类型(可选值为live,watch,h5)
-      platformType: 'live',
-      //是否有图片上传按钮
+      //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
       hasImgUpload: true,
-      //是否有聊天过滤按钮（屏蔽特效,只看主办方）
+      //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
       hasChatFilterBtn: false,
-      //是否有发言限频率倒计时(观看端可能会有)
-      hasChatLimitFrequency: false
+      //是否开启聊天设置功能
+      enableChatSetting: true,
+      //todo 预留的聊天审核跳转地址
+      chatAuthUrl: '',
+      //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】
+      //todo  这里预留，后续可能针对里面的操作也进行控制
+      userControlOptions: {
+        enable: true
+      }
     }
+  },
+  //成员列表组件
+  comMemberList: {
+    component: 'VmpMemberList',
+    options: {}
   },
   // 文档白板组件
   comDocUne: {

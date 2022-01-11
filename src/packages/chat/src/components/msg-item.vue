@@ -22,9 +22,21 @@
           v-if="!msg.interactStatus && !msg.interactToolsStatus"
           class="msg-item-template__normal-msg clearfix"
         >
-          <div class="normal-msg__avatar" @click="setPersonStatus($event, msg)">
-            <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
-          </div>
+          <template
+            v-if="
+              chatOptions && chatOptions.userControlOptions && chatOptions.userControlOptions.enable
+            "
+          >
+            <div class="normal-msg__avatar" @click="setPersonStatus($event, msg)">
+              <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+            </div>
+          </template>
+          <template v-else>
+            <div class="normal-msg__avatar">
+              <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+            </div>
+          </template>
+
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
               <span class="info-wrap__nick-name">{{ msg.nickName }}</span>
@@ -210,6 +222,13 @@
       },
       roleName: {
         required: true
+      },
+      //聊天配置
+      chatOptions: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {
@@ -219,35 +238,7 @@
         isEmbed: false
       };
     },
-    computed: {
-      //todo 互动判断消息类型不是特别靠谱，明天讨论下
-      //检查是否是抽奖消息 开启问答 关闭问答
-      checkMsgType() {
-        const mapList = [
-          'lottery_push',
-          'question_answer_open',
-          'question_answer_close',
-          'sign_in_push',
-          'sign_end',
-          'timer_start',
-          'timer_end',
-          'timer_pause',
-          'timer_reset',
-          'timer_resume'
-        ];
-        return function (type) {
-          return mapList.some(val => val === type);
-        };
-      },
-      //检查是否是非常规消息(比如欢迎语，红包，礼物)
-      checkIsNotRegularMessage() {
-        const mapList = ['welcome_msg', 'reward_pay_ok', 'gift_send_success', 'free_gift_send'];
-        return function (type) {
-          return mapList.some(val => val === type);
-        };
-      }
-      //检查是否是
-    },
+    computed: {},
     filters: {
       //文字过长截取
       textOverflowSlice(val = '', len = 0) {

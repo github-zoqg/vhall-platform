@@ -52,17 +52,19 @@
       </div>
 
       <div class="operate-container__tool-bar__right">
-        <!--聊天设置-->
-        <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
-        <chat-filter
-          v-if="roleName != 2"
-          :roomId="roomId"
-          :webinarId="webinarId"
-          :allBanned="allBanned"
-          ref="chatFilter"
-          :chatFilterUrl="chatFilterUrl"
-          :isAssistant="assistantType"
-        ></chat-filter>
+        <template v-if="chatOptions && chatOptions.enableChatSetting">
+          <!--聊天设置-->
+          <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
+          <chat-filter
+            v-if="roleName != 2"
+            :roomId="roomId"
+            :webinarId="webinarId"
+            :allBanned="allBanned"
+            ref="chatFilter"
+            :chatFilterUrl="chatFilterUrl"
+            :isAssistant="assistantType"
+          ></chat-filter>
+        </template>
       </div>
     </div>
     <div class="operate-container__input-bar">
@@ -207,6 +209,7 @@
           type: 'success',
           customClass: 'zdy-info-box'
         });
+        this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
@@ -218,6 +221,7 @@
           type: 'success',
           customClass: 'zdy-info-box'
         });
+        this.$emit('onSwitchShowSpecialEffects', status);
       },
       //点击筛选
       onClickFilterSetting() {

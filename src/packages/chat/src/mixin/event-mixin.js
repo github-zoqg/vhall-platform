@@ -37,6 +37,7 @@ const eventMixin = {
     this.msgServer = contextServer.get('msgServer');
   },
   methods: {
+    //todo 绝大部分都可以挪到domain里，因为视图数据（chatList）已经由domain接管了，这些事件传递的消息也可以交由其处理
     listenEvents() {
       //节流的方法
       const throttleChatMsg = throttle(() => {
@@ -159,7 +160,10 @@ const eventMixin = {
         }
         // 免费礼物
         if (msg.data.type === 'free_gift_send') {
-          this.chatList.push(generateGiftMessage(msg));
+          let data = generateGiftMessage(msg);
+          this.chatList.push(data);
+          this.addSpecialEffect(data);
+          console.log(this.chatList, 'list-----------------');
         }
 
         // 禁言某个用户
@@ -310,7 +314,7 @@ const eventMixin = {
               interactToolsStatus: true
             });
             this.chatList.push(data);
-            //todo 打赏特效
+            this.addSpecialEffect(data);
           }
           // 礼物
           if (msg.data.type === 'gift_send_success') {
@@ -329,7 +333,7 @@ const eventMixin = {
               interactToolsStatus: true
             });
             this.chatList.push(data);
-            //todo 特效
+            this.addSpecialEffect(data);
           }
           // 开启问答
           if (msg.type === 'question_answer_open') {
@@ -489,28 +493,6 @@ const eventMixin = {
           }
           EventBus.$emit(msg.type, msg);
         });
-        this.msgServer.$on(
-          'ROOM_MSG',
-          msg => {
-            if (typeof msg !== 'object') {
-              msg = JSON.parse(msg);
-            }
-            try {
-              if (msg.data && typeof msg.data !== 'object') {
-                msg.data = JSON.parse(msg.data);
-              }
-            } catch (e) {
-              console.log(e);
-            }
-            // console.log('==========房间消息========1===', msg);
-            Object.assign(msg, msg.data);
-            if (msg.type == 'live_over') {
-              // 直播结束消息进入小组需要保活，不在这里处理
-              EventBus.$emit(msg.type, msg);
-            }
-          },
-          true
-        );
       } else if (![1, '1'].includes(this.playerType)) {
         this.msgServer.$on('ROOM_MSG', msg => {
           if (typeof msg !== 'object') {
@@ -540,6 +522,7 @@ const eventMixin = {
               interactToolsStatus: true
             });
             this.chatList.push(giftData);
+            this.addSpecialEffect(giftData);
           }
           if (msg.data.type === 'reward_pay_ok') {
             EventBus.$emit('reward_pay_ok', msg);
@@ -561,9 +544,11 @@ const eventMixin = {
               interactToolsStatus: true
             });
             this.chatList.push(rewardData);
+            this.addSpecialEffect(rewardData);
           }
         });
       }
+      //todo 考虑移出chat模块，这部分应该由domain负责
       // 接受加入房间消息
       this.msgServer.$on('JOIN', msg => {
         if (typeof msg !== 'object') {

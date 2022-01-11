@@ -47,7 +47,7 @@ export const serverConfig = {
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
-    children: ['comChat']
+    children: ['comMemberList', 'comChat']
   },
   /*** 布局定义end */
 
@@ -212,7 +212,24 @@ export const serverConfig = {
   },
   //聊天组件
   comChat: {
-    component: 'VmpChat'
+    component: 'VmpChat',
+    options: {
+      //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
+      hasImgUpload: false,
+      //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
+      hasChatFilterBtn: false,
+      //是否开启聊天设置功能
+      enableChatSetting: false,
+      //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】
+      userControlOptions: {
+        enable: false
+      }
+    }
+  },
+  //成员列表组件
+  comMemberList: {
+    component: 'VmpMemberList',
+    options: {}
   },
   // 登录注册组件
   compRegLogin: {
