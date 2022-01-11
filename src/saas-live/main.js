@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { initGlobalAPI, i18n } from './core';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
-import './domain';
+import domainStore from './domain';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 // 导入样式及皮肤
 import './assets/styles/common.less';
@@ -16,8 +16,9 @@ Vue.use(OverlayScrollbarsPlugin);
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
-new Vue({
+window.root = new Vue({
   router,
   i18n,
+  domainStore,
   render: h => h(App)
 }).$mount('#app');

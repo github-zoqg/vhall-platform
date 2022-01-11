@@ -23,8 +23,7 @@ export const serverConfig = {
     options: {
       className: 'vmp-basic-bd'
     },
-    // children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
-    children: ['layerBodyLeft', 'layerBodyRight']
+    children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
   },
   layerBodyLeft: {
     component: 'VmpContainer',
@@ -34,7 +33,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne']
+    children: ['comDocUne']
     // children: ['comStreamList']
   },
   layerBodyRight: {
@@ -49,8 +48,8 @@ export const serverConfig = {
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__bd',
-    children: ['comChat']
+    className: 'vmp-basic-right__bd'
+    // children: ['comChat']
   },
   /*** 布局定义end */
 

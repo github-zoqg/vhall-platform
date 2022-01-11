@@ -3,17 +3,23 @@
   <div class="vmp-doc-toolbar">
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
-      <div v-show="suit === 'document'" class="choose-document" @click="openDocDlglist">
+      <div
+        v-show="docServer.state.currentType === 'document'"
+        class="choose-document"
+        @click="openDocDlglist"
+      >
         {{ $t('usual.chooseDocument') }}
       </div>
 
       <div class="audience-visible">
-        <span style="margin-right: 5px">{{ $t('usual.audienceVisible') }}</span>
+        <span style="margin-right: 5px">
+          {{ $t('usual.audienceVisible') }}
+        </span>
         <div class="audience-visible__swith">
           <el-switch
+            @click.native="handleSwitchStatus"
             v-model="switchStatus"
             active-color="#13ce66"
-            @change="audienceVisibleChange"
           ></el-switch>
           <!-- 提示 -->
           <div class="audience-tip" v-show="showAudienceTip">
@@ -122,7 +128,6 @@
     },
     provide() {
       return {
-        getSuit: () => this.suit,
         pen: this.pen,
         highlighter: this.highlighter,
         shape: this.shape,
@@ -134,10 +139,6 @@
     data() {
       return {
         showAudienceTip: true,
-        // 当前工具适配容器类型
-        suit: '', // 文档：document ， 白板： board
-        // 观众是否可见
-        switchStatus: false,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
         currentBrush: 'pen',
         // 画笔状态
@@ -162,6 +163,11 @@
         }
       };
     },
+    computed: {
+      switchStatus() {
+        return this.docServer?.state.switchStatus;
+      }
+    },
     beforeCreate() {
       this.docServer = useDocServer();
     },
@@ -177,8 +183,11 @@
        *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
        */
       changeTool(brush, key, value) {
-        console.log(brush, ';', key, ';', value);
-        const currentContainerId = this.docServer.state.docInstance.currentCid;
+        if (!this.docServer?.state.currentCid) {
+          console.log('容器不存在，不设置画笔');
+          return;
+        }
+        console.log(this.docServer.docInstance.currentDoc.id);
         this.currentBrush = brush;
         if (key) {
           this[brush][key] = value;
@@ -186,60 +195,37 @@
         switch (brush) {
           // 选择
           case 'select': {
-            this.docServer.cancelDrawable({ id: currentContainerId });
+            this.docServer.cancelDrawable();
             break;
           }
           // 画笔
           case 'pen': {
-            console.log('-------设置画笔 this.pen:', this.pen);
-            this.docServer.setPen({ id: currentContainerId });
-            this.docServer.setStrokeWidth({
-              id: currentContainerId,
-              width: this.pen.size
-            });
-            this.docServer.setStroke({
-              id: this.currentContainerId,
-              color: this.pen.color
-            });
+            console.log('设置画笔');
+            this.docServer.setPen();
+            this.docServer.setStrokeWidth(this.pen.size);
+            this.docServer.setStroke(this.pen.color);
             break;
           }
           // 荧光笔
           case 'highlighter': {
-            this.docServer.setHighlighters({ id: currentContainerId });
-            this.docServer.setStrokeWidth({
-              id: currentContainerId,
-              width: this.highlighter.size
-            });
-            this.docServer.setStroke({
-              id: this.currentContainerId,
-              color: this.highlighter.color
-            });
+            this.docServer.setHighlighters();
+            this.docServer.setStrokeWidth(this.highlighter.size);
+            this.docServer.setStroke(this.highlighter.color);
             break;
           }
           case 'shape': {
-            this.docServer[this.shape.kind]({ id: currentContainerId });
-            this.docServer.setStroke({
-              id: this.currentContainerId,
-              color: this.shape.color
-            });
+            this.docServer[this.shape.kind]();
+            this.docServer.setStroke(this.shape.color);
             break;
           }
           case 'text': {
-            this.docServer.setText({ id: currentContainerId });
-            this.docServer.setStrokeWidth({
-              id: currentContainerId,
-              width: this.text.size
-            });
-            this.docServer.setStroke({
-              id: this.currentContainerId,
-              color: this.text.color
-            });
+            this.docServer.setText();
+            this.docServer.setStrokeWidth(this.text.size);
+            this.docServer.setStroke(this.text.color);
             break;
           }
           case 'eraser': {
-            this.docServer.setEraser({
-              id: this.currentContainerId
-            });
+            this.docServer.setEraser();
             break;
           }
         }
@@ -270,8 +256,8 @@
        *  刷新或者退出重进恢复上次的状态
        */
       recoverLastState: async function () {
-        const { switch_status } = await this.docServer.getContainerInfo();
-        this.switchStatus = Boolean(switch_status);
+        // const { switch_status } = await this.docServer.getContainerInfo();
+        // this.switchStatus = Boolean(switch_status);
       },
       /**
        * 切换到 文档还是白板
@@ -279,28 +265,16 @@
        */
       async switchTo(type = 'document') {
         // 当前工具适配容器类型
-        this.suit = type;
-        console.log('this.suit: ', this.suit);
-        console.log(
-          'this.docServer?.state.docInstance.currentCid:',
-          this.docServer?.state.docInstance.currentCid
-        );
+        console.log('----switchTo---- toolbar');
 
         // 当前容器不能为空，否则设置画笔会报错
-        if (this.docServer?.state.docInstance.currentCid) {
-          // 需要重新设置一下笔刷工具
-          this.changeTool(this.currentBrush);
-        }
+        // if (this.docServer?.state.currentCid) {
+        //   // 需要重新设置一下笔刷工具
+        //   this.changeTool(this.currentBrush);
+        // }
       },
-      /**
-       * 观众可见切换
-       */
-      audienceVisibleChange() {
-        if (this.switchStatus) {
-          this.docServer.switchOnContainer();
-        } else {
-          this.docServer.switchOffContainer();
-        }
+      handleSwitchStatus() {
+        this.docServer.toggleSwitchStatus();
       }
     }
   };

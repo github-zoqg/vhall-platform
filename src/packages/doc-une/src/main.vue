@@ -11,17 +11,17 @@
         <div style="width: 0; height: 0">
           <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
-            v-for="item of fileOrboardList"
+            v-for="item of docServer.state.fileOrBoardList"
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ visibility: item.cid == cid ? 'visible' : 'hidden' }"
+            :style="{ visibility: item.cid == currentCid ? 'visible' : 'hidden' }"
           ></div>
         </div>
       </div>
 
       <!-- 没有文档时的占位组件 -->
-      <div class="vmp-doc-placeholder" v-show="!cid">
+      <div class="vmp-doc-placeholder" v-show="!currentCid">
         <div class="vmp-doc-placeholder__inner">
           <i class="iconfont iconzanwuwendang"></i>
           <span>暂未分享任何文档</span>
@@ -36,9 +36,9 @@
           class="doc-pagebar__opt iconfont iconzuofanye"
         ></li>
         <li class="page-number">
-          <span class="page-index">{{ pageNum }}</span>
+          <span class="page-index">{{ docServer.state.pageNum }}</span>
           <span class="page-split">/</span>
-          <span class="page-total">{{ pageTotal }}</span>
+          <span class="page-total">{{ docServer.state.pageTotal }}</span>
         </li>
         <li
           data-value="nextStep"
@@ -55,7 +55,7 @@
       <ul class="vmp-doc-thumbnailbar" @click="handleThumbnail" v-show="thumbnailShow">
         <li
           class="doc-thumbnailbar__opt"
-          v-for="(item, index) in thumbnailList"
+          v-for="(item, index) in docServer.state.thumbnailList"
           :key="'thum' + index"
           :data-value="index"
           :class="{ selected: slideIndex === index }"
@@ -70,6 +70,7 @@
 <script>
   import screenfull from 'screenfull';
   import { useDocServer } from 'middleDomain';
+
   export default {
     name: 'VmpDocUne',
     provide() {
@@ -82,29 +83,18 @@
       return {
         allComplete: false,
         isFullscreen: false, //是否全屏
-        thumbnailShow: false, // 文档缩略是否显示
-        // 从服务器获取的文档列表
-        fileOrboardList: [],
-        // 缩略图列表
-        thumbnailList: [],
-
-        // 当前文档或白板的信息start (为什么不用一个对象？有的时候不触发数据变化，暂时不知道原因)
-        is_board: 1, // 1:文档，2白板 。 默认文档
-        cid: null, //容器id
-        slideIndex: 0,
-        slidesTotal: 1
-        // 当前文档或白板的信息end
+        thumbnailShow: false // 文档缩略是否显示
       };
     },
     computed: {
+      currentType() {
+        return this.docServer?.state.currentType;
+      },
+      currentCid() {
+        return this.docServer?.state.currentCid;
+      },
       showPagebar() {
-        return this.cid && this.is_board == 1 && !this.isFullscreen;
-      },
-      pageTotal() {
-        return this.slidesTotal || 1;
-      },
-      pageNum() {
-        return Number(this.slideIndex || 0) + 1;
+        return this.currentType === 'document' && !this.isFullscreen;
       }
     },
     beforeCreate() {
@@ -178,15 +168,17 @@
           // console.log('this.isFullscreen :', this.isFullscreen);
           this.allComplete = true;
         });
-        this.docServer.on(VHDocSDK.Event.DOCUMENT_LOAD_COMPLETE, data => {
-          console.log('===================文档加载完成===================');
-          // this.isPageShow = true
-          this.slidesTotal = data.info.slidesTotal;
-          this.slideIndex = data.info.slideIndex;
-          const res = this.docServer.getThumbnailList();
-          // console.log('---res----:', res);
-          this.thumbnailList = res && res[0] ? res[0].list : [];
-        });
+        // this.docServer.on(VHDocSDK.Event.DOCUMENT_LOAD_COMPLETE, data => {
+        //   console.log('===================文档加载完成===================');
+        //   // this.isPageShow = true
+        //   this.slidesTotal = data.info.slidesTotal;
+        //   this.slideIndex = data.info.slideIndex;
+        //   const res = this.docServer.getThumbnailList();
+        //   // console.log('---res----:', res);
+        //   this.thumbnailList = res && res[0] ? res[0].list : [];
+
+        //   console.log('this.docServer.state:', this.docServer.state);
+        // });
         // 文档翻页事件
         this.docServer.on(VHDocSDK.Event.PAGE_CHANGE, data => {
           console.log('===================文档翻页====================');
@@ -270,127 +262,12 @@
           // }
         });
       },
-      /**
-       * 添加文档或者白板
-       * @param item 配置信息
-       * @param is_board  1文档  2白板
-       */
-      async addNewFile(item, is_board = 1) {
-        console.log('-------addNewFile-----');
-        this.allComplete = false;
+      async addNewFile(fileType, docId, type) {
         const { width, height } = this.docViewRect;
-        const elId = this.docServer.createUUID(Number(is_board) === 1 ? 'document' : 'board');
-        let options = {
-          docId: item.docId,
-          elId,
-          id: elId,
-          width,
-          height,
-          option: {
-            // 初始画笔
-            graphicType: window.VHDocSDK.GRAPHIC.PEN,
-            stroke: '#FD2C0A',
-            strokeWidth: 7
-          }
-        };
-        item.cid = elId;
-        item.is_board = is_board;
-        this.fileOrboardList.push({ ...item });
-        await this.$forceUpdate();
+        const options = this.docServer.prepareDocumentOrBorad(width, height, fileType, docId, type);
+        // await this.$forceUpdate();
         await this.$nextTick();
-
-        // 创建
-        if (Number(is_board) === 1) {
-          try {
-            await this.docServer.createDocument(options);
-            await this.docServer.selectContainer({ id: elId });
-            const {
-              status,
-              status_jpeg,
-              slideIndex,
-              slidesTotal,
-              converted_page,
-              converted_page_jpeg
-            } = await this.docServer.loadDoc({
-              docId: item.docId,
-              id: elId,
-              docType: item.type
-            });
-
-            if (Number(status) === 200) {
-              this.slideIndex = slideIndex;
-              this.slidesTotal = slidesTotal;
-            } else if (Number(status_jpeg) === 200) {
-              this.slideIndex = converted_page;
-              this.slidesTotal = converted_page_jpeg;
-            }
-
-            this.cid = elId;
-            this.is_board = 1;
-          } catch (e) {
-            // 移除失败的容器fileOrboardList
-            this.fileOrboardList = this.fileOrboardList.filter(item => item.elId === elId);
-            console.error(e);
-            // roomApi.report(this.$store.getters.roomId, e)
-          }
-        } else {
-          console.log('-------创建白板-------');
-          try {
-            await this.docServer.createBoard({
-              ...options,
-              backgroundColor: '#fff'
-            });
-            await this.docServer.selectContainer({ id: elId });
-            this.cid = elId;
-            this.is_board = 2;
-          } catch (e) {
-            // 移除失败的容器
-            this.fileOrboardList = this.fileOrboardList.filter(item => item.elId === elId);
-            console.error(e);
-            // roomApi.report(this.$store.getters.roomId, e)
-          }
-        }
-      },
-      /**
-       * 创建文档或白板
-       */
-      async createDocumentOrBorad(item) {
-        this.allComplete = false;
-        let { cid, active, docId, is_board } = item;
-        const { width, height } = this.docViewRect;
-        if (!width || !height) console.error('创建文档容器错误', cid, docId, width, height);
-        const options = {
-          elId: cid,
-          docId: docId,
-          width: width,
-          height: height,
-          noDispatch: false,
-          option: {
-            graphicType: window.VHDocSDK.GRAPHIC.PEN,
-            stroke: '#FD2C0A',
-            strokeWidth: 7
-          }
-        };
-
-        if (Number(is_board) === 1) {
-          await this.docServer.createDocument(options);
-        } else {
-          await this.docServer.createBoard({
-            ...options,
-            backgroundColor: item.backgroundColor || '#fff'
-          });
-        }
-        if (active != 0) {
-          this.cid = cid;
-          this.is_board = Number(is_board);
-          await this.docServer.selectContainer({ id: this.cid, noDispatch: false });
-
-          window.$middleEventSdk?.event?.send({
-            cuid: this.cuid,
-            method: 'emitSwitchTo',
-            params: [is_board === 1 ? 'document' : 'board']
-          });
-        }
+        await this.docServer.addNewDocumentOrBorad(options);
       },
       /**
        *  刷新或者退出重进恢复上次的文档
@@ -398,55 +275,45 @@
       recoverLastDocs: async function () {
         console.log('刷新或者退出重进恢复上次的文档');
         // 获取远端所有所有容器列表
-        const { list } = await this.docServer.getContainerInfo();
-        this.fileOrboardList = list;
+        await this.docServer.getAllContainerInfo();
         // 执行nextTick让div的id绑定完成
         await this.$nextTick();
-        if (list.length === 0) {
-          window.$middleEventSdk?.event?.send({
-            cuid: this.cuid,
-            method: 'emitDefault'
-          });
-          return;
-        }
-        list.forEach(item => {
-          this.createDocumentOrBorad(item);
+
+        // 加载文档和白板数据
+        const { width, height } = this.docViewRect;
+        this.docServer.loadDocumentOrBoradData(width, height);
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitSwitchTo'
         });
-        this.docServer.state.docInstance.instance.setRemoteData2(list);
       },
       /**
        * 切换到 文档还是白板
        * @param type:文档：document， 白板：board
        */
-      async switchTo(type = 'document') {
+      async switchTo(type) {
         console.log('doc-une 切换到。。。:', type);
-
         // 缩略图栏隐藏
         this.thumbnailShow = false;
-        // 文档：is_board=1 ，白板 文档：is_board=2
-        const is_board = type === 'board' ? 2 : type === 'document' ? 1 : null;
-        if (!is_board) return;
-        this.id_board = is_board;
+        this.docServer.state.currentType = type;
+        const is_board = type === 'board' ? 2 : 1;
 
         // 查找当前列表是否存在文档或白板
-        const item = this.fileOrboardList.find(item => {
+        const item = this.docServer.state.fileOrBoardList.find(item => {
           return Number(item.is_board) === is_board;
         });
         if (item) {
-          // 如果存在，设置当文档或白板
-          await this.docServer.selectContainer({
-            id: item.cid,
-            noDispatch: false
-          });
-          this.cid = item.cid;
+          // 如果存在，设置为当文档或白板
+          await this.docServer.selectContainer(item.cid);
           return;
         }
 
         // 如果不存在
-        if (is_board === 1) {
-          this.cid = '';
-        } else if (is_board === 2) {
-          this.addNewFile({}, 2);
+        if (type === 'document') {
+          this.docServer.state.currentCid = '';
+        } else if (type === 'board') {
+          // 白板不存在自动新建一个
+          this.addNewFile('board');
         }
       },
       /**
@@ -464,18 +331,18 @@
        * @param type 演示类型：1：静态文档（jpg） 2：动态文档(PPT)
        */
       demonstrate(docId, type) {
-        console.log('演示文档:', docId, ';type=', type);
-        // 保留白板删除其它的文档
-        const board = this.fileOrboardList.find(item => {
-          return item.is_board === 2;
-        });
-        for (let item of this.fileOrboardList) {
-          if (item.is_board === 1) {
-            this.docServer.destroyContainer({ id: item.cid });
-          }
-        }
-        this.fileOrboardList = board ? [board] : [];
-        this.addNewFile({ docId, type }, 1);
+        // console.log('演示文档:', docId, ';type=', type);
+        // // 保留白板删除其它的文档
+        // const board = this.fileOrBoardList.find(item => {
+        //   return item.is_board === 2;
+        // });
+        // for (let item of this.fileOrBoardList) {
+        //   if (item.is_board === 1) {
+        //     this.docServer.destroyContainer({ id: item.cid });
+        //   }
+        // }
+        // this.fileOrBoardList = board ? [board] : [];
+        // this.addNewFile({ docId, type }, 1);
       },
       /**
        * 页面操作工具
@@ -529,7 +396,7 @@
        * 缩略图点击
        */
       handleThumbnail(e) {
-        if (!this.cid || this.is_board === 2) {
+        if (!this.docServer.state.currentCid || this.docServer.state.currentType === 'board') {
           return;
         }
         if (e.target.nodeName === 'UL') return;
@@ -540,7 +407,7 @@
           null;
         if (!index) return;
         const page = Number(index) + 1;
-        this.docServer.gotoPage({ id: this.cid, page });
+        this.docServer.gotoPage({ id: this.docServer.currentCid, page });
         this.slideIndex = page - 1;
       }
     },
