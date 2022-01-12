@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer } from 'middleDomain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpHeaderRight',
     data() {

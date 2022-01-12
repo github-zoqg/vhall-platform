@@ -55,7 +55,7 @@
   </div>
 </template>
 <script>
-  import { useRroomBaseServer } from 'middleDomain';
+  import { useRroomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpShare',
     data() {

@@ -14,7 +14,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useRoomBaseServer } from 'middleDomain';
+  import { useMsgServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeColumn',
     data() {

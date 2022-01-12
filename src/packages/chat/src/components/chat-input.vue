@@ -48,7 +48,7 @@
 
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
-  import { useChatServer, useRoomBaseServer } from 'middleDomain';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatInput',
     props: {

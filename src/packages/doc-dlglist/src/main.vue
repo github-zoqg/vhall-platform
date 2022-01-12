@@ -155,7 +155,7 @@
   </div>
 </template>
 <script>
-  import { useDocServer, useRoomBaseServer } from 'middleDomain';
+  import { useDocServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpDocDlglist',
     data() {

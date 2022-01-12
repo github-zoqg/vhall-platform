@@ -36,7 +36,7 @@
 
 <script>
   import { sessionOrLocal, uuid } from '@/packages/chat/src/js/utils';
-  import { useRoomBaseServer } from 'middleDomain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatImgUpload',
     props: {

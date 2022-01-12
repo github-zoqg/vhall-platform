@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useNoticeServer, useBoomBaseServer } from 'middleDomain';
+  import { useMsgServer, useNoticeServer, useBoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeList',
     filters: {
