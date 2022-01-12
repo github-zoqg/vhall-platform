@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'dlgDocList']
+    children: ['layerHeader', 'layerBody', 'dlgDocList', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -55,6 +55,12 @@ export const serverConfig = {
   },
   /*** 布局定义end */
 
+  /*** 所有弹窗集合 */
+  comAllDialog: {
+    component: 'VmpAirContainer',
+    children: ['comShare']
+  },
+
   /**** 组件定义 */
   // 顶部左侧容器
   pannelHeaderLeft: {
@@ -70,6 +76,11 @@ export const serverConfig = {
   // // 顶部右侧容器
   pannelHeaderRight: {
     component: 'VmpHeaderRight',
+    options: {
+      isShowQuit: false, //是否显示退出
+      isShowSupport: false, //是否显示技术支持
+      isShowSplitScreen: true //是否显示分屏
+    },
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
@@ -90,7 +101,19 @@ export const serverConfig = {
   // 左侧导航菜单
   comAsideMenu: {
     component: 'VmpAsideMenu',
-    children: ['comDocMenu', 'comWbMenu', 'comShareDesktopMenu', 'comMediaPlayMenu']
+    children: [
+      'comDocMenu',
+      'comWbMenu',
+      'comShareDesktopMenu',
+      'comMediaPlayMenu',
+      'comInteractMenu'
+    ],
+    emitShareClick: [
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
+    ]
   },
   // 语言选择组件
   compLanguageChoice: {
@@ -163,6 +186,10 @@ export const serverConfig = {
         args: ['comMediaPlayMenu']
       }
     ]
+  },
+  // 互动工具
+  comInteractMenu: {
+    component: 'VmpInteractMenu'
   },
   //聊天组件
   comChat: {
@@ -289,5 +316,11 @@ export const serverConfig = {
         method: 'handleUnpublishComplate'
       }
     ]
+  },
+  comShare: {
+    component: 'VmpShare',
+    options: {
+      isInviteShare: false //分享是否展示邀请卡图标
+    }
   }
 };

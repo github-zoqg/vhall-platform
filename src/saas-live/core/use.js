@@ -19,6 +19,8 @@ import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
 import VmpMediaCheck from '@/packages/media-check';
 import VmpMemberList from '@/packages/member-list';
+import VmpInteractMenu from '@/packages/interact-menu';
+import VmpShare from '@/packages/share'; // 发起端分享观看端地址
 
 // 全局注册组件
 export function initUse() {
@@ -40,4 +42,6 @@ export function initUse() {
   Vue.use(VmpStreamRemote);
   Vue.use(VmpMediaCheck);
   Vue.use(VmpMemberList);
+  Vue.use(VmpInteractMenu);
+  Vue.use(VmpShare);
 }
