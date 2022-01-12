@@ -44,6 +44,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
+      // this.memberServer = userMemberServer();
     },
     beforeDestroy() {},
     mounted() {

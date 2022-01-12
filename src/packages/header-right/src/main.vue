@@ -14,11 +14,20 @@
         <span class="vmp-header-right_duration-end">结束直播</span>
       </div>
       <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+      <div class="vmp-header-right_control">
+        <headerControl
+          :isShowQuit="isShowQuit"
+          :isShowSupport="isShowSupport"
+          :isShowSplitScreen="isShowSplitScreen"
+        ></headerControl>
+      </div>
+      <div class="vmp-header-right_full"><i class="iconfont iconicon_quanping"></i></div>
     </section>
   </div>
 </template>
 
 <script>
+  import headerControl from './components/header-control.vue';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpHeaderRight',
@@ -27,17 +36,30 @@
         liveStep: 1,
         liveDuration: '',
         localDuration: 0,
-        roomBaseState: null
+        roomBaseState: null,
+        isShowQuit: false, //是否显示退出
+        isShowSupport: false, //是否显示技术支持
+        isShowSplitScreen: false //是否显示分屏
       };
+    },
+    components: {
+      headerControl
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
+      this.initConfig();
     },
     mounted() {
       this.calculateLiveDuration();
     },
     methods: {
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          Object.assign(this.$data, widget.options);
+        }
+      },
       // 推流成功事件
       async handlePublishComplate() {
         const res = await this.postStartLive();
@@ -117,10 +139,10 @@
       font-size: 14px;
       text-align: center;
       line-height: 26px;
-      color: #fff;
+      color: @font-error-low;
       padding: 0 10px;
       cursor: pointer;
-      background-color: #fc5659;
+      background-color: @bg-error-light;
     }
     .vmp-header-right_duration {
       &-end {
@@ -133,6 +155,27 @@
         .vmp-header-right_duration-end {
           display: inline;
         }
+      }
+    }
+    &_control {
+      margin-left: 12px;
+      color: @font-dark-low;
+      font-size: 14px;
+    }
+    &_full {
+      margin: 0 20px 0 12px;
+      background-color: hsla(0, 0%, 88.6%, 0.15);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      color: @font-dark-low;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .iconfont {
+        font-size: 14px;
       }
     }
   }

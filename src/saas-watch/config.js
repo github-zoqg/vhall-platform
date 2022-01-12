@@ -206,7 +206,7 @@ export const serverConfig = {
   comShare: {
     component: 'VmpShare',
     options: {
-      isInviteShare: false //分享是否展示邀请卡
+      isInviteShare: true //分享是否展示邀请卡
     }
   },
   // 底部
