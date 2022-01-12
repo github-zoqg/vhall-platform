@@ -54,7 +54,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin']
+    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth']
   },
 
   /**** 组件定义 */
@@ -165,28 +165,47 @@ export const serverConfig = {
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice', 'comOfficial', 'comAttention', 'comShare', 'comWatchLogin']
+    children: ['compLanguageChoice', 'comAttention'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ],
+    emitOpenOfficical: [
+      //弹出公众号
+      {
+        cuid: 'comOfficial',
+        method: 'openOfficial'
+      }
+    ],
+    emitOpenShare: [
+      //弹出分享
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
+    ]
   },
   comOfficial: {
     component: 'VmpOfficial'
   },
   comAttention: {
-    component: 'VmpAttention'
+    component: 'VmpAttention',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   comShare: {
     component: 'VmpShare',
     options: {
       isInviteShare: false //分享是否展示邀请卡
     }
-  },
-  comWatchLogin: {
-    component: 'VmpWatchLogin',
-    emitClickLogin: [
-      {
-        cuid: 'compRegLogin',
-        method: 'open'
-      }
-    ]
   },
   // 底部
   comFooter: {
@@ -209,6 +228,9 @@ export const serverConfig = {
   },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'
+  },
+  comWatchAuth: {
+    component: 'VmpWatchAuth'
   },
   //聊天组件
   comChat: {
