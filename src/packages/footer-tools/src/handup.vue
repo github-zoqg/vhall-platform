@@ -6,47 +6,40 @@
         type="primary"
         size="medium"
         round
-        v-if="isAllowhandup && !handupEnd"
+        v-if="isAllowhandup && !isSpeakOn"
       >
         举手上麦
       </el-button>
     </div>
-    <div><el-button type="primary" size="medium" v-if="handupEnd" round>下麦</el-button></div>
+    <div><el-button type="primary" size="medium" v-if="isSpeakOn" round>下麦</el-button></div>
   </div>
 </template>
 <script>
-  import { useMicServer, useMsgServer } from 'middleDomain';
+  import { useMicServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
       return {
         isAllowhandup: true, //是否允许上麦,
-        handupEnd: false // 是否已经上麦
+        isSpeakOn: false // 是否已经上麦
       };
     },
     beforeCreate() {
       this.micServer = useMicServer();
     },
     created() {
-      this.micServer.$on('user_apply', msg => {
-        this.$confirm(`${msg.data.nickname}申请上麦`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        })
-          .then(() => {
-            // this.micServer.hostAgreeApply
-          })
-          .catch(() => {});
+      // 主持人同意上麦申请
+      this.micServer.$on('user_apply_host_agree', msg => {
+        // 上麦推流
+      });
+      // 主持人拒绝上麦申请
+      this.micServer.$on('user_apply_host_reject', msg => {
+        // TODO:被拒绝的处理
       });
     },
     methods: {
       // 用户申请上麦
       userApply() {
-        useMsgServer().sendRoomMsg({
-          aaa: 222
-        });
         this.micServer.userApply();
       }
     }

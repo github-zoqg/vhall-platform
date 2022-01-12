@@ -77,13 +77,14 @@
     },
     methods: {
       subscribeRemoteStream() {
+        // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
           videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
         this.interactiveServer
-          .subscribeStream(opt)
+          .subscribe(opt)
           .then(e => {
             console.log('订阅成功----', e);
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面

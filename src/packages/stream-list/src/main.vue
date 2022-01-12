@@ -2,10 +2,14 @@
   <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': !streamList.length }">
     <div
       class="vmp-stream-list__local-container"
-      :class="{ 'vmp-stream-list__main-screen': accountId !== mainScreen }"
+      :class="{
+        'vmp-stream-list__main-screen': accountId !== mainScreen,
+        'vmp-dom__max': maxElement == 'mainScreen' && accountId == mainScreen,
+        'vmp-dom__mini': miniELement == 'mainScreen' && accountId == mainScreen
+      }"
     >
       <div class="vmp-stream-list__remote-container-h">
-        <!-- <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container> -->
+        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
     </div>
     <template v-if="streamList.length">
@@ -13,7 +17,11 @@
         v-for="stream in streamList"
         :key="stream.id"
         class="vmp-stream-list__remote-container"
-        :class="{ 'vmp-stream-list__main-screen': stream.accountId == 'mainScreen' }"
+        :class="{
+          'vmp-stream-list__main-screen': stream.accountId == 'mainScreen',
+          'vmp-dom__max': maxElement == 'mainScreen' && accountId == mainScreen,
+          'vmp-dom__mini': miniELement == 'mainScreen' && accountId == mainScreen
+        }"
       >
         <div class="vmp-stream-list__remote-container-h">
           <vmp-stream-remote :stream="stream"></vmp-stream-remote>
@@ -47,9 +55,15 @@
       this.getStreamList();
     },
 
+    mounted() {
+      this.interactiveServer.$on(VhallRTC.EVENT_REMOTESTREAM_ADD, event => {
+        console.log('---流列表组件----流加入事件', event);
+      });
+    },
+
     methods: {
       getStreamList() {
-        // this.streamList = this.interactiveServer.state.interactiveInstance.currentStreams;
+        this.streamList = this.interactiveServer.getRoomStreams();
         console.log('------streamlist------', this.streamList);
       },
       exchange(compName) {

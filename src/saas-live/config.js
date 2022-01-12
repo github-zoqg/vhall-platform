@@ -32,8 +32,8 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comDocUne']
-    // children: ['comStreamList']
+    // children: ['comDocUne']
+    children: ['comStreamList']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,8 +42,7 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd',
-    children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd'
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -278,7 +277,8 @@ export const serverConfig = {
   },
   // 上麦流列表
   comStreamList: {
-    component: 'VmpStreamList'
+    component: 'VmpStreamList',
+    children: ['comStreamLocal', 'comStreamRemote']
   },
   // 远端流
   comStreamRemote: {
