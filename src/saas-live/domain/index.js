@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import DomainStore from './store';
-import { setBaseUrl, setRequestHeaders, useDocServer } from 'middleDomain';
+import { setBaseUrl, setRequestHeaders, useDocServer } from 'middle-domain';
 
 setBaseUrl('https://t-saas-dispatch.vhall.com');
 setRequestHeaders({

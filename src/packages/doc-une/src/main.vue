@@ -69,7 +69,7 @@
 </template>
 <script>
   import screenfull from 'screenfull';
-  import { useDocServer } from 'middleDomain';
+  import { useDocServer } from 'middle-domain';
 
   export default {
     name: 'VmpDocUne',

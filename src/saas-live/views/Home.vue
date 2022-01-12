@@ -19,7 +19,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { Domain } from 'middleDomain';
+  import { Domain } from 'middle-domain';
   export default {
     name: 'Home',
     components: {

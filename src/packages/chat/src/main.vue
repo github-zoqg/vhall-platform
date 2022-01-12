@@ -151,7 +151,7 @@
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer } from 'middleDomain';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
 
   export default {

@@ -29,7 +29,7 @@
 
 <script>
   import EventBus from '../js/Events.js';
-  import { useChatServer } from 'middleDomain';
+  import { useChatServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   export default {
     mixins: [dataReportMixin],

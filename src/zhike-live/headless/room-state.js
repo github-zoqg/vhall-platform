@@ -1,4 +1,4 @@
-import { useMsgServer, useDocServer, useInteractiveServer } from 'middleDomain';
+import { useMsgServer, useDocServer, useInteractiveServer } from 'middle-domain';
 export default async function () {
   const msgServer = useMsgServer();
   const docServer = useDocServer();
