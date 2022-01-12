@@ -15,6 +15,7 @@
           <msg-item
             :key="msg.msgId"
             :msg="msg"
+            v-show="checkMessageShow(msg)"
             :roleName="roleName"
             @dispatchEvent="msgEventHandleDisPatch"
             @lotteryCheck="lotteryCheck"
@@ -24,13 +25,16 @@
         </template>
         <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
         <p
-          v-if="configList['ui.hide_chat_history'] === '1' && !chatList.length"
+          v-if="[1, '1'].includes(configList['ui.hide_chat_history']) && !chatList.length"
           class="chat-content__get-list-btn-container"
         >
           <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
         </p>
       </overlay-scrollbars>
-      <div v-if="configList['ui.hide_chat_history'] !== '1'" class="chat-content__tip-box">
+      <div
+        v-if="![1, '1'].includes(configList['ui.hide_chat_history'])"
+        class="chat-content__tip-box"
+      >
         <div
           v-show="
             unReadMessageCount !== 0 &&
@@ -54,7 +58,10 @@
         :webinar-id="webinarId"
         :all-banned="allBanned"
         :chat-list="chatList"
+        :at-list="atList"
         :chat-login-status="chatLoginStatus"
+        @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
+        @ononSwitchShowSponsor="onSwitchShowSponsor"
         @updateHeight="chatOperateBarHeightChange"
       ></chat-operate-bar>
       <img-preview
@@ -72,10 +79,69 @@
         :atList="atList"
       ></chat-user-control>
     </div>
+    <!--礼物、打赏特效-->
+    <ul
+      v-show="!!this.chatOptions.hasChatFilterBtn && showSpecialEffects"
+      class="chat-special-effect"
+    >
+      <li
+        v-for="(msg, index) in specialEffectsList"
+        v-show="msg.type !== 'reward_pay_ok' || !isEmbed"
+        :key="msg.count"
+        class="chat-special-effect__item"
+        :class="{
+          opacity0: msg.isTimeout,
+          // 打赏动效背景class
+          'bg-red-package': msg.type !== 'gift_send_success',
+          // 默认礼物的背景class
+          [effectsMap[msg.content.gift_name] || 'bg-custom']: msg.type === 'gift_send_success'
+        }"
+        :style="{ top: `${index * 48 + (index + 1) * 18 || 18}px` }"
+      >
+        <div class="special-effect__avatar-box">
+          <img class="special-effect__avatar" :src="msg.avatar || defaultAvatar" alt="" />
+        </div>
+        <div class="special-effect__middle-content">
+          <p class="middle-content__nick-name">
+            {{ textOverflowSlice(msg.nickName, 8) }}
+          </p>
+          <p v-if="msg.type === 'gift_send_success'" class="middle-content__detail">
+            {{ $t('chat.chat_1032') }} {{ $t(msg.content.gift_name) }}
+          </p>
+          <p v-if="msg.type == 'reward_pay_ok'" class="middle-content__detail">
+            {{ msg.content.text_content }}
+          </p>
+        </div>
+        <div
+          v-if="msg.type == 'gift_send_success' && !effectsMap[msg.content.gift_name]"
+          class="special-effect__img-box"
+        >
+          <img
+            class="sepcial-effect__img"
+            :src="msg.content.gift_url || require('./images/red-package-1.png')"
+            alt=""
+          />
+        </div>
+        <img
+          v-if="msg.type == 'gift_send_success' && effectsMap[msg.content.gift_name]"
+          class="sepcial-effect__img"
+          :class="`sepcial-effect__img-${effectsMap[msg.content.gift_name]}`"
+          :src="msg.content.gift_url || require('./images/red-package-1.png')"
+          alt=""
+        />
+        <img
+          v-if="msg.type === 'reward_pay_ok'"
+          class="sepcial-effect__img-reward"
+          :src="msg.content.gift_url || require('./images/red-package-1.png')"
+          alt=""
+        />
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+  import defaultAvatar from './images/my-dark@2x.png';
   import MsgItem from './components/msg-item.vue';
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
@@ -100,9 +166,8 @@
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
-      const roomBaseState = useRoomBaseServer().state;
+      // const roomBaseState = useRoomBaseServer().state;
       return {
-        roomBaseState,
         //滚动插件配置
         overlayScrollBarsOptions: {
           resize: 'none',
@@ -113,10 +178,25 @@
             autoHideDelay: 200
           }
         },
-        //todo 待替换
-        configList: {
-          'ui.hide_chat_history': '2'
-        },
+        //默认兜底头像
+        defaultAvatar,
+        /** domain中读取的数据 */
+        //配置列表
+        configList: {},
+        //活动id 打开手动过滤地址需要
+        webinarId: '',
+        //直播的类型，直播，回放
+        playerType: '',
+        //房间号
+        roomId: '',
+        //用户角色
+        roleName: '',
+        //用户id
+        userId: '',
+        //聊天消息列表
+        chatList: chatList,
+        /** domain中读取的数据结束 */
+        /** 消息提示 */
         //未读消息数量
         unReadMessageCount: 0,
         //是否有常规未读消息
@@ -125,13 +205,12 @@
         isHasUnreadAtMeMsg: false,
         //是否有未读的回复消息
         isHasUnreadReplyMsg: false,
+        /** 消息提示结束 */
         //是否正在执行动画
         animationRunning: false,
         //是否是助理
         assistantType: this.$route.query.assistantType,
-        //聊天消息列表
-        chatList: chatList,
-        // @用户
+        //todo 可以放入domain @用户
         atList: [],
         // 预览图片列表
         previewImgList: [],
@@ -139,8 +218,6 @@
         showTip: false,
         // 提示文字
         tipMsg: '',
-        // 输入框的值
-        inputValue: '',
         // 输入框状态
         inputStatus: {
           placeholder: '参与聊天',
@@ -152,26 +229,10 @@
         welcomeInfo: {
           required: false
         },
-        //参会角色身份
-        join_name: {
-          type: String
-        },
-        //活动id 打开手动过滤地址需要
-        webinarId: '',
         // 是否全体禁言
         allBanned: false,
         // 是否被禁言
         isBanned: false,
-        //频道id
-        channelId: '',
-        //todo 测试用，后续删掉 房间号
-        roomId: 'lss_8434acc2',
-        //用户角色
-        roleName: '',
-        //用户id
-        userId: '',
-        // 聊天过滤的跳转url
-        chatFilterUrl: '',
         //插件
         plugin: {
           image: false,
@@ -192,10 +253,46 @@
         //聊天配置
         chatOptions: {},
         //底部操作栏高度
-        operatorHeight: 91
+        operatorHeight: 91,
+        //是否展示礼物特效
+        showSpecialEffects: true,
+        //礼物特效数组
+        specialEffectsList: [],
+        //只看主办方
+        isOnlyShowSponsor: false,
+        //特效样式map
+        effectsMap: {
+          鲜花: 'bg-flower',
+          咖啡: 'bg-coffee',
+          赞: 'bg-praise',
+          鼓掌: 'bg-applause',
+          666: 'bg-666',
+          'bg-custom': 'bg-custom'
+        }
       };
     },
-    computed: {},
+    computed: {
+      //文字过长截取
+      textOverflowSlice() {
+        return function (val = '', len = 0) {
+          if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
+            return '';
+          }
+          if (val.length > len) {
+            return val.substring(0, len) + '...';
+          }
+          return val;
+        };
+      },
+      //检查消息项是否显示，实现只看主办方效果
+      checkMessageShow() {
+        return function (msg = {}) {
+          let { roleName = '' } = msg;
+          //如果开启了只看主办方
+          return this.isOnlyShowSponsor ? ![2, '2'].includes(roleName) : true;
+        };
+      }
+    },
     watch: {
       welcomeInfo: {
         handler(val) {
@@ -214,57 +311,20 @@
             this.unReadMessageCount++;
           }
         }
-      },
-      allBanned: {
-        handler() {},
-        immediate: true
-      },
-      isBanned: {
-        handler() {
-          this.inputStatus = {
-            placeholder:
-              this.roleName == '1'
-                ? '参与聊天'
-                : this.roleName != '2'
-                ? this.isBanned
-                  ? '您已被禁言'
-                  : '参与聊天'
-                : this.allBanned
-                ? '全员禁言中'
-                : this.isBanned
-                ? '您已被禁言'
-                : '参与聊天',
-            disable:
-              this.roleName == '1'
-                ? false
-                : this.roleName != '2'
-                ? this.isBanned
-                : this.isBanned || this.allBanned
-          };
-        }
-      },
-      replyMsg() {
-        if (Object.keys(this.replyMsg || {}).length === 0) {
-          this.inputValue = this.trimPlaceHolder('reply');
-        } else {
-          this.inputValue = this.inputValue
-            ? `回复${this.replyMsg.nickName}: ${this.trimPlaceHolder('reply')}`
-            : `回复${this.replyMsg.nickName}: `;
-        }
-      },
-      inputValue(newValue) {
-        if (!newValue) {
-          this.replyMsg = {};
-        }
       }
     },
-    beforeCreate() {},
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      console.log('roomBaseState', this.roomBaseServer.state);
+    },
     created() {
       this.initInputStatus();
     },
     mounted() {
       //初始化配置
       this.initConfig();
+      //初始化视图数据，domain里取
+      this.initViewData();
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
@@ -282,6 +342,17 @@
           this.chatOptions = widget.options;
         }
       },
+      //初始化视图数据
+      initViewData() {
+        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        this.configList = configList;
+        this.webinarId = webinar.id;
+        this.playerType = webinar.type;
+        this.roomId = interact.room_id;
+        this.roleName = join_info.role_name;
+        this.userId = join_info.user_id;
+      },
       init() {
         this.$nextTick(() => {
           this.pageConfig.page = 0;
@@ -289,7 +360,7 @@
         });
 
         EventBus.$on('group_channel-change', msg => {
-          console.log('开始接受消息-------------------------', msg);
+          console.log(msg);
           this.getHistoryMsg();
         });
         setTimeout(() => {
@@ -324,19 +395,21 @@
       },
       //初始检查是否要登录才可以参与互动
       initChatLoginStatus() {
-        if (sessionStorage.getItem('watch')) {
-          if (JSON.parse(sessionStorage.getItem('moduleShow')).modules.chat_login.show == 0) {
-            if (sessionStorage.getItem('userInfo') || this.isEmbed) {
-              // 登录状态
-              this.chatLoginStatus = false;
-            } else {
-              // 非登录状态
-              this.chatLoginStatus = true;
-              this.inputStatus.placeholder = '登录后参与互动';
-            }
-          } else {
+        if ([0, '0'].includes(this.configList['ui.show_chat_without_login'])) {
+          //主持人，这时候在发起端
+          if ([1, '1'].includes(this.roleName)) {
+            // 不需要登录
             this.chatLoginStatus = false;
+            return;
           }
+          if (![1, '1'].includes(this.roleName) && ['', null, void 0].includes(this.userId)) {
+            // 需要登录
+            this.chatLoginStatus = true;
+            this.inputStatus.placeholder = '登录后参与互动';
+          }
+        } else {
+          // 不需要登录
+          this.chatLoginStatus = false;
         }
       },
       //todo 信令完成这个或者domain 初始化口令登录自身显示的消息
@@ -362,7 +435,7 @@
 
         this.chatServer.getHistoryMsg(params, '发起端').then(result => {
           this.pageConfig.page = Number(this.pageConfig.page) + 1;
-          console.log(result);
+          return result;
         });
       },
       //todo domain负责 抽奖情况检查
@@ -426,7 +499,7 @@
       performScroll() {
         this.$nextTick(() => {
           this.animationRunning = true;
-          const delayTime = this.configList['ui.hide_chat_history'] === '1' ? 0 : 250;
+          const delayTime = [1, '1'].includes(this.configList['ui.hide_chat_history']) ? 0 : 250;
           this.osInstance.scrollStop().scroll({ y: '100%' }, delayTime, 'linear', () => {
             this.animationRunning = false;
           });
@@ -444,11 +517,11 @@
       //滚动到目标处
       scrollToTarget() {
         this.animationRunning = true;
-        const delayTime = this.configList['ui.hide_chat_history'] === '1' ? 0 : 250;
+        const delayTime = [1, '1'].includes(this.configList['ui.hide_chat_history']) ? 0 : 250;
         this.osInstance.scrollStop().scroll(
           {
             el: this.osInstance.getElements().content.children[
-              this.chatList.length - this.badgeNumber
+              this.chatList.length - this.unReadMessageCount
             ],
             block: { y: 'end' }
           },
@@ -456,7 +529,7 @@
           'linear',
           () => {
             this.animationRunning = false;
-            this.badgeNumber = 0;
+            this.unReadMessageCount = 0;
             this.isHasUnreadNormalMsg = false;
             this.isHasUnreadAtMeMsg = false;
             this.isHasUnreadReplyMsg = false;
@@ -484,6 +557,7 @@
           }
           this.welcome_vo = vo;
           console.log('自定义菜单...', this.welcome_vo);
+          //todo 欢迎语功能需要加上
         }
       },
       //todo domain负责组装 发送消息
@@ -672,6 +746,7 @@
         }, 3000); // 优化 17532
       },
       //todo domain负责 @用户
+      //@用户处理
       atUser(accountId) {
         //数据上报
         this.buriedPointReport(110120, {
@@ -694,7 +769,7 @@
             this.onCloseTipHandle();
             break;
           case 'replyMsg':
-            this.onReplyMsg(el);
+            this.onReplyMsg(el, msg);
             break;
         }
       },
@@ -710,16 +785,53 @@
         this.tipMsg = '';
       },
       //有人回复本用户
-      onReplyMsg(e) {
-        if (this.userId !== e.msg.sendId) return;
+      onReplyMsg(el, msg) {
+        if (this.userId !== msg.sendId) return;
         this.showTip = true;
         this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
-        this.replyElement = e.el;
+        this.replyElement = el;
       },
-      //todo 聊天区域高度变化
+      //底部输入框输入较多内容，聊天区域也调整高度
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
         this.$refs.chatOperator.updateOverlayScrollbar();
+      },
+      //特效
+      addSpecialEffect(item) {
+        // 如果开启聊天高并发的配置项，礼物特效需要限频，丢弃
+        if (this.configList['ui.hide_chat_history'] == '1') {
+          if (this._addSpecialEffectTimer) return;
+          this._addSpecialEffectTimer = setTimeout(() => {
+            clearTimeout(this._addSpecialEffectTimer);
+            this._addSpecialEffectTimer = null;
+          }, 200);
+        }
+        item.isTimeout = false;
+        item.timer = setTimeout(() => {
+          item.isTimeout = true;
+          // this.$forceUpdate()
+          setTimeout(() => {
+            this.specialEffectsList.pop();
+          }, 100);
+        }, 3000);
+        // 如果长度已经大于等于三个了，就需要将最早的关掉
+        if (this.specialEffectsList.length >= 3) {
+          clearTimeout(this.specialEffectsList[this.specialEffectsList.length - 1].timer);
+          this.specialEffectsList[this.specialEffectsList.length - 1].isTimeout = true;
+          // this.$forceUpdate()
+          setTimeout(() => {
+            this.specialEffectsList.pop();
+          }, 100);
+        }
+        this.specialEffectsList.unshift(item);
+      },
+      //处理开启/屏蔽特效
+      onSwitchShowSpecialEffects(status) {
+        this.showSpecialEffects = status;
+      },
+      //处理只看主办方
+      onSwitchShowSponsor(status) {
+        this.isOnlyShowSponsor = status;
       }
     }
   };
@@ -757,7 +869,7 @@
     }
     .chat-content {
       position: relative;
-      ::v-deep .vmp-chat-msg-item {
+      .vmp-chat-msg-item {
         &:last-child {
           padding-bottom: 20px;
         }
@@ -796,6 +908,127 @@
           font-size: 12px;
           margin-left: 6px;
         }
+      }
+    }
+    .chat-special-effect {
+      position: absolute;
+      left: 0;
+      top: 10px;
+      &__item {
+        width: 232px;
+        height: 40px;
+        background: linear-gradient(90deg, #fb3a32 0%, rgba(255, 172, 44, 0.8) 100%);
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        border-radius: 26px;
+        position: absolute;
+        left: 0;
+        top: 10px;
+        padding: 4px;
+        padding-top: 11px;
+        transition: all 200ms;
+        background-image: url(./images/red-package-bg.png);
+        background-size: 100%;
+        &.bg-applause {
+          background-image: url(./images/applause-bg.png);
+        }
+        &.bg-coffee {
+          background-image: url(./images/coffee-bg.png);
+        }
+        &.bg-custom {
+          background-image: url(./images/custom-bg.png);
+        }
+        &.bg-flower {
+          background-image: url(./images/flower-bg.png);
+        }
+        &.bg-praise {
+          background-image: url(./images/praise-bg.png);
+        }
+        &.bg-666 {
+          background-image: url(./images/666-bg.png);
+        }
+        &:first-child {
+          animation: added 180ms;
+        }
+        &.opacity0 {
+          opacity: 0;
+        }
+        .special-effect__img-box {
+          width: 42px;
+          height: 42px;
+          border-radius: 21px;
+          background-color: #ffffff;
+          position: absolute;
+          right: 16px;
+          top: -1px;
+          overflow: hidden;
+        }
+        .sepcial-effect__img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .sepcial-effect__img-bg-flower {
+          width: 62px;
+          position: absolute;
+          right: 6px;
+          top: -16px;
+        }
+        .sepcial-effect__img-bg-coffee {
+          width: 62px;
+          position: absolute;
+          right: 6px;
+          top: -16px;
+        }
+        .sepcial-effect__img-bg-applause {
+          width: 62px;
+          position: absolute;
+          right: 6px;
+          top: -16px;
+        }
+        .sepcial-effect__img-bg-praise {
+          width: 62px;
+          position: absolute;
+          right: 6px;
+          top: -16px;
+        }
+        .sepcial-effect__img-reward {
+          width: 32px;
+          position: absolute;
+          right: 18px;
+          top: -1px;
+        }
+        .sepcial-effect__img-bg-666 {
+          width: 70px;
+          position: absolute;
+          right: -2px;
+          top: -11px;
+        }
+      }
+      @keyframes added {
+        from {
+          margin-left: -160px;
+        }
+        to {
+          margin-left: 0;
+        }
+      }
+      .special-effect__avatar-box {
+        float: left;
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        .special-effect__avatar {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 100%;
+        }
+      }
+      .special-effect__middle-content {
+        float: left;
+        margin-left: 6px;
+        font-size: 14px;
+        color: #ffffff;
       }
     }
     .tip {

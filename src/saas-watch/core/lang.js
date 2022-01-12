@@ -10,7 +10,7 @@ Vue.use(VueI18n);
  */
 export function initI18n() {
   const i18n = new VueI18n({
-    locale: window.$globalConfig.currentLang,
+    locale: 'zh-CN' || window.$globalConfig.currentLang,
     messages: {
       zh: languages.zh,
       en: languages.en

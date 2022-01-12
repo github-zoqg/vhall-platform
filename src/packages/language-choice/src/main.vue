@@ -38,7 +38,7 @@
           },
           {
             type: 'cn',
-            label: '英文'
+            label: 'English'
           }
         ]
       };

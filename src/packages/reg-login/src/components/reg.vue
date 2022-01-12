@@ -27,7 +27,7 @@
         <div id="regCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-wrap-code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -44,7 +44,7 @@
           type="danger"
           :disabled="btnDisabled || isDownTime"
           :class="[
-            'vmp-code-btn show-border',
+            'vmp-reg-login__code__btn vmp-reg-login__show__border',
             {
               start: !btnDisabled && !isDownTime,
               disabled: btnDisabled,
@@ -71,10 +71,15 @@
           {{ $t('nav.nav_1005') }}
         </a>
       </el-form-item>
-      <el-button type="primary" round class="length-max vmp-register-btn" @click="handleRegister">
+      <el-button
+        type="primary"
+        round
+        class="length-max vmp-reg-login__register__btn"
+        @click="handleRegister"
+      >
         {{ $t('register.register_1013') }}
       </el-button>
-      <div class="register-checked" v-if="!isMobile">
+      <div class="vmp-reg-login__register__checked" v-if="!isMobile">
         <el-checkbox v-model="checked">
           {{ $t('register.register_1008') }}
           <a
@@ -87,7 +92,7 @@
           </a>
         </el-checkbox>
       </div>
-      <div class="register-checked" v-else>
+      <div class="vmp-reg-login__register__checked" v-else>
         <el-checkbox v-model="checked">
           {{ $t('login.login_1030') }}
           <a
@@ -280,7 +285,7 @@
       getCapthaId() {
         /* TODO 真实逻辑 */
         // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getCapthaId', {})
+        return this.$fetch('getCapthaId', {})
           .then(res => {
             if (res && res.data && res.data.captchaid) {
               this.captchaKey = res.data.captchaid || '';
@@ -409,7 +414,7 @@
       getLoginKey() {
         /*  // TODO 真实逻辑  */
         // const getLoginKey = ['/v4/ucenter-login-reg/safe/get-key-login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getLoginKey', {})
+        return this.$fetch('getLoginKey', {})
           .then(async res => {
             if (res.code == 200 && res.data) {
               this.loginKeyVo = res.data;
@@ -515,6 +520,10 @@
                     type: 'error',
                     customClass: 'zdy-info-box'
                   });
+                  // 重新渲染验证码
+                  if (!this.captchaVal) {
+                    this.reloadCaptha();
+                  }
                 }
               })
               .catch(res => {
@@ -526,6 +535,10 @@
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
+                // 重新渲染验证码
+                if (!this.captchaVal) {
+                  this.reloadCaptha();
+                }
               });
             /* this.$message({
               message: '注册成功',
@@ -548,13 +561,13 @@
           ...params
         };
         console.log('注册init', this.options);
+        await this.getCapthaId();
         await this.$nextTick();
         // 默认图片验证码加载
         this.reloadCaptha();
       }
     },
-    async created() {
-      await this.getCapthaId();
+    created() {
       this.init();
     }
   };
@@ -586,10 +599,10 @@
       line-height: 20px;
     }
   }
-  .vmp-register-btn {
+  .vmp-reg-login__register__btn {
     margin-bottom: 8px;
   }
-  .register-checked {
+  .vmp-reg-login__register__checked {
     text-align: left;
     vertical-align: middle;
     line-height: 20px;
