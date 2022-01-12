@@ -57,6 +57,7 @@
       },
       // 开始直播
       handleStartClick() {
+        this.roomBaseServer.setDevice();
         this.liveStep = 2;
         // 派发推流事件
         window.$middleEventSdk?.event?.send({
@@ -67,7 +68,9 @@
       // 结束直播
       async handleEndClick() {
         this.liveStep = 4;
-        const res = await this.roomBaseServer.endLive();
+        const res = await this.roomBaseServer.endLive({
+          webinar_id: this.roomBaseState.watchInitData.webinar.id
+        });
         if (res.code == 200) {
           // 派发结束直播事件
           window.$middleEventSdk?.event?.send({

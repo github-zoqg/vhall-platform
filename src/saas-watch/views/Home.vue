@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { useRoomInitGroupServer } from 'middle-domain';
+  import { Domain } from 'middleDomain';
   import roomState from '../headless/room-state.js';
   export default {
     name: 'Home',
@@ -20,9 +20,6 @@
       return {
         state: 0
       };
-    },
-    beforeCreate() {
-      this.roomInitGroupServer = useRoomInitGroupServer();
     },
     async created() {
       try {
@@ -34,30 +31,31 @@
         this.state = 1;
       } catch (ex) {
         console.error('---初始化直播房间出现异常--');
-        // console.error(ex);
+        console.error(ex);
         // this.state = 2;
         // this.errMsg = ex.msg;
       }
     },
     mounted() {
       // 派发推流事件
-      setTimeout(() => {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'comStreamLocal',
-          method: 'startPush'
-        });
-      }, 3000);
+      // setTimeout(() => {
+      //   window.$middleEventSdk?.event?.send({
+      //     cuid: 'comStreamLocal',
+      //     method: 'startPush'
+      //   });
+      // }, 3000);
     },
     methods: {
       initReceiveLive() {
         const { id } = this.$route.params;
-        return this.roomInitGroupServer.initReceiveLive({
-          webinarId: id,
-          visitor_id: '',
-          refer: '',
-          record_id: '',
+        return new Domain({
+          plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
+          },
+          initRoom: {
+            webinar_id: id, //活动id
+            clientType: 'standard' //客户端类型
           }
         });
       }
