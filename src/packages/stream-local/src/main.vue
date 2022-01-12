@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useRoomBaseServer } from 'middle-domain';
+  import { useInteractiveServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -81,8 +81,25 @@
       this.interactiveServer = useInteractiveServer();
       this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
+      this.micServer = useMicServer();
     },
-    async mounted() {},
+    async mounted() {
+      console.log('本地流组件mounted钩子函数');
+      // 主持人同意上麦
+      this.micServer.$on('user_apply_host_agree', async msg => {
+        console.log('---同意上麦---开始推流');
+        // 创建本地流
+        await this.createLocalStream();
+        // 推流
+        await this.publishLocalStream();
+        // 派发事件，上麦推流成功
+        console.log(this.cuid, '----cuid----');
+        // window.$middleEventSdk?.event?.send({
+        //   cuid: this.cuid,
+        //   method: 'emitClickStreamPushed'
+        // });
+      });
+    },
     methods: {
       // 开始推流
       async startPush() {

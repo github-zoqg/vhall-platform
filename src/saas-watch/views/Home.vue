@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { Domain } from 'middleDomain';
+  import { Domain } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   export default {
     name: 'Home',
