@@ -1,11 +1,7 @@
 <template>
   <div class="vmp-officaial">
-    <div class="vmp-officaial-icon" :style="{ color: themeClass.pageBg }" @click="openOfficial">
-      <i class="iconfont iconguankanbuju"></i>
-      <p>公众号</p>
-    </div>
     <el-dialog
-      title="公众号"
+      :title="$t('nav.nav_1002')"
       :visible.sync="officialVisible"
       :close-on-click-modal="true"
       :modal-append-to-body="true"
@@ -17,9 +13,9 @@
         </div>
       </div>
       <p class="vmp-officaial-introduce">
-        使用微信“扫一扫”
+        {{ $t('nav.nav_1019') }}
         <br />
-        关注公众号
+        {{ $t('nav.nav_1012') }}
       </p>
     </el-dialog>
   </div>
@@ -29,9 +25,6 @@
     name: 'VmpOfficial',
     data() {
       return {
-        themeClass: {
-          pageBg: '#3562fa'
-        },
         officialImg:
           '//t-alistatic01.e.vhall.com/upload/interacts/wechat-official-imgs/d0/e7/d0e737b7c30eced4bc498a93e647eae6.jpg',
         officialVisible: false
@@ -46,26 +39,6 @@
 </script>
 <style lang="less">
   .vmp-officaial {
-    padding-right: 24px;
-    &-icon {
-      text-align: center;
-      cursor: pointer;
-      i {
-        font-size: 16px;
-      }
-      p {
-        font-size: 14px;
-        line-height: 14px;
-        padding-top: 5px;
-      }
-      &:hover {
-        i,
-        p {
-          cursor: pointer;
-          color: @font-high-light-normal !important;
-        }
-      }
-    }
     &-wrap {
       padding-bottom: 20px;
       display: flex;

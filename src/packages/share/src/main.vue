@@ -1,11 +1,7 @@
 <template>
   <div class="vmp-share">
-    <div class="vmp-share-icon" :style="{ color: themeClass.pageBg }" @click="shareVisible = true">
-      <i class="iconfont iconfenxiang1"></i>
-      <p>分享</p>
-    </div>
     <el-dialog
-      title="分享"
+      :title="$t('nav.nav_1013')"
       :visible.sync="shareVisible"
       :close-on-click-modal="true"
       :modal-append-to-body="true"
@@ -15,19 +11,19 @@
         <div class="vmp-share-wrap-imgs">
           <div class="vmp-share-wrap-imgs-chat" @click="shareOtherDialog(1)">
             <span></span>
-            <p>微信</p>
+            <p>{{ $t('nav.nav_1016') }}</p>
           </div>
           <div class="vmp-share-wrap-imgs-qq" @click="shareOtherDialog(2)">
             <span></span>
-            <p>QQ</p>
+            <p>{{ $t('nav.nav_1018') }}</p>
           </div>
           <div class="vmp-share-wrap-imgs-weibo" @click="shareOtherDialog(3)">
             <span></span>
-            <p>微博</p>
+            <p>{{ $t('nav.nav_1017') }}</p>
           </div>
           <div class="vmp-share-wrap-imgs-invite" @click="shareOtherDialog(4)" v-if="isInviteShare">
             <span></span>
-            <p>邀请卡</p>
+            <p>{{ $t('nav.nav_1015') }}</p>
           </div>
         </div>
         <div class="vmp-share-wrap-input">
@@ -37,12 +33,12 @@
             class="vmp-share-wrap-input-width"
             readOnly
           ></el-input>
-          <span @click="copy">复制</span>
+          <span @click="copy">{{ $t('nav.nav_1014') }}</span>
         </div>
       </div>
     </el-dialog>
     <el-dialog
-      title="分享"
+      :title="$t('nav.nav_1013')"
       :visible.sync="shareOtherVisible"
       :close-on-click-modal="false"
       width="320px"
@@ -51,7 +47,7 @@
         <img :src="shareUrl" alt="" />
       </div>
       <p class="vmp-share-introduce">
-        使用微信“扫一扫”
+        {{ $t('nav.nav_1019') }}
         <br />
         {{ introduceText }}
       </p>
@@ -64,14 +60,11 @@
     name: 'VmpShare',
     data() {
       return {
-        themeClass: {
-          pageBg: '#3562fa'
-        },
         shareVisible: false,
         shareOtherVisible: false,
         watchWebUrl: `https://t-webinar.e.vhall.com/v3/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
-        introduceText: '即可将活动分享至好友或朋友圈',
+        introduceText: this.$t('nav.nav_1022'),
         isInviteShare: false
       };
     },
@@ -90,21 +83,23 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
-        console.log(widget.options, this.$data, this.isInviteShare, '???111zhangxiao123');
+      },
+      openShareDialog() {
+        this.shareVisible = true;
       },
       shareOtherDialog(index) {
         this.shareUrl = '';
         this.introduceText = '';
         if (index == 1) {
           this.openWeixinDialog();
-          this.introduceText = '即可将活动分享至好友或朋友圈';
+          this.introduceText = this.$t('nav.nav_1022');
         } else if (index == 2) {
           this.openQqDialog();
         } else if (index == 3) {
           this.openWeiboDialog();
         } else if (index == 4) {
           this.openInviteDialog();
-          this.introduceText = '获得并转发自己的专属邀请卡';
+          this.introduceText = this.$t('nav.nav_1023');
         }
       },
       openWeixinDialog() {
@@ -121,9 +116,9 @@
           )}`,
           desc: '',
           /* 分享标题(可选) */
-          title: '微吼直播',
+          title: this.$t('nav.nav_1026'),
           /* 分享摘要(可选) */
-          summary: '点击查看更多详情',
+          summary: this.$t('nav.nav_1025'),
           /* 分享图片(可选) */
           pics: '',
           /* 分享来源(可选) 如：QQ分享 */
@@ -146,7 +141,7 @@
         const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         const p = {
           url: weiboShareUrl,
-          title: '点击查看详情'
+          title: this.$t('nav.nav_1027')
         };
         const s = [];
         for (const i in p) {
@@ -173,7 +168,7 @@
         input.select();
         document.execCommand('copy');
         this.$message({
-          message: '复制成功',
+          message: this.$t('nav.nav_1024'),
           showClose: true,
           type: 'success',
           customClass: 'zdy-info-box'
@@ -184,26 +179,6 @@
 </script>
 <style lang="less">
   .vmp-share {
-    padding-right: 24px;
-    &-icon {
-      text-align: center;
-      cursor: pointer;
-      i {
-        font-size: 16px;
-      }
-      p {
-        font-size: 14px;
-        line-height: 14px;
-        padding-top: 5px;
-      }
-      &:hover {
-        i,
-        p {
-          cursor: pointer;
-          color: @font-high-light-normal !important;
-        }
-      }
-    }
     &-wrap {
       padding-bottom: 15px;
       &-imgs {
