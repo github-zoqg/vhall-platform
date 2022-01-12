@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useRoomBaseServer } from 'middleDomain';
+  import { useInteractiveServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpStreamLocal',
     data() {

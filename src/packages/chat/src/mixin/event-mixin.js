@@ -4,7 +4,7 @@ import { textToEmojiText } from '../js/emoji';
 import { handleTime } from '../js/handle-time';
 import getAvatar from '../js/get-avatar';
 import { throttle } from 'lodash';
-import { useMsgServer } from 'middleDomain';
+import { useMsgServer } from 'middle-domain';
 
 const pcDevice = ['pc_browser', 'desktop'];
 

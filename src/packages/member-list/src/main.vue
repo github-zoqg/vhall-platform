@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import { useMicServer, useRoomBaseServer } from 'middleDomain';
+  import { useMicServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpMemberList',
     data() {

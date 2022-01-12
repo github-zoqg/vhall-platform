@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { useRoomInitGroupServer } from 'middleDomain';
+  import { useRoomInitGroupServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   export default {
     name: 'Home',

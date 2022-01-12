@@ -1,4 +1,4 @@
-import { useMsgServer, useRoomBaseServer, useDocServer, useInteractiveServer } from 'middleDomain';
+import { useMsgServer, useRoomBaseServer, useDocServer, useInteractiveServer } from 'middle-domain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');

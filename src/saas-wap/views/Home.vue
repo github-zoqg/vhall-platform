@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  import { useRoomInitGroupServer, useMsgServer } from 'middleDomain';
+  import { useRoomInitGroupServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'Home',
     data() {},

@@ -88,7 +88,7 @@
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
   import ChatFilter from './chat-filter';
-  import { useRoomBaseServer } from 'middleDomain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatOperateBar',
     components: {
