@@ -58,7 +58,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middleDomain';
+  import { useInteractiveServer } from 'middle-domain';
   export default {
     name: 'VmpStreamRemote',
     data() {

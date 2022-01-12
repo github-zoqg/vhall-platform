@@ -2,7 +2,7 @@
   <span :id="cuid" :ref="cuid" :title="$t(title)" class="icon--func" :class="icon"></span>
 </template>
 <script>
-  // import { contextServer } from 'middleDomain';
+  // import { contextServer } from 'middle-domain';
   export default {
     name: 'VmpSettingIcon',
     data() {

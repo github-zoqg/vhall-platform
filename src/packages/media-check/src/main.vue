@@ -72,7 +72,7 @@
   import ChooseAudioInput from './components/steps/choose-audio-input.vue';
   import ChooseAudioOutput from './components/steps/choose-audio-output.vue';
   import CheckResult from './components/steps/check-result.vue';
-  import { useMediaCheckServer, useRoomBaseServer } from 'middleDomain';
+  import { useMediaCheckServer, useRoomBaseServer } from 'middle-domain';
 
   import { STEP_OPTS } from './js/config';
   import { getCheckList } from './js/getCheckListEntity';

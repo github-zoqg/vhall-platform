@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useRoomBaseServer } from 'middleDomain';
+  import { useMsgServer, useRoomBaseServer } from 'middle-domain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   export default {

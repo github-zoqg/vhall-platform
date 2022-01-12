@@ -15,7 +15,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { useRoomInitGroupServer, useMsgServer } from 'middleDomain';
+  import { useRoomInitGroupServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {

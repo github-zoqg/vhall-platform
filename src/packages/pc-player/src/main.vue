@@ -171,7 +171,7 @@
   </div>
 </template>
 <script>
-  import { usePlayerServer, useRoomBaseServer } from 'middleDomain';
+  import { usePlayerServer, useRoomBaseServer } from 'middle-domain';
   import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
