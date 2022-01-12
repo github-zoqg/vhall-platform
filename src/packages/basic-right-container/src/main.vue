@@ -2,7 +2,7 @@
   <div class="vmp-basic-right-container">
     <section class="vmp-basic-right-hd"></section>
     <section class="vmp-basic-right-bd">
-      <vmp-air-container :cuid="childrenComp[0]"></vmp-air-container>
+      <!-- <vmp-air-container :cuid="childrenComp[0]"></vmp-air-container> -->
     </section>
   </div>
 </template>
@@ -16,7 +16,7 @@
       };
     },
     created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
+      // this.childrenComp = window.$serverConfig[this.cuid].children;
     },
     mounted() {},
     methods: {}
