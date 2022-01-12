@@ -9,7 +9,8 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    children: ['layerBody']
   },
   // 顶部header容器
   layerHeader: {
@@ -37,12 +38,13 @@ export const serverConfig = {
   },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+    children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
 
   layerBodyRight: {
-    component: 'VmpBasicRightContainer',
-    children: ['layerBodyRightBody']
+    component: 'VmpBasicRightContainer'
+    // children: ['layerBodyRightBody']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -217,8 +219,8 @@ export const serverConfig = {
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
-    component: 'VmpFooterTools',
-    children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
+    component: 'VmpFooterTools'
+    // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
   comPraise: {
     component: 'VmpPraise'

@@ -29,7 +29,6 @@ import VmpBasicCenterContainer from '@/packages/basic-center-container';
 import VmpShare from '@/packages/share'; // 观看端分享
 import VmpAttention from '@/packages/attention-watch'; // 观看端关注
 import VmpOfficial from '@/packages/official-watch-pc'; // 观看端公众号
-import VmpWatchLogin from '@/packages/watch-person-login'; // 观看端公众号
 import VmpMemberList from '@/packages/member-list';
 // 全局注册组件
 export function initUse() {
@@ -59,6 +58,5 @@ export function initUse() {
   Vue.use(VmpShare);
   Vue.use(VmpAttention);
   Vue.use(VmpOfficial);
-  Vue.use(VmpWatchLogin);
   Vue.use(VmpMemberList);
 }
