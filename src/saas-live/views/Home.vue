@@ -19,7 +19,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { Domain } from 'middle-domain';
+  import { Domain, useMicServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
@@ -45,6 +45,26 @@
         this.state = 2;
         this.errMsg = ex.msg;
       }
+      this.micServer = useMicServer();
+      this.micServer.$on('user_apply', msg => {
+        console.log('----dingxiaodong----收到申请上麦消息', msg);
+        this.$confirm(`${msg.data.nickname}申请上麦`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        })
+          .then(() => {
+            this.micServer.hostAgreeApply({
+              receive_account_id: msg.data.applyUserId
+            });
+          })
+          .catch(() => {
+            this.micServer.hostRejectApply({
+              receive_account_id: msg.data.applyUserId
+            });
+          });
+      });
     },
     methods: {
       // 初始化直播房间
