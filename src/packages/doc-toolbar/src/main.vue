@@ -163,6 +163,14 @@
         }
       };
     },
+    watch: {
+      ['docServer.state.currentCid'](val) {
+        if (val) {
+          // 有容器切换，想保存上传的画笔属性，需要重新设置一下
+          this.changeTool(this.currentBrush);
+        }
+      }
+    },
     computed: {
       switchStatus() {
         return this.docServer?.state.switchStatus;
@@ -173,7 +181,6 @@
     },
     mounted() {
       this.initConfig();
-      this.recoverLastState();
     },
     methods: {
       // 初始化配置
@@ -184,10 +191,10 @@
        */
       changeTool(brush, key, value) {
         if (!this.docServer?.state.currentCid) {
-          console.log('容器不存在，不设置画笔');
+          console.log('容器不存在，不可设置画笔');
           return;
         }
-        console.log(this.docServer.docInstance.currentDoc.id);
+        console.log('brush:', brush, '; key:', key, '; value:', value);
         this.currentBrush = brush;
         if (key) {
           this[brush][key] = value;
@@ -200,7 +207,7 @@
           }
           // 画笔
           case 'pen': {
-            console.log('设置画笔');
+            console.log('设置画笔', this.pen);
             this.docServer.setPen();
             this.docServer.setStrokeWidth(this.pen.size);
             this.docServer.setStroke(this.pen.color);
@@ -253,25 +260,13 @@
         this.changeTool(brush);
       },
       /**
-       *  刷新或者退出重进恢复上次的状态
-       */
-      recoverLastState: async function () {
-        // const { switch_status } = await this.docServer.getContainerInfo();
-        // this.switchStatus = Boolean(switch_status);
-      },
-      /**
        * 切换到 文档还是白板
        * @param type:文档：document， 白板：board
        */
-      async switchTo(type = 'document') {
+      async switchTo() {
+        // async switchTo(type = 'document') {
         // 当前工具适配容器类型
-        console.log('----switchTo---- toolbar');
-
-        // 当前容器不能为空，否则设置画笔会报错
-        // if (this.docServer?.state.currentCid) {
-        //   // 需要重新设置一下笔刷工具
-        //   this.changeTool(this.currentBrush);
-        // }
+        // console.log('----switchTo---- toolbar');
       },
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();

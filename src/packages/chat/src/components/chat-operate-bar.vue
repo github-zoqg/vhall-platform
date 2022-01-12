@@ -52,17 +52,19 @@
       </div>
 
       <div class="operate-container__tool-bar__right">
-        <!--聊天设置-->
-        <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
-        <chat-filter
-          v-if="roleName != 2"
-          :roomId="roomId"
-          :webinarId="webinarId"
-          :allBanned="allBanned"
-          ref="chatFilter"
-          :chatFilterUrl="chatFilterUrl"
-          :isAssistant="assistantType"
-        ></chat-filter>
+        <template v-if="chatOptions && chatOptions.enableChatSetting">
+          <!--聊天设置-->
+          <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
+          <chat-filter
+            v-if="roleName != 2"
+            :roomId="roomId"
+            :webinarId="webinarId"
+            :allBanned="allBanned"
+            ref="chatFilter"
+            :chatFilterUrl="chatFilterUrl"
+            :isAssistant="assistantType"
+          ></chat-filter>
+        </template>
       </div>
     </div>
     <div class="operate-container__input-bar">
@@ -72,6 +74,7 @@
         :input-status="inputStatus"
         :chat-options="chatOptions"
         :chat-list="chatList"
+        :at-list="atList"
         @clearUploadImg="clearUploadImg"
         @getUploadImg="updateImgUrls"
         @inputHeightChange="chatInputHeightChangeHandle"
@@ -143,6 +146,11 @@
       chatList: {
         type: Array,
         default: () => []
+      },
+      //@列表
+      atList: {
+        type: Array,
+        default: () => []
       }
     },
     data() {
@@ -201,6 +209,7 @@
           type: 'success',
           customClass: 'zdy-info-box'
         });
+        this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
@@ -212,6 +221,7 @@
           type: 'success',
           customClass: 'zdy-info-box'
         });
+        this.$emit('onSwitchShowSpecialEffects', status);
       },
       //点击筛选
       onClickFilterSetting() {
@@ -375,16 +385,6 @@
           color: @active-color;
           cursor: pointer;
         }
-      }
-      .chat-audit {
-        background-image: url('../images/auditing.png');
-        &:hover {
-          background-size: 95%;
-          background-image: url('../images/auditing-hover.png');
-        }
-      }
-      .chat-img-upload {
-        flex: 1;
       }
     }
     .operate-container__input-bar {

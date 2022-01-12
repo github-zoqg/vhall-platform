@@ -7,7 +7,7 @@
       </div>
       <div
         :class="
-          this.atList.find(u => u.nickName == this.nickName)
+          this.atList.find(u => u.nickName === this.nickName)
             ? 'vmp-chat-user-control__item disabled'
             : 'vmp-chat-user-control__item'
         "
@@ -95,13 +95,15 @@
       // 监听客户端踢出操作
       EventBus.$on('assistantKickoutCallback', msg => {
         if (msg.type == 0) return;
-        this.$fetch('setKickOut', {
-          room_id: this.roomId,
-          receive_account_id: msg.data.room_join_id,
-          status: 1
-        }).then(() => {
-          EventBus.$emit('kicked_in_chat', { nextStatus: 1, accountId: this.accountId });
-        });
+        this.chatServer
+          .setKicked({
+            room_id: this.roomId,
+            receive_account_id: msg.data.room_join_id,
+            status: 1
+          })
+          .then(() => {
+            EventBus.$emit('kicked_in_chat', { nextStatus: 1, accountId: this.accountId });
+          });
       });
     },
     methods: {

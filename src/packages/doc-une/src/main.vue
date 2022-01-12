@@ -75,26 +75,28 @@
     name: 'VmpDocUne',
     provide() {
       return {
+        getKind: function () {
+          return this.$domainStore.state.docServer.currentType;
+        },
         fullscreen: this.fullscreen,
         openDocDlglist: this.openDocDlglist
       };
     },
     data() {
       return {
-        allComplete: false,
         isFullscreen: false, //是否全屏
         thumbnailShow: false // 文档缩略是否显示
       };
     },
     computed: {
       currentType() {
-        return this.docServer?.state.currentType;
+        return this.docServer.state.currentType;
       },
       currentCid() {
-        return this.docServer?.state.currentCid;
+        return this.docServer.state.currentCid;
       },
       showPagebar() {
-        return this.currentType === 'document' && !this.isFullscreen;
+        return this.docServer.state.currentType === 'document' && !this.isFullscreen;
       }
     },
     beforeCreate() {
@@ -133,9 +135,9 @@
           // h = this.$store.state.smChange ? 170 : 506;
         }
         this.docViewRect = { width: w, height: h };
-        // this.$refs.docBoxEl.style.height = `${h}px`;
-        // this.$refs.docBoxEl.style.width = `${w}px`;
-        if (this.docServer) this.docServer.setSize(w, h);
+        // this.$refs.docContent.style.height = `${h}px`;
+        // this.$refs.docContent.style.width = `${w}px`;
+        if (this.docServer.state.currentCid) this.docServer.setSize(w, h);
       },
 
       /**
@@ -148,6 +150,7 @@
        * 初始化各种事件
        */
       initEvents() {
+        // TODO 节流
         window.addEventListener('resize', this.resize);
 
         // 全屏/退出全屏事件
@@ -155,116 +158,16 @@
           console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
           this.isFullscreen = screenfull.isFullscreen;
         });
-
-        if (!this.docServer) return;
-        // PaaS提供的文档事件
-
-        // 所有文档加载完成事件
-        this.docServer.on(window.VHDocSDK.Event.ALL_COMPLETE, () => {
-          if (process.env.NODE_ENV !== 'production') console.debug('所有文档加载完成');
-          // const list = this.$doc.getLiveAllCids();
-          // if (list.includes(this.previewInfo.elId)) this.previewInfo.canOperate = true;
-          // console.log('this.cid:', this.cid);
-          // console.log('this.isFullscreen :', this.isFullscreen);
-          this.allComplete = true;
-        });
-        // this.docServer.on(VHDocSDK.Event.DOCUMENT_LOAD_COMPLETE, data => {
-        //   console.log('===================文档加载完成===================');
-        //   // this.isPageShow = true
-        //   this.slidesTotal = data.info.slidesTotal;
-        //   this.slideIndex = data.info.slideIndex;
-        //   const res = this.docServer.getThumbnailList();
-        //   // console.log('---res----:', res);
-        //   this.thumbnailList = res && res[0] ? res[0].list : [];
-
-        //   console.log('this.docServer.state:', this.docServer.state);
-        // });
-        // 文档翻页事件
-        this.docServer.on(VHDocSDK.Event.PAGE_CHANGE, data => {
-          console.log('===================文档翻页====================');
-          this.slidesTotal = data.info.slidesTotal;
-          this.slideIndex = data.info.slideIndex;
-        });
-
-        this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
-          // if (this.hasDocPermission) return;
-          console.log('==========控制文档开关=============', status);
-        });
-
-        this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
-          // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
-          //   return;
-          // }
-          console.log('===================创建容器====================', data);
-          // this.docInfo.docContainerShow = true;
-          // this.docInfo.docShowType = data.type;
-          // this.cids.push(data.id);
-          // this.$nextTick(() => {
-          //   this.initWidth(data.type);
-          //   this.initContainer(data.type, data.id, '');
-          // });
-        });
-
-        this.docServer.on(VHDocSDK.Event.DELETE_CONTAINER, data => {
-          // if (this.roleName != 1 && this.liveStatus != 1) {
-          //   return;
-          // }
-          console.log('===============删除容器=======================', data);
-          // const index = this.cids.indexOf(data.id);
-          // if (index > -1) {
-          //   this.cids.splice(index, 1);
-          //   this.docServer.destroyContainer({ id: data.id });
-          // }
-          // if (this.currentCid == data.id) {
-          //   this.currentCid = '';
-          //   this.docInfo.docShowType = '';
-          // }
-        });
-
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
-          //   return;
-          // }
-          console.log('===============选择容器=======================', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          // this.currentCid = data.id;
-          // // 判断容器是否存在
-          // if (this.cids.indexOf(data.id) > -1) {
-          //   this.activeContainer(data.id);
-          // } else {
-          //   this.cids.push(data.id);
-          //   await this.$nextTick();
-          //   this.initWidth(data.type);
-          //   this.initContainer(data.type, data.id, '');
-          //   this.activeContainer(data.id);
-          // }
-          // EventBus.$emit('docInfo', this.docInfo);
-          // console.log('a9');
-
-          // this.docServer.setControlStyle(this.styleOpts);
-        });
-
-        this.docServer.on(VHDocSDK.Event.DOCUMENT_NOT_EXIT, ({ cid, docId }) => {
-          console.log('====================文档不存在或已删除=================', cid, docId);
-          // if (cid == this.currentCid) {
-          //   this.$message({
-          //     type: 'error',
-          //     message: '文档不存在或已删除'
-          //   });
-          //   this.deleteTimer = setTimeout(() => {
-          //     this.docId = '';
-          //     const index = this.cids.indexOf(cid);
-          //     this.cids.splice(index, 1);
-          //     this.docServer.destroyContainer({ id: this.currentCid });
-          //     this.currentCid = '';
-          //     this.docInfo.docShowType = '';
-          //   }, 3000); // 其他地方调用回将值重新传入
-          // }
-        });
       },
-      async addNewFile(fileType, docId, type) {
+      async addNewFile(fileType, docId, docType) {
         const { width, height } = this.docViewRect;
-        const options = this.docServer.prepareDocumentOrBorad(width, height, fileType, docId, type);
+        const options = this.docServer.prepareDocumentOrBorad(
+          width,
+          height,
+          fileType,
+          docId,
+          docType
+        );
         // await this.$forceUpdate();
         await this.$nextTick();
         await this.docServer.addNewDocumentOrBorad(options);
@@ -281,10 +184,12 @@
 
         // 加载文档和白板数据
         const { width, height } = this.docViewRect;
-        this.docServer.loadDocumentOrBoradData(width, height);
+        await this.docServer.loadDocumentOrBoradData(width, height);
+
         window.$middleEventSdk?.event?.send({
           cuid: this.cuid,
-          method: 'emitSwitchTo'
+          method: 'emitSwitchTo',
+          params: [this.docServer.state.currentType]
         });
       },
       /**
@@ -328,28 +233,30 @@
       /**
        * 演示文档
        * @param docId 文档id
-       * @param type 演示类型：1：静态文档（jpg） 2：动态文档(PPT)
+       * @param docType 演示类型：1：静态文档（jpg） 2：动态文档(PPT)
+       * @param switchStatus 观众可见：true/false
        */
-      demonstrate(docId, type) {
-        // console.log('演示文档:', docId, ';type=', type);
-        // // 保留白板删除其它的文档
-        // const board = this.fileOrBoardList.find(item => {
-        //   return item.is_board === 2;
-        // });
-        // for (let item of this.fileOrBoardList) {
-        //   if (item.is_board === 1) {
-        //     this.docServer.destroyContainer({ id: item.cid });
-        //   }
-        // }
-        // this.fileOrBoardList = board ? [board] : [];
-        // this.addNewFile({ docId, type }, 1);
+      async demonstrate(docId, docType, switchStatus) {
+        console.log('演示文档:docId=', docId, ';docType=', docType, '; switchStatu:', switchStatus);
+        // 保留一个白板，其它删除
+        const board = this.docServer.state.fileOrBoardList.find(item => {
+          return item.is_board === 2;
+        });
+        for (let item of this.docServer.state.fileOrBoardList) {
+          if (!(board && item.id === board.id)) {
+            this.docServer.destroyContainer({ id: item.cid });
+          }
+        }
+        this.docServer.state.fileOrBoardList = board ? [board] : [];
+        await this.addNewFile('document', docId, docType);
+        this.docServer.setSwitchStatus(switchStatus);
       },
       /**
        * 页面操作工具
        * @param {*} e
        */
       handlePage(e) {
-        if (!this.cid || this.is_board === 2) {
+        if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
           return;
         }
         if (e.target.nodeName === 'UL') return;
@@ -359,18 +266,18 @@
           e.target.parentNode.parentNode.dataset.value ||
           null;
         if (!type) return;
-        if (!this.allComplete) {
+        if (!this.docServer.state.allComplete) {
           return this.$message.warning('请文档加载完成以后再操作');
         }
         switch (type) {
           case 'prevStep':
-            if (this.slideIndex > 0) {
-              this.docServer.prevStep({ id: this.cid });
+            if (this.docServer.state.pageNum > 1) {
+              this.docServer.prevStep();
             }
             break;
           case 'nextStep':
-            if (this.slideIndex < this.slidesTotal - 1) {
-              this.docServer.nextStep({ id: this.cid });
+            if (this.docServer.state.pageNum < this.docServer.state.pageTotal) {
+              this.docServer.nextStep();
             }
             break;
           // 放大
@@ -383,11 +290,11 @@
             break;
           // 还原
           case 'zoomReset':
-            this.docServer.zoomReset({ id: this.cid });
+            this.docServer.zoomReset();
             break;
           // 移动
           case 'move':
-            this.docServer.move({ id: this.cid });
+            this.docServer.move();
             break;
         }
       },
@@ -420,7 +327,7 @@
       this.recoverLastDocs();
     },
     beforeDestroy() {
-      window.removeEventListener('resize', this.onResize);
+      window.removeEventListener('resize', this.resize);
     }
   };
 </script>

@@ -12,7 +12,7 @@
 <script>
   export default {
     name: 'VmpIconItem',
-    inject: ['getSuit'],
+    inject: ['getKind'],
     data() {
       return {
         kind: 'all', // 所有:all,  文档：document ， 白板： board
@@ -23,8 +23,8 @@
     computed: {
       show() {
         if (this.kind === 'all') return true;
-        if (typeof this.getSuit === 'function') {
-          return this.kind === this.getSuit();
+        if (typeof this.getKind === 'function') {
+          return this.kind === this.getKind();
         }
         return false;
       }
@@ -36,6 +36,7 @@
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
+        console.log('widget.options:', widget.options);
         if (widget && widget.options) {
           // eslint-disable-next-line
           if (widget.options.hasOwnProperty('className')) {

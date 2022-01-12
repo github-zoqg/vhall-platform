@@ -47,14 +47,14 @@ export const serverConfig = {
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
-    children: ['comChat']
+    children: ['comMemberList', 'comChat']
   },
   /*** 布局定义end */
 
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin']
+    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth']
   },
 
   /**** 组件定义 */
@@ -165,28 +165,47 @@ export const serverConfig = {
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice', 'comOfficial', 'comAttention', 'comShare', 'comWatchLogin']
+    children: ['compLanguageChoice', 'comAttention'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ],
+    emitOpenOfficical: [
+      //弹出公众号
+      {
+        cuid: 'comOfficial',
+        method: 'openOfficial'
+      }
+    ],
+    emitOpenShare: [
+      //弹出分享
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
+    ]
   },
   comOfficial: {
     component: 'VmpOfficial'
   },
   comAttention: {
-    component: 'VmpAttention'
+    component: 'VmpAttention',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   comShare: {
     component: 'VmpShare',
     options: {
       isInviteShare: false //分享是否展示邀请卡
     }
-  },
-  comWatchLogin: {
-    component: 'VmpWatchLogin',
-    emitClickLogin: [
-      {
-        cuid: 'compRegLogin',
-        method: 'open'
-      }
-    ]
   },
   // 底部
   comFooter: {
@@ -210,9 +229,29 @@ export const serverConfig = {
   comNoticeColumn: {
     component: 'VmpNoticeColumn'
   },
+  comWatchAuth: {
+    component: 'VmpWatchAuth'
+  },
   //聊天组件
   comChat: {
-    component: 'VmpChat'
+    component: 'VmpChat',
+    options: {
+      //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
+      hasImgUpload: false,
+      //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
+      hasChatFilterBtn: false,
+      //是否开启聊天设置功能
+      enableChatSetting: false,
+      //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】
+      userControlOptions: {
+        enable: false
+      }
+    }
+  },
+  //成员列表组件
+  comMemberList: {
+    component: 'VmpMemberList',
+    options: {}
   },
   // 登录注册组件
   compRegLogin: {

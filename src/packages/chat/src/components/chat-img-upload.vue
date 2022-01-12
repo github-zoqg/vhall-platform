@@ -36,7 +36,7 @@
 
 <script>
   import { sessionOrLocal, uuid } from '@/packages/chat/src/js/utils';
-
+  import { useRoomBaseServer } from 'middleDomain';
   export default {
     name: 'VmpChatImgUpload',
     props: {
@@ -62,8 +62,7 @@
         imgUrls: [],
         //上传图片请求的token
         headToken: sessionOrLocal.get('token', 'localStorage') || '',
-        //todo 互动token从domain里拿
-        interact_token: sessionOrLocal.get('interact_token') || '',
+        interact_token: '',
         //todo 暂时写死，后续替换 上传图片地址
         action: `https://t-saas-dispatch.vhall.com/v3/commons/upload/index`
       };
@@ -88,7 +87,18 @@
         return this.imgUrls.length;
       }
     },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    mounted() {
+      this.initViewData();
+    },
     methods: {
+      //初始化视图数据
+      initViewData() {
+        const { state = {} } = this.roomBaseServer;
+        this.interact_token = state.watchInitData.interact.interact_token || '';
+      },
       //todo 可以升级为知客的上传多张 上传图片前置处理
       beforeUpload() {
         if (this.disable) {

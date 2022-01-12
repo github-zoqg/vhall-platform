@@ -25,7 +25,7 @@
         <div id="codeLoginCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-wrap-code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -43,7 +43,7 @@
           type="danger"
           :disabled="btnDisabled || isDownTime"
           :class="[
-            'vmp-code-btn show-border',
+            'vmp-reg-login__code__btn vmp-reg-login__show__border',
             {
               start: !btnDisabled && !isDownTime,
               disabled: btnDisabled,
@@ -59,23 +59,31 @@
       <el-form-item>
         <div
           :class="[
-            'vmp-box__link vmp-box__code__link',
+            'vmp-reg-login-box__link vmp-reg-login-box__code__link',
             {
-              'vmp-box__height__max': isMaxHeight
+              'vmp-reg-login-box__height__max': isMaxHeight
             }
           ]"
         >
           <el-checkbox v-model="autoLoginStatus" class="vmp-box-checkbox"></el-checkbox>
-          <span class="vmp-box__auto vmp-box__checked" @click="autoLoginStatus = !autoLoginStatus">
+          <span
+            class="vmp-reg-login-box__auto vmp-reg-login-box__checked"
+            @click="autoLoginStatus = !autoLoginStatus"
+          >
             {{ $t('login.login_1005') }}
           </span>
         </div>
-        <el-button type="primary" round class="length-max vmp-login-btn" @click="handleCodeLogin">
+        <el-button
+          type="primary"
+          round
+          class="length-max vmp-reg-login__login__btn"
+          @click="handleCodeLogin"
+        >
           {{ $t('nav.nav_1005') }}
         </el-button>
         <a
           href="javascript:void(0)"
-          class="vmp-reg__link"
+          class="vmp-reg-login__reg__link"
           v-if="options.showToReg == 1"
           @click="handleToReg"
         >
@@ -266,7 +274,7 @@
       getCapthaId() {
         /* TODO 真实逻辑
         // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('getCapthaId', {})
+        return this.$fetch('getCapthaId', {})
           .then(res => {
             if (res && res.data && res.data.captchaid) {
               this.captchaKey = res.data.captchaid || '';
@@ -462,7 +470,7 @@
               this.resetForm();
               this.$emit('handleClose', 'code');
               // 刷新页面
-              // this.$router.go(0);
+              this.$router.go(0);
             } else {
               localStorage.setItem('userInfo', '');
             }
@@ -532,7 +540,7 @@
         this.reloadCaptha();
       },
       // init组件入口 - 通用api
-      init(params = {}) {
+      async init(params = {}) {
         // 组件加载初始化默认数据
         this.isMobile =
           /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
@@ -547,12 +555,12 @@
           ...params
         };
         console.log('验证码登录init', this.options);
+        await this.getCapthaId();
         // 默认图片验证码加载
         this.reloadCaptha();
       }
     },
-    async created() {
-      await this.getCapthaId();
+    created() {
       this.init();
     }
   };

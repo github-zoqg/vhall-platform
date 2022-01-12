@@ -15,7 +15,10 @@ export default class Msg {
       msgId = '',
       channel = '',
       atList = [],
-      isHistoryMsg = false
+      isHistoryMsg = false,
+      interactStatus = false,
+      isCheck = false,
+      interactToolsStatus = false
     } = params;
 
     // 用户id
@@ -34,5 +37,8 @@ export default class Msg {
     this.channel = channel;
     this.atList = atList;
     this.isHistoryMsg = isHistoryMsg;
+    this.interactStatus = interactStatus;
+    this.isCheck = isCheck;
+    this.interactToolsStatus = interactToolsStatus;
   }
 }
