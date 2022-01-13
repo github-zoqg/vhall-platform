@@ -10,6 +10,7 @@
 
       <aside class="vmp-basic-dialog-container">
         <VmpPcMediaCheck></VmpPcMediaCheck>
+        <VmpPcMediaSetting></VmpPcMediaSetting>
       </aside>
     </div>
     <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
