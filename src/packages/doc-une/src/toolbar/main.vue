@@ -179,13 +179,7 @@
     beforeCreate() {
       this.docServer = useDocServer();
     },
-    mounted() {
-      this.initConfig();
-    },
     methods: {
-      // 初始化配置
-      initConfig() {},
-
       /**
        *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
        */
@@ -194,7 +188,7 @@
           console.log('容器不存在，不可设置画笔');
           return;
         }
-        console.log('brush:', brush, '; key:', key, '; value:', value);
+        console.log('changeTool brush:', brush, '; key:', key, '; value:', value);
         this.currentBrush = brush;
         if (key) {
           this[brush][key] = value;
@@ -258,15 +252,6 @@
           return;
         }
         this.changeTool(brush);
-      },
-      /**
-       * 切换到 文档还是白板
-       * @param type:文档：document， 白板：board
-       */
-      async switchTo() {
-        // async switchTo(type = 'document') {
-        // 当前工具适配容器类型
-        // console.log('----switchTo---- toolbar');
       },
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();

@@ -10,7 +10,6 @@ import VmpHeaderRight from '@/packages/header-right';
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
-import VmpDocToolbar from '@/packages/doc-toolbar';
 import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
@@ -30,7 +29,6 @@ export function initUse() {
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
   Vue.use(VmpDocUne);
-  Vue.use(VmpDocToolbar);
   Vue.use(VmpStreamList);
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);
