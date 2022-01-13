@@ -46,6 +46,8 @@
       height: 40px;
       display: flex;
       align-items: center;
+      padding-left: 24px;
+      user-select: none;
 
       &:hover {
         color: #fb3a32;
@@ -54,6 +56,16 @@
       &--active {
         color: #fb3a32;
         background: #f7f7f7;
+        position: relative;
+
+        &::before {
+          position: absolute;
+          content: '';
+          height: 100%;
+          left: 0;
+          width: 3px;
+          background: #fb3a32;
+        }
       }
     }
   }

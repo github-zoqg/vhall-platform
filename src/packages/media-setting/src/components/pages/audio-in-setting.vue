@@ -1,11 +1,26 @@
 <template>
   <section>
     <main>
-      <section>
-        <el-select></el-select>
+      <section class="vmp-media-setting-item">
+        <el-select
+          class="vmp-media-setting-item__content"
+          v-model="selectedId"
+          @change="audioInputChange"
+        >
+          <el-option
+            v-for="item in devices"
+            :key="item.deviceId"
+            :value="item.deviceId"
+            :label="item.label"
+          ></el-option>
+        </el-select>
       </section>
-      <section>
-        <preview-audio></preview-audio>
+      <section class="vmp-media-setting-item">
+        <preview-audio
+          ref="previewAudio"
+          class="vmp-media-setting-item__content"
+          :audioId="selectedId"
+        ></preview-audio>
       </section>
     </main>
     <footer>
@@ -25,6 +40,37 @@
   export default {
     components: {
       PreviewAudio
+    },
+    props: {
+      devices: {
+        type: Array,
+        default: () => []
+      },
+      selectedId: {
+        type: String,
+        default: ''
+      }
+    },
+    watch: {
+      selectedId() {
+        this.setAudioInput();
+      }
+    },
+    mounted() {},
+    methods: {
+      async audioInputChange(selectedId) {
+        selectedId && this.$emit('update:selectedId', selectedId);
+      },
+      async setAudioInput(id = this.selectedId) {
+        if (!this.$refs.previewAudio) return;
+
+        const mediaOptions = { audio: { deviceId: id } };
+        const stream = await navigator.mediaDevices.getUserMedia(mediaOptions);
+        stream.getTracks().forEach(trackInput => {
+          trackInput.stop();
+        });
+        this.$refs.previewAudio.initAudio(id);
+      }
     }
   };
 </script>
