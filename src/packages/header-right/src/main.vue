@@ -19,6 +19,7 @@
           :isShowQuit="isShowQuit"
           :isShowSupport="isShowSupport"
           :isShowSplitScreen="isShowSplitScreen"
+          @openVirtualProple="openVirtualProple"
         ></headerControl>
       </div>
       <div class="vmp-header-right_full"><i class="iconfont iconicon_quanping"></i></div>
@@ -59,6 +60,12 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
+      },
+      openVirtualProple() {
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitVirtualClick'
+        });
       },
       // 推流成功事件
       async handlePublishComplate() {
