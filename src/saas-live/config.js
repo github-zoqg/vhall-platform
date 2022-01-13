@@ -140,7 +140,7 @@ export const serverConfig = {
     },
     emitClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne', 'comDocToolbar'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
       }
@@ -156,7 +156,7 @@ export const serverConfig = {
     },
     emitClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne', 'comDocToolbar'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
       }
@@ -217,9 +217,8 @@ export const serverConfig = {
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    children: ['comDocToolbar'],
     emitSwitchTo: {
-      cuid: ['comAsideMenu', 'comDocToolbar'], //同名方法,同样的参数可以合并
+      cuid: ['comAsideMenu'],
       method: 'switchTo',
       args: ['$0'] // 获取动态参数的第一个
     },

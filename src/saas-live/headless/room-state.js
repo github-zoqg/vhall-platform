@@ -16,6 +16,11 @@ export default async function () {
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
+
+  // TODO 设置主持端测试权限数据
+  roomBaseServer.state.configList = {
+    hasToolbar: true
+  };
   console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue');
 
   await msgServer.init();
