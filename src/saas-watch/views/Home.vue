@@ -64,46 +64,46 @@
 </script>
 <style lang="less">
   // 媒体查询分辨率下效果
-  // @media screen and (min-width: 1920px) {
-  //   .vmp-basic-bd {
-  //     max-width: 1658px;
-  //   }
-  // }
+  @media screen and (min-width: 1920px) {
+    .vmp-basic-bd {
+      max-width: 1658px;
+    }
+  }
 
-  // @media screen and (min-width: 1706px) {
-  //   .vmp-basic-bd {
-  //     max-width: 1658px;
-  //   }
-  // }
+  @media screen and (min-width: 1706px) {
+    .vmp-basic-bd {
+      max-width: 1658px;
+    }
+  }
 
-  // @media screen and (min-width: 1388px) and (max-width: 1705px) {
-  //   .vmp-basic-bd {
-  //     max-width: 1339px;
-  //   }
-  // }
+  @media screen and (min-width: 1388px) and (max-width: 1705px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
 
-  // @media screen and (max-width: 1387px) {
-  //   .vmp-basic-bd {
-  //     max-width: 1339px;
-  //   }
-  // }
+  @media screen and (max-width: 1387px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
 
-  // @media screen and (max-width: 1440px) {
-  //   .vmp-basic-bd {
-  //     max-width: 1339px;
-  //   }
-  // }
+  @media screen and (max-width: 1440px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
 
-  // @media screen and (max-width: 1366px) {
-  //   .vmp-basic-bd {
-  //     max-width: 1103px;
-  //   }
-  // }
+  @media screen and (max-width: 1366px) {
+    .vmp-basic-bd {
+      max-width: 1103px;
+    }
+  }
 
-  // @media screen and (max-width: 1151px) {
-  //   // 浏览器中部最小间距，低于此分辨率1151px滚动条
-  //   .vmp-basic-bd {
-  //     max-width: 1103px;
-  //   }
-  // }
+  @media screen and (max-width: 1151px) {
+    // 浏览器中部最小间距，低于此分辨率1151px滚动条
+    .vmp-basic-bd {
+      max-width: 1103px;
+    }
+  }
 </style>

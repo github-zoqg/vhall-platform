@@ -8,9 +8,7 @@
         'vmp-dom__mini': miniElement == 'mainScreen' && accountId == mainScreen
       }"
     >
-      <div class="vmp-stream-list__remote-container-h">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-      </div>
+      <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
     </div>
     <template v-if="remoteStreams.length">
       <div
@@ -18,14 +16,12 @@
         :key="stream.id"
         class="vmp-stream-list__remote-container"
         :class="{
-          'vmp-stream-list__main-screen': stream.accountId !== mainScreen,
-          'vmp-dom__max': maxElement == 'mainScreen' && stream.accountId !== mainScreen,
-          'vmp-dom__mini': miniElement == 'mainScreen' && stream.accountId !== mainScreen
+          'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+          'vmp-dom__max': maxElement == 'mainScreen' && stream.accountId == mainScreen,
+          'vmp-dom__mini': miniElement == 'mainScreen' && stream.accountId == mainScreen
         }"
       >
-        <div class="vmp-stream-list__remote-container-h">
-          <vmp-stream-remote :stream="stream"></vmp-stream-remote>
-        </div>
+        <vmp-stream-remote :stream="stream"></vmp-stream-remote>
       </div>
     </template>
   </div>
@@ -34,7 +30,7 @@
 <script>
   import { useInteractiveServer } from 'middle-domain';
   export default {
-    name: 'VmpStreamList',
+    name: 'VmpStreamListLive',
 
     data() {
       return {
@@ -96,31 +92,21 @@
     .vmp-stream-list__main-screen {
       position: absolute;
       top: 80px;
-      width: calc(100% - 380px);
-      .vmp-stream-list__remote-container {
-        &-h {
-          padding-top: 56.25%;
-        }
-      }
-      // 为了保持16:9的比例，这里需要重写一下stream的样式
-      .vmp-stream-remote {
-        position: absolute;
+      left: 60px;
+      right: 310px;
+      bottom: 0;
+      // 主屏在小窗的样式
+      &.vmp-dom__mini {
+        right: 0;
+        left: auto;
         top: 0;
-      }
-      .vmp-stream-local {
-        position: absolute;
-        top: 0;
+        width: 309px;
+        height: 240px;
+        z-index: 1;
       }
     }
 
-    .vmp-stream-list__remote-container {
-      width: 142px;
-      &-h {
-        height: 100%;
-      }
-    }
-
-    // 只有一个主屏流的情况，设置高度为 0
+    // 没有远端流的时候高度为0
     &-h0 {
       height: 0;
       .vmp-stream-list__main-screen {
@@ -128,12 +114,9 @@
       }
     }
 
-    // 主屏在小窗的样式
-    .vmp-dom__mini {
-      right: 0;
-      top: 0;
-      width: 360px;
-      z-index: 1;
+    .vmp-stream-list__remote-container {
+      width: 142px;
+      height: 100%;
     }
   }
 </style>
