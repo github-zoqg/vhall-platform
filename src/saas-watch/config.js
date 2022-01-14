@@ -22,21 +22,26 @@ export const serverConfig = {
   layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
-    children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
+    children: ['layerBodyCenter', 'layerBodyRight']
+    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerFooter: {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
-  layerBodyLeft: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-left',
-    children: []
+  // layerBodyLeft: {
+  //   component: 'VmpContainer',
+  //   className: 'vmp-basic-left',
+  //   children: []
+  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+  // },
+  layerBodyCenter: {
+    component: 'VmpBasicCenterContainer',
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-    // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+    children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
-
   layerBodyRight: {
     component: 'VmpContainer',
     className: 'vmp-basic-right',
