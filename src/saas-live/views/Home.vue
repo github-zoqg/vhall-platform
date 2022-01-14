@@ -9,7 +9,7 @@
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
 
       <aside class="vmp-basic-dialog-container">
-        <VmpPcMediaCheck></VmpPcMediaCheck>
+        <!-- <VmpPcMediaCheck></VmpPcMediaCheck> -->
       </aside>
     </div>
     <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>

@@ -12,7 +12,7 @@
   min-height: 124px;
 }
 .el-dialog__headerbtn {
-  top: 32px;
+  top: 30px;
   right: 32px;
   height: 16px;
   .el-dialog__close {
@@ -300,6 +300,7 @@
 }
 .el-input__inner,
 .el-textarea__inner {
+  padding: 0 12px;
   border-color: @border-normal-color;
   color: @font-light-normal;
   &:hover {
@@ -361,6 +362,11 @@
 }
 .el-textarea__inner {
   resize: none;
+}
+
+/*-----------------------------------------表单-----------------------------------------*/
+.el-form-item {
+  margin-bottom: 24px;
 }
 
 /*-----------------------------------------下拉框重置-----------------------------------------*/
@@ -530,7 +536,6 @@
 
 .el-button.is-round {
   border-radius: 20px;
-  padding: 9px 51px;
 }
 
 .el-button.el-button--small {

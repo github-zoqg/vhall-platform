@@ -57,7 +57,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['comShare']
+    children: ['comShare', 'comVirtualPeople']
   },
 
   /**** 组件定义 */
@@ -80,6 +80,12 @@ export const serverConfig = {
       isShowSupport: false, //是否显示技术支持
       isShowSplitScreen: true //是否显示分屏
     },
+    emitVirtualClick: [
+      {
+        cuid: 'comVirtualPeople',
+        method: 'openVirtualDialog'
+      }
+    ],
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
@@ -321,5 +327,8 @@ export const serverConfig = {
     options: {
       isInviteShare: false //分享是否展示邀请卡图标
     }
+  },
+  comVirtualPeople: {
+    component: 'VmpVirtualPeople'
   }
 };
