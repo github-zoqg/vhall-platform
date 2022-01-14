@@ -24,6 +24,35 @@
                 <member-item
                   :key="user.account_id"
                   v-if="![1, '1'].includes(user.is_kicked)"
+                  @operateUser="handleOperateUser"
+                  :user-info="user"
+                  :role-name="roleName"
+                  :is-in-group="isInGroup"
+                  :mode="mode"
+                  :current-speaker-id="currentSpeakerId"
+                  :user-id="userId"
+                  :apply-users="applyUsers"
+                ></member-item>
+              </template>
+            </template>
+          </div>
+        </template>
+        <!--举手的成员-->
+        <template v-if="tabIndex === 2">
+          <div class="member-list__apply-tab">
+            <div
+              v-if="!applyUsers.length"
+              class="empty-container"
+              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
+            >
+              <span class="iconzanwujushou iconfont"></span>
+              <p>暂无人举手</p>
+            </div>
+            <template v-else>
+              <template v-for="user in applyUsers">
+                <member-item
+                  :key="user.account_id"
+                  v-if="![1, '1'].includes(user.is_kicked)"
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
@@ -32,13 +61,29 @@
             </template>
           </div>
         </template>
-        <!--举手的成员-->
-        <template v-if="tabIndex === 2">
-          <div class="member-list__apply-tab"></div>
-        </template>
         <!--受限制的成员-->
         <template v-if="tabIndex === 3">
-          <div class="member-list__limit-tab"></div>
+          <div class="member-list__limit-tab">
+            <div
+              v-if="!limitedUsers.length"
+              class="empty-container"
+              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
+            >
+              <span class="iconzanwuchengyuan iconfont"></span>
+              <p>没有禁言或者踢出的成员</p>
+            </div>
+            <template v-else>
+              <template v-for="user in limitedUsers">
+                <member-item
+                  :key="user.account_id"
+                  v-if="![1, '1'].includes(user.is_kicked)"
+                  :user-info="user"
+                  :role-name="roleName"
+                  :is-in-group="isInGroup"
+                ></member-item>
+              </template>
+            </template>
+          </div>
         </template>
       </div>
     </div>
@@ -50,19 +95,13 @@
         <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
         <span class="info-panel__refresh-btn" @click="refreshList">刷新</span>
         <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
-          <label class="lb-raisehands" for="lb-raisehands">
-            允许举手
-            <input
-              style="display: none"
-              v-model="allowRaiseHand"
-              @change="onSwitchAllowRaiseHand"
-              type="checkbox"
-              id="lb-raisehands"
-            />
-            <i class="ss">
-              <em></em>
-            </i>
-          </label>
+          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
+          <el-switch
+            v-model="allowRaiseHand"
+            :width="32"
+            @change="onSwitchAllowRaiseHand"
+            active-color="#fc5659"
+          ></el-switch>
         </div>
       </div>
       <!--按钮面板-->
@@ -122,7 +161,7 @@
 
 <script>
   import memberItem from './components/member-item';
-  import { useMicServer, useRoomBaseServer } from 'middle-domain';
+  import { useMicServer, useRoomBaseServer, useMemberServer } from 'middle-domain';
   export default {
     name: 'VmpMemberList',
     components: {
@@ -147,12 +186,40 @@
         memberOptions: {},
         //当前角色
         roleName: '',
+        //当前登录的用户
+        userId: '',
         //todo domain负责 在线人数
-        onlineUsers: [],
+        onlineUsers: [
+          {
+            join_id: 1001627,
+            room_id: 'lss_1057afbe',
+            account_id: '16422770',
+            nickname: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
+            avatar:
+              'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/08/2e/082ea1e5abcba87b5d5c57600c1bbec3.jpg',
+            role_name: '1',
+            is_banned: 0,
+            is_kicked: 0,
+            device_type: 0,
+            device_status: 1,
+            is_signed: 0,
+            is_answered_questionnaire: 0,
+            is_lottery_winner: 0,
+            is_answered_exam: 0,
+            is_answered_vote: 0,
+            status: 0,
+            updated_at: '2022-01-13 10:37:25',
+            created_at: '2022-01-04 21:30:04',
+            deleted_at: '',
+            is_speak: 0
+          }
+        ],
         //申请人数
         applyUsers: [],
         //受限人数
         limitedUsers: [],
+        //房间号
+        roomId: '',
         //mod 6代表分组活动
         mode: 3,
         /** 搜索输入框相关 */
@@ -175,13 +242,20 @@
         //todo 是否允许举手
         allowRaiseHand: false,
         // 举手提示
-        raiseHandTip: false
+        raiseHandTip: false,
+        //分页配置
+        pageConfig: {
+          page: 1,
+          limit: 10
+        },
+        //受限人员是否为空
+        limitedUsersEmpty: false
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
-      // this.memberServer = userMemberServer();
+      this.memberServer = useMemberServer();
     },
     beforeDestroy() {},
     mounted() {
@@ -189,6 +263,8 @@
       this.initConfig();
       //初始化视图数据
       this.initViewData();
+      //开始初始化流程
+      this.init();
     },
     computed: {
       //是否在分组里
@@ -199,7 +275,6 @@
       },
       //主讲人ID
       docPermissionId() {
-        //todo 临时注释
         const { state = {} } = this.roomBaseServer;
         const { groupInitData = {} } = state;
         return groupInitData.doc_permission;
@@ -216,18 +291,62 @@
       //初始化视图数据
       initViewData() {
         const { groupInitData = {}, watchInitData = {} } = this.roomBaseServer.state;
-        const { webinar = {}, join_info = {} } = watchInitData;
+        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         this.mode = webinar.mode;
         this.roleName = join_info.role_name;
+        this.userId = join_info.userId;
+        this.roomId = interact.room_id;
+      },
+      //统一初始化方法
+      init() {
+        this.getOnlineUserList();
       },
       //获取在线人员列表
-      getOnlineUserList() {},
+      getOnlineUserList() {
+        const { getOnlineUserList } = this.memberServer;
+        const data = {
+          room_id: this.roomId,
+          pos: this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page,
+          limit: this.pageConfig.limit
+        };
+
+        //如果存在输入搜索人员的值
+        if (this.searchUserInput) {
+          Object.assign(data, { nickname: this.searchUserInput });
+        }
+        getOnlineUserList(data).then(res => {
+          if (res.code === 200) {
+            this.onlineUsers = this.memberServer.state.onlineUsers || [];
+          }
+        });
+      },
       //获取受限人员列表
-      getLimitUserList() {},
+      async getLimitUserList() {
+        const { getMutedUserList, getKickedUserList } = this.memberServer;
+        const data = {
+          room_id: this.roomId,
+          pos: 0,
+          limit: 100
+        };
+        try {
+          const bannedList = await getMutedUserList(data);
+          const kickedList = this.isInGroup
+            ? { data: { list: [] } }
+            : await getKickedUserList(data);
+          const list = bannedList.data.list.concat(kickedList.data.list);
+          const hash = {};
+          this.limitedUsers = list.reduce((preVal, curVal) => {
+            !hash[curVal.account_id] && (hash[curVal.account_id] = true && preVal.push(curVal));
+            return preVal;
+          }, []);
+        } catch (error) {
+          console.error('获取受限人员列表接口错误', error);
+        }
+      },
       //刷新在线人数
       refreshList() {},
       //切换允许举手状态
-      onSwitchAllowRaiseHand() {},
+      onSwitchAllowRaiseHand(status) {},
       //切换聊天搜索框显示状态
       toggleSearchTab() {
         this.searchShow = !this.searchShow;
@@ -235,13 +354,25 @@
       //切换至某个tab
       switchToTab(index) {
         this.tabIndex = index;
+        //清空输入的人员筛选
+        this.searchUserInput = '';
+        if (index === 2) {
+          this.raiseHandTip = false;
+        } else if (index === 3) {
+          this.getLimitUserList();
+        }
+        //todo scroll调整
       },
       //清空人员搜索
       clearSearchInput() {
         this.searchUserInput = '';
       },
       //按条件进行搜索
-      doSearch() {}
+      doSearch() {},
+      //响应人员操作
+      handleOperateUser({ type = '', params = {} }) {
+        console.log(type, params);
+      }
     }
   };
 </script>
@@ -269,12 +400,39 @@
       flex: 1;
       position: relative;
       &__scroll {
+        display: flex;
+        flex-direction: column;
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         overflow: hidden;
+      }
+      .empty-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        span {
+          font-size: 80px;
+          color: #7e7e7e;
+        }
+        p {
+          margin-top: 10px;
+          color: #999999;
+        }
+      }
+      .member-list__all-tab {
+        flex: 1;
+      }
+      .member-list__apply-tab {
+        flex: 1;
+      }
+      .member-list__limit-tab {
+        flex: 1;
       }
     }
     &__operate-container {
@@ -306,42 +464,10 @@
       }
       .info-panel__allow-raise-hand {
         float: right;
-        .lb-raisehands {
-          cursor: pointer;
-          color: #ccc;
-          font-size: 12px;
-          margin-right: 1px;
-          & > input:checked + i em {
-            border-color: #ff9446;
-            left: 22px;
-            transition: all 0.1s ease-in-out;
-          }
-          & > i {
-            display: inline-block;
-            width: 30px;
-            height: 14px;
-            background-color: #242527;
-            border-radius: 100px;
-            position: relative;
-            margin-left: 5px;
-            position: relative;
-            top: 3px;
-            & > em {
-              box-sizing: border-box;
-              position: absolute;
-              top: 2px;
-              left: 0;
-              content: '';
-              width: 10px;
-              height: 10px;
-              background-color: #242527;
-              border: 2px solid #aaaaaa;
-              border-radius: 10px;
-              transition: all 0.1s ease-in-out;
-              backface-visibility: hidden;
-              transform-style: preserve-3d;
-            }
-          }
+        &__switch-title {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: 4px;
         }
       }
 
@@ -405,7 +531,7 @@
       }
       &__search-panel {
         display: flex;
-        width: 80%;
+        width: calc(100% - 20px);
         height: 30px;
         position: absolute;
         top: 4px;
@@ -413,14 +539,15 @@
         background-color: #34363a;
         border-radius: 4px;
         overflow: hidden;
-        &__input {
+
+        .search-panel__input {
           box-sizing: border-box;
           width: 100%;
           height: 100%;
-          background-color: rgba(255, 255, 255, 0.9);
+          background-color: hsla(0, 0%, 100%, 0.9);
           padding: 0 75px 0 10px;
           border: none;
-          color: #666666;
+          color: #666;
         }
         .search-panel__clear-btn {
           width: 15px;

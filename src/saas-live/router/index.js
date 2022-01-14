@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
+import ChatAuth from '@/packages/chat-auth/index';
 
 Vue.use(VueRouter);
 
@@ -16,6 +17,12 @@ const routes = [
     component: Home,
     name: 'LiveRoom',
     meta: { title: '直播间' }
+  },
+  {
+    path: '/lives/chat-auth/:id',
+    name: 'ChatAuth',
+    component: ChatAuth,
+    meta: { title: '聊天审核' }
   },
   // {
   //   path: '/about',
