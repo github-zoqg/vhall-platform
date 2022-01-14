@@ -15,7 +15,9 @@
     methods: {
       switchTo(kind) {
         for (const vn of this.$children) {
-          vn.setSelectedState(vn.kind === kind);
+          if (vn.setSelectedState) {
+            vn.setSelectedState(vn.kind === kind);
+          }
         }
       },
       goWatchShare() {

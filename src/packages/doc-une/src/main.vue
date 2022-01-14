@@ -1,8 +1,12 @@
 <template>
-  <div class="vmp-doc-une" :class="{ 'vmp-doc-une--fullscreen': isFullscreen }" ref="docWrapper">
+  <div
+    class="vmp-doc-une"
+    :class="[className, { 'vmp-doc-une--fullscreen': isFullscreen }]"
+    ref="docWrapper"
+  >
     <!-- 这里配置的是文档工具栏 -->
-    <div class="vmp-doc-une__hd">
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
+    <div class="vmp-doc-une__hd" v-if="hasToolbar">
+      <VmpDocToolbar></VmpDocToolbar>
     </div>
 
     <!-- 文档白板内容区 -->
@@ -31,16 +35,18 @@
       <!-- 文档操作栏: 翻页、放大、缩小、还原、拖拽 -->
       <ul class="vmp-doc-pagebar" @click="handlePage" v-show="showPagebar">
         <li
+          v-if="hasPager"
           data-value="prevStep"
           title="上一步"
           class="doc-pagebar__opt iconfont iconzuofanye"
         ></li>
-        <li class="page-number">
+        <li v-if="hasPager" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
           <span class="page-split">/</span>
           <span class="page-total">{{ docServer.state.pageTotal }}</span>
         </li>
         <li
+          v-if="hasPager"
           data-value="nextStep"
           title="下一步"
           class="doc-pagebar__opt iconfont iconyoufanye"
@@ -68,11 +74,13 @@
   </div>
 </template>
 <script>
+  import VmpDocToolbar from './toolbar/main.vue';
   import screenfull from 'screenfull';
-  import { useDocServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer } from 'middle-domain';
 
   export default {
     name: 'VmpDocUne',
+    components: { VmpDocToolbar },
     provide() {
       return {
         getKind: function () {
@@ -84,6 +92,10 @@
     },
     data() {
       return {
+        className: '',
+        keepAspectRatio: true,
+        hasToolbar: true, // 是否有工具栏(观看端没有)
+        hasPager: false, // 是否有分页操作(观看端没有)
         isFullscreen: false, //是否全屏
         thumbnailShow: false // 文档缩略是否显示
       };
@@ -100,12 +112,18 @@
       }
     },
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
+      window.docServer = useDocServer();
     },
     created() {
       this.initEvents();
     },
     methods: {
+      // 初始化配置
+      initConfig() {
+        this._initWidgetOptions();
+      },
       /**
        * 全屏
        */
@@ -119,20 +137,26 @@
         let { width, height } = screenfull.isFullscreen
           ? this.$refs.docWrapper.getBoundingClientRect()
           : this.$refs.docContent.getBoundingClientRect();
+
         let w = null,
           h = null;
-        if (width / height > 16 / 9) {
-          h = height;
-          w = (h / 9) * 16;
+        if (this.keepAspectRatio) {
+          if (width / height > 16 / 9) {
+            h = height;
+            w = (h / 9) * 16;
+          } else {
+            w = width;
+            h = (w / 16) * 9;
+          }
+          if (w === 0 || h === 0) {
+            w = 898;
+            h = 506;
+            // w = this.$store.state.smChange ? 300 : 898;
+            // h = this.$store.state.smChange ? 170 : 506;
+          }
         } else {
           w = width;
-          h = (w / 16) * 9;
-        }
-        if (w === 0 || h === 0) {
-          w = 898;
-          h = 506;
-          // w = this.$store.state.smChange ? 300 : 898;
-          // h = this.$store.state.smChange ? 170 : 506;
+          h = height;
         }
         this.docViewRect = { width: w, height: h };
         // this.$refs.docContent.style.height = `${h}px`;
@@ -177,20 +201,24 @@
        */
       recoverLastDocs: async function () {
         console.log('刷新或者退出重进恢复上次的文档');
+
         // 获取远端所有所有容器列表
         await this.docServer.getAllContainerInfo();
+
         // 执行nextTick让div的id绑定完成
         await this.$nextTick();
 
+        console.log('ssss:', document.getElementById('board-5f9480c'));
         // 加载文档和白板数据
         const { width, height } = this.docViewRect;
         await this.docServer.loadDocumentOrBoradData(width, height);
 
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitSwitchTo',
-          params: [this.docServer.state.currentType]
-        });
+        this.resize();
+        // window.$middleEventSdk?.event?.send({
+        //   cuid: this.cuid,
+        //   method: 'emitSwitchTo',
+        //   params: [this.docServer.state.currentType]
+        // });
       },
       /**
        * 切换到 文档还是白板
@@ -319,11 +347,15 @@
       }
     },
     mounted() {
+      this.initConfig();
+
       this.resize();
+      // TODO 测试设置文档工具栏是否可见
+      this.hasToolbar = this.roomBaseServer.state.configList.hasToolbar;
 
       // 清空
       // this.docServer.resetContainer();
-      // 恢复上一次的文档数据
+      // 恢复上一次的文档数据;
       this.recoverLastDocs();
     },
     beforeDestroy() {

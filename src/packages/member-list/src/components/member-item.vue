@@ -25,59 +25,124 @@
       {{ userInfo.role_name | roleFilter }}
     </span>
     <div class="vmp-member-item__control">
+      <!-- 主讲人 -->
+      <i
+        v-if="
+          (mode != 6 && currentSpeakerId === userInfo.account_id) ||
+          (mode == 6 && userInfo.role_name == 1)
+        "
+        class="vmp-member-item__control__user-icon iconfont iconxing"
+      ></i>
       <!-- 显示条件：被禁言 -->
       <i
-        v-show="userInfo.is_banned"
+        v-show="userInfo.is_banned == 1"
         class="vmp-member-item__control__user-icon iconfont iconjinyan"
         style="color: #cccccc"
       ></i>
-      <!-- 显示条件：被踢出 -->
+      <!-- 显示条件：申请上麦 -->
       <i
-        v-show="userInfo.is_kicked"
-        class="vmp-member-item__control__user-icon iconfont icontichu"
-        style="color: #cccccc"
+        v-show="
+          userInfo.isApply &&
+          applyUsers.find(u => u.account_id == userInfo.account_id) &&
+          !userInfo.is_speak
+        "
+        class="vmp-member-item__control__user-icon iconfont iconxiamai"
+        style="color: #cccccc; font-size: 15px"
       ></i>
+      <!-- 显示条件：上麦中 -->
+      <i
+        v-if="
+          currentSpeakerId != userInfo.account_id &&
+          userInfo.is_speak &&
+          userInfo.device_status != 2
+        "
+        class="vmp-member-item__control__user-icon iconfont iconxiamai1"
+        style="color: #fc5659; font-size: 15px"
+      ></i>
+      <!-- 设备有问题不能上麦 -->
+      <i
+        v-show="isInteract == '1' && userInfo.device_status == 2"
+        style="color: #fc5659; font-size: 15px; vertical-align: middle"
+        class="iconfont iconhebingxingzhuang vmp-member-item__control__device-abnormal"
+      ></i>
+      <!-- 显示条件：列表中该用户不是是主持人 -->
+      <template
+        v-if="
+          roleName == '1' &&
+          userInfo.role_name != 1 &&
+          ((isEnjoy && userInfo.role_name == 3) || userInfo.role_name != 3) &&
+          userInfo.role_name != 20 &&
+          userInfo.device_status != 2
+        "
+      >
+        <!--互动直播 没有被禁言 没有上麦 不是移动端 设备可以上麦-->
+        <i
+          v-show="
+            isInteract == '1' &&
+            !userInfo.is_banned &&
+            !userInfo.is_speak &&
+            userInfo.device_status == 1
+          "
+          class="vmp-member-item__control__up-mic"
+          @click="upMic(userInfo.isApply, userInfo.account_id)"
+        >
+          上麦
+        </i>
+        <!-- 显示条件：当前登录者是主持人  正在上麦 -->
+        <i
+          v-show="isInteract == '1' && userInfo.is_speak"
+          class="vmp-member-item__control__down-mic"
+          @click="downMic(userInfo.account_id)"
+        >
+          下麦
+        </i>
+      </template>
+      <!-- 显示条件：列表中该用户是是主持人 -->
+      <template v-if="roleName == '1' && userInfo.role_name == 1 && userInfo.device_status == 1">
+        <i
+          v-show="isInteract == '1'"
+          class="vmp-member-item__control__up-mic widthAuto"
+          @click="myPresentation(userInfo.account_id)"
+        >
+          我要演示
+        </i>
+        <i
+          v-show="isInteract == '1' && !userInfo.is_speak"
+          class="vmp-member-item__control__up-mic"
+          @click="upMic(userInfo.isApply, userInfo.account_id)"
+        >
+          上麦
+        </i>
+        <!-- 显示条件：当前登录者是主持人  正在上麦 -->
+        <i
+          v-show="isInteract == '1' && userInfo.is_speak && currentSpeakerId != userId"
+          class="vmp-member-item__control__down-mic"
+          @click="downMic(userInfo.account_id)"
+        >
+          下麦
+        </i>
+      </template>
+      <!-- class上的hide是为了hover的时候也不显示 -->
       <!-- more显示条件：1、当前登录者是主持人-->
       <!-- more显示条件：2、当前登录者是嘉宾助理并且所选用户是观众 -->
-      <i
-        v-if="[1, '1'].includes(roleName)"
-        @click.stop="getMore(userInfo.account_id, userInfo.role_name)"
-        class="vmp-member-item__control__more"
-      ></i>
-      <i
-        v-else-if="(roleName == '3' || roleName == '4') && user.role_name == '2'"
-        @click.stop="getMore(userInfo.account_id, userInfo.role_name)"
-        class="vmp-member-item__control__more"
-      ></i>
-      <i v-else class="vmp-member-item__control__more-placeholder"></i>
-
-      <div v-show="userInfo.showControl" class="vmp-member-item__control__detail">
-        <!-- 显示条件：被禁言没被踢出 -->
-        <div
-          v-show="userInfo.is_banned && !userInfo.is_kicked"
-          class="vmp-member-item__control__detail--set-speak"
-          @click="handleSetBanned(userInfo.account_id, userInfo.is_banned)"
-        >
-          <i></i>
-          <span>{{ userInfo.is_banned != 0 ? '取消' : '聊天' }}禁言</span>
-        </div>
-        <div
-          class="vmp-member-item__control__detail--set-kick"
-          v-if="!isInGroup"
-          @click="handleSetKicked(user.account_id, user.is_kicked)"
-        >
-          <i></i>
-          <span>{{ user.is_kicked ? '取消踢出' : '踢出活动' }}</span>
-        </div>
-        <div
-          class="vmp-member-item__control__detail--set-kick"
-          v-else
-          @click="handleSetKicked(user.account_id, user.is_kicked)"
-        >
-          <i></i>
-          <span>{{ user.is_kicked ? '取消踢出' : '踢出小组' }}</span>
-        </div>
-      </div>
+      <el-dropdown @command="handleCommand" v-show="showUserControl">
+        <i
+          @click.stop="getMore(userInfo.account_id, userInfo.role_name)"
+          class="vmp-member-item__control__more"
+        ></i>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="setBanned">聊天禁言</el-dropdown-item>
+          <el-dropdown-item command="setKicked">
+            {{ userInfo.is_kicked ? '取消踢出' : '踢出活动' }}
+          </el-dropdown-item>
+          <el-dropdown-item command="groupSetKicked">
+            {{ userInfo.is_kicked ? '取消踢出' : '踢出小组' }}
+          </el-dropdown-item>
+          <el-dropdown-item command="setSpeaker">设为主讲</el-dropdown-item>
+          <el-dropdown-item command="inviteMic">邀请演示</el-dropdown-item>
+          <el-dropdown-item command="setLeader">升为组长</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
   </div>
 </template>
@@ -141,6 +206,33 @@
         type: Boolean,
         required: true,
         default: () => false
+      },
+      //mode
+      mode: {
+        type: [Number, String],
+        default: () => 3
+      },
+      //当前主讲人id
+      currentSpeakerId: {
+        type: [Number, String]
+      },
+      //当前登录用户的id
+      userId: {
+        type: [Number, String]
+      },
+      //是否是互动直播
+      isInteract: {
+        type: Number,
+        default: () => false
+      },
+      isEnjoy: {
+        required: false,
+        default: false
+      },
+      //申请互动的人员
+      applyUsers: {
+        type: Array,
+        default: () => []
       }
     },
     data() {
@@ -149,19 +241,53 @@
         defaultAvatar
       };
     },
+    computed: {
+      //人员操作项是否显示
+      showUserControl() {
+        return (
+          (this.roleName == '1' && this.userInfo.account_id != this.userId && !this.isInGroup) ||
+          (this.roleName == '1' &&
+            this.userInfo.account_id != this.userId &&
+            this.isInGroup &&
+            this.userInfo.role_name != 20)
+        );
+      }
+    },
     methods: {
       //踢出成员
-      handleSetKicked(accountId, roleName) {
-        console.log(accountId, roleName);
+      handleSetKicked() {
+        this.$emit('operateUser', { type: 'setKicked', params: this.userInfo });
       },
       //禁言成员
-      handleSetBanned(accountId, roleName) {
-        console.log(accountId, roleName);
+      handleSetBanned() {
+        this.$emit('operateUser', { type: 'setBanned', params: this.userInfo });
       },
       //显示更多
       getMore(accountId, roleName) {
         console.log(accountId, roleName);
-      }
+      },
+      //处理指令
+      handleCommand(command) {
+        switch (command) {
+          case 'setBanned':
+            this.handleSetBanned();
+            break;
+          case 'setKicked':
+            this.handleSetKicked();
+            break;
+          case 'setGroupKicked':
+            this.handleSetKicked();
+            break;
+          default:
+            break;
+        }
+      },
+      //上麦
+      upMic() {},
+      //下麦
+      downMic() {},
+      //我要演示
+      myPresentation() {}
     }
   };
 </script>
@@ -230,8 +356,8 @@
         vertical-align: middle;
         padding: 0 3px;
       }
-      &__upmic,
-      &__downmic {
+      &__up-mic,
+      &__down-mic {
         display: inline-block;
         width: 30px;
         height: 20px;

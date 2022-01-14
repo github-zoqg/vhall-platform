@@ -10,7 +10,7 @@ export const serverConfig = {
   layerRoot: {
     component: 'VmpAirContainer',
     // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerBody']
+    children: ['layerHeader', 'layerBody']
   },
   // 顶部header容器
   layerHeader: {
@@ -21,10 +21,8 @@ export const serverConfig = {
   // 中间主区域容器
   layerBody: {
     component: 'VmpContainer',
-    options: {
-      className: 'vmp-basic-bd'
-    },
-    children: ['layerBodyCenter', 'layerBodyRight']
+    className: 'vmp-basic-bd',
+    children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerFooter: {
@@ -34,22 +32,15 @@ export const serverConfig = {
   layerBodyLeft: {
     component: 'VmpContainer',
     className: 'vmp-basic-left',
-    children: ['comAsideMenu']
-  },
-  layerBodyCenter: {
-    component: 'VmpBasicCenterContainer',
+    children: []
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-    children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+    // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
 
   layerBodyRight: {
-    component: 'VmpBasicRightContainer'
-    // children: ['layerBodyRightBody']
-  },
-  layerBodyRightBody: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__bd',
-    children: ['comMemberList', 'comChat']
+    className: 'vmp-basic-right',
+    children: ['comChat']
   },
   /*** 布局定义end */
 
@@ -149,6 +140,25 @@ export const serverConfig = {
         args: ['comMediaPlayMenu']
       }
     ]
+  },
+  // 文档白板组件
+  comDocUne: {
+    component: 'VmpDocUne',
+    options: {
+      className: 'vmp-area__max',
+      keepAspectRatio: false
+    }
+
+    // emitSwitchTo: {
+    //   cuid: ['comAsideMenu'],
+    //   method: 'switchTo',
+    //   args: ['$0'] // 获取动态参数的第一个
+    // },
+    // // 打开对话框
+    // emitOpenDocList: {
+    //   cuid: 'dlgDocList',
+    //   method: 'show'
+    // }
   },
   comStreamList: {
     component: 'VmpStreamList',

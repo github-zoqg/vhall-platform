@@ -4,7 +4,7 @@ import router from './router';
 import { initGlobalAPI, i18n } from './core';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import(`./assets/styles/skins/${window.$globalConfig.currentSkin}.less`);
-import './domain';
+import domainStore from './domain';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 // 初始化
 initGlobalAPI();
@@ -16,5 +16,6 @@ Vue.config.devtools = true;
 new Vue({
   router,
   i18n,
+  domainStore,
   render: h => h(App)
 }).$mount('#app');

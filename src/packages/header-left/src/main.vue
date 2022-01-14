@@ -1,15 +1,15 @@
 <template>
   <div class="vmp-header-left">
-    <div :title="subject" class="vhall-room-name">{{ subject }}</div>
+    <div :title="subject" class="vhall-room-name">{{ webinarInfo.subject || '房间名称' }}</div>
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
-      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ id }}</div>
+      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
       <div :data-clipboard-text="id" class="vhall-room-id-copy" @click="handleCopy">
         <i class="iconfont iconfuzhi"></i>
       </div>
     </div>
     <!---->
-    <div class="nopdelay-icon">
+    <div class="nopdelay-icon" v-if="webinarInfo.no_delay_webinar == 1 && webinarInfo.mode != 6">
       <img
         src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
         alt=""
@@ -29,14 +29,12 @@
         kind: '',
         icon: '',
         text: '',
-        subject: '', // 直播名称
-        id: '' // 房间id
+        webinarInfo: {}
       };
     },
     created() {
       const { watchInitData } = useRoomBaseServer().state;
-      this.subject = watchInitData?.webinar?.subject || '';
-      this.id = watchInitData?.webinar?.id || '';
+      this.webinarInfo = watchInitData.webinar;
     },
     mounted() {
       this.initConfig();
