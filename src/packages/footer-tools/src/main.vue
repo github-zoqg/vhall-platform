@@ -14,11 +14,11 @@
         {{ hotNum | formatHotNum }}
       </div>
     </div>
-    <div class="vmp-footer-tools__center">
-      <handup></handup>
-    </div>
     <div class="vmp-footer-tools__right">
       <vmp-air-container :cuid="cuid"></vmp-air-container>
+    </div>
+    <div class="vmp-footer-tools__center">
+      <handup></handup>
     </div>
   </div>
 </template>
@@ -65,14 +65,14 @@
 </script>
 <style lang="less">
   .vmp-footer-tools {
-    width: 100%;
     height: 56px;
-    background: #2d2d2d;
-    border-radius: 0 0 4px 4px;
-    margin-top: auto;
+    background: @bg-dark-section;
+    line-height: 56px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 24px;
+    position: relative;
 
     &__left {
       display: flex;
@@ -99,7 +99,10 @@
       }
     }
     &__center {
-      flex: 1;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 </style>
