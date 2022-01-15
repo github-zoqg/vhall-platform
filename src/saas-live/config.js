@@ -48,8 +48,8 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      'comMemberList'
-      // 'comChat'
+      // 'comMemberList'
+      'comChat'
     ]
   },
   /*** 布局定义end */
@@ -57,7 +57,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['comShare', 'comVirtualPeople']
+    children: ['comShare', 'comVirtualPeople', 'comLivePrivateChat']
   },
 
   /**** 组件定义 */
@@ -213,7 +213,19 @@ export const serverConfig = {
       userControlOptions: {
         enable: true
       }
-    }
+    },
+    //打开私聊弹窗
+    emitOpenLivePrivateChatModal: [
+      {
+        cuid: 'comLivePrivateChat',
+        method: 'openModal'
+      }
+    ]
+  },
+  //发起端--私聊组件
+  comLivePrivateChat: {
+    component: 'VmpLivePrivateChat',
+    options: {}
   },
   //成员列表组件
   comMemberList: {

@@ -11,6 +11,7 @@ import VmpHeaderLeft from '@/packages/header-left';
 import VmpHeaderRight from '@/packages/header-right';
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
+import VmpLivePrivateChat from '@/packages/live-private-chat';
 import VmpDocUne from '@/packages/doc-une';
 import VmpDocDlglist from '@/packages/doc-dlglist';
 import VmpStreamListLive from '@/packages/stream-list-live';
@@ -34,6 +35,7 @@ export function initUse() {
   Vue.use(VmpHeaderRight);
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
+  Vue.use(VmpLivePrivateChat);
   Vue.use(VmpDocUne);
   Vue.use(VmpDocDlglist);
   Vue.use(VmpStreamListLive);
