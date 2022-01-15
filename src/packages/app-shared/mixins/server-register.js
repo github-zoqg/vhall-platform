@@ -10,7 +10,7 @@ export default {
   },
   methods: {
     _initWidgetOptions() {
-      console.log(`this.cuid:${this.cuid}_initWidgetOptions`);
+      // 使用window.$serverConfig 中的配置内容，赋值给组件的data
       const widget = window.$serverConfig?.[this.cuid];
       if (widget && widget.options && typeof widget.options === 'object') {
         Object.keys(widget.options).forEach(key => {
@@ -23,8 +23,11 @@ export default {
   },
   created() {
     //  注册服务到服务池
-    if (this.cuid && this.componentType !== 'CONTAINER' && window.$middleEventSdk) {
+    if (this.cuid && window.$middleEventSdk) {
       window.$middleEventSdk.serverPool.set(this.cuid, this);
     }
+  },
+  mounted() {
+    this._initWidgetOptions();
   }
 };

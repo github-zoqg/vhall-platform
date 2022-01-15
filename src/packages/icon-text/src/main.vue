@@ -27,40 +27,7 @@
         text: ''
       };
     },
-    mounted() {
-      this.initConfig();
-    },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('className')) {
-            this.className = widget.options.className;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('kind')) {
-            this.kind = widget.options.kind;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('selected')) {
-            this.selected = widget.options.selected;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('disable')) {
-            this.disable = widget.options.disable;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('icon')) {
-            this.icon = widget.options.icon;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('text')) {
-            this.text = widget.options.text;
-          }
-        }
-      },
       // 设置选中转态
       setSelectedState(val) {
         this.selected = val;

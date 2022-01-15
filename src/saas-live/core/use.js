@@ -5,7 +5,6 @@ import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
 import VmpAsideMenu from '@/packages/aside-menu';
 import VmpIconText from '@/packages/icon-text';
-import VmpIconItem from '@/packages/icon-item';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
 import VmpHeaderRight from '@/packages/header-right';
@@ -30,7 +29,6 @@ export function initUse() {
   Vue.use(VmpAirContainer);
   Vue.use(VmpAsideMenu);
   Vue.use(VmpIconText);
-  Vue.use(VmpIconItem);
   Vue.use(VmpLanguageChoice);
   Vue.use(VmpHeaderLeft);
   Vue.use(VmpHeaderRight);
