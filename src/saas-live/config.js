@@ -32,8 +32,8 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    // children: ['comDocUne']
-    children: ['comStreamList']
+    children: ['comDocUne']
+    // children: ['comThirdStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -83,7 +83,8 @@ export const serverConfig = {
     emitVirtualClick: [
       {
         cuid: 'comVirtualPeople',
-        method: 'openVirtualDialog'
+        method: 'openVirtualDialog',
+        args: [{ type: 1 }]
       }
     ],
     emitClickStartLive: [
@@ -342,5 +343,8 @@ export const serverConfig = {
   },
   comVirtualPeople: {
     component: 'VmpVirtualPeople'
+  },
+  comThirdStream: {
+    component: 'VmpThirdStream'
   }
 };

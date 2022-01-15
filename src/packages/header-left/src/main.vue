@@ -81,15 +81,24 @@
         //     req_url: ''
         //   }
         // });
-        const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        clipboard.on('success', () => {
-          this.$message.success(this.$t('usual.copySucceeded'));
-          clipboard.destroy();
+        const input = document.getElementById('vhall-room-id-copy-val');
+        // input.select();
+        document.execCommand('copy');
+        this.$message({
+          message: '复制成功！',
+          showClose: true,
+          type: 'success',
+          customClass: 'zdy-info-box'
         });
-        clipboard.on('error', () => {
-          this.$message.error(this.$t('usual.copyFailed'));
-          clipboard.destroy();
-        });
+        // const clipboard = new this.$clipboard('.vhall-room-id-copy');
+        // clipboard.on('success', () => {
+        //   this.$message.success(this.$t('usual.copySucceeded'));
+        //   clipboard.destroy();
+        // });
+        // clipboard.on('error', () => {
+        //   this.$message.error(this.$t('usual.copyFailed'));
+        //   clipboard.destroy();
+        // });
       }
     }
   };

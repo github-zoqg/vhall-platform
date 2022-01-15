@@ -9,6 +9,7 @@
     "serve:saas-live": "node scripts/cli-service.js serve --project=saas-live",
     "serve:saas-wap": "node scripts/cli-service.js serve --project=saas-wap",
     "serve:saas-watch": "node scripts/cli-service.js serve --project=saas-watch",
+    "serve:zhike-live": "node scripts/cli-service.js serve --project=zhike-live",
     "build:saas-live": "node scripts/cli-service.js build --project=saas-live",
     "build:saas-live:test": "node scripts/cli-service.js build --project=saas-live --mode=test",
     "build:saas-wap": "node scripts/cli-service.js build --project=saas-wap",

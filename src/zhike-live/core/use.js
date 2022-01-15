@@ -16,6 +16,7 @@ import VmpStreamRemote from '@/packages/stream-remote';
 import VmpSettingIcon from '@/packages/setting-icon';
 import VmpCheckDevice from '@/packages/check-device';
 import VmpUserSettingBox from '@/packages/user-setting-box';
+import VmpVirtualPeople from '@/packages/virtual-people';
 
 // 全局注册组件
 export function initUse() {
@@ -35,4 +36,5 @@ export function initUse() {
   Vue.use(VmpSettingIcon);
   Vue.use(VmpCheckDevice);
   Vue.use(VmpUserSettingBox);
+  Vue.use(VmpVirtualPeople);
 }
