@@ -2,8 +2,7 @@
   <el-dialog
     :title="title"
     :visible.sync="visible"
-    :width="500"
-    center
+    width="500px"
     custom-class="vmp-auto-setting-modal"
   >
     <div class="auto-chat-main">
@@ -12,7 +11,7 @@
         <el-switch
           v-model="enableFilter"
           inactive-color="#ccc"
-          :width="34"
+          :width="32"
           active-color="#FFD021"
         ></el-switch>
         <span class="switch-title">
@@ -20,12 +19,12 @@
         </span>
       </p>
       <p>
-        <com-input
+        <el-input
           type="textarea"
           :rows="4"
-          v-model="filterWords"
           placeholder="输入禁止在本场聊天中出现的严禁词，逗号隔开，固定宽度换行"
-        ></com-input>
+          v-model="filterWords"
+        ></el-input>
       </p>
       <!--<p>-->
       <!--<button class="default-button s-button" @click="saveChatWords">保存严禁词</button> 添加后实时生效-->
@@ -43,7 +42,7 @@
       </div>
     </div>
     <span slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="handleConfirm">确 定</el-button>
+      <el-button type="primary" @click="handleConfirm" size="medium" round>保 存</el-button>
     </span>
   </el-dialog>
 </template>
@@ -51,6 +50,7 @@
 <script>
   export default {
     name: 'VmpAutoSettingModal',
+    components: {},
     data() {
       return {
         //模态窗标题
@@ -60,7 +60,7 @@
         //聊天严禁词打开状态
         enableFilter: false,
         //自动处理开关状态
-        enableAutoHandle: false,
+        enableAutoHandle: '1',
         //输入的严禁词
         filterWords: ''
       };
@@ -68,7 +68,14 @@
     methods: {
       //打开模态窗
       openModal() {
+        this.resetData();
         this.visible = true;
+      },
+      //重置模态窗数据
+      resetData() {
+        this.enableFilter = false;
+        this.enableAutoHandle = '1';
+        this.filterWords = '';
       },
       //模态窗关闭
       handleClose() {
@@ -84,9 +91,33 @@
 
 <style lang="less">
   .vmp-auto-setting-modal {
+    .el-dialog__header {
+      position: relative;
+      height: 40px;
+      padding: 0 20px;
+      line-height: 40px;
+      border-radius: 4px 4px 0 0;
+      background-color: #ffd021;
+    }
+    .el-dialog__title {
+      font-size: 16px;
+      color: #333;
+    }
+    .el-dialog__headerbtn {
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+    }
+    .dialog__close {
+      font-size: 20px;
+    }
+
     .auto-chat-main {
       padding-top: 10px;
       margin: 0 10px;
+      .el-textarea__inner {
+        padding: 10px;
+      }
       .switch-title {
         display: inline-block;
         vertical-align: middle;

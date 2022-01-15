@@ -60,6 +60,7 @@
         :chat-list="chatList"
         :at-list="atList"
         :chat-login-status="chatLoginStatus"
+        @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @ononSwitchShowSponsor="onSwitchShowSponsor"
         @updateHeight="chatOperateBarHeightChange"
@@ -832,6 +833,13 @@
       //处理只看主办方
       onSwitchShowSponsor(status) {
         this.isOnlyShowSponsor = status;
+      },
+      //打开私聊模态窗
+      openPrivateChatModal() {
+        window.$middleEventSdk?.event?.send({
+          cuid: 'comLivePrivateChat',
+          method: 'openModal'
+        });
       }
     }
   };
