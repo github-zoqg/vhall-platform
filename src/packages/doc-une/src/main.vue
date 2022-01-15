@@ -11,7 +11,7 @@
 
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
-      <div class="vmp-doc-inner">
+      <div ref="docInner" class="vmp-doc-inner">
         <div style="width: 0; height: 0">
           <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
@@ -25,7 +25,7 @@
       </div>
 
       <!-- 没有文档时的占位组件 -->
-      <div class="vmp-doc-placeholder" v-show="!currentCid">
+      <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <i class="iconfont iconzanwuwendang"></i>
           <span>暂未分享任何文档</span>
@@ -71,22 +71,32 @@
         </li>
       </ul>
     </div>
+
+    <!-- 文档加载时的遮罩和进度 -->
+    <div v-show="!docLoadComplete" class="el-loading-mask vmp-doc-mask">
+      <div class="el-loading-spinner">
+        <svg viewBox="25 25 50 50" class="circular">
+          <circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
+        </svg>
+        <p class="el-loading-text">文档加载中</p>
+      </div>
+    </div>
   </div>
 </template>
 <script>
   import VmpDocToolbar from './toolbar/main.vue';
   import screenfull from 'screenfull';
   import { useRoomBaseServer, useDocServer } from 'middle-domain';
+  import elementResizeDetectorMaker from 'element-resize-detector';
+  import { throttle } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpDocUne',
     components: { VmpDocToolbar },
     provide() {
       return {
-        getKind: function () {
-          return this.$domainStore.state.docServer.currentType;
-        },
         fullscreen: this.fullscreen,
+        toggleThumbnail: this.toggleThumbnail,
         openDocDlglist: this.openDocDlglist
       };
     },
@@ -95,12 +105,15 @@
         className: '',
         keepAspectRatio: true,
         hasToolbar: true, // 是否有工具栏(观看端没有)
-        hasPager: false, // 是否有分页操作(观看端没有)
+        hasPager: true, // 是否有分页操作(观看端没有)
         isFullscreen: false, //是否全屏
         thumbnailShow: false // 文档缩略是否显示
       };
     },
     computed: {
+      docLoadComplete() {
+        return this.docServer.state.docLoadComplete;
+      },
       currentType() {
         return this.docServer.state.currentType;
       },
@@ -114,16 +127,10 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
+      // TODO 方便查数据
       window.docServer = useDocServer();
     },
-    created() {
-      this.initEvents();
-    },
     methods: {
-      // 初始化配置
-      initConfig() {
-        this._initWidgetOptions();
-      },
       /**
        * 全屏
        */
@@ -131,13 +138,19 @@
         screenfull.toggle(this.$refs.docWrapper);
       },
       /**
+       * 缩略图列表展开与这都
+       */
+      toggleThumbnail() {
+        this.thumbnailShow = !this.thumbnailShow;
+      },
+      /**
        * 屏幕缩放
        */
       resize() {
         let { width, height } = screenfull.isFullscreen
-          ? this.$refs.docWrapper.getBoundingClientRect()
-          : this.$refs.docContent.getBoundingClientRect();
-
+          ? this.$refs.docWrapper?.getBoundingClientRect()
+          : this.$refs.docContent?.getBoundingClientRect();
+        if (!width || !height) return;
         let w = null,
           h = null;
         if (this.keepAspectRatio) {
@@ -148,34 +161,22 @@
             w = width;
             h = (w / 16) * 9;
           }
-          if (w === 0 || h === 0) {
-            w = 898;
-            h = 506;
-            // w = this.$store.state.smChange ? 300 : 898;
-            // h = this.$store.state.smChange ? 170 : 506;
-          }
         } else {
           w = width;
           h = height;
         }
         this.docViewRect = { width: w, height: h };
-        // this.$refs.docContent.style.height = `${h}px`;
-        // this.$refs.docContent.style.width = `${w}px`;
-        if (this.docServer.state.currentCid) this.docServer.setSize(w, h);
-      },
-
-      /**
-       * 缩略图切换
-       */
-      onThumbnailToggle() {
-        this.thumbnailShow = !this.thumbnailShow;
+        if (this.docServer.state.currentCid) {
+          this.docServer.setSize(w, h);
+        }
       },
       /**
        * 初始化各种事件
        */
       initEvents() {
-        // TODO 节流
-        window.addEventListener('resize', this.resize);
+        // 监控文档区域大小改变事件
+        let erd = elementResizeDetectorMaker();
+        erd.listenTo(this.$refs.docWrapper, throttle(this.resize, 200));
 
         // 全屏/退出全屏事件
         screenfull.onchange(() => {
@@ -183,42 +184,47 @@
           this.isFullscreen = screenfull.isFullscreen;
         });
       },
+      /**
+       * 新增文档或白板
+       * @param {*} fileType
+       * @param {*} docId
+       * @param {*} docType
+       */
       async addNewFile(fileType, docId, docType) {
         const { width, height } = this.docViewRect;
-        const options = this.docServer.prepareDocumentOrBorad(
+        await this.docServer.addNewDocumentOrBorad({
           width,
           height,
           fileType,
           docId,
-          docType
-        );
-        // await this.$forceUpdate();
-        await this.$nextTick();
-        await this.docServer.addNewDocumentOrBorad(options);
+          docType,
+          bindCidFun: async cid => {
+            await this.$nextTick();
+          }
+        });
+        this.resize();
       },
       /**
        *  刷新或者退出重进恢复上次的文档
        */
       recoverLastDocs: async function () {
         console.log('刷新或者退出重进恢复上次的文档');
-
-        // 获取远端所有所有容器列表
-        await this.docServer.getAllContainerInfo();
-
-        // 执行nextTick让div的id绑定完成
-        await this.$nextTick();
-
-        console.log('ssss:', document.getElementById('board-5f9480c'));
-        // 加载文档和白板数据
         const { width, height } = this.docViewRect;
-        await this.docServer.loadDocumentOrBoradData(width, height);
-
+        await this.docServer.recover({
+          width,
+          height,
+          bindCidFun: async () => {
+            await this.$nextTick();
+          }
+        });
+        // 调整大小
         this.resize();
-        // window.$middleEventSdk?.event?.send({
-        //   cuid: this.cuid,
-        //   method: 'emitSwitchTo',
-        //   params: [this.docServer.state.currentType]
-        // });
+
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitSwitchTo',
+          params: [this.docServer.state.currentType]
+        });
       },
       /**
        * 切换到 文档还是白板
@@ -226,6 +232,7 @@
        */
       async switchTo(type) {
         console.log('doc-une 切换到。。。:', type);
+
         // 缩略图栏隐藏
         this.thumbnailShow = false;
         this.docServer.state.currentType = type;
@@ -238,6 +245,7 @@
         if (item) {
           // 如果存在，设置为当文档或白板
           await this.docServer.selectContainer(item.cid);
+          this.resize();
           return;
         }
 
@@ -271,8 +279,9 @@
           return item.is_board === 2;
         });
         for (let item of this.docServer.state.fileOrBoardList) {
-          if (!(board && item.id === board.id)) {
-            this.docServer.destroyContainer({ id: item.cid });
+          if (!board || item.cid !== board.cid) {
+            // console.log('删除item.cid：', item.cid);
+            await this.docServer.destroyContainer({ id: item.cid });
           }
         }
         this.docServer.state.fileOrBoardList = board ? [board] : [];
@@ -347,9 +356,12 @@
       }
     },
     mounted() {
-      this.initConfig();
+      // 初始化事件
+      this.initEvents();
 
+      // 初始化 this.docViewRect
       this.resize();
+
       // TODO 测试设置文档工具栏是否可见
       this.hasToolbar = this.roomBaseServer.state.configList.hasToolbar;
 
@@ -357,18 +369,23 @@
       // this.docServer.resetContainer();
       // 恢复上一次的文档数据;
       this.recoverLastDocs();
-    },
-    beforeDestroy() {
-      window.removeEventListener('resize', this.resize);
     }
   };
 </script>
 <style lang="less">
   .vmp-doc-une {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
     display: flex;
     flex-direction: column;
     color: #fff;
-    flex: 1;
+
+    .vmp-doc-mask {
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 100;
+    }
+
     .vmp-doc-une__hd {
       width: 100%;
       box-sizing: border-box;
@@ -420,7 +437,6 @@
         overflow: visible !important;
       }
     }
-
     .vmp-doc-pagebar {
       user-select: none;
       position: absolute;
