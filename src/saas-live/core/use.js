@@ -21,6 +21,7 @@ import VmpMemberList from '@/packages/member-list';
 import VmpInteractMenu from '@/packages/interact-menu';
 import VmpShare from '@/packages/share'; // 发起端分享观看端地址
 import VmpVirtualPeople from '@/packages/virtual-people'; // 虚拟人数弹窗
+import VmpThirdStream from '@/packages/third-push-stream';
 
 // 全局注册组件
 export function initUse() {
@@ -44,4 +45,5 @@ export function initUse() {
   Vue.use(VmpInteractMenu);
   Vue.use(VmpShare);
   Vue.use(VmpVirtualPeople);
+  Vue.use(VmpThirdStream);
 }

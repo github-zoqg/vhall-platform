@@ -74,7 +74,7 @@
 <script>
   import { useRoomBaseServer } from 'middle-domain';
   export default {
-    name: 'VmpHeaderControl',
+    name: 'HeaderControl',
     props: {
       isShowQuit: {
         default: false,
@@ -166,7 +166,7 @@
     &_wrap {
       display: none;
       position: absolute;
-      top: 43px;
+      top: 35px;
       right: 10px;
       z-index: 10;
       width: 260px;
@@ -174,8 +174,8 @@
       overflow: hidden;
       font-size: 14px;
       cursor: auto;
-      // background: transparent;
-      // padding-top: 25px;
+      background: transparent;
+      padding-top: 15px;
       &-head {
         height: 50px;
         padding: 0 20px;

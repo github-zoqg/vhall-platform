@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'comCheckDevice']
+    children: ['layerHeader', 'layerBody', 'comCheckDevice', 'comVirtualPeople']
   },
   // 顶部header容器
   layerHeader: {
@@ -68,7 +68,14 @@ export const serverConfig = {
       isShowQuit: true, //是否显示退出
       isShowSupport: true, //是否显示技术支持
       isShowSplitScreen: false //是否显示分屏
-    }
+    },
+    emitVirtualClick: [
+      {
+        cuid: 'comVirtualPeople',
+        method: 'openVirtualDialog',
+        args: [{ type: 2 }]
+      }
+    ]
     // children: ['comSettingIcon', 'comFullIcon']
   },
   // 顶部左侧组件
@@ -246,5 +253,8 @@ export const serverConfig = {
       icon: 'iconfont icon-faqiduanshezhi',
       title: '设备检测'
     }
+  },
+  comVirtualPeople: {
+    component: 'VmpVirtualPeople'
   }
 };

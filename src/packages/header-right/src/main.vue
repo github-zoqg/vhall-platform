@@ -61,6 +61,7 @@
           Object.assign(this.$data, widget.options);
         }
       },
+      // 打开虚拟人数的弹窗
       openVirtualProple() {
         window.$middleEventSdk?.event?.send({
           cuid: this.cuid,
