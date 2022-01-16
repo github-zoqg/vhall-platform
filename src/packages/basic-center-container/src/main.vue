@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-basic-center">
     <!-- 流列表 -->
-    <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+    <!-- <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container> -->
     <!-- 主区域占位 -->
     <div class="vmp-basic-center__mainscreen-pos"></div>
     <!-- 播放器 -->
