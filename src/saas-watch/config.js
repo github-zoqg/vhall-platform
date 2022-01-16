@@ -39,8 +39,8 @@ export const serverConfig = {
   // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-    children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+    // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
   layerBodyRight: {
     component: 'VmpContainer',
