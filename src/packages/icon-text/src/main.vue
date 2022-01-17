@@ -15,6 +15,7 @@
   </a>
 </template>
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpIconText',
     data() {
@@ -39,10 +40,7 @@
       // click事件
       handleClick: function () {
         if (this.disable) return false;
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClick'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClick'));
       }
     }
   };
