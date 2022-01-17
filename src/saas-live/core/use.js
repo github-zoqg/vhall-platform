@@ -22,6 +22,8 @@ import VmpInteractMenu from '@/packages/interact-menu';
 import VmpShare from '@/packages/share'; // 发起端分享观看端地址
 import VmpVirtualPeople from '@/packages/virtual-people'; // 虚拟人数弹窗
 import VmpThirdStream from '@/packages/third-push-stream';
+import 'overlayscrollbars/css/OverlayScrollbars.css';
+import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 
 // 全局注册组件
 export function initUse() {
@@ -46,4 +48,7 @@ export function initUse() {
   Vue.use(VmpShare);
   Vue.use(VmpVirtualPeople);
   Vue.use(VmpThirdStream);
+
+  //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
+  Vue.use(OverlayScrollbarsPlugin);
 }
