@@ -88,7 +88,7 @@
   import screenfull from 'screenfull';
   import { useRoomBaseServer, useDocServer } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
-  import { throttle } from '@/packages/app-shared/utils/tool';
+  import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpDocUne',
@@ -199,6 +199,7 @@
           docId,
           docType,
           bindCidFun: async cid => {
+            console.log('addNewDocumentOrBorad:', cid);
             await this.$nextTick();
           }
         });
@@ -220,11 +221,9 @@
         // 调整大小
         this.resize();
 
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitSwitchTo',
-          params: [this.docServer.state.currentType]
-        });
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitSwitchTo', [this.docServer.state.currentType])
+        );
       },
       /**
        * 切换到 文档还是白板
@@ -261,10 +260,7 @@
        * 打开选择文档列表
        */
       openDocDlglist() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitOpenDocList'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenDocList'));
       },
       /**
        * 演示文档

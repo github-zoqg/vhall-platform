@@ -145,7 +145,7 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1000',
       kind: 'document'
     },
-    emitClick: [
+    handleClick: [
       {
         cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
@@ -161,7 +161,7 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1001',
       kind: 'board'
     },
-    emitClick: [
+    handleClick: [
       {
         cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
