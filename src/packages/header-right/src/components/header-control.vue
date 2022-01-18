@@ -14,13 +14,18 @@
               {{ userInfo.nickname }}
             </span>
           </div>
-          <div class="header-right_control_wrap-head-right" v-if="isShowQuit" @click="roleQuit">
+          <div
+            class="header-right_control_wrap-head-right"
+            v-if="isShowQuit"
+            @click="roleQuit || userInfo.role_name != 1"
+          >
             退出
           </div>
         </div>
         <div class="header-right_control_wrap-container">
           <div
             class="header-right_control_wrap-container-setting"
+            :class="{ 'header-right_control_wrap-container-disabled': thirtPushStreamimg }"
             v-if="userInfo.role_name == 1 || userInfo.role_name == 4"
             @click="openMediaSettings"
           >
@@ -28,30 +33,35 @@
             <p>媒体设置</p>
           </div>
           <div
-            class="header-right_control_wrap-container-setting header-right_control_wrap-container-disabled"
+            class="header-right_control_wrap-container-setting"
+            :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
             v-if="isSupportSplitScreen"
             @click="splitScreen"
           >
             <i class="iconfont iconfenpingmoshi"></i>
-            <p>分屏模式</p>
+            <p>{{ splitStatus == 2 ? '分屏' : '关闭分屏' }}</p>
           </div>
-          <div
+          <!-- <div
             class="header-right_control_wrap-container-setting"
             v-if="userInfo.role_name != 1"
             @click="roleQuit"
           >
             <i class="iconfont iconjiaosetuichu"></i>
             <p>角色退出</p>
-          </div>
+          </div> -->
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="webinarInfo.no_delay_webinar == 0"
+            v-if="webinarInfo.no_delay_webinar == 0 && isThirtPushStream && !thirtPushStreamimg"
             @click="thirdPartyShow"
           >
             <i class="iconfont iconxuniguanzhong"></i>
             <p>第三方发起</p>
           </div>
-          <div class="header-right_control_wrap-container-setting" @click="thirdPartyClose">
+          <div
+            class="header-right_control_wrap-container-setting"
+            @click="thirdPartyClose"
+            v-if="isThirtPushStream && thirtPushStreamimg"
+          >
             <i class="iconfont iconxuniguanzhong"></i>
             <p>网页发起</p>
           </div>
@@ -59,6 +69,7 @@
             class="header-right_control_wrap-container-setting"
             v-if="webinarInfo.mode != 6"
             @click="openVirtualAudience"
+            :class="{ 'header-right_control_wrap-container-disabled': !virtualAudienceCanUse }"
           >
             <i class="iconfont iconxuniguanzhong"></i>
             <p>虚拟人数</p>
@@ -92,7 +103,6 @@
     computed: {
       isSupportSplitScreen() {
         return (
-          this.isShowSplitScreen &&
           (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
           this.webinarInfo.mode != 6
         );
@@ -101,8 +111,13 @@
     data() {
       return {
         roomBaseState: null,
+        virtualAudienceCanUse: false, //虚拟人数是否可以使用，只有直播的时候可以使用
+        isThirtPushStream: false, // 是否支持第三方推流
+        thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
         webinarInfo: {}, //活动下信息
+        splitStatus: 2, //分屏状态
+        isLiving: false, //是否正在直播
         roleMap: {
           1: '主持人',
           2: '观众',
@@ -116,6 +131,12 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.userInfo = this.roomBaseState.watchInitData.join_info;
       this.webinarInfo = this.roomBaseState.watchInitData.webinar;
+      if (this.webinarInfo.type == 1) {
+        this.virtualAudienceCanUse = true;
+      }
+      if (this.webinarInfo.mode == 2) {
+        this.isThirtPushStream = true;
+      }
     },
     methods: {
       openMediaSettings() {
@@ -123,6 +144,11 @@
       },
       splitScreen() {
         //分屏
+        if (this.splitStatus == 2) {
+          this.$emit('startSplit');
+        } else {
+          this.$emit('endSplit');
+        }
       },
       roleQuit() {
         // 角色退出
@@ -155,7 +181,7 @@
       height: 28px;
       line-height: 28px;
       text-align: center;
-      color: @font-dark-low;
+      color: @font-error-low;
       font-size: 20px;
       cursor: pointer;
       border-radius: 50%;
@@ -228,9 +254,9 @@
             width: 34px;
             height: 34px;
             font-size: 19px;
-            color: @font-dark-second;
+            color: @font-error-low;
             line-height: 34px;
-            border: 1px solid @font-dark-second;
+            border: 1px solid @font-error-low;
             border-radius: 50%;
           }
           .iconfenpingmoshi {

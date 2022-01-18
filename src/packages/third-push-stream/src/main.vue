@@ -97,7 +97,6 @@
         });
       },
       doCopy(type) {
-        console.log('111111222222', type);
         let btn = '';
         if (type == 1) {
           btn = 'vmp-third-watch';
