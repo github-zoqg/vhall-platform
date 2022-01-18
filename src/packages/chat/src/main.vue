@@ -154,6 +154,7 @@
   import { sessionOrLocal } from './js/utils';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpChat',
@@ -836,10 +837,11 @@
       },
       //打开私聊模态窗
       openPrivateChatModal() {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'comLivePrivateChat',
-          method: 'openModal'
-        });
+        // window.$middleEventSdk?.event?.send({
+        //   cuid: 'comLivePrivateChat',
+        //   method: 'openModal'
+        // });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal'));
       }
     }
   };

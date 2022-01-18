@@ -3,29 +3,186 @@
     <el-dialog
       :title="title"
       :visible.sync="visible"
-      width="500px"
+      width="740px"
       custom-class="vmp-live-private-chat"
     >
-      测试------------------
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleConfirm" size="medium" round>保 存</el-button>
-      </span>
+      <div class="vmp-live-private-chat__wrap" @click="boxClick">
+        <ul class="wrap__left">
+          <li
+            class="wrap__left-item"
+            v-for="(group, index) in chatGroupList"
+            :class="{ active: activeGroupIndex === index }"
+            @click="selectGroup(index)"
+            :key="index"
+          >
+            <em class="wrap__left-item__news-chat" v-if="group.news"></em>
+            <span class="wrap__left-item__group-name">{{ group.group_name }}</span>
+            <i
+              v-if="group.type == 1"
+              class="el-icon-circle-close wrap__left-item__close-icon"
+              @click.stop="deleteChatGroup(index)"
+            ></i>
+          </li>
+        </ul>
+        <div
+          class="wrap__right"
+          :class="{
+            'hide-tip': activeGroupIndex !== -1 && chatGroupList[activeGroupIndex].type == 2
+          }"
+        >
+          <span class="wrap__right__header">提示：如想结束当前聊天，关闭左侧用户窗口即可</span>
+          <div class="wrap__right__content">
+            <chat-list
+              @showImg="openImgPreview"
+              :role="roleName"
+              :activity-id="webinarId"
+              ref="chatRef"
+            ></chat-list>
+          </div>
+          <div class="wrap__right__send">
+            <!--表情选择-->
+            <emoji ref="emoji" class="wrap__right__emoji-box" @emojiInput="emojiInput"></emoji>
+            <!--已上传的图片展示-->
+            <div class="wrap__right__img-upload-list" @click.stop="" v-if="showUploadImg">
+              <div
+                class="img-upload-item"
+                v-for="(imgUrl, keyIdx) in imgList"
+                @click="openImgPreview(keyIdx, imgList)"
+                :key="keyIdx"
+                :style="{
+                  backgroundImage: `url(${imgUrl}?x-oss-process=image/resize,m_lfit,w_100${
+                    isWebp ? '/format,webp' : ''
+                  })`
+                }"
+              >
+                <span class="img-delete" @click.stop="deleteImg(keyIdx)">
+                  <i class="el-icon-close"></i>
+                </span>
+              </div>
+              <div
+                v-if="imgList.length < 5"
+                class="img-upload-item img-upload-add"
+                title="上传图片（上限5张）"
+                @click="pickLoadImg"
+              >
+                <i class="el-icon-plus img-upload-icon"></i>
+              </div>
+            </div>
+            <!--     左侧图标       -->
+            <div class="wrap__right__send-tool">
+              <i
+                title="表情"
+                class="iconfont iconbiaoqing icon-emoji"
+                @click.stop="openEmojiModal"
+              ></i>
+              <i
+                title="上传图片（上限5张）"
+                class="iconfont icontupianliaotian"
+                @click="handleUploadImg"
+              ></i>
+            </div>
+            <!--聊天内容输入-->
+            <textarea
+              class="wrap__right__private-txt"
+              :placeholder="inputPlaceholder"
+              ref="sendBox"
+              v-model="inputText"
+              @keydown.prevent.13="sendMessage"
+            ></textarea>
+            <el-button type="primary" size="small" class="small-button" round @click="sendMessage">
+              发送
+            </el-button>
+          </div>
+        </div>
+        <img-preview
+          ref="imgPreview"
+          v-if="imgPreviewVisible"
+          :images="previewImgList"
+          @closeImgPreview="onClosePreviewImg"
+        ></img-preview>
+        <com-upload
+          accept="png|jpg|jpeg|bmp|gif"
+          :actionUrl="actionUrl"
+          inputName="resfile"
+          :fileSize="10240"
+          :multiple="true"
+          :totalCount="10"
+          ref="uploadImg"
+          :ex-params="extraParams"
+          @error="handleUploadError"
+          @load="handleUploadSuccess"
+          style="display: none"
+        ></com-upload>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import imgPreview from '@/packages/chat/src/components/img-preview';
+  import emoji from '@/packages/chat/src/components/emoji';
+  import chatList from './components/chat-list';
+  import comUpload from '@/packages/app-shared/components/com-upload';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLivePrivateChat',
+    components: {
+      imgPreview,
+      comUpload,
+      emoji,
+      chatList
+    },
     data() {
       return {
         //模态窗是否可见
         visible: false,
         //模态窗标题
-        title: '私聊'
+        title: '私聊',
+        //是否支持webp
+        isWebp: window.webp,
+        //已经上传的图片
+        imgList: [],
+        //图片上传地址 todo 暂时写死，后续替换
+        actionUrl: 'https://t-saas-dispatch.vhall.com/v3/commons/upload/index',
+        //私聊群组列表 todo 假数据替换
+        chatGroupList: [
+          {
+            type: 2,
+            group_name: '主办方群聊'
+          },
+          {
+            type: 1,
+            group_name: '测试用户私聊'
+          }
+        ],
+        //当前选中的私聊群组的index
+        activeGroupIndex: -1,
+        //聊天输入框的值
+        inputText: '',
+        //聊天输入框提示文字
+        inputPlaceholder: '请输入聊天内容',
+        //是否展示图片上传
+        showUploadImg: false,
+        //上传图片额外参数
+        extraParams: {},
+        //图片预览弹窗是否可见
+        imgPreviewVisible: false,
+        //图片预览的列表
+        previewImgList: [],
+        //当前的用户角色
+        roleName: '',
+        //当前的活动id
+        webinarId: '',
+        //当前的登录信息
+        loginInfo:{}
       };
     },
-    beforeCreate() {},
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    mounted() {
+      this.initViewData();
+    },
     methods: {
       //打开模态窗
       openModal() {
@@ -39,6 +196,86 @@
       //确认的处理方法
       handleConfirm() {
         this.handleClose();
+      },
+      //初始化上传图片额外信息
+      initViewData() {
+
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        const interact_token = interact.interact_token || '';
+        const roomId = interact.room_id;
+        this.roomId = roomId;
+        this.webinarId = webinar.id;
+        this.roleName = join_info.role_name;
+        this.loginInfo = join_info;
+        this.extraParams = {
+          path: `${roomId}/img`,
+          type: 'image',
+          interact_token
+        };
+      },
+      //聊天框整体点击处理
+      boxClick() {},
+      //选中某个群组
+      selectGroup(index) {
+        this.activeGroupIndex = index;
+      },
+      //删除某个群组 todo
+      deleteChatGroup(index) {
+        console.log('删除群组', index);
+      },
+      //上传图片出错的回调
+      handleUploadError(data) {
+        this.$message(data.msg || '上传失败，请重试！');
+      },
+      //上传图片成功的回调
+      handleUploadSuccess(data) {
+        const fileObj = JSON.parse(data.data).data;
+        if (this.imgList.length < 5) {
+          this.imgList.push(fileObj.domain_url);
+        }
+      },
+      //打开图片预览
+      openImgPreview(index, list = []) {
+        //处理掉图片携带的查询参数，只保留主要链接
+        this.previewImgList = list.map(item => item.split('?')[0]);
+        this.imgPreviewVisible = true;
+        this.$nextTick(() => {
+          this.$refs.imgPreview.jumpToTargetImg(index);
+        });
+      },
+      //关闭图片预览的回调
+      onClosePreviewImg() {
+        this.imgPreviewVisible = false;
+      },
+      //打开表情模态窗
+      openEmojiModal() {
+        this.$refs.emoji.toggleShow();
+      },
+      //处理图片上传
+      handleUploadImg() {
+        this.showUploadImg = !this.showUploadImg;
+        //清空已经上传的图片
+        this.imgList = [];
+      },
+      //删除图片
+      deleteImg(index) {
+        this.imgList.splice(index, 1);
+      },
+      //选择上传图片
+      pickLoadImg() {
+        if (this.imgList.length < 5) {
+          this.showUploadImg = true;
+          this.$refs.uploadImg.$el.click();
+        }
+      },
+      //选中表情
+      emojiInput(value) {
+        this.inputText += value;
+      },
+      //发送消息
+      sendMessage() {
+        console.log(this.roomBaseServer.state, '22222222222222');
       }
     }
   };
@@ -46,5 +283,255 @@
 
 <style lang="less">
   .vmp-live-private-chat {
+    @color-bd: #e2e2e2;
+    @color-red: #fc5659;
+    @color-default: #ffd021;
+    @color-default-hover: #fdd43f;
+
+    @main-color: #fc5659;
+    .el-dialog__body {
+      padding: 0;
+    }
+    .el-dialog__header {
+      position: relative;
+      height: 40px;
+      padding: 0 20px;
+      line-height: 40px;
+      border-radius: 4px 4px 0 0;
+      background-color: @main-color;
+    }
+    .el-dialog__title {
+      font-size: 16px;
+      //color: #333;
+      color: #fff;
+    }
+
+    .el-dialog__headerbtn {
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      .el-dialog__close {
+        color: #fff;
+      }
+    }
+    &__wrap {
+      display: flex;
+      align-items: center;
+      height: 480px;
+      overflow: hidden;
+      .wrap__left {
+        height: 100%;
+        width: 180px;
+        border-right: solid 1px @color-bd;
+        overflow: auto;
+        user-select: none;
+      }
+      .wrap__left-item {
+        position: relative;
+        display: block;
+        height: 44px;
+        line-height: 44px;
+        padding: 0 10px 0 20px;
+        border-bottom: solid 1px @color-bd;
+        transition: all 0.2s;
+        .iconfont {
+          display: none;
+          vertical-align: middle;
+          font-size: 18px;
+          &:hover {
+            color: @color-red;
+          }
+        }
+        &__close-icon {
+          display: none;
+          font-size: 18px;
+        }
+        &:hover {
+          cursor: pointer;
+          background-color: #f5f5f5;
+          .wrap__left-item__close-icon {
+            display: inline-block;
+          }
+        }
+        &.active {
+          cursor: pointer;
+          background-color: @color-bd;
+        }
+      }
+
+      .wrap__left-item__news-chat {
+        display: block;
+        content: '';
+        position: absolute;
+        top: 14px;
+        left: 12px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: @color-red;
+      }
+      .wrap__left-item__group-name {
+        display: inline-block;
+        width: calc(100% - 24px);
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .wrap__right {
+        height: 100%;
+        width: calc(100% - 180px);
+        &.hide-tip {
+          .right-header {
+            display: none;
+          }
+          .right-content {
+            height: calc(100% - 120px);
+          }
+        }
+
+        &__header {
+          display: block;
+          width: 100%;
+          height: 40px;
+          line-height: 40px;
+          background-color: #fffceb;
+          color: #666;
+          text-align: left;
+          padding-left: 16px;
+        }
+        &__content {
+          width: 100%;
+          height: calc(100% - 40px - 120px);
+          overflow-y: auto;
+        }
+        &__send {
+          position: relative;
+          width: 100%;
+          height: 120px;
+          border-top: 1px solid @color-bd;
+        }
+        .wrap__right__emoji-box {
+          position: absolute;
+          top: 0;
+          left: 0;
+          transform: translate(0, -100%);
+          width: 320px;
+          height: 290px;
+          padding: 12px 10px;
+          background-color: #fff;
+          box-shadow: 0 0 8px rgba(34, 34, 34, 0.5);
+          border-radius: 4px;
+          z-index: 2;
+        }
+        &__send-tool {
+          height: 34px;
+          line-height: 34px;
+          padding-left: 10px;
+          .iconfont {
+            margin-right: 6px;
+            font-size: 18px;
+            &:hover {
+              cursor: pointer;
+              color: @color-red;
+            }
+          }
+        }
+        &__private-txt {
+          width: 80%;
+          height: 70px;
+          padding: 0 10px 10px 10px;
+          border: none;
+        }
+        .small-button {
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+        }
+        &__img-upload-list {
+          display: flex;
+          position: absolute;
+          top: -64px;
+          left: 10px;
+          max-width: 312px;
+          height: 60px;
+          padding-right: 6px;
+          border-radius: 4px;
+          background-color: #fff;
+          font-size: 0;
+          cursor: default;
+          .img-upload-item {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            margin: 6px 0 6px 6px;
+            border-radius: 3px;
+            vertical-align: middle;
+            background: #eee no-repeat 50%;
+            background-size: contain;
+            cursor: pointer;
+            border: solid 1px transparent;
+            &:hover {
+              .img-delete {
+                display: flex;
+              }
+            }
+            .img-delete {
+              position: absolute;
+              display: none;
+              align-items: center;
+              justify-content: center;
+              top: -10px;
+              right: -10px;
+              width: 28px;
+              height: 28px;
+              line-height: 28px;
+              text-align: center;
+              background-color: #000;
+              border-radius: 50%;
+              transform: scale(0.5);
+              color: #fff;
+              i {
+                font-size: 16px;
+              }
+              &:hover {
+                background-color: @color-red;
+              }
+            }
+            &.img-upload-add {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              position: relative;
+              border: dashed 1px #aaa;
+              line-height: 46px;
+              text-align: center;
+              color: #888;
+              background-color: transparent;
+              overflow: hidden;
+
+              .img-upload-icon {
+                font-size: 20px;
+              }
+
+              .com-upload {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+              }
+              &:hover {
+                color: @color-red;
+                border-color: @color-red;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 </style>
