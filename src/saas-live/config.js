@@ -34,6 +34,7 @@ export const serverConfig = {
     className: 'vmp-basic-center',
     // children: ['comDocUne']
     children: ['comStreamList']
+    // children: ['comThirdStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -48,8 +49,8 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      'comMemberList'
-      // 'comChat'
+      // 'comMemberList'
+      'comChat'
     ]
   },
   /*** 布局定义end */
@@ -57,7 +58,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['comShare', 'comVirtualPeople']
+    children: ['comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */
@@ -83,7 +84,8 @@ export const serverConfig = {
     emitVirtualClick: [
       {
         cuid: 'comVirtualPeople',
-        method: 'openVirtualDialog'
+        method: 'openVirtualDialog',
+        args: [{ type: 1 }]
       }
     ],
     emitClickStartLive: [
@@ -144,7 +146,7 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1000',
       kind: 'document'
     },
-    emitClick: [
+    handleClick: [
       {
         cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
@@ -160,7 +162,7 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1001',
       kind: 'board'
     },
-    emitClick: [
+    handleClick: [
       {
         cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
@@ -213,7 +215,19 @@ export const serverConfig = {
       userControlOptions: {
         enable: true
       }
-    }
+    },
+    //打开私聊弹窗
+    emitOpenLivePrivateChatModal: [
+      {
+        cuid: 'comLivePrivateChat',
+        method: 'openModal'
+      }
+    ]
+  },
+  //发起端--私聊组件
+  comLivePrivateChat: {
+    component: 'VmpLivePrivateChat',
+    options: {}
   },
   //成员列表组件
   comMemberList: {
@@ -330,5 +344,11 @@ export const serverConfig = {
   },
   comVirtualPeople: {
     component: 'VmpVirtualPeople'
+  },
+  comThirdStream: {
+    component: 'VmpThirdStream'
+  },
+  comInsertVideo: {
+    component: 'VmpInsertVideo'
   }
 };

@@ -54,6 +54,7 @@
       <div class="operate-container__tool-bar__right">
         <template v-if="chatOptions && chatOptions.enableChatSetting">
           <!--聊天设置-->
+          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
           <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
           <chat-filter
             v-if="roleName != 2"
@@ -250,6 +251,10 @@
       //处理@用户
       handleAtUser(accountId) {
         this.$refs.chatInput.atUser(accountId);
+      },
+      //打开私聊模态窗
+      openPrivateChatModal() {
+        this.$emit('openPrivateChatModal');
       }
     }
   };

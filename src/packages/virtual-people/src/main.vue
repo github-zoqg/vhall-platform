@@ -3,30 +3,30 @@
     <el-dialog
       title="虚拟人数"
       :visible.sync="virtualVisible"
-      :close-on-click-modal="false"
+      :before-close="virtualClose"
       width="440px"
     >
       <div class="vmp-virtual-wrap">
         <div class="vmp-virtual-wrap-contaner">
           <div class="vmp-virtual-wrap-contaner-real">
-            实际数据：1人在线
+            实际数据：{{ person.onlineNum }}人在线
             <span>｜</span>
-            热度 66&nbsp;&nbsp;
+            {{ virtualText }} {{ person.pv }}&nbsp;&nbsp;
             <el-tooltip effect="dark" placement="right">
               <i class="iconfont iconicon_help_m"></i>
               <div slot="content">
                 1.人数：当前活动在线人数
                 <br />
-                2.热度：创建至今，进入观看页面（直播和回放、点播）的浏览量
+                2.{{ virtualText }}：创建至今，进入观看页面（直播和回放、点播）的浏览量
               </div>
             </el-tooltip>
           </div>
           <div class="vmp-virtual-wrap-contaner-online">
             <p class="vmp-virtual-wrap-contaner-online-num">
-              <template>
-                <span>1</span>
+              <template v-if="virtualType == 1">
+                <span>{{ totalOnlineNum }}</span>
                 人在线 &nbsp;&nbsp;|&nbsp;&nbsp;热度
-                <span>360</span>
+                <span>{{ totalPv }}</span>
               </template>
             </p>
             <p v-if="addCount == 0" class="vmp-virtual-wrap-contaner-online-vir">
@@ -37,13 +37,13 @@
             </p>
           </div>
           <div class="vmp-virtual-wrap-contaner-form">
-            <el-form label-width="70px" :rules="virtualRules" :model="formInfo">
+            <el-form label-width="70px" :rules="virtualRules" :model="formInfo" ref="formInfo">
               <el-form-item label="执行时间" prop="time">
                 <el-input placeholder="1 - 120" v-model="formInfo.time" :disabled="addStatus">
                   <b slot="suffix">分</b>
                 </el-input>
               </el-form-item>
-              <el-form-item label="人数增加" prop="onlineNum">
+              <el-form-item label="人数增加" prop="onlineNum" v-if="virtualType == 1">
                 <el-input
                   placeholder="请输入内容"
                   v-model="formInfo.onlineNum"
@@ -52,7 +52,7 @@
                   <b slot="suffix">人</b>
                 </el-input>
               </el-form-item>
-              <el-form-item label="热度增加" prop="pv">
+              <el-form-item :label="virtualType == 1 ? '热度增加' : '观看次数'" prop="pv">
                 <el-input placeholder="请输入内容" v-model="formInfo.pv" :disabled="addStatus">
                   <b slot="suffix">次</b>
                 </el-input>
@@ -62,7 +62,7 @@
         </div>
         <div class="vmp-virtual-wrap-btn">
           <div class="vmp-virtual-wrap-btn-left">
-            <div v-if="isShowSwitch">
+            <div v-if="virtualType == 2">
               <span>观看端显示</span>
               <el-switch
                 v-model="formInfo.watchShow"
@@ -72,10 +72,18 @@
             </div>
           </div>
           <div class="vmp-virtual-wrap-btn-right">
-            <el-button type="primary" round size="medium" v-if="!addStatus">开始添加</el-button>
+            <el-button
+              type="primary"
+              round
+              size="medium"
+              v-if="!addStatus"
+              @click="addVirtualPeople"
+            >
+              开始添加
+            </el-button>
             <el-button type="primary" round size="medium" v-else>
               <span class="virtual-adding">正在添加</span>
-              <span class="virtual-stop">结束添加</span>
+              <span class="virtual-stop" @click="stopAddNumFun">结束添加</span>
             </el-button>
           </div>
         </div>
@@ -84,6 +92,8 @@
   </div>
 </template>
 <script>
+  import { useVirtualAudienceServer } from 'middle-domain';
+  import CountTo from './js/countTo';
   export default {
     name: 'VmpVirtualPeople',
     data() {
@@ -122,25 +132,160 @@
       };
       return {
         virtualVisible: false,
+        webinarId: this.$route.params.id,
         addCount: 0,
         addStatus: false,
+        virtualText: '热度',
+        virtualType: 1, // 1:是saas； 2:知客
         formInfo: {
           time: '',
-          onlineNum: '',
+          onlineNum: 80,
           pv: 100,
           watchShow: false
         },
-        isShowSwitch: false,
         virtualRules: {
           time: [{ validator: validateTime, trigger: 'blur' }],
           onlineNum: [{ validator: validateOnline, trigger: 'blur' }],
           pv: [{ validator: validatePv, trigger: 'blur' }]
-        }
+        },
+        setIntervalVirtual: null,
+        person: {},
+        onlineNumCountTo: new CountTo(),
+        pvCountTo: new CountTo()
       };
     },
+    beforeCreate() {
+      this.virtualAudienceServer = useVirtualAudienceServer();
+    },
+    computed: {
+      totalOnlineNum() {
+        // 总在线人数（真实+虚拟）
+        return Number(this.person.onlineNum + this.person.baseOnlineNum);
+      },
+      totalPv() {
+        // 总观看人数/热度（真实+虚拟）
+        return Number(this.person.basePv + this.person.pv);
+      }
+    },
     methods: {
-      openVirtualDialog() {
+      openVirtualDialog(info) {
         this.virtualVisible = true;
+        this.virtualText = info.type == 1 ? '热度' : '观看次数';
+        this.virtualType = info.type;
+        this.getVirtualPerson();
+        this.getVirtualInterval();
+      },
+      addVirtualPeople() {
+        this.$refs.formInfo.validate(valid => {
+          if (valid) {
+            this.virtualAudienceServer
+              .virtualClientStart({
+                webinar_id: this.webinarId
+              })
+              .then(res => {
+                if (res.code == 200) {
+                  this.addStatus = true;
+                  this.addCount++;
+                  this.addVirtualOnline();
+                  this.addVirtualPv();
+                } else {
+                  this.$message.warning(res.msg);
+                }
+              });
+          } else {
+            this.addStatus = false;
+            return false;
+          }
+        });
+      },
+      addVirtualOnline() {
+        this.onlineNumCountTo.start(
+          0,
+          this.formInfo.onlineNum,
+          Number(this.formInfo.time) * 60,
+          0.2,
+          (count, lastStep, step) => {
+            // onlineNum修改
+            console.warn('onlineNum修改');
+            this.virtualAudienceServer
+              .virtualAccumulation({
+                webinar_id: this.webinarId,
+                online: count,
+                pv: 0
+              })
+              .then(res => {
+                console.warn('在线人数成功---', res.data);
+                if (lastStep) {
+                  this.addStatus = false;
+                }
+                this.person.baseOnlineNum = Number(this.person.baseOnlineNum) + Number(count);
+              })
+              .catch(res => {
+                this.$message.error(res.msg);
+                this.addStatus = false;
+                this.onlineNumCountTo.stop();
+              });
+          }
+        );
+      },
+      addVirtualPv() {
+        this.pvCountTo.start(
+          0,
+          this.formInfo.pv,
+          Number(this.formInfo.time) * 60,
+          0.2,
+          (count, lastStep, step) => {
+            // pv修改
+            this.virtualAudienceServer
+              .virtualAccumulation({
+                webinar_id: this.webinarId,
+                pv: count,
+                online: 0
+              })
+              .then(res => {
+                if (lastStep) {
+                  this.addStatus = false;
+                }
+                this.person.basePv = Number(this.person.basePv) + Number(count);
+              })
+              .catch(res => {
+                this.addStatus = true;
+                this.pvCountTo.stop();
+                this.$message.error(res.msg);
+              });
+          }
+        );
+      },
+      stopAddNumFun() {
+        this.onlineNumCountTo.stop();
+        this.pvCountTo.stop();
+        this.addStatus = false;
+      },
+      getVirtualPerson() {
+        this.virtualAudienceServer
+          .virtualClientGet({
+            webinar_id: this.webinarId
+          })
+          .then(res => {
+            if (res.code == 200) {
+              const { person, addCount } = this.virtualAudienceServer.state;
+              this.person = person;
+              this.addCount = addCount;
+              console.warn('zhangxiaoxuni虚拟人数添加', this.person, this.addCount);
+            }
+          });
+      },
+      getVirtualInterval() {
+        this.setIntervalVirtual = setInterval(() => {
+          this.getVirtualPerson();
+        }, 5000);
+      },
+      virtualClose() {
+        this.virtualVisible = false;
+        this.$refs.formInfo.resetFields();
+        if (this.setIntervalVirtual) {
+          clearInterval(this.setIntervalVirtual);
+        }
       }
     }
   };
@@ -152,7 +297,7 @@
         color: @font-light-normal;
         font-size: 14px;
         span {
-          color: @font-dark-normal;
+          color: @font-error-low;
         }
         .iconfont {
           color: @font-light-low;
@@ -162,10 +307,10 @@
       &-online {
         width: 300px;
         height: 92px;
-        color: #1a1a1a;
-        background: rgba(255, 235, 235, 0.5);
+        color: @font-light-normal;
+        background: @bg-virtual;
         border-radius: 4px;
-        border: 1px solid #fed8d6;
+        border: 1px solid @border-virtual;
         text-align: center;
         margin-top: 10px;
         margin-left: 70px;
@@ -179,7 +324,7 @@
         }
         &-vir {
           margin-top: 9px;
-          color: #999;
+          color: @font-light-low;
           font-size: 14px;
         }
       }

@@ -108,7 +108,17 @@
     </div>
     <!-- 右：全屏、文档章节等信息-->
     <div class="vmp-doc-toolbar__ft">
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
+      <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
+        <i class="iconfont iconquanping"></i>
+      </div>
+      <div
+        v-show="docServer.state.currentType === 'document'"
+        class="vmp-icon-item"
+        :title="$t('usual.docThumb')"
+        @click="toggleThumbnail"
+      >
+        <i class="iconfont iconsuolvetu"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -135,7 +145,7 @@
         changeTool: this.changeTool
       };
     },
-    inject: ['fullscreen', 'openDocDlglist'],
+    inject: ['fullscreen', 'toggleThumbnail', 'openDocDlglist'],
     data() {
       return {
         showAudienceTip: true,

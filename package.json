@@ -9,6 +9,7 @@
     "serve:saas-live": "node scripts/cli-service.js serve --project=saas-live",
     "serve:saas-wap": "node scripts/cli-service.js serve --project=saas-wap",
     "serve:saas-watch": "node scripts/cli-service.js serve --project=saas-watch",
+    "serve:zhike-live": "node scripts/cli-service.js serve --project=zhike-live",
     "build:saas-live": "node scripts/cli-service.js build --project=saas-live",
     "build:saas-live:test": "node scripts/cli-service.js build --project=saas-live --mode=test",
     "build:saas-wap": "node scripts/cli-service.js build --project=saas-wap",
@@ -22,6 +23,7 @@
   "dependencies": {
     "clipboard": "^2.0.8",
     "core-js": "^3.6.5",
+    "element-resize-detector": "^1.2.4",
     "element-ui": "^2.15.6",
     "highlight.js": "^11.3.1",
     "lodash": "^4.17.21",

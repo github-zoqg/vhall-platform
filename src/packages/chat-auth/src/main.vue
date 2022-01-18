@@ -49,7 +49,7 @@
               </span>
             </div>
           </div>
-          <div class="table-menu fl" :class="{ disabled: isCooling }">
+          <div class="table-menu" :class="{ disabled: isCooling }">
             <span
               class="table-menu-item"
               :class="{ active: selectMenuType === 'auth' }"
@@ -127,11 +127,10 @@
               批量阻止
             </el-button>
           </div>
-          <span
-            class="iconfont icon-yulanxuanzhuan refresh-btn"
-            :class="{ refreshing: refreshing }"
-            @click="refreshList"
-          ></span>
+          <span class="el-icon-refresh-right refresh-btn" @click="refreshList"></span>
+        </div>
+        <div class="main-container__content">
+          <auth-table :select-menu-type="selectMenuType"></auth-table>
         </div>
       </div>
     </div>
@@ -147,11 +146,13 @@
 </template>
 
 <script>
-  import autoSettingModal from '../components/autoSettingModal';
+  import autoSettingModal from './components/autoSettingModal';
+  import authTable from './components/authTable';
   export default {
     name: 'VmpChatAuth',
     components: {
-      autoSettingModal
+      autoSettingModal,
+      authTable
     },
     data() {
       return {
@@ -208,7 +209,27 @@
         }
       };
     },
+    beforeCreate() {
+      //todo 引入domain的chatAuthServer
+    },
+    created() {
+      this.init();
+      this.getFooterInfo();
+    },
     methods: {
+      //todo 初始化方法
+      init() {
+        this.getActivityInfo();
+        this.getChatAuthEnableStatus();
+      },
+      //todo 获取活动信息
+      getActivityInfo() {},
+      //todo 获取聊天审核开启状态
+      getChatAuthEnableStatus() {},
+      //todo 获取tab上的处理数
+      initTabTotalNum() {},
+      //todo 获取聊天数据 (0:未审核 1:通过  2:阻止)
+      getChatMessageList() {},
       //打开自动审核弹窗
       openAutoSettingModal() {
         this.$refs.autoSettingModal.openModal();
@@ -246,7 +267,9 @@
       //刷新当前tab下的列表
       refreshList() {},
       //选中下拉选项的处理
-      handleCommand(type) {},
+      handleCommand(type) {
+        console.log(type);
+      },
       //批量通过
       handleBatchPass() {},
       //批量阻止
@@ -350,18 +373,26 @@
         padding-bottom: 20px;
       }
       .main-container__header {
+        position: relative;
         display: flex;
         align-items: center;
-        position: absolute;
-        top: 0;
-        left: 0;
         height: 50px;
-        width: 100%;
-        padding: 0 10px;
         background-color: #fff;
         z-index: 2;
         border-bottom: 1px solid @color-bd;
 
+        .refresh-btn {
+          position: absolute;
+          font-size: 20px;
+          top: 50%;
+          right: 0;
+          transform: translateY(-50%);
+          &:hover {
+            cursor: pointer;
+            opacity: 0.8;
+            color: @color-blue-hover;
+          }
+        }
         .table-menu {
           float: left;
           display: inline-block;
@@ -393,6 +424,10 @@
           display: inline-block;
           position: absolute;
           right: 30px;
+        }
+        .el-button--danger,
+        .el-button--success {
+          color: #fff;
         }
         .table-select {
           display: flex;

@@ -1,6 +1,8 @@
 <template>
   <div class="vmp-header-left">
-    <div :title="subject" class="vhall-room-name">{{ webinarInfo.subject || '房间名称' }}</div>
+    <div :title="webinarInfo.subject" class="vhall-room-name">
+      {{ webinarInfo.subject || '房间名称' }}
+    </div>
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
       <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
@@ -81,15 +83,24 @@
         //     req_url: ''
         //   }
         // });
-        const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        clipboard.on('success', () => {
-          this.$message.success(this.$t('usual.copySucceeded'));
-          clipboard.destroy();
+        const input = document.getElementById('vhall-room-id-copy-val');
+        // input.select();
+        document.execCommand('copy');
+        this.$message({
+          message: '复制成功！',
+          showClose: true,
+          type: 'success',
+          customClass: 'zdy-info-box'
         });
-        clipboard.on('error', () => {
-          this.$message.error(this.$t('usual.copyFailed'));
-          clipboard.destroy();
-        });
+        // const clipboard = new this.$clipboard('.vhall-room-id-copy');
+        // clipboard.on('success', () => {
+        //   this.$message.success(this.$t('usual.copySucceeded'));
+        //   clipboard.destroy();
+        // });
+        // clipboard.on('error', () => {
+        //   this.$message.error(this.$t('usual.copyFailed'));
+        //   clipboard.destroy();
+        // });
       }
     }
   };

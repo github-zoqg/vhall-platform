@@ -17,7 +17,7 @@
     <div class="vmp-footer-tools__right">
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div>
-    <div class="vmp-footer-tools__center">
+    <div class="vmp-footer-tools__center" v-if="isInteractLive">
       <handup></handup>
     </div>
   </div>

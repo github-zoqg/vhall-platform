@@ -472,30 +472,22 @@
   padding: 9px 48px;
   color: @font-light-second;
   &:hover {
-    color: @font-light-normal;
-    background: @bg-light-normal;
-    border: 1px solid @border-normal-color;
+    background: @bg-light-hover;
   }
   &:focus {
-    color: @font-light-normal;
-    background: @bg-light-normal;
-    border: 1px solid @border-normal-color;
+    background: @bg-light-hover;
   }
   &:active {
-    color: @font-light-normal;
-    background: @active-light-normal;
-    border: 1px solid @active-light-normal;
+    background: @bg-light-hover;
   }
   &.is-disabled {
     background: transparent;
-    border: 1px solid @border-lighter-color;
     cursor: not-allowed;
     color: @font-disabled-normal;
     &:hover,
     &:focus,
     &:active {
       color: @font-disabled-normal;
-      border: 1px solid @border-lighter-color;
     }
   }
 }
@@ -513,12 +505,9 @@ button.el-button.el-button--white-medium {
   font-size: 14px;
   font-weight: 400;
   line-height: 26px;
-  border: 1px solid @border-light-color;
-  color: @font-error;
+  color: @font-light-second;
   &:hover {
-    background: @hover-light-normal;
-    color: @bg-light-normal;
-    border: 1px solid @hover-light-normal;
+    background: @bg-light-hover;
   }
 }
 .el-button.is-disabled {
