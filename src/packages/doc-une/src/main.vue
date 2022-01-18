@@ -64,7 +64,7 @@
           v-for="(item, index) in docServer.state.thumbnailList"
           :key="'thum' + index"
           :data-value="index"
-          :class="{ selected: slideIndex === index }"
+          :class="{ selected: pageNum - 1 === index }"
         >
           <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
           <img :src="item" />
@@ -119,6 +119,9 @@
       },
       currentCid() {
         return this.docServer.state.currentCid;
+      },
+      pageNum() {
+        return this.docServer.state.pageNum;
       },
       showPagebar() {
         return this.docServer.state.currentType === 'document' && !this.isFullscreen;
@@ -270,19 +273,22 @@
        */
       async demonstrate(docId, docType, switchStatus) {
         console.log('演示文档:docId=', docId, ';docType=', docType, '; switchStatu:', switchStatus);
-        // 保留一个白板，其它删除
-        const board = this.docServer.state.fileOrBoardList.find(item => {
-          return item.is_board === 2;
+        const doc = this.docServer.state.fileOrBoardList.find(item => {
+          return item.docId === docId && item.doc_type === docType;
         });
-        for (let item of this.docServer.state.fileOrBoardList) {
-          if (!board || item.cid !== board.cid) {
-            // console.log('删除item.cid：', item.cid);
-            await this.docServer.destroyContainer({ id: item.cid });
-          }
+        if (doc) {
+          console.log('--文档已经存在,直接应用:', doc);
+          this.docServer.state.currentType = 'document';
+          this.docServer.state.pageNum = Number(doc.slideIndex) + 1;
+          this.docServer.state.pageTotal = doc.slidesTotal;
+          await this.docServer.selectContainer(doc.cid);
+          this.docServer.getCurrentThumbnailList();
+        } else {
+          // 否则新建
+          console.log('--文档不存在,新建文档');
+          await this.addNewFile('document', docId, docType);
+          this.docServer.setSwitchStatus(switchStatus);
         }
-        this.docServer.state.fileOrBoardList = board ? [board] : [];
-        await this.addNewFile('document', docId, docType);
-        this.docServer.setSwitchStatus(switchStatus);
       },
       /**
        * 页面操作工具
@@ -348,7 +354,6 @@
         if (!index) return;
         const page = Number(index) + 1;
         this.docServer.gotoPage({ id: this.docServer.currentCid, page });
-        this.slideIndex = page - 1;
       }
     },
     mounted() {
