@@ -57,7 +57,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['comShare', 'comVirtualPeople', 'comLivePrivateChat']
+    children: ['comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */
@@ -346,5 +346,8 @@ export const serverConfig = {
   },
   comThirdStream: {
     component: 'VmpThirdStream'
+  },
+  comInsertVideo: {
+    component: 'VmpInsertVideo'
   }
 };
