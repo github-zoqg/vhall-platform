@@ -841,7 +841,9 @@
         //   cuid: 'comLivePrivateChat',
         //   method: 'openModal'
         // });
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal'));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
+        );
       }
     }
   };

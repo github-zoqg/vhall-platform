@@ -174,7 +174,7 @@
         //当前的活动id
         webinarId: '',
         //当前的登录信息
-        loginInfo:{}
+        loginInfo: {}
       };
     },
     beforeCreate() {
@@ -199,7 +199,6 @@
       },
       //初始化上传图片额外信息
       initViewData() {
-
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         const interact_token = interact.interact_token || '';
