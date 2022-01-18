@@ -331,15 +331,16 @@
           if (obj.role !== 'watch') {
             /* 正则匹配校验url */
             /* eslint-disable */
-          let reg = /(https:\/\/|http:\/\/|\/\/|www\.)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
-          obj.txt = obj.txt.replace(reg, (url) => {
-            let href = url
-            if (url.indexOf('www.') === 0) {
-              href = `//${url}`
-            }
-            return `<a class='a_link' href="${href}" title="点击打开链接" target='_blank'>${url}</a>`
-          })
-          /* eslint-enable */
+            let reg =
+              /(https:\/\/|http:\/\/|\/\/|www\.)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
+            obj.txt = obj.txt.replace(reg, url => {
+              let href = url;
+              if (url.indexOf('www.') === 0) {
+                href = `//${url}`;
+              }
+              return `<a class='a_link' href="${href}" title="点击打开链接" target='_blank'>${url}</a>`;
+            });
+            /* eslint-enable */
           }
         }
         /* 替换表情图片 */
