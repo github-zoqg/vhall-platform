@@ -17,12 +17,12 @@ export function calculateAudioLevel(level) {
 // 网络状态等级
 export function calculateNetworkStatus(status) {
   let netWorkStatus = 2;
-  if (status >= 0 && status <= 2) {
-    netWorkStatus = 2;
-  } else if (status > 2 && status <= 9) {
-    netWorkStatus = 1;
-  } else if (status > 9 && status <= 100) {
-    netWorkStatus = 0;
+  if (status >= 0 && status <= 5) {
+    netWorkStatus = 2; // 良
+  } else if (status > 5 && status <= 20) {
+    netWorkStatus = 1; // 中
+  } else if (status > 20 && status <= 100) {
+    netWorkStatus = 0; // 差
   } else {
     netWorkStatus = 0;
   }
