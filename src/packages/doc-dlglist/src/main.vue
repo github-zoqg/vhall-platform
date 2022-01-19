@@ -101,7 +101,7 @@
               <el-switch
                 class="vmp-doc-cur__switch"
                 v-model="switchStatus"
-                width="28"
+                :width="28"
                 active-color="#fb3a32"
               ></el-switch>
               <span>默认开启，文档演示将自动对观众可见</span>
@@ -156,6 +156,8 @@
 </template>
 <script>
   import { useDocServer, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+
   export default {
     name: 'VmpDocDlglist',
     data() {
@@ -224,11 +226,10 @@
        */
       demonstrate(docId, docType) {
         this.dialogVisible = false;
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitDemonstrateDoc',
-          params: [docId, docType, this.switchStatus]
-        });
+        console.log('演示文档ID：', docId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDemonstrateDoc', [docId, docType, this.switchStatus])
+        );
       },
       /***
        * 删除文档
@@ -353,7 +354,8 @@
       async handleDoclibCancel() {
         this.cancelCheckHandle();
         this.mode = 1;
-      }
+      },
+      handleUpload() {}
     }
   };
 </script>
