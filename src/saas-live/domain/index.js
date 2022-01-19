@@ -17,8 +17,8 @@ Vue.use(DomainStore);
 
 export default new DomainStore.Store({
   state: {
+    roomBaseServer: useRoomBaseServer().state,
     docServer: useDocServer().state,
-    interactiveServer: useInteractiveServer().state,
-    roomBaseServer: useRoomBaseServer().state
+    interactiveServer: useInteractiveServer().state
   }
 });
