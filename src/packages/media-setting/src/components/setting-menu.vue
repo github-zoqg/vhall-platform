@@ -1,5 +1,6 @@
 <template>
   <ul class="vmp-media-setting-menu">
+    <li class="vmp-media-setting-menu__title">媒体设置</li>
     <li
       class="vmp-media-setting-menu__item"
       :class="{ 'vmp-media-setting-menu__item--active': selectedItem === item.id }"
@@ -40,9 +41,22 @@
     display: flex;
     flex-direction: column;
 
+    .vmp-media-setting-menu__title {
+      line-height: 64px;
+      margin-bottom: 0px;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: left;
+      padding-left: 24px;
+      color: #1a1a1a;
+      position: relative;
+      cursor: pointer;
+    }
+
     .vmp-media-setting-menu__item {
       cursor: pointer;
       box-sizing: border-box;
+      font-size: 14px;
       height: 40px;
       display: flex;
       align-items: center;
