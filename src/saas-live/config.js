@@ -30,10 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-center',
+    component: 'VmpBasicCenterContainerLive',
     // children: ['comDocUne']
-    children: ['comStreamList']
+    children: ['comStreamList', 'comDocUne']
     // children: ['comThirdStream']
   },
   layerBodyRight: {

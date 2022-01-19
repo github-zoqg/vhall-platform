@@ -30,6 +30,7 @@
 <script>
   import headerControl from './components/header-control.vue';
   import { useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpHeaderRight',
     data() {
@@ -63,10 +64,7 @@
       },
       // 打开虚拟人数的弹窗
       openVirtualProple() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitVirtualClick'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
       },
       // 推流成功事件
       async handlePublishComplate() {
@@ -90,10 +88,7 @@
         this.roomBaseServer.setDevice();
         this.liveStep = 2;
         // 派发推流事件
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickStartLive'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       },
       // 结束直播
       async handleEndClick() {
@@ -103,10 +98,7 @@
         });
         if (res.code == 200) {
           // 派发结束直播事件
-          window.$middleEventSdk?.event?.send({
-            cuid: this.cuid,
-            method: 'emitClickEndLive'
-          });
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
       handleUnpublishComplate() {

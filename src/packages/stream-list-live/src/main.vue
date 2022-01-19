@@ -3,9 +3,8 @@
     <div
       class="vmp-stream-list__local-container"
       :class="{
-        'vmp-stream-list__main-screen': accountId == mainScreen,
-        'vmp-dom__max': maxElement == 'mainScreen' && accountId == mainScreen,
-        'vmp-dom__mini': miniElement == 'mainScreen' && accountId == mainScreen
+        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
+        'vmp-dom__mini': miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
       }"
     >
       <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
@@ -17,8 +16,7 @@
         class="vmp-stream-list__remote-container"
         :class="{
           'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-          'vmp-dom__max': maxElement == 'mainScreen' && stream.accountId == mainScreen,
-          'vmp-dom__mini': miniElement == 'mainScreen' && stream.accountId == mainScreen
+          'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
         }"
       >
         <vmp-stream-remote :stream="stream"></vmp-stream-remote>
@@ -34,17 +32,52 @@
 
     data() {
       return {
-        mainScreen: '16422770',
-        accountId: '16422770',
         childrenCom: [],
-        miniElement: 'mainScreen',
         maxElement: ''
       };
     },
 
     computed: {
+      miniElement() {
+        return this.$domainStore.state.roomBaseServer.miniElement;
+      },
+      mainScreen() {
+        return this.$domainStore.state.interactiveServer.mainScreen;
+      },
       remoteStreams() {
         return this.$domainStore.state.interactiveServer.remoteStreams;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      // 流列表高度是否为 0 的属性(这个属性依赖的场景比较多,后续有人更改,请更新说明注释)
+      isStreamListH0() {
+        /**
+         * 计算方式:
+         * 1. 远端流列表长度为 0
+         *    1) 如果存在本地流并且不是主屏,高度不为 0,返回 false
+         *    2) 如果存在本地流并且是主屏,高度为 0,返回 true
+         * 2. 远端流列表长度为 1
+         *    1) 如果不存在本地流并且远端流是主屏,高度为 0,返回 true
+         *    2) 如果不存在本地流并且远端流不是主屏,高度不为 0,返回 false
+         *    3) 如果存在本地流,高度不为 0,返回 false
+         * 3. 远端流列表长度大于 1
+         *    高度不为 0,返回 false
+         */
+        if (!this.remoteStreams.length) {
+          return !(
+            this.$domainStore.state.interactiveServer.localStream.streamId &&
+            this.joinInfo.third_party_user_id != this.mainScreen
+          );
+        } else if (this.remoteStreams.length == 1) {
+          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
+            return this.remoteStreams[0].accountId == this.mainScreen;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
       }
     },
 
@@ -62,7 +95,9 @@
       this.getStreamList();
     },
 
-    mounted() {},
+    mounted() {
+      console.log(this.joinInfo, '----stream-list----joinInfo');
+    },
 
     methods: {
       getStreamList() {
