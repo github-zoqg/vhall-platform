@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'dlgDocList', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -32,8 +32,8 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    // children: ['comDocUne']
-    children: ['comStreamList']
+    children: ['comDocUne']
+    // children: ['comStreamList']
     // children: ['comThirdStream']
   },
   layerBodyRight: {
@@ -58,7 +58,8 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
+    children: ['dlgDocList', 'comShare', 'comVirtualPeople', 'comLivePrivateChat']
+    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */

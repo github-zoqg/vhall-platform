@@ -246,6 +246,7 @@
         });
         if (item) {
           // 如果存在，设置为当文档或白板
+          this.docServer.state.currentCid = item.cid;
           await this.docServer.selectContainer(item.cid);
           this.resize();
           return;
@@ -278,6 +279,7 @@
         });
         if (doc) {
           console.log('--文档已经存在,直接应用:', doc);
+          this.docServer.state.currentCid = doc.cid;
           this.docServer.state.currentType = 'document';
           this.docServer.state.pageNum = Number(doc.slideIndex) + 1;
           this.docServer.state.pageTotal = doc.slidesTotal;
