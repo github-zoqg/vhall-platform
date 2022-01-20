@@ -46,7 +46,7 @@
         this.errMsg = ex.msg;
       }
       this.micServer = useMicServer();
-      this.micServer.$on('user_apply', msg => {
+      this.micServer.$on('vrtc_connect_apply', msg => {
         console.log('----dingxiaodong----收到申请上麦消息', msg);
         this.$confirm(`${msg.data.nickname}申请上麦`, '提示', {
           confirmButtonText: '确定',
@@ -56,12 +56,12 @@
         })
           .then(() => {
             this.micServer.hostAgreeApply({
-              receive_account_id: msg.data.applyUserId
+              receive_account_id: msg.data.room_join_id
             });
           })
           .catch(() => {
             this.micServer.hostRejectApply({
-              receive_account_id: msg.data.applyUserId
+              receive_account_id: msg.data.room_join_id
             });
           });
       });

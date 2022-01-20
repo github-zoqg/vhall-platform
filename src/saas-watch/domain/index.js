@@ -10,7 +10,7 @@ import {
 
 setBaseUrl('https://t-saas-dispatch.vhall.com');
 setRequestHeaders({
-  platform: 10
+  platform: 7
 });
 
 Vue.use(DomainStore);

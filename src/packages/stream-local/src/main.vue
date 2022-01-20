@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-local" :class="{ 'vmp-stream-local__publish': isStreamPublished }">
+  <div
+    :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
+    class="vmp-stream-local"
+    :class="{ 'vmp-stream-local__publish': isStreamPublished }"
+  >
     <!-- 流容器 -->
     <section
       class="vmp-stream-local__stream-box"
@@ -47,10 +51,10 @@
         </el-tooltip>
         <el-tooltip :content="localStream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
           <span
-            class="vmp-stream-local__shadow-icon"
+            class="vmp-stream-local__shadow-icon iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              localStream.audioMuted ? 'iconfont iconicon_maikefengguanbi' : 'iconfont iconyinliang'
+              localStream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
             "
           ></span>
         </el-tooltip>
@@ -147,7 +151,8 @@
     async mounted() {
       console.log('本地流组件mounted钩子函数');
       // 主持人同意上麦
-      this.micServer.$on('user_apply_host_agree', async () => {
+      this.micServer.$on('vrtc_connect_agree', async () => {
+        this.micServer.userSpeakOn();
         console.log('---同意上麦---开始推流');
         this.startPush();
       });
@@ -255,20 +260,6 @@
           );
         });
       },
-      // 本地流设置摄像头开关
-      muteVideo() {
-        this.interactiveServer.muteVideo({
-          stream: this.interactiveServer.state.localStream.streamId,
-          isMute: !this.interactiveServer.state.localStream.videoMuted
-        });
-      },
-      // 本地流设置麦克风开关
-      muteAudio() {
-        this.interactiveServer.muteAudio({
-          stream: this.interactiveServer.state.localStream.streamId,
-          isMute: !this.interactiveServer.state.localStream.audioMuted
-        });
-      },
       // 点击mute按钮事件
       handleClickMuteDevice(deviceType) {
         const status = this.interactiveServer.state.localStream[`${deviceType}Muted`] ? 1 : 0;
@@ -279,7 +270,27 @@
         });
       },
       speakOff() {},
-      fullScreen() {},
+      fullScreen() {
+        if (!this.isFullScreen) {
+          this.interactiveServer
+            .setStreamFullscreen({
+              streamId: this.localStream.streamId,
+              vNode: `vmp-stream-local__${this.joinInfo.third_party_user_id}`
+            })
+            .then(() => {
+              this.isFullScreen = true;
+            });
+        } else {
+          this.interactiveServer
+            .exitStreamFullscreen({
+              streamId: this.localStream.streamId,
+              vNode: `vmp-stream-local__${this.joinInfo.third_party_user_id}`
+            })
+            .then(() => {
+              this.isFullScreen = false;
+            });
+        }
+      },
       exchange() {
         const roomBaseServer = useRoomBaseServer();
         roomBaseServer.requestChangeMiniElement('stream-list');
@@ -453,6 +464,9 @@
         background: hsla(0, 0%, 100%, 0.3);
         border-radius: 100%;
         margin-right: 10px;
+        &:hover {
+          background-color: #fc5659;
+        }
         &:last-child {
           margin-right: 0;
         }
