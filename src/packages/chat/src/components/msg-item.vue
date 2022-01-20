@@ -11,8 +11,8 @@
     >
       <!--欢迎语-->
       <template v-if="['welcome_msg'].includes(msg.type)">
-        <div v-if="msg.nickName !== '' && msg.content !== ''" class="msg-item-template--welcome">
-          <span>{{ msg.nickName }}</span>
+        <div v-if="msg.nickname !== '' && msg.content !== ''" class="msg-item-template--welcome">
+          <span>{{ msg.nickname }}</span>
           {{ msg.content }}
         </div>
       </template>
@@ -39,7 +39,7 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">{{ msg.nickName }}</span>
+              <span class="info-wrap__nick-name">{{ msg.nickname }}</span>
               <span
                 v-if="
                   (msg.type === 'text' || msg.type === 'image') &&
@@ -67,8 +67,8 @@
                 class="reply-wrapper__content reply-msg"
                 v-html="
                   `<span class='reply-wrapper__content__nick-name'>${
-                    msg.replyMsg.nickName || msg.replyMsg.nick_name
-                  }</span>&nbsp;${msgContent}`
+                    msg.replyMsg.nickname || msg.replyMsg.nick_name
+                  }</span>&nbsp;${msg.replyMsg.content.text_content}`
                 "
               ></p>
               <!-- 图片 -->
@@ -86,7 +86,7 @@
                   v-if="!msg.replyMsg.content.text_content"
                   class="reply-wrapper__img-wrapper__nick-name"
                 >
-                  {{ msg.replyMsg.nickName }}
+                  {{ msg.replyMsg.nickname }}
                 </span>
                 <p class="msg-item__content-hr"></p>
                 <div
@@ -151,8 +151,8 @@
           class="msg-item-template__interact"
         >
           <div class="msg-item-template__interact-content">
-            <span v-show="msg.nickName && msg.roleName != 1" class="interact-content__nick-name">
-              {{ msg.nickName }}
+            <span v-show="msg.nickname && msg.roleName != 1" class="interact-content__nick-name">
+              {{ msg.nickname }}
             </span>
             <span
               v-show="msg.roleName"
@@ -183,8 +183,8 @@
           class="msg-item-template__interact-tools"
         >
           <div class="interact-tools-content">
-            <span v-show="msg.nickName" class="interact-tools-content__nick-name">
-              {{ msg.nickName }}
+            <span v-show="msg.nickname" class="interact-tools-content__nick-name">
+              {{ msg.nickname }}
             </span>
             <span>
               {{ msg.type === 'reward_pay_ok' ? '打赏了红包' : `送出${msg.content.gift_name}` }}
@@ -308,7 +308,7 @@
       } else {
         let at = false;
         this.msg.atList.forEach(a => {
-          const userName = `@${a.nickName} `;
+          const userName = `@${a.nickname} `;
           const match =
             this.msg.content &&
             this.msg.content.text_content &&
@@ -368,7 +368,7 @@
             event.target,
             msg.sendId,
             msg.count,
-            msg.nickName,
+            msg.nickname,
             false,
             msg.roleName
           );
@@ -383,7 +383,7 @@
           event.target,
           msg.sendId,
           msg.count,
-          msg.nickName,
+          msg.nickname,
           true,
           msg.roleName
         );
