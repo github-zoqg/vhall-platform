@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
-
+import PasswordLogin from '@/packages/password-login/index';
 Vue.use(VueRouter);
 
 const routes = [
@@ -17,6 +17,18 @@ const routes = [
     component: Home,
     name: 'LiveRoom',
     meta: { title: '直播间' }
+  },
+  {
+    path: '/lives/keylogin/:id/:role_name',
+    name: 'KeyLogin',
+    component: PasswordLogin,
+    meta: { title: '口令登录' }
+  },
+  {
+    path: '/lives/keylogin-host/:id/:role_name',
+    name: 'KeyLoginHost',
+    component: PasswordLogin,
+    meta: { title: '口令登录' }
   },
   {
     path: '/lives/chat-auth/:id',
