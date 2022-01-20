@@ -29,7 +29,10 @@ import VmpShare from '@/packages/share'; // 观看端分享
 import VmpAttention from '@/packages/attention-watch'; // 观看端关注
 import VmpOfficial from '@/packages/official-watch-pc'; // 观看端公众号
 import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
+//观看端成员列表
 import VmpMemberList from '@/packages/member-list';
+//观看端私聊
+import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -59,4 +62,5 @@ export function initUse() {
   Vue.use(VmpOfficial);
   Vue.use(VmpWatchAuth);
   Vue.use(VmpMemberList);
+  Vue.use(VmpWatchPrivateChat);
 }

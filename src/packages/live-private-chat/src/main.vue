@@ -441,6 +441,7 @@
           height: 70px;
           padding: 0 10px 10px 10px;
           border: none;
+          outline: none;
         }
         .small-button {
           position: absolute;
