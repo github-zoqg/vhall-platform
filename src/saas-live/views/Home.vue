@@ -77,11 +77,13 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: token || localStorage.getItem('token')
+            //token || localStorage.getItem('token')
+            token: ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'send' //客户端类型
+            clientType: 'send', //客户端类型
+            type: 1
           }
         });
         // 初始化房间
