@@ -16,7 +16,8 @@
             :key="msg.msgId"
             :msg="msg"
             v-show="checkMessageShow(msg)"
-            :roleName="roleName"
+            :role-name="roleName"
+            :join-info="joinInfo"
             @dispatchEvent="msgEventHandleDisPatch"
             @lotteryCheck="lotteryCheck"
             @questionnaireCheck="questionnaireCheck"
@@ -270,7 +271,9 @@
           鼓掌: 'bg-applause',
           666: 'bg-666',
           'bg-custom': 'bg-custom'
-        }
+        },
+        //当前登录人信息
+        joinInfo: {}
       };
     },
     computed: {
@@ -348,6 +351,7 @@
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        this.joinInfo = join_info;
         this.configList = configList;
         this.webinarId = webinar.id;
         this.playerType = webinar.type;
