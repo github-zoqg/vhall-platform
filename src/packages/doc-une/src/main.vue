@@ -1,17 +1,13 @@
 <template>
   <div
     class="vmp-doc-une"
-    :class="[
-      { 'is-watch': isWatch },
-      { 'vmp-area__max': isMax },
-      { 'vmp-area__min': !isMax },
-      { 'vmp-doc-une--fullscreen': isFullscreen }
-    ]"
-    v-show="show"
+    :class="[{ 'is-watch': isWatch }, `vmp-doc-une--${displayMode}`]"
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
-    <VmpDocToolbar v-show="isMax"></VmpDocToolbar>
+    <VmpDocToolbar
+      v-show="displayMode === 'normal' || displayMode === 'fullscreen'"
+    ></VmpDocToolbar>
 
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
@@ -59,6 +55,18 @@
         <li data-value="zoomOut" title="缩小" class="doc-pagebar__opt iconfont iconsuoxiao"></li>
         <li data-value="zoomReset" title="还原" class="doc-pagebar__opt iconfont iconhuanyuan"></li>
         <li data-value="move" title="移动" class="doc-pagebar__opt iconfont iconyidong"></li>
+        <li
+          v-if="isWatch && displayMode === 'normal'"
+          data-value="fullscreen"
+          title="全屏"
+          class="doc-pagebar__opt iconfont iconquanping"
+        ></li>
+        <li
+          v-if="isWatch && displayMode === 'fullscreen'"
+          data-value="fullscreen"
+          title="退出全屏"
+          class="doc-pagebar__opt iconfont iconquanpingguanbi"
+        ></li>
       </ul>
 
       <!-- 文档缩略图 -->
@@ -100,6 +108,7 @@
     provide() {
       return {
         fullscreen: this.fullscreen,
+        displayMode: this.displayMode,
         toggleThumbnail: this.toggleThumbnail,
         openDocDlglist: this.openDocDlglist
       };
@@ -107,10 +116,9 @@
     data() {
       return {
         className: '',
-        isMax: true,
+        displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         keepAspectRatio: true,
         hasPager: true, // 是否有分页操作(观看端没有)
-        isFullscreen: false, //是否全屏
         thumbnailShow: false // 文档缩略是否显示
       };
     },
@@ -124,8 +132,12 @@
       pageNum() {
         return this.docServer.state.pageNum;
       },
+      // 显示文档时 && (普通模式，或 观看端全屏模式下);
       showPagebar() {
-        return this.docServer.state.currentCid.split('-')[0] === 'document' && !this.isFullscreen;
+        return (
+          this.docServer.state.currentCid.split('-')[0] === 'document' &&
+          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
+        );
       },
       // 是否观看端
       isWatch() {
@@ -162,8 +174,15 @@
       toggleThumbnail() {
         this.thumbnailShow = !this.thumbnailShow;
       },
-      toggleSwitch() {
-        this.isMax = !this.isMax;
+      setDisplayMode(mode) {
+        if (!['normal', 'mini', 'fullscreen'].includes(mode)) {
+          console.error('展示模式必须是normal, mini, fullscreen中的一个');
+          return;
+        }
+        this.displayMode = mode;
+        if (this.displayMode === 'mini') {
+          this.thumbnailShow = false;
+        }
         this.resize();
       },
       /**
@@ -172,20 +191,19 @@
       resize() {
         let rect;
         if (this.isWatch) {
-          if (this.isMax) {
-            rect = this.$refs.docWrapper?.getBoundingClientRect();
-          } else {
+          if (this.displayMode === 'mini') {
             rect = {
               width: 360,
               height: 204
             };
+          } else {
+            rect = this.$refs.docWrapper?.getBoundingClientRect();
           }
         } else {
           rect = screenfull.isFullscreen
             ? this.$refs.docWrapper?.getBoundingClientRect()
             : this.$refs.docContent?.getBoundingClientRect();
         }
-        console.log('[doc] rect1:', rect);
         if (!rect) return;
         let { width, height } = rect;
         if (!width || !height) return;
@@ -221,7 +239,34 @@
         // 全屏/退出全屏事件
         screenfull.onchange(() => {
           console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-          this.isFullscreen = screenfull.isFullscreen;
+          if (screenfull.isFullscreen) {
+            this.displayMode = 'fullscreen';
+          } else {
+            this.displayMode = 'normal';
+          }
+        });
+
+        //
+        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
+          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
+          //   return;
+          // }
+          console.log('[doc] ===========选择容器======', data);
+          // this.docInfo.docShowType = data.id.split('-')[0];
+          this.docServer.state.currentCid = data.id;
+          // 判断容器是否存在
+          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
+          if (currentItem) {
+            this.docServer.activeContainer(data.id);
+          } else {
+            const { id: cid, docId } = data;
+            console.log('[doc] cid:', cid);
+            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
+          }
+        });
+
+        this.msgServer.$on('DOC_MSG', msg => {
+          console.log('------DOC_MSG-----文档消息：', msg);
         });
 
         //
@@ -409,6 +454,10 @@
           case 'move':
             this.docServer.move();
             break;
+          // 全屏
+          case 'fullscreen':
+            this.fullscreen();
+            break;
         }
       },
 
@@ -451,7 +500,7 @@
   .vmp-doc-une {
     width: 100%;
     height: 100%;
-    min-height: 360px;
+    min-height: 204px;
     display: flex;
     flex-direction: column;
     color: #fff;
@@ -590,6 +639,15 @@
     }
   }
 
+  .vmp-doc-une.vmp-doc-une--mini {
+    position: absolute !important;
+    width: 309px;
+    height: 240px;
+    top: 0;
+    right: 0;
+    z-index: 10;
+  }
+
   // 文档全屏时
   .vmp-doc-une.vmp-doc-une--fullscreen {
     .vmp-doc-toolbar {
@@ -612,6 +670,31 @@
 
   // 作为观看端时的样式
   .vmp-doc-une.is-watch {
+    // 普通模式
+    &.vmp-doc-une--normal {
+      position: absolute;
+      top: 0;
+      bottom: 56px;
+      width: calc(100% - 380px);
+      height: auto;
+      min-height: auto;
+    }
+
+    //mini模式
+    &.vmp-doc-une--mini {
+      position: absolute;
+      width: 360px;
+      height: 204px;
+      min-height: 204px;
+      top: 0;
+      right: 0;
+      z-index: 10;
+    }
+
+    // 全屏模式
+    &.vmp-doc-une--fullscreen {
+    }
+
     .vmp-doc-toolbar {
       position: absolute;
       border: 0;
@@ -625,23 +708,5 @@
         display: flex;
       }
     }
-  }
-
-  .vmp-doc-une.is-watch.vmp-area__max {
-    position: absolute;
-    top: 0;
-    bottom: 56px;
-    width: calc(100% - 380px);
-    height: auto;
-    min-height: auto;
-  }
-
-  .vmp-doc-une.is-watch.vmp-area__min {
-    position: absolute;
-    width: 360px;
-    height: 204px;
-    min-height: 204px;
-    top: 0;
-    right: 0;
   }
 </style>

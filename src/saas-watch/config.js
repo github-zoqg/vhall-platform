@@ -59,7 +59,8 @@ export const serverConfig = {
   comDocUne: {
     component: 'VmpDocUne',
     options: {
-      keepAspectRatio: false
+      keepAspectRatio: false,
+      hasPager: false
     }
   },
   comStreamList: {
