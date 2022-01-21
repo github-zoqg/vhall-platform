@@ -3,25 +3,6 @@
     <div class="vmp-player-box">
       <div class="vmp-player-container">
         <div id="vmp-player" class="vmp-player-watch">
-          <div class="vmp-player-living">
-            <div
-              v-if="isShowPoster"
-              class="vmp-player-living-background"
-              :style="`backgroundImage: url('${webinarsBgImg}')`"
-            ></div>
-            <div class="vmp-player-living-btn" v-if="!isLiving">
-              <div @click="startPlay"><i class="iconfont iconbofang_icon"></i></div>
-            </div>
-            <!-- <div class="vmp-player-living-end">
-              <div class="vmp-player-living-end-img">
-                <img src="../src/images/liveEnd.png" alt="" />
-              </div>
-              <h1>重新播放</h1>
-            </div> -->
-            <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
-              <div>语音播放中</div>
-            </div>
-          </div>
           <!-- 控制条 进度条、弹幕、全屏、时间等 -->
           <div class="vmp-player-controller" v-if="!isShowPoster">
             <!-- 进度条 -->
@@ -125,6 +106,25 @@
                   ></i>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="vmp-player-living">
+            <div
+              v-if="isShowPoster"
+              class="vmp-player-living-background"
+              :style="`backgroundImage: url('${webinarsBgImg}')`"
+            ></div>
+            <div class="vmp-player-living-btn" v-if="!isLiving">
+              <div @click="startPlay"><i class="iconfont iconbofang_icon"></i></div>
+            </div>
+            <!-- <div class="vmp-player-living-end">
+              <div class="vmp-player-living-end-img">
+                <img src="../src/images/liveEnd.png" alt="" />
+              </div>
+              <h1>重新播放</h1>
+            </div> -->
+            <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
+              <div>语音播放中</div>
             </div>
           </div>
         </div>
@@ -380,7 +380,7 @@
             if (this.isLive) {
               resolve();
             } else {
-              this.playerServer.on(VhallPlayer.LOADED, () => {
+              this.playerServer.$on(VhallPlayer.LOADED, () => {
                 resolve();
               });
             }
@@ -463,21 +463,12 @@
         return playerParams;
       },
       startPlay() {
-        this.isLiving ? this.pause() : this.play();
-      },
-      // 播放
-      play() {
-        this.playerServer && this.playerServer.play();
-      },
-      // 暂停
-      pause() {
-        this.playerServer && this.playerServer.pause();
+        this.isLiving ? this.playerServer.pause() : this.playerServer.play();
       },
       setVideo() {
         const time = (this.sliderVal / 100) * this.totalTime; // 快进
         this.setVideoCurrentTime(time);
-
-        this.play();
+        this.playerServer.play();
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus() {
@@ -615,6 +606,9 @@
     &-living {
       height: 100%;
       width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
       &-background {
         height: 100%;
         width: 100%;
@@ -848,7 +842,7 @@
               background-color: rgba(0, 0, 0, 0.7);
               display: none;
               border-radius: 4px;
-              .is-vertical .el-slider__runway {
+              .el-slider.is-vertical .el-slider__runway {
                 margin: 10px auto 10px;
                 background-color: rgba(255, 255, 255, 0.3);
               }
