@@ -1,17 +1,13 @@
 <template>
   <!-- 文档工具栏 -->
-  <div class="vmp-doc-toolbar">
+  <div class="vmp-doc-toolbar" :class="[{ 'is-watch': isWatch }]">
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd">
-      <div
-        v-show="docServer.state.currentType === 'document'"
-        class="choose-document"
-        @click="openDocDlglist"
-      >
+      <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}
       </div>
 
-      <div class="audience-visible">
+      <div class="audience-visible" v-if="!isWatch">
         <span style="margin-right: 5px">
           {{ $t('usual.audienceVisible') }}
         </span>
@@ -104,15 +100,24 @@
         >
           <i class="iconfont iconquanpingguanbi"></i>
         </div>
+
+        <div
+          v-show="currentType !== 'board'"
+          class="vmp-icon-item"
+          :title="$t('usual.docThumb')"
+          @click="toggleThumbnail"
+        >
+          <i class="iconfont iconsuolvetu"></i>
+        </div>
       </div>
     </div>
     <!-- 右：全屏、文档章节等信息-->
-    <div class="vmp-doc-toolbar__ft">
+    <div class="vmp-doc-toolbar__ft" v-if="!isWatch">
       <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
         <i class="iconfont iconquanping"></i>
       </div>
       <div
-        v-show="docServer.state.currentType === 'document'"
+        v-show="currentType !== 'board'"
         class="vmp-icon-item"
         :title="$t('usual.docThumb')"
         @click="toggleThumbnail"
@@ -127,7 +132,7 @@
   import VmpHighlighterPopup from './highlighter-popup.vue';
   import VmpShapePopup from './shape-popup.vue';
   import VmpTextPopup from './text-popup.vue';
-  import { useDocServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer } from 'middle-domain';
   export default {
     name: 'VmpDocToolbar',
     components: {
@@ -182,14 +187,23 @@
       }
     },
     computed: {
+      // 是否观看端(send是发起端，其它的都是你观看端)
+      isWatch() {
+        console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
+        return this.roomBaseServer.state.clientType !== 'send';
+      },
       switchStatus: {
         get() {
           return this.docServer.state.switchStatus;
         },
         set() {}
+      },
+      currentType() {
+        return this.docServer.state.currentCid.split('-')[0];
       }
     },
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
     },
     methods: {
@@ -283,158 +297,200 @@
     align-items: center;
     justify-content: space-between;
     z-index: 2;
-  }
 
-  .vmp-doc-toolbar__hd {
-    max-width: 250px;
-    display: flex;
-    flex-direction: row;
-    .choose-document {
-      height: 27px;
-      width: 76px;
-      border-radius: 15px;
-      border: 1px solid #dadada;
-      font-size: 12px;
-      color: #dadada;
-      line-height: 27px;
-      text-align: center;
-      margin-left: 16px;
-      cursor: pointer;
-      &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
-      }
-    }
-    .audience-visible {
-      font-size: 12px;
-      color: #dadada;
-      line-height: 17px;
-      display: -webkit-box;
-      display: -ms-flexbox;
+    .vmp-doc-toolbar__hd {
+      max-width: 250px;
       display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      margin-left: 20px;
-      position: relative;
-
-      .el-switch .el-switch__core {
-        border-color: #ddd !important;
-        background-color: #2d2d2d !important;
-        &::after {
-          background-color: #ddd;
+      flex-direction: row;
+      .choose-document {
+        height: 27px;
+        width: 76px;
+        border-radius: 15px;
+        border: 1px solid #dadada;
+        font-size: 12px;
+        color: #dadada;
+        line-height: 27px;
+        text-align: center;
+        margin-left: 16px;
+        cursor: pointer;
+        &:hover {
+          background: #fc5659;
+          border-color: #fc5659;
         }
       }
-      .el-switch.is-checked .el-switch__core {
-        border-color: #13ce66 !important;
-        background-color: #13ce66 !important;
+      .audience-visible {
+        font-size: 12px;
+        color: #dadada;
+        line-height: 17px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        margin-left: 20px;
+        position: relative;
+
+        .el-switch .el-switch__core {
+          border-color: #ddd !important;
+          background-color: #2d2d2d !important;
+          &::after {
+            background-color: #ddd;
+          }
+        }
+        .el-switch.is-checked .el-switch__core {
+          border-color: #13ce66 !important;
+          background-color: #13ce66 !important;
+        }
       }
     }
-  }
-  .vmp-doc-toolbar__bd {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .vmp-doc-toolbar__brush {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-  .vmp-doc-toolbar__ft {
-    display: flex;
-    flex-direction: row;
-    margin-right: 10px;
-  }
-
-  .vmp-icon-item {
-    height: 36px;
-    width: 36px;
-    margin-left: 3px;
-    border-radius: 4px;
-    text-align: center;
-    vertical-align: middle;
-    position: relative;
-    line-height: 36px;
-    cursor: pointer;
-    z-index: 100;
-
-    i {
-      font-size: 17px;
-      color: #dadada;
+    .vmp-doc-toolbar__bd {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
     }
 
-    &:hover {
-      background: #000;
-      .vmp-brush-popup {
-        display: block;
-      }
+    .vmp-doc-toolbar__brush {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
     }
-    &.selected {
-      background: #000;
+    .vmp-doc-toolbar__ft {
+      display: flex;
+      flex-direction: row;
+      margin-right: 10px;
     }
-    &.has-corner {
-      margin-right: 3px;
-    }
-  }
-  .vmp-icon-item.has-corner::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    border: 4px solid transparent;
-    border-left-color: #dadada;
-    -webkit-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-  .vmp-icon-item--exitFullscreen {
-    display: none;
-  }
 
-  .audience-visible__swith {
-    z-index: 2;
-  }
-  .audience-tip {
-    position: absolute;
-    top: 40px;
-    width: 192px;
-    word-break: break-all;
-    background: #ff9b00;
-    border-radius: 4px;
-    line-height: 20px;
-    padding: 9px 14px;
-    color: #fff;
-    box-sizing: content-box;
-    user-select: none;
-
-    span.iconfont {
-      position: absolute;
-      top: 2px;
-      right: 5px;
-      color: #fffdef;
-      width: 15px;
-      height: 15px;
-      font-size: 12px;
-      display: block;
+    .vmp-icon-item {
+      height: 36px;
+      width: 36px;
+      margin-left: 3px;
+      border-radius: 4px;
+      text-align: center;
+      vertical-align: middle;
+      position: relative;
+      line-height: 36px;
       cursor: pointer;
+      z-index: 100;
+
+      i {
+        font-size: 17px;
+        color: #dadada;
+      }
+
+      &:hover {
+        background: #000;
+        .vmp-brush-popup {
+          display: block;
+        }
+      }
+      &.selected {
+        background: #000;
+      }
+      &.has-corner {
+        margin-right: 3px;
+      }
+    }
+    .vmp-icon-item.has-corner::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      border: 4px solid transparent;
+      border-left-color: #dadada;
+      -webkit-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+    .vmp-icon-item--exitFullscreen {
+      display: none;
+    }
+
+    .audience-visible__swith {
       z-index: 2;
     }
-
-    .audience-tip__arrow {
+    .audience-tip {
       position: absolute;
-      display: block;
-      width: 0;
-      height: 0;
-      border-width: 0 8px 8px;
-      border-style: solid;
-      border-color: transparent transparent #ff9b00;
-      top: -8px;
-      left: 10px;
+      top: 40px;
+      width: 192px;
+      word-break: break-all;
+      background: #ff9b00;
+      border-radius: 4px;
+      line-height: 20px;
+      padding: 9px 14px;
+      color: #fff;
+      box-sizing: content-box;
+      user-select: none;
+
+      span.iconfont {
+        position: absolute;
+        top: 2px;
+        right: 5px;
+        color: #fffdef;
+        width: 15px;
+        height: 15px;
+        font-size: 12px;
+        display: block;
+        cursor: pointer;
+        z-index: 2;
+      }
+
+      .audience-tip__arrow {
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-width: 0 8px 8px;
+        border-style: solid;
+        border-color: transparent transparent #ff9b00;
+        top: -8px;
+        left: 10px;
+      }
+    }
+  }
+  .vmp-doc-toolbar.is-watch {
+    background: transparent;
+
+    .vmp-doc-toolbar__hd {
+      position: absolute;
+    }
+    .choose-document {
+      width: 90px;
+      height: 36px;
+      line-height: 36px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 97px;
+      border: 1px solid #666;
+      color: #fff;
+      font-size: 14px;
+    }
+    .vmp-doc-toolbar__brush {
+      width: 282px;
+      height: 36px;
+      line-height: 32px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      border: 1px solid #999;
+    }
+    .vmp-icon-item {
+      height: 24px;
+      width: 26px;
+      line-height: 24px;
+      margin-left: 6px;
+
+      i {
+        font-size: 14px;
+        color: #f7f7f7;
+        margin-right: 2px;
+      }
+    }
+
+    .vmp-icon-item.has-corner::after {
+      right: -2px;
+      bottom: -2px;
     }
   }
 </style>
