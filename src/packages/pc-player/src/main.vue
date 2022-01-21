@@ -318,7 +318,7 @@
         const { interact, join_info } = this.roomBaseState.watchInitData;
         console.log(this.roomBaseState, '????====zhangxiao');
         let params = {
-          appId: interact.paas_app_id || '', // 应用ID，必填
+          appId: this.roomBaseState.paasAppId || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
           videoNode: 'vmp-player',
@@ -481,7 +481,7 @@
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus() {
-        const { webinar, warmup, record } = this.roomBaseState.watchInitData;
+        const { webinar, warmup = {}, record = {} } = this.roomBaseState.watchInitData;
         if (this.roomBaseState.watchInitData.status === 'live') {
           if (webinar.type === 1) {
             // 直播

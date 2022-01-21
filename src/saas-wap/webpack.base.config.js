@@ -23,7 +23,8 @@ const htmlConfig = {
     player: '//static.vhallyun.com/jssdk/vhall-jssdk-player/latest/vhall-jssdk-player-2.4.0.js',
     interaction:
       '//static.vhallyun.com/jssdk/vhall-jssdk-interaction/latest/vhall-jssdk-interaction-2.3.6.js',
-    vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
+    vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js',
+    middleLog: '//t-alistatic01.e.vhall.com/common-static/middle/middle-log/1.0.1/index.min.js'
   },
   // cdn css
   cdnCss: {
