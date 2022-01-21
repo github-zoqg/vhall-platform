@@ -233,7 +233,7 @@
     computed: {
       //判断是否是音频直播模式
       isAudio() {
-        return this.roomBaseState.watchInitData.webinar.webinar_type == 1;
+        return this.roomBaseState.watchInitData.webinar.mode == 1;
       },
       // 背景图片
       webinarsBgImg() {
@@ -483,11 +483,11 @@
       getWebinerStatus() {
         const { webinar, warmup = {}, record = {} } = this.roomBaseState.watchInitData;
         if (this.roomBaseState.watchInitData.status === 'live') {
-          if (webinar.webinar_state === 1) {
+          if (webinar.type === 1) {
             // 直播
             this.isLive = true;
             this.optionTypeInfo('live');
-          } else if (webinar.webinar_state === 5) {
+          } else if (webinar.type === 5) {
             // 回放
             this.optionTypeInfo('vod', this.roomBaseState.watchInitData.paas_record_id);
             this.recordHistoryTime = sessionStorage.getItem(
@@ -497,7 +497,7 @@
               : 0;
           }
         } else {
-          if (webinar.webinar_state === 3) return; //结束状态
+          if (webinar.type === 3) return; //结束状态
           let _id = warmup.warmup_paas_record_id
             ? warmup.warmup_paas_record_id
             : record.preview_paas_record_id;

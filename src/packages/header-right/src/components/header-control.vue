@@ -67,7 +67,7 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="webinarInfo.webinar_type != 6"
+            v-if="webinarInfo.mode != 6"
             @click="openVirtualAudience"
             :class="{ 'header-right_control_wrap-container-disabled': !virtualAudienceCanUse }"
           >
@@ -104,7 +104,7 @@
       isSupportSplitScreen() {
         return (
           (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
-          this.webinarInfo.webinar_type != 6
+          this.webinarInfo.mode != 6
         );
       }
     },
@@ -134,7 +134,7 @@
       if (this.webinarInfo.type == 1) {
         this.virtualAudienceCanUse = true;
       }
-      if (this.webinarInfo.webinar_type == 2) {
+      if (this.webinarInfo.mode == 2) {
         this.isThirtPushStream = true;
       }
     },

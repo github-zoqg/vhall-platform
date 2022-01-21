@@ -47,8 +47,8 @@
       isInteractLive() {
         const { watchInitData } = this.roomBaseState;
         return (
-          (watchInitData.webinar.webinar_type == 3 || watchInitData.webinar.webinar_type == 6) &&
-          watchInitData.webinar.webinar_state == 1
+          (watchInitData.webinar.mode == 3 || watchInitData.webinar.mode == 6) &&
+          watchInitData.webinar.type == 1
         );
       }
     },
