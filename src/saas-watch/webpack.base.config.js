@@ -25,7 +25,8 @@ const htmlConfig = {
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
     jsencrypt:
       '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
-    vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
+    vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js',
+    middleLog: '//t-alistatic01.e.vhall.com/common-static/middle/middle-log/1.0.1/index.min.js'
   },
   // cdn css
   cdnCss: {

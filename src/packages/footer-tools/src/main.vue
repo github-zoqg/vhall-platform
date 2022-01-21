@@ -5,11 +5,17 @@
         <i class="iconfont iconmeitishezhi"></i>
         设置
       </div>
-      <div class="vmp-footer-tools-left-online" v-if="roomBaseState.watchInitData.online.show">
+      <div
+        class="vmp-footer-tools-left-online"
+        v-if="roomBaseState.watchInitData.online && roomBaseState.watchInitData.online.show"
+      >
         <i class="iconfont iconzaixianrenshu"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools-left-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div
+        class="vmp-footer-tools-left-hot"
+        v-if="roomBaseState.watchInitData.pv && roomBaseState.watchInitData.pv.show"
+      >
         <i class="iconfont iconzaixianrenshu"></i>
         {{ hotNum | formatHotNum }}
       </div>
@@ -41,8 +47,8 @@
       isInteractLive() {
         const { watchInitData } = this.roomBaseState;
         return (
-          (watchInitData.webinar.mode == 3 || watchInitData.webinar.mode == 6) &&
-          watchInitData.webinar.type == 1
+          (watchInitData.webinar.webinar_type == 3 || watchInitData.webinar.webinar_type == 6) &&
+          watchInitData.webinar.webinar_state == 1
         );
       }
     },

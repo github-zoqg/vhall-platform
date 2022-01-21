@@ -118,7 +118,7 @@
     },
     created() {
       const { watchInitData } = useRoomBaseServer().state;
-      this.liveMode = watchInitData?.webinar?.mode;
+      this.liveMode = watchInitData?.webinar?.webinar_type;
       this.getSessionSelectedDevice();
     },
     methods: {
