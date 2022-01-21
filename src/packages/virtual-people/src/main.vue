@@ -297,7 +297,7 @@
         color: @font-light-normal;
         font-size: 14px;
         span {
-          color: @font-dark-normal;
+          color: @font-error-low;
         }
         .iconfont {
           color: @font-light-low;

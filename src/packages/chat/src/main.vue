@@ -16,8 +16,9 @@
             :key="msg.msgId"
             :msg="msg"
             v-show="checkMessageShow(msg)"
-            :roleName="roleName"
             :chat-options="chatOptions"
+            :role-name="roleName"
+            :join-info="joinInfo"
             @dispatchEvent="msgEventHandleDisPatch"
             @lotteryCheck="lotteryCheck"
             @questionnaireCheck="questionnaireCheck"
@@ -155,6 +156,7 @@
   import { sessionOrLocal } from './js/utils';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpChat',
@@ -270,7 +272,9 @@
           鼓掌: 'bg-applause',
           666: 'bg-666',
           'bg-custom': 'bg-custom'
-        }
+        },
+        //当前登录人信息
+        joinInfo: {}
       };
     },
     computed: {
@@ -348,6 +352,7 @@
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        this.joinInfo = join_info;
         this.configList = configList;
         this.webinarId = webinar.id;
         this.playerType = webinar.type;
@@ -837,10 +842,13 @@
       },
       //打开私聊模态窗
       openPrivateChatModal() {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'comLivePrivateChat',
-          method: 'openModal'
-        });
+        // window.$middleEventSdk?.event?.send({
+        //   cuid: 'comLivePrivateChat',
+        //   method: 'openModal'
+        // });
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
+        );
       }
     }
   };

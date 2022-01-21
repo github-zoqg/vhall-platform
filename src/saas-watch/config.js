@@ -39,13 +39,16 @@ export const serverConfig = {
   // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-    children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+    // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
   layerBodyRight: {
     component: 'VmpContainer',
     className: 'vmp-basic-right',
-    children: ['comChat']
+    children: [
+      'comWatchPrivateChat'
+      // 'comChat'
+    ]
   },
   /*** 布局定义end */
 
@@ -268,6 +271,11 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
+    options: {}
+  },
+  //私聊组件
+  comWatchPrivateChat: {
+    component: 'VmpWatchPrivateChat',
     options: {}
   },
   // 登录注册组件

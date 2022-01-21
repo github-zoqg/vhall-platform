@@ -1,6 +1,8 @@
 <template>
   <div class="vmp-header-left">
-    <div :title="subject" class="vhall-room-name">{{ webinarInfo.subject || '房间名称' }}</div>
+    <div :title="webinarInfo.subject" class="vhall-room-name">
+      {{ webinarInfo.subject || '房间名称' }}
+    </div>
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
       <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>

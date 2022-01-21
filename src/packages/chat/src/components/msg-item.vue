@@ -229,6 +229,13 @@
         default: () => {
           return {};
         }
+      },
+      //当前登录人的信息
+      joinInfo: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {
@@ -331,10 +338,10 @@
           }
         });
       }
-      const userInfo = JSON.parse(sessionStorage.getItem('user'));
+
       if (
         this.msg.atList &&
-        this.msg.atList.find(u => userInfo.third_party_user_id == u.accountId) &&
+        this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
         !this.msg.isHistoryMsg
       ) {
         this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });

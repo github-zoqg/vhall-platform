@@ -182,8 +182,11 @@
       }
     },
     computed: {
-      switchStatus() {
-        return this.docServer?.state.switchStatus;
+      switchStatus: {
+        get() {
+          return this.docServer.state.switchStatus;
+        },
+        set() {}
       }
     },
     beforeCreate() {

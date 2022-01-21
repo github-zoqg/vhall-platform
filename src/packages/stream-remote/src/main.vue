@@ -2,37 +2,62 @@
   <div class="vmp-stream-remote">
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
+    <!-- videoMuted 的时候显示流占位图 -->
+    <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom">
-      <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
+      <span
+        v-show="[1, 3, 4].includes(stream.attributes.roleName)"
+        class="vmp-stream-local__bootom-role"
+        :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
+      >
+        {{ stream.attributes.roleName | roleNameFilter }}
+      </span>
+      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
         :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
       ></span>
       <span
         class="vmp-stream-local__bootom-mic iconfont"
-        :class="`iconicon_maikefeng_${micLevel}`"
+        :class="stream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`"
       ></span>
     </section>
     <!-- 鼠标 hover 遮罩层 -->
     <section class="vmp-stream-remote__shadow-box">
       <p class="vmp-stream-remote__shadow-first-line">
-        <el-tooltip :content="videoStatus ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <span
+          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
+          class="vmp-stream-local__shadow-label"
+        >
+          {{ stream.attributes.roleName | roleNameFilter }}
+        </span>
+        <el-tooltip
+          v-if="isShowVideoControl"
+          :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="muteDevice('video')"
             :class="
-              videoStatus
+              stream.videoMuted
                 ? 'iconfont iconicon_shexiangtouguanbi'
                 : 'iconfont iconicon_shexiangtoukaiqi'
             "
           ></span>
         </el-tooltip>
-        <el-tooltip :content="audioStatus ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          v-if="isShowAudioControl"
+          :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="muteDevice('audio')"
-            :class="audioStatus ? 'iconfont iconicon_maikefengguanbi' : 'iconfont iconyinliang'"
+            :class="
+              stream.audioMuted ? 'iconfont iconicon_maikefengguanbi' : 'iconfont iconyinliang'
+            "
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
@@ -44,6 +69,12 @@
         </el-tooltip>
       </p>
       <p class="vmp-stream-remote__shadow-second-line">
+        <span
+          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
+          class="vmp-stream-local__shadow-label"
+        >
+          视图
+        </span>
         <el-tooltip content="切换" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_qiehuan"
@@ -72,11 +103,12 @@
 
 <script>
   import { useInteractiveServer } from 'middle-domain';
+  import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
     data() {
       return {
-        micLevel: 1,
+        audioLevel: 1,
         networkStatus: 0
       };
     },
@@ -86,6 +118,21 @@
       }
     },
     computed: {
+      // 是否显示摄像头开关按钮
+      isShowVideoControl() {
+        // 如果当前人是主持人,并且是主屏,显示
+        // if (this.joinInfo.role_name == 1 && this.mainScreen == this.joinInfo.third_party_user_id) {
+        //   return true
+        // } else
+        return true;
+      },
+      // 是否显示麦克风开关按钮
+      isShowAudioControl() {
+        return true;
+      },
+      mainScreen() {
+        return this.$domainStore.state.interactiveServer.mainScreen;
+      },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
@@ -108,6 +155,15 @@
     mounted() {
       this.subscribeRemoteStream();
     },
+    beforeDestroy() {
+      // 清空计时器
+      if (this._audioLeveInterval) {
+        clearInterval(this._audioLeveInterval);
+      }
+      if (this._netWorkStatusInterval) {
+        clearInterval(this._netWorkStatusInterval);
+      }
+    },
     methods: {
       subscribeRemoteStream() {
         // TODO:主屏订阅大流，小窗订阅小流
@@ -120,6 +176,7 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功----', e);
+            this.getLevel();
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
             setTimeout(() => {
               const list = document.getElementsByTagName('video');
@@ -136,14 +193,38 @@
       speakOff() {},
       fullScreen() {},
       exchange() {
-        if (this.$listeners.exchange) {
-          this.$emit('exchange', this.index);
-          return false;
-        }
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickExchange'
-        });
+        this.roomBaseServer.requestChangeMiniElement('stream-list');
+      },
+      getLevel() {
+        // 麦克风音量查询计时器
+        this._audioLeveInterval = setInterval(() => {
+          if (!this.stream.streamId) clearInterval(this._audioLeveInterval);
+          // 获取音量
+          this.interactiveServer
+            .getAudioLevel({ streamId: this.stream.streamId })
+            .then(level => {
+              this.audioLevel = calculateAudioLevel(level);
+            })
+            .catch(() => {
+              clearInterval(this._audioLeveInterval);
+              this.audioLevel = 0;
+            });
+        }, 1000);
+
+        // 网络信号查询计时器
+        this._netWorkStatusInterval = setInterval(() => {
+          if (!this.stream.streamId) clearInterval(this._netWorkStatusInterval);
+          // 获取网络状态
+          this.interactiveServer
+            .getStreamPacketLoss({ streamId: this.stream.streamId })
+            .then(status => {
+              this.networkStatus = calculateNetworkStatus(status);
+            })
+            .catch(() => {
+              clearInterval(this._netWorkStatusInterval);
+              this.networkStatus = 0;
+            });
+        }, 2000);
       }
     }
   };
@@ -164,6 +245,16 @@
       width: 100%;
       height: 100%;
     }
+    .vmp-stream-remote__container__mute {
+      background-image: url(./images/no_video_bg.png);
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
     .vmp-stream-local__bootom {
       width: 100%;
       height: 24px;
@@ -175,6 +266,32 @@
       position: absolute;
       bottom: 0;
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
+      overflow: hidden;
+      &-role {
+        border-radius: 8px;
+        padding: 0 6px;
+        vertical-align: top;
+        // 主持人
+        &__1 {
+          background: rgba(251, 58, 50, 0.2);
+          color: #fb3a32;
+        }
+        // 观众
+        &__2 {
+          background: rgba(251, 58, 50, 0.2);
+          color: #fb3a32;
+        }
+        // 助理
+        &__3 {
+          background-color: rgba(53, 98, 250, 0.2);
+          color: #3562fa;
+        }
+        // 嘉宾
+        &__4 {
+          background-color: rgba(53, 98, 250, 0.2);
+          color: #3562fa;
+        }
+      }
       &-nickname {
         display: inline-block;
         width: 80px;
@@ -195,13 +312,13 @@
         height: 16px;
         width: 16px;
         background-image: url(./images/network0.png);
-        &-0 {
+        &__0 {
           background-image: url(./images/network0.png);
         }
-        &-1 {
+        &__1 {
           background-image: url(./images/network1.png);
         }
-        &-2 {
+        &__2 {
           background-image: url(./images/network2.png);
         }
       }
@@ -223,6 +340,14 @@
       }
       .vmp-stream-remote__shadow-second-line {
         line-height: 36px;
+      }
+      .vmp-stream-local__shadow-label {
+        display: inline-block;
+        width: 54px;
+        margin-right: 10px;
+        text-align: right;
+        color: #ffffff;
+        font-size: 12px;
       }
       .vmp-stream-remote__shadow-icon {
         cursor: pointer;

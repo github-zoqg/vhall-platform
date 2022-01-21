@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'dlgDocList', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -30,9 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-center',
-    children: ['comDocUne']
+    component: 'VmpBasicCenterContainerLive',
+    // children: ['comDocUne']
+    children: ['comStreamList', 'comDocUne']
     // children: ['comThirdStream']
   },
   layerBodyRight: {
@@ -57,7 +57,8 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['comShare', 'comVirtualPeople', 'comLivePrivateChat']
+    children: ['dlgDocList', 'comShare', 'comVirtualPeople', 'comLivePrivateChat']
+    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */
@@ -145,7 +146,7 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1000',
       kind: 'document'
     },
-    emitClick: [
+    handleClick: [
       {
         cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
@@ -161,7 +162,7 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1001',
       kind: 'board'
     },
-    emitClick: [
+    handleClick: [
       {
         cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
@@ -346,5 +347,8 @@ export const serverConfig = {
   },
   comThirdStream: {
     component: 'VmpThirdStream'
+  },
+  comInsertVideo: {
+    component: 'VmpInsertVideo'
   }
 };

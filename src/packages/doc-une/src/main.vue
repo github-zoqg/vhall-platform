@@ -64,7 +64,7 @@
           v-for="(item, index) in docServer.state.thumbnailList"
           :key="'thum' + index"
           :data-value="index"
-          :class="{ selected: slideIndex === index }"
+          :class="{ selected: pageNum - 1 === index }"
         >
           <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
           <img :src="item" />
@@ -88,7 +88,7 @@
   import screenfull from 'screenfull';
   import { useRoomBaseServer, useDocServer } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
-  import { throttle } from '@/packages/app-shared/utils/tool';
+  import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpDocUne',
@@ -119,6 +119,9 @@
       },
       currentCid() {
         return this.docServer.state.currentCid;
+      },
+      pageNum() {
+        return this.docServer.state.pageNum;
       },
       showPagebar() {
         return this.docServer.state.currentType === 'document' && !this.isFullscreen;
@@ -199,6 +202,7 @@
           docId,
           docType,
           bindCidFun: async cid => {
+            console.log('addNewDocumentOrBorad:', cid);
             await this.$nextTick();
           }
         });
@@ -220,11 +224,9 @@
         // 调整大小
         this.resize();
 
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitSwitchTo',
-          params: [this.docServer.state.currentType]
-        });
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitSwitchTo', [this.docServer.state.currentType])
+        );
       },
       /**
        * 切换到 文档还是白板
@@ -244,6 +246,7 @@
         });
         if (item) {
           // 如果存在，设置为当文档或白板
+          this.docServer.state.currentCid = item.cid;
           await this.docServer.selectContainer(item.cid);
           this.resize();
           return;
@@ -261,10 +264,7 @@
        * 打开选择文档列表
        */
       openDocDlglist() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitOpenDocList'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenDocList'));
       },
       /**
        * 演示文档
@@ -274,19 +274,23 @@
        */
       async demonstrate(docId, docType, switchStatus) {
         console.log('演示文档:docId=', docId, ';docType=', docType, '; switchStatu:', switchStatus);
-        // 保留一个白板，其它删除
-        const board = this.docServer.state.fileOrBoardList.find(item => {
-          return item.is_board === 2;
+        const doc = this.docServer.state.fileOrBoardList.find(item => {
+          return item.docId === docId && item.doc_type === docType;
         });
-        for (let item of this.docServer.state.fileOrBoardList) {
-          if (!board || item.cid !== board.cid) {
-            // console.log('删除item.cid：', item.cid);
-            await this.docServer.destroyContainer({ id: item.cid });
-          }
+        if (doc) {
+          console.log('--文档已经存在,直接应用:', doc);
+          this.docServer.state.currentCid = doc.cid;
+          this.docServer.state.currentType = 'document';
+          this.docServer.state.pageNum = Number(doc.slideIndex) + 1;
+          this.docServer.state.pageTotal = doc.slidesTotal;
+          await this.docServer.selectContainer(doc.cid);
+          this.docServer.getCurrentThumbnailList();
+        } else {
+          // 否则新建
+          console.log('--文档不存在,新建文档');
+          await this.addNewFile('document', docId, docType);
+          this.docServer.setSwitchStatus(switchStatus);
         }
-        this.docServer.state.fileOrBoardList = board ? [board] : [];
-        await this.addNewFile('document', docId, docType);
-        this.docServer.setSwitchStatus(switchStatus);
       },
       /**
        * 页面操作工具
@@ -352,7 +356,6 @@
         if (!index) return;
         const page = Number(index) + 1;
         this.docServer.gotoPage({ id: this.docServer.currentCid, page });
-        this.slideIndex = page - 1;
       }
     },
     mounted() {
