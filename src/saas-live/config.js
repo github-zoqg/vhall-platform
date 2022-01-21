@@ -62,7 +62,8 @@ export const serverConfig = {
       'comShare',
       'comVirtualPeople',
       'comLivePrivateChat',
-      'dlgGroupSetting'
+      'dlgGroupSetting',
+      'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
