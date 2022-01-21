@@ -28,7 +28,7 @@
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
-                  :webinar_type="webinar_type"
+                  :mode="mode"
                   :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :apply-users="applyUsers"
@@ -94,7 +94,7 @@
         <i class="iconfont iconzaixianrenshu"></i>
         <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
         <span class="info-panel__refresh-btn" @click="refreshList">刷新</span>
-        <div class="info-panel__allow-raise-hand" v-if="webinar_type !== 6">
+        <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
           <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
           <el-switch
             v-model="allowRaiseHand"
@@ -221,7 +221,7 @@
         //房间号
         roomId: '',
         //mod 6代表分组活动
-        webinar_type: 3,
+        mode: 3,
         /** 搜索输入框相关 */
         //是否显示搜索输入框
         searchShow: false,
@@ -292,7 +292,7 @@
       initViewData() {
         const { groupInitData = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
-        this.webinar_type = webinar.webinar_type;
+        this.mode = webinar.mode;
         this.roleName = join_info.role_name;
         this.userId = join_info.userId;
         this.roomId = interact.room_id;

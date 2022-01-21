@@ -28,8 +28,8 @@
       <!-- 主讲人 -->
       <i
         v-if="
-          (webinar_type != 6 && currentSpeakerId === userInfo.account_id) ||
-          (webinar_type == 6 && userInfo.role_name == 1)
+          (mode != 6 && currentSpeakerId === userInfo.account_id) ||
+          (mode == 6 && userInfo.role_name == 1)
         "
         class="vmp-member-item__control__user-icon iconfont iconxing"
       ></i>
@@ -207,8 +207,8 @@
         required: true,
         default: () => false
       },
-      //webinar_type
-      webinar_type: {
+      //mode
+      mode: {
         type: [Number, String],
         default: () => 3
       },
