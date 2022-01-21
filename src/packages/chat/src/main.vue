@@ -354,7 +354,7 @@
         this.joinInfo = join_info;
         this.configList = configList;
         this.webinarId = webinar.id;
-        this.playerType = webinar.type;
+        this.playerType = webinar.webinar_state;
         this.roomId = interact.room_id;
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;

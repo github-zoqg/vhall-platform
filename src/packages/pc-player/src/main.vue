@@ -233,7 +233,7 @@
     computed: {
       //判断是否是音频直播模式
       isAudio() {
-        return this.roomBaseState.watchInitData.webinar.mode == 1;
+        return this.roomBaseState.watchInitData.webinar.webinar_type == 1;
       },
       // 背景图片
       webinarsBgImg() {
@@ -318,7 +318,7 @@
         const { interact, join_info } = this.roomBaseState.watchInitData;
         console.log(this.roomBaseState, '????====zhangxiao');
         let params = {
-          appId: interact.paas_app_id || '', // 应用ID，必填
+          appId: this.roomBaseState.paasAppId || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
           videoNode: 'vmp-player',
@@ -481,13 +481,13 @@
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus() {
-        const { webinar, warmup, record } = this.roomBaseState.watchInitData;
+        const { webinar, warmup = {}, record = {} } = this.roomBaseState.watchInitData;
         if (this.roomBaseState.watchInitData.status === 'live') {
-          if (webinar.type === 1) {
+          if (webinar.webinar_state === 1) {
             // 直播
             this.isLive = true;
             this.optionTypeInfo('live');
-          } else if (webinar.type === 5) {
+          } else if (webinar.webinar_state === 5) {
             // 回放
             this.optionTypeInfo('vod', this.roomBaseState.watchInitData.paas_record_id);
             this.recordHistoryTime = sessionStorage.getItem(
@@ -497,7 +497,7 @@
               : 0;
           }
         } else {
-          if (webinar.type === 3) return; //结束状态
+          if (webinar.webinar_state === 3) return; //结束状态
           let _id = warmup.warmup_paas_record_id
             ? warmup.warmup_paas_record_id
             : record.preview_paas_record_id;
