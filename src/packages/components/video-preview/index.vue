@@ -21,16 +21,19 @@
               ref="controllerRef"
               @change="setVideo"
             ></el-slider>
-            <!-- <div class="vmp-video-preview-wrap-controller-times">
-              <span class="current-time">{{ hoverTime | secondToDate }}</span>
-            </div> -->
+            <div
+              :style="{ left: hoverLeft + 'px' }"
+              class="vmp-video-preview-wrap-controller-times"
+            >
+              <span>{{ hoverTime | secondToDate }}</span>
+            </div>
           </div>
           <div class="vmp-video-preview-wrap-controller-icons">
             <div class="vmp-video-preview-wrap-controller-icons-left">
               <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
               <i v-else class="iconfont iconzanting_icon" @click="videoPlayBtn"></i>
               <div class="vmp-center-box">
-                <span class="vmp-current-time">
+                <span>
                   {{ currentTime | secondToDate }}
                 </span>
                 <span>/</span>
@@ -101,7 +104,17 @@
     },
     filters: {
       secondToDate(val) {
-        return moment(val).format('hh:mm:ss');
+        let time = moment.duration(val, 'seconds');
+        let hours = time.hours();
+        let minutes = time.minutes();
+        let seconds = time.seconds();
+        let totalTime = '00:00';
+        if (hours) {
+          totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
+        } else {
+          totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
+        }
+        return totalTime;
       }
     },
     data() {
@@ -109,7 +122,7 @@
         roomBaseState: null,
         totalTime: 0,
         currentTime: 0,
-        statePaly: true, // 播放状态
+        statePaly: false, // 播放状态
         voice: 20, // 音量
         isMute: false, // 是否为静音
         sliderVal: 0,
@@ -177,10 +190,13 @@
         });
       },
       videoPlayBtn() {
-        console.log('播放、暂停');
+        this.statePaly ? this.playerServer.pause() : this.playerServer.play();
       },
       setVideo() {
-        console.log('jindut进度条');
+        const time = (this.sliderVal / 100) * this.totalTime; // 快进
+        this.setVideoCurrentTime(time);
+
+        this.playerServer.play();
       },
       closeInsertvideo() {
         console.log('关闭插播');
@@ -193,11 +209,12 @@
           this.currentTime = this.playerServer.getCurrentTime(() => {});
           this.sliderVal = (this.currentTime / this.totalTime) * 100;
         });
-        console.log(this.currentTime, this.sliderVal, this.totalTime, 'zhangxiao-====11111');
         // 拖拽显示时间
         const dom = this.$refs.controllerRef.$el;
         console.log('绑定事件dom', dom);
-        const but = document.querySelector('div.el-slider__button-wrapper');
+        const but = document.querySelector(
+          '.vmp-video-preview-wrap-controller-slider .el-slider__button-wrapper'
+        );
         const innitDom = () => {
           dom.onmouseover = e => {
             console.log('dom over', e);
@@ -277,6 +294,18 @@
       },
       enterFullscreen() {
         console.log('退出全屏');
+      },
+      // 设置播放时间
+      setVideoCurrentTime(val) {
+        if (!this.playerServer) return;
+
+        this.playerServer.setCurrentTime(val, () => {
+          this.$message({
+            type: 'error',
+            message: '设置当前时间失败,请稍后重试'
+          });
+          console.error('设置当前播放时间失败');
+        });
       },
       listen() {
         this.playerServer.$on(VhallPlayer.ENDED, () => {
@@ -388,6 +417,9 @@
             .el-slider__bar {
               height: 3px;
             }
+            .vmp-video-preview-wrap-controller-times {
+              display: block;
+            }
           }
           .el-slider {
             .el-slider__runway {
@@ -409,8 +441,22 @@
             border-color: #fb3a32;
           }
         }
+        &-times {
+          position: absolute;
+          line-height: 14px;
+          top: -35px;
+          text-align: center;
+          padding: 5px;
+          background: rgba(0, 0, 0, 0.3);
+          font-size: 12px;
+          color: #fff;
+          transform: translateX(-50%);
+          display: none;
+        }
         &-icons {
           width: 100%;
+          display: flex;
+          justify-content: space-between;
           &-left {
             i:first-child {
               padding: 0 8px;
@@ -436,7 +482,7 @@
               height: 34px;
               margin-top: 6px;
               &:hover {
-                .ver-slider {
+                .vmp-ver-slider {
                   display: block;
                 }
               }
@@ -446,7 +492,7 @@
                   cursor: pointer;
                 }
               }
-              .ver-slider {
+              .vmp-ver-slider {
                 display: none;
                 position: absolute;
                 left: 16px;
