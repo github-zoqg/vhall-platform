@@ -328,6 +328,18 @@
           console.error('设置当前播放时间失败');
         });
       },
+      // 设置播放时间
+      setVideoCurrentTime(val) {
+        if (!this.playerServer) return;
+
+        this.playerServer.setCurrentTime(val, () => {
+          this.$message({
+            type: 'error',
+            message: '设置当前时间失败,请稍后重试'
+          });
+          console.error('设置当前播放时间失败');
+        });
+      },
       listen() {
         this.playerServer.$on(VhallPlayer.ENDED, () => {
           console.log('播放结束');
