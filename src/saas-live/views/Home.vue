@@ -19,7 +19,7 @@
 <script>
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip.vue';
-  import { Domain, useMicServer } from 'middle-domain';
+  import { Domain, useMicServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
@@ -36,6 +36,7 @@
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         await this.initSendLive();
+        console.log(useRoomBaseServer());
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
