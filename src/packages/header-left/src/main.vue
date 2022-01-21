@@ -6,8 +6,9 @@
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
       <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
-      <div :data-clipboard-text="id" class="vhall-room-id-copy" @click="handleCopy">
+      <div class="vhall-room-id-copy" @click="handleCopy">
         <i class="iconfont iconfuzhi"></i>
+        <!-- :data-clipboard-text="id" -->
       </div>
     </div>
     <!---->
@@ -39,7 +40,7 @@
       this.webinarInfo = watchInitData.webinar;
     },
     mounted() {
-      this.initConfig();
+      // this.initConfig();
     },
     methods: {
       // 初始化配置
