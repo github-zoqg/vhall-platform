@@ -7,6 +7,7 @@
         {{ $t('usual.chooseDocument') }}
       </div>
 
+      <!-- 观看端没有观众可见的按钮 -->
       <div class="audience-visible" v-if="!isWatch">
         <span style="margin-right: 5px">
           {{ $t('usual.audienceVisible') }}
@@ -101,8 +102,9 @@
           <i class="iconfont iconquanpingguanbi"></i>
         </div>
 
+        <!-- 这个章节按钮用于观看端文档显示，主持端章节按钮在最右边 -->
         <div
-          v-show="currentType !== 'board'"
+          v-show="currentType !== 'board' && isWatch"
           class="vmp-icon-item"
           :title="$t('usual.docThumb')"
           @click="toggleThumbnail"
@@ -111,7 +113,7 @@
         </div>
       </div>
     </div>
-    <!-- 右：全屏、文档章节等信息-->
+    <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
     <div class="vmp-doc-toolbar__ft" v-if="!isWatch">
       <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
         <i class="iconfont iconquanping"></i>
@@ -456,6 +458,44 @@
 
     .vmp-doc-toolbar__hd {
       position: absolute;
+      display: none;
+    }
+    .choose-document {
+      width: 90px;
+      height: 36px;
+      line-height: 36px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 97px;
+      border: 1px solid #666;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .vmp-doc-toolbar__brush {
+      width: 282px;
+      height: 36px;
+      line-height: 32px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      border: 1px solid #999;
+      display: none;
+    }
+
+    .vmp-icon-item {
+      height: 24px;
+      width: 26px;
+      line-height: 24px;
+      margin-left: 6px;
+
+      i {
+        font-size: 14px;
+        color: #f7f7f7;
+        margin-right: 2px;
+      }
+
+      .vmp-brush-popup {
+        top: 0;
+      }
     }
     .choose-document {
       width: 90px;
@@ -480,13 +520,6 @@
       width: 26px;
       line-height: 24px;
       margin-left: 6px;
-
-      i {
-        font-size: 14px;
-        color: #f7f7f7;
-        margin-right: 2px;
-      }
-    }
 
     .vmp-icon-item.has-corner::after {
       right: -2px;
