@@ -50,155 +50,155 @@ const eventMixin = {
         }
       }, 2000);
 
-      this.msgServer.$on('CHAT', rawMsg => {
-        let msg = parseMsg(rawMsg);
-        console.log('============收到聊天消息===============');
-        console.log(msg);
-        EventBus.$emit('receiveMsg', msg);
+      // this.msgServer.$onMsg('CHAT', rawMsg => {
+      //   let msg = parseMsg(rawMsg);
+      //   console.log('============收到聊天消息===============');
+      //   console.log(msg);
+      //   EventBus.$emit('receiveMsg', msg);
 
-        if (['text', 'image'].includes(msg.data.type)) {
-          // 问答私聊消息，不添加到聊天列表里面
-          if (msg.data.target_id) {
-            return;
-          }
+      //   if (['text', 'image'].includes(msg.data.type)) {
+      //     // 问答私聊消息，不添加到聊天列表里面
+      //     if (msg.data.target_id) {
+      //       return;
+      //     }
 
-          // 如果是观众，并且接受到的消息是自己发的，不显示
-          if (this.roleName === 2 && msg.sender_id === this.userId) {
-            return;
-          }
+      //     // 如果是观众，并且接受到的消息是自己发的，不显示
+      //     if (this.roleName === 2 && msg.sender_id === this.userId) {
+      //       return;
+      //     }
 
-          let item = {};
-          if (this.chatList.length) {
-            item = this.chatList[this.chatList.length - 1];
-          }
-          // 获取聊天区域当前滚动条的状态
-          const osInstanceScrollStatus = this.osInstance.scroll();
-          if (msg.context.atList && msg.context.atList.length && msg.data.text_content) {
-            msg.context.atList.forEach(a => {
-              msg.data.text_content = msg.data.text_content.replace(
-                `***${a.nickName}`,
-                `@${a.nickName}`
-              );
-              // 判断是否是 @ 当前用户得消息
-              if (
-                osInstanceScrollStatus.max.y !== 0 &&
-                osInstanceScrollStatus.ratio.y !== 1 &&
-                this.userId === a.accountId
-              ) {
-                if (this.tipMsgTimer) {
-                  clearTimeout(this.tipMsgTimer);
-                  this.tipMsgTimer = null;
-                }
-                this.isHasUnreadAtMeMsg = true;
-                // 如果有未读普通消息或者未读回复消息，就显示有 x 条消息未读
-                this.tipMsg =
-                  this.isHasUnreadNormalMsg || this.isHasUnreadReplyMsg
-                    ? `有${this.unReadMessageCount + 1}条未读消息`
-                    : '有人@你';
-                if (this.tipMsg === '有人@你') {
-                  // 如果结果是 @ 清除之前的定时器并开启一个新的定时器，10秒后删除
-                  this.tipMsgTimer = setTimeout(() => {
-                    this.unReadMessageCount = 0;
-                    this.isHasUnreadAtMeMsg = false;
-                    this.tipMsgTimer = null;
-                  }, 10000);
-                }
-              }
-            });
-          } else if (
-            osInstanceScrollStatus.max.y !== 0 &&
-            osInstanceScrollStatus.ratio.y !== 1 &&
-            msg.context.replyMsg &&
-            msg.context.replyMsg.content &&
-            this.userId === msg.context.replyMsg.sendId
-          ) {
-            // 如果是否是回复当前观众的消息
-            if (this.tipMsgTimer) {
-              clearTimeout(this.tipMsgTimer);
-              this.tipMsgTimer = null;
-            }
-            this.isHasUnreadReplyMsg = true;
-            // 如果有未读普通消息或者未读回复消息，就显示有 x 条消息未读
-            this.tipMsg =
-              this.isHasUnreadNormalMsg || this.isHasUnreadAtMeMsg
-                ? `有${this.unReadMessageCount + 1}条未读消息`
-                : `有人回复你`;
-            if (this.tipMsg === '有人回复你') {
-              // 如果结果是 回复 清除之前的定时器并开启一个新的定时器，10秒后删除
-              this.tipMsgTimer = setTimeout(() => {
-                this.unReadMessageCount = 0;
-                this.isHasUnreadReplyMsg = false;
-                this.tipMsgTimer = null;
-              }, 10000);
-            }
-          } else if (osInstanceScrollStatus.max.y !== 0 && osInstanceScrollStatus.ratio.y !== 1) {
-            // 如果是除回复、 @之外的普通消息
-            if (this.tipMsgTimer) {
-              clearTimeout(this.tipMsgTimer);
-              this.tipMsgTimer = null;
-            }
-            this.isHasUnreadNormalMsg = true;
-            this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
-          }
-          throttleChatMsg(); // 解决17618
-          const data = new Msg({
-            avatar: getAvatar(msg.context.avatar),
-            nickName: msg.context.nickname,
-            type: msg.data.type,
-            content: msg.data,
-            sendId: msg.sender_id,
-            sendTime: msg.date_time,
-            roleName: msg.context.role_name,
-            client: pcDevice.includes(msg.client) ? 'pc' : 'mobile',
-            showTime: handleTime(item, msg),
-            replyMsg: msg.context.replyMsg || {},
-            atList: msg.context.atList || [],
-            msgId: msg.msg_id,
-            channel: msg.channel
-          });
-          this.chatList.push(data);
-        }
-        // 免费礼物
-        if (msg.data.type === 'free_gift_send') {
-          let data = generateGiftMessage(msg);
-          this.chatList.push(data);
-          this.addSpecialEffect(data);
-          console.log(this.chatList, 'list-----------------');
-        }
+      //     let item = {};
+      //     if (this.chatList.length) {
+      //       item = this.chatList[this.chatList.length - 1];
+      //     }
+      //     // 获取聊天区域当前滚动条的状态
+      //     const osInstanceScrollStatus = this.osInstance.scroll();
+      //     if (msg.context.atList && msg.context.atList.length && msg.data.text_content) {
+      //       msg.context.atList.forEach(a => {
+      //         msg.data.text_content = msg.data.text_content.replace(
+      //           `***${a.nickname}`,
+      //           `@${a.nickname}`
+      //         );
+      //         // 判断是否是 @ 当前用户得消息
+      //         if (
+      //           osInstanceScrollStatus.max.y !== 0 &&
+      //           osInstanceScrollStatus.ratio.y !== 1 &&
+      //           this.userId === a.accountId
+      //         ) {
+      //           if (this.tipMsgTimer) {
+      //             clearTimeout(this.tipMsgTimer);
+      //             this.tipMsgTimer = null;
+      //           }
+      //           this.isHasUnreadAtMeMsg = true;
+      //           // 如果有未读普通消息或者未读回复消息，就显示有 x 条消息未读
+      //           this.tipMsg =
+      //             this.isHasUnreadNormalMsg || this.isHasUnreadReplyMsg
+      //               ? `有${this.unReadMessageCount + 1}条未读消息`
+      //               : '有人@你';
+      //           if (this.tipMsg === '有人@你') {
+      //             // 如果结果是 @ 清除之前的定时器并开启一个新的定时器，10秒后删除
+      //             this.tipMsgTimer = setTimeout(() => {
+      //               this.unReadMessageCount = 0;
+      //               this.isHasUnreadAtMeMsg = false;
+      //               this.tipMsgTimer = null;
+      //             }, 10000);
+      //           }
+      //         }
+      //       });
+      //     } else if (
+      //       osInstanceScrollStatus.max.y !== 0 &&
+      //       osInstanceScrollStatus.ratio.y !== 1 &&
+      //       msg.context.replyMsg &&
+      //       msg.context.replyMsg.content &&
+      //       this.userId === msg.context.replyMsg.sendId
+      //     ) {
+      //       // 如果是否是回复当前观众的消息
+      //       if (this.tipMsgTimer) {
+      //         clearTimeout(this.tipMsgTimer);
+      //         this.tipMsgTimer = null;
+      //       }
+      //       this.isHasUnreadReplyMsg = true;
+      //       // 如果有未读普通消息或者未读回复消息，就显示有 x 条消息未读
+      //       this.tipMsg =
+      //         this.isHasUnreadNormalMsg || this.isHasUnreadAtMeMsg
+      //           ? `有${this.unReadMessageCount + 1}条未读消息`
+      //           : `有人回复你`;
+      //       if (this.tipMsg === '有人回复你') {
+      //         // 如果结果是 回复 清除之前的定时器并开启一个新的定时器，10秒后删除
+      //         this.tipMsgTimer = setTimeout(() => {
+      //           this.unReadMessageCount = 0;
+      //           this.isHasUnreadReplyMsg = false;
+      //           this.tipMsgTimer = null;
+      //         }, 10000);
+      //       }
+      //     } else if (osInstanceScrollStatus.max.y !== 0 && osInstanceScrollStatus.ratio.y !== 1) {
+      //       // 如果是除回复、 @之外的普通消息
+      //       if (this.tipMsgTimer) {
+      //         clearTimeout(this.tipMsgTimer);
+      //         this.tipMsgTimer = null;
+      //       }
+      //       this.isHasUnreadNormalMsg = true;
+      //       this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
+      //     }
+      //     throttleChatMsg(); // 解决17618
+      //     const data = new Msg({
+      //       avatar: getAvatar(msg.context.avatar),
+      //       nickname: msg.context.nickname,
+      //       type: msg.data.type,
+      //       content: msg.data,
+      //       sendId: msg.sender_id,
+      //       sendTime: msg.date_time,
+      //       roleName: msg.context.role_name,
+      //       client: pcDevice.includes(msg.client) ? 'pc' : 'mobile',
+      //       showTime: handleTime(item, msg),
+      //       replyMsg: msg.context.replyMsg || {},
+      //       atList: msg.context.atList || [],
+      //       msgId: msg.msg_id,
+      //       channel: msg.channel
+      //     });
+      //     this.chatList.push(data);
+      //   }
+      //   // 免费礼物
+      //   if (msg.data.type === 'free_gift_send') {
+      //     let data = generateGiftMessage(msg);
+      //     this.chatList.push(data);
+      //     this.addSpecialEffect(data);
+      //     console.log(this.chatList, 'list-----------------');
+      //   }
 
-        // 禁言某个用户
-        if (msg.data.type === 'disable') {
-          //todo 待移除 或者其他方式替代
-          EventBus.$emit('disable', msg);
-          //todo 要设法兼容分组
-          if (msg.data.target_id === this.userId) {
-            this.isBanned = true;
-            this.initInputStatus();
-          }
-        }
-        // 取消禁言某个用户
-        if (msg.data.type === 'permit') {
-          EventBus.$emit('permit', msg);
-          //todo 要设法兼容分组
-          if (msg.data.target_id === this.userId && !this.allBanned) {
-            this.isBanned = false;
-            this.initInputStatus();
-          }
-        }
+      //   // 禁言某个用户
+      //   if (msg.data.type === 'disable') {
+      //     //todo 待移除 或者其他方式替代
+      //     EventBus.$emit('disable', msg);
+      //     //todo 要设法兼容分组
+      //     if (msg.data.target_id === this.userId) {
+      //       this.isBanned = true;
+      //       this.initInputStatus();
+      //     }
+      //   }
+      //   // 取消禁言某个用户
+      //   if (msg.data.type === 'permit') {
+      //     EventBus.$emit('permit', msg);
+      //     //todo 要设法兼容分组
+      //     if (msg.data.target_id === this.userId && !this.allBanned) {
+      //       this.isBanned = false;
+      //       this.initInputStatus();
+      //     }
+      //   }
 
-        // 开启全体禁言
-        if (msg.data.type === 'disable_all') {
-          EventBus.$emit('disable_all', msg);
-          this.allBanned = true;
-          this.initInputStatus();
-        }
-        // 关闭全体禁言
-        if (msg.data.type === 'permit_all') {
-          EventBus.$emit('permit_all', msg);
-          this.allBanned = false;
-          this.initInputStatus();
-        }
-      });
+      //   // 开启全体禁言
+      //   if (msg.data.type === 'disable_all') {
+      //     EventBus.$emit('disable_all', msg);
+      //     this.allBanned = true;
+      //     this.initInputStatus();
+      //   }
+      //   // 关闭全体禁言
+      //   if (msg.data.type === 'permit_all') {
+      //     EventBus.$emit('permit_all', msg);
+      //     this.allBanned = false;
+      //     this.initInputStatus();
+      //   }
+      // });
 
       //判断直播类型
       if ([1, '1'].includes(this.playerType) || this.roleName != 2) {
@@ -216,7 +216,7 @@ const eventMixin = {
           // 发起抽奖
           if (msg.type === 'lottery_push' && [2, '2'].includes(this.roleName)) {
             const data = new Msg({
-              nickName: '抽奖',
+              nickname: '抽奖',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: '正在进行抽奖环节'
@@ -247,7 +247,7 @@ const eventMixin = {
                     //todo 替换为domain的方法
                     this.$fetch('v3CheckLottery', {}).then(res => {
                       const data = new Msg({
-                        nickName: '抽奖',
+                        nickname: '抽奖',
                         avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
                         content: {
                           text_content:
@@ -279,7 +279,7 @@ const eventMixin = {
             }
             const index = (_localLotteryId + '').indexOf(this.userId);
             const data = new Msg({
-              nickName: '',
+              nickname: '',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: index >= 0 ? '恭喜您中奖了！' : '很遗憾，您没有中奖！',
@@ -298,7 +298,7 @@ const eventMixin = {
           if (msg.data.type === 'reward_pay_ok') {
             const data = new Msg({
               avatar: getAvatar(msg.data.rewarder_avatar),
-              nickName:
+              nickname:
                 msg.data.rewarder_nickname.length > 8
                   ? msg.data.rewarder_nickname.substr(0, 8) + '...'
                   : msg.data.rewarder_nickname,
@@ -319,7 +319,7 @@ const eventMixin = {
           // 礼物
           if (msg.data.type === 'gift_send_success') {
             const data = new Msg({
-              nickName:
+              nickname:
                 msg.gift_user_nickname.length > 8
                   ? msg.gift_user_nickname.substr(0, 8) + '...'
                   : msg.gift_user_nickname,
@@ -339,7 +339,7 @@ const eventMixin = {
           if (msg.type === 'question_answer_open') {
             EventBus.$emit('open_qa');
             const data = new Msg({
-              nickName: msg.nick_name,
+              nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: '开启了问答'
@@ -355,7 +355,7 @@ const eventMixin = {
           if (msg.type === 'question_answer_close') {
             EventBus.$emit('close_qa');
             const data = new Msg({
-              nickName: '问答',
+              nickname: '问答',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: `${msg.nick_name}关闭了问答`
@@ -369,7 +369,7 @@ const eventMixin = {
           if (msg.type === 'questionnaire_push') {
             EventBus.$emit('questionnaireCheck', msg.questionnaire_id);
             const data = new Msg({
-              nickName: msg.nick_name,
+              nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: '发起了问卷',
@@ -386,7 +386,7 @@ const eventMixin = {
           if (msg.type === 'sign_in_push') {
             const data = new Msg({
               roleName: msg.role_name,
-              nickName: msg.data.sign_creator_nickname,
+              nickname: msg.data.sign_creator_nickname,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: '发起了签到'
@@ -401,7 +401,7 @@ const eventMixin = {
             const text = msg.data.sign_creator_nickname || '主持人';
             const data = new Msg({
               roleName: msg.role_name,
-              nickName: text,
+              nickname: text,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: '结束了签到'
@@ -415,7 +415,7 @@ const eventMixin = {
           if (msg.type === 'timer_start') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickName: '计时器',
+              nickname: '计时器',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: `${text}发起了计时器`
@@ -430,7 +430,7 @@ const eventMixin = {
           if (msg.type === 'timer_end') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickName: '计时器',
+              nickname: '计时器',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: `${text}关闭了计时器`
@@ -445,7 +445,7 @@ const eventMixin = {
           if (msg.type === 'timer_pause') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickName: '计时器',
+              nickname: '计时器',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: `${text}暂停了计时器`
@@ -460,7 +460,7 @@ const eventMixin = {
           if (msg.type === 'timer_reset') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickName: '计时器',
+              nickname: '计时器',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: `${text}重置了计时器`
@@ -475,7 +475,7 @@ const eventMixin = {
           if (msg.type === 'timer_resume') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickName: '计时器',
+              nickname: '计时器',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 text_content: `${text}继续了计时器`
@@ -512,7 +512,7 @@ const eventMixin = {
           if (msg.data.type === 'gift_send_success') {
             EventBus.$emit('gift_send_success', msg);
             const giftData = new Msg({
-              nickName: msg.gift_user_nickname,
+              nickname: msg.gift_user_nickname,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
                 gift_name: msg.gift_name,
@@ -528,7 +528,7 @@ const eventMixin = {
             EventBus.$emit('reward_pay_ok', msg);
             const rewardData = new Msg({
               avatar: getAvatar(msg.data.rewarder_avatar),
-              nickName:
+              nickname:
                 msg.data.rewarder_nickname.length > 8
                   ? msg.data.rewarder_nickname.substr(0, 8) + '...'
                   : msg.data.rewarder_nickname,
@@ -629,7 +629,7 @@ const eventMixin = {
       EventBus.$on('timer_pause', msg => {
         const text = msg.data.role_name == 3 ? '助理' : msg.data.role_name == 1 ? '主持人' : '嘉宾';
         const data = new Msg({
-          nickName: '计时器',
+          nickname: '计时器',
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
             text_content: `${text}暂停了计时器`
@@ -701,11 +701,11 @@ const eventMixin = {
       }
       //组装礼物消息
       function generateGiftMessage(msg) {
-        let nickName =
+        let nickname =
           msg.data.nickname.length > 8 ? msg.data.nickname.substr(0, 8) + '...' : msg.data.nickname;
 
         return new Msg({
-          nickName: nickName,
+          nickname: nickname,
           avatar: msg.data.avatar,
           content: {
             gift_name: msg.data.gift_name,
