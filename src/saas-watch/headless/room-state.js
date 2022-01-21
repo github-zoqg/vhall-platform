@@ -7,6 +7,7 @@ import {
 } from 'middle-domain';
 
 export default async function () {
+  const roomBaseServer = useRoomBaseServer();
   console.log('%c------服务初始化 开始', 'color:blue');
 
   const msgServer = useMsgServer();
@@ -14,8 +15,8 @@ export default async function () {
   const docServer = useDocServer();
 
   const interactiveServer = useInteractiveServer();
-
-  const roomBaseServer = useRoomBaseServer();
+  //TODO: 测试用，后续这个状态通过互动状态接口在domain设置
+  interactiveServer.state.mainScreen = roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
