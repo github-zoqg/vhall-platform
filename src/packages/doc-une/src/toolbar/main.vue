@@ -521,9 +521,10 @@
       line-height: 24px;
       margin-left: 6px;
 
-    .vmp-icon-item.has-corner::after {
-      right: -2px;
-      bottom: -2px;
+      .vmp-icon-item.has-corner::after {
+        right: -2px;
+        bottom: -2px;
+      }
     }
   }
 </style>
