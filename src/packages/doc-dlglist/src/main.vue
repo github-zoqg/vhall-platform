@@ -23,14 +23,34 @@
             <img src="/static/img/no-file.png" />
             <p>您还没有文档，快来上传吧</p>
             <div>
-              <el-button type="primary" @click="handleUpload">{{ $t('usual.upload') }}</el-button>
+              <!-- 上传文档 -->
+              <el-upload
+                class="doc-uploader"
+                action="#"
+                :http-request="handleUpload"
+                :before-upload="beforeUpload"
+                accept="*/*"
+                :show-file-list="false"
+              >
+                <el-button type="primary">{{ $t('usual.upload') }}</el-button>
+              </el-upload>
               <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
             </div>
           </div>
           <!-- 有数据 -->
           <div class="vmp-doc-cur__inner" v-show="dataList.length > 0">
             <div class="vmp-doc-cur__hd">
-              <el-button type="primary" @click="handleUpload">{{ $t('usual.upload') }}</el-button>
+              <!-- 上传文档 -->
+              <el-upload
+                class="doc-uploader"
+                action="#"
+                :http-request="handleUpload"
+                :before-upload="beforeUpload"
+                accept="*/*"
+                :show-file-list="false"
+              >
+                <el-button type="primary">{{ $t('usual.upload') }}</el-button>
+              </el-upload>
               <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
 
               <el-tooltip placement="right">
@@ -67,7 +87,54 @@
                 <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
                 <el-table-column prop="page" label="页码"></el-table-column>
-                <el-table-column prop="address" label="进度"></el-table-column>
+                <el-table-column prop="uploadPropress" label="进度">
+                  <template slot-scope="scope">
+                    <div class="progressBox">
+                      <template v-if="scope.row.isLocalUpload">
+                        <template v-if="scope.row.transcoded">
+                          <span class="transcoded-status-icon success"></span>
+                          <span>转码完成</span>
+                        </template>
+                        <el-progress
+                          v-else-if="scope.row.codeProcess && !scope.row.transcoded"
+                          :percentage="scope.row.codeProcess"
+                        ></el-progress>
+                        <template v-else>
+                          <span
+                            v-if="scope.row.completed"
+                            class="transcoded-status-icon wait"
+                          ></span>
+                          <span v-if="scope.row.completed">等待转码</span>
+                          <el-progress :percentage="scope.row.uploadPropress" v-else></el-progress>
+                        </template>
+                      </template>
+
+                      <template v-else>
+                        <el-progress
+                          :percentage="scope.row.codeProcess"
+                          v-if="scope.row.codeProcess && !scope.row.transcoded"
+                        ></el-progress>
+                        <template v-else-if="scope.row.transcoded">
+                          <span class="transcoded-status-icon success"></span>
+                          <span>转码完成</span>
+                        </template>
+                        <template v-else>
+                          <span
+                            class="transcoded-status-icon"
+                            :class="
+                              scope.row.transform_schedule_str == '转码完成'
+                                ? 'success'
+                                : scope.row.transform_schedule_str == '转码失败'
+                                ? 'failed'
+                                : 'wait'
+                            "
+                          ></span>
+                          <span>{{ scope.row.transform_schedule_str }}</span>
+                        </template>
+                      </template>
+                    </div>
+                  </template>
+                </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template slot-scope="scope">
                     <el-button
@@ -89,7 +156,12 @@
                     >
                       动画版演示
                     </el-button>
-                    <el-button @click="handleDeleteDoc(scope.row)" size="mini" type="text">
+                    <el-button
+                      v-if="scope.row.id"
+                      @click="handleDeleteDoc(scope.row)"
+                      size="mini"
+                      type="text"
+                    >
                       删除
                     </el-button>
                   </template>
@@ -164,6 +236,8 @@
       return {
         dialogVisible: false,
         mode: 1, //模式，默认1:当前直播列表 ，2：资料库列表
+
+        uploadUrl: `${process.env.VUE_APP_BASE_URL}/v3/interacts/document/upload-webinar-document`,
 
         // 要演示的文档观众是否可见
         switchStatus: true,
@@ -286,6 +360,7 @@
           });
           if (result && result.code === 200) {
             this.dataList = result.data.list;
+            console.log(this.dataList);
           } else {
             this.$message.error('查询失败');
           }
@@ -355,7 +430,112 @@
         this.cancelCheckHandle();
         this.mode = 1;
       },
-      handleUpload() {}
+      beforeUpload(file) {
+        if (file.size / 1024 / 1024 > 100) {
+          this.$message.warning('上传文件不可大于100M');
+          return false;
+        }
+        const acceptFileTypes = /(jpe?g|png|pptx?|xlsx?|docx?|pdf|bmp)$/i;
+        const cacheArr = file.name.split('.');
+        var curExt = cacheArr[cacheArr.length - 1];
+        if (!acceptFileTypes.test(curExt)) {
+          this.$message.warning('文件格式不正确，无法上传');
+          return false;
+        }
+        // console.log('---beforeUpload file:');
+        // console.log(file);
+        const fileObj = {
+          file_name: file.name,
+          ext: file.name.split('.')[1],
+          created_at: new Date().format('yyyy-MM-dd hh:mm:ss'),
+          page: 1,
+          uploadPropress: 0,
+          completed: false,
+          transcoded: false,
+          codeProcess: 0,
+          uid: file.uid,
+          isLocalUpload: true
+        };
+        this.dataList.unshift(fileObj);
+        return true;
+      },
+      // 上传文档
+      handleUpload(param) {
+        console.log('----param:', param);
+        param.onError = err => {
+          console.log('---上传错误---');
+          console.log(err);
+        };
+        param.onSuccess = async (res, file) => {
+          // console.log(' 文档的上传完成:', res, file, fileList);
+          if (res.code === 200) {
+            // res.data;
+            // document_id: "28fbfb47"
+            // ext: "jpg"
+            // file_name: "snow.jpg"
+            // hash: "d9df81a72626f52d11d4626bd98c6e8e"
+            // id: 20855
+            // page: 1
+            // size: 362733
+            const fuid = file.uid;
+            let documentId;
+            this.dataList.forEach(item => {
+              if (fuid === item.uid) {
+                documentId = res.data.document_id;
+                item.document_id = res.data.document_id;
+                item.id = res.data.id;
+              }
+            });
+            this.dataList = [...this.dataList];
+            this.$message({
+              message: '上传成功',
+              type: 'success'
+            });
+            try {
+              await this.$confirm('是否同步上传的文档共享至资料库，便于其他活动使用？', '提示', {
+                confirmButtonText: '同步',
+                cancelButtonText: '不同步'
+              });
+            } catch (ex) {
+              // 取消
+              return;
+            }
+            const params = {
+              document_id: documentId,
+              tag: 1
+            };
+            try {
+              const result = await this.docServer.syncDoc(params);
+              if (result && result.code === 200) {
+                this.$message({
+                  message: '同步成功',
+                  type: 'success'
+                });
+              } else {
+                this.$message.error('同步失败');
+              }
+            } catch (err) {
+              this.$message.warning(err.msg);
+            }
+          }
+        };
+        param.onProgress = (percent, file) => {
+          console.log('[doc] 上传进度：', percent);
+          const fuid = file.uid;
+          this.dataList.forEach(item => {
+            if (item.isLocalUpload && fuid === item.uid) {
+              item.uploadPropress = parseInt(percent);
+              if (item.uploadPropress >= 100) {
+                item.completed = true;
+              }
+            }
+          });
+          // 触发 watch/computed
+          this.dataList = [...this.dataList];
+        };
+        // 开始上传
+        this.docServer.uploadFile(param, this.uploadUrl);
+      }
     }
   };
 </script>
@@ -380,6 +560,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+
       .vmp-doc-cur__bd {
         padding-top: 10px;
 
@@ -430,6 +611,11 @@
           flex: 1;
         }
       }
+    }
+
+    .doc-uploader {
+      display: inline;
+      margin-right: 20px;
     }
   }
 </style>
