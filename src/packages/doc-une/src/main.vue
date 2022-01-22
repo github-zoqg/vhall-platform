@@ -181,12 +181,16 @@
           console.error('展示模式必须是normal, mini, fullscreen中的一个');
           return;
         }
+        if (this.displayMode === mode) {
+          console.log('当前已经是该模式，无需设置');
+          return;
+        }
         this.displayMode = mode;
         if (this.displayMode === 'mini') {
           this.thumbnailShow = false;
         }
         await this.$nextTick();
-        this.resize();
+        // 文档大小的改变，会自动触发 erd.listenTo 事件;
       },
       /**
        * 屏幕缩放
@@ -459,6 +463,8 @@
           '; switchStatu:',
           switchStatus
         );
+        this.docServer.setSwitchStatus(switchStatus);
+
         for (const item of this.docServer.state.containerList) {
           if (String.prototype.startsWith.call(item.cid, 'document')) {
             // 文档容器删除
@@ -473,7 +479,6 @@
         }
         this.docServer.state.containerList = boardItem ? [boardItem] : [];
         await this.addNewFile({ fileType: 'document', docId, docType });
-        this.docServer.setSwitchStatus(switchStatus);
       },
       /**
        * 页面操作工具
