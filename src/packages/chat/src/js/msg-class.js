@@ -4,7 +4,7 @@ export default class Msg {
     let {
       avatar = '',
       sendId = '',
-      nickName = '',
+      nickname = '',
       type = 'text',
       showTime = '',
       roleName = '',
@@ -25,7 +25,7 @@ export default class Msg {
     this.type = type;
     this.avatar = avatar;
     this.sendId = sendId;
-    this.nickName = nickName;
+    this.nickname = nickname;
     this.roleName = roleName;
     this.content = content;
     this.showTime = showTime;

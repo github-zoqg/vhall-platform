@@ -16,6 +16,7 @@
             :key="msg.msgId"
             :msg="msg"
             v-show="checkMessageShow(msg)"
+            :chat-options="chatOptions"
             :role-name="roleName"
             :join-info="joinInfo"
             @dispatchEvent="msgEventHandleDisPatch"
@@ -105,7 +106,7 @@
         </div>
         <div class="special-effect__middle-content">
           <p class="middle-content__nick-name">
-            {{ textOverflowSlice(msg.nickName, 8) }}
+            {{ textOverflowSlice(msg.nickname, 8) }}
           </p>
           <p v-if="msg.type === 'gift_send_success'" class="middle-content__detail">
             {{ $t('chat.chat_1032') }} {{ $t(msg.content.gift_name) }}
@@ -434,6 +435,7 @@
       // 获取历史消息
       getHistoryMsg() {
         const params = {
+          webinar_id: this.$route.params.id,
           room_id: this.roomId,
           pos: Number(this.pageConfig.page) * 50,
           limit: 50
@@ -629,7 +631,7 @@
           if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
             if (this.atList.length && data.text_content) {
               this.atList.forEach(a => {
-                data.text_content = data.text_content.replace(`@${a.nickName}`, `***${a.nickName}`);
+                data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
               });
             }
 
@@ -687,14 +689,14 @@
         const lastIndex = firstPart.lastIndexOf('@');
         if (lastIndex != -1) {
           const userName = this.inputValue.substring(lastIndex, currentIndex);
-          const nickName = userName.replace('@', '');
+          const nickname = userName.replace('@', '');
           // 删除整个@过的用户名逻辑
-          if (this.atList.find(u => u.nickName == nickName)) {
-            this.atList = this.atList.filter(n => n.nickName != nickName);
+          if (this.atList.find(u => u.nickname == nickname)) {
+            this.atList = this.atList.filter(n => n.nickname != nickname);
             this.inputValue = this.inputValue.replace(userName, '');
           } else {
             this.atList = this.atList.filter(a => {
-              const atIndex = this.inputValue.indexOf(`@${a.nickName} `);
+              const atIndex = this.inputValue.indexOf(`@${a.nickname} `);
               return atIndex != -1;
             });
           }
@@ -703,12 +705,12 @@
         const lastReplyIndex = firstPart.lastIndexOf('回复');
         if (lastReplyIndex != -1) {
           const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          console.log(`回复${this.replyMsg.nickName}:` == replyUserName);
-          if (`回复${this.replyMsg.nickName}:` == replyUserName) {
+          console.log(`回复${this.replyMsg.nickname}:` == replyUserName);
+          if (`回复${this.replyMsg.nickname}:` == replyUserName) {
             this.inputValue = this.inputValue.replace(replyUserName, '');
             this.replyMsg = {};
           } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) == -1 &&
+            this.inputValue.indexOf(`回复${this.replyMsg.nickname}: `) == -1 &&
               (this.replyMsg = {});
           }
         }
