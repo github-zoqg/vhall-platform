@@ -2,6 +2,7 @@
   <div
     class="vmp-doc-une"
     :class="[{ 'is-watch': isWatch }, `vmp-doc-une--${displayMode}`]"
+    v-show="showInWatch"
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
@@ -143,8 +144,8 @@
       isWatch() {
         return this.roomBaseServer.state.clientType !== 'send';
       },
-      // 文档是否可见
-      show() {
+      // 文档在观看端是否可见
+      showInWatch() {
         // 主持端始终可见，观看端
         return (
           this.roomBaseServer.state.clientType === 'send' ||
@@ -174,7 +175,8 @@
       toggleThumbnail() {
         this.thumbnailShow = !this.thumbnailShow;
       },
-      setDisplayMode(mode) {
+      async setDisplayMode(mode) {
+        console.log('[doc] setDisplayMode:', mode);
         if (!['normal', 'mini', 'fullscreen'].includes(mode)) {
           console.error('展示模式必须是normal, mini, fullscreen中的一个');
           return;
@@ -183,6 +185,7 @@
         if (this.displayMode === 'mini') {
           this.thumbnailShow = false;
         }
+        await this.$nextTick();
         this.resize();
       },
       /**
@@ -246,6 +249,31 @@
           }
         });
 
+        this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
+          // if (this.hasDocPermission) return;
+          console.log('==========控制文档开关=============', status);
+          this.docServer.state.switchStatus = status === 'on';
+          if (this.isWatch && this.docServer.state.switchStatus) {
+            this.recoverLastDocs();
+          }
+        });
+
+        this.docServer.on(VHDocSDK.Event.DELETE_CONTAINER, data => {
+          // if (this.roleName != 1 && this.liveStatus != 1) {
+          //   return;
+          // }
+          console.log('=========删除容器=============', data);
+          // const index = this.cids.indexOf(data.id);
+          // if (index > -1) {
+          //   this.cids.splice(index, 1);
+          //   this.docServer.destroyContainer({ id: data.id });
+          // }
+          // if (this.currentCid == data.id) {
+          //   this.currentCid = '';
+          //   this.docInfo.docShowType = '';
+          // }
+        });
+
         //
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
@@ -267,6 +295,19 @@
 
         this.msgServer.$on('DOC_MSG', msg => {
           console.log('------DOC_MSG-----文档消息：', msg);
+        });
+
+        this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
+          if (this.isWatch && !this.showInWatch) return;
+          // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
+          //   return;
+          // }
+          console.log('===========创建容器===========', data);
+          const { id: cid, docId } = data;
+          if (this.docServer.state.containerList.findIndex(item => item.cid === data.id) > -1) {
+            return;
+          }
+          this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
         });
 
         //
@@ -330,20 +371,45 @@
        */
       recoverLastDocs: async function () {
         console.log('[doc] 刷新或者退出重进恢复上次的文档');
-        if (!this.docViewRect) return;
+        try {
+          // 获取容器列表
+          await this.docServer.getContainerList();
+        } catch (ex) {
+          console.error('获取容器列表数据失败：', ex);
+          this.docServer.setDocLoadComplete();
+        }
+        if (this.isWatch && !this.docServer.state.switchStatus) {
+          // 如果是观看端，并且是观众不可见，结束
+          this.docServer.setDocLoadComplete();
+          return;
+        }
+        console.log('[doc] recoverLastDocs containerList:', this.docServer.state.containerList);
+        if (this.docServer.state.containerList.length === 0) {
+          // 没有文档
+          this.docServer.setDocLoadComplete();
+          return;
+        }
+        // 确定文档最外层节点显示，并且文档dom绑定ID成功
+        await this.$nextTick();
+
+        // 初始化文档最外层节点大小
+        this.resize();
+        console.log('[doc] recoverLastDocs docViewRect:', this.docViewRect);
         const { width, height } = this.docViewRect;
         await this.docServer.recover({
           width,
           height,
-          bindCidFun: async () => {
+          bindCidFun: async cid => {
+            console.log('[doc] recoverLastDocs bindCidFun:', cid);
             await this.$nextTick();
           }
         });
-        // 调整大小
-        this.resize();
-
-        const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType]));
+        if (this.roomBaseServer.state.clientType === 'send') {
+          const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
+          );
+        }
       },
       /**
        * 切换到 文档还是白板
@@ -484,11 +550,6 @@
     mounted() {
       // 初始化事件
       this.initEvents();
-
-      console.log('----this.$refs.docWrapper---', this.$refs.docWrapper);
-      // 初始化 this.docViewRect
-      this.resize();
-
       // 清空
       // this.docServer.resetContainer();
       // 恢复上一次的文档数据;
