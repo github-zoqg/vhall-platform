@@ -435,6 +435,7 @@
       // 获取历史消息
       getHistoryMsg() {
         const params = {
+          webinar_id: this.$route.params.id,
           room_id: this.roomId,
           pos: Number(this.pageConfig.page) * 50,
           limit: 50
