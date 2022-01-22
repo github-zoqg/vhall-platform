@@ -78,7 +78,7 @@
           plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
             //token || localStorage.getItem('token')
-            token: ''
+            // token: ''
           },
           initRoom: {
             webinar_id: id, //活动id

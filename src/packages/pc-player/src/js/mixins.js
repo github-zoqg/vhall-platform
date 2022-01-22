@@ -28,37 +28,37 @@ const playerMixins = {
     },
     getListenPlayer() {
       //  直播开始
-      this.playerServer.on(VhallPlayer.PLAY, () => {
+      this.playerServer.$on(VhallPlayer.PLAY, () => {
         // 监听播放状态
         this.isLiving = true;
         this.isShowPoster = false;
         console.warn('PLAY');
       });
-      this.playerServer.on(VhallPlayer.PAUSE, () => {
+      this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态
         this.isLiving = false;
         console.warn('PAUSE');
       });
       // 视频清晰度发生改变----卡顿切换清晰度时触发
-      this.playerServer.on(VhallPlayer.DEFINITION_CHANGE, e => {
+      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, e => {
         console.warn('DEFINITION_CHANGE');
         this.loading = true;
       });
-      this.playerServer.on(VhallPlayer.LOADEDMETADATA, e => {
+      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, e => {
         console.warn('LOADEDMETADATA');
       });
-      this.playerServer.on(VhallPlayer.LAG_REPORT, e => {
+      this.playerServer.$on(VhallPlayer.LAG_REPORT, e => {
         console.warn('LAG_REPORT');
         this.loading = false;
       });
-      this.playerServer.on(VhallPlayer.LOADED, () => {
+      this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
       });
-      this.playerServer.on(VhallPlayer.ERROR, e => {
+      this.playerServer.$on(VhallPlayer.ERROR, e => {
         this.loading = false;
         console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
-      this.playerServer.on(VhallPlayer.ENDED, () => {
+      this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('播放完毕');
         this.isShowPoster = true;
@@ -169,7 +169,7 @@ const playerMixins = {
       }
     },
     initSlider() {
-      this.playerServer.on(window.VhallPlayer.TIMEUPDATE, () => {
+      this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {
         this.currentTime = this.playerServer.getCurrentTime(() => {
           console.log('获取当前视频播放时间失败----------');
         });
@@ -208,7 +208,7 @@ const playerMixins = {
         dom.onmouseout = dom.onmousemove = dom.onmousemove = dom.onmouseover = null;
         this.ContorlWidth = dom.offsetWidth;
         this.onmousedownControl = true;
-        this.pause();
+        this.playerServer.pause();
         // eslint-disable-next-line no-unused-vars
         document.onmousemove = e => {
           this.TimesShow = true;

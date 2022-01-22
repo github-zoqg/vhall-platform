@@ -27,7 +27,7 @@
     data() {
       return {
         themeClass: {
-          pageBg: '#3562fa'
+          pageBg: '#e6e6e6'
         },
         label: '',
         lang: 'zh',
