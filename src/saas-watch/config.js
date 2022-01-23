@@ -10,7 +10,7 @@ export const serverConfig = {
   layerRoot: {
     component: 'VmpAirContainer',
     // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -39,16 +39,12 @@ export const serverConfig = {
   // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
     // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
   layerBodyRight: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-right',
-    children: [
-      'comWatchPrivateChat'
-      // 'comChat'
-    ]
+    component: 'VmpBasicRightContainer',
+    children: ['comChat']
   },
   /*** 布局定义end */
 
@@ -59,114 +55,13 @@ export const serverConfig = {
   },
 
   /**** 组件定义 */
-  // 顶部左侧容器
-  pannelHeaderLeft: {
-    component: 'VmpAirContainer',
-    children: ['compHeaderLeft']
-  },
-  // 顶部右侧容器
-  pannelHeaderRight: {
-    component: 'VmpContainer',
-    className: 'vmp-header-right',
-    children: ['compLanguageChoice']
-  },
-  // 顶部左侧组件
-  compHeaderLeft: {
-    component: 'VmpHeaderLeft'
-  },
-  // 左侧导航菜单
-  comAsideMenu: {
-    component: 'VmpAsideMenu',
-    children: ['comDocMenu', 'comWbMenu', 'comShareDesktopMenu', 'comMediaPlayMenu']
-  },
-  // 语言选择组件
-  compLanguageChoice: {
-    component: 'VmpLanguageChoice',
-    options: {
-      choices: [
-        {
-          value: 'zh',
-          label: 'i18n.languageChoice.zh'
-        },
-        {
-          value: 'en',
-          label: 'i18n.languageChoice.en'
-        }
-      ]
-    }
-  },
-  // 文档菜单
-  comDocMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconwendang',
-      text: 'i18n.asideMenu.document'
-    },
-    emitClick: [
-      {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comDocMenu']
-      }
-    ]
-  },
-  // 白板菜单
-  comWbMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconbaiban',
-      text: 'i18n.asideMenu.whiteBoard'
-    },
-    emitClick: [
-      {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comWbMenu']
-      }
-    ]
-  },
-  // 桌面共享
-  comShareDesktopMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconzhuomiangongxiang',
-      text: 'i18n.asideMenu.shareDesktop',
-      disable: true
-    }
-  },
-  // 插播文件
-  comMediaPlayMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconwangyechabo_icon',
-      text: 'i18n.asideMenu.mediaPlay'
-    },
-    emitClick: [
-      {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comMediaPlayMenu']
-      }
-    ]
-  },
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
     options: {
-      className: 'vmp-area__max',
-      keepAspectRatio: false
+      keepAspectRatio: false,
+      hasPager: false
     }
-
-    // emitSwitchTo: {
-    //   cuid: ['comAsideMenu'],
-    //   method: 'switchTo',
-    //   args: ['$0'] // 获取动态参数的第一个
-    // },
-    // // 打开对话框
-    // emitOpenDocList: {
-    //   cuid: 'dlgDocList',
-    //   method: 'show'
-    // }
   },
   comStreamList: {
     component: 'VmpStreamList',

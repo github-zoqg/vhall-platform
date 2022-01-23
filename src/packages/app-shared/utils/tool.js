@@ -54,3 +54,23 @@ export function boxEventOpitons(cuid, method, params) {
     method
   };
 }
+
+/**
+ * 计算uuid唯一标识
+ */
+export function uuid() {
+  const chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+  const uuid = [];
+  let i;
+  let r;
+
+  uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+
+  for (i = 0; i < 36; i++) {
+    if (!uuid[i]) {
+      r = 0 | (Math.random() * 16);
+      uuid[i] = chars[i == 19 ? (r & 0x3) | 0x8 : r];
+    }
+  }
+  return uuid.join('');
+}

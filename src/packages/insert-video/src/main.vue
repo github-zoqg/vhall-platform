@@ -111,10 +111,22 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 预览功能 -->
+    <template>
+      <el-dialog
+        class="vmp-insert-video-preview"
+        :visible.sync="previewDialog"
+        width="642px"
+        :close-on-click-modal="false"
+      >
+        <video-preview ref="videoPreview" :videoParam="videoParam"></video-preview>
+      </el-dialog>
+    </template>
   </div>
 </template>
 <script>
   import { useInsertFileServer } from 'middle-domain';
+  import videoPreview from '../../components/video-preview';
   export default {
     name: 'VmpInsertVideo',
     data() {
@@ -123,6 +135,7 @@
         searchKey: '',
         noVideo: 1,
         isFetching: false,
+        videoParam: {}, //预览数据
         webinarId: this.$route.params.id,
         tableData: [
           {
@@ -131,6 +144,7 @@
             duration: '00:04:42',
             file_type: '.mp3',
             transcode_status: 1,
+            paas_record_id: '22429f36',
             id: 819,
             transcode_status_text: '转码成功',
             created_at: '2022-01-17 11:15:06'
@@ -141,6 +155,7 @@
             duration: '00:04:42',
             file_type: '.mp4',
             transcode_status: 0,
+            paas_record_id: '26054ddf',
             transcode_status_text: '转码失败',
             id: 818,
             created_at: '2022-01-17 11:15:06'
@@ -151,6 +166,7 @@
             duration: '00:04:42',
             file_type: '.mav',
             transcode_status: 1,
+            paas_record_id: '48cdaf1d',
             transcode_status_text: '转码成功',
             id: 817,
             created_at: '2022-01-17 11:15:06'
@@ -162,8 +178,12 @@
           pageNum: 1
         },
         total: 1,
-        totalPages: 0
+        totalPages: 0,
+        previewDialog: false
       };
+    },
+    components: {
+      videoPreview
     },
     beforeCreate() {
       this.insertFileServer = useInsertFileServer();
@@ -323,6 +343,7 @@
       },
       // 预览页面
       handlePreview(video) {
+        this.previewDialog = true;
         if (video.transcode_status == 1) {
           this.videoParam = video;
         } else {
@@ -450,6 +471,37 @@
           word-break: break-all;
           text-align: left;
           margin-left: 102px;
+        }
+      }
+    }
+    &-preview {
+      .el-dialog {
+        background: transparent;
+        box-shadow: none;
+      }
+      .el-dialog__header {
+        width: 642px !important;
+        padding: 0;
+        height: 55px;
+        background: transparent !important;
+        border: none;
+        color: #fff;
+      }
+      .el-dialog__body {
+        height: 361px;
+        border-top: 4px solid #000;
+        border-bottom: 4px solid #000;
+        background: #000;
+        border-radius: 4px;
+        padding: 0 4px;
+      }
+      .el-dialog__headerbtn {
+        right: 10px;
+        .el-dialog__close {
+          color: #fff;
+          &:hover {
+            color: #fff;
+          }
         }
       }
     }
