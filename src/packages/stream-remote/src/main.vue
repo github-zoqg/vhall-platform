@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-stream-remote">
+  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图 -->
@@ -39,7 +39,7 @@
         >
           <span
             class="vmp-stream-remote__shadow-icon"
-            @click="muteDevice('video')"
+            @click="handleClickMuteDevice('video')"
             :class="
               stream.videoMuted
                 ? 'iconfont iconicon_shexiangtouguanbi'
@@ -53,10 +53,10 @@
           placement="top"
         >
           <span
-            class="vmp-stream-remote__shadow-icon"
-            @click="muteDevice('audio')"
+            class="vmp-stream-remote__shadow-icon iconfont"
+            @click="handleClickMuteDevice('audio')"
             :class="
-              stream.audioMuted ? 'iconfont iconicon_maikefengguanbi' : 'iconfont iconyinliang'
+              stream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
             "
           ></span>
         </el-tooltip>
@@ -64,7 +64,7 @@
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
             @click="speakOff"
-            v-if="roleName != 1 && role != 20"
+            v-if="stream.attributes.roleName != 1 && stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -92,7 +92,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
-            v-if="roleName != 1"
+            v-if="stream.attributes.roleName != 1"
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -109,7 +109,8 @@
     data() {
       return {
         audioLevel: 1,
-        networkStatus: 0
+        networkStatus: 0,
+        isFullScreen: false
       };
     },
     props: {
@@ -189,9 +190,22 @@
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
-      muteDevice() {},
+      // 点击mute按钮事件
+      handleClickMuteDevice(deviceType) {
+        const status = this.stream[`${deviceType}Muted`] ? 1 : 0;
+        this.interactiveServer.setDeviceStatus({
+          device: deviceType == 'video' ? 2 : 1,
+          status,
+          receive_account_id: this.stream.accountId
+        });
+      },
       speakOff() {},
-      fullScreen() {},
+      fullScreen() {
+        this.interactiveServer.setStreamFullscreen({
+          streamId: this.stream.streamId,
+          vNode: `vmp-stream-remote__${this.stream.streamId}`
+        });
+      },
       exchange() {
         this.roomBaseServer.requestChangeMiniElement('stream-list');
       },
@@ -361,6 +375,9 @@
         background: hsla(0, 0%, 100%, 0.3);
         border-radius: 100%;
         margin-right: 10px;
+        &:hover {
+          background-color: #fc5659;
+        }
         &:last-child {
           margin-right: 0;
         }
