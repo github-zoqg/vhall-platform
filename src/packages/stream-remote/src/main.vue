@@ -64,7 +64,7 @@
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
             @click="speakOff"
-            v-if="roleName != 1 && role != 20"
+            v-if="stream.attributes.roleName != 1 && stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -92,7 +92,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
-            v-if="roleName != 1"
+            v-if="stream.attributes.roleName != 1"
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -109,7 +109,8 @@
     data() {
       return {
         audioLevel: 1,
-        networkStatus: 0
+        networkStatus: 0,
+        isFullScreen: false
       };
     },
     props: {

@@ -49,7 +49,7 @@
       this.micServer = useMicServer();
       this.micServer.$on('vrtc_connect_apply', msg => {
         console.log('----dingxiaodong----收到申请上麦消息', msg);
-        this.$confirm(`${msg.data.nickname}申请上麦`, '提示', {
+        this.$confirm(`${msg.data.nick_name}申请上麦`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           customClass: 'zdy-message-box',

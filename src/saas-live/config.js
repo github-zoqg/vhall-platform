@@ -91,7 +91,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPush'
+        method: 'startPushAndSetBroadCast'
       }
     ],
     emitClickEndLive: [
