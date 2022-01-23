@@ -2,10 +2,12 @@
   <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': !remoteStreams.length }">
     <div
       class="vmp-stream-list__local-container"
-      :class="{
-        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__mini': miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
-      }"
+      :class="[
+        joinInfo.third_party_user_id == mainScreen ? 'vmp-stream-list__main-screen' : '',
+        miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
+          ? 'vmp-dom__mini'
+          : 'vmp-dom__max'
+      ]"
     >
       <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
     </div>
@@ -14,10 +16,12 @@
         v-for="stream in remoteStreams"
         :key="stream.id"
         class="vmp-stream-list__remote-container"
-        :class="{
-          'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-          'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
-        }"
+        :class="[
+          stream.accountId == mainScreen ? 'vmp-stream-list__main-screen' : '',
+          miniElement == 'stream-list' && stream.accountId == mainScreen
+            ? 'vmp-dom__mini'
+            : 'vmp-dom__max'
+        ]"
       >
         <vmp-stream-remote :stream="stream"></vmp-stream-remote>
       </div>
@@ -126,10 +130,35 @@
     // 除了主屏流，还有其他上麦流存在的情况
     .vmp-stream-list__main-screen {
       position: absolute;
-      top: 80px;
-      left: 60px;
-      right: 310px;
-      bottom: 0;
+
+      // 主屏在大窗的样式
+      &.vmp-dom__max {
+        top: 80px;
+        left: 60px;
+        right: 310px;
+        bottom: 0;
+        // 本地流大窗样式
+        .vmp-stream-local {
+          .vmp-stream-local__shadow-box {
+            display: flex;
+            height: 41px;
+            bottom: 10px;
+            flex-direction: row;
+            top: auto;
+            background: rgba(0, 0, 0, 0);
+            .vmp-stream-local__shadow-icon {
+              background: none;
+              &:hover {
+                background-color: #fc5659;
+              }
+            }
+          }
+          .vmp-stream-local__bootom {
+            bottom: 17px;
+          }
+        }
+        // 远端流大窗样式
+      }
       // 主屏在小窗的样式
       &.vmp-dom__mini {
         right: 0;
@@ -145,7 +174,9 @@
     &-h0 {
       height: 0;
       .vmp-stream-list__main-screen {
-        top: 0;
+        &.vmp-dom__max {
+          top: 0;
+        }
       }
     }
 
