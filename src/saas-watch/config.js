@@ -9,8 +9,8 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerBody']
+    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    // children: ['layerBody']
   },
   // 顶部header容器
   layerHeader: {
@@ -56,7 +56,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth']
+    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth', 'comUserAccount']
   },
 
   /**** 组件定义 */
@@ -208,6 +208,9 @@ export const serverConfig = {
     options: {
       isInviteShare: true //分享是否展示邀请卡
     }
+  },
+  comUserAccount: {
+    component: 'VmpUserAccount'
   },
   // 底部
   comFooter: {

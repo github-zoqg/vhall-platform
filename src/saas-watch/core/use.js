@@ -31,6 +31,7 @@ import VmpAttention from '@/packages/attention-watch'; // 观看端关注
 import VmpOfficial from '@/packages/official-watch-pc'; // 观看端公众号
 import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
 import VmpMemberList from '@/packages/member-list';
+import VmpUserAccount from '@/packages/user-account'; // 个人资料
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -61,4 +62,5 @@ export function initUse() {
   Vue.use(VmpOfficial);
   Vue.use(VmpWatchAuth);
   Vue.use(VmpMemberList);
+  Vue.use(VmpUserAccount);
 }
