@@ -48,8 +48,8 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      // 'comMemberList'
-      'comChat'
+      'comMemberList'
+      // 'comChat'
     ]
   },
   /*** 布局定义end */
