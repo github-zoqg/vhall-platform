@@ -1,15 +1,18 @@
 <template>
   <div class="vmp-header-left">
-    <div :title="subject" class="vhall-room-name">{{ subject }}</div>
+    <div :title="webinarInfo.subject" class="vhall-room-name">
+      {{ webinarInfo.subject || '房间名称' }}
+    </div>
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
-      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ id }}</div>
-      <div :data-clipboard-text="id" class="vhall-room-id-copy" @click="handleCopy">
+      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
+      <div class="vhall-room-id-copy" @click="handleCopy">
         <i class="iconfont iconfuzhi"></i>
+        <!-- :data-clipboard-text="id" -->
       </div>
     </div>
     <!---->
-    <div class="nopdelay-icon">
+    <div class="nopdelay-icon" v-if="webinarInfo.no_delay_webinar == 1 && webinarInfo.mode != 6">
       <img
         src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
         alt=""
@@ -29,17 +32,15 @@
         kind: '',
         icon: '',
         text: '',
-        subject: '', // 直播名称
-        id: '' // 房间id
+        webinarInfo: {}
       };
     },
     created() {
       const { watchInitData } = useRoomBaseServer().state;
-      this.subject = watchInitData?.webinar?.subject || '';
-      this.id = watchInitData?.webinar?.id || '';
+      this.webinarInfo = watchInitData.webinar;
     },
     mounted() {
-      this.initConfig();
+      // this.initConfig();
     },
     methods: {
       // 初始化配置
@@ -83,15 +84,24 @@
         //     req_url: ''
         //   }
         // });
-        const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        clipboard.on('success', () => {
-          this.$message.success(this.$t('usual.copySucceeded'));
-          clipboard.destroy();
+        const input = document.getElementById('vhall-room-id-copy-val');
+        // input.select();
+        document.execCommand('copy');
+        this.$message({
+          message: '复制成功！',
+          showClose: true,
+          type: 'success',
+          customClass: 'zdy-info-box'
         });
-        clipboard.on('error', () => {
-          this.$message.error(this.$t('usual.copyFailed'));
-          clipboard.destroy();
-        });
+        // const clipboard = new this.$clipboard('.vhall-room-id-copy');
+        // clipboard.on('success', () => {
+        //   this.$message.success(this.$t('usual.copySucceeded'));
+        //   clipboard.destroy();
+        // });
+        // clipboard.on('error', () => {
+        //   this.$message.error(this.$t('usual.copyFailed'));
+        //   clipboard.destroy();
+        // });
       }
     }
   };

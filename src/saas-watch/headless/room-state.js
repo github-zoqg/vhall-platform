@@ -4,7 +4,7 @@ import {
   useDocServer,
   useInteractiveServer,
   useMicServer
-} from 'middleDomain';
+} from 'middle-domain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
@@ -20,8 +20,14 @@ export default async function () {
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
+  // TODO 设置观看端测试权限数据
+  roomBaseServer.state.configList = {
+    hasToolbar: false
+  };
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
+
   await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 

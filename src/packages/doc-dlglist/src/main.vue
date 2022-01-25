@@ -23,14 +23,34 @@
             <img src="/static/img/no-file.png" />
             <p>您还没有文档，快来上传吧</p>
             <div>
-              <el-button type="primary" @click="handleUpload">{{ $t('usual.upload') }}</el-button>
+              <!-- 上传文档 -->
+              <el-upload
+                class="doc-uploader"
+                action="#"
+                :http-request="handleUpload"
+                :before-upload="beforeUpload"
+                accept="*/*"
+                :show-file-list="false"
+              >
+                <el-button type="primary">{{ $t('usual.upload') }}</el-button>
+              </el-upload>
               <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
             </div>
           </div>
           <!-- 有数据 -->
           <div class="vmp-doc-cur__inner" v-show="dataList.length > 0">
             <div class="vmp-doc-cur__hd">
-              <el-button type="primary" @click="handleUpload">{{ $t('usual.upload') }}</el-button>
+              <!-- 上传文档 -->
+              <el-upload
+                class="doc-uploader"
+                action="#"
+                :http-request="handleUpload"
+                :before-upload="beforeUpload"
+                accept="*/*"
+                :show-file-list="false"
+              >
+                <el-button type="primary">{{ $t('usual.upload') }}</el-button>
+              </el-upload>
               <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
 
               <el-tooltip placement="right">
@@ -67,11 +87,19 @@
                 <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
                 <el-table-column prop="page" label="页码"></el-table-column>
-                <el-table-column prop="address" label="进度"></el-table-column>
+                <el-table-column prop="uploadPropress" label="进度">
+                  <template slot-scope="scope">
+                    <DocProgressStatus
+                      :docStatus="scope.row.docStatus"
+                      :transformProcess="scope.row.transformProcess"
+                      :uploadPropress="scope.row.uploadPropress"
+                    ></DocProgressStatus>
+                  </template>
+                </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template slot-scope="scope">
                     <el-button
-                      v-if="scope.row.status_jpeg == 200 || scope.row.transcoded"
+                      v-if="scope.row.status_jpeg == 200"
                       @click="demonstrate(scope.row.document_id, 2)"
                       size="mini"
                       type="text"
@@ -79,17 +107,19 @@
                       演示
                     </el-button>
                     <el-button
-                      v-if="
-                        scope.row.ext.indexOf('ppt') != -1 &&
-                        (scope.row.status_jpeg == 200 || scope.row.transcoded)
-                      "
+                      v-if="scope.row.ext.indexOf('ppt') > -1 && scope.row.status == 200"
                       @click="demonstrate(scope.row.document_id, 1)"
                       size="mini"
                       type="text"
                     >
                       动画版演示
                     </el-button>
-                    <el-button @click="handleDeleteDoc(scope.row)" size="mini" type="text">
+                    <el-button
+                      v-if="scope.row.id"
+                      @click="handleDeleteDoc(scope.row)"
+                      size="mini"
+                      type="text"
+                    >
                       删除
                     </el-button>
                   </template>
@@ -101,7 +131,7 @@
               <el-switch
                 class="vmp-doc-cur__switch"
                 v-model="switchStatus"
-                width="28"
+                :width="28"
                 active-color="#fb3a32"
               ></el-switch>
               <span>默认开启，文档演示将自动对观众可见</span>
@@ -139,7 +169,15 @@
               <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
               <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
               <el-table-column prop="page" label="页码"></el-table-column>
-              <el-table-column prop="address" label="进度" width="200"></el-table-column>
+              <el-table-column prop="uploadPropress" label="进度" width="200">
+                <template slot-scope="scope">
+                  <DocProgressStatus
+                    :docStatus="scope.row.docStatus"
+                    :transformProcess="scope.row.transformProcess"
+                    :uploadPropress="scope.row.uploadPropress"
+                  ></DocProgressStatus>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
           <div class="vmp-doc-lib__ft">
@@ -155,13 +193,21 @@
   </div>
 </template>
 <script>
-  import { useDocServer, useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useMsgServer, useDocServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import DocProgressStatus from './progress-status.vue';
+
   export default {
     name: 'VmpDocDlglist',
+    components: {
+      DocProgressStatus
+    },
     data() {
       return {
         dialogVisible: false,
         mode: 1, //模式，默认1:当前直播列表 ，2：资料库列表
+
+        uploadUrl: `${process.env.VUE_APP_BASE_URL}/v3/interacts/document/upload-webinar-document`,
 
         // 要演示的文档观众是否可见
         switchStatus: true,
@@ -180,6 +226,7 @@
     beforeCreate() {
       this.docServer = useDocServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.msgServer = useMsgServer();
     },
     watch: {
       docSearchKey(val) {
@@ -192,7 +239,77 @@
         }
       }
     },
+    mounted() {
+      // 初始化事件
+      this.initEvents();
+    },
     methods: {
+      initEvents() {
+        // 监听文档消息
+        this.msgServer.$onMsg('CUSTOM_MSG', this.listenDocMsg);
+      },
+      // 使用具名消息，后面offMsg的时候使用
+      // TODO 暂时没有offMsg事件，后面有的时候加上
+      listenDocMsg(msg) {
+        console.log('[doc] ------CUSTOM_MSG-----文档消息：', msg);
+        // {
+        //   "type": "host_msg_webinar",
+        //   "data": {
+        //       "page": "1",
+        //       "document_id": "64f984ff",
+        //       "converted_page": "0",
+        //       "status": "0",
+        //       "status_jpeg": "200",
+        //       "converted_page_jpeg": "1",
+        //       "doc_type": "doc_convert",
+        //       "user_id": 101643
+        //    },
+        //   "webinar_id": "131121788"
+        // }
+        try {
+          if (typeof msg === 'string') {
+            msg = JSON.parse(msg);
+          }
+          if (typeof msg.context === 'string') {
+            msg.context = JSON.parse(msg.context);
+          }
+          if (typeof msg.data === 'string') {
+            msg.data = JSON.parse(msg.data);
+          }
+        } catch (ex) {
+          console.log('消息转换错误：', ex);
+          return;
+        }
+        if (msg.data.type === 'host_msg_webinar') {
+          const msgData = msg.data.data;
+          // status: "200" // 动态转换状态 0待转换 100转换中 200完成 500失败
+          // status_jpeg: "200" // 静态转换状态 0待转换 100转换中 200完成 500失败
+          this.$nextTick(() => {
+            this.dataList.forEach(item => {
+              if (msgData.document_id === item.document_id) {
+                const statusJpeg = Number(msgData.status_jpeg);
+                const status = Number(msgData.status);
+                if (statusJpeg === 0 && status === 0) {
+                  item.docStatus = 'transwait'; // 等待转码
+                  item.transformProcess = 0;
+                } else if (statusJpeg === 100 || status === 100) {
+                  item.docStatus = 'transdoing'; // 转码中
+                } else if (statusJpeg === 200 || status === 200) {
+                  item.docStatus = 'transcompleted'; // 转码完成
+                  item.transformProcess = 100;
+                } else {
+                  item.docStatus = 'transfailed'; // 转码失败
+                  item.transformProcess = 100;
+                }
+                item.status_jpeg = statusJpeg;
+                item.page = Number(msgData.page);
+                // 使用set解决视图有时候不更新的问题
+                this.$set(item, 'status', status);
+              }
+            });
+          });
+        }
+      },
       show() {
         this.dialogVisible = true;
       },
@@ -224,11 +341,10 @@
        */
       demonstrate(docId, docType) {
         this.dialogVisible = false;
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitDemonstrateDoc',
-          params: [docId, docType, this.switchStatus]
-        });
+        console.log('演示文档ID：', docId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDemonstrateDoc', [docId, docType, this.switchStatus])
+        );
       },
       /***
        * 删除文档
@@ -285,6 +401,7 @@
           });
           if (result && result.code === 200) {
             this.dataList = result.data.list;
+            // console.log(this.dataList);
           } else {
             this.$message.error('查询失败');
           }
@@ -353,6 +470,113 @@
       async handleDoclibCancel() {
         this.cancelCheckHandle();
         this.mode = 1;
+      },
+      beforeUpload(file) {
+        if (file.size / 1024 / 1024 > 100) {
+          this.$message.warning('上传文件不可大于100M');
+          return false;
+        }
+        const acceptFileTypes = /(jpe?g|png|pptx?|xlsx?|docx?|pdf|bmp)$/i;
+        const cacheArr = file.name.split('.');
+        var curExt = cacheArr[cacheArr.length - 1];
+        if (!acceptFileTypes.test(curExt)) {
+          this.$message.warning('文件格式不正确，无法上传');
+          return false;
+        }
+        // console.log('---beforeUpload file:');
+        // console.log(file);
+        const fileObj = {
+          file_name: file.name,
+          ext: file.name.split('.')[1],
+          created_at: new Date().format('yyyy-MM-dd hh:mm:ss'),
+          page: 1,
+          docStatus: 'uploading', // 文档状态:上传中
+          uploadPropress: 0, // 上传进度
+          transformProcess: 0, // 文档转换进度
+          uid: file.uid
+        };
+        this.dataList.unshift(fileObj);
+        return true;
+      },
+      // 上传文档
+      handleUpload(param) {
+        console.log('----param:', param);
+        param.onError = (err, file) => {
+          this.dataList.forEach(item => {
+            if (file.uid === item.uid) {
+              item.docStatus = 'uploadfailed'; //上传失败
+            }
+          });
+          console.log('---上传错误---');
+          console.log(err);
+        };
+        param.onSuccess = async (res, file) => {
+          // console.log(' 文档的上传完成:', res, file, fileList);
+          if (res.code === 200) {
+            // res.data;
+            // document_id: "28fbfb47"
+            // ext: "jpg"
+            // file_name: "snow.jpg"
+            // hash: "d9df81a72626f52d11d4626bd98c6e8e"
+            // id: 20855
+            // page: 1
+            // size: 362733
+            const fuid = file.uid;
+            let documentId;
+            this.dataList.forEach(item => {
+              if (fuid === item.uid) {
+                documentId = res.data.document_id;
+                item.document_id = res.data.document_id;
+                item.id = res.data.id;
+                item.docStatus = 'transwait'; //上传成功，等待转码
+              }
+            });
+            this.dataList = [...this.dataList];
+            this.$message({
+              message: '上传成功',
+              type: 'success'
+            });
+            try {
+              await this.$confirm('是否同步上传的文档共享至资料库，便于其他活动使用？', '提示', {
+                confirmButtonText: '同步',
+                cancelButtonText: '不同步'
+              });
+            } catch (ex) {
+              // 取消
+              return;
+            }
+            const params = {
+              document_id: documentId,
+              tag: 1
+            };
+            try {
+              const result = await this.docServer.syncDoc(params);
+              if (result && result.code === 200) {
+                this.$message({
+                  message: '同步成功',
+                  type: 'success'
+                });
+              } else {
+                this.$message.error('同步失败');
+              }
+            } catch (err) {
+              this.$message.warning(err.msg);
+            }
+          }
+        };
+        param.onProgress = (percent, file) => {
+          console.log('[doc] 上传进度：', percent);
+          const fuid = file.uid;
+          this.dataList.forEach(item => {
+            if (fuid === item.uid) {
+              item.uploadPropress = parseInt(percent);
+            }
+          });
+          // 触发 watch/computed
+          this.dataList = [...this.dataList];
+        };
+        // 开始上传
+        this.docServer.uploadFile(param, this.uploadUrl);
       }
     }
   };
@@ -378,6 +602,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+
       .vmp-doc-cur__bd {
         padding-top: 10px;
 
@@ -428,6 +653,11 @@
           flex: 1;
         }
       }
+    }
+
+    .doc-uploader {
+      display: inline;
+      margin-right: 20px;
     }
   }
 </style>

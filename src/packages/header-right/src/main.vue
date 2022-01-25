@@ -14,12 +14,23 @@
         <span class="vmp-header-right_duration-end">结束直播</span>
       </div>
       <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+      <div class="vmp-header-right_control">
+        <headerControl
+          :isShowQuit="isShowQuit"
+          :isShowSupport="isShowSupport"
+          :isShowSplitScreen="isShowSplitScreen"
+          @openVirtualProple="openVirtualProple"
+        ></headerControl>
+      </div>
+      <div class="vmp-header-right_full"><i class="iconfont iconicon_quanping"></i></div>
     </section>
   </div>
 </template>
 
 <script>
+  import headerControl from './components/header-control.vue';
   import { useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpHeaderRight',
     data() {
@@ -27,17 +38,34 @@
         liveStep: 1,
         liveDuration: '',
         localDuration: 0,
-        roomBaseState: null
+        roomBaseState: null,
+        isShowQuit: false, //是否显示退出
+        isShowSupport: false, //是否显示技术支持
+        isShowSplitScreen: false //是否显示分屏
       };
+    },
+    components: {
+      headerControl
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
+      this.initConfig();
     },
     mounted() {
       this.calculateLiveDuration();
     },
     methods: {
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          Object.assign(this.$data, widget.options);
+        }
+      },
+      // 打开虚拟人数的弹窗
+      openVirtualProple() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
+      },
       // 推流成功事件
       async handlePublishComplate() {
         const res = await this.postStartLive();
@@ -60,10 +88,7 @@
         this.roomBaseServer.setDevice();
         this.liveStep = 2;
         // 派发推流事件
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickStartLive'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       },
       // 结束直播
       async handleEndClick() {
@@ -73,10 +98,7 @@
         });
         if (res.code == 200) {
           // 派发结束直播事件
-          window.$middleEventSdk?.event?.send({
-            cuid: this.cuid,
-            method: 'emitClickEndLive'
-          });
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
       handleUnpublishComplate() {
@@ -117,10 +139,10 @@
       font-size: 14px;
       text-align: center;
       line-height: 26px;
-      color: #fff;
+      color: @font-error-low;
       padding: 0 10px;
       cursor: pointer;
-      background-color: #fc5659;
+      background-color: @bg-error-light;
     }
     .vmp-header-right_duration {
       &-end {
@@ -133,6 +155,27 @@
         .vmp-header-right_duration-end {
           display: inline;
         }
+      }
+    }
+    &_control {
+      margin-left: 12px;
+      color: @font-error-low;
+      font-size: 14px;
+    }
+    &_full {
+      margin: 0 20px 0 12px;
+      background-color: hsla(0, 0%, 88.6%, 0.15);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      color: @font-error-low;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .iconfont {
+        font-size: 14px;
       }
     }
   }

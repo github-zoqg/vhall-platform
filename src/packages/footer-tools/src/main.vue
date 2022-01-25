@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-footer-tools">
-    <div class="vmp-footer-tools-left">
+    <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="iconfont iconmeitishezhi"></i>
         设置
@@ -14,10 +14,10 @@
         {{ hotNum | formatHotNum }}
       </div>
     </div>
-    <div class="vmp-footer-tools-right">
+    <div class="vmp-footer-tools__right">
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div>
-    <div class="vmp-footer-tools-center">
+    <div class="vmp-footer-tools__center" v-if="isInteractLive">
       <handup></handup>
     </div>
   </div>
@@ -73,7 +73,8 @@
     align-items: center;
     padding: 0 24px;
     position: relative;
-    &-left {
+
+    &__left {
       display: flex;
       align-items: center;
       color: @font-dark-normal;
@@ -88,7 +89,7 @@
         cursor: pointer;
       }
     }
-    &-right {
+    &__right {
       display: flex;
       align-items: center;
       color: @font-dark-normal;
@@ -97,7 +98,7 @@
         margin-left: 16px;
       }
     }
-    &-center {
+    &__center {
       position: absolute;
       left: 50%;
       top: 50%;

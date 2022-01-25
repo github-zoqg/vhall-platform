@@ -1,4 +1,10 @@
-import { useMsgServer, useRoomBaseServer, useDocServer, useInteractiveServer } from 'middle-domain';
+import {
+  useMsgServer,
+  useRoomBaseServer,
+  useDocServer,
+  useInteractiveServer,
+  useMicServer
+} from 'middle-domain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
@@ -20,4 +26,6 @@ export default async function () {
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
+
+  useMicServer();
 }

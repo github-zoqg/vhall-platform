@@ -12,7 +12,7 @@
   min-height: 124px;
 }
 .el-dialog__headerbtn {
-  top: 32px;
+  top: 30px;
   right: 32px;
   height: 16px;
   .el-dialog__close {
@@ -300,6 +300,7 @@
 }
 .el-input__inner,
 .el-textarea__inner {
+  padding: 0 12px;
   border-color: @border-normal-color;
   color: @font-light-normal;
   &:hover {
@@ -361,6 +362,17 @@
 }
 .el-textarea__inner {
   resize: none;
+}
+
+/*-----------------------------------------表单-----------------------------------------*/
+.el-form-item {
+  margin-bottom: 24px;
+}
+.el-form-item.is-success .el-input__inner,
+.el-form-item.is-success .el-input__inner:focus,
+.el-form-item.is-success .el-textarea__inner,
+.el-form-item.is-success .el-textarea__inner:focus {
+  border-color: @font-light-normal;
 }
 
 /*-----------------------------------------下拉框重置-----------------------------------------*/
@@ -471,6 +483,10 @@
   border: 1px solid @border-normal-color;
   padding: 9px 48px;
   color: @font-light-second;
+  &.is-round {
+    border-radius: 20px;
+    padding: 7px 30px;
+  }
   &:hover {
     color: @font-error-low;
     background: @font-high-light-normal;
@@ -530,7 +546,6 @@
 
 .el-button.is-round {
   border-radius: 20px;
-  padding: 9px 51px;
 }
 
 .el-button.el-button--small {

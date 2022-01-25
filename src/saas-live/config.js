@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'dlgDocList']
+    children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -30,10 +30,10 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-center',
-    children: ['comDocUne']
-    // children: ['comStreamList']
+    component: 'VmpBasicCenterContainerLive',
+    // children: ['comDocUne']
+    children: ['comStreamList', 'comDocUne']
+    // children: ['comThirdStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,19 +42,30 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd',
-    children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd'
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      // 'comCustomMenu',
-      'comMemberList'
-      // 'comChat'
+      // 'comMemberList'
+      'comChat'
     ]
   },
   /*** 布局定义end */
+
+  /*** 所有弹窗集合 */
+  comAllDialog: {
+    component: 'VmpAirContainer',
+    children: [
+      'dlgDocList',
+      'comShare',
+      'comVirtualPeople',
+      'comLivePrivateChat',
+      'dlgGroupSetting'
+    ]
+    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
+  },
 
   /**** 组件定义 */
   // 顶部左侧容器
@@ -71,10 +82,22 @@ export const serverConfig = {
   // // 顶部右侧容器
   pannelHeaderRight: {
     component: 'VmpHeaderRight',
+    options: {
+      isShowQuit: false, //是否显示退出
+      isShowSupport: false, //是否显示技术支持
+      isShowSplitScreen: true //是否显示分屏
+    },
+    emitVirtualClick: [
+      {
+        cuid: 'comVirtualPeople',
+        method: 'openVirtualDialog',
+        args: [{ type: 1 }]
+      }
+    ],
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPush'
+        method: 'startPushAndSetBroadCast'
       }
     ],
     emitClickEndLive: [
@@ -91,7 +114,20 @@ export const serverConfig = {
   // 左侧导航菜单
   comAsideMenu: {
     component: 'VmpAsideMenu',
-    children: ['comDocMenu', 'comWbMenu', 'comShareDesktopMenu', 'comMediaPlayMenu']
+    children: [
+      'comDocMenu',
+      'comWbMenu',
+      'comShareDesktopMenu',
+      'comMediaPlayMenu',
+      'comInteractMenu',
+      'comGroupMenu'
+    ],
+    emitShareClick: [
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
+    ]
   },
   // 语言选择组件
   compLanguageChoice: {
@@ -117,9 +153,9 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1000',
       kind: 'document'
     },
-    emitClick: [
+    handleClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne', 'comDocToolbar'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
       }
@@ -133,9 +169,9 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1001',
       kind: 'board'
     },
-    emitClick: [
+    handleClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne', 'comDocToolbar'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
       }
@@ -165,6 +201,25 @@ export const serverConfig = {
       }
     ]
   },
+  // 互动工具
+  comInteractMenu: {
+    component: 'VmpInteractMenu'
+  },
+
+  // 分组讨论
+  comGroupMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'iconfont icona-icon_fenzutaolun1x',
+      text: 'aside_menu.aside_menu_1008'
+    },
+    handleClick: [
+      {
+        cuid: 'dlgGroupSetting',
+        method: 'show'
+      }
+    ]
+  },
   //聊天组件
   comChat: {
     component: 'VmpChat',
@@ -182,7 +237,19 @@ export const serverConfig = {
       userControlOptions: {
         enable: true
       }
-    }
+    },
+    //打开私聊弹窗
+    emitOpenLivePrivateChatModal: [
+      {
+        cuid: 'comLivePrivateChat',
+        method: 'openModal'
+      }
+    ]
+  },
+  //发起端--私聊组件
+  comLivePrivateChat: {
+    component: 'VmpLivePrivateChat',
+    options: {}
   },
   comCustomMenu: {
     component: 'VmpCustomMenu'
@@ -195,9 +262,8 @@ export const serverConfig = {
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    children: ['comDocToolbar'],
     emitSwitchTo: {
-      cuid: ['comAsideMenu', 'comDocToolbar'], //同名方法,同样的参数可以合并
+      cuid: ['comAsideMenu'],
       method: 'switchTo',
       args: ['$0'] // 获取动态参数的第一个
     },
@@ -255,7 +321,8 @@ export const serverConfig = {
   },
   // 上麦流列表
   comStreamList: {
-    component: 'VmpStreamList'
+    component: 'VmpStreamListLive',
+    children: ['comStreamLocal', 'comStreamRemote']
   },
   // 远端流
   comStreamRemote: {
@@ -293,5 +360,25 @@ export const serverConfig = {
         method: 'handleUnpublishComplate'
       }
     ]
+  },
+  comShare: {
+    component: 'VmpShare',
+    options: {
+      isInviteShare: false //分享是否展示邀请卡图标
+    }
+  },
+  comVirtualPeople: {
+    component: 'VmpVirtualPeople'
+  },
+  comThirdStream: {
+    component: 'VmpThirdStream'
+  },
+  comInsertVideo: {
+    component: 'VmpInsertVideo'
+  },
+
+  // 分组设置对话框
+  dlgGroupSetting: {
+    component: 'VmpGroupSetting'
   }
 };

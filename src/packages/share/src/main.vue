@@ -55,7 +55,7 @@
   </div>
 </template>
 <script>
-  import { useRroomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpShare',
     data() {
@@ -69,7 +69,7 @@
       };
     },
     beforeCreate() {
-      this.roomBaseServer = useRroomBaseServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
       this.initConfig();
