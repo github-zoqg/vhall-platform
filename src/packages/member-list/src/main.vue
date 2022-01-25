@@ -19,7 +19,7 @@
               <span class="iconzanwusousuo iconfont"></span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
-            <template v-else>
+            <template v-else v-infinite-scroll="loadMore" style="overflow: auto">
               <template v-for="user in onlineUsers">
                 <member-item
                   :key="user.account_id"
@@ -188,32 +188,7 @@
         roleName: '',
         //当前登录的用户
         userId: '',
-        //todo domain负责 在线人数
-        onlineUsers: [
-          {
-            join_id: 1001627,
-            room_id: 'lss_1057afbe',
-            account_id: '16422770',
-            nickname: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
-            avatar:
-              'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/08/2e/082ea1e5abcba87b5d5c57600c1bbec3.jpg',
-            role_name: '1',
-            is_banned: 0,
-            is_kicked: 0,
-            device_type: 0,
-            device_status: 1,
-            is_signed: 0,
-            is_answered_questionnaire: 0,
-            is_lottery_winner: 0,
-            is_answered_exam: 0,
-            is_answered_vote: 0,
-            status: 0,
-            updated_at: '2022-01-13 10:37:25',
-            created_at: '2022-01-04 21:30:04',
-            deleted_at: '',
-            is_speak: 0
-          }
-        ],
+        onlineUsers: [],
         //申请人数
         applyUsers: [],
         //受限人数
@@ -245,7 +220,7 @@
         raiseHandTip: false,
         //分页配置
         pageConfig: {
-          page: 1,
+          page: 0,
           limit: 10
         },
         //受限人员是否为空
@@ -290,23 +265,24 @@
       },
       //初始化视图数据
       initViewData() {
-        const { groupInitData = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         this.mode = webinar.mode;
         this.roleName = join_info.role_name;
         this.userId = join_info.userId;
         this.roomId = interact.room_id;
+        this.allowRaiseHand = this.micServer.state.isAllowhandup;
       },
       //统一初始化方法
       init() {
         this.getOnlineUserList();
       },
       //获取在线人员列表
-      getOnlineUserList() {
+      getOnlineUserList(pos) {
         const { getOnlineUserList } = this.memberServer;
         const data = {
           room_id: this.roomId,
-          pos: this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page,
+          pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
           limit: this.pageConfig.limit
         };
 
@@ -317,6 +293,8 @@
         getOnlineUserList(data).then(res => {
           if (res.code === 200) {
             this.onlineUsers = this.memberServer.state.onlineUsers || [];
+            //在线总人数
+            this.totalNum = this.memberServer.state.totalNum;
           }
         });
       },
@@ -344,9 +322,40 @@
         }
       },
       //刷新在线人数
-      refreshList() {},
+      refreshList() {
+        if (this.tabIndex === 3) {
+          this.switchToTab(3);
+        }
+        this.pageConfig.page = 0;
+        this.searchUserInput = '';
+        this.getOnlineUserList();
+      },
       //切换允许举手状态
-      onSwitchAllowRaiseHand(status) {},
+      onSwitchAllowRaiseHand(status) {
+        //todo 检测活动是否开始
+        // if (this.status != 1) {
+        //   this.allowRaiseHand = false;
+        //   this.$message.error('活动尚未开始');
+        //   return;
+        // }
+        const params = {
+          room_id: this.roomId,
+          status: status ? 1 : 0
+        };
+
+        //todo 待micServer完善方法
+        this.micServer
+          .setHandsUp(params)
+          .then(res => {
+            console.log(res);
+            //todo 上报埋点
+            this.$message.success({ message: '设置成功' });
+          })
+          .catch(err => {
+            this.allowRaiseHand = false;
+            console.log('举手状态变更失败', err);
+          });
+      },
       //切换聊天搜索框显示状态
       toggleSearchTab() {
         this.searchShow = !this.searchShow;
@@ -372,6 +381,12 @@
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
         console.log(type, params);
+      },
+      //加载更多
+      loadMore() {
+        if (this.onlineUsers.length > 100) {
+          this.getOnlineUserList(++this.pageConfig.page * 100);
+        }
       }
     }
   };
