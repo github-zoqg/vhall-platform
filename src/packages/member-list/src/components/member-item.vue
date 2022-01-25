@@ -220,10 +220,10 @@
       userId: {
         type: [Number, String]
       },
-      //是否是互动直播
+      //是否是互动直播(1是 0否)
       isInteract: {
         type: Number,
-        default: () => false
+        default: 0
       },
       isEnjoy: {
         required: false,
@@ -301,6 +301,9 @@
     padding: 2px 24px;
     color: #999999;
     line-height: 44px;
+    &:hover {
+      background-color: #2d2d2d;
+    }
     &__avatar-wrapper {
       display: inline-block;
       position: relative;
