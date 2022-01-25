@@ -13,6 +13,7 @@
         v-if="isShow"
         @submit="isShow = false"
         @showConfirm="showConfirm"
+        @closeDlg="isShow = false"
       ></media-setting>
     </saas-dialog>
 
@@ -51,13 +52,16 @@
     },
     data() {
       return {
-        isShow: true,
+        isShow: false,
         isConfirmVisible: false,
         alertText: '修改设置后会导致重新推流，是否继续保存？',
         selectedItem: 'audio-in-setting'
       };
     },
     methods: {
+      showMediaSetting() {
+        this.isShow = true;
+      },
       showConfirm(text) {
         this.alertText = text;
         this.isConfirmVisible = true;
