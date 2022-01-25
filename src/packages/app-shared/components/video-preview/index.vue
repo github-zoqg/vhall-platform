@@ -315,33 +315,6 @@
       destroy() {
         console.log('销毁点播播放器');
         this.playerServer.destroy();
-<<<<<<< HEAD:src/packages/app-shared/components/video-preview/index.vue
-      },
-      // 设置播放时间
-      setVideoCurrentTime(val) {
-        if (!this.playerServer) return;
-
-        this.playerServer.setCurrentTime(val, () => {
-          this.$message({
-            type: 'error',
-            message: '设置当前时间失败,请稍后重试'
-          });
-          console.error('设置当前播放时间失败');
-        });
-=======
->>>>>>> f4c18d3 (feat: 新增插播逻辑):src/packages/components/video-preview/index.vue
-      },
-      // 设置播放时间
-      setVideoCurrentTime(val) {
-        if (!this.playerServer) return;
-
-        this.playerServer.setCurrentTime(val, () => {
-          this.$message({
-            type: 'error',
-            message: '设置当前时间失败,请稍后重试'
-          });
-          console.error('设置当前播放时间失败');
-        });
       },
       // 设置播放时间
       setVideoCurrentTime(val) {

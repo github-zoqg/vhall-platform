@@ -390,7 +390,6 @@ export const serverConfig = {
       }
     ]
   },
-
   // 分组设置对话框
   dlgGroupSetting: {
     component: 'VmpGroupSetting'
