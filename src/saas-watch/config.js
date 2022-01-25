@@ -9,8 +9,8 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerHeader', 'layerBody', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    // children: ['layerBody']
   },
   // 顶部header容器
   layerHeader: {
@@ -51,7 +51,15 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth']
+    children: [
+      'compRegLogin',
+      'comOfficial',
+      'comShare',
+      'comWatchAuth',
+      'comSignUpForm',
+      'comUserAccount',
+      'comCash'
+    ]
   },
 
   /**** 组件定义 */
@@ -122,6 +130,12 @@ export const serverConfig = {
       isInviteShare: true //分享是否展示邀请卡
     }
   },
+  comUserAccount: {
+    component: 'VmpUserAccount'
+  },
+  comCash: {
+    component: 'VmpCash'
+  },
   // 底部
   comFooter: {
     component: 'VmpFooter',
@@ -132,7 +146,12 @@ export const serverConfig = {
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
-    component: 'VmpFooterTools'
+    component: 'VmpFooterTools',
+    //todo 后续正式的需要调整或移除，此处仅为测试配置
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
   comPraise: {
@@ -171,6 +190,11 @@ export const serverConfig = {
   //私聊组件
   comWatchPrivateChat: {
     component: 'VmpWatchPrivateChat',
+    options: {}
+  },
+  //报名表单
+  comSignUpForm: {
+    component: 'VmpSignUpForm',
     options: {}
   },
   // 登录注册组件

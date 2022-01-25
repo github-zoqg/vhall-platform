@@ -1,0 +1,86 @@
+<template>
+  <ul class="vmp-media-setting-menu">
+    <li class="vmp-media-setting-menu__title">媒体设置</li>
+    <li
+      class="vmp-media-setting-menu__item"
+      :class="{ 'vmp-media-setting-menu__item--active': selectedItem === item.id }"
+      v-for="item of menuList"
+      :key="item.id"
+      @click="onClickItem(item)"
+    >
+      {{ item.text }}
+    </li>
+  </ul>
+</template>
+
+<script>
+  import { getOptionEntity } from '../js/getOptionEntity';
+
+  export default {
+    props: {
+      selectedItem: {
+        type: String,
+        default: 'basic-setting'
+      }
+    },
+    data() {
+      return {
+        menuList: getOptionEntity()
+      };
+    },
+    methods: {
+      onClickItem(item) {
+        this.$emit('change', item.id);
+      }
+    }
+  };
+</script>
+
+<style lang="less">
+  .vmp-media-setting-menu {
+    display: flex;
+    flex-direction: column;
+
+    .vmp-media-setting-menu__title {
+      line-height: 64px;
+      margin-bottom: 0px;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: left;
+      padding-left: 24px;
+      color: #1a1a1a;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .vmp-media-setting-menu__item {
+      cursor: pointer;
+      box-sizing: border-box;
+      font-size: 14px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      padding-left: 24px;
+      user-select: none;
+
+      &:hover {
+        color: #fb3a32;
+      }
+
+      &--active {
+        color: #fb3a32;
+        background: #f7f7f7;
+        position: relative;
+
+        &::before {
+          position: absolute;
+          content: '';
+          height: 100%;
+          left: 0;
+          width: 3px;
+          background: #fb3a32;
+        }
+      }
+    }
+  }
+</style>
