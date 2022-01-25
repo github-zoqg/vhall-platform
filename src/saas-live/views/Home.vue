@@ -36,8 +36,10 @@
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         await this.initSendLive();
-        console.log(useRoomBaseServer());
         await roomState();
+        const roomBaseServer = useRoomBaseServer();
+        // 获取房间互动工具状态
+        await roomBaseServer.getInavToolStatus();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
       } catch (ex) {
@@ -47,6 +49,7 @@
         this.errMsg = ex.msg;
       }
       this.micServer = useMicServer();
+      // FIXME:测试连麦代码，由于成员列表尚未接入，成员接入后删除
       this.micServer.$on('vrtc_connect_apply', msg => {
         console.log('----dingxiaodong----收到申请上麦消息', msg);
         this.$confirm(`${msg.data.nick_name}申请上麦`, '提示', {
@@ -85,11 +88,6 @@
             clientType: 'send' //客户端类型
           }
         });
-        // 初始化房间
-        // await domainInstance.initRoom({
-        //   webinarId: id, //活动id
-        //   clientType: 'send' //客户端类型
-        // });
       }
     }
   };
