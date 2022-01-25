@@ -24,6 +24,7 @@ import VmpVirtualPeople from '@/packages/virtual-people'; // 虚拟人数弹窗
 import VmpThirdStream from '@/packages/third-push-stream';
 import VmpInsertVideo from '@/packages/insert-video';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
+import VmpGroupSetting from '@/packages/group-setting';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 
@@ -52,6 +53,7 @@ export function initUse() {
   Vue.use(VmpThirdStream);
   Vue.use(VmpInsertVideo);
   Vue.use(VmpBasicCenterContainerLive);
+  Vue.use(VmpGroupSetting);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

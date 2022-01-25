@@ -318,7 +318,6 @@
           this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
         });
 
-        //
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
           //   return;
@@ -395,6 +394,10 @@
         if (this.docServer.state.containerList.length === 0) {
           // 没有文档
           this.docServer.setDocLoadComplete();
+          // 通知默认菜单和工具栏默认为文档
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+          );
           return;
         }
         // 确定文档最外层节点显示，并且文档dom绑定ID成功
