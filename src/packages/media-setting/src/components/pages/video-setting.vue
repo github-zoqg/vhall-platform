@@ -12,11 +12,7 @@
       </section>
 
       <section v-show="selectedVideoType === 'camera'" class="vmp-media-setting-item">
-        <el-select
-          class="vmp-media-setting-item__content"
-          v-model="selectedId"
-          @change="videoChange"
-        >
+        <el-select class="vmp-media-setting-item__content" v-model="selectedVideoId">
           <el-option
             v-for="item in devices"
             :key="item.deviceId"
@@ -69,14 +65,6 @@
       devices: {
         type: Array,
         default: () => []
-      },
-      selectedId: {
-        type: String,
-        default: ''
-      },
-      selectedAudioId: {
-        type: String,
-        default: ''
       }
     },
     components: {
@@ -94,12 +82,21 @@
         roomId: null,
         interactToken: null,
 
-        videoError: false
+        videoError: false,
+        selectedVideoId: ''
       };
     },
     watch: {
-      selectedId() {
+      selectedVideoId(val) {
+        this.$emit('onSelectChange', 'video', val);
         this.createPreview();
+      },
+      devices(val) {
+        if (val && val.length) {
+          this.selectedVideoId = val[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedVideoDeviceId');
+        }
       }
     },
     beforeDestroy() {
@@ -117,12 +114,12 @@
           this.createPreview();
         }
       },
-      videoChange(val) {
-        console.log('选择视频设备ID 发生变化', val);
-        if (!val) return;
+      // videoChange(val) {
+      //   console.log('选择视频设备ID 发生变化', val);
+      //   if (!val) return;
 
-        this.createPreview();
-      },
+      //   this.createPreview();
+      // },
       // 创建视频流
       async createPreview() {
         await this.destroyStream();
@@ -134,7 +131,7 @@
           video: true,
           profile: VhallRTC.RTC_VIDEO_PROFILE_480P_16X9_M,
           mute: { audio: false, video: false },
-          videoDevice: this.selectedId
+          videoDevice: this.selectedVideoId
         };
 
         try {

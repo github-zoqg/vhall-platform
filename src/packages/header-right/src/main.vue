@@ -10,7 +10,7 @@
         class="vmp-header-right_btn vmp-header-right_duration"
         @click="handleEndClick"
       >
-        <span class="vmp-header-right_duration-text">{{ liveDuration }}</span>
+        <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
         <span class="vmp-header-right_duration-end">结束直播</span>
       </div>
       <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
@@ -20,6 +20,7 @@
           :isShowSupport="isShowSupport"
           :isShowSplitScreen="isShowSplitScreen"
           @openVirtualProple="openVirtualProple"
+          @openMediaSettings="openMediaSettings"
         ></headerControl>
       </div>
       <div class="vmp-header-right_full"><i class="iconfont iconicon_quanping"></i></div>
@@ -37,23 +38,36 @@
       return {
         liveStep: 1,
         liveDuration: '',
-        localDuration: 0,
-        roomBaseState: null,
         isShowQuit: false, //是否显示退出
         isShowSupport: false, //是否显示技术支持
         isShowSplitScreen: false //是否显示分屏
       };
+    },
+    computed: {
+      formatDuration() {
+        const temp = this.liveDuration * 1000;
+        const hours = this.$moment.duration(temp).hours();
+        const minutes = this.$moment.duration(temp).minutes();
+        const seconds = this.$moment.duration(temp).seconds();
+        return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
+          seconds < 10 ? '0' + seconds : seconds
+        }`;
+      }
     },
     components: {
       headerControl
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
-      this.roomBaseState = this.roomBaseServer.state;
       this.initConfig();
     },
     mounted() {
-      this.calculateLiveDuration();
+      const { watchInitData } = this.roomBaseServer.state;
+      if (watchInitData.webinar.type == 1) {
+        this.liveDuration = watchInitData.webinar.live_time;
+        this.calculateLiveDuration();
+        this.handleStartClick();
+      }
     },
     methods: {
       initConfig() {
@@ -62,25 +76,32 @@
           Object.assign(this.$data, widget.options);
         }
       },
+      // 打开媒体设置弹窗
+      openMediaSettings() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitMediaSettingClick'));
+      },
       // 打开虚拟人数的弹窗
       openVirtualProple() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
       },
       // 推流成功事件
       async handlePublishComplate() {
-        const res = await this.postStartLive();
-        // 开始直播成功
-        if (res.code == 200) {
-          this.liveStep = 3;
-          this.calculateLiveDuration();
+        const { watchInitData } = this.roomBaseServer.state;
+        if (watchInitData.webinar.type != 1) {
+          const res = await this.postStartLive();
+          // 开始直播成功
+          if (res.code == 200) {
+            this.liveStep = 3;
+            this.calculateLiveDuration();
+          }
         } else {
-          // TODO: 开始直播失败,将房间还原到初始化的状态
+          this.liveStep = 3;
         }
       },
       // 调开始直播接口
       postStartLive() {
         return this.roomBaseServer.startLive({
-          webinar_id: this.roomBaseState.watchInitData.webinar.id
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id
         });
       },
       // 开始直播
@@ -94,7 +115,7 @@
       async handleEndClick() {
         this.liveStep = 4;
         const res = await this.roomBaseServer.endLive({
-          webinar_id: this.roomBaseState.watchInitData.webinar.id
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id
         });
         if (res.code == 200) {
           // 派发结束直播事件
@@ -108,16 +129,8 @@
         if (this._durationInterval) {
           window.clearInterval(this._durationInterval);
         }
-        let temp = 0;
         this._durationInterval = window.setInterval(() => {
-          this.localDuration = this.localDuration + 1;
-          temp = this.localDuration * 1000;
-          const hours = this.$moment.duration(temp).hours();
-          const minutes = this.$moment.duration(temp).minutes();
-          const seconds = this.$moment.duration(temp).seconds();
-          this.liveDuration = `${hours < 10 ? '0' + hours : hours}:${
-            minutes < 10 ? '0' + minutes : minutes
-          }:${seconds < 10 ? '0' + seconds : seconds}`;
+          this.liveDuration++;
         }, 1000);
       }
     }

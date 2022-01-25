@@ -107,14 +107,14 @@
       getStreamList() {
         this.interactiveServer.getRoomStreams();
         console.log('------remoteStreams------', this.remoteStreams);
-      },
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
       }
+      // exchange(compName) {
+      //   window.$middleEventSdk?.event?.send({
+      //     cuid: 'ps.surface',
+      //     method: 'exchange',
+      //     args: [compName, 2]
+      //   });
+      // }
     }
   };
 </script>

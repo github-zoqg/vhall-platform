@@ -141,6 +141,7 @@
     methods: {
       openMediaSettings() {
         // TODO 媒体设置弹窗
+        this.$emit('openMediaSettings');
       },
       splitScreen() {
         //分屏

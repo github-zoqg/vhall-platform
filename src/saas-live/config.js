@@ -62,6 +62,7 @@ export const serverConfig = {
       'comVirtualPeople',
       'comLivePrivateChat',
       'dlgGroupSetting',
+      'comMediaSetting',
       'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
@@ -104,6 +105,12 @@ export const serverConfig = {
       {
         cuid: 'comStreamLocal',
         method: 'stopPush'
+      }
+    ],
+    emitMediaSettingClick: [
+      {
+        cuid: 'comMediaSetting',
+        method: 'showMediaSetting'
       }
     ]
   },
@@ -382,6 +389,14 @@ export const serverConfig = {
         args: ['$0', '$1']
       }
     ]
+  },
+
+  // 分组设置对话框
+  dlgGroupSetting: {
+    component: 'VmpGroupSetting'
+  },
+  comMediaSetting: {
+    component: 'VmpPcMediaSetting'
   },
   comInsertStream: {
     component: 'VmpInsertStream',

@@ -2,11 +2,7 @@
   <section>
     <main>
       <section class="vmp-media-setting-item">
-        <el-select
-          class="vmp-media-setting-item__content"
-          v-model="selectedId"
-          @change="audioInputChange"
-        >
+        <el-select class="vmp-media-setting-item__content" v-model="selectedMicId">
           <el-option
             v-for="item in devices"
             :key="item.deviceId"
@@ -19,7 +15,7 @@
         <preview-audio
           ref="previewAudio"
           class="vmp-media-setting-item__content"
-          :audioId="selectedId"
+          :audioId="selectedMicId"
         />
       </section>
     </main>
@@ -49,23 +45,29 @@
       devices: {
         type: Array,
         default: () => []
-      },
-      selectedId: {
-        type: String,
-        default: ''
       }
     },
+    data() {
+      return {
+        selectedMicId: ''
+      };
+    },
     watch: {
-      selectedId() {
+      selectedMicId(val) {
+        this.$emit('onSelectChange', 'audioInput', val);
         this.setAudioInput();
+      },
+      devices(val) {
+        if (val && val.length) {
+          this.selectedMicId = val[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedAudioDeviceId');
+        }
       }
     },
     mounted() {},
     methods: {
-      async audioInputChange(selectedId) {
-        selectedId && this.$emit('update:selectedId', selectedId);
-      },
-      async setAudioInput(id = this.selectedId) {
+      async setAudioInput(id = this.selectedMicId) {
         if (!this.$refs.previewAudio) return;
 
         const mediaOptions = { audio: { deviceId: id } };
