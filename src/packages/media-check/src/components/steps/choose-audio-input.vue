@@ -44,7 +44,7 @@
 </template>
 
 <script>
-  import PreviewAudio from '../preview-audio.vue';
+  import PreviewAudio from '@/packages/volume-preview/src/main.vue';
 
   export default {
     name: 'choose-audio-input',
