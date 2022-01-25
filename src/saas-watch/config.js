@@ -9,8 +9,8 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerHeader', 'layerBody', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    // children: ['layerBody']
   },
   // 顶部header容器
   layerHeader: {
