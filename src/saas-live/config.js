@@ -390,6 +390,7 @@ export const serverConfig = {
       }
     ]
   },
+<<<<<<< HEAD
 
   // 分组设置对话框
   dlgGroupSetting: {
@@ -398,6 +399,8 @@ export const serverConfig = {
   comMediaSetting: {
     component: 'VmpPcMediaSetting'
   },
+=======
+>>>>>>> f4c18d3 (feat: 新增插播逻辑)
   comInsertStream: {
     component: 'VmpInsertStream',
     emitClose: [
