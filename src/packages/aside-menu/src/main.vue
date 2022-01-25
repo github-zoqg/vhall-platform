@@ -10,6 +10,7 @@
   </div>
 </template>
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpAsideMenu',
     methods: {
@@ -21,10 +22,7 @@
         }
       },
       goWatchShare() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitShareClick'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShareClick'));
       }
     }
   };
