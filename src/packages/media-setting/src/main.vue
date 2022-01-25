@@ -9,7 +9,11 @@
       @onReturn="isShow = false"
       @onClose="isShow = false"
     >
-      <media-setting v-if="isShow" @showConfirm="showConfirm"></media-setting>
+      <media-setting
+        v-if="isShow"
+        @submit="isShow = false"
+        @showConfirm="showConfirm"
+      ></media-setting>
     </saas-dialog>
 
     <!-- 弹窗容器 -->

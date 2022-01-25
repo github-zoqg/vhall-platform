@@ -79,8 +79,11 @@
           this.showDelImg = true;
           this.$emit('update:canvasImgUrl', res.data.domain_url);
           this.canvasImgUrlChange = true;
-          console.log('上传成功');
-          this.$message.success('上传成功');
+
+          // 等待图片更换完毕，一秒再弹出，动画效果较好
+          setTimeout(() => {
+            this.$message.success('上传成功');
+          }, 1000);
         } else {
           this.$message.error(res.msg);
         }

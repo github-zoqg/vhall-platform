@@ -49,6 +49,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
+      // 'comCustomMenu',
       'comMemberList'
       // 'comChat'
     ]
@@ -182,6 +183,9 @@ export const serverConfig = {
         enable: true
       }
     }
+  },
+  comCustomMenu: {
+    component: 'VmpCustomMenu'
   },
   //成员列表组件
   comMemberList: {

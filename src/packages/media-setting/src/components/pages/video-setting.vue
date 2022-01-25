@@ -27,7 +27,14 @@
       </section>
 
       <section v-show="selectedVideoType === 'camera'" class="vmp-media-setting-video-canvas">
-        <div id="vmp-media-setting-preview-video"></div>
+        <div id="vmp-media-setting-preview-video" style="height: 100%"></div>
+        <div
+          v-show="isVideoSwitching || isVideoError"
+          class="vmp-media-setting-preview-loading-container"
+        >
+          <img :src="videoLoadingImg" alt="" />
+          <p>{{ videoTipsText }}</p>
+        </div>
       </section>
 
       <section v-show="selectedVideoType === 'picture'">
@@ -49,6 +56,8 @@
 
 <script>
   import canvasDefaultImg from '../../assets/img/canvasDefault.png';
+  import videoSwitchImg from '@/packages/app-shared/assets/img/video.gif';
+  import videoFailImg from '@/packages/app-shared/assets/img/videoFailed.png';
   import PictureUploader from '../picture-uploader.vue';
 
   export default {
@@ -76,10 +85,12 @@
     data() {
       return {
         selectedVideoType: 'camera', // camera or picture
+        videoLoadingImg: videoSwitchImg,
         localStreamId: '',
         canvasImgUrl: canvasDefaultImg,
-        isSwitching: false,
-
+        isVideoSwitching: false,
+        isVideoError: false,
+        videoTipsText: '设备切换中，请稍后…',
         roomId: null,
         interactToken: null,
 
@@ -127,13 +138,15 @@
         };
 
         try {
-          this.isSwitching = true;
+          this.videoError = false;
+          this.isVideoSwitching = true;
           const streamId = await this.mediaCheckServer.startVideoPreview(options);
           this.localStreamId = streamId;
-          this.isSwitching = false;
+          this.isVideoSwitching = false;
         } catch (err) {
-          this.isSwitching = false;
+          this.isVideoSwitching = false;
           this.videoError = true;
+          this.videoTipsText = '摄像头切换失败，请稍后重试';
           this.$message.error(`创建本地预览流失败，请检查设备`);
           console.error(`创建本地预览流失败`, err);
         }
@@ -149,6 +162,7 @@
       },
       //TODO: let stream save
       saveStream() {},
+      uploadSuccessCanvas() {},
       updateDeviceSetting() {}
     }
   };
@@ -159,5 +173,30 @@
     height: 166px;
     border-radius: 4px;
     overflow: hidden;
+    position: relative;
+
+    .vmp-media-setting-preview-loading-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        flex: 0 0 auto;
+      }
+
+      p {
+        padding-top: 10px;
+        font-size: 12px;
+        color: #ffffff;
+        line-height: 20px;
+      }
+    }
   }
 </style>

@@ -126,9 +126,14 @@
       },
       saveSetting() {
         // TODO: 开播才弹出对话框  if(status=== 1)
-        this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
+        // this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
+        this.updateDeviceSetting();
       },
-      updateDeviceSetting() {},
+      updateDeviceSetting() {
+        // 这里发送事件通知 stream 变化
+        alert('test');
+        this.$emit('submit', false);
+      },
       async getVideoDeviceInfo() {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         stream.getTracks().forEach(trackInput => trackInput.stop());
@@ -171,10 +176,16 @@
         }
       },
       saveSelected() {
-        sessionStorage.setItem('selectedVideoDeviceId', this.selected.video);
-        sessionStorage.setItem('selectedAudioDeviceId', this.selected.audioInput);
-        sessionStorage.setItem('selectedAudioOutputDeviceId', this.selected.audioInput);
-        sessionStorage.setItem('layout', this.selected.layout);
+        const saveMap = new Map([
+          ['selectedVideoDeviceId', this.selected.video],
+          ['selectedAudioDeviceId', this.selected.audioInput],
+          ['selectedAudioOutputDeviceId', this.selected.audioInput],
+          ['layout', this.selected.layout]
+        ]);
+
+        for (const [key, value] of saveMap) {
+          sessionStorage.setItem(key, value);
+        }
       }
     }
   };
@@ -182,6 +193,10 @@
 
 <style lang="less">
   .vmp-media-setting-dialog-body {
+    .el-radio__input.is-checked + .el-radio__label {
+      color: #606266;
+    }
+
     background: #fff;
     display: flex;
     // height: 100%;

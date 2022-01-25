@@ -20,6 +20,7 @@ import VmpStreamRemote from '@/packages/stream-remote';
 import VmpMediaCheck from '@/packages/media-check';
 import VmpMemberList from '@/packages/member-list';
 import VmpMediaSetting from '@/packages/media-setting';
+import VmpCustomMenu from '@/packages/custom-menu';
 
 // 全局注册组件
 export function initUse() {
@@ -42,4 +43,5 @@ export function initUse() {
   Vue.use(VmpMediaCheck);
   Vue.use(VmpMemberList);
   Vue.use(VmpMediaSetting);
+  Vue.use(VmpCustomMenu);
 }
