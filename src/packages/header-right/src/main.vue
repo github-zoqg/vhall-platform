@@ -20,6 +20,7 @@
           :isShowSupport="isShowSupport"
           :isShowSplitScreen="isShowSplitScreen"
           @openVirtualProple="openVirtualProple"
+          @openMediaSettings="openMediaSettings"
         ></headerControl>
       </div>
       <div class="vmp-header-right_full"><i class="iconfont iconicon_quanping"></i></div>
@@ -48,11 +49,6 @@
         const hours = this.$moment.duration(temp).hours();
         const minutes = this.$moment.duration(temp).minutes();
         const seconds = this.$moment.duration(temp).seconds();
-        console.log(
-          `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
-            seconds < 10 ? '0' + seconds : seconds
-          }`
-        );
         return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
           seconds < 10 ? '0' + seconds : seconds
         }`;
@@ -79,6 +75,10 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
+      },
+      // 打开媒体设置弹窗
+      openMediaSettings() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitMediaSettingClick'));
       },
       // 打开虚拟人数的弹窗
       openVirtualProple() {

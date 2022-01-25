@@ -17,18 +17,17 @@
           v-show="selectedItem === 'video-setting'"
           :mediaCheckServer="mediaCheckServer"
           :devices="devices.videoInputDevices"
-          :selectedId.sync="selected.video"
-          :selectedAudioId="selected.audioInput"
+          @onSelectChange="onSelectChange"
         />
         <audio-in-setting
           v-show="selectedItem === 'audio-in-setting'"
           :devices="devices.audioInputDevices"
-          :selectedId.sync="selected.audioInput"
+          @onSelectChange="onSelectChange"
         />
         <audio-out-setting
           v-show="selectedItem === 'audio-out-setting'"
           :devices="devices.audioOutputDevices"
-          :selectedId.sync="selected.audioOutput"
+          @onSelectChange="onSelectChange"
         />
       </main>
 
@@ -43,7 +42,7 @@
         </a>
         <section>
           <el-button size="small" type="primary" @click="saveSetting">确定</el-button>
-          <el-button size="small">取消</el-button>
+          <el-button @click="clickClose" size="small">取消</el-button>
         </section>
       </footer>
     </section>
@@ -108,7 +107,13 @@
       this.restart();
     },
     methods: {
+      onSelectChange(type, val) {
+        this.selected[type] = val;
+      },
       // action
+      clickClose() {
+        this.$emit('closeDlg');
+      },
       deviceChange() {},
       changeSelectedItem(id) {
         console.log('on click on lick', id);
@@ -152,28 +157,6 @@
 
         // 获取扬声器
         await this.mediaCheckServer.getSpeakers(item => item.label);
-
-        this.setDefaultSelected();
-      },
-      setDefaultSelected() {
-        // 设置默认选项
-        if (this.devices.videoInputDevices.length > 0) {
-          this.selected.video = this.devices.videoInputDevices[0].deviceId;
-        } else {
-          sessionStorage.removeItem('selectedVideoDeviceId');
-        }
-
-        if (this.devices.audioInputDevices.length > 0) {
-          this.selected.audioInput = this.devices.audioInputDevices[0].deviceId;
-        } else {
-          sessionStorage.removeItem('selectedAudioDeviceId');
-        }
-
-        if (this.devices.audioOutputDevices.length > 0) {
-          this.selected.audioOutput = this.devices.audioOutputDevices[0].deviceId;
-        } else {
-          sessionStorage.removeItem('selectedAudioOutputDeviceId');
-        }
       },
       saveSelected() {
         const saveMap = new Map([

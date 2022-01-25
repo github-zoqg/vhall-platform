@@ -11,7 +11,7 @@
       <section class="vmp-media-setting-item">
         <el-select
           class="vmp-media-setting-item__content"
-          v-model="selectedId"
+          v-model="selectedAudioId"
           @change="audioOutputChange"
         >
           <el-option
@@ -65,10 +65,6 @@
       devices: {
         type: Array,
         default: () => []
-      },
-      selectedId: {
-        type: String,
-        default: ''
       }
     },
     data() {
@@ -76,13 +72,21 @@
         isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
         speakerReady: false,
         isPaused: true,
-        volume: 0.5
+        volume: 0.5,
+        selectedAudioId: ''
       };
     },
     watch: {
       volume(value) {
         if (!this.$refs.outputAudioPlayer) return;
         this.$refs.outputAudioPlayer.volume = value;
+      },
+      devices(val) {
+        if (val && val.length) {
+          this.selectedAudioId = val[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedAudioOutputDeviceId');
+        }
       }
     },
     mounted() {
@@ -106,13 +110,12 @@
       playAudio: debounce(function () {
         if (!this.$refs.outputAudioPlayer) return;
         if (!this.isPaused) return this.$refs.outputAudioPlayer.pause();
-        if (!this.selectedId && !this.isSafari) return this.$message.warning('无可用的扬声器');
+        if (!this.selectedAudioId && !this.isSafari) return this.$message.warning('无可用的扬声器');
         this.$refs.outputAudioPlayer.play();
         this.speakerReady = true;
       }, 500),
-      audioOutputChange(selectedId) {
-        this.$emit('update:selectedId', selectedId);
-
+      audioOutputChange() {
+        this.$emit('onSelectChange', 'audioOutput', this.selectedAudioId);
         const audioPlayer = this.$refs.outputAudioPlayer;
         if (!audioPlayer) return;
 
@@ -120,7 +123,7 @@
           console.warn('Browser does not support output device selection.');
         } else {
           audioPlayer
-            .setSinkId(this.selectedId)
+            .setSinkId(this.selectedAudioId)
             .then(() => {})
             .catch(error => {
               let errorMessage = error;
