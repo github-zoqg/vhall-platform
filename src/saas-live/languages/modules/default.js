@@ -36,7 +36,8 @@ export const zh = {
     aside_menu_1004: '聊天',
     aside_menu_1005: '数据',
     aside_menu_1006: '分享',
-    aside_menu_1007: '成员'
+    aside_menu_1007: '成员',
+    aside_menu_1008: '分组讨论'
   },
   setting_icon: {
     setting_icon_1000: '设置'
@@ -89,7 +90,8 @@ export const en = {
     aside_menu_1004: '聊天',
     aside_menu_1005: '数据',
     aside_menu_1006: '分享',
-    aside_menu_1007: '成员'
+    aside_menu_1007: '成员',
+    aside_menu_1008: 'group talk'
   },
   setting_icon: {
     setting_icon_1000: '设置'

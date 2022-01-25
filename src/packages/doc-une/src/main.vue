@@ -152,8 +152,6 @@
           (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus)
         );
       }
-
-      // switchStatus=false && clientType=''
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
@@ -185,9 +183,19 @@
           console.log('当前已经是该模式，无需设置');
           return;
         }
-        this.displayMode = mode;
-        if (this.displayMode === 'mini') {
-          this.thumbnailShow = false;
+        //缩略图列表隐藏
+        this.thumbnailShow = false;
+
+        if (this.displayMode === 'fullscreen') {
+          // 全屏模式转其它模式
+          this.fullscreen();
+          screenfull.targetMode = mode;
+        } else if (mode === 'fullscreen') {
+          // 其它模式转全屏模式
+          this.fullscreen();
+        } else {
+          // 非全屏模式互转
+          this.displayMode = mode;
         }
         await this.$nextTick();
         // 文档大小的改变，会自动触发 erd.listenTo 事件;
@@ -230,7 +238,7 @@
           h = height;
         }
         this.docViewRect = { width: w, height: h };
-        console.log('[doc] this.docViewRect:', this.docViewRect);
+        // console.log('[doc] this.docViewRect:', this.docViewRect);
         if (this.docServer.state.currentCid) {
           this.docServer.setSize(w, h);
         }
@@ -245,11 +253,11 @@
 
         // 全屏/退出全屏事件
         screenfull.onchange(() => {
-          console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+          // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {
-            this.displayMode = 'normal';
+            this.displayMode = screenfull.targetMode || 'normal';
           }
         });
 
@@ -297,10 +305,6 @@
           }
         });
 
-        this.msgServer.$on('DOC_MSG', msg => {
-          console.log('------DOC_MSG-----文档消息：', msg);
-        });
-
         this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
           if (this.isWatch && !this.showInWatch) return;
           // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
@@ -314,7 +318,6 @@
           this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
         });
 
-        //
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
           //   return;
@@ -391,6 +394,10 @@
         if (this.docServer.state.containerList.length === 0) {
           // 没有文档
           this.docServer.setDocLoadComplete();
+          // 通知默认菜单和工具栏默认为文档
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+          );
           return;
         }
         // 确定文档最外层节点显示，并且文档dom绑定ID成功
