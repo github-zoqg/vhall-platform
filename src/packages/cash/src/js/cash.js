@@ -10,7 +10,7 @@ export default {
         this.cashCaptVo.btnCtrl_bind = 'disabled'; // 验证失败，禁用
         callback(new Error(this.$t('account.account_1025')));
       } else {
-        if (!(/^1[0-9]{10}$/.test(value))) {
+        if (!/^1[0-9]{10}$/.test(value)) {
           this.cashCaptVo.btnCtrl_bind = 'disabled'; // 验证失败，禁用
           callback(new Error(this.$t('account.account_1069')));
         } else {
@@ -31,7 +31,7 @@ export default {
       }
     };
     const validateMoney = (rule, value, callback) => {
-      if (!(/^\d+$|^\d*\.\d+$/g.test(value))) {
+      if (!/^\d+$|^\d*\.\d+$/g.test(value)) {
         callback(new Error(this.$t('cash.cash_1030')));
       } else {
         if (value < 1) {
@@ -53,7 +53,7 @@ export default {
       }
     };
     return {
-      dialogVisible: true,
+      dialogVisible: false,
       isAllowCash: true, // 是否允许提现，默认不允许提现
       cashProcess: false, // 是否处于-提现中状态，默认当前未处于提现中
       step: 0, // 0 表示列表；1 表示当前账号未绑定手机号；2 表示已绑手机号&未设置提现微信号&未授权登录微信号 <=> 已绑手机号&未未设置提现微信号 ；3 表示 已绑手机号&已设提现微信号
@@ -68,12 +68,8 @@ export default {
         scene_id: 2
       },
       bindFormRules: {
-        phone: [
-          { required: true, validator: validatePhone, trigger: 'blur' }
-        ],
-        code: [
-          { required: true, validator: validateCaptchas, trigger: 'blur' }
-        ]
+        phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
+        code: [{ required: true, validator: validateCaptchas, trigger: 'blur' }]
       },
       cashCaptVo: {
         capDom_bind: '', // 云盾实例（当前账号未绑定手机号）
@@ -107,12 +103,8 @@ export default {
         scene_id: 6
       },
       cashFormRules: {
-        code: [
-          { required: true, validator: validateCaptchas, trigger: 'blur' }
-        ],
-        money: [
-          { validator: validateMoney, trigger: 'blur' }
-        ]
+        code: [{ required: true, validator: validateCaptchas, trigger: 'blur' }],
+        money: [{ validator: validateMoney, trigger: 'blur' }]
       },
       cashUserInfo: {},
       accountVo: {},
@@ -129,20 +121,23 @@ export default {
   methods: {
     // ...mapMutations('watchBase', ['setUserInfo']),
     getUserInfo() {
-      return this.$vhallapi.nav.getInfo({
-        scene_id: 2
-      }).then(res => {
-        if (res && res.code == 200) {
-          // this.setUserInfo(res.data); TODO
-          this.accountVo = res.data;
-        } else {
-          console.log(res);
+      return this.$vhallapi.nav
+        .getInfo({
+          scene_id: 2
+        })
+        .then(res => {
+          if (res && res.code == 200) {
+            // this.setUserInfo(res.data); TODO
+            this.accountVo = res.data;
+          } else {
+            console.log(res);
+            // this.setUserInfo(null); TODO
+          }
+        })
+        .catch(e => {
+          console.log(e);
           // this.setUserInfo(null); TODO
-        }
-      }).catch(e => {
-        console.log(e);
-        // this.setUserInfo(null); TODO
-      });
+        });
     },
     initComp() {
       console.log('每次提现进入当前... ...');
@@ -151,22 +146,27 @@ export default {
       this.withdrawRpList();
     },
     getIncomeInfo() {
-      this.$vhallapi.nav.incomeInfo({
-      }).then(res => {
-        // res.data.red_packet_income = '5.0'
-        this.incomeVo = res && res.code == 200 ? res.data || {} : {};
-      }).catch(res => {
-        this.incomeVo = {
-          // red_packet_income: '5.0'
-        };
-      });
+      this.$vhallapi.nav
+        .incomeInfo({})
+        .then(res => {
+          // res.data.red_packet_income = '5.0'
+          this.incomeVo = res && res.code == 200 ? res.data || {} : {};
+        })
+        .catch(res => {
+          this.incomeVo = {
+            // red_packet_income: '5.0'
+          };
+        });
     },
     withdrawRpList() {
-      this.$vhallapi.nav.withdrawRpList({}).then(res => {
-        this.dataList = res && res.code == 200 ? res.data.list || [] : [];
-      }).catch(res => {
-        this.dataList = [];
-      });
+      this.$vhallapi.nav
+        .withdrawRpList({})
+        .then(res => {
+          this.dataList = res && res.code == 200 ? res.data.list || [] : [];
+        })
+        .catch(res => {
+          this.dataList = [];
+        });
     },
     async checkPhoneToWx() {
       await this.getUserInfo();
@@ -176,7 +176,8 @@ export default {
           console.log('手机号未绑定进入... ...');
           // 若手机号未绑定
           this.step = 1;
-          this.$nextTick(() => { // 初始化网易云盾-图片验证码
+          this.$nextTick(() => {
+            // 初始化网易云盾-图片验证码
             this.callCaptcha('bindForm');
           });
         } else if (data && data.is_oauth == 1) {
@@ -215,7 +216,8 @@ export default {
             this.cashCaptVo.codeErr_cash = '';
             this.cashCaptVo.btnCtrl_cash = 'disabled';
             this.cashCaptVo.sendCode_cash = false; // 是
-            const autoMoney = this.incomeVo.red_packet_balance <= 800 ? this.incomeVo.red_packet_balance : 800;
+            const autoMoney =
+              this.incomeVo.red_packet_balance <= 800 ? this.incomeVo.red_packet_balance : 800;
             this.cashForm.money = autoMoney;
             this.cashForm.code = '';
           }
@@ -225,7 +227,8 @@ export default {
       } finally {
         // 已绑定过微信
         this.step = 3;
-        this.$nextTick(() => { // 初始化网易云盾-图片验证码
+        this.$nextTick(() => {
+          // 初始化网易云盾-图片验证码
           this.callCaptcha('cashForm');
         });
       }
@@ -316,33 +319,49 @@ export default {
         }
       }
       const fName = formName == 'cashForm' ? 'withdrawSendCode' : 'sendCode';
-      const params = formName == 'cashForm' ? {
-        captcha: this.cashCaptVo[successMsgCodeKey],
-        user_type: 2
-      } : {
-        type: 1, // 手机
-        data: this[formName].phone,
-        validate: this.cashCaptVo[successMsgCodeKey],
-        scene_id: this[formName].scene_id
-      };
-      this.$vhallapi.nav[fName](params).then(res => {
-        if (res && res.code == 200) {
-          this.cashCaptVo[btnCtrlKey] = 'pending';
-          this.cashCaptVo[sendCodeDisabledKey] = true;
-          if (this.cashCaptVo[timeIntervalKey]) clearInterval(this.cashCaptVo[timeIntervalKey]);
-          this.cashCaptVo[timeIntervalKey] = setInterval(() => {
-            if (this.cashCaptVo[timeKey] > 0) {
-              this.cashCaptVo[timeKey]--;
-            } else {
-              clearInterval(this.cashCaptVo[timeIntervalKey]);
-              this.cashCaptVo[sendCodeDisabledKey] = false;
-              this.cashCaptVo[timeKey] = 60;
-              this.cashCaptVo[btnCtrlKey] = 'start';
+      const params =
+        formName == 'cashForm'
+          ? {
+              captcha: this.cashCaptVo[successMsgCodeKey],
+              user_type: 2
             }
-          }, 1000);
-        } else {
+          : {
+              type: 1, // 手机
+              data: this[formName].phone,
+              validate: this.cashCaptVo[successMsgCodeKey],
+              scene_id: this[formName].scene_id
+            };
+      this.$vhallapi.nav[fName](params)
+        .then(res => {
+          if (res && res.code == 200) {
+            this.cashCaptVo[btnCtrlKey] = 'pending';
+            this.cashCaptVo[sendCodeDisabledKey] = true;
+            if (this.cashCaptVo[timeIntervalKey]) clearInterval(this.cashCaptVo[timeIntervalKey]);
+            this.cashCaptVo[timeIntervalKey] = setInterval(() => {
+              if (this.cashCaptVo[timeKey] > 0) {
+                this.cashCaptVo[timeKey]--;
+              } else {
+                clearInterval(this.cashCaptVo[timeIntervalKey]);
+                this.cashCaptVo[sendCodeDisabledKey] = false;
+                this.cashCaptVo[timeKey] = 60;
+                this.cashCaptVo[btnCtrlKey] = 'start';
+              }
+            }, 1000);
+          } else {
+            this.$message({
+              message: this.$tec(res.code) || res.msg,
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+            this.cashCaptVo[btnCtrlKey] = 'disabled';
+            // 图片验证码重置
+            this.callCaptcha(formName, `${keyName}`);
+          }
+        })
+        .catch(res => {
           this.$message({
-            message: this.$tec(res.code) || res.msg,
+            message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
             showClose: true,
             type: 'error',
             customClass: 'zdy-info-box'
@@ -350,88 +369,83 @@ export default {
           this.cashCaptVo[btnCtrlKey] = 'disabled';
           // 图片验证码重置
           this.callCaptcha(formName, `${keyName}`);
-        }
-      }).catch(res => {
-        this.$message({
-          message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
-          showClose: true,
-          type: 'error',
-          customClass: 'zdy-info-box'
         });
-        this.cashCaptVo[btnCtrlKey] = 'disabled';
-        // 图片验证码重置
-        this.callCaptcha(formName, `${keyName}`);
-      });
     },
     cashPhoneToWx() {
-      this.$refs.bindForm.validate((valid) => {
+      this.$refs.bindForm.validate(valid => {
         if (valid) {
           // 先验证验证码结果，再实际绑定为新手机号
-          this.useUserServer.codeCheck({
-            type: 1,
-            data: this.bindForm.phone,
-            code: this.bindForm.code,
-            scene_id: this.bindForm.scene_id
-          }).then(res => {
-            if (res && res.code == 200 && res.data.check_result > 0) {
-              this.cashCaptVo.checkKey_bind = res.data.key;
-              this.bindPhoneSave('bindForm');
-            } else {
+          this.useUserServer
+            .codeCheck({
+              type: 1,
+              data: this.bindForm.phone,
+              code: this.bindForm.code,
+              scene_id: this.bindForm.scene_id
+            })
+            .then(res => {
+              if (res && res.code == 200 && res.data.check_result > 0) {
+                this.cashCaptVo.checkKey_bind = res.data.key;
+                this.bindPhoneSave('bindForm');
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg || this.$t('cash.cash_1033'),
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            })
+            .catch(res => {
+              console.log(res);
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('cash.cash_1033'),
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
-            }
-          }).catch(res => {
-            console.log(res);
-            this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
-              showClose: true,
-              type: 'error',
-              customClass: 'zdy-info-box'
             });
-          });
         }
       });
     },
     // 设置手机号 / 修改手机号 =>> （绑定）
     bindPhoneSave(formName) {
       // 确认绑定新功能
-      this.$vhallapi.nav.bindInfo({
-        type: 1,
-        account: this[formName].phone,
-        code: this[formName].code,
-        scene_id: this[formName].scene_id,
-        key: this.cashCaptVo.checkKey_bind
-      }).then(res => {
-        if (res && res.code == 200) {
-          this.$message({
-            message: this.$t('account.account_1053'),
-            showClose: true,
-            type: 'success',
-            customClass: 'zdy-info-box'
-          });
-          // 继续下一步鉴权判断
-          this.checkPhoneToWx();
-        } else {
+      this.$vhallapi.nav
+        .bindInfo({
+          type: 1,
+          account: this[formName].phone,
+          code: this[formName].code,
+          scene_id: this[formName].scene_id,
+          key: this.cashCaptVo.checkKey_bind
+        })
+        .then(res => {
+          if (res && res.code == 200) {
+            this.$message({
+              message: this.$t('account.account_1053'),
+              showClose: true,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+            // 继续下一步鉴权判断
+            this.checkPhoneToWx();
+          } else {
+            this.$message({
+              message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          }
+        })
+        .catch(res => {
+          console.log(res);
           this.$message({
             message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
             showClose: true,
             type: 'error',
             customClass: 'zdy-info-box'
           });
-        }
-      }).catch(res => {
-        console.log(res);
-        this.$message({
-          message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
-          showClose: true,
-          type: 'error',
-          customClass: 'zdy-info-box'
         });
-      });
     },
     // 跳转微信扫码绑定布局
     toCodeWxPanel(type) {
@@ -442,43 +456,46 @@ export default {
     goBangWeixin(type) {
       const that = this;
       // 获取key值
-      this.$vhallapi.nav.getBindKey({}).then(res => {
-        if (res.code == 200) {
-          // this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${process.env.VUE_APP_WAP_WATCH}/lives/forceBinding/${res.data.mark}`
-          const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
-          this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
-          console.log(`二维码请求地址：${this.qrcode}`);
-          that.startPolling(type);
-          if (this.cashTimer) {
-            console.log('之前存在计时器，清除');
-            clearTimeout(this.cashTimer);
-          }
-          this.cashTimer = setTimeout(function() {
-            clearTimeout(that.cashTimer);
-            // 若未得到理想轮询结果，到时间后自动停止轮询
-            that.stopPolling();
-            // 若当前还停留在第二步，二维码自动更新
-            if (that.step == 2) {
-              // 重新展示二维码
+      this.$vhallapi.nav
+        .getBindKey({})
+        .then(res => {
+          if (res.code == 200) {
+            // this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${process.env.VUE_APP_WAP_WATCH}/lives/forceBinding/${res.data.mark}`
+            const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
+            this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
+            console.log(`二维码请求地址：${this.qrcode}`);
+            that.startPolling(type);
+            if (this.cashTimer) {
+              console.log('之前存在计时器，清除');
+              clearTimeout(this.cashTimer);
             }
-          }, 60000);
-        } else {
+            this.cashTimer = setTimeout(function () {
+              clearTimeout(that.cashTimer);
+              // 若未得到理想轮询结果，到时间后自动停止轮询
+              that.stopPolling();
+              // 若当前还停留在第二步，二维码自动更新
+              if (that.step == 2) {
+                // 重新展示二维码
+              }
+            }, 60000);
+          } else {
+            this.$message({
+              message: this.$tec(res.code) || res.msg || '获取信息失败',
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          }
+        })
+        .catch(res => {
           this.$message({
             message: this.$tec(res.code) || res.msg || '获取信息失败',
             showClose: true,
             type: 'error',
             customClass: 'zdy-info-box'
           });
-        }
-      }).catch(res => {
-        this.$message({
-          message: this.$tec(res.code) || res.msg || '获取信息失败',
-          showClose: true,
-          type: 'error',
-          customClass: 'zdy-info-box'
+          console.log(res);
         });
-        console.log(res);
-      });
       console.log(this.qrcode);
     },
     checkWithDrawal() {
@@ -504,7 +521,7 @@ export default {
       const that = this;
       const id = this.pollingTimerId++;
       this.pollingTimerVo[id] = true;
-      const pollingFn = async function() {
+      const pollingFn = async function () {
         // 若发现setTimeout存在，即退出
         if (!that.pollingTimerVo[id]) return;
         const bindData = await that.withdrawIsBind(type); // 模拟请求
@@ -587,40 +604,43 @@ export default {
       }
     },
     cashFormSubmit() {
-      this.$refs.cashForm.validate((valid) => {
+      this.$refs.cashForm.validate(valid => {
         if (valid) {
-          this.$vhallapi.nav.withdraw({
-            verification_code: this.cashForm.code,
-            fee: this.cashForm.money,
-            type: 1,
-            user_type: 2
-          }).then(res => {
-            if (res && res.code == 200) {
-              this.$message({
-                message: this.$t('cash.cash_1036'),
-                showClose: true,
-                type: 'success',
-                customClass: 'zdy-info-box'
-              });
-              this.closeDialog();
-              this.initComp();
-            } else {
+          this.$vhallapi.nav
+            .withdraw({
+              verification_code: this.cashForm.code,
+              fee: this.cashForm.money,
+              type: 1,
+              user_type: 2
+            })
+            .then(res => {
+              if (res && res.code == 200) {
+                this.$message({
+                  message: this.$t('cash.cash_1036'),
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+                this.closeDialog();
+                this.initComp();
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            })
+            .catch(res => {
+              console.log(res);
               this.$message({
                 message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
-            }
-          }).catch(res => {
-            console.log(res);
-            this.$message({
-              message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
-              showClose: true,
-              type: 'error',
-              customClass: 'zdy-info-box'
             });
-          });
         }
       });
     },
@@ -642,7 +662,7 @@ export default {
     }
   },
   filters: {
-    splitLenStr: function(name, len) {
+    splitLenStr: function (name, len) {
       return name && name.length > len ? name.substring(0, len) + '...' : name;
     }
   },
