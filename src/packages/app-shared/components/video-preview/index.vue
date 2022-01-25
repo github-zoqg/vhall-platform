@@ -7,8 +7,8 @@
       element-loading-background="rgba(0,0,0,.9)"
     >
       <div :id="'videoDom' + timestamp" class="vmp-video-preview-wrap-container">
-        <div class="vmp-video-preview-wrap-tips">
-          <div class="vmp-video-img" v-if="isAudio">
+        <div class="vmp-video-preview-wrap-tips" v-if="isAudio">
+          <div class="vmp-video-img">
             <img class="audio-img" :src="audioImg" alt="" />
           </div>
         </div>
@@ -37,7 +37,7 @@
                   {{ currentTime | secondToDate }}
                 </span>
                 <span>/</span>
-                <span class="vmp--all-time">{{ totalTime | secondToDate }}</span>
+                <span>{{ totalTime | secondToDate }}</span>
               </div>
             </div>
             <div class="vmp-video-preview-wrap-controller-icons-right">
@@ -73,10 +73,13 @@
                   <i @click="$emit('openInsert')" class="iconfont iconchaboliebiao_icon"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="关闭插播">
-                  <i @click="closeInsertvideo" class="iconfont iconguanbichabo_icon"></i>
+                  <i @click="$emit('closeInsertvideo')" class="iconfont iconguanbichabo_icon"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="隐藏">
-                  <i @click="hideInsertVideoControl" class="iconfont iconshouqibofangqi_icon"></i>
+                  <i
+                    @click="$emit('hideInsertVideoControl')"
+                    class="iconfont iconshouqibofangqi_icon"
+                  ></i>
                 </el-tooltip>
               </template>
             </div>
@@ -155,6 +158,9 @@
     methods: {
       initPlayer() {
         this.initSDK().then(() => {
+          if (this.isInsertVideoPreview) {
+            this._firstInit = true;
+          }
           this.totalTime = this.playerServer.getDuration(() => {
             console.log('获取总时间失败');
           }); // 获取视频总时长
@@ -284,16 +290,31 @@
         };
       },
       jingYin() {
-        console.log('静音');
+        if (this.isMute) {
+          this.voice = this._cacheVolume;
+          this.isMute = false;
+          this.playerServer.setVolume(this.voice);
+        } else {
+          this._cacheVolume = this.voice;
+          this.voice = 1;
+          this.isMute = true;
+          this.playerServer.setVolume(this.voice);
+        }
       },
       setVoice() {
-        console.log('yinl音量');
-      },
-      exitFullscreen() {
-        console.log('进入全屏');
+        this.playerServer.setVolume(this.voice);
       },
       enterFullscreen() {
-        console.log('退出全屏');
+        this.isFullscreen = true;
+        this.playerServer.enterFullScreen();
+      },
+      exitFullscreen() {
+        this.isFullscreen = false;
+        this.playerServer.exitFullScreen();
+      },
+      destroy() {
+        console.log('销毁点播播放器');
+        this.playerServer.destroy();
       },
       // 设置播放时间
       setVideoCurrentTime(val) {
@@ -353,6 +374,11 @@
           },
           true
         );
+      }
+    },
+    beforeDestroy() {
+      if (this.playerServer) {
+        this.playerServer.destroy();
       }
     }
   };
@@ -515,12 +541,19 @@
                 }
               }
             }
+            .iconchaboliebiao_icon,
+            .iconguanbichabo_icon {
+              margin-left: 12px;
+            }
             .iconfont {
               cursor: pointer;
             }
           }
         }
       }
+    }
+    .vhallPlayer-container {
+      display: none !important;
     }
   }
 </style>

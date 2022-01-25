@@ -42,7 +42,7 @@
             <ul>
               <li class="insert-list-header">
                 <p class="insert-header-item0"></p>
-                <p class="insert-header-item">音视频名称</p>
+                <p class="insert-header-item insert-header-item1">音视频名称</p>
                 <p class="insert-header-item">上传时间</p>
                 <p class="insert-header-item">时长</p>
                 <p class="insert-header-item">进度</p>
@@ -56,7 +56,11 @@
               >
                 <li v-for="video in tableData" :key="video.id">
                   <p class="insert-header-item0">
-                    <img src="./images/playing.gif" alt="" v-if="video.type" />
+                    <img
+                      src="./images/playing.gif"
+                      alt=""
+                      v-if="playingInsertVideoId == video.id"
+                    />
                   </p>
                   <p class="insert-header-item">
                     <i
@@ -117,7 +121,8 @@
         class="vmp-insert-video-preview"
         :visible.sync="previewDialog"
         width="642px"
-        :close-on-click-modal="false"
+        :before-close="closeBefore"
+        :close-on-click-modal="true"
       >
         <video-preview ref="videoPreview" :videoParam="videoParam"></video-preview>
       </el-dialog>
@@ -126,17 +131,20 @@
 </template>
 <script>
   import { useInsertFileServer } from 'middle-domain';
-  import videoPreview from '../../components/video-preview';
+  import videoPreview from '@/packages/app-shared/components/video-preview';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpInsertVideo',
     data() {
       return {
-        insertVideoVisible: true,
+        insertVideoVisible: false,
         searchKey: '',
         noVideo: 1,
         isFetching: false,
         videoParam: {}, //预览数据
-        webinarId: this.$route.params.id,
+        webinarId: '876395481' || this.$route.params.id,
+        insertVideoStatus: false, // 是否正在插播
+        playingInsertVideoId: '',
         tableData: [],
         pageInfo: {
           pos: 0,
@@ -155,6 +163,16 @@
       this.insertFileServer = useInsertFileServer();
     },
     methods: {
+      openInserVideoDialog() {
+        this.insertVideoVisible = true;
+        this.getTableList(false, true);
+      },
+      closeInserVideoDialog(flag, id) {
+        console.log(flag, '======zhangxiao=======');
+        this.insertVideoStatus = flag;
+        this.playingInsertVideoId = id;
+        this.insertVideoVisible = false;
+      },
       searchTableList() {
         this.getTableList(false);
       },
@@ -183,8 +201,24 @@
               _this.$message.warning('只支持插播MP4、WEBM、OGG格式的视频');
               return;
             }
+            this.initVideo(e.target.files[0]);
           }
         });
+      },
+      initVideo(File) {
+        this.playingInsertVideoId = null;
+        const isGt5M = File.size / 1024 / 1024 / 1024 > 5;
+        const video_ext_type = File.type; // type: "audio/ogg" // video/mp4
+        console.log(video_ext_type, 'video_ext_type');
+        this.isAudio = video_ext_type.includes('ogg');
+        if (isGt5M) {
+          this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
+          return;
+        }
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitOnchange', [File, 'local'])
+        );
+        // this.insertVideoVisible = false;
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -266,11 +300,15 @@
             cancelButtonClass: 'zdy-confirm-cancel'
           })
             .then(() => {
-              // this.$emit('insterVideoInit', video, 'remote');
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitOnchange', [video, 'remote'])
+              );
             })
             .catch(() => {});
         } else {
-          // this.$emit('insterVideoInit', video, 'remote');
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitOnchange', [video, 'remote'])
+          );
         }
       },
       handleDelete(video) {
@@ -315,6 +353,11 @@
         } else {
           this.$message.warning('只有转码成功才能查看');
         }
+      },
+      closeBefore(done) {
+        this.previewDialog = false;
+        this.$refs.videoPreview.destroy();
+        done();
       }
     }
   };
@@ -357,6 +400,11 @@
             }
             .insert-header-item {
               width: 200px;
+            }
+            .insert-header-item {
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
             }
           }
           .insert-list-container {
