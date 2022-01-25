@@ -1,0 +1,403 @@
+<template>
+  <div>
+    <div class="vh-chose-active-box" :class="{ 'live-check-page': pagetype == 'subscribe' }">
+      <!-- 单个视频 -->
+      <div
+        v-for="item in activeList"
+        :key="item.id"
+        class="vh-chose-active-item"
+        @click="gotoRoom(item.id)"
+      >
+        <div class="vh-chose-active-item__cover">
+          <img :src="item.img_url" alt="" />
+          <div class="vh-chose-active-item__cover-status">
+            <span class="liveTag">
+              <label v-if="item.webinar_state == 1" class="live-status">
+                <img src="../assets/imgs/live.gif" alt="" />
+              </label>
+              <div class="scale8">
+                <span>{{ item | liveTag }}</span>
+                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">| 无延迟</span>
+              </div>
+            </span>
+          </div>
+          <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
+            <i class="saasicon_redu iconfont iconredu_icon1"></i>
+            <i>{{ item.pv }}</i>
+          </div>
+        </div>
+        <div class="vh-chose-active-item__titleInfo">
+          <div class="vh-chose-active-item__title">
+            {{ item.subject }}
+          </div>
+          <div class="vh-chose-active-item__info">
+            {{ item.start_time || item.created_at }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  // import { mapState } from 'vuex';
+
+  export default {
+    filters: {
+      liveTag(val) {
+        /**
+         * webinar_state  1直播 2预约 3结束 4点播 5回放
+         * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播
+         */
+        const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
+        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播'];
+        let str = liveTypeStr[val.webinar_state];
+        if (val.webinar_state != 4 && val.webinar_type != 5) {
+          str += ` | ${liveStatusStr[val.webinar_type]}`;
+        }
+        return str;
+      }
+    },
+    props: ['checkedList', 'pagetype'],
+    data() {
+      return {
+        activeList: [],
+        loading: false,
+        hasDelayPermission: false
+      };
+    },
+    computed: {
+      // ...mapState('watchBase', ['watchInitData', 'configList']),
+      userId() {
+        return this.watchInitData.join_info.third_party_user_id;
+      }
+    },
+    watch: {
+      checkedList: {
+        handler(val) {
+          if (val) {
+            this.getActiveList();
+          }
+        },
+        deep: true,
+        immediate: true
+      }
+    },
+    mounted() {
+      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+    },
+    methods: {
+      gotoRoom(id) {
+        this.$emit('link', id);
+      },
+      getActiveList() {
+        if (this.checkedList.length == 0) {
+          this.activeList = [];
+          return;
+        }
+        this.loading = true;
+        this.$vhallapi.interactTool
+          .queryActiveList({
+            webinar_ids: this.checkedList.join(','),
+            user_id: '',
+            is_check: 0
+          })
+          .then(res => {
+            if (res.code == 200) {
+              if (res.data.total == 0) {
+                this.lock = true;
+                this.loading = false;
+                this.total = 0;
+              } else {
+                this.activeList = res.data.list;
+                this.loading = false;
+              }
+            } else {
+              this.loading = false;
+            }
+          });
+      }
+    }
+  };
+</script>
+
+<style lang="less" scoped>
+  .vh-chose-active-box {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .live-check-page {
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0px 0px 20px;
+  }
+  .vh-chose-active-item {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    width: 312px;
+    height: 80px;
+    padding: 0px 10px 8px;
+    border-radius: 4px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    &:hover {
+      background: #383838;
+      cursor: pointer;
+    }
+    &__cover {
+      position: relative;
+      width: 142px;
+      height: 80px;
+      margin-right: 12px;
+      background: #383838;
+      border-radius: 4px;
+      img {
+        display: inline-block;
+        width: 142px;
+        height: 80px;
+        border-radius: 4px;
+      }
+      &-status {
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        height: 20px;
+        line-height: 20px;
+        background: rgba(0, 0, 0, 0.65);
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 400;
+        color: #ffffff;
+        text-align: center;
+        img {
+          height: 8px;
+        }
+      }
+      &-hots {
+        position: absolute;
+        left: 12px;
+        bottom: 4px;
+        font-size: 12px;
+        font-weight: 400;
+        color: #ffffff;
+        line-height: 20px;
+        z-index: 3;
+        .saasicon_redu {
+          &:before {
+            display: inline-block;
+            width: 14px !important;
+            height: 14px !important;
+            margin-right: 4px;
+            margin-top: 2px;
+          }
+        }
+      }
+      .mask {
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        width: 100%;
+        height: 32px;
+        z-index: 2;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+        border-radius: 4px;
+      }
+      .delay-icon {
+        width: 48px;
+        height: 24px;
+        background: url('../assets/imgs/delay-icon.png') no-repeat;
+        background-size: 48px 24px;
+        background-position: center;
+        float: right;
+        margin: 4px 10px 0px 0px;
+      }
+    }
+    &__titleInfo {
+      height: 55px;
+    }
+    &__title {
+      margin: 10px 0px 4px 0px;
+      font-size: 14px;
+      font-weight: 400;
+      color: @font-dark-normal;
+      line-height: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      text-align: left;
+    }
+    &__info {
+      font-weight: 400;
+      word-break: keep-all;
+      white-space: nowrap;
+      font-size: 12px;
+      color: @font-dark-low;
+      line-height: 16px;
+      text-align: left;
+    }
+    .liveTag {
+      color: #fff;
+      font-size: 12px;
+      // padding:12px;
+      border-radius: 20px;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .live-status {
+        display: inline-block;
+        width: 12px;
+        img {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 0px;
+          // margin-top: 4px;
+        }
+      }
+      .scale8 {
+        zoom: 0.8;
+        white-space: nowrap;
+      }
+    }
+    .vh-chose-active-item__cover-status {
+      padding: 0px 8px !important;
+    }
+  }
+  .live-check-page .vh-chose-active-item {
+    flex-direction: column;
+    width: 284px;
+    height: 261px;
+    margin: 0px 8px 8px;
+    border-radius: 4px;
+    padding: 0px;
+    &__cover {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 0px;
+        transition: all 0.3s;
+        &:hover {
+          transform: scale(1.2);
+        }
+      }
+      &-status {
+        padding: 0px 12px;
+      }
+      &-hots {
+        font-size: 14px;
+        left: 12px;
+        bottom: 6px;
+        z-index: 3;
+      }
+    }
+    &__titleInfo {
+      height: 100px;
+      background: #fff;
+      &:hover {
+        .vh-chose-active-item__title {
+          color: #fb3a32;
+        }
+      }
+    }
+    &__title {
+      font-size: 16px !important;
+      color: @font-light-normal;
+      line-height: 24px;
+      margin: 12px 16px 7px 16px;
+    }
+    &__info {
+      font-size: 14px;
+      font-weight: 400;
+      color: @font-dark-second;
+      line-height: 17px;
+      margin-left: 16px;
+    }
+    .liveTag {
+      display: inline-block;
+      height: 20px;
+      padding: 0px;
+      .live-status {
+        display: inline-block;
+        width: 12px;
+        img {
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+  @media screen and (max-width: 1366px) {
+    .live-check-page {
+      .vh-chose-active-item {
+        width: 249px;
+        height: 240px;
+        .vh-chose-active-item__cover {
+          height: 140px;
+        }
+        .vh-chose-active-item__titleInfo {
+          height: 100px;
+        }
+      }
+    }
+  }
+
+  @media screen and (min-width: 1367px) and (max-width: 1600px) {
+    .live-check-page {
+      .vh-chose-active-item {
+        width: 284px;
+        height: 261px;
+        .vh-chose-active-item__cover {
+          height: 160px;
+        }
+        .vh-chose-active-item__titleInfo {
+          height: 101px;
+        }
+      }
+    }
+  }
+  @media screen and (min-width: 1601px) and (max-width: 1920px) {
+    .live-check-page {
+      .vh-chose-active-item {
+        width: 358px;
+        height: 302px;
+        .vh-chose-active-item__cover {
+          height: 202px;
+        }
+        .vh-chose-active-item__titleInfo {
+          height: 100px;
+        }
+      }
+    }
+  }
+  @media screen and (min-width: 1921px) {
+    .live-check-page {
+      .vh-chose-active-item {
+        width: 358px;
+        height: 302px;
+        .vh-chose-active-item__cover {
+          height: 202px;
+        }
+        .vh-chose-active-item__titleInfo {
+          height: 100px;
+        }
+      }
+    }
+  }
+</style>

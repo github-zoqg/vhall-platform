@@ -1,6 +1,6 @@
 <template>
-  <div id="preview-audio" class="preview-audio">
-    <div class="preview-audio-current" :style="widthStyle"></div>
+  <div id="vmp-volume-preview" class="vmp-volume-preview">
+    <div class="vmp-volume-preview-current" :style="widthStyle"></div>
   </div>
 </template>
 <script>
@@ -95,14 +95,14 @@
   };
 </script>
 <style lang="less" scoped>
-  .preview-audio {
+  .vmp-volume-preview {
     width: 320px;
     height: 40px;
     margin: auto;
-    background: url('../assets/volume_gray.png') no-repeat;
+    background: url('./assets/volume_gray.png') no-repeat;
     background-position: left center;
     &-current {
-      background: url('../assets/volume_orange.png') no-repeat;
+      background: url('./assets/volume_orange.png') no-repeat;
       background-position: left center;
       height: 40px;
       position: relative;

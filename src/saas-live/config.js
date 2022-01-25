@@ -251,6 +251,9 @@ export const serverConfig = {
     component: 'VmpLivePrivateChat',
     options: {}
   },
+  comCustomMenu: {
+    component: 'VmpCustomMenu'
+  },
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
