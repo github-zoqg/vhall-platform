@@ -22,7 +22,8 @@ import VmpInteractMenu from '@/packages/interact-menu';
 import VmpShare from '@/packages/share'; // 发起端分享观看端地址
 import VmpVirtualPeople from '@/packages/virtual-people'; // 虚拟人数弹窗
 import VmpThirdStream from '@/packages/third-push-stream';
-import VmpInsertVideo from '@/packages/insert-video';
+import VmpInsertVideo from '@/packages/insert-video-list';
+import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
 import VmpGroupSetting from '@/packages/group-setting';
 import VmpPcMediaSetting from '@/packages/media-setting';
@@ -53,6 +54,7 @@ export function initUse() {
   Vue.use(VmpVirtualPeople);
   Vue.use(VmpThirdStream);
   Vue.use(VmpInsertVideo);
+  Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
   Vue.use(VmpGroupSetting);
   Vue.use(VmpPcMediaSetting);

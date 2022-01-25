@@ -32,8 +32,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpBasicCenterContainerLive',
     // children: ['comDocUne']
-    children: ['comStreamList', 'comDocUne']
-    // children: ['comThirdStream']
+    children: ['comStreamList', 'comDocUne', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -48,8 +47,8 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      // 'comMemberList'
-      'comChat'
+      'comMemberList'
+      // 'comChat'
     ]
   },
   /*** 布局定义end */
@@ -63,7 +62,8 @@ export const serverConfig = {
       'comVirtualPeople',
       'comLivePrivateChat',
       'dlgGroupSetting',
-      'comMediaSetting'
+      'comMediaSetting',
+      'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
@@ -200,11 +200,11 @@ export const serverConfig = {
       icon: 'iconfont iconwangyechabo_icon',
       text: 'aside_menu.aside_menu_1003'
     },
-    emitClick: [
+    handleClick: [
       {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comMediaPlayMenu']
+        cuid: 'comInsertVideo',
+        method: 'openInserVideoDialog',
+        args: []
       }
     ]
   },
@@ -381,7 +381,14 @@ export const serverConfig = {
     component: 'VmpThirdStream'
   },
   comInsertVideo: {
-    component: 'VmpInsertVideo'
+    component: 'VmpInsertVideo',
+    emitOnchange: [
+      {
+        cuid: 'comInsertStream',
+        method: 'openInsertShow',
+        args: ['$0', '$1']
+      }
+    ]
   },
 
   // 分组设置对话框
@@ -390,5 +397,15 @@ export const serverConfig = {
   },
   comMediaSetting: {
     component: 'VmpPcMediaSetting'
+  },
+  comInsertStream: {
+    component: 'VmpInsertStream',
+    emitClose: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'closeInserVideoDialog',
+        args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
+      }
+    ]
   }
 };
