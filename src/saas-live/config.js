@@ -30,9 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpBasicCenterContainerLive',
-    // children: ['comDocUne']
-    children: ['comStreamList', 'comDocUne', 'comInsertStream']
+    component: 'VmpContainer',
+    className: 'vmp-basic-center',
+    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -41,7 +41,8 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
+    className: 'vmp-basic-right__hd',
+    children: ['comStreamLocal']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -162,7 +163,7 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
       }
@@ -178,7 +179,7 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
       }
@@ -213,17 +214,19 @@ export const serverConfig = {
     component: 'VmpInteractMenu'
   },
 
-  // 分组讨论
+  // 分组讨论菜单
   comGroupMenu: {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont icona-icon_fenzutaolun1x',
-      text: 'aside_menu.aside_menu_1008'
+      text: 'aside_menu.aside_menu_1008',
+      kind: 'group'
     },
     handleClick: [
       {
-        cuid: 'dlgGroupSetting',
-        method: 'show'
+        cuid: ['comGroupDiscussion'],
+        method: 'switchTo',
+        args: 'group'
       }
     ]
   },
@@ -345,12 +348,15 @@ export const serverConfig = {
   // 本地流
   comStreamLocal: {
     component: 'VmpStreamLocal',
-    // 窗口切换事件
-    emitClickExchange: [
+    // 窗口切换事件,获取配置
+    exchangeCfg: [
       {
-        cuid: 'ps.surface',
-        method: 'exchange',
-        args: ['comStreamLocal']
+        cuid: 'comDocUne',
+        kind: 'doc'
+      },
+      {
+        cuid: 'comInsertVideo',
+        kind: 'insertvideo'
       }
     ],
     // 推流完成事件
@@ -407,5 +413,14 @@ export const serverConfig = {
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ]
+  },
+  // 分组讨论组件
+  comGroupDiscussion: {
+    component: 'VmpGroupDiscussion',
+    toggle: {
+      cuid: ['comGroupMenu'],
+      method: 'setSelectedState',
+      args: ['$0'] // 获取动态参数的第一个
+    }
   }
 };

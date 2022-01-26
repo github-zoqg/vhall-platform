@@ -415,7 +415,7 @@
        * 资料库文档查询
        */
       async handleDoclibSearch() {
-        const result = await this.docServer.getAllDocList({
+        const result = await this.docServer.getSharedDocList({
           keyword: this.doclibSearchKey,
           type: 2,
           room_id: this.roomBaseServer.state.watchInitData.interact.room_id

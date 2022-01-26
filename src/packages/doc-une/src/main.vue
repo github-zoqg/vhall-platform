@@ -13,7 +13,7 @@
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
-        <div style="width: 0; height: 0">
+        <div>
           <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
@@ -117,7 +117,7 @@
     data() {
       return {
         className: '',
-        displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
+        displayMode: 'normal', // normal: 正常; small: 小屏 fullscreen:全屏
         keepAspectRatio: true,
         hasPager: true, // 是否有分页操作(观看端没有)
         thumbnailShow: false // 文档缩略是否显示
@@ -175,8 +175,8 @@
       },
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
-        if (!['normal', 'mini', 'fullscreen'].includes(mode)) {
-          console.error('展示模式必须是normal, mini, fullscreen中的一个');
+        if (!['normal', 'small', 'fullscreen'].includes(mode)) {
+          console.error('展示模式必须是normal, small, fullscreen中的一个');
           return;
         }
         if (this.displayMode === mode) {
@@ -206,7 +206,7 @@
       resize() {
         let rect;
         if (this.isWatch) {
-          if (this.displayMode === 'mini') {
+          if (this.displayMode === 'small') {
             rect = {
               width: 360,
               height: 204
@@ -387,6 +387,7 @@
         }
         if (this.isWatch && !this.docServer.state.switchStatus) {
           // 如果是观看端，并且是观众不可见，结束
+          console.log('[doc] 是观看端，并且是观众不可见');
           this.docServer.setDocLoadComplete();
           return;
         }
@@ -470,6 +471,7 @@
           '; switchStatu:',
           switchStatus
         );
+        this.docServer.setDocLoadComplete(false);
         this.docServer.setSwitchStatus(switchStatus);
 
         for (const item of this.docServer.state.containerList) {
@@ -712,7 +714,7 @@
     }
   }
 
-  .vmp-doc-une.vmp-doc-une--mini {
+  .vmp-doc-une.vmp-doc-une--small {
     position: absolute !important;
     width: 309px;
     height: 240px;
@@ -753,8 +755,8 @@
       min-height: auto;
     }
 
-    //mini模式
-    &.vmp-doc-une--mini {
+    //small模式
+    &.vmp-doc-une--small {
       position: absolute;
       width: 360px;
       height: 204px;
