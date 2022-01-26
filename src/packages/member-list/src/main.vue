@@ -29,8 +29,10 @@
                   :role-name="roleName"
                   :is-in-group="isInGroup"
                   :mode="mode"
+                  :member-options="memberOptions"
                   :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
+                  :tab-index="tabIndex"
                   :apply-users="applyUsers"
                 ></member-item>
               </template>
@@ -56,6 +58,8 @@
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
+                  :member-options="memberOptions"
+                  :tab-index="tabIndex"
                 ></member-item>
               </template>
             </template>
@@ -80,6 +84,8 @@
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
+                  :member-options="memberOptions"
+                  :tab-index="tabIndex"
                 ></member-item>
               </template>
             </template>
@@ -222,9 +228,7 @@
         pageConfig: {
           page: 0,
           limit: 10
-        },
-        //受限人员是否为空
-        limitedUsersEmpty: false
+        }
       };
     },
     beforeCreate() {
@@ -253,6 +257,12 @@
         const { state = {} } = this.roomBaseServer;
         const { groupInitData = {} } = state;
         return groupInitData.doc_permission;
+      },
+      //活动状态(直播未开始，已开始，已结束)
+      liveStatus() {
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        const { webinar = {} } = watchInitData;
+        return webinar.type;
       }
     },
     methods: {
@@ -269,7 +279,7 @@
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         this.mode = webinar.mode;
         this.roleName = join_info.role_name;
-        this.userId = join_info.userId;
+        this.userId = join_info.user_id;
         this.roomId = interact.room_id;
         this.allowRaiseHand = this.micServer.state.isAllowhandup;
       },
@@ -332,18 +342,17 @@
       },
       //切换允许举手状态
       onSwitchAllowRaiseHand(status) {
-        //todo 检测活动是否开始
-        // if (this.status != 1) {
-        //   this.allowRaiseHand = false;
-        //   this.$message.error('活动尚未开始');
-        //   return;
-        // }
+        if (this.liveStatus !== 1) {
+          this.allowRaiseHand = false;
+          this.$message.error('活动尚未开始');
+          return;
+        }
         const params = {
           room_id: this.roomId,
           status: status ? 1 : 0
         };
 
-        //todo 待micServer完善方法
+        //todo 待micServer这边完善方法
         this.micServer
           .setHandsUp(params)
           .then(res => {
@@ -375,10 +384,20 @@
       //清空人员搜索
       clearSearchInput() {
         this.searchUserInput = '';
+        this.searchShow = false;
+        this.pageConfig.page = 0;
+        this.getOnlineUserList();
       },
       //按条件进行搜索
-      doSearch() {},
-      //响应人员操作
+      doSearch() {
+        if (['', null, void 0].includes(this.searchUserInput)) {
+          return;
+        }
+        //todo 埋点上报
+        this.pageConfig.page = 0;
+        this.getOnlineUserList();
+      },
+      //响应人员操作 todo
       handleOperateUser({ type = '', params = {} }) {
         console.log(type, params);
       },
