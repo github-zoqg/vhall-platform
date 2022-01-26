@@ -151,7 +151,9 @@
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
-      this.playerServer = usePlayerServer();
+      this.playerServer = usePlayerServer({
+        extra: true
+      });
       this.timestamp = new Date().getTime();
       this.initPlayer();
     },

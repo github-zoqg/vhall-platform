@@ -30,9 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion']
+    component: 'VmpBasicCenterContainerLive',
+    // children: ['comDocUne']
+    children: ['comStreamList', 'comDocUne', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -396,7 +396,30 @@ export const serverConfig = {
       }
     ]
   },
-
+  // 分组设置对话框
+  dlgGroupSetting: {
+    component: 'VmpGroupSetting'
+  },
+  comMediaSetting: {
+    component: 'VmpPcMediaSetting'
+  },
+  comInsertStream: {
+    component: 'VmpInsertStream',
+    emitClose: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'closeInserVideoDialog',
+        args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
+      }
+    ],
+    emitOpen: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'openInserVideoDialog',
+        args: []
+      }
+    ]
+  },
   // 分组讨论组件
   comGroupDiscussion: {
     component: 'VmpGroupDiscussion',
