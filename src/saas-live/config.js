@@ -419,5 +419,14 @@ export const serverConfig = {
         args: []
       }
     ]
+  },
+  // 分组讨论组件
+  comGroupDiscussion: {
+    component: 'VmpGroupDiscussion',
+    toggle: {
+      cuid: ['comGroupMenu'],
+      method: 'setSelectedState',
+      args: ['$0'] // 获取动态参数的第一个
+    }
   }
 };

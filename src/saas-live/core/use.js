@@ -25,7 +25,6 @@ import VmpThirdStream from '@/packages/third-push-stream';
 import VmpInsertVideo from '@/packages/insert-video-list';
 import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
-import VmpGroupSetting from '@/packages/group-setting';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpGroupDiscussion from '@/packages/group-discussion';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
@@ -57,7 +56,6 @@ export function initUse() {
   Vue.use(VmpInsertVideo);
   Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
-  Vue.use(VmpGroupSetting);
   Vue.use(VmpPcMediaSetting);
   Vue.use(VmpGroupDiscussion);
 
