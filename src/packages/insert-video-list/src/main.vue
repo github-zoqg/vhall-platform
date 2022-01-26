@@ -234,6 +234,7 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOnchange', [File, 'local'])
         );
+        // this.insertVideoVisible = false;
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {

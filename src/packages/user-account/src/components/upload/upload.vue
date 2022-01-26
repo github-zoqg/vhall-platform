@@ -1,6 +1,6 @@
 <template>
   <el-upload
-    class="avatar-uploader"
+    class="vmp-avatar-uploader"
     v-bind="$props"
     :headers="headersVo"
     :data="saveData"
@@ -204,121 +204,120 @@
   };
 </script>
 
-<style lang="less" scoped>
-  .el-upload--picture-card {
-    width: 100%;
-    height: 138px;
-    line-height: unset;
-    overflow: hidden;
-    background-color: #f7f7f7;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    &:hover,
-    &:focus {
+<style lang="less">
+  .vmp-avatar-uploader {
+    .el-upload--picture-card {
+      width: 100%;
+      height: 138px;
+      line-height: unset;
+      overflow: hidden;
       background-color: #f7f7f7;
-      border: 1px solid #999999;
+      border: 1px solid #cccccc;
       border-radius: 4px;
-    }
-    i {
-      color: #999;
-      display: inline-block;
-    }
-    i.saasicon_shangchuan {
-      font-size: 36px;
-      color: #999;
-    }
-    .box {
-      width: 100%;
-      height: 100%;
-      display: table;
-      > div {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        // padding-top: 30px;
-        display: table-cell;
-        vertical-align: middle;
-        text-align: center;
-        &:hover {
-          .mask {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            line-height: 20px;
-            // padding: 0 10px;
-          }
-          .bottom-mask {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            color: #fff;
-          }
-        }
-      }
-      /* .picInco{
-        height: 40px;
-      } */
-    }
-    .img-logo {
-      margin: 0 auto;
-    }
-    img {
-      height: 100%;
-      object-fit: scale-down;
-      width: 100%;
-      margin: 0px auto;
-    }
-  }
-  // .avatar-uploader{
-  //   height: 180px;
-  // }
-  .mask {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    span {
-      font-size: 14px;
-      &:nth-child(2) {
-        margin: 0 0 0 10px;
-        i {
-          line-height: 1;
-        }
+      &:hover,
+      &:focus {
+        background-color: #f7f7f7;
+        border: 1px solid #999999;
+        border-radius: 4px;
       }
       i {
-        color: #fff;
-        font-size: 18px;
-        vertical-align: middle;
+        color: #999;
+        display: inline-block;
+      }
+      i.saasicon_shangchuan {
+        font-size: 36px;
+        color: #999;
+      }
+      .box {
+        width: 100%;
+        height: 100%;
+        display: table;
+        > div {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          // padding-top: 30px;
+          display: table-cell;
+          vertical-align: middle;
+          text-align: center;
+          &:hover {
+            .mask {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              color: #fff;
+              line-height: 20px;
+              // padding: 0 10px;
+            }
+            .bottom-mask {
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              color: #fff;
+            }
+          }
+        }
+        /* .picInco{
+          height: 40px;
+        } */
+      }
+      .img-logo {
+        margin: 0 auto;
+      }
+      img {
+        height: 100%;
+        object-fit: scale-down;
+        width: 100%;
+        margin: 0px auto;
       }
     }
-  }
-  .bottom-mask {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    border-radius: 2px 2px 0 0;
-    padding: 0 5px;
-    bottom: 0;
-    span {
-      font-size: 14px;
-      display: inline-block;
-      line-height: 26px;
-      color: #fff;
+    .mask {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      span {
+        font-size: 14px;
+        &:nth-child(2) {
+          margin: 0 0 0 10px;
+          i {
+            line-height: 1;
+          }
+        }
+        i {
+          color: #fff;
+          font-size: 18px;
+          vertical-align: middle;
+        }
+      }
     }
-  }
-  .tips {
-    font-size: 12px;
-    color: #999;
-    text-align: center;
-    p {
-      line-height: 16px;
-      padding: 0;
+    .bottom-mask {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      border-radius: 2px 2px 0 0;
+      padding: 0 5px;
+      bottom: 0;
+      span {
+        font-size: 14px;
+        display: inline-block;
+        line-height: 26px;
+        color: #fff;
+      }
+    }
+    .tips {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      p {
+        line-height: 16px;
+        padding: 0;
+      }
     }
   }
 </style>

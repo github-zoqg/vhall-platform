@@ -206,6 +206,9 @@
 
         this.playerServer.play();
       },
+      closeInsertvideo() {
+        console.log('关闭插播');
+      },
       hideInsertVideoControl() {
         console.log('wosh我是隐藏');
       },
