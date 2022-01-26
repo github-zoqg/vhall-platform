@@ -298,7 +298,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    z-index: 2;
+    z-index: 1;
 
     .vmp-doc-toolbar__hd {
       max-width: 250px;

@@ -4,6 +4,8 @@
       :visible.sync="dialogVisible"
       @open="handlOpen"
       :before-close="handleClose"
+      :close-on-click-modal="false"
+      :append-to-body="false"
       width="480px"
       title="分组设置"
     >
@@ -11,12 +13,15 @@
         <div class="vmp-group-item group-number">
           <div class="vmp-group-item__hd">分组数量</div>
           <div class="vmp-group-item__bd">
-            将当前 0 观众分成
+            将当前 {{ userNumber }} 观众分成
             <el-input
               style="width: 60px; margin: 0 6px"
               clearable
               maxlength="2"
               placeholder="2-50"
+              v-model.trim.number="number"
+              onkeyup="this.value=this.value.replace(/[^\d]/g,'')"
+              class="group-number__input"
             ></el-input>
             小组
           </div>
@@ -35,7 +40,7 @@
 
         <!-- 底部按钮 -->
         <div class="vmp-group-ft">
-          <el-button type="primary">开始分组</el-button>
+          <el-button type="primary" @click="handleGroup">开始分组</el-button>
           <el-button @click="handleClose">取消</el-button>
         </div>
       </div>
@@ -43,21 +48,42 @@
   </div>
 </template>
 <script>
+  import { useGroupServer, useMemberServer } from 'middle-domain';
   export default {
     name: 'VmpGroupSetting',
+    props: {
+      dialogVisible: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
-        dialogVisible: false,
+        number: '',
         radio: '1'
       };
     },
+
+    beforeCreate() {
+      this.groupServer = useGroupServer();
+      this.memberServer = useMemberServer();
+    },
+    computed: {
+      // 观众数量
+      userNumber() {
+        return this.memberServer.state.onlineUsers.length;
+      }
+    },
     methods: {
-      show() {
-        this.dialogVisible = true;
+      handlOpen() {
+        console.log(this.memberServer.state.onlineUsers);
       },
-      handlOpen() {},
+      handleGroup() {
+        this.groupServer.state.status = 'grouping';
+      },
       handleClose() {
-        this.dialogVisible = false;
+        this.groupServer.state.status = '';
+        this.groupServer.state.show = false;
       }
     }
   };
@@ -83,6 +109,11 @@
           width: 90px;
         }
 
+        &.group-number {
+          .group-number__input.el-input--suffix .el-input__inner {
+            padding-right: 0;
+          }
+        }
         &.group-way {
           margin-top: 30px;
           .vmp-group-item__hd {
