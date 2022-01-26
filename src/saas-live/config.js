@@ -267,7 +267,10 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'live'
+    }
   },
   // 文档白板组件
   comDocUne: {
