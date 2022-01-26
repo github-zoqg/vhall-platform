@@ -145,9 +145,9 @@ textarea {
   background: #777;
 }
 .vmp-basic-layout .vmp-basic-hd {
-  background: #b30304;
+  /* background: #b30304;
   background-image: url('../../images/newyear-banner.jpg');
-  background-repeat: no-repeat;
+  background-repeat: no-repeat; */
   border-bottom: 0;
 }
 .vmp-basic-layout .vmp-basic-left {

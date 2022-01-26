@@ -8,14 +8,15 @@
   padding: 24px 32px 20px 32px; /*跟此间距不同时，在各自业务里重置*/
 }
 .el-dialog__body {
-  padding: 0 32px;
+  padding: 0 32px 24px 32px;
   min-height: 124px;
 }
 .el-dialog__headerbtn {
-  top: 32px;
+  top: 30px;
   right: 32px;
   height: 16px;
   .el-dialog__close {
+    font-size: 18px;
     color: @font-light-second;
   }
 }
@@ -471,6 +472,10 @@
   border: 1px solid @border-normal-color;
   padding: 9px 48px;
   color: @font-light-second;
+  &.is-round {
+    border-radius: 20px;
+    padding: 8px 36px;
+  }
   &:hover {
     color: @font-error-low;
     background: @font-high-light-normal;
@@ -500,14 +505,14 @@
   }
 }
 
-button.el-button.el-button--medium {
+.el-button.el-button--medium {
   /* 中等按钮 */
   padding: 4px 24px;
   font-size: 14px;
   font-weight: 400;
   line-height: 26px;
 }
-button.el-button.el-button--white-medium {
+.el-button.el-button--white-medium {
   /* 中等按钮 */
   padding: 4px 24px;
   font-size: 14px;
@@ -528,20 +533,20 @@ button.el-button.el-button--white-medium {
   }
 }
 
-.el-button.is-round {
-  border-radius: 20px;
-  padding: 9px 51px;
-}
-
-button.el-button.el-button--small {
+.el-button.el-button--small {
   /*小型按钮*/
   padding: 5px 16px;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
 }
-
-button.el-button.el-button--mini {
+/*大型按钮*/
+.length-max {
+  width: 100%;
+  height: 40px;
+  border-radius: 20px;
+}
+.el-button.el-button--mini {
   /*迷你按钮 26Height*/
   padding: 2px 8px;
   font-size: 12px;
@@ -549,7 +554,7 @@ button.el-button.el-button--mini {
   line-height: 20px;
 }
 
-button.el-button.el-button--primary {
+.el-button.el-button--primary {
   /*primary 按钮*/
   background: @bg-error-light;
   color: @font-error-low;
@@ -586,8 +591,7 @@ button.el-button.el-button--primary {
     }
   }
 }
-
-button.el-button.el-button--white-primary {
+.el-button.el-button--white-primary {
   /*白色-primary 按钮*/
   background: transparent;
   color: @font-error;
@@ -631,29 +635,24 @@ button.el-button.el-button--white-primary {
   padding: 0 0;
 }
 .el-dropdown-menu {
-  background-color: @bg-dark-section !important;
-  color: @font-light-low !important;
+  background-color: #383838;
   border: none !important;
   top: 48px;
   padding: 5px 0 !important;
   .el-dropdown-menu__item {
     height: 28px;
     line-height: 28px;
+    color: #ccc;
   }
   .el-dropdown-menu__item:hover {
-    background-color: @border-bormal;
+    background-color: #444;
     color: @font-dark-normal !important;
   }
 }
-.el-popper[x-placement^='bottom'] .popper__arrow {
-  border-bottom-color: transparent;
+.el-popper .popper__arrow {
+  display: none;
 }
-.el-popper[x-placement^='bottom'] .popper__arrow::after {
-  border-bottom-color: @popper-normal;
-}
-.el-popper[x-placement^='top'] .popper__arrow {
-  border-top-color: transparent;
-}
-.el-popper[x-placement^='top'] .popper__arrow::after {
-  border-top-color: @popper-normal;
+// 重置slider
+.el-slider.is-vertical .el-slider__runway {
+  margin: 0;
 }

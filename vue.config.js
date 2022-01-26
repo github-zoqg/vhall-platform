@@ -149,8 +149,10 @@ const sharedConfig = {
       },
       // PostCSS 是一个用 JavaScript 工具和插件转换 CSS 代码的工具. https://www.postcss.com.cn/
       postcss: {
-        // autoprefixer插件自动补全浏览器前缀
-        plugins: [require('autoprefixer')]
+        plugins: [
+          // autoprefixer插件自动补全浏览器前缀
+          require('autoprefixer')()
+        ]
       }
     },
     // 启用 CSS modules for all css / pre-processor files.
@@ -209,8 +211,8 @@ if (['serve', 'build'].includes(cmd)) {
     );
   }
 
-  // console.log(chalk.bold.bgBlue(` vueConfig `));
-  // console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
+  console.log(chalk.bold.bgBlue(` vueConfig `));
+  console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
 
   // 导出
   module.exports = vueConfig;

@@ -1,44 +1,110 @@
 <template>
-  <div class="vmp-basic-layout">
-    <div class="vmp-basic-container">
-      <h2>wap观看端</h2>
+  <div
+    class="vmp-basic-layout"
+    v-loading="state === 0"
+    element-loading-text="加载中..."
+    element-loading-background="rgba(255, 255, 255, 0.1)"
+  >
+    <div class="vmp-basic-container" v-if="state === 1">
+      <!-- <vmp-air-container cuid="layerRoot"></vmp-air-container> -->
+      <div>wap观看端</div>
     </div>
   </div>
 </template>
 
 <script>
-  import { useRoomInitGroupServer, useMsgServer } from 'middle-domain';
+  import { Domain } from 'middle-domain';
+  import roomState from '../headless/room-state.js';
   export default {
     name: 'Home',
-    data() {},
-    beforeCreate() {
-      this.roomInitGroupServer = useRoomInitGroupServer();
+    data() {
+      return {
+        state: 0
+      };
     },
-    created() {
-      this.setToken();
-      this.initSendLive();
+    async created() {
+      try {
+        console.log('%c---初始化直播房间 开始', 'color:blue');
+        // 初始化直播房间
+        await this.initReceiveLive();
+        await roomState();
+        console.log('%c---初始化直播房间 完成', 'color:blue');
+        this.state = 1;
+      } catch (ex) {
+        console.error('---初始化直播房间出现异常--');
+        console.error(ex);
+        // this.state = 2;
+        // this.errMsg = ex.msg;
+      }
+    },
+    mounted() {
+      // 派发推流事件
+      // setTimeout(() => {
+      //   window.$middleEventSdk?.event?.send({
+      //     cuid: 'comStreamLocal',
+      //     method: 'startPush'
+      //   });
+      // }, 3000);
     },
     methods: {
-      setToken() {
-        localStorage.setItem(
-          'token',
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODMyNDgsImV4cCI6MTY0MzI3NTI0OCwidXNlcl9pZCI6IjE2NDIyNzcwIiwicGxhdGZvcm0iOiI3IiwiY2giOiJiIiwiYnVzaW5lc3NfYWNjb3VudF9pZCI6IiJ9.zBKTqqn4EEmLKHduBlUfsmqMMU1I3vPmBfjfGR1cXfo'
-        );
-      },
-      initSendLive() {
-        this.roomInitGroupServer.initSendLive({
-          webinarId: 693742622,
+      initReceiveLive() {
+        const { id } = this.$route.params;
+        return new Domain({
+          plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: localStorage.getItem('token')
+            token: localStorage.getItem('token') || ''
+          },
+          initRoom: {
+            webinar_id: id, //活动id
+            clientType: 'standard' //客户端类型
           }
-        });
-      },
-      initChatSDK() {
-        this.msgServer = useMsgServer();
-        this.msgServer.init().then(res => {
-          console.log('聊天实例创建', res);
         });
       }
     }
   };
 </script>
+<style lang="less">
+  // 媒体查询分辨率下效果
+  @media screen and (min-width: 1920px) {
+    .vmp-basic-bd {
+      max-width: 1658px;
+    }
+  }
+
+  @media screen and (min-width: 1706px) {
+    .vmp-basic-bd {
+      max-width: 1658px;
+    }
+  }
+
+  @media screen and (min-width: 1388px) and (max-width: 1705px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
+
+  @media screen and (max-width: 1387px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
+
+  @media screen and (max-width: 1440px) {
+    .vmp-basic-bd {
+      max-width: 1339px;
+    }
+  }
+
+  @media screen and (max-width: 1366px) {
+    .vmp-basic-bd {
+      max-width: 1103px;
+    }
+  }
+
+  @media screen and (max-width: 1151px) {
+    // 浏览器中部最小间距，低于此分辨率1151px滚动条
+    .vmp-basic-bd {
+      max-width: 1103px;
+    }
+  }
+</style>
