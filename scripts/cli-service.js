@@ -26,7 +26,7 @@ const cmdArgs = Array.prototype.slice.call(argv, 2);
 // };
 const args = btool.parseArgv(argv);
 // 获取项目名
-const { project } = args;
+const { project, mode } = args;
 // 获取项目的package.json
 const projectPkg = require(path.join(pathConfig.SRC, project, 'package.json'));
 // 补充版本号
@@ -37,7 +37,7 @@ const cmdOption = cmdArgs.join(' ');
 const spinner = ora();
 
 //默认规则打包
-runSingle(project, cmdOption);
+runSingle(project, cmdOption, mode);
 
 // 执行单条
 async function runSingle(project, cmdOption) {
