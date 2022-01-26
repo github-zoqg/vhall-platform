@@ -151,7 +151,9 @@
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
-      this.playerServer = usePlayerServer();
+      this.playerServer = usePlayerServer({
+        extra: true
+      });
       this.timestamp = new Date().getTime();
       this.initPlayer();
     },
@@ -203,9 +205,6 @@
         this.setVideoCurrentTime(time);
 
         this.playerServer.play();
-      },
-      closeInsertvideo() {
-        console.log('关闭插播');
       },
       hideInsertVideoControl() {
         console.log('wosh我是隐藏');

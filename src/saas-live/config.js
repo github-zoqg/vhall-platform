@@ -405,6 +405,13 @@ export const serverConfig = {
         method: 'closeInserVideoDialog',
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
+    ],
+    emitOpen: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'openInserVideoDialog',
+        args: []
+      }
     ]
   }
 };

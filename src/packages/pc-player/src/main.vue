@@ -380,7 +380,7 @@
             if (this.isLive) {
               resolve();
             } else {
-              this.playerServer.on(VhallPlayer.LOADED, () => {
+              this.playerServer.$on(VhallPlayer.LOADED, () => {
                 resolve();
               });
             }

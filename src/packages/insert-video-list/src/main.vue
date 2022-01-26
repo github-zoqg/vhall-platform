@@ -116,7 +116,7 @@
       </div>
     </el-dialog>
     <!-- 预览功能 -->
-    <template>
+    <template v-if="previewDialog">
       <el-dialog
         class="vmp-insert-video-preview"
         :visible.sync="previewDialog"
@@ -164,8 +164,24 @@
     },
     methods: {
       openInserVideoDialog() {
+        // 检查是否可以插播文件
+        // this.checkCaptureStream();
         this.insertVideoVisible = true;
         this.getTableList(false, true);
+      },
+      checkCaptureStream() {
+        // TODO 是否是网页端发起的直播  助理其他端不支持插播 、并且是正在直播
+        if (!this.isPcStartLive && this.status == 1) {
+          this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
+            title: '提示',
+            confirmButtonText: '知道了',
+            // center: true,
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            callback: action => {}
+          });
+          return;
+        }
       },
       closeInserVideoDialog(flag, id) {
         console.log(flag, '======zhangxiao=======');
@@ -218,7 +234,6 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOnchange', [File, 'local'])
         );
-        // this.insertVideoVisible = false;
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
