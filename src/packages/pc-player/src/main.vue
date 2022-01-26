@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-player">
+  <div class="vmp-player" :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]">
     <div class="vmp-player-box">
       <div class="vmp-player-container">
         <div id="vmp-player" class="vmp-player-watch">
@@ -171,7 +171,7 @@
   </div>
 </template>
 <script>
-  import { usePlayerServer, useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
@@ -184,6 +184,7 @@
     data() {
       const { state: playerState } = this.playerServer;
       return {
+        displayMode: 'mini', // normal: 正常; mini: 小屏; fullscreen:全屏
         playerState,
         roomBaseState: null,
         isMini: false,
@@ -228,9 +229,14 @@
       };
     },
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
     },
     computed: {
+      // 是否观看端
+      isWatch() {
+        return this.roomBaseServer.state.clientType !== 'send';
+      },
       //判断是否是音频直播模式
       isAudio() {
         return this.roomBaseState.watchInitData.webinar.mode == 1;
@@ -919,6 +925,29 @@
           cursor: pointer;
         }
       }
+    }
+  }
+
+  // 作为观看端时的样式
+  .vmp-player.is-watch {
+    // 普通模式
+    &.vmp-player--normal {
+      position: absolute;
+      top: 0;
+      bottom: 56px;
+      width: calc(100% - 380px);
+      height: auto;
+      min-height: auto;
+    }
+
+    &.vmp-player--mini {
+      position: absolute;
+      width: 360px;
+      height: 204px;
+      min-height: 204px;
+      top: 0;
+      right: 0;
+      z-index: 10;
     }
   }
 </style>
