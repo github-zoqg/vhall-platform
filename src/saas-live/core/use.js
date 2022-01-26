@@ -25,6 +25,7 @@ import VmpThirdStream from '@/packages/third-push-stream';
 import VmpInsertVideo from '@/packages/insert-video-list';
 import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
+import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpGroupDiscussion from '@/packages/group-discussion';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
@@ -55,6 +56,7 @@ export function initUse() {
   Vue.use(VmpInsertVideo);
   Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
+  Vue.use(VmpPcMediaSetting);
   Vue.use(VmpGroupDiscussion);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
