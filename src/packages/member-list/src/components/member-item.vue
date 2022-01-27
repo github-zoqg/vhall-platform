@@ -122,27 +122,67 @@
           下麦
         </i>
       </template>
-      <!-- class上的hide是为了hover的时候也不显示 -->
       <!-- more显示条件：1、当前登录者是主持人-->
       <!-- more显示条件：2、当前登录者是嘉宾助理并且所选用户是观众 -->
-      <el-dropdown @command="handleCommand" v-show="showUserControl">
-        <i
-          @click.stop="getMore(userInfo.account_id, userInfo.role_name)"
-          class="vmp-member-item__control__more"
-        ></i>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="setBanned">聊天禁言</el-dropdown-item>
-          <el-dropdown-item command="setKicked">
-            {{ userInfo.is_kicked ? '取消踢出' : '踢出活动' }}
-          </el-dropdown-item>
-          <el-dropdown-item command="groupSetKicked">
-            {{ userInfo.is_kicked ? '取消踢出' : '踢出小组' }}
-          </el-dropdown-item>
-          <el-dropdown-item command="setSpeaker">设为主讲</el-dropdown-item>
-          <el-dropdown-item command="inviteMic">邀请演示</el-dropdown-item>
-          <el-dropdown-item command="setLeader">升为组长</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+      <template v-if="memberOptions.platformType === 'live'">
+        <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="hover">
+          <i class="vmp-member-item__control__more"></i>
+          <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
+            <template v-if="!isInGroup">
+              <!--设为主讲人-->
+              <el-dropdown-item
+                command="setSpeaker"
+                v-if="
+                  tabIndex === 1 &&
+                  isInteract &&
+                  [1, 4, '1', '4'].includes(userInfo.role_name) &&
+                  userInfo.is_speak &&
+                  currentSpeakerId !== userInfo.account_id
+                "
+              >
+                设为主讲
+              </el-dropdown-item>
+              <!--禁言/取消禁言-->
+              <el-dropdown-item command="setBanned" v-if="![1, '1'].includes(userInfo.role_name)">
+                {{ ![0, '0'].includes(userInfo.is_banned) ? '取消' : '聊天' }}禁言
+              </el-dropdown-item>
+              <!--踢出/取消踢出-->
+              <el-dropdown-item command="setKicked" v-if="![1, '1'].includes(userInfo.role_name)">
+                {{ userInfo.is_kicked ? '取消踢出' : '踢出活动' }}
+              </el-dropdown-item>
+              <!--邀请演示-->
+              <el-dropdown-item command="inviteMic" v-if="isShowInvitationItem">
+                邀请演示
+              </el-dropdown-item>
+            </template>
+            <template v-else>
+              <!--邀请演示-->
+              <el-dropdown-item command="inviteMic" v-if="isShowInvitationItem">
+                邀请演示
+              </el-dropdown-item>
+              <!--禁言/取消禁言-->
+              <el-dropdown-item command="setBanned" v-if="![1, '1'].includes(userInfo.role_name)">
+                {{ ![0, '0'].includes(userInfo.is_banned) ? '取消' : '聊天' }}禁言
+              </el-dropdown-item>
+              <el-dropdown-item command="groupSetKicked">
+                {{ userInfo.is_kicked ? '取消踢出' : '踢出小组' }}
+              </el-dropdown-item>
+              <el-dropdown-item
+                command="setLeader"
+                v-if="
+                  [2, '2'].includes(userInfo.role_name) &&
+                  [2, '2'].includes(userInfo.device_type) &&
+                  [0, '0'].includes(userInfo.is_banned) &&
+                  ![2, '2'].includes(userInfo.device_status)
+                "
+              >
+                升为组长
+              </el-dropdown-item>
+            </template>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </template>
+      <template v-if="memberOptions.platformType === 'watch'"></template>
     </div>
   </div>
 </template>
@@ -188,6 +228,17 @@
       }
     },
     props: {
+      //当前的tabIndex
+      tabIndex: {
+        required: true
+      },
+      //成员组件配置
+      memberOptions: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      },
       //成员信息
       userInfo: {
         type: Object,
@@ -251,6 +302,33 @@
             this.isInGroup &&
             this.userInfo.role_name != 20)
         );
+      },
+      //是否显示邀请演示操作选项
+      isShowInvitationItem() {
+        let isShow = false;
+        //如果不是分组讨论
+        if (!this.isInGroup) {
+          let validateRoleName = [this.userInfo.role_name, this.roleName].every(item => {
+            return ![3, '3'].includes(item);
+          });
+          isShow =
+            [6, '6'].includes(this.mode) &&
+            [2, '2'].includes(this.userInfo.device_type) &&
+            ![2, '2'].includes(this.userInfo.device_status) &&
+            validateRoleName &&
+            [0, '0'].includes(this.userInfo.is_banned);
+        }
+
+        //如果是分组讨论
+        if (this.isInGroup) {
+          isShow =
+            [1, '1'].includes(this.roleName) &&
+            [2, '2'].includes(this.userInfo.role_name) &&
+            [2, '2'].includes(this.userInfo.device_type) &&
+            ![2, '2'].includes(this.userInfo.device_status) &&
+            [0, '0'].includes(this.userInfo.is_banned);
+        }
+        return isShow;
       }
     },
     methods: {
@@ -262,10 +340,8 @@
       handleSetBanned() {
         this.$emit('operateUser', { type: 'setBanned', params: this.userInfo });
       },
-      //显示更多
-      getMore(accountId, roleName) {
-        console.log(accountId, roleName);
-      },
+      //邀请演示
+      handleInviteMic() {},
       //处理指令
       handleCommand(command) {
         switch (command) {
@@ -277,6 +353,8 @@
             break;
           case 'setGroupKicked':
             this.handleSetKicked();
+            break;
+          case 'inviteMic':
             break;
           default:
             break;
@@ -424,6 +502,39 @@
             color: #fff;
           }
         }
+      }
+    }
+  }
+  .vmp-member-dropdown-menu.el-dropdown-menu {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    z-index: 2;
+    width: 96px;
+    background-color: #fff !important;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
+    box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    .el-dropdown-menu__item {
+      height: 28px;
+      color: #666;
+      text-align: center;
+      line-height: 28px;
+      padding: 0;
+      margin: 3px 0;
+      &:hover {
+        background-color: #fc5659;
+        color: #fff;
+      }
+    }
+    .popper__arrow {
+      &:after {
+        border-bottom-color: #fff !important;
       }
     }
   }

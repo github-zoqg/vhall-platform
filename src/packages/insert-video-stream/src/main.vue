@@ -25,8 +25,12 @@
     <!-- 本地互动流的显示容器 -->
     <div id="vmp-insert-local-stream" ref="localStreamRef" class="vmp-insert-local-stream"></div>
 
-    <!-- 远端互动流的显示容器 -->
-    <!-- <div id="vmp-insert-remote-stream" ref="remoteStreamRef" class="vmp-insert-inster-stream"></div> -->
+    <!-- 远端互动流的显示容器 订阅流 -->
+    <div
+      id="vmp-insert-subscribe-stream"
+      ref="remoteStreamRef"
+      class="vmp-insert-subscribe-stream"
+    ></div>
 
     <!-- 本地视频插播的video容器 -->
     <div
@@ -44,6 +48,7 @@
         :isInsertVideoPreview="true"
         @remoteInsterSucces="remoteInsterSucces"
         @openInsert="handleOpenInsert"
+        @closeInsertvideo="closeInsertvideo(true)"
         v-if="remoteVideo.show"
       ></video-preview>
     </div>
@@ -118,13 +123,20 @@
 </template>
 <script>
   import videoPreview from '@/packages/app-shared/components/video-preview';
-  import { useInsertFileServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useInsertFileServer,
+    useRoomBaseServer,
+    useInteractiveServer,
+    useMsgServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import moment from 'moment';
   export default {
     name: 'VmpInsertStream',
     data() {
+      const { state: interactiveState } = this.interactiveServer;
       return {
+        interactiveState,
         pushStreamSucces: false,
         remoteVideo: {
           show: false,
@@ -176,7 +188,12 @@
     components: { videoPreview },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.interactiveServer = useInteractiveServer();
+      this.msgServer = useMsgServer();
       this.insertFileServer = useInsertFileServer();
+    },
+    mounted() {
+      this.initEventListener();
     },
     methods: {
       async openInsertShow(File, type) {
@@ -202,12 +219,11 @@
           .then(el => {
             this._isHasLocalStreamIdBeforeInit = false;
             this.insertSucces(el);
-            this.$emit('changeInsertVideoStatus', true); // 改变插播状态为插播中
           })
           .catch(e => {
             console.log(e);
             this.$message.warning('视频分辨率过高，请打开分辨率为1280*720以下的视频');
-            // this.closeInsertvideo(false); // 关闭插播
+            this.closeInsertvideo(false); // 关闭插播
           });
       },
       insertSucces(videoElement) {
@@ -289,7 +305,7 @@
         });
       },
       handleOpenInsert() {
-        console.log('1111wosh我是插播列表');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpen'));
       },
       async closeInsertvideo(isShowConfirmDialog) {
         if (!isShowConfirmDialog) {
@@ -384,6 +400,131 @@
         this._videoElement = videEl;
         this._isHasLocalStreamIdBeforeInit = 'noCare'; // 云插播不需要关心这个状态
         this.pushLocalStream();
+      },
+      initEventListener() {
+        if (this.interactiveState.remoteStreams[0]) {
+          this.subscribeInster();
+          this.addSDKEvents();
+        }
+        this.msgServer.$on('live_start', msg => {
+          this.closeInsertvideoHandler(true);
+        });
+        this.msgServer.$on('live_over', msg => {
+          this.pushStreamSucces && this.closeInsertvideoHandler();
+        });
+        /**
+         *  监听退出全屏事件
+         */
+        window.addEventListener(
+          'fullscreenchange',
+          e => {
+            if (document.fullscreenElement) {
+              // 进入全屏
+            } else {
+              // 离开全屏
+              this.isFullScreen = false;
+            }
+          },
+          true
+        );
+      },
+      subscribeInster(currentStreams) {
+        let owner = null;
+        currentStreams.forEach(stream => {
+          const obj = JSON.parse(stream.attributes);
+          if (obj.stream_type == 4 || stream.streamType == 4) {
+            owner = stream;
+          }
+        });
+        if (!owner) return;
+        console.log('刷新重新订阅- 插播流', owner);
+        this.streamId = owner.streamId;
+        const opt = {
+          streamId: this.streamId,
+          videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
+          mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
+        };
+        this.insertFileServer
+          .subscribeInsertStream(opt)
+          .then(() => {
+            const obj = JSON.parse(owner.attributes);
+            obj.accountId = owner.accountId;
+            this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
+            this.isAudio = obj.has_video == 0;
+            this.subscribInsterStreamSucess = true;
+          })
+          .catch(e => {
+            console.log('订阅失败', e);
+          });
+      },
+      addSDKEvents() {
+        // 流加入
+        this.interactiveServer.$on(VhallRTC.EVENT_REMOTESTREAM_ADD, e => {
+          console.log('监听流加入55555555', e);
+          // { e.type， 流类行 }
+          // 0: 纯音频, 1: 只是视频, 2: 音视频  3: 屏幕共享, 4: 插播
+          const obj = JSON.parse(e.data.attributes);
+          obj.accountId = e.data.accountId;
+          if (obj.stream_type == 4 || e.data.streamType == 4) {
+            console.log('流加入-插播流,自己收不到自己的流', e);
+            this.isCurrentRoleInsert = false; // 非当前角色进行的插播
+            this.streamId = e.data.streamId;
+            const opt = {
+              streamId: e.data.streamId,
+              videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
+              mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
+            };
+            // this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
+            this.isAudio = obj.has_video == 0; // 音频是0
+            this.interactiveServer
+              .subscribeStream(opt)
+              .then(() => {
+                console.log('插播流订阅成功');
+                this.subscribInsterStreamSucess = true;
+                // EventBus.$emit('inster_mic_close');
+              })
+              .catch(e => {
+                console.log('订阅失败', e);
+              });
+          }
+        });
+
+        // 插播流删除 流结束
+        this.interactiveServer.$on(VhallRTC.EVENT_REMOTESTREAM_REMOVED, e => {
+          console.log('EVENT_REMOTESTREAM_REMOVED插播流删除了', e);
+          // 自己和其他人都能收到
+          console.log('插播流删除，流id', e.data.streamId, this.streamId);
+          if (e.data.streamId == this.streamId) {
+            this.streamId = '';
+            this.$refs.localStreamRef.innerHTML = '';
+            this.subscribInsterStreamSucess = false;
+            // EventBus.$emit('inster_mic_open');
+            // this.$emit('pushStreamInsterRemove');
+            clearInterval(this.resubscribeTimer);
+          }
+        });
+        this.interactiveServer.$on(VhallRTC.EVENT_REMOTESTREAM_FAILED, e => {
+          if (e.data.stream.getID() == this.streamId) {
+            clearInterval(this.resubscribeTimer);
+            this.resubscribeTimer = setInterval(() => {
+              const opt = {
+                streamId: this.streamId,
+                videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
+                mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
+              };
+              this.insertFileServer
+                .subscribeInsertStream(opt)
+                .then(() => {
+                  clearInterval(this.resubscribeTimer);
+                  console.log('重新插播流订阅成功', e.data.stream);
+                  this.subscribInsterStreamSucess = true;
+                })
+                .catch(e => {
+                  console.log('订阅失败', e);
+                });
+            }, 3000);
+          }
+        });
       },
       hideInsertVideoControl() {
         this.constrolUp = false;

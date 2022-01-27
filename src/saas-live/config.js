@@ -30,9 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion']
+    component: 'VmpBasicCenterContainerLive',
+    // children: ['comDocUne']
+    children: ['comStreamList', 'comDocUne', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -48,11 +48,29 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      'comMemberList'
-      // 'comChat'
+      // 'comMemberList'
+      // 'comChat',
+      'comTabMenu',
+      'comTabContent'
     ]
   },
   /*** 布局定义end */
+
+  comTabMenu: {
+    component: 'VmpTabMenu',
+    handleSelect: [
+      {
+        cuid: ['comTabContent'],
+        method: 'switchTo',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+
+  comTabContent: {
+    component: 'VmpTabContainer',
+    children: ['comChat', 'comMemberList', 'comCustomMenu']
+  },
 
   /*** 所有弹窗集合 */
   comAllDialog: {
@@ -267,7 +285,10 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'live'
+    }
   },
   // 文档白板组件
   comDocUne: {
@@ -396,7 +417,6 @@ export const serverConfig = {
       }
     ]
   },
-
   // 分组设置对话框
   dlgGroupSetting: {
     component: 'VmpGroupSetting'
@@ -411,6 +431,13 @@ export const serverConfig = {
         cuid: 'comInsertVideo',
         method: 'closeInserVideoDialog',
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
+      }
+    ],
+    emitOpen: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'openInserVideoDialog',
+        args: []
       }
     ]
   },

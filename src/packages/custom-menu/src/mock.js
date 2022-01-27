@@ -1,4 +1,4 @@
-const menu1 = [
+const mock1 = [
   {
     component_id: 1,
     content: '<p><span style="font-size: 24px;">abc</span></p>'
@@ -17,7 +17,7 @@ const menu1 = [
   }
 ];
 
-const menu2 = [
+const mock2 = [
   {
     component_id: 9,
     inSwitch: 1,
@@ -27,7 +27,7 @@ const menu2 = [
   }
 ];
 
-const menu3 = [
+const mock3 = [
   {
     component_id: 1,
     content: '<p><span style="font-size: 24px;">abc</span></p>'
@@ -35,26 +35,26 @@ const menu3 = [
   {
     component_id: 8
   },
-  {
-    component_id: 7,
-    title: 'AB C'
-  },
+  // {
+  //   component_id: 7,
+  //   title: 'AB C'
+  // },
   {
     component_id: 2,
     imageSrc:
       'https://t-alistatic01.e.vhall.com/upload//aliqr.e.vhall.com/qr.png?t=https://t-webinar.e.vhall.com/v3/lives/watch/800606360'
   },
-  {
-    component_id: 3,
-    webinars: [834527205, 603265575, 666782699, 542135044]
-  },
+  // {
+  //   component_id: 3,
+  //   webinars: [834527205, 603265575, 666782699, 542135044]
+  // },
   {
     component_id: 8
   },
-  {
-    component_id: 4,
-    subjects: [680009208, 180242371]
-  },
+  // {
+  //   component_id: 4,
+  //   subjects: [680009208, 180242371]
+  // },
   {
     component_id: 8
   },
@@ -71,4 +71,4 @@ const menu3 = [
   }
 ];
 
-export default menu3;
+export { mock1, mock2, mock3 };

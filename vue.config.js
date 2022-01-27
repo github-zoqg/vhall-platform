@@ -73,7 +73,7 @@ function getPlugins() {
           rules: [
             {
               search: /sourceMappingURL=/gi,
-              replace: `https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
+              replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
             }
           ]
         }
