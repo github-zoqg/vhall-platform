@@ -48,11 +48,29 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      'comMemberList'
-      // 'comChat'
+      // 'comMemberList'
+      // 'comChat',
+      'comTabMenu',
+      'comTabContent'
     ]
   },
   /*** 布局定义end */
+
+  comTabMenu: {
+    component: 'VmpTabMenu',
+    handleSelect: [
+      {
+        cuid: ['comTabContent'],
+        method: 'switchTo',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+
+  comTabContent: {
+    component: 'VmpTabContainer',
+    children: ['comChat', 'comMemberList', 'comCustomMenu']
+  },
 
   /*** 所有弹窗集合 */
   comAllDialog: {
