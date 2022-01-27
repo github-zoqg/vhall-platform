@@ -128,61 +128,36 @@
         <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="hover">
           <i class="vmp-member-item__control__more"></i>
           <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
-            <template v-if="!isInGroup">
-              <!--设为主讲人-->
+            <template v-for="item in operateList">
               <el-dropdown-item
-                command="setSpeaker"
-                v-if="
-                  tabIndex === 1 &&
-                  isInteract &&
-                  [1, 4, '1', '4'].includes(userInfo.role_name) &&
-                  userInfo.is_speak &&
-                  currentSpeakerId !== userInfo.account_id
-                "
+                :command="item.command"
+                v-if="item.isShow"
+                :disabled="item.disable"
+                :key="item.command"
               >
-                设为主讲
-              </el-dropdown-item>
-              <!--禁言/取消禁言-->
-              <el-dropdown-item command="setBanned" v-if="![1, '1'].includes(userInfo.role_name)">
-                {{ ![0, '0'].includes(userInfo.is_banned) ? '取消' : '聊天' }}禁言
-              </el-dropdown-item>
-              <!--踢出/取消踢出-->
-              <el-dropdown-item command="setKicked" v-if="![1, '1'].includes(userInfo.role_name)">
-                {{ userInfo.is_kicked ? '取消踢出' : '踢出活动' }}
-              </el-dropdown-item>
-              <!--邀请演示-->
-              <el-dropdown-item command="inviteMic" v-if="isShowInvitationItem">
-                邀请演示
-              </el-dropdown-item>
-            </template>
-            <template v-else>
-              <!--邀请演示-->
-              <el-dropdown-item command="inviteMic" v-if="isShowInvitationItem">
-                邀请演示
-              </el-dropdown-item>
-              <!--禁言/取消禁言-->
-              <el-dropdown-item command="setBanned" v-if="![1, '1'].includes(userInfo.role_name)">
-                {{ ![0, '0'].includes(userInfo.is_banned) ? '取消' : '聊天' }}禁言
-              </el-dropdown-item>
-              <el-dropdown-item command="groupSetKicked">
-                {{ userInfo.is_kicked ? '取消踢出' : '踢出小组' }}
-              </el-dropdown-item>
-              <el-dropdown-item
-                command="setLeader"
-                v-if="
-                  [2, '2'].includes(userInfo.role_name) &&
-                  [2, '2'].includes(userInfo.device_type) &&
-                  [0, '0'].includes(userInfo.is_banned) &&
-                  ![2, '2'].includes(userInfo.device_status)
-                "
-              >
-                升为组长
+                {{ item.text }}
               </el-dropdown-item>
             </template>
           </el-dropdown-menu>
         </el-dropdown>
       </template>
-      <template v-if="memberOptions.platformType === 'watch'"></template>
+      <template v-if="memberOptions.platformType === 'watch'">
+        <el-dropdown @command="handleWatchCommand" v-show="isInGroup" trigger="hover">
+          <i class="vmp-member-item__control__more"></i>
+          <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
+            <template v-for="item in watchOperateList">
+              <el-dropdown-item
+                :command="item.command"
+                v-if="item.isShow"
+                :disabled="item.disable"
+                :key="item.command"
+              >
+                {{ item.text }}
+              </el-dropdown-item>
+            </template>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </template>
     </div>
   </div>
 </template>
@@ -289,11 +264,97 @@
     data() {
       return {
         //默认头像
-        defaultAvatar
+        defaultAvatar,
+        //操作项
+        operateList: [
+          //设为主讲
+          {
+            command: 'setSpeaker',
+            isShow: this.isShowSetSpeaker,
+            disable: false,
+            text: '设为主讲',
+            sequence: 1
+          },
+          //设置禁言/取消禁言
+          {
+            command: 'setBanned',
+            isShow: ![1, '1'].includes(this.userInfo.role_name),
+            disable: false,
+            text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
+            sequence: 2
+          },
+          //踢出 / 取消踢出
+          {
+            command: 'setKicked',
+            isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            disable: false,
+            text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
+            sequence: 3
+          },
+          {
+            command: 'setKicked',
+            isShow: this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            disable: false,
+            text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
+            sequence: 4
+          },
+          //邀请演示（全部人员里展示）
+          {
+            command: 'inviteMic',
+            isShow: this.isShowInvitation,
+            disable: this.userInfo.account_id === this.currentSpeakerId,
+            text: '邀请演示',
+            sequence: 5
+          },
+          //升为组长 （全部人员下展示）
+          {
+            command: 'setLeader',
+            isShow: this.isShowSetLeader,
+            disable: false,
+            text: '升为组长',
+            sequence: 6
+          }
+        ],
+        //观看端操作项
+        watchOperateList: [
+          //邀请演示（全部人员里展示）
+          {
+            command: 'inviteMic',
+            isShow: this.isShowWatchInvitation,
+            //todo 确认下presentation_screen
+            disable: this.userInfo.account_id === this.currentSpeakerId,
+            text: '邀请演示',
+            sequence: 1
+          },
+          //设置禁言/取消禁言
+          {
+            command: 'setBanned',
+            isShow: ![2, '2'].includes(this.userInfo.role_name),
+            disable: false,
+            text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
+            sequence: 2
+          },
+          //踢出 / 取消踢出
+          {
+            command: 'setKicked',
+            isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            disable: false,
+            text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
+            sequence: 3
+          },
+          //升为组长
+          {
+            command: 'setLeader',
+            isShow: this.isShowWatchSetLeader,
+            disable: false,
+            text: '升为组长',
+            sequence: 4
+          }
+        ]
       };
     },
     computed: {
-      //人员操作项是否显示
+      //人员操作项是否显示(PC发起)
       showUserControl() {
         return (
           (this.roleName == '1' && this.userInfo.account_id != this.userId && !this.isInGroup) ||
@@ -303,9 +364,34 @@
             this.userInfo.role_name != 20)
         );
       },
-      //是否显示邀请演示操作选项
-      isShowInvitationItem() {
+      //是否展示设为主讲按钮(PC发起)
+      isShowSetSpeaker() {
+        if (!this.isInGroup || this.tabIndex !== 1) {
+          return false;
+        }
+        return (
+          this.isInteract &&
+          [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
+          this.userInfo.is_speak &&
+          this.currentSpeakerId !== this.userInfo.account_id
+        );
+      },
+      //PC观看端设为组长
+      isShowWatchSetLeader() {
+        return (
+          this.tabIndex !== 3 &&
+          [2, '2'].includes(this.userInfo.role_name) &&
+          [2, '2'].includes(this.userInfo.device_type) &&
+          [0, '0'].includes(this.userInfo.is_banned) &&
+          ![2, '2'].includes(this.userInfo.device_status)
+        );
+      },
+      //是否显示邀请演示操作选项(PC发起)
+      isShowInvitation() {
         let isShow = false;
+        if (this.tabIndex !== 1) {
+          return false;
+        }
         //如果不是分组讨论
         if (!this.isInGroup) {
           let validateRoleName = [this.userInfo.role_name, this.roleName].every(item => {
@@ -329,6 +415,34 @@
             [0, '0'].includes(this.userInfo.is_banned);
         }
         return isShow;
+      },
+      //是否显示邀请演示操作选项(PC观看)
+      isShowWatchInvitation() {
+        if ([1, 2].includes(this.tabIndex)) {
+          return (
+            this.isInteract &&
+            [2, '2'].includes(this.userInfo.device_type) &&
+            [0, '0'].includes(this.userInfo.is_banned) &&
+            ![2, '2'].includes(this.userInfo.device_status)
+          );
+        }
+        return false;
+      },
+      //是否显示升为组长选项(PC发起)
+      isShowSetLeader() {
+        if (!this.isInGroup || this.tabIndex !== 1) {
+          return false;
+        }
+        return (
+          [2, '2'].includes(this.userInfo.role_name) &&
+          [2, '2'].includes(this.userInfo.device_type) &&
+          [0, '0'].includes(this.userInfo.is_banned) &&
+          ![2, '2'].includes(this.userInfo.device_status)
+        );
+      },
+      //当前的操作项
+      currentOperateList() {
+        return true;
       }
     },
     methods: {
@@ -344,6 +458,24 @@
       handleInviteMic() {},
       //处理指令
       handleCommand(command) {
+        switch (command) {
+          case 'setBanned':
+            this.handleSetBanned();
+            break;
+          case 'setKicked':
+            this.handleSetKicked();
+            break;
+          case 'setGroupKicked':
+            this.handleSetKicked();
+            break;
+          case 'inviteMic':
+            break;
+          default:
+            break;
+        }
+      },
+      //处理观看端指令
+      handleWatchCommand(command) {
         switch (command) {
           case 'setBanned':
             this.handleSetBanned();
