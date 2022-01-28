@@ -25,103 +25,94 @@
       {{ userInfo.role_name | roleFilter }}
     </span>
     <div class="vmp-member-item__control">
-      <!-- 主讲人 -->
-      <i
-        v-if="
-          (mode != 6 && currentSpeakerId === userInfo.account_id) ||
-          (mode == 6 && userInfo.role_name == 1)
-        "
-        class="vmp-member-item__control__user-icon iconfont iconxing"
-      ></i>
-      <!-- 显示条件：被禁言 -->
-      <i
-        v-show="userInfo.is_banned == 1"
-        class="vmp-member-item__control__user-icon iconfont iconjinyan"
-        style="color: #cccccc"
-      ></i>
+      <!-- 主讲人标识 -->
+      <template v-if="isShowSpeakerFlag">
+        <i class="vmp-member-item__control__user-icon iconfont iconxing"></i>
+      </template>
+
+      <!--被禁言标识 -->
+      <template v-show="[1, 3].includes(tabIndex) && userInfo.is_banned === 1">
+        <i
+          class="vmp-member-item__control__user-icon iconfont iconjinyan"
+          style="color: #cccccc"
+        ></i>
+      </template>
+      <!--被踢出标识 -->
+      <template v-show="tabIndex === 3 && userInfo.is_kicked">
+        <i
+          class="vmp-member-item__control__user-icon iconfont icontichu"
+          style="color: #cccccc"
+        ></i>
+      </template>
       <!-- 显示条件：申请上麦 -->
-      <i
+      <template
         v-show="
+          [1, 2].includes(this.tabIndex) &&
           userInfo.isApply &&
           applyUsers.find(u => u.account_id == userInfo.account_id) &&
           !userInfo.is_speak
         "
-        class="vmp-member-item__control__user-icon iconfont iconxiamai"
-        style="color: #cccccc; font-size: 15px"
-      ></i>
+      >
+        <i
+          class="vmp-member-item__control__user-icon iconfont iconxiamai"
+          style="color: #cccccc; font-size: 15px"
+        ></i>
+      </template>
       <!-- 显示条件：上麦中 -->
-      <i
-        v-if="
-          currentSpeakerId != userInfo.account_id &&
-          userInfo.is_speak &&
-          userInfo.device_status != 2
-        "
-        class="vmp-member-item__control__user-icon iconfont iconxiamai1"
-        style="color: #fc5659; font-size: 15px"
-      ></i>
-      <!-- 设备有问题不能上麦 -->
-      <i
-        v-show="isInteract == '1' && userInfo.device_status == 2"
-        style="color: #fc5659; font-size: 15px; vertical-align: middle"
-        class="iconfont iconhebingxingzhuang vmp-member-item__control__device-abnormal"
-      ></i>
-      <!-- 显示条件：列表中该用户不是是主持人 -->
       <template
         v-if="
-          roleName == '1' &&
-          userInfo.role_name != 1 &&
-          ((isEnjoy && userInfo.role_name == 3) || userInfo.role_name != 3) &&
-          userInfo.role_name != 20 &&
-          userInfo.device_status != 2
+          tabIndex === 1 &&
+          currentSpeakerId !== userInfo.account_id &&
+          userInfo.is_speak &&
+          ![2, '2'].includes(userInfo.device_status)
         "
       >
-        <!--互动直播 没有被禁言 没有上麦 不是移动端 设备可以上麦-->
         <i
-          v-show="
-            isInteract == '1' &&
-            !userInfo.is_banned &&
-            !userInfo.is_speak &&
-            userInfo.device_status == 1
-          "
+          class="vmp-member-item__control__user-icon iconfont iconxiamai1"
+          style="color: #fc5659; font-size: 15px"
+        ></i>
+      </template>
+
+      <!-- 设备有问题不能上麦 -->
+      <template
+        v-show="
+          tabIndex === 1 &&
+          [1, '1'].includes(isInteract) &&
+          [2, '2'].includes(userInfo.device_status)
+        "
+      >
+        <i
+          style="color: #fc5659; font-size: 15px; vertical-align: middle"
+          class="iconfont iconhebingxingzhuang vmp-member-item__control__device-abnormal"
+        ></i>
+      </template>
+      <template v-if="tabIndex === 1">
+        <!--上麦-->
+        <i
+          v-show="isShowUpMic"
           class="vmp-member-item__control__up-mic"
           @click="upMic(userInfo.isApply, userInfo.account_id)"
         >
           上麦
         </i>
-        <!-- 显示条件：当前登录者是主持人  正在上麦 -->
+        <!--下麦-->
         <i
-          v-show="isInteract == '1' && userInfo.is_speak"
+          v-show="isShowDownMic"
           class="vmp-member-item__control__down-mic"
           @click="downMic(userInfo.account_id)"
         >
           下麦
         </i>
-      </template>
-      <!-- 显示条件：列表中该用户是是主持人 -->
-      <template v-if="roleName == '1' && userInfo.role_name == 1 && userInfo.device_status == 1">
+        <!--我要演示-->
         <i
-          v-show="isInteract == '1'"
+          v-show="isShowMyPresentation"
           class="vmp-member-item__control__up-mic widthAuto"
           @click="myPresentation(userInfo.account_id)"
         >
           我要演示
         </i>
-        <i
-          v-show="isInteract == '1' && !userInfo.is_speak"
-          class="vmp-member-item__control__up-mic"
-          @click="upMic(userInfo.isApply, userInfo.account_id)"
-        >
-          上麦
-        </i>
-        <!-- 显示条件：当前登录者是主持人  正在上麦 -->
-        <i
-          v-show="isInteract == '1' && userInfo.is_speak && currentSpeakerId != userId"
-          class="vmp-member-item__control__down-mic"
-          @click="downMic(userInfo.account_id)"
-        >
-          下麦
-        </i>
       </template>
+
       <!-- more显示条件：1、当前登录者是主持人-->
       <!-- more显示条件：2、当前登录者是嘉宾助理并且所选用户是观众 -->
       <template v-if="memberOptions.platformType === 'live'">
@@ -184,7 +175,7 @@
             ret = '组长';
             break;
           default:
-            ret = '未定义';
+            ret = '';
         }
         return ret;
       },
@@ -440,6 +431,74 @@
           ![2, '2'].includes(this.userInfo.device_status)
         );
       },
+      /** 状态标识显示条件 */
+      //是否显示主讲人标识
+      isShowSpeakerFlag() {
+        if (this.tabIndex === 1) {
+          const options = [
+            this.mode !== 6 && this.currentSpeakerId === this.userInfo.account_id,
+            this.mode === 6 && [1, '1'].includes(this.userInfo.role_name)
+          ];
+          return options.some(value => !!value);
+        }
+        return false;
+      },
+      //列表中该用户是否补是主持人身份 todo 调查原本为啥要这样子写，是否可以简化？
+      isNotHost() {
+        const options = [
+          [1, '1'].includes(this.roleName),
+          ![1, '1'].includes(this.userInfo.role_name),
+          (this.isEnjoy && [3, '3'].includes(this.userInfo.role_name)) ||
+            ![3, '3'].includes(this.userInfo.role_name),
+          ![20, '20'].includes(this.userInfo.role_name),
+          ![2, '2'].includes(this.userInfo.device_status)
+        ];
+        return options.every(item => !!item);
+      },
+      //是否是主持人 todo 调查原本为啥要这样子写，是否必要？
+      isHost() {
+        return (
+          [1, '1'].includes(this.roleName) &&
+          [1, '1'].includes(this.userInfo.role_name) &&
+          [1, '1'].includes(this.userInfo.device_status)
+        );
+      },
+      //是否显示上麦标识
+      isShowUpMic() {
+        let isShow = false;
+        if (this.isNotHost) {
+          return (
+            [1, '1'].includes(this.isInteract) &&
+            !this.userInfo.is_banned &&
+            !this.userInfo.is_speak &&
+            [1, '1'].includes(this.userInfo.device_status)
+          );
+        }
+        if (this.isHost) {
+          isShow =
+            [1, '1'].includes(this.isInteract) && !this.userInfo.is_speak && this.status === 1;
+        }
+        return isShow;
+      },
+      //是否显示下麦标识
+      isShowDownMic() {
+        let isShow = false;
+        if (this.isNotHost) {
+          return [1, '1'].includes(this.isInteract) && this.userInfo.is_speak;
+        }
+        if (this.isHost) {
+          isShow =
+            [1, '1'].includes(this.isInteract) &&
+            this.userInfo.is_speak &&
+            this.currentSpeakerId !== this.userId;
+        }
+        return isShow;
+      },
+      //是否显示我要演示
+      isShowMyPresentation() {
+        return this.isHost && [1, '1'].includes(this.isInteract) && this.isInGroup;
+      },
+      /** 状态标识显示条件 */
       //当前的操作项
       currentOperateList() {
         return true;
@@ -493,11 +552,17 @@
         }
       },
       //上麦
-      upMic() {},
+      upMic() {
+        this.$emit('upMic', this.userInfo);
+      },
       //下麦
-      downMic() {},
+      downMic() {
+        this.$emit('downMic', this.userInfo);
+      },
       //我要演示
-      myPresentation() {}
+      myPresentation() {
+        this.$emit('myPresentation', this.userInfo);
+      }
     }
   };
 </script>

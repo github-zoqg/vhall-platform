@@ -30,7 +30,7 @@
                   :is-in-group="isInGroup"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="currentSpeakerId"
+                  :current-speaker-id="docPermissionId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -55,11 +55,16 @@
                 <member-item
                   :key="user.account_id"
                   v-if="![1, '1'].includes(user.is_kicked)"
+                  @operateUser="handleOperateUser"
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
+                  :mode="mode"
                   :member-options="memberOptions"
+                  :current-speaker-id="docPermissionId"
+                  :user-id="userId"
                   :tab-index="tabIndex"
+                  :apply-users="applyUsers"
                 ></member-item>
               </template>
             </template>
@@ -80,12 +85,16 @@
               <template v-for="user in limitedUsers">
                 <member-item
                   :key="user.account_id"
-                  v-if="![1, '1'].includes(user.is_kicked)"
+                  @operateUser="handleOperateUser"
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
+                  :mode="mode"
                   :member-options="memberOptions"
+                  :current-speaker-id="docPermissionId"
+                  :user-id="userId"
                   :tab-index="tabIndex"
+                  :apply-users="applyUsers"
                 ></member-item>
               </template>
             </template>
