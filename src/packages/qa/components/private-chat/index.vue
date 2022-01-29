@@ -117,8 +117,10 @@
 </template>
 
 <script>
+  import { useRoomBaseServer, useQaServer } from 'middle-domain';
   import smallEmoji from '@/packages/chat/src/components/emoji.vue';
   import { textToEmoji, textToEmojiText } from '@/packages/chat/src/js/emoji';
+
   import Vue from 'vue';
 
   export default {
@@ -136,7 +138,6 @@
         acrivePrivate: 0, // 当前私聊对象
         activeName: '',
         privateValue: '', // 私聊内容
-        // userList: this.priteChatList, // 私聊列表
         chatList: [] // 获取到
       };
     },
@@ -207,6 +208,11 @@
         return this.priteChatList;
       }
     },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      this.qaServer = useQaServer();
+    },
+    beforeDestroy() {},
     mounted() {
       const sessionUser = sessionStorage.getItem('userInfo');
       const userInfo = sessionUser ? JSON.parse(sessionUser) : null;

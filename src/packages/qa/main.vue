@@ -104,7 +104,7 @@
                     class="setBut">在直播中回答此问题</span> -->
                   <el-dropdown @command="replyBut" class="setBut">
                     <el-button class="el-dropdown-link">更多</el-button>
-                    <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-menu slot="dropdown" class="qa-more__dropdown">
                       <el-dropdown-item :command="{ type: 'private', item: item, index }">
                         私聊
                       </el-dropdown-item>
@@ -399,7 +399,7 @@
       </div>
     </div>
     <div class="private-window" v-show="privateFlag">
-      <Private
+      <PrivateChat
         ref="private"
         :userInfo="baseObj"
         :webinar_id="webinar_id"
@@ -407,7 +407,7 @@
         :priteChatList="priteChatList"
         @close="privateClose"
         @sendMsg="privateSendMsg"
-      ></Private>
+      ></PrivateChat>
     </div>
     <el-dialog
       title="文字回复"
@@ -445,20 +445,14 @@
 </template>
 
 <script>
-  import Private from './components/private-chat/index';
+  import { useRoomBaseServer, useQaServer } from 'middle-domain';
+  import PrivateChat from './components/private-chat/index';
   import { getQueryString } from './utils';
   import { textToEmoji, textToEmojiText } from '@/packages/chat/src/js/emoji';
   export default {
-    name: 'qa',
+    name: 'VmpQa',
     components: {
-      Private
-    },
-    computed: {
-      filterTime() {
-        return function (time) {
-          return this.$moment(time).format('HH:mm');
-        };
-      }
+      PrivateChat
     },
     filters: {
       filterRoleName(val) {
@@ -523,19 +517,9 @@
           exactSearch2: '', // 文字回复检索
           exactSearch3: '' // 未处理检索
         },
-        List: [
-          { text: '未回复', count: 0 },
-          { text: '直播中回答', count: 0 },
-          { text: '文字回复', count: 0 },
-          { text: '不处理', count: 0 }
-        ],
+
         active: 0, // 当前正在展示的Dom
-        activeObj: {}, // 当前正在展示的信息
-        baseObj: {},
-        awaitList: [], // 待处理
-        textDealList: [], // 文字回复
-        audioList: [], // 直播中回答
-        noDealList: [], // 不处理
+
         $Chat: null, // 聊天句柄
         privateFlag: false,
         textDalog: false, // 是否显示输入框
@@ -556,20 +540,64 @@
         isSearch: false // 是否是正在搜索数据
       };
     },
-    async created() {
+    computed: {
+      //主办方信息
+      baseObj() {
+        return this.$domainStore.state.qaServer.baseObj;
+      },
+      awaitList() {
+        return this.$domainStore.state.qaServer.awaitList;
+      }, // 待处理
+      textDealList() {
+        return this.$domainStore.state.qaServer.textDealList;
+      }, // 文字回复
+      audioList() {
+        return this.$domainStore.state.qaServer.audioList;
+      }, // 直播中回答
+      noDealList() {
+        return this.$domainStore.state.qaServer.noDealList;
+      }, // 不处理
+      activeObj() {
+        return this.$domainStore.state.qaServer.activeObj;
+      },
+      List() {
+        return this.$domainStore.state.qaServer.List;
+      },
+      filterTime() {
+        return function (time) {
+          return this.$moment(time).format('HH:mm');
+        };
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      this.qaServer = useQaServer();
+    },
+    async mounted() {
+      this.webinar_id = this.$router.currentRoute.params.id;
+
       if (location.search.includes('assistant_token=')) {
         sessionStorage.setItem('vhall_client_token', getQueryString('assistant_token') || '');
       }
-      await this.getInitChatMess();
-      await this.getPrivateList(); // 获取私聊列表
+
+      await this.qaServer
+        .InitChatMess({
+          webinar_id: this.webinar_id
+        })
+        .catch(err => {
+          this.$message.error(err.msg);
+        });
+
+      await this.getPrivateList();
+
       this.getChat(0); // 待处理
       this.getChat(1); // 不处理
       this.getChat(2); // 直播中回答
       this.setReply(); // 文字回复
-      this.initChat();
-    },
-    mounted() {
-      this.webinar_id = this.$router.currentRoute.params.id;
+
+      // this.initChat();
+
+      //事件监听
       this.$EventBus.$on('question_answer_create', e => {
         // 发起端收到消息
         e.content = this.emojiToText(e.content);
@@ -581,6 +609,17 @@
       });
     },
     methods: {
+      //获取私聊列表
+      async getPrivateList() {
+        await this.qaServer
+          .getPrivateList({
+            room_id: this.baseObj.interact.room_id,
+            webinar_id: this.$router.currentRoute.params.id
+          })
+          .catch(err => {
+            this.$message.error(err.msg);
+          });
+      },
       handlerAnswer(statu) {
         this.sendMessage.Radio = statu == 'public' ? 1 : 0;
         this.textReply();
@@ -603,27 +642,13 @@
         // 重新查询下数据
         this.handleSearchQaList();
       },
-      getInitChatMess() {
-        return new Promise(resolve => {
-          this.$fetch('v3InitChatMess', { webinar_id: this.$router.currentRoute.params.id })
-            .then(res => {
-              this.baseObj = res.data;
-              sessionStorage.setItem('interact_token', res.data.interact.interact_token);
-              resolve();
-            })
-            .catch(err => {
-              this.$message.error(err.msg);
-              resolve();
-            });
-        });
-      },
       select(index) {
         this.active = index;
         this.isSearch = false;
-        this.activeObj = Object.assign(this.activeObj, {
-          active: index,
-          count: this.List[index].count
-        });
+        // this.activeObj = Object.assign(this.activeObj, {
+        //   active: index,
+        //   count: this.List[index].count
+        // });
         this.$nextTick(() => {
           this.searchParams.page = 1;
         });
@@ -672,55 +697,18 @@
           this.getChat(type, (val - 1) * 20, searchContent);
         }
       },
-      getChat(val, pagePos, str) {
-        this.$fetch('getAutherQa', {
-          room_id: this.baseObj.interact.room_id,
-          type: val,
-          limit: 20,
-          keyword: str,
-          pos: pagePos || 0,
-          sort_sequence: 1 // 是否按序号正序排列 0 否 1 是
-        })
-          .then(res => {
-            if (res.code == 200) {
-              try {
-                res.data.list.forEach(item => {
-                  if (item.content) {
-                    item.content = textToEmojiText(item.content);
-                  }
-                });
-              } catch (error) {
-                console.warn(error, '聊天消息过滤错误');
-              }
-              switch (val) {
-                case 0:
-                  this.awaitList = res.data.list;
-                  this.List[0].count = res.data.total;
-                  this.activeObj = Object.assign(this.activeObj, {
-                    active: 0,
-                    count: res.data.total
-                  });
-                  break;
-                case 1:
-                  console.log('aaaaaaa', val, res.data.list);
-                  this.noDealList = res.data.list;
-                  this.List[3].count = res.data.total;
-                  this.activeObj.count = res.data.total;
-                  break;
-                case 2:
-                  this.audioList = res.data.list;
-                  this.List[1].count = res.data.total;
-                  this.activeObj.count = res.data.total;
-                  break;
-              }
-              console.log('9090090909', this.activeObj);
-            } else {
-              this.$message.error(res.msg);
-            }
-            // console.log(this.total, this.isSearch, '??')
+      getChat(type, pagePos, str) {
+        this.qaServer
+          .getAutherQa({
+            room_id: this.baseObj.interact.room_id,
+            type: type,
+            limit: 20,
+            keyword: str,
+            pos: pagePos || 0,
+            sort_sequence: 1 // 是否按序号正序排列 0 否 1 是
           })
           .catch(err => {
-            console.log(err);
+            this.$message.error(err.msg);
           });
       },
       setReply(pagePos, keyword) {
@@ -949,33 +937,56 @@
             }
           }
         });
-      },
-      getPrivateList() {
-        return new Promise(resolve => {
-          this.$fetch('v3GetPrivateList', {
-            room_id: this.baseObj.interact.room_id,
-            webinar_id: this.$router.currentRoute.params.id
-          })
-            .then(res => {
-              this.priteChatList = res.data.list;
-              resolve();
-            })
-            .catch(err => {
-              console.warn('获取私聊联系人出现错误', err);
-              this.$message.error(err.msg);
-              resolve(err);
-            });
-        });
       }
     }
   };
 </script>
 
 <style lang="less">
+  .el-dropdown-menu {
+    &.qa-more__dropdown {
+      background-color: #fff;
+      border: 1px solid #ebeef5;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+      .el-dropdown-menu__item {
+        &:focus,
+        &:not(.is-disabled):hover {
+          color: #606266;
+          background-color: #ecf5ff;
+        }
+      }
+
+      &.el-popper[x-placement^='bottom'] .popper__arrow {
+        border-bottom-color: transparent;
+      }
+      &.el-popper[x-placement^='bottom'] .popper__arrow::after {
+        border-bottom-color: #fff;
+      }
+      &.el-popper[x-placement^='top'] .popper__arrow {
+        border-top-color: transparent;
+      }
+      &.el-popper[x-placement^='top'] .popper__arrow::after {
+        border-top-color: #fff;
+      }
+    }
+  }
+
   .new-qa {
     background: #f7f7f7;
     height: 100%;
     min-height: 780px;
+    .fl {
+      float: left;
+    }
+    .clearFix:after {
+      clear: both;
+      content: '';
+      display: block;
+      width: 0;
+      height: 0;
+      visibility: hidden;
+    }
     &::-webkit-scrollbar {
       width: 5px;
     }
@@ -1013,8 +1024,6 @@
             border-top-right-radius: 4px;
             border: 1px solid #e6e6e6;
             font-size: 14px;
-            font-family: PingFangSC-Regular, PingFang SC;
-            font-weight: 400;
             line-height: 42px;
             margin-top: 1px;
             cursor: pointer;
@@ -1076,9 +1085,6 @@
               line-height: 14px;
               margin-top: 4px;
               float: left;
-            }
-            &::-webkit-scrollbar {
-              width: 5px;
             }
             font-size: 14px;
             li {
@@ -1183,11 +1189,6 @@
             }
           }
           .text-deal {
-            // &::-webkit-scrollbar {
-            //   display: none; /* Chrome Safari */
-            // }
-            // -ms-overflow-style: none;
-            // scrollbar-width: none;
             &::-webkit-scrollbar {
               height: 6px;
               border-radius: 10px;
