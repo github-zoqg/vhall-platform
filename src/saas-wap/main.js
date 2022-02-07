@@ -2,9 +2,13 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import { initGlobalAPI, i18n } from './core';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
-import(`./assets/styles/skins/${window.$globalConfig.currentSkin}.less`);
 import domainStore from './domain';
+
+import 'overlayscrollbars/css/OverlayScrollbars.css';
+// 导入样式及皮肤
+import './assets/styles/common.less';
+import './assets/styles/skins/index.less';
+
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 // 初始化
 initGlobalAPI();

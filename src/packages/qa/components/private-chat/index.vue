@@ -240,47 +240,51 @@
         }
       },
       listener() {
-        window.privateChat.onChat(msg => {
-          if (typeof msg !== 'object') {
-            msg = JSON.parse(msg);
-          }
-          try {
-            if (typeof msg.context !== 'object') {
-              msg.context = JSON.parse(msg.context);
-            }
-            if (msg.context.form == 'self') {
-              return;
-            }
-          } catch (e) {
-            console.log(e);
-          }
-          msg.text_content = textToEmojiText(msg.text_content);
-          if (
-            msg.user_id &&
-            !Object.prototype.hasOwnProperty.call(this.newMessageIds, msg.user_id) &&
-            this.userList[this.acrivePrivate].user_id != msg.user_id
-          ) {
-            Vue.set(this.newMessageIds, msg.user_id, msg.user_id);
-          }
-          if (
-            (this.userList[this.acrivePrivate].account_id ||
-              this.userList[this.acrivePrivate].user_id) == msg.user_id
-          ) {
-            const newCurrentUserInList = this.userList[this.acrivePrivate];
-            // 根据消息中的最新昵称和头像与当前用户保持一致
-            newCurrentUserInList.nickname = msg.context.nick_name;
-            newCurrentUserInList.avatar = msg.context.avatar;
-            this.$set(this.userList, this.acrivePrivate, newCurrentUserInList);
-            if (msg.context.to && msg.context.to != '') {
-              const time = msg.date_time;
-              if (time) {
-                msg.date_time = this.$moment(time).format('HH:mm:ss');
-              }
-              this.chatList.push(msg);
-              this.scrollBottom();
-            }
-          }
+        this.qaServer.chatInstance.onChat(msg => {
+          this.onChatMsg(msg);
         });
+      },
+      //处理聊天消息
+      onChatMsg(msg) {
+        if (typeof msg !== 'object') {
+          msg = JSON.parse(msg);
+        }
+        try {
+          if (typeof msg.context !== 'object') {
+            msg.context = JSON.parse(msg.context);
+          }
+          if (msg.context.form == 'self') {
+            return;
+          }
+        } catch (e) {
+          console.log(e);
+        }
+        msg.text_content = textToEmojiText(msg.text_content);
+        if (
+          msg.user_id &&
+          !Object.prototype.hasOwnProperty.call(this.newMessageIds, msg.user_id) &&
+          this.userList[this.acrivePrivate].user_id != msg.user_id
+        ) {
+          Vue.set(this.newMessageIds, msg.user_id, msg.user_id);
+        }
+        if (
+          (this.userList[this.acrivePrivate].account_id ||
+            this.userList[this.acrivePrivate].user_id) == msg.user_id
+        ) {
+          const newCurrentUserInList = this.userList[this.acrivePrivate];
+          // 根据消息中的最新昵称和头像与当前用户保持一致
+          newCurrentUserInList.nickname = msg.context.nick_name;
+          newCurrentUserInList.avatar = msg.context.avatar;
+          this.$set(this.userList, this.acrivePrivate, newCurrentUserInList);
+          if (msg.context.to && msg.context.to != '') {
+            const time = msg.date_time;
+            if (time) {
+              msg.date_time = this.$moment(time).format('HH:mm:ss');
+            }
+            this.chatList.push(msg);
+            this.scrollBottom();
+          }
+        }
       },
       delCom(val) {
         if (val.code != 200) {
