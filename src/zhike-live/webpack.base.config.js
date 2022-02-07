@@ -6,43 +6,30 @@ const path = require('path');
 const pathConfig = require('../../scripts/path-config');
 const pkg = require('./package.json');
 
-/**
- * 解析命令后面的参数
- * @param {*} argv
- * @returns
- */
-const parseArgv = argv => {
-  const rawArgv = argv.slice(2);
-  return require('minimist')(rawArgv);
-};
-
-const argv = process.argv;
-const args = parseArgv(argv);
-const { buildVersion } = args;
-
 const htmlConfig = {
   // cdn js
   cdnJs: {
-    vue: '//t-alistatic01.e.vhall.com/3rdlibs/vue/2.6.14/vue.min.js',
+    vue: '//t-alistatic01.e.vhall.com/3rdlibs/vue/2.6.14/vue.js',
     VueRouter: '//t-alistatic01.e.vhall.com/3rdlibs/vue-router/3.5.2/vue-router.min.js',
     Moment: '//cnstatic01.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
-    MiddleEventSdk:
-      '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.0.1/index.min.js',
-    MiddleDomain:
-      '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.0.0/dist/lib/middleDomain.js',
+    MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
+    // MiddleDomain:
+    //   '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.0.0/dist/lib/middleDomain.js',
+    MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
     ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
-    doc: '//static.vhallyun.com/jssdk/vhall-jssdk-doc/latest/vhall-jssdk-doc-3.2.0.js',
-    chat: '//static.vhallyun.com/jssdk/vhall-jssdk-chat/latest/vhall-jssdk-chat-2.1.4.js',
-    player: '//static.vhallyun.com/jssdk/vhall-jssdk-player/latest/vhall-jssdk-player-2.4.0.js',
-    interaction:
-      '//static.vhallyun.com/jssdk/vhall-jssdk-interaction/latest/vhall-jssdk-interaction-2.3.6.js'
+    vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
+    // doc: '//static.vhallyun.com/jssdk/vhall-jssdk-doc/latest/vhall-jssdk-doc-3.2.0.js',
+    // chat: '//static.vhallyun.com/jssdk/vhall-jssdk-chat/latest/vhall-jssdk-chat-2.1.4.js',
+    // player: '//static.vhallyun.com/jssdk/vhall-jssdk-player/latest/vhall-jssdk-player-2.4.0.js',
+    // interaction:
+    //   '//static.vhallyun.com/jssdk/vhall-jssdk-interaction/latest/vhall-jssdk-interaction-2.3.6.js'
   },
   // cdn css
   cdnCss: {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    iconfont: '//static-component.vhall.com/iconfont/saas/v1/pc-lives/iconfont.css'
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-zk-pc/iconfont.css'
   },
   // dns-prefetch
   dnsPrefetch: {
@@ -55,10 +42,6 @@ const htmlConfig = {
 
 let outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name);
 
-if (buildVersion) {
-  outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name, pkg.version);
-}
-
 module.exports = {
   outputDir: outputDir,
   pages: {
@@ -67,6 +50,7 @@ module.exports = {
       filename: 'index.html',
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
+      version: pkg.version,
       ...htmlConfig
     }
   }
