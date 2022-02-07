@@ -232,8 +232,8 @@
             <template v-for="item in operateList">
               <el-dropdown-item
                 :command="item.command"
-                v-if="item.isShow"
-                :disabled="item.disable"
+                v-if="getPropertyByKey(item, 'isShow')"
+                :disabled="getPropertyByKey(item, 'disable')"
                 :key="item.command"
               >
                 {{ item.text }}
@@ -249,8 +249,8 @@
             <template v-for="item in watchOperateList">
               <el-dropdown-item
                 :command="item.command"
-                v-if="item.isShow"
-                :disabled="item.disable"
+                v-if="getPropertyByKey(item, 'isShow')"
+                :disabled="getPropertyByKey(item, 'disable')"
                 :key="item.command"
               >
                 {{ item.text }}
@@ -371,7 +371,8 @@
           //设为主讲
           {
             command: 'setSpeaker',
-            isShow: this.isShowSetSpeaker,
+            //在对应的计算属性中判断
+            isShow: 'isShowSetSpeaker',
             disable: false,
             text: '设为主讲',
             sequence: 1
@@ -402,7 +403,7 @@
           //邀请演示（全部人员里展示）
           {
             command: 'inviteMic',
-            isShow: this.isShowInvitation,
+            isShow: 'isShowInvitation',
             disable: this.userInfo.account_id === this.currentSpeakerId,
             text: '邀请演示',
             sequence: 5
@@ -410,7 +411,7 @@
           //升为组长 （全部人员下展示）
           {
             command: 'setLeader',
-            isShow: this.isShowSetLeader,
+            isShow: 'isShowSetLeader',
             disable: false,
             text: '升为组长',
             sequence: 6
@@ -421,7 +422,7 @@
           //邀请演示（全部人员里展示）
           {
             command: 'inviteMic',
-            isShow: this.isShowWatchInvitation,
+            isShow: 'isShowWatchInvitation',
             //todo 确认下presentation_screen
             disable: this.userInfo.account_id === this.currentSpeakerId,
             text: '邀请演示',
@@ -446,7 +447,7 @@
           //升为组长
           {
             command: 'setLeader',
-            isShow: this.isShowWatchSetLeader,
+            isShow: 'isShowWatchSetLeader',
             disable: false,
             text: '升为组长',
             sequence: 4
@@ -609,9 +610,11 @@
         return this.isHost && [1, '1'].includes(this.isInteract) && this.isInGroup;
       },
       /** 状态标识显示条件 */
-      //当前的操作项
-      currentOperateList() {
-        return true;
+      //获取属性值
+      getPropertyByKey() {
+        return function (item = {}, keyName = '') {
+          return typeof item[keyName] === 'boolean' ? item[keyName] : this[item[keyName]];
+        };
       }
     },
     methods: {
@@ -624,7 +627,9 @@
         this.$emit('operateUser', { type: 'setBanned', params: this.userInfo });
       },
       //邀请演示
-      handleInviteMic() {},
+      handleInviteMic() {
+        this.$emit('operateUser', { type: 'inviteMic', params: this.userInfo });
+      },
       //处理指令
       handleCommand(command) {
         switch (command) {
@@ -638,6 +643,7 @@
             this.handleSetKicked();
             break;
           case 'inviteMic':
+            this.handleInviteMic();
             break;
           default:
             break;

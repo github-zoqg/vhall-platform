@@ -241,7 +241,7 @@
         tabIndex: 1,
         //总人数
         totalNum: 0,
-        //todo 是否允许举手
+        //是否允许举手
         allowRaiseHand: false,
         // 举手提示
         raiseHandTip: false,
@@ -1009,7 +1009,6 @@
           localUser: {}
         };
         const inavInfo = this.interactiveServer.getRoomInfo();
-        console.log('wwwwwwwww', inavInfo);
         const users = inavInfo.remote.users.concat(inavInfo.local.user || {});
         users.forEach(u => {
           // 判断一下有没有人用插播或桌面
@@ -1157,7 +1156,11 @@
               room_id: this.roomId,
               type: this.isInGroup ? 1 : 0
             };
-            kickedUser(params).then(() => {
+            kickedUser(params).then(res => {
+              let { msg = '', code } = res || {};
+              if (![200, '200'].includes(code)) {
+                return this.$message.error(msg);
+              }
               // 踢出只能在在线和举手列表操作
               //todo 上报事件
               if (nextStatus) {
