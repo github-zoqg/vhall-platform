@@ -37,6 +37,7 @@ import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpUserAccount from '@/packages/user-account'; // 个人资料
 import VmpCash from '@/packages/cash'; // 提现
+import VmpWatchNavMenu from '@/packages/watch-nav-menu'; // 观看端侧边栏
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -70,4 +71,5 @@ export function initUse() {
   Vue.use(VmpSignUpForm);
   Vue.use(VmpUserAccount);
   Vue.use(VmpCash);
+  Vue.use(VmpWatchNavMenu);
 }
