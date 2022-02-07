@@ -445,7 +445,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useQaServer } from 'middle-domain';
+  import { useRoomBaseServer, useMsgServer, useQaServer } from 'middle-domain';
   import PrivateChat from './components/private-chat/index';
   import { getQueryString } from './utils';
   import { textToEmoji, textToEmojiText } from '@/packages/chat/src/js/emoji';
@@ -496,30 +496,7 @@
     },
     data() {
       return {
-        testAnswer: 2,
-        testAnswerSelects: [
-          {
-            label: '全部回答',
-            value: 2
-          },
-          {
-            label: '公开回答',
-            value: 1
-          },
-          {
-            label: '悄悄回答',
-            value: 0
-          }
-        ],
-        exactSearch: {
-          exactSearch0: '', // 待处理检索
-          exactSearch1: '', // 直播中问答检索
-          exactSearch2: '', // 文字回复检索
-          exactSearch3: '' // 未处理检索
-        },
-
         active: 0, // 当前正在展示的Dom
-
         $Chat: null, // 聊天句柄
         privateFlag: false,
         textDalog: false, // 是否显示输入框
@@ -528,14 +505,13 @@
           text: '',
           Radio: '1' // 信息类型
         },
-        openReply: true, // 文字回复之公开
-        privacyReply: true, // 文字回复之隐私
+        // openReply: true, // 文字回复之公开
+        // privacyReply: true, // 文字回复之隐私
         searchParams: {
           page_size: 20,
           page: 0
         },
-        onlyChatMess: {}, // 当前私聊对象
-        priteChatList: [], // 私聊列表
+
         webinar_id: null,
         isSearch: false // 是否是正在搜索数据
       };
@@ -563,6 +539,21 @@
       List() {
         return this.$domainStore.state.qaServer.List;
       },
+      exactSearch() {
+        return this.$domainStore.state.qaServer.exactSearch;
+      },
+      testAnswer() {
+        return this.$domainStore.state.qaServer.testAnswer;
+      },
+      testAnswerSelects() {
+        return this.$domainStore.state.qaServer.testAnswerSelects;
+      },
+      onlyChatMess() {
+        return this.$domainStore.state.qaServer.onlyChatMess;
+      },
+      priteChatList() {
+        return this.$domainStore.state.qaServer.priteChatList;
+      },
       filterTime() {
         return function (time) {
           return this.$moment(time).format('HH:mm');
@@ -572,6 +563,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.qaServer = useQaServer();
+      console.log('qa useMsgServer------>', useMsgServer);
     },
     async mounted() {
       this.webinar_id = this.$router.currentRoute.params.id;
@@ -595,18 +587,18 @@
       this.getChat(2); // 直播中回答
       this.setReply(); // 文字回复
 
-      // this.initChat();
+      this.initChat();
 
       //事件监听
-      this.$EventBus.$on('question_answer_create', e => {
-        // 发起端收到消息
-        e.content = this.emojiToText(e.content);
-        this.awaitList.push(e);
-        this.$nextTick(() => {
-          this.List[0].count = this.awaitList.length;
-          console.warn(this.awaitList, 'this.awaitList');
-        });
-      });
+      // this.$EventBus.$on('question_answer_create', e => {
+      //   // 发起端收到消息
+      //   e.content = this.emojiToText(e.content);
+      //   this.awaitList.push(e);
+      //   this.$nextTick(() => {
+      //     this.List[0].count = this.awaitList.length;
+      //     console.warn(this.awaitList, 'this.awaitList');
+      //   });
+      // });
     },
     methods: {
       //获取私聊列表
@@ -852,25 +844,26 @@
       },
       // 初始化
       initChat() {
-        const option = {
-          appId: this.baseObj.interact.paas_app_id, // appId 必须
-          accountId: this.baseObj.join_info.third_party_user_id, // 第三方用户ID
-          channelId: this.baseObj.interact.channel_id, // 频道id 必须
-          token: this.baseObj.interact.paas_access_token, // 必须， token，初始化接口获取
-          hide: true
-        };
-        window.VhallChat.createInstance(
-          option,
-          event => {
-            this.$Chat = event.message; // 聊天实例句柄
-            window.privateChat = event.message;
-            this.$refs.private.listener();
-            this.monitor();
-          },
-          err => {
-            console.error(err);
-          }
-        );
+        // const option = {
+        //   appId: this.baseObj.interact.paas_app_id, // appId 必须
+        //   accountId: this.baseObj.join_info.third_party_user_id, // 第三方用户ID
+        //   channelId: this.baseObj.interact.channel_id, // 频道id 必须
+        //   token: this.baseObj.interact.paas_access_token, // 必须， token，初始化接口获取
+        //   hide: true
+        // };
+        // window.VhallChat.createInstance(
+        //   option,
+        //   event => {
+        //     this.$Chat = event.message; // 聊天实例句柄
+        //     window.privateChat = event.message;
+        //     this.$refs.private.listener();
+        //     this.monitor();
+        //   },
+        //   err => {
+        //     console.error(err);
+        //   }
+        // );
+        this.qaServer.InitChatInstance();
       },
       emojiToText(content) {
         return textToEmoji(content)
