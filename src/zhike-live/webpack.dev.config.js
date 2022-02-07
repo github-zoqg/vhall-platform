@@ -5,7 +5,8 @@ const htmlConfig = {
   // cdn css
   cdnCss: {
     // iconfontCommon: '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/iconfont.css',
-    iconfont: '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-zk-pc/iconfont.css'
+    iconfont:
+      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-zk-pc/v1.0.0/iconfont.css'
   }
 };
 
