@@ -8,7 +8,8 @@ import {
   useRoomBaseServer,
   useMicServer,
   useMemberServer,
-  useQaServer
+  useQaServer,
+  useGroupServer
 } from 'middle-domain';
 
 setBaseUrl('https://t-saas-dispatch.vhall.com');
@@ -27,6 +28,7 @@ export default new DomainStore.Store({
     interactiveServer: useInteractiveServer().state,
     micServer: useMicServer().state,
     memberServer: useMemberServer().state,
-    qaServer: useQaServer().state
+    qaServer: useQaServer().state,
+    groupServer: useGroupServer().state
   }
 });
