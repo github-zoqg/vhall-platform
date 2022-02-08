@@ -32,7 +32,8 @@
 <script>
   // import { mapState } from 'vuex';
   // import { contextServer } from 'middle-domain';
-
+  import { useRoomBaseServer } from 'middle-domain';
+  const roomBaseServer = useRoomBaseServer();
   export default {
     name: 'VmpWatchNavMenu',
     props: {
@@ -78,63 +79,63 @@
       }
     },
     created() {
-      this.groupInitData = this.roomBaseServer.state.groupInitData;
+      this.groupInitData = roomBaseServer.state.groupInitData;
       this.isInGroup = this.groupInitData.isInGroup;
-      // 切换chainal
-      this.$VhallEventBus.$on(this.$VhallEventType.Group.GROUP_MSG_CREATED, msg => {
-        console.log(msg, '切换chainal');
-        this.groupInitData = this.roomBaseServer.state.groupInitData;
-        this.isInGroup = true;
-      });
-      // 结束讨论
-      this.$VhallEventBus.$on(this.$VhallEventType.Group.GROUP_SWITCH_END, msg => {
-        console.log(msg, '结束讨论');
-        this.isInGroup = false;
-      });
-      // 分组解散
-      this.$VhallEventBus.$on(this.$VhallEventType.Group.GROUP_DISBAND, msg => {
-        // TODO: 与结束讨论方法相同
-        console.log(msg, '分组解散');
-        this.isInGroup = false;
-        this.$emit('changeSpeaker', false);
-      });
-      // 同意邀请成功 ——> 开始演示
-      this.$VhallEventBus.$on(this.$VhallEventType.Group.VRTC_CONNECT_PRESENTATION_SUCCESS, msg => {
-        if (this.watchInitData.join_info.third_party_user_id == msg.sender_id) {
-          this.$emit('changeSpeaker', true);
-        } else {
-          this.$emit('changeSpeaker', false);
-        }
-      });
-      // 踢出小组
-      this.$VhallEventBus.$on(this.$VhallEventType.Group.ROOM_GROUP_KICKOUT, msg => {
-        if (this.watchInitData.join_info.third_party_user_id == msg.target_id) {
-          this.isInGroup = false;
-        }
-      });
-      // 开启/关闭桌面共享
-      this.$VhallEventBus.$on('changeNavItem', msg => {
-        console.log(msg, '开启桌面共享');
-        if (msg) {
-          this.menuList[2].name = '关闭共享';
-          // 开启桌面共享更改按钮状态的时候，需要记录选中的按钮，关闭桌面共享的时候还原
-          this.selectedMenuBeforeShareScreen = this.currentNav;
-          this.currentNav = 'startShareScreen';
-        } else {
-          this.menuList[2].name = '桌面共享';
-          this.currentNav = this.selectedMenuBeforeShareScreen;
-        }
-      });
-      /**
-       * @description 同步文档/白板切换状态
-       */
-      this.$VhallEventBus.$on('docTypeChagne', type => {
-        if (type === 'document') {
-          this.currentNav = type;
-        } else if (type === 'board') {
-          this.currentNav = 'whiteboard';
-        }
-      });
+      // // 切换chainal
+      // this.$VhallEventBus.$on(this.$VhallEventType.Group.GROUP_MSG_CREATED, msg => {
+      //   console.log(msg, '切换chainal');
+      //   this.groupInitData = roomBaseServer.state.groupInitData;
+      //   this.isInGroup = true;
+      // });
+      // // 结束讨论
+      // this.$VhallEventBus.$on(this.$VhallEventType.Group.GROUP_SWITCH_END, msg => {
+      //   console.log(msg, '结束讨论');
+      //   this.isInGroup = false;
+      // });
+      // // 分组解散
+      // this.$VhallEventBus.$on(this.$VhallEventType.Group.GROUP_DISBAND, msg => {
+      //   // TODO: 与结束讨论方法相同
+      //   console.log(msg, '分组解散');
+      //   this.isInGroup = false;
+      //   this.$emit('changeSpeaker', false);
+      // });
+      // // 同意邀请成功 ——> 开始演示
+      // this.$VhallEventBus.$on(this.$VhallEventType.Group.VRTC_CONNECT_PRESENTATION_SUCCESS, msg => {
+      //   if (this.watchInitData.join_info.third_party_user_id == msg.sender_id) {
+      //     this.$emit('changeSpeaker', true);
+      //   } else {
+      //     this.$emit('changeSpeaker', false);
+      //   }
+      // });
+      // // 踢出小组
+      // this.$VhallEventBus.$on(this.$VhallEventType.Group.ROOM_GROUP_KICKOUT, msg => {
+      //   if (this.watchInitData.join_info.third_party_user_id == msg.target_id) {
+      //     this.isInGroup = false;
+      //   }
+      // });
+      // // 开启/关闭桌面共享
+      // this.$VhallEventBus.$on('changeNavItem', msg => {
+      //   console.log(msg, '开启桌面共享');
+      //   if (msg) {
+      //     this.menuList[2].name = '关闭共享';
+      //     // 开启桌面共享更改按钮状态的时候，需要记录选中的按钮，关闭桌面共享的时候还原
+      //     this.selectedMenuBeforeShareScreen = this.currentNav;
+      //     this.currentNav = 'startShareScreen';
+      //   } else {
+      //     this.menuList[2].name = '桌面共享';
+      //     this.currentNav = this.selectedMenuBeforeShareScreen;
+      //   }
+      // });
+      // /**
+      //  * @description 同步文档/白板切换状态
+      //  */
+      // this.$VhallEventBus.$on('docTypeChagne', type => {
+      //   if (type === 'document') {
+      //     this.currentNav = type;
+      //   } else if (type === 'board') {
+      //     this.currentNav = 'whiteboard';
+      //   }
+      // });
     },
     methods: {
       closeNav() {
