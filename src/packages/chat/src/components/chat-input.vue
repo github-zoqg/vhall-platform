@@ -374,7 +374,7 @@
             console.log(e);
           }
           this.atList.push({
-            nickname: msgToAt.nickname,
+            nickName: msgToAt.nickname,
             accountId: msgToAt.sendId,
             index: currentIndex
           });
