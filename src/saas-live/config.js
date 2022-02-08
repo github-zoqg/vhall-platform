@@ -57,7 +57,13 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['dlgDocList', 'comShare', 'comVirtualPeople', 'comLivePrivateChat']
+    children: [
+      'dlgDocList',
+      'comShare',
+      'comVirtualPeople',
+      'comLivePrivateChat',
+      'dlgGroupSetting'
+    ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
@@ -91,7 +97,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPush'
+        method: 'startPushAndSetBroadCast'
       }
     ],
     emitClickEndLive: [
@@ -113,7 +119,8 @@ export const serverConfig = {
       'comWbMenu',
       'comShareDesktopMenu',
       'comMediaPlayMenu',
-      'comInteractMenu'
+      'comInteractMenu',
+      'comGroupMenu'
     ],
     emitShareClick: [
       {
@@ -197,6 +204,21 @@ export const serverConfig = {
   // 互动工具
   comInteractMenu: {
     component: 'VmpInteractMenu'
+  },
+
+  // 分组讨论
+  comGroupMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'iconfont icona-icon_fenzutaolun1x',
+      text: 'aside_menu.aside_menu_1008'
+    },
+    handleClick: [
+      {
+        cuid: 'dlgGroupSetting',
+        method: 'show'
+      }
+    ]
   },
   //聊天组件
   comChat: {
@@ -350,5 +372,10 @@ export const serverConfig = {
   },
   comInsertVideo: {
     component: 'VmpInsertVideo'
+  },
+
+  // 分组设置对话框
+  dlgGroupSetting: {
+    component: 'VmpGroupSetting'
   }
 };

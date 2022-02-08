@@ -9,8 +9,8 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    // children: ['layerBody']
   },
   // 顶部header容器
   layerHeader: {
@@ -39,134 +39,36 @@ export const serverConfig = {
   // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
+    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
     // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
   layerBodyRight: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-right',
-    children: [
-      'comWatchPrivateChat'
-      // 'comChat'
-    ]
+    component: 'VmpBasicRightContainer',
+    children: ['comChat']
   },
   /*** 布局定义end */
 
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth']
+    children: [
+      'compRegLogin',
+      'comOfficial',
+      'comShare',
+      'comWatchAuth',
+      'comSignUpForm',
+      'comUserAccount'
+    ]
   },
 
   /**** 组件定义 */
-  // 顶部左侧容器
-  pannelHeaderLeft: {
-    component: 'VmpAirContainer',
-    children: ['compHeaderLeft']
-  },
-  // 顶部右侧容器
-  pannelHeaderRight: {
-    component: 'VmpContainer',
-    className: 'vmp-header-right',
-    children: ['compLanguageChoice']
-  },
-  // 顶部左侧组件
-  compHeaderLeft: {
-    component: 'VmpHeaderLeft'
-  },
-  // 左侧导航菜单
-  comAsideMenu: {
-    component: 'VmpAsideMenu',
-    children: ['comDocMenu', 'comWbMenu', 'comShareDesktopMenu', 'comMediaPlayMenu']
-  },
-  // 语言选择组件
-  compLanguageChoice: {
-    component: 'VmpLanguageChoice',
-    options: {
-      choices: [
-        {
-          value: 'zh',
-          label: 'i18n.languageChoice.zh'
-        },
-        {
-          value: 'en',
-          label: 'i18n.languageChoice.en'
-        }
-      ]
-    }
-  },
-  // 文档菜单
-  comDocMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconwendang',
-      text: 'i18n.asideMenu.document'
-    },
-    emitClick: [
-      {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comDocMenu']
-      }
-    ]
-  },
-  // 白板菜单
-  comWbMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconbaiban',
-      text: 'i18n.asideMenu.whiteBoard'
-    },
-    emitClick: [
-      {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comWbMenu']
-      }
-    ]
-  },
-  // 桌面共享
-  comShareDesktopMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconzhuomiangongxiang',
-      text: 'i18n.asideMenu.shareDesktop',
-      disable: true
-    }
-  },
-  // 插播文件
-  comMediaPlayMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont iconwangyechabo_icon',
-      text: 'i18n.asideMenu.mediaPlay'
-    },
-    emitClick: [
-      {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comMediaPlayMenu']
-      }
-    ]
-  },
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
     options: {
-      className: 'vmp-area__max',
-      keepAspectRatio: false
+      keepAspectRatio: false,
+      hasPager: false
     }
-
-    // emitSwitchTo: {
-    //   cuid: ['comAsideMenu'],
-    //   method: 'switchTo',
-    //   args: ['$0'] // 获取动态参数的第一个
-    // },
-    // // 打开对话框
-    // emitOpenDocList: {
-    //   cuid: 'dlgDocList',
-    //   method: 'show'
-    // }
   },
   comStreamList: {
     component: 'VmpStreamList',
@@ -227,6 +129,9 @@ export const serverConfig = {
       isInviteShare: true //分享是否展示邀请卡
     }
   },
+  comUserAccount: {
+    component: 'VmpUserAccount'
+  },
   // 底部
   comFooter: {
     component: 'VmpFooter',
@@ -237,7 +142,12 @@ export const serverConfig = {
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
-    component: 'VmpFooterTools'
+    component: 'VmpFooterTools',
+    //todo 后续正式的需要调整或移除，此处仅为测试配置
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
   comPraise: {
@@ -276,6 +186,11 @@ export const serverConfig = {
   //私聊组件
   comWatchPrivateChat: {
     component: 'VmpWatchPrivateChat',
+    options: {}
+  },
+  //报名表单
+  comSignUpForm: {
+    component: 'VmpSignUpForm',
     options: {}
   },
   // 登录注册组件

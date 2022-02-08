@@ -33,6 +33,9 @@ import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
 import VmpWatchPrivateChat from '@/packages/watch-private-chat';
+//观看端报名表单
+import VmpSignUpForm from '@/packages/sign-up-form';
+import VmpUserAccount from '@/packages/user-account'; // 个人资料
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -63,4 +66,6 @@ export function initUse() {
   Vue.use(VmpWatchAuth);
   Vue.use(VmpMemberList);
   Vue.use(VmpWatchPrivateChat);
+  Vue.use(VmpSignUpForm);
+  Vue.use(VmpUserAccount);
 }

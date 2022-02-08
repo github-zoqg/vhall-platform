@@ -113,7 +113,7 @@
       },
       //角色名
       roleName: {
-        type: [Number, String],
+        type: [String, Number],
         default: () => ''
       },
       //是否被禁言
