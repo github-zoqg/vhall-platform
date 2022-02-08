@@ -32,8 +32,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpBasicCenterContainerLive',
     // children: ['comDocUne']
-    children: ['comStreamList', 'comDocUne']
-    // children: ['comThirdStream']
+    children: ['comStreamList', 'comDocUne', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,17 +41,36 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
+    className: 'vmp-basic-right__hd',
+    children: ['comStreamLocal']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
       // 'comMemberList'
-      'comChat'
+      // 'comChat',
+      'comTabMenu',
+      'comTabContent'
     ]
   },
   /*** 布局定义end */
+
+  comTabMenu: {
+    component: 'VmpTabMenu',
+    handleSelect: [
+      {
+        cuid: ['comTabContent'],
+        method: 'switchTo',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+
+  comTabContent: {
+    component: 'VmpTabContainer',
+    children: ['comChat', 'comMemberList', 'comCustomMenu']
+  },
 
   /*** 所有弹窗集合 */
   comAllDialog: {
@@ -62,7 +80,9 @@ export const serverConfig = {
       'comShare',
       'comVirtualPeople',
       'comLivePrivateChat',
-      'dlgGroupSetting'
+      'dlgGroupSetting',
+      'comMediaSetting',
+      'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
@@ -104,6 +124,12 @@ export const serverConfig = {
       {
         cuid: 'comStreamLocal',
         method: 'stopPush'
+      }
+    ],
+    emitMediaSettingClick: [
+      {
+        cuid: 'comMediaSetting',
+        method: 'showMediaSetting'
       }
     ]
   },
@@ -155,7 +181,7 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
       }
@@ -171,7 +197,7 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
       }
@@ -193,11 +219,11 @@ export const serverConfig = {
       icon: 'iconfont iconwangyechabo_icon',
       text: 'aside_menu.aside_menu_1003'
     },
-    emitClick: [
+    handleClick: [
       {
-        cuid: 'comAsideMenu',
-        method: 'setSelectedState',
-        args: ['comMediaPlayMenu']
+        cuid: 'comInsertVideo',
+        method: 'openInserVideoDialog',
+        args: []
       }
     ]
   },
@@ -206,17 +232,19 @@ export const serverConfig = {
     component: 'VmpInteractMenu'
   },
 
-  // 分组讨论
+  // 分组讨论菜单
   comGroupMenu: {
     component: 'VmpIconText',
     options: {
       icon: 'iconfont icona-icon_fenzutaolun1x',
-      text: 'aside_menu.aside_menu_1008'
+      text: 'aside_menu.aside_menu_1008',
+      kind: 'group'
     },
     handleClick: [
       {
-        cuid: 'dlgGroupSetting',
-        method: 'show'
+        cuid: ['comGroupDiscussion'],
+        method: 'switchTo',
+        args: 'group'
       }
     ]
   },
@@ -251,10 +279,16 @@ export const serverConfig = {
     component: 'VmpLivePrivateChat',
     options: {}
   },
+  comCustomMenu: {
+    component: 'VmpCustomMenu'
+  },
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'live'
+    }
   },
   // 文档白板组件
   comDocUne: {
@@ -335,12 +369,15 @@ export const serverConfig = {
   // 本地流
   comStreamLocal: {
     component: 'VmpStreamLocal',
-    // 窗口切换事件
-    emitClickExchange: [
+    // 窗口切换事件,获取配置
+    exchangeCfg: [
       {
-        cuid: 'ps.surface',
-        method: 'exchange',
-        args: ['comStreamLocal']
+        cuid: 'comDocUne',
+        kind: 'doc'
+      },
+      {
+        cuid: 'comInsertVideo',
+        kind: 'insertvideo'
       }
     ],
     // 推流完成事件
@@ -371,11 +408,46 @@ export const serverConfig = {
     component: 'VmpThirdStream'
   },
   comInsertVideo: {
-    component: 'VmpInsertVideo'
+    component: 'VmpInsertVideo',
+    emitOnchange: [
+      {
+        cuid: 'comInsertStream',
+        method: 'openInsertShow',
+        args: ['$0', '$1']
+      }
+    ]
   },
-
   // 分组设置对话框
   dlgGroupSetting: {
     component: 'VmpGroupSetting'
+  },
+  comMediaSetting: {
+    component: 'VmpPcMediaSetting'
+  },
+  comInsertStream: {
+    component: 'VmpInsertStream',
+    emitClose: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'closeInserVideoDialog',
+        args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
+      }
+    ],
+    emitOpen: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'openInserVideoDialog',
+        args: []
+      }
+    ]
+  },
+  // 分组讨论组件
+  comGroupDiscussion: {
+    component: 'VmpGroupDiscussion',
+    toggle: {
+      cuid: ['comGroupMenu'],
+      method: 'setSelectedState',
+      args: ['$0'] // 获取动态参数的第一个
+    }
   }
 };

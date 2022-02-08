@@ -36,6 +36,12 @@ const routes = [
     component: ChatAuth,
     meta: { title: '聊天审核' }
   },
+  {
+    path: '/lives/qa/:id',
+    name: 'qa',
+    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa/main.vue'),
+    meta: { title: '问答' }
+  },
   // {
   //   path: '/about',
   //   name: 'About',

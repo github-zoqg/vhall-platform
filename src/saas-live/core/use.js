@@ -22,11 +22,16 @@ import VmpInteractMenu from '@/packages/interact-menu';
 import VmpShare from '@/packages/share'; // 发起端分享观看端地址
 import VmpVirtualPeople from '@/packages/virtual-people'; // 虚拟人数弹窗
 import VmpThirdStream from '@/packages/third-push-stream';
-import VmpInsertVideo from '@/packages/insert-video';
+import VmpInsertVideo from '@/packages/insert-video-list';
+import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
-import VmpGroupSetting from '@/packages/group-setting';
+import VmpPcMediaSetting from '@/packages/media-setting';
+import VmpGroupDiscussion from '@/packages/group-discussion';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
+import VmpTabContainer from '@/packages/tab-container';
+import VmpTabMenu from '@/packages/tab-menu';
+import VmpCustomMenu from '@/packages/custom-menu';
 
 // 全局注册组件
 export function initUse() {
@@ -52,8 +57,14 @@ export function initUse() {
   Vue.use(VmpVirtualPeople);
   Vue.use(VmpThirdStream);
   Vue.use(VmpInsertVideo);
+  Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
   Vue.use(VmpGroupSetting);
+  Vue.use(VmpTabContainer);
+  Vue.use(VmpTabMenu);
+  Vue.use(VmpCustomMenu);
+  Vue.use(VmpPcMediaSetting);
+  Vue.use(VmpGroupDiscussion);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

@@ -53,7 +53,7 @@ export default {
       }
     };
     return {
-      dialogVisible: true,
+      dialogVisible: false,
       isAllowCash: true, // 是否允许提现，默认不允许提现
       cashProcess: false, // 是否处于-提现中状态，默认当前未处于提现中
       step: 0, // 0 表示列表；1 表示当前账号未绑定手机号；2 表示已绑手机号&未设置提现微信号&未授权登录微信号 <=> 已绑手机号&未未设置提现微信号 ；3 表示 已绑手机号&已设提现微信号

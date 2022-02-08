@@ -13,7 +13,7 @@
       >
         <template v-for="msg in chatList">
           <msg-item
-            :key="msg.msgId"
+            :key="msg.count"
             :msg="msg"
             v-show="checkMessageShow(msg)"
             :chat-options="chatOptions"

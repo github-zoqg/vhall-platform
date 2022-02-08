@@ -94,16 +94,16 @@
     methods: {
       setSelectedId(id) {
         this.selectedId = this.selectedId || id;
-        this.startPreviewVideo({ action: 'preview' });
+        this.startVideoPreview({ action: 'preview' });
       },
       videoChange() {
-        this.startPreviewVideo({ action: 'switching' });
+        this.startVideoPreview({ action: 'switching' });
       },
-      async startPreviewVideo({ action = 'preview' }) {
+      async startVideoPreview({ action = 'preview' }) {
         try {
-          await this.stopPreviewVideo();
+          await this.stopVideoPreview();
 
-          const streamId = await this.server.startPreviewVideo({
+          const streamId = await this.server.startVideoPreview({
             videoNode: 'vh-device-check-video',
             videoDevice: this.selectedId
           });
@@ -117,11 +117,11 @@
           console.error('创建本地预览流失败', error);
         }
       },
-      async stopPreviewVideo() {
+      async stopVideoPreview() {
         if (!this.localStreamId) return;
 
         try {
-          await this.server.stopPreviewVideo(this.localStreamId);
+          await this.server.stopVideoPreview(this.localStreamId);
           console.log('销毁预览成功');
           this.resourceReady = false;
           this.localStreamId = null;
