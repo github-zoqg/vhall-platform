@@ -2,11 +2,13 @@ import Vue from 'vue';
 import { globalConfig, serverConfig } from '../config';
 import clipboard from 'clipboard';
 import moment from 'moment';
+import pkg from '../package.json';
 
 export function initGlobalPrototype() {
   // 初始化全局变量挂载到 window 上
   window.$globalConfig = globalConfig;
   window.$serverConfig = serverConfig;
+  window.$middleInfo = pkg;
 
   // 初始化全局变量挂载的 vue 实例上
   Vue.prototype.$clipboard = clipboard;
@@ -30,7 +32,7 @@ export function initGlobalPrototype() {
       localStorage.setItem('skin', value);
     },
     get: function () {
-      return localStorage.getItem('skin') || window.$globalConfig?.skin || 'default';
+      return localStorage.getItem('skin') || window.$globalConfig?.skin || '';
     }
   });
 }

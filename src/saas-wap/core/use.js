@@ -1,8 +1,5 @@
 import Vue from 'vue';
-// element-ui
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
-import '../assets/icon-font/iconfont.css';
+
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -35,9 +32,9 @@ import VmpMemberList from '@/packages/member-list';
 import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
+
 // 全局注册组件
 export function initUse() {
-  Vue.use(ElementUI);
   Vue.use(VmpContainer);
   Vue.use(VmpAirContainer);
   Vue.use(VmpAsideMenu);
