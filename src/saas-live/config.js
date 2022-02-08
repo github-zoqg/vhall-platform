@@ -32,7 +32,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne', 'comInsertStream']
+    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -80,7 +80,6 @@ export const serverConfig = {
       'comShare',
       'comVirtualPeople',
       'comLivePrivateChat',
-      'comGroupDiscussion',
       'comMediaSetting',
       'comInsertVideo'
     ]
@@ -220,6 +219,11 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1003'
     },
     handleClick: [
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'switchTo',
+        args: []
+      },
       {
         cuid: 'comInsertVideo',
         method: 'openInserVideoDialog',
