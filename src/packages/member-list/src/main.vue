@@ -587,6 +587,53 @@
             this._deleteUser(msg.data.target_id, this.applyUsers);
           }
         });
+
+        this.msgServer.$onMsg('CHAT', rawMsg => {
+          let temp = Object.assign({}, rawMsg);
+
+          if (typeof temp.data !== 'object') {
+            temp.data = JSON.parse(temp.data);
+            temp.context = JSON.parse(temp.context);
+          }
+          console.log(temp, '原始消息');
+          const { type = '' } = temp.data || {};
+          switch (type) {
+            case 'disable':
+              this.changeUserStatus(temp.data.target_id, this.onlineUsers, {
+                is_banned: 1
+              });
+              this.changeUserStatus(temp.data.target_id, this.limitedUsers, {
+                is_banned: 1
+              });
+              this.changeUserStatus(temp.data.target_id, this.applyUsers, {
+                is_banned: 1
+              });
+              // 禁言并且是举手列表
+              if (this.tabIndex === 2) {
+                this._deleteUser(temp.data.target_id, this.applyUsers);
+              }
+              break;
+            case 'permit':
+              this.changeUserStatus(temp.data.target_id, this.onlineUsers, {
+                is_banned: 0
+              });
+              this.changeUserStatus(temp.data.target_id, this.limitedUsers, {
+                is_banned: 0
+              });
+              this.changeUserStatus(temp.data.target_id, this.applyUsers, {
+                is_banned: 0
+              });
+              this.limitedUsers.forEach((item, index) => {
+                if (item.account_id == temp.data.target_id) {
+                  this.limitedUsers.splice(index, 1);
+                }
+              });
+              break;
+            default:
+              break;
+          }
+        });
+
         // 取消禁言某个用户
         this.msgServer.$on('permit', msg => {
           this.changeUserStatus(msg.data.target_id, this.onlineUsers, {
@@ -717,7 +764,7 @@
       //获取在线人员列表
       getOnlineUserList(pos) {
         const { getOnlineUserList } = this.memberServer;
-        const data = {
+        const params = {
           room_id: this.roomId,
           pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
           limit: this.pageConfig.limit
@@ -725,9 +772,9 @@
 
         //如果存在输入搜索人员的值
         if (this.searchUserInput) {
-          Object.assign(data, { nickname: this.searchUserInput });
+          Object.assign(params, { nickname: this.searchUserInput });
         }
-        getOnlineUserList(data).then(res => {
+        getOnlineUserList(params).then(res => {
           if (res.code === 200) {
             this.onlineUsers = this.memberServer.state.onlineUsers || [];
             //在线总人数
