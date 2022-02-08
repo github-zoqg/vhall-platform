@@ -61,7 +61,7 @@
 <style lang="less">
   .vmp-group-discussion {
     position: absolute;
-    top: 0;
+    top: 51px;
     left: 60px;
     right: 309px;
     bottom: 0;

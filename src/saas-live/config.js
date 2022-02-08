@@ -30,8 +30,8 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpBasicCenterContainerLive',
-    // children: ['comDocUne']
+    component: 'VmpContainer',
+    className: 'vmp-basic-center',
     children: ['comStreamList', 'comDocUne', 'comInsertStream']
   },
   layerBodyRight: {
@@ -80,7 +80,7 @@ export const serverConfig = {
       'comShare',
       'comVirtualPeople',
       'comLivePrivateChat',
-      'dlgGroupSetting',
+      'comGroupDiscussion',
       'comMediaSetting',
       'comInsertVideo'
     ]
@@ -416,10 +416,6 @@ export const serverConfig = {
         args: ['$0', '$1']
       }
     ]
-  },
-  // 分组设置对话框
-  dlgGroupSetting: {
-    component: 'VmpGroupSetting'
   },
   comMediaSetting: {
     component: 'VmpPcMediaSetting'
