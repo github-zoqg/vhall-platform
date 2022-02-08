@@ -61,11 +61,14 @@
 <style lang="less">
   .vmp-group-discussion {
     position: absolute;
-    top: 51px;
+    top: 0;
     left: 60px;
     right: 309px;
     bottom: 0;
+    width: calc(100% - 370px);
+    box-sizing: border-box;
     color: #f4f4f4;
-    z-index: 3000; // 层级要比文档高,比对话框层级高
+    display: flex;
+    z-index: 2099; // 层级要比文档高,比对话框层级高
   }
 </style>
