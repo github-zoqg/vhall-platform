@@ -7,7 +7,7 @@ import VmpAsideMenu from '@/packages/aside-menu';
 import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
-import VmpHeaderWatch from '@/packages/header-watch-pc';
+import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
@@ -41,7 +41,7 @@ export function initUse() {
   Vue.use(VmpIconText);
   Vue.use(VmpLanguageChoice);
   Vue.use(VmpHeaderLeft);
-  Vue.use(VmpHeaderWatch);
+  Vue.use(VmpHeaderWatchWap);
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
   Vue.use(VmpDocUne);
