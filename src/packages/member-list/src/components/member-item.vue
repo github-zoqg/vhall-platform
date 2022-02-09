@@ -381,6 +381,7 @@
             command: 'setBanned',
             isShow: ![1, '1'].includes(this.userInfo.role_name),
             disable: false,
+            //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
             type: 'toggleButton',
             sequence: 2
@@ -558,7 +559,7 @@
         }
         return false;
       },
-      //列表中该用户是否补是主持人身份 todo 调查原本为啥要这样子写，是否可以简化？
+      //列表中该用户是否补是主持人身份
       isNotHost() {
         const options = [
           [1, '1'].includes(this.roleName),
@@ -570,7 +571,7 @@
         ];
         return options.every(item => !!item);
       },
-      //是否是主持人 todo 调查原本为啥要这样子写，是否必要？
+      //是否是主持人
       isHost() {
         return (
           [1, '1'].includes(this.roleName) &&

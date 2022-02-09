@@ -1,4 +1,5 @@
 <template>
+  <!-- 小组公告弹窗 -->
   <div class="vmp-group-notice">
     <el-dialog
       :visible="dialogVisible"
@@ -52,9 +53,7 @@
     },
     watch: {
       show: function (newVal) {
-        if (newVal) {
-          this.dialogVisible = true;
-        }
+        this.dialogVisible = newVal;
       }
     },
     methods: {
