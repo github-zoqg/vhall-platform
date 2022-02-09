@@ -41,8 +41,7 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd',
-    children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd'
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -81,6 +80,7 @@ export const serverConfig = {
       'comVirtualPeople',
       'comLivePrivateChat',
       'comMediaSetting',
+      'comPcMediaCheck',
       'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
@@ -423,6 +423,9 @@ export const serverConfig = {
   },
   comMediaSetting: {
     component: 'VmpPcMediaSetting'
+  },
+  comPcMediaCheck: {
+    component: 'VmpPcMediaCheck'
   },
   comInsertStream: {
     component: 'VmpInsertStream',
