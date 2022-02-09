@@ -91,6 +91,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpHeaderWatch',
     data() {
@@ -137,7 +138,6 @@
       getWebinarInfo() {
         const { webinar } = this.roomBaseState.watchInitData;
         this.webinarInfo = webinar;
-        console.log(this.webinarInfo, '11111===zhangxiao===???');
       },
       exitLogin() {
         this.isLogin = false;
@@ -145,24 +145,15 @@
       },
       //登录
       goLogin() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickLogin'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       //公众号
       goOfficical() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitOpenOfficical'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
       },
       //分享
       goShare() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitOpenShare'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
       },
       // 个人资料弹窗
       goUserInfo() {

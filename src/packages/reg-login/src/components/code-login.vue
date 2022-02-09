@@ -97,6 +97,7 @@
 </template>
 <script>
   import ThirdLoginLink from './third-login-link.vue';
+  import { useLoginServer } from 'middle-domain';
   export default {
     name: 'VmpCodeLogin',
     components: {
@@ -193,11 +194,10 @@
       },
       // 间距设定
       autoLoginSetMargin() {
-        let captchasFlag = false;
-        this.$refs.ruleForm.validateField('captchas', function (res) {
-          captchasFlag = !res;
+        this.$refs.ruleForm.validateField('captchas', res => {
+          console.log('🚀 ~ file: code-login.vue ~ line 198 ~ autoLoginSetMargin ~ res', res);
+          this.isMaxHeight = !!res;
         });
-        this.isMaxHeight = !captchasFlag;
       },
       // 控制发送验证码是否禁用状态
       codeBtnDisabledCheck() {
@@ -221,13 +221,14 @@
         const that = this;
         if (this.captchaKey) {
           // 若拿到了图形验证码的key，在调用云盾图形验证码
-          window.initNECaptcha({
+          const NECaptchaOpts = {
             captchaId: this.captchaKey,
             element: element,
             mode: 'float',
             width: 270,
-            // TODO 网易易顿多语言字段 lang
-            lang: window.$globalConfig.currentLang,
+            // FIXME: 网易易顿多语言字段 lang 需要翻译(暂时写死)
+            lang: 'zh-CN',
+            // lang: window.$globalConfig.currentLang || 'zh-CN',
             onReady(instance) {
               console.log('instance', instance);
             },
@@ -239,7 +240,12 @@
               console.log('load...', instance);
               failure(that, instance);
             }
-          });
+          };
+          console.log(
+            '🚀 ~ file: code-login.vue ~ line 243 ~ callCaptcha ~ NECaptchaOpts',
+            NECaptchaOpts
+          );
+          window.initNECaptcha(NECaptchaOpts);
         } else {
           failure(that, '当前未获取到图形验证captchaId的值，需要后端人员协助');
         }
@@ -326,7 +332,8 @@
           if (biz_id == 4) {
             params.zhike_type = 'CONSUMER_USER_LOGIN'; // CONSUMER_USER_LOGIN - C端账户快捷登录
           }
-          this.$fetch('sendCode', params)
+          this.loginServer
+            .sendCode(params)
             .then(res => {
               if (res.code == 200) {
                 if (this.timeInterval) {
@@ -559,6 +566,9 @@
         // 默认图片验证码加载
         this.reloadCaptha();
       }
+    },
+    beforeCreate() {
+      this.loginServer = useLoginServer();
     },
     created() {
       this.init();
