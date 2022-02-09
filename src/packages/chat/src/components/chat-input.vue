@@ -49,6 +49,7 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  const chatServer = useChatServer();
   export default {
     name: 'VmpChatInput',
     props: {
@@ -122,8 +123,8 @@
           this.inputValue = this.trimPlaceHolder('reply');
         } else {
           this.inputValue = this.inputValue
-            ? `回复${this.replyMsg.nickName}: ${this.trimPlaceHolder('reply')}`
-            : `回复${this.replyMsg.nickName}: `;
+            ? `回复${this.replyMsg.nickname}: ${this.trimPlaceHolder('reply')}`
+            : `回复${this.replyMsg.nickname}: `;
         }
       },
       inputValue(newValue) {
@@ -132,9 +133,7 @@
         }
       }
     },
-    beforeCreate() {
-      this.chatServer = useChatServer();
-    },
+    beforeCreate() {},
     mounted() {
       this.overlayScrollbarInit();
     },
@@ -205,15 +204,15 @@
         const lastIndex = firstPart.lastIndexOf('@');
         if (lastIndex !== -1) {
           const userName = this.inputValue.substring(lastIndex, currentIndex);
-          const nickName = userName.replace('@', '');
+          const nickname = userName.replace('@', '');
           // 删除整个@过的用户名逻辑
-          if (this.atList.find(u => u.nickName === nickName)) {
-            let tempList = this.atList.filter(n => n.nickName !== nickName);
+          if (this.atList.find(u => u.nickname === nickname)) {
+            let tempList = this.atList.filter(n => n.nickname !== nickname);
             this.atList.splice(0, this.atList.length, ...tempList);
             this.inputValue = this.inputValue.replace(userName, '');
           } else {
             let tempList = this.atList.filter(a => {
-              const atIndex = this.inputValue.indexOf(`@${a.nickName} `);
+              const atIndex = this.inputValue.indexOf(`@${a.nickname} `);
               return atIndex !== -1;
             });
             this.atList.splice(0, this.atList.length, ...tempList);
@@ -223,19 +222,17 @@
         const lastReplyIndex = firstPart.lastIndexOf('回复');
         if (lastReplyIndex !== -1) {
           const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          if (`回复${this.replyMsg.nickName}:` === replyUserName) {
+          if (`回复${this.replyMsg.nickname}:` === replyUserName) {
             this.inputValue = this.inputValue.replace(replyUserName, '');
             this.replyMsg = {};
           } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) === -1 &&
+            this.inputValue.indexOf(`回复${this.replyMsg.nickname}: `) === -1 &&
               (this.replyMsg = {});
           }
         }
       },
       /** 发送聊天消息 */
       sendMsg(callback) {
-        this.sendTimeOut && window.clearTimeout(this.sendTimeOut);
-
         //是否是聊天禁言状态
         if (this.inputStatus.disable) {
           return;
@@ -247,81 +244,46 @@
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
           return this.$message.warning('内容不能为空');
         }
+        const curmsg = chatServer.createCurMsg();
+        //将文本消息加入消息体
+        curmsg.setText(inputValue);
+        //将图片消息加入消息体
+        curmsg.setImge(this.imgUrls);
+        //将回复消息加入消息体
+        curmsg.setReply(this.replyMsg);
+        //将@消息加入消息体
+        curmsg.setAt(this.atList);
+        //发送消息
+        chatServer.sendMsg(curmsg);
+        //清除发送后的消息
+        chatServer.clearCurMsg();
+        //判断一下是否是分组讨论的组长
+        // const { groupInitData = {} } = this.roomBaseState;
+        // if (groupInitData.isInGroup && groupInitData.join_role == 20) {
+        //   context.role_name = 20;
+        // }
 
-        const { checkHasKeyword, sendMsg } = this.chatServer;
-        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
-          ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
-          : '';
+        // let filterStatus = true;
+        // if (sessionStorage.getItem('watch')) {
+        //   filterStatus = chatServer.checkHasKeyword(inputValue);
+        // }
 
-        this.sendTimeOut = setTimeout(() => {
-          const data = {};
-          if (inputValue) {
-            data.type = 'text';
-            data.barrageTxt = inputValue
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n/g, '<br/>');
-            data.text_content = inputValue;
-          }
-          //如果有聊天图片
-          if (this.imgUrls.length) {
-            data.image_urls = this.imgUrls;
-            data.type = 'image';
-          }
-          //todo 考虑从domain里取用
-          const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-          console.warn('获取当前的本地用户信息', userInfo);
-          let name = '';
-          if (userInfo) {
-            if (userInfo.nickname) {
-              name = userInfo.nickname;
-            } else {
-              name = userInfo.nick_name;
-            }
-          } else {
-            name = joinDefaultName;
-          }
-          //获取发消息的用户的用户昵称
-          if (this.roleName === 2 && this.join_name) {
-            name = this.join_name;
-          }
-          //消息内容
-          const context = {
-            nickname: name, // 昵称
-            avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
-            role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
-            replyMsg: this.replyMsg, // 回复消息
-            atList: this.atList // @用户列表
-          };
-
-          //判断一下是否是分组讨论的组长
-          const { groupInitData = {} } = this.roomBaseState;
-          if (groupInitData.isInGroup && groupInitData.join_role == 20) {
-            context.role_name = 20;
-          }
-
-          let filterStatus = true;
-          if (sessionStorage.getItem('watch')) {
-            filterStatus = checkHasKeyword(inputValue);
-          }
-
-          if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-            if (this.atList.length && data.text_content) {
-              this.atList.forEach(a => {
-                data.text_content = data.text_content.replace(`@${a.nickName}`, `***${a.nickName}`);
-              });
-            }
-
-            sendMsg({ data, context });
-          }
-          //清空一下子组件里上传的图片
-          this.clearImgUrls();
-          this.inputValue = '';
-          this.replyMsg = {};
-          //todo 建议移入domain  清空一下@列表，但是保持引用
-          this.atList.splice(0, this.atList.length);
-          callback && callback();
-        }, 300);
+        // if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
+        //   if (this.atList.length && data.text_content) {
+        //     this.atList.forEach(a => {
+        //       data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
+        //     });
+        //   }
+        //   chatServer.createMsg();
+        //   chatServer.sendMsg(data, context);
+        // }
+        //清空一下子组件里上传的图片
+        this.clearImgUrls();
+        this.inputValue = '';
+        this.replyMsg = {};
+        //todo 建议移入domain  清空一下@列表，但是保持引用
+        this.atList.splice(0, this.atList.length);
+        callback && callback();
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
@@ -403,7 +365,7 @@
             return chatMsg.sendId == accountId;
           }) || {};
         if (!this.atList.find(u => u.accountId == msgToAt.sendId)) {
-          this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickName} `;
+          this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickname} `;
           this.$refs.chatTextarea.focus();
           let currentIndex = 0;
           try {
@@ -412,7 +374,7 @@
             console.log(e);
           }
           this.atList.push({
-            nickName: msgToAt.nickName,
+            nickName: msgToAt.nickname,
             accountId: msgToAt.sendId,
             index: currentIndex
           });

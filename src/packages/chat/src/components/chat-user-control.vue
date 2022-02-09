@@ -7,7 +7,7 @@
       </div>
       <div
         :class="
-          this.atList.find(u => u.nickName === this.nickName)
+          this.atList.find(u => u.nickname === this.nickname)
             ? 'vmp-chat-user-control__item disabled'
             : 'vmp-chat-user-control__item'
         "
@@ -63,7 +63,7 @@
           is_banned: null,
           is_kicked: null
         },
-        nickName: '',
+        nickname: '',
         godMode: false,
         assistantType: ''
       };
@@ -79,15 +79,15 @@
       //todo 待改为信令
       EventBus.$on(
         'set_person_status_in_chat',
-        async (el, accountId, count, nickName, godMode, roleName) => {
+        async (el, accountId, count, nickname, godMode, roleName) => {
           if (accountId === this.userId) return; // 不能点击自己
           this.accountId = accountId;
           this.count = count;
-          this.userStatus = await this.getUserStatus();
+          // this.userStatus = await this.getUserStatus();
           this.isShow = true;
           this.godMode = godMode;
           this.calculate(el);
-          this.nickName = nickName;
+          this.nickname = nickname;
           this.roleName = roleName;
         }
       );
