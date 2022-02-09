@@ -57,7 +57,7 @@
         this.popAlertCheckVisible = false;
         this.$nextTick(() => {
           this.popAlertCheckConfirmVisible = true;
-        }, 1000);
+        });
       },
       popAlertCheckConfirm() {
         this.popAlertCheckConfirmVisible = false;
