@@ -418,9 +418,7 @@
         });
         if (this.roomBaseServer.state.clientType === 'send') {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
-          );
+          window.$middleEventSdk?.event?.(boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType]));
         }
       },
       /**

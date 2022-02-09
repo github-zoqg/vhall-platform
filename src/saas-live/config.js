@@ -422,7 +422,8 @@ export const serverConfig = {
     ]
   },
   comMediaSetting: {
-    component: 'VmpPcMediaSetting'
+    component: 'VmpPcMediaSetting',
+    saveOptions: []
   },
   comPcMediaCheck: {
     component: 'VmpPcMediaCheck'
