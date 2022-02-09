@@ -59,7 +59,7 @@ export function initUse() {
   Vue.use(VmpInsertVideo);
   Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
-  Vue.use(VmpGroupSetting);
+  // Vue.use(VmpGroupSetting);
   Vue.use(VmpTabContainer);
   Vue.use(VmpTabMenu);
   Vue.use(VmpCustomMenu);
