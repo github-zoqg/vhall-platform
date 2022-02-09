@@ -6,8 +6,7 @@
       :class="{ disabledClick: selectedIndex === 0 }"
       @click="prev"
     >
-      L
-      <i class="iconfont iconzuojiantou" />
+      <i class="iconfont iconzuofanye" />
     </span>
 
     <!-- item -->
@@ -30,8 +29,7 @@
       :class="{ disabledClick: selectedIndex === menu.length - 1 }"
       @click="next"
     >
-      R
-      <i class="iconfont iconyoujiantou" />
+      <i class="iconfont iconyoufanye" />
     </span>
   </section>
 </template>
@@ -152,12 +150,13 @@
 
     .vmp-tab-menu-page-btn {
       position: relative;
-      display: inline-block;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
       width: 24px;
       height: 100%;
       text-align: center;
       font-size: 14px;
-      vertical-align: middle;
       color: #fff;
       height: 100%;
       cursor: pointer;

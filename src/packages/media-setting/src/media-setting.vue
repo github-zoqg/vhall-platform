@@ -2,33 +2,20 @@
   <section class="vmp-media-setting-dialog-body">
     <!-- 左侧菜单 -->
     <aside class="vmp-media-setting-menu">
-      <setting-menu :selected-item="selectedItem" @change="changeSelectedItem"></setting-menu>
+      <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
     </aside>
 
     <!-- 右侧面板 -->
     <section class="vmp-media-setting-content">
       <main class="vmp-media-setting-content-main">
-        <basic-setting
-          v-show="selectedItem === 'basic-setting'"
-          :selected="selected"
-          @showConfirm="showConfirm"
-        />
-        <video-setting
-          v-show="selectedItem === 'video-setting'"
-          :mediaCheckServer="mediaCheckServer"
-          :devices="devices.videoInputDevices"
-          @onSelectChange="onSelectChange"
-        />
-        <audio-in-setting
-          v-show="selectedItem === 'audio-in-setting'"
-          :devices="devices.audioInputDevices"
-          @onSelectChange="onSelectChange"
-        />
-        <audio-out-setting
-          v-show="selectedItem === 'audio-out-setting'"
-          :devices="devices.audioOutputDevices"
-          @onSelectChange="onSelectChange"
-        />
+        <!-- 基础设置 -->
+        <basic-setting v-show="selectedMenuItem === 'basic-setting'" @showConfirm="showConfirm" />
+        <!-- 摄像头 -->
+        <video-setting v-show="selectedMenuItem === 'video-setting'" />
+        <!-- 麦克风 -->
+        <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
+        <!-- 扬声器 -->
+        <audio-out-setting v-show="selectedMenuItem === 'audio-out-setting'" />
       </main>
 
       <!-- 底部按钮区域 -->
@@ -59,9 +46,9 @@
   import VideoSetting from './components/pages/video-setting.vue';
   import AudioInSetting from './components/pages/audio-in-setting.vue';
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
-  import { getOptionEntity } from './js/getOptionEntity';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
-  import { useMediaCheckServer, useRoomBaseServer } from 'middle-domain';
+  import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
     name: 'VmpPcMediaSetting',
@@ -74,21 +61,11 @@
     },
     data() {
       return {
+        mediaState: this.mediaSettingServer.state,
         isShow: true,
-        selectedItem: 'basic-setting',
+        selectedMenuItem: 'basic-setting',
 
-        liveMode: 0,
-
-        menuList: getOptionEntity(),
-        mediaState: this.mediaCheckServer.state,
-        selected: {
-          rate: '', // 画质
-          pptRate: '', // PPT模式（动态/静态）
-          layout: '', //布局
-          video: '',
-          audioInput: '',
-          audioOutput: ''
-        }
+        liveMode: 0 // 1-音频 2-视频 3-互动
       };
     },
     computed: {
@@ -97,27 +74,24 @@
       }
     },
     beforeCreate() {
-      this.mediaCheckServer = useMediaCheckServer();
+      this.mediaSettingServer = useMediaSettingServer();
     },
     created() {
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
+      this.webinar = watchInitData.webinar;
     },
     mounted() {
       this.restart();
     },
     methods: {
-      onSelectChange(type, val) {
-        this.selected[type] = val;
-      },
       // action
       clickClose() {
         this.$emit('closeDlg');
       },
-      deviceChange() {},
-      changeSelectedItem(id) {
+      changeSelectedMenuItem(id) {
         console.log('on click on lick', id);
-        this.selectedItem = id;
+        this.selectedMenuItem = id;
       },
       showConfirm(text = '', payload = {}) {
         this.$emit('showConfirm', text, payload);
@@ -130,13 +104,37 @@
         }
       },
       saveSetting() {
-        // TODO: 开播才弹出对话框  if(status=== 1)
-        // this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
+        // const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+        // if (watchInitData.webinar.type === 1) {
+        this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
         this.updateDeviceSetting();
+        // }
       },
-      updateDeviceSetting() {
+      async updateDeviceSetting() {
+        const { watchInitData } = useRoomBaseServer().state;
+
+        // 角色为1
+        if (watchInitData?.join_info?.role_name == '1') {
+          const res = await this.mediaSettingServer.setStream({
+            room_id: watchInitData.interact.room_id,
+            definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
+            layout: this.mediaState.layout || 0,
+            screen_definition: this.mediaState.screenRate // 桌面共享清晰度
+          });
+          // 角色不为1
+
+          this.saveSelected();
+        } else {
+          // TODO: event.deviceSplit(options)&selectVideoType
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions'));
+
+          this.saveSelected();
+
+          this.$message.success('保存成功！');
+        }
+
         // 这里发送事件通知 stream 变化
-        alert('test');
+        this.mediaSettingServer.stopVideoPreview();
         this.$emit('submit', false);
       },
       async getVideoDeviceInfo() {
@@ -144,30 +142,81 @@
         stream.getTracks().forEach(trackInput => trackInput.stop());
         this.getDevices();
       },
+      // 按条件获取devices列表
       async getDevices() {
         // 获取视频列表
-        await this.mediaCheckServer.getCameras(
+        await this.mediaSettingServer.getCameras(
           item => item.label && item.deviceId !== 'desktopScreen'
         );
 
         // 获取话筒
-        await this.mediaCheckServer.getMicrophones(
+        await this.mediaSettingServer.getMicrophones(
           d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
         );
 
         // 获取扬声器
-        await this.mediaCheckServer.getSpeakers(item => item.label);
+        await this.mediaSettingServer.getSpeakers(item => item.label);
+
+        this.setDefaultSelected();
       },
       saveSelected() {
-        const saveMap = new Map([
-          ['selectedVideoDeviceId', this.selected.video],
-          ['selectedAudioDeviceId', this.selected.audioInput],
-          ['selectedAudioOutputDeviceId', this.selected.audioInput],
-          ['layout', this.selected.layout]
+        const canvasObj = JSON.stringify({
+          flag: this.mediaState.videoType === 'picture',
+          streamUrl: this.mediaState.canvasImgUrl
+        });
+
+        const localMap = new Map([
+          [`saveCanvasObj_${this.webinar.id}`, canvasObj],
+          [`selectVideoType_${this.webinar.id}`, this.mediaState.videoType || 'camera']
         ]);
 
-        for (const [key, value] of saveMap) {
+        const sessionMap = new Map([
+          ['selectedVideoDeviceId', this.mediaState.video || ''],
+          ['selectedAudioDeviceId', this.mediaState.audioInput || ''],
+          ['selectedAudioOutputDeviceId', this.mediaState.audioInput || ''],
+          ['selectedRate', this.mediaState.rate || ''],
+          ['selectedScreenRate', this.mediaState.screenRate || ''],
+          ['layout', this.mediaState.layout || '']
+        ]);
+
+        // 记录
+        for (const [key, value] of localMap) {
+          localStorage.setItem(key, value);
+        }
+        for (const [key, value] of sessionMap) {
           sessionStorage.setItem(key, value);
+        }
+      },
+
+      setDefaultSelected() {
+        const {
+          videoInputDevices = [],
+          audioInputDevices = [],
+          audioOutputDevices = []
+        } = this.devices;
+
+        // 视频
+        if (videoInputDevices.length > 0) {
+          const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
+          this.mediaState.video = sessionVideoId || videoInputDevices[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedVideoDeviceId');
+        }
+
+        // 麦克风
+        if (audioInputDevices.length > 0) {
+          const sessionAudioId = sessionStorage.getItem('selectedAudioDeviceId');
+          this.mediaState.audioInput = sessionAudioId || audioInputDevices[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedAudioDeviceId');
+        }
+
+        // 扬声器
+        if (audioOutputDevices.length > 0) {
+          const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
+          this.mediaState.audioOutput = sessionAudioOutputId || audioOutputDevices[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedAudioOutputDeviceId');
         }
       }
     }
