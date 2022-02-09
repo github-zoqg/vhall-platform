@@ -1,5 +1,5 @@
-<!-- 新增分组 -->
 <template>
+  <!-- 新增分组弹窗 -->
   <div class="vmp-group-add">
     <el-dialog
       :visible="dialogVisible"
@@ -19,13 +19,14 @@
 
       <!-- 底部按钮 -->
       <div slot="footer" class="vmp-group-ft">
-        <el-button type="primary" :round="true" @click="handleSubmit">发布</el-button>
+        <el-button type="primary" :round="true" @click="handleSubmit">确定</el-button>
         <el-button :round="true" @click="handleClose">取消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
+  import { useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpGroupAdd',
     props: {
@@ -37,20 +38,47 @@
     data() {
       return {
         dialogVisible: this.show,
-        placeholder: '最多新增36组',
         count: 1
       };
     },
+    beforeCreate() {
+      this.groupServer = useGroupServer();
+    },
+    computed: {
+      placeholder() {
+        return `最多新增${50 - this.groupServer.state.groupedUserList.length}组`;
+      }
+    },
     watch: {
       show: function (newVal) {
-        if (newVal) {
-          this.dialogVisible = true;
-        }
+        this.dialogVisible = newVal;
       }
     },
     methods: {
-      handleSubmit() {},
-      handlOpen() {},
+      // 新增分组确定
+      handleSubmit: async function () {
+        if (this.count > 50 - this.groupServer.state.groupedUserList.length) {
+          this.$message.warning('请输入正确分组数量');
+          return false;
+        }
+        try {
+          const result = await this.groupServer.groupCreate({
+            number: this.count,
+            way: 2
+          });
+          if (result && result.code === 200) {
+            this.count = 1;
+            this.handleClose();
+          } else {
+            this.$message.error(result.msg || '新增分组失败');
+          }
+        } catch (ex) {
+          this.$message.error(ex.messge || '新增分组出现异常');
+        }
+      },
+      handlOpen() {
+        // this.placeholder = `最多新增$组`,
+      },
       handleClose() {
         this.dialogVisible = false;
         this.$emit('update:show', false);
