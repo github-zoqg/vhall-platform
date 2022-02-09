@@ -246,9 +246,10 @@ export const serverConfig = {
     },
     handleClick: [
       {
+        // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
         method: 'switchTo',
-        args: 'group'
+        args: []
       }
     ]
   },
@@ -444,7 +445,8 @@ export const serverConfig = {
   // 分组讨论组件
   comGroupDiscussion: {
     component: 'VmpGroupDiscussion',
-    toggle: {
+    //触发切换
+    emitToggle: {
       cuid: ['comGroupMenu'],
       method: 'setSelectedState',
       args: ['$0'] // 获取动态参数的第一个
