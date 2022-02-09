@@ -58,8 +58,8 @@ export const serverConfig = {
       'comWatchAuth',
       'comSignUpForm',
       'comUserAccount',
-      'comCash',
-      'comWatchNavMenu'
+      'comCash'
+      // 'comWatchNavMenu'
     ]
   },
 

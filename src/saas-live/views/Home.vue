@@ -13,21 +13,24 @@
       </aside>
     </div>
     <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
+    <Chrome v-else-if="state === 3"></Chrome>
   </div>
 </template>
 
 <script>
   import roomState from '../headless/room-state.js';
-  import MsgTip from './MsgTip.vue';
+  import MsgTip from './MsgTip';
+  import Chrome from './Chrome';
   import { Domain, useMicServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
-      MsgTip
+      MsgTip,
+      Chrome
     },
     data() {
       return {
-        state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败
+        state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败；3：浏览器不支持
         errMsg: ''
       };
     },
@@ -36,7 +39,12 @@
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         await this.initSendLive();
-        await roomState();
+        const res = await roomState();
+        // 如果浏览器不支持
+        if (res === 'isBrowserNotSuppport') {
+          this.state = 3;
+          return;
+        }
         const roomBaseServer = useRoomBaseServer();
         // 获取房间互动工具状态
         await roomBaseServer.getInavToolStatus();

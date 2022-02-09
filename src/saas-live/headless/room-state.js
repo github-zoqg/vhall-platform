@@ -3,7 +3,8 @@ import {
   useRoomBaseServer,
   useDocServer,
   useInteractiveServer,
-  useMicServer
+  useMicServer,
+  useMediaCheckServer
 } from 'middle-domain';
 
 export default async function () {
@@ -12,6 +13,12 @@ export default async function () {
   const docServer = useDocServer();
   const interactiveServer = useInteractiveServer();
   const roomBaseServer = useRoomBaseServer();
+  const mediaCheckServer = useMediaCheckServer();
+
+  const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
+  if (!checkSystemResult.result) {
+    return 'isBrowserNotSuppport';
+  }
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
