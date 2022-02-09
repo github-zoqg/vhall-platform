@@ -11,7 +11,7 @@
       <section class="vmp-media-setting-item">
         <el-select
           class="vmp-media-setting-item__content"
-          v-model="selectedAudioId"
+          v-model="mediaState.audioOutput"
           @change="audioOutputChange"
         >
           <el-option
@@ -58,23 +58,23 @@
 </template>
 
 <script>
+  import { useMediaSettingServer } from 'middle-domain';
   import { debounce } from 'lodash';
 
   export default {
-    props: {
-      devices: {
-        type: Array,
-        default: () => []
-      }
-    },
     data() {
       return {
+        mediaState: this.mediaSettingServer.state,
         isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
         speakerReady: false,
         isPaused: true,
-        volume: 0.5,
-        selectedAudioId: ''
+        volume: 0.5
       };
+    },
+    computed: {
+      devices() {
+        return this.mediaState.devices.audioOutputDevices;
+      }
     },
     watch: {
       volume(value) {
@@ -83,11 +83,14 @@
       },
       devices(val) {
         if (val && val.length) {
-          this.selectedAudioId = val[0].deviceId;
+          this.mediaState.audioOutput = val[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedAudioOutputDeviceId');
         }
       }
+    },
+    beforeCreate() {
+      this.mediaSettingServer = useMediaSettingServer();
     },
     mounted() {
       this.listenEvents();
@@ -110,12 +113,12 @@
       playAudio: debounce(function () {
         if (!this.$refs.outputAudioPlayer) return;
         if (!this.isPaused) return this.$refs.outputAudioPlayer.pause();
-        if (!this.selectedAudioId && !this.isSafari) return this.$message.warning('无可用的扬声器');
+        if (!this.mediaState.audioOutput && !this.isSafari)
+          return this.$message.warning('无可用的扬声器');
         this.$refs.outputAudioPlayer.play();
         this.speakerReady = true;
       }, 500),
       audioOutputChange() {
-        this.$emit('onSelectChange', 'audioOutput', this.selectedAudioId);
         const audioPlayer = this.$refs.outputAudioPlayer;
         if (!audioPlayer) return;
 
@@ -123,7 +126,7 @@
           console.warn('Browser does not support output device selection.');
         } else {
           audioPlayer
-            .setSinkId(this.selectedAudioId)
+            .setSinkId(this.selected.audioOutput)
             .then(() => {})
             .catch(error => {
               let errorMessage = error;

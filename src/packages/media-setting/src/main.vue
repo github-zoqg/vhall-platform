@@ -80,8 +80,3 @@
     }
   };
 </script>
-
-<style lang="less">
-  .vmp-media-setting-container {
-  }
-</style>
