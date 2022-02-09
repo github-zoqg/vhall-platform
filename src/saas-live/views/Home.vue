@@ -38,14 +38,41 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initSendLive();
+        const domain = await this.initSendLive();
+        const roomBaseServer = useRoomBaseServer();
+        domain.initVhallReport(
+          {
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            webinar_id: this.$route.params.id,
+            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            os: 10,
+            type: 4,
+            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            pf: 7,
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          },
+          {
+            namespace: 'saas', //业务线
+            env: 'test', // 环境
+            method: 'post' // 上报方式
+          }
+        );
+        window.vhallReport.report('ENTER_WATCH');
+        window.vhallLog({
+          tag: 'doc', // 日志所属功能模块
+          data: {
+            user_id: 20001,
+            user_name: 'hello world',
+            url: 'https://t.e.vhall.com'
+          },
+          type: 'log' // log 日志埋点，event 业务数据埋点
+        });
         const res = await roomState();
         // 如果浏览器不支持
         if (res === 'isBrowserNotSuppport') {
           this.state = 3;
           return;
         }
-        const roomBaseServer = useRoomBaseServer();
         // 获取房间互动工具状态
         await roomBaseServer.getInavToolStatus();
         console.log('%c---初始化直播房间 完成', 'color:blue');
