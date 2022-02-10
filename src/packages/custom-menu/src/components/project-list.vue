@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-  // import { mapState } from 'vuex';
+  import { useCustomMenuServer } from 'middle-domain';
 
   export default {
     props: ['checkedList', 'pagetype'],
@@ -48,8 +48,11 @@
         this.getActiveList();
       }
     },
-    mounted() {
-      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+    beforeCreate() {
+      this.customMenuServer = useCustomMenuServer();
+    },
+    created() {
+      // this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
       this.getActiveList();
     },
     methods: {
@@ -62,30 +65,26 @@
             `/special/detail?id=${id}&delay=${this.hasDelayPermission ? 1 : 0}`
         );
       },
-      getActiveList() {
+      async getActiveList() {
         if (this.checkedList.length == 0) {
           this.activeList = [];
           return;
         }
         this.loading = true;
-        this.$vhallapi.interactTool
-          .queryProjectList({
-            subject_ids: this.checkedList.join(',')
-          })
-          .then(res => {
-            if (res.code == 200) {
-              if (res.data.total == 0) {
-                this.lock = true;
-                this.loading = false;
-                this.total = 0;
-              } else {
-                this.activeList = res.data.list;
-                this.loading = false;
-              }
-            } else {
-              this.loading = false;
-            }
-          });
+
+        const res = await this.customMenuServer.getProjectList({
+          subject_ids: this.checkedList.join(',')
+        });
+
+        this.loading = false;
+        if (res.code === 200 && res.data) {
+          if (res.data.total == 0) {
+            this.lock = true;
+            this.total = 0;
+          } else {
+            this.activeList = res.data.list;
+          }
+        }
       }
     }
   };
@@ -94,7 +93,6 @@
 <style lang="less" scoped>
   .vh-chose-active-box {
     width: 100%;
-    height: 100%;
     overflow: hidden;
     position: relative;
     display: flex;

@@ -51,9 +51,8 @@
           { comp: 'comChat', key: 'chat', text: '聊天', showIcon: false },
           { comp: 'comMemberList', key: 'member', text: '成员', showIcon: false },
           { comp: 'comNotice', key: 'notice', text: '公告', showIcon: false },
-          { comp: 'comCustomMenu', key: 1, text: 'test1', showIcon: false },
-          { comp: 'comCustomMenu', key: 2, text: 'test2', showIcon: false },
-          { comp: 'comCustomMenu', key: 3, text: 'test3', showIcon: false }
+          { comp: 'comCustomMenu', key: 32245, text: 'test1', showIcon: false },
+          { comp: 'comCustomMenu', key: 32246, text: 'test2', showIcon: false }
         ]
       };
     },
