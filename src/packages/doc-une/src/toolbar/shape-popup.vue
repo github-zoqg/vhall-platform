@@ -40,21 +40,21 @@
     data() {
       return {
         itemArr: Object.freeze([
-          { label: '圆形', value: 'setCircle', icon: 'iconfont iconyuanxing' },
+          { label: '圆形', value: 'setCircle', icon: 'vh-iconfont vh-line-circle' },
           {
             label: '四边形',
             value: 'setSquare',
-            icon: 'iconfont iconzhengfangxing'
+            icon: 'vh-iconfont vh-line-square'
           },
           {
             label: '单向箭头',
             value: 'setSingleArrow',
-            icon: 'iconfont iconjiantou'
+            icon: 'vh-iconfont vh-a-line-singlearrow'
           },
           {
             label: '双向箭头',
             value: 'setDoubleArrow',
-            icon: 'iconfont iconshuangjiantou'
+            icon: 'vh-iconfont vh-a-line-doublearrow'
           }
         ]),
         colorArr: Object.freeze([
