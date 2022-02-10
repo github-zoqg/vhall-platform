@@ -11,9 +11,32 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpAsideMenu',
+    mounted() {
+      this.initData();
+    },
+    watch: {
+      ['$domainStore.state.roomBaseServer.watchInitData.webinar.type'](newval) {
+        const vn = this.$children.find(item => item.kind === 'group');
+        if (!vn) return;
+        //直播状态： type=1 直播中 ，type=3 直播结束
+        if (newval === 1) {
+          vn.setDisableState(false);
+        } else {
+          vn.setSelectedState(false);
+          vn.setDisableState(true);
+        }
+      }
+    },
     methods: {
+      initData() {
+        if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type === 1) {
+          const vn = this.$children.find(item => item.kind === 'group');
+          vn && vn.setDisableState(false);
+        }
+      },
       switchTo(kind) {
         for (const vn of this.$children) {
           if (vn.setSelectedState) {

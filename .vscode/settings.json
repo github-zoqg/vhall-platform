@@ -15,7 +15,7 @@
   //是否自动换行
   "editor.wordWrap": "on",
   //关闭迷你图快速预览
-  "editor.minimap.enabled": false,
+  // "editor.minimap.enabled": false,
   //关闭rg.exe进程（吃CPU）
   "search.followSymlinks": false,
   //开启行数提示

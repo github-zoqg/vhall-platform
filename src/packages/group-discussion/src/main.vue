@@ -1,13 +1,13 @@
 <template>
   <div v-show="show" class="vmp-group-discussion">
-    <!-- 准备设置分组对话框 -->
-    <vmp-group-setting :dialogVisible="show && isOpenSwitch == 0"></vmp-group-setting>
-
     <!-- 分组设置页 -->
     <vmp-group-split
       ref="groupSplit"
-      v-show="show && (isOpenSwitch == 1 || isOpenSwitch == 2)"
+      v-show="isOpenSwitch == 1 || isOpenSwitch == 2"
     ></vmp-group-split>
+
+    <!-- 准备设置分组对话框 -->
+    <vmp-group-setting :show.sync="settingDialogVisible"></vmp-group-setting>
 
     <!-- 新增分组对话框 -->
     <vmp-group-add :show.sync="addDialogVisible"></vmp-group-add>
@@ -41,6 +41,7 @@
     },
     data() {
       return {
+        settingDialogVisible: false,
         addDialogVisible: false,
         noticeDialogVisible: false,
         chooseDialogVisible: false
@@ -64,15 +65,31 @@
         return this.roomBaseServer.state.interactToolStatus.is_open_switch;
       }
     },
+
     methods: {
       // 切换显示隐藏
-      switchTo() {
-        if (this.groupServer.state.show) {
-          // 如果是显示状态，直接隐藏
-          this.groupServer.state.show = false;
+      switchTo(menu) {
+        if (menu === 'group') {
+          if (this.groupServer.state.show) {
+            // 如果是显示状态，直接隐藏
+            this.groupServer.state.show = false;
+            this.settingDialogVisible = false;
+            this.addDialogVisible = false;
+            this.noticeDialogVisible = false;
+            this.chooseDialogVisible = false;
+          } else {
+            // 如果是隐藏状态，
+            this.groupServer.state.show = true;
+            if (this.isOpenSwitch === 0) {
+              this.settingDialogVisible = true;
+            }
+          }
         } else {
-          // 如果是隐藏状态，
-          this.groupServer.state.show = true;
+          this.groupServer.state.show = false;
+          this.settingDialogVisible = false;
+          this.addDialogVisible = false;
+          this.noticeDialogVisible = false;
+          this.chooseDialogVisible = false;
         }
       },
       // 选择小组后确定

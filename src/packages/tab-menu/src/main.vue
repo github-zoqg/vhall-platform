@@ -10,9 +10,10 @@
     </span>
 
     <!-- item -->
-    <ul class="vmp-tab-menu-scroll-container">
+    <ul class="vmp-tab-menu-scroll-container" ref="menu">
       <li
         v-for="item of menu"
+        :ref="`${item.comp}_${item.key}`"
         class="vmp-tab-menu-item"
         :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.comp}_${item.key}` }"
         :key="`${item.comp}_${item.key}`"
@@ -49,9 +50,9 @@
         menu: [
           { comp: 'comChat', key: 'chat', text: '聊天', showIcon: false },
           { comp: 'comMemberList', key: 'member', text: '成员', showIcon: false },
-          { comp: 'comCustomMenu', key: 1, text: 'test1', showIcon: false },
-          { comp: 'comCustomMenu', key: 2, text: 'test2', showIcon: false },
-          { comp: 'comCustomMenu', key: 3, text: 'test3', showIcon: false }
+          { comp: 'comNotice', key: 'notice', text: '公告', showIcon: false },
+          { comp: 'comCustomMenu', key: 32245, text: 'test1', showIcon: false },
+          { comp: 'comCustomMenu', key: 32246, text: 'test2', showIcon: false }
         ]
       };
     },
@@ -77,8 +78,6 @@
       removeItemByIndex(index) {
         this.menu.splice(index);
       },
-
-      removeItemByKey(comp, key) {},
 
       addItem(item) {
         if (!item || !item.key || !item.text) {
@@ -124,6 +123,25 @@
         tab.showIcon = !tab.showIcon;
       },
 
+      // 滑动到某个item的动画效果
+      scrollToItem(comp, key) {
+        // 由于menu列表随时会增减，
+        const itemsWithPosition = this.menu.map(item => {
+          const key = `${item.comp}_${item.key}`;
+          const ref = this.$refs[key][0];
+          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
+          const left = ref.offsetLeft - paddingLeft;
+          return { key, ref, left };
+        });
+
+        const positionItem = itemsWithPosition.find(item => item.key === `${comp}_${key}`);
+
+        this.$refs['menu'].scrollTo({
+          left: positionItem.left,
+          behavior: 'smooth'
+        });
+      },
+
       select(comp, key) {
         this.selectedId = `${comp}_${key}`;
         let payload = null;
@@ -134,6 +152,9 @@
           };
         }
 
+        this.scrollToItem(comp, key);
+
+        // 切换container内容
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'handleSelect', [comp, key, payload])
         );

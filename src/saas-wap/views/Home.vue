@@ -6,8 +6,8 @@
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
     <div class="vmp-basic-container" v-if="state === 1">
-      <!-- <vmp-air-container cuid="layerRoot"></vmp-air-container> -->
-      <div>wap观看端</div>
+      <vmp-air-container cuid="layerRoot"></vmp-air-container>
+      <!-- <div>wap观看端</div> -->
     </div>
   </div>
 </template>

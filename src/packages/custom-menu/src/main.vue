@@ -1,12 +1,14 @@
 <template>
   <section class="vmp-custom-menu">
-    <component
-      v-for="(block, index) in customTabs"
-      :is="block.componentName"
-      :key="index"
-      :info="block"
-      :room-id="roomId"
-    />
+    <div class="vmp-custom-menu-wrapper">
+      <component
+        v-for="(block, index) in customTabs"
+        :is="block.componentName"
+        :key="index"
+        :info="block"
+        :room-id="roomId"
+      />
+    </div>
   </section>
 </template>
 
@@ -20,9 +22,10 @@
   import ComponentImglink from './components/component-imglink.vue';
   import ComponentLives from './components/component-lives.vue';
   import ComponentProjects from './components/component-projects.vue';
+  import ComponentPromote from './components/component-promote.vue';
   import componentMap from './js/componentMap';
-  import { mock1, mock2, mock3 } from './mock.js';
 
+  import { useCustomMenuServer } from 'middle-domain';
   export default {
     name: 'VmpCustomMenu',
     components: {
@@ -34,7 +37,8 @@
       ComponentTextlink,
       ComponentImglink,
       ComponentLives,
-      ComponentProjects
+      ComponentProjects,
+      ComponentPromote
     },
     data() {
       return {
@@ -42,27 +46,41 @@
         roomId: ''
       };
     },
+    beforeCreate() {
+      this.customMenuServer = useCustomMenuServer();
+    },
     created() {
       this.queryDetail();
     },
     methods: {
-      queryDetail(id) {
-        // 测试数据组
-        let mock = mock1;
-        if (id === 1) mock = mock1;
-        if (id === 2) mock = mock2;
-        if (id === 3) mock = mock3;
+      async queryDetail(id) {
+        if (id === undefined || id === null) {
+          throw Error('custom-menu 必须传入id');
+        }
 
-        // query
-        this.customTabs = mock.map(menu => {
-          menu.componentName = `component-${componentMap[menu.component_id]}`;
-          return menu;
+        const res = await this.customMenuServer.getCustomMenuDetail({
+          menu_id: id
         });
-
-        console.log('customTabs:', this.customTabs);
+        if (res.code === 200 && res.data) {
+          this.customTabs = res.data.components.map(menu => {
+            menu.componentName = `component-${componentMap[menu.component_id]}`;
+            return menu;
+          });
+        }
       }
     }
   };
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+  .vmp-custom-menu {
+    height: 100%;
+    width: 100%;
+
+    &-wrapper {
+      height: 100%;
+      width: 100%;
+      overflow-y: scroll;
+    }
+  }
+</style>

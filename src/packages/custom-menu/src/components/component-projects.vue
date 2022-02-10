@@ -1,17 +1,17 @@
 <template>
   <div class="lives-wrapbox">
-    <live-list :checked-list="info.subjects" :pagetype="pagetype" @link="linkWatch" />
+    <project-list :checked-list="info.subjects" :pagetype="pagetype" @link="linkWatch" />
   </div>
 </template>
 <script>
   /**
    * 专题自定义菜单
    */
-  import liveList from './live-list';
+  import projectList from './project-list';
   export default {
     name: 'component-projects',
     components: {
-      liveList
+      projectList
     },
     props: {
       info: {

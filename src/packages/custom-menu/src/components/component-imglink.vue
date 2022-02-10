@@ -44,7 +44,6 @@
       .qrbox {
         position: relative;
         width: 100%;
-        // height: 180px;
         overflow: hidden;
         &:hover {
           cursor: pointer;
@@ -52,9 +51,6 @@
         img {
           display: block;
           max-width: 100%;
-          // width: 312px;
-          // height: 176px;
-          // object-fit: scale-down;
           margin: 0px auto;
         }
       }
