@@ -1,12 +1,14 @@
 <template>
   <section class="vmp-custom-menu">
-    <component
-      v-for="(block, index) in customTabs"
-      :is="block.componentName"
-      :key="index"
-      :info="block"
-      :room-id="roomId"
-    />
+    <div class="vmp-custom-menu-wrapper">
+      <component
+        v-for="(block, index) in customTabs"
+        :is="block.componentName"
+        :key="index"
+        :info="block"
+        :room-id="roomId"
+      />
+    </div>
   </section>
 </template>
 
@@ -20,6 +22,7 @@
   import ComponentImglink from './components/component-imglink.vue';
   import ComponentLives from './components/component-lives.vue';
   import ComponentProjects from './components/component-projects.vue';
+  import ComponentPromote from './components/component-promote.vue';
   import componentMap from './js/componentMap';
   import { mock1, mock2, mock3 } from './mock.js';
 
@@ -34,7 +37,8 @@
       ComponentTextlink,
       ComponentImglink,
       ComponentLives,
-      ComponentProjects
+      ComponentProjects,
+      ComponentPromote
     },
     data() {
       return {
@@ -46,7 +50,7 @@
       this.queryDetail();
     },
     methods: {
-      queryDetail(id) {
+      queryDetail(id = 3) {
         // 测试数据组
         let mock = mock1;
         if (id === 1) mock = mock1;
@@ -65,4 +69,15 @@
   };
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+  .vmp-custom-menu {
+    height: 100%;
+    width: 100%;
+
+    &-wrapper {
+      height: 100%;
+      width: 100%;
+      overflow-y: scroll;
+    }
+  }
+</style>

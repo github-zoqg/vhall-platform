@@ -33,7 +33,9 @@ const compoentMap = {
   // 分割线
   8: 'line',
   // 排行榜
-  9: 'rank'
+  9: 'rank',
+  // 推广
+  10: 'promote'
 };
 
 export default compoentMap;
