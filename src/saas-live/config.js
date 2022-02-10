@@ -30,9 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpBasicCenterContainerLive',
-    // children: ['comDocUne']
-    children: ['comStreamList', 'comDocUne', 'comInsertStream']
+    component: 'VmpContainer',
+    className: 'vmp-basic-center',
+    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -41,8 +41,7 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd',
-    children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd'
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
@@ -80,8 +79,8 @@ export const serverConfig = {
       'comShare',
       'comVirtualPeople',
       'comLivePrivateChat',
-      'dlgGroupSetting',
       'comMediaSetting',
+      'comPcMediaCheck',
       'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
@@ -221,6 +220,11 @@ export const serverConfig = {
     },
     handleClick: [
       {
+        cuid: 'comGroupDiscussion',
+        method: 'switchTo',
+        args: 'media'
+      },
+      {
         cuid: 'comInsertVideo',
         method: 'openInserVideoDialog',
         args: []
@@ -242,6 +246,7 @@ export const serverConfig = {
     },
     handleClick: [
       {
+        // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
         method: 'switchTo',
         args: 'group'
@@ -417,12 +422,12 @@ export const serverConfig = {
       }
     ]
   },
-  // 分组设置对话框
-  dlgGroupSetting: {
-    component: 'VmpGroupSetting'
-  },
   comMediaSetting: {
-    component: 'VmpPcMediaSetting'
+    component: 'VmpPcMediaSetting',
+    saveOptions: []
+  },
+  comPcMediaCheck: {
+    component: 'VmpPcMediaCheck'
   },
   comInsertStream: {
     component: 'VmpInsertStream',
@@ -444,7 +449,8 @@ export const serverConfig = {
   // 分组讨论组件
   comGroupDiscussion: {
     component: 'VmpGroupDiscussion',
-    toggle: {
+    //触发切换
+    emitToggle: {
       cuid: ['comGroupMenu'],
       method: 'setSelectedState',
       args: ['$0'] // 获取动态参数的第一个

@@ -1,4 +1,5 @@
 <template>
+  <!-- 分组设置弹窗 -->
   <div class="vmp-group-setting">
     <el-dialog
       :visible.sync="dialogVisible"
@@ -29,10 +30,10 @@
         <div class="vmp-group-item group-way">
           <div class="vmp-group-item__hd">分组方式</div>
           <div class="vmp-group-item__bd">
-            <el-radio class="group-radio" v-model="radio" label="1">
+            <el-radio class="group-radio" v-model="way" label="1">
               自动分组 （系统随机分屏组内成员）
             </el-radio>
-            <el-radio class="group-radio" v-model="radio" label="2">
+            <el-radio class="group-radio" v-model="way" label="2">
               手动分组（按照实际情况及个人意愿分配）
             </el-radio>
           </div>
@@ -48,42 +49,66 @@
   </div>
 </template>
 <script>
-  import { useGroupServer, useMemberServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer, useMemberServer } from 'middle-domain';
   export default {
     name: 'VmpGroupSetting',
     props: {
-      dialogVisible: {
+      show: {
         type: Boolean,
         default: false
       }
     },
     data() {
       return {
-        number: '',
-        radio: '1'
+        dialogVisible: this.show,
+        number: '', // 分组数量，2~50 之间
+        way: '1' // 分组方式，1=随机分配|2=手动分配
       };
     },
 
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.memberServer = useMemberServer();
     },
     computed: {
       // 观众数量
       userNumber() {
-        return this.memberServer.state.onlineUsers.length;
+        return this.memberServer.state.onlineUsers.filter(item => item.role_name == 2).length;
+      }
+    },
+    watch: {
+      show: function (newVal) {
+        this.dialogVisible = newVal;
       }
     },
     methods: {
-      handlOpen() {
-        console.log(this.memberServer.state.onlineUsers);
+      handlOpen() {},
+      // 开始分组
+      handleGroup: async function () {
+        if (this.number < 2 || this.number > 50) {
+          this.$message.warning('请输入正确分组数量');
+          return false;
+        }
+        try {
+          const result = await this.groupServer.groupCreate({
+            number: this.number,
+            way: this.way
+          });
+          if (result && result.code === 200) {
+            this.roomBaseServer.setInavToolStatus('is_open_switch', 2);
+            this.handleClose();
+          } else {
+            this.$message.error(result.msg || '分组失败');
+          }
+        } catch (ex) {
+          this.$message.error(ex.messge || '分组出现异常');
+        }
       },
-      handleGroup() {
-        this.groupServer.state.status = 'grouping';
-      },
+      // 取消
       handleClose() {
-        this.groupServer.state.status = '';
-        this.groupServer.state.show = false;
+        this.dialogVisible = false;
+        this.$emit('update:show', false);
       }
     }
   };

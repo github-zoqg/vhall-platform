@@ -2,7 +2,7 @@
   <section>
     <main>
       <section class="vmp-media-setting-item">
-        <el-select class="vmp-media-setting-item__content" v-model="selectedMicId">
+        <el-select class="vmp-media-setting-item__content" v-model="mediaState.audioInput">
           <el-option
             v-for="item in devices"
             :key="item.deviceId"
@@ -15,7 +15,7 @@
         <preview-audio
           ref="previewAudio"
           class="vmp-media-setting-item__content"
-          :audioId="selectedMicId"
+          :audioId="mediaState.audioInput"
         />
       </section>
     </main>
@@ -36,38 +36,39 @@
 </template>
 
 <script>
+  import { useMediaSettingServer } from 'middle-domain';
   import PreviewAudio from '@/packages/volume-preview/src/main.vue';
   export default {
     components: {
       PreviewAudio
     },
-    props: {
-      devices: {
-        type: Array,
-        default: () => []
-      }
-    },
     data() {
       return {
-        selectedMicId: ''
+        mediaState: this.mediaSettingServer.state
       };
     },
+    computed: {
+      devices() {
+        return this.mediaState.devices.audioInputDevices;
+      }
+    },
     watch: {
-      selectedMicId(val) {
-        this.$emit('onSelectChange', 'audioInput', val);
-        this.setAudioInput();
+      'mediaState.audioInput'(val) {
+        this.setAudioInput(val);
       },
       devices(val) {
         if (val && val.length) {
-          this.selectedMicId = val[0].deviceId;
+          this.mediaState.audioInput = val[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedAudioDeviceId');
         }
       }
     },
-    mounted() {},
+    beforeCreate() {
+      this.mediaSettingServer = useMediaSettingServer();
+    },
     methods: {
-      async setAudioInput(id = this.selectedMicId) {
+      async setAudioInput(id) {
         if (!this.$refs.previewAudio) return;
 
         const mediaOptions = { audio: { deviceId: id } };
