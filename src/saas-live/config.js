@@ -68,7 +68,7 @@ export const serverConfig = {
 
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comChat', 'comMemberList', 'comCustomMenu']
+    children: ['comChat', 'comNotice', 'comMemberList', 'comCustomMenu']
   },
 
   /*** 所有弹窗集合 */
@@ -279,6 +279,9 @@ export const serverConfig = {
         method: 'openModal'
       }
     ]
+  },
+  comNotice: {
+    component: 'VmpNoticeList'
   },
   //发起端--私聊组件
   comLivePrivateChat: {

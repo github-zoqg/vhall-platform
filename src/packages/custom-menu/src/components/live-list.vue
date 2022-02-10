@@ -39,7 +39,7 @@
   </div>
 </template>
 <script>
-  // import { mapState } from 'vuex';
+  import { useCustomMenuServer } from 'middle-domain';
 
   export default {
     filters: {
@@ -82,6 +82,9 @@
         immediate: true
       }
     },
+    beforeCreate() {
+      this.customMenuServer = useCustomMenuServer();
+    },
     mounted() {
       this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
     },
@@ -89,32 +92,28 @@
       gotoRoom(id) {
         this.$emit('link', id);
       },
-      getActiveList() {
+      async getActiveList() {
         if (this.checkedList.length == 0) {
           this.activeList = [];
           return;
         }
         this.loading = true;
-        this.$vhallapi.interactTool
-          .queryActiveList({
-            webinar_ids: this.checkedList.join(','),
-            user_id: '',
-            is_check: 0
-          })
-          .then(res => {
-            if (res.code == 200) {
-              if (res.data.total == 0) {
-                this.lock = true;
-                this.loading = false;
-                this.total = 0;
-              } else {
-                this.activeList = res.data.list;
-                this.loading = false;
-              }
-            } else {
-              this.loading = false;
-            }
-          });
+
+        const res = await this.customMenuServer.getActiveList({
+          webinar_ids: this.checkedList.join(','),
+          user_id: '',
+          is_check: 0
+        });
+
+        this.loading = false;
+        if (res.code === 200 && res.data) {
+          if (res.data.total == 0) {
+            this.lock = true;
+            this.total = 0;
+          } else {
+            this.activeList = res.data.list;
+          }
+        }
       }
     }
   };
@@ -123,7 +122,6 @@
 <style lang="less" scoped>
   .vh-chose-active-box {
     width: 100%;
-    height: 100%;
     overflow: hidden;
     position: relative;
     display: flex;
