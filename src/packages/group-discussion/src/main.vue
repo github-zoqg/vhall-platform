@@ -1,12 +1,12 @@
 <template>
   <div v-show="show" class="vmp-group-discussion">
     <!-- 准备设置分组对话框 -->
-    <vmp-group-setting :dialogVisible="isOpenSwitch == 0"></vmp-group-setting>
+    <vmp-group-setting :dialogVisible="show && isOpenSwitch == 0"></vmp-group-setting>
 
     <!-- 分组设置页 -->
     <vmp-group-split
       ref="groupSplit"
-      v-show="isOpenSwitch == 1 || isOpenSwitch == 2"
+      v-show="show && (isOpenSwitch == 1 || isOpenSwitch == 2)"
     ></vmp-group-split>
 
     <!-- 新增分组对话框 -->
