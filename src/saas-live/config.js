@@ -429,9 +429,6 @@ export const serverConfig = {
   comPcMediaCheck: {
     component: 'VmpPcMediaCheck'
   },
-  comPcMediaCheck: {
-    component: 'VmpPcMediaCheck'
-  },
   comInsertStream: {
     component: 'VmpInsertStream',
     emitClose: [
