@@ -4,7 +4,10 @@
     <el-dropdown @command="handleChangeLang" trigger="click" placement="bottom">
       <div class="vmp-language-choice-lang">
         <span class="vmp-language-choice-lang-icon">
-          <i class="iconfont iconicon_help_m" :style="{ color: themeClass.pageBg }"></i>
+          <i
+            class="vh-saas-iconfont vh-saas-line-multilingual"
+            :style="{ color: themeClass.pageBg }"
+          ></i>
         </span>
         <p :style="{ color: themeClass.pageBg }">简体中文</p>
       </div>

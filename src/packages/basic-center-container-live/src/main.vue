@@ -6,10 +6,10 @@
     <!-- <div class="vmp-basic-center__mainscreen-pos"></div> -->
     <!-- 播放器 -->
     <!-- 文档 -->
-    <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
+    <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
     <!-- 桌面共享 -->
     <!-- 插播 -->
-    <vmp-air-container :cuid="childrenComp[2]" :oneself="true"></vmp-air-container>
+    <!-- <vmp-air-container :cuid="childrenComp[2]" :oneself="true"></vmp-air-container> -->
     <!-- 底部控制栏 -->
     <!-- <vmp-air-container :cuid="childrenComp[2]" :oneself="true"></vmp-air-container> -->
     <!-- 滚动的公告 -->

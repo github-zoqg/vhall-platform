@@ -2,15 +2,15 @@
   <div class="vmp-footer-tools">
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
-        <i class="iconfont iconmeitishezhi"></i>
+        <i class="vh-iconfont vh-line-setting"></i>
         设置
       </div>
       <div class="vmp-footer-tools-left-online" v-if="roomBaseState.watchInitData.online.show">
-        <i class="iconfont iconzaixianrenshu"></i>
+        <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
       <div class="vmp-footer-tools-left-hot" v-if="roomBaseState.watchInitData.pv.show">
-        <i class="iconfont iconzaixianrenshu"></i>
+        <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
     </div>
