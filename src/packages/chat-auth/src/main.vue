@@ -12,9 +12,9 @@
           <span class="switch-title">聊天审核</span>
           <el-switch
             v-model="enableChatAuth"
-            :inactive-color="inactiveColor"
+            :inactive-color="options.inactiveColor"
             :width="32"
-            active-color="#FFD021"
+            :active-color="options.activeColor"
             @change="toggleChatAuth"
           ></el-switch>
           <span class="switch-title sub-title">
@@ -130,7 +130,7 @@
           <span class="el-icon-refresh-right refresh-btn" @click="refreshList"></span>
         </div>
         <div class="main-container__content">
-          <auth-table :select-menu-type="selectMenuType"></auth-table>
+          <auth-table :select-menu-type="selectMenuType" :options="options"></auth-table>
         </div>
       </div>
     </div>
@@ -141,13 +141,14 @@
     >
       {{ footerInfo.text }}
     </div>
-    <auto-setting-modal ref="autoSettingModal"></auto-setting-modal>
+    <auto-setting-modal ref="autoSettingModal" :options="options"></auto-setting-modal>
   </div>
 </template>
 
 <script>
   import autoSettingModal from './components/autoSettingModal';
   import authTable from './components/authTable';
+  import { useChatAuthServer } from 'middle-domain';
   export default {
     name: 'VmpChatAuth',
     components: {
@@ -162,11 +163,6 @@
         },
         //开启聊天审核
         enableChatAuth: false,
-        //todo 这俩都可以用从配置读取
-        //switch未激活的颜色
-        inactiveColor: '#cccccc',
-        //switch激活的颜色
-        activeColor: '#FFD021',
         //底部支持信息
         footerInfo: {
           show: 'Y',
@@ -206,15 +202,27 @@
         controlConfig: {
           size: 'small',
           round: true
+        },
+        //聊天审核配置 todo 后续移到config里，当前config不支持
+        options: {
+          //是否有通过并回复按钮(未审核按钮)
+          hasPassAndReplyBtn: true,
+          //switch未激活的颜色
+          inactiveColor: '#cccccc',
+          //switch激活的颜色
+          activeColor: '#FFD021',
         }
       };
     },
     beforeCreate() {
-      //todo 引入domain的chatAuthServer
+      this.chatAuthServer = useChatAuthServer();
     },
     created() {
       this.init();
       this.getFooterInfo();
+    },
+    mounted() {
+      console.log(this.chatAuthServer, 'chatAuthServer');
     },
     methods: {
       //todo 初始化方法
