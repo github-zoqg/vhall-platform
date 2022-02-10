@@ -7,7 +7,6 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpTabContainer',
     data() {
@@ -60,6 +59,7 @@
     }
 
     & > main {
+      height: 1px;
       flex: 1 1 auto;
     }
   }
