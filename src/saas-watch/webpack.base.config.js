@@ -23,9 +23,8 @@ const htmlConfig = {
     //   '//static.vhallyun.com/jssdk/vhall-jssdk-interaction/latest/vhall-jssdk-interaction-2.3.6.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
-    jsencrypt:
-      '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
-    vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
+    jsencrypt: '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js'
+    // vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
   },
   // cdn css
   cdnCss: {
