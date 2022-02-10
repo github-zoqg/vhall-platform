@@ -53,13 +53,14 @@
   export default {
     name: 'VmpGroupSetting',
     props: {
-      dialogVisible: {
+      show: {
         type: Boolean,
         default: false
       }
     },
     data() {
       return {
+        dialogVisible: this.show,
         number: '', // 分组数量，2~50 之间
         way: '1' // 分组方式，1=随机分配|2=手动分配
       };
@@ -76,6 +77,11 @@
         return this.memberServer.state.onlineUsers.filter(item => item.role_name == 2).length;
       }
     },
+    watch: {
+      show: function (newVal) {
+        this.dialogVisible = newVal;
+      }
+    },
     methods: {
       handlOpen() {},
       // 开始分组
@@ -90,7 +96,8 @@
             way: this.way
           });
           if (result && result.code === 200) {
-            console.log('分组完成');
+            this.roomBaseServer.setInavToolStatus('is_open_switch', 2);
+            this.handleClose();
           } else {
             this.$message.error(result.msg || '分组失败');
           }
@@ -100,8 +107,8 @@
       },
       // 取消
       handleClose() {
-        this.groupServer.state.status = '';
-        this.groupServer.state.show = false;
+        this.dialogVisible = false;
+        this.$emit('update:show', false);
       }
     }
   };

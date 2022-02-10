@@ -222,7 +222,7 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'switchTo',
-        args: []
+        args: 'media'
       },
       {
         cuid: 'comInsertVideo',
@@ -249,7 +249,7 @@ export const serverConfig = {
         // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
         method: 'switchTo',
-        args: []
+        args: 'group'
       }
     ]
   },
