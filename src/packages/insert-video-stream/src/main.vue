@@ -259,9 +259,9 @@
       pushLocalStream() {
         // if (this.isLiving != 1) {
         //   // 不在直播中，不推流
-        //   // this.visibleBeforeLive = true;
         //   return;
         // }
+        const { watchInitData } = this.roomBaseServer.state;
         this.creatLoaclStream().then(res => {
           this.insertFileServer
             .publishInsertStream({ streamId: res })
@@ -270,13 +270,16 @@
               console.log('插播推流成功', e, this._LoclaStreamId);
               this._isHasLocalStreamIdBeforeInit = true;
               this.pushStreamSucces = true;
-              // const obj = {
-              //   accountId: this.accountId,
-              //   role: this.roleName,
-              //   nickname: this.nickname,
-              //   stream_type: 4,
-              //   has_video: this.isAudio ? 0 : 1
-              // };
+              const obj = {
+                accountId: watchInitData.webinar.userinfo.user_id,
+                role: watchInitData.join_info.role_name,
+                nickname: watchInitData.join_info.nickname,
+                stream_type: 4,
+                has_video: this.isAudio ? 0 : 1
+              };
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitInsertInfo', [obj])
+              );
               // 开始插播事件
               // this.$nextTick(() => {
               //   // 文档需要调整大小
@@ -362,7 +365,6 @@
             resolve();
             return;
           }
-          console.log(this._LoclaStreamId, 'this._LoclaStreamId');
           // 停止推流
           this.insertFileServer
             .stopPublishInsertStream(this._LoclaStreamId)
@@ -383,7 +385,7 @@
           const el = document.getElementById('vmp-insert-stream-video');
           el.innerHTML = '';
         }
-        this.$refs.insertStream && this.$refs.insertStream.destroy();
+        // this.$refs.insertStream && this.$refs.insertStream.destroy();
         this.remoteVideo.videoParam = file;
         this.$nextTick(() => {
           this.remoteVideo.show = true;
@@ -449,7 +451,7 @@
           .then(() => {
             const obj = JSON.parse(owner.attributes);
             obj.accountId = owner.accountId;
-            this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
+            // this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
             this.isAudio = obj.has_video == 0;
             this.subscribInsterStreamSucess = true;
           })

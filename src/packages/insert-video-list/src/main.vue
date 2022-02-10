@@ -130,7 +130,7 @@
   </div>
 </template>
 <script>
-  import { useInsertFileServer } from 'middle-domain';
+  import { useInsertFileServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
   import videoPreview from '@/packages/app-shared/components/video-preview';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
@@ -143,13 +143,18 @@
         isFetching: false,
         videoParam: {}, //预览数据
         webinarId: '876395481' || this.$route.params.id,
-        insertVideoStatus: false, // 是否正在插播
         playingInsertVideoId: '',
+        isPcStartLive: true, // 是不是网页发起
         tableData: [],
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
+        },
+        insertVideoObj: {
+          isinsterVideoPushing: false,
+          userInfo: {},
+          insertVideoStatus: false // 是否正在插播
         },
         total: 1,
         totalPages: 0,
@@ -161,6 +166,34 @@
     },
     beforeCreate() {
       this.insertFileServer = useInsertFileServer();
+      this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    created() {
+      this.assistantType = this.$route.query.assistantType;
+      this.roomBaseState = this.roomBaseServer.state;
+      this.roleName = this.roomBaseState.watchInitData.join_info.role_name;
+    },
+    mounted() {
+      this.msgServer.$on('ROOM_MSG', msg => {
+        let msgs = JSON.parse(msg.data);
+        if (msgs.type == 'live_start') {
+          // 1主持人 2观众 3助理 4嘉宾
+          if (this.roleName == 3 && !this.assistantType) {
+            if (msgs.switch_type != 1) {
+              // 1为网页发起
+              clearTimeout(this._setTimeoutlive_start);
+              this._setTimeoutlive_start = setTimeout(() => {
+                this.autoPlay();
+              }, 1000);
+              // 当前为助理，并且是由客户端发起的
+              this.isPcStartLive = false; // 是否是网页端发起的直播  助理其他端不支持插播
+            } else {
+              this.isPcStartLive = true;
+            }
+          }
+        }
+      });
     },
     methods: {
       openInserVideoDialog() {
@@ -170,8 +203,9 @@
         this.getTableList(false, true);
       },
       checkCaptureStream() {
-        // TODO 是否是网页端发起的直播  助理其他端不支持插播 、并且是正在直播
-        if (!this.isPcStartLive && this.status == 1) {
+        //是否是网页端发起的直播  助理其他端不支持插播 、并且是正在直播
+        const { watchInitData } = this.roomBaseState;
+        if (!this.isPcStartLive && watchInitData.webinar.type == 1) {
           this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
             title: '提示',
             confirmButtonText: '知道了',
@@ -182,12 +216,19 @@
           });
           return;
         }
+        // const thirdId = this.watchInitData.join_info.third_party_user_id;
+        // const accountId = this.watchInitData.webinar.userinfo.user_id;
+        // if (this.roleName == 3 && this.insertVideoObj.insertVideoStatus && accountId != thirdId) {
+        // }
       },
       closeInserVideoDialog(flag, id) {
-        console.log(flag, '======zhangxiao=======');
-        this.insertVideoStatus = flag;
+        this.insertVideoObj.insertVideoStatus = flag;
         this.playingInsertVideoId = id;
         this.insertVideoVisible = false;
+      },
+      // 获取正在插播用户信息
+      getInsertingInfo(obj) {
+        console.log(obj, '???1zhangixoa-------');
       },
       searchTableList() {
         this.getTableList(false);
@@ -308,7 +349,7 @@
           video.isAudio = true;
         }
         // 如果当前角色正在进行插播，需要先确认
-        if (this.insertVideoStatus) {
+        if (this.insertVideoObj.insertVideoStatus) {
           this.$confirm('是否中断播放中视频，并替换播放？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -360,6 +401,23 @@
               });
           })
           .catch(() => {});
+      },
+      autoPlay() {
+        setTimeout(() => {
+          this.$alert('您已进入直播房间，马上开始互动吧', '', {
+            title: '提示',
+            confirmButtonText: '立即开始',
+            // center: true,
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            callback: () => {
+              const list = document.getElementsByTagName('video');
+              for (const item of list) {
+                item.play();
+              }
+            }
+          });
+        }, 500);
       },
       // 预览页面
       handlePreview(video) {
