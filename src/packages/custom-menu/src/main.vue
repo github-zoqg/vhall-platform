@@ -38,7 +38,8 @@
     },
     data() {
       return {
-        customTabs: []
+        customTabs: [],
+        roomId: ''
       };
     },
     created() {

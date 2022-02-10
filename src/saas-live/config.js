@@ -82,7 +82,9 @@ export const serverConfig = {
       'comLivePrivateChat',
       'dlgGroupSetting',
       'comMediaSetting',
-      'comInsertVideo'
+      'comInsertVideo',
+      'liveTimerSet',
+      'liveTimer'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
@@ -229,7 +231,21 @@ export const serverConfig = {
   },
   // 互动工具
   comInteractMenu: {
-    component: 'VmpInteractMenu'
+    component: 'VmpInteractMenu',
+    emitOpenTimerSet: [
+      {
+        cuid: ['liveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
+  },
+  // 互动工具-计时器设置
+  liveTimerSet: {
+    component: 'VmpLiveTimerSet'
+  },
+  // 互动工具-计时器
+  liveTimer: {
+    component: 'VmpLiveTimer'
   },
 
   // 分组讨论菜单
