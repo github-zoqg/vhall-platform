@@ -23,7 +23,7 @@
           @openMediaSettings="openMediaSettings"
         ></headerControl>
       </div>
-      <div class="vmp-header-right_full"><i class="iconfont iconicon_quanping"></i></div>
+      <div class="vmp-header-right_full"><i class="vh-iconfont vh-line-amplification"></i></div>
     </section>
   </div>
 </template>
@@ -181,7 +181,7 @@
       border-radius: 50%;
       width: 28px;
       height: 28px;
-      color: @font-error-low;
+      color: @font-dark-low;
       font-size: 14px;
       cursor: pointer;
       display: flex;

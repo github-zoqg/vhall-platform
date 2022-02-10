@@ -30,8 +30,13 @@
           </div>
           <div class="vmp-video-preview-wrap-controller-icons">
             <div class="vmp-video-preview-wrap-controller-icons-left">
-              <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
-              <i v-else class="iconfont iconzanting_icon" @click="videoPlayBtn"></i>
+              <i
+                class="vh-iconfont"
+                :class="statePaly ? 'vh-a-line-videopause' : 'vh-a-line-videoplay'"
+                @click="videoPlayBtn"
+              ></i>
+              <!-- <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
+              <i v-else class="iconfont iconzanting_icon" @click="videoPlayBtn"></i> -->
               <div class="vmp-center-box">
                 <span>
                   {{ currentTime | secondToDate }}
@@ -44,9 +49,9 @@
               <div class="vmp-volume-box">
                 <span class="vmp-icon-box">
                   <i
-                    class="iconfont"
+                    class="vh-iconfont"
                     @click="jingYin"
-                    :class="voice > 0 ? 'iconyinliang_icon' : 'iconyinliangguanbi_icon'"
+                    :class="voice > 0 ? 'vh-line-voice' : 'vh-line-mute'"
                   ></i>
                 </span>
                 <div class="vmp-ver-slider">
@@ -62,10 +67,10 @@
               <template v-if="!isInsertVideoPreview">
                 <i
                   v-if="isFullscreen"
-                  class="iconfont iconicon_quxiaoquanping"
+                  class="vh-iconfont vh-a-line-fullscreen"
                   @click="exitFullscreen"
                 ></i>
-                <i v-else class="iconfont iconicon_quanping" @click="enterFullscreen"></i>
+                <i v-else class="vh-iconfont vh-a-line-exitfullscreen" @click="enterFullscreen"></i>
               </template>
               <!-- 插播视频播放器显示的按钮 -->
               <template v-if="isInsertVideoPreview">
@@ -73,12 +78,12 @@
                   <i @click="$emit('openInsert')" class="iconfont iconchaboliebiao_icon"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="关闭插播">
-                  <i @click="$emit('closeInsertvideo')" class="iconfont iconguanbichabo_icon"></i>
+                  <i @click="$emit('closeInsertvideo')" class="vh-iconfont vh-line-close"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="隐藏">
                   <i
                     @click="$emit('hideInsertVideoControl')"
-                    class="iconfont iconshouqibofangqi_icon"
+                    class="vh-iconfont vh-line-arrow-down"
                   ></i>
                 </el-tooltip>
               </template>
