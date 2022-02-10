@@ -3,7 +3,7 @@
     <vmp-air-container :cuid="cuid"></vmp-air-container>
     <div class="vmp-aside-menu-share">
       <div @click="goWatchShare">
-        <i class="iconfont iconfenxiang"></i>
+        <i class="vh-iconfont vh-line-share"></i>
         <p>分享</p>
       </div>
     </div>

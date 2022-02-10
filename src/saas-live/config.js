@@ -444,6 +444,13 @@ export const serverConfig = {
         method: 'openInserVideoDialog',
         args: []
       }
+    ],
+    emitInsertInfo: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'getInsertingInfo',
+        args: ['$0']
+      }
     ]
   },
   // 分组讨论组件
