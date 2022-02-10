@@ -65,6 +65,7 @@
         return this.roomBaseServer.state.interactToolStatus.is_open_switch;
       }
     },
+
     methods: {
       // 切换显示隐藏
       switchTo(menu) {

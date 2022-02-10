@@ -39,7 +39,7 @@
           v-if="hasPager"
           data-value="prevStep"
           title="上一步"
-          class="doc-pagebar__opt iconfont iconzuofanye"
+          class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
         <li v-if="hasPager" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
@@ -50,23 +50,39 @@
           v-if="hasPager"
           data-value="nextStep"
           title="下一步"
-          class="doc-pagebar__opt iconfont iconyoufanye"
+          class="doc-pagebar__opt vh-iconfont vh-line-arrow-right"
         ></li>
-        <li data-value="zoomIn" title="放大" class="doc-pagebar__opt iconfont iconfangda"></li>
-        <li data-value="zoomOut" title="缩小" class="doc-pagebar__opt iconfont iconsuoxiao"></li>
-        <li data-value="zoomReset" title="还原" class="doc-pagebar__opt iconfont iconhuanyuan"></li>
-        <li data-value="move" title="移动" class="doc-pagebar__opt iconfont iconyidong"></li>
+        <li
+          data-value="zoomIn"
+          title="放大"
+          class="doc-pagebar__opt vh-iconfont vh-line-zoom-in"
+        ></li>
+        <li
+          data-value="zoomOut"
+          title="缩小"
+          class="doc-pagebar__opt vh-iconfont vh-line-zoom-out"
+        ></li>
+        <li
+          data-value="zoomReset"
+          title="还原"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-a-line-11"
+        ></li>
+        <li
+          data-value="move"
+          title="移动"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag"
+        ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
           data-value="fullscreen"
           title="全屏"
-          class="doc-pagebar__opt iconfont iconquanping"
+          class="doc-pagebar__opt vh-iconfont vh-a-line-fullscreen"
         ></li>
         <li
           v-if="isWatch && displayMode === 'fullscreen'"
           data-value="fullscreen"
           title="退出全屏"
-          class="doc-pagebar__opt iconfont iconquanpingguanbi"
+          class="doc-pagebar__opt vh-iconfont vh-a-line-exitfullscreen"
         ></li>
       </ul>
 

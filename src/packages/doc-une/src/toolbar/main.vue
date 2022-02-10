@@ -21,7 +21,10 @@
           <!-- 提示 -->
           <div class="audience-tip" v-show="showAudienceTip">
             <div class="audience-tip__arrow"></div>
-            <span @click="showAudienceTip = false" class="iconfont iconguanbi1"></span>
+            <span
+              @click="showAudienceTip = false"
+              class="close-icon vh-iconfont vh-line-close"
+            ></span>
             如果想让观众看到文档/白板内容， 必须开启“观众可见”开关
           </div>
         </div>
@@ -37,7 +40,7 @@
           :class="{ selected: currentBrush === 'select' }"
           @click="handleBoardTool('select')"
         >
-          <i class="iconfont iconxuanze"></i>
+          <i class="vh-saas-iconfont vh-saas-line-choose"></i>
         </div>
         <!-- 画笔 -->
         <div
@@ -46,7 +49,7 @@
           :class="{ selected: currentBrush === 'pen' }"
           @click="handleBoardTool('pen')"
         >
-          <i class="iconfont iconhuabi"></i>
+          <i class="vh-iconfont vh-line-brush"></i>
           <vmp-pen-popup></vmp-pen-popup>
         </div>
         <!-- 荧光笔 -->
@@ -56,7 +59,7 @@
           :class="{ selected: currentBrush === 'highlighter' }"
           @click="handleBoardTool('highlighter')"
         >
-          <i class="iconfont iconjiguangbi"></i>
+          <i class="vh-iconfont vh-a-line-fluorescentpen"></i>
           <vmp-highlighter-popup></vmp-highlighter-popup>
         </div>
         <!-- 形状 -->
@@ -76,7 +79,7 @@
           :class="{ selected: currentBrush === 'text' }"
           @click="handleBoardTool('text')"
         >
-          <i class="iconfont iconwenzi"></i>
+          <i class="vh-iconfont vh-line-text"></i>
           <vmp-text-popup></vmp-text-popup>
         </div>
         <!-- 橡皮擦 -->
@@ -86,11 +89,11 @@
           :class="{ selected: currentBrush === 'eraser' }"
           @click="handleBoardTool('eraser')"
         >
-          <i class="iconfont iconxiangpica"></i>
+          <i class="vh-iconfont vh-line-eraser"></i>
         </div>
         <!-- 清除 -->
         <div class="vmp-icon-item" :title="$t('usual.clear')" @click="handleBoardTool('clear')">
-          <i class="iconfont iconqingkong"></i>
+          <i class="vh-iconfont vh-line-delete"></i>
         </div>
 
         <!-- 退出全屏 -->
@@ -99,7 +102,7 @@
           :title="$t('usual.clear')"
           @click="fullscreen"
         >
-          <i class="iconfont iconquanpingguanbi"></i>
+          <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
         </div>
 
         <!-- 这个章节按钮用于观看端文档显示，主持端章节按钮在最右边 -->
@@ -109,14 +112,14 @@
           :title="$t('usual.docThumb')"
           @click="toggleThumbnail"
         >
-          <i class="iconfont iconsuolvetu"></i>
+          <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
         </div>
       </div>
     </div>
     <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
     <div class="vmp-doc-toolbar__ft" v-if="!isWatch">
       <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
-        <i class="iconfont iconquanping"></i>
+        <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
       <div
         v-show="currentType !== 'board'"
@@ -124,7 +127,7 @@
         :title="$t('usual.docThumb')"
         @click="toggleThumbnail"
       >
-        <i class="iconfont iconsuolvetu"></i>
+        <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
       </div>
     </div>
   </div>
@@ -426,7 +429,7 @@
       box-sizing: content-box;
       user-select: none;
 
-      span.iconfont {
+      span.close-icon {
         position: absolute;
         top: 2px;
         right: 5px;
