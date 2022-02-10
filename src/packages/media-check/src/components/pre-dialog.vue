@@ -12,7 +12,7 @@
       @onCancel="popAlertCheckClose"
     >
       <div slot="content">
-        <span>直播前取消设备检测，将会影响直播质量，确定不检测？</span>
+        <span>为保证直播顺利进行，推荐在直播开始前进行设备检测</span>
       </div>
     </saas-alert>
 
@@ -57,7 +57,7 @@
         this.popAlertCheckVisible = false;
         this.$nextTick(() => {
           this.popAlertCheckConfirmVisible = true;
-        }, 1000);
+        });
       },
       popAlertCheckConfirm() {
         this.popAlertCheckConfirmVisible = false;

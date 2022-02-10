@@ -5,11 +5,11 @@
         <label class="vmp-media-setting-item__label">画质选择</label>
         <el-select
           class="vmp-media-setting-item__content"
-          v-model="selectedRate"
-          @change="rateChange(selectedRate)"
+          v-model="mediaState.rate"
+          @change="rateChange(mediaState.rate)"
         >
           <el-option
-            v-for="rate in rates"
+            v-for="rate in ratesConfig"
             :key="rate.label"
             :value="rate.label"
             :label="formatDefinitionLabel(rate.label)"
@@ -21,11 +21,11 @@
         <label class="vmp-media-setting-item__label">桌面共享</label>
         <el-select
           class="vmp-media-setting-item__content"
-          v-model="selectedPPTRate"
+          v-model="mediaState.screenRate"
           placeholder="请选择桌面共享模式"
         >
           <el-option
-            v-for="rate in pptRates"
+            v-for="rate in screenRatesConfig"
             :key="rate.label"
             :value="rate.value"
             :label="rate.label"
@@ -38,7 +38,9 @@
         <section class="vmp-media-setting-item__content">
           <div
             class="vmp-media-setting-item-layout__item"
-            :class="{ 'vmp-media-setting-item-layout__item--selected': selectedLayout === item.id }"
+            :class="{
+              'vmp-media-setting-item-layout__item--selected': mediaState.layout === item.id
+            }"
             v-for="item of layoutConfig"
             :key="item.id"
             @click="setLayout(item.id)"
@@ -64,24 +66,20 @@
 </template>
 
 <script>
-  import { getDefinitionMap, getPPTOptions } from '../../js/getOptionEntity';
+  import { useMediaSettingServer } from 'middle-domain';
+  import { getDefinitionMap, getScreenOptions } from '../../js/getOptionEntity';
+
   import FloatImg from '../../assets/img/float.png';
   import TiledImg from '../../assets/img/tiled.png';
   import GridImg from '../../assets/img/grid.png';
   export default {
-    props: {
-      selected: {
-        require: true,
-        default: () => ({})
-      }
-    },
     data() {
       return {
-        rates: '',
-        selectedRate: '',
-        selectedPPTRate: '',
-        selectedLayout: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE',
-        pptRates: getPPTOptions(),
+        mediaState: this.mediaSettingServer.state,
+
+        // v-for config
+        ratesConfig: [],
+        screenRatesConfig: getScreenOptions(),
         layoutConfig: Object.freeze([
           { id: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE', img: FloatImg, text: '主次浮窗' },
           { id: 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE', img: TiledImg, text: '主次平铺' },
@@ -89,16 +87,16 @@
         ])
       };
     },
+    beforeCreate() {
+      this.mediaSettingServer = useMediaSettingServer();
+    },
     watch: {
-      'selected.video'(cur, old) {
+      'mediaState.video'(cur, old) {
         if (cur === old) return;
         this.getVideoConstraints(cur);
       }
     },
     methods: {
-      setLayout(id) {
-        this.selectedLayout = id;
-      },
       async getVideoConstraints(deviceId) {
         console.log('getVideoConstraints', deviceId);
         if (!deviceId) return;
@@ -112,10 +110,15 @@
           'RTC_VIDEO_PROFILE_720P_16x9_M',
           'RTC_VIDEO_PROFILE_240P_16x9_M'
         ];
-        this.rates = constraints.filter(item => {
+        this.ratesConfig = constraints.filter(item => {
           return availableRates.includes(item.label);
         });
       },
+
+      setLayout(id) {
+        this.mediaState.layout = id;
+      },
+
       setDefault() {
         const saveRate = sessionStorage.getItem('selectedRate');
         const savedLayout = sessionStorage.getItem('layout');

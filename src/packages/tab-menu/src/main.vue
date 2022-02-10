@@ -6,14 +6,14 @@
       :class="{ disabledClick: selectedIndex === 0 }"
       @click="prev"
     >
-      L
-      <i class="iconfont iconzuojiantou" />
+      <i class="iconfont iconzuofanye" />
     </span>
 
     <!-- item -->
-    <ul class="vmp-tab-menu-scroll-container">
+    <ul class="vmp-tab-menu-scroll-container" ref="menu">
       <li
         v-for="item of menu"
+        :ref="`${item.comp}_${item.key}`"
         class="vmp-tab-menu-item"
         :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.comp}_${item.key}` }"
         :key="`${item.comp}_${item.key}`"
@@ -30,8 +30,7 @@
       :class="{ disabledClick: selectedIndex === menu.length - 1 }"
       @click="next"
     >
-      R
-      <i class="iconfont iconyoujiantou" />
+      <i class="iconfont iconyoufanye" />
     </span>
   </section>
 </template>
@@ -80,8 +79,6 @@
         this.menu.splice(index);
       },
 
-      removeItemByKey(comp, key) {},
-
       addItem(item) {
         if (!item || !item.key || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
@@ -126,6 +123,25 @@
         tab.showIcon = !tab.showIcon;
       },
 
+      // 滑动到某个item的动画效果
+      scrollToItem(comp, key) {
+        // 由于menu列表随时会增减，
+        const itemsWithPosition = this.menu.map(item => {
+          const key = `${item.comp}_${item.key}`;
+          const ref = this.$refs[key][0];
+          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
+          const left = ref.offsetLeft - paddingLeft;
+          return { key, ref, left };
+        });
+
+        const positionItem = itemsWithPosition.find(item => item.key === `${comp}_${key}`);
+
+        this.$refs['menu'].scrollTo({
+          left: positionItem.left,
+          behavior: 'smooth'
+        });
+      },
+
       select(comp, key) {
         this.selectedId = `${comp}_${key}`;
         let payload = null;
@@ -136,6 +152,9 @@
           };
         }
 
+        this.scrollToItem(comp, key);
+
+        // 切换container内容
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'handleSelect', [comp, key, payload])
         );
@@ -152,12 +171,13 @@
 
     .vmp-tab-menu-page-btn {
       position: relative;
-      display: inline-block;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
       width: 24px;
       height: 100%;
       text-align: center;
       font-size: 14px;
-      vertical-align: middle;
       color: #fff;
       height: 100%;
       cursor: pointer;

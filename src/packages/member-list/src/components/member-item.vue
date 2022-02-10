@@ -33,7 +33,6 @@
 
         <!--被禁言标识 -->
         <template v-if="[1, 3].includes(tabIndex) && userInfo.is_banned === 1">
-          {{ [1, 3].includes(tabIndex) && userInfo.is_banned === 1 }}
           <i
             class="vmp-member-item__control__user-icon iconfont iconjinyan"
             style="color: #cccccc"
@@ -236,7 +235,7 @@
                 :disabled="getPropertyByKey(item, 'disable')"
                 :key="item.command"
               >
-                {{ item.text }}
+                {{ item.type && item.type === 'toggleButton' ? computedShowText(item) : item.text }}
               </el-dropdown-item>
             </template>
           </el-dropdown-menu>
@@ -253,7 +252,7 @@
                 :disabled="getPropertyByKey(item, 'disable')"
                 :key="item.command"
               >
-                {{ item.text }}
+                {{ item.type && item.type === 'toggleButton' ? computedShowText(item) : item.text }}
               </el-dropdown-item>
             </template>
           </el-dropdown-menu>
@@ -382,7 +381,9 @@
             command: 'setBanned',
             isShow: ![1, '1'].includes(this.userInfo.role_name),
             disable: false,
+            //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
+            type: 'toggleButton',
             sequence: 2
           },
           //踢出 / 取消踢出
@@ -391,6 +392,7 @@
             isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
+            type: 'toggleButton',
             sequence: 3
           },
           {
@@ -398,6 +400,7 @@
             isShow: this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
+            type: 'toggleButton',
             sequence: 4
           },
           //邀请演示（全部人员里展示）
@@ -434,6 +437,7 @@
             isShow: ![2, '2'].includes(this.userInfo.role_name),
             disable: false,
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
+            type: 'toggleButton',
             sequence: 2
           },
           //踢出 / 取消踢出
@@ -442,6 +446,7 @@
             isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
+            type: 'toggleButton',
             sequence: 3
           },
           //升为组长
@@ -554,7 +559,7 @@
         }
         return false;
       },
-      //列表中该用户是否补是主持人身份 todo 调查原本为啥要这样子写，是否可以简化？
+      //列表中该用户是否补是主持人身份
       isNotHost() {
         const options = [
           [1, '1'].includes(this.roleName),
@@ -566,7 +571,7 @@
         ];
         return options.every(item => !!item);
       },
-      //是否是主持人 todo 调查原本为啥要这样子写，是否必要？
+      //是否是主持人
       isHost() {
         return (
           [1, '1'].includes(this.roleName) &&
@@ -614,6 +619,29 @@
       getPropertyByKey() {
         return function (item = {}, keyName = '') {
           return typeof item[keyName] === 'boolean' ? item[keyName] : this[item[keyName]];
+        };
+      },
+      //计算应该显示的文字
+      computedShowText() {
+        const _this = this;
+        return function (item = {}) {
+          let text = '';
+          const { command = '' } = item;
+          switch (command) {
+            case 'setBanned':
+              text = ![0, '0'].includes(_this.userInfo.is_banned) ? '取消禁言' : '聊天禁言';
+              break;
+            case 'setKicked':
+              if (_this.isInGroup) {
+                text = _this.userInfo.is_kicked ? '取消踢出' : '踢出小组';
+              } else {
+                text = _this.userInfo.is_kicked ? '取消踢出' : '踢出活动';
+              }
+              break;
+            default:
+              break;
+          }
+          return text;
         };
       }
     },

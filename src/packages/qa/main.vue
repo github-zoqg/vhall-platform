@@ -10,7 +10,7 @@
         <h3 class="title ellsips">{{ baseObj.webinar && baseObj.webinar.subject }}</h3>
       </el-tooltip>
       <p class="host">
-        主办方：{{
+        {{ $t('nav.nav_1001') }}：{{
           baseObj.webinar && baseObj.webinar.userinfo && baseObj.webinar.userinfo.nickname
         }}
       </p>
@@ -18,14 +18,14 @@
         <ul class="tab-list">
           <li
             @click="select(index)"
-            :class="['tab-li', { 'tab-li-active': index == active }]"
+            :class="['tab-li', { 'tab-li-active': index == activeIndex }]"
             v-for="(item, index) in List"
             :key="index"
           >
             {{ item.text }}
             <span class="count">({{ item.count | filterChatCount }})</span>
           </li>
-          <li v-if="active == 2" class="reply-text">
+          <li v-if="activeIndex == 2" class="reply-text">
             <!-- <el-checkbox @change='setReply'
               v-model="openReply">公开</el-checkbox>
             <el-checkbox @change='setReply'
@@ -34,11 +34,11 @@
         </ul>
         <div class="exact-search">
           <el-select
-            v-if="active == 2"
+            v-if="activeIndex == 2"
             v-model="testAnswer"
             @change="handleSearchQaList"
             slot="prepend"
-            placeholder="请选择"
+            :placeholder="$t('form.form_1018')"
           >
             <el-option
               v-for="item in testAnswerSelects"
@@ -50,22 +50,16 @@
           <el-input
             class="exact-search-input"
             prefix-icon="el-icon-search"
-            placeholder="输入关键词/用户昵称"
-            v-model="exactSearch['exactSearch' + active]"
+            :placeholder="$t('form.form_1086')"
+            v-model="exactSearch['exactSearch' + activeIndex]"
             @keyup.enter.native="handleSearchQaList"
             @clear="clearSearchQaList"
             clearable
           ></el-input>
         </div>
-        <div class="tab-content">
+        <div class="tab-content" :class="[{ showPagination: activeObj.count > 20 }]">
           <!-- 待处理 -->
-          <ul
-            :class="[
-              'await-deal',
-              { showPagination: activeObj.count > 20, topLine: awaitList.length > 0 }
-            ]"
-            v-show="active == 0"
-          >
+          <ul :class="['await-deal', { topLine: awaitList.length > 0 }]" v-show="activeIndex == 0">
             <template v-if="awaitList.length > 0">
               <li v-for="(item, index) in awaitList" :key="index" class="clearFix">
                 <div class="fl">
@@ -87,29 +81,29 @@
                     <span>{{ item.created_at }}</span>
                   </p>
                   <p class="await-content" style="margin-top: 2px">
-                    <span class="tiwen">提问</span>
+                    <span class="tiwen">{{ $t('chat.chat_1040') }}</span>
                     <span class="content-text" v-html="item.content"></span>
                   </p>
                 </div>
                 <div class="fr">
                   <el-button @click="reply('text', item, index)" size="small" class="setBut">
-                    文字回复
+                    {{ $t('chat.chat_1082') }}
                   </el-button>
                   <el-button @click="reply('audio', item, index)" size="small" class="setBut">
-                    在直播中回答
+                    {{ $t('chat.chat_1083') }}
                   </el-button>
                   <!-- <span @click="reply('text', item, index)"
-                    class="setBut">文字回复</span>
+                    class="setBut">{{ $t('chat.chat_1082') }}</span>
                   <span @click="reply('audio', item, index)"
                     class="setBut">在直播中回答此问题</span> -->
                   <el-dropdown @command="replyBut" class="setBut">
-                    <el-button class="el-dropdown-link">更多</el-button>
+                    <el-button class="el-dropdown-link">{{ $t('chat.chat_1084') }}</el-button>
                     <el-dropdown-menu slot="dropdown" class="qa-more__dropdown">
                       <el-dropdown-item :command="{ type: 'private', item: item, index }">
-                        私聊
+                        {{ $t('common.common_1008') }}
                       </el-dropdown-item>
                       <el-dropdown-item :command="{ type: 'no', item: item, index }">
-                        不处理
+                        {{ $t('chat.chat_1085') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -120,7 +114,9 @@
               <div class="no-default">
                 <img v-if="this.isSearch" src="./images/no-search.png" alt="" />
                 <img v-if="!this.isSearch" src="./images/no-create.png" alt="" />
-                <span>{{ isSearch ? '暂未搜索到您想要的内容' : '暂无数据' }}</span>
+                <span>
+                  {{ isSearch ? $t('webinar.webinar_1042') : $t('webinar.webinar_1006') }}
+                </span>
               </div>
             </template>
           </ul>
@@ -128,7 +124,7 @@
           <ul
             class="await-deal text-deal"
             :class="{ topLine: audioList.length > 0 }"
-            v-show="active == 1"
+            v-show="activeIndex == 1"
           >
             <template v-if="audioList.length > 0">
               <li v-for="(item, index) in audioList" :key="index" class="clearFix">
@@ -150,16 +146,16 @@
                     <span>{{ item.created_at }}</span>
                   </p>
                   <p class="await-content">
-                    <span class="tiwen">提问</span>
+                    <span class="tiwen">{{ $t('chat.chat_1040') }}</span>
                     <span class="content-text" v-html="item.content"></span>
                   </p>
                 </div>
                 <div class="fr">
                   <span class="answer-control-btn" @click="reply({ type: 'private' }, item, index)">
-                    私聊
+                    {{ $t('common.common_1008') }}
                   </span>
                   <span class="answer-control-btn" @click="reply('text', item, index)">
-                    文字回复
+                    {{ $t('chat.chat_1082') }}
                   </span>
                 </div>
                 <ul class="answer">
@@ -194,7 +190,7 @@
                       </span>
                       <span class="answer-time">{{ item.operator.operate_time }}</span>
                     </p>
-                    <p class="livein-processed">已在直播中回答此问题</p>
+                    <p class="livein-processed">{{ $t('chat.chat_1086') }}</p>
                   </li>
                 </ul>
               </li>
@@ -203,7 +199,9 @@
               <div class="no-default">
                 <img v-if="this.isSearch" src="./images/no-search.png" alt="" />
                 <img v-if="!this.isSearch" src="./images/no-create.png" alt="" />
-                <span>{{ isSearch ? '暂未搜索到您想要的内容' : '暂无数据' }}</span>
+                <span>
+                  {{ isSearch ? $t('webinar.webinar_1042') : $t('webinar.webinar_1006') }}
+                </span>
               </div>
             </template>
           </ul>
@@ -211,7 +209,7 @@
           <ul
             class="await-deal text-deal"
             :class="{ topLine: textDealList.length > 0 }"
-            v-show="active == 2"
+            v-show="activeIndex == 2"
           >
             <template v-if="textDealList.length > 0">
               <li v-for="(item, index) in textDealList" :key="index" class="clearFix">
@@ -233,16 +231,16 @@
                     <span>{{ item.created_at }}</span>
                   </p>
                   <p class="await-content">
-                    <span class="tiwen">提问</span>
+                    <span class="tiwen">{{ $t('chat.chat_1040') }}</span>
                     <span class="content-text" v-html="item.content"></span>
                   </p>
                 </div>
                 <div class="fr">
                   <span class="answer-control-btn" @click="reply({ type: 'private' }, item, index)">
-                    私聊
+                    {{ $t('common.common_1008') }}
                   </span>
                   <span class="answer-control-btn" @click="reply('text', item, index)">
-                    文字回复
+                    {{ $t('chat.chat_1082') }}
                   </span>
                 </div>
                 <ul class="answer">
@@ -278,30 +276,34 @@
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
                       <template v-if="ite.is_open == 1">
-                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">已撤销</span>
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
                         <span
                           v-if="ite.is_backout == 0"
                           @click="revoke(ite, ind, index)"
                           class="answer-time answer-revoke"
                         >
-                          撤销回复
+                          {{ $t('chat.chat_1088') }}
                         </span>
                       </template>
                       <template v-if="ite.is_open == 0">
-                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">已撤销</span>
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
                         <span
                           v-if="ite.is_backout == 0"
                           @click="revoke(ite, ind, index)"
                           class="answer-time answer-revoke"
                         >
-                          撤销回复
+                          {{ $t('chat.chat_1088') }}
                         </span>
                       </template>
                     </p>
-                    <!-- <p class="livein-processed">已在直播中回答此问题</p> -->
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
                     <p class="answer-text">
                       <span class="answer-tip">
-                        {{ ite.is_open == 1 ? '公开回答' : '悄悄回答' }}
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
                       </span>
                       <span v-html="ite.content"></span>
                     </p>
@@ -313,7 +315,9 @@
               <div class="no-default">
                 <img v-if="this.isSearch" src="./images/no-search.png" alt="" />
                 <img v-if="!this.isSearch" src="./images/no-create.png" alt="" />
-                <span>{{ isSearch ? '暂未搜索到您想要的内容' : '暂无数据' }}</span>
+                <span>
+                  {{ isSearch ? $t('webinar.webinar_1042') : $t('webinar.webinar_1006') }}
+                </span>
               </div>
             </template>
           </ul>
@@ -321,7 +325,7 @@
           <ul
             class="no-deal await-deal"
             :class="{ topLine: noDealList.length > 0 }"
-            v-show="active == 3"
+            v-show="activeIndex == 3"
           >
             <template v-if="noDealList.length > 0">
               <li v-for="(item, index) in noDealList" :key="index" class="clearFix">
@@ -343,7 +347,7 @@
                     <span>{{ item.created_at }}</span>
                   </p>
                   <p class="await-content">
-                    <span class="tiwen">提问</span>
+                    <span class="tiwen">{{ $t('chat.chat_1040') }}</span>
                     <span class="content-text" v-html="item.content"></span>
                   </p>
                 </div>
@@ -369,7 +373,7 @@
                       {{ item.operator.role_name | filterRoleName }}
                     </span>
                   </div>
-                  <span>处理时间：{{ item.operator.operate_time }}</span>
+                  <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
                 </div>
               </li>
             </template>
@@ -377,13 +381,14 @@
               <div class="no-default">
                 <img v-if="this.isSearch" src="./images/no-search.png" alt="" />
                 <img v-if="!this.isSearch" src="./images/no-create.png" alt="" />
-                <span>{{ isSearch ? '暂未搜索到您想要的内容' : '暂无数据' }}</span>
+                <span>
+                  {{ isSearch ? $t('webinar.webinar_1042') : $t('webinar.webinar_1006') }}
+                </span>
               </div>
             </template>
           </ul>
           <div class="pagination" v-show="activeObj.count > 20">
             <el-pagination
-              class="pagination-Bwrap"
               :total="activeObj.count"
               :current-page.sync="searchParams.page"
               :page-size="searchParams.page_size"
@@ -391,9 +396,10 @@
               align="center"
             ></el-pagination>
           </div>
-          <!-- 私聊组件 -->
           <div class="messChat">
-            <span class="messchat-btn" v-show="!privateFlag" @click="messClick">私聊</span>
+            <span class="messchat-btn" v-show="!privateFlag" @click="messClick">
+              {{ $t('common.common_1008') }}
+            </span>
           </div>
         </div>
       </div>
@@ -410,10 +416,11 @@
       ></PrivateChat>
     </div>
     <el-dialog
-      title="文字回复"
+      :title="$t('chat.chat_1082')"
       custom-class="text-reply"
-      :visible.sync="textDalog"
+      :visible="textDialogStatus"
       :close-on-click-modal="false"
+      :before-close="handleCloseChatDialog"
       width="50%"
     >
       <div id="send-content" class="send-content">
@@ -437,8 +444,10 @@
         </span>
       </div>
       <div slot="footer">
-        <span class="answer-btn default-answer-btn" @click="handlerAnswer('public')">公开回答</span>
-        <span class="answer-btn" @click="handlerAnswer('private')">悄悄回答</span>
+        <el-button type="primary" @click="handlerAnswer('public')">
+          {{ $t('chat.chat_1089') }}
+        </el-button>
+        <el-button @click="handlerAnswer('private')">{{ $t('chat.chat_1090') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -448,7 +457,8 @@
   import { useRoomBaseServer, useMsgServer, useQaServer } from 'middle-domain';
   import PrivateChat from './components/private-chat/index';
   import { getQueryString } from './utils';
-  import { textToEmoji, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import { textToEmoji } from '@/packages/chat/src/js/emoji';
+  import { debounce } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQa',
     components: {
@@ -496,30 +506,48 @@
     },
     data() {
       return {
-        active: 0, // 当前正在展示的Dom
         $Chat: null, // 聊天句柄
         privateFlag: false,
-        textDalog: false, // 是否显示输入框
-        // 当前展示 提交信息集合
-        sendMessage: {
-          text: '',
-          Radio: '1' // 信息类型
-        },
+        testAnswer: 2,
+        testAnswerSelects: [
+          {
+            label: '全部回答',
+            value: 2
+          },
+          {
+            label: '公开回答',
+            value: 1
+          },
+          {
+            label: '悄悄回答',
+            value: 0
+          }
+        ],
         // openReply: true, // 文字回复之公开
         // privacyReply: true, // 文字回复之隐私
         searchParams: {
           page_size: 20,
           page: 0
         },
-
-        webinar_id: null,
-        isSearch: false // 是否是正在搜索数据
+        webinar_id: null
       };
     },
     computed: {
       //主办方信息
       baseObj() {
         return this.$domainStore.state.qaServer.baseObj;
+      },
+      activeIndex() {
+        return this.$domainStore.state.qaServer.activeIndex;
+      },
+      isSearch() {
+        return this.$domainStore.state.qaServer.isSearch;
+      },
+      textDialogStatus() {
+        return this.$domainStore.state.qaServer.textDialogStatus;
+      },
+      sendMessage() {
+        return this.$domainStore.state.qaServer.sendMessage;
       },
       awaitList() {
         return this.$domainStore.state.qaServer.awaitList;
@@ -542,12 +570,12 @@
       exactSearch() {
         return this.$domainStore.state.qaServer.exactSearch;
       },
-      testAnswer() {
-        return this.$domainStore.state.qaServer.testAnswer;
-      },
-      testAnswerSelects() {
-        return this.$domainStore.state.qaServer.testAnswerSelects;
-      },
+      // testAnswer() {
+      //   return this.$domainStore.state.qaServer.testAnswer;
+      // },
+      // testAnswerSelects() {
+      //   return this.$domainStore.state.qaServer.testAnswerSelects;
+      // },
       onlyChatMess() {
         return this.$domainStore.state.qaServer.onlyChatMess;
       },
@@ -563,7 +591,6 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.qaServer = useQaServer();
-      console.log('qa useMsgServer------>', useMsgServer);
     },
     async mounted() {
       this.webinar_id = this.$router.currentRoute.params.id;
@@ -573,38 +600,33 @@
       }
 
       await this.qaServer
-        .InitChatMess({
+        .initChatMess({
           webinar_id: this.webinar_id
         })
         .catch(err => {
           this.$message.error(err.msg);
         });
 
-      await this.getPrivateList();
+      await this.chatPrivateGetRankList();
 
       this.getChat(0); // 待处理
       this.getChat(1); // 不处理
       this.getChat(2); // 直播中回答
       this.setReply(); // 文字回复
 
-      this.initChat();
-
-      //事件监听
-      // this.$EventBus.$on('question_answer_create', e => {
-      //   // 发起端收到消息
-      //   e.content = this.emojiToText(e.content);
-      //   this.awaitList.push(e);
-      //   this.$nextTick(() => {
-      //     this.List[0].count = this.awaitList.length;
-      //     console.warn(this.awaitList, 'this.awaitList');
-      //   });
-      // });
+      this.qaServer.initChatInstance({}, () => {});
     },
     methods: {
+      /**
+       * 关闭文字回复窗口
+       */
+      handleCloseChatDialog() {
+        this.qaServer.setState('textDialogStatus', false);
+      },
       //获取私聊列表
-      async getPrivateList() {
+      async chatPrivateGetRankList() {
         await this.qaServer
-          .getPrivateList({
+          .chatPrivateGetRankList({
             room_id: this.baseObj.interact.room_id,
             webinar_id: this.$router.currentRoute.params.id
           })
@@ -612,41 +634,35 @@
             this.$message.error(err.msg);
           });
       },
-      handlerAnswer(statu) {
-        this.sendMessage.Radio = statu == 'public' ? 1 : 0;
+      handlerAnswer(status) {
+        this.qaServer.handlerAnswer(status);
         this.textReply();
       },
       // 检索问答
       handleSearchQaList() {
-        const searchContent = this.exactSearch[`exactSearch${this.active}`];
+        const searchContent = this.exactSearch[`exactSearch${this.activeIndex}`];
         if (searchContent) {
-          this.isSearch = true;
+          this.qaServer.setState('isSearch', true);
         }
-        if (this.active == 2) {
+        if (this.activeIndex == 2) {
           this.setReply(0, searchContent);
         } else {
-          const active = this.active == 1 ? 2 : this.active == 3 ? 1 : 0;
-          this.getChat(active, 0, searchContent);
+          const activeIndex = this.activeIndex == 1 ? 2 : this.activeIndex == 3 ? 1 : 0;
+          this.getChat(activeIndex, 0, searchContent);
         }
       },
       clearSearchQaList() {
-        this.exactSearch[`exactSearch${this.active}`] = '';
+        this.exactSearch[`exactSearch${this.activeIndex}`] = '';
         // 重新查询下数据
         this.handleSearchQaList();
       },
       select(index) {
-        this.active = index;
-        this.isSearch = false;
-        // this.activeObj = Object.assign(this.activeObj, {
-        //   active: index,
-        //   count: this.List[index].count
-        // });
-        this.$nextTick(() => {
-          this.searchParams.page = 1;
-        });
-        const searchContent = this.exactSearch[`exactSearch${this.active}`];
+        this.searchParams.page = 1;
+        this.qaServer.setState('activeIndex', index);
+        this.qaServer.setState('isSearch', false);
+        const searchContent = this.exactSearch[`exactSearch${this.activeIndex}`];
         if (searchContent) {
-          this.isSearch = true;
+          this.qaServer.setState('isSearch', true);
         }
         // 0 未处理 1 不处理 2 直播中回答 3 文字回复
         switch (index) {
@@ -667,15 +683,15 @@
       },
       currentChangeHandler(val) {
         console.warn('页码的点击效果----', val);
-        const searchContent = this.exactSearch[`exactSearch${this.active}`];
+        const searchContent = this.exactSearch[`exactSearch${this.activeIndex}`];
         if (searchContent) {
-          this.isSearch = true;
+          this.qaServer.setState('isSearch', true);
         }
-        if (this.active == 2) {
+        if (this.activeIndex == 2) {
           this.setReply((val - 1) * 20, searchContent);
         } else {
           let type;
-          switch (this.active) {
+          switch (this.activeIndex) {
             case 0:
               type = 0;
               break;
@@ -691,7 +707,7 @@
       },
       getChat(type, pagePos, str) {
         this.qaServer
-          .getAutherQa({
+          .getQuestionByStatus({
             room_id: this.baseObj.interact.room_id,
             type: type,
             limit: 20,
@@ -706,7 +722,6 @@
       setReply(pagePos, keyword) {
         // 文本回复  --- 设置回复 / 获取回复
         const openType = this.testAnswer;
-        console.log(8888888, openType, typeof openType);
         const data = {
           room_id: this.baseObj.interact.room_id,
           is_open: openType, // 0 私密 1 公开 2 全部
@@ -715,21 +730,9 @@
           keyword: keyword || '',
           sort_sequence: 1
         };
-        this.$fetch('v3GetTextReply', data).then(res => {
-          if (res.code == 200) {
-            try {
-              res.data.list.forEach(item => {
-                if (item.content) {
-                  item.content = textToEmojiText(item.content);
-                }
-              });
-            } catch (error) {
-              console.warn(error, '聊天消息过滤错误');
-            }
-            this.textDealList = res.data.list;
-            this.List[2].count = res.data.total;
-            this.activeObj.count = res.data.total;
-          } else {
+
+        this.qaServer.getTextReply(data).then(res => {
+          if (res.code != 200) {
             this.$message.error(res.msg);
           }
         });
@@ -739,14 +742,15 @@
         this.reply(val, val.item, val.index);
       },
       reply(val, item, index) {
-        console.log('&&&&&&&', val, item, index);
         if (typeof val == 'object') {
           if (val.type == 'private') {
             // 合并 当前数据
             this.onlyChatMess = {};
-            console.warn(val, item, '点击的是私聊');
-            const privateMess = Object.assign(val, { activeDom: this.active, Subscript: index });
-            if (this.active != 0) {
+            const privateMess = Object.assign(val, {
+              activeDom: this.activeIndex,
+              Subscript: index
+            });
+            if (this.activeIndex != 0) {
               privateMess.item = item;
             } else {
               privateMess.Subscript = val.index;
@@ -754,68 +758,50 @@
             privateMess.nickname = privateMess.item.nick_name;
             privateMess.join_id = privateMess.item.join_id;
             privateMess.avatar = item.avatar;
-            console.warn('--------点击的是私聊---------------', privateMess);
             if (!this.privateFlag) {
               this.privateFlag = true;
             }
             this.onlyChatMess = privateMess;
           } else {
-            console.warn('不处理----开始执行');
-            const data = {
-              question_id: val.item.id,
-              room_id: this.baseObj.interact.room_id,
-              type: 1,
-              is_open: 1
-            };
-            this.$fetch('v3ReplayUserQu', data).then(res => {
-              if (res.code == 200) {
-                this.$nextTick(() => {
-                  this.List[0].count--;
-                  if (this.List[0].count <= 0) this.List[0].count = 0;
-                  this.List[3].count++;
-                  this.awaitList.splice(index, 1); // 修复40714-标记为直播中回答时数组移除错误问题
-                });
-              } else {
-                this.$message.error(res.msg);
-              }
-            });
+            this.qaServer
+              .replyUserQuestion({
+                question_id: val.item.id,
+                room_id: this.baseObj.interact.room_id,
+                type: 1,
+                is_open: 1
+              })
+              .then(res => {
+                if (res.code != 200) {
+                  this.$message.error(res.msg);
+                }
+              });
           }
         } else {
           if (val == 'text') {
-            this.sendMessage.text = '';
-            this.sendMessage.Radio = '1';
-            this.sendMessage = Object.assign(this.sendMessage, item, {
-              activeDom: this.active,
-              index: index
-            });
-            this.textDalog = true;
+            this.qaServer.replayIsText(item, index);
           } else if (val == 'audio') {
             // 设置为直播中回答
-            const data = {
-              question_id: item.id,
-              room_id: this.baseObj.interact.room_id,
-              type: 2,
-              is_open: 1
-            };
-            this.$fetch('v3ReplayUserQu', data).then(res => {
-              if (res.code == 200) {
-                this.$nextTick(() => {
-                  this.List[0].count--;
-                  this.awaitList.splice(index, 1); // 修复40714-标记为直播中回答时数组移除错误问题
-                  this.List[1].count++;
-                });
-              }
-            });
+            this.qaServer
+              .replyUserQuestion({
+                question_id: item.id,
+                room_id: this.baseObj.interact.room_id,
+                type: 2,
+                is_open: 1
+              })
+              .then(res => {
+                if (res.code != 200) {
+                  this.$message.error(res.msg);
+                }
+              });
           }
         }
       },
       async messClick() {
-        console.warn('点击的升级', this.priteChatList);
+        console.warn('qa messClick---------->', this.priteChatList);
         this.privateFlag = true;
-        await this.getPrivateList();
-        if (!(this.onlyChatMess && this.onlyChatMess.type)) {
-          this.onlyChatMess = this.priteChatList[0];
-        }
+        await this.chatPrivateGetRankList({}).then(res => {});
+
+        //todo 调用私聊组件中的方法, 需要通过事件驱动
         this.$nextTick(() => {
           if (this.priteChatList.length != 0) {
             this.$refs.private.getDefaultContent(this.priteChatList[0].user_id, 'father');
@@ -825,45 +811,26 @@
       privateClose() {
         this.privateFlag = false;
       },
+      /**
+       * 发送私聊内容
+       */
       privateSendMsg(data, msg) {
-        this.$Chat.emit(data, msg);
+        this.qaServer.chatInstance.emit(data, msg);
       },
+      // 撤销回复
       revoke(val, index, fatherIndex) {
-        // 撤销回复
-        this.$fetch('v3Revoke', { answer_id: val.id, room_id: this.baseObj.interact.room_id }).then(
-          res => {
-            if (res.code == 200) {
-              this.$nextTick(() => {
-                this.textDealList[fatherIndex].answer[index].is_backout = 1;
-              });
-            } else {
+        this.qaServer
+          .revokeReply({
+            answer_id: val.id,
+            room_id: this.baseObj.interact.room_id,
+            index: index,
+            father_index: fatherIndex
+          })
+          .then(res => {
+            if (res.code != 200) {
               this.$message.error(res.msg);
             }
-          }
-        );
-      },
-      // 初始化
-      initChat() {
-        // const option = {
-        //   appId: this.baseObj.interact.paas_app_id, // appId 必须
-        //   accountId: this.baseObj.join_info.third_party_user_id, // 第三方用户ID
-        //   channelId: this.baseObj.interact.channel_id, // 频道id 必须
-        //   token: this.baseObj.interact.paas_access_token, // 必须， token，初始化接口获取
-        //   hide: true
-        // };
-        // window.VhallChat.createInstance(
-        //   option,
-        //   event => {
-        //     this.$Chat = event.message; // 聊天实例句柄
-        //     window.privateChat = event.message;
-        //     this.$refs.private.listener();
-        //     this.monitor();
-        //   },
-        //   err => {
-        //     console.error(err);
-        //   }
-        // );
-        this.qaServer.InitChatInstance();
+          });
       },
       emojiToText(content) {
         return textToEmoji(content)
@@ -874,62 +841,27 @@
           })
           .join(' ');
       },
-      // 监听
-      monitor() {
-        this.$Chat.onRoomMsg(msg => {
-          if (typeof msg !== 'object') {
-            msg = JSON.parse(msg);
-          }
-          try {
-            if (msg.data && typeof msg.data !== 'object') {
-              msg.data = JSON.parse(msg.data);
-            }
-          } catch (e) {
-            console.log(e);
-          }
-          Object.assign(msg, msg.data);
-          // 观看端发送问答进入的 type:question_answer_create
-          this.$EventBus.$emit(msg.type, msg);
-        });
-      },
       textReply() {
         if (this.sendMessage.text.trim() == '') {
           return this.$message.warning('请输入回复内容!');
         }
-        const data = {
-          question_id: this.sendMessage.id,
-          content: this.sendMessage.text,
-          is_open: Number(this.sendMessage.Radio),
-          type: 3,
-          room_id: this.baseObj.interact.room_id
-        };
-        this.$fetch('v3ReplayUserQu', data).then(res => {
-          console.warn(res.data, 12);
-          if (res.code == 200) {
-            this.textDalog = false;
-            if (this.active != 2) {
-              if (this.sendMessage.activeDom == 0) {
-                // 点击的是待处理的 Dom
-                this.awaitList.splice(this.sendMessage.index, 1);
-              } else if (this.sendMessage.activeDom == 1) {
-                // 点击的是直播中回答 Dom
-                this.audioList.splice(this.sendMessage.index, 1);
-              } else {
-                // 点击的是文字回复 Dom
-                this.textDealList.splice(this.sendMessage.index, 1);
+        this.qaServer
+          .replyUserQuestion({
+            question_id: this.sendMessage.id,
+            content: this.sendMessage.text,
+            is_open: Number(this.sendMessage.Radio),
+            type: 3,
+            room_id: this.baseObj.interact.room_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              if (this.activeIndex == 2) {
+                debounce(() => {
+                  this.setReply(0);
+                }, 500);
               }
-              this.List[2].count++;
-              this.List[this.sendMessage.activeDom].count--;
-              if (this.List[this.sendMessage.activeDom].count <= 0) {
-                this.List[this.sendMessage.activeDom].count = 0;
-              }
-            } else {
-              setTimeout(() => {
-                this.setReply(0);
-              }, 500);
             }
-          }
-        });
+          });
       }
     }
   };
@@ -979,9 +911,6 @@
       width: 0;
       height: 0;
       visibility: hidden;
-    }
-    &::-webkit-scrollbar {
-      width: 5px;
     }
     .qa-wrap {
       width: 720px;
@@ -1153,8 +1082,6 @@
               }
               .answer-control-btn {
                 font-size: 14px;
-                font-family: PingFangSC-Regular, PingFang SC;
-                font-weight: 400;
                 color: #1a1a1a;
                 line-height: 14px;
                 margin: 0px 8px;
@@ -1181,13 +1108,6 @@
               }
             }
           }
-          .text-deal {
-            &::-webkit-scrollbar {
-              height: 6px;
-              border-radius: 10px;
-              background-color: #fff;
-            }
-          }
           .messChat {
             position: fixed;
             width: 80px;
@@ -1211,8 +1131,6 @@
               top: 50%;
               left: 50%;
               font-size: 14px;
-              font-family: PingFangSC-Regular, PingFang SC;
-              font-weight: 400;
               color: #fff;
               border: none;
               transform: translate(-50%, -50%);
@@ -1248,8 +1166,6 @@
                 float: right;
                 height: 14px;
                 font-size: 14px;
-                font-family: PingFangSC-Regular, PingFang SC;
-                font-weight: 400;
                 line-height: 14px;
               }
               span:nth-child(1) {
@@ -1272,8 +1188,6 @@
                   min-width: 30px;
                   border-radius: 9px;
                   font-size: 12px;
-                  font-family: PingFangSC-Regular, PingFang SC;
-                  font-weight: 400;
                   line-height: 16px;
                   padding: 0px 4px;
                   height: 16px;
@@ -1290,8 +1204,6 @@
               }
               .answer-control-btn {
                 font-size: 14px;
-                font-family: PingFangSC-Regular, PingFang SC;
-                font-weight: 400;
                 color: #1a1a1a;
                 line-height: 14px;
                 margin: 0px 8px;
@@ -1304,24 +1216,10 @@
           }
         }
         .showPagination {
-          height: calc(100% - 58px) !important;
+          height: calc(100% - 120px);
         }
         .pagination {
           height: 60px;
-          .pageBox {
-            width: 100%;
-            background: #fff;
-            padding: 0;
-            position: absolute;
-            left: 50%;
-            bottom: 0px;
-            height: 60px;
-            transform: translateX(-50%);
-            .el-pagination {
-              height: 100%;
-              margin-top: 20px;
-            }
-          }
         }
         // 文字回复  回答
         .answer {
@@ -1335,8 +1233,15 @@
             margin-left: 54px;
           }
           p {
-            // &.answer-title {
-            // }
+            &.answer-title {
+              span {
+                line-height: 16px;
+                display: inline-block;
+                &.answer-revoke {
+                  display: none;
+                }
+              }
+            }
             .avatar {
               display: inline-block;
               width: 30px;
@@ -1346,8 +1251,10 @@
               vertical-align: top;
             }
             &:hover {
-              .answer-revoke {
-                display: inline-block;
+              span {
+                &.answer-revoke {
+                  display: inline-block;
+                }
               }
             }
             .role-host,
@@ -1357,9 +1264,6 @@
               height: 16px;
               border-radius: 9px;
               font-size: 12px;
-              font-family: PingFangSC-Regular, PingFang SC;
-              font-weight: 400;
-              line-height: 16px;
               padding: 0px 4px;
               margin-left: 12px;
               margin-right: 16px;
@@ -1387,7 +1291,6 @@
               text-decoration: none;
               color: #1a1a1a;
               font-size: 14px;
-              display: none;
               margin-left: 10px;
               &:hover {
                 color: #3562fa;
@@ -1396,8 +1299,6 @@
             }
             .answer-tip {
               font-size: 14px;
-              font-family: PingFangSC-Regular, PingFang SC;
-              font-weight: 400;
               color: #fc9600;
               margin-right: 10px;
               line-height: 20px;
@@ -1415,6 +1316,8 @@
               margin-left: 38px;
               margin-top: -10px;
               color: #fa9a32;
+              display: inline-block;
+              line-height: 22px;
             }
           }
         }
@@ -1451,8 +1354,6 @@
 
         .el-pagination__rightwrapper {
           font-size: 14px;
-          font-family: PingFangSC-Regular, PingFang SC;
-          font-weight: 400;
           color: #666666;
           line-height: 20px;
         }
@@ -1556,8 +1457,6 @@
         bottom: 4px;
         right: 4px;
         font-size: 14px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        font-weight: 400;
         color: #999999;
         line-height: 24px;
         i {
@@ -1570,36 +1469,6 @@
           color: #fb2626;
         }
       }
-    }
-    .answer-btn {
-      display: inline-block;
-      width: 104px;
-      height: 36px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-family: PingFangSC-Regular, PingFang SC;
-      font-weight: 400;
-      line-height: 20px;
-      margin: 0px 8px;
-      line-height: 36px;
-      text-align: center;
-      border: 1px solid #cccccc;
-      &:hover {
-        cursor: pointer;
-        background: #fb3a32;
-        color: #fff;
-        border: 1px solid #fb3a32;
-      }
-      &.default-answer-btn {
-        background: #fb3a32;
-        color: #fff;
-        border: 1px solid #fb3a32;
-      }
-      // font-size: 14px;
-      // font-family: PingFangSC-Regular, PingFang SC;
-      // font-weight: 400;
-      // color: #ffffff;
-      // line-height: 20px;
     }
     .setBut,
     .el-dropdown-link {
