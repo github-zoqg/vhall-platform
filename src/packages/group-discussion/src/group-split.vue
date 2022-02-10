@@ -13,8 +13,24 @@
           小组公告
         </el-button>
         <el-button type="default" size="small" :round="true" @click="handleAdd">新增分组</el-button>
-        <el-button type="default" size="small" :round="true" :disabled="!groupedUserExists">
+        <el-button
+          v-if="isOpenSwitch == 2"
+          type="default"
+          size="small"
+          :round="true"
+          :disabled="!groupedUserExists"
+          @click="handleStartDiscussion"
+        >
           开始讨论
+        </el-button>
+        <el-button
+          v-if="isOpenSwitch == 1"
+          type="default"
+          size="small"
+          :round="true"
+          @click="handleEndDiscussion"
+        >
+          结束讨论
         </el-button>
       </div>
     </div>
@@ -33,7 +49,7 @@
                 :disabled="waitingUserList.length === 0"
                 @click="handleDispatch"
               >
-                <i class="iconfont icona-icon_piliangfenpei1x"></i>
+                <i class="menu-icon vh-saas-iconfont vh-saas-a-line-batchdistribution"></i>
                 <span>批量分配</span>
               </el-button>
 
@@ -41,7 +57,7 @@
                 v-if="checkStatus"
                 type="text"
                 :disabled="waitingUserList.length == 0"
-                icon="iconfont icona-icon_piliangfenpei1x"
+                icon="menu-icon vh-saas-iconfont vh-saas-a-line-batchdistribution"
                 class="btn-menu btn-menu--cancel"
                 @click="handleCancelDispatch"
               >
@@ -51,7 +67,7 @@
                 v-if="checkStatus"
                 type="text"
                 :disabled="waitingUserList.length == 0"
-                icon="iconfont icona-icon_pilianghuanzu1x"
+                icon="menu-icon vh-saas-iconfont vh-saas-a-line-batchdistribution"
                 class="btn-menu"
                 @click="handleChangeGroup(1)"
               >
@@ -106,11 +122,11 @@
             <div class="split-card__menus">
               <template v-if="!item.isChange">
                 <el-button v-if="isOpenSwitch == 1" class="btn-menu" type="text">
-                  <i class="iconfont icona-icon_jinruxiaozu1x"></i>
+                  <i class="menu-icon vh-saas-iconfont vh-saas-a-line-Intotheteam"></i>
                   <span>进入小组</span>
                 </el-button>
                 <el-button class="btn-menu" type="text" @click="handleDisband(item.id)">
-                  <i class="iconfont icona-icon_jiesan1x"></i>
+                  <i class="menu-icon vh-saas-iconfont vh-saas-a-line-dissolutiongrouping"></i>
                   <span>解散</span>
                 </el-button>
                 <el-button
@@ -119,7 +135,7 @@
                   :disabled="item.group_joins.length === 0"
                   @click="handleChange(item)"
                 >
-                  <i class="iconfont icona-icon_pilianghuanzu1x"></i>
+                  <i class="menu-icon vh-saas-iconfont vh-saas-a-line-batchChangegroup"></i>
                   <span>批量换组</span>
                 </el-button>
               </template>
@@ -127,7 +143,7 @@
                 <el-button
                   class="btn-menu"
                   type="text"
-                  icon="iconfont iconguanbichabo_icon "
+                  icon="menu-icon vh-iconfont vh-line-close"
                   @click="handleCancelChange(item)"
                 >
                   <span>取消</span>
@@ -135,7 +151,7 @@
                 <el-button
                   class="btn-menu"
                   type="text"
-                  icon="iconfont icona-icon_huanzu1x "
+                  icon="menu-icon vh-saas-iconfont vh-saas-a-line-Ingroup"
                   @click="handleChangeGroup(2)"
                 >
                   <span>换组</span>
@@ -177,7 +193,7 @@
                   <div @click="handleChangeGroupOne(u)">换组</div>
                   <div
                     v-if="u.join_role != 20 && u.device_type == 2 && u.device_status != 2"
-                    @click="setLeader(item, u)"
+                    @click="setLeader(item.id, u.account_id)"
                   >
                     设为组长
                   </div>
@@ -393,7 +409,9 @@
         this.showItem = null;
       },
       // 设为组长
-      setLeader(u) {},
+      setLeader(groupId, accountId) {
+        this.groupServer.setLeader(groupId, accountId);
+      },
       // 解散
       handleDisband(id) {
         // TODO 国际化
@@ -407,6 +425,32 @@
             this.groupServer.groupDisband(id);
           })
           .catch(() => {});
+      },
+      // 开始讨论
+      handleStartDiscussion() {
+        this.$confirm('开始讨论后，观众将进入小组直播间开始讨论，是否开始讨论?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+          //   type: 'warning'
+        }).then(() => {
+          this.groupServer.startDiscussion();
+        });
+      },
+      // 结束讨论
+      handleEndDiscussion() {
+        this.$confirm('结束讨论后，所有小组成员将全部回到主直播间，确定结束讨论？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+          //   type: 'warning'
+        }).then(() => {
+          this.groupServer.endDiscussion().then(() => {
+            this.$emit('endDiscussion');
+          });
+        });
       },
       // 是否含有主持人||助理
       isHave(arr) {
@@ -502,7 +546,7 @@
             line-height: 22px;
             border: 0;
 
-            .iconfont {
+            .i {
               position: relative;
               top: 1px;
               padding-right: 2px;
@@ -516,6 +560,10 @@
           }
           .btn-menu.is-disabled {
             color: #666;
+          }
+          .menu-icon {
+            font-size: 12px;
+            margin-right: 3px;
           }
         }
 
