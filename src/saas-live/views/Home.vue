@@ -7,10 +7,6 @@
   >
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
-
-      <aside class="vmp-basic-dialog-container">
-        <!-- <VmpPcMediaCheck></VmpPcMediaCheck> -->
-      </aside>
     </div>
     <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
     <Chrome v-else-if="state === 3"></Chrome>
