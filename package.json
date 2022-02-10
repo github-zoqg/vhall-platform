@@ -78,8 +78,7 @@
   "lint-staged": {
     "*.{js,jsx,vue}": [
       "node_modules/.bin/prettier --write",
-      "node_modules/.bin/vue-cli-service lint",
-      "git add ."
+      "node_modules/.bin/vue-cli-service lint"
     ]
   }
 }
