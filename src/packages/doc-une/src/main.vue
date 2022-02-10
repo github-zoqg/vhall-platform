@@ -7,6 +7,7 @@
   >
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
+      ref="docToolbar"
       v-show="displayMode === 'normal' || displayMode === 'fullscreen'"
     ></VmpDocToolbar>
 
@@ -547,6 +548,7 @@
           // 移动
           case 'move':
             this.docServer.move();
+            this.$refs.docToolbar.changeTool('');
             break;
           // 全屏
           case 'fullscreen':
@@ -674,6 +676,10 @@
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
+
+        &.selected {
+          color: #fc5659;
+        }
       }
     }
   }

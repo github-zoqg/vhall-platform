@@ -220,11 +220,15 @@
           console.log('容器不存在，不可设置画笔');
           return;
         }
+
         console.log('changeTool brush:', brush, '; key:', key, '; value:', value);
         this.currentBrush = brush;
+        if (!brush) return;
         if (key) {
           this[brush][key] = value;
         }
+        // 取消缩放、移动模式
+        this.docServer.cancelZoom();
         switch (brush) {
           // 选择
           case 'select': {
