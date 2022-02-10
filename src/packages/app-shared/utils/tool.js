@@ -42,7 +42,7 @@ export function throttle(fn, t = 300) {
 /**
  * 封装使用事件驱动需要的参数
  * @param cuid 当前组件的唯一标识
- * @param cuid 当前组件配置的动作
+ * @param method 当前组件配置的动作
  * @param params 动态参数
  */
 export function boxEventOpitons(cuid, method, params) {

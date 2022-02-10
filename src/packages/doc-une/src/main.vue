@@ -7,6 +7,7 @@
   >
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
+      ref="docToolbar"
       v-show="displayMode === 'normal' || displayMode === 'fullscreen'"
     ></VmpDocToolbar>
 
@@ -434,7 +435,9 @@
         });
         if (this.roomBaseServer.state.clientType === 'send') {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
-          window.$middleEventSdk?.event?.(boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType]));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
+          );
         }
       },
       /**
@@ -547,6 +550,7 @@
           // 移动
           case 'move':
             this.docServer.move();
+            this.$refs.docToolbar.changeTool('');
             break;
           // 全屏
           case 'fullscreen':
@@ -674,6 +678,10 @@
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
+
+        &.selected {
+          color: #fc5659;
+        }
       }
     }
   }

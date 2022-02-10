@@ -4,10 +4,14 @@
     <vmp-group-split
       ref="groupSplit"
       v-show="isOpenSwitch == 1 || isOpenSwitch == 2"
+      @endDiscussion="endDiscussion"
     ></vmp-group-split>
 
     <!-- 准备设置分组对话框 -->
-    <vmp-group-setting :show.sync="settingDialogVisible"></vmp-group-setting>
+    <vmp-group-setting
+      :show.sync="settingDialogVisible"
+      @settingCancel="settingCancel"
+    ></vmp-group-setting>
 
     <!-- 新增分组对话框 -->
     <vmp-group-add :show.sync="addDialogVisible"></vmp-group-add>
@@ -91,6 +95,16 @@
           this.noticeDialogVisible = false;
           this.chooseDialogVisible = false;
         }
+      },
+      // 分配设置主动取消回调
+      settingCancel() {
+        this.groupServer.state.show = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
+      },
+      // 结束讨论回调
+      endDiscussion() {
+        this.groupServer.state.show = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
       },
       // 选择小组后确定
       chooseGroupComplete(selectGroup) {
