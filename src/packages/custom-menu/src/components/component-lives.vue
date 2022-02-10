@@ -1,11 +1,6 @@
 <template>
   <div class="lives-wrapbox">
-    <live-list
-      :checked-list="info.webinars"
-      :live-status="webinarStatus"
-      :pagetype="pagetype"
-      @link="linkWatch"
-    />
+    <live-list :checked-list="info.webinars" :pagetype="pagetype" @link="linkWatch" />
   </div>
 </template>
 <script>
@@ -28,10 +23,9 @@
     },
     computed: {
       // ...mapState('watchBase', ['watchInitData']),
-
-      webinarStatus() {
-        return this.watchInitData.webinar.type;
-      }
+      // webinarStatus() {
+      //   return this.watchInitData.webinar.type;
+      // }
     },
     components: {
       liveList
@@ -53,7 +47,6 @@
 <style lang="less" scoped>
   .lives-wrapbox {
     width: 100%;
-    height: 100%;
     margin-bottom: 16px;
   }
   /deep/ .menus-checkedBox {

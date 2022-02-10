@@ -68,7 +68,7 @@ export const serverConfig = {
 
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comChat', 'comMemberList', 'comCustomMenu']
+    children: ['comChat', 'comNotice', 'comMemberList', 'comCustomMenu']
   },
 
   /*** 所有弹窗集合 */
@@ -81,7 +81,9 @@ export const serverConfig = {
       'comLivePrivateChat',
       'comMediaSetting',
       'comPcMediaCheck',
-      'comInsertVideo'
+      'comInsertVideo',
+      'liveTimerSet',
+      'liveTimer'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
@@ -233,7 +235,21 @@ export const serverConfig = {
   },
   // 互动工具
   comInteractMenu: {
-    component: 'VmpInteractMenu'
+    component: 'VmpInteractMenu',
+    emitOpenTimerSet: [
+      {
+        cuid: ['liveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
+  },
+  // 互动工具-计时器设置
+  liveTimerSet: {
+    component: 'VmpLiveTimerSet'
+  },
+  // 互动工具-计时器
+  liveTimer: {
+    component: 'VmpLiveTimer'
   },
 
   // 分组讨论菜单
@@ -279,6 +295,9 @@ export const serverConfig = {
         method: 'openModal'
       }
     ]
+  },
+  comNotice: {
+    component: 'VmpNoticeList'
   },
   //发起端--私聊组件
   comLivePrivateChat: {
