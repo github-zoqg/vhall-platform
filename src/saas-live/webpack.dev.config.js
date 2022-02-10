@@ -11,13 +11,10 @@ const htmlConfig = {
   }
 };
 
-module.exports = _.merge(
-  {
-    pages: {
-      index: {
-        ...htmlConfig
-      }
+module.exports = _.merge(baseConfig, {
+  pages: {
+    index: {
+      ...htmlConfig
     }
-  },
-  baseConfig
-);
+  }
+});
