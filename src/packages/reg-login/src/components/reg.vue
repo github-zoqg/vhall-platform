@@ -226,7 +226,7 @@
         this.$refs.ruleForm.validateField('phone', err => {
           // console.log('校验结果：', !err);
           if (!err) {
-            this.loginServer.sendCode(this.ruleForm.phone); // 相应与异常已在domain处理
+            this.loginServer.sendCode(this.ruleForm.phone, 8); // 相应与异常已在domain处理
           }
         });
       },
@@ -238,7 +238,6 @@
               this.$message({
                 message: this.$t('login.login_1023'),
                 showClose: true,
-                // duration: 0,
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
@@ -287,7 +286,6 @@
                 customClass: 'zdy-info-box'
               });
             };
-            // FIXME: 接口请求不通
             this.loginServer
               .register(params)
               .then(res => {
@@ -295,7 +293,7 @@
                   this.$message({
                     message: this.$t('register.register_1009'),
                     showClose: true,
-                    type: 'error',
+                    type: 'success',
                     customClass: 'zdy-info-box'
                   });
                   this.handleToLogin();
