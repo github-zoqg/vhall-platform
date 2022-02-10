@@ -175,31 +175,33 @@
       this.roleName = this.roomBaseState.watchInitData.join_info.role_name;
     },
     mounted() {
-      this.msgServer.$on('ROOM_MSG', msg => {
-        let msgs = JSON.parse(msg.data);
-        if (msgs.type == 'live_start') {
-          // 1主持人 2观众 3助理 4嘉宾
-          if (this.roleName == 3 && !this.assistantType) {
-            if (msgs.switch_type != 1) {
-              // 1为网页发起
-              clearTimeout(this._setTimeoutlive_start);
-              this._setTimeoutlive_start = setTimeout(() => {
-                this.autoPlay();
-              }, 1000);
-              // 当前为助理，并且是由客户端发起的
-              this.isPcStartLive = false; // 是否是网页端发起的直播  助理其他端不支持插播
-            } else {
-              this.isPcStartLive = true;
-            }
+      this.msgServer.$on('live_start', msg => {
+        //  1主持人 2观众 3助理 4嘉宾
+        if (this.roleName == 3 && !this.assistantType) {
+          if (msg.data.switch_type != 1) {
+            // 1为网页发起
+            clearTimeout(this._setTimeoutlive_start);
+            this._setTimeoutlive_start = setTimeout(() => {
+              this.autoPlay();
+            }, 1000);
+            // 当前为助理，并且是由客户端发起的
+            this.isPcStartLive = false; // 是否是网页端发起的直播  助理其他端不支持插播
+          } else {
+            this.isPcStartLive = true;
           }
         }
       });
+      // this.msgServer.$on('ROOM_MSG', msg => {
+      //   let msgs = JSON.parse(msg.data);
+      //   if (msgs.type == 'live_start') {
+      //   }
+      // });
     },
     methods: {
       openInserVideoDialog() {
         // 检查是否可以插播文件
-        // this.checkCaptureStream();
-        this.insertVideoVisible = true;
+        this.checkCaptureStream();
+        // this.insertVideoVisible = true;
         this.getTableList(false, true);
       },
       checkCaptureStream() {
@@ -216,10 +218,64 @@
           });
           return;
         }
-        // const thirdId = this.watchInitData.join_info.third_party_user_id;
-        // const accountId = this.watchInitData.webinar.userinfo.user_id;
-        // if (this.roleName == 3 && this.insertVideoObj.insertVideoStatus && accountId != thirdId) {
-        // }
+        const thirdId = this.watchInitData.join_info.third_party_user_id;
+        const user = this.insertVideoObj.userInfo;
+        if (
+          this.roleName == 3 &&
+          this.insertVideoObj.insertVideoStatus &&
+          user.accountId != thirdId
+        ) {
+          if (user.role == 4 || user.role_name == 4) {
+            this.$alert(`嘉宾${user.nickname}正在插播文件，请稍后重试`, '', {
+              title: '提示',
+              confirmButtonText: '确定',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel',
+              callback: action => {}
+            });
+            return;
+          }
+          this.$alert('主持人正在插播文件，请稍后重试', '', {
+            title: '提示',
+            confirmButtonText: '确定',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            // center: true,
+            callback: action => {}
+          });
+          return;
+        } else if (
+          this.insertVideoObj.insertVideoStatus &&
+          user.role == 3 &&
+          user.accountId != thirdId
+        ) {
+          this.$alert(`助理${user.nickname}正在插播文件，请稍后重试`, '', {
+            title: '提示',
+            confirmButtonText: '确定',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            // center: true,
+            callback: action => {}
+          });
+          return;
+        }
+        const v = document.createElement('video');
+        if (typeof v.captureStream !== 'function') {
+          this.$alert(
+            '当前浏览器版本不支持插播文件。<br>建议您下载chrome72及以上版本后使用<br>下载<a href="https://www.google.cn/chrome/" target="_blank" style="color: #3562fa">Chrome浏览器</a>',
+            '',
+            {
+              title: '提示',
+              confirmButtonText: '知道了',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel',
+              dangerouslyUseHTMLString: true,
+              callback: action => {}
+            }
+          );
+          return;
+        }
+        this.insertVideoVisible = true;
       },
       closeInserVideoDialog(flag, id) {
         this.insertVideoObj.insertVideoStatus = flag;
@@ -228,7 +284,8 @@
       },
       // 获取正在插播用户信息
       getInsertingInfo(obj) {
-        console.log(obj, '???1zhangixoa-------');
+        console.log(obj, '====???1zhangxiao-------');
+        this.insertVideoObj.userInfo = obj;
       },
       searchTableList() {
         this.getTableList(false);
@@ -275,7 +332,6 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOnchange', [File, 'local'])
         );
-        // this.insertVideoVisible = false;
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
