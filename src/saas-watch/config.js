@@ -59,6 +59,7 @@ export const serverConfig = {
       'comSignUpForm',
       'comUserAccount',
       'comCash'
+      // 'comWatchNavMenu'
     ]
   },
 
@@ -135,6 +136,9 @@ export const serverConfig = {
   },
   comCash: {
     component: 'VmpCash'
+  },
+  comWatchNavMenu: {
+    component: 'VmpWatchNavMenu'
   },
   // 底部
   comFooter: {

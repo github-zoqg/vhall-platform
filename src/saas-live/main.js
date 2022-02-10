@@ -27,10 +27,11 @@ Sentry.init({
     new Integrations.BrowserTracing({
       routingInstrumentation: Sentry.vueRouterInstrumentation(router),
       tracingOrigins: [
+        // 'localhost',
         'dev-csd-saas-web.vhall.com',
         'test-csd-saas-web.vhall.com',
         'csd-saas-web.vhall.com',
-        'e.vhall.com',
+        // 'e.vhall.com',
         /^\//
       ]
     })

@@ -151,7 +151,7 @@
     },
     data() {
       return {
-        dialogVisible: true,
+        dialogVisible: false,
         accountVo: {
           nick_name: '', // 昵称
           avatar: '', // 头像

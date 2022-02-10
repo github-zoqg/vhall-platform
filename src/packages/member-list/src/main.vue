@@ -3,7 +3,7 @@
     <!--分组名称-->
     <div class="vmp-member-list__group-name" v-if="isInGroup">
       <i class="iconfont icona-icon_fenzutaolun1x"></i>
-      <span class="pr_top">{{ roomBaseServer.state.groupInitData.name }}</span>
+      <span class="pr_top">{{ groupInitData.name }}</span>
     </div>
     <!--成员区域-->
     <div class="vmp-member-list__container">
@@ -25,12 +25,15 @@
                   :key="user.account_id"
                   v-if="![1, '1'].includes(user.is_kicked)"
                   @operateUser="handleOperateUser"
+                  @interactiveOperate="handleInteractiveOperate"
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
                   :mode="mode"
-                  :current-speaker-id="currentSpeakerId"
+                  :member-options="memberOptions"
+                  :current-speaker-id="docPermissionId"
                   :user-id="userId"
+                  :tab-index="tabIndex"
                   :apply-users="applyUsers"
                 ></member-item>
               </template>
@@ -53,9 +56,17 @@
                 <member-item
                   :key="user.account_id"
                   v-if="![1, '1'].includes(user.is_kicked)"
+                  @operateUser="handleOperateUser"
+                  @interactiveOperate="handleInteractiveOperate"
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
+                  :mode="mode"
+                  :member-options="memberOptions"
+                  :current-speaker-id="docPermissionId"
+                  :user-id="userId"
+                  :tab-index="tabIndex"
+                  :apply-users="applyUsers"
                 ></member-item>
               </template>
             </template>
@@ -76,10 +87,17 @@
               <template v-for="user in limitedUsers">
                 <member-item
                   :key="user.account_id"
-                  v-if="![1, '1'].includes(user.is_kicked)"
+                  @operateUser="handleOperateUser"
+                  @interactiveOperate="handleInteractiveOperate"
                   :user-info="user"
                   :role-name="roleName"
                   :is-in-group="isInGroup"
+                  :mode="mode"
+                  :member-options="memberOptions"
+                  :current-speaker-id="docPermissionId"
+                  :user-id="userId"
+                  :tab-index="tabIndex"
+                  :apply-users="applyUsers"
                 ></member-item>
               </template>
             </template>
@@ -161,7 +179,14 @@
 
 <script>
   import memberItem from './components/member-item';
-  import { useMicServer, useRoomBaseServer, useMemberServer } from 'middle-domain';
+  import * as _ from 'lodash';
+  import {
+    useMicServer,
+    useRoomBaseServer,
+    useMemberServer,
+    useInteractiveServer,
+    useMsgServer
+  } from 'middle-domain';
   export default {
     name: 'VmpMemberList',
     components: {
@@ -193,6 +218,10 @@
         applyUsers: [],
         //受限人数
         limitedUsers: [],
+        //上麦人员列表 todo 这个需要从server取，没法从props获取
+        speakerList: [],
+        //上麦人员列表 todo 这个要从Server获取
+        speaker_list: [],
         //房间号
         roomId: '',
         //mod 6代表分组活动
@@ -210,11 +239,15 @@
         emptyContainerPaddingTop: 10,
         //todo domain里取 当前主讲人的id
         currentSpeakerId: '',
+        //当前演示者的id
+        presentation_screen: '',
+        //组长id
+        leader_id: '',
         //当前的激活的tab
         tabIndex: 1,
         //总人数
         totalNum: 0,
-        //todo 是否允许举手
+        //是否允许举手
         allowRaiseHand: false,
         // 举手提示
         raiseHandTip: false,
@@ -223,14 +256,20 @@
           page: 0,
           limit: 10
         },
-        //受限人员是否为空
-        limitedUsersEmpty: false
+        //当前的分组活动id todo 待求证，未在房间信息中找到
+        groupId: '',
+        // 举手列表定时器列表
+        handsUpTimerList: {},
+        // 上麦人员掉线处理计时器map
+        speakerLeaveIntervalMap: {}
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.msgServer = useMsgServer();
       this.micServer = useMicServer();
       this.memberServer = useMemberServer();
+      this.interactiveServer = useInteractiveServer();
     },
     beforeDestroy() {},
     mounted() {
@@ -240,6 +279,38 @@
       this.initViewData();
       //开始初始化流程
       this.init();
+      this.listenEvent();
+
+      this.currentSpeakerId = this.groupInitData.doc_permission;
+      this.presentation_screen = this.groupInitData.presentation_screen;
+      this.memberOptions.platformType === 'watch' && this.changeSpeakerList();
+    },
+    watch: {
+      currentSpeakerId(newVal) {
+        this.currentSpeakerId = newVal;
+      },
+      roleName(newVal, oldVal) {
+        this.roleName = newVal;
+      },
+      leader_id: {
+        handler(newVal, oldVal) {
+          this.leader_id = newVal;
+          if (newVal == oldVal) return;
+          this.handleLeaderChange(newVal, oldVal);
+        },
+        immediate: true
+      },
+      onlineUsers: {
+        handler(newVal) {
+          if (this.memberOptions.platformType === 'watch' && newVal && newVal.length) {
+            this.onlineSpeakerList = newVal.filter(item => {
+              return item.is_speak;
+            });
+          }
+        },
+        deep: true,
+        immediate: true
+      }
     },
     computed: {
       //是否在分组里
@@ -253,6 +324,18 @@
         const { state = {} } = this.roomBaseServer;
         const { groupInitData = {} } = state;
         return groupInitData.doc_permission;
+      },
+      //分组信息
+      groupInitData() {
+        const { state = {} } = this.roomBaseServer;
+        const { groupInitData = {} } = state;
+        return groupInitData;
+      },
+      //活动状态(直播未开始，已开始，已结束)
+      liveStatus() {
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        const { webinar = {} } = watchInitData;
+        return webinar.type;
       }
     },
     methods: {
@@ -267,9 +350,10 @@
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        console.log(this.roomBaseServer.state);
         this.mode = webinar.mode;
         this.roleName = join_info.role_name;
-        this.userId = join_info.userId;
+        this.userId = join_info.user_id;
         this.roomId = interact.room_id;
         this.allowRaiseHand = this.micServer.state.isAllowhandup;
       },
@@ -277,10 +361,896 @@
       init() {
         this.getOnlineUserList();
       },
+      listenEvent() {
+        this.listenRoomMsg();
+        this.listenGroupMsg();
+        this.msgServer.$onMsg('CHAT', rawMsg => {
+          let temp = Object.assign({}, rawMsg);
+
+          if (typeof temp.data !== 'object') {
+            temp.data = JSON.parse(temp.data);
+            temp.context = JSON.parse(temp.context);
+          }
+          console.log(temp, '原始消息');
+          const { type = '' } = temp.data || {};
+          switch (type) {
+            case 'disable':
+              this.changeUserStatus(temp.data.target_id, this.onlineUsers, {
+                is_banned: 1
+              });
+              this.changeUserStatus(temp.data.target_id, this.limitedUsers, {
+                is_banned: 1
+              });
+              this.changeUserStatus(temp.data.target_id, this.applyUsers, {
+                is_banned: 1
+              });
+              // 禁言并且是举手列表
+              if (this.tabIndex === 2) {
+                this._deleteUser(temp.data.target_id, this.applyUsers);
+              }
+              break;
+            case 'permit':
+              this.changeUserStatus(temp.data.target_id, this.onlineUsers, {
+                is_banned: 0
+              });
+              this.changeUserStatus(temp.data.target_id, this.limitedUsers, {
+                is_banned: 0
+              });
+              this.changeUserStatus(temp.data.target_id, this.applyUsers, {
+                is_banned: 0
+              });
+              this.limitedUsers.forEach((item, index) => {
+                if (item.account_id == temp.data.target_id) {
+                  this.limitedUsers.splice(index, 1);
+                }
+              });
+              break;
+            default:
+              break;
+          }
+        });
+      },
+      //初始化房间消息回调监听
+      listenRoomMsg() {
+        const isLive = this.memberOptions.platformType === 'live';
+        const isWatch = this.memberOptions.platformType === 'watch';
+        // 加入房间
+        this.msgServer.$onMsg('JOIN', msg => {
+          handleUserJoinRoom(msg);
+        });
+
+        //离开房间
+        this.msgServer.$onMsg('LEFT', msg => {
+          handleUserLeaveRoom(msg);
+        });
+
+        //房间消息
+        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
+          let temp = Object.assign({}, rawMsg);
+          if (typeof temp.data !== 'object') {
+            temp.data = JSON.parse(temp.data);
+            temp.context = JSON.parse(temp.context);
+          }
+          const { type = '' } = temp.data || {};
+
+          switch (type) {
+            case 'vrtc_connect_apply':
+              //用户申请上麦
+              handleApplyConnect(temp);
+              break;
+            case 'vrtc_connect_apply_cancel':
+              //用户取消申请上麦
+              handleCancelApplyConnect(temp);
+              break;
+            case 'vrtc_connect_agree':
+              //同意用户上麦
+              handleAgreeApplyConnect(temp);
+              break;
+            case 'vrtc_connect_success':
+              //用户上麦成功
+              handleSuccessConnect(temp);
+              break;
+            case 'vrtc_connect_invite_refused':
+              //用户拒绝上麦邀请
+              handleUserRejectConnect(temp);
+              break;
+            case 'vrtc_disconnect_success':
+              //互动连麦断开成功
+              handleSuccessDisconnect(temp);
+              break;
+            case 'vrtc_speaker_switch':
+              //互动设置主讲人
+              handleChangeSpeaker(temp);
+              break;
+            case 'vrtc_connect_device_check':
+              //设备检测
+              handleDeviceCheck(temp);
+              break;
+            case 'kicked_in_chat':
+              handleKicked(temp);
+              break;
+            case 'vrtc_connect_presentation_refused':
+              //用户拒绝了演示邀请
+              isLive && handleUserRejectPresentation(temp);
+              break;
+            case 'vrtc_disconnect_presentation_success':
+              //用户主动结束演示
+              handleUserEndPresentation(temp);
+              break;
+            case 'main_room_join_change':
+              handleMainRoomJoinChange(temp);
+              break;
+            case 'endLive':
+              handleEndLive(temp);
+              break;
+            case 'live_over':
+              handleLiveOver(temp);
+              break;
+            default:
+              break;
+          }
+        });
+
+        //直播结束
+        function handleEndLive(msg) {
+          this.allowRaiseHand = false;
+        }
+        //直播结束
+        function handleLiveOver(msg) {
+          setTimeout(() => {
+            this.refreshList();
+          }, 1000);
+        }
+        //设备检测
+        function handleDeviceCheck(msg) {
+          if (![2, '2'].includes(msg.device_type)) {
+            this.changeUserStatus(msg.room_join_id, this.onlineUsers, {
+              device_type: msg.device_type
+            });
+          }
+          if (![0, '0'].includes(msg.device_status)) {
+            this.changeUserStatus(msg.room_join_id, this.onlineUsers, {
+              device_status: msg.device_status
+            });
+          }
+        }
+        //用户加入房间
+        function handleUserJoinRoom(msg) {
+          const isLive = this.memberOptions.platformType === 'live';
+          const isWatch = this.memberOptions.platformType === 'watch';
+
+          // 上线的人是自己，不做操作
+          if (isLive && msg.sender_id == this.userId) {
+            return;
+          }
+
+          let index = this._getUserIndex(msg.sender_id, this.onlineUsers);
+
+          if (isWatch) {
+            //todo 需要从主房间取speakerList
+            this.speakerList = this.isInGroup ? this.groupInitData.speaker_list : [];
+            this.totalNum = msg.uv;
+          }
+
+          if (isLive) {
+            //todo 这里暂时没有$store,需要替换为从server取分组里的成员数
+            this.totalNum = this.isInGroup
+              ? msg.uv
+              : msg.uv -
+                (this.groupInitData.discussState
+                  ? this.$store.getters.getAllState('groupUsersNumber')
+                  : 0);
+          }
+
+          if (isWatch && !this.isInGroup && index >= 0) {
+            return;
+          }
+
+          if (isLive && index >= 0) {
+            return;
+          }
+
+          // 在线人数大于200不再添加到列表里，只能加载更多
+          if (this.totalNum > 200) {
+            return;
+          }
+          // 隐身模式登录
+          if (msg.data.hide) {
+            return;
+          }
+
+          // 从上麦人员列表中获取加入房间着是否上麦
+          const speakIndex = this._getUserIndex(msg.sender_id, this.speakerList);
+          const { context } = msg;
+
+          // 如果是分组直播 主持人/助理在主房间,小组内观众上线
+          if (isLive && this.mode === 6) {
+            if (!this.isInGroup && context.groupInitData.isInGroup) {
+              return false;
+            }
+          }
+
+          if (isLive) {
+            const user = {
+              account_id: msg.sender_id,
+              avatar: context.avatar,
+              device_status: context.device_status,
+              device_type: context.device_type,
+              is_banned: Number(context.is_banned),
+              nickname: context.nick_name,
+              role_name: context.role_name,
+              is_speak: speakIndex >= 0 ? 1 : 0
+            };
+            this.onlineUsers.push(user);
+            this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
+            setTimeout(() => {
+              //todo 待移除
+              this.$refs.scroll.refresh();
+            }, 100);
+            if (msg.context.role_name == 4) {
+              if (msg.sender_id == this.userId) {
+                return;
+              }
+              this.$message({
+                message: this.$t('message.message_1030', { n: msg.context.nickname }),
+                showClose: true,
+                // duration: 0,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+            }
+          }
+
+          if (isWatch) {
+            if (this.isInGroup) {
+              const flag = this.onlineUsers.find(item => item.account_id == msg.sender_id);
+              if (flag) {
+                this.onlineUsers.forEach(item => {
+                  if (item.account_id == msg.sender_id) {
+                    Object.assign(item, {
+                      avatar: context.avatar,
+                      device_status: context.device_status,
+                      nickname: context.nick_name || context.nickname,
+                      device_type: context.device_type,
+                      is_speak: speakIndex >= 0 ? 1 : 0
+                    });
+                  }
+                });
+                this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
+              } else {
+                const user = {
+                  account_id: msg.sender_id,
+                  nickname: context.nick_name || context.nickname,
+                  avatar: context.avatar,
+                  device_status: context.device_status,
+                  device_type: context.device_type,
+                  role_name: context.role_name,
+                  is_speak: speakIndex >= 0 ? 1 : 0
+                };
+                this.onlineUsers.push(user);
+                this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
+              }
+            } else {
+              const user = {
+                account_id: msg.sender_id,
+                avatar: context.avatar,
+                device_status: context.device_status,
+                device_type: context.device_type,
+                is_banned: Number(context.is_banned),
+                nickname: context.nickname,
+                role_name: context.role_name,
+                is_speak: speakIndex >= 0 ? 1 : 0
+              };
+              this.onlineUsers.push(user);
+              this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
+              if (msg.context.role_name == 4) {
+                if (msg.sender_id == this.userId) {
+                  return;
+                }
+                this.$message({
+                  message: this.$t('message.message_1030', { n: msg.context.nickname }),
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
+          }
+        }
+        //用户离开房间
+        function handleUserLeaveRoom(msg) {
+          const isLive = this.memberOptions.platformType === 'live';
+          const isWatch = this.memberOptions.platformType === 'watch';
+          if (msg.context.isAuthChat) return; // 如果是聊天审核页面不做任何操作
+
+          if (isLive) {
+            //todo 需要server里取数据替换这个groupUsersNumber
+            this.totalNum = this.isInGroup
+              ? msg.uv
+              : msg.uv -
+                (this.groupInitData.discussState
+                  ? this.$store.getters.getAllState('groupUsersNumber')
+                  : 0);
+          }
+
+          if (isWatch) {
+            this.totalNum = msg.uv;
+          }
+          this.totalNum < 0 && (this.totalNum = 0);
+          this._deleteUser(msg.sender_id, this.onlineUsers, 'leave');
+          this._deleteUser(msg.sender_id, this.applyUsers); // 14273
+          setTimeout(() => {
+            //todo 等待移除
+            this.$refs.scroll.refresh();
+          }, 50);
+          if (msg.context.role_name == 1 && this.roleName != 1) {
+            this.$message.warning({ message: this.$t('message.message_1027') });
+          }
+          if (msg.context.role_name == 4) {
+            this.$message.warning({
+              message: this.$t('message.message_1029', { n: msg.context.nickname })
+            });
+          }
+        }
+        //用户申请上麦
+        function handleApplyConnect(msg) {
+          if (this.tabIndex !== 2) {
+            this.raiseHandTip = true;
+          }
+          // 如果申请人是自己
+          if (msg.room_join_id == this.userId) {
+            return;
+          }
+          const user = {
+            account_id: msg.room_join_id,
+            avatar: msg.avatar,
+            device_status: msg.device_status,
+            device_type: msg.device_type,
+            nickname: msg.nick_name,
+            role_name: msg.room_role
+          };
+          this.applyUsers.unshift(user);
+
+          this.applyUsers = _.uniqBy(this.applyUsers, 'account_id'); // 去重
+          this.changeUserStatus(user.account_id, this.onlineUsers, {
+            isApply: true
+          });
+          // 申请30秒后从列表去掉
+          this.handsUpTimerList[user.account_id] &&
+            clearTimeout(this.handsUpTimerList[user.account_id]);
+          delete this.handsUpTimerList[user.account_id];
+          this.handsUpTimerList[user.account_id] = window.setTimeout(() => {
+            this.handsUpTimerList[user.account_id] &&
+              clearTimeout(this.handsUpTimerList[user.account_id]);
+            delete this.handsUpTimerList[user.account_id];
+            this.changeUserStatus(user.account_id, this.onlineUsers, {
+              isApply: false
+            });
+            this.applyUsers = this.applyUsers.filter(u => u.account_id !== user.account_id);
+            if (!this.applyUsers.length) {
+              this.raiseHandTip = false;
+            }
+          }, 30000);
+          //todo 信令通知其他组件(比如自定义菜单组件，有红点)
+          // this.$emit('memberUpdata');
+        }
+        //用户取消上麦申请
+        function handleCancelApplyConnect(msg) {
+          this.raiseHandTip = false;
+          this._deleteUser(msg.room_join_id, this.applyUsers);
+          this.changeUserStatus(msg.room_join_id, this.onlineUsers, {
+            isApply: false
+          });
+          this.handsUpTimerList[msg.room_join_id] &&
+            clearTimeout(this.handsUpTimerList[msg.room_join_id]); // 取消下麦清除定时器
+          delete this.handsUpTimerList[msg.room_join_id];
+        }
+        //同意用户上麦
+        function handleAgreeApplyConnect(msg) {
+          if (this.memberOptions.platformType === 'live') {
+            this.raiseHandTip = false;
+            return;
+          }
+          if (this.memberOptions.platformType === 'watch') {
+            this.changeUserStatus(msg.room_join_id, this.onlineUsers, {
+              isApply: false,
+              is_speak: 1
+            });
+          }
+        }
+        //用户上麦成功
+        function handleSuccessConnect(msg) {
+          this.changeUserStatus(msg.room_join_id, this.onlineUsers, {
+            isApply: false,
+            is_speak: 1
+          });
+          if (msg.room_join_id == this.userId && msg.room_role == 2) {
+            return;
+          }
+          if (this.isInteract !== 1 && msg.room_role == 1) {
+            this.$message.success({ message: '直播发起成功' });
+            return;
+          }
+          if (msg.room_join_id == this.userId) {
+            this.$message.success({ message: '您已上麦' });
+          } else {
+            msg.room_role != 2 && this.$message.success({ message: `${msg.nick_name}已上麦` });
+          }
+          this.handsUpTimerList[msg.room_join_id] &&
+            clearTimeout(this.handsUpTimerList[msg.room_join_id]); // 取消下麦清楚定时器
+          delete this.handsUpTimerList[msg.room_join_id];
+
+          if (this.memberOptions.platformType === 'watch') {
+            this.changeSpeakerList();
+            // 维护上麦成员列表
+            const obj =
+              this.speakerList && this.speakerList.find(item => item.account_id == msg.sender_id);
+            if (!obj) {
+              this.speakerList.push({
+                account_id: msg.data.room_join_id,
+                audio: msg.data.vrtc_audio_status == 'on' ? 1 : 0,
+                nick_name: msg.data.nick_name,
+                role_name: Number(msg.data.room_role),
+                video: msg.data.vrtc_video_status == 'on' ? 1 : 0
+              });
+            }
+            console.log('用户上麦成功', msg, this.speakerList);
+            if (!this.applyUsers.length) {
+              this.raiseHandTip = false;
+            }
+            this.changeUserStatus(msg.room_join_id, this.onlineUsers, {
+              isApply: false,
+              is_speak: 1
+            });
+          }
+        }
+        //用户拒绝上麦邀请
+        function handleUserRejectConnect(msg) {
+          // 如果申请人是自己
+          if (msg.room_join_id == this.userId || this.roleName != 1) {
+            return;
+          }
+          let role = '';
+          if (msg.room_role == 2) {
+            role = '观众';
+          } else if (msg.room_role == 4) {
+            role = '嘉宾';
+          }
+          if (msg.extra_params == this.userId) {
+            this.$message.warning({
+              message: `${role}${msg.nick_name}拒绝了你的上麦邀请`
+            });
+          }
+        }
+        //互动连麦成功断开链接
+        function handleSuccessDisconnect(msg) {
+          this.changeUserStatus(msg.target_id, this.onlineUsers, {
+            is_speak: 0,
+            isApply: false
+          });
+          //如果是观看端，还要维护一下上麦列表
+          if (this.memberOptions.platformType === 'watch') {
+            this.changeSpeakerList();
+            this.speakerList = this.speakerList.filter(item => item.account_id != msg.sender_id);
+          }
+          if (msg.target_id == this.userId) {
+            this.$message.success({ message: this.$t('interact.interact_1028') });
+            return;
+          }
+          // 当前用户ID,解决俩次触发vrtc_connect_success会提示两次下麦消息
+          if (this.LocalCatchTarget_id != msg.target_id) {
+            this.LocalCatchTarget_id = msg.target_id;
+            if (msg.room_role != 2) {
+              this.$message.success({
+                message: this.$t('interact.interact_1030', { n: msg.nick_name })
+              });
+            }
+            setTimeout(() => {
+              this.LocalCatchTarget_id = null;
+            }, 3000);
+          }
+          if (this.applyUsers.length > 0) {
+            const deleteIndex = this.applyUsers.findIndex(item => item.account_id == msg.target_id);
+            if (deleteIndex >= 0) {
+              this.applyUsers.splice(deleteIndex, 1);
+            }
+          }
+        }
+        //互动设置主讲人
+        function handleChangeSpeaker(msg) {
+          this.currentSpeakerId = msg.room_join_id;
+        }
+        //处理踢出人员
+        function handleKicked(msg) {
+          if (msg.nextStatus) {
+            this._deleteUser(msg.accountId, this.onlineUsers);
+            this._deleteUser(msg.accountId, this.applyUsers);
+          } else {
+            // 取消踢出只能在受限列表操作
+            this.getLimitUserList();
+          }
+          this.refreshList();
+        }
+        //用户拒绝邀请演示
+        function handleUserRejectPresentation(msg) {
+          // 如果申请人是自己
+          if (msg.room_join_id == this.userId || this.roleName != 1) {
+            return;
+          }
+          let role = '';
+          if (msg.room_role == 2) {
+            role = '观众';
+          } else if (msg.room_role == 4) {
+            role = '嘉宾';
+          }
+          if (msg.extra_params == this.userId) {
+            this.$message.warning({
+              message: `${role}${msg.nick_name}拒绝了你的演示邀请`
+            });
+          }
+        }
+        //用户主动结束演示
+        function handleUserEndPresentation(msg) {
+          if (isLive && msg.sender_id != this.userId) {
+            this.$message.warning('观众结束了演示');
+          } else {
+            this.presentation_screen = this.leader_id;
+          }
+        }
+        //主房间人员变动
+        function handleMainRoomJoinChange(msg) {
+          //必须在主房间
+          if (!this.isInGroup) {
+            return;
+          }
+          if (isLive) {
+            //todo 替换这里的
+            this.totalNum = msg.uv - this.$store.getters.getAllState('groupUsersNumber');
+            // 如果sender_id==自己
+            if (msg.sender_id == this.userId) {
+              this.totalNum++;
+            }
+          }
+
+          if (msg.data.isJoinMainRoom) {
+            const flag = this.onlineUsers.find(item => item.account_id == msg.sender_id);
+            if (flag) return false;
+            this.onlineUsers.push({
+              nickname: msg.nickname,
+              is_banned: msg.isBanned,
+              account_id: msg.accountId,
+              role_name: msg.role_name == 20 ? 2 : msg.role_name,
+              device_type: msg.device_type
+            });
+          } else {
+            this.onlineUsers.forEach((item, index) => {
+              if (item.account_id === msg.accountId) {
+                this.onlineUsers.splice(index, 1);
+              }
+            });
+          }
+        }
+      },
+      //初始化分组消息回调监听
+      listenGroupMsg() {
+        const isLive = this.memberOptions.platformType === 'live';
+        const isWatch = this.memberOptions.platformType === 'watch';
+        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
+          let temp = Object.assign({}, rawMsg);
+          if (typeof temp.data !== 'object') {
+            temp.data = JSON.parse(temp.data);
+            temp.context = JSON.parse(temp.context);
+          }
+          const { type = '' } = temp.data || {};
+          switch (type) {
+            case 'group_join_info':
+              //为上线的分组成员添加身份
+              handleSetUserJoinInfo(temp);
+              break;
+            case 'group_join_change':
+              //主持人/助理进入小组
+              handleHostJoin(temp);
+              break;
+            case 'group_switch_start':
+            case 'group_msg_created':
+              //开始讨论
+              isLive && handleStartGroupDiscuss(temp);
+              break;
+            case 'group_switch_end':
+              //结束讨论
+              handleEndGroupDiscuss(temp);
+              break;
+            case 'changeGroupInitData':
+              //重新获取最新的groupInitData
+              isLive && changeGroupInitData(temp);
+              break;
+            case 'room_group_kickout':
+              //踢出小组
+              handleGroupKicked(temp);
+              break;
+            case 'group_disband':
+              //小组被解散
+              isWatch && handleGroupDisband(temp);
+              break;
+            case 'vrtc_connect_presentation_agree':
+              //用户被邀请演示-同意演示
+              isWatch && agreePresentation(temp);
+              break;
+            case 'vrtc_connect_presentation_success':
+              //演示权限变更
+              isWatch && handlePresentationPermissionChange(temp);
+              break;
+            case 'group_leader_change':
+              //组长变更
+              isWatch && handleLeaderChange(temp);
+              break;
+            case 'room_channel_change':
+              //频道变更
+              isWatch && handleRoomChannelChange(temp);
+              break;
+            case 'group_join_change_update':
+              //切换小组
+              isWatch && handleGroupChange(temp);
+              break;
+            case 'room_vrtc_disconnect_success':
+              //下麦成功
+              isWatch && handleRoomDisconnectSuccess(temp);
+              break;
+            default:
+              break;
+          }
+        });
+        //为上线的分组成员添加身份
+        function handleSetUserJoinInfo(msg) {
+          const isLive = this.memberOptions.platformType === 'live';
+          const isWatch = this.memberOptions.platformType === 'watch';
+
+          // 是自己 && 不在分组中
+          if (isLive && msg.sender_id == this.userId && !this.isInGroup) {
+            return;
+          }
+          // 是自己 && 在分组中
+          if (isWatch && (msg.sender_id == this.userId || !this.isInGroup)) {
+            return;
+          }
+
+          if (isWatch) {
+            this.speakerList = this.groupInitData.isInGroup
+              ? msg.data.speaker_list
+              : this.speaker_list;
+          }
+
+          // 是否已添加
+          const flag = this.onlineUsers.find(item => item.account_id == msg.sender_id);
+          const speakIndex = this._getUserIndex(msg.sender_id, this.speakerList);
+          if (flag) {
+            this.onlineUsers.forEach(item => {
+              if (item.account_id == msg.sender_id) {
+                Object.assign(item, {
+                  account_id: msg.sender_id,
+                  is_banned: msg.is_banned,
+                  role_name: msg.join_role,
+                  is_speak: speakIndex >= 0 ? 1 : 0,
+                  nickname: msg.nickname
+                });
+              }
+            });
+            this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
+          } else {
+            const user = {
+              account_id: msg.sender_id,
+              is_banned: msg.is_banned,
+              role_name: msg.join_role,
+              is_speak: speakIndex >= 0 ? 1 : 0,
+              nickname: msg.nickname
+            };
+            this.onlineUsers.push(user);
+            this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
+          }
+        }
+        //主持人/助理进入小组
+        function handleHostJoin(msg) {
+          if (msg.sender_id == this.userId && [1, 3, '1', '3'].includes(this.roleName)) {
+            // 进入小组
+            if (msg.group_ids[0] == 0) {
+              setTimeout(() => {
+                this.onlineUsers = [];
+                this.getOnlineUserList();
+              }, 1000);
+            }
+            // 返回主房间
+            if (msg.group_ids[1] == 0) {
+              //todo 这里的host_uid可能要从分组server取
+              if (sessionStorage.getItem('host_uid').includes(msg.sender_id)) {
+                this.onlineUsers = [];
+                this.getOnlineUserList();
+              }
+            }
+          }
+        }
+        //分组--开始讨论
+        function handleStartGroupDiscuss(msg) {
+          console.log(msg);
+          this.onlineUsers = [];
+          this.getOnlineUserList();
+        }
+        //分组--结束讨论
+        function handleEndGroupDiscuss(msg) {
+          console.log(msg);
+          this.onlineUsers = [];
+          this.getOnlineUserList();
+        }
+        //重新获取最新的groupInitData
+        function changeGroupInitData(msg) {
+          // this.groupInitData = msg;
+        }
+        //踢出小组
+        function handleGroupKicked(msg) {
+          if (isLive) {
+            this.onlineUsers = [];
+            this.getOnlineUserList();
+            return;
+          }
+          if (isWatch) {
+            if (!this.isInGroup) return;
+            if (this.userId == msg.target_id) {
+              this.onlineUsers = [];
+              this.getOnlineUserList();
+            } else {
+              // 不等于时删除该人员
+              this.onlineUsers.forEach((item, index) => {
+                if (item.account_id == msg.target_id) {
+                  this.onlineUsers.splice(index, 1);
+                }
+              });
+            }
+          }
+        }
+        //小组被解散
+        function handleGroupDisband(msg) {
+          this.onlineUsers = [];
+          this.getOnlineUserList();
+        }
+        //用户被邀请演示-同意演示
+        function agreePresentation(msg) {
+          if (this.roleName == 20) {
+            this.$message({
+              message: '对方已接受邀请',
+              showClose: true,
+              // duration: 0,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          }
+          this.presentation_screen = msg.sender_id;
+        }
+        //演示权限变更
+        function handlePresentationPermissionChange(msg) {
+          this.onlineUsers.forEach(item => {
+            if (msg.sender_id == item.account_id) {
+              item.is_speak = 1;
+            }
+          });
+        }
+        //组长变更
+        function handleLeaderChange(msg) {
+          // 原组长提示
+          if (this.leader_id == this.userId && this.isInGroup) {
+            this.$alert('组长身份已变更', '提示', {
+              confirmButtonText: '确定',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+              // type: 'info',
+              // center: true
+            });
+          }
+          // 新组长提示
+          if (msg.account_id == this.userId && this.isInGroup) {
+            this.presentation_screen = msg.account_id;
+            this.$alert('您被提升为组长', '提示', {
+              confirmButtonText: '确定',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+              // type: 'info',
+              // center: true
+            }).then(() => {});
+          }
+          this.leader_id = msg.account_id;
+          this.getOnlineUserList();
+        }
+        //切换频道
+        function handleRoomChannelChange(msg) {
+          console.log(msg);
+          //todo 待确认切换频道事件和这里的mainScreen
+          this.mainScreen = this.roomBaseServer.state.groupInitData.main_screen;
+          this.presentation_screen = this.roomBaseServer.state.groupInitData.presentation_screen;
+          setTimeout(() => {
+            this.onlineUsers = [];
+            this.getOnlineUserList();
+          }, 1000);
+        }
+        //切换小组
+        function handleGroupChange(msg) {
+          // 进入小组重置演示人id
+          this.presentation_screen = msg.main_screen;
+        }
+        //下麦成功
+        function handleRoomDisconnectSuccess(msg) {
+          if (msg.target_id == this.presentation_screen) {
+            this.presentation_screen = this.leader_id;
+          }
+        }
+      },
+      // 更新上麦人员列表
+      changeSpeakerList() {
+        //todo 需要micServer提供一下speakerList,若不是分组则从server取
+        this.speakerList = this.roomBaseServer.state.groupInitData.isInGroup
+          ? this.groupInitData.speaker_list || []
+          : this.speaker_list || [];
+      },
+      handleLeaderChange(newVal, oldVal) {
+        // 如果被设为了组长，接管权限拥有者掉线的异常处理
+        if (newVal == this.userId) {
+          this.msgServer.$onMsg('LEFT', this.handleRoomLeaveForLeader);
+          this.msgServer.$onMsg('JOIN', this.handleRoomJoinForLeader);
+        }
+        // 如果自己不是组长了，注销事件
+        if (oldVal == this.userId) {
+          this.msgServer.$offMsg('LEFT', this.handleRoomLeaveForLeader);
+          this.msgServer.$offMsg('JOIN', this.handleRoomJoinForLeader);
+        }
+      },
+      handleRoomLeaveForLeader(msg) {
+        this.handlePermissionLeave(msg);
+        this.handleSpeakerLeave(msg);
+      },
+      handleRoomJoinForLeader(msg) {
+        this.handleSpeakerBack(msg);
+      },
+      // 演示权限人员掉线异常处理
+      handlePermissionLeave(msg) {
+        // 如果是当前主讲人掉线，启动异常处理流程
+        if (msg.sender_id == this.currentSpeakerId) {
+          this._permissionLeaveId = msg.sender_id;
+          this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
+          this._permissionLeaveInterval = window.setTimeout(() => {
+            // 15秒后自动结束演示
+            this.downMic(this._permissionLeaveId);
+            this.msgServer.$offMsg('JOIN', this.handlePermissionJoin);
+          }, 15000);
+        }
+      },
+      // 演示权限人员掉线又重新上线
+      handlePermissionJoin(msg) {
+        if (this._permissionLeaveId == msg.sender_id) {
+          this._permissionLeaveInterval && window.clearTimeout(this._permissionLeaveInterval);
+          this.msgServer.$offMsg('JOIN', this.handlePermissionJoin);
+        }
+      },
+      // 上麦人员掉线异常处理
+      handleSpeakerLeave(msg) {
+        if (this.onlineSpeakerList.findIndex(item => msg.sender_id == item.account_id) > -1) {
+          this.speakerLeaveIntervalMap[msg.sender_id] = setTimeout(() => {
+            this.speakerLeaveIntervalMap[msg.sender_id] &&
+              clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
+            delete this.speakerLeaveIntervalMap[msg.sender_id];
+            this.downMic(msg.sender_id);
+          }, 15000);
+        }
+      },
+      // 上麦人员掉线又重新上线
+      handleSpeakerBack(msg) {
+        if (this.speakerLeaveIntervalMap[msg.sender_id]) {
+          this.speakerLeaveIntervalMap[msg.sender_id] &&
+            clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
+          delete this.speakerLeaveIntervalMap[msg.sender_id];
+        }
+      },
       //获取在线人员列表
       getOnlineUserList(pos) {
         const { getOnlineUserList } = this.memberServer;
-        const data = {
+        const params = {
           room_id: this.roomId,
           pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
           limit: this.pageConfig.limit
@@ -288,15 +1258,30 @@
 
         //如果存在输入搜索人员的值
         if (this.searchUserInput) {
-          Object.assign(data, { nickname: this.searchUserInput });
+          Object.assign(params, { nickname: this.searchUserInput });
         }
-        getOnlineUserList(data).then(res => {
+        getOnlineUserList(params).then(res => {
           if (res.code === 200) {
             this.onlineUsers = this.memberServer.state.onlineUsers || [];
             //在线总人数
             this.totalNum = this.memberServer.state.totalNum;
           }
         });
+      },
+      /**
+       * 改变在线人员列表的状态
+       */
+      changeUserStatus(accountId, list, obj) {
+        console.log('更改上麦状态', accountId, list, obj);
+        const item = list.find(item => item.account_id === accountId);
+        if (!item) {
+          return;
+        }
+        const index = list.findIndex(item => item.account_id === accountId);
+        if (index !== -1) {
+          Object.assign(item, obj);
+          this.$set(list, index, item);
+        }
       },
       //获取受限人员列表
       async getLimitUserList() {
@@ -332,18 +1317,17 @@
       },
       //切换允许举手状态
       onSwitchAllowRaiseHand(status) {
-        //todo 检测活动是否开始
-        // if (this.status != 1) {
-        //   this.allowRaiseHand = false;
-        //   this.$message.error('活动尚未开始');
-        //   return;
-        // }
+        if (this.liveStatus !== 1) {
+          this.allowRaiseHand = false;
+          this.$message.error('活动尚未开始');
+          return;
+        }
         const params = {
           room_id: this.roomId,
           status: status ? 1 : 0
         };
 
-        //todo 待micServer完善方法
+        //todo 待micServer这边完善方法
         this.micServer
           .setHandsUp(params)
           .then(res => {
@@ -375,12 +1359,363 @@
       //清空人员搜索
       clearSearchInput() {
         this.searchUserInput = '';
+        this.searchShow = false;
+        this.pageConfig.page = 0;
+        this.getOnlineUserList();
       },
       //按条件进行搜索
-      doSearch() {},
+      doSearch() {
+        if (['', null, void 0].includes(this.searchUserInput)) {
+          return;
+        }
+        //todo 埋点上报
+        this.pageConfig.page = 0;
+        this.getOnlineUserList();
+      },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
         console.log(type, params);
+        const { account_id = '', is_kicked, is_banned } = params;
+        switch (type) {
+          case 'setBanned':
+            this.setBanned(account_id, is_banned);
+            break;
+          case 'setKicked':
+            this.setKicked(account_id, is_kicked);
+            break;
+          case 'setSpeaker':
+            this.setSpeaker(account_id);
+            break;
+          case 'setLeader':
+            this.setLeader(account_id);
+            break;
+          case 'inviteMic':
+            this.inviteMic(account_id);
+            break;
+          default:
+            break;
+        }
+      },
+      //响应互动操作
+      handleInteractiveOperate({ type = '', params = {} }) {
+        const { isApply = false, account_id = '' } = params;
+        switch (type) {
+          case 'upMic':
+            this.upMic(isApply, account_id);
+            break;
+          case 'downMic':
+            this.downMic(account_id);
+            break;
+          case 'myPresentation':
+            this.myPresentation(account_id);
+            break;
+          case 'agreeUpMic':
+            this.agreeUpMic(account_id);
+            break;
+          default:
+            break;
+        }
+      },
+      /**
+       * @description: 同意上麦
+       * @param accountId {String} 用户ID
+       * @return:
+       */
+      agreeUpMic(accountId) {
+        const params = {
+          room_id: this.roomId,
+          receive_account_id: accountId
+        };
+        //todo 待联调，domain的可能暂时不可用
+        this.micServer
+          .hostAgreeApply(params)
+          .then(res => {
+            console.log(res);
+            this._deleteUser(accountId, this.applyUsers);
+          })
+          .catch(err => {
+            console.log('allow speak fail ::', err);
+          });
+      },
+      /**
+       * 邀请上麦 / 同意上麦
+       */
+      upMic(isApply, accountId) {
+        if (this.liveStatus !== 1) {
+          this.$message.error('活动还未开始');
+          return;
+        }
+
+        if (isApply) {
+          this.agreeUpMic(accountId);
+        } else {
+          if (this.userId === accountId) {
+            // 主持人自己上麦 todo 可能是信令或者直接移除
+            // EventBus.$emit('applyByHost');
+          } else {
+            //todo 待domain micServer完善这部分
+            this.micServer
+              .inviteMic({
+                receive_account_id: accountId
+              })
+              .then(res => {
+                console.warn(res, '邀请上麦');
+                if (res.code == 200) {
+                  //todo 这里需要上报埋点
+                  this.$message.success({ message: '邀请发送成功' });
+                } else {
+                  this.$message.error(res.msg);
+                }
+              })
+              .catch(err => {
+                this.$message.error(err.msg);
+              });
+          }
+        }
+      },
+      //用户下麦
+      downMic(accountId) {
+        const data = {
+          room_id: this.roomId,
+          receive_account_id: accountId
+        };
+        const request = this.micServer
+          .userSpeakOff(data)
+          .then(res => {
+            //todo 埋点上报
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
+          });
+        if (this.isInGroup) {
+          this.$confirm('下麦后，演示将自动结束，是否下麦？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+            // type: 'info',
+            // center: true
+          }).then(() => {
+            request();
+          });
+        } else {
+          request();
+        }
+      },
+      // 我要演示
+      myPresentation(accountId) {
+        if (this.currentSpeakerId === accountId) {
+          this.$message.warning('正在演示中');
+          return false;
+        }
+        // 设置主讲人
+        this.$confirm('演示后，您可使用小组中的白板、文档、桌面共享功能，是否要演示？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          this.$fetch('presentation', {
+            room_id: this.roomBaseServer.state.watchInitData.interact.room_id
+          })
+            .then(res => {
+              console.log(res, 'presentation');
+            })
+            .catch(err => {
+              this.$message.warning(err.msg);
+            });
+        });
+      },
+      //获取插播和桌面共享流信息
+      /**
+       *  获取插播和桌面共享的流信息
+       *  @returns { object } [{streaming: Boolean, streamId: streamId, accountId: accountId, streamType: streamType, remoteUsers: [], localUser: {}  }]
+       */
+      getDesktopAndInStreamInfo() {
+        const info = {
+          streaming: false,
+          streamId: '',
+          streamType: '',
+          accountId: '',
+          remoteUsers: [],
+          localUser: {}
+        };
+        const inavInfo = this.interactiveServer.getRoomInfo();
+        const users = inavInfo.remote.users.concat(inavInfo.local.user || {});
+        users.forEach(u => {
+          // 判断一下有没有人用插播或桌面
+          u.streams.forEach(stream => {
+            const obj = stream.attributes ? JSON.parse(stream.attributes) : {}; // 插播再2个地方存储
+            if (stream.streamType == 3 || stream.streamType == 4 || obj.stream_type == 4) {
+              info.streaming = true;
+              info.streamId = stream.streamId;
+              info.streamType = obj.stream_type || stream.streamType;
+              info.accountId = u.accountId;
+              if (obj.stream_type == 4 || stream.streamType == 4) {
+                info.isInsterStream = true;
+              }
+            }
+          });
+        });
+        info.remoteUsers = inavInfo.remote.users;
+        info.localUser = inavInfo.local.user;
+        return info;
+      },
+      /**
+       * 设置主讲人
+       * @param {Number | String} accountId 用户ID
+       * @Function void()
+       */
+      setSpeaker(accountId, setMainScreen = true) {
+        if (accountId) {
+          const streamInfo = this.getDesktopAndInStreamInfo();
+          const users = streamInfo.remoteUsers.concat(streamInfo.localUser);
+          const mainScreenUser = users.find(u => u.accountId === accountId) || { streams: [] };
+          const mainScreenStream =
+            mainScreenUser.streams.find(s => [2, '2'].includes(s.streamType)) || {};
+          if (!mainScreenStream.streamId) {
+            this.$message.error('设置主讲人失败，请刷新后重试');
+            return;
+          }
+        }
+        if (setMainScreen) {
+          this.interactiveServer
+            .setMainScreen({
+              receive_account_id: accountId || this.accountId
+            })
+            .then(res => {
+              console.log('setmainscreen success ::', res);
+            })
+            .catch(err => {
+              console.log('setmainscreen failed ::', err);
+            });
+        }
+        return this.interactiveServer
+          .setSpeaker({
+            receive_account_id: accountId
+          })
+          .then(res => {
+            console.log('setSpeaker success ::', res);
+          })
+          .catch(err => {
+            console.log('setSpeaker failed ::', err);
+          });
+      },
+      //邀请上麦
+      inviteMic(accountId = '') {
+        if (accountId === this.currentSpeakerId) {
+          return;
+        }
+        const params = { room_id: this.roomId, receive_account_id: accountId, type: 1 };
+        return this.memberServer
+          .inviteUserToInteract(params)
+          .then(res => {
+            console.log(res, 'v3InviteMic');
+            if (res.code == 200) {
+              if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
+                // this.$message.success('邀请演示发送成功')
+              } else {
+                this.$message.success('邀请演示发送成功');
+              }
+            }
+          })
+          .catch(err => {
+            this.$message.warning(err.msg);
+          });
+      },
+      //设为组长 todo 这里接口有点问题，需要协调完善一下分组讨论server
+      setLeader(accountId = '') {
+        const params = {
+          room_id: this.roomId,
+          leader_account_id: accountId,
+          group_id: this.groupId
+        };
+        this.memberServer
+          .setGroupLeader(params)
+          .then(res => {
+            this.onlineUsers.forEach(item => {
+              if ([20, '20'].includes(item.role_name)) {
+                item.role_name = 2;
+              }
+              if (item.account_id === accountId) {
+                item.role_name = 20;
+              }
+            });
+            console.log(res, 'setLeader');
+          })
+          .catch(err => console.log(err));
+      },
+      /**
+       * 禁言/取消禁言
+       */
+      setBanned(accountId, isBanned) {
+        const { mutedUser } = this.memberServer;
+        const nextStatus = [1, '1'].includes(isBanned) ? 0 : 1;
+        const params = {
+          receive_account_id: accountId,
+          status: nextStatus,
+          room_id: this.roomId
+        };
+        mutedUser(params)
+          .then(res => {
+            //todo 事件上报
+            console.warn('禁言---res', res);
+          })
+          .catch(err => {
+            console.warn('禁言---res', err);
+          });
+      },
+      /**
+       * 踢出/取消踢出
+       */
+      setKicked(accountId, isKicked) {
+        const { kickedUser } = this.memberServer;
+        const nextStatus = [1, '1'].includes(isKicked) ? 0 : 1;
+        const confirmText = nextStatus ? '您确定要执行踢出操作？' : '您确定要执行取消踢出操作？';
+        this.$confirm(confirmText, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+          // type: 'info',
+          // center: true
+        })
+          .then(() => {
+            const params = {
+              receive_account_id: accountId,
+              status: nextStatus,
+              room_id: this.roomId,
+              type: this.isInGroup ? 1 : 0
+            };
+            kickedUser(params).then(res => {
+              let { msg = '', code } = res || {};
+              if (![200, '200'].includes(code)) {
+                return this.$message.error(msg);
+              }
+              // 踢出只能在在线和举手列表操作
+              //todo 上报事件
+              if (nextStatus) {
+                this._deleteUser(accountId, this.onlineUsers);
+                this._deleteUser(accountId, this.applyUsers);
+              } else {
+                // 取消踢出只能在受限列表操作
+                this.getLimitUserList();
+              }
+            });
+          })
+          .catch(() => {});
+      },
+      //删除用户
+      _deleteUser(accountId, list = []) {
+        const index = list.findIndex(
+          item => ![null, void 0, ''].includes(accountId) && item.account_id === accountId
+        );
+        index !== -1 && list.splice(index, 1);
+      },
+      //查找用户在数组的索引号
+      _getUserIndex(accountId, list) {
+        return list.findIndex(item => item.account_id === accountId);
       },
       //加载更多
       loadMore() {

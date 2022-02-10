@@ -30,9 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpBasicCenterContainerLive',
-    // children: ['comDocUne']
-    children: ['comStreamList', 'comDocUne', 'comInsertStream']
+    component: 'VmpContainer',
+    className: 'vmp-basic-center',
+    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion', 'comInsertStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -41,18 +41,35 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd',
-    children: ['comStreamLocal']
+    className: 'vmp-basic-right__hd'
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      'comMemberList'
-      // 'comChat'
+      // 'comMemberList'
+      // 'comChat',
+      'comTabMenu',
+      'comTabContent'
     ]
   },
   /*** 布局定义end */
+
+  comTabMenu: {
+    component: 'VmpTabMenu',
+    handleSelect: [
+      {
+        cuid: ['comTabContent'],
+        method: 'switchTo',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+
+  comTabContent: {
+    component: 'VmpTabContainer',
+    children: ['comChat', 'comMemberList', 'comCustomMenu']
+  },
 
   /*** 所有弹窗集合 */
   comAllDialog: {
@@ -62,8 +79,8 @@ export const serverConfig = {
       'comShare',
       'comVirtualPeople',
       'comLivePrivateChat',
-      'dlgGroupSetting',
       'comMediaSetting',
+      'comPcMediaCheck',
       'comInsertVideo'
     ]
     // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
@@ -203,6 +220,11 @@ export const serverConfig = {
     },
     handleClick: [
       {
+        cuid: 'comGroupDiscussion',
+        method: 'switchTo',
+        args: []
+      },
+      {
         cuid: 'comInsertVideo',
         method: 'openInserVideoDialog',
         args: []
@@ -224,9 +246,10 @@ export const serverConfig = {
     },
     handleClick: [
       {
+        // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
         method: 'switchTo',
-        args: 'group'
+        args: []
       }
     ]
   },
@@ -267,7 +290,10 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'live'
+    }
   },
   // 文档白板组件
   comDocUne: {
@@ -396,12 +422,12 @@ export const serverConfig = {
       }
     ]
   },
-  // 分组设置对话框
-  dlgGroupSetting: {
-    component: 'VmpGroupSetting'
-  },
   comMediaSetting: {
-    component: 'VmpPcMediaSetting'
+    component: 'VmpPcMediaSetting',
+    saveOptions: []
+  },
+  comPcMediaCheck: {
+    component: 'VmpPcMediaCheck'
   },
   comInsertStream: {
     component: 'VmpInsertStream',
@@ -423,7 +449,8 @@ export const serverConfig = {
   // 分组讨论组件
   comGroupDiscussion: {
     component: 'VmpGroupDiscussion',
-    toggle: {
+    //触发切换
+    emitToggle: {
       cuid: ['comGroupMenu'],
       method: 'setSelectedState',
       args: ['$0'] // 获取动态参数的第一个
