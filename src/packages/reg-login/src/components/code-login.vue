@@ -104,47 +104,12 @@
    * @description 验证码登录
    */
   import ThirdLoginLink from './third-login-link.vue';
-  import { useLoginServer } from 'middle-domain';
+  import mixin from '../mixins/mixin';
   export default {
     name: 'VmpCodeLogin',
+    mixins: [mixin],
     components: {
       ThirdLoginLink
-    },
-    props: {
-      sonTitle: {
-        required: false,
-        default() {
-          return '';
-        }
-      },
-      showToReg: {
-        required: true,
-        default() {
-          /* showToReg取值范围
-             0 -- 不开启注册快捷入口；
-             1 -- 开启注册快捷入口。
-          */
-          return 0;
-        }
-      },
-      showThirdLogin: {
-        required: true,
-        // type: Boolean,
-        default() {
-          /* showThirdLogin 取值范围
-             0 -- 不开启第三方登录功能；
-             1 -- 开启第三方登录功能。
-          */
-          return 0;
-        }
-      },
-      visitorId: {
-        // visitorId 游客ID
-        type: String,
-        default() {
-          return '';
-        }
-      }
     },
     data() {
       const validatePhone = (rule, value, callback) => {
@@ -165,9 +130,7 @@
           callback();
         }
       };
-      const loginServerState = this.loginServer.state; // 响应式注入
       return {
-        loginServerState,
         ruleForm: {
           phone: '', // 验证码登录时，表示手机号
           captchas: '' // 短信验证码
@@ -193,14 +156,6 @@
         this.codeBtnDisabledCheck();
       }
     },
-    computed: {
-      captchaReady() {
-        return !!this.loginServerState.captchaVal;
-      },
-      isDownTime() {
-        return this.loginServerState.second >= 0;
-      }
-    },
     methods: {
       // 切换至注册面板
       handleToReg() {
@@ -209,7 +164,6 @@
       // 间距设定
       autoLoginSetMargin() {
         this.$refs.ruleForm.validateField('captchas', res => {
-          console.log('🚀 ~ file: code-login.vue ~ line 198 ~ autoLoginSetMargin ~ res', res);
           this.isMaxHeight = !!res;
         });
       },
@@ -241,9 +195,6 @@
         });
       },
       // 点击登录 - 验证码登录
-      // handleCodeLogin() {
-      //   this.loginServer.refreshNECaptha();
-      // },
       handleCodeLogin() {
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
@@ -257,10 +208,6 @@
               params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
             }
             this.loginServer.userLogin(params).then(res => {
-              console.log(
-                '🚀 ~ file: code-login.vue ~ line 257 ~ this.loginServer.userLogin ~ res',
-                res
-              );
               if (res.code === 200) {
                 this.resetForm();
                 this.$emit('handleClose', 'code');
@@ -278,36 +225,7 @@
             });
           }
         });
-      },
-      // 获取C端登录后用户信息
-      // getCUserInfo() {
-      //   /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递  */
-      //   // const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-      //   this.$fetch('cUserInfo', {})
-      //     .then(res => {
-      //       if (res.code == 200) {
-      //         localStorage.setItem('userInfo', JSON.stringify(res.data));
-      //         // TODO exp_time 做token失效机制的内容，在PC端是否还需要处理？需要的话需要后端返回？
-      //         // TODO 登录成功，事件派发 或者修改登录状态等，待书写。
-      //       } else {
-      //         localStorage.setItem('userInfo', '');
-      //       }
-      //     })
-      //     .catch(res => {
-      //       console.warn('获取C端登录后用户信息失败', res);
-      //       localStorage.setItem('userInfo', '');
-      //     });
-      //   this.resetForm();
-      //   this.$emit('closeParent', 'code');
-      // },
-      // 重置当前表单 - 通用api
-      resetForm() {
-        // 数据重置
-        this.$refs.ruleForm && this.$refs.ruleForm.resetFields();
       }
-    },
-    beforeCreate() {
-      this.loginServer = useLoginServer();
     },
     async mounted() {
       await this.loginServer.initNECaptcha();

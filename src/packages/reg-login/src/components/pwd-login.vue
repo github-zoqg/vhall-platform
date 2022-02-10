@@ -65,14 +65,14 @@
         <a
           href="javascript:void(0)"
           class="vmp-reg-login__reg__link"
-          v-if="options.showToReg == 1"
+          v-if="showToReg == 1"
           @click="handleToReg"
         >
           {{ $t('register.register_1005') }}
         </a>
       </el-form-item>
       <!-- 第三方登录 -->
-      <third-login-link v-if="options.showThirdLogin"></third-login-link>
+      <third-login-link v-if="showThirdLogin"></third-login-link>
     </el-form>
   </div>
 </template>
@@ -139,7 +139,6 @@
         }
       };
       return {
-        isMobile: false, // 是否是手机端展示(true - 手机端；false - PC浏览器)
         options: {},
         ruleForm: {
           account: '', // 密码登录时，表示账号
@@ -188,82 +187,6 @@
           passwordFlag = !res;
         });
         this.isMaxHeight = !passwordFlag;
-      },
-      // 调起图片验证码
-      callCaptcha(element, success, failure) {
-        const that = this;
-        if (this.captchaKey) {
-          // 若拿到了图形验证码的key，在调用云盾图形验证码
-          window.initNECaptcha({
-            captchaId: this.captchaKey,
-            element: element,
-            mode: 'float',
-            width: 270,
-            // TODO 网易易顿多语言字段 lang
-            lang: window.$globalConfig.currentLang,
-            onReady(instance) {
-              console.log('instance', instance);
-            },
-            onVerify(err, data) {
-              console.log(err);
-              success(that, err, data);
-            },
-            onload(instance) {
-              console.log('load...', instance);
-              failure(that, instance);
-            }
-          });
-        } else {
-          failure(that, '当前未获取到图形验证captchaId的值，需要后端人员协助');
-        }
-      },
-      // 重置图形验证码
-      reloadCaptha() {
-        // 每次初始化之前，先把原有值清除
-        this.captchaVal = '';
-        try {
-          if (!document.getElementById('pwdLoginCaptcha')) {
-            return;
-          }
-          this.callCaptcha(
-            '#pwdLoginCaptcha',
-            function (that, err, data) {
-              if (data) {
-                that.captchaVal = data.validate;
-              } else {
-                console.log('#pwdLoginCaptcha --- call-success图片验证码', err);
-              }
-            },
-            function (that, err) {
-              console.log('#pwdLoginCaptcha --- call-failure图片验证码', err);
-            }
-          );
-        } catch (e) {
-          console.warn('Dom元素不存在情况下未渲染', e);
-        }
-      },
-      // 获取图形验证码key
-      getCapthaId() {
-        // 若已经获取过图片验证码key，避免重复请求获取key数据
-        if (!this.captchaKey) {
-          /* TODO 真实逻辑
-          // const getCapthaId = ['/v4/ucenter-login-reg/code/get-captchaid', 'GET', true] // Mock地址配置举例，需headers里biz_id根据业务线区分。
-          return this.$fetch('getCapthaId', {})
-            .then(res => {
-              if (res && res.data && res.data.captchaid) {
-                this.captchaKey = res.data.captchaid || '';
-              } else {
-                this.captchaKey = '';
-              }
-            })
-            .catch(res => {
-              console.warn('获取图形验证码key失败', res);
-              this.captchaKey = '';
-            });
-          */
-          // TODO 模拟数据
-          this.captchaKey = 'b7982ef659d64141b7120a6af27e19a0';
-        }
       },
       // 密码登录
       handlePwdLogin() {
@@ -365,12 +288,6 @@
               this.reloadCaptha();
             }
           });
-        // TODO 模拟数据
-        /* this.loginKeyVo = {
-          public_key:
-            '-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC0O8nqq9sX460V0T6+sQTGZKBWoMUhELEmYDB1rDfvKZ6x4yt0Q6Xna45K/ZQKaRuwPCDqKxjtX/tyL4azLvJl+KWMaPMmsjdO5O8cDgIdoGscDD+jvF/kQdqhpvyz5kVK/8ZWxnyvTDsWHKJz4WO2m+zSxXFEgn1AjZShI6ofVQIDAQAB-----END PUBLIC KEY-----',
-          uuid: '972201070353222848'
-        }; */
       },
       handleEncryptPassword(password) {
         let retPassword = '';
@@ -405,8 +322,8 @@
               params.captcha = this.captchaVal;
               params.validate_type = 1; // 1=图片交互方式校验|2=点击交互校验，【账号密码方式登录并且账号被锁定情况下校验，默认是图片交互方式】
             }
-            if (this.options.visitorId) {
-              params.visitor_id = this.options.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
+            if (this.visitorId) {
+              params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
             }
             this.$fetch('cUserLogin', params)
               .then(res => {
@@ -452,109 +369,36 @@
         });
       },
       // 获取C端登录后用户信息
-      getCUserInfo() {
-        /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递  */
-        // const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-        this.$fetch('cUserInfo', {})
-          .then(res => {
-            if (res.code == 200) {
-              localStorage.setItem('userInfo', JSON.stringify(res.data));
-              // TODO exp_time 做token失效机制的内容，在PC端是否还需要处理？需要的话需要后端返回？
-              // TODO 登录成功，事件派发 或者修改登录状态等，待书写。
-              this.resetForm();
-              this.$emit('handleClose', 'code');
-              // 刷新页面
-              this.$router.go(0);
-            } else {
-              localStorage.setItem('userInfo', '');
-            }
-          })
-          .catch(res => {
-            console.warn('获取C端登录后用户信息失败', res);
-            localStorage.setItem('userInfo', '');
-          });
-        // 模拟逻辑
-        /* localStorage.setItem(
-          'userInfo',
-          JSON.stringify({
-            code: 200,
-            msg: '',
-            data: {
-              current_date: '2022-01-07 00:45:09',
-              user_thirds: [],
-              user_extends: {
-                logo: '',
-                wechat_profile: '',
-                wechat_name_wap: '',
-                logo_jump_url: '',
-                extends_remark: 0,
-                is_bind_wechat: 0
-              },
-              name: 's16690403',
-              email: '',
-              phone: '184****0000',
-              avatar: '',
-              balance: '0',
-              company: '',
-              position: '',
-              industry: 0,
-              country: '',
-              province: 0,
-              city: '',
-              area: '',
-              birthday: 0,
-              user_id: 102277,
-              nick_name: '\u7b28\u732a',
-              pay_weixin: '',
-              user_type: 0,
-              real_name: '',
-              education_level: '',
-              is_activated: 0,
-              wx_union_id: '',
-              wx_qr_open_id: '',
-              open_id: '',
-              wx_open_id: '',
-              created_at: '2021-11-16 19:23:18',
-              updated_at: '2022-01-07 00:45:00',
-              deleted_at: '',
-              is_new_regist: 1,
-              is_jump_hd: 1,
-              has_password: 1
-            },
-            request_id: 'acd3362a-e24d-28a7-bcdf-1627fcc3fecd'
-          })
-        );
-        this.resetForm();
-        this.$emit('closeParent', 'code'); */
-      },
+      // getCUserInfo() {
+      //   /* // TODO 真实逻辑 C端用户信息 [http://yapi.vhall.domain/project/740/interface/api/45707] ??? 不确定参数如何传递  */
+      //   // const cUserInfo = ['/v4/ucenter-c/consumer/get-info', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+      //   this.$fetch('cUserInfo', {})
+      //     .then(res => {
+      //       if (res.code == 200) {
+      //         localStorage.setItem('userInfo', JSON.stringify(res.data));
+      //         // TODO exp_time 做token失效机制的内容，在PC端是否还需要处理？需要的话需要后端返回？
+      //         // TODO 登录成功，事件派发 或者修改登录状态等，待书写。
+      //         this.resetForm();
+      //         this.$emit('handleClose', 'code');
+      //         // 刷新页面
+      //         this.$router.go(0);
+      //       } else {
+      //         localStorage.setItem('userInfo', '');
+      //       }
+      //     })
+      //     .catch(res => {
+      //       console.warn('获取C端登录后用户信息失败', res);
+      //       localStorage.setItem('userInfo', '');
+      //     });
+      // },
       resetForm() {
         // 数据重置
         this.$refs.ruleForm && this.$refs.ruleForm.resetFields();
-        this.reloadCaptha();
-      },
-      // init组件入口
-      init(params = {}) {
-        // 组件加载初始化默认数据
-        this.isMobile =
-          /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
-            navigator.userAgent
-          );
-        this.options = {
-          ...{
-            showToReg: this.showToReg,
-            showThirdLogin: this.showThirdLogin,
-            visitorId: this.visitorId
-          },
-          ...params
-        };
-        console.log('密码登录init', this.options);
-        // TODO - C端忘记密码控制，待按照实际逻辑走
-        const { href } = this.$router.resolve({ path: '/forgetPwd' });
-        this.forgetUrl = href;
       }
     },
     created() {
-      this.init();
+      const { href } = this.$router.resolve({ path: '/forgetPwd' });
+      this.forgetUrl = href;
     }
   };
 </script>
