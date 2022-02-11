@@ -74,3 +74,29 @@ export function uuid() {
   }
   return uuid.join('');
 }
+
+/**
+ * @description 校验当前所在浏览器环境
+ * @return Boolean {*}
+ */
+const ua = navigator.userAgent.toLowerCase();
+
+// 是否微信
+export function isWechat() {
+  return ua.indexOf('micromessenger') > -1;
+}
+// 是否qq浏览器
+export function isQQ() {
+  return ua.indexOf('qq') > -1;
+}
+// 是否企业微信
+export function isWechatCom() {
+  return ua.indexOf('wxwork') > -1;
+}
+
+// 是否移动端
+export function isMobile() {
+  return /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
+    navigator.userAgent
+  );
+}
