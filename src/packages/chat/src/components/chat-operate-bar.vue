@@ -56,7 +56,7 @@
           <!--聊天设置-->
           <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
           <div class="chat-setting-btn--chat-auth">
-            <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
+            <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
               <!--              <div class="chat-setting-box__item switch-box">-->
               <!--                <span class="switch-title">屏蔽礼物/打赏消息</span>-->
@@ -259,10 +259,6 @@
         if (this.$refs.emoji.isShow) {
           this.$refs.emoji.toggleShow();
         }
-      },
-      //聊天设置
-      onClickChatSetting() {
-        this.$refs.chatFilter.toggleShow();
       },
       //响应输入框高度变化事件
       chatInputHeightChangeHandle() {

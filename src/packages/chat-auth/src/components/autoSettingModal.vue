@@ -51,6 +51,15 @@
   export default {
     name: 'VmpAutoSettingModal',
     components: {},
+    props: {
+      //聊天审核组件的配置
+      options: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      }
+    },
     data() {
       return {
         //模态窗标题
