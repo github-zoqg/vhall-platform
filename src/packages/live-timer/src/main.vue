@@ -97,6 +97,8 @@
 </template>
 
 <script>
+  import { useLiveTimerServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
     name: 'VmpLiveTimer',
@@ -130,13 +132,17 @@
       }
     },
     data() {
+      let liveTimerServer = useLiveTimerServer();
+      let roomBaseServer = useRoomBaseServer();
       return {
+        liveTimerServer,
+        roomBaseServer,
         status: 'kaishi',
         beifenshijian: 60,
         shijian: 0,
         timer: null,
         auth: 1,
-        timerVisible: true,
+        timerVisible: false,
         is_timeout: 0,
         is_all_show: 0,
         sec: 0,
@@ -147,10 +153,51 @@
         doc_permission: ''
       };
     },
+    beforeCreate() {
+      this.msgServer = useMsgServer();
+    },
     mounted() {
-      // console.log(this.doc_permission);
-      // this.init();
-      this.$EventBus.$on('timer_start', e => {
+      this.init();
+      console.log(this.msgServer.$onMsg, 'this.roomBaseServer');
+      this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
+      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
+        let temp = Object.assign({}, rawMsg);
+
+        if (typeof temp.data !== 'object') {
+          temp.data = JSON.parse(temp.data);
+          temp.context = JSON.parse(temp.context);
+        }
+        console.log(temp, '原始消息');
+        const { type = '' } = temp.data || {};
+        switch (type) {
+          // 计时器开始
+          case 'timer_start':
+            this.timer_start(temp);
+            break;
+          // 计时器结束
+          case 'timer_end':
+            this.timer_end(temp);
+            break;
+          // 计时器暂停
+          case 'timer_pause':
+            this.timer_pause(temp);
+            break;
+          // 计时器重置
+          case 'timer_reset':
+            this.timer_reset(temp);
+            break;
+          // 计时器继续
+          case 'timer_resume':
+            this.timer_resume(temp);
+            break;
+          default:
+            break;
+        }
+      });
+    },
+    methods: {
+      // 计时器开始
+      timer_start(e) {
         console.warn('监听到了计时器开始-------', e);
         this.timerVisible = true;
         this.status = 'kaishi';
@@ -161,25 +208,23 @@
         this.timeFormat(Math.abs(this.shijian));
         this.timerFun(e.data.duration);
         this.$emit('disTimer', false);
-      });
-      this.$EventBus.$on('timer_pause', e => {
-        console.warn('监听到了计时器暂停-------', e);
-        this.status = 'zanting';
-        this.timeFormat(Math.abs(e.data.remain_time));
-        clearInterval(this.timer);
-      });
-      this.$EventBus.$on('timer_resume', e => {
-        console.warn('监听到了计时器继续-------', e);
-        this.status = 'kaishi';
-        this.timerFun(this.shijian);
-      });
-      this.$EventBus.$on('timer_end', e => {
+      },
+      // 计时器结束
+      timer_end(e) {
         console.warn('监听到了计时器结束-------', e);
         this.timerVisible = false;
         this.$emit('disTimer', true);
         clearInterval(this.timer);
-      });
-      this.$EventBus.$on('timer_reset', e => {
+      },
+      // 计时器暂停
+      timer_pause(e) {
+        console.warn('监听到了计时器暂停-------', e);
+        this.status = 'zanting';
+        this.timeFormat(Math.abs(e.data.remain_time));
+        clearInterval(this.timer);
+      },
+      // 计时器重置
+      timer_reset(e) {
         console.warn('监听到了计时器重置-------', e);
         clearInterval(this.timer);
         this.timerVisible = false;
@@ -194,32 +239,39 @@
           this.$emit('openSetTimer');
           return false;
         }
-      });
-    },
-    methods: {
+      },
+      // 计时器继续
+      timer_resume(e) {
+        console.warn('监听到了计时器继续-------', e);
+        this.status = 'kaishi';
+        this.timerFun(this.shijian);
+      },
       init() {
-        this.$fetch('timerInfo', {}).then(res => {
-          if (JSON.stringify(res.data) != '{}') {
-            console.log(res.data, 'timerInfo');
-            const resData = res.data;
-            this.shijian = resData.remain_time;
-            this.beifenshijian = resData.duration;
-            this.is_timeout = resData.is_timeout;
-            this.is_all_show = resData.is_all_show;
-            this.timeFormat(Math.abs(this.shijian));
-            this.timerVisible = true;
-            if (resData.status != 4) {
-              this.timerFun(this.shijian);
+        this.liveTimerServer
+          .getTimerInfo()
+          .then(res => {
+            if (JSON.stringify(res.data) != '{}') {
+              console.log(res.data, 'timerInfo');
+              const resData = res.data;
+              this.shijian = resData.remain_time;
+              this.beifenshijian = resData.duration;
+              this.is_timeout = resData.is_timeout;
+              this.is_all_show = resData.is_all_show;
+              this.timeFormat(Math.abs(this.shijian));
+              this.timerVisible = true;
+              if (resData.status != 4) {
+                this.timerFun(this.shijian);
+              }
+              if (resData.status == 4) {
+                this.status = 'zanting';
+              }
+              if (resData.status == 2) {
+                this.status = 'jieshu';
+              }
+              this.$emit('disTimer', false);
             }
-            if (resData.status == 4) {
-              this.status = 'zanting';
-            }
-            if (resData.status == 2) {
-              this.status = 'jieshu';
-            }
-            this.$emit('disTimer', false);
-          }
-        });
+          })
+          .catch(e => e);
       },
       // 打开计时弹框
       openTimer() {
@@ -292,13 +344,14 @@
       goOn(status) {
         if (status == 4) {
           this.status = 'zanting';
-          if (window.chatSDK) {
-            window.chatSDK.emitCustomMsg({
-              role_name: JSON.parse(sessionStorage.getItem('user')).role_name,
-              type: 'timer_pause',
-              remain_time: this.shijian
-            });
-          }
+          // if (window.chatSDK) {
+          // TODO: // 主动向房间暂停发送消息
+          this.msgServer.sendRoomMsg({
+            role_name: JSON.parse(sessionStorage.getItem('user')).role_name,
+            type: 'timer_pause',
+            remain_time: this.shijian
+          });
+          // }
         } else {
           this.status = this.shijian > 0 ? 'kaishi' : 'chaoshi';
           this.timerFun(this.shijian);
@@ -321,22 +374,25 @@
       // 重置时间
       resetTimerConfirmClose() {
         this.timerVisible = false;
-        this.$emit('openSetTimer');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+        // this.$emit('openSetTimer');
         clearInterval(this.timer);
         this.status = 'kaishi';
         this.editTimer(3);
       },
       // 操作计时器
       editTimer(status) {
-        this.$fetch('timerEdit', {
-          action_type: status,
-          duration: this.beifenshijian || this.shijian,
-          remain_time: this.shijian,
-          is_all_show: this.is_all_show ? 1 : 0,
-          is_timeout: this.is_timeout ? 1 : 0
-        }).then(res => {
-          console.log(res);
-        });
+        this.liveTimerServer
+          .timerEdit({
+            action_type: status,
+            duration: this.beifenshijian || this.shijian,
+            remain_time: this.shijian,
+            is_all_show: this.is_all_show ? 1 : 0,
+            is_timeout: this.is_timeout ? 1 : 0
+          })
+          .then(res => {
+            console.log(res);
+          });
       }
     }
   };

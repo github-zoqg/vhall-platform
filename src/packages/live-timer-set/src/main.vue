@@ -153,10 +153,13 @@
 </template>
 
 <script>
+  import { useLiveTimerServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',
     data() {
+      let liveTimerServer = useLiveTimerServer();
       return {
+        liveTimerServer,
         form: {
           is_all_show: false,
           is_timeout: false
@@ -168,21 +171,39 @@
         ten_mon: 0
       };
     },
+    beforeCreate() {
+      this.msgServer = useMsgServer();
+    },
     mounted() {
-      this.$EventBus.$on('timer_start', e => {
-        console.log(1111111111111113213213);
-        this.timerVisible = false;
-      });
-      this.$EventBus.$on('timer_end', e => {
-        console.warn('监听到了计时器结束-------', e);
-        this.form = {
-          is_all_show: false,
-          is_timeout: false
-        };
-        this.sec = 0;
-        this.ten_sec = 0;
-        this.mon = 0;
-        this.ten_mon = 0;
+      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
+        let temp = Object.assign({}, rawMsg);
+
+        if (typeof temp.data !== 'object') {
+          temp.data = JSON.parse(temp.data);
+          temp.context = JSON.parse(temp.context);
+        }
+        console.log(temp, '原始消息');
+        const { type = '' } = temp.data || {};
+        switch (type) {
+          // 计时器开始
+          case 'timer_start':
+            this.timerVisible = false;
+            break;
+          // 计时器结束
+          case 'timer_end':
+            console.warn('监听到了计时器结束-------');
+            this.form = {
+              is_all_show: false,
+              is_timeout: false
+            };
+            this.sec = 0;
+            this.ten_sec = 0;
+            this.mon = 0;
+            this.ten_mon = 0;
+            break;
+          default:
+            break;
+        }
       });
     },
     methods: {
@@ -207,11 +228,12 @@
           is_timeout: this.form.is_timeout,
           is_all_show: this.form.is_all_show
         });
-        this.$fetch('timerCreate', {
-          duration: time,
-          is_all_show: this.form.is_all_show ? 1 : 0,
-          is_timeout: this.form.is_timeout ? 1 : 0
-        })
+        this.liveTimerServer
+          .timerCreate({
+            duration: time,
+            is_all_show: this.form.is_all_show ? 1 : 0,
+            is_timeout: this.form.is_timeout ? 1 : 0
+          })
           .then(res => {
             console.log(res);
           })
