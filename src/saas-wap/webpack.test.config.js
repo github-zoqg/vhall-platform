@@ -1,3 +1,4 @@
+// 测试环境配置文件
 const _ = require('lodash');
 const baseConfig = require('./webpack.base.config');
 
