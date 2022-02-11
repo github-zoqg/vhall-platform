@@ -121,7 +121,12 @@
             </div>
             <div class="split-card__menus">
               <template v-if="!item.isChange">
-                <el-button v-if="isOpenSwitch == 1" class="btn-menu" type="text">
+                <el-button
+                  v-if="isOpenSwitch == 1"
+                  class="btn-menu"
+                  type="text"
+                  @click="handleEnterGroup(item.id)"
+                >
                   <i class="menu-icon vh-saas-iconfont vh-saas-a-line-Intotheteam"></i>
                   <span>进入小组</span>
                 </el-button>
@@ -159,7 +164,7 @@
               </template>
             </div>
           </div>
-          <div class="split-card__bd" @click.stop="handleHideDropdown()">
+          <div class="split-card__bd" @click="handleHideDropdown()">
             <template v-if="item.isChange">
               <el-checkbox-group v-model="needChangeList">
                 <el-checkbox
@@ -260,38 +265,41 @@
         await this.groupServer.getGroupedUserList();
       },
       initEvents() {
-        // 监听文档消息
+        // 监听消息
         this.msgServer.$onMsg('ROOM_MSG', this.listenRoomMsg);
+        this.msgServer.$onMsg('JOIN', this.listenJoinMsg); // 加入房间
+        this.msgServer.$onMsg('LEFT', this.listenLeftMsg); // 离开房间
       },
       // 使用具名消息，后面offMsg的时候使用
       // TODO 暂时没有offMsg事件，后面有的时候加上
       listenRoomMsg(msg) {
         console.log('[group] ------ROOM_MSG-----房间消息：', msg);
-        try {
-          if (typeof msg === 'string') {
-            msg = JSON.parse(msg);
-          }
-          if (typeof msg.context === 'string') {
-            msg.context = JSON.parse(msg.context);
-          }
-          if (typeof msg.data === 'string') {
-            msg.data = JSON.parse(msg.data);
-          }
-        } catch (ex) {
-          console.log('消息转换错误：', ex);
-          return;
-        }
         if (msg.data.event_type === 'group_room_create') {
           // 分组创建完成消息
-          if (msg.sender_id === this.userId) {
-            // 0 新增   1 初始化
-            if (msg.data.is_append === 1) {
-              // this.groupServer.state.status = 'grouping';
-              // this.getWaitUserList();
-            }
-            // this.getUserList();
-          }
-          // this.getGroupList();
+          // if (msg.sender_id === this.userId) {
+          //   // 0 新增   1 初始化
+          //   if (msg.data.is_append === 1) {
+          //   }
+          // }
+        } else if (msg.data.type === 'group_manager_enter') {
+          // 进入小组
+          //  account_id: "101643"
+          // group_id: 5521302
+          // role: "1"
+          // status: "enter"
+          // type: "group_manager_enter"
+        } else if (msg.data.type === 'group_join_change') {
+          // 小组变更
+        }
+      },
+      listenJoinMsg(msg) {
+        if (msg.data.type === 'Join') {
+          this.groupServer.getWaitingUserList();
+        }
+      },
+      listenLeftMsg(msg) {
+        if (msg.data.type === 'Left') {
+          this.groupServer.getWaitingUserList();
         }
       },
       handleNotice() {
@@ -406,11 +414,16 @@
       },
       // 隐藏观众的 dropdown菜单
       handleHideDropdown() {
+        console.log('-------handleHideDropdown----');
         this.showItem = null;
       },
       // 设为组长
       setLeader(groupId, accountId) {
         this.groupServer.setLeader(groupId, accountId);
+      },
+      // 进入小组
+      handleEnterGroup(groupId) {
+        this.groupServer.groupEnter(groupId);
       },
       // 解散
       handleDisband(id) {
