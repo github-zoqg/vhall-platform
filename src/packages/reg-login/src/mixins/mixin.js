@@ -1,4 +1,4 @@
-import { useLoginServer } from 'middle-domain';
+import { useUserServer } from 'middle-domain';
 
 export default {
   props: {
@@ -35,17 +35,17 @@ export default {
     }
   },
   data() {
-    const loginServerState = this.loginServer.state; // 响应式注入
+    const userServerState = this.userServer.state; // 响应式注入
     return {
-      loginServerState
+      userServerState
     };
   },
   computed: {
     captchaReady() {
-      return !!this.loginServerState.captchaVal;
+      return !!this.userServerState.captchaVal;
     },
     isDownTime() {
-      return this.loginServerState.second >= 0;
+      return this.userServerState.second >= 0;
     }
   },
   methods: {
@@ -55,9 +55,9 @@ export default {
     }
   },
   beforeCreate() {
-    this.loginServer = useLoginServer();
+    this.userServer = useUserServer();
   }
   // async mounted() {
-  //   await this.loginServer.initNECaptcha();
+  //   await this.userServer.initNECaptcha();
   // }
 };

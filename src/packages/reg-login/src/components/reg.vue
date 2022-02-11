@@ -55,7 +55,7 @@
         >
           {{
             isDownTime
-              ? $t('account.account_1031', { n: loginServerState.second })
+              ? $t('account.account_1031', { n: userServerState.second })
               : $t('account.account_1030')
           }}
         </span>
@@ -125,7 +125,7 @@
           if (!/^1[0-9]{10}$/.test(value)) {
             callback(new Error(this.$t('account.account_1069')));
           } else {
-            await this.loginServer
+            await this.userServer
               .loginCheck(value)
               .then(async res => {
                 // 检测结果：check_result 0账号未锁定 1账号锁定; account_exist 账号是否存在：1存在 0不存在
@@ -226,7 +226,7 @@
         this.$refs.ruleForm.validateField('phone', err => {
           // console.log('校验结果：', !err);
           if (!err) {
-            this.loginServer.sendCode(this.ruleForm.phone, 8); // 相应与异常已在domain处理
+            this.userServer.sendCode(this.ruleForm.phone, 8); // 相应与异常已在domain处理
           }
         });
       },
@@ -254,7 +254,7 @@
             }
             let relt = {};
             if (this.ruleForm.password?.length) {
-              relt = await this.loginServer.handlePassword(this.ruleForm.password);
+              relt = await this.userServer.handlePassword(this.ruleForm.password);
               if (!relt.pass) {
                 this.$message({
                   message: relt.msg || this.$t('register.register_1010'),
@@ -286,7 +286,7 @@
                 customClass: 'zdy-info-box'
               });
             };
-            this.loginServer
+            this.userServer
               .register(params)
               .then(res => {
                 if (res.code == 200) {
@@ -309,7 +309,7 @@
       }
     },
     async mounted() {
-      await this.loginServer.initNECaptcha('#regCaptcha');
+      await this.userServer.initNECaptcha('#regCaptcha');
     }
   };
 </script>

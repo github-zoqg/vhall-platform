@@ -54,7 +54,7 @@
         >
           {{
             isDownTime
-              ? $t('account.account_1031', { n: loginServerState.second })
+              ? $t('account.account_1031', { n: userServerState.second })
               : $t('account.account_1030')
           }}
         </span>
@@ -190,7 +190,7 @@
         this.$refs.ruleForm.validateField('phone', err => {
           // console.log('校验结果：', !err);
           if (!err) {
-            this.loginServer.sendCode(this.ruleForm.phone); // 相应与异常已在domain处理
+            this.userServer.sendCode(this.ruleForm.phone); // 相应与异常已在domain处理
           }
         });
       },
@@ -207,7 +207,7 @@
             if (this.visitorId) {
               params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
             }
-            this.loginServer.userLogin(params).then(res => {
+            this.userServer.userLogin(params).then(res => {
               if (res.code === 200) {
                 this.resetForm();
                 this.$emit('handleClose', 'code');
@@ -228,7 +228,7 @@
       }
     },
     async mounted() {
-      await this.loginServer.initNECaptcha();
+      await this.userServer.initNECaptcha();
     }
   };
 </script>
