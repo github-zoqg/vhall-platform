@@ -46,7 +46,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'tab-content',
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comStreamList']
+    children: ['comTabMenu', 'comTabContent']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -83,5 +83,25 @@ export const serverConfig = {
         method: 'openShareDialog'
       }
     ]
+  },
+
+  comTabMenu: {
+    component: 'VmpTabMenuWap',
+    handleSelect: [
+      {
+        cuid: ['comTabContent'],
+        method: 'switchTo',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+
+  comTabContent: {
+    component: 'VmpTabContainer',
+    children: ['comIntro']
+  },
+
+  comIntro: {
+    component: 'VmpIntroWap'
   }
 };
