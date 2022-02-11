@@ -26,7 +26,7 @@
           <i class="iconfont iconhongbao"></i>
           <p>红包</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div class="vmp-interact-menu-list-item" @click="openTimer">
           <i class="iconfont iconjishiqi"></i>
           <p>计时器</p>
         </div>
@@ -39,12 +39,19 @@
   </div>
 </template>
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpInteractMenu',
     data() {
       return {
         living: false
       };
+    },
+    methods: {
+      // 打开计时器设置弹框
+      openTimer() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons('comInteractMenu', 'emitOpenTimerSet'));
+      }
     }
   };
 </script>

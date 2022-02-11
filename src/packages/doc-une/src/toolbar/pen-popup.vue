@@ -11,8 +11,8 @@
         @click.stop="handleChange('size', item.value)"
       >
         <i
-          class="iconfont iconhuabichicun"
-          :style="`font-size:12px;transform:scale(${item.value / 12})`"
+          class="vh-iconfont vh-full-brush-l"
+          :style="`font-size:12px;transform:scale(${item.value / 6})`"
         ></i>
       </div>
     </template>

@@ -62,6 +62,7 @@
         :chat-list="chatList"
         :at-list="atList"
         :chat-login-status="chatLoginStatus"
+        @changeAllBanned="handleChangeAllBanned"
         @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @ononSwitchShowSponsor="onSwitchShowSponsor"
@@ -839,6 +840,25 @@
       //处理只看主办方
       onSwitchShowSponsor(status) {
         this.isOnlyShowSponsor = status;
+      },
+      //处理全体禁言切换
+      handleChangeAllBanned(flag) {
+        let params = {
+          room_id: this.roomId,
+          status: flag ? 1 : 0
+        };
+        this.chatServer
+          .setAllBanned(params)
+          .then(res => {
+            this.buriedPointReport(flag ? 110116 : 110117, {
+              business_uid: this.userId,
+              webinar_id: this.webinarId
+            });
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
+          });
       },
       //打开私聊模态窗
       openPrivateChatModal() {
