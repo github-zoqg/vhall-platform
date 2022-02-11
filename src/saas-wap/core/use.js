@@ -32,6 +32,10 @@ import VmpMemberList from '@/packages/member-list';
 import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
+//wap互动工具计时器弹窗
+import VmpWapTimer from '@/packages/wap-timer';
+//wap互动工具box
+import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -63,4 +67,6 @@ export function initUse() {
   Vue.use(VmpMemberList);
   Vue.use(VmpWatchPrivateChat);
   Vue.use(VmpSignUpForm);
+  Vue.use(VmpWapTimer);
+  Vue.use(VmpContainerRightWap);
 }

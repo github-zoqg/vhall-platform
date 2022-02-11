@@ -4,7 +4,7 @@
 
 <script>
   export default {
-    name: 'headerWatchWap',
+    name: 'VmpHeaderWatchWap',
     data() {
       return {};
     }

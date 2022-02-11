@@ -46,7 +46,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'tab-content',
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comStreamList']
+    children: ['comContainerTop', 'comContainerRight']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -56,7 +56,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth', 'comSignUpForm']
+    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -83,5 +83,24 @@ export const serverConfig = {
         method: 'openShareDialog'
       }
     ]
+  },
+  comWatchTimer: {
+    component: 'VmpWapTimer',
+    emitChangeTimer: {
+      cuid: ['comContainerRight'],
+      method: 'changeStatus',
+      args: ['$0', '$1'] // 获取动态参数的第一个
+    }
+  },
+  comContainerTop: {
+    component: 'VmpContainer',
+    className: 'container-top'
+  },
+  comContainerRight: {
+    component: 'VmpContainerRightWap',
+    emitOpenTimer: {
+      cuid: ['comWatchTimer'],
+      method: 'handleTimer'
+    }
   }
 };
