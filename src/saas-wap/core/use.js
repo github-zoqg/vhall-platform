@@ -35,6 +35,10 @@ import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpTabMenuWap from '@/packages/tab-menu-wap';
 import VmpTabContainer from '@/packages/tab-container';
 import VmpIntroWap from '@/packages/intro-wap';
+//wap互动工具计时器弹窗
+import VmpWapTimer from '@/packages/wap-timer';
+//wap互动工具box
+import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -70,4 +74,6 @@ export function initUse() {
   Vue.use(VmpTabMenuWap);
   Vue.use(VmpTabContainer);
   Vue.use(VmpIntroWap);
+  Vue.use(VmpWapTimer);
+  Vue.use(VmpContainerRightWap);
 }

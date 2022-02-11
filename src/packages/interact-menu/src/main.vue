@@ -50,7 +50,7 @@
     methods: {
       // 打开计时器设置弹框
       openTimer() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons('comInteractMenu', 'emitOpenTimerSet'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
       }
     }
   };

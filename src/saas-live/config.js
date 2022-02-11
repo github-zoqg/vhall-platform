@@ -249,7 +249,13 @@ export const serverConfig = {
   },
   // 互动工具-计时器
   liveTimer: {
-    component: 'VmpLiveTimer'
+    component: 'VmpLiveTimer',
+    emitOpenTimerSet: [
+      {
+        cuid: ['liveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
   },
 
   // 分组讨论菜单

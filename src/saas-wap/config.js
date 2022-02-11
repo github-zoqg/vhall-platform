@@ -46,7 +46,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'tab-content',
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comTabMenu', 'comTabContent']
+    children: ['comContainerTop', 'comContainerRight']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -56,7 +56,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchAuth', 'comSignUpForm']
+    children: ['compRegLogin', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -84,24 +84,23 @@ export const serverConfig = {
       }
     ]
   },
-
-  comTabMenu: {
-    component: 'VmpTabMenuWap',
-    handleSelect: [
-      {
-        cuid: ['comTabContent'],
-        method: 'switchTo',
-        args: ['$0', '$1', '$2']
-      }
-    ]
+  comWatchTimer: {
+    component: 'VmpWapTimer',
+    emitChangeTimer: {
+      cuid: ['comContainerRight'],
+      method: 'changeStatus',
+      args: ['$0', '$1'] // 获取动态参数的第一个
+    }
   },
-
-  comTabContent: {
-    component: 'VmpTabContainer',
-    children: ['comIntro']
+  comContainerTop: {
+    component: 'VmpContainer',
+    className: 'container-top'
   },
-
-  comIntro: {
-    component: 'VmpIntroWap'
+  comContainerRight: {
+    component: 'VmpContainerRightWap',
+    emitOpenTimer: {
+      cuid: ['comWatchTimer'],
+      method: 'handleTimer'
+    }
   }
 };

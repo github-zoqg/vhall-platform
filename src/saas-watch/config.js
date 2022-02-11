@@ -58,7 +58,8 @@ export const serverConfig = {
       'comWatchAuth',
       'comSignUpForm',
       'comUserAccount',
-      'comCash'
+      'comCash',
+      'comWatchTimer'
       // 'comWatchNavMenu'
     ]
   },
@@ -204,5 +205,9 @@ export const serverConfig = {
   // 登录注册组件
   compRegLogin: {
     component: 'VmpRegLogin'
+  },
+  // 互动工具计时器
+  comWatchTimer: {
+    component: 'VmpWatchTimer'
   }
 };
