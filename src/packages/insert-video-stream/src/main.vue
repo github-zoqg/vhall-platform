@@ -78,9 +78,9 @@
         <div class="vmp-insert-stream-controller-wrap-left">
           <i
             ref="videoPlayBtnDom"
-            class="iconfont icons"
+            class="vh-iconfont"
             @click="videoPlayBtn"
-            :class="conctorObj.statePaly ? 'iconzanting_icon' : 'iconbofang_icon'"
+            :class="conctorObj.statePaly ? 'vh-a-line-videopause' : 'vh-a-line-videoplay'"
           ></i>
           <div class="vmp-insert-time">
             <span>{{ conctorObj.currentTime | secondToDate }}</span>
@@ -92,8 +92,8 @@
           <div class="vmp-volume-box">
             <span class="vmp-icon-box">
               <i
-                class="icon iconfont poiner"
-                :class="voice > 1 ? 'iconyinliang_icon' : 'iconyinliangguanbi_icon'"
+                class="vh-iconfont"
+                :class="voice > 1 ? 'vh-line-voice' : 'vh-line-mute'"
                 @click="jingYin"
               ></i>
             </span>
@@ -111,10 +111,10 @@
             <i @click="handleOpenInsert" class="iconfont iconchaboliebiao_icon"></i>
           </el-tooltip>
           <el-tooltip effect="dark" content="关闭插播">
-            <i @click="closeInsertvideo(true)" class="iconfont iconguanbichabo_icon"></i>
+            <i @click="closeInsertvideo(true)" class="vh-iconfont vh-line-close"></i>
           </el-tooltip>
           <el-tooltip effect="dark" content="隐藏">
-            <i @click="hideInsertVideoControl" class="iconfont iconshouqibofangqi_icon"></i>
+            <i @click="hideInsertVideoControl" class="vh-iconfont vh-line-arrow-down"></i>
           </el-tooltip>
         </div>
       </div>
@@ -199,7 +199,6 @@
       async openInsertShow(File, type) {
         console.log('=====zhangxiao----', type);
         this.pushStreamSucces = true;
-        await this.$nextTick();
         const { watchInitData } = this.roomBaseServer.state;
         this.isLiving = watchInitData.webinar.type;
         if (type === 'local') {
@@ -221,7 +220,6 @@
             this.insertSucces(el);
           })
           .catch(e => {
-            console.log(e);
             this.$message.warning('视频分辨率过高，请打开分辨率为1280*720以下的视频');
             this.closeInsertvideo(false); // 关闭插播
           });
@@ -259,9 +257,9 @@
       pushLocalStream() {
         // if (this.isLiving != 1) {
         //   // 不在直播中，不推流
-        //   // this.visibleBeforeLive = true;
         //   return;
         // }
+        const { watchInitData } = this.roomBaseServer.state;
         this.creatLoaclStream().then(res => {
           this.insertFileServer
             .publishInsertStream({ streamId: res })
@@ -270,13 +268,16 @@
               console.log('插播推流成功', e, this._LoclaStreamId);
               this._isHasLocalStreamIdBeforeInit = true;
               this.pushStreamSucces = true;
-              // const obj = {
-              //   accountId: this.accountId,
-              //   role: this.roleName,
-              //   nickname: this.nickname,
-              //   stream_type: 4,
-              //   has_video: this.isAudio ? 0 : 1
-              // };
+              const obj = {
+                accountId: watchInitData.webinar.userinfo.user_id,
+                role: watchInitData.join_info.role_name,
+                nickname: watchInitData.join_info.nickname,
+                stream_type: 4,
+                has_video: this.isAudio ? 0 : 1
+              };
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitInsertInfo', [obj])
+              );
               // 开始插播事件
               // this.$nextTick(() => {
               //   // 文档需要调整大小
@@ -362,7 +363,6 @@
             resolve();
             return;
           }
-          console.log(this._LoclaStreamId, 'this._LoclaStreamId');
           // 停止推流
           this.insertFileServer
             .stopPublishInsertStream(this._LoclaStreamId)
@@ -383,7 +383,7 @@
           const el = document.getElementById('vmp-insert-stream-video');
           el.innerHTML = '';
         }
-        this.$refs.insertStream && this.$refs.insertStream.destroy();
+        // this.$refs.insertStream && this.$refs.insertStream.destroy();
         this.remoteVideo.videoParam = file;
         this.$nextTick(() => {
           this.remoteVideo.show = true;
@@ -449,7 +449,9 @@
           .then(() => {
             const obj = JSON.parse(owner.attributes);
             obj.accountId = owner.accountId;
-            this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitInsertInfo', [obj])
+            ); // 其余订阅的人
             this.isAudio = obj.has_video == 0;
             this.subscribInsterStreamSucess = true;
           })
@@ -474,6 +476,9 @@
               videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
               mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
             };
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitInsertInfo', [obj])
+            );
             // this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
             this.isAudio = obj.has_video == 0; // 音频是0
             this.interactiveServer
@@ -540,7 +545,7 @@
         // 拖拽显示时间
         const dom = this.$refs.controllerRef.$el;
         const but = document.querySelector(
-          'vmp-insert-stream-controller-slider .el-slider__button-wrapper'
+          '.vmp-insert-stream-controller-slider .el-slider__button-wrapper'
         );
         const innitDom = () => {
           dom.onmouseover = e => {
@@ -812,7 +817,7 @@
             color: #fff;
             display: inline-block;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 16px;
             text-align: center;
             position: relative;
           }
@@ -873,7 +878,7 @@
           .iconguanbichabo_icon {
             margin-left: 12px;
           }
-          .iconfont {
+          .vh-iconfont {
             cursor: pointer;
           }
         }

@@ -18,7 +18,6 @@
 
 <script>
   // TODO: isWebp
-  import { mockPromote } from '../mock.js';
 
   export default {
     name: 'component-promote',
@@ -33,7 +32,7 @@
     },
     methods: {
       getPromoteList() {
-        this.promoteList = [...mockPromote];
+        this.promoteList = [];
       },
       activityImg(item) {
         return `url(${item.img_url})`;

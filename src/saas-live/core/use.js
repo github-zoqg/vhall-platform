@@ -32,6 +32,7 @@ import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpTabContainer from '@/packages/tab-container';
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';
+import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
 
@@ -67,6 +68,7 @@ export function initUse() {
   Vue.use(VmpCustomMenu);
   Vue.use(VmpPcMediaSetting);
   Vue.use(VmpGroupDiscussion);
+  Vue.use(VmpNoticeList);
   Vue.use(VmpLiveTimerSet);
   Vue.use(VmpLiveTimer);
 

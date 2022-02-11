@@ -55,16 +55,36 @@
         <template v-if="chatOptions && chatOptions.enableChatSetting">
           <!--聊天设置-->
           <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
-          <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
-          <chat-filter
-            v-if="roleName != 2"
-            :roomId="roomId"
-            :webinarId="webinarId"
-            :allBanned="allBanned"
-            ref="chatFilter"
-            :chatFilterUrl="chatFilterUrl"
-            :isAssistant="assistantType"
-          ></chat-filter>
+          <div class="chat-setting-btn--chat-auth">
+            <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
+            <div class="chat-setting-box">
+              <!--              <div class="chat-setting-box__item switch-box">-->
+              <!--                <span class="switch-title">屏蔽礼物/打赏消息</span>-->
+              <!--                <el-switch-->
+              <!--                  class="switch"-->
+              <!--                  v-model="filterStatus.isShieldingEffects"-->
+              <!--                  inactive-color="#E2E2E2"-->
+              <!--                  :width="32"-->
+              <!--                  active-color="#fc5659"-->
+              <!--                  @change="onClickShieldingEffects"-->
+              <!--                />-->
+              <!--              </div>-->
+              <div class="chat-setting-box__item switch-box">
+                <span class="switch-title">全体禁言</span>
+                <el-switch
+                  class="switch"
+                  v-model="enableMutedAll"
+                  inactive-color="#E2E2E2"
+                  :width="32"
+                  active-color="#fc5659"
+                  @change="toggleMutedAllStatus"
+                />
+              </div>
+              <div class="chat-setting-box__item join-chat-btn" @click="joinChatAuth">
+                进入聊天审核
+              </div>
+            </div>
+          </div>
         </template>
       </div>
     </div>
@@ -88,15 +108,13 @@
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
-  import ChatFilter from './chat-filter';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatOperateBar',
     components: {
       Emoji,
       ChatImgUpload,
-      ChatInput,
-      ChatFilter
+      ChatInput
     },
     props: {
       //聊天配置
@@ -167,13 +185,23 @@
           //屏蔽特效
           isShieldingEffects: false
         },
-        //聊天审核链接
-        chatFilterUrl: '',
+        //聊天审核链接 todo 暂时写死
+        chatFilterUrl: [location.origin, `/lives/chat-auth/${this.webinarId}`].join(''),
         //是否是助理
-        assistantType: this.$route.query.assistantType
+        assistantType: this.$route.query.assistantType,
+        //是否开启全体禁言
+        enableMutedAll: this.allBanned
       };
     },
     methods: {
+      //切换全体禁言开关状态
+      toggleMutedAllStatus() {
+        this.$emit('changeAllBanned', this.enableMutedAll);
+      },
+      //进入聊天审核
+      joinChatAuth() {
+        window.open(this.chatFilterUrl, '_blank');
+      },
       //切换表情模态窗展示
       toggleEmoji() {
         if (this.chatLoginStatus) {
@@ -297,6 +325,69 @@
           &:hover {
             color: @active-color;
             cursor: pointer;
+          }
+        }
+        .chat-setting-btn--chat-auth {
+          position: relative;
+          display: inline-flex;
+          margin-right: 10px;
+          font-size: 14px;
+          color: #999;
+          cursor: pointer;
+          /* hack处理，增加hover的区域大小 */
+          &:after {
+            content: '';
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: -100%;
+            right: 0;
+          }
+          &:hover {
+            color: @active-color;
+            cursor: pointer;
+            &:after {
+              display: block;
+            }
+            .chat-setting-box {
+              display: block;
+            }
+          }
+        }
+        .chat-setting-box {
+          display: none;
+          position: absolute;
+          top: -105px;
+          right: 0;
+          width: 180px;
+          padding: 4px 0;
+          border-radius: 4px;
+          background-color: #fff;
+          text-align: left;
+          font-size: 14px;
+          color: #555;
+          &__item {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 15px;
+            &:hover {
+              color: @active-color;
+              background-color: #f0f1fe;
+            }
+          }
+          .switch-box {
+            .switch-title {
+              display: inline-block;
+              vertical-align: middle;
+              margin-right: 4px;
+            }
+          }
+          .join-chat-btn {
+            &:hover {
+              cursor: pointer;
+              color: @active-color;
+            }
           }
         }
       }
