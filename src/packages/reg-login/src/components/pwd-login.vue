@@ -78,45 +78,12 @@
 </template>
 <script>
   import ThirdLoginLink from './third-login-link.vue';
+  import mixin from '../mixins/mixin';
   export default {
     name: 'VmpPwdLogin',
+    mixins: [mixin],
     components: {
       ThirdLoginLink
-    },
-    props: {
-      sonTitle: {
-        required: false,
-        default() {
-          return '';
-        }
-      },
-      showToReg: {
-        required: true,
-        default() {
-          /* showToReg取值范围
-             0 -- 不开启注册快捷入口；
-             1 -- 开启注册快捷入口。
-          */
-          return 0;
-        }
-      },
-      showThirdLogin: {
-        required: true,
-        default() {
-          /* showThirdLogin 取值范围
-             0 -- 不开启第三方登录功能；
-             1 -- 开启第三方登录功能。
-          */
-          return 0;
-        }
-      },
-      visitorId: {
-        required: false,
-        default() {
-          // visitorId 游客ID
-          return 0;
-        }
-      }
     },
     data() {
       const validAccount = (rule, value, callback) => {
@@ -139,7 +106,6 @@
         }
       };
       return {
-        options: {},
         ruleForm: {
           account: '', // 密码登录时，表示账号
           password: '' // 密码
@@ -184,7 +150,7 @@
       },
       // 密码登录
       handlePwdLogin() {
-        if (this.captchaIsShow && !this.captchaVal) {
+        if (this.captchaIsShow && !this.captchaReady) {
           // 开启了图片验证码展示，但是当前未选择图形码
           this.$message({
             message: this.$t('account.account_1028'),
@@ -192,108 +158,101 @@
             type: 'error',
             customClass: 'zdy-info-box'
           });
-        } else if (this.captchaVal) {
+        } else if (this.captchaReady) {
           // 如果选择的图形码有值，表示触发了账号锁定，再次登录需要图片验证码逻辑。这个时候直接往下走。
-          this.nextLogin();
+          this.snedLogin();
         } else {
           // 如果没有选择过图形码，走账号检测判断
           this.$refs.ruleForm.validate(async valid => {
             // 表单验证通过，方才检验，减少多余的请求发送
             if (valid) {
-              /* // TODO 真实逻辑 */
-              // const loginCheck = ['/v4/ucenter-login-reg/user-check/login-check', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
-              this.$fetch('loginCheck', {
-                account: this.ruleForm.username,
-                channel: 'C' // B端用户还是C端用户
-              })
+              const failure = err => {
+                console.log('获取账号检测接口结果错误', err);
+                this.$message({
+                  message: err.msg || this.$t('login.login_1021'),
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              };
+              this.userServer
+                .loginCheck(this.ruleForm.account)
                 .then(async res => {
-                  if (res.code == 200 && res.data && res.data.check_result == 1) {
+                  if (res.code == 200 && res.data?.check_result === 1) {
                     this.captchaIsShow = true;
                     // 账号被锁定 再次登录需要图片验证)
-                    await this.getCapthaId();
                     // 默认图片验证码加载
                     this.reloadCaptha();
                   } else if (res.code == 200) {
                     this.captchaIsShow = false;
                     // 非异常情况下，触发登录逻辑
-                    this.nextLogin();
+                    this.snedLogin();
                   } else {
-                    console.log('获取账号检测接口结果错误', res);
-                    this.$message({
-                      message: res.msg || this.$t('login.login_1021'),
-                      showClose: true,
-                      type: 'error',
-                      customClass: 'zdy-info-box'
-                    });
+                    failure(res);
                   }
                 })
-                .catch(res => {
-                  console.log('获取账号检测接口结果错误', res);
-                  this.$message({
-                    message: res.msg || this.$t('login.login_1021'),
-                    showClose: true,
-                    // duration: 0,
-                    type: 'error',
-                    customClass: 'zdy-info-box'
-                  });
+                .catch(err => {
+                  failure(err);
                 });
             }
           });
         }
       },
+      reloadCaptha() {
+        if (this.captchaReady) {
+          this.userServer.refreshNECaptha();
+        } else {
+          this.userServer.initNECaptcha('#pwdLoginCaptcha');
+        }
+      },
       // 触发login表单验证，若验证通过，执行登录
-      nextLogin() {
+      snedLogin() {
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
-            // 账号密码登录 [http://yapi.vhall.domain/project/740/interface/api/45707]
-            // const cUserLogin = ['/v4/ucenter-login-reg/consumer/login', 'POST', true]; // Mock地址配置举例，需headers里biz_id根据业务线区分。
+            let relt = await this.userServer.handlePassword(this.ruleForm.password);
+            if (!relt.pass) {
+              this.$message({
+                message: relt.msg || this.$t('register.register_1010'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+              return false;
+            }
             const params = {
               way: 1, // 账号密码登录
               account: this.ruleForm.account,
-              // password: retPassword,
-              remember: Number(this.autoLoginStatus)
+              password: relt.retPassword,
+              remember: this.autoLoginStatus ? 1 : '',
+              uuid: relt.uuid
             };
             if (this.captchaIsShow) {
-              params.captcha = this.captchaVal;
+              params.captcha = this.userServerState.captchaVal;
               // TODO: zhike有可能是 2 需要看v4对接的情况
               params.validate_type = 1; // 1=图片交互方式校验|2=点击交互校验，【账号密码方式登录并且账号被锁定情况下校验，默认是图片交互方式】
             }
             if (this.visitorId) {
               params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
             }
-            this.$fetch('cUserLogin', params)
-              .then(res => {
-                if (res.code == 200) {
-                  // TODO 存储登录状态 - 待书写
-                  localStorage.setItem('token', res.data.token || '');
-                  // TODO 登录成功后，获取用户信息
-                  this.getCUserInfo();
-                } else {
-                  this.$message({
-                    message: res.msg || this.$t('login.login_1021'),
-                    showClose: true,
-                    type: 'error',
-                    customClass: 'zdy-info-box'
-                  });
-                  localStorage.setItem('token', '');
-                  if (this.captchaIsShow && !this.captchaVal) {
-                    this.reloadCaptha();
-                  }
+            this.userServer.userLogin(params).then(res => {
+              if (res.code === 200) {
+                // this.resetForm();
+                this.$emit('handleClose', 'code');
+                // 刷新页面
+                // this.$router.go(0);
+                window.location.reload();
+              } else {
+                if (this.captchaIsShow && !this.captchaReady) {
+                  this.reloadCaptha();
                 }
-              })
-              .catch(res => {
-                console.warn('登录失败', res);
                 this.$message({
                   message: res.msg || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
-                localStorage.setItem('token', '');
-                if (this.captchaIsShow && !this.captchaVal) {
-                  this.reloadCaptha();
-                }
-              });
+              }
+            });
           }
         });
       }

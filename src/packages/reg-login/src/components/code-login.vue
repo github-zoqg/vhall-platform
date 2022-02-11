@@ -209,7 +209,7 @@
             }
             this.userServer.userLogin(params).then(res => {
               if (res.code === 200) {
-                this.resetForm();
+                // this.resetForm();
                 this.$emit('handleClose', 'code');
                 // 刷新页面
                 // this.$router.go(0);
