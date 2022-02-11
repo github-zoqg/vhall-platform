@@ -1,12 +1,6 @@
 <template>
   <div class="vmp-aside-menu">
     <vmp-air-container :cuid="cuid"></vmp-air-container>
-    <div class="vmp-aside-menu-share">
-      <div @click="goWatchShare">
-        <i class="vh-iconfont vh-line-share"></i>
-        <p>分享</p>
-      </div>
-    </div>
   </div>
 </template>
 <script>
@@ -14,6 +8,9 @@
 
   export default {
     name: 'VmpAsideMenu',
+    data() {
+      return {};
+    },
     mounted() {
       this.initData();
     },
@@ -33,8 +30,37 @@
     methods: {
       initData() {
         if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type === 1) {
-          const vn = this.$children.find(item => item.kind === 'group');
-          vn && vn.setDisableState(false);
+          // 如果当前状态是直播中
+          if (this.$domainStore.state.roomBaseServer.groupInitData.isInGroup) {
+            // 如果当前用户正在小组中
+            console.log('vn:', this.$children);
+            for (const vn of this.$children) {
+              console.log('vn:', vn.kind);
+              // 文档、白板、桌面共享不可用
+              if (['document', 'board', 'deskshare'].includes(vn.kind)) {
+                vn.setSelectedState(false);
+                vn.setDisableState(true);
+              } else if (vn.kind === 'exitGroup') {
+                vn.setDisableState(false);
+                vn.setHiddenState(false);
+              } else {
+                // 其它菜单不可见
+                vn.setHiddenState && vn.setHiddenState(true);
+              }
+            }
+          } else {
+            // 不在小组中
+            for (const vn of this.$children) {
+              console.log('vn:', vn.kind);
+              // 分组讨论不可用
+              if (['group'].includes(vn.kind)) {
+                vn.setDisableState(true);
+              } else if (vn.kind === 'exitGroup') {
+                vn.setDisableState(false);
+                vn.setHiddenState(false);
+              }
+            }
+          }
         }
       },
       switchTo(kind) {
@@ -52,31 +78,10 @@
 </script>
 <style lang="less">
   .vmp-aside-menu {
-    &-share {
+    .menu-footer {
       position: fixed;
       bottom: 20px;
-      left: 20px;
-      div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 12px;
-        color: #ececec;
-        padding: 10px 0px;
-        cursor: pointer;
-        i {
-          user-select: none;
-          display: block;
-          width: 23px;
-          height: 23px;
-          margin: 0 auto;
-          padding-bottom: 6px;
-          font-size: 22px;
-        }
-        p {
-          font-size: 12px;
-        }
-      }
+      left: 7px;
     }
   }
 </style>
