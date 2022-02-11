@@ -46,7 +46,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'tab-content',
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comContainerTop', 'comContainerRight']
+    children: ['comContainerTop', 'comContainerRight', 'comNoticeWap']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -102,5 +102,8 @@ export const serverConfig = {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
     }
+  },
+  comNoticeWap: {
+    component: 'VmpNoticeWap'
   }
 };
