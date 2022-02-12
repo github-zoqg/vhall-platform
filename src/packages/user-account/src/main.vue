@@ -1,0 +1,657 @@
+<template>
+  <div class="vmp-user-account">
+    <!-- 个人资料弹出框 -->
+    <el-dialog
+      :title="$t('account.account_1001')"
+      :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
+      width="365px"
+    >
+      <div class="vmp-user-account-wrap">
+        <div class="vmp-user-account-wrap-item">
+          <label>{{ $t('account.account_1002') }}</label>
+          <div class="vmp-user-account-wrap-item__center">
+            {{ accountVo && accountVo.phone ? accountVo.phone : $t('account.account_1003') }}
+          </div>
+          <div>
+            <el-button type="text" @click="openPhoneDialog">
+              {{
+                accountVo && accountVo.phone
+                  ? $t('account.account_1004')
+                  : $t('account.account_1005')
+              }}
+            </el-button>
+          </div>
+        </div>
+        <div class="vmp-user-account-wrap-item">
+          <label>{{ $t('account.account_1006') }}</label>
+          <div class="vmp-user-account-wrap-item__center nick-item">
+            <span v-if="!isNickNameEdit">
+              {{ (accountVo && accountVo.nick_name ? accountVo.nick_name : '') | splitLenStr(6) }}
+            </span>
+            <el-input
+              v-if="isNickNameEdit"
+              v-model.trim="nickName"
+              :maxlength="30"
+              :minlength="1"
+              :class="['btn-relative btn-two', { 'input-error': nickError != '' }]"
+            >
+              <el-button slot="append" class="no-border" @click="editNickHandler">
+                {{ $t('account.account_1007') }}
+              </el-button>
+            </el-input>
+            <span v-if="nickError != ''" class="vmp-user-account-wrap-error">{{ nickError }}</span>
+          </div>
+          <div>
+            <el-button v-if="!isNickNameEdit" type="text" @click="changeNickEditStatus">
+              {{ $t('account.account_1008') }}
+            </el-button>
+          </div>
+        </div>
+        <div class="vmp-user-account-wrap-item upload">
+          <label>{{ $t('account.account_1009') }}</label>
+          <div class="vmp-user-account-wrap-item__center upload-zdy">
+            <Upload
+              v-model="avatar"
+              class="upload__avatar"
+              :domain_url="domain_url"
+              :saveData="{
+                path: 'users/face-imgs',
+                type: 'image'
+              }"
+              :widthImg="80"
+              :heightImg="80"
+              :on-success="handleUploadSuccess"
+              :on-progress="uploadProcess"
+              :on-error="uploadError"
+              :on-preview="uploadPreview"
+              :before-upload="beforeUploadHandler"
+              @delete="delAvatarHandler"
+            ></Upload>
+          </div>
+          <div class="upload-right">
+            <p>{{ $t('account.account_1010') }}</p>
+            <p>{{ $t('account.account_1011') }}</p>
+            <p>{{ $t('account.account_1012') }}</p>
+          </div>
+        </div>
+        <div class="vmp-user-account-wrap-item pwd-item">
+          <label>{{ $t('account.account_1013') }}</label>
+          <div class="vmp-user-account-wrap-item__center">
+            {{
+              accountVo && accountVo.has_password > 0
+                ? $t('account.account_1014')
+                : $t('account.account_1015')
+            }}
+          </div>
+          <div>
+            <el-button type="text" @click="openPwdHandler">
+              {{
+                accountVo && accountVo.has_password > 0
+                  ? $t('account.account_1016')
+                  : $t('account.account_1017')
+              }}
+            </el-button>
+          </div>
+        </div>
+        <div class="vmp-user-account-wrap-item bind-item">
+          <label>{{ $t('account.account_1018') }}</label>
+          <div class="vmp-user-account-wrap-item__center">
+            {{ (QQ && QQ.nick_name ? QQ.nick_name : '') | splitLenStr(6) }}
+            {{
+              QQ && QQ.nick_name ? `（${$t('account.account_1019')}）` : $t('account.account_1020')
+            }}
+          </div>
+          <div>
+            <el-button type="text" @click="editQQHandler">
+              {{ QQ && QQ.nick_name ? $t('account.account_1021') : $t('account.account_1022') }}
+            </el-button>
+          </div>
+        </div>
+        <div class="vmp-user-account-wrap-item bind-item">
+          <label>{{ $t('account.account_1023') }}</label>
+          <div class="vmp-user-account-wrap-item__center">
+            {{ (Weixin && Weixin.nick_name ? Weixin.nick_name : '') | splitLenStr(6) }}
+            {{
+              Weixin && Weixin.nick_name
+                ? `（${$t('account.account_1019')}）`
+                : $t('account.account_1020')
+            }}
+          </div>
+          <div>
+            <el-button type="text" @click="editWXHandler">
+              {{
+                Weixin && Weixin.nick_name ? $t('account.account_1021') : $t('account.account_1022')
+              }}
+            </el-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置手机号 -->
+      <Phone v-model="phoneDialog.visible"></Phone>
+
+      <!-- 设置密码 -->
+      <Password v-model="pwdDialog.visible"></Password>
+    </el-dialog>
+  </div>
+</template>
+<script>
+  // import { mapState, mapMutations } from 'vuex';
+  import Upload from './components/upload/upload.vue';
+  import Phone from './components/phone/phone.vue';
+  import Password from './components/password/password.vue';
+  import { useUserServer } from 'middle-domain';
+  export default {
+    name: 'VmpUserAccount',
+    components: {
+      Upload,
+      Phone,
+      Password
+    },
+    data() {
+      return {
+        dialogVisible: false,
+        accountVo: {
+          nick_name: '', // 昵称
+          avatar: '', // 头像
+          phone: '', // 手机号
+          has_password: '' // 是否设置密码
+        },
+        isNickNameEdit: false,
+        nickName: '',
+        nickError: '',
+        avatar: '',
+        domain_url: '',
+
+        Weixin: null,
+        QQ: null,
+        useUserServer: null,
+        /** *********设置手机号相关-start***************/
+        phoneDialog: {
+          visible: false,
+          type: 'add',
+          step: 1,
+          phone: ''
+        },
+        /** *********设置手机号相关-end***************/
+        /** *********设置密码相关-start***************/
+        pwdDialog: {
+          visible: false,
+          type: 'add'
+        }
+        /** *********设置密码相关-end***************/
+      };
+    },
+    created() {
+      this.useUserServer = useUserServer();
+    },
+    computed: {
+      // ...mapState('watchBase', ['toolsCount', 'languages'])
+    },
+    methods: {
+      // ...mapMutations('watchBase', ['setLoginToken', 'setUserInfo', 'setIsLogin']),
+      handleUploadSuccess(res, file) {
+        console.log(res, file);
+        if (res.data) {
+          const domain_url = res.data.domain_url || '';
+          const file_url = res.data.file_url || '';
+          this.avatar = file_url;
+          this.domain_url = domain_url;
+          // 发送保存头像接口
+          this.changeAvatarSend(this.$parseURL(this.avatar).path);
+        }
+      },
+      beforeUploadHandler(file) {
+        console.log(file);
+        const typeList = ['png', 'jpeg', 'gif', 'bmp'];
+        console.log(file.type.toLowerCase());
+        const typeArr = file.type.toLowerCase().split('/');
+        const isType = typeList.includes(typeArr[typeArr.length - 1]);
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isType) {
+          this.$message({
+            message: this.$t('account.account_1044', { n: typeList.join('、') }),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        }
+        if (!isLt2M) {
+          this.$message({
+            message: this.$t('account.account_1045'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        }
+        return isType && isLt2M;
+      },
+      uploadProcess(event, file, fileList) {
+        console.log('uploadProcess', event, file, fileList);
+      },
+      uploadError(err, file, fileList) {
+        console.log('uploadError', err, file, fileList);
+        this.$message({
+          message: this.$t('account.account_1046'),
+          showClose: true,
+          type: 'error',
+          customClass: 'zdy-info-box'
+        });
+      },
+      uploadPreview(file) {
+        console.log('uploadPreview', file);
+      },
+      delAvatarHandler() {
+        this.avatar = '';
+        this.domain_url = '';
+        this.changeAvatarSend('');
+      },
+      changeAvatarSend(avatar) {
+        // 发送保存头像接口
+        this.$vhallapi.nav
+          .editUser({
+            avatar: avatar
+          })
+          .then(res => {
+            if (res && res.code == 200) {
+              this.$message({
+                message: this.$t('account.account_1047'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              // 用户信息接口更新
+              this.initComp(1);
+            } else {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+          })
+          .catch(res => {
+            this.$message({
+              message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+      initComp(type) {
+        this.getUserInfo(type);
+      },
+      getUserInfo(type) {
+        this.$vhallapi.nav
+          .getInfo({
+            scene_id: 2
+          })
+          .then(res => {
+            if (res && res.code == 200) {
+              // this.setUserInfo(res.data); TODO
+              this.accountVo = res.data;
+              // 设置用户昵称
+              this.nickName = res.data.nick_name;
+              if (type === 2) {
+                // 昵称修改成功调用
+                // this.$VhallEventBus.$emit(this.$VhallEventType.Chat.CHAT_NICKNAME_CHANGE, res.data.nick_name)
+              }
+              // QQ信息
+              const QQ = res.data.user_thirds.filter(item => item.type === 2);
+              if (QQ && QQ.length > 0) {
+                this.QQ = QQ[0];
+              } else {
+                this.QQ = {};
+              }
+              // 微信信息
+              const Weixin = res.data.user_thirds.filter(item => item.type === 3);
+              if (Weixin && Weixin.length > 0) {
+                this.Weixin = Weixin[0];
+              } else {
+                this.Weixin = {};
+              }
+              // 用户头像
+              this.avatar = res.data.avatar;
+              if (type === 1) {
+                // 头像修改成功调用
+                // this.$VhallEventBus.$emit(this.$VhallEventType.Chat.CHAT_AVATAR_CHANGE, res.data.avatar)
+              }
+              this.domain_url = res.data.avatar;
+            } else {
+              // this.setUserInfo(null); TODO
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            // this.setUserInfo(null); TODO
+          });
+      },
+      // 设置手机号 or 修改手机号
+      openPhoneDialog() {
+        if (this.accountVo && this.accountVo.phone) {
+          // 当前为修改手机号
+          this.phoneDialog.visible = true;
+          this.phoneDialog.type = 'edit';
+          this.phoneDialog.step = 1;
+          // 若是修改手机号，表单初始值设定
+          this.phoneDialog.phone = this.accountVo.phone;
+
+          // 若是修改手机号，表单初始值设定
+          // this.checkForm.phone = this.accountVo.phone;
+          // 初始化网易云盾-图片验证码
+          // const tempTimer = setTimeout(function() {
+          //   clearTimeout(tempTimer);
+          //   that.$nextTick(() => {
+          //     that.callCaptcha('checkForm');
+          //   });
+          // }, 300);
+        } else {
+          // 当前为设置手机号
+          this.phoneDialog.visible = true;
+          this.phoneDialog.type = 'add';
+          this.phoneDialog.step = 1;
+          this.phoneDialog.phone = '';
+          // 初始化网易云盾-图片验证码
+          // this.$nextTick(() => {
+          //   this.callCaptcha('setPhoneForm');
+          // });
+        }
+      },
+      // 切换昵称为 可修改状态
+      changeNickEditStatus() {
+        this.isNickNameEdit = true;
+        this.nickName = this.accountVo.nick_name;
+      },
+      // 设置昵称 or 修改昵称
+      editNickHandler() {
+        if (!this.nickName) {
+          this.nickError = this.$t('account.account_1055');
+        } else {
+          if (this.nickName.length < 1 || this.nickName.length > 30) {
+            this.nickError = this.$t('account.account_1056');
+          } else {
+            this.nickError = '';
+            this.$vhallapi.nav
+              .editUser({
+                nick_name: this.nickName
+              })
+              .then(res => {
+                if (res && res.code == 200) {
+                  this.$message({
+                    message: this.$t('account.account_1057'),
+                    showClose: true,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  // 触发保存接口
+                  this.isNickNameEdit = false;
+                  // 用户信息接口更新
+                  this.initComp(2);
+                } else {
+                  this.$message({
+                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                    showClose: true,
+                    type: 'error',
+                    customClass: 'zdy-info-box'
+                  });
+                }
+              })
+              .catch(res => {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          }
+        }
+      },
+      // 设置密码 or 修改密码
+      openPwdHandler() {
+        if (this.accountVo && this.accountVo.has_password > 0) {
+          // 当前为修改密码
+          this.pwdDialog.visible = true;
+          this.pwdDialog.type = 'edit';
+        } else {
+          // 当前为设置密码
+          this.pwdDialog.visible = true;
+          this.pwdDialog.type = 'add';
+        }
+      },
+      // QQ绑定 or QQ解绑
+      editQQHandler() {
+        if (this.QQ && this.QQ.nick_name) {
+          // 解绑
+          this.$confirm(this.$t('account.account_1060'), this.$t('account.account_1061'), {
+            confirmButtonText: this.$t('account.account_1062'),
+            cancelButtonText: this.$t('account.account_1063'),
+            customClass: 'zdy-message-box',
+            lockScroll: false,
+            cancelButtonClass: 'zdy-confirm-cancel'
+          })
+            .then(() => {
+              // 1微博 2QQ 3微信 4 阿里 5 SDK打赏生的用户6小程序观看端
+              this.unBindSend(2);
+            })
+            .catch(() => {});
+        } else {
+          // 绑定
+          this.$VhallStorage.set('tag', 'bindQQ', 'local');
+          window.open(
+            `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
+              this.$VhallStorage.get('goHref', 'local')
+            )}`,
+            '_blank'
+          );
+        }
+      },
+      unBindSend(type) {
+        this.$vhallapi.nav
+          .unBindInfo({
+            type: type
+          })
+          .then(res => {
+            if (res && res.code == 200) {
+              this.$message({
+                message: this.$t('account.account_1064'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              // 解绑成功后，刷新页面
+              // window.location.reload()
+              this.initComp();
+            } else {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              this.initComp();
+            }
+          })
+          .catch(res => {
+            this.$message({
+              message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+              showClose: true,
+              // duration: 0,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+      // 微信绑定 or 微信解绑
+      editWXHandler() {
+        if (this.Weixin && this.Weixin.nick_name) {
+          // 解绑
+          this.$confirm(this.$t('account.account_1066'), this.$t('account.account_1061'), {
+            confirmButtonText: this.$t('account.account_1062'),
+            cancelButtonText: this.$t('account.account_1063'),
+            customClass: 'zdy-message-box',
+            lockScroll: false,
+            cancelButtonClass: 'zdy-confirm-cancel'
+          })
+            .then(() => {
+              this.unBindSend(3);
+            })
+            .catch(() => {});
+        } else {
+          // 绑定
+          this.$VhallStorage.set('tag', 'bindWx', 'local');
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
+          // 前端回传地址
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.il_id}`;
+          window.open(
+            `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+          );
+          // window.open(`${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(this.$VhallStorage.get('goHref', 'local'))}`, '_blank');
+        }
+      }
+    },
+    filters: {
+      splitLenStr: function (name, len) {
+        return name && name.length > len ? name.substring(0, len) + '...' : name;
+      }
+    }
+  };
+</script>
+<style lang="less">
+  .vmp-user-account {
+    &-wrap {
+      &-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0;
+        padding-bottom: 24px;
+        &:last-child {
+          padding-bottom: 32px;
+        }
+        .el-button {
+          padding: 0 0;
+        }
+        .el-button.el-button--text {
+          font-size: 14px;
+          font-weight: 400;
+          color: #3562fa;
+          line-height: 20px;
+        }
+        &.upload {
+          align-items: flex-start;
+          border-bottom: 1px solid #e6e6e6;
+          padding-bottom: 16px;
+          .upload-right {
+            font-size: 12px;
+            font-weight: 400;
+            color: #999999;
+            line-height: 17px;
+            margin-right: auto;
+            p {
+              word-break: break-word;
+            }
+          }
+        }
+        &.pwd-item {
+          border-bottom: 1px solid #e6e6e6;
+          padding-top: 24px;
+          margin-bottom: 16px;
+        }
+        label {
+          width: 56px;
+          margin-right: 12px;
+          text-align: right;
+          font-size: 14px;
+          font-weight: 400;
+          color: #1a1a1a;
+          line-height: 20px;
+        }
+        &.bind-item {
+          label {
+            text-align: right;
+          }
+        }
+        &__center {
+          margin-right: auto;
+          &.upload-zdy {
+            margin-right: 8px;
+          }
+          &.nick-item {
+            position: relative;
+          }
+        }
+        .el-upload--picture-card {
+          width: 80px;
+          height: 80px;
+          line-height: unset;
+          overflow: hidden;
+        }
+        .el-input-group__append {
+          width: 52px;
+          height: 38px;
+          background: #f7f7f7;
+          border-radius: 0px 4px 4px 0px;
+          text-align: center;
+          padding: 0 0;
+        }
+      }
+      &-error {
+        position: absolute;
+        left: 0;
+        top: 43px;
+        font-size: 12px;
+        font-weight: 400;
+        color: #fb3a32;
+        line-height: 17px;
+      }
+      .el-form-item__error {
+        color: #fb3a32;
+      }
+    }
+  }
+
+  .btn-relative {
+    position: relative;
+    .el-input-group__append {
+      width: 52px !important;
+      height: 38px;
+      background: #f7f7f7;
+      border-radius: 0 4px 4px 0;
+      position: absolute;
+      right: 1px;
+      top: 1px;
+      line-height: 38px;
+      text-align: center;
+      padding: 0 0;
+      margin: 0 0;
+      font-weight: 400;
+      color: #666;
+      border: 0;
+    }
+    .el-input__inner {
+      padding: 0 62px 0 10px;
+      border-top-right-radius: 4px !important;
+      border-bottom-right-radius: 4px !important;
+      /*border-color: #cccccc;*/
+      /*&:hover {
+        color: #999999;
+      }*/
+    }
+    &.input-error {
+      .el-input__inner {
+        border-color: #fb3a32;
+        &:hover {
+          color: #999999;
+        }
+      }
+      .el-input__inner:hover {
+        color: #999999;
+      }
+    }
+  }
+</style>

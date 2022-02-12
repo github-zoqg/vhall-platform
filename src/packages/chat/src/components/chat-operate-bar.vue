@@ -1,0 +1,485 @@
+<template>
+  <div class="vmp-chat-operate-container" ref="chatOperateContainer">
+    <div class="operate-container__tool-bar">
+      <div class="operate-container__tool-bar__left">
+        <!--表情过滤按钮-->
+        <i class="icon iconfont iconbiaoqing" @click.stop="toggleEmoji"></i>
+        <!--上传图片-->
+        <template v-if="chatOptions && chatOptions.hasImgUpload">
+          <!-- 聊天图片上传 -->
+          <chat-img-upload
+            class="operate-container__tool-bar__img-upload"
+            ref="chatImgUpload"
+            :room-id="roomId"
+            :role-name="roleName"
+            :disable="inputStatus.disable"
+          ></chat-img-upload>
+        </template>
+        <!--只看主办方按钮-->
+        <i
+          class="icon iconfont iconmeitishezhi"
+          @click.stop="onClickFilterSetting"
+          v-if="chatOptions && chatOptions.hasChatFilterBtn"
+        ></i>
+        <!-- 表情选择 -->
+        <div class="operate-container__tool-bar__emoji-wrap">
+          <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
+        </div>
+        <!-- 过滤设置 -->
+        <ul
+          v-show="chatOptions && chatOptions.hasChatFilterBtn && isFilterShow"
+          class="operate-container__tool-bar__chat-filter-wrap"
+        >
+          <li class="filter-item">
+            <el-checkbox
+              class="filter-item__checkbox"
+              @change="onClickOnlyShowSponsor"
+              v-model="filterStatus.onlyShowSponsor"
+            >
+              只看主办方
+            </el-checkbox>
+          </li>
+          <li class="filter-item">
+            <el-checkbox
+              class="filter-item__checkbox"
+              @change="onClickShieldingEffects"
+              v-model="filterStatus.isShieldingEffects"
+            >
+              屏蔽特效
+            </el-checkbox>
+          </li>
+        </ul>
+      </div>
+
+      <div class="operate-container__tool-bar__right">
+        <template v-if="chatOptions && chatOptions.enableChatSetting">
+          <!--聊天设置-->
+          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
+          <div class="chat-setting-btn--chat-auth">
+            <i class="chat-setting-btn">聊天设置</i>
+            <div class="chat-setting-box">
+              <!--              <div class="chat-setting-box__item switch-box">-->
+              <!--                <span class="switch-title">屏蔽礼物/打赏消息</span>-->
+              <!--                <el-switch-->
+              <!--                  class="switch"-->
+              <!--                  v-model="filterStatus.isShieldingEffects"-->
+              <!--                  inactive-color="#E2E2E2"-->
+              <!--                  :width="32"-->
+              <!--                  active-color="#fc5659"-->
+              <!--                  @change="onClickShieldingEffects"-->
+              <!--                />-->
+              <!--              </div>-->
+              <div class="chat-setting-box__item switch-box">
+                <span class="switch-title">全体禁言</span>
+                <el-switch
+                  class="switch"
+                  v-model="enableMutedAll"
+                  inactive-color="#E2E2E2"
+                  :width="32"
+                  active-color="#fc5659"
+                  @change="toggleMutedAllStatus"
+                />
+              </div>
+              <div class="chat-setting-box__item join-chat-btn" @click="joinChatAuth">
+                进入聊天审核
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="operate-container__input-bar">
+      <chat-input
+        ref="chatInput"
+        :chat-login-status="chatLoginStatus"
+        :input-status="inputStatus"
+        :chat-options="chatOptions"
+        :chat-list="chatList"
+        :at-list="atList"
+        @clearUploadImg="clearUploadImg"
+        @getUploadImg="updateImgUrls"
+        @inputHeightChange="chatInputHeightChangeHandle"
+      ></chat-input>
+    </div>
+  </div>
+</template>
+
+<script>
+  import Emoji from './emoji.vue';
+  import ChatImgUpload from './chat-img-upload';
+  import ChatInput from './chat-input';
+  import { useRoomBaseServer } from 'middle-domain';
+  export default {
+    name: 'VmpChatOperateBar',
+    components: {
+      Emoji,
+      ChatImgUpload,
+      ChatInput
+    },
+    props: {
+      //聊天配置
+      chatOptions: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      },
+      //房间号
+      roomId: {
+        type: [Number, String],
+        default: () => ''
+      },
+      //角色名
+      roleName: {
+        type: [String, Number],
+        default: () => ''
+      },
+      //是否被禁言
+      inputStatus: {
+        type: Object,
+        default: () => {
+          return {
+            placeholder: '参与聊天',
+            disable: false
+          };
+        }
+      },
+      // 是否全体禁言
+      allBanned: {
+        type: Boolean,
+        default: () => false
+      },
+      //活动id
+      webinarId: {
+        type: [Number, String],
+        default: () => {
+          return '';
+        }
+      },
+      //聊天登录状态
+      chatLoginStatus: {
+        type: Boolean,
+        default: () => false
+      },
+      //聊天消息列表
+      chatList: {
+        type: Array,
+        default: () => []
+      },
+      //@列表
+      atList: {
+        type: Array,
+        default: () => []
+      }
+    },
+    data() {
+      const roomBaseState = useRoomBaseServer().state;
+      return {
+        roomBaseState,
+        //显示观众的过滤设置
+        isFilterShow: false,
+        //过滤状态集合
+        filterStatus: {
+          //只看主办方
+          onlyShowSponsor: false,
+          //屏蔽特效
+          isShieldingEffects: false
+        },
+        //聊天审核链接 todo 暂时写死
+        chatFilterUrl: [location.origin, `/lives/chat-auth/${this.webinarId}`].join(''),
+        //是否是助理
+        assistantType: this.$route.query.assistantType,
+        //是否开启全体禁言
+        enableMutedAll: this.allBanned
+      };
+    },
+    methods: {
+      //切换全体禁言开关状态
+      toggleMutedAllStatus() {
+        this.$emit('changeAllBanned', this.enableMutedAll);
+      },
+      //进入聊天审核
+      joinChatAuth() {
+        window.open(this.chatFilterUrl, '_blank');
+      },
+      //切换表情模态窗展示
+      toggleEmoji() {
+        if (this.chatLoginStatus) {
+          this.$message.warning('未登录');
+          return;
+        }
+
+        if (this.inputStatus.disable) {
+          this.$message.warning('您已被禁言');
+          return;
+        }
+        this.$refs.emoji.toggleShow();
+      },
+      //将表情发送给input
+      emojiInput(value) {
+        this.$refs.chatInput.emojiInput(value);
+      },
+      //更新输入框组件里的图片
+      updateImgUrls() {
+        const images = this.$refs.chatImgUpload.getImgUrls();
+        this.$refs.chatInput.updateImgUrls(images);
+      },
+      //清空上传图片组件里的图片
+      clearUploadImg() {
+        this.$refs.chatImgUpload.clearImgUrls();
+      },
+      //只看主办方
+      onClickOnlyShowSponsor(status) {
+        let message = status ? '已开启只看主办方' : '已关闭只看主办方';
+        this.$message({
+          message: message,
+          showClose: true,
+          // duration: 0,
+          type: 'success',
+          customClass: 'zdy-info-box'
+        });
+        this.$emit('onSwitchShowSponsor', status);
+      },
+      //屏蔽特效
+      onClickShieldingEffects(status) {
+        let message = status ? '已屏蔽特效' : '已开启特效';
+        this.$message({
+          message: message,
+          showClose: true,
+          // duration: 0,
+          type: 'success',
+          customClass: 'zdy-info-box'
+        });
+        this.$emit('onSwitchShowSpecialEffects', status);
+      },
+      //点击筛选
+      onClickFilterSetting() {
+        this.isFilterShow = !this.isFilterShow;
+        // 如果表情弹窗开启，则关闭
+        if (this.$refs.emoji.isShow) {
+          this.$refs.emoji.toggleShow();
+        }
+      },
+      //响应输入框高度变化事件
+      chatInputHeightChangeHandle() {
+        this.$emit('updateHeight', this.$refs.chatOperateContainer.offsetHeight);
+      },
+      //更新滚动区域高度
+      updateOverlayScrollbar() {
+        this.$refs.chatInput.overlayScrollbar.update();
+      },
+      //处理回复消息
+      handleReply(count) {
+        this.$refs.chatInput.reply(count);
+      },
+      //处理@用户
+      handleAtUser(accountId) {
+        this.$refs.chatInput.atUser(accountId);
+      },
+      //打开私聊模态窗
+      openPrivateChatModal() {
+        this.$emit('openPrivateChatModal');
+      }
+    }
+  };
+</script>
+
+<style lang="less">
+  .vmp-chat-operate-container {
+    @active-color: #fc5659;
+    @font-error: #fb3a32;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-top: 1px solid #3a3a48;
+    background-color: #2d2d2d;
+    position: absolute;
+    box-sizing: border-box;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    .operate-container__tool-bar {
+      display: flex;
+      align-items: center;
+      height: 18px;
+      margin-bottom: 9px;
+      position: relative;
+      &__left {
+        display: flex;
+        justify-content: flex-start;
+        flex: 1;
+      }
+      &__right {
+        display: flex;
+        justify-content: flex-end;
+        flex: 1;
+        .chat-setting-btn {
+          margin-right: 10px;
+          font-size: 14px;
+          color: #999;
+          cursor: pointer;
+          &:hover {
+            color: @active-color;
+            cursor: pointer;
+          }
+        }
+        .chat-setting-btn--chat-auth {
+          position: relative;
+          display: inline-flex;
+          margin-right: 10px;
+          font-size: 14px;
+          color: #999;
+          cursor: pointer;
+          /* hack处理，增加hover的区域大小 */
+          &:after {
+            content: '';
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: -100%;
+            right: 0;
+          }
+          &:hover {
+            color: @active-color;
+            cursor: pointer;
+            &:after {
+              display: block;
+            }
+            .chat-setting-box {
+              display: block;
+            }
+          }
+        }
+        .chat-setting-box {
+          display: none;
+          position: absolute;
+          top: -105px;
+          right: 0;
+          width: 180px;
+          padding: 4px 0;
+          border-radius: 4px;
+          background-color: #fff;
+          text-align: left;
+          font-size: 14px;
+          color: #555;
+          &__item {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 15px;
+            &:hover {
+              color: @active-color;
+              background-color: #f0f1fe;
+            }
+          }
+          .switch-box {
+            .switch-title {
+              display: inline-block;
+              vertical-align: middle;
+              margin-right: 4px;
+            }
+          }
+          .join-chat-btn {
+            &:hover {
+              cursor: pointer;
+              color: @active-color;
+            }
+          }
+        }
+      }
+      &__emoji-wrap {
+        width: 294px;
+        position: absolute;
+        top: 0;
+        transform: translateY(-100%);
+        left: 0;
+      }
+      &__chat-filter-wrap {
+        width: 120px;
+        height: 80px;
+        padding: 4px 0;
+        background-color: #383838;
+        box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+        border-radius: 4px;
+        position: absolute;
+        top: -11px;
+        transform: translateY(-100%);
+        .iconmeitishezhi {
+          font-size: 19px;
+          color: #999;
+          margin-left: 10px;
+          margin-bottom: 1px;
+          &:hover {
+            color: @active-color;
+            cursor: pointer;
+          }
+        }
+        .filter-item {
+          height: 40px;
+          line-height: 40px;
+          padding-left: 15px;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          &:hover {
+            .filter-item__label {
+              color: #e6e6e6;
+            }
+          }
+        }
+        .filter-item__checkbox {
+          display: inline-block;
+          margin-right: 8px;
+          position: relative;
+          color: #999999;
+          font-size: 14px;
+        }
+        .el-checkbox__label {
+          font-size: 14px;
+          color: #999999;
+        }
+      }
+      .iconfont {
+        color: #999;
+        font-size: 19px;
+        cursor: pointer;
+        &.active {
+          color: @active-color;
+        }
+        &:hover {
+          color: @active-color;
+          cursor: pointer;
+        }
+        &.pic-disabled {
+          pointer-events: none;
+        }
+        &.icontupianliaotian {
+          font-size: 18px;
+        }
+
+        margin-left: 10px;
+      }
+      .icon-common {
+        width: 24px;
+        color: #999;
+        height: 24px;
+        font-size: 18px;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      .iconbiaoqing {
+        font-size: 19px;
+        color: #999;
+        margin-left: 0;
+        margin-bottom: 1px;
+        &:hover {
+          color: @active-color;
+          cursor: pointer;
+        }
+      }
+    }
+    .operate-container__input-bar {
+    }
+  }
+</style>
