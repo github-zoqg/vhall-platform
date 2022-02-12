@@ -147,7 +147,6 @@
       getWebinarInfo() {
         const { webinar } = this.roomBaseState.watchInitData;
         this.webinarInfo = webinar;
-        console.log(this.webinarInfo, '11111===zhangxiao===???');
       },
       exitLogin() {
         this.isLogin = false;

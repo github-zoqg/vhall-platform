@@ -20,6 +20,16 @@ export default async function () {
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
+  // TODO：晓东确认，是否在此处添加，配置项调用
+  await roomBaseServer.getConfigList();
+  await roomBaseServer.getLowerConfigList({
+    params: {},
+    environment: process.env.NODE_ENV != 'production' ? 'test' : 'production',
+    systemKey: 2,
+    time: 5
+  });
+  console.log('%c------黄金链路请求配置项完成', 'color:pink');
+  console.log(roomBaseServer.state.configList);
   // TODO 设置观看端测试权限数据
   roomBaseServer.state.configList = {
     hasToolbar: false

@@ -43,6 +43,16 @@
               >
                 阻止
               </el-button>
+              <el-button
+                v-if="options.hasPassAndReplyBtn"
+                type="success"
+                class="confirm-button"
+                size="small"
+                round
+                @click.stop="handleSetPassed(3, row)"
+              >
+                通过并回复
+              </el-button>
             </div>
           </div>
         </el-table-column>
@@ -62,10 +72,12 @@
         @current-change="changePage"
       ></el-pagination>
     </div>
+    <chat-auth-reply-modal ref="chatAuthReplyModal" :options="options"></chat-auth-reply-modal>
   </div>
 </template>
 
 <script>
+  import chatAuthReplyModal from './replyModal';
   export default {
     name: 'VmpChatAuthTable',
     props: {
@@ -73,7 +85,17 @@
       selectMenuType: {
         type: String,
         default: () => ''
+      },
+      //聊天审核组件的配置
+      options: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
+    },
+    components: {
+      chatAuthReplyModal
     },
     data() {
       return {
@@ -173,7 +195,14 @@
       //todo 踢出
       handleSetKicked() {},
       //todo 通过
-      handleSetPassed() {},
+      handleSetPassed(type, info) {
+        console.log(info);
+        switch (type) {
+          case 3:
+            this.$refs.chatAuthReplyModal.openModal();
+            break;
+        }
+      },
       //todo 阻止
       handleSetProhibit() {},
       //todo
