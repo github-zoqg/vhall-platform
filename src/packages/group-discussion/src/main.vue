@@ -109,6 +109,10 @@
       // 选择小组后确定
       chooseGroupComplete(selectGroup) {
         this.$refs.groupSplit.handleChangeGroupSubmit(selectGroup);
+      },
+      // 退出小组
+      exitGroup() {
+        alert('退出小组');
       }
     }
   };

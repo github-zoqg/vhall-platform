@@ -23,20 +23,23 @@
         type="textarea"
         :rows="10"
         placeholder="请输入小组公告内容"
-        v-model="notice"
+        v-model="content"
         maxlength="300"
         show-word-limit
       ></el-input>
 
       <!-- 底部按钮 -->
       <div slot="footer" class="vmp-group-ft">
-        <el-button type="primary" :round="true" @click="handleSubmit">发布</el-button>
+        <el-button type="primary" :round="true" @click="handleThrottleSubmit()">发布</el-button>
         <el-button :round="true" @click="handleClose">取消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
+  import { useNoticeServer } from 'middle-domain';
+  import _ from 'lodash';
+
   export default {
     name: 'VmpGroupNotice',
     props: {
@@ -48,17 +51,40 @@
     data() {
       return {
         dialogVisible: this.show,
-        notice: ''
+        content: ''
       };
+    },
+    beforeCreate() {
+      this.noticeServer = useNoticeServer();
     },
     watch: {
       show: function (newVal) {
         this.dialogVisible = newVal;
       }
     },
+    mounted() {
+      this.handleThrottleSubmit = _.throttle(this.handleSubmit, 300, { trailing: false });
+    },
     methods: {
-      handlOpen() {},
-      handleSubmit() {},
+      handlOpen() {
+        this.content = '';
+      },
+      handleSubmit: async function () {
+        const fmtContent = this.content.trim();
+        if (fmtContent.length === 0) {
+          this.$message.warning('请输入公告内容');
+          return;
+        }
+        try {
+          await this.noticeServer.sendNotice({
+            content: fmtContent,
+            messageType: 2
+          });
+          this.handleClose();
+        } catch (ex) {
+          console.log('-----ex----', ex);
+        }
+      },
       handleClose() {
         this.dialogVisible = false;
         this.$emit('update:show', false);

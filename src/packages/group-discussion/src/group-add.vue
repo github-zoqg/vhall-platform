@@ -19,9 +19,7 @@
 
       <!-- 底部按钮 -->
       <div slot="footer" class="vmp-group-ft">
-        <el-button type="primary" :round="true" @click.native="handleThrottleSubmit()">
-          确定
-        </el-button>
+        <el-button type="primary" :round="true" @click="handleThrottleSubmit()">确定</el-button>
         <el-button :round="true" @click="handleClose">取消</el-button>
       </div>
     </el-dialog>
