@@ -194,6 +194,24 @@
             break;
         }
       });
+      this.msgServer.$onMsg('CUSTOM_MSG', rawMsg => {
+        let temp = Object.assign({}, rawMsg);
+
+        if (typeof temp.data !== 'object') {
+          temp.data = JSON.parse(temp.data);
+          temp.context = JSON.parse(temp.context);
+        }
+        console.log(temp, '原始消息');
+        const { type = '' } = temp.data || {};
+        switch (type) {
+          // 计时器暂停
+          case 'timer_pause':
+            this.timer_pause(temp);
+            break;
+          default:
+            break;
+        }
+      });
     },
     methods: {
       // 计时器开始
@@ -346,7 +364,7 @@
           this.status = 'zanting';
           // if (window.chatSDK) {
           // TODO: // 主动向房间暂停发送消息
-          this.msgServer.sendRoomMsg({
+          this.msgServer.sendCustomMsg({
             role_name: JSON.parse(sessionStorage.getItem('user')).role_name,
             type: 'timer_pause',
             remain_time: this.shijian
