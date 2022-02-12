@@ -53,11 +53,6 @@
     display: flex;
     flex-direction: column;
 
-    & > header {
-      flex: 0 0 auto;
-      height: 64px;
-    }
-
     & > main {
       height: 1px;
       flex: 1 1 auto;

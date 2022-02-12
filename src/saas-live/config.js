@@ -147,13 +147,9 @@ export const serverConfig = {
       'comShareDesktopMenu',
       'comMediaPlayMenu',
       'comInteractMenu',
-      'comGroupMenu'
-    ],
-    emitShareClick: [
-      {
-        cuid: 'comShare',
-        method: 'openShareDialog'
-      }
+      'comGroupMenu',
+      'comShareMenu',
+      'comExitGroupMenu'
     ]
   },
   // 语言选择组件
@@ -210,6 +206,7 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
+      kind: 'deskshare',
       disable: true
     }
   },
@@ -218,7 +215,8 @@ export const serverConfig = {
     component: 'VmpIconText',
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-color-Spotfile',
-      text: 'aside_menu.aside_menu_1003'
+      text: 'aside_menu.aside_menu_1003',
+      kind: 'insertMedia'
     },
     handleClick: [
       {
@@ -249,7 +247,13 @@ export const serverConfig = {
   },
   // 互动工具-计时器
   liveTimer: {
-    component: 'VmpLiveTimer'
+    component: 'VmpLiveTimer',
+    emitOpenTimerSet: [
+      {
+        cuid: ['liveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
   },
 
   // 分组讨论菜单
@@ -267,6 +271,39 @@ export const serverConfig = {
         cuid: ['comGroupDiscussion'],
         method: 'switchTo',
         args: 'group'
+      }
+    ]
+  },
+  // 分享菜单
+  comShareMenu: {
+    component: 'VmpIconText',
+    options: {
+      className: 'menu-footer',
+      icon: 'vh-iconfont vh-line-share',
+      text: '分享',
+      kind: 'share'
+    },
+    handleClick: [
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
+    ]
+  },
+
+  // 退出小组菜单
+  comExitGroupMenu: {
+    component: 'VmpIconText',
+    options: {
+      className: 'menu-footer',
+      icon: 'vh-iconfont vh-line-exit',
+      text: '退出小组',
+      kind: 'exitGroup'
+    },
+    handleClick: [
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'exitGroup'
       }
     ]
   },
@@ -329,41 +366,6 @@ export const serverConfig = {
       method: 'show'
     }
   },
-  // 文档工具栏
-  comDocToolbar: {
-    component: 'VmpDocToolbar',
-    children: ['comFullscreenIcon', 'comDocThumbnailIcon']
-  },
-  // 文档全屏按钮
-  comFullscreenIcon: {
-    component: 'VmpIconItem',
-    options: {
-      icon: 'iconfont iconquanping',
-      title: 'doc.doc_1010'
-    },
-    emitClick: [
-      {
-        cuid: 'comDocUne',
-        method: 'fullscreen'
-      }
-    ]
-  },
-  // 文档缩略图按钮
-  comDocThumbnailIcon: {
-    component: 'VmpIconItem',
-    options: {
-      icon: 'iconfont iconsuolvetu',
-      title: 'usual.docThumb',
-      kind: 'document'
-    },
-    emitClick: [
-      {
-        cuid: 'comDocUne',
-        method: 'onThumbnailToggle'
-      }
-    ]
-  },
-
   //文档列表对话框
   dlgDocList: {
     component: 'VmpDocDlglist',

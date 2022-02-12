@@ -105,7 +105,8 @@ const sharedConfig = {
       'vue-i18n': 'VueI18n',
       moment: 'moment',
       'element-ui': 'ELEMENT',
-      'middle-domain': 'middleDomain'
+      'middle-domain': 'middleDomain',
+      vant: 'vant'
     },
     // 插件
     plugins: getPlugins()
