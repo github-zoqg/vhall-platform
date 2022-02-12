@@ -61,7 +61,7 @@
           <!-- 待处理 -->
           <ul :class="['await-deal', { topLine: awaitList.length > 0 }]" v-show="activeIndex == 0">
             <template v-if="awaitList.length > 0">
-              <li v-for="(item, index) in awaitList" :key="index" class="clearFix">
+              <li v-for="(item, index) in awaitList" :key="item.id" class="clearFix">
                 <div class="fl">
                   <p class="await-name">
                     <span class="await-id" v-if="item.sequence">
@@ -127,7 +127,7 @@
             v-show="activeIndex == 1"
           >
             <template v-if="audioList.length > 0">
-              <li v-for="(item, index) in audioList" :key="index" class="clearFix">
+              <li v-for="(item, index) in audioList" :key="item.id" class="clearFix">
                 <div class="fl">
                   <p class="await-name">
                     <span class="await-id" v-if="item.sequence">
@@ -212,7 +212,7 @@
             v-show="activeIndex == 2"
           >
             <template v-if="textDealList.length > 0">
-              <li v-for="(item, index) in textDealList" :key="index" class="clearFix">
+              <li v-for="(item, index) in textDealList" :key="item.id" class="clearFix">
                 <div class="fl">
                   <p class="await-name">
                     <span class="await-id" v-if="item.sequence">
@@ -248,7 +248,7 @@
                     class="await-name"
                     v-for="(ite, ind) in item.answer"
                     style="padding-bottom: 0px"
-                    :key="ind"
+                    :key="ite.id"
                   >
                     <p class="answer-title">
                       <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
@@ -328,7 +328,7 @@
             v-show="activeIndex == 3"
           >
             <template v-if="noDealList.length > 0">
-              <li v-for="(item, index) in noDealList" :key="index" class="clearFix">
+              <li v-for="item in noDealList" :key="item.id" class="clearFix">
                 <div class="fl">
                   <p class="await-name">
                     <span class="await-id" v-if="item.sequence">
