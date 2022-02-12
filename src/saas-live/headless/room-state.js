@@ -30,13 +30,10 @@ export default async function () {
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();
 
-  console.log('[group] start1');
-  // 如果当前正在进行分组讨论，初始化小组信息
-  if (roomBaseServer.state.interactToolStatus.is_open_switch === 1) {
-    console.log('[group] start2');
-    await groupServer.groupInit();
-  }
-  console.log('[group] start3');
+  // 初始化分组信息
+  await groupServer.init();
+  console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  window.groupServer = groupServer;
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
@@ -48,4 +45,9 @@ export default async function () {
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
 
   useMicServer();
+
+  // TODO 方便查询数据，后面会删除
+  window.roomBaseServer = roomBaseServer;
+  window.docServer = docServer;
+  window.groupServer = groupServer;
 }
