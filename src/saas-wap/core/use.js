@@ -39,6 +39,8 @@ import VmpIntroWap from '@/packages/intro-wap';
 import VmpWapTimer from '@/packages/wap-timer';
 //wap互动工具box
 import VmpContainerRightWap from '@/packages/basic-right-container-wap';
+//wap公告
+import VmpNoticeWap from '@/packages/notice-watch-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -76,4 +78,5 @@ export function initUse() {
   Vue.use(VmpIntroWap);
   Vue.use(VmpWapTimer);
   Vue.use(VmpContainerRightWap);
+  Vue.use(VmpNoticeWap);
 }
