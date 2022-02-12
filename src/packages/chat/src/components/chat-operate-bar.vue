@@ -128,8 +128,8 @@
       },
       // 是否全体禁言
       allBanned: {
-        type: Boolean,
-        default: () => false
+        type: Number,
+        default: () => 0
       },
       //活动id
       webinarId: {

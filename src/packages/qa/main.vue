@@ -397,24 +397,22 @@
             ></el-pagination>
           </div>
           <div class="messChat">
-            <span class="messchat-btn" v-show="!privateFlag" @click="messClick">
+            <span class="messchat-btn" @click="messClick">
               {{ $t('common.common_1008') }}
             </span>
           </div>
         </div>
       </div>
     </div>
-    <div class="private-window" v-show="privateFlag">
-      <PrivateChat
-        ref="private"
-        :userInfo="baseObj"
-        :webinar_id="webinar_id"
-        :onlyChatMess="onlyChatMess"
-        :priteChatList="priteChatList"
-        @close="privateClose"
-        @sendMsg="privateSendMsg"
-      ></PrivateChat>
-    </div>
+    <PrivateChat
+      ref="privateChat"
+      :userInfo="baseObj"
+      :webinar_id="webinar_id"
+      :onlyChatMess="onlyChatMess"
+      :priteChatList="priteChatList"
+      @close="privateClose"
+      @sendMsg="privateSendMsg"
+    ></PrivateChat>
     <el-dialog
       :title="$t('chat.chat_1082')"
       custom-class="text-reply"
@@ -455,7 +453,7 @@
 
 <script>
   import { useRoomBaseServer, useMsgServer, useQaServer } from 'middle-domain';
-  import PrivateChat from './components/private-chat/index';
+  import PrivateChat from '@/packages/live-private-chat/src/main';
   import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { debounce } from '@/packages/app-shared/utils/tool';
@@ -744,24 +742,13 @@
       reply(val, item, index) {
         if (typeof val == 'object') {
           if (val.type == 'private') {
-            // 合并 当前数据
-            this.onlyChatMess = {};
-            const privateMess = Object.assign(val, {
-              activeDom: this.activeIndex,
-              Subscript: index
+            console.log(item);
+            this.$refs.privateChat.addChatItem({
+              type: 1,
+              id: item.user_id,
+              chat_name: item.nick_name
             });
-            if (this.activeIndex != 0) {
-              privateMess.item = item;
-            } else {
-              privateMess.Subscript = val.index;
-            }
-            privateMess.nickname = privateMess.item.nick_name;
-            privateMess.join_id = privateMess.item.join_id;
-            privateMess.avatar = item.avatar;
-            if (!this.privateFlag) {
-              this.privateFlag = true;
-            }
-            this.onlyChatMess = privateMess;
+            this.$refs.privateChat.openModal();
           } else {
             this.qaServer
               .replyUserQuestion({
@@ -800,13 +787,13 @@
         console.warn('qa messClick---------->', this.priteChatList);
         this.privateFlag = true;
         await this.chatPrivateGetRankList({}).then(res => {});
-
+        this.$refs.privateChat.openModal();
         //todo 调用私聊组件中的方法, 需要通过事件驱动
-        this.$nextTick(() => {
-          if (this.priteChatList.length != 0) {
-            this.$refs.private.getDefaultContent(this.priteChatList[0].user_id, 'father');
-          }
-        });
+        // this.$nextTick(() => {
+        //   if (this.priteChatList.length != 0) {
+        //     this.$refs.private.getDefaultContent(this.priteChatList[0].user_id, 'father');
+        //   }
+        // });
       },
       privateClose() {
         this.privateFlag = false;
