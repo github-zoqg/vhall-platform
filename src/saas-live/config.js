@@ -85,7 +85,6 @@ export const serverConfig = {
       'liveTimerSet',
       'liveTimer'
     ]
-    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */
@@ -178,9 +177,13 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
       }
     ]
   },
@@ -194,9 +197,13 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
       }
     ]
   },
@@ -206,8 +213,7 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
-      kind: 'deskshare',
-      disable: true
+      kind: 'desktopShare'
     }
   },
   // 插播文件
@@ -221,8 +227,7 @@ export const serverConfig = {
     handleClick: [
       {
         cuid: 'comGroupDiscussion',
-        method: 'switchTo',
-        args: 'media'
+        method: 'hiddenAll'
       },
       {
         cuid: 'comInsertVideo',
@@ -234,6 +239,9 @@ export const serverConfig = {
   // 互动工具
   comInteractMenu: {
     component: 'VmpInteractMenu',
+    options: {
+      kind: 'interactTool'
+    },
     emitOpenTimerSet: [
       {
         cuid: ['liveTimerSet'],
@@ -269,8 +277,7 @@ export const serverConfig = {
       {
         // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
-        method: 'switchTo',
-        args: 'group'
+        method: 'toggle'
       }
     ]
   },
@@ -298,7 +305,8 @@ export const serverConfig = {
       className: 'menu-footer',
       icon: 'vh-iconfont vh-line-exit',
       text: '退出小组',
-      kind: 'exitGroup'
+      kind: 'exitGroup',
+      hidden: true
     },
     handleClick: [
       {
@@ -400,11 +408,11 @@ export const serverConfig = {
     exchangeCfg: [
       {
         cuid: 'comDocUne',
-        kind: 'doc'
+        kind: 'document'
       },
       {
         cuid: 'comInsertVideo',
-        kind: 'insertvideo'
+        kind: 'insertMedia'
       }
     ],
     // 推流完成事件
