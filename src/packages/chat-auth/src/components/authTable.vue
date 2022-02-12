@@ -92,6 +92,13 @@
         default: () => {
           return {};
         }
+      },
+      //当前的列表
+      list: {
+        type: Array,
+        default: () => {
+          return [];
+        }
       }
     },
     components: {
@@ -100,72 +107,72 @@
     data() {
       return {
         //列表数据
-        list: [
-          {
-            data: '9999',
-            date_time: '2022-01-14 15:39:15',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_aed7b493cf3d4867ab6814f202af1eac',
-            avatar: '',
-            image_urls: null
-          },
-          {
-            data: '6666',
-            date_time: '2022-01-14 15:38:40',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_f442e8d3a0ca4115980e5ad9040c480b',
-            avatar: '',
-            image_urls: null
-          },
-          {
-            data: '7777',
-            date_time: '2022-01-13 18:14:14',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_0a531a2f82d748088cace56d14f09a0f',
-            avatar: '',
-            image_urls: null
-          },
-          {
-            data: '6666',
-            date_time: '2022-01-13 18:13:47',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_456664c553a84ac58e8bbf7c68e95a57',
-            avatar: '',
-            image_urls: null
-          }
-        ],
+        // list: [
+        //   {
+        //     data: '9999',
+        //     date_time: '2022-01-14 15:39:15',
+        //     nick_name: '测试人员5',
+        //     context: {
+        //       role_name: 2,
+        //       nick_name: '测试人员5',
+        //       nickname: '测试人员5',
+        //       avatar: ''
+        //     },
+        //     type: 'text',
+        //     third_party_user_id: '100696',
+        //     msg_id: 'msg_aed7b493cf3d4867ab6814f202af1eac',
+        //     avatar: '',
+        //     image_urls: null
+        //   },
+        //   {
+        //     data: '6666',
+        //     date_time: '2022-01-14 15:38:40',
+        //     nick_name: '测试人员5',
+        //     context: {
+        //       role_name: 2,
+        //       nick_name: '测试人员5',
+        //       nickname: '测试人员5',
+        //       avatar: ''
+        //     },
+        //     type: 'text',
+        //     third_party_user_id: '100696',
+        //     msg_id: 'msg_f442e8d3a0ca4115980e5ad9040c480b',
+        //     avatar: '',
+        //     image_urls: null
+        //   },
+        //   {
+        //     data: '7777',
+        //     date_time: '2022-01-13 18:14:14',
+        //     nick_name: '测试人员5',
+        //     context: {
+        //       role_name: 2,
+        //       nick_name: '测试人员5',
+        //       nickname: '测试人员5',
+        //       avatar: ''
+        //     },
+        //     type: 'text',
+        //     third_party_user_id: '100696',
+        //     msg_id: 'msg_0a531a2f82d748088cace56d14f09a0f',
+        //     avatar: '',
+        //     image_urls: null
+        //   },
+        //   {
+        //     data: '6666',
+        //     date_time: '2022-01-13 18:13:47',
+        //     nick_name: '测试人员5',
+        //     context: {
+        //       role_name: 2,
+        //       nick_name: '测试人员5',
+        //       nickname: '测试人员5',
+        //       avatar: ''
+        //     },
+        //     type: 'text',
+        //     third_party_user_id: '100696',
+        //     msg_id: 'msg_456664c553a84ac58e8bbf7c68e95a57',
+        //     avatar: '',
+        //     image_urls: null
+        //   }
+        // ],
         //是否正在加载
         loading: false,
         //分页配置
