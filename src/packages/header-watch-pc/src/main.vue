@@ -114,7 +114,8 @@
           nickname: '测试==测试==测试==测试==测试==测试==测试==测试'
         }, // 用户登录之后的信息
         themeClass: {
-          pageBg: '#3562fa'
+          bgColor: 'light',
+          pageBg: '#cccccc'
         },
         isLogin: false
       };
