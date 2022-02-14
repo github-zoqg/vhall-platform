@@ -156,6 +156,11 @@ export const serverConfig = {
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
       method: 'openModal'
+    },
+    //打开计时器组件
+    emitOpenTimer: {
+      cuid: ['comWatchTimer'],
+      method: 'handleTimer'
     }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
@@ -208,6 +213,11 @@ export const serverConfig = {
   },
   // 互动工具计时器
   comWatchTimer: {
-    component: 'VmpWatchTimer'
+    component: 'VmpWatchTimer',
+    emitChangeTimer: {
+      cuid: ['comFooterTools'],
+      method: 'changeStatus',
+      args: ['$0', '$1']
+    }
   }
 };
