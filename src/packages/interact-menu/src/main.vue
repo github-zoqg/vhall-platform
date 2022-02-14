@@ -11,23 +11,23 @@
     <div class="vmp-interact-menu-wrap">
       <div class="vmp-interact-menu-list">
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-line-label"></i>
+          <i class="vh-iconfont vh-a-line-luckydraw"></i>
           <p>抽奖</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-a-line-Signin"></i>
+          <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-color-Question"></i>
+          <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
         <div class="vmp-interact-menu-list-item vmp-interact-menu-list-disable">
-          <i class="vh-saas-iconfont vh-saas-color-questionnaire"></i>
+          <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-a-color-redpacket"></i>
+          <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
         </div>
         <div class="vmp-interact-menu-list-item" @click="openTimer">
