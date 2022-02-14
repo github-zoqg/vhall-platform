@@ -34,7 +34,7 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE) // 路由base
+        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE_URL)
       }
     })
   ];
@@ -143,7 +143,7 @@ const sharedConfig = {
           dist: path.resolve('dist'),
           project: argv.project,
           version: argv.version,
-          routerBase: `${process.env.VUE_APP_ROUTER_BASE}`
+          routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
         })
       );
     }

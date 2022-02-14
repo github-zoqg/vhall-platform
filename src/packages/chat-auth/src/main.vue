@@ -5,7 +5,7 @@
       <!--活动标题-->
       <!--      <div class="header-bar__title">-->
       <!--        <i class="iconfont iconzhibo"></i>-->
-      <!--        {{ activityInfo.title }}-->
+      <!--        {{ activityTitle }}-->
       <!--      </div>-->
       <div class="header-bar__operate-bar">
         <div class="switch-box">
@@ -14,6 +14,8 @@
             v-model="enableChatAuth"
             :inactive-color="options.inactiveColor"
             :width="32"
+            :active-value="2"
+            :inactive-value="1"
             :active-color="options.activeColor"
             @change="toggleChatAuth"
           ></el-switch>
@@ -35,20 +37,20 @@
       <div class="main-container">
         <!--列表操作栏-->
         <div class="main-container__header">
-          <div
-            class="table-select"
-            :class="{ disabled: selectMenuType !== 'auth' || (list && !list.length) }"
-          >
-            <i class="el-icon-s-operation"></i>
-            <div class="sub-menus">
-              <span :class="{ active: selectDataType === 'page' }" @click="changeDataType('page')">
-                选择本页数据
-              </span>
-              <span :class="{ active: selectDataType === 'all' }" @click="changeDataType('all')">
-                选择所有数据
-              </span>
-            </div>
-          </div>
+          <!--          <div-->
+          <!--            class="table-select"-->
+          <!--            :class="{ disabled: selectMenuType !== 'auth' || (auditList && !auditList.length) }"-->
+          <!--          >-->
+          <!--            <i class="el-icon-s-operation"></i>-->
+          <!--            <div class="sub-menus">-->
+          <!--              <span :class="{ active: selectDataType === 'page' }" @click="changeDataType('page')">-->
+          <!--                选择本页数据-->
+          <!--              </span>-->
+          <!--              <span :class="{ active: selectDataType === 'all' }" @click="changeDataType('all')">-->
+          <!--                选择所有数据-->
+          <!--              </span>-->
+          <!--            </div>-->
+          <!--          </div>-->
           <div class="table-menu" :class="{ disabled: isCooling }">
             <span
               class="table-menu-item"
@@ -69,21 +71,21 @@
               :class="{ active: selectMenuType === 'passed' }"
               @click="switchToTab('passed')"
             >
-              已通过({{ passedTotal }})
+              已通过({{ passedNum }})
             </span>
             <span
               class="table-menu-item"
               :class="{ active: selectMenuType === 'muted' }"
               @click="switchToTab('muted')"
             >
-              禁言({{ mutedTotal }})
+              禁言({{ mutedNum }})
             </span>
             <span
               class="table-menu-item"
               :class="{ active: selectMenuType === 'kickedOut' }"
               @click="switchToTab('kickedOut')"
             >
-              踢出({{ kickedOutTotal }})
+              踢出({{ kickedNum }})
             </span>
           </div>
           <div
@@ -91,40 +93,40 @@
             :class="{ disabled: !selectMsgIds.length }"
             v-if="selectMenuType === 'auth'"
           >
+            <!--            <el-button-->
+            <!--              v-if="!selectMsgIds.length"-->
+            <!--              type="default"-->
+            <!--              :size="controlConfig.size"-->
+            <!--              :round="controlConfig.round"-->
+            <!--            >-->
+            <!--              其他操作-->
+            <!--            </el-button>-->
+            <!--            <el-dropdown @command="handleCommand" v-else>-->
+            <!--              <span class="el-dropdown-link">-->
+            <!--                <el-button type="default" :size="controlConfig.size" :round="controlConfig.round">-->
+            <!--                  其他操作-->
+            <!--                </el-button>-->
+            <!--              </span>-->
+            <!--              <el-dropdown-menu slot="dropdown">-->
+            <!--                <el-dropdown-item command="batchBaned">批量禁言</el-dropdown-item>-->
+            <!--                <el-dropdown-item command="batchKicked">批量踢出</el-dropdown-item>-->
+            <!--              </el-dropdown-menu>-->
+            <!--            </el-dropdown>-->
             <el-button
-              v-if="!selectMsgIds.length"
-              type="default"
-              :size="controlConfig.size"
-              :round="controlConfig.round"
-            >
-              其他操作
-            </el-button>
-            <el-dropdown @command="handleCommand" v-else>
-              <span class="el-dropdown-link">
-                <el-button type="default" :size="controlConfig.size" :round="controlConfig.round">
-                  其他操作
-                </el-button>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="batchBaned">批量禁言</el-dropdown-item>
-                <el-dropdown-item command="batchKicked">批量踢出</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-            <el-button
-              type="success"
+              type="danger"
               @click="handleBatchPass()"
               :size="controlConfig.size"
               :round="controlConfig.round"
             >
-              批量通过
+              全部通过
             </el-button>
             <el-button
-              type="danger"
+              type="default"
               @click="handleBatchPrevent()"
               :size="controlConfig.size"
               :round="controlConfig.round"
             >
-              批量阻止
+              全部阻止
             </el-button>
           </div>
           <span class="el-icon-refresh-right refresh-btn" @click="refreshList"></span>
@@ -134,6 +136,10 @@
             :select-menu-type="selectMenuType"
             :options="options"
             :list="currentList"
+            ref="authTable"
+            @cancelMuted="handleCancelMuted"
+            @cancelKicked="handleCancelKicked"
+            @messageOperate="handleMessageOperate"
           ></auth-table>
         </div>
       </div>
@@ -145,7 +151,11 @@
     >
       {{ footerInfo.text }}
     </div>
-    <auto-setting-modal ref="autoSettingModal" :options="options"></auto-setting-modal>
+    <auto-setting-modal
+      ref="autoSettingModal"
+      :options="options"
+      @confirm="handleAutoSetting"
+    ></auto-setting-modal>
   </div>
 </template>
 
@@ -161,12 +171,8 @@
     },
     data() {
       return {
-        //todo 需要根据配置决定是否展示活动标题 活动信息
-        activityInfo: {
-          title: '测试用活动标题'
-        },
         //开启聊天审核
-        enableChatAuth: false,
+        enableChatAuth: 1,
         //是否开启了自动处理
         enableAutoHandle: '1',
         //底部支持信息
@@ -180,20 +186,8 @@
         selectMenuType: 'auth',
         //批处理选择的是哪种 all:所有数据 , page：当前页的数据
         selectDataType: '',
-        //已通过审核的列表
-        passedList: [],
-        // 被踢出和禁言的消息列表
-        specialUser: [],
         //已阻止的数量
         prohibitTotal: 0,
-        //未审核的数量
-        authTotal: 0,
-        //已通过总数
-        passedTotal: 0,
-        //已禁言总数
-        mutedTotal: 0,
-        //已踢出的总数
-        kickedOutTotal: 0,
         //查询参数
         searchParams: {
           page: 1,
@@ -202,9 +196,9 @@
         },
         //todo  tab切换限流 是否在冷却
         isCooling: false,
-        //选中的操作消息的id集合
+        //选中的操作消息的id集合 todo
         selectMsgIds: [],
-        //选中的操作人员的id集合
+        //选中的操作人员的id集合 todo
         selectUserIds: [],
         //控件配置
         controlConfig: {
@@ -218,7 +212,7 @@
           //switch未激活的颜色
           inactiveColor: '#cccccc',
           //switch激活的颜色
-          activeColor: '#FFD021'
+          activeColor: '#fc5659'
         },
         //当前活动id
         webinarId: this.$route.params.id || '',
@@ -227,13 +221,17 @@
       };
     },
     computed: {
+      //活动标题
+      activityTitle() {
+        return this.$domainStore.state.chatAuthServer.activityTitle;
+      },
       //当前的列表
       currentList() {
         let list = [];
         switch (this.selectMenuType) {
           case 'auth':
             //未审核
-            list = this.list;
+            list = this.auditList;
             break;
           case 'prohibit':
             //已阻止
@@ -243,10 +241,10 @@
             //已通过
             break;
           case 'muted':
-            list = this.specialUser;
+            list = this.mutedList;
             break;
           case 'kickedOut':
-            list = this.specialUser;
+            list = this.kickedList;
             break;
           default:
             break;
@@ -254,12 +252,36 @@
         return list;
       },
       //待审核列表
-      list() {
+      auditList() {
         return this.$domainStore.state.chatAuthServer.auditList;
+      },
+      //已审核的列表
+      passedList() {
+        return this.$domainStore.state.chatAuthServer.passedList;
+      },
+      //已禁言的列表
+      mutedList() {
+        return this.$domainStore.state.chatAuthServer.mutedList;
+      },
+      //已踢出的列表
+      kickedList() {
+        return this.$domainStore.state.chatAuthServer.kickedList;
+      },
+      //已审核的数量
+      passedNum() {
+        return this.$domainStore.state.chatAuthServer.passedNum;
       },
       //未审核的数量
       auditNum() {
         return this.$domainStore.state.chatAuthServer.auditList.length;
+      },
+      //已禁言的数量
+      mutedNum() {
+        return this.$domainStore.state.chatAuthServer.mutedNum;
+      },
+      //已踢出的数量
+      kickedNum() {
+        return this.$domainStore.state.chatAuthServer.kickedNum;
       }
     },
     beforeCreate() {
@@ -274,14 +296,12 @@
     methods: {
       //todo 初始化方法
       async init() {
-        //获取活动信息
-        this.getActivityInfo();
-        //获取聊天审核开关状态
-        this.getChatAuthEnableStatus();
         //提取Url参数
         this.urlParams = this.extractionUrlParams();
         //初始化房间信息，这里也会在domain里初始化聊天sdk和消息sdk
         await this.initRoomInfo();
+        //获取聊天审核开关状态
+        this.getChatAuthEnableStatus();
         this.listenEvents();
       },
       //初始化聊天实例
@@ -300,6 +320,7 @@
         });
         this.fetchOperate(params);
       },
+      //更新操作
       fetchOperate(params, cb) {
         if (!params.msg_id) return;
         this.chatAuthServer
@@ -308,15 +329,17 @@
             if (cb) {
               cb();
             }
+            this.getChatMessageList();
             if (res.code === 50014) {
-              this.getChatMessageList();
+              // this.getChatMessageList();
             } else if (res.code == 10001) {
               this.$message.warning(res.msg);
             }
           })
           .catch(res => {
+            this.getChatMessageList();
             if (res.code === 50014) {
-              this.getChatMessageList();
+              // this.getChatMessageList();
             } else if (res.code === 10040) {
               this.$message({
                 message: '当前无聊天消息',
@@ -349,7 +372,7 @@
         }
         return mapObj;
       },
-      //获取房间信息  todo 获取房间信息，初始化消息sdk和聊天sdk
+      //获取房间信息、活动信息
       initRoomInfo() {
         let vc = this.$route.query.vc;
         try {
@@ -378,8 +401,6 @@
             console.log(error);
           });
       },
-      //todo 获取活动信息
-      getActivityInfo() {},
       //获取聊天审核开启状态
       getChatAuthEnableStatus() {
         const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
@@ -387,7 +408,7 @@
         return this.chatAuthServer
           .getChatAuthEnableStatus(params)
           .then(res => {
-            this.enableChatAuth = res.data.switch || 1;
+            this.enableChatAuth = res && res.data ? Number(res.data.switch) : 1;
             this.enableAutoHandle = res.data.switch_options + '';
           })
           .catch(res => {
@@ -397,7 +418,7 @@
             });
           });
       },
-      //todo 获取tab上的处理数
+      //获取tab上的处理数
       initTabTotalNum() {
         //获取全部的tab
         this.getChatMessageList();
@@ -407,102 +428,35 @@
       },
       //获取未审核的聊天数据 (0:未审核 1:通过  2:阻止)
       getChatMessageList() {
-        // const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
-        // const params = Object.assign({}, baseChanelInfo);
-        // this.list = [];
-        // let tempItem = {};
-        // let object = {};
-        // let context, data;
-        // this.chatAuthServer.getAuditMessageList(params).then(res => {
-        //   for (let i in res.data) {
-        //     object = JSON.parse(res.data[i]);
-        //     context =
-        //       typeof JSON.parse(object.context) === 'object'
-        //         ? JSON.parse(object.context)
-        //         : JSON.parse(JSON.parse(object.context));
-        //     tempItem.nick_name = context.nickname || context.nick_name;
-        //     tempItem.time = object.time;
-        //     tempItem.type = object.type;
-        //     tempItem.msg_id = i;
-        //     tempItem.third_party_user_id = object.sender_id; // 发送消息的人第三方id
-        //     tempItem.channel = object.channel;
-        //     tempItem.room_id = object.room_id;
-        //     data = JSON.parse(object.data);
-        //     if (tempItem.type === 'text') {
-        //       tempItem.text_content = data.barrageTxt || data.text_content;
-        //     } else if (tempItem.type === 'video') {
-        //       tempItem.video_url = data.video_url;
-        //     } else if (tempItem.type === 'voice') {
-        //       tempItem.voice_url = data.voice_url;
-        //     } else if (tempItem.type === 'image') {
-        //       tempItem.image_urls = data.image_urls;
-        //       if (Object.prototype.hasOwnProperty.call(data, 'text_content')) {
-        //         tempItem.text_content = data.barrageTxt || data.text_content;
-        //       }
-        //     } else if (tempItem.type === 'link') {
-        //       tempItem.link_url = data.link_url;
-        //     }
-        //     tempItem.isOperate = 0; // 0 未对数据操作， 1审核通过，2拒绝
-        //     this.list.push(tempItem);
-        //     tempItem = {};
-        //     object = {};
-        //   }
-        // });
-        return this.chatAuthServer.getChatMessageList();
+        return this.chatAuthServer.fetchChatMessageList();
       },
       //获取已通过的审核的聊天数据
       getPassedMessageList() {
-        const { baseChanelInfo = {}, createTime = '' } = this.chatAuthServer.state;
         const params = {
-          ...baseChanelInfo,
-          msg_type: 'image,text,link,video,voice',
           page_size: this.searchParams.pageSize,
-          curr_page: this.searchParams.page,
-          start_time: createTime
+          curr_page: this.searchParams.page
         };
-        return this.chatAuthServer.getPassedMessageList(params).then(res => {
-          this.passedList = res.data.list;
-          this.passedTotal = res.data.total;
-          this.searchParams.total = res.data.total;
-        });
+        return this.chatAuthServer.fetchPassedMessageList(params);
       },
       //获取被禁言的人员列表
       getMutedUserList() {
-        const { roomInfo = {} } = this.chatAuthServer.state;
         const params = {
-          ...roomInfo,
           pos: 0,
           limit: this.searchParams.pageSize
         };
-        return this.chatAuthServer
-          .getBannedList(params)
-          .then(res => {
-            this.specialUser = res.data.list;
-            this.searchParams.total = res.data.total;
-            this.mutedTotal = res.data.total;
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        return this.chatAuthServer.fetchMutedUserList(params).catch(error => {
+          console.log(error);
+        });
       },
       //获取被踢出的人员列表
       getKickedUserList() {
-        const { roomInfo = {} } = this.chatAuthServer.state;
         const params = {
-          ...roomInfo,
           pos: 0,
           limit: this.searchParams.pageSize
         };
-        return this.chatAuthServer
-          .getKickedList(params)
-          .then(res => {
-            this.specialUser = res.data.list;
-            this.searchParams.total = res.data.total;
-            this.kickedOutTotal = res.data.total;
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        return this.chatAuthServer.fetchKickedUserList(params).catch(error => {
+          console.log(error);
+        });
       },
       //打开自动审核弹窗
       openAutoSettingModal() {
@@ -510,14 +464,22 @@
       },
       //开启/关闭聊天审核
       toggleChatAuth() {
-        const params = {};
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
+          switch: this.enableChatAuth
+        };
+        console.log(params);
         this.chatAuthServer
           .toggleChatAuthStatus(params)
           .then(res => {
-            console.log(res);
+            this.enableChatAuth = res.data.switch;
           })
           .catch(error => {
-            console.log(error);
+            const { msg = '' } = error || {};
+            this.$message({
+              message: msg,
+              type: 'error'
+            });
           });
       },
       //todo 请求接口获取底部技术支持配置
@@ -531,7 +493,6 @@
         } else {
           this.selectDataType = type;
         }
-        //todo 考虑优化
       },
       //切换tab
       switchToTab(type = '') {
@@ -564,15 +525,217 @@
         }
       },
       //刷新当前tab下的列表
-      refreshList() {},
+      refreshList() {
+        this.searchParams.page = 1;
+        switch (this.selectMenuType) {
+          case 'auth':
+            this.getChatMessageList();
+            break;
+          case 'passed':
+            this.getPassedMessageList();
+            break;
+          case 'muted':
+            this.getMutedUserList();
+            break;
+          case 'kickedOut':
+            this.getKickedUserList();
+            break;
+          default:
+            break;
+        }
+      },
       //选中下拉选项的处理
       handleCommand(type) {
         console.log(type);
       },
-      //批量通过
-      handleBatchPass() {},
-      //批量阻止
-      handleBatchPrevent() {}
+      //全部通过
+      handleBatchPass() {
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.baseChanelInfo
+        };
+        params.msg_id = this.$domainStore.state.chatAuthServer.auditList
+          .map(it => it.msg_id)
+          .join();
+        params.status = 1;
+        this.fetchOperate(params);
+      },
+      //全部阻止
+      handleBatchPrevent() {
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.baseChanelInfo
+        };
+        params.msg_id = this.$domainStore.state.chatAuthServer.auditList
+          .map(it => it.msg_id)
+          .join();
+        params.status = 2;
+        this.fetchOperate(params);
+      },
+      //取消禁言
+      handleCancelMuted(item = {}) {
+        const { roomInfo = {} } = this.chatAuthServer.state;
+        const params = {
+          ...roomInfo,
+          receive_account_id: item.account_id,
+          status: 0
+        };
+        this.chatAuthServer
+          .toggleBannedStatus(params)
+          .then(res => {
+            const { code = '', msg = '' } = res || {};
+            if (![200, '200'].includes(code)) {
+              this.$message({
+                message: msg,
+                type: 'error'
+              });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //取消踢出
+      handleCancelKicked(item = {}) {
+        const { roomInfo = {} } = this.chatAuthServer.state;
+        const params = {
+          ...roomInfo,
+          receive_account_id: item.account_id,
+          status: 0
+        };
+        this.chatAuthServer
+          .toggleKickedStatus(params)
+          .then(res => {
+            const { code = '', msg = '' } = res || {};
+            if (![200, '200'].includes(code)) {
+              this.$message({
+                message: msg,
+                type: 'error'
+              });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //禁言
+      handleSetMuted(params = {}) {
+        return this.chatAuthServer
+          .toggleBannedStatus(params)
+          .then(res => {
+            const { code = '', msg = '' } = res || {};
+            if (![200, '200'].includes(code)) {
+              this.$message({
+                message: msg,
+                type: 'error'
+              });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //踢出
+      handleSetKicked(params = {}) {
+        return this.chatAuthServer
+          .toggleKickedStatus(params)
+          .then(res => {
+            const { code = '', msg = '' } = res || {};
+            if (![200, '200'].includes(code)) {
+              this.$message({
+                message: msg,
+                type: 'error'
+              });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //处理消息操作
+      handleMessageOperate(eventInfo = {}) {
+        const { type = '', params = {} } = eventInfo;
+        switch (type) {
+          case 'setPassed':
+            this.handleSetPassed(params);
+            break;
+          case 'setProhibit':
+            this.handleSetProhibit(params);
+            break;
+          case 'setMuted':
+            this.handleSetMuted(params);
+            break;
+          case 'setKicked':
+            this.handleSetKicked(params);
+            break;
+          case 'passedAndReply':
+            this.handlePassedAndReply(params);
+            break;
+          default:
+            break;
+        }
+      },
+      //处理通过消息
+      handleSetPassed(params = {}) {
+        this.fetchOperate(params);
+      },
+      //处理阻止消息
+      handleSetProhibit(params = {}) {
+        this.fetchOperate(params);
+      },
+      //处理通过并回复
+      handlePassedAndReply({ messageInfo = {}, replyText = '' }) {
+        const _this = this;
+        const replayData = {
+          type: 'text',
+          access_audit: 1,
+          text_content: replyText
+        };
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const context = {
+          nickname: user.nickname || user.nick_name,
+          avatar: user.avatar,
+          role_name: this.$domainStore.state.chatAuthServer.roleName,
+          replyMsg: {
+            ...messageInfo,
+            nickName: messageInfo.nick_name,
+            content: { text_content: messageInfo.text_content, type: 'text' }
+          }
+        };
+        //先发送消息
+        function sendReplyData() {
+          _this.chatAuthServer.chatInstance.emit(replayData, context, 0);
+        }
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
+          msg_id: messageInfo.msg_id,
+          status: 1
+        };
+        this.fetchOperate(params, sendReplyData);
+      },
+      //处理自动审核设置
+      handleAutoSetting(messageInfo = {}) {
+        const { switch_options = '' } = messageInfo;
+        if (this.enableChatAuth === 1) {
+          this.enableChatAuth = 2;
+        }
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
+          switch: this.enableChatAuth,
+          switch_options: switch_options
+        };
+        this.chatAuthServer
+          .setMessageFilterOptions(params)
+          .then(res => {
+            const { switch_options = '' } = res && res.data ? res.data : {};
+            this.enableAutoHandle = switch_options + '';
+          })
+          .catch(error => {
+            const { msg = '' } = error || {};
+            this.$message({
+              message: msg,
+              type: 'error'
+            });
+          });
+      }
     }
   };
 </script>
@@ -582,8 +745,8 @@
     @color-blue: #4b5afe;
     @color-blue-hover: #5d6afe;
     @color-bd: #e2e2e2;
-    @color-default-hover: #fdd43f;
-    @color-default-active: #eec11a;
+    @color-default-hover: #fc5659;
+    @color-default-active: #fc5659;
     @color-blue-hover: #5d6afe;
     @color-blue: #4b5afe;
 
@@ -667,6 +830,8 @@
       overflow: hidden;
       box-shadow: 0 0 12px 0 rgba(213, 197, 231, 0.5);
       .main-container {
+        display: flex;
+        flex-direction: column;
         position: relative;
         height: 100%;
         padding-bottom: 20px;
@@ -779,6 +944,9 @@
             }
           }
         }
+      }
+      .main-container__content {
+        flex: 1;
       }
     }
     &__bottom-bar {

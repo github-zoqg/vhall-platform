@@ -144,15 +144,15 @@ export default {
     changeHoverImg(data) {
       if (data.source_status == 1) return '';
       if (data.name == '鲜花') {
-        return require('../../img/rose-move.gif');
+        return require('./img/rose-move.gif');
       } else if (data.name == '咖啡') {
-        return require('../../img/coffee-move.gif');
+        return require('./img/coffee-move.gif');
       } else if (data.name == '鼓掌') {
-        return require('../../img/hand-move.gif');
+        return require('./img/hand-move.gif');
       } else if (data.name == '赞') {
-        return require('../../img/favor-move.gif');
+        return require('./img/favor-move.gif');
       } else if (data.name == '666') {
-        return require('../../img/666-move.gif');
+        return require('./img/666-move.gif');
       }
     },
     handleClearTime() {

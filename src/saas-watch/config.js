@@ -111,7 +111,7 @@ export const serverConfig = {
         cuid: 'comShare',
         method: 'openShareDialog'
       }
-    ]
+    ],
   },
   comOfficial: {
     component: 'VmpOfficial'
@@ -161,6 +161,11 @@ export const serverConfig = {
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
+    },
+    // 打开登陆弹窗
+    emitNeedLogin: {
+      cuid: ['compRegLogin'],
+      method: 'open'
     }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
