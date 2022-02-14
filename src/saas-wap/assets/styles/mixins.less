@@ -1,0 +1,37 @@
+// @mixin border-1px-direction($direction, $color: #e6e6e6, $borderRadius: 8PX) {
+//   position: relative;
+//   border-width: 0;
+//   input{
+//     background-color: transparent;
+//     position: relative;
+//     z-index: 1;
+//   }
+//   &::after {
+//     content: ' ';
+//     width: 200%;
+//     height: 200%;
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     /* prettier-ignore */
+//     @if $direction == 'left' {
+//       border-left: 1PX solid $color;
+//       border-radius: unset;
+//     } @else if $direction == 'right' {
+//       border-right: 1PX solid $color;
+//       border-radius: unset;
+//     } @else if $direction == 'bottom' {
+//       border-bottom: 1PX solid $color;
+//       border-radius: unset;
+//     } @else if $direction == 'top' {
+//       border-top: 1PX solid $color;
+//       border-radius: unset;
+//     } @else {
+//       border: 1PX solid $color;
+//       border-radius: $borderRadius;
+//     }
+//     transform: scale(0.5);
+//     transform-origin: 0 0;
+//     box-sizing: border-box;
+//   }
+// }
