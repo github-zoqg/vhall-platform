@@ -2,8 +2,15 @@
   <div class="vmp-header-watch">
     <div class="vmp-header-watch-left">
       <!-- 品牌设置-标识图片 -->
-      <div class="vmp-header-watch-left-logo">
-        <img src="./images/logo-red@2x.png" alt="" />
+      <div
+        class="vmp-header-watch-left-logo"
+        v-if="webinarTag && webinarTag.view_status == 1"
+        @click="goLogoUrl"
+      >
+        <img
+          :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogoUrl"
+          alt=""
+        />
       </div>
     </div>
     <div class="vmp-header-watch-center">
@@ -27,7 +34,13 @@
         </span>
       </div>
       <div class="vmp-header-watch-center-host">
-        <a href="">{{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}</a>
+        <a
+          :href="create_user_url"
+          v-if="webinarTag && webinarTag.organizers_status == 1"
+          :target="create_user_url == 'javascript:void(0);' ? '_self' : '_blank'"
+        >
+          {{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}
+        </a>
         <span>{{ webinarInfo.start_time }}</span>
       </div>
     </div>
@@ -36,24 +49,34 @@
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
 
       <!-- 公众号 -->
-      <div class="vmp-header-watch-right-officical">
+      <div class="vmp-header-watch-right-officical" v-if="officialImg">
         <div
-          class="vmp-header-watch-right-officical-icon"
+          :class="'vmp-header-watch-right-officical-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goOfficical"
         >
-          <i class="vh-saas-iconfont vh-saas-line-speaker"></i>
+          <i class="vh-saas-iconfont vh-saas-line-public"></i>
           <p>{{ $t('nav.nav_1002') }}</p>
         </div>
       </div>
 
       <!-- 关注 -->
-      <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+      <div class="vmp-header-watch-right-attention">
+        <div
+          :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"
+          :style="{ color: themeClass.pageBg }"
+          @click="attentionHandler"
+        >
+          <i class="vh-iconfont vh-line-collection"></i>
+          <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
+        </div>
+      </div>
+      <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
 
       <!-- 分享 -->
       <div class="vmp-header-watch-right-share">
         <div
-          class="vmp-header-watch-right-share-icon"
+          :class="'vmp-header-watch-right-share-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goShare"
         >
@@ -62,6 +85,11 @@
         </div>
       </div>
 
+      <officaial-dialog
+        ref="officaialDialog"
+        :officialImg="officialImg"
+        v-if="officialImg"
+      ></officaial-dialog>
       <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
         <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="isLogin">
@@ -94,20 +122,25 @@
           </div>
         </div>
       </div>
-      <!-- <vmp-air-container :cuid="cuid"></vmp-air-container> -->
     </div>
   </div>
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import officaialDialog from './components/officalDialog.vue';
   export default {
     name: 'VmpHeaderWatch',
     data() {
       return {
         noDelayIconUrl:
           '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
+        defaultLogoUrl: require('./images/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
+        skinInfo: {}, //皮肤的信息
+        webinarTag: {}, // 活动标识
+        officicalInfo: {}, //公众号
+        officialImg: '',
         userInfo: {
           avatar:
             'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/9c/e9/9ce963aaaa11f3bf9650f01fc62c3514.jpg',
@@ -115,7 +148,8 @@
         }, // 用户登录之后的信息
         themeClass: {
           bgColor: 'light',
-          pageBg: '#cccccc'
+          pageBg: '#cccccc',
+          iconClass: 'icon-default' // icon默认色
         },
         isLogin: false
       };
@@ -136,22 +170,87 @@
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
+    components: {
+      officaialDialog
+    },
+    computed: {
+      create_user_url() {
+        const { watchInitData } = this.roomBaseState;
+        if (watchInitData && watchInitData.urls && this.webinarInfo) {
+          const url = watchInitData.urls.web_url || '';
+          if (url.split('')[url.length - 1] == '/') {
+            return watchInitData.urls.web_url + 'user/home/' + this.webinarInfo.userinfo.user_id;
+          } else {
+            return watchInitData.urls.web_url + '/user/home/' + this.webinarInfo.userinfo.user_id;
+          }
+        } else {
+          return 'javascript:void(0);';
+        }
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
+      console.log(this.roomBaseState, '???1132424?????');
       this.getWebinarInfo();
     },
     methods: {
       getWebinarInfo() {
         const { webinar } = this.roomBaseState.watchInitData;
-        this.webinarInfo = webinar;
+        this.webinarInfo = webinar || {};
+        this.skinInfo = this.roomBaseState.skinInfo || {};
+        this.webinarTag = this.roomBaseState.webinarTag || {};
+        this.officicalInfo = this.roomBaseState.officicalInfo || {};
+        this.setOfficicalInfo(this.officicalInfo);
+        this.setSkinInfo(this.skinInfo);
       },
       exitLogin() {
         this.isLogin = false;
         console.log('退出登录');
+      },
+      attentionHandler() {
+        if (!this.isLogin) {
+          this.goLoginDialog();
+        }
+      },
+      goLoginDialog() {
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitClickLogin'
+        });
+      },
+      setOfficicalInfo(info) {
+        if (info && info.status == 0 && info.img) {
+          this.officialImg = info.img;
+        }
+        if (info && info.alert_type == 0 && info.status == 0) {
+          this.$refs.officaialDialog.officialVisible = true;
+        }
+      },
+      setSkinInfo(skin) {
+        if (skin && skin.skin_json_pc && skin.status == 1) {
+          this.$nextTick(() => {
+            const { pageStyle } = JSON.parse(skin.skin_json_pc) || '';
+            this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
+            this.themeClass.pageBg = pageStyle;
+          });
+        } else {
+          this.$nextTick(() => {
+            // 默认皮肤
+            this.themeClass.pageBg = '#cccccc';
+            this.themeClass.iconClass = 'icon-default';
+          });
+        }
+      },
+      goLogoUrl() {
+        let logoUrl =
+          this.webinarTag && this.webinarTag.skip_url
+            ? this.webinarTag.skip_url
+            : 'https://www.vhall.com/';
+        window.open(logoUrl, '_blank');
       },
       //登录
       goLogin() {
@@ -159,7 +258,9 @@
       },
       //公众号
       goOfficical() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
+        this.officialImg = this.officicalInfo.img;
+        this.$refs.officaialDialog.officialVisible = true;
+        // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
       },
       //分享
       goShare() {
@@ -190,6 +291,7 @@
         width: 120px;
         height: 44px;
         margin: 14px 0;
+        cursor: pointer;
         img {
           width: 100%;
           height: 100%;
@@ -276,6 +378,7 @@
       align-items: center;
       justify-content: center;
       &-officical,
+      &-attention,
       &-share {
         padding-right: 24px;
         &-icon {
@@ -289,11 +392,24 @@
             line-height: 14px;
             padding-top: 5px;
           }
+        }
+        .icon-default {
           &:hover {
+            cursor: pointer;
             i,
             p {
               cursor: pointer;
               color: @font-high-light-normal !important;
+            }
+          }
+        }
+        .icon-revert {
+          &:hover {
+            cursor: pointer;
+            i,
+            p {
+              cursor: pointer;
+              color: @font-dark-second !important;
             }
           }
         }

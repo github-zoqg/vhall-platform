@@ -12,7 +12,8 @@
     data() {
       return {
         themeClass: {
-          pageBg: '#3562fa'
+          bgColor: 'light',
+          pageBg: '#cccccc'
         },
         isAttention: false,
         isLogin: false
