@@ -111,7 +111,7 @@ export const serverConfig = {
         cuid: 'comShare',
         method: 'openShareDialog'
       }
-    ],
+    ]
   },
   comOfficial: {
     component: 'VmpOfficial'
