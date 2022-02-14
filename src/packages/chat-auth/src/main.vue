@@ -55,7 +55,7 @@
               :class="{ active: selectMenuType === 'auth' }"
               @click="switchToTab('auth')"
             >
-              未审核({{ authTotal }})
+              未审核({{ auditNum }})
             </span>
             <!--            <span-->
             <!--              class="table-menu-item"-->
@@ -180,8 +180,6 @@
         selectMenuType: 'auth',
         //批处理选择的是哪种 all:所有数据 , page：当前页的数据
         selectDataType: '',
-        //列表数据
-        list: [],
         //已通过审核的列表
         passedList: [],
         // 被踢出和禁言的消息列表
@@ -254,22 +252,28 @@
             break;
         }
         return list;
+      },
+      //待审核列表
+      list() {
+        return this.$domainStore.state.chatAuthServer.auditList;
+      },
+      //未审核的数量
+      auditNum() {
+        return this.$domainStore.state.chatAuthServer.auditList.length;
       }
     },
     beforeCreate() {
       this.chatAuthServer = useChatAuthServer();
       this.msgServer = useMsgServer();
     },
-    created() {
-      this.init();
-      this.getFooterInfo();
-    },
+    created() {},
     mounted() {
-      console.log(this.chatAuthServer, 'chatAuthServer');
+      this.getFooterInfo();
+      this.init();
     },
     methods: {
       //todo 初始化方法
-      init() {
+      async init() {
         //获取活动信息
         this.getActivityInfo();
         //获取聊天审核开关状态
@@ -277,53 +281,19 @@
         //提取Url参数
         this.urlParams = this.extractionUrlParams();
         //初始化房间信息，这里也会在domain里初始化聊天sdk和消息sdk
-        this.initRoomInfo();
+        await this.initRoomInfo();
+        this.listenEvents();
       },
+      //初始化聊天实例
       listenEvents() {
-        this.msgServer.$onMsg('CHAT', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (typeof temp.data !== 'object') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          switch (type) {
-            case 'disable':
-              break;
-            case 'permit':
-              break;
-            default:
-              break;
-          }
-        });
-        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (typeof temp.data !== 'object') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          switch (type) {
-            case 'room_kickout':
-              break;
-            case 'room_kickout_cancel':
-              break;
-            default:
-              break;
-          }
-        });
+        this.chatAuthServer.initChatInstance();
       },
       //操作用户
       operateUser(id, type) {
-        //更新tab栏上的未读数
-        if (type === 'room_kickout') {
-          this.kickedOutTotal++;
-        } else if (type === 'disable') {
-          this.mutedTotal++;
-        }
+        this.chatAuthServer.operateUser(id, type);
         const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
         const params = Object.assign({ msg_id: '', status: 2 }, baseChanelInfo);
-        this.list.forEach(item => {
+        this.chatAuthServer.state.auditList.forEach(item => {
           if (item.third_party_user_id === id) {
             params.msg_id += item.msg_id + ',';
           }
@@ -401,11 +371,6 @@
             if (!sessionStorage.getItem('user')) {
               sessionStorage.setItem('user', JSON.stringify(res.data.join_info));
             }
-            //获取审核按钮状态
-            this.getChatAuthEnableStatus();
-
-            //初始化聊天消息监听
-            this.initListenEvents();
             //获取所有tab下的数据
             this.initTabTotalNum();
           })
@@ -440,94 +405,50 @@
         this.getMutedUserList();
         this.getKickedUserList();
       },
-      //初始化事件监听
-      initListenEvents() {
-        this.msgServer.$onMsg('CHAT', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (typeof temp.data !== 'object') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          switch (type) {
-            case 'disable':
-              this.operateUser(temp.data.target_id, type);
-              break;
-            case 'permit':
-              this.mutedTotal--;
-              this.specialUser = this.specialUser.filter(item => {
-                return item.account_id !== temp.data.target_id;
-              });
-              break;
-            default:
-              break;
-          }
-        });
-        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (typeof temp.data !== 'object') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          switch (type) {
-            case 'room_kickout':
-              this.operateUser(temp.data.target_id, type);
-              break;
-            case 'room_kickout_cancel':
-              this.kickedOutTotal--;
-              this.specialUser = this.specialUser.filter(item => {
-                return item.account_id !== temp.data.target_id;
-              });
-              break;
-            default:
-              break;
-          }
-        });
-      },
       //获取未审核的聊天数据 (0:未审核 1:通过  2:阻止)
       getChatMessageList() {
-        const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
-        const params = Object.assign({}, baseChanelInfo);
-        this.list = [];
-        let tempItem = {};
-        let object = {};
-        let context, data;
-        this.chatAuthServer.getAuditMessageList(params).then(res => {
-          for (let i in res.data) {
-            object = JSON.parse(res.data[i]);
-            context =
-              typeof JSON.parse(object.context) === 'object'
-                ? JSON.parse(object.context)
-                : JSON.parse(JSON.parse(object.context));
-            tempItem.nick_name = context.nickname || context.nick_name;
-            tempItem.time = object.time;
-            tempItem.type = object.type;
-            tempItem.msg_id = i;
-            tempItem.third_party_user_id = object.sender_id; // 发送消息的人第三方id
-            tempItem.channel = object.channel;
-            tempItem.room_id = object.room_id;
-            data = JSON.parse(object.data);
-            if (tempItem.type === 'text') {
-              tempItem.text_content = data.barrageTxt || data.text_content;
-            } else if (tempItem.type === 'video') {
-              tempItem.video_url = data.video_url;
-            } else if (tempItem.type === 'voice') {
-              tempItem.voice_url = data.voice_url;
-            } else if (tempItem.type === 'image') {
-              tempItem.image_urls = data.image_urls;
-              if (Object.prototype.hasOwnProperty.call(data, 'text_content')) {
-                tempItem.text_content = data.barrageTxt || data.text_content;
-              }
-            } else if (tempItem.type === 'link') {
-              tempItem.link_url = data.link_url;
-            }
-            tempItem.isOperate = 0; // 0 未对数据操作， 1审核通过，2拒绝
-            this.list.push(tempItem);
-            tempItem = {};
-            object = {};
-          }
-        });
+        // const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
+        // const params = Object.assign({}, baseChanelInfo);
+        // this.list = [];
+        // let tempItem = {};
+        // let object = {};
+        // let context, data;
+        // this.chatAuthServer.getAuditMessageList(params).then(res => {
+        //   for (let i in res.data) {
+        //     object = JSON.parse(res.data[i]);
+        //     context =
+        //       typeof JSON.parse(object.context) === 'object'
+        //         ? JSON.parse(object.context)
+        //         : JSON.parse(JSON.parse(object.context));
+        //     tempItem.nick_name = context.nickname || context.nick_name;
+        //     tempItem.time = object.time;
+        //     tempItem.type = object.type;
+        //     tempItem.msg_id = i;
+        //     tempItem.third_party_user_id = object.sender_id; // 发送消息的人第三方id
+        //     tempItem.channel = object.channel;
+        //     tempItem.room_id = object.room_id;
+        //     data = JSON.parse(object.data);
+        //     if (tempItem.type === 'text') {
+        //       tempItem.text_content = data.barrageTxt || data.text_content;
+        //     } else if (tempItem.type === 'video') {
+        //       tempItem.video_url = data.video_url;
+        //     } else if (tempItem.type === 'voice') {
+        //       tempItem.voice_url = data.voice_url;
+        //     } else if (tempItem.type === 'image') {
+        //       tempItem.image_urls = data.image_urls;
+        //       if (Object.prototype.hasOwnProperty.call(data, 'text_content')) {
+        //         tempItem.text_content = data.barrageTxt || data.text_content;
+        //       }
+        //     } else if (tempItem.type === 'link') {
+        //       tempItem.link_url = data.link_url;
+        //     }
+        //     tempItem.isOperate = 0; // 0 未对数据操作， 1审核通过，2拒绝
+        //     this.list.push(tempItem);
+        //     tempItem = {};
+        //     object = {};
+        //   }
+        // });
+        return this.chatAuthServer.getChatMessageList();
       },
       //获取已通过的审核的聊天数据
       getPassedMessageList() {
@@ -539,7 +460,7 @@
           curr_page: this.searchParams.page,
           start_time: createTime
         };
-        this.chatAuthServer.getPassedMessageList(params).then(res => {
+        return this.chatAuthServer.getPassedMessageList(params).then(res => {
           this.passedList = res.data.list;
           this.passedTotal = res.data.total;
           this.searchParams.total = res.data.total;
@@ -618,7 +539,6 @@
         if (this.selectMenuType === type) {
           return;
         }
-        this.list = [];
         this.isCooling = true;
         let s = setTimeout(() => {
           clearTimeout(s);
@@ -626,6 +546,22 @@
         }, 1000);
         this.selectMenuType = type;
         this.searchParams.page = 1;
+        switch (type) {
+          case 'auth':
+            this.getChatMessageList();
+            break;
+          case 'passed':
+            this.getPassedMessageList();
+            break;
+          case 'muted':
+            this.getMutedUserList();
+            break;
+          case 'kickedOut':
+            this.getKickedUserList();
+            break;
+          default:
+            break;
+        }
       },
       //刷新当前tab下的列表
       refreshList() {},

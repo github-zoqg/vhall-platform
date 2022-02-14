@@ -1,11 +1,7 @@
 <template>
   <div class="vhsaas-praise-timer">
-    <div v-if="openTimer" class="vhsaas-timer-box">
-      <i v-if="showTimer" class="circle"></i>
-      <img class="vhsaas-timer-icon" src="./img/timer.png" alt="" @click="handleTimer" />
-    </div>
     <!-- 时间显示区 -->
-    <div v-show="timerVisible && openTimer" v-drag class="bgimg">
+    <div v-show="timerVisible" v-drag class="bgimg">
       <!-- <el-row :class="status == 'zanting'?'colorFC9600':status == 'kaishi'?'color0FBB5A':'colorFB3A32'"> -->
       <el-row class="colorFFF">
         <el-col class="ft12">
@@ -59,6 +55,7 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpWatchTimer',
@@ -95,7 +92,6 @@
       const roomBaseServer = useRoomBaseServer();
       return {
         roomBaseServer,
-        showTimer: true,
         timerVisible: true,
         status: 'kaishi',
         is_all_show: false,
@@ -106,7 +102,6 @@
         mon: 3,
         ten_sec: 4,
         sec: 0,
-        openTimer: true,
         timerInfo: {}
       };
     },
@@ -175,14 +170,18 @@
         this.status = 'kaishi';
         this.timerVisible = true;
         if (this.is_all_show == 1) {
-          this.openTimer = true;
+          // 通知相应组件打开计时器Icon
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+          );
         }
-        this.showTimer = false;
       },
       // 计时器结束
       timer_end() {
-        this.showTimer = false;
-        this.openTimer = false;
+        // 通知相应组件关闭计时器Icon
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
+        );
         this.timerVisible = false;
         this.status = 'jieshu';
         clearInterval(this.timer);
@@ -197,7 +196,10 @@
       timer_reset() {
         clearInterval(this.timer);
         this.status = 'kaishi';
-        this.openTimer = false;
+        // 通知相应组件关闭计时器Icon
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
+        );
       },
       // 计时器继续
       timer_resume(e) {
@@ -228,20 +230,28 @@
             this.status = resData.status == 4 ? 'zanting' : 'kaishi';
             this.timerVisible = true;
             if (this.is_all_show == 1) {
-              this.openTimer = true;
+              // 通知相应组件打开计时器Icon
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+              );
             }
-            this.showTimer = false;
           }
         }, 100);
       },
       // open计时器弹框
       handleTimer() {
         this.timerVisible = true;
-        this.showTimer = false;
+        // 通知相应组件打开计时器Icon
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+        );
       },
       onClose() {
         this.timerVisible = false;
-        this.showTimer = true;
+        // 通知相应组件打开计时器Icon上的红点
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
+        );
       },
       // 秒转时间
       timeFormat(data) {
@@ -260,7 +270,10 @@
             }
             if (data == 0) {
               clearInterval(this.timer);
-              this.openTimer = false;
+              // 通知相应组件关闭计时器Icon
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
+              );
               return false;
             }
           }
