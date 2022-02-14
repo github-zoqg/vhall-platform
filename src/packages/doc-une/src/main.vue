@@ -8,7 +8,7 @@
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
       ref="docToolbar"
-      v-show="displayMode === 'normal' || displayMode === 'fullscreen'"
+      v-show="!isInGroup && (displayMode === 'normal' || displayMode === 'fullscreen')"
     ></VmpDocToolbar>
 
     <!-- 文档白板内容区 -->
@@ -116,7 +116,7 @@
 <script>
   import VmpDocToolbar from './toolbar/main.vue';
   import screenfull from 'screenfull';
-  import { useRoomBaseServer, useDocServer, useMsgServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
@@ -150,6 +150,10 @@
       pageNum() {
         return this.docServer.state.pageNum;
       },
+      isInGroup() {
+        console.log('[doc] isInGroup', this.groupServer.state.groupInitData?.isInGroup);
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 显示文档时 && (普通模式，或 观看端全屏模式下);
       showPagebar() {
         return (
@@ -170,12 +174,25 @@
         );
       }
     },
+    watch: {
+      ['docServer.state.isChannelChanged'](newval) {
+        console.log('-[doc]---watch频道变更', newval);
+        if (newval) {
+          this.docServer.state.isChannelChanged = false;
+          // 初始化事件
+          this.initEvents();
+          // 清空
+          // this.docServer.resetContainer();
+          // 恢复上一次的文档数据;
+          this.recoverLastDocs();
+        }
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.msgServer = useMsgServer();
-      // TODO 方便查数据
-      window.docServer = useDocServer();
+      this.groupServer = useGroupServer();
     },
     methods: {
       /**

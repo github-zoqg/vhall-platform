@@ -69,7 +69,6 @@
           this.state = 3;
           return;
         }
-        window.roomBaseServer = roomBaseServer;
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
       } catch (ex) {

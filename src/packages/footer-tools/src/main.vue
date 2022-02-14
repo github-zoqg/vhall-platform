@@ -14,28 +14,73 @@
         {{ hotNum | formatHotNum }}
       </div>
     </div>
-    <div class="vmp-footer-tools__right">
+    <!-- <div class="vmp-footer-tools__right">
       <vmp-air-container :cuid="cuid"></vmp-air-container>
-    </div>
+    </div> -->
+    <!-- 上下麦按钮 -->
     <div class="vmp-footer-tools__center" v-if="isInteractLive">
       <handup></handup>
     </div>
+    <!-- 互动工具 -->
+    <ul
+      v-if="!roomBaseState.groupInitData.isInGroup"
+      v-show="!isTrySee"
+      class="vmp-footer-tools__right"
+    >
+      <li v-if="isLive">
+        <!-- 计时器 -->
+        <div v-if="openTimer" class="pr">
+          <i v-if="showTimer" class="circle"></i>
+          <img src="./img/timer.png" alt="" @click="openTimerHandle" />
+        </div>
+      </li>
+      <li v-if="showGiftIcon">
+        <div class="vh-gifts-wrap">
+          <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
+          <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
+          <vh-gifts
+            v-show="showGift && roomBaseState.watchInitData.interact.room_id"
+            :roomId="roomBaseState.watchInitData.interact.room_id"
+            :show-gift-count="showGiftCount"
+          />
+        </div>
+      </li>
+      <li>
+        <!-- 打赏 -->
+        <div class="vh-icon-box">
+          <img src="./img/reward-icon.png" alt="" />
+          <reward />
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useMsgServer, useRoomBaseServer } from 'middle-domain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
+  import reward from './handup.vue';
+  import vhGifts from './component/gifts/index.vue';
   export default {
     name: 'VmpFooterTools',
     mixins: [onlineMixin],
     data() {
       return {
-        roomBaseState: null
+        roomBaseState: null,
+        isLive: true,
+        isTrySee: false,
+        showGiftIcon: true,
+        showGift: false,
+        showGiftCount: 0,
+        openTimer: false,
+        showTimer: false
       };
     },
     components: {
-      handup
+      handup,
+      reward,
+      vhGifts
     },
     computed: {
       isInteractLive() {
@@ -52,6 +97,11 @@
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
+      window.addEventListener('click', () => {
+        if (this.showGift) {
+          this.showGift = false;
+        }
+      });
     },
     methods: {
       settingShow() {
@@ -59,6 +109,22 @@
           cuid: this.cuid,
           method: 'emitClickMediaCheck' // TODO 设置媒体的弹窗方法
         });
+      },
+      changeStatus(data, status) {
+        this[data] = status;
+      },
+      // 打开计时器弹框
+      openTimerHandle() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimer'));
+        this.changeStatus('showTimer', false);
+      },
+      // 打开礼物弹框
+      handleShowGift() {
+        this.showGift = !this.showGift;
+        if (this.showGift) {
+          this.showGiftCount++;
+        }
+        this.$refs.notice && (this.$refs.notice.isShowNotice = false);
       }
     }
   };
@@ -97,12 +163,38 @@
       > div {
         margin-left: 16px;
       }
+      li > div > img {
+        width: 32px;
+        height: 32px;
+        margin-left: 16px;
+        border-radius: 16px;
+        cursor: pointer;
+      }
+      .vh-gifts-wrap {
+        border-radius: 16px;
+        position: relative;
+      }
     }
     &__center {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+    }
+    .circle {
+      position: absolute;
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #fb3a32;
+      border: 1px solid #2a2a2a;
+      border-radius: 50%;
+      top: 10px;
+      right: 0px;
+      position: absolute;
+    }
+    .pr {
+      position: relative;
     }
   }
 </style>

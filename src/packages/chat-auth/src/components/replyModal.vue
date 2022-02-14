@@ -2,7 +2,7 @@
   <el-dialog
     :title="title"
     :visible.sync="visible"
-    width="500px"
+    width="480px"
     custom-class="vmp-reply-modal"
     append-to-body
   >
@@ -61,6 +61,9 @@
 <style lang="less">
   .vmp-reply-modal {
     .vmp-reply-modal__main {
+      .el-textarea__inner {
+        padding: 10px;
+      }
     }
   }
 </style>
