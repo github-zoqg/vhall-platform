@@ -11,8 +11,8 @@ const chalk = require('chalk');
 const walk = require('fs-walk');
 
 const PLUGIN_NAME = 'reorganizePlugin';
-const patternForStatic = /"\/static\//gi;
-const patternForRouter = /base:[\S\s]+?(",)/gi;
+const patternForStatic = /"\/static\//g;
+const patternForRouter = /base:[\S\s]+?(",)/g;
 
 class ReorganizeWebpackPlugin {
   constructor(options) {
@@ -29,7 +29,7 @@ class ReorganizeWebpackPlugin {
           chalk.bold.green('[ReorganizePlugin] reorganize the all resource in dist dir')
       );
       const { dist, project, version, resoucePrefix, routerBase } = this.options;
-      // console.log(this.options);
+      console.log(this.options);
       // {
       //   resoucePrefix: '//t-alistatic01.e.vhall.com/common-static/saas-live',
       //   dist: '/Users/yangxinyuan/vhall/fork-middle-platform/dist',

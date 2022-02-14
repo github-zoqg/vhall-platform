@@ -96,8 +96,6 @@
             way: this.way
           });
           if (result && result.code === 200) {
-            this.roomBaseServer.setInavToolStatus('is_open_switch', 2);
-            this.groupServer.state.panelShow = true;
             this.close();
           } else {
             this.$message.error(result.msg || '分组失败');
