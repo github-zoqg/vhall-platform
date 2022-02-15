@@ -83,7 +83,8 @@ export const serverConfig = {
       'comPcMediaCheck',
       'comInsertVideo',
       'liveTimerSet',
-      'liveTimer'
+      'liveTimer',
+      'comRebroadcast'
     ]
   },
 
@@ -500,5 +501,9 @@ export const serverConfig = {
         args: false
       }
     ]
+  },
+  // 转播
+  comRebroadcast: {
+    component: 'VmpRebroadcast'
   }
 };
