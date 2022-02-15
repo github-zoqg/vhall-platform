@@ -124,9 +124,19 @@ export const serverConfig = {
   },
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comIntro']
+    children: ['comIntro', 'comRecommendWap']
   },
   comIntro: {
     component: 'VmpIntroWap'
+  },
+  comRecommendWap: {
+    component: 'VmpRecommendWap',
+    addTab: [
+      {
+        cuid: ['comTabMenu'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ]
   }
 };
