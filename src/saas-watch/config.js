@@ -97,7 +97,14 @@ export const serverConfig = {
   },
   // 分组直播侧边菜单
   comWatchAsideMenu: {
-    component: 'VmpWatchAsideMenu'
+    component: 'VmpWatchAsideMenu',
+    handleClickDoc: [
+      {
+        cuid: ['comDocUne'],
+        method: 'switchTo',
+        args: ['$0']
+      }
+    ]
   },
   comStreamList: {
     component: 'VmpStreamList',

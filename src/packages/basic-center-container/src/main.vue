@@ -5,7 +5,7 @@
     <!-- 主区域占位 -->
     <div class="vmp-basic-center__mainscreen-pos"></div>
     <!-- 播放器 -->
-    <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+    <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
     <!-- 文档 -->
     <vmp-air-container :cuid="childrenComp[4]" :oneself="true"></vmp-air-container>
     <!-- 侧边菜单 -->
