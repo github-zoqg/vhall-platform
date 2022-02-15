@@ -46,7 +46,7 @@
 
     computed: {
       mainScreen() {
-        return this.$domainStore.state.interactiveServer.mainScreen;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
       remoteStreams() {
         console.log(
