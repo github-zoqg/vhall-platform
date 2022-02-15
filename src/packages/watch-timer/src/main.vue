@@ -56,7 +56,7 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { useRoomBaseServer, useTimerServer } from 'middle-domain';
   export default {
     name: 'VmpWatchTimer',
     directives: {
@@ -92,7 +92,7 @@
       const roomBaseServer = useRoomBaseServer();
       return {
         roomBaseServer,
-        timerVisible: true,
+        timerVisible: false,
         status: 'kaishi',
         is_all_show: false,
         is_timeout: false,
@@ -115,46 +115,24 @@
       }
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.timerServer = useTimerServer();
     },
     mounted() {
       this.timerInfo = this.roomBaseServer.state?.interactToolStatus?.timer;
       // console.log(this.$domainStore.state, this.roomBaseServer, '123132');
       // this.init();
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器开始
-          case 'timer_start':
-            this.timer_start(temp);
-            break;
-          // 计时器结束
-          case 'timer_end':
-            this.timer_end(temp);
-            break;
-          // 计时器暂停
-          case 'timer_pause':
-            this.timer_pause(temp);
-            break;
-          // 计时器重置
-          case 'timer_reset':
-            this.timer_reset(temp);
-            break;
-          // 计时器继续
-          case 'timer_resume':
-            this.timer_resume(temp);
-            break;
-          default:
-            break;
-        }
-      });
+      this.timerServer.listenMsg();
+      console.log(this.timerServer, 'this.roomBaseServer');
+      // 计时器开始
+      this.timerServer.$on('timer_start', temp => this.timer_start(temp));
+      // 计时器结束
+      this.timerServer.$on('timer_end', temp => this.timer_end(temp));
+      // 计时器暂停
+      this.timerServer.$on('timer_pause', temp => this.timer_pause(temp));
+      // 计时器重置
+      this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
+      // 计时器继续
+      this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
     },
     methods: {
       // 计时器开始
@@ -208,12 +186,7 @@
       },
       init() {
         setTimeout(() => {
-          const resData = this.timerInfo || {
-            duration: '60',
-            is_all_show: '1',
-            is_timeout: '1',
-            remain_time: '56'
-          };
+          const resData = this.timerInfo;
           console.log(resData, ',,,,,,,,,,,,,,,,,,,');
           if (resData && JSON.stringify(resData) != '{}') {
             this.shijian = resData.remain_time;

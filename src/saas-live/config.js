@@ -262,6 +262,13 @@ export const serverConfig = {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
       }
+    ],
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
+      }
     ]
   },
 
