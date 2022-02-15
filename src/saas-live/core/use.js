@@ -37,7 +37,6 @@ import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
 import VmpRebroadcast from '@/packages/rebroadcast';
 
-
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -77,6 +76,4 @@ export function initUse() {
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);
-
-
 }
