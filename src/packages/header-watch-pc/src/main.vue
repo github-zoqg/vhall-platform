@@ -236,7 +236,7 @@
       },
       attentionHandler() {
         if (!this.isLogin) {
-          this.goLoginDialog();
+          this.goLogin();
           return;
         }
         if (this.timer) clearTimeout(this.timer);
@@ -297,12 +297,6 @@
               });
           }
         }, 300);
-      },
-      goLoginDialog() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickLogin'
-        });
       },
       setOfficicalInfo(info) {
         if (info && info.status == 0 && info.img) {
