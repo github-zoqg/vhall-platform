@@ -46,7 +46,7 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        return this.$domainStore.state.interactiveServer.mainScreen;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
       remoteStreams() {
         return this.$domainStore.state.interactiveServer.remoteStreams;

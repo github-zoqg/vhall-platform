@@ -41,6 +41,13 @@
         return this.menu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
       }
     },
+    async mounted() {
+      await this.$nextTick(0);
+      if (this.menu.length > 0) {
+        const { comp, key } = this.menu[0];
+        this.select(comp, key);
+      }
+    },
     methods: {
       prev() {
         if (this.selectedIndex === 0) return;
@@ -59,9 +66,21 @@
         this.menu.splice(index);
       },
 
+      hasItem(item) {
+        return this.menu.some(menuItem => {
+          const sameComp = item.comp === menuItem.comp;
+          const sameKey = item.key === menuItem.key;
+          return sameComp && sameKey;
+        });
+      },
+
       addItem(item) {
         if (!item || !item.key || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
+        }
+
+        if (this.hasItem(item)) {
+          throw Error('不能传入comp和key都相同的item');
         }
 
         item = getItemEntity(item);
@@ -72,6 +91,10 @@
       addItemByIndex(index, item) {
         if (!item || !item.key || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
+        }
+
+        if (this.hasItem(item)) {
+          throw Error('不能传入comp和key都相同的item');
         }
 
         item = getItemEntity(item);
