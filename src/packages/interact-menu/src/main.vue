@@ -51,7 +51,8 @@
         className: '', // 自定义样式
         kind: '', // 类型
         disable: false, // 是否禁用
-        hidden: false // 是否隐藏
+        hidden: false, // 是否隐藏
+        disTimer: false
       };
     },
     methods: {
@@ -65,7 +66,13 @@
       },
       // 打开计时器设置弹框
       openTimer() {
+        if (this.disTimer) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+      },
+      // 更改禁用状态
+      changeStatus(data, status) {
+        // console.log(data, status, 'data, status');
+        this[data] = status;
       }
     }
   };

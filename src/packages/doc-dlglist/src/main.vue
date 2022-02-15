@@ -34,7 +34,9 @@
               >
                 <el-button type="primary">{{ $t('usual.upload') }}</el-button>
               </el-upload>
-              <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
+              <el-button @click="handleGotoDoclib">
+                {{ $t('doc_list.doclib') }}
+              </el-button>
             </div>
           </div>
           <!-- 有数据 -->
@@ -47,11 +49,14 @@
                 :http-request="handleUpload"
                 :before-upload="beforeUpload"
                 accept="*/*"
+                list-type="text"
                 :show-file-list="false"
               >
                 <el-button type="primary">{{ $t('usual.upload') }}</el-button>
               </el-upload>
-              <el-button @click="handleGotoDoclib">{{ $t('doc_list.doclib') }}</el-button>
+              <el-button v-if="!isWatch" @click="handleGotoDoclib">
+                {{ $t('doc_list.doclib') }}
+              </el-button>
 
               <el-tooltip placement="right">
                 <div slot="content">
@@ -126,7 +131,7 @@
                 </el-table-column>
               </el-table>
             </div>
-            <div class="vmp-doc-cur__ft">
+            <div class="vmp-doc-cur__ft" v-if="!isWatch">
               <span>观众可见</span>
               <el-switch
                 class="vmp-doc-cur__switch"
@@ -140,7 +145,7 @@
         </div>
 
         <!-- 资料库列表 -->
-        <div class="vmp-doc-lib" v-show="mode === 2">
+        <div v-if="!isWatch" class="vmp-doc-lib" v-show="mode === 2">
           <div class="vmp-doc-lib__hd">
             <el-input
               style="width: 220px"
@@ -227,6 +232,12 @@
       this.docServer = useDocServer();
       this.roomBaseServer = useRoomBaseServer();
       this.msgServer = useMsgServer();
+    },
+    computed: {
+      // 是否观看端
+      isWatch() {
+        return this.roomBaseServer.state.clientType !== 'send';
+      }
     },
     watch: {
       docSearchKey(val) {
