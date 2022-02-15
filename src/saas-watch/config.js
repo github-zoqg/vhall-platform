@@ -138,6 +138,13 @@ export const serverConfig = {
         cuid: 'comShare',
         method: 'openShareDialog'
       }
+    ],
+    emitOpenUserAccount: [
+      //弹出个人资料
+      {
+        cuid: 'comUserAccount',
+        method: 'openUserAccountDialog'
+      }
     ]
   },
   comOfficial: {

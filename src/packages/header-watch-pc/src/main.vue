@@ -134,7 +134,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useAttentionServer } from 'middle-domain';
+  import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import officaialDialog from './components/officalDialog.vue';
   export default {
@@ -201,6 +201,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.attentionServer = useAttentionServer();
+      this.userServer = useUserServer();
     },
     async created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
@@ -232,10 +233,6 @@
         this.attentionServer.getAttentionStatus(params).then(res => {
           this.isAttention = Boolean(res.data.result);
         });
-      },
-      exitLogin() {
-        this.isLogin = false;
-        console.log('退出登录');
       },
       attentionHandler() {
         if (!this.isLogin) {
@@ -342,15 +339,27 @@
       goOfficical() {
         this.officialImg = this.officicalInfo.img;
         this.$refs.officaialDialog.officialVisible = true;
-        // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
       },
       //分享
       goShare() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
       },
+      exitLogin() {
+        this.userServer.loginOut().then(res => {
+          if (res.code == 200) {
+            this.isLogin = false;
+            this.isAttention = false;
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+            this.$nextTick(() => {
+              window.location.reload();
+            });
+          }
+        });
+      },
       // 个人资料弹窗
       goUserInfo() {
-        console.log('个人资料');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserAccount'));
       },
       // 提现管理弹窗
       goCashInfo() {
