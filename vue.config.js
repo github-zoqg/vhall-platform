@@ -121,7 +121,8 @@ const sharedConfig = {
       moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
-      vant: 'vant'
+      vant: 'vant',
+      lodash: '_',
     },
     // 插件
     plugins: getPlugins()

@@ -39,6 +39,10 @@ import VmpUserAccount from '@/packages/user-account'; // 个人资料
 import VmpCash from '@/packages/cash'; // 提现
 import VmpWatchNavMenu from '@/packages/watch-nav-menu'; // 观看端侧边栏
 import VmpWatchTimer from '@/packages/watch-timer'; // 观看端计时器
+
+// 商品列表
+import VmpGoodList from '@/packages/good';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -74,4 +78,6 @@ export function initUse() {
   Vue.use(VmpCash);
   Vue.use(VmpWatchNavMenu);
   Vue.use(VmpWatchTimer);
+
+  Vue.use(VmpGoodList);
 }
