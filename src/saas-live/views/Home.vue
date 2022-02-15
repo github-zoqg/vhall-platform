@@ -38,6 +38,7 @@
         const roomBaseServer = useRoomBaseServer();
         domain.initVhallReport(
           {
+            bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
             t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),

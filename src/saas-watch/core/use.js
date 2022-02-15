@@ -6,7 +6,7 @@ import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
-import VmpAsideMenu from '@/packages/aside-menu';
+import VmpWatchAsideMenu from '@/packages/watch-aside-menu';
 import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
@@ -14,6 +14,7 @@ import VmpHeaderWatch from '@/packages/header-watch-pc';
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
+import VmpDocDlglist from '@/packages/doc-dlglist';
 import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
@@ -44,7 +45,7 @@ export function initUse() {
   Vue.use(ElementUI);
   Vue.use(VmpContainer);
   Vue.use(VmpAirContainer);
-  Vue.use(VmpAsideMenu);
+  Vue.use(VmpWatchAsideMenu);
   Vue.use(VmpIconText);
   Vue.use(VmpLanguageChoice);
   Vue.use(VmpHeaderLeft);
@@ -52,6 +53,7 @@ export function initUse() {
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
   Vue.use(VmpDocUne);
+  Vue.use(VmpDocDlglist);
   Vue.use(VmpStreamList);
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);

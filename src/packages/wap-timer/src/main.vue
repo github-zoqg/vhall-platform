@@ -45,7 +45,7 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { useRoomBaseServer, useTimerServer } from 'middle-domain';
   export default {
     name: 'VmpWapTimer',
     directives: {
@@ -141,45 +141,23 @@
       }
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.timerServer = useTimerServer();
     },
     mounted() {
       console.log(this.roomBaseServer.state);
       this.timerInfo = this.roomBaseServer.state?.interactToolStatus?.timer;
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器开始
-          case 'timer_start':
-            this.timer_start(temp);
-            break;
-          // 计时器结束
-          case 'timer_end':
-            this.timer_end(temp);
-            break;
-          // 计时器暂停
-          case 'timer_pause':
-            this.timer_pause(temp);
-            break;
-          // 计时器重置
-          case 'timer_reset':
-            this.timer_reset(temp);
-            break;
-          // 计时器继续
-          case 'timer_resume':
-            this.timer_resume(temp);
-            break;
-          default:
-            break;
-        }
-      });
+      this.timerServer.listenMsg();
+      console.log(this.timerServer, 'this.timerServer');
+      // 计时器开始
+      this.timerServer.$on('timer_start', temp => this.timer_start(temp));
+      // 计时器结束
+      this.timerServer.$on('timer_end', temp => this.timer_end(temp));
+      // 计时器暂停
+      this.timerServer.$on('timer_pause', temp => this.timer_pause(temp));
+      // 计时器重置
+      this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
+      // 计时器继续
+      this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
     },
     methods: {
       // 计时器开始

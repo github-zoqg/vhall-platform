@@ -13,12 +13,12 @@
             <div class="table-list__chat-item" @click="row.isChecked = !row.isChecked">
               <div class="table-list__chat-item__chat-info">
                 <div class="chat-info__title">
-                  <div class="check-box-row" v-if="selectMenuType === 'auth'">
-                    <el-checkbox
-                      v-model="row.isChecked"
-                      @change="selectChange($index)"
-                    ></el-checkbox>
-                  </div>
+                  <!--                  <div class="check-box-row" v-if="selectMenuType === 'auth'">-->
+                  <!--                    <el-checkbox-->
+                  <!--                      v-model="row.isChecked"-->
+                  <!--                      @change="selectChange($index)"-->
+                  <!--                    ></el-checkbox>-->
+                  <!--                  </div>-->
                   <span class="chat-info__name">{{ row.nick_name || row.nickname || '' }}</span>
                   <!--                <span class="chat-info__tag" v-if="row.is_gag === 'Y'">(已禁言)</span>-->
                   <!--                <span class="chat-info__tag" v-if="row.is_kick === 'Y'">(已踢出)</span>-->
@@ -87,7 +87,7 @@
                   踢出
                 </span>
                 <el-button
-                  type="success"
+                  type="danger"
                   class="confirm-button"
                   size="small"
                   round
@@ -96,17 +96,17 @@
                   通过
                 </el-button>
                 <el-button
-                  type="danger"
+                  type="default"
                   class="red-button"
                   size="small"
                   round
-                  @click.stop="handleSetProhibit(2, row)"
+                  @click.stop="handleSetProhibit(row)"
                 >
                   阻止
                 </el-button>
                 <el-button
                   v-if="options.hasPassAndReplyBtn"
-                  type="success"
+                  type="default"
                   class="confirm-button"
                   size="small"
                   round
@@ -153,7 +153,11 @@
     <!--        @current-change="changePage"-->
     <!--      ></el-pagination>-->
     <!--    </div>-->
-    <chat-auth-reply-modal ref="chatAuthReplyModal" :options="options"></chat-auth-reply-modal>
+    <chat-auth-reply-modal
+      ref="chatAuthReplyModal"
+      :options="options"
+      @confirm="handlePassedAndReply"
+    ></chat-auth-reply-modal>
   </div>
 </template>
 
@@ -220,45 +224,75 @@
       }
     },
     methods: {
-      //todo 初始化方法
-      init() {
-        //todo 可能需要有获取禁言列表，踢出列表的逻辑
-      },
-      //获取列表数据
-      getList() {},
       //改变页码
       changePage(num) {
         console.log(num);
       },
-      //todo 禁言
-      handleSetBanned() {},
-      //todo 踢出
-      handleSetKicked() {},
-      //todo 通过
-      handleSetPassed(type, info) {
-        console.log(info);
-        switch (type) {
-          case 3:
-            this.$refs.chatAuthReplyModal.openModal();
-            break;
+      //禁言
+      handleSetBanned(info = {}) {
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.roomInfo,
+          receive_account_id: info.third_party_user_id,
+          status: 1
+        };
+        this.$emit('messageOperate', { type: 'setMuted', params });
+      },
+      //踢出
+      handleSetKicked(info = {}) {
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.roomInfo,
+          receive_account_id: info.third_party_user_id,
+          status: 1
+        };
+        this.$emit('messageOperate', { type: 'setKicked', params });
+      },
+      //通过
+      handleSetPassed(type, info = {}) {
+        //通过则status传1，阻止则传2
+        if (type === 1) {
+          const params = {
+            ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
+            msg_id: info.msg_id,
+            status: type
+          };
+          this.$emit('messageOperate', { type: 'setPassed', params });
+          return;
+        }
+        if (type === 3) {
+          this.$refs.chatAuthReplyModal.openModal(info);
         }
       },
-      //todo 阻止
-      handleSetProhibit() {},
+      //通过并回复
+      handlePassedAndReply(params = {}) {
+        this.$emit('messageOperate', { type: 'passedAndReply', params });
+      },
+      //阻止
+      handleSetProhibit(info = {}) {
+        const params = {
+          ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
+          msg_id: info.msg_id,
+          status: 2
+        };
+        this.$emit('messageOperate', { type: 'setProhibit', params });
+      },
       //todo
       selectChange(index) {
         console.log(index);
       },
-      //特殊消息点击 todo 特殊消息处理
+      //特殊消息点击 todo 特殊消息处理 如图片预览
       infoClick(url, type) {
         this.msgDetail.url = url;
         this.msgDetail.type = type;
         this.isModalShow = true;
       },
-      //todo 取消禁言
-      handleCancelMuted() {},
-      //todo 取消踢出
-      handleCancelKicked() {}
+      //取消禁言
+      handleCancelMuted(info = {}) {
+        this.$emit('cancelMuted', info);
+      },
+      //取消踢出
+      handleCancelKicked(info = {}) {
+        this.$emit('cancelKicked', info);
+      }
     }
   };
 </script>
@@ -267,29 +301,30 @@
   .vmp-chat-auth-table {
     @color-blue-hover: #5d6afe;
     @color-red: #fc5659;
+    height: 100%;
     &__list {
       position: relative;
       height: calc(100% - 60px);
       overflow-y: auto;
-      &__no-data {
-        padding-top: 20px;
-        position: absolute;
+    }
+    &__no-data {
+      padding-top: 20px;
+      position: absolute;
+      display: block;
+      width: 100%;
+      top: 50%;
+      margin-top: -90px;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      &:before {
+        content: '';
         display: block;
-        width: 100%;
-        top: 50%;
-        margin-top: -90px;
-        text-align: center;
-        color: #888;
-        font-size: 14px;
-        &:before {
-          content: '';
-          display: block;
-          width: 120px;
-          height: 120px;
-          margin: 10px auto;
-          background: url('../images/no-data.png') no-repeat;
-          background-size: cover;
-        }
+        width: 120px;
+        height: 120px;
+        margin: 10px auto;
+        //background: url('../images/no-data.png') no-repeat;
+        background-size: cover;
       }
     }
     .table-list__column {
@@ -367,11 +402,6 @@
           }
         }
       }
-    }
-    &__no-data {
-      width: 100%;
-      height: 100%;
-      text-align: center;
     }
     &__page-box {
       width: 100%;

@@ -8,7 +8,7 @@
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
       ref="docToolbar"
-      v-show="!isInGroup && (displayMode === 'normal' || displayMode === 'fullscreen')"
+      v-show="hasDocPermission && (displayMode === 'normal' || displayMode === 'fullscreen')"
     ></VmpDocToolbar>
 
     <!-- 文档白板内容区 -->
@@ -151,7 +151,7 @@
         return this.docServer.state.pageNum;
       },
       isInGroup() {
-        console.log('[doc] isInGroup', this.groupServer.state.groupInitData?.isInGroup);
+        // 在小组中
         return !!this.groupServer.state.groupInitData?.isInGroup;
       },
       // 显示文档时 && (普通模式，或 观看端全屏模式下);
@@ -170,7 +170,18 @@
         // 主持端始终可见，观看端
         return (
           this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus)
+          (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus) ||
+          this.groupServer.state.groupInitData.join_role == 20
+        );
+      },
+      hasDocPermission() {
+        return (
+          this.roomBaseServer.state.clientType === 'send' ||
+          (this.roomBaseServer?.state.clientType !== 'send' &&
+            this.roomBaseServer?.state.watchInitData.webinar.type === 1 &&
+            this.roomBaseServer?.state.interactToolStatus.is_open_switch == 1 &&
+            this.groupServer?.state.groupInitData?.isInGroup &&
+            this.groupServer?.state.groupInitData?.join_role == 20)
         );
       }
     },
