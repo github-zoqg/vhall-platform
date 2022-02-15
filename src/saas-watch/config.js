@@ -60,8 +60,7 @@ export const serverConfig = {
     component: 'VmpAirContainer',
     children: [
       'dlgDocList',
-      // 'compRegLogin',
-      'comOfficial',
+      'compRegLogin',
       'comShare',
       'comWatchAuth',
       // 'comSignUpForm',
@@ -117,19 +116,12 @@ export const serverConfig = {
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice', 'comAttention'],
+    children: ['compLanguageChoice'],
     emitClickLogin: [
       //登录弹窗
       {
         cuid: 'compRegLogin',
         method: 'open'
-      }
-    ],
-    emitOpenOfficical: [
-      //弹出公众号
-      {
-        cuid: 'comOfficial',
-        method: 'openOfficial'
       }
     ],
     emitOpenShare: [
@@ -144,19 +136,6 @@ export const serverConfig = {
       {
         cuid: 'comUserAccount',
         method: 'openUserAccountDialog'
-      }
-    ]
-  },
-  comOfficial: {
-    component: 'VmpOfficial'
-  },
-  comAttention: {
-    component: 'VmpAttention',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLogin',
-        method: 'open'
       }
     ]
   },
