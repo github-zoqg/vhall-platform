@@ -359,6 +359,7 @@
       },
       // 个人资料弹窗
       goUserInfo() {
+        console.log('个人资料');
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserAccount'));
       },
       // 提现管理弹窗
@@ -542,12 +543,14 @@
             p {
               width: 36px;
               height: 36px;
-              border-radius: 50%;
+
               margin-right: 8px;
               overflow: hidden;
+              padding: 5px 0;
               img {
                 width: 100%;
                 height: 100%;
+                border-radius: 50%;
                 object-fit: cover;
               }
             }
@@ -568,6 +571,7 @@
             position: absolute;
             top: 38px;
             right: -6px;
+            z-index: 11;
             border-radius: 4px;
             padding: 4px 0;
             background: #383838;

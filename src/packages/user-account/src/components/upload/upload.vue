@@ -41,7 +41,7 @@
         </div>
       </div>
       <div v-else class="noPic">
-        <div class="picInco"><i class="iconfont iconshangchuan_icon"></i></div>
+        <div class="picInco"><i class="iconfont vh-a-line-cloudtoupload"></i></div>
         <div class="tips">
           <slot name="tip"></slot>
         </div>

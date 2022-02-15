@@ -12,6 +12,23 @@ initGlobalAPI();
 Vue.use(OverlayScrollbarsPlugin);
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
+Vue.prototype.$tec = function(path) {
+  return this.$te(path) ? this.$t(path) : undefined;
+};
+
+// 限制按钮重复点击
+Vue.directive('preventReClick', {
+  inserted: function(el, binding) {
+    el.addEventListener('click', () => {
+      if (!el.disabled) {
+        el.disabled = true;
+        setTimeout(() => {
+          el.disabled = false;
+        }, binding.value || 3000);
+      }
+    });
+  }
+});
 
 new Vue({
   router,
