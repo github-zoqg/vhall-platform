@@ -14,6 +14,7 @@
 <script>
   import { Domain } from 'middle-domain';
   import roomState from '../headless/room-state.js';
+  import groupMixin from '../mixins/group';
   export default {
     name: 'Home',
     data() {
@@ -21,6 +22,7 @@
         state: 0
       };
     },
+    mixins: [groupMixin],
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');

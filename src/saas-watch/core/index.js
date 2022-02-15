@@ -1,3 +1,4 @@
+import './extend';
 import { initGlobalPrototype } from './prototype';
 import { initUse } from './use';
 import { initPureServer } from './pure';
