@@ -71,6 +71,7 @@
     },
     watch: {
       ['$domainStore.state.groupServer.hasGroupPermission'](newval) {
+        console.log('[group]---------hasGroupPermission watch-------------');
         this.resetMenus();
       }
     },
