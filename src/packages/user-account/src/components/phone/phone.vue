@@ -1,7 +1,7 @@
 <template>
   <!-- 设置手机号 -->
   <el-dialog
-    :visible.sync="value"
+    :visible.sync="dialogShow"
     width="365px"
     :title="phoneData.type == 'add' ? $t('account.account_1024') : $t('account.account_1026')"
     :class="
@@ -12,6 +12,8 @@
     :close-on-click-modal="false"
     @opened="dialogOpened"
     append-to-body
+    @close="onDialogClose"
+    :destroy-on-close="true"
   >
     <div class="vmp-user-account-phone-wrap">
       <template v-if="phoneData.type == 'add'">
@@ -111,7 +113,7 @@
               >
                 {{
                   phoneCaptVo.sendCode_edit_1
-                    ? $t('account.account_1031', { n: phoneCaptVo.time_add_1 })
+                    ? $t('account.account_1031', { n: phoneCaptVo.time_edit_1 })
                     : $t('account.account_1030')
                 }}
               </span>
@@ -131,7 +133,7 @@
           >
             <!-- 设置手机号第二步 -->
             <p class="vmp-user-account__eTitle">{{ $t('account.account_1034') }}</p>
-            <el-form-item key="phone" prop="phone">
+            <el-form-item key="phone2" prop="phone">
               <el-input
                 v-model.trim="editPhoneForm.phone"
                 auto-complete="off"
@@ -152,7 +154,7 @@
               </span>
             </el-form-item>
             <el-form-item
-              key="code"
+              key="code2"
               prop="code"
               :class="[
                 'vmp-user-account-wrap__code',
@@ -174,7 +176,7 @@
               >
                 {{
                   phoneCaptVo.sendCode_edit_2
-                    ? $t('account.account_1031', { n: phoneCaptVo.time_add_1 })
+                    ? $t('account.account_1031', { n: phoneCaptVo.time_edit_2 })
                     : $t('account.account_1030')
                 }}
               </span>
@@ -217,6 +219,7 @@
 </template>
 
 <script>
+  import { useUserServer } from 'middle-domain';
   export default {
     props: {
       value: {
@@ -358,12 +361,18 @@
         editFormRules: {
           phone: [{ required: true, validator: validateEditPhone, trigger: 'blur' }],
           code: [{ required: true, validator: validateCaptchasEdit, trigger: 'blur' }]
-        }
+        },
         /** *********修改绑定手机号-end***************/
+        dialogShow: false, // 控制弹窗显示隐藏
+        useUserServer: {}
       };
+    },
+    created() {
+      this.useUserServer = useUserServer()
     },
     watch: {
       value(val) {
+        this.dialogShow = val;
         this.$emit('input', val);
       }
     },
@@ -414,13 +423,10 @@
           clearInterval(this.phoneCaptVo[timeIntervalKey]);
           this.phoneCaptVo[timeIntervalKey] = null;
         }
-        this.$vhallapi.nav
-          .sendCode({
-            type: 1, // 手机
-            data: this[formName].phone,
-            validate: this.phoneCaptVo[successMsgCodeKey],
-            scene_id: this[formName].scene_id
-          })
+
+        // 获取验证码
+        this.useUserServer.state.captchaVal = this.phoneCaptVo[successMsgCodeKey];
+        this.useUserServer.sendCode(this.phoneData.type === 'edit' ? this.phoneData.phone : this[formName].phone, 2)
           .then(res => {
             if (res && res.code == 200) {
               this.phoneCaptVo[btnCtrlKey] = 'pending';
@@ -522,7 +528,7 @@
         this.$refs.setPhoneForm.validate(valid => {
           if (valid) {
             // 先验证验证码结果，再实际绑定为新手机号
-            this.$vhallapi.nav
+            this.useUserServer
               .codeCheck({
                 type: 1,
                 data: this.setPhoneForm.phone,
@@ -560,7 +566,7 @@
       bindPhoneSave(formName) {
         const checkKey = `checkKey_${this.phoneData.type}_${this.phoneData.step}`;
         // 确认绑定新功能
-        this.$vhallapi.nav
+        this.useUserServer
           .bindInfo({
             type: 1,
             account: this[formName].phone,
@@ -581,7 +587,7 @@
                 // 修改手机号，重新登录
                 window.localStorage.clear();
                 window.sessionStorage.clear();
-                this.setIsLogin(false); // 更新登录状态
+                // this.setIsLogin(false); // 更新登录状态
                 this.$nextTick(() => {
                   window.location.reload();
                 });
@@ -619,25 +625,28 @@
             // 第一步，验证码，获取验证码是否正确得到key，验证通过，继续下一步
             const params = {
               type: 1,
-              data: this.checkForm.phone,
+              data: this.phoneData.phone,
               code: this.checkForm.code,
               scene_id: 2
             };
-            this.$vhallapi.nav
+            this.useUserServer
               .codeCheck(params)
               .then(async res => {
                 if (res && res.code == 200 && res.data.check_result > 0) {
+                  console.log('checkKey', checkKey)
                   this.phoneCaptVo[checkKey] = res.data.key;
                   // 验证码第一步，继续下一步
                   this.phoneData.step = 2;
                   // 初始化网易云盾-图片验证码
-                  await this.$nextTick(() => {
-                    this.callCaptcha('editPhoneForm');
-                  });
+                  setTimeout(() => {
+                    this.$nextTick(() => {
+                      this.callCaptcha('editPhoneForm', 'captcha_edit_2');
+                    });
+                  }, 500);
                   // 表单校验还原
                   if (this.$refs.editPhoneForm) {
                     this.$nextTick(() => {
-                      this.$refs.editPhoneForm.clearValidate();
+                      this.$refs.editPhoneForm && this.$refs.editPhoneForm.clearValidate();
                     });
                   }
                 } else {
@@ -675,7 +684,7 @@
               code: this.editPhoneForm.code,
               scene_id: 2
             };
-            this.$vhallapi.nav
+            this.useUserServer
               .codeCheck(params)
               .then(res => {
                 if (res && res.code == 200 && res.data.check_result > 0) {
@@ -705,8 +714,9 @@
         });
       },
       dialogOpened() {
-        this.$refs['setPhoneForm'].clearValidate();
-        this.reset();
+        // this.$refs['setPhoneForm'] && this.$refs['setPhoneForm'].clearValidate();
+        // this.$refs['checkForm'] && this.$refs['checkForm'].clearValidate();
+        // this.reset();
         this.$nextTick(() => {
           if (this.phoneData.type === 'edit') {
             this.callCaptcha('checkForm');
@@ -727,6 +737,23 @@
         this.phoneCaptVo.btnCtrl_edit_1 = 'disabled';
         this.phoneCaptVo.sendCode_edit_1 = false;
         this.phoneCaptVo.time_edit_1 = 60;
+        this.phoneData.step = 1;
+      },
+      onDialogClose() {
+        this.dialogShow = false;
+        this.$emit('input', false);
+        // 重置表单
+        this.$refs['setPhoneForm'] && this.$refs['setPhoneForm'].clearValidate();
+        this.$refs['checkForm'] && this.$refs['checkForm'].clearValidate();
+        this.$refs['editPhoneForm'] && this.$refs['editPhoneForm'].clearValidate();
+        this.reset();
+        this.$nextTick(() => {
+          if (this.phoneData.type === 'edit') {
+            this.callCaptcha('checkForm');
+          } else {
+            this.callCaptcha('setPhoneForm');
+          }
+        });
       }
     }
   };
