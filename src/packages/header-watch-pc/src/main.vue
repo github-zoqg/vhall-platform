@@ -61,13 +61,21 @@
       </div>
 
       <!-- 关注 -->
-      <div class="vmp-header-watch-right-attention">
+      <div
+        class="vmp-header-watch-right-attention"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.type != 6"
+      >
         <div
           :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="attentionHandler"
         >
-          <i class="vh-iconfont vh-line-collection"></i>
+          <i
+            :class="`vh-iconfont ${
+              isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
+            }`"
+          ></i>
+          <!-- <i class="vh-iconfont vh-line-collection vh-a-line-collectionsuccess"></i> -->
           <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
         </div>
       </div>
@@ -87,12 +95,12 @@
 
       <officaial-dialog
         ref="officaialDialog"
-        :officialImg="officialImg"
+        :officicalInfo="officicalInfo"
         v-if="officialImg"
       ></officaial-dialog>
       <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
-        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="isLogin">
+        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
           <p><img src="./images/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
@@ -102,23 +110,23 @@
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
               <img v-else src="./images/my-dark@2x.png" alt="" />
             </p>
-            <span>{{ userInfo.nickname | splitLenStr(8) }}</span>
-          </div>
-          <div class="vmp-header-watch-right-login-user-list">
-            <ul>
-              <li @click="goUserInfo">
-                <i class="vh-iconfont vh-line-account"></i>
-                {{ $t('account.account_1001') }}
-              </li>
-              <li @click="goCashInfo">
-                <i class="vh-iconfont vh-a-line-financialcenter"></i>
-                {{ $t('nav.nav_1028') }}
-              </li>
-              <li @click="exitLogin">
-                <i class="vh-iconfont vh-line-exit"></i>
-                {{ $t('nav.nav_1011') }}
-              </li>
-            </ul>
+            <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
+            <div class="vmp-header-watch-right-login-user-list">
+              <ul>
+                <li @click="goUserInfo">
+                  <i class="vh-iconfont vh-line-account"></i>
+                  {{ $t('account.account_1001') }}
+                </li>
+                <li @click="goCashInfo">
+                  <i class="vh-iconfont vh-a-line-financialcenter"></i>
+                  {{ $t('nav.nav_1028') }}
+                </li>
+                <li @click="exitLogin">
+                  <i class="vh-iconfont vh-line-exit"></i>
+                  {{ $t('nav.nav_1011') }}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -126,7 +134,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useAttentionServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import officaialDialog from './components/officalDialog.vue';
   export default {
@@ -141,17 +149,14 @@
         webinarTag: {}, // 活动标识
         officicalInfo: {}, //公众号
         officialImg: '',
-        userInfo: {
-          avatar:
-            'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/9c/e9/9ce963aaaa11f3bf9650f01fc62c3514.jpg',
-          nickname: '测试==测试==测试==测试==测试==测试==测试==测试'
-        }, // 用户登录之后的信息
+        userInfo: JSON.parse(window.localStorage.getItem('userInfo')) || {}, // 用户登录之后的信息
         themeClass: {
           bgColor: 'light',
           pageBg: '#cccccc',
           iconClass: 'icon-default' // icon默认色
         },
-        isLogin: false
+        isAttention: false,
+        isLogin: Boolean(window.localStorage.getItem('token'))
       };
     },
     filters: {
@@ -186,15 +191,26 @@
         } else {
           return 'javascript:void(0);';
         }
+      },
+      isNotEmbed() {
+        return this.embedObj
+          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
+          : true;
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.attentionServer = useAttentionServer();
     },
-    created() {
+    async created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
-      console.log(this.roomBaseState, '???1132424?????');
+      this.embedObj = this.roomBaseState.embedObj;
+      console.log(this.isLogin, this.userInfo.user_id, '???1132424?????');
+      if (this.isLogin && this.isNotEmbed) {
+        // 通过活动ID，获取关注信息
+        await this.attentionStatus();
+      }
       this.getWebinarInfo();
     },
     methods: {
@@ -207,6 +223,16 @@
         this.setOfficicalInfo(this.officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },
+      // 关注状态
+      attentionStatus() {
+        let params = {
+          at_id: this.userInfo.user_id,
+          type: 1 // 关注人
+        };
+        this.attentionServer.getAttentionStatus(params).then(res => {
+          this.isAttention = Boolean(res.data.result);
+        });
+      },
       exitLogin() {
         this.isLogin = false;
         console.log('退出登录');
@@ -214,7 +240,66 @@
       attentionHandler() {
         if (!this.isLogin) {
           this.goLoginDialog();
+          return;
         }
+        if (this.timer) clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          if (this.isAttention) {
+            this.attentionServer
+              .cancelAttention({
+                at_id: this.userInfo.user_id, // 被关注ID
+                type: 1
+              })
+              .then(res => {
+                if (res.code == 200) {
+                  this.$message({
+                    message: this.$t('nav.nav_1029'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.isAttention = false;
+                }
+              })
+              .catch(e => {
+                this.$message({
+                  message: e.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          } else {
+            this.attentionServer
+              .attention({
+                at_id: this.userInfo.user_id, // 被取消关注ID
+                type: 1
+              })
+              .then(res => {
+                if (res.code == 200) {
+                  this.$message({
+                    message: this.$t('nav.nav_1030'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.isAttention = true;
+                }
+              })
+              .catch(e => {
+                this.$message({
+                  message: e.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          }
+        }, 300);
       },
       goLoginDialog() {
         window.$middleEventSdk?.event?.send({
@@ -225,9 +310,6 @@
       setOfficicalInfo(info) {
         if (info && info.status == 0 && info.img) {
           this.officialImg = info.img;
-        }
-        if (info && info.alert_type == 0 && info.status == 0) {
-          this.$refs.officaialDialog.officialVisible = true;
         }
       },
       setSkinInfo(skin) {
@@ -441,6 +523,7 @@
         }
         &-user {
           position: relative;
+          height: 100%;
           &-dropdown {
             text-align: center;
             display: flex;
@@ -465,17 +548,17 @@
               color: #ccc;
               line-height: 32px;
             }
-          }
-          &:hover {
-            .vmp-header-watch-right-login-user-list {
-              display: block;
+            &:hover {
+              .vmp-header-watch-right-login-user-list {
+                display: block;
+              }
             }
           }
           &-list {
             width: 160px;
             position: absolute;
-            top: 40px;
-            left: 0;
+            top: 38px;
+            right: -6px;
             border-radius: 4px;
             padding: 4px 0;
             background: #383838;
