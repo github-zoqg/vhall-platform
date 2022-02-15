@@ -9,7 +9,7 @@
   >
     <div class="officaial-dialog-wrap">
       <div class="officaial-dialog-wrap-img">
-        <img :src="`${officialImg}?x-oss-process=image/resize,m_fill,w_233,h_233`" alt="" />
+        <img :src="`${officicalInfo.img}?x-oss-process=image/resize,m_fill,w_233,h_233`" alt="" />
       </div>
     </div>
     <p class="officaial-dialog-introduce">
@@ -23,9 +23,24 @@
   export default {
     name: 'OfficaialDialog',
     props: {
-      officialImg: {
-        type: String,
-        default: ''
+      officicalInfo: {
+        type: Object,
+        default: () => {}
+      }
+    },
+    watch: {
+      officicalInfo: {
+        immediate: true,
+        deep: true,
+        handler() {
+          if (
+            this.officicalInfo &&
+            this.officicalInfo.alert_type == 0 &&
+            this.officicalInfo.status == 0
+          ) {
+            this.officialVisible = true;
+          }
+        }
       }
     },
     data() {

@@ -11,7 +11,11 @@
         <div class="vmp-user-account-wrap-item">
           <label>{{ $t('account.account_1002') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ this.useUserServer.state.userInfo ? this.useUserServer.state.userInfo.phone : $t('account.account_1003') }}
+            {{
+              this.useUserServer.state.userInfo
+                ? this.useUserServer.state.userInfo.phone
+                : $t('account.account_1003')
+            }}
           </div>
           <div>
             <el-button type="text" @click="openPhoneDialog">
@@ -27,7 +31,11 @@
           <label>{{ $t('account.account_1006') }}</label>
           <div class="vmp-user-account-wrap-item__center nick-item">
             <span v-if="!isNickNameEdit">
-              {{ (this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.nick_name ? this.useUserServer.state.userInfo.nick_name : '') | splitLenStr(6) }}
+              {{
+                (this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.nick_name
+                  ? this.useUserServer.state.userInfo.nick_name
+                  : '') | splitLenStr(6)
+              }}
             </span>
             <el-input
               v-if="isNickNameEdit"
@@ -99,12 +107,18 @@
           <div class="vmp-user-account-wrap-item__center">
             {{ useUserServer.state.thirdInfo.QQNickName | splitLenStr(6) }}
             {{
-              useUserServer.state.thirdInfo.QQNickName ? `（${$t('account.account_1019')}）` : $t('account.account_1020')
+              useUserServer.state.thirdInfo.QQNickName
+                ? `（${$t('account.account_1019')}）`
+                : $t('account.account_1020')
             }}
           </div>
           <div>
             <el-button type="text" @click="editQQHandler">
-              {{ useUserServer.state.thirdInfo.QQbind ? $t('account.account_1021') : $t('account.account_1022') }}
+              {{
+                useUserServer.state.thirdInfo.QQbind
+                  ? $t('account.account_1021')
+                  : $t('account.account_1022')
+              }}
             </el-button>
           </div>
         </div>
@@ -121,7 +135,9 @@
           <div>
             <el-button type="text" @click="editWXHandler">
               {{
-                useUserServer.state.thirdInfo.WeixinBind ? $t('account.account_1021') : $t('account.account_1022')
+                useUserServer.state.thirdInfo.WeixinBind
+                  ? $t('account.account_1021')
+                  : $t('account.account_1022')
               }}
             </el-button>
           </div>
@@ -190,15 +206,19 @@
       // ...mapState('watchBase', ['toolsCount', 'languages'])
       phoneData() {
         return {
-          type: this.useUserServer.state.userInfo.phone ? 'edit': 'add',
+          type: this.useUserServer.state.userInfo.phone ? 'edit' : 'add',
           step: 1,
           phone: this.useUserServer.state.userInfo.phone
-        }
+        };
       },
       pwdData() {
         return {
-          type: this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.has_password === 1 ? 'edit' : 'add'
-        }
+          type:
+            this.useUserServer.state.userInfo &&
+            this.useUserServer.state.userInfo.has_password === 1
+              ? 'edit'
+              : 'add'
+        };
       }
     },
     methods: {
@@ -211,31 +231,34 @@
           this.avatar = file_url;
           this.domain_url = domain_url;
           // 发送保存头像接口
-          this.useUserServer.changeAvatarSend({ avatar: file_url }).then(res => {
-            if (res && res.code === 200) {
-              this.$message({
-                message: this.$t('account.account_1047'),
-                showClose: true,
-                type: 'success',
-                customClass: 'zdy-info-box'
-              });
-              this.useUserServer.getUserInfo({ scene_id: 2 });
-            } else {
+          this.useUserServer
+            .changeAvatarSend({ avatar: file_url })
+            .then(res => {
+              if (res && res.code === 200) {
+                this.$message({
+                  message: this.$t('account.account_1047'),
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+                this.useUserServer.getUserInfo({ scene_id: 2 });
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            })
+            .catch(res => {
               this.$message({
                 message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
-            }
-          }).catch(res => {
-            this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
-              showClose: true,
-              type: 'error',
-              customClass: 'zdy-info-box'
             });
-          });
         }
       },
       beforeUploadHandler(file) {
@@ -283,31 +306,34 @@
       delAvatarHandler() {
         this.avatar = '';
         this.domain_url = '';
-        this.useUserServer.changeAvatarSend({ avatar: '' }).then(res => {
-          if (res && res.code === 200) {
-            this.$message({
-              message: this.$t('account.account_1047'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-            this.useUserServer.getUserInfo({ scene_id: 2 });
-          } else {
+        this.useUserServer
+          .changeAvatarSend({ avatar: '' })
+          .then(res => {
+            if (res && res.code === 200) {
+              this.$message({
+                message: this.$t('account.account_1047'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              this.useUserServer.getUserInfo({ scene_id: 2 });
+            } else {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+          })
+          .catch(res => {
             this.$message({
               message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
             });
-          }
-        }).catch(res => {
-          this.$message({
-            message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
-            showClose: true,
-            type: 'error',
-            customClass: 'zdy-info-box'
           });
-        });
       },
 
       initComp(type) {
@@ -403,35 +429,37 @@
             this.nickError = this.$t('account.account_1056');
           } else {
             this.nickError = '';
-            this.useUserServer.editUserNickName({ nick_name: this.nickName }).then(res => {
-              if (res && res.code == 200) {
-                this.$message({
-                  message: this.$t('account.account_1057'),
-                  showClose: true,
-                  type: 'success',
-                  customClass: 'zdy-info-box'
-                });
-                // 触发保存接口
-                this.isNickNameEdit = false;
-                // 用户信息接口更新
-                this.useUserServer.getUserInfo({ scene_id: 2 });
-              } else {
+            this.useUserServer
+              .editUserNickName({ nick_name: this.nickName })
+              .then(res => {
+                if (res && res.code == 200) {
+                  this.$message({
+                    message: this.$t('account.account_1057'),
+                    showClose: true,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  // 触发保存接口
+                  this.isNickNameEdit = false;
+                  // 用户信息接口更新
+                  this.useUserServer.getUserInfo({ scene_id: 2 });
+                } else {
+                  this.$message({
+                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                    showClose: true,
+                    type: 'error',
+                    customClass: 'zdy-info-box'
+                  });
+                }
+              })
+              .catch(res => {
                 this.$message({
                   message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
-              }
-            })
-            .catch(res => {
-              this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
-                showClose: true,
-                type: 'error',
-                customClass: 'zdy-info-box'
               });
-            });
           }
         }
       },
@@ -458,44 +486,48 @@
         } else {
           // 绑定
           // this.$VhallStorage.set('tag', 'bindQQ', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindQQ')
+          localStorage.setItem('vhsaas_tag', 'bindQQ');
           const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.il_id}`;
           window.open(
-            `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(jumpUrlPath)}`,
+            `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
+              jumpUrlPath
+            )}`,
             '_blank'
           );
         }
       },
       unBindSend(type) {
-        this.useUserServer.thirdUnbind({type}).then(res => {
-          if (res && res.code == 200) {
-            this.$message({
-              message: this.$t('account.account_1064'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-            // 解绑成功后，刷新页面
-            this.useUserServer.getUserInfo({ scene_id: 2 });
-          } else {
+        this.useUserServer
+          .thirdUnbind({ type })
+          .then(res => {
+            if (res && res.code == 200) {
+              this.$message({
+                message: this.$t('account.account_1064'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              // 解绑成功后，刷新页面
+              this.useUserServer.getUserInfo({ scene_id: 2 });
+            } else {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              this.useUserServer.getUserInfo({ scene_id: 2 });
+            }
+          })
+          .catch(res => {
             this.$message({
               message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
               showClose: true,
-              type: 'success',
+              // duration: 0,
+              type: 'error',
               customClass: 'zdy-info-box'
             });
-            this.useUserServer.getUserInfo({ scene_id: 2 });
-          }
-        })
-        .catch(res => {
-          this.$message({
-            message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
-            showClose: true,
-            // duration: 0,
-            type: 'error',
-            customClass: 'zdy-info-box'
           });
-        });
       },
       // 微信绑定 or 微信解绑
       editWXHandler() {
@@ -515,7 +547,7 @@
         } else {
           // 绑定
           // this.$VhallStorage.set('tag', 'bindWx', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindWx')
+          localStorage.setItem('vhsaas_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           // 前端回传地址
           const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.il_id}`;
@@ -531,7 +563,7 @@
         this.isNickNameEdit = false;
         this.nickError = '';
         this.useUserServer.getUserInfo({ scene_id: 2 });
-      },
+      }
     },
     filters: {
       splitLenStr: function (name, len) {

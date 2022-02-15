@@ -27,8 +27,6 @@ import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
 import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
 import VmpShare from '@/packages/share'; // 观看端分享
-import VmpAttention from '@/packages/attention-watch'; // 观看端关注
-import VmpOfficial from '@/packages/official-watch-pc'; // 观看端公众号
 import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
@@ -66,8 +64,6 @@ export function initUse() {
   Vue.use(VmpBasicRightContainer);
   Vue.use(VmpBasicCenterContainer);
   Vue.use(VmpShare);
-  Vue.use(VmpAttention);
-  Vue.use(VmpOfficial);
   Vue.use(VmpWatchAuth);
   Vue.use(VmpMemberList);
   Vue.use(VmpWatchPrivateChat);
