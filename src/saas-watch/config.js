@@ -23,6 +23,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
+    // children: ['comGoodSaas']
     // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
@@ -251,5 +252,9 @@ export const serverConfig = {
       method: 'changeStatus',
       args: ['$0', '$1']
     }
+  },
+  //商品列表
+  comGoodSaas: {
+    component: 'VmpGoodList'
   }
 };

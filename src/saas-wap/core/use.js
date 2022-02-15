@@ -43,6 +43,9 @@ import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 import VmpNoticeWap from '@/packages/notice-watch-wap';
 import VmpRecommendWap from '@/packages/recommend-wap';
 
+// 商品列表
+import VmpGoodListWap from '@/packages/good-wap';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -81,4 +84,5 @@ export function initUse() {
   Vue.use(VmpContainerRightWap);
   Vue.use(VmpNoticeWap);
   Vue.use(VmpRecommendWap);
+  Vue.use(VmpGoodListWap);
 }
