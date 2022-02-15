@@ -96,6 +96,7 @@
             way: this.way
           });
           if (result && result.code === 200) {
+            this.number = '';
             this.close();
           } else {
             this.$message.error(result.msg || '分组失败');

@@ -144,6 +144,7 @@
     align-items: center;
     padding: 0 24px;
     position: relative;
+    z-index: 10;
 
     &__left {
       display: flex;
