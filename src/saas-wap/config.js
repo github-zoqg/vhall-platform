@@ -46,7 +46,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'tab-content',
     // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comContainerTop', 'comContainerRight', 'comNoticeWap']
+    children: ['comContainerTop', 'comTabContent', 'comContainerRight', 'comNoticeWap']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -94,7 +94,8 @@ export const serverConfig = {
   },
   comContainerTop: {
     component: 'VmpContainer',
-    className: 'container-top'
+    className: 'container-top',
+    children: ['comTabMenu']
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
@@ -109,5 +110,22 @@ export const serverConfig = {
   // 登录弹窗
   compRegLoginWap: {
     component: 'VmpRegLoginWap'
+  },
+  comTabMenu: {
+    component: 'VmpTabMenuWap',
+    handleSelect: [
+      {
+        cuid: ['comTabContent'],
+        method: 'switchTo',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+  comTabContent: {
+    component: 'VmpTabContainer',
+    children: ['comIntro']
+  },
+  comIntro: {
+    component: 'VmpIntroWap'
   }
 };
