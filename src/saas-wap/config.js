@@ -104,22 +104,6 @@ export const serverConfig = {
       method: 'handleTimer'
     }
   },
-  // tab菜单
-  comTabMenu: {
-    component: 'VmpTabMenuWap',
-    handleSelect: [
-      {
-        cuid: ['comTabContent'],
-        method: 'switchTo',
-        args: ['$0', '$1', '$2']
-      }
-    ]
-  },
-  // 可切换区域
-  comTabContent: {
-    component: 'VmpTabContainer',
-    children: ['comIntro']
-  },
   // notice横幅
   comNoticeWap: {
     component: 'VmpNoticeWap'
