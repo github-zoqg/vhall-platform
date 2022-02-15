@@ -213,14 +213,14 @@
       }
     },
     created() {
-      this.useUserServer = useUserServer()
+      this.useUserServer = useUserServer();
     },
     methods: {
       // 修改密码
       editPwdHandler() {
         this.$refs.pwdForm.validate(async valid => {
           if (valid) {
-            console.log(this.useUserServer.state)
+            console.log(this.useUserServer.state);
             const params = {
               old_password: this.pwdForm.old_pwd || '',
               password: this.pwdForm.password,
