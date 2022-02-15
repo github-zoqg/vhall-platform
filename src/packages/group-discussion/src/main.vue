@@ -388,14 +388,12 @@
           //
         } else if (msg.data.event_type === 'group_switch_start') {
           //【开启讨论】
-          console.log('[group] room-msg group_switch_start');
-          this.roomBaseServer.setInavToolStatus('is_open_switch', 1);
           //
         } else if (msg.data.event_type === 'group_switch_end') {
           //【结束讨论】
-          console.log('[group] room-msg group_switch_end');
-          this.groupServer.state.panelShow = false;
-          this.roomBaseServer.setInavToolStatus('is_open_switch', 0);
+          // console.log('[group] room-msg group_switch_end');
+          // this.groupServer.state.panelShow = false;
+          // this.roomBaseServer.setInavToolStatus('is_open_switch', 0);
           //
         } else if (msg.data.event_type === 'group_disband') {
           //【解散小组】
@@ -417,105 +415,15 @@
         } else if (msg.data.type === 'group_join_change') {
           //【切换小组】小组人员变动
           // 如果不是自己结束之后逻辑
-          if (msg.sender_id != this.userId) {
-            console.log('[group] 不是自己');
-            return false;
-          }
-          const groupJoinChangeInfo = await this.groupServer.getGroupJoinChangeInfo(
-            msg.data.group_ids
-          );
-
-          // 如果不需要关心这条切换的小组消息,直接 return
-          if (!groupJoinChangeInfo.isNeedCare) {
-            console.log('[group] 不需要关心这条切换的小组消息');
-            return false;
-          }
-          const groupInitData = this.groupServer.state.groupInitData;
-          // TODO 聊天切换
-          if (groupJoinChangeInfo.to === 0) {
-            console.log('[group] 子房间->主直播间 (退出小组)');
-            // 从子房间切换的主房间
-            // 演示权限的channel切换
-            // this.handleEndDemonstrateInChannelChange();
-            // 给主房间发消息通知当前人离开子房间进入主房间
-            this.groupServer.sendMainRoomJoinChangeMsg({
-              isJoinMainRoom: true,
-              isBanned: groupInitData.isBanned
-            });
-            // // TODO 销毁子房间聊天实例
-            // this.msgServer.destroyGroupMsg();
-            // // TODO: 切换互动channel
-            // this.reInitInteractProcess({ from: 'group', to: 'main' });
-
-            // 切换文档channel
-            await this.docServer.reset();
-
-            // 分组状态还原 1 为开始讨论
-            this.roomBaseServer.setInavToolStatus('is_open_switch', 1);
-            this.groupServer.state.panelShow = false;
-
-            // this.mainScreen = this.doc_permission;
-            // // 演示人id
-            // this.isInvitedId = this.doc_permission;
-            // this.groupInviteId = this.interactStatusInfo.main_screen;
-            // // 退出小组 显示人员分组面板
-            // this.showComponentName = 'group';
-          } else if (groupJoinChangeInfo.from === 0) {
-            console.log('[group] 主直播间->子房间');
-            // 从主直播间切换到子房间
-            // 如果需要关心这条消息,并且是从小组中进入到主直播间
-            // window.clearInterval(this.durationInterval);
-            // 处理特殊流
-            // await this.handleSpecialStreamClose();
-            // 给主房间发消息通知当前人离开主房间进入子房间
-            this.groupServer.sendMainRoomJoinChangeMsg({
-              isJoinMainRoom: false,
-              isBanned: groupInitData.isBanned
-            });
-            // 主屏权限(左侧菜单是否禁用)
-            // this.mainScreen = groupInitData.doc_permission;
-            // this.groupInviteId = groupInitData.main_screen;
-            // // 演示人id
-            // this.isInvitedId = groupInitData.doc_permission;
-            // await this.initGroupMsgInstance().then(res => {
-            //   console.log('开始讨论，子房间聊天初始化成功', res);
-            //   // 派发子房间聊天实例创建成功事件，通知成员列表请求 online-list
-            //   EventBus.$emit('group_msg_created');
-            // });
-            // // TODO: 切换互动channel
-            // this.reInitInteractProcess({ from: 'main', to: 'group' });
-
-            // 切换文档channel
-            await this.docServer.reset();
-            //
-          } else {
-            console.log('[group] 子房间->子房间');
-            // 从子房间切换到另一个子房间
-            // 演示权限的channel切换
-            // this.handleEndDemonstrateInChannelChange();
-            // TODO: 销毁子房间聊天实例
-            // this.msgServer.destroyGroupMsg();
-            // TODO: 创建新的子房间聊天实例
-            // await this.initGroupMsgInstance().then(res => {
-            //   console.log('开始讨论，子房间聊天初始化成功', res);
-            //   // 派发子房间聊天实例创建成功事件，通知成员列表请求 online-list
-            //   EventBus.$emit('group_msg_created');
-            // });
-            // this.groupInviteId = groupInitData.main_screen;
-            // // TODO: 切换互动channel
-            // this.reInitInteractProcess({ from: 'group', to: 'group' });
-            // TODO: 切换文档channel
-            this.docServer.reset();
-          }
-          console.log('[group] 更新列表');
-          this.groupServer.getWaitingUserList();
-          this.groupServer.getGroupedUserList();
+          // console.log('[group] 更新列表');
+          // this.groupServer.getWaitingUserList();
+          // this.groupServer.getGroupedUserList();
           //
         } else if (msg.data.type === 'room_group_kickout') {
           // 【踢出小组】
-          console.log('[group] room-msg room_group_kickout');
-          this.groupServer.getWaitingUserList();
-          this.groupServer.getGroupedUserList();
+          // console.log('[group] room-msg room_group_kickout');
+          // this.groupServer.getWaitingUserList();
+          // this.groupServer.getGroupedUserList();
           //
         }
       },

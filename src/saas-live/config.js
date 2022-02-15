@@ -83,8 +83,8 @@ export const serverConfig = {
       'comPcMediaCheck',
       'comInsertVideo',
       'liveTimerSet',
-      'liveTimer',
-      'comRebroadcast'
+      'liveTimer'
+      // 'comRebroadcast'
     ]
   },
 
