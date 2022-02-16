@@ -138,7 +138,11 @@ export const serverConfig = {
   },
   // 底部互动工具box
   comInteractToolsWap: {
-    component: 'VmpInteractToolsWap'
+    component: 'VmpInteractToolsWap',
+    emitNeedLogin: {
+      cuid: ['compRegLoginWap'],
+      method: 'open'
+    }
   },
   // 广告（推荐）
   comRecommendWap: {

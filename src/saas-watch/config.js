@@ -54,7 +54,8 @@ export const serverConfig = {
     component: 'VmpAirContainer',
     children: [
       'dlgDocList',
-      // 'compRegLogin',
+      'compRegLogin',
+      'comOfficial',
       'comShare',
       'comWatchAuth',
       // 'comSignUpForm',
@@ -137,6 +138,20 @@ export const serverConfig = {
       {
         cuid: 'comShare',
         method: 'openShareDialog'
+      }
+    ],
+    emitOpenUserAccount: [
+      //弹出个人资料
+      {
+        cuid: 'comUserAccount',
+        method: 'openUserAccountDialog'
+      }
+    ],
+    emitOpenCash: [
+      //弹出个人资料
+      {
+        cuid: 'comCash',
+        method: 'openCashDialog'
       }
     ]
   },

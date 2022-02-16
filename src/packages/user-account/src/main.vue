@@ -145,7 +145,8 @@
       </div>
 
       <!-- 设置手机号 -->
-      <Phone v-model="phoneDialog.visible" :phoneData="phoneData"></Phone>
+      <!-- <Phone v-model="phoneDialog.visible" :phoneDatas="phoneData"></Phone> -->
+      <Phones v-model="phoneData" />
 
       <!-- 设置密码 -->
       <Password v-model="pwdDialog.visible" :pwdData="pwdData"></Password>
@@ -155,14 +156,16 @@
 <script>
   // import { mapState, mapMutations } from 'vuex';
   import Upload from './components/upload/upload.vue';
-  import Phone from './components/phone/phone.vue';
+  // import Phone from './components/phone/phone.vue';
+  import Phones from './components/phones/index.vue';
   import Password from './components/password/password.vue';
   import { useUserServer } from 'middle-domain';
   export default {
     name: 'VmpUserAccount',
     components: {
       Upload,
-      Phone,
+      // Phone,
+      Phones,
       Password
     },
     data() {
@@ -195,8 +198,15 @@
         pwdDialog: {
           visible: false,
           type: 'add'
-        }
+        },
         /** *********设置密码相关-end***************/
+
+        phoneData: {
+          dialogShow: false,
+          type: 'add',
+          step: 1,
+          phone: ''
+        }
       };
     },
     created() {
@@ -204,13 +214,13 @@
     },
     computed: {
       // ...mapState('watchBase', ['toolsCount', 'languages'])
-      phoneData() {
-        return {
-          type: this.useUserServer.state.userInfo.phone ? 'edit' : 'add',
-          step: 1,
-          phone: this.useUserServer.state.userInfo.phone
-        };
-      },
+      // phoneData() {
+      //   return {
+      //     type: this.useUserServer.state.userInfo.phone ? 'edit': 'add',
+      //     step: 1,
+      //     phone: this.useUserServer.state.userInfo.phone
+      //   }
+      // },
       pwdData() {
         return {
           type:
@@ -336,9 +346,6 @@
           });
       },
 
-      initComp(type) {
-        this.getUserInfo(type);
-      },
       getUserInfo(type) {
         this.$vhallapi.nav
           .getInfo({
@@ -386,34 +393,12 @@
       },
       // 设置手机号 or 修改手机号
       openPhoneDialog() {
-        if (this.accountVo && this.accountVo.phone) {
-          // 当前为修改手机号
-          this.phoneDialog.visible = true;
-          this.phoneDialog.type = 'edit';
-          this.phoneDialog.step = 1;
-          // 若是修改手机号，表单初始值设定
-          this.phoneDialog.phone = this.accountVo.phone;
-
-          // 若是修改手机号，表单初始值设定
-          // this.checkForm.phone = this.accountVo.phone;
-          // 初始化网易云盾-图片验证码
-          // const tempTimer = setTimeout(function() {
-          //   clearTimeout(tempTimer);
-          //   that.$nextTick(() => {
-          //     that.callCaptcha('checkForm');
-          //   });
-          // }, 300);
-        } else {
-          // 当前为设置手机号
-          this.phoneDialog.visible = true;
-          this.phoneDialog.type = 'add';
-          this.phoneDialog.step = 1;
-          this.phoneDialog.phone = '';
-          // 初始化网易云盾-图片验证码
-          // this.$nextTick(() => {
-          //   this.callCaptcha('setPhoneForm');
-          // });
-        }
+        this.phoneDialog.visible = true;
+        this.phoneData.dialogShow = true;
+        // this.phoneData.type = this.useUserServer.state.userInfo.phone ? 'edit': 'add';
+        this.phoneData.type = 'edit';
+        this.phoneData.phone = this.useUserServer.state.userInfo.phone;
+        this.phoneData.step = 1;
       },
       // 切换昵称为 可修改状态
       changeNickEditStatus() {
@@ -484,10 +469,12 @@
             })
             .catch(() => {});
         } else {
+          console.log(this.$route);
           // 绑定
           // this.$VhallStorage.set('tag', 'bindQQ', 'local');
           localStorage.setItem('vhsaas_tag', 'bindQQ');
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.il_id}`;
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
+          console.log(jumpUrlPath);
           window.open(
             `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
               jumpUrlPath
@@ -550,7 +537,7 @@
           localStorage.setItem('vhsaas_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           // 前端回传地址
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.il_id}`;
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
           window.open(
             `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );

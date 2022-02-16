@@ -226,13 +226,18 @@
         type: Boolean,
         default: false
       },
-      phoneData: {
+      phoneDatas: {
         type: Object,
         default: () => ({
           type: 'add',
           step: 1,
           phone: ''
         })
+      }
+    },
+    computed: {
+      phoneData() {
+        return this.phoneDatas;
       }
     },
     data() {
