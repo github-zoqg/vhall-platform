@@ -45,9 +45,13 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
-    children: ['comGoodSaasWap']
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    // children: ['comContainerTop', 'comTabContent', 'comContainerRight', 'comNoticeWap']
+    children: [
+      'comContainerTop',
+      'comTabContent',
+      'comContainerRight',
+      'comNoticeWap',
+      'comGoodSaasWap'
+    ]
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
