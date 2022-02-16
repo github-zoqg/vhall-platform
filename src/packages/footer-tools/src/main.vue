@@ -74,7 +74,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer, useVirtualClientStartServe } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer, useVirtualAudienceServer } from 'middle-domain';
   // import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -101,6 +101,21 @@
       vhGifts,
       notice,
       praise
+    },
+    filters: {
+      formatHotNum(value) {
+        value = parseInt(value);
+        let unit = '';
+        const k = 99999;
+        const sizes = ['', '万', '亿', '万亿'];
+        let i;
+        if (value > k) {
+          i = Math.floor(Math.log(value) / Math.log(k));
+          value = (value / Math.pow(k / 10, i)).toFixed(1);
+          unit = sizes[i];
+        }
+        return value + unit;
+      }
     },
     computed: {
       isInteractLive() {
@@ -134,15 +149,15 @@
       }
     },
     beforeCreate() {
-      this.virtualClientStartServe = useVirtualClientStartServe();
+      this.virtualClientStartServer = useVirtualAudienceServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
-      this.onlineState = this.virtualClientStartServe.state;
-      this.listenEvent();
+      this.onlineState = this.virtualClientStartServer.state;
+      this.virtualClientStartServer.listenEvent();
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
