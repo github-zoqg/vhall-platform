@@ -57,7 +57,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import { useDocServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
@@ -69,16 +69,8 @@
         disableMenus: ['document', 'board', 'desktopShare', 'assistance']
       };
     },
-    watch: {
-      ['$domainStore.state.groupServer.hasGroupPermission'](newval) {
-        console.log('[group]---------hasGroupPermission watch-------------');
-        this.resetMenus();
-      }
-    },
     beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
-      this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
     },
     mounted() {
@@ -96,13 +88,35 @@
         });
         // 结束分组讨论
         this.groupServer.$on('dispatch_group_switch_end', () => {
+          this.isCollapse = true;
           this.resetMenus();
           this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
+        // 小组解散
+        this.groupServer.$on('dispatch_group_disband', () => {
+          this.isCollapse = true;
+          this.resetMenus();
+          this.gobackHome(4);
+        });
+
         // 本人被踢出来
         this.groupServer.$on('dispatch_room_group_kickout', () => {
+          this.isCollapse = true;
+          this.resetMenus();
           this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        });
+
+        // 组长变更
+        this.groupServer.$on('dispatch_group_leader_change', () => {
+          this.isCollapse = true;
+          this.resetMenus();
+          console.log('[group] 组长变更：', this.groupServer.state.groupInitData.join_role);
+          if (this.groupServer.state.groupInitData.join_role === 20) {
+            this.gobackHome(6);
+          } else {
+            this.gobackHome(7);
+          }
         });
       },
       // 返回主房间提示
@@ -124,6 +138,12 @@
           case 5:
             title = '您已被踢出该小组';
             break;
+          case 6:
+            title = '您被提升为组长!';
+            break;
+          case 7:
+            title = '组长身份已变更';
+            break;
         }
         this.$alert(title, '提示', {
           confirmButtonText: '我知道了',
@@ -140,14 +160,11 @@
         // （2）普通组员：只有请求协助按钮可用
         // else
         //  菜单都是禁用状态
-        if (this.groupServer.state.hasGroupPermission) {
-          // 主讲人
-          if (this.groupServer.state.groupInitData?.join_role == 20) {
-            this.disableMenus = [];
-            this.selectedMenu = 'document';
-          } else {
-            this.disableMenus = ['document', 'board', 'desktopShare'];
-          }
+        if (this.docServer.state.hasDocPermission) {
+          this.disableMenus = [];
+          this.selectedMenu = 'document';
+        } else {
+          this.disableMenus = ['document', 'board', 'desktopShare'];
         }
       },
       handleToggle() {
