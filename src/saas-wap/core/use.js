@@ -37,10 +37,12 @@ import VmpTabContainer from '@/packages/tab-container';
 import VmpIntroWap from '@/packages/intro-wap';
 //wap互动工具计时器弹窗
 import VmpWapTimer from '@/packages/wap-timer';
-//wap互动工具box
+//wap互动工具icon-box
 import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 //wap公告
 import VmpNoticeWap from '@/packages/notice-watch-wap';
+//wap互动工具box
+import VmpInteractToolsWap from '@/packages/interact-tools-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -79,4 +81,5 @@ export function initUse() {
   Vue.use(VmpWapTimer);
   Vue.use(VmpContainerRightWap);
   Vue.use(VmpNoticeWap);
+  Vue.use(VmpInteractToolsWap);
 }
