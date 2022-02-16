@@ -106,7 +106,6 @@
       },
       // 开始直播
       handleStartClick() {
-        this.roomBaseServer.setDevice();
         this.liveStep = 2;
         // 派发推流事件
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
