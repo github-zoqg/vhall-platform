@@ -74,7 +74,6 @@
       initNotice() {
         // 公告消息
         this.msgServer.$on('ROOM_MSG', msg => {
-          alert('success');
           let msgs = JSON.parse(msg.data);
           if (msgs.type == 'room_announcement') {
             this.noticeNum++;

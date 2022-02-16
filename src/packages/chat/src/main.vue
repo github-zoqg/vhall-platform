@@ -364,7 +364,6 @@
       listenChatServer() {
         //监听禁言通知
         chatServer.$on('banned', res => {
-          alert(1);
           this.isBanned = res;
           this.initInputStatus();
         });
