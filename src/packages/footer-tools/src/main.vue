@@ -165,6 +165,8 @@
       },
       // 打开打赏弹框
       onClickReward() {
+        // TODO:需校验是否登陆
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
         this.$refs.reward.onClickReward();
       }
     }
