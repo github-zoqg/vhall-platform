@@ -22,11 +22,7 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul
-      v-if="!roomBaseState.groupInitData.isInGroup"
-      v-show="!isTrySee"
-      class="vmp-footer-tools__right"
-    >
+    <ul v-if="!groupInitData.isInGroup" v-show="!isTrySee" class="vmp-footer-tools__right">
       <li v-if="isLive">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
@@ -57,7 +53,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useMsgServer, useRoomBaseServer } from 'middle-domain';
+  import { useMsgServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -74,7 +70,8 @@
         showGift: false,
         showGiftCount: 0,
         openTimer: false,
-        showTimer: false
+        showTimer: false,
+        groupInitData: {}
       };
     },
     components: {
@@ -96,7 +93,7 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     created() {
-      this.roomBaseState = this.roomBaseServer.state;
+      this.groupInitData = useGroupServer().state.groupInitData;
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
