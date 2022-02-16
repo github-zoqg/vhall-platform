@@ -274,6 +274,7 @@
       // 提现管理弹窗
       goCashInfo() {
         console.log('提现管理');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenCash'));
       }
     }
   };

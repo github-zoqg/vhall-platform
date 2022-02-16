@@ -145,6 +145,13 @@ export const serverConfig = {
         cuid: 'comUserAccount',
         method: 'openUserAccountDialog'
       }
+    ],
+    emitOpenCash: [
+      //弹出个人资料
+      {
+        cuid: 'comCash',
+        method: 'openCashDialog'
+      }
     ]
   },
   comOfficial: {
