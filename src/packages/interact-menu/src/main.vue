@@ -10,7 +10,7 @@
     </div>
     <div class="vmp-interact-menu-wrap">
       <div class="vmp-interact-menu-list">
-        <div class="vmp-interact-menu-list-item">
+        <div class="vmp-interact-menu-list-item" @click="openLottery">
           <i class="vh-iconfont vh-a-line-luckydraw"></i>
           <p>抽奖</p>
         </div>
@@ -73,6 +73,10 @@
       changeStatus(data, status) {
         // console.log(data, status, 'data, status');
         this[data] = status;
+      },
+      // 打开抽奖弹窗
+      openLottery() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
       }
     }
   };
