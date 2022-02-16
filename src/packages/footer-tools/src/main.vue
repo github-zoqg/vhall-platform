@@ -22,11 +22,7 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul
-      v-if="!roomBaseState.groupInitData.isInGroup"
-      v-show="!isTrySee"
-      class="vmp-footer-tools__right"
-    >
+    <ul v-if="!this.isInGroup" v-show="!isTrySee" class="vmp-footer-tools__right">
       <li v-if="isLive">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
@@ -57,7 +53,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useMsgServer, useRoomBaseServer } from 'middle-domain';
+  import { useMsgServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -89,11 +85,15 @@
           (watchInitData.webinar.mode == 3 || watchInitData.webinar.mode == 6) &&
           watchInitData.webinar.type == 1
         );
+      },
+      isInGroup() {
+        return this.groupServer.state.groupInitData.isInGroup;
       }
     },
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
