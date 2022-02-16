@@ -47,7 +47,7 @@ export const serverConfig = {
     className: 'tab-content',
     children: [
       'comContainerTop',
-      'comTabContent',
+      'comTabContentWap',
       'comContainerRight',
       'comNoticeWap',
       'comGoodSaasWap'
@@ -101,7 +101,7 @@ export const serverConfig = {
   comContainerTop: {
     component: 'VmpContainer',
     className: 'container-top',
-    children: ['comTabMenu']
+    children: ['comTabMenuWap']
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
@@ -118,21 +118,21 @@ export const serverConfig = {
   compRegLoginWap: {
     component: 'VmpRegLoginWap'
   },
-  comTabMenu: {
+  comTabMenuWap: {
     component: 'VmpTabMenuWap',
     handleSelect: [
       {
-        cuid: ['comTabContent'],
+        cuid: ['comTabContentWap'],
         method: 'switchTo',
         args: ['$0', '$1', '$2']
       }
     ]
   },
-  comTabContent: {
+  comTabContentWap: {
     component: 'VmpTabContainer',
-    children: ['comChatWap', 'comIntro', 'comRecommendWap']
+    children: ['comChatWap', 'comIntroWap', 'comRecommendWap']
   },
-  comIntro: {
+  comIntroWap: {
     component: 'VmpIntroWap',
     children: ['comInteractToolsWap']
   },
@@ -140,11 +140,12 @@ export const serverConfig = {
   comInteractToolsWap: {
     component: 'VmpInteractToolsWap'
   },
+  // 广告（推荐）
   comRecommendWap: {
     component: 'VmpRecommendWap',
     addTab: [
       {
-        cuid: ['comTabMenu'],
+        cuid: ['comTabMenuWap'],
         method: 'addItem',
         args: ['$0']
       }
@@ -159,7 +160,7 @@ export const serverConfig = {
     component: 'VmpChatWap',
     addTab: [
       {
-        cuid: ['comTabMenu'],
+        cuid: ['comTabMenuWap'],
         method: 'addItem',
         args: ['$0']
       }

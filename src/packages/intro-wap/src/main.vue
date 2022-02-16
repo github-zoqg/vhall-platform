@@ -35,6 +35,8 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+
   export default {
     name: 'VmpIntroWap',
     data() {
@@ -46,7 +48,41 @@
       introductionContent() {
         return '<p style="font-size:15px">test test test</p>';
       }
-    }
+    },
+    created() {
+      window.$middleEventSdk?.event?.send(
+        boxEventOpitons(this.cuid, 'addTab', {
+          comp: 'comIntroWap',
+          key: 'introWap',
+          text: '简介'
+        })
+      );
+
+      window.$middleEventSdk?.event?.send(
+        boxEventOpitons(this.cuid, 'addTab', {
+          comp: 'comIntroWap',
+          key: 'introWap2',
+          text: '简介2(假)'
+        })
+      );
+
+      window.$middleEventSdk?.event?.send(
+        boxEventOpitons(this.cuid, 'addTab', {
+          comp: 'comIntroWap',
+          key: 'introWap3',
+          text: '简介3(假)'
+        })
+      );
+
+      window.$middleEventSdk?.event?.send(
+        boxEventOpitons(this.cuid, 'addTab', {
+          comp: 'comIntroWap',
+          key: 'introWap4',
+          text: '简介4(假)'
+        })
+      );
+    },
+    methods: {}
   };
 </script>
 
