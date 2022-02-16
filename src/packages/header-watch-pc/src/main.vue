@@ -306,9 +306,21 @@
       setSkinInfo(skin) {
         if (skin && skin.skin_json_pc && skin.status == 1) {
           this.$nextTick(() => {
-            const { pageStyle } = JSON.parse(skin.skin_json_pc) || '';
+            const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_pc) || '';
             this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
             this.themeClass.pageBg = pageStyle;
+            this.themeClass.bgColor =
+              bgColor == '#1a1a1a' ? 'dark' : bgColor == '#F2F2F2' ? 'gray' : 'white';
+            const bottomContent = document.querySelector('.vmp-basic-container');
+            if (bottomContent && background) {
+              bottomContent.style.background = `url(${background}) no-repeat`;
+              bottomContent.style.backgroundSize = '100% 100%';
+              bottomContent.style.backgroundPosition = 'center';
+            } else if (bottomContent && bgColor) {
+              bottomContent.style.background = `${bgColor}`;
+            } else {
+              bottomContent.style.background = '#1a1a1a';
+            }
           });
         } else {
           this.$nextTick(() => {

@@ -6,6 +6,7 @@ import {
   useMicServer,
   useGroupServer
 } from 'middle-domain';
+import { getQueryString } from '@/packages/app-shared/utils/tool';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
@@ -22,11 +23,12 @@ export default async function () {
   // 判断是否是嵌入/单视频嵌入
   try {
     const _param = {};
-    if (/embed/.test(this.$route.path)) {
+    if (location.pathname.indexOf('embedclient') != -1) {
       _param.isEmbed = true;
     }
-    const { embed } = this.$route.query;
-    _param.isEmbedVideo = embed == 'video';
+    if (getQueryString('embed') == 'video') {
+      _param.isEmbedVideo = true;
+    }
     roomBaseServer.setEmbedObj(_param);
   } catch (e) {
     console.log('嵌入', e);
