@@ -1,7 +1,7 @@
 <template>
   <section class="vmp-tab-container">
     <main>
-      <vmp-air-container :cuid="cuid" />
+      <vmp-air-container :cuid="tabCuid" />
     </main>
   </section>
 </template>
@@ -9,6 +9,12 @@
 <script>
   export default {
     name: 'VmpTabContainer',
+    props: {
+      tabCuid: {
+        type: String,
+        default: ''
+      }
+    },
     data() {
       return {
         selectedId: ''
