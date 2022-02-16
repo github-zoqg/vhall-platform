@@ -45,18 +45,24 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comContainerTop', 'comTabContent', 'comContainerRight', 'comNoticeWap']
+    children: [
+      'comContainerTop',
+      'comTabContentWap',
+      'comContainerRight',
+      'comNoticeWap',
+      'comGoodSaasWap'
+    ]
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comChat']
+    children: []
   },
   /*** 布局定义end */
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: []
+    // children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -95,7 +101,7 @@ export const serverConfig = {
   comContainerTop: {
     component: 'VmpContainer',
     className: 'container-top',
-    children: ['comTabMenu']
+    children: ['comTabMenuWap']
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
@@ -112,21 +118,58 @@ export const serverConfig = {
   compRegLoginWap: {
     component: 'VmpRegLoginWap'
   },
-  comTabMenu: {
+  comTabMenuWap: {
     component: 'VmpTabMenuWap',
     handleSelect: [
       {
-        cuid: ['comTabContent'],
+        cuid: ['comTabContentWap'],
         method: 'switchTo',
         args: ['$0', '$1', '$2']
       }
     ]
   },
-  comTabContent: {
-    component: 'VmpTabContainer',
-    children: ['comIntro']
+  comTabContentWap: {
+    component: 'VmpTabContainerWap',
+    children: ['comChatWap', 'comIntroWap', 'comRecommendWap']
   },
-  comIntro: {
-    component: 'VmpIntroWap'
+  comIntroWap: {
+    component: 'VmpIntroWap',
+    children: ['comInteractToolsWap']
+  },
+  // 底部互动工具box
+  comInteractToolsWap: {
+    component: 'VmpInteractToolsWap',
+    emitNeedLogin: {
+      cuid: ['compRegLoginWap'],
+      method: 'open'
+    }
+  },
+  // 广告（推荐）
+  comRecommendWap: {
+    component: 'VmpRecommendWap',
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ]
+  },
+  //商品列表
+  comGoodSaasWap: {
+    component: 'VmpGoodListWap'
+  },
+  //wap端聊天
+  comChatWap: {
+    component: 'VmpChatWap',
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ],
+    children: [],
+    options: {}
   }
 };

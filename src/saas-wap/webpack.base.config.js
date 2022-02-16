@@ -9,14 +9,15 @@ const pkg = require('./package.json');
 const htmlConfig = {
   // cdn js
   cdnJs: {
-    vue: '//t-alistatic01.e.vhall.com/3rdlibs/vue/2.6.14/vue.js',
-    VueRouter: '//t-alistatic01.e.vhall.com/3rdlibs/vue-router/3.5.2/vue-router.min.js',
+    vue: '//cnstatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.min.js',
+    VueRouter:
+      '//cnstatic01.e.vhall.com/common-static/middle/vue-router/3.5.3/dist/vue-router.min.js',
     Moment: '//cnstatic01.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
     ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
-    Vant: '//vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant%402.1.5/js/vant.min.js',
+    Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant@2.1.5/js/vant.min.js',
     // doc: '//static.vhallyun.com/jssdk/vhall-jssdk-doc/latest/vhall-jssdk-doc-3.2.0.js',
     // chat: '//static.vhallyun.com/jssdk/vhall-jssdk-chat/latest/vhall-jssdk-chat-2.1.4.js',
     // player: '//static.vhallyun.com/jssdk/vhall-jssdk-player/latest/vhall-jssdk-player-2.4.0.js',
@@ -24,16 +25,18 @@ const htmlConfig = {
     //   '//static.vhallyun.com/jssdk/vhall-jssdk-interaction/latest/vhall-jssdk-interaction-2.3.6.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
-    jsencrypt: '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js'
+    jsencrypt:
+      '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
+    lodash: '//cnstatic01.e.vhall.com/common-static/middle/lodash/4.17.21/lodash.min.js'
     // vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
   },
   // cdn css
   cdnCss: {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    Vant: '//vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant%402.1.5/css/index.css',
+    Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant@2.1.5/css/index.css',
     iconfontCommon:
-      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.0/iconfont.css',
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.0/iconfont.css',
     iconfont:
       '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas-pc/v1.0.1/iconfont.css'
   },
@@ -41,6 +44,7 @@ const htmlConfig = {
   dnsPrefetch: {
     open: false,
     dns: {
+      'cnstatic01.e.vhall.com': '//cnstatic01.e.vhall.com',
       't-alistatic01': '//t-alistatic01.e.vhall.com'
     }
   }

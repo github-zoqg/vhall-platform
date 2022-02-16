@@ -30,6 +30,12 @@ export default async function () {
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();
 
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
@@ -38,6 +44,25 @@ export default async function () {
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
+
+  roomBaseServer.getCommonConfig({
+    tags: [
+      'skin',
+      'screen-poster',
+      'like',
+      'keywords',
+      'public-account',
+      'webinar-tag',
+      'menu',
+      'adv-default',
+      'invite-card',
+      'red-packet',
+      'room-tool',
+      'goods-default',
+      'announcement',
+      'sign'
+    ]
+  });
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息

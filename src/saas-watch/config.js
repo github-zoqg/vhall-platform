@@ -23,6 +23,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
+    // children: ['comGoodSaas']
     // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
@@ -30,13 +31,6 @@ export const serverConfig = {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
-  // layerBodyLeft: {
-  //   component: 'VmpContainer',
-  //   className: 'vmp-basic-left',
-  //   children: []
-  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
-  // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
     children: [
@@ -60,7 +54,7 @@ export const serverConfig = {
     component: 'VmpAirContainer',
     children: [
       'dlgDocList',
-      // 'compRegLogin',
+      'compRegLogin',
       'comOfficial',
       'comShare',
       'comWatchAuth',
@@ -98,7 +92,14 @@ export const serverConfig = {
   },
   // 分组直播侧边菜单
   comWatchAsideMenu: {
-    component: 'VmpWatchAsideMenu'
+    component: 'VmpWatchAsideMenu',
+    handleClickDoc: [
+      {
+        cuid: ['comDocUne'],
+        method: 'switchTo',
+        args: ['$0']
+      }
+    ]
   },
   comStreamList: {
     component: 'VmpStreamList',
@@ -154,9 +155,6 @@ export const serverConfig = {
       }
     ]
   },
-  comOfficial: {
-    component: 'VmpOfficial'
-  },
   comAttention: {
     component: 'VmpAttention',
     emitClickLogin: [
@@ -210,12 +208,6 @@ export const serverConfig = {
     }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
-  comPraise: {
-    component: 'VmpPraise'
-  },
-  comNotice: {
-    component: 'VmpNoticeList'
-  },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'
   },
@@ -265,5 +257,9 @@ export const serverConfig = {
       method: 'changeStatus',
       args: ['$0', '$1']
     }
+  },
+  //商品列表
+  comGoodSaas: {
+    component: 'VmpGoodList'
   }
 };

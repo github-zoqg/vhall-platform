@@ -198,10 +198,8 @@
           }
           if (this.type == 1) {
             params.source = 1; // 2app 3小助手
-            this.$vhallapi.footer
-              .videoTipOff({
-                ...params
-              })
+            this.roomBaseServer
+              .feedbackInfo({ ...params })
               .then(res => {
                 if (res.code == 200) {
                   this.$message({
@@ -232,8 +230,8 @@
                 });
               });
           } else {
-            this.$vhallapi.footer
-              .tipOff({
+            this.roomBaseServer
+              .tipOffInfo({
                 ...params
               })
               .then(res => {
