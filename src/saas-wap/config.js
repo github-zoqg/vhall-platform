@@ -129,7 +129,7 @@ export const serverConfig = {
     ]
   },
   comTabContentWap: {
-    component: 'VmpTabContainer',
+    component: 'VmpTabContainerWap',
     children: ['comChatWap', 'comIntroWap', 'comRecommendWap']
   },
   comIntroWap: {
