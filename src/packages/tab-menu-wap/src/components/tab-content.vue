@@ -3,21 +3,28 @@
     <main>
       <!-- 主菜单区域 -->
       <section class="vmp-tab-container-mainarea">
-        <vmp-air-container
-          v-for="tab of mainMenu"
-          :key="tab.cuid"
-          :cuid="tab.cuid"
-          :oneself="true"
-        />
+        <section v-for="tab of mainMenu" :key="tab.cuid" v-show="curItem.cuid === tab.cuid">
+          <vmp-air-container :cuid="tab.cuid" :oneself="true" />
+        </section>
       </section>
 
-      <section class="vmp-tab-container-subarea">
-        <vmp-air-container
-          v-for="tab of subMenu"
-          :key="tab.cuid"
-          :cuid="tab.cuid"
-          :oneself="true"
-        />
+      <section class="vmp-tab-container-poparea">
+        <van-popup
+          v-model="isPopupVisible"
+          position="bottom"
+          closeable
+          :lazy-render="false"
+          :overlay="false"
+        >
+          <section>
+            <header>
+              {{ curItem.text }}
+            </header>
+            <section v-for="tab of subMenu" v-show="curItem.cuid === tab.cuid" :key="tab.cuid">
+              <vmp-air-container :cuid="tab.cuid" :oneself="true" />
+            </section>
+          </section>
+        </van-popup>
       </section>
     </main>
   </section>
@@ -25,7 +32,7 @@
 
 <script>
   export default {
-    name: 'VmpTabContainer',
+    name: 'TabContent',
     props: {
       tabCuid: {
         type: String,
@@ -42,40 +49,45 @@
     },
     data() {
       return {
-        selectedId: '',
-        childrenComp: []
+        curItem: {}
       };
     },
-    created() {
-      this.childrenComp = window.$serverConfig[this.tabCuid].children;
-    },
-    mounted() {
-      for (const child of this.$children) {
-        child.$el.style.display = 'none';
+    computed: {
+      isPopupVisible: {
+        get() {
+          return Boolean(this.subMenu.find(item => item.cuid === this.curItem.cuid));
+        },
+        set() {}
       }
     },
-
     methods: {
-      hiddenAll() {
-        this.$children.forEach(i => (i.$el.style.display = 'none'));
-      },
       getComp(cuid) {
-        return this.$children.find(i => i.cuid === cuid);
-      },
-      switchTo(cuid, id, payload = null) {
-        this.hiddenAll();
-        const child = this.getComp(cuid, payload);
+        // 由于air-container不一定是本组件的直系chilren，需要深入遍历查找
+        const findComp = (cuid, array) => {
+          if (!array || array.length === 0) return false;
+          for (const item of array) {
+            // 只找cuid和空cuid下的cuid，一旦找到cuid便不再深入遍历
+            if (item.cuid && item.cuid === cuid) return item;
+            if (item.cuid && item.cuid !== cuid) continue;
+            const comp = findComp(cuid, item.$children);
+            if (comp) return comp;
+          }
+          return false;
+        };
 
+        return findComp(cuid, this.$children);
+      },
+      switchTo(item, payload = null) {
+        const child = this.getComp(item.cuid);
         if (!child) return;
 
         // pre-show
-        if (cuid === 'comCustomMenu') {
+        if (item.cuid === 'comCustomMenu') {
           const { method, arg = [] } = payload;
           child[method] && child[method](...arg);
         }
 
-        // show
-        child.$el.style.display = '';
+        this.curItem = item;
       }
     }
   };

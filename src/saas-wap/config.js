@@ -45,7 +45,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
-    children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap', 'comGoodSaasWap']
+    children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -117,8 +117,8 @@ export const serverConfig = {
       defaultMenu: [
         { cuid: 'comChatWap', text: '聊天', visible: true },
         { cuid: 'comIntroWap', text: '简介', visible: true },
-        { cuid: 'comRecommendWap', text: '推荐', visible: true },
-        { cuid: 'comGoodSaasWap', text: '商品', visible: true }
+        { cuid: 'comGoodSaasWap', text: '商品', visible: true },
+        { cuid: 'comRecommendWap', text: '推荐', visible: true }
       ]
     }
   },

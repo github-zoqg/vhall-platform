@@ -16,7 +16,7 @@
         <li
           v-if="menu.length > 3"
           class="vmp-tab-menu-more"
-          :class="{ isSubMenuShow: 'selected' }"
+          :class="{ selected: isSubMenuShow }"
           @click="toggleSubMenuVisible"
         >
           <i class="vh-iconfont vh-full-more"></i>
@@ -82,7 +82,9 @@
         return this.visibleMenu.filter((item, index) => index >= 3);
       },
       selectedIndex() {
-        return this.visibleMenu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
+        return this.visibleMenu.findIndex(
+          item => `${item.cuid}_${item.contentId}` === this.selectedId
+        );
       }
     },
     created() {
@@ -94,8 +96,8 @@
 
       // 选择默认项
       if (this.visibleMenu.length > 0) {
-        const { comp, key } = this.visibleMenu[0];
-        this.select(comp, key);
+        const { cuid, contentId } = this.visibleMenu[0];
+        this.select(cuid, contentId);
       }
     },
 
@@ -107,9 +109,9 @@
           this.tabOptions = widget.options;
         }
       },
-
+      // 初始化菜单选项
       initMenu() {
-        // TODO: 混入
+        // TODO: 混入 custom-menu 的内容
         this.tabOptions.defaultMenu.forEach(item => {
           this.addItem(item);
         });
@@ -118,21 +120,9 @@
       toggleSubMenuVisible() {
         this.isSubMenuShow = !this.isSubMenuShow;
       },
-      prev() {
-        if (this.selectedIndex === 0) return;
-        const index = this.selectedIndex - 1;
-        const item = this.visibleMenu[index];
-        this.select(item.comp, item.key);
-      },
-      next() {
-        if (this.selectedIndex >= this.visibleMenu.length - 1) return;
-        const index = this.selectedIndex + 1;
-        const item = this.visibleMenu[index];
-        this.select(item.comp, item.key);
-      },
 
       removeItemByIndex(index) {
-        this.visibleMenu.splice(index);
+        this.menu.splice(index);
       },
 
       hasItem(item) {
@@ -158,12 +148,12 @@
       },
 
       addItemByIndex(index, item) {
-        if (!item || !item.key || !item.text) {
+        if (!item || !item.cuid || !item.contentId || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
         }
 
         if (this.hasItem(item)) {
-          throw Error('不能传入comp和key都相同的item');
+          throw Error('不能传入cuid和contentId都相同的item');
         }
 
         item = getItemEntity(item);
@@ -171,25 +161,25 @@
         this.menu.splice(index, 0, item);
       },
 
-      getItem(comp, key) {
-        return this.menu.find(item => item.comp === comp && item.key === key);
+      getItem(cuid, contentId) {
+        return this.menu.find(item => item.cuid === cuid && item.contentId === contentId);
       },
 
-      setIcon(comp, key) {
-        const tab = this.getItem(comp, key);
+      setIcon(cuid, contentId) {
+        const tab = this.getItem(cuid, contentId);
         if (!tab) return;
         tab.showIcon = true;
       },
 
-      hiddenIcon(comp, key) {
-        const tab = this.getItem(comp, key);
+      hiddenIcon(cuid, contentId) {
+        const tab = this.getItem(cuid, contentId);
         if (!tab) return;
 
         tab.showIcon = false;
       },
 
-      setVisible(comp, key) {
-        const tab = this.getItem(comp, key);
+      setVisible(cuid, contentId) {
+        const tab = this.getItem(cuid, contentId);
         if (!tab) return;
 
         tab.visible = true;
@@ -224,8 +214,8 @@
       select(cuid, contentId = '') {
         this.selectedCuid = cuid;
         this.selectedContentId = contentId;
-        let payload = null;
 
+        let payload = null;
         // TODO: 强耦合，需更改
         if (cuid === 'comCustomMenu') {
           payload = {
@@ -236,7 +226,9 @@
 
         // wap端逻辑
         this.isSubMenuShow = false;
-        this.$refs['tabContent'].switchTo(cuid, contentId, payload);
+
+        const item = this.getItem(cuid, contentId);
+        this.$refs['tabContent'].switchTo(item, payload);
       }
     }
   };
