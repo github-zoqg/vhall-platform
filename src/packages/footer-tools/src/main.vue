@@ -70,7 +70,8 @@
         showGift: false,
         showGiftCount: 0,
         openTimer: false,
-        showTimer: false
+        showTimer: false,
+        groupInitData: {}
       };
     },
     components: {
@@ -96,7 +97,6 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.roomBaseState = this.roomBaseServer.state;
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;

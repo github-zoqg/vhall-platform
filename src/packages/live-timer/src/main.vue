@@ -147,7 +147,7 @@
         ten_sec: 0,
         mon: 0,
         ten_mon: 0,
-        userInfo: JSON.parse(sessionStorage.getItem('user')),
+        userInfo: JSON.parse(sessionStorage.getItem('user')) || {},
         doc_permission: ''
       };
     },

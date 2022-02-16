@@ -28,6 +28,8 @@
       >
         微吼提供技术支持
       </a>
+      <!-- 暂时借用dom -->
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
     </aside>
   </section>
 </template>

@@ -35,12 +35,11 @@
   .base-box {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 90px);
     background: #ddd;
     position: absolute;
     display: inline-block;
     right: 26px;
-    top: 90px;
+    top: 100px;
     // width: 20px;
     .icon-wrap {
       margin-bottom: 10px;

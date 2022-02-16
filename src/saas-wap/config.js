@@ -129,7 +129,12 @@ export const serverConfig = {
     children: ['comIntro', 'comRecommendWap']
   },
   comIntro: {
-    component: 'VmpIntroWap'
+    component: 'VmpIntroWap',
+    children: ['comInteractToolsWap']
+  },
+  // 底部互动工具box
+  comInteractToolsWap: {
+    component: 'VmpInteractToolsWap'
   },
   comRecommendWap: {
     component: 'VmpRecommendWap',
