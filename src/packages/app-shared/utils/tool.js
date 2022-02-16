@@ -101,6 +101,20 @@ export function isMobile() {
   );
 }
 
+/**
+ * @description 区分浏览器类型 是微信还是普通浏览器
+ * @returns null
+ */
+export function browserType() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+    /* 是微信浏览器 */
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // 返回四位版本数
 function versionPadding(num, length) {
   for (let len = (num + '').length; len < length; len = num.length) {

@@ -57,8 +57,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: []
-    // children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -67,7 +66,7 @@ export const serverConfig = {
     emitClickLogin: [
       //登录弹窗
       {
-        cuid: 'compRegLogin',
+        cuid: 'compRegLoginWap',
         method: 'open'
       }
     ],
@@ -144,5 +143,9 @@ export const serverConfig = {
   //商品列表
   comGoodSaasWap: {
     component: 'VmpGoodListWap'
+  },
+  // 二维码弹框
+  comOfficial: {
+    component: 'VmpWapQrCode'
   }
 };

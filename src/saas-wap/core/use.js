@@ -46,6 +46,9 @@ import VmpRecommendWap from '@/packages/recommend-wap';
 // 商品列表
 import VmpGoodListWap from '@/packages/good-wap';
 
+// 二维码弹框
+import VmpWapQrCode from '@/packages/qrcode-wap';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -85,4 +88,5 @@ export function initUse() {
   Vue.use(VmpNoticeWap);
   Vue.use(VmpRecommendWap);
   Vue.use(VmpGoodListWap);
+  Vue.use(VmpWapQrCode);
 }
