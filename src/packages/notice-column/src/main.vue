@@ -8,7 +8,7 @@
         </span>
       </p>
       <span class="vmp-notice-column-wrap-close" @click="isNoticeColumn = false">
-        <i class="iconfont iconguanbi_icon"></i>
+        <i class="vh-iconfont vh-line-close"></i>
       </span>
     </div>
   </div>
