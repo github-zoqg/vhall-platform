@@ -148,7 +148,8 @@ export const serverConfig = {
       'comInteractMenu',
       'comGroupMenu',
       'comShareMenu',
-      'comExitGroupMenu'
+      'comExitGroupMenu',
+      'comLottery'
     ]
   },
   // 语言选择组件
@@ -246,6 +247,12 @@ export const serverConfig = {
       {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
+      }
+    ],
+    emitOpenLottery: [
+      {
+        cuid: ['comLottery'],
+        method: 'open'
       }
     ]
   },
@@ -500,5 +507,8 @@ export const serverConfig = {
         args: false
       }
     ]
+  },
+  comLottery: {
+    component: 'VmpLotteryLive'
   }
 };

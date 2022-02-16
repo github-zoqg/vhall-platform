@@ -10,7 +10,7 @@
     </div>
     <div class="vmp-interact-menu-wrap">
       <div class="vmp-interact-menu-list">
-        <div class="vmp-interact-menu-list-item">
+        <div class="vmp-interact-menu-list-item" @click="openLottery">
           <i class="vh-saas-iconfont vh-saas-line-label"></i>
           <p>抽奖</p>
         </div>
@@ -66,6 +66,10 @@
       // 打开计时器设置弹框
       openTimer() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+      },
+      // 打开抽奖弹窗
+      openLottery() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
       }
     }
   };
