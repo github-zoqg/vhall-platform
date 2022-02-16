@@ -508,7 +508,7 @@
       }
 
       .vmp-brush-popup {
-        top: 0;
+        top: 24px;
       }
     }
     .choose-document {

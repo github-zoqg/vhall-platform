@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
+  import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -40,7 +40,7 @@
     data() {
       return {
         noticeOptions: {},
-        noticeNum: 1,
+        noticeNum: 0,
         isShowNotice: false, //是否显示公告列表
         noticeList: [],
         pageInfo: {
@@ -53,14 +53,17 @@
       };
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
     },
     created() {
       this.initConfig();
       this.roomBaseState = this.roomBaseServer.state;
-      console.log(this.roomBaseState, '===zhangxiao===???');
+      this.noticeNum = this.noticeServer.state.latestNotice.total || 0;
+      this.noticeServer.listenMsg();
+    },
+    mounted() {
       this.initNotice();
     },
     methods: {
@@ -72,19 +75,17 @@
         }
       },
       initNotice() {
+        const { groupInitData } = this.groupServer.state;
+        if (groupInitData.isInGroup) return;
         // 公告消息
-        this.msgServer.$on('ROOM_MSG', msg => {
-          alert('success');
-          let msgs = JSON.parse(msg.data);
-          if (msgs.type == 'room_announcement') {
-            this.noticeNum++;
-            this.noticeList.unshift({
-              created_at: msgs.push_time,
-              content: {
-                content: msgs.room_announcement_text
-              }
-            });
-          }
+        this.noticeServer.$on('room_announcement', msg => {
+          this.noticeNum++;
+          this.noticeList.unshift({
+            created_at: msg.push_time,
+            content: {
+              content: msg.room_announcement_text
+            }
+          });
         });
       },
       getNoticeHistoryList() {

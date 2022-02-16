@@ -21,6 +21,7 @@
   </div>
 </template>
 <script>
+  import { useMsgServer, useRoomBaseServer, usePraiseServer } from 'middle-domain';
   export default {
     name: 'VmpPraise',
     data() {
@@ -31,6 +32,24 @@
         totalPraiseNum: 0, // 点赞数量
         increment: 0 // 点赞增量
       };
+    },
+    beforeCreate() {
+      this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
+      this.praiseServer = usePraiseServer();
+    },
+    created() {
+      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum;
+      this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
+      this.praiseServer.listenMsg();
+    },
+    mounted() {
+      this.praiseServer.$on('customPraise', msg => {
+        if (msg.visitorId != this.roomBaseServer.state.watchInitData.visitor_id) {
+          this.totalPraiseNum = this.totalPraiseNum + msg.num;
+          this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
+        }
+      });
     },
     methods: {
       // 点击事件
@@ -45,13 +64,18 @@
         this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
         // 调点赞接口的延时器，防抖，最后一次点击按钮的两秒之后统一调接口和发消息
         this.postPraiseTimer = setTimeout(() => {
-          // this.praise();
+          this.praise();
           this.increment = 0;
         }, 2000);
       },
       // 点赞方法
       praise() {
-        console.log('zheli这里调用点赞接口');
+        const num = this.increment;
+        const { watchInitData } = this.roomBaseServer.state;
+        this.praiseServer.postPraiseIncrement({
+          room_id: watchInitData.interact.room_id,
+          num
+        });
       },
       // 点赞组件的动画控制
       handleAnimation() {
