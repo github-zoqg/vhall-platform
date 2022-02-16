@@ -44,17 +44,19 @@
             @click="handleClickMuteDevice('video')"
             :class="
               localStream.videoMuted
-                ? 'iconfont iconicon_shexiangtouguanbi'
-                : 'iconfont iconicon_shexiangtoukaiqi'
+                ? 'vh-iconfont vh-line-turn-off-video-camera'
+                : 'vh-iconfont vh-line-video-camera'
             "
           ></span>
         </el-tooltip>
         <el-tooltip :content="localStream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
           <span
-            class="vmp-stream-local__shadow-icon iconfont"
+            class="vmp-stream-local__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              localStream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+              localStream.audioMuted
+                ? 'vh-line-turn-off-microphone'
+                : `iconicon_maikefeng_${audioLevel}`
             "
           ></span>
         </el-tooltip>
@@ -72,15 +74,18 @@
         </span>
         <el-tooltip content="切换" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_qiehuan"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
             v-if="!isFullScreen"
             @click="exchange"
           ></span>
         </el-tooltip>
         <el-tooltip content="全屏" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont"
-            :class="{ iconicon_quanping: !isFullScreen, iconicon_quxiaoquanping: isFullScreen }"
+            class="vmp-stream-local__shadow-icon vh-iconfont"
+            :class="{
+              'vh-line-amplification': !isFullScreen,
+              'vh-line-narrow': isFullScreen
+            }"
             @click="fullScreen"
           ></span>
         </el-tooltip>

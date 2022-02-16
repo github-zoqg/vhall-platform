@@ -32,7 +32,7 @@
     </div>
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
-      <div class="vmp-doc-toolbar__brush" v-show="hasDocPermission && currentType === 'document'">
+      <div class="vmp-doc-toolbar__brush" v-show="hasDocPermission && currentType.length > 0">
         <!-- 选择 -->
         <div
           class="vmp-icon-item"
@@ -206,15 +206,9 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      // 是否文档演示权限
       hasDocPermission() {
-        return (
-          this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer?.state.clientType !== 'send' &&
-            this.roomBaseServer?.state.watchInitData.webinar.type === 1 &&
-            this.roomBaseServer?.state.interactToolStatus.is_open_switch == 1 &&
-            this.groupServer?.state.groupInitData?.isInGroup &&
-            this.groupServer?.state.groupInitData?.join_role == 20)
-        );
+        return this.docServer.state.hasDocPermission;
       }
     },
     beforeCreate() {
@@ -514,7 +508,7 @@
       }
 
       .vmp-brush-popup {
-        top: 0;
+        top: 24px;
       }
     }
     .choose-document {

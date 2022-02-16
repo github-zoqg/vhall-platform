@@ -4,8 +4,10 @@ import {
   useDocServer,
   useInteractiveServer,
   useMicServer,
+  useMediaCheckServer,
   useGroupServer
 } from 'middle-domain';
+import { getQueryString } from '@/packages/app-shared/utils/tool';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
@@ -13,6 +15,7 @@ export default async function () {
   const msgServer = useMsgServer();
   const docServer = useDocServer();
   const interactiveServer = useInteractiveServer();
+  const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
 
   if (!roomBaseServer) {
@@ -22,17 +25,23 @@ export default async function () {
   // 判断是否是嵌入/单视频嵌入
   try {
     const _param = {};
-    if (/embed/.test(this.$route.path)) {
+    if (location.pathname.indexOf('embedclient') != -1) {
       _param.isEmbed = true;
     }
-    const { embed } = this.$route.query;
-    _param.isEmbedVideo = embed == 'video';
+    if (getQueryString('embed') == 'video') {
+      _param.isEmbedVideo = true;
+    }
     roomBaseServer.setEmbedObj(_param);
   } catch (e) {
     console.log('嵌入', e);
   }
 
-  // TODO：晓东确认，是否在此处添加，配置项调用
+  // 互动、分组直播进行设备检测
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    // 获取媒体许可，设置设备状态
+    mediaCheckServer.getMediaInputPermission();
+  }
+
   await roomBaseServer.getConfigList();
   await roomBaseServer.getLowerConfigList({
     params: {},
@@ -66,12 +75,11 @@ export default async function () {
     ]
   });
 
-  // 获取房间互动工具状态
-  await roomBaseServer.getInavToolStatus();
-
-  // 初始化分组信息
-  await groupServer.init();
-  console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
@@ -79,9 +87,7 @@ export default async function () {
   await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
-  await docServer.init({
-    token: roomBaseServer.state.watchInitData.interact.paas_access_token
-  });
+  await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
 
   const micServer = useMicServer();

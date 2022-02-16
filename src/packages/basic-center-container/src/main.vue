@@ -10,9 +10,9 @@
     <vmp-air-container :cuid="childrenComp[4]" :oneself="true"></vmp-air-container>
     <!-- 侧边菜单 -->
     <vmp-air-container :cuid="childrenComp[5]" :oneself="true"></vmp-air-container>
-    <!-- 桌面共享 -->
+    桌面共享
     <!-- 插播 -->
-    <!-- 底部控制栏 -->
+    <!-- 底部工具栏 -->
     <vmp-air-container :cuid="childrenComp[2]" :oneself="true"></vmp-air-container>
     <!-- 滚动的公告 -->
     <!-- <vmp-air-container :cuid="childrenComp[3]" :oneself="true"></vmp-air-container> -->

@@ -40,6 +40,9 @@
       // 是否已上麦
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     beforeCreate() {

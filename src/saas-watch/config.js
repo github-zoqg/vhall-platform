@@ -54,7 +54,7 @@ export const serverConfig = {
     component: 'VmpAirContainer',
     children: [
       'dlgDocList',
-      // 'compRegLogin',
+      'compRegLogin',
       'comOfficial',
       'comShare',
       'comWatchAuth',
@@ -139,10 +139,21 @@ export const serverConfig = {
         cuid: 'comShare',
         method: 'openShareDialog'
       }
+    ],
+    emitOpenUserAccount: [
+      //弹出个人资料
+      {
+        cuid: 'comUserAccount',
+        method: 'openUserAccountDialog'
+      }
+    ],
+    emitOpenCash: [
+      //弹出个人资料
+      {
+        cuid: 'comCash',
+        method: 'openCashDialog'
+      }
     ]
-  },
-  comOfficial: {
-    component: 'VmpOfficial'
   },
   comAttention: {
     component: 'VmpAttention',
@@ -196,12 +207,6 @@ export const serverConfig = {
       method: 'open'
     }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
-  },
-  comPraise: {
-    component: 'VmpPraise'
-  },
-  comNotice: {
-    component: 'VmpNoticeList'
   },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'

@@ -1,7 +1,7 @@
-import VmpTabContainer from './src/main.vue';
+import VmpTabContainerWap from './src/main.vue';
 
-VmpTabContainer.install = function (Vue) {
-  Vue.component(VmpTabContainer.name, VmpTabContainer);
+VmpTabContainerWap.install = function (Vue) {
+  Vue.component(VmpTabContainerWap.name, VmpTabContainerWap);
 };
 
-export default VmpTabContainer;
+export default VmpTabContainerWap;
