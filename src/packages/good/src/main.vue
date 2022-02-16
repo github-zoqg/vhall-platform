@@ -4,7 +4,7 @@
       v-for="good in goodsList"
       :key="good.goods_id"
       class="vh-goods_item watch-page"
-      @click="showPop(good)"
+      @click="showDetailDialog(good)"
     >
       <div class="vh-goods_item-cover">
         <template v-for="i in good.img_list">
@@ -97,7 +97,6 @@
 
 <script>
   import { useRoomBaseServer, useGoodServer } from 'middle-domain';
-  // impor debounce unce } from '@/packages/app-shared/utils/tool';
   import { debounce } from 'lodash';
 
   export default {
@@ -195,7 +194,7 @@
       handleClose() {
         this.openGoodInfo = false;
       },
-      showPop(val) {
+      showDetailDialog(val) {
         const data = val;
         if (data && data.img_list.length < 4) {
           const defaults = 4 - data.img_list.length;
@@ -302,7 +301,7 @@
 </script>
 
 <style lang="less">
-  .vh-goods {
+  c {
     width: 100%;
     height: 500px;
     overflow-y: scroll;
