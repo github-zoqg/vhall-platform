@@ -55,7 +55,7 @@ export const serverConfig = {
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comChat']
+    children: []
   },
   /*** 布局定义end */
   /*** 所有弹窗集合 */
@@ -130,7 +130,7 @@ export const serverConfig = {
   },
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comIntro', 'comRecommendWap']
+    children: ['comChatWap', 'comIntro', 'comRecommendWap']
   },
   comIntro: {
     component: 'VmpIntroWap',
@@ -153,5 +153,18 @@ export const serverConfig = {
   //商品列表
   comGoodSaasWap: {
     component: 'VmpGoodListWap'
+  },
+  //wap端聊天
+  comChatWap: {
+    component: 'VmpChatWap',
+    addTab: [
+      {
+        cuid: ['comTabMenu'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ],
+    children: [],
+    options: {}
   }
 };

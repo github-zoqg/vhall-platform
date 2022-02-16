@@ -37,7 +37,7 @@ import VmpTabContainer from '@/packages/tab-container';
 import VmpIntroWap from '@/packages/intro-wap';
 //wap互动工具计时器弹窗
 import VmpWapTimer from '@/packages/wap-timer';
-//wap互动工具icon-box
+//wap互动工具box
 import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 //wap公告
 import VmpNoticeWap from '@/packages/notice-watch-wap';
@@ -45,6 +45,7 @@ import VmpRecommendWap from '@/packages/recommend-wap';
 
 // 商品列表
 import VmpGoodListWap from '@/packages/good-wap';
+import VmpChatWap from '@/packages/chat-wap';
 //wap互动工具box
 import VmpInteractToolsWap from '@/packages/interact-tools-wap';
 
@@ -88,4 +89,5 @@ export function initUse() {
   Vue.use(VmpRecommendWap);
   Vue.use(VmpGoodListWap);
   Vue.use(VmpInteractToolsWap);
+  Vue.use(VmpChatWap);
 }
