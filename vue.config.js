@@ -34,7 +34,7 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: JSON.stringify('/middle') // 路由base
+        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE) // 路由base
       }
     })
   ];
@@ -67,6 +67,21 @@ function getPlugins() {
       }),
       // 修改文件内容替换路由标记
       new ReplaceInFileWebpackPlugin([
+        // {
+        //   dir: `dist/${argv.project}/cloud/static`,
+        //   test: /\.js$/,
+        //   rules: [{
+        //     search: '@routerBase',
+        //     replace: `${process.env.VUE_APP_ROUTER_BASE}`
+        //   }]
+        // }, {
+        //   dir: `dist/${argv.project}/cloud/${argv.version}/static`,
+        //   test: /\.js$/,
+        //   rules: [{
+        //     search: '@routerBase',
+        //     replace: `${process.env.VUE_APP_ROUTER_BASE}/${argv.version}`
+        //   }]
+        // },
         {
           dir: `dist/${argv.project}`,
           test: /\.js$/,
@@ -105,7 +120,8 @@ const sharedConfig = {
       'vue-i18n': 'VueI18n',
       moment: 'moment',
       'element-ui': 'ELEMENT',
-      'middle-domain': 'middleDomain'
+      'middle-domain': 'middleDomain',
+      vant: 'vant'
     },
     // 插件
     plugins: getPlugins()
@@ -126,7 +142,8 @@ const sharedConfig = {
           resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
           dist: path.resolve('dist'),
           project: argv.project,
-          version: argv.version
+          version: argv.version,
+          routerBase: `${process.env.VUE_APP_ROUTER_BASE}`
         })
       );
     }

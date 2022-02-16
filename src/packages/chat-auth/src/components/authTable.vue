@@ -1,71 +1,164 @@
 <template>
   <div class="vmp-chat-auth-table">
     <div class="vmp-chat-auth-table__list">
-      <el-table v-if="list && list.length" :data="list" style="width: 100%" :show-header="false">
+      <el-table
+        v-if="list && list.length"
+        :data="list"
+        style="width: 100%"
+        :show-header="false"
+        max-height="600"
+      >
         <el-table-column class-name="table-list__column">
-          <div
-            class="table-list__chat-item"
-            slot-scope="{ $index, row }"
-            @click="row.isChecked = !row.isChecked"
-          >
-            <div class="table-list__chat-item__chat-info">
-              <div class="chat-info__title">
-                <div class="check-box-row" v-if="selectMenuType === 'auth'">
-                  <el-checkbox v-model="row.isChecked" @change="selectChange($index)"></el-checkbox>
+          <template slot-scope="{ $index, row }">
+            <div class="table-list__chat-item" @click="row.isChecked = !row.isChecked">
+              <div class="table-list__chat-item__chat-info">
+                <div class="chat-info__title">
+                  <div class="check-box-row" v-if="selectMenuType === 'auth'">
+                    <el-checkbox
+                      v-model="row.isChecked"
+                      @change="selectChange($index)"
+                    ></el-checkbox>
+                  </div>
+                  <span class="chat-info__name">{{ row.nick_name || row.nickname || '' }}</span>
+                  <!--                <span class="chat-info__tag" v-if="row.is_gag === 'Y'">(已禁言)</span>-->
+                  <!--                <span class="chat-info__tag" v-if="row.is_kick === 'Y'">(已踢出)</span>-->
+                  <span
+                    class="chat-info__time"
+                    v-if="!['muted', 'kickedOut'].includes(selectMenuType)"
+                  >
+                    {{ row.time || row.date_time }}
+                  </span>
+                  <span
+                    class="chat-info__time"
+                    v-if="['muted', 'kickedOut'].includes(selectMenuType)"
+                  >
+                    {{ row.created_at }}
+                  </span>
                 </div>
-                <span class="chat-info__name">{{ row.context.nickname }}</span>
-                <span class="chat-info__tag" v-if="row.is_gag === 'Y'">(已禁言)</span>
-                <span class="chat-info__tag" v-if="row.is_kick === 'Y'">(已踢出)</span>
-                <span class="chat-info__time">{{ row.date_time }}</span>
+                <div
+                  class="chat-info__content"
+                  :class="{ prohibit: selectMenuType === 'prohibit' }"
+                  v-if="!['muted', 'kickedOut'].includes(selectMenuType)"
+                >
+                  <template v-if="row.type === 'text'">
+                    <p>{{ row.barrageTxt || row.text_content || row.data }}</p>
+                  </template>
+                  <template v-else-if="row.type === 'image'">
+                    <img
+                      v-for="(item, ind) in row.image_urls"
+                      :src="item"
+                      alt=""
+                      :key="ind"
+                      @click="infoClick(item, row.type)"
+                    />
+                    <span v-if="row.text_content || row.data">
+                      {{ row.barrageTxt || row.text_content || row.data }}
+                    </span>
+                  </template>
+                  <template v-else-if="row.type === 'link'">
+                    <a :href="row.link_url" target="_blank">{{ row.link_url }}</a>
+                  </template>
+                  <template v-else-if="row.type === 'voice'">
+                    <audio controls>
+                      <source :src="row.voice_url" type="audio/mpeg" />
+                      您的浏览器不支持 audio 元素。
+                    </audio>
+                  </template>
+                  <template v-else-if="row.type === 'video'">
+                    <p class="video" alt="" @click="infoClick(row.video_url, row.type)">
+                      视频消息：{{ row.video_url }}
+                    </p>
+                  </template>
+                </div>
               </div>
-              <div class="chat-info__content" :class="{ prohibit: selectMenuType === 'prohibit' }">
-                {{ row.data }}
+              <div class="chat-info__operate-box" v-if="selectMenuType === 'auth'">
+                <span
+                  class="handle-item"
+                  @click.stop="handleSetBanned(row)"
+                  v-if="showMutedAndKickedBtn(row)"
+                >
+                  禁言
+                </span>
+                <span
+                  class="handle-item"
+                  @click.stop="handleSetKicked(row)"
+                  v-if="showMutedAndKickedBtn(row)"
+                >
+                  踢出
+                </span>
+                <el-button
+                  type="success"
+                  class="confirm-button"
+                  size="small"
+                  round
+                  @click.stop="handleSetPassed(1, row)"
+                >
+                  通过
+                </el-button>
+                <el-button
+                  type="danger"
+                  class="red-button"
+                  size="small"
+                  round
+                  @click.stop="handleSetProhibit(2, row)"
+                >
+                  阻止
+                </el-button>
+                <el-button
+                  v-if="options.hasPassAndReplyBtn"
+                  type="success"
+                  class="confirm-button"
+                  size="small"
+                  round
+                  @click.stop="handleSetPassed(3, row)"
+                >
+                  通过并回复
+                </el-button>
+              </div>
+              <div
+                class="chat-info__operate-box"
+                v-if="['muted', 'kickedOut'].includes(selectMenuType)"
+              >
+                <span
+                  class="handle-item"
+                  v-if="['muted'].includes(selectMenuType)"
+                  @click.stop="handleCancelMuted(row)"
+                >
+                  取消禁言
+                </span>
+                <span
+                  class="handle-item"
+                  v-if="['kickedOut'].includes(selectMenuType)"
+                  @click.stop="handleCancelKicked(row)"
+                >
+                  取消踢出
+                </span>
               </div>
             </div>
-            <div class="chat-info__operate-box" v-if="selectMenuType === 'auth'">
-              <span class="handle-item" @click.stop="handleSetBanned(row)">禁言</span>
-              <span class="handle-item" @click.stop="handleSetKicked(row)">踢出</span>
-              <el-button
-                type="success"
-                class="confirm-button"
-                size="small"
-                round
-                @click.stop="handleSetPassed(1, row)"
-              >
-                通过
-              </el-button>
-              <el-button
-                type="danger"
-                class="red-button"
-                size="small"
-                round
-                @click.stop="handleSetProhibit(2, row)"
-              >
-                阻止
-              </el-button>
-            </div>
-          </div>
+          </template>
         </el-table-column>
       </el-table>
       <div v-else-if="!loading && !list.length" class="vmp-chat-auth-table__no-data">
         暂无聊天数据
       </div>
     </div>
-    <div class="vmp-chat-auth-table__page-box">
-      <el-pagination
-        background
-        :pager-count="pageConfig.pagerCount"
-        :layout="pageConfig.layout"
-        :page-size="pageConfig.pageSize"
-        :current-page="pageConfig.currentPage"
-        :total="pageConfig.total"
-        @current-change="changePage"
-      ></el-pagination>
-    </div>
+    <!--    <div class="vmp-chat-auth-table__page-box">-->
+    <!--      <el-pagination-->
+    <!--        background-->
+    <!--        :pager-count="pageConfig.pagerCount"-->
+    <!--        :layout="pageConfig.layout"-->
+    <!--        :page-size="pageConfig.pageSize"-->
+    <!--        :current-page="pageConfig.currentPage"-->
+    <!--        :total="pageConfig.total"-->
+    <!--        @current-change="changePage"-->
+    <!--      ></el-pagination>-->
+    <!--    </div>-->
+    <chat-auth-reply-modal ref="chatAuthReplyModal" :options="options"></chat-auth-reply-modal>
   </div>
 </template>
 
 <script>
+  import chatAuthReplyModal from './replyModal';
   export default {
     name: 'VmpChatAuthTable',
     props: {
@@ -73,78 +166,27 @@
       selectMenuType: {
         type: String,
         default: () => ''
+      },
+      //聊天审核组件的配置
+      options: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      },
+      //当前的列表
+      list: {
+        type: Array,
+        default: () => {
+          return [];
+        }
       }
+    },
+    components: {
+      chatAuthReplyModal
     },
     data() {
       return {
-        //列表数据
-        list: [
-          {
-            data: '9999',
-            date_time: '2022-01-14 15:39:15',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_aed7b493cf3d4867ab6814f202af1eac',
-            avatar: '',
-            image_urls: null
-          },
-          {
-            data: '6666',
-            date_time: '2022-01-14 15:38:40',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_f442e8d3a0ca4115980e5ad9040c480b',
-            avatar: '',
-            image_urls: null
-          },
-          {
-            data: '7777',
-            date_time: '2022-01-13 18:14:14',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_0a531a2f82d748088cace56d14f09a0f',
-            avatar: '',
-            image_urls: null
-          },
-          {
-            data: '6666',
-            date_time: '2022-01-13 18:13:47',
-            nick_name: '测试人员5',
-            context: {
-              role_name: 2,
-              nick_name: '测试人员5',
-              nickname: '测试人员5',
-              avatar: ''
-            },
-            type: 'text',
-            third_party_user_id: '100696',
-            msg_id: 'msg_456664c553a84ac58e8bbf7c68e95a57',
-            avatar: '',
-            image_urls: null
-          }
-        ],
-        //是否正在加载
         loading: false,
         //分页配置
         pageConfig: {
@@ -154,8 +196,28 @@
           total: 0,
           pagerCount: 7,
           layout: 'prev, pager, next'
-        }
+        },
+        //todo 特殊消息
+        msgDetail: {
+          url: '',
+          type: ''
+        },
+        //todo 特殊消息模态窗
+        isModalShow: false
       };
+    },
+    computed: {
+      //判断未审核的禁言何踢出按钮是否展示
+      showMutedAndKickedBtn() {
+        return function (item) {
+          const { third_party_user_id = '' } = item;
+          const { baseChanelInfo = {}, hostUserId = '' } = this.$domainStore.state.chatAuthServer;
+          return (
+            third_party_user_id !== hostUserId &&
+            baseChanelInfo.third_party_user_id !== third_party_user_id
+          );
+        };
+      }
     },
     methods: {
       //todo 初始化方法
@@ -173,13 +235,30 @@
       //todo 踢出
       handleSetKicked() {},
       //todo 通过
-      handleSetPassed() {},
+      handleSetPassed(type, info) {
+        console.log(info);
+        switch (type) {
+          case 3:
+            this.$refs.chatAuthReplyModal.openModal();
+            break;
+        }
+      },
       //todo 阻止
       handleSetProhibit() {},
       //todo
       selectChange(index) {
         console.log(index);
-      }
+      },
+      //特殊消息点击 todo 特殊消息处理
+      infoClick(url, type) {
+        this.msgDetail.url = url;
+        this.msgDetail.type = type;
+        this.isModalShow = true;
+      },
+      //todo 取消禁言
+      handleCancelMuted() {},
+      //todo 取消踢出
+      handleCancelKicked() {}
     }
   };
 </script>
@@ -254,6 +333,16 @@
           white-space: break-spaces;
           &.prohibit {
             padding-left: 0;
+          }
+          img {
+            display: inline-block;
+            width: 30px;
+            cursor: pointer;
+            margin-right: 10px;
+          }
+
+          .video {
+            cursor: pointer;
           }
         }
       }

@@ -19,7 +19,7 @@
 
       <!-- 底部按钮 -->
       <div slot="footer" class="vmp-group-ft">
-        <el-button type="primary" :round="true" @click="handleSubmit">确定</el-button>
+        <el-button type="primary" :round="true" @click="handleThrottleSubmit()">确定</el-button>
         <el-button :round="true" @click="handleClose">取消</el-button>
       </div>
     </el-dialog>
@@ -27,6 +27,8 @@
 </template>
 <script>
   import { useGroupServer } from 'middle-domain';
+  import _ from 'lodash';
+
   export default {
     name: 'VmpGroupAdd',
     props: {
@@ -53,6 +55,9 @@
       show: function (newVal) {
         this.dialogVisible = newVal;
       }
+    },
+    mounted() {
+      this.handleThrottleSubmit = _.throttle(this.handleSubmit, 300, { trailing: false });
     },
     methods: {
       // 新增分组确定

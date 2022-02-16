@@ -42,7 +42,7 @@ export function throttle(fn, t = 300) {
 /**
  * 封装使用事件驱动需要的参数
  * @param cuid 当前组件的唯一标识
- * @param cuid 当前组件配置的动作
+ * @param method 当前组件配置的动作
  * @param params 动态参数
  */
 export function boxEventOpitons(cuid, method, params) {
@@ -73,4 +73,30 @@ export function uuid() {
     }
   }
   return uuid.join('');
+}
+
+/**
+ * @description 校验当前所在浏览器环境
+ * @return Boolean {*}
+ */
+const ua = navigator.userAgent.toLowerCase();
+
+// 是否微信
+export function isWechat() {
+  return ua.indexOf('micromessenger') > -1;
+}
+// 是否qq浏览器
+export function isQQ() {
+  return ua.indexOf('qq') > -1;
+}
+// 是否企业微信
+export function isWechatCom() {
+  return ua.indexOf('wxwork') > -1;
+}
+
+// 是否移动端
+export function isMobile() {
+  return /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
+    navigator.userAgent
+  );
 }

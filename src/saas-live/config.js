@@ -68,7 +68,7 @@ export const serverConfig = {
 
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comChat', 'comMemberList', 'comCustomMenu']
+    children: ['comChat', 'comNotice', 'comMemberList', 'comCustomMenu']
   },
 
   /*** 所有弹窗集合 */
@@ -81,9 +81,10 @@ export const serverConfig = {
       'comLivePrivateChat',
       'comMediaSetting',
       'comPcMediaCheck',
-      'comInsertVideo'
+      'comInsertVideo',
+      'liveTimerSet',
+      'liveTimer'
     ]
-    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */
@@ -145,13 +146,9 @@ export const serverConfig = {
       'comShareDesktopMenu',
       'comMediaPlayMenu',
       'comInteractMenu',
-      'comGroupMenu'
-    ],
-    emitShareClick: [
-      {
-        cuid: 'comShare',
-        method: 'openShareDialog'
-      }
+      'comGroupMenu',
+      'comShareMenu',
+      'comExitGroupMenu'
     ]
   },
   // 语言选择组件
@@ -174,15 +171,19 @@ export const serverConfig = {
   comDocMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont iconwendang',
+      icon: 'vh-iconfont vh-line-document',
       text: 'aside_menu.aside_menu_1000',
       kind: 'document'
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
       }
     ]
   },
@@ -190,15 +191,19 @@ export const serverConfig = {
   comWbMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont iconbaiban',
+      icon: 'vh-saas-iconfont vh-saas-line-whiteboard',
       text: 'aside_menu.aside_menu_1001',
       kind: 'board'
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
       }
     ]
   },
@@ -206,23 +211,23 @@ export const serverConfig = {
   comShareDesktopMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont iconzhuomiangongxiang',
+      icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
-      disable: true
+      kind: 'desktopShare'
     }
   },
   // 插播文件
   comMediaPlayMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont iconwangyechabo_icon',
-      text: 'aside_menu.aside_menu_1003'
+      icon: 'vh-saas-iconfont vh-saas-a-color-Spotfile',
+      text: 'aside_menu.aside_menu_1003',
+      kind: 'insertMedia'
     },
     handleClick: [
       {
         cuid: 'comGroupDiscussion',
-        method: 'switchTo',
-        args: 'media'
+        method: 'hiddenAll'
       },
       {
         cuid: 'comInsertVideo',
@@ -233,23 +238,80 @@ export const serverConfig = {
   },
   // 互动工具
   comInteractMenu: {
-    component: 'VmpInteractMenu'
+    component: 'VmpInteractMenu',
+    options: {
+      kind: 'interactTool'
+    },
+    emitOpenTimerSet: [
+      {
+        cuid: ['liveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
+  },
+  // 互动工具-计时器设置
+  liveTimerSet: {
+    component: 'VmpLiveTimerSet'
+  },
+  // 互动工具-计时器
+  liveTimer: {
+    component: 'VmpLiveTimer',
+    emitOpenTimerSet: [
+      {
+        cuid: ['liveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
   },
 
   // 分组讨论菜单
   comGroupMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'iconfont icona-icon_fenzutaolun1x',
+      icon: 'vh-saas-iconfont vh-saas-a-color-groupinglive',
       text: 'aside_menu.aside_menu_1008',
-      kind: 'group'
+      kind: 'group',
+      disable: true
     },
     handleClick: [
       {
         // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
-        method: 'switchTo',
-        args: 'group'
+        method: 'toggle'
+      }
+    ]
+  },
+  // 分享菜单
+  comShareMenu: {
+    component: 'VmpIconText',
+    options: {
+      className: 'menu-footer',
+      icon: 'vh-iconfont vh-line-share',
+      text: '分享',
+      kind: 'share'
+    },
+    handleClick: [
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
+    ]
+  },
+
+  // 退出小组菜单
+  comExitGroupMenu: {
+    component: 'VmpIconText',
+    options: {
+      className: 'menu-footer',
+      icon: 'vh-iconfont vh-line-exit',
+      text: '退出小组',
+      kind: 'exitGroup',
+      hidden: true
+    },
+    handleClick: [
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'exitGroup'
       }
     ]
   },
@@ -278,6 +340,9 @@ export const serverConfig = {
         method: 'openModal'
       }
     ]
+  },
+  comNotice: {
+    component: 'VmpNoticeList'
   },
   //发起端--私聊组件
   comLivePrivateChat: {
@@ -309,41 +374,6 @@ export const serverConfig = {
       method: 'show'
     }
   },
-  // 文档工具栏
-  comDocToolbar: {
-    component: 'VmpDocToolbar',
-    children: ['comFullscreenIcon', 'comDocThumbnailIcon']
-  },
-  // 文档全屏按钮
-  comFullscreenIcon: {
-    component: 'VmpIconItem',
-    options: {
-      icon: 'iconfont iconquanping',
-      title: 'doc.doc_1010'
-    },
-    emitClick: [
-      {
-        cuid: 'comDocUne',
-        method: 'fullscreen'
-      }
-    ]
-  },
-  // 文档缩略图按钮
-  comDocThumbnailIcon: {
-    component: 'VmpIconItem',
-    options: {
-      icon: 'iconfont iconsuolvetu',
-      title: 'usual.docThumb',
-      kind: 'document'
-    },
-    emitClick: [
-      {
-        cuid: 'comDocUne',
-        method: 'onThumbnailToggle'
-      }
-    ]
-  },
-
   //文档列表对话框
   dlgDocList: {
     component: 'VmpDocDlglist',
@@ -378,11 +408,11 @@ export const serverConfig = {
     exchangeCfg: [
       {
         cuid: 'comDocUne',
-        kind: 'doc'
+        kind: 'document'
       },
       {
         cuid: 'comInsertVideo',
-        kind: 'insertvideo'
+        kind: 'insertMedia'
       }
     ],
     // 推流完成事件
@@ -444,6 +474,13 @@ export const serverConfig = {
         method: 'openInserVideoDialog',
         args: []
       }
+    ],
+    emitInsertInfo: [
+      {
+        cuid: 'comInsertVideo',
+        method: 'getInsertingInfo',
+        args: ['$0']
+      }
     ]
   },
   // 分组讨论组件
@@ -454,6 +491,14 @@ export const serverConfig = {
       cuid: ['comGroupMenu'],
       method: 'setSelectedState',
       args: ['$0'] // 获取动态参数的第一个
-    }
+    },
+    // 分组设置取消
+    emitCancelGroup: [
+      {
+        cuid: ['comGroupMenu'],
+        method: 'setSelectedState',
+        args: false
+      }
+    ]
   }
 };

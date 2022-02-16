@@ -6,6 +6,7 @@
     class="vmp-icon-text"
     :data-kind="kind"
     :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
+    :style="{ display: hidden ? 'none' : 'flex' }"
     @click="handleClick"
   >
     <i :class="icon"></i>
@@ -20,12 +21,13 @@
     name: 'VmpIconText',
     data() {
       return {
-        className: '',
-        kind: '',
-        selected: false,
-        disable: false,
-        icon: '',
-        text: ''
+        className: '', // 自定义样式
+        icon: '', // 小图标
+        text: '', // 文本
+        kind: '', // 类型
+        selected: false, // 是否选中
+        disable: false, // 是否禁用
+        hidden: false // 是否隐藏
       };
     },
     methods: {
@@ -36,6 +38,10 @@
       // 设置可用状态
       setDisableState(val) {
         this.disable = val;
+      },
+      // 设置显示隐藏状态
+      setHiddenState(val) {
+        this.hidden = val;
       },
       // click事件
       handleClick: function () {

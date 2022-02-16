@@ -12,9 +12,9 @@
           <span class="switch-title">聊天审核</span>
           <el-switch
             v-model="enableChatAuth"
-            :inactive-color="inactiveColor"
+            :inactive-color="options.inactiveColor"
             :width="32"
-            active-color="#FFD021"
+            :active-color="options.activeColor"
             @change="toggleChatAuth"
           ></el-switch>
           <span class="switch-title sub-title">
@@ -55,15 +55,15 @@
               :class="{ active: selectMenuType === 'auth' }"
               @click="switchToTab('auth')"
             >
-              未审核({{ authTotal }})
+              未审核({{ auditNum }})
             </span>
-            <span
-              class="table-menu-item"
-              :class="{ active: selectMenuType === 'prohibit' }"
-              @click="switchToTab('prohibit')"
-            >
-              已阻止({{ prohibitTotal }})
-            </span>
+            <!--            <span-->
+            <!--              class="table-menu-item"-->
+            <!--              :class="{ active: selectMenuType === 'prohibit' }"-->
+            <!--              @click="switchToTab('prohibit')"-->
+            <!--            >-->
+            <!--              已阻止({{ prohibitTotal }})-->
+            <!--            </span>-->
             <span
               class="table-menu-item"
               :class="{ active: selectMenuType === 'passed' }"
@@ -130,7 +130,11 @@
           <span class="el-icon-refresh-right refresh-btn" @click="refreshList"></span>
         </div>
         <div class="main-container__content">
-          <auth-table :select-menu-type="selectMenuType"></auth-table>
+          <auth-table
+            :select-menu-type="selectMenuType"
+            :options="options"
+            :list="currentList"
+          ></auth-table>
         </div>
       </div>
     </div>
@@ -141,13 +145,14 @@
     >
       {{ footerInfo.text }}
     </div>
-    <auto-setting-modal ref="autoSettingModal"></auto-setting-modal>
+    <auto-setting-modal ref="autoSettingModal" :options="options"></auto-setting-modal>
   </div>
 </template>
 
 <script>
   import autoSettingModal from './components/autoSettingModal';
   import authTable from './components/authTable';
+  import { useChatAuthServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpChatAuth',
     components: {
@@ -162,11 +167,8 @@
         },
         //开启聊天审核
         enableChatAuth: false,
-        //todo 这俩都可以用从配置读取
-        //switch未激活的颜色
-        inactiveColor: '#cccccc',
-        //switch激活的颜色
-        activeColor: '#FFD021',
+        //是否开启了自动处理
+        enableAutoHandle: '1',
         //底部支持信息
         footerInfo: {
           show: 'Y',
@@ -178,8 +180,10 @@
         selectMenuType: 'auth',
         //批处理选择的是哪种 all:所有数据 , page：当前页的数据
         selectDataType: '',
-        //列表数据
-        list: [],
+        //已通过审核的列表
+        passedList: [],
+        // 被踢出和禁言的消息列表
+        specialUser: [],
         //已阻止的数量
         prohibitTotal: 0,
         //未审核的数量
@@ -193,7 +197,7 @@
         //查询参数
         searchParams: {
           page: 1,
-          page_size: 20,
+          pageSize: 200,
           total: 0
         },
         //todo  tab切换限流 是否在冷却
@@ -206,36 +210,316 @@
         controlConfig: {
           size: 'small',
           round: true
-        }
+        },
+        //聊天审核配置 todo 后续移到config里，当前config不支持
+        options: {
+          //是否有通过并回复按钮(未审核按钮)
+          hasPassAndReplyBtn: true,
+          //switch未激活的颜色
+          inactiveColor: '#cccccc',
+          //switch激活的颜色
+          activeColor: '#FFD021'
+        },
+        //当前活动id
+        webinarId: this.$route.params.id || '',
+        //url上携带的参数
+        urlParams: {}
       };
     },
-    beforeCreate() {
-      //todo 引入domain的chatAuthServer
+    computed: {
+      //当前的列表
+      currentList() {
+        let list = [];
+        switch (this.selectMenuType) {
+          case 'auth':
+            //未审核
+            list = this.list;
+            break;
+          case 'prohibit':
+            //已阻止
+            break;
+          case 'passed':
+            list = this.passedList;
+            //已通过
+            break;
+          case 'muted':
+            list = this.specialUser;
+            break;
+          case 'kickedOut':
+            list = this.specialUser;
+            break;
+          default:
+            break;
+        }
+        return list;
+      },
+      //待审核列表
+      list() {
+        return this.$domainStore.state.chatAuthServer.auditList;
+      },
+      //未审核的数量
+      auditNum() {
+        return this.$domainStore.state.chatAuthServer.auditList.length;
+      }
     },
-    created() {
-      this.init();
+    beforeCreate() {
+      this.chatAuthServer = useChatAuthServer();
+      this.msgServer = useMsgServer();
+    },
+    created() {},
+    mounted() {
       this.getFooterInfo();
+      this.init();
     },
     methods: {
       //todo 初始化方法
-      init() {
+      async init() {
+        //获取活动信息
         this.getActivityInfo();
+        //获取聊天审核开关状态
         this.getChatAuthEnableStatus();
+        //提取Url参数
+        this.urlParams = this.extractionUrlParams();
+        //初始化房间信息，这里也会在domain里初始化聊天sdk和消息sdk
+        await this.initRoomInfo();
+        this.listenEvents();
+      },
+      //初始化聊天实例
+      listenEvents() {
+        this.chatAuthServer.initChatInstance();
+      },
+      //操作用户
+      operateUser(id, type) {
+        this.chatAuthServer.operateUser(id, type);
+        const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
+        const params = Object.assign({ msg_id: '', status: 2 }, baseChanelInfo);
+        this.chatAuthServer.state.auditList.forEach(item => {
+          if (item.third_party_user_id === id) {
+            params.msg_id += item.msg_id + ',';
+          }
+        });
+        this.fetchOperate(params);
+      },
+      fetchOperate(params, cb) {
+        if (!params.msg_id) return;
+        this.chatAuthServer
+          .operateMessage(params)
+          .then(res => {
+            if (cb) {
+              cb();
+            }
+            if (res.code === 50014) {
+              this.getChatMessageList();
+            } else if (res.code == 10001) {
+              this.$message.warning(res.msg);
+            }
+          })
+          .catch(res => {
+            if (res.code === 50014) {
+              this.getChatMessageList();
+            } else if (res.code === 10040) {
+              this.$message({
+                message: '当前无聊天消息',
+                type: 'error'
+              });
+            } else {
+              this.$message({
+                message: res.msg,
+                type: 'error'
+              });
+            }
+          });
+      },
+      //提取url参数
+      extractionUrlParams() {
+        const url = window.location.href;
+        const mapObj = {};
+        if (url.indexOf('?') !== -1) {
+          let _index = -1;
+          if (url.indexOf('?') > url.indexOf('#/')) {
+            _index = url.length;
+          } else {
+            _index = url.indexOf('#/');
+          }
+          const str = url.substring(url.indexOf('?') + 1, _index);
+          const entriesList = str.split('&');
+          for (let i = 0; i < entriesList.length; i++) {
+            mapObj[entriesList[i].split('=')[0]] = entriesList[i].split('=')[1];
+          }
+        }
+        return mapObj;
+      },
+      //获取房间信息  todo 获取房间信息，初始化消息sdk和聊天sdk
+      initRoomInfo() {
+        let vc = this.$route.query.vc;
+        try {
+          vc = decodeURI(vc);
+        } catch (e) {
+          console.error(e);
+        }
+        vc = vc === void 0 ? '' : vc;
+
+        const params = Object.assign({}, this.urlParams, {
+          webinar_id: this.webinarId,
+          vc
+        });
+
+        return this.chatAuthServer
+          .initRoomInfo(params)
+          .then(res => {
+            sessionStorage.setItem('interact_token', res.data.interact.interact_token);
+            if (!sessionStorage.getItem('user')) {
+              sessionStorage.setItem('user', JSON.stringify(res.data.join_info));
+            }
+            //获取所有tab下的数据
+            this.initTabTotalNum();
+          })
+          .catch(error => {
+            console.log(error);
+          });
       },
       //todo 获取活动信息
       getActivityInfo() {},
-      //todo 获取聊天审核开启状态
-      getChatAuthEnableStatus() {},
+      //获取聊天审核开启状态
+      getChatAuthEnableStatus() {
+        const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
+        const params = { ...baseChanelInfo };
+        return this.chatAuthServer
+          .getChatAuthEnableStatus(params)
+          .then(res => {
+            this.enableChatAuth = res.data.switch || 1;
+            this.enableAutoHandle = res.data.switch_options + '';
+          })
+          .catch(res => {
+            this.$message({
+              message: res.msg,
+              type: 'error'
+            });
+          });
+      },
       //todo 获取tab上的处理数
-      initTabTotalNum() {},
-      //todo 获取聊天数据 (0:未审核 1:通过  2:阻止)
-      getChatMessageList() {},
+      initTabTotalNum() {
+        //获取全部的tab
+        this.getChatMessageList();
+        this.getPassedMessageList();
+        this.getMutedUserList();
+        this.getKickedUserList();
+      },
+      //获取未审核的聊天数据 (0:未审核 1:通过  2:阻止)
+      getChatMessageList() {
+        // const { baseChanelInfo = {} } = this.chatAuthServer.state || {};
+        // const params = Object.assign({}, baseChanelInfo);
+        // this.list = [];
+        // let tempItem = {};
+        // let object = {};
+        // let context, data;
+        // this.chatAuthServer.getAuditMessageList(params).then(res => {
+        //   for (let i in res.data) {
+        //     object = JSON.parse(res.data[i]);
+        //     context =
+        //       typeof JSON.parse(object.context) === 'object'
+        //         ? JSON.parse(object.context)
+        //         : JSON.parse(JSON.parse(object.context));
+        //     tempItem.nick_name = context.nickname || context.nick_name;
+        //     tempItem.time = object.time;
+        //     tempItem.type = object.type;
+        //     tempItem.msg_id = i;
+        //     tempItem.third_party_user_id = object.sender_id; // 发送消息的人第三方id
+        //     tempItem.channel = object.channel;
+        //     tempItem.room_id = object.room_id;
+        //     data = JSON.parse(object.data);
+        //     if (tempItem.type === 'text') {
+        //       tempItem.text_content = data.barrageTxt || data.text_content;
+        //     } else if (tempItem.type === 'video') {
+        //       tempItem.video_url = data.video_url;
+        //     } else if (tempItem.type === 'voice') {
+        //       tempItem.voice_url = data.voice_url;
+        //     } else if (tempItem.type === 'image') {
+        //       tempItem.image_urls = data.image_urls;
+        //       if (Object.prototype.hasOwnProperty.call(data, 'text_content')) {
+        //         tempItem.text_content = data.barrageTxt || data.text_content;
+        //       }
+        //     } else if (tempItem.type === 'link') {
+        //       tempItem.link_url = data.link_url;
+        //     }
+        //     tempItem.isOperate = 0; // 0 未对数据操作， 1审核通过，2拒绝
+        //     this.list.push(tempItem);
+        //     tempItem = {};
+        //     object = {};
+        //   }
+        // });
+        return this.chatAuthServer.getChatMessageList();
+      },
+      //获取已通过的审核的聊天数据
+      getPassedMessageList() {
+        const { baseChanelInfo = {}, createTime = '' } = this.chatAuthServer.state;
+        const params = {
+          ...baseChanelInfo,
+          msg_type: 'image,text,link,video,voice',
+          page_size: this.searchParams.pageSize,
+          curr_page: this.searchParams.page,
+          start_time: createTime
+        };
+        return this.chatAuthServer.getPassedMessageList(params).then(res => {
+          this.passedList = res.data.list;
+          this.passedTotal = res.data.total;
+          this.searchParams.total = res.data.total;
+        });
+      },
+      //获取被禁言的人员列表
+      getMutedUserList() {
+        const { roomInfo = {} } = this.chatAuthServer.state;
+        const params = {
+          ...roomInfo,
+          pos: 0,
+          limit: this.searchParams.pageSize
+        };
+        return this.chatAuthServer
+          .getBannedList(params)
+          .then(res => {
+            this.specialUser = res.data.list;
+            this.searchParams.total = res.data.total;
+            this.mutedTotal = res.data.total;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //获取被踢出的人员列表
+      getKickedUserList() {
+        const { roomInfo = {} } = this.chatAuthServer.state;
+        const params = {
+          ...roomInfo,
+          pos: 0,
+          limit: this.searchParams.pageSize
+        };
+        return this.chatAuthServer
+          .getKickedList(params)
+          .then(res => {
+            this.specialUser = res.data.list;
+            this.searchParams.total = res.data.total;
+            this.kickedOutTotal = res.data.total;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
       //打开自动审核弹窗
       openAutoSettingModal() {
-        this.$refs.autoSettingModal.openModal();
+        this.$refs.autoSettingModal.openModal({ enableAutoHandle: this.enableAutoHandle });
       },
       //开启/关闭聊天审核
-      toggleChatAuth() {},
+      toggleChatAuth() {
+        const params = {};
+        this.chatAuthServer
+          .toggleChatAuthStatus(params)
+          .then(res => {
+            console.log(res);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
       //todo 请求接口获取底部技术支持配置
       getFooterInfo() {},
       //todo 点击底部技术支持的处理
@@ -255,7 +539,6 @@
         if (this.selectMenuType === type) {
           return;
         }
-        this.list = [];
         this.isCooling = true;
         let s = setTimeout(() => {
           clearTimeout(s);
@@ -263,6 +546,22 @@
         }, 1000);
         this.selectMenuType = type;
         this.searchParams.page = 1;
+        switch (type) {
+          case 'auth':
+            this.getChatMessageList();
+            break;
+          case 'passed':
+            this.getPassedMessageList();
+            break;
+          case 'muted':
+            this.getMutedUserList();
+            break;
+          case 'kickedOut':
+            this.getKickedUserList();
+            break;
+          default:
+            break;
+        }
       },
       //刷新当前tab下的列表
       refreshList() {},

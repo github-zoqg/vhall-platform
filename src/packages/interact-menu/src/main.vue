@@ -1,37 +1,41 @@
 <template>
-  <div class="vmp-interact-menu">
-    <div :class="['vmp-interact-menu-icon', living ? 'vmp-interact-menu-disable' : '']">
-      <i class="iconfont iconhudonggongju"></i>
+  <div
+    class="vmp-interact-menu"
+    :class="[className, disable ? 'disable' : '']"
+    :style="{ display: hidden ? 'none' : 'flex' }"
+  >
+    <div class="vmp-interact-menu-icon">
+      <i class="vh-saas-iconfont vh-saas-a-line-Interactivetools"></i>
       <p>互动工具</p>
     </div>
     <div class="vmp-interact-menu-wrap">
       <div class="vmp-interact-menu-list">
         <div class="vmp-interact-menu-list-item">
-          <i class="iconfont iconchoujiang"></i>
+          <i class="vh-saas-iconfont vh-saas-line-label"></i>
           <p>抽奖</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="iconfont iconqiandao"></i>
+          <i class="vh-saas-iconfont vh-saas-a-line-Signin"></i>
           <p>签到</p>
         </div>
-        <div class="vmp-interact-menu-list-item vmp-interact-menu-list-disable">
-          <i class="iconfont iconhudonggongju"></i>
+        <div class="vmp-interact-menu-list-item">
+          <i class="vh-saas-iconfont vh-saas-color-Question"></i>
           <p>问卷</p>
         </div>
-        <div class="vmp-interact-menu-list-item" @click="handleQAPopup">
-          <i class="iconfont iconwenda"></i>
+        <div class="vmp-interact-menu-list-item vmp-interact-menu-list-disable">
+          <i class="vh-saas-iconfont vh-saas-color-questionnaire"></i>
           <p>问答</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="iconfont iconhongbao"></i>
+          <i class="vh-saas-iconfont vh-saas-a-color-redpacket"></i>
           <p>红包</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
-          <i class="iconfont iconjishiqi"></i>
+        <div class="vmp-interact-menu-list-item" @click="openTimer">
+          <i class="vh-iconfont vh-line-time"></i>
           <p>计时器</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="iconfont iconzhuanbo"></i>
+          <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
         </div>
       </div>
@@ -66,6 +70,7 @@
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { debounce } from 'lodash';
   import { useQaServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const qaServer = useQaServer();
   export default {
     name: 'VmpInteractMenu',
@@ -77,7 +82,11 @@
         living: false,
         isQAEnabled: false,
         qaVisible: false,
-        qaCount: 0
+        qaCount: 0,
+        className: '', // 自定义样式
+        kind: '', // 类型
+        disable: false, // 是否禁用
+        hidden: false // 是否隐藏
       };
     },
     methods: {
@@ -105,21 +114,35 @@
         qaServer.qaEnable().then(res => {
           console.log('开启问答', res);
         });
-      }, 500)
+      }, 500),
+      // 设置可用状态
+      setDisableState(val) {
+        this.disable = val;
+      },
+      // 设置显示隐藏状态
+      setHiddenState(val) {
+        this.hidden = val;
+      },
+      // 打开计时器设置弹框
+      openTimer() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+      }
     }
   };
 </script>
 <style lang="less">
   .vmp-interact-menu {
     position: relative;
+    justify-content: center;
+
     &-icon {
       display: flex;
       flex-direction: column;
       align-items: center;
       font-size: 12px;
-      color: #ececec;
       padding: 10px 0px;
       cursor: pointer;
+      color: #ececec;
       i {
         user-select: none;
         display: block;
@@ -132,8 +155,12 @@
       p {
         font-size: 12px;
       }
+      &:hover {
+        color: #fc5659;
+      }
     }
-    &-disable {
+
+    &.disable {
       i,
       p {
         color: #777777;

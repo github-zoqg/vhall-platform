@@ -32,30 +32,39 @@
       </div>
     </div>
     <div class="vmp-header-watch-right">
+      <!-- 多语言 -->
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+
+      <!-- 公众号 -->
       <div class="vmp-header-watch-right-officical">
         <div
           class="vmp-header-watch-right-officical-icon"
           :style="{ color: themeClass.pageBg }"
           @click="goOfficical"
         >
-          <i class="iconfont iconguankanbuju"></i>
+          <i class="vh-saas-iconfont vh-saas-line-speaker"></i>
           <p>{{ $t('nav.nav_1002') }}</p>
         </div>
       </div>
+
+      <!-- 关注 -->
       <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+
+      <!-- 分享 -->
       <div class="vmp-header-watch-right-share">
         <div
           class="vmp-header-watch-right-share-icon"
           :style="{ color: themeClass.pageBg }"
           @click="goShare"
         >
-          <i class="iconfont iconguankanbuju"></i>
+          <i class="vh-iconfont vh-line-share"></i>
           <p>{{ $t('nav.nav_1013') }}</p>
         </div>
       </div>
+
+      <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
-        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
+        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="isLogin">
           <p><img src="./images/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
@@ -70,15 +79,15 @@
           <div class="vmp-header-watch-right-login-user-list">
             <ul>
               <li @click="goUserInfo">
-                <i class="iconfont iconzaixianrenshu"></i>
+                <i class="vh-iconfont vh-line-account"></i>
                 {{ $t('account.account_1001') }}
               </li>
               <li @click="goCashInfo">
-                <i class="iconfont iconzaixianrenshu"></i>
+                <i class="vh-iconfont vh-a-line-financialcenter"></i>
                 {{ $t('nav.nav_1028') }}
               </li>
               <li @click="exitLogin">
-                <i class="iconfont iconjiaosetuichu"></i>
+                <i class="vh-iconfont vh-line-exit"></i>
                 {{ $t('nav.nav_1011') }}
               </li>
             </ul>
@@ -91,6 +100,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpHeaderWatch',
     data() {
@@ -137,7 +147,6 @@
       getWebinarInfo() {
         const { webinar } = this.roomBaseState.watchInitData;
         this.webinarInfo = webinar;
-        console.log(this.webinarInfo, '11111===zhangxiao===???');
       },
       exitLogin() {
         this.isLogin = false;
@@ -145,24 +154,15 @@
       },
       //登录
       goLogin() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickLogin'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       //公众号
       goOfficical() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitOpenOfficical'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
       },
       //分享
       goShare() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitOpenShare'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
       },
       // 个人资料弹窗
       goUserInfo() {
@@ -375,7 +375,7 @@
                 &:hover {
                   background: #444;
                 }
-                .iconfont {
+                .vh-iconfont {
                   font-size: 18px;
                   margin-left: 10px;
                   margin-right: 6px;

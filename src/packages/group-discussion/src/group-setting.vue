@@ -97,7 +97,8 @@
           });
           if (result && result.code === 200) {
             this.roomBaseServer.setInavToolStatus('is_open_switch', 2);
-            this.handleClose();
+            this.groupServer.state.panelShow = true;
+            this.close();
           } else {
             this.$message.error(result.msg || '分组失败');
           }
@@ -107,6 +108,10 @@
       },
       // 取消
       handleClose() {
+        this.close();
+        this.$emit('emitCancelGroup');
+      },
+      close() {
         this.dialogVisible = false;
         this.$emit('update:show', false);
       }

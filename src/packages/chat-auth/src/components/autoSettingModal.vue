@@ -51,6 +51,15 @@
   export default {
     name: 'VmpAutoSettingModal',
     components: {},
+    props: {
+      //聊天审核组件的配置
+      options: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      }
+    },
     data() {
       return {
         //模态窗标题
@@ -67,8 +76,10 @@
     },
     methods: {
       //打开模态窗
-      openModal() {
+      openModal(params = {}) {
         this.resetData();
+        const { enableAutoHandle = '1' } = params;
+        this.enableAutoHandle = enableAutoHandle;
         this.visible = true;
       },
       //重置模态窗数据

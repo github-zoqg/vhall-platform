@@ -7,7 +7,8 @@
   >
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
-      v-show="displayMode === 'normal' || displayMode === 'fullscreen'"
+      ref="docToolbar"
+      v-show="!isInGroup && (displayMode === 'normal' || displayMode === 'fullscreen')"
     ></VmpDocToolbar>
 
     <!-- 文档白板内容区 -->
@@ -39,7 +40,7 @@
           v-if="hasPager"
           data-value="prevStep"
           title="上一步"
-          class="doc-pagebar__opt iconfont iconzuofanye"
+          class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
         <li v-if="hasPager" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
@@ -50,23 +51,39 @@
           v-if="hasPager"
           data-value="nextStep"
           title="下一步"
-          class="doc-pagebar__opt iconfont iconyoufanye"
+          class="doc-pagebar__opt vh-iconfont vh-line-arrow-right"
         ></li>
-        <li data-value="zoomIn" title="放大" class="doc-pagebar__opt iconfont iconfangda"></li>
-        <li data-value="zoomOut" title="缩小" class="doc-pagebar__opt iconfont iconsuoxiao"></li>
-        <li data-value="zoomReset" title="还原" class="doc-pagebar__opt iconfont iconhuanyuan"></li>
-        <li data-value="move" title="移动" class="doc-pagebar__opt iconfont iconyidong"></li>
+        <li
+          data-value="zoomIn"
+          title="放大"
+          class="doc-pagebar__opt vh-iconfont vh-line-zoom-in"
+        ></li>
+        <li
+          data-value="zoomOut"
+          title="缩小"
+          class="doc-pagebar__opt vh-iconfont vh-line-zoom-out"
+        ></li>
+        <li
+          data-value="zoomReset"
+          title="还原"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-a-line-11"
+        ></li>
+        <li
+          data-value="move"
+          title="移动"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag"
+        ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
           data-value="fullscreen"
           title="全屏"
-          class="doc-pagebar__opt iconfont iconquanping"
+          class="doc-pagebar__opt vh-iconfont vh-a-line-fullscreen"
         ></li>
         <li
           v-if="isWatch && displayMode === 'fullscreen'"
           data-value="fullscreen"
           title="退出全屏"
-          class="doc-pagebar__opt iconfont iconquanpingguanbi"
+          class="doc-pagebar__opt vh-iconfont vh-a-line-exitfullscreen"
         ></li>
       </ul>
 
@@ -99,7 +116,7 @@
 <script>
   import VmpDocToolbar from './toolbar/main.vue';
   import screenfull from 'screenfull';
-  import { useRoomBaseServer, useDocServer, useMsgServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
@@ -133,6 +150,10 @@
       pageNum() {
         return this.docServer.state.pageNum;
       },
+      isInGroup() {
+        console.log('[doc] isInGroup', this.groupServer.state.groupInitData?.isInGroup);
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 显示文档时 && (普通模式，或 观看端全屏模式下);
       showPagebar() {
         return (
@@ -153,12 +174,25 @@
         );
       }
     },
+    watch: {
+      ['docServer.state.isChannelChanged'](newval) {
+        console.log('-[doc]---watch频道变更', newval);
+        if (newval) {
+          this.docServer.state.isChannelChanged = false;
+          // 初始化事件
+          this.initEvents();
+          // 清空
+          // this.docServer.resetContainer();
+          // 恢复上一次的文档数据;
+          this.recoverLastDocs();
+        }
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.msgServer = useMsgServer();
-      // TODO 方便查数据
-      window.docServer = useDocServer();
+      this.groupServer = useGroupServer();
     },
     methods: {
       /**
@@ -418,7 +452,9 @@
         });
         if (this.roomBaseServer.state.clientType === 'send') {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
-          window.$middleEventSdk?.event?.(boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType]));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
+          );
         }
       },
       /**
@@ -531,6 +567,7 @@
           // 移动
           case 'move':
             this.docServer.move();
+            this.$refs.docToolbar.changeTool('');
             break;
           // 全屏
           case 'fullscreen':
@@ -658,6 +695,10 @@
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
+
+        &.selected {
+          color: #fc5659;
+        }
       }
     }
   }

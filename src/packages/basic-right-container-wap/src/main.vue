@@ -1,0 +1,67 @@
+<template>
+  <div class="base-box">
+    <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
+      <div :class="!timerVisible ? 'have' : ''"></div>
+      <img src="./image/timer.png" />
+    </div>
+  </div>
+</template>
+
+<script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  export default {
+    name: 'VmpContainerRightWap',
+    data() {
+      return {
+        showTimer: false,
+        timerVisible: true
+      };
+    },
+    methods: {
+      handleTimer() {
+        if (!this.timerVisible) {
+          this.timerVisible = true;
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimer'));
+        }
+      },
+      changeStatus(data, status) {
+        this[data] = status;
+      }
+    }
+  };
+</script>
+
+<style lang="less" scoped>
+  .base-box {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 90px);
+    background: #ddd;
+    position: absolute;
+    display: inline-block;
+    right: 26px;
+    top: 90px;
+    // width: 20px;
+    .icon-wrap {
+      margin-bottom: 10px;
+      width: 84px;
+      height: 84px;
+      position: relative;
+      background-color: transparent;
+      img {
+        width: 84px;
+        height: 84px;
+      }
+    }
+    .have {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #ff0005;
+      content: '';
+    }
+  }
+</style>

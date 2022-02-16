@@ -1,19 +1,111 @@
 <template>
   <div class="vmp-aside-menu">
     <vmp-air-container :cuid="cuid"></vmp-air-container>
-    <div class="vmp-aside-menu-share">
-      <div @click="goWatchShare">
-        <i class="iconfont iconfenxiang"></i>
-        <p>分享</p>
-      </div>
-    </div>
   </div>
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpAsideMenu',
+    data() {
+      return {};
+    },
+    mounted() {
+      this.resetMenus();
+    },
+    watch: {
+      ['$domainStore.state.roomBaseServer.watchInitData.webinar.type'](newval) {
+        this.resetMenus();
+      },
+      ['$domainStore.state.groupServer.groupInitData.isInGroup'](newval) {
+        this.resetMenus();
+      }
+    },
     methods: {
+      // 重置菜单，根据场景设置菜单的隐藏和显示
+      resetMenus() {
+        let scene;
+        if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type === 1) {
+          console.log('scene= 直播中');
+          if (this.$domainStore.state.groupServer.groupInitData?.isInGroup) {
+            console.log('scene= 小组中中');
+            scene = 3;
+          } else {
+            console.log('scene= 不在小组中');
+            scene = 2;
+          }
+        } else {
+          console.log('scene= 未直播');
+          scene = 1;
+        }
+        // kind: document-文档，board-白板, desktopShare-桌面共享，insertMedia-插播文件，
+        // interactTool-互动工具，group-分组讨论, share-分享, exitGroup-退出小组
+        if (scene === 1) {
+          // 未直播
+          for (const vn of this.$children) {
+            if (['exitGroup'].includes(vn.kind)) {
+              // 禁用并隐藏
+              vn.setDisableState(true);
+              vn.setHiddenState(true);
+            } else if (
+              ['document', 'board', 'insertMedia', 'interactTool', 'share'].includes(vn.kind)
+            ) {
+              // 可用并显示
+              vn.setDisableState(false);
+              vn.setHiddenState(false);
+            } else if (['desktopShare', 'group'].includes(vn.kind)) {
+              // 显示但禁用
+              vn.setDisableState(true);
+              vn.setHiddenState(false);
+            }
+          }
+        } else if (scene === 2) {
+          for (const vn of this.$children) {
+            // 直播中，但不在小组中
+            if (['exitGroup'].includes(vn.kind)) {
+              // 禁用并隐藏
+              vn.setDisableState(true);
+              vn.setHiddenState(true);
+            } else if (
+              [
+                'document',
+                'board',
+                'desktopShare',
+                'insertMedia',
+                'interactTool',
+                'group',
+                'share'
+              ].includes(vn.kind)
+            ) {
+              // 可用并显示
+              vn.setDisableState(false);
+              vn.setHiddenState(false);
+            } else {
+              // 显示但禁用
+              vn.setDisableState(true);
+              vn.setHiddenState(false);
+            }
+          }
+        } else if (scene === 3) {
+          // 直播中，并正在小组中
+          for (const vn of this.$children) {
+            if (['document', 'board', 'desktopShare'].includes(vn.kind)) {
+              // 显示但禁用
+              vn.setDisableState(true);
+              vn.setHiddenState(false);
+            } else if (['exitGroup'].includes(vn.kind)) {
+              // 显示并可用
+              vn.setDisableState(false);
+              vn.setHiddenState(false);
+            } else {
+              // 禁用并隐藏
+              vn.setDisableState(true);
+              vn.setHiddenState(true);
+            }
+          }
+        }
+      },
       switchTo(kind) {
         for (const vn of this.$children) {
           if (vn.setSelectedState) {
@@ -29,31 +121,13 @@
 </script>
 <style lang="less">
   .vmp-aside-menu {
-    &-share {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 12px;
-        color: #ececec;
-        padding: 10px 0px;
-        cursor: pointer;
-        i {
-          user-select: none;
-          display: block;
-          width: 23px;
-          height: 23px;
-          margin: 0 auto;
-          padding-bottom: 6px;
-          font-size: 22px;
-        }
-        p {
-          font-size: 12px;
-        }
-      }
+    position: relative;
+    height: 100%;
+
+    .menu-footer {
+      position: absolute;
+      width: 100%;
+      bottom: 10px;
     }
   }
 </style>

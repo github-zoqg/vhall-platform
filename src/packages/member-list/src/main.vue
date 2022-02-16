@@ -7,7 +7,7 @@
     </div>
     <!--成员区域-->
     <div class="vmp-member-list__container">
-      <div class="vmp-member-list__container__scroll" ref="scroll">
+      <scroll class="vmp-member-list__container__scroll" ref="scroll" @pullingUp="loadMore">
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
@@ -19,7 +19,7 @@
               <span class="iconzanwusousuo iconfont"></span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
-            <template v-else v-infinite-scroll="loadMore" style="overflow: auto">
+            <template v-else style="overflow: auto">
               <template v-for="user in onlineUsers">
                 <member-item
                   :key="user.account_id"
@@ -103,7 +103,7 @@
             </template>
           </div>
         </template>
-      </div>
+      </scroll>
     </div>
     <!--底部操作区域-->
     <div class="vmp-member-list__operate-container">
@@ -179,6 +179,7 @@
 
 <script>
   import memberItem from './components/member-item';
+  import scroll from './components/scroll';
   import * as _ from 'lodash';
   import {
     useMicServer,
@@ -190,7 +191,8 @@
   export default {
     name: 'VmpMemberList',
     components: {
-      memberItem
+      memberItem,
+      scroll
     },
     filters: {
       //数值压缩
@@ -237,7 +239,7 @@
         /** 搜索输入框结束 */
         // 容器内边距
         emptyContainerPaddingTop: 10,
-        //todo domain里取 当前主讲人的id
+        //当前主讲人的id
         currentSpeakerId: '',
         //当前演示者的id
         presentation_screen: '',
@@ -291,6 +293,7 @@
       },
       roleName(newVal, oldVal) {
         this.roleName = newVal;
+        console.log(oldVal);
       },
       leader_id: {
         handler(newVal, oldVal) {
@@ -413,7 +416,6 @@
       //初始化房间消息回调监听
       listenRoomMsg() {
         const isLive = this.memberOptions.platformType === 'live';
-        const isWatch = this.memberOptions.platformType === 'watch';
         // 加入房间
         this.msgServer.$onMsg('JOIN', msg => {
           handleUserJoinRoom(msg);
@@ -493,10 +495,12 @@
 
         //直播结束
         function handleEndLive(msg) {
+          console.log(msg);
           this.allowRaiseHand = false;
         }
         //直播结束
         function handleLiveOver(msg) {
+          console.log(msg);
           setTimeout(() => {
             this.refreshList();
           }, 1000);
@@ -584,7 +588,6 @@
             this.onlineUsers.push(user);
             this.onlineUsers = this.memberServer._sortUsers(this.onlineUsers);
             setTimeout(() => {
-              //todo 待移除
               this.$refs.scroll.refresh();
             }, 100);
             if (msg.context.role_name == 4) {
@@ -681,7 +684,6 @@
           this._deleteUser(msg.sender_id, this.onlineUsers, 'leave');
           this._deleteUser(msg.sender_id, this.applyUsers); // 14273
           setTimeout(() => {
-            //todo 等待移除
             this.$refs.scroll.refresh();
           }, 50);
           if (msg.context.role_name == 1 && this.roleName != 1) {
@@ -1083,6 +1085,7 @@
         }
         //重新获取最新的groupInitData
         function changeGroupInitData(msg) {
+          console.log(msg);
           // this.groupInitData = msg;
         }
         //踢出小组
@@ -1109,6 +1112,7 @@
         }
         //小组被解散
         function handleGroupDisband(msg) {
+          console.log(msg);
           this.onlineUsers = [];
           this.getOnlineUserList();
         }
@@ -1260,13 +1264,27 @@
         if (this.searchUserInput) {
           Object.assign(params, { nickname: this.searchUserInput });
         }
-        getOnlineUserList(params).then(res => {
-          if (res.code === 200) {
-            this.onlineUsers = this.memberServer.state.onlineUsers || [];
-            //在线总人数
-            this.totalNum = this.memberServer.state.totalNum;
-          }
-        });
+        getOnlineUserList(params)
+          .then(res => {
+            if (res.code === 200) {
+              this.$refs.scroll.finishPullUp();
+              this.onlineUsers = this.memberServer.state.onlineUsers || [];
+              if (!this.onlineUsers.length) {
+                this.pageConfig.page--;
+              }
+              //在线总人数
+              this.totalNum = this.memberServer.state.totalNum;
+              setTimeout(() => {
+                this.$refs.scroll.refresh();
+              }, 50);
+            }
+            if (![200, '200'].includes(res.code)) {
+              this.pageConfig.page--;
+            }
+          })
+          .catch(() => {
+            this.pageConfig.page--;
+          });
       },
       /**
        * 改变在线人员列表的状态
@@ -1355,6 +1373,12 @@
           this.getLimitUserList();
         }
         //todo scroll调整
+        if (this.$refs.scroll && this.$refs.scroll.$refs && this.$refs.scroll.$refs.scrollBox) {
+          this.emptyContainerPaddingTop = this.$refs.scroll.$refs.scrollBox.scrollHeight / 2 - 60;
+        }
+        setTimeout(() => {
+          this.$refs.scroll.refresh();
+        }, 50);
       },
       //清空人员搜索
       clearSearchInput() {
@@ -1719,9 +1743,8 @@
       },
       //加载更多
       loadMore() {
-        if (this.onlineUsers.length > 100) {
-          this.getOnlineUserList(++this.pageConfig.page * 100);
-        }
+        this.page++;
+        this.getOnlineUserList();
       }
     }
   };
