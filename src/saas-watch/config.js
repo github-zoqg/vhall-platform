@@ -23,6 +23,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
+    // children: ['comGoodSaas']
     // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
@@ -30,13 +31,6 @@ export const serverConfig = {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
-  // layerBodyLeft: {
-  //   component: 'VmpContainer',
-  //   className: 'vmp-basic-left',
-  //   children: []
-  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
-  // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
     children: [
@@ -60,7 +54,8 @@ export const serverConfig = {
     component: 'VmpAirContainer',
     children: [
       'dlgDocList',
-      'compRegLogin',
+      // 'compRegLogin',
+      'comOfficial',
       'comShare',
       'comWatchAuth',
       // 'comSignUpForm',
@@ -97,7 +92,14 @@ export const serverConfig = {
   },
   // 分组直播侧边菜单
   comWatchAsideMenu: {
-    component: 'VmpWatchAsideMenu'
+    component: 'VmpWatchAsideMenu',
+    handleClickDoc: [
+      {
+        cuid: ['comDocUne'],
+        method: 'switchTo',
+        args: ['$0']
+      }
+    ]
   },
   comStreamList: {
     component: 'VmpStreamList',
@@ -116,12 +118,19 @@ export const serverConfig = {
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice'],
+    children: ['compLanguageChoice', 'comAttention'],
     emitClickLogin: [
       //登录弹窗
       {
         cuid: 'compRegLogin',
         method: 'open'
+      }
+    ],
+    emitOpenOfficical: [
+      //弹出公众号
+      {
+        cuid: 'comOfficial',
+        method: 'openOfficial'
       }
     ],
     emitOpenShare: [
@@ -130,12 +139,18 @@ export const serverConfig = {
         cuid: 'comShare',
         method: 'openShareDialog'
       }
-    ],
-    emitOpenUserAccount: [
-      //弹出个人资料
+    ]
+  },
+  comOfficial: {
+    component: 'VmpOfficial'
+  },
+  comAttention: {
+    component: 'VmpAttention',
+    emitClickLogin: [
+      //登录弹窗
       {
-        cuid: 'comUserAccount',
-        method: 'openUserAccountDialog'
+        cuid: 'compRegLogin',
+        method: 'open'
       }
     ]
   },
@@ -237,5 +252,9 @@ export const serverConfig = {
       method: 'changeStatus',
       args: ['$0', '$1']
     }
+  },
+  //商品列表
+  comGoodSaas: {
+    component: 'VmpGoodList'
   }
 };

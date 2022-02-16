@@ -2,7 +2,6 @@
   <!-- 文档工具栏 -->
   <div class="vmp-doc-toolbar" :class="[{ 'is-watch': isWatch }]">
     <!-- 左: 选择文档等操作 -->
-    ---- {{ hasDocPermission }}
     <div class="vmp-doc-toolbar__hd" v-show="hasDocPermission">
       <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}

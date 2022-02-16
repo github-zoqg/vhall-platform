@@ -57,6 +57,9 @@
   </div>
 </template>
 <script>
+  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpWatchAsideMenu',
     data() {
@@ -67,35 +70,81 @@
       };
     },
     watch: {
-      ['$domainStore.state.roomBaseServer.watchInitData.webinar.type'](newval) {
-        this.resetMenus();
-      },
-      ['$domainStore.state.roomBaseServer.interactToolStatus.is_open_switch'](newval) {
-        this.resetMenus();
-      },
-      ['$domainStore.state.groupServer.groupInitData.isInGroup'](newval) {
+      ['$domainStore.state.groupServer.hasGroupPermission'](newval) {
+        console.log('[group]---------hasGroupPermission watch-------------');
         this.resetMenus();
       }
     },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      this.docServer = useDocServer();
+      this.msgServer = useMsgServer();
+      this.groupServer = useGroupServer();
+    },
     mounted() {
+      this.initEvent();
       this.resetMenus();
     },
     methods: {
+      initEvent() {
+        // 开启分组讨论
+        this.groupServer.$on('dispatch_group_switch_start', () => {
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(1, this.groupServer.state.groupInitData.name);
+          }
+        });
+        // 结束分组讨论
+        this.groupServer.$on('dispatch_group_switch_end', () => {
+          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+        });
+
+        // 本人被踢出来
+        this.groupServer.$on('dispatch_room_group_kickout', () => {
+          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        });
+      },
+      // 返回主房间提示
+      gobackHome(index, name) {
+        let title = '';
+        switch (index) {
+          case 1:
+            title = '主持人开启了分组讨论，您将进入' + name + '组参与讨论';
+            break;
+          case 2:
+            title = '主持人已将您分配至' + name + '组';
+            break;
+          case 3:
+            title = '主持人结束了分组讨论，您将返回主直播间';
+            break;
+          case 4:
+            title = '主持人解散了分组，您将返回主直播间';
+            break;
+          case 5:
+            title = '您已被踢出该小组';
+            break;
+        }
+        this.$alert(title, '提示', {
+          confirmButtonText: '我知道了',
+          customClass: 'know-message-box',
+          lockScroll: false,
+          cancelButtonClass: 'zdy-confirm-cancel'
+        })
+          .then(() => {})
+          .catch(() => {});
+      },
       resetMenus() {
         // if 直播中，在小组中，并且开启讨论
         // （1）主讲人：全部菜单可用
         // （2）普通组员：只有请求协助按钮可用
         // else
         //  菜单都是禁用状态
-        if (
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type === 1 &&
-          this.$domainStore.state.groupServer?.groupInitData?.isInGroup &&
-          this.$domainStore.state.roomBaseServer.interactToolStatus.is_open_switch == 1
-        ) {
+        if (this.groupServer.state.hasGroupPermission) {
           // 主讲人
-          if (this.$domainStore.state.groupServer?.groupInitData?.join_role == 20) {
+          if (this.groupServer.state.groupInitData?.join_role == 20) {
+            console.log('[group] sssss111111----group-------');
             this.disableMenus = [];
           } else {
+            console.log('[group] sssss222222----group-------');
             this.disableMenus = ['document', 'board', 'desktopShare'];
           }
         }
@@ -106,6 +155,11 @@
       handleClickItem(kind) {
         if (this.disableMenus.includes(kind)) return false;
         this.selectedMenu = kind;
+        if (this.disable) return false;
+
+        if (kind === 'document' || kind === 'board') {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClickDoc', [kind]));
+        }
       }
     }
   };
@@ -150,6 +204,9 @@
         color: #999;
         font-size: 12px;
         padding: 10px 0;
+        span {
+          user-select: none;
+        }
 
         &.selected {
           color: #fb3a32;
