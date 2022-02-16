@@ -45,6 +45,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
+<<<<<<< HEAD
     children: [
       'comContainerTop',
       'comTabContent',
@@ -52,6 +53,10 @@ export const serverConfig = {
       'comNoticeWap',
       'comGoodSaasWap'
     ]
+=======
+    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
+    children: ['comContainerTop', 'comTabContentWap', 'comContainerRight', 'comNoticeWap']
+>>>>>>> 458c42e (feat: 二级菜单)
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -122,7 +127,7 @@ export const serverConfig = {
     component: 'VmpTabMenuWap',
     handleSelect: [
       {
-        cuid: ['comTabContent'],
+        cuid: ['comTabContentWap'],
         method: 'switchTo',
         args: ['$0', '$1', '$2']
       }
@@ -140,6 +145,7 @@ export const serverConfig = {
   comInteractToolsWap: {
     component: 'VmpInteractToolsWap'
   },
+  // 广告（推荐）
   comRecommendWap: {
     component: 'VmpRecommendWap',
     addTab: [

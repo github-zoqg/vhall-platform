@@ -33,7 +33,7 @@ import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpTabMenuWap from '@/packages/tab-menu-wap';
-import VmpTabContainer from '@/packages/tab-container';
+import VmpTabContainerWap from '@/packages/tab-container-wap';
 import VmpIntroWap from '@/packages/intro-wap';
 //wap互动工具计时器弹窗
 import VmpWapTimer from '@/packages/wap-timer';
@@ -81,7 +81,7 @@ export function initUse() {
   Vue.use(VmpSignUpForm);
   Vue.use(VmpContainer);
   Vue.use(VmpTabMenuWap);
-  Vue.use(VmpTabContainer);
+  Vue.use(VmpTabContainerWap);
   Vue.use(VmpIntroWap);
   Vue.use(VmpWapTimer);
   Vue.use(VmpContainerRightWap);
