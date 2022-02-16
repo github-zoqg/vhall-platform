@@ -27,7 +27,7 @@ import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
 import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
 import VmpShare from '@/packages/share'; // 观看端分享
-import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
+import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公权限验证
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊

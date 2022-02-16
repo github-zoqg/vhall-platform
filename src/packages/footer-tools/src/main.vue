@@ -27,7 +27,22 @@
       v-show="!isTrySee"
       class="vmp-footer-tools__right"
     >
-      <li v-if="isLive">
+      <li>
+        <!-- 公告 -->
+      </li>
+      <li>
+        <!-- 问卷-->
+      </li>
+      <li>
+        <!-- 签到 -->
+      </li>
+      <li v-if="isLiving">
+        <!-- 抽奖 -->
+      </li>
+      <li>
+        <!-- 红包 -->
+      </li>
+      <li v-if="isLiving">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -35,6 +50,7 @@
         </div>
       </li>
       <li v-if="showGiftIcon">
+        <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
           <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
@@ -52,6 +68,10 @@
           <reward ref="reward" />
         </div>
       </li>
+      <li>
+        <!-- 点赞 -->
+        <vmp-air-container :cuid="cuid"></vmp-air-container>
+      </li>
     </ul>
   </div>
 </template>
@@ -68,8 +88,6 @@
     data() {
       return {
         roomBaseState: null,
-        isLive: true,
-        isTrySee: false,
         showGiftIcon: true,
         showGift: false,
         showGiftCount: 0,
@@ -88,6 +106,19 @@
         return (
           (watchInitData.webinar.mode == 3 || watchInitData.webinar.mode == 6) &&
           watchInitData.webinar.type == 1
+        );
+      },
+      isLiving() {
+        const { watchInitData } = this.roomBaseState;
+        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
+        return watchInitData.webinar.type == 1;
+      },
+      isTrySee() {
+        const { watchInitData } = this.roomBaseState;
+        return (
+          watchInitData.status == 'subscribe' &&
+          watchInitData.preview_paas_record_id &&
+          watchInitData.is_subscribe == 0
         );
       }
     },
