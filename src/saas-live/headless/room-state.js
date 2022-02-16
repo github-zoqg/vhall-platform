@@ -39,7 +39,7 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  await interactiveServer.init();
+  // await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   await docServer.init();
