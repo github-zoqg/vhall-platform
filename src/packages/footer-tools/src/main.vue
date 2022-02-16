@@ -22,7 +22,7 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul v-if="!isTrySee" class="vmp-footer-tools__right">
+    <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
       <li>
         <!-- 公告 -->
         <notice></notice>
@@ -74,8 +74,8 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useMsgServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
-  import onlineMixin from './js/mixins';
+  import { useRoomBaseServer, useGroupServer, useVirtualClientStartServe } from 'middle-domain';
+  // import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -83,7 +83,7 @@
   import praise from './component/praise/index.vue';
   export default {
     name: 'VmpFooterTools',
-    mixins: [onlineMixin],
+    // mixins: [onlineMixin],
     data() {
       return {
         roomBaseState: null,
@@ -124,15 +124,24 @@
       },
       isInGroup() {
         return this.groupServer.state.groupInitData.isInGroup;
+      },
+      hotNum() {
+        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+      },
+      onlineNum() {
+        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
       }
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.virtualClientStartServe = useVirtualClientStartServe();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
+      this.groupState = this.groupServer.state;
+      this.onlineState = this.virtualClientStartServe.state;
+      this.listenEvent();
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
