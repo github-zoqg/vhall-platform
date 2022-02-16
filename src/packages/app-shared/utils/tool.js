@@ -100,6 +100,13 @@ export function isMobile() {
     navigator.userAgent
   );
 }
+// 获取地址栏参数
+export function getQueryString(name) {
+  const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
+  const r = window.location.search.substr(1).match(reg);
+  if (r != null) return unescape(r[2]);
+  return null;
+}
 
 // 返回四位版本数
 function versionPadding(num, length) {

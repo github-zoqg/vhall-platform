@@ -22,8 +22,24 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul v-if="!this.isInGroup" v-show="!isTrySee" class="vmp-footer-tools__right">
-      <li v-if="isLive">
+    <ul v-if="!isTrySee" class="vmp-footer-tools__right">
+      <li>
+        <!-- 公告 -->
+        <notice></notice>
+      </li>
+      <li>
+        <!-- 问卷-->
+      </li>
+      <li>
+        <!-- 签到 -->
+      </li>
+      <li v-if="isLiving">
+        <!-- 抽奖 -->
+      </li>
+      <li>
+        <!-- 红包 -->
+      </li>
+      <li v-if="isLiving">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -31,6 +47,7 @@
         </div>
       </li>
       <li v-if="showGiftIcon">
+        <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
           <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
@@ -48,6 +65,10 @@
           <reward ref="reward" />
         </div>
       </li>
+      <li>
+        <!-- 点赞 -->
+        <praise></praise>
+      </li>
     </ul>
   </div>
 </template>
@@ -58,14 +79,14 @@
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
+  import notice from './component/notice/index.vue';
+  import praise from './component/praise/index.vue';
   export default {
     name: 'VmpFooterTools',
     mixins: [onlineMixin],
     data() {
       return {
         roomBaseState: null,
-        isLive: true,
-        isTrySee: false,
         showGiftIcon: true,
         showGift: false,
         showGiftCount: 0,
@@ -77,7 +98,9 @@
     components: {
       handup,
       reward,
-      vhGifts
+      vhGifts,
+      notice,
+      praise
     },
     computed: {
       isInteractLive() {
@@ -85,6 +108,19 @@
         return (
           (watchInitData.webinar.mode == 3 || watchInitData.webinar.mode == 6) &&
           watchInitData.webinar.type == 1
+        );
+      },
+      isLiving() {
+        const { watchInitData } = this.roomBaseState;
+        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
+        return watchInitData.webinar.type == 1;
+      },
+      isTrySee() {
+        const { watchInitData } = this.roomBaseState;
+        return (
+          watchInitData.status == 'subscribe' &&
+          watchInitData.preview_paas_record_id &&
+          watchInitData.is_subscribe == 0
         );
       },
       isInGroup() {

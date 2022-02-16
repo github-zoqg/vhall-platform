@@ -23,7 +23,7 @@
         </ul>
       </div>
       <div class="vmp-notice-list-container-close">
-        <i class="iconfont iconguanbi_icon" @click="isShowNotice = false"></i>
+        <i class="vh-iconfont vh-line-close" @click="isShowNotice = false"></i>
       </div>
     </div>
   </div>
