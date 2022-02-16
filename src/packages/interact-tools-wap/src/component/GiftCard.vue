@@ -10,7 +10,7 @@
       <div class="gift-wrap">
         <header>
           {{ $t('interact_tools.interact_tools_1029') }}
-          <i class="iconfont iconguanbi" @click="close"></i>
+          <i class="vh-iconfont vh-line-close" @click="close"></i>
         </header>
         <van-swipe
           class="swiper-box"
@@ -56,6 +56,7 @@
 
 <script>
   // import EventBus from '@/utils/Events';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useGiftsServer } from 'middle-domain';
   import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
   export default {
@@ -65,7 +66,7 @@
         giftList: [],
         currentGift: {},
         showgiftCard: false,
-        popHeight: '60%',
+        popHeight: '67.8%',
         btnDisabled: false,
         timer: 3,
         handlerTimer: null,
@@ -155,7 +156,7 @@
       // 支付接口
       payProcess(params) {
         const that = this;
-        this.$axios('sendGift', { ...params }).then(res => {
+        this.giftsServer.sendGift({ ...params }).then(res => {
           if (res.data && res.code == 200) {
             if (res.data.price == 0) {
               this.$toast(this.$t('interact_tools.interact_tools_1063'));
@@ -202,6 +203,9 @@
       submit() {
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons('comInteractToolsWap', 'emitNeedLogin')
+          );
           // EventBus.$emit('showChatLogin');
           return;
         }
@@ -267,42 +271,49 @@
        * 计算 设置的弹层高度
        */
       setSetingHeight() {
-        const headerDom = document.getElementById('header');
-        const interactDoc = document.getElementById('interactBox');
-        if (headerDom) {
-          if (interactDoc) {
-            this.popHeight =
-              document.body.clientHeight -
-              document.getElementById('interactBox').offsetHeight -
-              headerDom.offsetHeight +
-              'px';
-          } else {
-            this.popHeight =
-              document.body.clientHeight -
-              document.getElementById('videoBox').offsetHeight -
-              headerDom.offsetHeight +
-              'px';
-          }
-        } else {
-          if (interactDoc) {
-            this.popHeight =
-              document.body.clientHeight -
-              document.getElementById('interactBox').offsetHeight +
-              'px';
-          } else {
-            this.popHeight =
-              document.body.clientHeight - document.getElementById('videoBox').offsetHeight + 'px';
-          }
-        }
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
+        // const headerDom = document.getElementById('header');
+        // const interactDoc = document.getElementById('interactBox');
+        // if (headerDom) {
+        //   if (interactDoc) {
+        //     this.popHeight =
+        //       document.body.clientHeight -
+        //       document.getElementById('interactBox').offsetHeight -
+        //       headerDom.offsetHeight +
+        //       'px';
+        //   } else {
+        //     this.popHeight =
+        //       document.body.clientHeight -
+        //       document.getElementById('videoBox').offsetHeight -
+        //       headerDom.offsetHeight +
+        //       'px';
+        //   }
+        // } else {
+        //   if (interactDoc) {
+        //     this.popHeight =
+        //       document.body.clientHeight -
+        //       document.getElementById('interactBox').offsetHeight +
+        //       'px';
+        //   } else {
+        //     this.popHeight =
+        //       document.body.clientHeight - document.getElementById('videoBox').offsetHeight + 'px';
+        //   }
+        // }
       },
       // open礼物弹框
       showgift() {
-        // if (!(this.localRoomInfo.isLogin || (this.joinInfoInGift.hideChatHistory && this.isEmbed))) {
-        //   EventBus.$emit('showChatLogin')
-        //   return
-        // }
-        console.log('showgift1');
-        // this.setSetingHeight();
+        if (
+          !(this.localRoomInfo.isLogin || (this.joinInfoInGift.hideChatHistory && this.isEmbed))
+        ) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons('comInteractToolsWap', 'emitNeedLogin')
+          );
+          //   EventBus.$emit('showChatLogin')
+          return;
+        }
+        this.setSetingHeight();
         this.showgiftCard = true;
         // 每次点开礼物弹框的时候，默认礼物图标未选中
         if (this.currentGift) {
@@ -390,8 +401,8 @@
       text-align: center;
       height: 90px;
       line-height: 90px;
-      @include border(bottom);
-      // border-bottom: 1px solid rgba(212, 212, 212, 1);
+      // @include border(bottom);
+      border-bottom: 1px solid rgba(212, 212, 212, 1);
       i {
         position: absolute;
         top: 50%;
@@ -434,7 +445,8 @@
           object-fit: scale-down;
         }
         &.active {
-          @include border-1px(#fc5459);
+          border: 1px solid #fc5459;
+          // @include border-1px(#fc5459);
         }
       }
       > p {

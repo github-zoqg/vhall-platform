@@ -1,8 +1,8 @@
 <template>
   <div class="tools-box">
-    <div class="icon-wrapper" v-if="!roomBaseState.groupInitData.isInGroup">
+    <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }">
-        <i class="iconfont iconliwu" @click="opneGifts">X</i>
+        <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
         <GiftCard
           ref="gifts"
           :isEmbed="localRoomInfo.isEmbed"
@@ -13,8 +13,8 @@
       </div>
       <!-- 打赏 -->
       <div v-if="!localRoomInfo.isEmbed" auth="{ 'ui.hide_reward': 0 }">
-        <i class="iconfont iconyaoqingka">X</i>
-        <RewardCard :webinarData="webinarData" />
+        <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
+        <RewardCard ref="reward" :webinarData="webinarData" :localRoomInfo="localRoomInfo" />
       </div>
       <!-- 邀请卡 -->
       <a
@@ -22,11 +22,11 @@
         target="_blank"
         :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
       >
-        <i class="iconfont iconyaoqingka">X</i>
+        <i class="vh-saas-iconfont iconyaoqingka"></i>
       </a>
       <!-- 点赞 -->
       <div auth="{ 'ui.watch_hide_like': 0 }">
-        <i class="iconfont iconyaoqingka">X</i>
+        <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i>
         <!-- <praise :hideChatHistory="joinInfoInGift.hideChatHistory" :totalLike="totalLike" /> -->
       </div>
     </div>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   export default {
@@ -42,6 +42,7 @@
     components: { GiftCard, RewardCard },
     data() {
       let { configList } = useRoomBaseServer().state;
+      let { groupInitData } = useGroupServer().state;
       let roomBaseState = useRoomBaseServer().state;
       let localRoomInfo = {
         OnlineNum: 0,
@@ -69,6 +70,7 @@
         localRoomInfo,
         webinarData,
         configList,
+        groupInitData,
         joinInfoInGift: {},
         showInviteCard: false,
         totalLike: '',
@@ -83,6 +85,10 @@
     methods: {
       opneGifts() {
         this.$refs.gifts.showgift();
+      },
+      openReward() {
+        console.log('showReward');
+        this.$refs.reward.showReward();
       }
     }
   };
@@ -99,6 +105,9 @@
           margin-right: 0px;
         }
       }
+    }
+    .vh-saas-iconfont {
+      font-size: 47px;
     }
   }
 </style>

@@ -54,7 +54,7 @@ export const serverConfig = {
     component: 'VmpAirContainer',
     children: [
       'dlgDocList',
-      // 'compRegLogin',
+      'compRegLogin',
       'comOfficial',
       'comShare',
       'comWatchAuth',
