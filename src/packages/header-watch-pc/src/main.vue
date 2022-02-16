@@ -452,7 +452,7 @@
             p {
               width: 36px;
               height: 36px;
-              
+
               margin-right: 8px;
               overflow: hidden;
               padding: 5px 0;

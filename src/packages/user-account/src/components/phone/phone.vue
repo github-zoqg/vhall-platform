@@ -237,7 +237,7 @@
     },
     computed: {
       phoneData() {
-        return this.phoneDatas
+        return this.phoneDatas;
       }
     },
     data() {
@@ -373,7 +373,7 @@
       };
     },
     created() {
-      this.useUserServer = useUserServer()
+      this.useUserServer = useUserServer();
     },
     watch: {
       value(val) {
@@ -431,7 +431,8 @@
 
         // 获取验证码
         this.useUserServer.state.captchaVal = this.phoneCaptVo[successMsgCodeKey];
-        this.useUserServer.sendCode(this.phoneData.type === 'edit' ? this.phoneData.phone : this[formName].phone, 2)
+        this.useUserServer
+          .sendCode(this.phoneData.type === 'edit' ? this.phoneData.phone : this[formName].phone, 2)
           .then(res => {
             if (res && res.code == 200) {
               this.phoneCaptVo[btnCtrlKey] = 'pending';
@@ -638,7 +639,7 @@
               .codeCheck(params)
               .then(async res => {
                 if (res && res.code == 200 && res.data.check_result > 0) {
-                  console.log('checkKey', checkKey)
+                  console.log('checkKey', checkKey);
                   this.phoneCaptVo[checkKey] = res.data.key;
                   // 验证码第一步，继续下一步
                   this.phoneData.step = 2;
