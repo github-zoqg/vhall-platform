@@ -3,7 +3,7 @@
     <!-- item -->
     <ul class="vmp-tab-menu-scroll-container" ref="menu">
       <li
-        v-for="item of menu"
+        v-for="item of mainMenu"
         :ref="`${item.comp}_${item.key}`"
         class="vmp-tab-menu-item"
         :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.comp}_${item.key}` }"
@@ -12,12 +12,27 @@
       >
         <span class="item-text">{{ item.text }}</span>
       </li>
-      <li class="vmp-tab-menu-more">
+
+      <li
+        v-if="menu.length > 3"
+        class="vmp-tab-menu-more"
+        :class="{ isSubMenuShow: 'selected' }"
+        @click="toggleSubMenuVisible"
+      >
         <i class="vh-iconfont vh-full-more"></i>
       </li>
     </ul>
 
-    <section class="vmp-tab-menu-sub"></section>
+    <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+      <li
+        class="vmp-tab-menu-sub__item"
+        v-for="item of subMenu"
+        :key="`${item.comp}_${item.key}`"
+        @click="select(item.comp, item.key)"
+      >
+        {{ item.text }}
+      </li>
+    </ul>
   </section>
 </template>
 
@@ -33,37 +48,53 @@
       return {
         direciton: 'row', // row(横)，column(纵)
         selectedId: '',
-        menu: [{ comp: 'comIntro', key: 'intro', text: '简介', showIcon: false }]
+        menu: [],
+        isSubMenuShow: false
       };
     },
     computed: {
+      visibleMenu() {
+        return this.menu.filter(item => item.visible);
+      },
+      mainMenu() {
+        return this.visibleMenu.filter((item, index) => index < 3);
+      },
+      subMenu() {
+        if (this.visibleMenu.length <= 3) return [];
+        return this.visibleMenu.filter((item, index) => index >= 3);
+      },
       selectedIndex() {
-        return this.menu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
+        return this.visibleMenu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
       }
     },
     async mounted() {
       await this.$nextTick(0);
-      if (this.menu.length > 0) {
-        const { comp, key } = this.menu[0];
+
+      // 选择默认项
+      if (this.visibleMenu.length > 0) {
+        const { comp, key } = this.visibleMenu[0];
         this.select(comp, key);
       }
     },
     methods: {
+      toggleSubMenuVisible() {
+        this.isSubMenuShow = !this.isSubMenuShow;
+      },
       prev() {
         if (this.selectedIndex === 0) return;
         const index = this.selectedIndex - 1;
-        const item = this.menu[index];
+        const item = this.visibleMenu[index];
         this.select(item.comp, item.key);
       },
       next() {
-        if (this.selectedIndex >= this.menu.length - 1) return;
+        if (this.selectedIndex >= this.visibleMenu.length - 1) return;
         const index = this.selectedIndex + 1;
-        const item = this.menu[index];
+        const item = this.visibleMenu[index];
         this.select(item.comp, item.key);
       },
 
       removeItemByIndex(index) {
-        this.menu.splice(index);
+        this.visibleMenu.splice(index);
       },
 
       hasItem(item) {
@@ -119,17 +150,24 @@
         tab.showIcon = false;
       },
 
-      toggleIcon(comp, key) {
+      setVisible(comp, key) {
         const tab = this.getItem(comp, key);
         if (!tab) return;
 
-        tab.showIcon = !tab.showIcon;
+        tab.visible = true;
+      },
+
+      setHidden(comp, key) {
+        const tab = this.getItem(comp, key);
+        if (!tab) return;
+
+        tab.visible = false;
       },
 
       // 滑动到某个item的动画效果
       scrollToItem(comp, key) {
         // 由于menu列表随时会增减，
-        const itemsWithPosition = this.menu.map(item => {
+        const itemsWithPosition = this.visibleMenu.map(item => {
           const key = `${item.comp}_${item.key}`;
           const ref = this.$refs[key][0];
           const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
@@ -148,6 +186,8 @@
       select(comp, key) {
         this.selectedId = `${comp}_${key}`;
         let payload = null;
+
+        // TODO: 强耦合，需更改
         if (comp === 'comCustomMenu') {
           payload = {
             method: 'queryDetail',
@@ -155,7 +195,10 @@
           };
         }
 
-        this.scrollToItem(comp, key);
+        // wap端逻辑
+        this.isSubMenuShow = false;
+
+        // this.scrollToItem(comp, key);
 
         // 切换container内容
         window.$middleEventSdk?.event?.send(
@@ -168,6 +211,7 @@
 
 <style lang="less">
   .vmp-tab-menu {
+    position: relative;
     background: #fff;
     font-size: 32px;
     display: flex;
@@ -250,6 +294,35 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
+
+        &.selected {
+          background-color: #f3f3f3;
+        }
+      }
+    }
+
+    .vmp-tab-menu-sub {
+      position: relative;
+      font-size: 32px;
+      position: absolute;
+      top: 90px;
+      left: 0;
+      right: 0;
+      z-index: 22; // 危险值
+      background-color: #f3f3f3;
+      color: #444;
+      width: 100%;
+
+      &__item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 88px;
+        padding: 0 40px;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid #d4d4d4;
+        }
       }
     }
   }

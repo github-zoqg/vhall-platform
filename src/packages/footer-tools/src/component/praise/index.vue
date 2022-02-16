@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-praise">
-    <span class="vmp-praise-num">{{ praiseNum }}</span>
+    <span class="vmp-praise-num" v-if="praiseNum">{{ praiseNum }}</span>
     <div class="vmp-praise-icon">
       <img
         class="vmp-praise-icon-img"
@@ -10,7 +10,7 @@
         @click="handlePraise"
       />
     </div>
-    <div class="vmp-praise-pubble">
+    <div class="vmp-praise-bubble" v-show="bubbleList.length">
       <div
         v-for="item in bubbleList"
         :key="item.timestamp"
@@ -25,7 +25,7 @@
     name: 'VmpPraise',
     data() {
       return {
-        praiseNum: 100, //点赞数量
+        praiseNum: 0, //点赞数量
         isActive: false, // 是否激活点赞
         bubbleList: [],
         totalPraiseNum: 0, // 点赞数量
@@ -48,6 +48,10 @@
           // this.praise();
           this.increment = 0;
         }, 2000);
+      },
+      // 点赞方法
+      praise() {
+        console.log('zheli这里调用点赞接口');
       },
       // 点赞组件的动画控制
       handleAnimation() {
@@ -129,6 +133,7 @@
       background: linear-gradient(180deg, #ff765a 0%, #f6261d 100%);
       border-radius: 16px;
       cursor: pointer;
+      margin-left: 16px;
       &-img {
         width: 32px;
         height: 32px;
@@ -161,7 +166,7 @@
     &-num {
       position: absolute;
       bottom: 22px;
-      left: 22px;
+      left: 36px;
       background: @bg-error-light;
       height: 17px;
       border-radius: 9px;
@@ -173,7 +178,7 @@
       z-index: 1;
       white-space: nowrap;
     }
-    &-pubble {
+    &-bubble {
       width: 400px;
       height: 280px;
       position: absolute;

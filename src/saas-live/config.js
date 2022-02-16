@@ -68,7 +68,7 @@ export const serverConfig = {
 
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comChat', 'comNotice', 'comMemberList', 'comCustomMenu']
+    children: ['comChat', 'comNotice', 'comMemberList', 'comRecommend', 'comCustomMenu']
   },
 
   /*** 所有弹窗集合 */
@@ -512,5 +512,15 @@ export const serverConfig = {
   // 转播
   comRebroadcast: {
     component: 'VmpRebroadcast'
+  },
+  comRecommend: {
+    component: 'VmpRecommend',
+    addTab: [
+      {
+        cuid: ['comTabMenu'],
+        method: 'addItemByIndex',
+        args: ['$0', '$1']
+      }
+    ]
   }
 };

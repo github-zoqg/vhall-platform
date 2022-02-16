@@ -55,7 +55,6 @@ export const serverConfig = {
     children: [
       'dlgDocList',
       // 'compRegLogin',
-      'comOfficial',
       'comShare',
       'comWatchAuth',
       // 'comSignUpForm',
@@ -141,9 +140,6 @@ export const serverConfig = {
       }
     ]
   },
-  comOfficial: {
-    component: 'VmpOfficial'
-  },
   comAttention: {
     component: 'VmpAttention',
     emitClickLogin: [
@@ -196,12 +192,6 @@ export const serverConfig = {
       method: 'open'
     }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
-  },
-  comPraise: {
-    component: 'VmpPraise'
-  },
-  comNotice: {
-    component: 'VmpNoticeList'
   },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'

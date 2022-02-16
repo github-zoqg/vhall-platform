@@ -30,7 +30,8 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <i class="iconfont iconzanwuwendang"></i>
-          <span>暂未分享任何文档</span>
+          <span v-if="hasDocPermission">暂未分享任何文档</span>
+          <span v-else>主讲人正在准备文档，请稍等...</span>
         </div>
       </div>
 
@@ -174,15 +175,9 @@
           this.groupServer.state.groupInitData.join_role == 20
         );
       },
+      // 是否文档演示权限
       hasDocPermission() {
-        return (
-          this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer?.state.clientType !== 'send' &&
-            this.roomBaseServer?.state.watchInitData.webinar.type === 1 &&
-            this.roomBaseServer?.state.interactToolStatus.is_open_switch == 1 &&
-            this.groupServer?.state.groupInitData?.isInGroup &&
-            this.groupServer?.state.groupInitData?.join_role == 20)
-        );
+        return this.docServer.state.hasDocPermission;
       }
     },
     watch: {
@@ -308,6 +303,14 @@
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
+          }
+        });
+
+        // 开启分组讨论
+        this.groupServer.$on('dispatch_group_switch_start', () => {
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            // this.resetMenus();
+            // this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
 
