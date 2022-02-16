@@ -77,7 +77,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useMsgServer, useRoomBaseServer } from 'middle-domain';
+  import { useMsgServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -120,11 +120,15 @@
           watchInitData.preview_paas_record_id &&
           watchInitData.is_subscribe == 0
         );
+      },
+      isInGroup() {
+        return this.groupServer.state.groupInitData.isInGroup;
       }
     },
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
