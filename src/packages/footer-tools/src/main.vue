@@ -22,13 +22,10 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul
-      v-if="!roomBaseState.groupInitData.isInGroup"
-      v-show="!isTrySee"
-      class="vmp-footer-tools__right"
-    >
+    <ul v-if="!isTrySee" class="vmp-footer-tools__right">
       <li>
         <!-- 公告 -->
+        <notice></notice>
       </li>
       <li>
         <!-- 问卷-->
@@ -70,7 +67,7 @@
       </li>
       <li>
         <!-- 点赞 -->
-        <vmp-air-container :cuid="cuid"></vmp-air-container>
+        <praise></praise>
       </li>
     </ul>
   </div>
@@ -82,6 +79,8 @@
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
+  import notice from './component/notice/index.vue';
+  import praise from './component/praise/index.vue';
   export default {
     name: 'VmpFooterTools',
     mixins: [onlineMixin],
@@ -98,7 +97,9 @@
     components: {
       handup,
       reward,
-      vhGifts
+      vhGifts,
+      notice,
+      praise
     },
     computed: {
       isInteractLive() {
