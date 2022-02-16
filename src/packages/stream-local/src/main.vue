@@ -123,7 +123,7 @@
         return this.$domainStore.state.interactiveServer.localStream;
       },
       mainScreen() {
-        return this.$domainStore.state.interactiveServer.mainScreen;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;

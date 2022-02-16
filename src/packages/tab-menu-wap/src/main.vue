@@ -1,14 +1,5 @@
 <template>
   <section class="vmp-tab-menu">
-    <!-- prev-btn -->
-    <span
-      class="vmp-tab-menu-page-btn prev-btn"
-      :class="{ disabledClick: selectedIndex === 0 }"
-      @click="prev"
-    >
-      <i class="iconfont iconzuofanye" />
-    </span>
-
     <!-- item -->
     <ul class="vmp-tab-menu-scroll-container" ref="menu">
       <li
@@ -20,18 +11,13 @@
         @click="select(item.comp, item.key)"
       >
         <span class="item-text">{{ item.text }}</span>
-        <hr class="bottom-line" />
+      </li>
+      <li class="vmp-tab-menu-more">
+        <i class="vh-iconfont vh-full-more"></i>
       </li>
     </ul>
 
-    <!-- next btn -->
-    <span
-      class="vmp-tab-menu-page-btn next-btn"
-      :class="{ disabledClick: selectedIndex === menu.length - 1 }"
-      @click="next"
-    >
-      <i class="iconfont iconyoufanye" />
-    </span>
+    <section class="vmp-tab-menu-sub"></section>
   </section>
 </template>
 
@@ -55,6 +41,13 @@
         return this.menu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
       }
     },
+    async mounted() {
+      await this.$nextTick(0);
+      if (this.menu.length > 0) {
+        const { comp, key } = this.menu[0];
+        this.select(comp, key);
+      }
+    },
     methods: {
       prev() {
         if (this.selectedIndex === 0) return;
@@ -73,9 +66,21 @@
         this.menu.splice(index);
       },
 
+      hasItem(item) {
+        return this.menu.some(menuItem => {
+          const sameComp = item.comp === menuItem.comp;
+          const sameKey = item.key === menuItem.key;
+          return sameComp && sameKey;
+        });
+      },
+
       addItem(item) {
         if (!item || !item.key || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
+        }
+
+        if (this.hasItem(item)) {
+          throw Error('不能传入comp和key都相同的item');
         }
 
         item = getItemEntity(item);
@@ -86,6 +91,10 @@
       addItemByIndex(index, item) {
         if (!item || !item.key || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
+        }
+
+        if (this.hasItem(item)) {
+          throw Error('不能传入comp和key都相同的item');
         }
 
         item = getItemEntity(item);
@@ -159,52 +168,39 @@
 
 <style lang="less">
   .vmp-tab-menu {
-    font-size: 14px;
-    border-bottom: 1px solid #1a1a1a;
+    background: #fff;
+    font-size: 32px;
     display: flex;
-
-    .vmp-tab-menu-page-btn {
-      position: relative;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      width: 24px;
-      height: 100%;
-      text-align: center;
-      font-size: 14px;
-      color: #fff;
-      height: 100%;
-      cursor: pointer;
-
-      &.disabledClick:hover {
-        cursor: auto;
-        i {
-          color: @font-light-low;
-        }
-      }
-
-      &:hover {
-        color: #e6e6e6;
-      }
+    justify-content: space-around;
+    height: 90px;
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      border-bottom: 1px solid #d4d4d4;
     }
 
     .vmp-tab-menu-scroll-container {
-      height: 45px;
+      height: 100%;
       flex: 1 1 auto;
       overflow-y: scroll;
       display: flex;
       flex-wrap: nowrap;
       overflow: hidden;
       .vmp-tab-menu-item {
-        flex: 0 0 auto;
+        flex: 1 1 auto;
+        width: calc((100% - 100px) / 4);
         position: relative;
         display: inline-flex;
         flex-direction: column;
-        height: 45px;
+        height: 100%;
         justify-content: center;
         align-items: center;
         padding: 0 20px;
-        color: #999;
+        color: #333333;
         cursor: pointer;
         user-select: none;
 
@@ -233,16 +229,27 @@
         }
 
         &__active {
-          color: #ccc;
+          color: @font-error;
+          font-weight: bolder;
 
           .item-text {
             position: relative;
+            border-bottom: 6px solid @font-error;
           }
 
           .bottom-line {
             display: block;
           }
         }
+      }
+
+      .vmp-tab-menu-more {
+        height: 100%;
+        width: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
       }
     }
   }

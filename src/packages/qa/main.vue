@@ -452,8 +452,8 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useMsgServer, useQaServer } from 'middle-domain';
-  import PrivateChat from '@/packages/live-private-chat/src/main';
+  import { useRoomBaseServer, useQaServer } from 'middle-domain';
+  import PrivateChat from './components/private-chat/index';
   import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { debounce } from '@/packages/app-shared/utils/tool';

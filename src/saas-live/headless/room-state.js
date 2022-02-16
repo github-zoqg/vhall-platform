@@ -30,10 +30,11 @@ export default async function () {
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();
 
-  // 初始化分组信息
-  await groupServer.init();
-  console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  window.groupServer = groupServer;
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);

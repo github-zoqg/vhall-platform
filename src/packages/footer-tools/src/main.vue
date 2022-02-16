@@ -48,8 +48,8 @@
       <li>
         <!-- 打赏 -->
         <div class="vh-icon-box">
-          <img src="./img/reward-icon.png" alt="" />
-          <reward />
+          <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+          <reward ref="reward" />
         </div>
       </li>
     </ul>
@@ -60,7 +60,7 @@
   import { useMsgServer, useRoomBaseServer } from 'middle-domain';
   import onlineMixin from './js/mixins';
   import handup from './handup.vue';
-  import reward from './handup.vue';
+  import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   export default {
     name: 'VmpFooterTools',
@@ -124,7 +124,12 @@
         if (this.showGift) {
           this.showGiftCount++;
         }
+        // TODO:是否需要处理
         this.$refs.notice && (this.$refs.notice.isShowNotice = false);
+      },
+      // 打开打赏弹框
+      onClickReward() {
+        this.$refs.reward.onClickReward();
       }
     }
   };
@@ -139,6 +144,7 @@
     align-items: center;
     padding: 0 24px;
     position: relative;
+    z-index: 10;
 
     &__left {
       display: flex;

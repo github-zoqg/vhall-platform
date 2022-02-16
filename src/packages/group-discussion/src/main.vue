@@ -1,5 +1,6 @@
 <template>
   <!-- 分组讨论 -->
+
   <div class="vmp-group-discussion">
     <!-- 分组设置主操作面板 -->
     <div class="vmp-group-workspace" v-show="panelShow">
@@ -228,7 +229,6 @@
         </div>
       </div>
     </div>
-
     <!-- 对话框:准备设置分组 -->
     <vmp-group-setting
       :show.sync="settingDialogVisible"
@@ -280,7 +280,8 @@
         checkList: [], //批量分配选择的待分配的人员
         changeGroupFlag: 1, //1-待分配的换组，2-某个组的换组
         needChangeList: [], // 某个组选择要换组人员
-        showItem: null
+        showItem: null,
+        isInvitedId: '' // 演示人id(受邀请人Id)
       };
     },
     beforeCreate() {
@@ -289,7 +290,6 @@
       this.msgServer = useMsgServer();
       this.chatServer = useChatServer();
       this.docServer = useDocServer();
-      this.userId = this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id;
     },
     computed: {
       userId() {
@@ -330,6 +330,12 @@
       this.initData();
     },
     methods: {
+      // 正在演示的人，切换channel需要自己结束演示
+      handleEndDemonstrateInChannelChange() {
+        if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
+          this.groupServer.endSelft;
+        }
+      },
       hiddenAll() {
         this.settingDialogVisible = false;
         this.groupServer.state.panelShow = false;
@@ -358,50 +364,78 @@
       },
       initEvents() {
         // 监听消息
-        this.msgServer.$onMsg('ROOM_MSG', this.listenRoomMsg);
+        // this.msgServer.$onMsg('ROOM_MSG', this.listenRoomMsg);
         this.msgServer.$onMsg('JOIN', this.listenJoinMsg); // 加入房间
         this.msgServer.$onMsg('LEFT', this.listenLeftMsg); // 离开房间
+
+        this.groupServer.$on('group_room_create', () => {
+          console.log('[group] 派发消息group_room_create');
+          this.settingDialogVisible = false;
+          this.addDialogVisible = false;
+        });
       },
       // 使用具名消息，后面offMsg的时候使用
       // TODO 暂时没有offMsg事件，后面有的时候加上
-      listenRoomMsg(msg) {
-        console.log('[group] ------ROOM_MSG-----房间消息：', msg);
+      listenRoomMsg: async function (msg) {
+        console.log(
+          '[group] --ROOM_MSG--房间消息：',
+          `${msg.data.type ? 'type:' : 'event_type'}:${msg.data.type || msg.data.event_type}`
+        );
         if (msg.data.event_type === 'group_room_create') {
-          // 分组创建完成消息
-          // if (msg.sender_id === this.userId) {
-          //   // 0 新增   1 初始化
-          //   if (msg.data.is_append === 1) {
-          //   }
-          // }
-        } else if (msg.data.type === 'group_manager_enter') {
-          // 进入小组
-          //  account_id: "101643"
-          // group_id: 5521302
-          // role: "1"
-          // status: "enter"
-          // type: "group_manager_enter"
+          // 【分组创建完成】
+          console.log('[group] room-msg group_room_create');
+
+          //
+        } else if (msg.data.event_type === 'group_switch_start') {
+          //【开启讨论】
+          //
+        } else if (msg.data.event_type === 'group_switch_end') {
+          //【结束讨论】
+          // console.log('[group] room-msg group_switch_end');
+          // this.groupServer.state.panelShow = false;
+          // this.roomBaseServer.setInavToolStatus('is_open_switch', 0);
+          //
+        } else if (msg.data.event_type === 'group_disband') {
+          //【解散小组】
+          console.log('[group] room-msg group_disband');
+          // this.groupServer.getWaitingUserList();
+          // this.groupServer.getGroupedUserList();
+          //
+        } else if (msg.data.type === 'group_help') {
+          //【请求协助】
+          // TODO
+        } else if (msg.data.type === 'main_room_join_change') {
+          //
+        } else if (msg.data.type === 'group_leader_change') {
+          //【主持人更改掉线组长】
+          // console.log('[group] room-msg group_leader_change:');
+          // this.groupServer.state.groupInitData.doc_permission = msg.data.account_id;
+          // this.groupServer.getGroupedUserList();
+          //
         } else if (msg.data.type === 'group_join_change') {
-          console.log('收到切换小组的消息', msg);
-          // 如果不是自己，结束之后逻辑
-          if (msg.sender_id !== this.userId) return false;
+          //【切换小组】小组人员变动
+          // 如果不是自己结束之后逻辑
+          // console.log('[group] 更新列表');
+          // this.groupServer.getWaitingUserList();
+          // this.groupServer.getGroupedUserList();
+          //
         } else if (msg.data.type === 'room_group_kickout') {
-          // 踢出小组
-          const groupInitData = this.groupServer.state.groupInitData;
-          // 如果本人在小组 并被解散
-          if (groupInitData.isInGroup && this.userId == msg.target_id) {
-            // TODO 逻辑
-          }
-        } else if (msg.data.type === 'group_switch_end') {
-          // 结束讨论
+          // 【踢出小组】
+          // console.log('[group] room-msg room_group_kickout');
+          // this.groupServer.getWaitingUserList();
+          // this.groupServer.getGroupedUserList();
+          //
         }
       },
       listenJoinMsg(msg) {
         if (msg.data.type === 'Join') {
+          // 【加入直播间】
           this.groupServer.getWaitingUserList();
         }
       },
       listenLeftMsg(msg) {
         if (msg.data.type === 'Left') {
+          // 【离开直播间】
           this.groupServer.getWaitingUserList();
         }
       },
@@ -551,9 +585,9 @@
           this.groupServer
             .groupQuit()
             .then(() => {
-              this.groupServer.state.panelShow = true;
-              console.log('[doc] 退出小组文档重置');
-              this.docServer.reset();
+              // this.groupServer.state.panelShow = true;
+              // console.log('[doc] 退出小组文档重置');
+              // this.docServer.reset();
             })
             .catch(ex => {
               console.error(ex);

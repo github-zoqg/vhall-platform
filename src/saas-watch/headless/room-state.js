@@ -3,23 +3,35 @@ import {
   useRoomBaseServer,
   useDocServer,
   useInteractiveServer,
-  useMicServer
+  useMicServer,
+  useGroupServer
 } from 'middle-domain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
-
-  const msgServer = useMsgServer();
-
-  const docServer = useDocServer();
-
-  const interactiveServer = useInteractiveServer();
-
   const roomBaseServer = useRoomBaseServer();
+  const msgServer = useMsgServer();
+  const docServer = useDocServer();
+  const interactiveServer = useInteractiveServer();
+  const groupServer = useGroupServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
+
+  // 判断是否是嵌入/单视频嵌入
+  try {
+    const _param = {};
+    if (/embed/.test(this.$route.path)) {
+      _param.isEmbed = true;
+    }
+    const { embed } = this.$route.query;
+    _param.isEmbedVideo = embed == 'video';
+    roomBaseServer.setEmbedObj(_param);
+  } catch (e) {
+    console.log('嵌入', e);
+  }
+
   // TODO：晓东确认，是否在此处添加，配置项调用
   await roomBaseServer.getConfigList();
   await roomBaseServer.getLowerConfigList({
@@ -54,6 +66,13 @@ export default async function () {
     ]
   });
 
+  // 获取房间互动工具状态
+  await roomBaseServer.getInavToolStatus();
+
+  // 初始化分组信息
+  await groupServer.init();
+  console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
@@ -68,4 +87,9 @@ export default async function () {
   const micServer = useMicServer();
   console.log(micServer);
   // micServer.init();
+
+  // TODO 方便查询数据，后面会删除
+  window.roomBaseServer = roomBaseServer;
+  window.docServer = docServer;
+  window.groupServer = groupServer;
 }

@@ -16,7 +16,7 @@ import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
-import VmpRegLogin from '@/packages/reg-login';
+import VmpRegLoginWap from '@/packages/reg-login-wap';
 import VmpPraise from '@/packages/praise';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
@@ -41,6 +41,10 @@ import VmpWapTimer from '@/packages/wap-timer';
 import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 //wap公告
 import VmpNoticeWap from '@/packages/notice-watch-wap';
+import VmpRecommendWap from '@/packages/recommend-wap';
+
+// 商品列表
+import VmpGoodListWap from '@/packages/good-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -59,7 +63,7 @@ export function initUse() {
   Vue.use(VmpStreamRemote);
   Vue.use(VmpFooter);
   Vue.use(VmpFooterTools);
-  Vue.use(VmpRegLogin);
+  Vue.use(VmpRegLoginWap);
   Vue.use(VmpPraise);
   Vue.use(VmpNoticeList);
   Vue.use(VmpNoticeColumn);
@@ -79,4 +83,6 @@ export function initUse() {
   Vue.use(VmpWapTimer);
   Vue.use(VmpContainerRightWap);
   Vue.use(VmpNoticeWap);
+  Vue.use(VmpRecommendWap);
+  Vue.use(VmpGoodListWap);
 }

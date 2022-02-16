@@ -84,6 +84,7 @@ export const serverConfig = {
       'comInsertVideo',
       'liveTimerSet',
       'liveTimer'
+      // 'comRebroadcast'
     ]
   },
 
@@ -260,6 +261,13 @@ export const serverConfig = {
       {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
+      }
+    ],
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
       }
     ]
   },
@@ -500,5 +508,9 @@ export const serverConfig = {
         args: false
       }
     ]
+  },
+  // 转播
+  comRebroadcast: {
+    component: 'VmpRebroadcast'
   }
 };
