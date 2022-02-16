@@ -90,11 +90,13 @@
         // 开启分组讨论
         this.groupServer.$on('dispatch_group_switch_start', () => {
           if (this.groupServer.state.groupInitData.isInGroup) {
+            this.resetMenus();
             this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
         // 结束分组讨论
         this.groupServer.$on('dispatch_group_switch_end', () => {
+          this.resetMenus();
           this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
@@ -141,10 +143,9 @@
         if (this.groupServer.state.hasGroupPermission) {
           // 主讲人
           if (this.groupServer.state.groupInitData?.join_role == 20) {
-            console.log('[group] sssss111111----group-------');
             this.disableMenus = [];
+            this.selectedMenu = 'document';
           } else {
-            console.log('[group] sssss222222----group-------');
             this.disableMenus = ['document', 'board', 'desktopShare'];
           }
         }

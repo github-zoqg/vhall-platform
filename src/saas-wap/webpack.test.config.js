@@ -2,21 +2,19 @@ const _ = require('lodash');
 const baseConfig = require('./webpack.base.config');
 
 const htmlConfig = {
-  // cdn css
+  cdnJs: {
+    vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/dist/2.6.14/vue.js'
+  },
   cdnCss: {
-    // iconfontCommon: '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/iconfont.css',
     iconfont:
-      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-saas-pc/v1.0.0/iconfont.css'
+      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-saas-pc/v1.0.1/iconfont.css'
   }
 };
 
-module.exports = _.merge(
-  {
-    pages: {
-      index: {
-        ...htmlConfig
-      }
+module.exports = _.merge(baseConfig, {
+  pages: {
+    index: {
+      ...htmlConfig
     }
-  },
-  baseConfig
-);
+  }
+});
