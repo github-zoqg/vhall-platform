@@ -1,22 +1,53 @@
 <template>
   <section class="vmp-tab-container">
     <main>
-      <!-- 默认区域 -->
-      <section>
-        <vmp-air-container :cuid="cuid" />
+      <!-- 主菜单区域 -->
+      <section class="vmp-tab-container-mainarea">
+        <vmp-air-container
+          v-for="tab of mainMenu"
+          :key="tab.cuid"
+          :cuid="tab.cuid"
+          :oneself="true"
+        />
+      </section>
+
+      <section class="vmp-tab-container-subarea">
+        <vmp-air-container
+          v-for="tab of subMenu"
+          :key="tab.cuid"
+          :cuid="tab.cuid"
+          :oneself="true"
+        />
       </section>
     </main>
   </section>
 </template>
 
 <script>
-  // 相较于 tab-container，wap版多滑窗特性和subMenu特性
   export default {
-    name: 'VmpTabContainerWap',
+    name: 'VmpTabContainer',
+    props: {
+      tabCuid: {
+        type: String,
+        default: ''
+      },
+      mainMenu: {
+        type: Array,
+        default: () => []
+      },
+      subMenu: {
+        type: Array,
+        default: () => []
+      }
+    },
     data() {
       return {
-        selectedId: ''
+        selectedId: '',
+        childrenComp: []
       };
+    },
+    created() {
+      this.childrenComp = window.$serverConfig[this.tabCuid].children;
     },
     mounted() {
       for (const child of this.$children) {
@@ -34,8 +65,6 @@
       switchTo(cuid, id, payload = null) {
         this.hiddenAll();
         const child = this.getComp(cuid, payload);
-
-        console.log('switch it!', child, cuid, payload);
 
         if (!child) return;
 
@@ -55,7 +84,7 @@
 <style lang="less">
   .vmp-tab-container {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 90px);
     display: flex;
     flex-direction: column;
 
