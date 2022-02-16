@@ -115,8 +115,37 @@ export default {
         });
     },
     sendGift() {
-      this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_GIFT_SEND, this.giftInfo);
-      this.setDialogZIndexQueue('giftPay');
+      // this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_GIFT_SEND, this.giftInfo);
+      // this.setDialogZIndexQueue('giftPay');
+      this.giftsServer
+        .sendGift({
+          gift_id: this.giftInfo.id,
+          channel: 'WEIXIN',
+          service_code: 'QR_PAY', //TODO:两种支付方式 - 'ALIPAY'
+          room_id: this.watchInitData.interact.room_id
+        })
+        .then(res => {
+          if (res.code == 200 && res.data) {
+            if (this.giftInfo.price == 0) {
+              this.showGift = false;
+              return;
+            }
+            const link = encodeURIComponent(res.data.data.pay_data.qr_code);
+            const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
+            this.wxQr = img;
+            this.showPay = true;
+            this.showGift = false;
+          }
+        })
+        .catch(e => {
+          this.$message({
+            message: e.msg,
+            showClose: true,
+            // duration: 0,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        });
     },
     handleChangePage(page) {
       this.selectPage = page;

@@ -91,7 +91,8 @@
         showGift: false,
         showGiftCount: 0,
         openTimer: false,
-        showTimer: false
+        showTimer: false,
+        groupInitData: {}
       };
     },
     components: {

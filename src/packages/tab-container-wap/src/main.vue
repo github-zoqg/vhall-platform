@@ -1,6 +1,7 @@
 <template>
   <section class="vmp-tab-container">
     <main>
+      <!-- 默认区域 -->
       <vmp-air-container :cuid="cuid" />
     </main>
   </section>
@@ -31,6 +32,8 @@
       switchTo(cuid, id, payload = null) {
         this.hiddenAll();
         const child = this.getComp(cuid, payload);
+
+        console.log('switch it!', child, cuid, payload);
 
         if (!child) return;
 
