@@ -4,10 +4,10 @@
     lock-scroll
     round
     safe-area-inset-bottom
-    :close-on-click-overlay="false"
+    close-on-click-overlay
     teleport="body"
   >
-    <section class="css-login">
+    <section class="vh-login-wap">
       <div v-show="showLoginCard" key="login">
         <header>
           <div class="login-menu">
@@ -266,13 +266,15 @@
     beforeCreate() {
       this.userServer = useUserServer();
     },
-    mounted() {
-      this.initCaptcha();
+    async mounted() {
+      // this.initCaptcha();
+      await this.open();
     },
     methods: {
       // 打开弹窗
-      open() {
-        this.dialogVisible = true;
+      async open() {
+        await this.initCaptcha();
+        this.popupVisible = true;
       },
       reloadCaptha() {
         if (this.captchaReady) {
@@ -487,13 +489,30 @@
     }
   };
 </script>
+<style lang="less">
+  .vh-login-wap {
+    .yiyun-vhall {
+      .yidun_control,
+      .yidun_slide_indicator,
+      .yidun_tips {
+        height: 80px !important;
+        line-height: 80px !important;
+        .yidun_tips__text {
+          vertical-align: super;
+          line-height: 76px;
+        }
+      }
+      .yidun_slider__icon {
+        margin-top: -8px !important;
+      }
+    }
+  }
+</style>
 <style lang="less" scoped>
-  .css-login {
+  .vh-login-wap {
     width: 670px;
-    /* height: 674px; */
     background: #ffffff;
     border-radius: 32px;
-    /* overflow-y: auto; */
     padding: 80px 64px;
   }
   .length-max {
@@ -713,21 +732,6 @@
         }
       }
     }
-    // ::v-deep .yiyun-vhall {
-    //   .yidun_control,
-    //   .yidun_slide_indicator,
-    //   .yidun_tips {
-    //     height: 80px !important;
-    //     line-height: 80px !important;
-    //     .yidun_tips__text {
-    //       vertical-align: super;
-    //       line-height: 76px;
-    //     }
-    //   }
-    //   .yidun_slider__icon {
-    //     margin-top: -8px !important;
-    //   }
-    // }
   }
 
   .registerNow {
