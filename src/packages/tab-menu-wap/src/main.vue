@@ -1,58 +1,76 @@
 <template>
   <section class="vmp-tab-menu">
-    <!-- item -->
-    <ul class="vmp-tab-menu-scroll-container" ref="menu">
-      <li
-        v-for="item of mainMenu"
-        :ref="`${item.comp}_${item.key}`"
-        class="vmp-tab-menu-item"
-        :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.comp}_${item.key}` }"
-        :key="`${item.comp}_${item.key}`"
-        @click="select(item.comp, item.key)"
-      >
-        <span class="item-text">{{ item.text }}</span>
-      </li>
+    <section class="vmp-tab-menu__header">
+      <!-- 菜单区域 -->
+      <ul class="vmp-tab-menu-scroll-container" ref="menu">
+        <li
+          v-for="item of mainMenu"
+          :ref="`${item.cuid}_${item.key}`"
+          class="vmp-tab-menu-item"
+          :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.cuid}_${item.contentId}` }"
+          :key="`${item.cuid}_${item.contentId}`"
+          @click="select(item.cuid, item.contentId)"
+        >
+          <span class="item-text">{{ item.text }}</span>
+        </li>
+        <li
+          v-if="menu.length > 3"
+          class="vmp-tab-menu-more"
+          :class="{ selected: isSubMenuShow }"
+          @click="toggleSubMenuVisible"
+        >
+          <i class="vh-iconfont vh-full-more"></i>
+        </li>
+      </ul>
 
-      <li
-        v-if="menu.length > 3"
-        class="vmp-tab-menu-more"
-        :class="{ isSubMenuShow: 'selected' }"
-        @click="toggleSubMenuVisible"
-      >
-        <i class="vh-iconfont vh-full-more"></i>
-      </li>
-    </ul>
+      <!-- 次级菜单 -->
+      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+        <li
+          class="vmp-tab-menu-sub__item"
+          v-for="item of subMenu"
+          :key="`${item.cuid}_${item.contentId}`"
+          @click="select(item.cuid, item.contentId)"
+        >
+          {{ item.text }}
+        </li>
+      </ul>
+    </section>
 
-    <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-      <li
-        class="vmp-tab-menu-sub__item"
-        v-for="item of subMenu"
-        :key="`${item.comp}_${item.key}`"
-        @click="select(item.comp, item.key)"
-      >
-        {{ item.text }}
-      </li>
-    </ul>
+    <!-- 正文区域 -->
+    <section class="vmp-tab-menu__main">
+      <tab-content
+        :tab-cuid="cuid"
+        :mainMenu="mainMenu"
+        :subMenu="subMenu"
+        ref="tabContent"
+      ></tab-content>
+    </section>
   </section>
 </template>
 
 <script>
   import { getItemEntity } from './js/getItemEntity';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import tabContent from './components/tab-content.vue';
 
   // TODO: tips
 
   export default {
     name: 'VmpTabMenuWap',
+    components: { tabContent },
     data() {
       return {
         direciton: 'row', // row(横)，column(纵)
-        selectedId: '',
+        selectedCuid: '',
+        selectedContentId: '', //存在相同cuid，但不同内容的情形
         menu: [],
-        isSubMenuShow: false
+        isSubMenuShow: false,
+        tabOptions: {}
       };
     },
     computed: {
+      selectedId() {
+        return `${this.selectedCuid}_${this.selectedContentId}`;
+      },
       visibleMenu() {
         return this.menu.filter(item => item.visible);
       },
@@ -64,54 +82,64 @@
         return this.visibleMenu.filter((item, index) => index >= 3);
       },
       selectedIndex() {
-        return this.visibleMenu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
+        return this.visibleMenu.findIndex(
+          item => `${item.cuid}_${item.contentId}` === this.selectedId
+        );
       }
+    },
+    created() {
+      this.initConfig();
+      this.initMenu();
     },
     async mounted() {
       await this.$nextTick(0);
 
       // 选择默认项
       if (this.visibleMenu.length > 0) {
-        const { comp, key } = this.visibleMenu[0];
-        this.select(comp, key);
+        const { cuid, contentId } = this.visibleMenu[0];
+        this.select(cuid, contentId);
       }
     },
+
     methods: {
+      // 初始化配置
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          this.tabOptions = widget.options;
+        }
+      },
+      // 初始化菜单选项
+      initMenu() {
+        // TODO: 混入 custom-menu 的内容
+        this.tabOptions.defaultMenu.forEach(item => {
+          this.addItem(item);
+        });
+      },
+
       toggleSubMenuVisible() {
         this.isSubMenuShow = !this.isSubMenuShow;
       },
-      prev() {
-        if (this.selectedIndex === 0) return;
-        const index = this.selectedIndex - 1;
-        const item = this.visibleMenu[index];
-        this.select(item.comp, item.key);
-      },
-      next() {
-        if (this.selectedIndex >= this.visibleMenu.length - 1) return;
-        const index = this.selectedIndex + 1;
-        const item = this.visibleMenu[index];
-        this.select(item.comp, item.key);
-      },
 
       removeItemByIndex(index) {
-        this.visibleMenu.splice(index);
+        this.menu.splice(index);
       },
 
       hasItem(item) {
         return this.menu.some(menuItem => {
-          const sameComp = item.comp === menuItem.comp;
-          const sameKey = item.key === menuItem.key;
-          return sameComp && sameKey;
+          const sameComp = item.cuid === menuItem.cuid;
+          const sameContentId = item.contentId === menuItem.contentId;
+          return sameComp && sameContentId;
         });
       },
 
       addItem(item) {
-        if (!item || !item.key || !item.text) {
-          throw Error('传入的 tab item 必须有id、text');
+        if (!item || !item.cuid || !item.text) {
+          throw Error('传入的 tab item 必须有cuid、text');
         }
 
         if (this.hasItem(item)) {
-          throw Error('不能传入comp和key都相同的item');
+          throw Error('不能传入已经存在的item');
         }
 
         item = getItemEntity(item);
@@ -120,12 +148,12 @@
       },
 
       addItemByIndex(index, item) {
-        if (!item || !item.key || !item.text) {
+        if (!item || !item.cuid || !item.contentId || !item.text) {
           throw Error('传入的 tab item 必须有id、text');
         }
 
         if (this.hasItem(item)) {
-          throw Error('不能传入comp和key都相同的item');
+          throw Error('不能传入cuid和contentId都相同的item');
         }
 
         item = getItemEntity(item);
@@ -133,25 +161,25 @@
         this.menu.splice(index, 0, item);
       },
 
-      getItem(comp, key) {
-        return this.menu.find(item => item.comp === comp && item.key === key);
+      getItem(cuid, contentId) {
+        return this.menu.find(item => item.cuid === cuid && item.contentId === contentId);
       },
 
-      setIcon(comp, key) {
-        const tab = this.getItem(comp, key);
+      setIcon(cuid, contentId) {
+        const tab = this.getItem(cuid, contentId);
         if (!tab) return;
         tab.showIcon = true;
       },
 
-      hiddenIcon(comp, key) {
-        const tab = this.getItem(comp, key);
+      hiddenIcon(cuid, contentId) {
+        const tab = this.getItem(cuid, contentId);
         if (!tab) return;
 
         tab.showIcon = false;
       },
 
-      setVisible(comp, key) {
-        const tab = this.getItem(comp, key);
+      setVisible(cuid, contentId) {
+        const tab = this.getItem(cuid, contentId);
         if (!tab) return;
 
         tab.visible = true;
@@ -183,27 +211,24 @@
         });
       },
 
-      select(comp, key) {
-        this.selectedId = `${comp}_${key}`;
-        let payload = null;
+      select(cuid, contentId = '') {
+        this.selectedCuid = cuid;
+        this.selectedContentId = contentId;
 
+        let payload = null;
         // TODO: 强耦合，需更改
-        if (comp === 'comCustomMenu') {
+        if (cuid === 'comCustomMenu') {
           payload = {
             method: 'queryDetail',
-            arg: [key]
+            arg: [contentId]
           };
         }
 
         // wap端逻辑
         this.isSubMenuShow = false;
 
-        // this.scrollToItem(comp, key);
-
-        // 切换container内容
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'handleSelect', [comp, key, payload])
-        );
+        const item = this.getItem(cuid, contentId);
+        this.$refs['tabContent'].switchTo(item, payload);
       }
     }
   };
@@ -211,20 +236,33 @@
 
 <style lang="less">
   .vmp-tab-menu {
+    height: 100%;
     position: relative;
     background: #fff;
     font-size: 32px;
     display: flex;
-    justify-content: space-around;
-    height: 90px;
-    position: relative;
-    &::before {
-      content: '';
-      position: absolute;
-      bottom: 0;
+    flex-direction: column;
+
+    &__header {
       width: 100%;
-      height: 1px;
-      border-bottom: 1px solid #d4d4d4;
+      height: 90px;
+      position: relative;
+      display: flex;
+      justify-content: space-around;
+
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        border-bottom: 1px solid #d4d4d4;
+      }
+    }
+
+    &__main {
+      width: 100%;
+      flex: 1 1 auto;
     }
 
     .vmp-tab-menu-scroll-container {

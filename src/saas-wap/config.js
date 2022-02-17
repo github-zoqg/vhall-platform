@@ -45,13 +45,7 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
-    children: [
-      'comContainerTop',
-      'comTabContentWap',
-      'comContainerRight',
-      'comNoticeWap',
-      'comGoodSaasWap'
-    ]
+    children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -61,8 +55,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: []
-    // children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -71,7 +64,7 @@ export const serverConfig = {
     emitClickLogin: [
       //登录弹窗
       {
-        cuid: 'compRegLogin',
+        cuid: 'compRegLoginWap',
         method: 'open'
       }
     ],
@@ -100,8 +93,7 @@ export const serverConfig = {
   },
   comContainerTop: {
     component: 'VmpContainer',
-    className: 'container-top',
-    children: ['comTabMenuWap']
+    className: 'container-top'
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
@@ -120,21 +112,26 @@ export const serverConfig = {
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
-    handleSelect: [
-      {
-        cuid: ['comTabContentWap'],
-        method: 'switchTo',
-        args: ['$0', '$1', '$2']
-      }
-    ]
-  },
-  comTabContentWap: {
-    component: 'VmpTabContainerWap',
-    children: ['comChatWap', 'comIntroWap', 'comRecommendWap']
+    children: ['comChatWap', 'comIntroWap', 'comRecommendWap'],
+    options: {
+      defaultMenu: [
+        { cuid: 'comChatWap', text: '聊天', visible: true },
+        { cuid: 'comIntroWap', text: '简介', visible: true },
+        { cuid: 'comGoodSaasWap', text: '商品', visible: true },
+        { cuid: 'comRecommendWap', text: '推荐', visible: true }
+      ]
+    }
   },
   comIntroWap: {
     component: 'VmpIntroWap',
-    children: ['comInteractToolsWap']
+    children: ['comInteractToolsWap'],
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ]
   },
   // 底部互动工具box
   comInteractToolsWap: {
@@ -158,6 +155,10 @@ export const serverConfig = {
   //商品列表
   comGoodSaasWap: {
     component: 'VmpGoodListWap'
+  },
+  // 二维码弹框
+  comOfficial: {
+    component: 'VmpWapQrCode'
   },
   //wap端聊天
   comChatWap: {

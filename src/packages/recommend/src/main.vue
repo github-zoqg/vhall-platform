@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-recommend recommendWrapper" refs="recommendWrapper" v-show="advs.length > 0">
+  <div class="vmp-recommend recommendWrapper" refs="recommendWrapper">
     <ul class="a-wrap">
       <li
         class="recommend-item"
@@ -56,7 +56,7 @@
         deep: true
       },
       'advs.length': {
-        async handler(val) {
+        async handler() {
           await this.$nextTick();
           setTimeout(() => {
             this.scroll && this.scroll.refresh();

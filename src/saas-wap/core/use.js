@@ -49,6 +49,9 @@ import VmpChatWap from '@/packages/chat-wap';
 //wap互动工具box
 import VmpInteractToolsWap from '@/packages/interact-tools-wap';
 
+// 二维码弹框
+import VmpWapQrCode from '@/packages/qrcode-wap';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -88,6 +91,7 @@ export function initUse() {
   Vue.use(VmpNoticeWap);
   Vue.use(VmpRecommendWap);
   Vue.use(VmpGoodListWap);
+  Vue.use(VmpWapQrCode);
   Vue.use(VmpInteractToolsWap);
   Vue.use(VmpChatWap);
 }

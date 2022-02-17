@@ -2,7 +2,9 @@
   <section class="vmp-tab-container">
     <main>
       <!-- 默认区域 -->
-      <vmp-air-container :cuid="cuid" />
+      <section>
+        <vmp-air-container :cuid="cuid" />
+      </section>
     </main>
   </section>
 </template>

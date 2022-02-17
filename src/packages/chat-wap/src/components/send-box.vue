@@ -98,7 +98,6 @@
   import { faceArr, emojiToPath } from '@/packages/chat/src/js/emoji';
   import { useGroupServer, useRoomBaseServer } from 'middle-domain';
 
-
   export default {
     inject: {
       localRoomInfo: {
@@ -457,9 +456,9 @@
         }, 400);
       },
       textFocus() {
-        try {
+        // try {
           clearTimeout(this.$inputTimer);
-        } catch (e) {}
+        // } catch (e) {}
 
         if (this.vantFaildPlacer.indexOf(', 最多140字') == -1) {
           this.vantFaildPlacer = this.vantFaildPlacer + ',' + this.$t('chat.chat_1069');
