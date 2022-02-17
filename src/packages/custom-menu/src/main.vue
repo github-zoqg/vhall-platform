@@ -55,7 +55,7 @@
     methods: {
       async queryDetail(id) {
         if (id === undefined || id === null) {
-          throw Error('custom-menu 必须传入id');
+          return;
         }
 
         const res = await this.customMenuServer.getCustomMenuDetail({
