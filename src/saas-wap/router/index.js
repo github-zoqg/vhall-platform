@@ -15,6 +15,12 @@ const routes = [
     component: Home,
     name: 'LiveRoom',
     meta: { title: '直播间' }
+  },
+  // 错误页、升级页
+  {
+    path: '/upgrading',
+    name: 'upgrading',
+    component: () => import('../views/Upgrading.vue')
   }
   // {
   //   path: '/about',
