@@ -55,7 +55,14 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: [
+      'compRegLoginWap',
+      'comOfficial',
+      'comShare',
+      'comWatchTimer',
+      'comSignUpForm',
+      'comSignWap'
+    ]
   },
   // 顶部
   comHeaderWatch: {
@@ -97,9 +104,14 @@ export const serverConfig = {
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
+    children: ['comSignWap'],
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
+    },
+    emitOpenSign: {
+      cuid: ['comSignWap'],
+      method: 'openSign'
     }
   },
   // notice横幅
@@ -108,7 +120,7 @@ export const serverConfig = {
   },
   // 登录弹窗
   compRegLoginWap: {
-    component: 'VmpRegLoginWap'
+    // component: 'VmpRegLoginWap'
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
@@ -172,5 +184,14 @@ export const serverConfig = {
     ],
     children: [],
     options: {}
+  },
+  // wap互动工具-签到
+  comSignWap: {
+    component: 'VmpSignWap',
+    emitOpenSignIcon: {
+      cuid: ['comContainerRight'],
+      method: 'changeStatus',
+      args: ['$0', '$1']
+    }
   }
 };

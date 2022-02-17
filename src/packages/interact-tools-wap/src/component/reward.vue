@@ -86,7 +86,6 @@
       };
     },
     mounted() {
-      console.log('reward');
       // EventBus.$on('reward_pay_ok', this.rewardFn);
     },
     beforeDestroy() {
