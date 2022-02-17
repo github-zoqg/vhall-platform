@@ -81,14 +81,14 @@
   "path-intellisense.mappings": {
     "@": "${workspaceRoot}/src"
   },
-  "i18n-ally.sourceLanguage": "zh-CN",
-  "i18n-ally.displayLanguage": "zh-CN",
-  "i18n-ally.keystyle": "auto",
   "i18n-ally.localesPaths": [
     "src/saas-live/languages/modules",
     "src/saas-watch/languages/modules",
     "src/saas-wap/languages/modules"
   ],
+  "i18n-ally.enabledParsers": ["json", "js"],
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.displayLanguage": "zh",
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   }
