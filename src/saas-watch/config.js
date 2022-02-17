@@ -60,8 +60,8 @@ export const serverConfig = {
       'comWatchAuth',
       // 'comSignUpForm',
       'comUserAccount',
-      'comCash',
-      'comLottery'
+      'comCash'
+      // 'comLottery'
       // 'comWatchTimer'
     ]
   },

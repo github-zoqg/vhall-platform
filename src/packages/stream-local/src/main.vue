@@ -98,6 +98,7 @@
         </el-tooltip>
       </p>
     </section>
+    <ImgStream ref="imgPushStream"></ImgStream>
   </div>
 </template>
 
@@ -110,6 +111,7 @@
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import ImgStream from './components/img-stream/index.vue';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -120,6 +122,9 @@
         networkStatus: 2,
         audioLevel: 1
       };
+    },
+    components: {
+      ImgStream
     },
     computed: {
       miniElement() {
@@ -226,6 +231,10 @@
           // 设置旁路主屏布局失败
           console.log('设置主屏失败');
           // TODO: 设置旁路主屏布局失败错误处理
+        } else if (err == 'getCanvasStreamError') {
+          console.error('获取图片流track错误');
+        } else if (err == 'createLocalPhotoStreamError') {
+          this.$message.error('初始化图片流失败');
         } else {
           console.error(err);
           throw new Error('代码错误');
@@ -255,11 +264,34 @@
       },
       // 创建本地流
       async createLocalStream() {
-        await this.interactiveServer
-          .createLocalVideoStream({
-            videoNode: `stream-${this.joinInfo.third_party_user_id}`
-          })
-          .catch(() => 'createLocalStreamError');
+        switch (this.$domainStore.state.mediaSettingServer.videoType) {
+          case 'camera':
+            await this.interactiveServer
+              .createLocalVideoStream({
+                videoNode: `stream-${this.joinInfo.third_party_user_id}`
+              })
+              .catch(() => 'createLocalStreamError');
+            break;
+          case 'pictrue':
+            await (() => {
+              setTimeout(() => {}, 1000);
+            })();
+            // eslint-disable-next-line no-case-declarations
+            let videoTracks = await this.$refs.imgPushStream.getCanvasStream();
+            if (!videoTracks) {
+              throw 'getCanvasStreamError';
+            }
+            await this.interactiveServer
+              .createLocalPhotoStream({
+                videoNode: `stream-${this.joinInfo.third_party_user_id}`,
+                videoTrack: videoTracks
+              })
+              .catch(() => 'createLocalPhotoStreamError');
+            break;
+
+          default:
+            break;
+        }
       },
       // 推流
       async publishLocalStream() {
