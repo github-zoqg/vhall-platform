@@ -343,6 +343,11 @@
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
         return webinar.type;
+      },
+      //互动工具状态
+      interactToolStatus() {
+        const { interactToolStatus = {} } = this.roomBaseServer.state;
+        return interactToolStatus;
       }
     },
     methods: {
@@ -554,7 +559,7 @@
               _this.totalNum = _this.isInGroup
                 ? msg.uv
                 : msg.uv -
-                  (_this.groupInitData.discussState
+                  ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
                     ? _this.$store.getters.getAllState('groupUsersNumber')
                     : 0);
             }
@@ -689,7 +694,7 @@
             _this.totalNum = _this.isInGroup
               ? msg.uv
               : msg.uv -
-                (_this.groupInitData.discussState
+                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
                   ? _this.$store.getters.getAllState('groupUsersNumber')
                   : 0);
           }
