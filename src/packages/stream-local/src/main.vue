@@ -227,6 +227,7 @@
           console.log('设置主屏失败');
           // TODO: 设置旁路主屏布局失败错误处理
         } else {
+          console.error(err);
           throw new Error('代码错误');
         }
       },
