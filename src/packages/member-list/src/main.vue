@@ -384,7 +384,7 @@
         this.msgServer.$onMsg('CHAT', rawMsg => {
           let temp = Object.assign({}, rawMsg);
 
-          if (typeof temp.data !== 'object') {
+          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
             temp.data = JSON.parse(temp.data);
             temp.context = JSON.parse(temp.context);
           }
@@ -444,7 +444,7 @@
         //房间消息
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
-          if (typeof temp.data !== 'object') {
+          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
             temp.data = JSON.parse(temp.data);
             temp.context = JSON.parse(temp.context);
           }
@@ -453,7 +453,7 @@
           switch (type) {
             case 'vrtc_connect_apply':
               //用户申请上麦
-              handleApplyConnect(temp);
+              handleApplyConnect(temp.data);
               break;
             case 'vrtc_connect_apply_cancel':
               //用户取消申请上麦
@@ -778,25 +778,26 @@
         }
         //用户上麦成功
         function handleSuccessConnect(msg) {
-          _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, {
+          _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, {
             isApply: false,
             is_speak: 1
           });
-          if (msg.room_join_id == _this.userId && msg.room_role == 2) {
+          if (msg.data.room_join_id == _this.userId && msg.data.room_role == 2) {
             return;
           }
-          if (_this.isInteract !== 1 && msg.room_role == 1) {
+          if (_this.isInteract !== 1 && msg.data.room_role == 1) {
             _this.$message.success({ message: '直播发起成功' });
             return;
           }
-          if (msg.room_join_id == _this.userId) {
+          if (msg.data.room_join_id == _this.userId) {
             _this.$message.success({ message: '您已上麦' });
           } else {
-            msg.room_role != 2 && _this.$message.success({ message: `${msg.nick_name}已上麦` });
+            msg.data.room_role != 2 &&
+              _this.$message.success({ message: `${msg.data.nick_name}已上麦` });
           }
-          _this.handsUpTimerList[msg.room_join_id] &&
-            clearTimeout(_this.handsUpTimerList[msg.room_join_id]); // 取消下麦清楚定时器
-          delete _this.handsUpTimerList[msg.room_join_id];
+          _this.handsUpTimerList[msg.data.room_join_id] &&
+            clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]); // 取消下麦清楚定时器
+          delete _this.handsUpTimerList[msg.data.room_join_id];
 
           if (_this.memberOptions.platformType === 'watch') {
             _this.changeSpeakerList();
@@ -816,7 +817,7 @@
             if (!_this.applyUsers.length) {
               _this.raiseHandTip = false;
             }
-            _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, {
+            _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, {
               isApply: false,
               is_speak: 1
             });
@@ -958,7 +959,7 @@
         const isWatch = this.memberOptions.platformType === 'watch';
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
-          if (typeof temp.data !== 'object') {
+          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
             temp.data = JSON.parse(temp.data);
             temp.context = JSON.parse(temp.context);
           }
