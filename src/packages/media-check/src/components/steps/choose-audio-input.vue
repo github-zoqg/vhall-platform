@@ -22,7 +22,7 @@
 
     <footer class="vh-media-check-footer">
       <div class="vh-check-tip">
-        <span class="iconfont iconmaikefeng_icon icon-tip"></span>
+        <span class="vh-iconfont vh-line-microphone icon-tip"></span>
         <span>对着麦克风讲话，您能看到音量条波动么？</span>
       </div>
       <div class="button-container button-container__microphone">
