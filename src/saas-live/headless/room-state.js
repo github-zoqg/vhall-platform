@@ -16,6 +16,7 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
+  const micServer = useMicServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -37,6 +38,10 @@ export default async function () {
     // 如果是分组直播，初始化分组信息
     await groupServer.init();
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    micServer.init();
   }
 
   await msgServer.init();
