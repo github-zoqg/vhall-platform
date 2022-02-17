@@ -85,6 +85,7 @@ export default async function () {
   useMicServer();
 
   // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
