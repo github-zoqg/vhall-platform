@@ -4,21 +4,16 @@
     class="send-msg-wrapper"
     :class="[className, { 'send-msg-wrapper-top': showEmojiArr }]"
   >
-    <div
-      class="send-msg"
-      :class="{
-        'v-private': currentTab == 'private',
-        'v-qa': currentTab == 'qa'
-      }"
-    >
+    <div class="send-msg">
       <!--用户个人信息，提现，修改头像-->
+      <div class="user-advatar-panel" v-if="!isEmbed && isShowUser">
+        <div class="user-advatar-box">
+          <img class="user-img" :src="avatar" srcset />
+        </div>
+      </div>
       <div class="need-input">
         <template v-if="chatShow">
-          <div
-            class="placeholder"
-            v-if="localRoomInfo.isNeedLogin && !localRoomInfo.isLogin && !noChatLogin"
-            @click="login"
-          >
+          <div class="placeholder" v-if="isNeedLogin && !isLogin && !noChatLogin" @click="login">
             <span class="login-btn">登录</span>
             参与互动
           </div>
@@ -33,100 +28,53 @@
             </span>
             <span v-else-if="isAllBanned">全体禁言中</span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>
-              {{ currentTab == 'private' ? '输入私聊内容' : '说点什么' }}
-            </span>
+            <span v-else>说点什么</span>
           </div>
         </template>
       </div>
-      <div class="interact-wrapper" v-if="currentTab == 3">
+      <div class="interact-wrapper">
         <!-- 上麦入口 -->
         <div
           class="icon-wrapper"
           v-show="
-            (webinarData.webinar.type == 1 &&
+            (webinar.type == 1 &&
               deviceStatus != 2 &&
               connectMicShow &&
               !disabledAll &&
               !isBanned &&
-              !roomBaseState.groupInitData.isInGroup) ||
-            (onlineMicStatus && !roomBaseState.groupInitData.isInGroup) ||
-            (!roomBaseState.groupInitData.isBanned && roomBaseState.groupInitData.isInGroup)
+              !groupInitData.isInGroup) ||
+            (onlineMicStatus && !groupInitData.isInGroup) ||
+            (!groupInitData.isBanned && groupInitData.isInGroup)
           "
         ></div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
           <!-- 礼物 -->
-          <div class="icon-wrapper liwu" v-auth="{ 'ui.hide_gifts': 0 }"></div>
+          <div class="icon-wrapper liwu"></div>
           <!-- 打赏 -->
-          <div
-            class="icon-wrapper"
-            v-if="!localRoomInfo.isEmbed"
-            v-auth="{ 'ui.hide_reward': 0 }"
-          ></div>
+          <div class="icon-wrapper" v-if="!isEmbed"></div>
           <!-- 邀请卡 -->
           <!-- 点赞-->
-          <div class="icon-wrapper" v-auth="{ 'ui.watch_hide_like': 0 }"></div>
+          <div class="icon-wrapper"></div>
         </div>
       </div>
-      <template v-if="showInput">
-        <p class="sendBox" @click="send">
-          <i class="iconfont iconfasong"></i>
-        </p>
-      </template>
     </div>
-    <div v-show="showEmojiArr" class="emoji-box">
-      <div class="face-box clearfix">
-        <img
-          :src="item | emojiToPath"
-          @click.stop="inputEmoji(index)"
-          v-for="(item, index) in emojiArr"
-          :key="index"
-        />
-      </div>
-    </div>
-
-    <div class="vh-chat-InputArea" v-show="showInput">
-      <vh-chat v-model="chatValue"></vh-chat>
-      <p class="sendBox" @click.stop="send"><i class="iconfont iconfasong"></i></p>
-    </div>
+    <chat-wap-input-modal ref="chatWapInputModal" @sendMsg="sendMessage"></chat-wap-input-modal>
   </div>
 </template>
 <script>
-  import vhChat from './wapModalInput';
+  import chatWapInputModal from './chatWapInputModal';
   import Vue from 'vue';
   const EventBus = new Vue();
-  import { faceArr, emojiToPath } from '@/packages/chat/src/js/emoji';
-  import { useGroupServer, useRoomBaseServer } from 'middle-domain';
+  import { faceArr, emojiToPath, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import { useGroupServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import getAvatar from '@/packages/chat/src/js/get-avatar';
+  import Msg from '@/packages/chat/src/js/msg-class';
+  import { formatTime, handleTime } from '@/packages/chat/src/js/handle-time';
 
   export default {
-    inject: {
-      localRoomInfo: {
-        from: 'localRoomInfo',
-        default: () => ({})
-      },
-      tabState: {
-        from: 'tabState',
-        default: () => ({})
-      }
-    },
     props: {
-      joinInfoInGift: {
-        required: false
-      },
-      showInviteCard: {
-        default: false
-      },
       noChatLogin: {
         // 是否免登陆
-        type: Boolean,
-        default: false
-      },
-      totalLike: {
-        default: 0,
-        required: false
-      },
-      // 是否需要登录
-      needLogin: {
         type: Boolean,
         default: false
       },
@@ -157,10 +105,6 @@
         type: Boolean,
         default: false
       },
-      webinarData: {
-        type: Object,
-        default: () => {}
-      },
       onlineMicStatus: {
         type: Boolean,
         default: false
@@ -177,12 +121,12 @@
     },
     filters: {
       //表情转换为图片地址
-      emojiToPath(val) {
-        return emojiToPath(val);
+      emojiToPath(index) {
+        return emojiToPath(index);
       }
     },
     components: {
-      vhChat
+      chatWapInputModal
     },
     data() {
       const { state: roomBaseState } = this.roomBaseServer;
@@ -208,13 +152,18 @@
         vantFaildPlacer: '说点什么',
         location:
           window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
-        avaImgShow: false, // 是否展示 选择个人资料 or 提现管理内容
-        userState: false, // 是否展示个人资料面板
-        cashState: false, // 是否展示提现面板
         isShowUser: false,
         connectMicShow: false, // 连麦入口按钮
         disabledAll: false, // 全员禁言
-        deviceStatus: false // 是否支持上麦
+        deviceStatus: false, // 是否支持上麦
+        //是否是嵌入端
+        isEmbed: false,
+        //活动信息
+        webinar: {},
+        //是否已经登录
+        isLogin: false,
+        //配置列表
+        configList: {}
       };
     },
     computed: {
@@ -222,6 +171,16 @@
       groupInitData() {
         const { groupInitData = {} } = this.groupServer.state;
         return groupInitData;
+      },
+      //是否需要登录
+      isNeedLogin() {
+        return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
+      },
+      //当前登录人信息
+      joinInfo() {
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        const { join_info = {} } = watchInitData;
+        return join_info;
       }
     },
     watch: {
@@ -234,6 +193,10 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
+      this.chatServer = useChatServer();
+    },
+    created() {
+      this.initViewData();
     },
     mounted() {
       // 初始开启允许连麦，非组内判断禁言，全员禁言
@@ -246,10 +209,21 @@
       this.eventListener();
     },
     methods: {
+      //初始化视图数据
+      initViewData() {
+        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { webinar = {} } = watchInitData;
+        const { embed = false } = embedObj;
+        console.log(this.roomBaseServer, 'roomBaseServer');
+        this.webinar = webinar;
+        this.isEmbed = embed;
+        this.configList = configList;
+      },
       // 判断登录
       checkIsLogin() {
         // 若用户已经登录
         if (window.sessionStorage.getItem('token')) {
+          this.isLogin = true;
           // 若用户已经登录过，获取userInfo
           const userVo = sessionStorage.getItem('userInfo')
             ? JSON.parse(sessionStorage.getItem('userInfo'))
@@ -274,23 +248,27 @@
       eventListener() {
         // 直播结束不展示入口
         EventBus.$on('live_over', e => {
+          console.log(e);
           this.connectMicShow = false;
         });
         // 接收开启连麦消息事件
         EventBus.$on('vrtc_connect_open', msg => {
-          // console.log(9999999, msg);
+          console.log(9999999, msg);
           this.connectMicShow = true;
         });
         // 全员禁言
         EventBus.$on('disable_all', val => {
+          console.log(val);
           this.disabledAll = true;
         });
         // 全员取消禁言
         EventBus.$on('permit_all', val => {
+          console.log(val);
           this.disabledAll = false;
         });
         // 接收关闭连麦消息事件
         EventBus.$on('vrtc_connect_close', msg => {
+          console.log(msg);
           this.connectMicShow = false;
         });
         // EventBus.$on('vrtc_connect_success', (msg) => {
@@ -330,6 +308,7 @@
           }
         });
         EventBus.$on('blurEmojie', msg => {
+          console.log(msg);
           if (this.showEmojiArr) {
             this.showEmojiArr = false;
           }
@@ -342,6 +321,7 @@
         EventBus.$on('zIndexShowFalse', value => {
           /* 同下面  无使用祖先元素   先让其元素进行层级修改后根据真实状况再次修改 */
           this.$refs.indexUpdate.style.zIndex = '21';
+          console.log(value);
         });
         EventBus.$on('zIndexShow', value => {
           if (value) {
@@ -355,47 +335,23 @@
           this.avatar = avatar;
         });
       },
-      changeCashState() {
-        this.cashState = !this.cashState;
-      },
-      changeUserState() {
-        this.userState = !this.userState;
-      },
-      closeUserBox() {
-        this.userState = false;
-        this.avaImgShow = false;
-      },
-      closeCashBox() {
-        this.cashState = false;
-        this.avaImgShow = false;
-      },
       saySomething() {
-        const { groupInitData } = this.roomBaseState;
         if (
-          (this.isBanned && !groupInitData.isInGroup) ||
+          (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
-          (groupInitData.isBanned && groupInitData.isInGroup)
+          (this.groupInitData.isBanned && this.groupInitData.isInGroup)
         ) {
           return;
         }
 
-        if (this.currentTab == 'qa') {
-          if (this.canSend) {
-            EventBus.$emit('showSendBox');
-          } else {
-            this.$toast(
-              `${this.$t('chat.chat_1025')} ${this.$t('chat.chat_1067', { n: this.time })}`
-            );
-          }
-        } else if (this.currentTab == 3) {
+        if (this.currentTab == 3) {
           if (this.waitTimeFlag) {
-            EventBus.$emit('showSendBox');
+            this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$toast(this.$t('chat.chat_1068'));
-            // this.$toast(`当前活动火爆，请您在${this.waitTime}秒后再次发言`);
+            this.$message(`当前活动火爆，请您在${this.waitTime}秒后再次发言`);
           }
         } else {
-          EventBus.$emit('showSendBox');
+          this.$refs.chatWapInputModal.openModal();
         }
       },
       //计算延迟时间
@@ -417,76 +373,58 @@
         }
         return Math.floor(o * result);
       },
-      showMyQA() {
-        this.isShowMyQA = !this.isShowMyQA;
-        this.localRoomInfo.isShowOnselfMdess = this.isShowMyQA;
-        EventBus.$emit('showMyQA', this.isShowMyQA);
-      },
-      login() {
-        EventBus.$emit('showChatLogin');
-      },
-      /* 表情 */
-      showEmojiClick() {
-        // 展示的是图片表情
-        this.showEmojiArr = !this.showEmojiArr;
-        setTimeout(() => {
-          this.showInput = true;
-          this.showEmojiIcon = true;
-        }, 10);
-      },
-      inputEmoji(index) {
-        console.log(index, '选中图的下标');
-        for (const key in this.emojiArr[index]) {
-          this.chatValue += key;
-        }
-      },
-      // 失去焦点
-      textBlur() {
-        if (this.vantFaildPlacer.indexOf(', 最多140字') > -1) {
-          this.vantFaildPlacer =
-            this.currentTab == 'private'
-              ? this.$t('chat.chat_1045')
-              : this.currentTab == 'qa'
-              ? this.$t('chat.chat_166')
-              : this.$t('chat.chat_1042');
-        }
-        this.$inputTimer = setTimeout(() => {
-          this.showEmojiIcon = false;
-          this.showInput = false;
-        }, 400);
-      },
-      textFocus() {
-        // try {
-          clearTimeout(this.$inputTimer);
-        // } catch (e) {}
+      //登录 todo 发送信令唤起登录
+      login() {},
+      //发送消息
+      sendMessage(value = '') {
+        // 按在线人数 计算- 发送聊天的延时
+        // this.waitTime = this.delayTime(0, 1);
+        // this.waitTimeFlag = this.waitTime <= 0;
+        // this.waitTimeSet = window.setInterval(() => {
+        //   if (this.waitTime <= 1) {
+        //     this.waitTime = 1;
+        //     window.clearInterval(this.waitTimeSet);
+        //     this.waitTimeFlag = true;
+        //   }
+        //   this.waitTime--;
+        // }, 1000);
+        // 要发送的数据
+        const data = { type: 'text', text_content: value };
+        const context = {
+          nickname: this.joinInfo.nickname, // 昵称
+          avatar: this.isEmbed ? '' : this.joinInfo.avatar, // 头像 微信登录  有时会被服务端获取个人信息 先兼容
+          role_name: 2, // 角色 1主持人2观众3助理4嘉宾
+          event: JSON.stringify(data),
+          source: 'mobile'
+        };
 
-        if (this.vantFaildPlacer.indexOf(', 最多140字') == -1) {
-          this.vantFaildPlacer = this.vantFaildPlacer + ',' + this.$t('chat.chat_1069');
-        }
-        setTimeout(() => {
-          this.showEmojiIcon = true;
-          if (this.showEmojiArr) {
-            this.showEmojiArr = false;
-          }
-        }, 100);
-      },
-      send() {
-        const inputValue = this.chatValue.trim();
-        if (!inputValue) {
-          this.$toast(this.$t('chat.chat_1057'));
-          return;
-        }
-        EventBus.$emit('sendMsg', inputValue, this.currentTab);
+        // 关键词过滤标识
+        const filterStatus = this.chatServer.checkHasKeyword(true, value);
 
-        this.chatValue = '';
-        this.showEmojiArr = false;
-        this.showEmojiIcon = false;
-
-        if (this.currentTab == 'qa') {
-          this.isReadonly = true;
+        // 发送socket消息  当关键词列表中不包含当前要发的消息时候，进行发送(主意这里仅是把消息保存到了服务器，本地并没有消息)
+        if (filterStatus) {
+          this.chatServer.sendMsg({ data, context });
         }
-
-        this.showInput = false;
+        // 观众端会显示回显，会过滤掉socket中自己的信息
+        let chatContext = sessionStorage.getItem('vhall_chat_context');
+        chatContext = chatContext ? JSON.parse(chatContext) : {};
+        let item = {};
+        if (this.chatList.length) {
+          item = this.chatList[this.chatList.length - 1];
+        }
+        data.text_content = textToEmojiText(data.text_content);
+        const tempData = new Msg({
+          avatar: getAvatar(chatContext.avatar),
+          nickName: chatContext.nickname,
+          type: 'text',
+          content: data,
+          sendId: this.joinInfo.third_party_user_id,
+          sendTime: formatTime(new Date()),
+          roleName: 2,
+          client: chatContext.device_type == 2 ? 'pc' : 'mobile',
+          showTime: handleTime(item.sendTime)
+        });
+        filterStatus && this.chatList.push(tempData);
       }
     }
   };
