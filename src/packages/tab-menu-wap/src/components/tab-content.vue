@@ -129,7 +129,12 @@
       position: relative;
 
       .vmp-tab-container-mainarea {
+        height: 100%;
         position: relative;
+
+        & > section {
+          height: 100%;
+        }
       }
 
       .vmp-tab-container-poparea {
@@ -161,6 +166,10 @@
           top: 50%;
           transform: translateY(-50%);
         }
+      }
+
+      & > main > section {
+        height: 100%;
       }
     }
   }
