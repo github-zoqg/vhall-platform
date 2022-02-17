@@ -27,7 +27,7 @@
 
   import { useCustomMenuServer } from 'middle-domain';
   export default {
-    name: 'VmpCustomMenu',
+    name: 'VmpCustomMenuWap',
     components: {
       ComponentDesimg,
       ComponentQrcode,

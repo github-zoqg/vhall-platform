@@ -111,7 +111,6 @@
 
 <style lang="less">
   .vmp-intro {
-    font-size: 36px;
     background-color: #f2f2f2;
     height: 100%;
     position: relative;
@@ -131,6 +130,7 @@
       }
 
       &__headtitle {
+        font-size: 36px;
         text-overflow: -o-ellipsis-lastline;
         overflow: hidden;
         text-overflow: ellipsis;

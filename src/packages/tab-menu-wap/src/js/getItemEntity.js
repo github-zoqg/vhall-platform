@@ -17,7 +17,8 @@ export function getItemEntity({
   showIcon = false
 }) {
   const cuid = typeMap.get(type);
-  const visible = status == 1 || status == 3 ? true : false;
+  let visible = status == 1 || status == 3 ? true : false;
+  if (type === 2) visible = false;
 
   return {
     type,
