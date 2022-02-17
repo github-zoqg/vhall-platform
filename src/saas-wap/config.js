@@ -18,44 +18,26 @@ export const serverConfig = {
     children: ['comHeaderWatch']
   },
   // 中间主区域容器
-  layerBody: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-bd',
-    children: ['layerPlayer', 'layerBodyCenter']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
-  },
-  // 底部主区域容器
-  layerFooter: {
-    component: 'VmpFooter',
-    className: 'vmp-footer'
-  },
-  // layerBodyLeft: {
+  // layerBody: {
   //   component: 'VmpContainer',
-  //   className: 'vmp-basic-left',
-  //   children: []
-  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+  //   className: 'vmp-basic-bd',
+  //   children: ['layerPlayer', 'layerBodyCenter']
   // },
   layerPlayer: {
     component: 'VmpContainer',
-    className: 'player',
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comPcPlayer']
+    className: 'vmp-basic-bd',
+    children: ['comWapPlayer']
   },
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
     children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
-  layerBodyRight: {
-    component: 'VmpBasicRightContainer',
-    children: []
-  },
   /*** 布局定义end */
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: ['compRegLoginWap', 'comOfficial', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -74,14 +56,10 @@ export const serverConfig = {
         cuid: 'comOfficial',
         method: 'openOfficial'
       }
-    ],
-    emitOpenShare: [
-      //弹出分享
-      {
-        cuid: 'comShare',
-        method: 'openShareDialog'
-      }
     ]
+  },
+  comWapPlayer: {
+    component: 'VmpWapPlayer'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
