@@ -8,6 +8,7 @@
         </section>
       </section>
 
+      <!-- 弹窗区域 -->
       <section class="vmp-tab-container-poparea">
         <van-popup
           v-model="isPopupVisible"
@@ -16,13 +17,16 @@
           :lazy-render="false"
           :overlay="false"
         >
-          <section>
+          <section class="vmp-tab-container-popup__body">
             <header>
-              {{ curItem.text }}
+              <span>{{ curItem.text }}</span>
+              <i class="vh-iconfont vh-line-close" @click="closePopup"></i>
             </header>
-            <section v-for="tab of subMenu" v-show="curItem.cuid === tab.cuid" :key="tab.cuid">
-              <vmp-air-container :cuid="tab.cuid" :oneself="true" />
-            </section>
+            <main>
+              <section v-for="tab of subMenu" v-show="curItem.cuid === tab.cuid" :key="tab.cuid">
+                <vmp-air-container :cuid="tab.cuid" :oneself="true" />
+              </section>
+            </main>
           </section>
         </van-popup>
       </section>
@@ -88,6 +92,10 @@
         }
 
         this.curItem = item;
+      },
+      closePopup() {
+        this.isPopupVisible = false;
+        this.curItem = {};
       }
     }
   };
@@ -103,6 +111,42 @@
     & > main {
       height: 1px;
       flex: 1 1 auto;
+      position: relative;
+
+      .vmp-tab-container-mainarea {
+        position: relative;
+      }
+
+      .vmp-tab-container-poparea {
+        position: relative;
+      }
+    }
+
+    .vmp-tab-container-popup__body {
+      & > header {
+        position: relative;
+        width: 100%;
+        height: 90px;
+        display: flex;
+        color: @border-bormal;
+        border-bottom: 1px solid #d4d4d4;
+
+        & > span {
+          position: relative;
+          width: 100%;
+          text-align: center;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        & > i {
+          position: absolute;
+          right: 33px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
     }
   }
 </style>
