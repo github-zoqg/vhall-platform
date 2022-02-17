@@ -27,7 +27,7 @@
         </el-col>
       </el-row>
       <span class="close ps" @click="onClose">
-        <i class="iconfont iconguanbi_icon"></i>
+        <i class="vh-iconfont vh-line-close"></i>
       </span>
       <div class="pad20">
         <el-row class="margin10 bg000 pr mt10">
@@ -60,7 +60,7 @@
   export default {
     name: 'VmpWatchTimer',
     directives: {
-      drag(el, bindings) {
+      drag(el) {
         el.onmousedown = function (e) {
           var disx = e.pageX - el.offsetLeft;
           var disy = e.pageY - el.offsetTop;
@@ -118,11 +118,11 @@
       this.timerServer = useTimerServer();
     },
     mounted() {
-      this.timerInfo = this.roomBaseServer.state?.interactToolStatus?.timer;
-      // console.log(this.$domainStore.state, this.roomBaseServer, '123132');
+      this.timerInfo = this.roomBaseServer.state?.timerInfo;
+      console.log(this.$domainStore.state, this.roomBaseServer, '123132');
       // this.init();
       this.timerServer.listenMsg();
-      console.log(this.timerServer, 'this.roomBaseServer');
+      console.log(this.timerServer.listenMsg, 'this.roomBaseServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
@@ -137,6 +137,7 @@
     methods: {
       // 计时器开始
       timer_start(e) {
+        console.log('计时器开始');
         this.shijian = e.data.duration;
         this.beifenshijian = e.data.duration;
         this.is_timeout = e.data.is_timeout;

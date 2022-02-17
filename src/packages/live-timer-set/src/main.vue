@@ -31,7 +31,7 @@
           <el-col class="margin10 bg000 ft42 pr font_zdy">
             <div class="border4 ps"></div>
             <span class="close ps" @click="onClose">
-              <i class="iconfont iconguanbi"></i>
+              <i class="vh-iconfont vh-line-close"></i>
             </span>
             <div class="margin5 timerbg">
               <el-input

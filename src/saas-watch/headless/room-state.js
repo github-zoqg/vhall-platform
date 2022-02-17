@@ -73,7 +73,8 @@ export default async function () {
       'room-tool',
       'goods-default',
       'announcement',
-      'sign'
+      'sign',
+      'timer'
     ]
   });
 

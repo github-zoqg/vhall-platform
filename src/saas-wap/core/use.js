@@ -33,6 +33,8 @@ import VmpGoodListWap from '@/packages/good-wap';
 import VmpChatWap from '@/packages/chat-wap';
 //wap互动工具box
 import VmpInteractToolsWap from '@/packages/interact-tools-wap';
+// wap互动工具-签到
+import VmpSignWap from '@/packages/interact-sign-wap';
 
 // 二维码弹框
 import VmpWapQrCode from '@/packages/qrcode-wap';
@@ -61,4 +63,5 @@ export function initUse() {
   Vue.use(VmpInteractToolsWap);
   Vue.use(VmpChatWap);
   Vue.use(VmpCustomMenuWap);
+  Vue.use(VmpSignWap);
 }
