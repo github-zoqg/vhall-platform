@@ -67,7 +67,7 @@
     overflow: hidden;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
-    z-index: 2199;
+    z-index: 100;
     justify-content: center;
     align-items: center;
     .qrcode-content {
