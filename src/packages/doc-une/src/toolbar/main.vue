@@ -32,7 +32,7 @@
     </div>
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
-      <div class="vmp-doc-toolbar__brush" v-show="hasDocPermission && currentType.length > 0">
+      <div class="vmp-doc-toolbar__brush" v-show="showBrushToolbar">
         <!-- 选择 -->
         <div
           class="vmp-icon-item"
@@ -206,9 +206,16 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
-      // 是否文档演示权限
+      // 是否有演示权限
       hasDocPermission() {
         return this.docServer.state.hasDocPermission;
+      },
+      // 是否显示画笔工具栏
+      showBrushToolbar() {
+        // 有文档演示权限, 主持端或者 观看端+有文档内容
+        return (
+          this.hasDocPermission && (!this.isWatch || (this.isWatch && this.currentType.length > 0))
+        );
       }
     },
     beforeCreate() {
