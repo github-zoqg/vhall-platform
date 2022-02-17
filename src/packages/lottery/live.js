@@ -4,11 +4,9 @@
 
 import VmpLotteryLive from './src/live';
 
-
 /* istanbul ignore next */
-VmpLotteryLive.install = function(Vue) {
+VmpLotteryLive.install = function (Vue) {
   Vue.component(VmpLotteryLive.name, VmpLotteryLive);
 };
 
-
-export default VmpLotteryLive
+export default VmpLotteryLive;

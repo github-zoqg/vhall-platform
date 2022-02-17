@@ -5,8 +5,8 @@
 import VmpLotteryWatch from './src/watch';
 
 /* istanbul ignore next */
-VmpLotteryWatch.install = function(Vue) {
+VmpLotteryWatch.install = function (Vue) {
   Vue.component(VmpLotteryWatch.name, VmpLotteryWatch);
 };
 
-export default VmpLotteryWatch
+export default VmpLotteryWatch;

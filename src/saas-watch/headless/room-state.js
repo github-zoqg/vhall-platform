@@ -8,7 +8,7 @@ import {
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
-export default async function() {
+export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
   const roomBaseServer = useRoomBaseServer();
   const msgServer = useMsgServer();
