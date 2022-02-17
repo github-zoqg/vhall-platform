@@ -247,10 +247,6 @@
         },
         //是否为嵌入页
         isEmbed: false,
-        //分页配置
-        pageConfig: {
-          page: 0
-        },
         //图片预览弹窗是否可见
         imgPreviewVisible: false,
         //聊天配置
@@ -375,7 +371,7 @@
       },
       init() {
         this.$nextTick(() => {
-          this.pageConfig.page = 0;
+          this.chatServerState.page = 0;
           this.getHistoryMsg();
         });
 
@@ -441,7 +437,7 @@
       },
       //处理分组讨论频道变更
       handleChannelChange() {
-        this.pageConfig.page = 0;
+        this.chatServerState.page = 0;
         chatServer.clearHistoryMsg();
         this.getHistoryMsg();
       },
@@ -449,12 +445,12 @@
       getHistoryMsg() {
         const params = {
           room_id: this.roomId,
-          pos: Number(this.pageConfig.page) * 50,
+          pos: Number(this.chatServerState.page) * 50,
           limit: 50
         };
 
         chatServer.getHistoryMsg(params, '发起端').then(result => {
-          this.pageConfig.page = Number(this.pageConfig.page) + 1;
+          this.pageConfig.page = Number(this.chatServerState.page) + 1;
           return result;
         });
       },
