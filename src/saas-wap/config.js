@@ -135,6 +135,9 @@ export const serverConfig = {
   comGoodSaasWap: {
     component: 'VmpGoodListWap'
   },
+  comCustomMenuWap: {
+    component: 'VmpCustomMenu'
+  },
   // 二维码弹框
   comOfficial: {
     component: 'VmpWapQrCode'

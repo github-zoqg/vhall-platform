@@ -16,6 +16,7 @@
           closeable
           :lazy-render="false"
           :overlay="false"
+          :style="{ height: popHeight + 'px' }"
         >
           <section class="vmp-tab-container-popup__body">
             <header>
@@ -53,7 +54,8 @@
     },
     data() {
       return {
-        curItem: {}
+        curItem: {},
+        popHeight: 200
       };
     },
     computed: {
@@ -64,7 +66,20 @@
         set() {}
       }
     },
+    watch: {
+      isPopupVisible() {
+        this.popHeight = this.getTabContentHeight();
+      }
+    },
     methods: {
+      getTabContentHeight() {
+        const dom = document.querySelector('.tab-content');
+        if (dom) {
+          const rect = dom.getBoundingClientRect();
+          return rect.height;
+        }
+        return 200;
+      },
       getComp(cuid) {
         // 由于air-container不一定是本组件的直系chilren，需要深入遍历查找
         const findComp = (cuid, array) => {
@@ -107,9 +122,9 @@
     height: calc(100% - 90px);
     display: flex;
     flex-direction: column;
+    overflow: scroll;
 
     & > main {
-      height: 1px;
       flex: 1 1 auto;
       position: relative;
 
