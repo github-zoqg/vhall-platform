@@ -1476,7 +1476,7 @@
           receive_account_id: accountId
         };
         //todo 待联调，domain的可能暂时不可用
-        this.micServer
+        useMicServer()
           .hostAgreeApply(params)
           .then(res => {
             console.log(res);
@@ -1503,8 +1503,9 @@
             // EventBus.$emit('applyByHost');
           } else {
             //todo 待domain micServer完善这部分
-            this.micServer
+            useMicServer()
               .inviteMic({
+                room_id: this.roomId,
                 receive_account_id: accountId
               })
               .then(res => {
