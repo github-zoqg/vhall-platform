@@ -96,4 +96,5 @@ export default async function () {
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
+  window.micServer = micServer;
 }
