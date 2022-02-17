@@ -120,6 +120,7 @@
           <el-switch
             v-model="allowRaiseHand"
             :width="32"
+            :disabled="disabledSwitchHand"
             @change="onSwitchAllowRaiseHand"
             active-color="#fc5659"
           ></el-switch>
@@ -269,7 +270,9 @@
         // 举手列表定时器列表
         handsUpTimerList: {},
         // 上麦人员掉线处理计时器map
-        speakerLeaveIntervalMap: {}
+        speakerLeaveIntervalMap: {},
+        //切换举手状态,防连点
+        disabledSwitchHand: false
       };
     },
     beforeCreate() {
@@ -366,7 +369,9 @@
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
         this.roomId = interact.room_id;
-        this.allowRaiseHand = this.micServer.state.isAllowhandup;
+        this.allowRaiseHand = parseInt(this.roomBaseServer.state.interactToolStatus.is_handsup)
+          ? true
+          : false;
       },
       //统一初始化方法
       init() {
@@ -1363,14 +1368,17 @@
         };
 
         //todo 待micServer这边完善方法
-        this.micServer
+        this.disabledSwitchHand = true;
+        useMicServer()
           .setHandsUp(params)
           .then(res => {
-            console.log(res);
+            console.log('switch-mic-status', res);
             //todo 上报埋点
+            this.disabledSwitchHand = false;
             this.$message.success({ message: '设置成功' });
           })
           .catch(err => {
+            this.disabledSwitchHand = false;
             this.allowRaiseHand = false;
             console.log('举手状态变更失败', err);
           });

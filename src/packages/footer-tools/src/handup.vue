@@ -35,7 +35,7 @@
       },
       // 是否开启举手
       isAllowhandup() {
-        return this.$domainStore.state.micServer.isAllowhandup;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
       },
       // 是否已上麦
       isSpeakOn() {
@@ -52,7 +52,9 @@
       const { join_info } = useRoomBaseServer().state.watchInitData;
       // 申请上麦
       this.micServer.$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', join_info);
+        console.log('---申请上麦消息---1', join_info);
+        console.log(this.micServer);
+        useMicServer().userApply();
       });
       // 用户成功上麦
       this.micServer.$on('vrtc_connect_success', msg => {
@@ -64,7 +66,7 @@
       });
       // 用户成功下麦
       this.micServer.$on('vrtc_disconnect_success', msg => {
-        console.log('---申请上麦消息---', join_info);
+        console.log('---申请下麦消息---', join_info);
       });
       // 主持人同意上麦申请
       this.micServer.$on('user_apply_host_agree', msg => {});
@@ -116,7 +118,6 @@
           this.btnText = `等待(${this.waitTime}s)`;
           if (this.waitTime <= 0) {
             this.handText = '举手上麦';
-            window.clearInterval(this._waitInterval);
             // TODO: 分组
             let tip = '';
             if (this.isInGroup) {
@@ -125,8 +126,10 @@
               tip = '主持人拒绝了您的上麦请求';
             }
             this.$message.warning(tip);
+            this.btnText = '举手上麦';
             this.isApplyed = false;
             this.micServer.userCancelApply();
+            window.clearInterval(this._waitInterval);
           }
         }, 1000);
       }
