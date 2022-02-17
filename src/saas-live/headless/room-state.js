@@ -5,7 +5,8 @@ import {
   useInteractiveServer,
   useMicServer,
   useMediaCheckServer,
-  useGroupServer
+  useGroupServer,
+  useMediaSettingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -16,6 +17,7 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
+  const mediaSettingServer = useMediaSettingServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -47,6 +49,8 @@ export default async function () {
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
+
+  mediaSettingServer.init();
 
   roomBaseServer.getCommonConfig({
     tags: [
