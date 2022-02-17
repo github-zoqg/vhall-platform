@@ -370,15 +370,6 @@
         });
       },
       init() {
-        this.$nextTick(() => {
-          this.chatServerState.page = 0;
-          this.getHistoryMsg();
-        });
-
-        EventBus.$on('group_channel-change', msg => {
-          console.log(msg);
-          this.getHistoryMsg();
-        });
         setTimeout(() => {
           this.chatSDK = window.chatSDK;
           //todo 替换掉EventBus，拆为全局信令以及父子组件通信事件
@@ -435,24 +426,9 @@
           this.chatList.push(msg);
         });
       },
-      //处理分组讨论频道变更
-      handleChannelChange() {
-        this.chatServerState.page = 0;
-        chatServer.clearHistoryMsg();
-        this.getHistoryMsg();
-      },
       // 获取历史消息
       getHistoryMsg() {
-        const params = {
-          room_id: this.roomId,
-          pos: Number(this.chatServerState.page) * 50,
-          limit: 50
-        };
-
-        chatServer.getHistoryMsg(params, '发起端').then(result => {
-          this.pageConfig.page = Number(this.chatServerState.page) + 1;
-          return result;
-        });
+        chatServer.getHistoryMsg();
       },
       //todo domain负责 抽奖情况检查
       lotteryCheck() {},
