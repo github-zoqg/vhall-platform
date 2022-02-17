@@ -16,6 +16,7 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
+  const micServer = useMicServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -39,10 +40,14 @@ export default async function () {
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    micServer.init();
+  }
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  await interactiveServer.init();
+  // await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   await docServer.init();

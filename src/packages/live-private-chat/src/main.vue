@@ -13,14 +13,14 @@
             v-for="(group, index) in chatGroupList"
             :class="{ active: activeGroupIndex === index }"
             @click="selectGroup(index)"
-            :key="index"
+            :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
-            <span class="wrap__left-item__group-name">{{ group.group_name }}</span>
+            <span class="wrap__left-item__group-name">{{ group.chat_name }}</span>
             <i
               v-if="group.type == 1"
               class="el-icon-circle-close wrap__left-item__close-icon"
-              @click.stop="deleteChatGroup(index)"
+              @click.stop="delChatItem(index)"
             ></i>
           </li>
         </ul>
@@ -43,7 +43,7 @@
             <!--表情选择-->
             <emoji ref="emoji" class="wrap__right__emoji-box" @emojiInput="emojiInput"></emoji>
             <!--已上传的图片展示-->
-            <div class="wrap__right__img-upload-list" @click.stop="" v-if="showUploadImg">
+            <div class="wrap__right__img-upload-list" v-if="showUploadImg">
               <div
                 class="img-upload-item"
                 v-for="(imgUrl, keyIdx) in imgList"
@@ -123,7 +123,8 @@
   import emoji from '@/packages/chat/src/components/emoji';
   import chatList from './components/chat-list';
   import comUpload from '@/packages/app-shared/components/com-upload';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  const chatServer = useChatServer();
   export default {
     name: 'VmpLivePrivateChat',
     components: {
@@ -147,12 +148,9 @@
         //私聊群组列表 todo 假数据替换
         chatGroupList: [
           {
+            id: 0,
             type: 2,
-            group_name: '主办方群聊'
-          },
-          {
-            type: 1,
-            group_name: '测试用户私聊'
+            chat_name: '主办方群聊'
           }
         ],
         //当前选中的私聊群组的index
@@ -219,9 +217,25 @@
       selectGroup(index) {
         this.activeGroupIndex = index;
       },
-      //删除某个群组 todo
-      deleteChatGroup(index) {
-        console.log('删除群组', index);
+      //新建对话
+      addChatItem(chatItemInfo) {
+        const isExit = this.chatGroupList.some((chatItem, index) => {
+          if (chatItemInfo.id == chatItem.id) {
+            this.selectGroup(index);
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (!isExit) {
+          this.chatGroupList.push(chatItemInfo);
+          this.selectGroup(this.chatGroupList.length - 1);
+        }
+      },
+      //删除某个对话 todo
+      delChatItem(index) {
+        this.chatGroupList.splice(index, 1);
+        this.selectGroup(this.activeGroupIndex - 1);
       },
       //上传图片出错的回调
       handleUploadError(data) {
@@ -255,7 +269,7 @@
       handleUploadImg() {
         this.showUploadImg = !this.showUploadImg;
         //清空已经上传的图片
-        this.imgList = [];
+        this.imgList.length = 0;
       },
       //删除图片
       deleteImg(index) {
@@ -274,7 +288,24 @@
       },
       //发送消息
       sendMessage() {
-        console.log(this.roomBaseServer.state, '22222222222222');
+        //判断是否有输入内容，或者上传图片
+        if (
+          (!this.inputText || (this.inputText && !this.inputText.trim())) &&
+          !this.imgList.length
+        ) {
+          this.$message.warning('内容不能为空');
+        }
+        const curmsg = chatServer.createCurMsg();
+        //将文本消息加入消息体
+        curmsg.setText(this.inputText);
+        //将图片消息加入消息体
+        curmsg.setImge(this.imgList);
+        //发送消息
+        chatServer.sendMsg(curmsg);
+        //清除发送后的消息
+        chatServer.clearCurMsg();
+        this.imgList.length = 0;
+        this.inputText = '';
       }
     }
   };

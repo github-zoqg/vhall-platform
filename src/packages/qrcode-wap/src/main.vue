@@ -10,7 +10,7 @@
         <b class="split-line"></b>
       </p>
       <div class="hand-down">
-        <i class="vh-iconfont iconzhiwen"></i>
+        <i class="vh-saas-iconfont vh-saas-line-fingerprint"></i>
       </div>
       <i @click="closeOfficial" class="btn-close vh-iconfont vh-line-close"></i>
     </div>
@@ -67,7 +67,7 @@
     overflow: hidden;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
-    z-index: 2199;
+    z-index: 100;
     justify-content: center;
     align-items: center;
     .qrcode-content {

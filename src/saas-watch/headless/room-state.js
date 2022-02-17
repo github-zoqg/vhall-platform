@@ -17,6 +17,7 @@ export default async function () {
   const interactiveServer = useInteractiveServer();
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
+  const micServer = useMicServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -40,6 +41,7 @@ export default async function () {
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态
     mediaCheckServer.getMediaInputPermission();
+    micServer.init();
   }
 
   await roomBaseServer.getConfigList();
@@ -84,15 +86,11 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-  await interactiveServer.init();
+  // await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
-
-  const micServer = useMicServer();
-  console.log(micServer);
-  // micServer.init();
 
   // TODO 方便查询数据，后面会删除
   window.roomBaseServer = roomBaseServer;

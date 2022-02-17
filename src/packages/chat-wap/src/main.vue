@@ -143,14 +143,6 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     created() {
-      //添加聊天tab
-      window.$middleEventSdk?.event?.send(
-        boxEventOpitons(this.cuid, 'addTab', {
-          comp: 'comChatWap',
-          key: 'chatWap',
-          text: '聊天'
-        })
-      );
       this.initViewData();
       this.page = 0;
       if (!this.hideChatHistory) {
@@ -167,6 +159,7 @@
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        console.log(join_info);
         this.webinar = webinar;
         this.configList = configList;
         this.roomId = interact.room_id;
@@ -185,11 +178,9 @@
           setState('defaultAvatar', defaultAvatar);
         }
 
-        const { backData, imgUrls = [] } = await getHistoryMsg(data, 'h5');
-
-        if (backData.data.list.length > 0) {
+        const { chatList = [], imgUrls = [] } = await getHistoryMsg(data, 'h5');
+        if (chatList.length > 0) {
           this.imgUrls = imgUrls;
-          window.chatList = this.chatList;
         } else {
           this.$refs.scroll.finishPullDown();
           this.isPullingDown = false;

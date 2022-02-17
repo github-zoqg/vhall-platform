@@ -566,6 +566,9 @@
           .groupEnter(groupId)
           .then(() => {
             this.groupServer.state.panelShow = false;
+            console.log('[doc] 进入小组文档重置');
+            this.docServer.reset();
+            //调用该接口后台会发送房间消息，后续处理逻辑在收到房间消息后处理
           })
           .catch(ex => {
             console.error(ex);

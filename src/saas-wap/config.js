@@ -37,7 +37,8 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comWatchTimer', 'comSignUpForm']
+    // children: []
+    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {

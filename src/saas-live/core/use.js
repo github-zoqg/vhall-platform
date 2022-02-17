@@ -37,7 +37,7 @@ import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
 import VmpRebroadcast from '@/packages/rebroadcast';
 import VmpRecommend from '@/packages/recommend';
-import VmpLotteryLive from '@/packages/lottery';
+import VmpLotteryLive from '@/packages/lottery/live';
 
 // 全局注册组件
 export function initUse() {

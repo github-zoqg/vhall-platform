@@ -4,10 +4,10 @@
     lock-scroll
     round
     safe-area-inset-bottom
-    :close-on-click-overlay="false"
+    close-on-click-overlay
     teleport="body"
   >
-    <section class="css-login">
+    <section class="vh-login-wap">
       <div v-show="showLoginCard" key="login">
         <header>
           <div class="login-menu">
@@ -63,9 +63,6 @@
           <!-- 图片滑动 -->
           <li v-show="showMobileLogin || showCaptcha" class="yiyun-vhall">
             <div id="loginCaptcha"></div>
-            <!-- <p :class="['error-tip', { error: errorMsgShow.mobileKey }]">
-              {{ errorMsgShow.mobileKey ? $t('login.login_1023') : '' }}
-            </p> -->
           </li>
           <li :class="['sms', { li_check_error: errorMsgShow.smsCode }]" v-show="showMobileLogin">
             <div>
@@ -266,19 +263,19 @@
     beforeCreate() {
       this.userServer = useUserServer();
     },
-    mounted() {
-      this.initCaptcha();
-    },
+    async mounted() {},
     methods: {
       // 打开弹窗
-      open() {
-        this.dialogVisible = true;
+      async open() {
+        this.popupVisible = true;
+        await this.$nextTick();
+        this.reloadCaptha();
       },
       reloadCaptha() {
         if (this.captchaReady) {
           this.userServer.refreshNECaptha();
         } else {
-          this.userServer.initNECaptcha('#pwdLoginCaptcha');
+          this.initCaptcha();
         }
       },
       async checkPh() {
@@ -487,13 +484,30 @@
     }
   };
 </script>
+<style lang="less">
+  .vh-login-wap {
+    .yiyun-vhall {
+      .yidun_control,
+      .yidun_slide_indicator,
+      .yidun_tips {
+        height: 80px !important;
+        line-height: 80px !important;
+        .yidun_tips__text {
+          vertical-align: super;
+          line-height: 76px;
+        }
+      }
+      .yidun_slider__icon {
+        margin-top: -8px !important;
+      }
+    }
+  }
+</style>
 <style lang="less" scoped>
-  .css-login {
+  .vh-login-wap {
     width: 670px;
-    /* height: 674px; */
     background: #ffffff;
     border-radius: 32px;
-    /* overflow-y: auto; */
     padding: 80px 64px;
   }
   .length-max {
@@ -713,21 +727,6 @@
         }
       }
     }
-    // ::v-deep .yiyun-vhall {
-    //   .yidun_control,
-    //   .yidun_slide_indicator,
-    //   .yidun_tips {
-    //     height: 80px !important;
-    //     line-height: 80px !important;
-    //     .yidun_tips__text {
-    //       vertical-align: super;
-    //       line-height: 76px;
-    //     }
-    //   }
-    //   .yidun_slider__icon {
-    //     margin-top: -8px !important;
-    //   }
-    // }
   }
 
   .registerNow {
