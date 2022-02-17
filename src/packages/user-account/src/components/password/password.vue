@@ -2,13 +2,15 @@
   <!-- 设置密码 -->
   <div class="vmp-user-account-pwd">
     <el-dialog
-      :visible.sync="value"
+      :visible.sync="dialogShow"
       width="365px"
       :title="pwdData.type == 'add' ? $t('account.account_1017') : $t('account.account_1016')"
       :class="pwdData.type == 'edit' ? 'vmp-user-account-pwd pwd-edit' : 'vmp-user-account-pwd'"
       :close-on-click-modal="false"
       @opened="dialogOpened"
       append-to-body
+      @close="onDialogClose"
+      :destroy-on-close="true"
     >
       <div class="vmp-user-account-pwd-wrap">
         <el-form ref="pwdForm" :model="pwdForm" :rules="pwdFormRules" label-width="0">
@@ -135,6 +137,7 @@
 
 <script>
   import PwdInput from './pwd-input.vue';
+  import { useUserServer } from 'middle-domain';
   export default {
     components: {
       PwdInput
@@ -198,29 +201,34 @@
           old_pwd_focus: false,
           pwd_focus: false,
           new_pwd_focus: false
-        }
+        },
+        dialogShow: false,
+        useUserServer: {}
       };
     },
     watch: {
       value(val) {
+        this.dialogShow = val;
         this.$emit('input', val);
       }
     },
-    mounted() {},
+    created() {
+      this.useUserServer = useUserServer();
+    },
     methods: {
       // 修改密码
       editPwdHandler() {
         this.$refs.pwdForm.validate(async valid => {
           if (valid) {
-            // await this.getLoginKey()
+            console.log(this.useUserServer.state);
             const params = {
               old_password: this.pwdForm.old_pwd || '',
               password: this.pwdForm.password,
               confirm_password: this.pwdForm.new_password,
-              scene_id: !(this.accountVo && this.accountVo.has_password > 0) ? 9 : 10 // 1账户信息-修改密码  4忘记密码-邮箱方式找回 5忘记密码-短信方式找回 9设置密码（密码不存在情况）10账户信息-修改密码(不需要发送验证码)
+              scene_id: this.pwdData.type === 'add' ? 9 : 10 // 1账户信息-修改密码  4忘记密码-邮箱方式找回 5忘记密码-短信方式找回 9设置密码（密码不存在情况）10账户信息-修改密码(不需要发送验证码)
             };
             this.useUserServer
-              .resetPassword(this.$params(params))
+              .resetPassword(params)
               .then(res => {
                 if (res && res.code == 200) {
                   this.$message({
@@ -233,7 +241,7 @@
                   // 密码修改完成后，刷新页面
                   window.localStorage.clear();
                   window.sessionStorage.clear();
-                  this.setIsLogin(false); // 更新登录状态
+                  // this.setIsLogin(false); // 更新登录状态
                   this.$nextTick(() => {
                     window.location.reload();
                   });
@@ -276,7 +284,14 @@
         window.open(href, '_blank');
       },
       dialogOpened() {
-        this.$refs['pwdForm'].clearValidate();
+        // this.$refs['pwdForm'].clearValidate();
+        console.log('warn: 重置方法在关闭事件重写了');
+      },
+      // 关闭弹窗重置表单
+      onDialogClose() {
+        this.$refs['pwdForm'].resetFields();
+        this.dialogShow = false;
+        this.$emit('input', false);
       }
     }
   };

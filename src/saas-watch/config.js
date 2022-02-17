@@ -23,6 +23,7 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
+    // children: ['comGoodSaas']
     // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
@@ -30,16 +31,16 @@ export const serverConfig = {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
-  // layerBodyLeft: {
-  //   component: 'VmpContainer',
-  //   className: 'vmp-basic-left',
-  //   children: []
-  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
-  // },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
+    children: [
+      'comStreamList',
+      'comPcPlayer',
+      'comFooterTools',
+      'comNoticeColumn',
+      'comDocUne',
+      'comWatchAsideMenu'
+    ]
     // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
   layerBodyRight: {
@@ -52,15 +53,16 @@ export const serverConfig = {
   comAllDialog: {
     component: 'VmpAirContainer',
     children: [
+      'dlgDocList',
       'compRegLogin',
       'comOfficial',
       'comShare',
       'comWatchAuth',
-      'comSignUpForm',
+      // 'comSignUpForm',
       'comUserAccount',
       'comCash',
+      // 'comLottery'
       'comWatchTimer'
-      // 'comWatchNavMenu'
     ]
   },
 
@@ -71,7 +73,34 @@ export const serverConfig = {
     options: {
       keepAspectRatio: false,
       hasPager: false
+    },
+    // 打开对话框
+    emitOpenDocList: {
+      cuid: 'dlgDocList',
+      method: 'show'
     }
+  },
+  //文档列表对话框
+  dlgDocList: {
+    component: 'VmpDocDlglist',
+    emitDemonstrateDoc: [
+      {
+        cuid: 'comDocUne',
+        method: 'demonstrate',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+  // 分组直播侧边菜单
+  comWatchAsideMenu: {
+    component: 'VmpWatchAsideMenu',
+    handleClickDoc: [
+      {
+        cuid: ['comDocUne'],
+        method: 'switchTo',
+        args: ['$0']
+      }
+    ]
   },
   comStreamList: {
     component: 'VmpStreamList',
@@ -112,9 +141,20 @@ export const serverConfig = {
         method: 'openShareDialog'
       }
     ],
-  },
-  comOfficial: {
-    component: 'VmpOfficial'
+    emitOpenUserAccount: [
+      //弹出个人资料
+      {
+        cuid: 'comUserAccount',
+        method: 'openUserAccountDialog'
+      }
+    ],
+    emitOpenCash: [
+      //弹出个人资料
+      {
+        cuid: 'comCash',
+        method: 'openCashDialog'
+      }
+    ]
   },
   comAttention: {
     component: 'VmpAttention',
@@ -161,14 +201,13 @@ export const serverConfig = {
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
+    },
+    // 打开登陆弹窗
+    emitNeedLogin: {
+      cuid: ['compRegLogin'],
+      method: 'open'
     }
     // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
-  },
-  comPraise: {
-    component: 'VmpPraise'
-  },
-  comNotice: {
-    component: 'VmpNoticeList'
   },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'
@@ -219,5 +258,13 @@ export const serverConfig = {
       method: 'changeStatus',
       args: ['$0', '$1']
     }
+  },
+  //商品列表
+  comGoodSaas: {
+    component: 'VmpGoodList'
+  },
+  // 抽奖
+  comLottery: {
+    component: 'VmpLotteryWatch'
   }
 };

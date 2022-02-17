@@ -26,7 +26,8 @@
       return {
         btnText: '举手上麦',
         isApplyed: false, // 是否申请上麦
-        waitTime: 30 // 等待倒计时时间
+        waitTime: 30, // 等待倒计时时间
+        waitInterval: null
       };
     },
     computed: {
@@ -35,45 +36,51 @@
       },
       // 是否开启举手
       isAllowhandup() {
-        return this.$domainStore.state.micServer.isAllowhandup;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
       },
       // 是否已上麦
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
-    beforeCreate() {
-      this.micServer = useMicServer();
-    },
     created() {
+      if (this.waitInterval) {
+        clearInterval(this.waitInterval);
+      }
       const { join_info } = useRoomBaseServer().state.watchInitData;
       // 申请上麦
-      this.micServer.$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', join_info);
+      useMicServer().$on('vrtc_connect_apply', msg => {
+        console.log('---申请上麦消息---', join_info, msg);
       });
       // 用户成功上麦
-      this.micServer.$on('vrtc_connect_success', msg => {
+      useMicServer().$on('vrtc_connect_success', msg => {
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          clearInterval(this._waitInterval);
+          clearInterval(this.waitInterval);
           this.isApplyed = false;
           this.btnText = '举手上麦';
         }
       });
       // 用户成功下麦
-      this.micServer.$on('vrtc_disconnect_success', msg => {
-        console.log('---申请上麦消息---', join_info);
+      useMicServer().$on('vrtc_disconnect_success', msg => {
+        console.log('---申请下麦消息---', join_info, msg);
       });
       // 主持人同意上麦申请
-      this.micServer.$on('user_apply_host_agree', msg => {});
+      useMicServer().$on('user_apply_host_agree', msg => {
+        console.log(msg);
+      });
       // 主持人拒绝上麦申请
-      this.micServer.$on('user_apply_host_reject', msg => {
+      useMicServer().$on('user_apply_host_reject', msg => {
         // TODO:被拒绝的处理
+        console.log(msg);
       });
     },
     methods: {
       // 下麦
       userSpeakOff() {
-        this.micServer.userSpeakOff();
+        useMicServer().userSpeakOff();
       },
       // 举手按钮点击事件
       handleHandClick() {
@@ -85,35 +92,41 @@
       },
       // 申请上麦
       userApply() {
-        this.micServer.userApply().then(() => {
-          this.isApplyed = true;
-          this.waitTime = 30;
-          this.btnText = `等待(${this.waitTime}s)`;
-          this.startWaitInterval();
-        });
+        useMicServer()
+          .userApply()
+          .then(() => {
+            this.isApplyed = true;
+            this.waitTime = 30;
+            this.btnText = `等待(${this.waitTime}s)`;
+            this.startWaitInterval();
+          });
       },
       // 取消申请
       userCancelApply() {
-        this.micServer.userCancelApply().then(() => {
-          this.isApplyed = false;
-          clearInterval(this._waitInterval);
-          this.btnText = '举手上麦';
-          this.$message({
-            message: '您已取消申请上麦！',
-            showClose: true,
-            type: 'success',
-            customClass: 'zdy-info-box'
+        useMicServer()
+          .userCancelApply()
+          .then(() => {
+            this.isApplyed = false;
+            clearInterval(this.waitInterval);
+            this.btnText = '举手上麦';
+            this.$message({
+              message: '您已取消申请上麦！',
+              showClose: true,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
           });
-        });
       },
       // 等待倒计时
       startWaitInterval() {
-        this._waitInterval = setInterval(() => {
+        this.waitInterval = setInterval(() => {
           this.waitTime--;
           this.btnText = `等待(${this.waitTime}s)`;
           if (this.waitTime <= 0) {
-            this.handText = '举手上麦';
-            window.clearInterval(this._waitInterval);
+            window.clearInterval(this.waitInterval);
+            this.btnText = '举手上麦';
+            this.isApplyed = false;
+            useMicServer().userCancelApply();
             // TODO: 分组
             let tip = '';
             if (this.isInGroup) {
@@ -122,8 +135,6 @@
               tip = '主持人拒绝了您的上麦请求';
             }
             this.$message.warning(tip);
-            this.isApplyed = false;
-            this.micServer.userCancelApply();
           }
         }, 1000);
       }

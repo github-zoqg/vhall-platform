@@ -1,3 +1,9 @@
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // @mixin border-1px-direction($direction, $color: #e6e6e6, $borderRadius: 8PX) {
 //   position: relative;
 //   border-width: 0;
@@ -35,3 +41,89 @@
 //     box-sizing: border-box;
 //   }
 // }
+
+// 1px边框
+.border-left(@color, @opacity) {
+  content: '';
+  position: absolute;
+  border-left: 1px solid @color;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transform-origin: 0 0;
+  opacity: @opacity;
+}
+
+.border-bottom(@color, @opacity) {
+  content: '';
+  position: absolute;
+  width: 100%;
+  border-bottom: 1px solid @color;
+  left: 0;
+  bottom: 0;
+  transform-origin: 0 bottom;
+  opacity: @opacity;
+}
+
+.border-top(@color, @opacity) {
+  content: '';
+  position: absolute;
+  width: 100%;
+  border-bottom: 1px solid @color;
+  left: 0;
+  top: 0;
+  transform-origin: 0 bottom;
+  opacity: @opacity;
+}
+
+.border-right(@color, @opacity) {
+  content: '';
+  position: absolute;
+  width: 100%;
+  border-right: 1px solid @color;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  opacity: @opacity;
+}
+
+.mixin-border(@direction, @color: #d4d4d4, @opacity: 1) when (@direction = 'left') {
+  position: relative;
+  &::after {
+    .border-left(@color, @opacity);
+  }
+}
+
+.mixin-border(@direction, @color: #d4d4d4, @opacity: 1) when (@direction = 'bottom') {
+  position: relative;
+  &::after {
+    .border-bottom(@color, @opacity);
+  }
+}
+
+.mixin-border(@direction, @color: #d4d4d4, @opacity: 1) when (@direction = 'top') {
+  position: relative;
+  &::after {
+    .border-top(@color, @opacity);
+  }
+}
+
+.mixin-border(@direction, @color: #d4d4d4, @opacity: 1) when (@direction = 'right') {
+  position: relative;
+  &::after {
+    .border-right(@color, @opacity);
+  }
+  .border-direction-media();
+}
+
+.border-direction-media() {
+  @media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 3dppx) {
+    height: 300%;
+    width: 300%;
+  }
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    height: 200%;
+    width: 200%;
+  }
+}

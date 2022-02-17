@@ -1,0 +1,119 @@
+<template>
+  <div class="tools-box">
+    <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
+      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }">
+        <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
+        <GiftCard
+          ref="gifts"
+          :isEmbed="localRoomInfo.isEmbed"
+          :joinInfoInGift="joinInfoInGift"
+          :roomId="localRoomInfo.room_id"
+          :localRoomInfo="localRoomInfo"
+        />
+      </div>
+      <!-- 打赏 -->
+      <div v-if="!localRoomInfo.isEmbed" auth="{ 'ui.hide_reward': 0 }">
+        <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
+        <RewardCard ref="reward" :webinarData="webinarData" :localRoomInfo="localRoomInfo" />
+      </div>
+      <!-- 邀请卡 -->
+      <a
+        v-if="showInviteCard && !localRoomInfo.isEmbed"
+        target="_blank"
+        :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+      >
+        <i class="vh-saas-iconfont iconyaoqingka"></i>
+      </a>
+      <!-- 点赞 -->
+      <div auth="{ 'ui.watch_hide_like': 0 }">
+        <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
+        <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import GiftCard from './component/GiftCard.vue';
+  import RewardCard from './component/reward.vue';
+  import Parise from './component/parise.vue';
+  export default {
+    name: 'VmpInteractToolsWap',
+    components: { GiftCard, RewardCard, Parise },
+    data() {
+      let { configList } = useRoomBaseServer().state;
+      let { groupInitData } = useGroupServer().state;
+      let roomBaseState = useRoomBaseServer().state;
+      let localRoomInfo = {
+        authId: roomBaseState.watchInitData.join_info.third_party_user_id,
+        insertChannelId: roomBaseState.watchInitData.webinar.rebroadcast
+          ? roomBaseState.watchInitData.webinar.rebroadcast.channel_id
+          : '',
+        isEmbed: /embed/.test(this.$route.path),
+        isLogin: sessionStorage.getItem('isLogin'),
+        isNeedLogin: !sessionStorage.getItem('isLogin'),
+        isShowGift: true,
+        isShowOnselfMdess: false,
+        showLike: true,
+        showShare: true,
+        roomId: roomBaseState.watchInitData.interact.room_id,
+        saasJoinId: roomBaseState.watchInitData.join_info.join_id,
+        staticSrc: roomBaseState.watchInitData.urls.static_url,
+        type: roomBaseState.watchInitData.webinar.type,
+        uploadSrc: roomBaseState.watchInitData.urls.upload_url,
+        webSrc: roomBaseState.watchInitData.urls.web_url,
+        webinarId: '723145973'
+      };
+      let webinarData = roomBaseState.watchInitData.webinar;
+      return {
+        roomBaseState,
+        localRoomInfo,
+        webinarData,
+        configList,
+        groupInitData,
+        joinInfoInGift: {},
+        showInviteCard: false,
+        location:
+          window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
+        qwe: 1
+      };
+    },
+    mounted() {
+      this.joinInfoInGift = {
+        avatar: this.roomBaseState.watchInitData.join_info.avatar,
+        nickname: this.roomBaseState.watchInitData.join_info.nickname,
+        hideChatHistory: this.configList['ui.hide_chat_history'] == 1
+      };
+      console.log(this.roomBaseState, 'roomBaseState');
+    },
+    methods: {
+      opneGifts() {
+        this.$refs.gifts.showgift();
+      },
+      openReward() {
+        console.log('showReward');
+        this.$refs.reward.showReward();
+      }
+    }
+  };
+</script>
+
+<style lang="less" scoped>
+  .tools-box {
+    .icon-wrapper {
+      display: flex;
+      div {
+        font-size: 43px;
+        margin-right: 36px;
+        &:last-child {
+          margin-right: 0px;
+        }
+      }
+    }
+    .vh-saas-iconfont {
+      font-size: 47px;
+      color: #666666;
+    }
+  }
+</style>

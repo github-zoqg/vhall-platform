@@ -40,7 +40,7 @@
 
     <footer class="vh-media-check-footer">
       <div class="vh-check-tip audio-preview">
-        <span class="iconfont iconyangshengqi_icon icon-tip"></span>
+        <span class="vh-iconfont vh-line-voice icon-tip"></span>
         <span>点击播放键，您能听到声音么？</span>
       </div>
       <div class="button-container button-container__audio">

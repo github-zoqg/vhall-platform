@@ -121,7 +121,8 @@ const sharedConfig = {
       moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
-      vant: 'vant'
+      vant: 'vant',
+      lodash: '_'
     },
     // 插件
     plugins: getPlugins()
@@ -179,7 +180,10 @@ const sharedConfig = {
     // 配置全局less变量
     'style-resources-loader': {
       preProcessor: 'less',
-      patterns: [resolve(`/src/${argv.project}/assets/styles/variables.less`)]
+      patterns: [
+        resolve(`/src/${argv.project}/assets/styles/variables.less`),
+        resolve(`/src/${argv.project}/assets/styles/mixins.less`)
+      ]
     }
   },
   // 设置是否在开发环境下每次保存代码时都启用eslint验证

@@ -14,7 +14,7 @@
         </div>
       </div>
       <span class="close ps" @click="onClose">
-        <i class="iconfont iconguanbi"></i>
+        <i class="vh-iconfont vh-line-close"></i>
       </span>
       <div align="center">
         <div class="margin10 pr mt10 font_zdy">
@@ -45,11 +45,11 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { useRoomBaseServer, useTimerServer } from 'middle-domain';
   export default {
     name: 'VmpWapTimer',
     directives: {
-      drag(van, bindings) {
+      drag(van) {
         van.ontouchstart = function (e) {
           let touch;
           if (e.changedTouches) {
@@ -132,7 +132,7 @@
           statusStr = this.$t('interact_tools.interact_tools_1056');
         } else if (this.status == 'zanting') {
           // '已暂停';
-          statusStr = this.$t('webinar.webinar_1007');
+          statusStr = this.$t('interact_tools.interact_tools_1055');
         } else {
           // '进行中...';
           statusStr = this.$t('interact_tools.interact_tools_1057');
@@ -141,45 +141,23 @@
       }
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.timerServer = useTimerServer();
     },
     mounted() {
       console.log(this.roomBaseServer.state);
-      this.timerInfo = this.roomBaseServer.state?.interactToolStatus?.timer;
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器开始
-          case 'timer_start':
-            this.timer_start(temp);
-            break;
-          // 计时器结束
-          case 'timer_end':
-            this.timer_end(temp);
-            break;
-          // 计时器暂停
-          case 'timer_pause':
-            this.timer_pause(temp);
-            break;
-          // 计时器重置
-          case 'timer_reset':
-            this.timer_reset(temp);
-            break;
-          // 计时器继续
-          case 'timer_resume':
-            this.timer_resume(temp);
-            break;
-          default:
-            break;
-        }
-      });
+      this.timerInfo = this.roomBaseServer.state?.timerInfo;
+      this.timerServer.listenMsg();
+      console.log(this.timerServer, 'this.timerServer');
+      // 计时器开始
+      this.timerServer.$on('timer_start', temp => this.timer_start(temp));
+      // 计时器结束
+      this.timerServer.$on('timer_end', temp => this.timer_end(temp));
+      // 计时器暂停
+      this.timerServer.$on('timer_pause', temp => this.timer_pause(temp));
+      // 计时器重置
+      this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
+      // 计时器继续
+      this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
     },
     methods: {
       // 计时器开始
@@ -192,11 +170,10 @@
         if (e.data.status != 4) {
           this.timerFun(this.shijian);
         }
-        this.handleTimer();
         // 打开计时器组件
-        this.status = 'kaishi';
-        this.timerVisible = true;
         if (this.is_all_show == 1) {
+          this.status = 'kaishi';
+          this.handleTimer();
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
           );
@@ -233,12 +210,7 @@
       },
       init() {
         if (JSON.stringify(this.timerInfo) != '{}') {
-          const resData = this.timerInfo || {
-            duration: '60',
-            is_all_show: '1',
-            is_timeout: '1',
-            remain_time: '56'
-          };
+          const resData = this.timerInfo;
           this.shijian = resData.remain_time;
           this.beifenshijian = resData.duration;
           this.is_timeout = resData.is_timeout;

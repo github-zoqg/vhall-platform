@@ -18,45 +18,33 @@ export const serverConfig = {
     children: ['comHeaderWatch']
   },
   // 中间主区域容器
-  layerBody: {
-    component: 'VmpContainer',
-    className: 'vmp-basic-bd',
-    children: ['layerPlayer', 'layerBodyCenter']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
-  },
-  // 底部主区域容器
-  layerFooter: {
-    component: 'VmpFooter',
-    className: 'vmp-footer'
-  },
-  // layerBodyLeft: {
+  // layerBody: {
   //   component: 'VmpContainer',
-  //   className: 'vmp-basic-left',
-  //   children: []
-  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+  //   className: 'vmp-basic-bd',
+  //   children: ['layerPlayer', 'layerBodyCenter']
   // },
   layerPlayer: {
     component: 'VmpContainer',
-    className: 'player',
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comPcPlayer']
+    className: 'vmp-basic-bd',
+    children: ['comWapPlayer']
   },
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
-    // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn', 'comDocUne']
-    children: ['comContainerTop', 'comContainerRight', 'comNoticeWap']
-  },
-  layerBodyRight: {
-    component: 'VmpBasicRightContainer',
-    children: ['comChat']
+    children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   /*** 布局定义end */
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: [
+      'compRegLoginWap',
+      'comOfficial',
+      'comShare',
+      'comWatchTimer',
+      'comSignUpForm',
+      'comSignWap'
+    ]
   },
   // 顶部
   comHeaderWatch: {
@@ -65,7 +53,7 @@ export const serverConfig = {
     emitClickLogin: [
       //登录弹窗
       {
-        cuid: 'compRegLogin',
+        cuid: 'compRegLoginWap',
         method: 'open'
       }
     ],
@@ -75,14 +63,10 @@ export const serverConfig = {
         cuid: 'comOfficial',
         method: 'openOfficial'
       }
-    ],
-    emitOpenShare: [
-      //弹出分享
-      {
-        cuid: 'comShare',
-        method: 'openShareDialog'
-      }
     ]
+  },
+  comWapPlayer: {
+    component: 'VmpWapPlayer'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
@@ -98,16 +82,90 @@ export const serverConfig = {
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
+    children: ['comSignWap'],
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
+    },
+    emitOpenSign: {
+      cuid: ['comSignWap'],
+      method: 'openSign'
     }
   },
+  // notice横幅
   comNoticeWap: {
     component: 'VmpNoticeWap'
   },
   // 登录弹窗
   compRegLoginWap: {
-    component: 'VmpRegLoginWap'
+    // component: 'VmpRegLoginWap'
+  },
+  comTabMenuWap: {
+    component: 'VmpTabMenuWap',
+    children: ['comChatWap', 'comIntroWap', 'comRecommendWap'],
+    options: {}
+  },
+  comIntroWap: {
+    component: 'VmpIntroWap',
+    children: ['comInteractToolsWap'],
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ]
+  },
+  // 底部互动工具box
+  comInteractToolsWap: {
+    component: 'VmpInteractToolsWap',
+    emitNeedLogin: {
+      cuid: ['compRegLoginWap'],
+      method: 'open'
+    }
+  },
+  // 广告（推荐）
+  comRecommendWap: {
+    component: 'VmpRecommendWap',
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ]
+  },
+  //商品列表
+  comGoodSaasWap: {
+    component: 'VmpGoodListWap'
+  },
+  comCustomMenuWap: {
+    component: 'VmpCustomMenuWap'
+  },
+  // 二维码弹框
+  comOfficial: {
+    component: 'VmpWapQrCode'
+  },
+  //wap端聊天
+  comChatWap: {
+    component: 'VmpChatWap',
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ],
+    children: [],
+    options: {}
+  },
+  // wap互动工具-签到
+  comSignWap: {
+    component: 'VmpSignWap',
+    emitOpenSignIcon: {
+      cuid: ['comContainerRight'],
+      method: 'changeStatus',
+      args: ['$0', '$1']
+    }
   }
 };

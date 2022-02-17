@@ -11,12 +11,16 @@
         <div class="vmp-user-account-wrap-item">
           <label>{{ $t('account.account_1002') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ accountVo && accountVo.phone ? accountVo.phone : $t('account.account_1003') }}
+            {{
+              this.useUserServer.state.userInfo
+                ? this.useUserServer.state.userInfo.phone
+                : $t('account.account_1003')
+            }}
           </div>
           <div>
             <el-button type="text" @click="openPhoneDialog">
               {{
-                accountVo && accountVo.phone
+                this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.phone
                   ? $t('account.account_1004')
                   : $t('account.account_1005')
               }}
@@ -27,7 +31,11 @@
           <label>{{ $t('account.account_1006') }}</label>
           <div class="vmp-user-account-wrap-item__center nick-item">
             <span v-if="!isNickNameEdit">
-              {{ (accountVo && accountVo.nick_name ? accountVo.nick_name : '') | splitLenStr(6) }}
+              {{
+                (this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.nick_name
+                  ? this.useUserServer.state.userInfo.nick_name
+                  : '') | splitLenStr(6)
+              }}
             </span>
             <el-input
               v-if="isNickNameEdit"
@@ -52,9 +60,9 @@
           <label>{{ $t('account.account_1009') }}</label>
           <div class="vmp-user-account-wrap-item__center upload-zdy">
             <Upload
-              v-model="avatar"
+              v-model="useUserServer.state.userInfo.avatar"
               class="upload__avatar"
-              :domain_url="domain_url"
+              :domain_url="useUserServer.state.userInfo.avatar"
               :saveData="{
                 path: 'users/face-imgs',
                 type: 'image'
@@ -79,7 +87,7 @@
           <label>{{ $t('account.account_1013') }}</label>
           <div class="vmp-user-account-wrap-item__center">
             {{
-              accountVo && accountVo.has_password > 0
+              useUserServer.state.userInfo && useUserServer.state.userInfo.has_password > 0
                 ? $t('account.account_1014')
                 : $t('account.account_1015')
             }}
@@ -87,7 +95,7 @@
           <div>
             <el-button type="text" @click="openPwdHandler">
               {{
-                accountVo && accountVo.has_password > 0
+                useUserServer.state.userInfo && useUserServer.state.userInfo.has_password > 0
                   ? $t('account.account_1016')
                   : $t('account.account_1017')
               }}
@@ -97,23 +105,29 @@
         <div class="vmp-user-account-wrap-item bind-item">
           <label>{{ $t('account.account_1018') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ (QQ && QQ.nick_name ? QQ.nick_name : '') | splitLenStr(6) }}
+            {{ useUserServer.state.thirdInfo.QQNickName | splitLenStr(6) }}
             {{
-              QQ && QQ.nick_name ? `（${$t('account.account_1019')}）` : $t('account.account_1020')
+              useUserServer.state.thirdInfo.QQNickName
+                ? `（${$t('account.account_1019')}）`
+                : $t('account.account_1020')
             }}
           </div>
           <div>
             <el-button type="text" @click="editQQHandler">
-              {{ QQ && QQ.nick_name ? $t('account.account_1021') : $t('account.account_1022') }}
+              {{
+                useUserServer.state.thirdInfo.QQbind
+                  ? $t('account.account_1021')
+                  : $t('account.account_1022')
+              }}
             </el-button>
           </div>
         </div>
         <div class="vmp-user-account-wrap-item bind-item">
           <label>{{ $t('account.account_1023') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ (Weixin && Weixin.nick_name ? Weixin.nick_name : '') | splitLenStr(6) }}
+            {{ useUserServer.state.thirdInfo.WeixinNickName | splitLenStr(6) }}
             {{
-              Weixin && Weixin.nick_name
+              useUserServer.state.thirdInfo.WeixinNickName
                 ? `（${$t('account.account_1019')}）`
                 : $t('account.account_1020')
             }}
@@ -121,7 +135,9 @@
           <div>
             <el-button type="text" @click="editWXHandler">
               {{
-                Weixin && Weixin.nick_name ? $t('account.account_1021') : $t('account.account_1022')
+                useUserServer.state.thirdInfo.WeixinBind
+                  ? $t('account.account_1021')
+                  : $t('account.account_1022')
               }}
             </el-button>
           </div>
@@ -129,24 +145,27 @@
       </div>
 
       <!-- 设置手机号 -->
-      <Phone v-model="phoneDialog.visible"></Phone>
+      <!-- <Phone v-model="phoneDialog.visible" :phoneDatas="phoneData"></Phone> -->
+      <Phones v-model="phoneData" />
 
       <!-- 设置密码 -->
-      <Password v-model="pwdDialog.visible"></Password>
+      <Password v-model="pwdDialog.visible" :pwdData="pwdData"></Password>
     </el-dialog>
   </div>
 </template>
 <script>
   // import { mapState, mapMutations } from 'vuex';
   import Upload from './components/upload/upload.vue';
-  import Phone from './components/phone/phone.vue';
+  // import Phone from './components/phone/phone.vue';
+  import Phones from './components/phones/index.vue';
   import Password from './components/password/password.vue';
   import { useUserServer } from 'middle-domain';
   export default {
     name: 'VmpUserAccount',
     components: {
       Upload,
-      Phone,
+      // Phone,
+      Phones,
       Password
     },
     data() {
@@ -179,8 +198,15 @@
         pwdDialog: {
           visible: false,
           type: 'add'
-        }
+        },
         /** *********设置密码相关-end***************/
+
+        phoneData: {
+          dialogShow: false,
+          type: 'add',
+          step: 1,
+          phone: ''
+        }
       };
     },
     created() {
@@ -188,18 +214,61 @@
     },
     computed: {
       // ...mapState('watchBase', ['toolsCount', 'languages'])
+      // phoneData() {
+      //   return {
+      //     type: this.useUserServer.state.userInfo.phone ? 'edit': 'add',
+      //     step: 1,
+      //     phone: this.useUserServer.state.userInfo.phone
+      //   }
+      // },
+      pwdData() {
+        return {
+          type:
+            this.useUserServer.state.userInfo &&
+            this.useUserServer.state.userInfo.has_password === 1
+              ? 'edit'
+              : 'add'
+        };
+      }
     },
     methods: {
       // ...mapMutations('watchBase', ['setLoginToken', 'setUserInfo', 'setIsLogin']),
+      // 上传、替换头像
       handleUploadSuccess(res, file) {
-        console.log(res, file);
         if (res.data) {
           const domain_url = res.data.domain_url || '';
           const file_url = res.data.file_url || '';
           this.avatar = file_url;
           this.domain_url = domain_url;
           // 发送保存头像接口
-          this.changeAvatarSend(this.$parseURL(this.avatar).path);
+          this.useUserServer
+            .changeAvatarSend({ avatar: file_url })
+            .then(res => {
+              if (res && res.code === 200) {
+                this.$message({
+                  message: this.$t('account.account_1047'),
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+                this.useUserServer.getUserInfo({ scene_id: 2 });
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            })
+            .catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
         }
       },
       beforeUploadHandler(file) {
@@ -243,27 +312,21 @@
       uploadPreview(file) {
         console.log('uploadPreview', file);
       },
+      // 删除头像
       delAvatarHandler() {
         this.avatar = '';
         this.domain_url = '';
-        this.changeAvatarSend('');
-      },
-      changeAvatarSend(avatar) {
-        // 发送保存头像接口
-        this.$vhallapi.nav
-          .editUser({
-            avatar: avatar
-          })
+        this.useUserServer
+          .changeAvatarSend({ avatar: '' })
           .then(res => {
-            if (res && res.code == 200) {
+            if (res && res.code === 200) {
               this.$message({
                 message: this.$t('account.account_1047'),
                 showClose: true,
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
-              // 用户信息接口更新
-              this.initComp(1);
+              this.useUserServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
                 message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
@@ -282,9 +345,7 @@
             });
           });
       },
-      initComp(type) {
-        this.getUserInfo(type);
-      },
+
       getUserInfo(type) {
         this.$vhallapi.nav
           .getInfo({
@@ -332,39 +393,17 @@
       },
       // 设置手机号 or 修改手机号
       openPhoneDialog() {
-        if (this.accountVo && this.accountVo.phone) {
-          // 当前为修改手机号
-          this.phoneDialog.visible = true;
-          this.phoneDialog.type = 'edit';
-          this.phoneDialog.step = 1;
-          // 若是修改手机号，表单初始值设定
-          this.phoneDialog.phone = this.accountVo.phone;
-
-          // 若是修改手机号，表单初始值设定
-          // this.checkForm.phone = this.accountVo.phone;
-          // 初始化网易云盾-图片验证码
-          // const tempTimer = setTimeout(function() {
-          //   clearTimeout(tempTimer);
-          //   that.$nextTick(() => {
-          //     that.callCaptcha('checkForm');
-          //   });
-          // }, 300);
-        } else {
-          // 当前为设置手机号
-          this.phoneDialog.visible = true;
-          this.phoneDialog.type = 'add';
-          this.phoneDialog.step = 1;
-          this.phoneDialog.phone = '';
-          // 初始化网易云盾-图片验证码
-          // this.$nextTick(() => {
-          //   this.callCaptcha('setPhoneForm');
-          // });
-        }
+        this.phoneDialog.visible = true;
+        this.phoneData.dialogShow = true;
+        // this.phoneData.type = this.useUserServer.state.userInfo.phone ? 'edit': 'add';
+        this.phoneData.type = 'edit';
+        this.phoneData.phone = this.useUserServer.state.userInfo.phone;
+        this.phoneData.step = 1;
       },
       // 切换昵称为 可修改状态
       changeNickEditStatus() {
         this.isNickNameEdit = true;
-        this.nickName = this.accountVo.nick_name;
+        this.nickName = this.useUserServer.state.userInfo.nick_name;
       },
       // 设置昵称 or 修改昵称
       editNickHandler() {
@@ -375,10 +414,8 @@
             this.nickError = this.$t('account.account_1056');
           } else {
             this.nickError = '';
-            this.$vhallapi.nav
-              .editUser({
-                nick_name: this.nickName
-              })
+            this.useUserServer
+              .editUserNickName({ nick_name: this.nickName })
               .then(res => {
                 if (res && res.code == 200) {
                   this.$message({
@@ -390,7 +427,7 @@
                   // 触发保存接口
                   this.isNickNameEdit = false;
                   // 用户信息接口更新
-                  this.initComp(2);
+                  this.useUserServer.getUserInfo({ scene_id: 2 });
                 } else {
                   this.$message({
                     message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
@@ -413,19 +450,11 @@
       },
       // 设置密码 or 修改密码
       openPwdHandler() {
-        if (this.accountVo && this.accountVo.has_password > 0) {
-          // 当前为修改密码
-          this.pwdDialog.visible = true;
-          this.pwdDialog.type = 'edit';
-        } else {
-          // 当前为设置密码
-          this.pwdDialog.visible = true;
-          this.pwdDialog.type = 'add';
-        }
+        this.pwdDialog.visible = true;
       },
       // QQ绑定 or QQ解绑
       editQQHandler() {
-        if (this.QQ && this.QQ.nick_name) {
+        if (this.useUserServer.state.thirdInfo.QQBind) {
           // 解绑
           this.$confirm(this.$t('account.account_1060'), this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -440,21 +469,23 @@
             })
             .catch(() => {});
         } else {
+          console.log(this.$route);
           // 绑定
-          this.$VhallStorage.set('tag', 'bindQQ', 'local');
+          // this.$VhallStorage.set('tag', 'bindQQ', 'local');
+          localStorage.setItem('vhsaas_tag', 'bindQQ');
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
+          console.log(jumpUrlPath);
           window.open(
             `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
-              this.$VhallStorage.get('goHref', 'local')
+              jumpUrlPath
             )}`,
             '_blank'
           );
         }
       },
       unBindSend(type) {
-        this.$vhallapi.nav
-          .unBindInfo({
-            type: type
-          })
+        this.useUserServer
+          .thirdUnbind({ type })
           .then(res => {
             if (res && res.code == 200) {
               this.$message({
@@ -464,8 +495,7 @@
                 customClass: 'zdy-info-box'
               });
               // 解绑成功后，刷新页面
-              // window.location.reload()
-              this.initComp();
+              this.useUserServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
                 message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
@@ -473,7 +503,7 @@
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
-              this.initComp();
+              this.useUserServer.getUserInfo({ scene_id: 2 });
             }
           })
           .catch(res => {
@@ -488,7 +518,7 @@
       },
       // 微信绑定 or 微信解绑
       editWXHandler() {
-        if (this.Weixin && this.Weixin.nick_name) {
+        if (this.useUserServer.state.thirdInfo.WeixinBind) {
           // 解绑
           this.$confirm(this.$t('account.account_1066'), this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -503,15 +533,23 @@
             .catch(() => {});
         } else {
           // 绑定
-          this.$VhallStorage.set('tag', 'bindWx', 'local');
+          // this.$VhallStorage.set('tag', 'bindWx', 'local');
+          localStorage.setItem('vhsaas_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           // 前端回传地址
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.il_id}`;
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
           window.open(
             `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );
           // window.open(`${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(this.$VhallStorage.get('goHref', 'local'))}`, '_blank');
         }
+      },
+      // 打开个人资料弹出框
+      openUserAccountDialog() {
+        this.dialogVisible = true;
+        this.isNickNameEdit = false;
+        this.nickError = '';
+        this.useUserServer.getUserInfo({ scene_id: 2 });
       }
     },
     filters: {
@@ -523,6 +561,9 @@
 </script>
 <style lang="less">
   .vmp-user-account {
+    .el-dialog__body {
+      padding-bottom: 0;
+    }
     &-wrap {
       &-item {
         display: flex;

@@ -8,7 +8,7 @@
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
       ref="docToolbar"
-      v-show="!isInGroup && (displayMode === 'normal' || displayMode === 'fullscreen')"
+      v-show="hasDocPermission && (displayMode === 'normal' || displayMode === 'fullscreen')"
     ></VmpDocToolbar>
 
     <!-- 文档白板内容区 -->
@@ -30,7 +30,8 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <i class="iconfont iconzanwuwendang"></i>
-          <span>暂未分享任何文档</span>
+          <span v-if="hasDocPermission">暂未分享任何文档</span>
+          <span v-else>主讲人正在准备文档，请稍等...</span>
         </div>
       </div>
 
@@ -151,7 +152,7 @@
         return this.docServer.state.pageNum;
       },
       isInGroup() {
-        console.log('[doc] isInGroup', this.groupServer.state.groupInitData?.isInGroup);
+        // 在小组中
         return !!this.groupServer.state.groupInitData?.isInGroup;
       },
       // 显示文档时 && (普通模式，或 观看端全屏模式下);
@@ -170,8 +171,13 @@
         // 主持端始终可见，观看端
         return (
           this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus)
+          (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus) ||
+          this.groupServer.state.groupInitData.join_role == 20
         );
+      },
+      // 是否文档演示权限
+      hasDocPermission() {
+        return this.docServer.state.hasDocPermission;
       }
     },
     watch: {
@@ -186,6 +192,11 @@
           // 恢复上一次的文档数据;
           this.recoverLastDocs();
         }
+      },
+      ['roomBaseServer.state.miniElement'](newval) {
+        console.log('-[doc]---大小屏变更', newval); // newval 取值 doc, stream-list
+        const mode = newval === 'doc' ? 'small' : 'normal';
+        this.setDisplayMode(mode);
       }
     },
     beforeCreate() {
@@ -292,6 +303,14 @@
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
+          }
+        });
+
+        // 开启分组讨论
+        this.groupServer.$on('dispatch_group_switch_start', () => {
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            // this.resetMenus();
+            // this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
 

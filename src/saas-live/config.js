@@ -68,7 +68,7 @@ export const serverConfig = {
 
   comTabContent: {
     component: 'VmpTabContainer',
-    children: ['comChat', 'comNotice', 'comMemberList', 'comCustomMenu']
+    children: ['comChat', 'comNotice', 'comMemberList', 'comRecommend', 'comCustomMenu']
   },
 
   /*** 所有弹窗集合 */
@@ -84,6 +84,7 @@ export const serverConfig = {
       'comInsertVideo',
       'liveTimerSet',
       'liveTimer'
+      // 'comRebroadcast'
     ]
   },
 
@@ -117,7 +118,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPushAndSetBroadCast'
+        method: 'startPush'
       }
     ],
     emitClickEndLive: [
@@ -148,7 +149,8 @@ export const serverConfig = {
       'comInteractMenu',
       'comGroupMenu',
       'comShareMenu',
-      'comExitGroupMenu'
+      'comExitGroupMenu',
+      'comLottery'
     ]
   },
   // 语言选择组件
@@ -247,6 +249,12 @@ export const serverConfig = {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
       }
+    ],
+    emitOpenLottery: [
+      {
+        cuid: ['comLottery'],
+        method: 'open'
+      }
     ]
   },
   // 互动工具-计时器设置
@@ -260,6 +268,13 @@ export const serverConfig = {
       {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
+      }
+    ],
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
       }
     ]
   },
@@ -500,5 +515,22 @@ export const serverConfig = {
         args: false
       }
     ]
+  },
+  // 转播
+  comRebroadcast: {
+    component: 'VmpRebroadcast'
+  },
+  comRecommend: {
+    component: 'VmpRecommend',
+    addTab: [
+      {
+        cuid: ['comTabMenu'],
+        method: 'addItemByIndex',
+        args: ['$0', '$1']
+      }
+    ]
+  },
+  comLottery: {
+    component: 'VmpLotteryLive'
   }
 };

@@ -26,9 +26,9 @@
         :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic iconfont"
+        class="vmp-stream-local__bootom-mic vh-iconfont"
         :class="
-          localStream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+          localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
       ></span>
     </section>
@@ -44,23 +44,23 @@
             @click="handleClickMuteDevice('video')"
             :class="
               localStream.videoMuted
-                ? 'iconfont iconicon_shexiangtouguanbi'
-                : 'iconfont iconicon_shexiangtoukaiqi'
+                ? 'vh-iconfont vh-line-turn-off-video-camera'
+                : 'vh-iconfont vh-line-video-camera'
             "
           ></span>
         </el-tooltip>
         <el-tooltip :content="localStream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
           <span
-            class="vmp-stream-local__shadow-icon iconfont"
+            class="vmp-stream-local__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              localStream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+              localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
             "
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="top">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="joinInfo.role_name != 1 && role != 20"
           ></span>
@@ -72,34 +72,44 @@
         </span>
         <el-tooltip content="切换" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_qiehuan"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
             v-if="!isFullScreen"
             @click="exchange"
           ></span>
         </el-tooltip>
         <el-tooltip content="全屏" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont"
-            :class="{ iconicon_quanping: !isFullScreen, iconicon_quxiaoquanping: isFullScreen }"
+            class="vmp-stream-local__shadow-icon vh-iconfont"
+            :class="{
+              'vh-line-amplification': !isFullScreen,
+              'vh-line-narrow': isFullScreen
+            }"
             @click="fullScreen"
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="joinInfo.role_name != 1"
             @click="speakOff"
           ></span>
         </el-tooltip>
       </p>
     </section>
+    <ImgStream ref="imgPushStream"></ImgStream>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useRoomBaseServer,
+    usePlayerServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import ImgStream from './components/img-stream/index.vue';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -110,6 +120,9 @@
         networkStatus: 2,
         audioLevel: 1
       };
+    },
+    components: {
+      ImgStream
     },
     computed: {
       miniElement() {
@@ -123,7 +136,7 @@
         return this.$domainStore.state.interactiveServer.localStream;
       },
       mainScreen() {
-        return this.$domainStore.state.interactiveServer.mainScreen;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -144,17 +157,25 @@
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
+      this.playerServer = usePlayerServer();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数');
-      // 主持人同意上麦
-      this.micServer.$on('vrtc_connect_agree', async () => {
-        // 调上麦接口
-        const isSuccessSpeakOn = await this.userSpeakOn();
-        if (isSuccessSpeakOn) {
-          // 如果成功，销毁播放器，初始化互动，上麦
 
-          // 如果上麦成功开始推流
+      if (this.micServer.state.isSpeakOn) {
+        this.startPush();
+      }
+
+      // 上麦成功
+      this.micServer.$on('vrtc_connect_success', async msg => {
+        if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
+          // 如果成功，销毁播放器
+          this.playerServer.destroy();
+
+          // 实例化互动实例
+          await this.interactiveServer.init();
+
+          // 开始推流
           this.startPush();
         }
       });
@@ -208,31 +229,16 @@
           // 设置旁路主屏布局失败
           console.log('设置主屏失败');
           // TODO: 设置旁路主屏布局失败错误处理
+        } else if (err == 'getCanvasStreamError') {
+          console.error('获取图片流track错误');
+        } else if (err == 'createLocalPhotoStreamError') {
+          this.$message.error('初始化图片流失败');
         } else {
+          console.error(err);
           throw new Error('代码错误');
         }
       },
-      // 开始推流并设置旁路，主持人用
-      async startPushAndSetBroadCast() {
-        try {
-          // 创建本地流
-          await this.createLocalStream();
-          // 推流
-          await this.publishLocalStream();
-          // 开启旁路
-          await this.startBroadCast();
-          // 配置旁路主屏
-          await this.setBroadCastScreen();
-          // 实时获取网络状况
-          this.getLevel();
-          // 派发事件
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
-          );
-        } catch (err) {
-          this.handleSpeakOnError(err);
-        }
-      },
+
       // 开始推流，不设置旁路，主持人之外的其他角色用
       async startPush() {
         try {
@@ -242,6 +248,10 @@
           await this.publishLocalStream();
           // 实时获取网络状况
           this.getLevel();
+
+          // TODO 配置主屏条件
+          // 配置旁路主屏
+          await this.setBroadCastScreen();
           // 派发事件
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickPublishComplate')
@@ -252,11 +262,34 @@
       },
       // 创建本地流
       async createLocalStream() {
-        await this.interactiveServer
-          .createLocalVideoStream({
-            videoNode: `stream-${this.joinInfo.third_party_user_id}`
-          })
-          .catch(() => 'createLocalStreamError');
+        switch (this.$domainStore.state.mediaSettingServer.videoType) {
+          case 'camera':
+            await this.interactiveServer
+              .createLocalVideoStream({
+                videoNode: `stream-${this.joinInfo.third_party_user_id}`
+              })
+              .catch(() => 'createLocalStreamError');
+            break;
+          case 'pictrue':
+            await (() => {
+              setTimeout(() => {}, 1000);
+            })();
+            // eslint-disable-next-line no-case-declarations
+            let videoTracks = await this.$refs.imgPushStream.getCanvasStream();
+            if (!videoTracks) {
+              throw 'getCanvasStreamError';
+            }
+            await this.interactiveServer
+              .createLocalPhotoStream({
+                videoNode: `stream-${this.joinInfo.third_party_user_id}`,
+                videoTrack: videoTracks
+              })
+              .catch(() => 'createLocalPhotoStreamError');
+            break;
+
+          default:
+            break;
+        }
       },
       // 推流
       async publishLocalStream() {
@@ -267,15 +300,7 @@
           })
           .catch(() => 'publishStreamError');
       },
-      // 开启旁路
-      async startBroadCast() {
-        const options1 = {
-          adaptiveLayoutMode:
-            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
-        };
 
-        await this.interactiveServer.startBroadCast(options1).catch(() => 'startBroadCastError');
-      },
       // 设置主屏
       async setBroadCastScreen() {
         await this.interactiveServer.setBroadCastScreen().catch(() => 'setBroadCastScreenError');

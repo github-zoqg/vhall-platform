@@ -2,8 +2,15 @@
   <div class="vmp-header-watch">
     <div class="vmp-header-watch-left">
       <!-- 品牌设置-标识图片 -->
-      <div class="vmp-header-watch-left-logo">
-        <img src="./images/logo-red@2x.png" alt="" />
+      <div
+        class="vmp-header-watch-left-logo"
+        v-if="webinarTag && webinarTag.view_status == 1"
+        @click="goLogoUrl"
+      >
+        <img
+          :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogoUrl"
+          alt=""
+        />
       </div>
     </div>
     <div class="vmp-header-watch-center">
@@ -27,7 +34,13 @@
         </span>
       </div>
       <div class="vmp-header-watch-center-host">
-        <a href="">{{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}</a>
+        <a
+          :href="create_user_url"
+          v-if="webinarTag && webinarTag.organizers_status == 1"
+          :target="create_user_url == 'javascript:void(0);' ? '_self' : '_blank'"
+        >
+          {{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}
+        </a>
         <span>{{ webinarInfo.start_time }}</span>
       </div>
     </div>
@@ -36,24 +49,42 @@
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
 
       <!-- 公众号 -->
-      <div class="vmp-header-watch-right-officical">
+      <div class="vmp-header-watch-right-officical" v-if="officialImg">
         <div
-          class="vmp-header-watch-right-officical-icon"
+          :class="'vmp-header-watch-right-officical-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goOfficical"
         >
-          <i class="vh-saas-iconfont vh-saas-line-speaker"></i>
+          <i class="vh-saas-iconfont vh-saas-line-public"></i>
           <p>{{ $t('nav.nav_1002') }}</p>
         </div>
       </div>
 
       <!-- 关注 -->
-      <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+      <div
+        class="vmp-header-watch-right-attention"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.type != 6"
+      >
+        <div
+          :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"
+          :style="{ color: themeClass.pageBg }"
+          @click="attentionHandler"
+        >
+          <i
+            :class="`vh-iconfont ${
+              isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
+            }`"
+          ></i>
+          <!-- <i class="vh-iconfont vh-line-collection vh-a-line-collectionsuccess"></i> -->
+          <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
+        </div>
+      </div>
+      <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
 
       <!-- 分享 -->
       <div class="vmp-header-watch-right-share">
         <div
-          class="vmp-header-watch-right-share-icon"
+          :class="'vmp-header-watch-right-share-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goShare"
         >
@@ -62,9 +93,14 @@
         </div>
       </div>
 
+      <officaial-dialog
+        ref="officaialDialog"
+        :officicalInfo="officicalInfo"
+        v-if="officialImg"
+      ></officaial-dialog>
       <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
-        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="isLogin">
+        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
           <p><img src="./images/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
@@ -74,49 +110,53 @@
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
               <img v-else src="./images/my-dark@2x.png" alt="" />
             </p>
-            <span>{{ userInfo.nickname | splitLenStr(8) }}</span>
-          </div>
-          <div class="vmp-header-watch-right-login-user-list">
-            <ul>
-              <li @click="goUserInfo">
-                <i class="vh-iconfont vh-line-account"></i>
-                {{ $t('account.account_1001') }}
-              </li>
-              <li @click="goCashInfo">
-                <i class="vh-iconfont vh-a-line-financialcenter"></i>
-                {{ $t('nav.nav_1028') }}
-              </li>
-              <li @click="exitLogin">
-                <i class="vh-iconfont vh-line-exit"></i>
-                {{ $t('nav.nav_1011') }}
-              </li>
-            </ul>
+            <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
+            <div class="vmp-header-watch-right-login-user-list">
+              <ul>
+                <li @click="goUserInfo">
+                  <i class="vh-iconfont vh-line-account"></i>
+                  {{ $t('account.account_1001') }}
+                </li>
+                <li @click="goCashInfo">
+                  <i class="vh-iconfont vh-a-line-financialcenter"></i>
+                  {{ $t('nav.nav_1028') }}
+                </li>
+                <li @click="exitLogin">
+                  <i class="vh-iconfont vh-line-exit"></i>
+                  {{ $t('nav.nav_1011') }}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-      <!-- <vmp-air-container :cuid="cuid"></vmp-air-container> -->
     </div>
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import officaialDialog from './components/officalDialog.vue';
   export default {
     name: 'VmpHeaderWatch',
     data() {
       return {
         noDelayIconUrl:
           '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
+        defaultLogoUrl: require('./images/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
-        userInfo: {
-          avatar:
-            'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/9c/e9/9ce963aaaa11f3bf9650f01fc62c3514.jpg',
-          nickname: '测试==测试==测试==测试==测试==测试==测试==测试'
-        }, // 用户登录之后的信息
+        skinInfo: {}, //皮肤的信息
+        webinarTag: {}, // 活动标识
+        officicalInfo: {}, //公众号
+        officialImg: '',
+        userInfo: JSON.parse(window.localStorage.getItem('userInfo')) || {}, // 用户登录之后的信息
         themeClass: {
-          pageBg: '#3562fa'
+          bgColor: 'light',
+          pageBg: '#cccccc',
+          iconClass: 'icon-default' // icon默认色
         },
-        isLogin: false
+        isAttention: false,
+        isLogin: Boolean(window.localStorage.getItem('token'))
       };
     },
     filters: {
@@ -135,22 +175,167 @@
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
+    components: {
+      officaialDialog
+    },
+    computed: {
+      create_user_url() {
+        const { watchInitData } = this.roomBaseState;
+        if (watchInitData && watchInitData.urls && this.webinarInfo) {
+          const url = watchInitData.urls.web_url || '';
+          if (url.split('')[url.length - 1] == '/') {
+            return watchInitData.urls.web_url + 'user/home/' + this.webinarInfo.userinfo.user_id;
+          } else {
+            return watchInitData.urls.web_url + '/user/home/' + this.webinarInfo.userinfo.user_id;
+          }
+        } else {
+          return 'javascript:void(0);';
+        }
+      },
+      isNotEmbed() {
+        return this.embedObj
+          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
+          : true;
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.attentionServer = useAttentionServer();
+      this.userServer = useUserServer();
     },
-    created() {
+    async created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
+      this.embedObj = this.roomBaseState.embedObj;
+      console.log(this.isLogin, this.userInfo.user_id, '???1132424?????');
+      if (this.isLogin && this.isNotEmbed) {
+        // 通过活动ID，获取关注信息
+        await this.attentionStatus();
+      }
       this.getWebinarInfo();
     },
     methods: {
       getWebinarInfo() {
         const { webinar } = this.roomBaseState.watchInitData;
-        this.webinarInfo = webinar;
+        this.webinarInfo = webinar || {};
+        this.skinInfo = this.roomBaseState.skinInfo || {};
+        this.webinarTag = this.roomBaseState.webinarTag || {};
+        this.officicalInfo = this.roomBaseState.officicalInfo || {};
+        this.setOfficicalInfo(this.officicalInfo);
+        this.setSkinInfo(this.skinInfo);
       },
-      exitLogin() {
-        this.isLogin = false;
-        console.log('退出登录');
+      // 关注状态
+      attentionStatus() {
+        let params = {
+          at_id: this.userInfo.user_id,
+          type: 1 // 关注人
+        };
+        this.attentionServer.getAttentionStatus(params).then(res => {
+          this.isAttention = Boolean(res.data.result);
+        });
+      },
+      attentionHandler() {
+        if (!this.isLogin) {
+          this.goLogin();
+          return;
+        }
+        if (this.timer) clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          if (this.isAttention) {
+            this.attentionServer
+              .cancelAttention({
+                at_id: this.userInfo.user_id, // 被关注ID
+                type: 1
+              })
+              .then(res => {
+                if (res.code == 200) {
+                  this.$message({
+                    message: this.$t('nav.nav_1029'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.isAttention = false;
+                }
+              })
+              .catch(e => {
+                this.$message({
+                  message: e.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          } else {
+            this.attentionServer
+              .attention({
+                at_id: this.userInfo.user_id, // 被取消关注ID
+                type: 1
+              })
+              .then(res => {
+                if (res.code == 200) {
+                  this.$message({
+                    message: this.$t('nav.nav_1030'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.isAttention = true;
+                }
+              })
+              .catch(e => {
+                this.$message({
+                  message: e.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          }
+        }, 300);
+      },
+      setOfficicalInfo(info) {
+        if (info && info.status == 0 && info.img) {
+          this.officialImg = info.img;
+        }
+      },
+      setSkinInfo(skin) {
+        if (skin && skin.skin_json_pc && skin.status == 1) {
+          this.$nextTick(() => {
+            const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_pc) || '';
+            this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
+            this.themeClass.pageBg = pageStyle;
+            this.themeClass.bgColor =
+              bgColor == '#1a1a1a' ? 'dark' : bgColor == '#F2F2F2' ? 'gray' : 'white';
+            const bottomContent = document.querySelector('.vmp-basic-container');
+            if (bottomContent && background) {
+              bottomContent.style.background = `url(${background}) no-repeat`;
+              bottomContent.style.backgroundSize = '100% 100%';
+              bottomContent.style.backgroundPosition = 'center';
+            } else if (bottomContent && bgColor) {
+              bottomContent.style.background = `${bgColor}`;
+            } else {
+              bottomContent.style.background = '#1a1a1a';
+            }
+          });
+        } else {
+          this.$nextTick(() => {
+            // 默认皮肤
+            this.themeClass.pageBg = '#cccccc';
+            this.themeClass.iconClass = 'icon-default';
+          });
+        }
+      },
+      goLogoUrl() {
+        let logoUrl =
+          this.webinarTag && this.webinarTag.skip_url
+            ? this.webinarTag.skip_url
+            : 'https://www.vhall.com/';
+        window.open(logoUrl, '_blank');
       },
       //登录
       goLogin() {
@@ -158,19 +343,35 @@
       },
       //公众号
       goOfficical() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
+        this.officialImg = this.officicalInfo.img;
+        this.$refs.officaialDialog.officialVisible = true;
       },
       //分享
       goShare() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
       },
+      exitLogin() {
+        this.userServer.loginOut().then(res => {
+          if (res.code == 200) {
+            this.isLogin = false;
+            this.isAttention = false;
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+            this.$nextTick(() => {
+              window.location.reload();
+            });
+          }
+        });
+      },
       // 个人资料弹窗
       goUserInfo() {
         console.log('个人资料');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserAccount'));
       },
       // 提现管理弹窗
       goCashInfo() {
         console.log('提现管理');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenCash'));
       }
     }
   };
@@ -189,6 +390,7 @@
         width: 120px;
         height: 44px;
         margin: 14px 0;
+        cursor: pointer;
         img {
           width: 100%;
           height: 100%;
@@ -275,6 +477,7 @@
       align-items: center;
       justify-content: center;
       &-officical,
+      &-attention,
       &-share {
         padding-right: 24px;
         &-icon {
@@ -288,11 +491,24 @@
             line-height: 14px;
             padding-top: 5px;
           }
+        }
+        .icon-default {
           &:hover {
+            cursor: pointer;
             i,
             p {
               cursor: pointer;
               color: @font-high-light-normal !important;
+            }
+          }
+        }
+        .icon-revert {
+          &:hover {
+            cursor: pointer;
+            i,
+            p {
+              cursor: pointer;
+              color: @font-dark-second !important;
             }
           }
         }
@@ -324,6 +540,7 @@
         }
         &-user {
           position: relative;
+          height: 100%;
           &-dropdown {
             text-align: center;
             display: flex;
@@ -333,12 +550,14 @@
             p {
               width: 36px;
               height: 36px;
-              border-radius: 50%;
+
               margin-right: 8px;
               overflow: hidden;
+              padding: 5px 0;
               img {
                 width: 100%;
                 height: 100%;
+                border-radius: 50%;
                 object-fit: cover;
               }
             }
@@ -348,17 +567,18 @@
               color: #ccc;
               line-height: 32px;
             }
-          }
-          &:hover {
-            .vmp-header-watch-right-login-user-list {
-              display: block;
+            &:hover {
+              .vmp-header-watch-right-login-user-list {
+                display: block;
+              }
             }
           }
           &-list {
             width: 160px;
             position: absolute;
-            top: 40px;
-            left: 0;
+            top: 38px;
+            right: -6px;
+            z-index: 11;
             border-radius: 4px;
             padding: 4px 0;
             background: #383838;

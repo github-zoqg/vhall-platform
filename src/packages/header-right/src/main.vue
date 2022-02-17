@@ -36,7 +36,7 @@
     name: 'VmpHeaderRight',
     data() {
       return {
-        liveStep: 1,
+        liveStep: 1, // 1未开始 2启动中 3直播中 4结束中
         liveDuration: '',
         isShowQuit: false, //是否显示退出
         isShowSupport: false, //是否显示技术支持
@@ -66,7 +66,7 @@
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
-        this.handleStartClick();
+        this.liveStep = 2;
       }
     },
     methods: {
@@ -106,8 +106,7 @@
       },
       // 开始直播
       handleStartClick() {
-        this.roomBaseServer.setDevice();
-        this.liveStep = 2;
+        // this.liveStep = 2;
         // 派发推流事件
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       },

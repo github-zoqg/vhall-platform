@@ -44,6 +44,7 @@
         if (scene === 1) {
           // 未直播
           for (const vn of this.$children) {
+            if (!vn.kind) continue;
             if (['exitGroup'].includes(vn.kind)) {
               // 禁用并隐藏
               vn.setDisableState(true);
@@ -62,6 +63,10 @@
           }
         } else if (scene === 2) {
           for (const vn of this.$children) {
+            if (!vn.kind) continue;
+            if (!vn.setDisableState) {
+              console.error(scene, '>', vn);
+            }
             // 直播中，但不在小组中
             if (['exitGroup'].includes(vn.kind)) {
               // 禁用并隐藏
@@ -90,6 +95,7 @@
         } else if (scene === 3) {
           // 直播中，并正在小组中
           for (const vn of this.$children) {
+            if (!vn.kind) continue;
             if (['document', 'board', 'desktopShare'].includes(vn.kind)) {
               // 显示但禁用
               vn.setDisableState(true);

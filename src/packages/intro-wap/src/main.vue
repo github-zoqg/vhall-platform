@@ -1,11 +1,223 @@
 <template>
-  <section>intro</section>
+  <section class="vmp-intro">
+    <section class="vmp-intro-block">
+      <header class="vmp-intro-block__headtitle">
+        <i v-if="isNoDelay" class="delay-icon">
+          <img :src="NoDelayImg" />
+        </i>
+        {{ title }}
+      </header>
+      <main class="vmp-intro-block__detail">
+        <p>
+          <i class="vh-iconfont vh-line-time" />
+          开始时间:{{ startTime }}
+        </p>
+        <p>
+          <i class="vh-iconfont vh-line-user"></i>
+          在线人数:{{ personCount }} 人
+        </p>
+      </main>
+    </section>
+
+    <section class="vmp-intro-block vmp-intro-block-content">
+      <header class="vmp-intro-block__title">活动简介</header>
+      <main class="vmp-intro-block__content-main" v-html="content"></main>
+    </section>
+
+    <aside>
+      <a
+        class="vmp-intro-link"
+        v-show="isShowCopyRight"
+        href="https://www.vhall.com/saas"
+        target="_blank"
+      >
+        微吼提供技术支持
+      </a>
+      <!-- 暂时借用dom -->
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
+    </aside>
+  </section>
 </template>
 
 <script>
+  import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
+
   export default {
-    name: 'VmpIntroWap'
+    name: 'VmpIntroWap',
+    filters: {
+      formatCount(num) {
+        if (num < 10000) return num;
+
+        const integer = Math.floor(num / 10000); // 整数
+        let decimals = Math.floor((num % 10000) / 1000); // 小数
+        decimals = decimals === 0 ? '' : '.' + decimals;
+
+        return integer + decimals + '万';
+      }
+    },
+    data() {
+      return {
+        NoDelayImg,
+        type: 'default' // default、subscribe
+      };
+    },
+    computed: {
+      watchInitData() {
+        return this?.$domainStore?.state?.roomBaseServer?.watchInitData;
+      },
+      webinar() {
+        return this?.watchInitData?.webinar;
+      },
+      webinarTag() {
+        return this?.$domainStore?.state?.roomBaseServer?.webinarTag;
+      },
+      // 是否显示版权信息 type:Boolean
+      isShowCopyRight() {
+        return this?.webinarTag?.reserved_status === 1;
+      },
+      // 无延迟 Type:Boolean
+      isNoDelay() {
+        return this.webinar.no_delay_webinar === 1;
+      },
+      // 标题 Type:String
+      title() {
+        return this?.webinar?.subject || '';
+      },
+      // 开始时间 Type:String
+      startTime() {
+        return this?.webinar?.start_time?.substr(0, 16) || '';
+      },
+      // 在线人数或订阅人数 Type:String
+      personCount() {
+        //  订阅人数
+        const subscribeCount = `${Number(this?.watchInitData?.subscribe.num)}`;
+
+        //  在线人数
+        const baseOnlineCount = Number(this.watchInitData.online);
+        const uvCount = Number(''); // TODO:
+        const onlineCount = baseOnlineCount + uvCount;
+
+        if (this.type === 'subscribe') return subscribeCount || '';
+        if (this.type === 'default') return onlineCount || '';
+        return '';
+      },
+      // 简介富文本正文 Type:String
+      content() {
+        return this?.webinar?.introduction || '<p></p>';
+      }
+    }
   };
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+  .vmp-intro {
+    background-color: #f2f2f2;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    .vmp-intro-block {
+      padding: 0.4rem;
+      background-color: #fff;
+
+      &:not(:first-child) {
+        margin-top: 20px;
+      }
+
+      &-content {
+        flex: 1 1 auto;
+      }
+
+      &__headtitle {
+        font-size: 36px;
+        text-overflow: -o-ellipsis-lastline;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        word-break: break-all;
+        font-weight: bold;
+        line-height: 48px;
+        color: @font-hover-low;
+        .delay-icon {
+          display: inline-block;
+          width: 116px;
+          height: 50px;
+
+          img {
+            height: 100%;
+          }
+
+          vertical-align: bottom;
+        }
+      }
+
+      &__title {
+        font-weight: bold;
+        font-size: 32px;
+        line-height: 48px;
+        color: @font-hover-low;
+        display: flex;
+        align-items: center;
+        padding-left: 14px;
+        position: relative;
+        margin-bottom: 20px;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0px;
+          width: 4px;
+          height: 30px;
+          background: @font-error;
+        }
+      }
+
+      &__detail {
+        p {
+          i {
+            margin-right: 8px;
+          }
+
+          height: 40px;
+          font-size: 28px;
+          font-family: PingFangSC;
+          font-weight: 400;
+          color: @bg-end-normal;
+          line-height: 40px;
+          margin-top: 15px;
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      &__content-main {
+        padding-bottom: 30px;
+        color: #666666;
+        word-break: break-all;
+        line-height: 1.2;
+        p {
+          word-break: break-all;
+        }
+      }
+    }
+
+    aside {
+      flex: 0 0 auto;
+
+      .vmp-intro-link {
+        width: 100%;
+        height: 100px;
+        font-size: 28px;
+        font-weight: 400;
+        color: rgba(129, 129, 129, 1);
+        line-height: 100px;
+        text-align: center;
+        display: block;
+      }
+    }
+  }
+</style>

@@ -30,7 +30,7 @@
               @click="onClose"
               v-if="userInfo.role_name == 3 || userInfo.third_party_user_id == this.doc_permission"
             >
-              <i class="iconfont iconguanbi"></i>
+              <i class="vh-iconfont vh-line-close"></i>
             </span>
           </el-row>
           <!-- 时间显示区 -->
@@ -97,13 +97,13 @@
 </template>
 
 <script>
-  import { useLiveTimerServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useTimerServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
     name: 'VmpLiveTimer',
     directives: {
-      drag(el, bindings) {
+      drag(el) {
         el.onmousedown = function (e) {
           var disx = e.pageX - el.offsetLeft;
           var disy = e.pageY - el.offsetTop;
@@ -132,10 +132,8 @@
       }
     },
     data() {
-      let liveTimerServer = useLiveTimerServer();
       let roomBaseServer = useRoomBaseServer();
       return {
-        liveTimerServer,
         roomBaseServer,
         status: 'kaishi',
         beifenshijian: 60,
@@ -149,69 +147,29 @@
         ten_sec: 0,
         mon: 0,
         ten_mon: 0,
-        userInfo: JSON.parse(sessionStorage.getItem('user')),
+        userInfo: JSON.parse(sessionStorage.getItem('user')) || {},
         doc_permission: ''
       };
     },
     beforeCreate() {
+      this.timerServer = useTimerServer();
       this.msgServer = useMsgServer();
     },
     mounted() {
       this.init();
-      console.log(this.msgServer.$onMsg, 'this.roomBaseServer');
+      this.timerServer.listenMsg();
+      console.log(this.timerServer, 'this.roomBaseServer');
+      // 计时器开始
+      this.timerServer.$on('timer_start', temp => this.timer_start(temp));
+      // 计时器结束
+      this.timerServer.$on('timer_end', temp => this.timer_end(temp));
+      // 计时器暂停
+      this.timerServer.$on('timer_pause', temp => this.timer_pause(temp));
+      // 计时器重置
+      this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
+      // 计时器继续
+      this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
       this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器开始
-          case 'timer_start':
-            this.timer_start(temp);
-            break;
-          // 计时器结束
-          case 'timer_end':
-            this.timer_end(temp);
-            break;
-          // 计时器暂停
-          case 'timer_pause':
-            this.timer_pause(temp);
-            break;
-          // 计时器重置
-          case 'timer_reset':
-            this.timer_reset(temp);
-            break;
-          // 计时器继续
-          case 'timer_resume':
-            this.timer_resume(temp);
-            break;
-          default:
-            break;
-        }
-      });
-      this.msgServer.$onMsg('CUSTOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器暂停
-          case 'timer_pause':
-            this.timer_pause(temp);
-            break;
-          default:
-            break;
-        }
-      });
     },
     methods: {
       // 计时器开始
@@ -225,12 +183,19 @@
         this.is_all_show = e.data.is_all_show;
         this.timeFormat(Math.abs(this.shijian));
         this.timerFun(e.data.duration);
-        this.$emit('disTimer', false);
+        // 禁用互动工具-计时器
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
+        );
+        this.$emit('disTimer', true);
       },
       // 计时器结束
       timer_end(e) {
         console.warn('监听到了计时器结束-------', e);
         this.timerVisible = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
+        );
         this.$emit('disTimer', true);
         clearInterval(this.timer);
       },
@@ -265,7 +230,7 @@
         this.timerFun(this.shijian);
       },
       init() {
-        this.liveTimerServer
+        this.timerServer
           .getTimerInfo()
           .then(res => {
             if (JSON.stringify(res.data) != '{}') {
@@ -400,7 +365,7 @@
       },
       // 操作计时器
       editTimer(status) {
-        this.liveTimerServer
+        this.timerServer
           .timerEdit({
             action_type: status,
             duration: this.beifenshijian || this.shijian,

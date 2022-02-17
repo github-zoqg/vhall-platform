@@ -559,7 +559,7 @@
         }
         return false;
       },
-      //列表中该用户是否补是主持人身份
+      //列表中该用户是否不是主持人身份
       isNotHost() {
         const options = [
           [1, '1'].includes(this.roleName),
@@ -591,8 +591,8 @@
           );
         }
         if (this.isHost) {
-          isShow =
-            [1, '1'].includes(this.isInteract) && !this.userInfo.is_speak && this.status === 1;
+          //todo 可能需要一个检查直播开始结束状态的判断
+          isShow = [1, '1'].includes(this.isInteract) && !this.userInfo.is_speak;
         }
         return isShow;
       },

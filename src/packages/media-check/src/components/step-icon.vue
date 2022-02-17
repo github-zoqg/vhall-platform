@@ -1,5 +1,5 @@
 <template>
-  <span class="iconfont" :class="[iconStyles]"></span>
+  <span class="vh-iconfont" :class="[iconStyles]"></span>
 </template>
 
 <script>
@@ -17,11 +17,11 @@
     computed: {
       iconStyles() {
         if (this.item.status === 'fail') {
-          return 'iconjianceshibai';
+          return 'vh-a-line-exclamationpoint';
         }
 
         if (this.item.status === 'success') {
-          return 'iconjiancechenggong';
+          return 'vh-line-check';
         }
 
         return this.item.icon;
@@ -30,4 +30,10 @@
   };
 </script>
 
-<style></style>
+<style lang="less">
+  .is-process {
+    .vh-iconfont {
+      color: #3562fa;
+    }
+  }
+</style>
