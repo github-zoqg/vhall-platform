@@ -148,9 +148,9 @@
       },
 
       addItemByIndex(index, item) {
-        if (this.hasItem(item)) {
-          throw Error('不能传入cuid和contentId都相同的item');
-        }
+        // if (this.hasItem(item)) {
+        //   throw Error('不能传入cuid和contentId都相同的item');
+        // }
 
         item = getItemEntity(item);
 

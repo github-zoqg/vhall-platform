@@ -10,7 +10,7 @@ const typeMap = new Map([
 
 export function getItemEntity({
   type = 2,
-  menuId = '',
+  id = '', // MENU ID
   name,
   payload = {},
   status = '1',
@@ -22,7 +22,8 @@ export function getItemEntity({
   return {
     type,
     cuid,
-    contentId: menuId,
+    id,
+    contentId: id, // 等同于 id
     text: name,
     payload,
     status,
