@@ -23,7 +23,7 @@
         @click="attentionApi"
       ></i>
       <i
-        class="vh-iconfont vh-fill-QRcode"
+        class="vh-saas-iconfont vh-saas-a-color-officialaccount"
         :style="{ color: themeColor }"
         @click="showPublic"
         v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
@@ -47,19 +47,6 @@
         userInfo: {}
       };
     },
-    watch: {
-      officicalInfo: {
-        handler(val) {
-          if (val && val.alert_type == 0 && val.status == 0) {
-            // 自动弹出
-            this.showPublic();
-          }
-          return val;
-        },
-        deep: true,
-        immediate: true
-      }
-    },
     filters: {
       webinarFilter(val) {
         // const webinarArr = [
@@ -80,7 +67,7 @@
       // 关注的domain服务
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
-      console.log('header roomBaseServer---->', this.$domainStore.state.roomBaseServer);
+      this.autoShowPublic();
     },
     computed: {
       /**
@@ -132,11 +119,24 @@
     },
     methods: {
       /**
+       * 自动弹出公众号
+       */
+      autoShowPublic() {
+        console.log('header officicalInfo---->', this.officicalInfo);
+        if (
+          this.officicalInfo &&
+          this.officicalInfo.alert_type == 0 &&
+          this.officicalInfo.status == 0
+        ) {
+          this.showPublic();
+        }
+      },
+      /**
        * 初始化登录信息
        */
       initUserLoginStatus() {
-        const userInfo = sessionStorage.getItem('userInfo')
-          ? JSON.parse(sessionStorage.getItem('userInfo'))
+        const userInfo = localStorage.getItem('userInfo')
+          ? JSON.parse(localStorage.getItem('userInfo'))
           : '';
         console.log('用户信息-------->', userInfo);
         if (userInfo) {
