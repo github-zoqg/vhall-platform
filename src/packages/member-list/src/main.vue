@@ -325,21 +325,15 @@
     computed: {
       //是否在分组里
       isInGroup() {
-        const { state = {} } = this.groupServer;
-        const { groupInitData = {} } = state;
-        return groupInitData.isInGroup;
+        return this.groupServer.state.groupInitData.isInGroup;
       },
       //主讲人ID
       docPermissionId() {
-        const { state = {} } = this.groupServer;
-        const { groupInitData = {} } = state;
-        return groupInitData.doc_permission;
+        return this.groupServer.state.groupInitData.doc_permission;
       },
       //分组信息
       groupInitData() {
-        const { state = {} } = this.groupServer;
-        const { groupInitData = {} } = state;
-        return groupInitData;
+        return this.groupServer.state.groupInitData;
       },
       //活动状态(直播未开始，已开始，已结束)
       liveStatus() {
@@ -426,6 +420,7 @@
       listenRoomMsg() {
         const _this = this;
         const isLive = this.memberOptions.platformType === 'live';
+
         // 加入房间
         this.msgServer.$onMsg('JOIN', msg => {
           handleUserJoinRoom(msg);
@@ -530,132 +525,80 @@
         }
         //用户加入房间
         function handleUserJoinRoom(msg) {
-          const isLive = _this.memberOptions.platformType === 'live';
-          const isWatch = _this.memberOptions.platformType === 'watch';
+          try {
+            console.log('_this.groupServer:', _this.groupServer);
+            console.log('_this.isInGroup:', _this.isInGroup);
+            const isLive = _this.memberOptions.platformType === 'live';
+            const isWatch = _this.memberOptions.platformType === 'watch';
 
-          // 上线的人是自己，不做操作
-          if (isLive && msg.sender_id == _this.userId) {
-            return;
-          }
-
-          let index = _this._getUserIndex(msg.sender_id, _this.onlineUsers);
-
-          if (isWatch) {
-            //todo 需要从主房间取speakerList
-            _this.speakerList = _this.isInGroup ? _this.groupInitData.speaker_list : [];
-            _this.totalNum = msg.uv;
-          }
-
-          if (isLive) {
-            //todo 这里暂时没有$store,需要替换为从server取分组里的成员数
-            _this.totalNum = _this.isInGroup
-              ? msg.uv
-              : msg.uv -
-                (_this.groupInitData.discussState
-                  ? _this.$store.getters.getAllState('groupUsersNumber')
-                  : 0);
-          }
-
-          if (isWatch && !_this.isInGroup && index >= 0) {
-            return;
-          }
-
-          if (isLive && index >= 0) {
-            return;
-          }
-
-          // 在线人数大于200不再添加到列表里，只能加载更多
-          if (_this.totalNum > 200) {
-            return;
-          }
-          // 隐身模式登录
-          if (msg.data.hide) {
-            return;
-          }
-
-          // 从上麦人员列表中获取加入房间着是否上麦
-          const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
-          const { context } = msg;
-
-          // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-          if (isLive && _this.mode === 6) {
-            if (!_this.isInGroup && context.groupInitData.isInGroup) {
-              return false;
+            // 上线的人是自己，不做操作
+            if (isLive && msg.sender_id == _this.userId) {
+              return;
             }
-          }
 
-          if (isLive) {
-            const user = {
-              account_id: msg.sender_id,
-              avatar: context.avatar,
-              device_status: context.device_status,
-              device_type: context.device_type,
-              is_banned: Number(context.is_banned),
-              nickname: context.nick_name,
-              role_name: context.role_name,
-              is_speak: speakIndex >= 0 ? 1 : 0
-            };
-            _this.onlineUsers.push(user);
-            _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
-            setTimeout(() => {
-              _this.$refs.scroll.refresh();
-            }, 100);
-            if (msg.context.role_name == 4) {
-              if (msg.sender_id == _this.userId) {
-                return;
-              }
-              _this.$message({
-                message: _this.$t('message.message_1030', { n: msg.context.nickname }),
-                showClose: true,
-                // duration: 0,
-                type: 'success',
-                customClass: 'zdy-info-box'
-              });
+            let index = _this._getUserIndex(msg.sender_id, _this.onlineUsers);
+
+            if (isWatch) {
+              //todo 需要从主房间取speakerList
+              _this.speakerList = _this.isInGroup ? _this.groupInitData.speaker_list : [];
+              _this.totalNum = msg.uv;
             }
-          }
 
-          if (isWatch) {
-            if (_this.isInGroup) {
-              const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
-              if (flag) {
-                _this.onlineUsers.forEach(item => {
-                  if (item.account_id == msg.sender_id) {
-                    Object.assign(item, {
-                      avatar: context.avatar,
-                      device_status: context.device_status,
-                      nickname: context.nick_name || context.nickname,
-                      device_type: context.device_type,
-                      is_speak: speakIndex >= 0 ? 1 : 0
-                    });
-                  }
-                });
-                _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
-              } else {
-                const user = {
-                  account_id: msg.sender_id,
-                  nickname: context.nick_name || context.nickname,
-                  avatar: context.avatar,
-                  device_status: context.device_status,
-                  device_type: context.device_type,
-                  role_name: context.role_name,
-                  is_speak: speakIndex >= 0 ? 1 : 0
-                };
-                _this.onlineUsers.push(user);
-                _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+            if (isLive) {
+              //todo 这里暂时没有$store,需要替换为从server取分组里的成员数
+              _this.totalNum = _this.isInGroup
+                ? msg.uv
+                : msg.uv -
+                  (_this.groupInitData.discussState
+                    ? _this.$store.getters.getAllState('groupUsersNumber')
+                    : 0);
+            }
+
+            if (isWatch && !_this.isInGroup && index >= 0) {
+              return;
+            }
+
+            if (isLive && index >= 0) {
+              return;
+            }
+
+            // 在线人数大于200不再添加到列表里，只能加载更多
+            if (_this.totalNum > 200) {
+              return;
+            }
+            // 隐身模式登录
+            if (msg.data.hide) {
+              return;
+            }
+
+            // 从上麦人员列表中获取加入房间着是否上麦
+            const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
+            const { context } = msg;
+            console.log('msg:', msg);
+
+            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
+            if (isLive && _this.mode === 6) {
+              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
+                return false;
               }
-            } else {
+            }
+
+            if (isLive) {
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
                 device_status: context.device_status,
                 device_type: context.device_type,
                 is_banned: Number(context.is_banned),
-                nickname: context.nickname,
+                nickname: context.nick_name,
                 role_name: context.role_name,
                 is_speak: speakIndex >= 0 ? 1 : 0
               };
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+              setTimeout(() => {
+                _this.$refs.scroll.refresh();
+              }, 100);
               if (msg.context.role_name == 4) {
                 if (msg.sender_id == _this.userId) {
                   return;
@@ -669,6 +612,65 @@
                 });
               }
             }
+
+            if (isWatch) {
+              if (_this.isInGroup) {
+                const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
+                if (flag) {
+                  _this.onlineUsers.forEach(item => {
+                    if (item.account_id == msg.sender_id) {
+                      Object.assign(item, {
+                        avatar: context.avatar,
+                        device_status: context.device_status,
+                        nickname: context.nick_name || context.nickname,
+                        device_type: context.device_type,
+                        is_speak: speakIndex >= 0 ? 1 : 0
+                      });
+                    }
+                  });
+                  _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                } else {
+                  const user = {
+                    account_id: msg.sender_id,
+                    nickname: context.nick_name || context.nickname,
+                    avatar: context.avatar,
+                    device_status: context.device_status,
+                    device_type: context.device_type,
+                    role_name: context.role_name,
+                    is_speak: speakIndex >= 0 ? 1 : 0
+                  };
+                  _this.onlineUsers.push(user);
+                  _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                }
+              } else {
+                const user = {
+                  account_id: msg.sender_id,
+                  avatar: context.avatar,
+                  device_status: context.device_status,
+                  device_type: context.device_type,
+                  is_banned: Number(context.is_banned),
+                  nickname: context.nickname,
+                  role_name: context.role_name,
+                  is_speak: speakIndex >= 0 ? 1 : 0
+                };
+                _this.onlineUsers.push(user);
+                _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                if (msg.context.role_name == 4) {
+                  if (msg.sender_id == _this.userId) {
+                    return;
+                  }
+                  _this.$message({
+                    message: _this.$t('message.message_1030', { n: msg.context.nickname }),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                }
+              }
+            }
+          } catch (ex) {
+            console.error('ex:', ex);
           }
         }
         //用户离开房间
@@ -920,7 +922,7 @@
           }
           if (isLive) {
             //todo 替换这里的
-            _this.totalNum = msg.uv - _this.$store.getters.getAllState('groupUsersNumber');
+            // _this.totalNum = msg.uv - _this.$store.getters.getAllState('groupUsersNumber');
             // 如果sender_id==自己
             if (msg.sender_id == _this.userId) {
               _this.totalNum++;
@@ -1066,23 +1068,23 @@
         }
         //主持人/助理进入小组
         function handleHostJoin(msg) {
-          if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
-            // 进入小组
-            if (msg.group_ids[0] == 0) {
-              setTimeout(() => {
-                _this.onlineUsers = [];
-                _this.getOnlineUserList();
-              }, 1000);
-            }
-            // 返回主房间
-            if (msg.group_ids[1] == 0) {
-              //todo 这里的host_uid可能要从分组server取
-              if (sessionStorage.getItem('host_uid').includes(msg.sender_id)) {
-                _this.onlineUsers = [];
-                _this.getOnlineUserList();
-              }
-            }
-          }
+          // if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
+          //   // 进入小组
+          //   if (msg.data.group_ids[0] == 0) {
+          //     setTimeout(() => {
+          //       _this.onlineUsers = [];
+          //       _this.getOnlineUserList();
+          //     }, 1000);
+          //   }
+          //   // 返回主房间
+          //   if (msg.data.group_ids[1] == 0) {
+          //     //todo 这里的host_uid可能要从分组server取
+          //     if (sessionStorage.getItem('host_uid').includes(msg.sender_id)) {
+          //       _this.onlineUsers = [];
+          //       _this.getOnlineUserList();
+          //     }
+          //   }
+          // }
         }
         //分组--开始讨论
         function handleStartGroupDiscuss(msg) {
