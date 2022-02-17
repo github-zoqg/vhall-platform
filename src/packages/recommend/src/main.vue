@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-recommend recommendWrapper" refs="recommendWrapper" v-show="advs.length > 0">
+  <div class="vmp-recommend recommendWrapper" refs="recommendWrapper">
     <ul class="a-wrap">
       <li
         class="recommend-item"
@@ -56,7 +56,7 @@
         deep: true
       },
       'advs.length': {
-        async handler(val) {
+        async handler() {
           await this.$nextTick();
           setTimeout(() => {
             this.scroll && this.scroll.refresh();
@@ -67,26 +67,19 @@
     },
     created() {
       window.$middleEventSdk?.event?.send(
-        boxEventOpitons(this.cuid, 'addTab', {
-          comp: 'comRecommendWap',
-          key: 'recommend',
-          text: '推荐'
-        })
+        boxEventOpitons(this.cuid, 'addTab', [
+          3,
+          {
+            comp: 'comRecommend',
+            key: 'recommend',
+            text: '推荐'
+          }
+        ])
       );
     },
     methods: {
       handlerInitScroll() {
         this.$nextTick(() => {
-          const wrapper = document.querySelector('.recommendWrapper');
-          // this.scroll = new BScroll(wrapper, {
-          //   pullUpLoad: true,
-          //   bindToWrapper: true,
-          //   scrollX: false,
-          //   scrollY: true,
-          //   bounce: true,
-          //   click: true,
-          //   tap: 'tap'
-          // });
           this.scroll && this.handleBindScrollEvent();
           this.scroll && this.scroll.refresh();
         });
@@ -153,8 +146,6 @@
 </script>
 <style lang="less">
   .vmp-recommend {
-    background: #fff;
-    padding: 0px 30px;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -165,7 +156,6 @@
       width: 100%;
       // height: 100%;
       // overflow-y: hidden !important;
-      overflow-y: scroll;
       touch-action: pan-y !important;
       // overflow: hidden;
       // display: flex;
@@ -174,20 +164,20 @@
       // touch-action: pan-y;
     }
     .recommend-item {
-      width: 330px;
-      height: 230px;
-      margin-bottom: 30px;
-      margin-right: 8px;
+      height: 80px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-bottom: 1px solid #444;
+      padding: 16px 0;
       float: left;
       a {
         display: inline-block;
-        width: 330px;
-        height: 230px;
         margin-bottom: 30px;
       }
       .banner {
-        width: 100%;
-        height: 186px;
+        width: 40%;
+        height: 100%;
         border-radius: 8px;
         object-fit: scale-down;
         border: 1px solid #e6e6e6;

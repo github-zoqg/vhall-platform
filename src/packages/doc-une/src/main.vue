@@ -192,6 +192,11 @@
           // 恢复上一次的文档数据;
           this.recoverLastDocs();
         }
+      },
+      ['roomBaseServer.state.miniElement'](newval) {
+        console.log('-[doc]---大小屏变更', newval); // newval 取值 doc, stream-list
+        const mode = newval === 'doc' ? 'small' : 'normal';
+        this.setDisplayMode(mode);
       }
     },
     beforeCreate() {

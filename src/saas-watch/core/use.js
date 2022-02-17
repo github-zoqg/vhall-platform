@@ -21,13 +21,11 @@ import VmpStreamRemote from '@/packages/stream-remote';
 import VmpFooter from '@/packages/footer';
 import VmpFooterTools from '@/packages/footer-tools';
 import VmpRegLogin from '@/packages/reg-login';
-import VmpPraise from '@/packages/praise';
-import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpNoticeColumn from '@/packages/notice-column'; //公告滚动显示
 import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
 import VmpShare from '@/packages/share'; // 观看端分享
-import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
+import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公权限验证
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
@@ -38,7 +36,6 @@ import VmpUserAccount from '@/packages/user-account'; // 个人资料
 import VmpCash from '@/packages/cash'; // 提现
 import VmpWatchNavMenu from '@/packages/watch-nav-menu'; // 观看端侧边栏
 import VmpWatchTimer from '@/packages/watch-timer'; // 观看端计时器
-import VmpOfficial from '@/packages/official-watch-pc';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -63,8 +60,6 @@ export function initUse() {
   Vue.use(VmpFooter);
   Vue.use(VmpFooterTools);
   Vue.use(VmpRegLogin);
-  Vue.use(VmpPraise);
-  Vue.use(VmpNoticeList);
   Vue.use(VmpNoticeColumn);
   Vue.use(VmpBasicRightContainer);
   Vue.use(VmpBasicCenterContainer);
@@ -77,6 +72,5 @@ export function initUse() {
   Vue.use(VmpCash);
   Vue.use(VmpWatchNavMenu);
   Vue.use(VmpWatchTimer);
-  Vue.use(VmpOfficial);
   Vue.use(VmpGoodList);
 }

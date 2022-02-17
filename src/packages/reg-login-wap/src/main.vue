@@ -218,7 +218,7 @@
       const userServerState = this.userServer.state; // 响应式注入
       return {
         userServerState,
-        popupVisible: true, // 外框是否可见(弹出)
+        popupVisible: false, // 外框是否可见(弹出)
         actionType: 'code', // code 验证码登录, pwd密码登录, reg 注册
         showMobileLogin: true, // true - 手机登录  false - 账号密码登录
         showLoginCard: true, // true - 登录  false - 注册

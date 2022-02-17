@@ -22,8 +22,24 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul v-if="!this.isInGroup" v-show="!isTrySee" class="vmp-footer-tools__right">
-      <li v-if="isLive">
+    <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
+      <li>
+        <!-- 公告 -->
+        <notice></notice>
+      </li>
+      <li>
+        <!-- 问卷-->
+      </li>
+      <li>
+        <!-- 签到 -->
+      </li>
+      <li v-if="isLiving">
+        <!-- 抽奖 -->
+      </li>
+      <li>
+        <!-- 红包 -->
+      </li>
+      <li v-if="isLiving">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -31,6 +47,7 @@
         </div>
       </li>
       <li v-if="showGiftIcon">
+        <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
           <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
@@ -48,35 +65,57 @@
           <reward ref="reward" />
         </div>
       </li>
+      <li>
+        <!-- 点赞 -->
+        <praise></praise>
+      </li>
     </ul>
   </div>
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useMsgServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
-  import onlineMixin from './js/mixins';
+  import { useRoomBaseServer, useGroupServer, useVirtualAudienceServer } from 'middle-domain';
+  // import onlineMixin from './js/mixins';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
+  import notice from './component/notice/index.vue';
+  import praise from './component/praise/index.vue';
   export default {
     name: 'VmpFooterTools',
-    mixins: [onlineMixin],
+    // mixins: [onlineMixin],
     data() {
       return {
         roomBaseState: null,
-        isLive: true,
-        isTrySee: false,
         showGiftIcon: true,
         showGift: false,
         showGiftCount: 0,
         openTimer: false,
-        showTimer: false
+        showTimer: false,
+        groupInitData: {}
       };
     },
     components: {
       handup,
       reward,
-      vhGifts
+      vhGifts,
+      notice,
+      praise
+    },
+    filters: {
+      formatHotNum(value) {
+        value = parseInt(value);
+        let unit = '';
+        const k = 99999;
+        const sizes = ['', '万', '亿', '万亿'];
+        let i;
+        if (value > k) {
+          i = Math.floor(Math.log(value) / Math.log(k));
+          value = (value / Math.pow(k / 10, i)).toFixed(1);
+          unit = sizes[i];
+        }
+        return value + unit;
+      }
     },
     computed: {
       isInteractLive() {
@@ -86,17 +125,39 @@
           watchInitData.webinar.type == 1
         );
       },
+      isLiving() {
+        const { watchInitData } = this.roomBaseState;
+        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
+        return watchInitData.webinar.type == 1;
+      },
+      isTrySee() {
+        const { watchInitData } = this.roomBaseState;
+        return (
+          watchInitData.status == 'subscribe' &&
+          watchInitData.preview_paas_record_id &&
+          watchInitData.is_subscribe == 0
+        );
+      },
       isInGroup() {
         return this.groupServer.state.groupInitData.isInGroup;
+      },
+      hotNum() {
+        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+      },
+      onlineNum() {
+        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
       }
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.virtualClientStartServer = useVirtualAudienceServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
+      this.groupState = this.groupServer.state;
+      this.onlineState = this.virtualClientStartServer.state;
+      this.virtualClientStartServer.listenEvent();
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
@@ -129,6 +190,8 @@
       },
       // 打开打赏弹框
       onClickReward() {
+        // TODO:需校验是否登陆
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
         this.$refs.reward.onClickReward();
       }
     }
