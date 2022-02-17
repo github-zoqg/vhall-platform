@@ -42,6 +42,7 @@
         :tab-cuid="cuid"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
+        @closePopup="selectDefault"
         ref="tabContent"
       ></tab-content>
     </section>
@@ -93,12 +94,6 @@
     },
     async mounted() {
       await this.$nextTick(0);
-
-      // 选择默认项
-      if (this.visibleMenu.length > 0) {
-        const { cuid, contentId } = this.visibleMenu[0];
-        this.select(cuid, contentId);
-      }
     },
 
     methods: {
@@ -118,6 +113,13 @@
         }
 
         console.log('list:::::', list);
+      },
+      selectDefault() {
+        // 选择默认项
+        if (this.visibleMenu.length > 0) {
+          const { cuid, contentId } = this.visibleMenu[0];
+          this.select(cuid, contentId);
+        }
       },
 
       toggleSubMenuVisible() {
@@ -142,6 +144,7 @@
         // if (this.hasItem(item)) {
         //   throw Error('不能传入已经存在的item');
         // }
+        console.log('item::::', item);
 
         item = getItemEntity(item);
         this.menu.push(item);
@@ -212,13 +215,6 @@
         this.selectedContentId = contentId;
 
         let payload = null;
-        // TODO: 强耦合，需更改
-        if (cuid === 'comCustomMenu') {
-          payload = {
-            method: 'queryDetail',
-            arg: [contentId]
-          };
-        }
 
         // wap端逻辑
         this.isSubMenuShow = false;

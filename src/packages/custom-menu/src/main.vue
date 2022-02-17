@@ -49,9 +49,6 @@
     beforeCreate() {
       this.customMenuServer = useCustomMenuServer();
     },
-    created() {
-      this.queryDetail();
-    },
     methods: {
       async queryDetail(id) {
         if (id === undefined || id === null) {
@@ -61,6 +58,7 @@
         const res = await this.customMenuServer.getCustomMenuDetail({
           menu_id: id
         });
+
         if (res.code === 200 && res.data) {
           this.customTabs = res.data.components.map(menu => {
             menu.componentName = `component-${componentMap[menu.component_id]}`;

@@ -24,7 +24,11 @@
               <i class="vh-iconfont vh-line-close" @click="closePopup"></i>
             </header>
             <main>
-              <section v-for="tab of subMenu" v-show="curItem.cuid === tab.cuid" :key="tab.cuid">
+              <section
+                v-for="tab of filterSubMenu"
+                v-show="curItem.cuid === tab.cuid"
+                :key="tab.cuid"
+              >
                 <vmp-air-container :cuid="tab.cuid" :oneself="true" />
               </section>
             </main>
@@ -59,6 +63,16 @@
       };
     },
     computed: {
+      filterSubMenu() {
+        let set = [];
+        for (const item of this.subMenu) {
+          if (set.every(i => i.cuid !== item.cuid)) {
+            set.push(item);
+          }
+        }
+
+        return [...set];
+      },
       isPopupVisible: {
         get() {
           return Boolean(this.subMenu.find(item => item.cuid === this.curItem.cuid));
@@ -96,14 +110,13 @@
 
         return findComp(cuid, this.$children);
       },
-      switchTo(item, payload = null) {
+      switchTo(item) {
         const child = this.getComp(item.cuid);
         if (!child) return;
 
         // pre-show
-        if (item.cuid === 'comCustomMenu') {
-          const { method, arg = [] } = payload;
-          child[method] && child[method](...arg);
+        if (item.cuid.startsWith('comCustomMenu')) {
+          child.queryDetail(item.contentId);
         }
 
         this.curItem = item;
@@ -111,6 +124,7 @@
       closePopup() {
         this.isPopupVisible = false;
         this.curItem = {};
+        this.$emit('closePopup');
       }
     }
   };
@@ -143,7 +157,12 @@
     }
 
     .vmp-tab-container-popup__body {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
       & > header {
+        flex: 0 0 auto;
         position: relative;
         width: 100%;
         height: 90px;
@@ -166,6 +185,11 @@
           top: 50%;
           transform: translateY(-50%);
         }
+      }
+
+      & > main {
+        flex: 1 1 auto;
+        overflow: scroll;
       }
 
       & > main > section {
