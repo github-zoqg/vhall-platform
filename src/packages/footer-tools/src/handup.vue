@@ -125,6 +125,8 @@
           if (this.waitTime <= 0) {
             window.clearInterval(this.waitInterval);
             this.btnText = '举手上麦';
+            this.isApplyed = false;
+            useMicServer().userCancelApply();
             // TODO: 分组
             let tip = '';
             if (this.isInGroup) {
@@ -133,8 +135,6 @@
               tip = '主持人拒绝了您的上麦请求';
             }
             this.$message.warning(tip);
-            this.isApplyed = false;
-            useMicServer().userCancelApply();
           }
         }, 1000);
       }
