@@ -111,8 +111,6 @@
         for (const item of list) {
           this.addItem(item);
         }
-
-        console.log('list:::::', list);
       },
       selectDefault() {
         // 选择默认项
