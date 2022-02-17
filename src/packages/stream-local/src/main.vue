@@ -26,9 +26,9 @@
         :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic iconfont"
+        class="vmp-stream-local__bootom-mic vh-iconfont"
         :class="
-          localStream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+          localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
       ></span>
     </section>
@@ -54,15 +54,13 @@
             class="vmp-stream-local__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              localStream.audioMuted
-                ? 'vh-line-turn-off-microphone'
-                : `iconicon_maikefeng_${audioLevel}`
+              localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
             "
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="top">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="joinInfo.role_name != 1 && role != 20"
           ></span>
@@ -91,7 +89,7 @@
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="joinInfo.role_name != 1"
             @click="speakOff"
           ></span>
