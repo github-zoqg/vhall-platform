@@ -16,7 +16,6 @@ import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpTabMenuWap from '@/packages/tab-menu-wap';
-import VmpTabContainerWap from '@/packages/tab-container-wap';
 import VmpIntroWap from '@/packages/intro-wap';
 //wap互动工具计时器弹窗
 import VmpWapTimer from '@/packages/wap-timer';
@@ -27,7 +26,7 @@ import VmpNoticeWap from '@/packages/notice-watch-wap';
 import VmpRecommendWap from '@/packages/recommend-wap';
 
 // 自定义菜单
-import VmpCustomMenu from '@/packages/custom-menu';
+import VmpCustomMenuWap from '@/packages/custom-menu-wap';
 
 // 商品列表
 import VmpGoodListWap from '@/packages/good-wap';
@@ -52,7 +51,6 @@ export function initUse() {
   Vue.use(VmpWatchPrivateChat);
   Vue.use(VmpSignUpForm);
   Vue.use(VmpTabMenuWap);
-  Vue.use(VmpTabContainerWap);
   Vue.use(VmpIntroWap);
   Vue.use(VmpWapTimer);
   Vue.use(VmpContainerRightWap);
@@ -62,5 +60,5 @@ export function initUse() {
   Vue.use(VmpWapQrCode);
   Vue.use(VmpInteractToolsWap);
   Vue.use(VmpChatWap);
-  Vue.use(VmpCustomMenu);
+  Vue.use(VmpCustomMenuWap);
 }
