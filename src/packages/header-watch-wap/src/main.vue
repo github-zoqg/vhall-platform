@@ -135,8 +135,8 @@
        * 初始化登录信息
        */
       initUserLoginStatus() {
-        const userInfo = sessionStorage.getItem('userInfo')
-          ? JSON.parse(sessionStorage.getItem('userInfo'))
+        const userInfo = localStorage.getItem('userInfo')
+          ? JSON.parse(localStorage.getItem('userInfo'))
           : '';
         console.log('用户信息-------->', userInfo);
         if (userInfo) {
