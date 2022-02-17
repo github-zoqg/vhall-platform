@@ -63,9 +63,6 @@
           <!-- 图片滑动 -->
           <li v-show="showMobileLogin || showCaptcha" class="yiyun-vhall">
             <div id="loginCaptcha"></div>
-            <!-- <p :class="['error-tip', { error: errorMsgShow.mobileKey }]">
-              {{ errorMsgShow.mobileKey ? $t('login.login_1023') : '' }}
-            </p> -->
           </li>
           <li :class="['sms', { li_check_error: errorMsgShow.smsCode }]" v-show="showMobileLogin">
             <div>
@@ -266,21 +263,19 @@
     beforeCreate() {
       this.userServer = useUserServer();
     },
-    async mounted() {
-      // this.initCaptcha();
-      await this.open();
-    },
+    async mounted() {},
     methods: {
       // 打开弹窗
       async open() {
-        await this.initCaptcha();
         this.popupVisible = true;
+        await this.$nextTick();
+        this.reloadCaptha();
       },
       reloadCaptha() {
         if (this.captchaReady) {
           this.userServer.refreshNECaptha();
         } else {
-          this.userServer.initNECaptcha('#pwdLoginCaptcha');
+          this.initCaptcha();
         }
       },
       async checkPh() {
