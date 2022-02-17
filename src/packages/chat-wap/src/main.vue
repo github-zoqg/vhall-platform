@@ -171,14 +171,13 @@
           pos: this.page * 10,
           limit: 10 // 所有端统一显示50条
         };
-        const { getHistoryMsg, state, setState } = this.chatServer;
 
         // eslint-disable-next-line no-void
-        if (state && ['', void 0, null].includes(state.defaultAvatar)) {
-          setState('defaultAvatar', defaultAvatar);
+        if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
+          this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
 
-        const { chatList = [], imgUrls = [] } = await getHistoryMsg(data, 'h5');
+        const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
         } else {
