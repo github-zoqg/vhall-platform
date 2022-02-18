@@ -2,7 +2,7 @@
   <section class="vmp-media-setting-container">
     <saas-dialog
       :visible="isShow"
-      title="设置"
+      :title="$t('account.account_1005')"
       width="480px"
       style="min-width: 480px"
       :showDefault="false"
@@ -22,8 +22,8 @@
       <saas-alert
         :visible="isConfirmVisible"
         :confirm="true"
-        confirmText="确认"
-        cancelText="取消"
+        :confirmText="$t('common.common_1010')"
+        :cancelText="$t('account.account_1063')"
         @onSubmit="confirmSave"
         @onClose="closeConfirm"
         @onCancel="closeConfirm"

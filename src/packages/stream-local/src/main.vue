@@ -158,6 +158,7 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
+      // this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数');
@@ -165,6 +166,11 @@
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
       }
+
+      // 主持人同意上麦申请
+      this.micServer.$on('vrtc_connect_agree', async () => {
+        this.userSpeakOn();
+      });
 
       // 上麦成功
       this.micServer.$on('vrtc_connect_success', async msg => {
@@ -177,6 +183,17 @@
 
           // 开始推流
           this.startPush();
+        }
+      });
+      // 下麦成功
+      this.micServer.$on('vrtc_disconnect_success', async msg => {
+        if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
+          this.stopPush();
+          // 如果成功，销毁播放器
+          this.playerServer.init();
+
+          // 实例化互动实例
+          this.interactiveServer.destroy();
         }
       });
     },

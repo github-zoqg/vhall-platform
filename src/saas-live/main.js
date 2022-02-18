@@ -13,34 +13,35 @@ import { Integrations } from '@sentry/tracing';
 // 初始化
 initGlobalAPI();
 
+window.$globalConfig.currentI18n = i18n;
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
 // Sentry监控探针
-// Sentry.init({
-//   Vue,
-//   dsn: 'https://a8d7c8deb63541239a0e9fcb538187bb@sentry.vhall.com/17',
-//   release: `${process.env.VUE_APP_BUILD_VERSION}`,
-//   // environment 上报的环境 建议 按照 测试、生产区分
-//   environment: process.env.NODE_ENV,
-//   integrations: [
-//     new Integrations.BrowserTracing({
-//       routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-//       tracingOrigins: [
-//         // 'localhost',
-//         'dev-csd-saas-web.vhall.com',
-//         'test-csd-saas-web.vhall.com',
-//         'csd-saas-web.vhall.com',
-//         // 'e.vhall.com',
-//         /^\//
-//       ]
-//     })
-//   ],
-//   // Set tracesSampleRate to 1.0 to capture 100%
-//   // of transactions for performance monitoring.
-//   // We recommend adjusting this value in production
-//   tracesSampleRate: 1.0
-// });
+Sentry.init({
+  Vue,
+  dsn: 'https://a8d7c8deb63541239a0e9fcb538187bb@sentry.vhall.com/17',
+  release: `${process.env.VUE_APP_BUILD_VERSION}`,
+  // environment 上报的环境 建议 按照 测试、生产区分
+  environment: process.env.NODE_ENV,
+  integrations: [
+    new Integrations.BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+      tracingOrigins: [
+        // 'localhost',
+        'dev-csd-saas-web.vhall.com',
+        'test-csd-saas-web.vhall.com',
+        'csd-saas-web.vhall.com',
+        // 'e.vhall.com',
+        /^\//
+      ]
+    })
+  ],
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0
+});
 
 window.root = new Vue({
   router,

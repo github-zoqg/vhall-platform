@@ -133,7 +133,7 @@
 <style lang="less">
   .vmp-tab-container {
     width: 100%;
-    height: calc(100% - 90px);
+    height: calc(100%);
     display: flex;
     flex-direction: column;
     overflow: scroll;
