@@ -7,8 +7,7 @@ const htmlConfig = {
     // vhallReport: '//t-alistatic01.e.vhall.com/common-static/middle/middle-log/1.0.1/index.min.js'
   },
   cdnCss: {
-    iconfont:
-      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-saas-pc/v1.0.1/iconfont.css'
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'
   }
 };
 
