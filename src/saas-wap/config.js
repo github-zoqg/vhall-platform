@@ -26,7 +26,8 @@ export const serverConfig = {
   layerPlayer: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
-    children: ['comWapPlayer']
+    children: ['comWaStreamLocal']
+    // comWapPlayer 编写互动功能，暂时注释
   },
   layerBodyCenter: {
     component: 'VmpContainer',
@@ -60,6 +61,9 @@ export const serverConfig = {
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
+  },
+  comWaStreamLocal: {
+    component: 'VmpWapStreamLocal'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
@@ -101,9 +105,8 @@ export const serverConfig = {
     component: 'VmpIntroWap',
     addTab: [
       {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
+        cuid: ['comGoodSaasWap'],
+        method: 'addItem'
       }
     ]
   },

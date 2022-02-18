@@ -6,7 +6,7 @@
       :class="{ disabledClick: selectedIndex === 0 }"
       @click="prev"
     >
-      <i class="vh-iconfont vh-line-arrow-left" />
+      <i class="iconfont iconzuofanye" />
     </span>
 
     <!-- item -->
@@ -19,7 +19,7 @@
         :key="`${item.comp}_${item.key}`"
         @click="select(item.comp, item.key)"
       >
-        <span class="item-text">{{ item.text }}</span>
+        <span class="item-text">{{ $t(item.text) }}</span>
         <hr class="bottom-line" />
       </li>
     </ul>
@@ -30,7 +30,7 @@
       :class="{ disabledClick: selectedIndex === menu.length - 1 }"
       @click="next"
     >
-      <i class="vh-iconfont vh-line-arrow-right" />
+      <i class="iconfont iconyoufanye" />
     </span>
   </section>
 </template>
@@ -61,7 +61,16 @@
         return this.menu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
       }
     },
+    mounted() {
+      this.selectDefault();
+    },
     methods: {
+      selectDefault() {
+        if (this.menu.length > 0) {
+          const { cuid, contentId } = this.menu[0];
+          this.select(cuid, contentId);
+        }
+      },
       prev() {
         if (this.selectedIndex === 0) return;
         const index = this.selectedIndex - 1;

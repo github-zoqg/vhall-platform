@@ -1,8 +1,9 @@
 <template>
-  <div class="vhall-lottery" v-if="payoff">
+  <div class="vhall-lottery" v-if="dialogVisible">
     <!-- 抽奖中 -->
     <lottery-pending v-if="prizeShow" :fitment="fitment" @close="close" @end="handleEndLottery" />
     <lottery-winner
+      mode="live"
       v-else-if="lotteryResultShow"
       :winner-list="winLotteryUserList"
       @reStart="reStart"
@@ -28,7 +29,7 @@
     name: 'VmpLotteryLive',
     data() {
       return {
-        payoff: false, // 整个组件的显隐(包括背景遮罩)
+        dialogVisible: false, // 整个组件的显隐(包括背景遮罩)
         fitment: {}, // 正在进行中的抽奖信息
         prizeShow: false, // 趣味抽奖
         lotteryContentShow: false, // 发起抽奖
@@ -36,7 +37,6 @@
         lotteryInfoId: null, // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
         prizeInfo: {} // 奖品信息
-        // -----------------------------------------------------
       };
     },
     provide() {
@@ -45,7 +45,7 @@
       };
     },
     beforeCreate() {
-      this.lotteryServer = new useLotteryServer();
+      this.lotteryServer = useLotteryServer();
     },
     methods: {
       /**
@@ -55,7 +55,7 @@
         // this.lotteryContentShow = true; // 发起抽奖
         // this.prizeShow = true;
         this.checkLottery().then(() => {
-          this.payoff = true;
+          this.dialogVisible = true;
         });
       },
       /**
@@ -84,7 +84,7 @@
         this.lotteryResultShow = false; // 抽奖结果
         this.lotteryContentShow = false; // 发起抽奖
         this.prizeShow = false; // 抽奖中
-        this.payoff = false;
+        this.dialogVisible = false;
       },
       // 结束抽奖
       handleEndLottery() {
@@ -92,7 +92,6 @@
         return this.lotteryServer.endLottery(this.lotteryInfoId).then(res => {
           if (res.code === 200) {
             this.winLotteryUserList = res.data.lottery_users;
-
             // console.warn('抽奖完成', res.data, res.data.award_snapshoot);
             // this.closeShow = true;
             // this.lotteryResultShow = true;

@@ -187,9 +187,10 @@
       });
       // 下麦成功
       this.micServer.$on('vrtc_disconnect_success', async () => {
-        this.stopPush();
+        await this.stopPush();
 
         this.interactiveServer.destroy();
+
         // 如果成功，销毁播放器
         this.playerServer.init();
       });
@@ -276,6 +277,7 @@
       },
       // 创建本地流
       async createLocalStream() {
+        console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         switch (this.$domainStore.state.mediaSettingServer.videoType) {
           case 'camera':
             await this.interactiveServer
@@ -321,11 +323,16 @@
       },
       // 结束推流
       stopPush() {
-        this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
-          this.isStreamPublished = false;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-          );
+        return new Promise(resolve => {
+          this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            this.isStreamPublished = false;
+            clearInterval(this._audioLeveInterval);
+
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          });
         });
       },
       // 点击mute按钮事件
@@ -368,7 +375,7 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.localStream.streamId) return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.localStream.streamId })
@@ -383,7 +390,7 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.localStream.streamId) return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.localStream.streamId })

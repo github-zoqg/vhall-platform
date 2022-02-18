@@ -40,6 +40,9 @@ import VmpSignWap from '@/packages/interact-sign-wap';
 // 二维码弹框
 import VmpWapQrCode from '@/packages/qrcode-wap';
 
+// Wap互动推流组件
+import VmpWapStreamLocal from '@/packages/wap-stream-local';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -66,4 +69,5 @@ export function initUse() {
   Vue.use(VmpCustomMenuWap);
   Vue.use(VmpSignWap);
   Vue.use(VmpMemberListWap);
+  Vue.use(VmpWapStreamLocal);
 }
