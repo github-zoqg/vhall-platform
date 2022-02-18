@@ -130,7 +130,7 @@
             }
           });
       },
-      swiperChange(index) {
+      swiperChange() {
         this.filterGift.forEach(ele => {
           ele.forEach(item => {
             item.active = false;

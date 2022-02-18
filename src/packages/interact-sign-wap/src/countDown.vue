@@ -1,0 +1,124 @@
+<template>
+  <div class="countdown">
+    <svg
+      class="countdown-ani"
+      viewBox="0 0 100 100"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="greenGradient" x1="0" y1="100%" x2="100%" y2="0">
+          <stop offset="0%" stop-color="#FC5659" />
+          <stop offset="50%" stop-color="#FC5659" />
+          <stop offset="100%" stop-color="#FFA32B" />
+        </linearGradient>
+      </defs>
+      <circle
+        class="progress"
+        cx="50%"
+        cy="50%"
+        r="47"
+        fill="transparent"
+        stroke="url(#greenGradient)"
+        stroke-dasharray="1"
+        stroke-dashoffset="1"
+      ></circle>
+      <circle
+        class="progress progress-bar"
+        cx="50%"
+        cy="50%"
+        r="47"
+        fill="transparent"
+        stroke="#F5F5F5"
+        :stroke-dasharray="perimeter"
+        :stroke-dashoffset="progress"
+      ></circle>
+    </svg>
+
+    <div class="countdown-core">
+      <div>{{ remainder }}</div>
+    </div>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: 'countDown',
+    data() {
+      return {
+        perimeter: Math.PI * 94
+      };
+    },
+    props: {
+      duration: {
+        type: [Number, String],
+        default: 30
+      },
+      consume: {
+        type: [Number, String],
+        default: 29
+      }
+    },
+    computed: {
+      percent() {
+        const ret = this.consume / this.duration;
+        return ret > 1 ? 1 : ret;
+      },
+      progress() {
+        return Math.PI * 94 * this.percent;
+      },
+      remainder() {
+        // eslint-disable-next-line one-var
+        let ret = this.consume,
+          m,
+          s;
+        ret = ret > 0 ? ret : 0;
+        m = parseInt(ret / 60);
+        s = ret % 60;
+        m = m > 9 ? m : `0${m}`;
+        s = s > 9 ? s : `0${s}`;
+        return `${m}:${s}`;
+      }
+    }
+  };
+</script>
+
+<style lang="less" scoped>
+  .countdown {
+    position: relative;
+    width: 238px;
+    height: 238px;
+    &-core {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background-color: #fff2f0;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      color: #fc5659;
+      font-weight: bold;
+    }
+    &-ani {
+      width: 238px;
+      height: 238px;
+    }
+    > svg {
+      transform: rotate(-90deg);
+    }
+  }
+  .progress {
+    stroke-width: 12px;
+  }
+  .progress-bar {
+    transform: rotate(-90deg);
+    transform: rotateX(180deg);
+    transform-origin: 50%;
+    stroke-width: 14px;
+  }
+</style>

@@ -41,21 +41,14 @@
       </div>
     </div>
     <send-box
-      :joinInfoInGift="joinInfoInGift"
-      :totalLike="totalLike"
       :currentTab="3"
-      :webinarData="webinar"
       :isAllBanned="isAllBanned"
       :isBanned="isBanned"
       :isHandsUp="isHandsUp"
       :noChatLogin="noChatLogin"
-      :showInviteCard="showInviteCard"
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
     ></send-box>
-    <!--    <div class="vmp-chat-wap__bottom-area">-->
-
-    <!--    </div>-->
   </div>
 </template>
 
@@ -63,10 +56,10 @@
   import scroll from './components/scroll';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from './images/default_avatar.png';
+  import { browserType } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpChatWap',
     components: {
@@ -77,7 +70,6 @@
     data() {
       const { chatList } = this.chatServer.state;
       return {
-        //todo 聊天列表,接入domain
         chatList: chatList,
         //新消息信息集合体
         messageType: {
@@ -93,33 +85,18 @@
         webinar: {},
         //是否隐藏聊天历史加载记录
         configList: {},
-        //是否是全体禁言
-        isAllBanned: false,
-        //是否是禁言
-        isBanned: false,
-        //是否是举手
-        isHandsUp: false,
-        //是否不需要登录也可以参与聊天
-        noChatLogin: false,
-        //是否显示邀请卡
-        showInviteCard: false,
-        //设备类型
-        deviceType: {
-          audio: false,
-          video: false
-        },
-        //在线的上麦状态
+        //在线的上麦状态 todo 待确认从哪里取全局的speakerList
         onlineMicStatus: false,
-        //总点赞数
-        totalLike: 0,
-        //当前页数 todo
+        //当前页数
         page: 1,
         //是否已经下拉刷新
         isPullingDown: false,
-        //关键词列表
+        //关键词列表 todo 需要获取设置的关键词
         keywordList: [],
         //房间号
-        roomId: ''
+        roomId: '',
+        //是否是嵌入端
+        isEmbed: false
       };
     },
     computed: {
@@ -127,20 +104,98 @@
       hideChatHistory() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
-      //礼物的参与信息 todo 待移除
-      joinInfoInGift() {
+      //当前登录人信息
+      joinInfo() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {} } = watchInitData;
-        return {
-          avatar: join_info.avatar,
-          nickname: join_info.nickname,
-          hideChatHistory: this.hideChatHistory
-        };
+        return join_info;
+      },
+      //是否允许举手
+      isHandsUp() {
+        const { interactToolStatus = {} } = this.roomBaseServer.state;
+        return interactToolStatus && !!interactToolStatus['is_handsup'];
+      },
+      //是否是全体禁言
+      isAllBanned() {
+        const { allBanned = 0 } = this.chatServer.state;
+        return allBanned === 1;
+      },
+      //是否是自己被禁言
+      isBanned() {
+        const { banned = 0 } = this.chatServer.state;
+        return banned === 1;
+      },
+      //是否不登陆也可以参与聊天
+      noChatLogin() {
+        let noChatLogin = false;
+        if (browserType()) {
+          /**
+           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
+           */
+          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
+            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+          } else {
+            noChatLogin = true;
+          }
+        } else {
+          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+        }
+        return noChatLogin;
+      },
+      // 设备状态
+      deviceType() {
+        const { interactToolStatus = {} } = this.roomBaseServer.state;
+        let muteType = {};
+        const { groupInitData = {} } = this.groupServer.state;
+        if (this.webinar.mode == 6 && groupInitData.speaker_list && groupInitData.isInGroup) {
+          muteType = groupInitData.speaker_list.find(
+            ele => ele.account_id === this.joinInfo.third_party_user_id
+          );
+        } else {
+          muteType =
+            interactToolStatus &&
+            Array.isArray(interactToolStatus.speaker_list) &&
+            interactToolStatus.speaker_list.find(
+              ele => ele.account_id === this.joinInfo.third_party_user_id
+            );
+        }
+        if (muteType) {
+          return {
+            audio:
+              (muteType.audio != 1 && !groupInitData.isInGroup) ||
+              (muteType.audio != 1 && groupInitData.isInGroup && groupInitData.join_role == 2),
+            video: muteType.video != 1
+          };
+        } else {
+          return {
+            // 开启自动上麦需要静音
+            audio:
+              (this.webinar.mode == 6 &&
+                interactToolStatus.auto_speak == 1 &&
+                !groupInitData.isInGroup) ||
+              groupInitData.join_role == 2,
+            video: false
+          };
+        }
+      }
+    },
+    watch: {
+      async 'chatList.length'(newVal) {
+        console.log(newVal);
+        await this.$nextTick();
+        this.$refs.scroll.refresh();
+        if (this.isPullingDown) {
+          this.$refs.scroll.finishPullDown();
+          this.isPullingDown = false;
+          return;
+        }
+        this.$refs.scroll.scrollBottom();
       }
     },
     beforeCreate() {
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
     },
     created() {
       this.initViewData();
@@ -157,12 +212,15 @@
     methods: {
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        const { embed = false } = embedObj;
+        console.log(this.roomBaseServer, 'roomBaseServer');
         console.log(join_info);
         this.webinar = webinar;
         this.configList = configList;
         this.roomId = interact.room_id;
+        this.isEmbed = embed;
       },
       // 获取历史消息
       async getHistoryMessage() {
@@ -171,14 +229,12 @@
           pos: this.page * 10,
           limit: 10 // 所有端统一显示50条
         };
-        const { getHistoryMsg, state, setState } = this.chatServer;
-
         // eslint-disable-next-line no-void
-        if (state && ['', void 0, null].includes(state.defaultAvatar)) {
-          setState('defaultAvatar', defaultAvatar);
+        if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
+          this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
 
-        const { chatList = [], imgUrls = [] } = await getHistoryMsg(data, 'h5');
+        const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
         } else {
@@ -227,7 +283,9 @@
       left: 0;
       right: 0;
       bottom: 120px;
-      overflow: hidden;
+      //overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       &__get-list-btn-container {
         width: 100%;
         text-align: center;
