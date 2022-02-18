@@ -15,9 +15,9 @@
         v-for="item of menu"
         :ref="`${item.comp}_${item.key}`"
         class="vmp-tab-menu-item"
-        :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.comp}_${item.key}` }"
-        :key="`${item.comp}_${item.key}`"
-        @click="select(item.comp, item.key)"
+        :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.cuid}_${item.contentId}` }"
+        :key="`${item.cuid}_${item.contentId}`"
+        @click="select(item.cuid, item.contentId)"
       >
         <span class="item-text">{{ $t(item.text) }}</span>
         <hr class="bottom-line" />
@@ -48,11 +48,11 @@
         direciton: 'row', // row(横)，column(纵)
         selectedId: '',
         menu: [
-          { comp: 'comChat', key: 'chat', text: '聊天', showIcon: false },
-          { comp: 'comMemberList', key: 'member', text: '成员', showIcon: false },
-          { comp: 'comNotice', key: 'notice', text: '公告', showIcon: false },
-          { comp: 'comCustomMenu', key: 32245, text: 'test1', showIcon: false },
-          { comp: 'comCustomMenu', key: 32246, text: 'test2', showIcon: false }
+          { cuid: 'comChat', contentId: 'chat', text: '聊天', showIcon: false },
+          { cuid: 'comMemberList', contentId: 'member', text: '成员', showIcon: false },
+          { cuid: 'comNotice', contentId: 'notice', text: '公告', showIcon: false },
+          { cuid: 'comCustomMenu', contentId: 32245, text: 'test1', showIcon: false },
+          { cuid: 'comCustomMenu', contentId: 32246, text: 'test2', showIcon: false }
         ]
       };
     },
@@ -61,89 +61,88 @@
         return this.menu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
       }
     },
-    mounted() {
+    async mounted() {
+      await this.$nextTick(0);
       this.selectDefault();
     },
     methods: {
+      /**
+       * 选中默认的菜单项（第一项）
+       */
       selectDefault() {
         if (this.menu.length > 0) {
           const { cuid, contentId } = this.menu[0];
           this.select(cuid, contentId);
         }
       },
+      /**
+       * 选中当前项左边一项
+       */
       prev() {
         if (this.selectedIndex === 0) return;
         const index = this.selectedIndex - 1;
         const item = this.menu[index];
-        this.select(item.comp, item.key);
+        this.select(item.cuid, item.contentId);
       },
+      /**
+       * 选中当前想右边一项
+       */
       next() {
         if (this.selectedIndex >= this.menu.length - 1) return;
         const index = this.selectedIndex + 1;
         const item = this.menu[index];
-        this.select(item.comp, item.key);
+        this.select(item.cuid, item.contentId);
       },
 
+      /**
+       * 通过index删除tab-item
+       * @param {Number} index
+       */
       removeItemByIndex(index) {
         this.menu.splice(index);
       },
 
       addItem(item) {
-        if (!item || !item.key || !item.text) {
-          throw Error('传入的 tab item 必须有id、text');
-        }
-
         item = getItemEntity(item);
 
         this.menu.push(item);
       },
 
       addItemByIndex(index, item) {
-        if (!item || !item.key || !item.text) {
-          throw Error('传入的 tab item 必须有id、text');
-        }
-
         item = getItemEntity(item);
 
         this.menu.splice(index, 0, item);
       },
 
-      getItem(comp, key) {
-        return this.menu.find(item => item.comp === comp && item.key === key);
+      /**
+       * 获取某个菜单项（根据cuid和menuId获取某个菜单项）
+       * @param {String} cuid
+       * @param {String|Number} menuId
+       */
+      getItem(cuid, menuId) {
+        return this.menu.find(item => {
+          const precise = item.cuid === cuid && item.cotentId === menuId;
+          const fuzzy = item.cuid === cuid;
+          return precise || fuzzy;
+        });
       },
 
-      setIcon(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-        tab.showIcon = true;
-      },
-
-      hiddenIcon(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-
-        tab.showIcon = false;
-      },
-
-      toggleIcon(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-
-        tab.showIcon = !tab.showIcon;
-      },
-
-      // 滑动到某个item的动画效果
-      scrollToItem(comp, key) {
+      /**
+       *
+       * @param {String} cuid
+       * @param {String|Number} menuId
+       */
+      scrollToItem(cuid, menuId = '') {
         // 由于menu列表随时会增减，
         const itemsWithPosition = this.menu.map(item => {
-          const key = `${item.comp}_${item.key}`;
+          const key = `${item.cuid}_${item.contentId}`;
           const ref = this.$refs[key][0];
           const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
           const left = ref.offsetLeft - paddingLeft;
           return { key, ref, left };
         });
 
-        const positionItem = itemsWithPosition.find(item => item.key === `${comp}_${key}`);
+        const positionItem = itemsWithPosition.find(item => item.key === `${cuid}_${menuId}`);
 
         this.$refs['menu'].scrollTo({
           left: positionItem.left,
@@ -151,21 +150,27 @@
         });
       },
 
-      select(comp, key) {
-        this.selectedId = `${comp}_${key}`;
+      /**
+       * 选中一个菜单项，并显示对应内容
+       * @param {String} cuid cuid
+       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
+       * @example select('comCustomMenuWap','10246')
+       */
+      select(cuid, menuId = '') {
+        this.selectedId = `${cuid}_${menuId}`;
         let payload = null;
-        if (comp === 'comCustomMenu') {
+        if (cuid === 'comCustomMenu') {
           payload = {
             method: 'queryDetail',
-            arg: [key]
+            arg: [menuId]
           };
         }
 
-        this.scrollToItem(comp, key);
+        this.scrollToItem(cuid, menuId);
 
         // 切换container内容
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'handleSelect', [comp, key, payload])
+          boxEventOpitons(this.cuid, 'handleSelect', [cuid, menuId, payload])
         );
       }
     }

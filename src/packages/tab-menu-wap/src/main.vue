@@ -5,14 +5,13 @@
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
         <li
           v-for="item of mainMenu"
-          :ref="`${item.cuid}_${item.key}`"
+          :ref="item.id"
           class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.cuid}_${item.contentId}` }"
-          :key="`${item.cuid}_${item.contentId}`"
-          @click="select(item.cuid, item.contentId)"
+          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :key="item.id"
+          @click="select(item.type, item.id)"
         >
           <span class="item-text">{{ $t(item.text) }}</span>
-          <span v-if="item.tipsVisible">tips</span>
         </li>
         <li
           v-if="visibleMenu.length > 3"
@@ -29,10 +28,10 @@
         <li
           class="vmp-tab-menu-sub__item"
           v-for="item of subMenu"
-          :key="`${item.cuid}_${item.contentId}`"
+          :key="item.id"
           @click="select(item.cuid, item.contentId)"
         >
-          {{ item.text }}
+          {{ $t(item.text) }}
         </li>
       </ul>
     </section>
@@ -61,17 +60,14 @@
     data() {
       return {
         direciton: 'row', // row(横)，column(纵)
-        selectedCuid: '',
-        selectedContentId: '', //存在相同cuid，但不同内容的情形
+        selectType: '',
+        selectedId: '',
         menu: [],
         isSubMenuShow: false,
         tabOptions: {}
       };
     },
     computed: {
-      selectedId() {
-        return `${this.selectedCuid}_${this.selectedContentId}`;
-      },
       visibleMenu() {
         return this.menu.filter(item => item.visible);
       },
@@ -83,9 +79,7 @@
         return this.visibleMenu.filter((item, index) => index >= 3);
       },
       selectedIndex() {
-        return this.visibleMenu.findIndex(
-          item => `${item.cuid}_${item.contentId}` === this.selectedId
-        );
+        return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       }
     },
     beforeCreate() {
@@ -115,10 +109,10 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
+        // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
 
         for (const item of list) {
-          console.log('initMenu::item:', item);
           this.addItem(item);
         }
       },
@@ -128,8 +122,8 @@
       selectDefault() {
         // 选择默认项
         if (this.visibleMenu.length > 0) {
-          const { cuid, contentId } = this.visibleMenu[0];
-          this.select(cuid, contentId);
+          const { type, id } = this.visibleMenu[0];
+          this.select(type, id);
         }
       },
       /**
@@ -150,8 +144,7 @@
        * @param {*} item
        */
       addItem(item) {
-        item = getItemEntity(item);
-        console.log('item:::::::', item);
+        item = getItemEntity(item, this.tabOptions.menuConfig);
         this.menu.push(item);
       },
       /**
@@ -160,7 +153,7 @@
        * @param {*} item
        */
       addItemByIndex(index, item) {
-        item = getItemEntity(item);
+        item = getItemEntity(item, this.tabOptions.menuConfig);
 
         this.menu.splice(index, 0, item);
       },
@@ -170,10 +163,10 @@
        * @param {String|Number} menuId [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        * @example getItem('comChatWap','10468')
        */
-      getItem(cuid, menuId) {
+      getItem(type, id) {
         return this.menu.find(item => {
-          const precise = item.cuid === cuid && item.cotentId === menuId;
-          const fuzzy = item.cuid === cuid;
+          const fuzzy = item.type === type;
+          const precise = fuzzy && item.id === id;
           return precise || fuzzy;
         });
       },
@@ -245,19 +238,17 @@
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
-      select(cuid, menuId = '') {
-        this.selectedCuid = cuid;
-        this.selectedContentId = menuId;
-
-        let payload = null;
+      select(type, id = '') {
+        this.selectType = type;
+        this.selectedId = id;
 
         // wap端逻辑
         this.isSubMenuShow = false;
 
-        const item = this.getItem(cuid, menuId);
+        const item = this.getItem(type, id);
 
-        this.$refs['tabContent'].switchTo(item, payload);
-        this.menuServer.$emit('tab-switched', { cuid, menuId });
+        this.$refs['tabContent'].switchTo(item);
+        this.menuServer.$emit('tab-switched', { type, id, item });
       }
     }
   };

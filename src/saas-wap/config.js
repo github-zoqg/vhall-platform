@@ -99,7 +99,22 @@ export const serverConfig = {
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
-    options: {}
+    options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
+        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
+        { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
+        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' }, // 广告、推荐
+        { type: 7, cuid: 'comChapterWap', text: 'menu.menu_1013' }, // 章节
+        { type: 8, cuid: 'comMemberListWap', text: '' } // 成员
+      ]
+    }
   },
   comIntroWap: {
     component: 'VmpIntroWap',

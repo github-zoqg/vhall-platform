@@ -20,7 +20,7 @@
         >
           <section class="vmp-tab-container-popup__body">
             <header>
-              <span>{{ curItem.text }}</span>
+              <span>{{ $t(curItem.text) }}</span>
               <i class="vh-iconfont vh-line-close" @click="closePopup"></i>
             </header>
             <main>
