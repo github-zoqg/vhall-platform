@@ -24,6 +24,7 @@ import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 //wap公告
 import VmpNoticeWap from '@/packages/notice-watch-wap';
 import VmpRecommendWap from '@/packages/recommend-wap';
+import VmpMemberListWap from '@/packages/member-list-wap';
 
 // 自定义菜单
 import VmpCustomMenuWap from '@/packages/custom-menu-wap';
@@ -64,4 +65,5 @@ export function initUse() {
   Vue.use(VmpChatWap);
   Vue.use(VmpCustomMenuWap);
   Vue.use(VmpSignWap);
+  Vue.use(VmpMemberListWap);
 }
