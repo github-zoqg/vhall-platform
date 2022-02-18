@@ -22,7 +22,7 @@ export const serverConfig = {
   layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
-    children: ['layerBodyCenter', 'comFooterTools', 'layerBodyRight']
+    children: ['layerBodyCenter', 'layerBodyRight']
     // children: ['comGoodSaas']
     // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
