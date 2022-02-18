@@ -1079,6 +1079,7 @@
         }
         //主持人/助理进入小组
         function handleHostJoin(msg) {
+          console.log(msg);
           // if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
           //   // 进入小组
           //   if (msg.data.group_ids[0] == 0) {
@@ -1538,7 +1539,7 @@
           receive_account_id: accountId
         };
         const request = this.micServer
-          .userSpeakOff(data)
+          .speakOff(data)
           .then(res => {
             //todo 埋点上报
             return res;

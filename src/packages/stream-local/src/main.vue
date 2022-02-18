@@ -186,15 +186,12 @@
         }
       });
       // 下麦成功
-      this.micServer.$on('vrtc_disconnect_success', async msg => {
-        if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          this.stopPush();
-          // 如果成功，销毁播放器
-          this.playerServer.init();
+      this.micServer.$on('vrtc_disconnect_success', async () => {
+        this.stopPush();
 
-          // 实例化互动实例
-          this.interactiveServer.destroy();
-        }
+        this.interactiveServer.destroy();
+        // 如果成功，销毁播放器
+        this.playerServer.init();
       });
     },
     beforeDestroy() {
@@ -221,8 +218,8 @@
         return false;
       },
       // 用户下麦接口
-      userSpeakOff() {
-        return this.micServer.userSpeakOff();
+      speakOff() {
+        return this.micServer.speakOff();
       },
       // 处理上麦失败
       handleSpeakOnError(err) {
@@ -230,13 +227,13 @@
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
@@ -398,8 +395,7 @@
               this.networkStatus = 0;
             });
         }, 2000);
-      },
-      speakOff() {}
+      }
     }
   };
 </script>
