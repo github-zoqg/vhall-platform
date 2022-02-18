@@ -158,6 +158,7 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
+      // this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数');
@@ -165,6 +166,11 @@
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
       }
+
+      // 主持人同意上麦申请
+      this.micServer.$on('vrtc_connect_agree', async () => {
+        this.userSpeakOn();
+      });
 
       // 上麦成功
       this.micServer.$on('vrtc_connect_success', async msg => {
@@ -178,6 +184,15 @@
           // 开始推流
           this.startPush();
         }
+      });
+      // 下麦成功
+      this.micServer.$on('vrtc_disconnect_success', async () => {
+        await this.stopPush();
+
+        this.interactiveServer.destroy();
+
+        // 如果成功，销毁播放器
+        this.playerServer.init();
       });
     },
     beforeDestroy() {
@@ -204,8 +219,8 @@
         return false;
       },
       // 用户下麦接口
-      userSpeakOff() {
-        return this.micServer.userSpeakOff();
+      speakOff() {
+        return this.micServer.speakOff();
       },
       // 处理上麦失败
       handleSpeakOnError(err) {
@@ -213,13 +228,13 @@
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
@@ -262,6 +277,7 @@
       },
       // 创建本地流
       async createLocalStream() {
+        console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         switch (this.$domainStore.state.mediaSettingServer.videoType) {
           case 'camera':
             await this.interactiveServer
@@ -307,11 +323,16 @@
       },
       // 结束推流
       stopPush() {
-        this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
-          this.isStreamPublished = false;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-          );
+        return new Promise(resolve => {
+          this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            this.isStreamPublished = false;
+            clearInterval(this._audioLeveInterval);
+
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          });
         });
       },
       // 点击mute按钮事件
@@ -354,7 +375,7 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.localStream.streamId) return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.localStream.streamId })
@@ -369,7 +390,7 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.localStream.streamId) return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.localStream.streamId })
@@ -381,8 +402,7 @@
               this.networkStatus = 0;
             });
         }, 2000);
-      },
-      speakOff() {}
+      }
     }
   };
 </script>

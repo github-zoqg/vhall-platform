@@ -2,11 +2,11 @@
   <div class="vmp-cash">
     <el-dialog
       v-if="dialogVisible"
+      class="vmp-cash-dialog"
+      width="365px"
       :title="$t('cash.cash_1001')"
       :visible.sync="dialogVisible"
       :close-on-click-modal="false"
-      class="vmp-cash-dialog"
-      width="365px"
       @close="closeDialog"
     >
       <div class="vmp-cash-wrap">
@@ -14,21 +14,35 @@
         <div class="vmp-cash-wrap-top">
           <div>
             <p class="vmp-cash-wrap-top__title">{{ $t('cash.cash_1002') }}</p>
-            <p class="vmp-cash-wrap-top__money">¥{{ incomeVo.red_packet_balance || '0.00' }}</p>
+            <p class="vmp-cash-wrap-top__money">
+              ¥{{ useCashServer.state.cashInfo.red_packet_balance || '0.00' }}
+            </p>
           </div>
           <div>
+            <!-- 提现按钮 -->
             <el-button
-              :disabled="!(incomeVo.red_packet_balance >= 1) || incomeVo.in_red_withdraw == true"
               class="vmp-cash-red-button vmp-cash-length-middle"
               round
+              :disabled="
+                useCashServer.state.cashInfo.red_packet_balance < 1 ||
+                useCashServer.state.cashInfo.in_red_withdraw
+              "
               :style="{ visibility: step === 0 ? 'visible' : 'hidden' }"
               @click="checkPhoneToWx"
             >
-              {{ incomeVo.in_red_withdraw == true ? $t('cash.cash_1004') : $t('cash.cash_1005') }}
-              <div v-if="!(incomeVo.red_packet_balance >= 1)" class="vmp-cash_btn_hover">
+              {{
+                useCashServer.state.cashInfo.in_red_withdraw
+                  ? $t('cash.cash_1004')
+                  : $t('cash.cash_1005')
+              }}
+              <div
+                v-if="useCashServer.state.cashInfo.red_packet_balance < 1"
+                class="vmp-cash_btn_hover"
+              >
                 {{ $t('cash.cash_1006') }}
               </div>
             </el-button>
+            <!-- 提现说明 -->
             <div v-if="step !== 3" class="vmp-cash__question">
               <p>{{ $t('cash.cash_1007') }}</p>
               <div class="vmp-cash__question__box">
@@ -60,11 +74,12 @@
             </div>
           </div>
         </div>
+
         <!-- 第二段-00， 200条数据 -->
         <div v-show="step === 0" class="vmp-cash-list-box">
-          <div v-if="dataList.length > 0" class="vmp-cash-list">
+          <div v-if="useCashServer.state.cashList.length > 0" class="vmp-cash-list">
             <ul>
-              <li v-for="(item, index) in dataList" :key="index">
+              <li v-for="(item, index) in useCashServer.state.cashList" :key="index">
                 <div>
                   <p>{{ item.type == 0 ? $t('cash.cash_1019') : $t('cash.cash_1005') }}</p>
                   <p>{{ item.time }}</p>
@@ -80,11 +95,12 @@
             {{ $t('cash.cash_1020') }}
           </div>
         </div>
-        <!-- 第二段-01， 绑定手机号 -->
-        <div v-show="step === 1" class="vmp-cash__bind-phone">
+
+        <!-- 第二段-01， 绑定手机号 和 提现 -->
+        <div v-show="step === 1 || step === 3" class="vmp-cash__bind-phone vmp-cash__submit-wx">
           <el-form ref="bindForm" :model="bindForm" :rules="bindFormRules" label-width="0">
-            <p class="cash-bind-notice">{{ $t('cash.cash_1021') }}</p>
-            <el-form-item key="phone" prop="phone">
+            <p v-if="step === 1" class="cash-bind-notice">{{ $t('cash.cash_1021') }}</p>
+            <el-form-item v-if="step === 1" prop="phone">
               <el-input
                 v-model.trim="bindForm.phone"
                 auto-complete="off"
@@ -92,17 +108,16 @@
                 :maxlength="30"
               />
             </el-form-item>
-            <el-form-item
-              v-if="step === 1"
-              id="captcha-box"
-              :class="cashCaptVo.eMsg_bind ? 'vmp-cash-box__msg__error__bottom' : ''"
-            >
-              <div id="captcha_bind">
-                <el-input v-model.trim="bindForm.imgCode" style="display: none"></el-input>
-              </div>
-              <span v-if="cashCaptVo.eMsg_bind" class="vmp-cash-form-error">
-                {{ $t('account.account_1028') }}
-              </span>
+            <el-form-item v-if="step === 3" prop="money">
+              <el-input
+                v-model.trim="bindForm.money"
+                clearable
+                oninput="this.value=this.value.replace(/[^\d^\.]+/g, '')"
+                :placeholder="$t('cash.cash_1025')"
+              ></el-input>
+            </el-form-item>
+            <el-form-item id="captcha-box" prop="imgCode">
+              <NECaptcha ref="NECaptcha" v-model="bindForm.imgCode" />
             </el-form-item>
             <el-form-item key="code" prop="code" class="vmp-cash-wrap-code">
               <el-input
@@ -114,108 +129,38 @@
               ></el-input>
               <span
                 type="danger"
-                :disabled="cashCaptVo.btnCtrl_bind == 'disabled'"
-                :class="['vmp-cash-code-btn', cashCaptVo.btnCtrl_bind]"
-                @click.stop.prevent="getCaptha('bindForm', 'code')"
+                :disabled="bindForm.imgCode ? '' : 'disabled'"
+                :class="['vmp-cash-code-btn', bindForm.imgCode && !timer ? 'start' : 'disabled']"
+                @click.stop.prevent="getCaptha"
               >
                 {{
-                  cashCaptVo.sendCode_bind
-                    ? $t('account.account_1031', { n: cashCaptVo.time_bind })
-                    : $t('account.account_1030')
+                  timer ? $t('account.account_1031', { n: countTime }) : $t('account.account_1030')
                 }}
               </span>
-              <!-- TODO 可能注释掉 -->
-              <span v-if="cashCaptVo.codeErr_bind != ''" class="vmp-cash-form-error">
-                {{ cashCaptVo.codeErr_bind }}
-              </span>
             </el-form-item>
-          </el-form>
-          <el-button
-            v-preventReClick
-            class="vmp-cash-red-button vmp-cash__length-max"
-            @click="cashPhoneToWx()"
-          >
-            {{ $t('cash.cash_1022') }}
-          </el-button>
-        </div>
-        <!-- 第三段-02， 绑定提现微信 -->
-        <div v-show="step === 2" class="vmp-cash__bind-wx">
-          <div class="vmp-share__img__box">
-            <img
-              v-if="qrcode"
-              :src="`//aliqr.e.vhall.com/qr.png?t=${encodeURIComponent(qrcode)}`"
-              alt=""
-            />
-          </div>
-          <p>{{ $t('cash.cash_1023') }}</p>
-          <p>{{ $t('cash.cash_1024') }}</p>
-        </div>
-        <!-- 第四段-03， 提现表单 -->
-        <div v-show="step === 3" class="vmp-cash__submit-wx">
-          <el-form ref="cashForm" :model="cashForm" :rules="cashFormRules" label-width="0">
-            <el-form-item key="money" prop="money">
-              <el-input
-                v-model.trim="cashForm.money"
-                clearable
-                oninput="this.value=this.value.replace(/[^\d^\.]+/g, '')"
-                :placeholder="$t('cash.cash_1025')"
-              ></el-input>
-            </el-form-item>
-            <el-form-item
-              v-if="step === 3"
-              id="captcha-box"
-              :class="cashCaptVo.eMsg_cash ? 'vmp-cash-box__msg__error__bottom' : ''"
-            >
-              <div id="captcha_cash">
-                <el-input v-model.trim="cashForm.imgCode" style="display: none"></el-input>
-              </div>
-              <span v-if="cashCaptVo.eMsg_cash" class="vmp-cash-form-error">
-                {{ $t('account.account_1028') }}
-              </span>
-            </el-form-item>
-            <el-form-item key="code" prop="code" class="vmp-cash-wrap-code">
-              <el-input
-                v-model.trim="cashForm.code"
-                clearable
-                type="captcha"
-                :maxlength="6"
-                :placeholder="$t('account.account_1029')"
-              ></el-input>
-              <span
-                type="danger"
-                :disabled="cashCaptVo.btnCtrl_cash == 'disabled'"
-                :class="['vmp-cash-code-btn', cashCaptVo.btnCtrl_cash]"
-                @click.stop.prevent="getCaptha('cashForm', 'code')"
-              >
-                {{
-                  cashCaptVo.sendCode_cash
-                    ? $t('account.account_1031', { n: cashCaptVo.time_cash })
-                    : $t('account.account_1030')
-                }}
-              </span>
-              <!-- TODO 可能注释掉 -->
-              <span v-if="cashCaptVo.codeErr_cash != ''" class="vmp-cash-form-error">
-                {{ cashCaptVo.codeErr_cash }}
-              </span>
-            </el-form-item>
-            <el-form-item>
+            <el-form-item v-if="step === 3">
               <div class="vmp-wrap-cash-wx">
                 <label class="vmp-wrap-cash__title">{{ $t('cash.cash_1026') }}</label>
                 <div class="vmp-wrap-cash__avatar">
                   <img
-                    v-show="!cashUserInfo.avatar"
-                    src="data:image/png;base64,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"
+                    v-show="!useCashServer.state.wxInfo.wechat_profile"
+                    src="./images/my-dark@2x.png"
                     alt=""
                   />
-                  <img v-show="cashUserInfo.avatar" :src="cashUserInfo.avatar" alt="" />
+                  <img
+                    v-show="useCashServer.state.wxInfo.wechat_profile"
+                    :src="useCashServer.state.wxInfo.wechat_profile"
+                    alt=""
+                  />
                 </div>
                 <label class="vmp-wrap-cash__name">
                   {{
-                    (cashUserInfo && cashUserInfo.nick_name ? cashUserInfo.nick_name : '')
-                      | splitLenStr(6)
+                    (useCashServer.state.wxInfo.wechat_name_wap
+                      ? useCashServer.state.wxInfo.wechat_name_wap
+                      : '') | splitLenStr(6)
                   }}
                   {{
-                    cashUserInfo && cashUserInfo.nick_name
+                    useCashServer.state.wxInfo.wechat_name_wap
                       ? `（${$t('account.account_1019')}）`
                       : `（${$t('account.account_1020')}）`
                   }}
@@ -232,22 +177,522 @@
             </el-form-item>
           </el-form>
           <el-button
+            v-if="step === 1"
+            v-preventReClick
+            class="vmp-cash-red-button vmp-cash__length-max"
+            @click="cashPhoneToWx()"
+          >
+            {{ $t('cash.cash_1022') }}
+          </el-button>
+          <el-button
+            v-if="step === 3"
             v-preventReClick
             class="vmp-cash-red-button vmp-cash__length-max"
             @click="cashFormSubmit()"
           >
             {{ $t('cash.cash_1027') }}
           </el-button>
-          <p class="vmp-cash-protol">
+          <p v-if="step === 3" class="vmp-cash-protol">
             <span>{{ $t('cash.cash_1028') }}</span>
             <span class="vmp-cash-link" @click="toCashProtol">{{ $t('cash.cash_1029') }}</span>
           </p>
+        </div>
+
+        <!-- 第三段-02， 绑定提现微信 -->
+        <div v-show="step === 2" class="vmp-cash__bind-wx">
+          <div class="vmp-share__img__box">
+            <img
+              v-if="qrcode"
+              :src="`//aliqr.e.vhall.com/qr.png?t=${encodeURIComponent(qrcode)}`"
+              alt=""
+            />
+            <div
+              class="vmp-qr-reload"
+              v-if="countPoll === 12"
+              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1)"
+            >
+              <i class="vh-iconfont vh-a-line-clockwiserotation"></i>
+            </div>
+          </div>
+          <p>{{ $t('cash.cash_1023') }}</p>
+          <p>{{ $t('cash.cash_1024') }}</p>
         </div>
       </div>
     </el-dialog>
   </div>
 </template>
-<script src="./js/cash.js"></script>
+
+<script>
+  import { useUserServer, useCashServer } from 'middle-domain';
+  import NECaptcha from './components/NECaptcha/index.vue';
+  export default {
+    name: 'VmpCash',
+    components: {
+      NECaptcha
+    },
+    data() {
+      // 提现金额校验
+      const validateMoney = (rule, value, callback) => {
+        if (!/^\d+$|^\d*\.\d+$/g.test(value)) {
+          callback(new Error(this.$t('cash.cash_1030')));
+        } else {
+          if (value < 1) {
+            this.handleInputChange(value);
+            callback(new Error(this.$t('cash.cash_1031')));
+          } else if (value - this.useCashServer.state.cashInfo.red_packet_balance > 0) {
+            this.handleInputChange(value);
+            callback(new Error(this.$t('cash.cash_1032')));
+          } else if (value - 800 > 0) {
+            if (value > 800) {
+              this.bindForm.money = 800;
+            }
+            callback();
+          } else {
+            this.handleInputChange(value);
+            callback();
+          }
+        }
+      };
+
+      // 手机号校验
+      const validatePhone = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t('account.account_1025')));
+        } else {
+          if (!/^1[0-9]{10}$/.test(value)) {
+            callback(new Error(this.$t('account.account_1069')));
+          } else {
+            callback();
+          }
+        }
+      };
+
+      // 易盾校验
+      const validateImgCode = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('account.account_1028')));
+        } else {
+          callback();
+        }
+      };
+
+      // 验证码校验
+      const validateCode = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t('account.account_1070')));
+        } else {
+          callback();
+        }
+      };
+
+      return {
+        dialogVisible: false, // 组件是否显示
+        useUserServer: {}, // 用户相关的接口
+        useCashServer: {}, // 提现相关的接口
+        step: 0, // 当前步骤
+        cashCaptVo: {}, // 待删除
+        bindForm: {
+          money: '',
+          phone: '',
+          imgCode: null,
+          code: ''
+        }, // 绑定手机号表单
+        bindFormRules: {
+          phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
+          imgCode: [{ required: true, validator: validateImgCode, trigger: 'change' }],
+          code: [{ required: true, validator: validateCode, trigger: 'blur' }],
+          money: [{ required: true, validator: validateMoney, trigger: 'blur' }]
+        }, // 表单校验规则
+        qrcode: '', // 绑定微信的二维码
+        timer: null, // 倒计时定时器
+        countTime: 60, // 倒计时的时间
+        pollTimer: null, // 轮询定时器
+        countPoll: 0 // 轮询执行次数
+      };
+    },
+    filters: {
+      splitLenStr: function (name, len) {
+        return name && name.length > len ? name.substring(0, len) + '...' : name;
+      }
+    },
+    created() {
+      this.useUserServer = useUserServer();
+      this.useCashServer = useCashServer();
+    },
+    beforeDestroy() {
+      this.initInterval(); // 初始化定时器
+      this.initPollTimer(); // 初始化微信绑定情况的轮询
+    },
+    methods: {
+      // 关闭弹窗初始化事件
+      closeDialog() {
+        this.dialogVisible = false;
+        this.step = 0;
+        this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+        this.$refs.bindForm?.resetFields(); // 重置表单
+        this.initInterval(); // 初始化定时器
+        this.initPollTimer(); // 初始化微信绑定情况的轮询
+      },
+
+      // 打开弹窗
+      openCashDialog() {
+        this.dialogVisible = true;
+        this.useCashServer.getCashInfo();
+        this.useCashServer.getCashList();
+      },
+
+      // 提现按钮
+      async checkPhoneToWx() {
+        // 获取用户的基本信息 如绑定的手机号
+        await this.useUserServer.getUserInfo({ scene_id: 2 });
+        // 获取微信的绑定信息 返回是否绑定 头像 昵称
+        await this.useCashServer.checkWithDrawal();
+        if (!this.useUserServer.state.userInfo.phone) {
+          console.log('手机号未绑定进入... ...');
+          this.step = 1;
+        } else if (this.useCashServer.state.wxInfo.is_oauth === 1) {
+          console.log('手机号已绑定、微信已绑定(昵称和头像都有)进入... ...');
+          this.step = 3;
+        } else if (this.useCashServer.state.wxInfo.is_oauth !== 1) {
+          console.log('手机号已绑定、（微信未绑定or绑定无头像or绑定无昵称）进入... ...');
+          await this.goBangWeixin(1);
+          this.step = 2;
+        } else {
+          console.log('手机号已绑定、（cash_wechat其它异常返回）进入... ...');
+        }
+      },
+
+      // 获取验证码
+      getCaptha() {
+        if (this.timer) return; // 防止倒计时过程中触发事件
+        // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回
+        // 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码
+        const validateList = []; // 数据项校验的错误信息
+        let params = {}; // 提交参数
+        let fnName = 'withdrawSendCode'; // 触发方法名
+        if (this.step === 1) {
+          // 绑定手机号的验证码
+          this.$refs.bindForm.validateField(['phone', 'imgCode'], valid => {
+            validateList.push(valid);
+          });
+          params = {
+            type: 1, // 1 手机号 2 邮箱
+            data: this.bindForm.phone,
+            validate: this.bindForm.imgCode,
+            scene_id: 2
+          };
+          fnName = 'sendCode';
+        } else if (this.step === 3) {
+          // 提现的验证码
+          this.$refs.bindForm.validateField(['imgCode'], valid => {
+            validateList.push(valid);
+          });
+          params = {
+            captcha: this.bindForm.imgCode,
+            user_type: 2
+          };
+          fnName = 'withdrawSendCode';
+        }
+
+        // 若没有错误信息则请求接口
+        if (validateList.every(item => item === '')) {
+          this.useCashServer[fnName](params)
+            .then(res => {
+              if (res && res.code === 200) {
+                this.initInterval();
+                this.timer = setInterval(() => {
+                  this.countTime--;
+                  if (this.countTime === 0) {
+                    this.initInterval();
+                  }
+                }, 1000);
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg,
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+                this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+              }
+            })
+            .catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+              this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+            });
+        }
+      },
+
+      // 绑定手机号 -- 验证手机号绑定情况
+      cashPhoneToWx() {
+        this.$refs.bindForm.validate(valid => {
+          if (valid) {
+            // 先验证验证码结果，再实际绑定为新手机号
+            this.useUserServer
+              .codeCheck({
+                type: 1,
+                data: this.bindForm.phone,
+                code: this.bindForm.code,
+                scene_id: 2
+              })
+              .then(res => {
+                if (res && res.code == 200 && res.data.check_result === 1) {
+                  // 执行绑定手机号操作
+                  this.bindPhoneSave(res.data.key);
+                } else {
+                  this.$message({
+                    message: this.$tec(res.code) || res.msg || this.$t('cash.cash_1033'),
+                    showClose: true,
+                    type: 'error',
+                    customClass: 'zdy-info-box'
+                  });
+                }
+              })
+              .catch(res => {
+                console.log(res);
+                this.$message({
+                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          }
+        });
+      },
+
+      // 绑定手机号 -- 执行绑定手机号操作 成功后判断微信绑定情况
+      bindPhoneSave(key) {
+        // 确认绑定新功能
+        this.useUserServer
+          .bindInfo({
+            type: 1,
+            account: this.bindForm.phone,
+            code: this.bindForm.code,
+            scene_id: 2,
+            key
+          })
+          .then(res => {
+            if (res && res.code == 200) {
+              this.$message({
+                message: this.$t('account.account_1053'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
+              this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+              this.$refs.bindForm?.resetFields(); // 重置表单
+              this.initInterval(); // 初始化定时器
+              // 再次执行提现按钮
+              this.checkPhoneToWx();
+            } else {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+          })
+          .catch(err => {
+            this.$message({
+              message: this.$tec(err.code) || err.msg || this.$t('account.account_1054'),
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+
+      // 打开用户兑换协议
+      toCashProtol() {
+        window.open('https://e.vhall.com/home/vhallapi/exchangeagreement', '_blank');
+      },
+
+      // 更换账户绑定的微信
+      async changeWx() {
+        await this.goBangWeixin(2);
+        this.step = 2;
+      },
+
+      // 绑定微信 --- 获取绑定微信二维码 1初次绑定 2更换绑定
+      goBangWeixin(type) {
+        // 获取微信绑定key值
+        this.useCashServer
+          .getBindKey()
+          .then(res => {
+            if (res.code == 200) {
+              const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
+              this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
+              console.log(`二维码请求地址: ${this.qrcode}`);
+              // 轮询微信扫码绑定情况
+              this.startPolling(type);
+            } else {
+              this.$message({
+                message: this.$tec(res.code) || res.msg || '获取信息失败',
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+          })
+          .catch(err => {
+            this.$message({
+              message: this.$tec(err.code) || err.msg || '获取信息失败',
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+
+      // 轮询微信扫码绑定情况
+      async startPolling(type) {
+        this.initPollTimer();
+        const pollingFn = async () => {
+          // 微信扫码绑定情况
+          const bindData = await this.withdrawIsBind(type);
+          if (type == 1 && bindData.data.is_bind == 1) {
+            console.log('第一次绑定, 当前已经授权过...');
+            this.initPollTimer();
+            // 获取微信的绑定信息 返回是否绑定 头像 昵称
+            await this.useCashServer.checkWithDrawal();
+            this.step = 3;
+          } else if (type == 2 && bindData.data.is_change == 1) {
+            console.log('更换绑定, 当前已经授权过...');
+            this.initPollTimer();
+            // 获取微信的绑定信息 返回是否绑定 头像 昵称
+            await this.useCashServer.checkWithDrawal();
+            this.step = 3;
+          }
+          // v3组件老逻辑 1min 自动重置一次二维码 后续可以改成用户手动
+          this.countPoll++;
+          if (this.countPoll % 12 === 0) {
+            clearInterval(this.pollTimer);
+            this.pollTimer = null;
+          }
+        };
+        this.pollTimer = setInterval(pollingFn, 5000);
+      },
+
+      // 获取当前的微信绑定状态 1初次绑定 2更换绑定
+      withdrawIsBind(type) {
+        const params = {};
+        type === 2 && (params.is_change = 1); // 更换绑定增加参数
+        return this.useCashServer.withdrawIsBind(params);
+      },
+
+      // 立即提现按钮
+      cashFormSubmit() {
+        this.$refs.bindForm.validate(valid => {
+          if (valid) {
+            this.useCashServer
+              .withdraw({
+                verification_code: this.bindForm.code,
+                fee: this.bindForm.money,
+                type: 1,
+                user_type: 2
+              })
+              .then(res => {
+                if (res && res.code == 200) {
+                  this.$message({
+                    message: this.$t('cash.cash_1036'),
+                    showClose: true,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.closeDialog();
+                } else {
+                  this.$message({
+                    message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
+                    showClose: true,
+                    type: 'error',
+                    customClass: 'zdy-info-box'
+                  });
+                }
+              })
+              .catch(err => {
+                this.$message({
+                  message: this.$tec(err.code) || err.msg || '验证失败，无法操作',
+                  showClose: true,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              });
+          }
+        });
+        this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+        this.$refs.bindForm?.resetFields(); // 重置表单
+        this.initInterval(); // 初始化定时器
+      },
+
+      // 初始化定时器
+      initInterval() {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.countTime = 60;
+      },
+
+      // 初始化微信绑定情况的轮询
+      initPollTimer() {
+        clearInterval(this.pollTimer);
+        this.pollTimer = null;
+        this.countPoll = 0;
+      },
+
+      /**
+       * 价格格式限制 v3复制来的
+       * 只能输入数字和小数点；
+       * 小数点只能有1个
+       * 第一位不能是小数点
+       * 第一位如果输入0，且第二位不是小数点，则去掉第一位的0
+       * 小数点后保留2位
+       */
+      handleInputChange(value) {
+        if (value != '') {
+          let str = value + '';
+          const len1 = str.substr(0, 1);
+          const len2 = str.substr(1, 1);
+          // 如果第一位是0，第二位不是点，就用数字把点替换掉
+          if (str.length > 1 && len1 == 0 && len2 != '.') {
+            str = str.substr(1, 1);
+          }
+          // 第一位不能是.
+          if (len1 == '.') {
+            str = '';
+          }
+          // 限制只能输入一个小数点
+          if (str.indexOf('.') != -1) {
+            const str_ = str.substr(str.indexOf('.') + 1);
+            if (str_.indexOf('.') != -1) {
+              str = str.substr(0, str.indexOf('.') + str_.indexOf('.') + 1);
+            }
+          }
+          // 正则替换，保留数字和小数点
+          // eslint-disable-next-line no-useless-escape
+          str = str.replace(/[^\d^\.]+/g, '');
+          // 如果需要保留小数点后两位，则用下面公式
+          if (str.indexOf('.') > -1 && str.length - str.indexOf('.') > 3) {
+            str = str.slice(0, str.indexOf('.') + 3);
+            this.$message({
+              message: this.$t('cash.cash_1034'),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          }
+          this.bindForm.money = str;
+        }
+      }
+    }
+  };
+</script>
+
 <style lang="less">
   .vmp-cash {
     .vmp-cash-dialog {
@@ -539,9 +984,27 @@
         text-align: center;
         .vmp-share__img__box {
           padding: 12px 0 7px 0;
+          position: relative;
           img {
             width: 215px;
             height: 215px;
+          }
+          .vmp-qr-reload {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            background: rgba(225, 225, 225, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            .vh-a-line-clockwiserotation {
+              font-size: 20px;
+              color: #333333;
+            }
           }
         }
         p {
