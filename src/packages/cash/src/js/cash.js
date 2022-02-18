@@ -1,7 +1,7 @@
 // import { mapMutations, mapState } from 'vuex';
-import { useUserServer } from 'middle-domain';
+import { useUserServer, useCashServer } from 'middle-domain';
 export default {
-  name: 'VmpCash',
+  name: 'VmpCashOld',
   data() {
     const validatePhone = (rule, value, callback) => {
       // this.phoneError = value === '' || !(/^1[0-9]{10}$/.test(value))
@@ -108,37 +108,37 @@ export default {
       },
       cashUserInfo: {},
       accountVo: {},
-      useUserServer: null
+      useUserServer: null,
+      useCashServer: null
     };
   },
   created() {
     // 创建
     this.useUserServer = useUserServer();
+    this.useCashServer = useCashServer();
+    console.log('+++++++++++++++++', this.useUserServer, this.useCashServer);
   },
   computed: {
     // ...mapState('watchBase', ['languages'])
   },
   methods: {
     // ...mapMutations('watchBase', ['setUserInfo']),
-    getUserInfo() {
-      return this.$vhallapi.nav
-        .getInfo({
-          scene_id: 2
-        })
-        .then(res => {
-          if (res && res.code == 200) {
-            // this.setUserInfo(res.data); TODO
-            this.accountVo = res.data;
-          } else {
-            console.log(res);
-            // this.setUserInfo(null); TODO
-          }
-        })
-        .catch(e => {
-          console.log(e);
-          // this.setUserInfo(null); TODO
-        });
-    },
+    // getUserInfo() {
+    //   return this.useUserServer.getInfo({ scene_id: 2 });
+    //     // .then(res => {
+    //     //   if (res && res.code == 200) {
+    //     //     // this.setUserInfo(res.data); TODO
+    //     //     this.accountVo = res.data;
+    //     //   } else {
+    //     //     console.log(res);
+    //     //     // this.setUserInfo(null); TODO
+    //     //   }
+    //     // })
+    //     // .catch(e => {
+    //     //   console.log(e);
+    //     //   // this.setUserInfo(null); TODO
+    //     // });
+    // },
     initComp() {
       console.log('每次提现进入当前... ...');
       this.step = 0;
@@ -146,33 +146,35 @@ export default {
       this.withdrawRpList();
     },
     getIncomeInfo() {
-      this.$vhallapi.nav
-        .incomeInfo({})
+      this.useCashServer
+        .getCashInfo({})
         .then(res => {
           // res.data.red_packet_income = '5.0'
           this.incomeVo = res && res.code == 200 ? res.data || {} : {};
         })
-        .catch(res => {
+        .catch(err => {
+          console.log(err);
           this.incomeVo = {
             // red_packet_income: '5.0'
           };
         });
     },
     withdrawRpList() {
-      this.$vhallapi.nav
-        .withdrawRpList({})
+      this.useCashServer
+        .getCashList({})
         .then(res => {
           this.dataList = res && res.code == 200 ? res.data.list || [] : [];
         })
-        .catch(res => {
+        .catch(err => {
+          console.log(err);
           this.dataList = [];
         });
     },
     async checkPhoneToWx() {
-      await this.getUserInfo();
+      await this.useUserServer.getUserInfo({ scene_id: 2 });
       const { data } = await this.checkWithDrawal();
-      if (this.accountVo) {
-        if (!this.accountVo.phone) {
+      if (this.useUserServer.state.userInfo) {
+        if (!this.useUserServer.state.userInfo.phone) {
           console.log('手机号未绑定进入... ...');
           // 若手机号未绑定
           this.step = 1;
@@ -331,7 +333,7 @@ export default {
               validate: this.cashCaptVo[successMsgCodeKey],
               scene_id: this[formName].scene_id
             };
-      this.$vhallapi.nav[fName](params)
+      this.useCashServer[fName](params)
         .then(res => {
           if (res && res.code == 200) {
             this.cashCaptVo[btnCtrlKey] = 'pending';
@@ -410,7 +412,7 @@ export default {
     // 设置手机号 / 修改手机号 =>> （绑定）
     bindPhoneSave(formName) {
       // 确认绑定新功能
-      this.$vhallapi.nav
+      this.useUserServer
         .bindInfo({
           type: 1,
           account: this[formName].phone,
@@ -456,7 +458,7 @@ export default {
     goBangWeixin(type) {
       const that = this;
       // 获取key值
-      this.$vhallapi.nav
+      this.useCashServer
         .getBindKey({})
         .then(res => {
           if (res.code == 200) {
@@ -500,7 +502,7 @@ export default {
     },
     checkWithDrawal() {
       return new Promise((resolve, reject) => {
-        this.$vhallapi.nav.checkWithDrawal({}).then(res => {
+        this.useCashServer.checkWithDrawal({}).then(res => {
           resolve(res);
         }, reject);
       });
@@ -512,7 +514,7 @@ export default {
           // 更换加参数传递
           params.is_change = 1;
         }
-        this.$vhallapi.nav.withdrawIsBind(params).then(res => {
+        this.useCashServer.withdrawIsBind(params).then(res => {
           resolve(res);
         }, reject);
       });
@@ -606,7 +608,7 @@ export default {
     cashFormSubmit() {
       this.$refs.cashForm.validate(valid => {
         if (valid) {
-          this.$vhallapi.nav
+          this.useCashServer
             .withdraw({
               verification_code: this.cashForm.code,
               fee: this.cashForm.money,
@@ -653,12 +655,20 @@ export default {
       this.toCodeWxPanel(2);
     },
     closeDialog() {
+      this.initComp();
       this.stopPolling();
       this.dialogVisible = false;
       if (this.cashTimer) {
         console.log('销毁存在计时器，清除');
         clearTimeout(this.cashTimer);
       }
+    },
+    openCashDialog() {
+      this.dialogVisible = true;
+      // this.useCashServer.getCashInfo();
+      // this.useCashServer.getCashList();
+      this.getIncomeInfo();
+      this.withdrawRpList();
     }
   },
   filters: {

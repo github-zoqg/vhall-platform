@@ -244,6 +244,7 @@
         }
         await this.$nextTick();
         // 文档大小的改变，会自动触发 erd.listenTo 事件;
+        this.resize();
       },
       /**
        * 屏幕缩放
@@ -315,28 +316,16 @@
         });
 
         this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
-          // if (this.hasDocPermission) return;
           console.log('==========控制文档开关=============', status);
           this.docServer.state.switchStatus = status === 'on';
-          if (this.isWatch && this.docServer.state.switchStatus) {
+          if (this.docServer.state.switchStatus) {
+            // 观众可见
             this.recoverLastDocs();
           }
         });
 
         this.docServer.on(VHDocSDK.Event.DELETE_CONTAINER, data => {
-          // if (this.roleName != 1 && this.liveStatus != 1) {
-          //   return;
-          // }
           console.log('=========删除容器=============', data);
-          // const index = this.cids.indexOf(data.id);
-          // if (index > -1) {
-          //   this.cids.splice(index, 1);
-          //   this.docServer.destroyContainer({ id: data.id });
-          // }
-          // if (this.currentCid == data.id) {
-          //   this.currentCid = '';
-          //   this.docInfo.docShowType = '';
-          // }
         });
 
         //
@@ -359,34 +348,16 @@
         });
 
         this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
-          if (this.isWatch && !this.showInWatch) return;
+          console.log('===========创建容器===========', data);
           // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
           //   return;
           // }
-          console.log('===========创建容器===========', data);
+
           const { id: cid, docId } = data;
           if (this.docServer.state.containerList.findIndex(item => item.cid === data.id) > -1) {
             return;
           }
           this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-        });
-
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
-          //   return;
-          // }
-          console.log('[doc] ===========选择容器======', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          this.docServer.state.currentCid = data.id;
-          // 判断容器是否存在
-          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-          if (currentItem) {
-            this.docServer.activeContainer(data.id);
-          } else {
-            const { id: cid, docId } = data;
-            console.log('[doc] cid:', cid);
-            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-          }
         });
 
         this.msgServer.$on('DOC_MSG', msg => {

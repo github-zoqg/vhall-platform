@@ -73,14 +73,14 @@ const playerMixins = {
         console.warn('PAUSE');
       });
       // 视频清晰度发生改变----卡顿切换清晰度时触发
-      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, e => {
+      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, () => {
         console.warn('DEFINITION_CHANGE');
         this.loading = true;
       });
-      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, e => {
+      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, () => {
         console.warn('LOADEDMETADATA');
       });
-      this.playerServer.$on(VhallPlayer.LAG_REPORT, e => {
+      this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
         this.loading = false;
       });
@@ -95,6 +95,10 @@ const playerMixins = {
         // 监听暂停状态
         console.log('播放完毕');
         this.isShowPoster = true;
+      });
+      // 销毁播放器，播放器组件隐藏
+      this.playerServer.$on('destroy', () => {
+        this.isShowPlayer = false;
       });
     },
     listenEvents() {
@@ -191,9 +195,24 @@ const playerMixins = {
       return new Promise(resolve => {
         this.playerServer.init(params).then(() => {
           this.eventPointList = this.playerServer.state.markPoints;
+          this.$nextTick(() => {
+            if (this.water && this.water.watermark_open == 1) {
+              const watermarkContainer = document.getElementById('vh-watermark-container');
+              watermarkContainer && (watermarkContainer.style.width = '80px');
+              const waterMark = document.getElementById('vh-watermark');
+              // waterMark && (waterMark.style.width = '80px')
+              waterMark && (waterMark.style.height = '35px');
+            }
+          });
+          try {
+            document.getElementsByTagName('video')[0].setAttribute('x5-video-player-type', 'h5');
+          } catch (e) {
+            console.log(e);
+          }
+
           this.playerServer.openControls(false);
           this.playerServer.openUI(false);
-          if (this.isLive) {
+          if (this.isLiving) {
             resolve();
           } else {
             this.playerServer.$on(VhallPlayer.LOADED, () => {

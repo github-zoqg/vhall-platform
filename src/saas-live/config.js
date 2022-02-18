@@ -286,7 +286,7 @@ export const serverConfig = {
   comGroupMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'vh-saas-iconfont vh-saas-a-color-groupinglive',
+      icon: 'vh-iconfont vh-line-group',
       text: 'aside_menu.aside_menu_1008',
       kind: 'group',
       disable: true

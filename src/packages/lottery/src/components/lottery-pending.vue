@@ -1,13 +1,16 @@
 <template>
   <div class="prize-pending" :class="fitment.img_order === 3 ? 'blue' : ''">
-    <h4 class="prize-pending__title">{{ fitment.title || '抽奖' }}</h4>
+    <h4 class="prize-pending__title">
+      {{ fitment.title || $t('interact_tools.interact_tools_1003') }}
+    </h4>
     <div class="prize-pending-imgWrap">
       <img v-if="fitment.url" :src="fitment.url" />
     </div>
     <p class="prize-pending__desc">
-      {{ fitment.text ? fitment.text : '正在进行抽奖....' }}
+      {{ fitment.text ? fitment.text : `${$t('interact_tools.interact_tools_1002')}....` }}
     </p>
     <p
+      v-if="showEndBtn"
       class="prize-pending__end-button"
       @click="endLottery"
       :class="[
@@ -18,7 +21,7 @@
         { disabled: disabledTime > 0 && disabledTime <= 5 }
       ]"
     >
-      结束抽奖
+      {{ $t('interact_tools.interact_tools_1008') }}
       <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
     </p>
     <i class="prize-pending__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
@@ -26,7 +29,7 @@
 </template>
 
 <script>
-  // 抽奖中的展示样式
+  // 抽奖中的展示样式(发起与观看,必须有多语言)
   export default {
     name: 'LotteryPending',
     props: {
@@ -34,10 +37,19 @@
         // 皮肤门厅
         type: Object,
         required: true
+      },
+      showEndBtn: {
+        // 是否显示结束抽奖(发起端)
+        type: Boolean,
+        default() {
+          return false;
+        }
       }
     },
     mounted() {
-      this.coutDown();
+      if (this.showEndBtn) {
+        this.coutDown();
+      }
     },
     destroyed() {
       this.clearTimer();

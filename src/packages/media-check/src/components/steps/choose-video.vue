@@ -88,9 +88,6 @@
         this.setSelectedId(cur);
       }
     },
-    mounted() {
-      this.setSelectedId(this.defaultSelected);
-    },
     methods: {
       setSelectedId(id) {
         this.selectedId = this.selectedId || id;

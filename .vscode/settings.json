@@ -86,10 +86,16 @@
     "src/saas-watch/languages/modules",
     "src/saas-wap/languages/modules"
   ],
-  "i18n-ally.enabledParsers": ["json", "js"],
-  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.enabledParsers": [
+    "json",
+    "js"
+  ],
+  "i18n-ally.enabledFrameworks": [
+    "vue"
+  ],
   "i18n-ally.displayLanguage": "zh",
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+  },
+  "i18n-ally.keystyle": "nested"
 }

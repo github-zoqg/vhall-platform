@@ -43,13 +43,33 @@
       this.playerServer = usePlayerServer();
     },
     async mounted() {
-      // if (this.micServer.state.isSpeakOn) {
-      console.warn('--------dfs');
-      await this.interactiveServer.init();
-      await this.startPush();
-      // }
+      if (this.micServer.state.isSpeakOn) {
+        await this.startPush();
+      }
 
-      // 上麦成功
+      /*  暂时测试使用，测试完进行删除-------优先测试本地推流逻辑使用
+        // 主持人邀请观众上麦
+        case 'vrtc_connect_invite':
+          this.$emit('vrtc_connect_invite', msg);
+          break;
+        // 用户同意上麦
+        case 'vrtc_connect_invite_agree':
+          this.$emit('vrtc_connect_invite_agree', msg);
+          break;
+        // 用户拒绝上麦
+        case 'vrtc_connect_invite_refused':
+          this.$emit('vrtc_connect_invite_refused', msg);
+          break;
+      */
+      // 收到上麦邀请消息
+      this.micServer.$on('vrtc_connect_invite', async msg => {
+        if (msg.data.target_id === this.joinInfo.third_party_user_id) {
+          // 调用确认上麦接口
+          this.micServer.userSpeakOn();
+        }
+      });
+
+      // 上麦成功消息
       this.micServer.$on('vrtc_connect_success', async msg => {
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           // 如果成功，销毁播放器
