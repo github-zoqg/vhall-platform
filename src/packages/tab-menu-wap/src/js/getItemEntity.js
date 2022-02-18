@@ -1,16 +1,18 @@
+let localId = 0;
+
 export function getItemEntity(
   {
     type = 2,
-    id = '', //menu id
+    id = `local_${localId++}`, //menu id
     name,
     status = '1'
   },
   typeMap
 ) {
   const item = typeMap.find(config => config.type === type);
+  if (!item) return false;
 
   const text = type === 1 ? name : item.text;
-
   const { visible = true, tipsVisible = false, iconVisible = false } = item;
 
   return {

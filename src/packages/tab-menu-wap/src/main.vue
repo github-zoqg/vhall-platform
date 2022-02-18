@@ -9,7 +9,7 @@
           class="vmp-tab-menu-item"
           :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
           :key="item.id"
-          @click="select(item.type, item.id)"
+          @click="select({ type: item.type, id: item.id })"
         >
           <span class="item-text">{{ $t(item.text) }}</span>
         </li>
@@ -29,7 +29,7 @@
           class="vmp-tab-menu-sub__item"
           v-for="item of subMenu"
           :key="item.id"
-          @click="select(item.cuid, item.contentId)"
+          @click="select({ type: item.type, id: item.id })"
         >
           {{ $t(item.text) }}
         </li>
@@ -39,12 +39,11 @@
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
       <tab-content
-        :tab-cuid="cuid"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
         @closePopup="selectDefault"
         ref="tabContent"
-      ></tab-content>
+      />
     </section>
   </section>
 </template>
@@ -60,7 +59,7 @@
     data() {
       return {
         direciton: 'row', // row(横)，column(纵)
-        selectType: '',
+        selectedType: '',
         selectedId: '',
         menu: [],
         isSubMenuShow: false,
@@ -91,7 +90,6 @@
     },
     async mounted() {
       await this.$nextTick(0);
-
       this.selectDefault();
     },
 
@@ -123,7 +121,7 @@
         // 选择默认项
         if (this.visibleMenu.length > 0) {
           const { type, id } = this.visibleMenu[0];
-          this.select(type, id);
+          this.select({ type, id });
         }
       },
       /**
@@ -145,6 +143,7 @@
        */
       addItem(item) {
         item = getItemEntity(item, this.tabOptions.menuConfig);
+        console.log('addItem:::', item);
         this.menu.push(item);
       },
       /**
@@ -154,33 +153,35 @@
        */
       addItemByIndex(index, item) {
         item = getItemEntity(item, this.tabOptions.menuConfig);
-
         this.menu.splice(index, 0, item);
       },
       /**
        * 获取某个菜单项（根据cuid和menuId获取某个菜单项）
-       * @param {String} cuid cuid
-       * @param {String|Number} menuId [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
-       * @example getItem('comChatWap','10468')
+       * @param {String} type tab的type
+       * @param {String|Number} menuId [非必传] 菜单id，由后端返得
+       * @example getItem(2,'10468')
        */
-      getItem(type, id) {
+      getItem({ type, id }) {
         return this.menu.find(item => {
-          const fuzzy = item.type === type;
-          const precise = fuzzy && item.id === id;
-          return precise || fuzzy;
+          if (id !== undefined) {
+            return item.id === id;
+          } else {
+            return item.type === type;
+          }
         });
       },
       /**
        * 设置菜单项显隐
        * @param {Boolean} visible [true|false] 显隐值
        * @param {String} cuid cuid
-       * @param {String|Number} menuId [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
-      setVisible(visible, cuid, menuId) {
-        const tab = this.getItem(cuid, menuId);
+      setVisible({ visible = true, type, id }) {
+        const tab = this.getItem({ type, id });
         if (!tab) return;
 
         tab.visible = visible;
+        visible === false && this.jumpToNearestItemById(id);
       },
       /**
        * 切换某个菜单tab的可视性
@@ -188,8 +189,8 @@
        * @param {*} menuId [非必传]
        * @example toggleVisible('comChatWap','')
        */
-      toggleVisible(cuid, menuId) {
-        const tab = this.getItem(cuid, menuId);
+      toggleVisible({ type, id }) {
+        const tab = this.getItem({ type, id });
         if (!tab) return;
 
         tab.visible = !tab.visible;
@@ -201,54 +202,55 @@
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        * @example setTipsVisible(true,'comChatWap','10186')
        */
-      setTipsVisible(visible, cuid, menuId) {
-        const tab = this.getItem(cuid, menuId);
+      setTipsVisible({ visible, type, id }) {
+        const tab = this.getItem({ type, id });
         if (!tab) return;
 
         tab.tipsVisible = visible;
       },
 
       /**
-       * 滑动到某个item
-       * @param {String} cuid cuid
-       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
-       * @example scrollToItem('comChatWap','10478')
+       * 跳转到最近的item
        */
-      scrollToItem(comp, key) {
-        // 由于menu列表随时会增减，
-        const itemsWithPosition = this.visibleMenu.map(item => {
-          const key = `${item.comp}_${item.key}`;
-          const ref = this.$refs[key][0];
-          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
-          const left = ref.offsetLeft - paddingLeft;
-          return { key, ref, left };
-        });
+      jumpToNearestItemById(id) {
+        const index = this.visibleMenu.findIndex(item => item.id === id);
 
-        const positionItem = itemsWithPosition.find(item => item.key === `${comp}_${key}`);
+        // 向后跳
+        const nextItem = this.visibleMenu[index + 1];
+        if (index < this.visibleMenu.length && nextItem !== undefined) {
+          const { type, id } = nextItem;
+          this.select({ type, id });
+        }
 
-        this.$refs['menu'].scrollTo({
-          left: positionItem.left,
-          behavior: 'smooth'
-        });
+        // 向前跳
+        const lastItem = this.visibleMenu[index - 1];
+        if (index > 0 && lastItem !== undefined) {
+          const { type, id } = lastItem;
+          this.select({ type, id });
+        }
+
+        // 前后都没有清空任何选择(基本不会发生的极端情况)
+        this.selectedId = '';
+        this.selectedType = '';
       },
 
       /**
        * 选中一个菜单项，并显示对应内容
-       * @param {String} cuid cuid
+       * @param {String} type tab类型
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
-      select(type, id = '') {
-        this.selectType = type;
+      select({ type, id = '' }) {
+        this.selectedType = type;
         this.selectedId = id;
 
-        // wap端逻辑
         this.isSubMenuShow = false;
 
-        const item = this.getItem(type, id);
+        const item = this.getItem({ type, id });
+        item.tipsVisible = false;
 
-        this.$refs['tabContent'].switchTo(item);
-        this.menuServer.$emit('tab-switched', { type, id, item });
+        this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+        this.menuServer.$emit('tab-switched', item);
       }
     }
   };
