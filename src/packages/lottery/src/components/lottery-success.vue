@@ -3,8 +3,8 @@
     <lottery-header :prizeInfo="prizeInfo"></lottery-header>
     <p class="lottery-title-icon" :class="prizeInfo.publish_winner != 1 ? 'nobtn' : ''">
       <span
-        class="iconfont icontanhao_icon"
-        :class="isSuccess ? 'iconduihao_icon' : 'icontanhao_icon'"
+        class="vh-iconfont"
+        :class="isSuccess ? 'vh-line-check' : 'vh-a-line-exclamationpoint'"
       ></span>
     </p>
     <p class="lottery-ret-desc">
