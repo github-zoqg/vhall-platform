@@ -6,7 +6,7 @@
       :class="{ disabledClick: selectedIndex === 0 }"
       @click="prev"
     >
-      <i class="vh-iconfont vh-line-arrow-left" />
+      <i class="iconfont iconzuofanye" />
     </span>
 
     <!-- item -->
@@ -30,7 +30,7 @@
       :class="{ disabledClick: selectedIndex === menu.length - 1 }"
       @click="next"
     >
-      <i class="vh-iconfont vh-line-arrow-right" />
+      <i class="iconfont iconyoufanye" />
     </span>
   </section>
 </template>
