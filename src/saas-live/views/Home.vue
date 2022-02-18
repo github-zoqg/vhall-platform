@@ -17,7 +17,7 @@
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
-  import { Domain, useMicServer, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {

@@ -286,7 +286,7 @@
               })
               .catch(() => 'createLocalStreamError');
             break;
-          case 'pictrue':
+          case 'picture':
             await (() => {
               setTimeout(() => {}, 1000);
             })();
