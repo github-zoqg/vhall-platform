@@ -2,11 +2,11 @@
   <section class="vmp-media-setting-video">
     <main>
       <section class="vmp-media-setting-item">
-        <label class="vmp-media-setting-item__label">摄像头</label>
+        <label class="vmp-media-setting-item__label">{{ $t('setting.setting_1003') }}</label>
         <section class="vmp-media-setting-item__content">
           <el-radio-group v-model="mediaState.videoType" @change="onVideoTypeChange">
-            <el-radio label="camera">摄像头</el-radio>
-            <el-radio label="picture">图片</el-radio>
+            <el-radio label="camera">{{ $t('setting.setting_1003') }}</el-radio>
+            <el-radio label="picture">{{ $t('setting.setting_1007') }}</el-radio>
           </el-radio-group>
         </section>
       </section>
@@ -39,11 +39,11 @@
     </main>
     <footer v-show="mediaState.videoType === 'camera'">
       <section class="vmp-media-setting-tips">
-        <section class="vmp-media-setting-tips__title">看不到摄像头画面？试试以下方法：</section>
+        <section class="vmp-media-setting-tips__title">{{ $t('setting.setting_1011') }}</section>
         <section class="vmp-media-setting-tips__content">
-          <p>1. 请允许浏览器使用摄像头权限</p>
-          <p>2. 确认摄像头没有被其他程序占用</p>
-          <p>3. 选择外置摄像头或者更换电脑</p>
+          <p>1. {{ $t('setting.setting_1012') }}</p>
+          <p>2. {{ $t('setting.setting_1013') }}</p>
+          <p>3. {{ $t('setting.setting_1014') }}</p>
         </section>
       </section>
     </footer>
@@ -146,9 +146,9 @@
           this.isVideoSwitching = false;
           this.videoLoadingImg = videoFailImg;
           this.videoError = true;
-          this.videoTipsText = '摄像头切换失败，请稍后重试';
-          this.$message.error(`创建本地预览流失败，请检查设备`);
-          console.error(`创建本地预览流失败`, err);
+          this.videoTipsText = this.$t('setting.setting_1010');
+          this.$message.error(this.$t('message.message_1031'));
+          console.error(this.$t('message.message_1028'), err);
         }
       },
       async destroyStream() {

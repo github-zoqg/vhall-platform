@@ -19,5 +19,4 @@ export function initGlobalAPI() {
   // 全局混入
   initMixin();
 }
-
 export const i18n = initI18n();
