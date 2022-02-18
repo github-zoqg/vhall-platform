@@ -28,7 +28,7 @@
             <img v-if="isPaused" src="@/packages/app-shared/assets/img/media_play.gif" />
             <img v-else src="@/packages/app-shared/assets/img/media_pause.gif" />
           </div>
-          <p class="vmp-media-setting-play-tips">点击播放声音</p>
+          <p class="vmp-media-setting-play-tips">{{ $t('setting.setting_1024') }}</p>
 
           <div class="vmp-media-setting-voice-slider">
             <el-slider
@@ -45,12 +45,12 @@
     <footer>
       <section class="vmp-media-setting-tips">
         <section class="vmp-media-setting-tips__title">
-          点击播放键，听不到声音？试试以下方法：
+          {{ $t('setting.setting_1025') }}
         </section>
         <section class="vmp-media-setting-tips__content">
-          <p>1. 请允许浏览器使用声音权限</p>
-          <p>2. 请调高设备的扬声器音量</p>
-          <p>3. 选择外置扬声器或者更换电脑</p>
+          <p>1. {{ $t('setting.setting_1026') }}</p>
+          <p>2. {{ $t('setting.setting_1027') }}</p>
+          <p>3. {{ $t('setting.setting_1028') }}</p>
         </section>
       </section>
     </footer>
