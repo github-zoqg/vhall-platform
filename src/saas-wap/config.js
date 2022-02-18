@@ -167,5 +167,9 @@ export const serverConfig = {
       method: 'changeStatus',
       args: ['$0', '$1']
     }
+  },
+  //成员列表
+  comMemberListWap: {
+    component: 'VmpMemberListWap'
   }
 };
