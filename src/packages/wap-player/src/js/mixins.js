@@ -52,11 +52,11 @@ const playerMixins = {
         } else if (this.vodType === 'warm') {
           this.isWarnPreview = true;
         }
-        // 暖场视频或者试看
         this.optionTypeInfo('vod', _id);
-        if (!this.isWarnPreview) {
-          this.initPlayerOtherInfo();
-        }
+      }
+      // 暖场视频或者试看
+      if (!this.isWarnPreview) {
+        this.initPlayerOtherInfo();
       }
     },
     getListenPlayer() {
