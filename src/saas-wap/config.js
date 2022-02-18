@@ -37,14 +37,7 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: [
-      'compRegLoginWap',
-      'comOfficial',
-      'comShare',
-      'comWatchTimer',
-      'comSignUpForm',
-      'comSignWap'
-    ]
+    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
   },
   // 顶部
   comHeaderWatch: {
@@ -102,12 +95,10 @@ export const serverConfig = {
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
-    children: ['comChatWap', 'comIntroWap', 'comRecommendWap'],
     options: {}
   },
   comIntroWap: {
     component: 'VmpIntroWap',
-    children: ['comInteractToolsWap'],
     addTab: [
       {
         cuid: ['comTabMenuWap'],
@@ -126,14 +117,7 @@ export const serverConfig = {
   },
   // 广告（推荐）
   comRecommendWap: {
-    component: 'VmpRecommendWap',
-    addTab: [
-      {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
-      }
-    ]
+    component: 'VmpRecommendWap'
   },
   //商品列表
   comGoodSaasWap: {
@@ -156,7 +140,7 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
-    children: [],
+    children: ['comInteractToolsWap'],
     options: {}
   },
   // wap互动工具-签到
@@ -167,5 +151,9 @@ export const serverConfig = {
       method: 'changeStatus',
       args: ['$0', '$1']
     }
+  },
+  //成员列表
+  comMemberListWap: {
+    component: 'VmpMemberListWap'
   }
 };
