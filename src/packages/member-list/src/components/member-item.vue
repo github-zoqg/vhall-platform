@@ -49,7 +49,7 @@
         <template
           v-if="
             [1, 2].includes(this.tabIndex) &&
-            userInfo.isApply &&
+            [1, '1'].includes(userInfo.is_apply) &&
             applyUsers.find(u => u.account_id == userInfo.account_id) &&
             !userInfo.is_speak
           "
@@ -100,7 +100,7 @@
           <i
             v-if="isShowUpMic"
             class="vmp-member-item__control__up-mic"
-            @click="upMic(userInfo.isApply, userInfo.account_id)"
+            @click="upMic(userInfo.is_apply, userInfo.account_id)"
           >
             上麦
           </i>
@@ -138,7 +138,7 @@
         <i
           v-if="
             [1, 2].includes(tabIndex) &&
-            userInfo.isApply &&
+            [1, '1'].includes(userInfo.is_apply) &&
             applyUsers.find(u => u.account_id === userInfo.account_id) &&
             !userInfo.is_speak
           "
@@ -190,7 +190,7 @@
               currentSpeakerId !== userInfo.account_id
             "
             class="vmp-member-item__control__up-mic"
-            @click="upMic(userInfo.isApply, userInfo.account_id)"
+            @click="upMic(userInfo.is_apply, userInfo.account_id)"
           >
             上麦
           </i>
