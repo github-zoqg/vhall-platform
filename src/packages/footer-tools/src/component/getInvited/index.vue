@@ -77,8 +77,9 @@
             type: 0 // 0=邀请上麦|1=邀请演示
           })
           .then(res => {
-            console.log('接受邀请111,callback');
-            console.log(res);
+            console.log('接受邀请111,callback', res);
+            clearInterval(this.waitInterval);
+            this.btnText = '确认';
             this.isConfirmVisible = false;
           });
       },
@@ -90,8 +91,10 @@
             type: 0 // 0=邀请上麦|1=邀请演示
           })
           .then(res => {
-            console.log('拒绝邀请222,callback');
-            console.log(res);
+            console.log('拒绝邀请222,callback', res);
+            clearInterval(this.waitInterval);
+            this.btnText = '确认';
+            this.isConfirmVisible = false;
           });
       }
     }
