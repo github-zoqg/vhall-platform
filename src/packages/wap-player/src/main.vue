@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-player" v-if="isShowPlayer">
+  <div class="vmp-wap-player">
     <p v-show="isNoBuffer" class="vmp-wap-player-prompt">
       <span>{{ prompt }}</span>
     </p>
@@ -220,8 +220,9 @@
 <script>
   import { secondToDateZH, isMse } from './js/utils';
   import controlEventPoint from './components/control-event-point.vue';
-  import { useRoomBaseServer, usePlayerServer, useVirtualAudienceServer } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
+  // import { create } from 'qrcode';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -275,7 +276,11 @@
         return this.roomBaseState.watchInitData.webinar.type == 1;
       },
       hotNum() {
-        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
+        );
       }
     },
     data() {
@@ -331,12 +336,12 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
-      this.virtualClientStartServer = useVirtualAudienceServer();
     },
     async created() {
       this.roomBaseState = this.roomBaseServer.state;
       this.embedObj = this.roomBaseState.embedObj;
-      this.onlineState = this.virtualClientStartServer.state;
+    },
+    mounted() {
       this.getWebinerStatus();
       this.listenEvents();
     },

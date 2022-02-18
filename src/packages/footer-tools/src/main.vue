@@ -76,8 +76,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer, useVirtualAudienceServer } from 'middle-domain';
-  // import onlineMixin from './js/mixins';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -87,7 +86,6 @@
 
   export default {
     name: 'VmpFooterTools',
-    // mixins: [onlineMixin],
     data() {
       return {
         roomBaseState: null,
@@ -147,21 +145,26 @@
         return this.groupServer.state.groupInitData.isInGroup;
       },
       hotNum() {
-        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
+        );
       },
       onlineNum() {
-        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
+        );
       }
     },
     beforeCreate() {
-      this.virtualClientStartServer = useVirtualAudienceServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
-      this.onlineState = this.virtualClientStartServer.state;
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
