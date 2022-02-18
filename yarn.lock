@@ -883,6 +883,13 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
+"@babel/runtime@7.x":
+  version "7.17.2"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.17.2.tgz#66f68591605e59da47523c631416b18508779941"
+  integrity sha512-hzeyJyMA1YGdJTuWU0e/j4wKXrU4OMFvY2MSlaI9B7VQb0r5cxTE3EAIS2Q7Tn2RIcDkRvTA/v2JsAEhxe99uw==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/runtime@^7.11.0", "@babel/runtime@^7.8.4":
   version "7.16.7"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.16.7.tgz#03ff99f64106588c9c403c6ecb8c3bafbbdff1fa"
@@ -1256,6 +1263,11 @@
   resolved "https://registry.npmjs.org/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
+"@popperjs/core@^2.9.2":
+  version "2.11.2"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.2.tgz#830beaec4b4091a9e9398ac50f865ddea52186b9"
+  integrity sha512-92FRmppjjqz29VMJ2dn+xdyXZBrMlE42AV6Kq6BwjWV7CNUW1hs2FtxSNLQE+gJhaZ6AAmYuO9y8dshhcBl7vA==
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
   resolved "https://registry.npmjs.org/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.1.tgz#a21117b19ee9be70c379ec1877537ef2e1c63301"
@@ -1543,9 +1555,21 @@
     anymatch "^3.0.0"
     source-map "^0.6.0"
 
-"@vue/babel-helper-vue-jsx-merge-props@^1.2.1":
+"@vant/icons@^1.7.1":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@vant/icons/-/icons-1.7.3.tgz#e51b46065cfde445617401ebe309a33b62a29725"
+  integrity sha512-tW4EqzxN4kXw1rnlnQJQHofEifPbt/gECOWiibomht8QLyvoGuE4iUmDFS288dJ07ZjuTy0bhdABj0SENo2fmQ==
+
+"@vant/popperjs@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@vant/popperjs/-/popperjs-1.1.0.tgz#b4edee5bbfa6fb18705986e313d4fd5f17942a0f"
+  integrity sha512-8MD1gz146awV/uPxYjz4pet22f7a9YVKqk7T+gFkWFwT9mEcrIUEg/xPrdOnWKLP9puXyYtm7oVfSDSefZ/p/w==
+  dependencies:
+    "@popperjs/core" "^2.9.2"
+
+"@vue/babel-helper-vue-jsx-merge-props@^1.0.0", "@vue/babel-helper-vue-jsx-merge-props@^1.2.1":
   version "1.2.1"
-  resolved "https://registry.npmjs.org/@vue/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-1.2.1.tgz#31624a7a505fb14da1d58023725a4c5f270e6a81"
+  resolved "https://registry.yarnpkg.com/@vue/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-1.2.1.tgz#31624a7a505fb14da1d58023725a4c5f270e6a81"
   integrity sha512-QOi5OW45e2R20VygMSNhyQHvpdUwQZqGPc748JLGCYEy+yp8fNFNdbNIGAgZmi9e+2JHPd6i6idRuqivyicIkA==
 
 "@vue/babel-helper-vue-transform-on@^1.0.2":
@@ -10116,6 +10140,17 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
+vant@^2.1.5:
+  version "2.12.44"
+  resolved "https://registry.yarnpkg.com/vant/-/vant-2.12.44.tgz#bb8ca87512a91a98d577d6c275fc37ae8b8c7258"
+  integrity sha512-0ZRq0v+26Ny6Ezt3M1GEN5KLEh6vVp6rBmQENi6jd0HejgpwfCRUWTFCH9sQqB3LhfxJ7ywHmrLAn5oj1eHozA==
+  dependencies:
+    "@babel/runtime" "7.x"
+    "@vant/icons" "^1.7.1"
+    "@vant/popperjs" "^1.1.0"
+    "@vue/babel-helper-vue-jsx-merge-props" "^1.0.0"
+    vue-lazyload "1.2.3"
+
 vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
@@ -10182,6 +10217,11 @@ vue-i18n@^8.26.7:
   version "8.27.0"
   resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.27.0.tgz#3e3b3ed2c107ccbd7f20dbdd7a96763a9990253e"
   integrity sha512-SX35iJHL5PJ4Gfh0Mo/q0shyHiI2V6Zkh51c+k8E9O1RKv5BQyYrCxRzpvPrsIOJEnLaeiovet3dsUB0e/kDzw==
+
+vue-lazyload@1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/vue-lazyload/-/vue-lazyload-1.2.3.tgz#901f9ec15c7e6ca78781a2bae4a343686bdedb2c"
+  integrity sha512-DC0ZwxanbRhx79tlA3zY5OYJkH8FYp3WBAnAJbrcuoS8eye1P73rcgAZhyxFSPUluJUTelMB+i/+VkNU/qVm7g==
 
 "vue-loader-v16@npm:vue-loader@^16.1.0":
   version "16.8.3"

@@ -30,7 +30,7 @@ const htmlConfig = {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     iconfontCommon:
-      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.0/iconfont.css',
+      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
     iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-zk-pc/iconfont.css'
   },
   // dns-prefetch
