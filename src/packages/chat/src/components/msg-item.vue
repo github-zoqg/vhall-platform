@@ -310,14 +310,14 @@
     },
     mounted() {
       //todo 可以考虑domaint提供统一的处理 实现@用户
-      console.log(this.msg.atList);
+      console.log('atlist', this.msg.atList);
       if (!this.msg.atList.length) {
         this.msgContent = this.msg.content.text_content;
       } else {
         let at = false;
         this.msg.atList.forEach(a => {
           console.log(this.msg.atList.length);
-          const userName = `@${a.nickname} `;
+          const userName = `@${a.nick_name} `;
           const match =
             this.msg.content &&
             this.msg.content.text_content &&
