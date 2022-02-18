@@ -55,8 +55,6 @@
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
-  // TODO: tips
-
   export default {
     name: 'VmpTabMenuWap',
     components: { tabContent },
@@ -120,6 +118,7 @@
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
 
         for (const item of list) {
+          console.log('initMenu::item:', item);
           this.addItem(item);
         }
       },
@@ -152,6 +151,7 @@
        */
       addItem(item) {
         item = getItemEntity(item);
+        console.log('item:::::::', item);
         this.menu.push(item);
       },
       /**
@@ -255,6 +255,7 @@
         this.isSubMenuShow = false;
 
         const item = this.getItem(cuid, menuId);
+
         this.$refs['tabContent'].switchTo(item, payload);
         this.menuServer.$emit('tab-switched', { cuid, menuId });
       }

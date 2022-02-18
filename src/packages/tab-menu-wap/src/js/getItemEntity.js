@@ -5,7 +5,8 @@ const typeMap = new Map([
   [4, { cuid: 'comIntroWap', text: 'menu.menu_1003' }], //简介
   [5, { cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }], //商品
   [6, { cuid: 'comRecommendWap', text: 'menu.menu_1005' }], //广告、推荐
-  [7, { cuid: 'comChapter', text: 'menu.menu_1013' }] // 章节
+  [7, { cuid: 'comChapter', text: 'menu.menu_1013' }], // 章节
+  [8, { cuid: 'comMemberListWap', text: '成员' }] // 成员
 ]);
 
 export function getItemEntity({
