@@ -37,7 +37,7 @@
     <template v-else-if="msg.type == 'reward_pay_ok'">
       <div class="msg-item interact new-gift" :class="Math.random() * 10 > 3 ? 'purpose' : 'red'">
         <div class="interact-gift-box">
-          <p class="new-gift-name ellsips">
+          <p class="new-gift-name">
             {{ msg.nickName | textOverflowSlice(10) }}
           </p>
           <p class="new-gift-content">
@@ -55,7 +55,7 @@
         :class="Math.random() * 10 > 3 ? 'purpose' : 'red'"
       >
         <div class="interact-gift-box">
-          <p class="new-gift-name ellsips">
+          <p class="new-gift-name">
             {{ msg.nickName | textOverflowSlice(10) }}
           </p>
           <p class="new-gift-content">
@@ -109,7 +109,7 @@
               </div>
             </template>
             <!-- @消息 -->
-            <template v-if="msg.atList.length != 0">
+            <template v-if="msg.atList.length !== 0">
               <div class="msg-content_body">
                 <span v-html="msg.content.text_content"></span>
                 <img
