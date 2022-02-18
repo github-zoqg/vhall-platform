@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-player">
+  <div class="vmp-wap-player" v-if="isShowPlayer">
     <p v-show="isNoBuffer" class="vmp-wap-player-prompt">
       <span>{{ prompt }}</span>
     </p>
