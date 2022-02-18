@@ -187,9 +187,10 @@
       });
       // 下麦成功
       this.micServer.$on('vrtc_disconnect_success', async () => {
-        this.stopPush();
+        await this.stopPush();
 
         this.interactiveServer.destroy();
+
         // 如果成功，销毁播放器
         this.playerServer.init();
       });
@@ -321,11 +322,16 @@
       },
       // 结束推流
       stopPush() {
-        this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
-          this.isStreamPublished = false;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-          );
+        return new Promise(resolve => {
+          this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            this.isStreamPublished = false;
+            clearInterval(this._audioLeveInterval);
+
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          });
         });
       },
       // 点击mute按钮事件
