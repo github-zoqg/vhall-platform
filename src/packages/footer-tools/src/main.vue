@@ -162,7 +162,6 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
       this.onlineState = this.virtualClientStartServer.state;
-      this.virtualClientStartServer.listenEvent();
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;

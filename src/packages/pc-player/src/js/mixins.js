@@ -64,6 +64,9 @@ const playerMixins = {
         this.isShowPoster = true;
         this.$emit('BackEnd', true); // 暖场视频需要参数
       });
+      this.playerServer.$on('destroy', () => {
+        this.isShowPlayer = false;
+      });
     },
     // 设置默认视频清晰度
     setDefaultQuality() {

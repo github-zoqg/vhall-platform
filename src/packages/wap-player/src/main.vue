@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-player">
+  <div class="vmp-wap-player" v-if="isShowPlayer">
     <p v-show="isNoBuffer" class="vmp-wap-player-prompt">
       <span>{{ prompt }}</span>
     </p>
@@ -130,6 +130,7 @@
               ></controlEventPoint>
             </div>
             <van-slider
+              v-if="!isLiving"
               v-model="sliderVal"
               active-color="rgba(252,86,89,.7)"
               inactive-color="rgba(255,255,255,.3)"
@@ -281,6 +282,7 @@
       const { state: playerState } = this.playerServer;
       return {
         playerState,
+        isShowPlayer: true,
         isNoBuffer: false,
         promptFlag: false,
         isOpenSpeed: false,
@@ -333,8 +335,8 @@
     },
     async created() {
       this.roomBaseState = this.roomBaseServer.state;
-      this.onlineState = this.virtualClientStartServer.state;
       this.embedObj = this.roomBaseState.embedObj;
+      this.onlineState = this.virtualClientStartServer.state;
       this.getWebinerStatus();
       this.listenEvents();
     },
@@ -385,7 +387,7 @@
               document.msExitFullscreen
             )
           ) {
-            this.playerServer.exitFullScreen(event => {});
+            this.playerServer.exitFullScreen();
           }
           if (document.exitFullscreen) document.exitFullscreen();
           else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
@@ -402,7 +404,7 @@
               element.msRequestFullscreen
             )
           ) {
-            this.playerServer.enterFullScreen(event => {});
+            this.playerServer.enterFullScreen();
           }
           if (element.requestFullscreen) element.requestFullscreen();
           else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
