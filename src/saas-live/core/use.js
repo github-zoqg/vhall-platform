@@ -29,7 +29,6 @@ import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpGroupDiscussion from '@/packages/group-discussion';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
-import VmpTabContainer from '@/packages/tab-container';
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
@@ -66,7 +65,6 @@ export function initUse() {
   Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
   // Vue.use(VmpGroupSetting);
-  Vue.use(VmpTabContainer);
   Vue.use(VmpTabMenu);
   Vue.use(VmpCustomMenu);
   Vue.use(VmpPcMediaSetting);

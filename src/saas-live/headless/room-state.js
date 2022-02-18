@@ -57,7 +57,7 @@ export default async function () {
 
   mediaSettingServer.init();
 
-  roomBaseServer.getCommonConfig({
+  await roomBaseServer.getCommonConfig({
     tags: [
       'skin',
       'screen-poster',
