@@ -22,7 +22,7 @@ export default async function () {
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
-    return 'isBrowserNotSuppport';
+    return 'isBrowserNotSupport';
   }
 
   if (!roomBaseServer) {

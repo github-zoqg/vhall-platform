@@ -66,7 +66,7 @@
         });
         const res = await roomState();
         // 如果浏览器不支持
-        if (res === 'isBrowserNotSuppport') {
+        if (res === 'isBrowserNotSupport') {
           this.state = 3;
           return;
         }
