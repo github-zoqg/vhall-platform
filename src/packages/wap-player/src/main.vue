@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-player">
+  <div class="vmp-wap-player" v-if="isShowPlayer">
     <p v-show="isNoBuffer" class="vmp-wap-player-prompt">
       <span>{{ prompt }}</span>
     </p>
@@ -130,6 +130,7 @@
               ></controlEventPoint>
             </div>
             <van-slider
+              v-if="!isLiving"
               v-model="sliderVal"
               active-color="rgba(252,86,89,.7)"
               inactive-color="rgba(255,255,255,.3)"
@@ -219,8 +220,9 @@
 <script>
   import { secondToDateZH, isMse } from './js/utils';
   import controlEventPoint from './components/control-event-point.vue';
-  import { useRoomBaseServer, usePlayerServer, useVirtualAudienceServer } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
+  // import { create } from 'qrcode';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -274,13 +276,18 @@
         return this.roomBaseState.watchInitData.webinar.type == 1;
       },
       hotNum() {
-        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
+        );
       }
     },
     data() {
       const { state: playerState } = this.playerServer;
       return {
         playerState,
+        isShowPlayer: true,
         isNoBuffer: false,
         promptFlag: false,
         isOpenSpeed: false,
@@ -329,12 +336,12 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
-      this.virtualClientStartServer = useVirtualAudienceServer();
     },
     async created() {
       this.roomBaseState = this.roomBaseServer.state;
-      this.onlineState = this.virtualClientStartServer.state;
       this.embedObj = this.roomBaseState.embedObj;
+    },
+    mounted() {
       this.getWebinerStatus();
       this.listenEvents();
     },
@@ -385,7 +392,7 @@
               document.msExitFullscreen
             )
           ) {
-            this.playerServer.exitFullScreen(event => {});
+            this.playerServer.exitFullScreen();
           }
           if (document.exitFullscreen) document.exitFullscreen();
           else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
@@ -402,7 +409,7 @@
               element.msRequestFullscreen
             )
           ) {
-            this.playerServer.enterFullScreen(event => {});
+            this.playerServer.enterFullScreen();
           }
           if (element.requestFullscreen) element.requestFullscreen();
           else if (element.mozRequestFullScreen) element.mozRequestFullScreen();

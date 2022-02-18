@@ -234,7 +234,7 @@
     methods: {
       // ...mapMutations('watchBase', ['setLoginToken', 'setUserInfo', 'setIsLogin']),
       // 上传、替换头像
-      handleUploadSuccess(res, file) {
+      handleUploadSuccess(res) {
         if (res.data) {
           const domain_url = res.data.domain_url || '';
           const file_url = res.data.file_url || '';

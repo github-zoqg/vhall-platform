@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-player" :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]">
+  <div
+    class="vmp-player"
+    :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
+    v-if="isShowPlayer"
+  >
     <div class="vmp-player-box">
       <div class="vmp-player-container">
         <div id="vmp-player" class="vmp-player-watch">
@@ -188,6 +192,7 @@
         playerState,
         roomBaseState: null,
         isMini: false,
+        isShowPlayer: true,
         isShowPoster: true, //是否展示活动图片背景
         isLiving: false, // 是否是播放状态
         isLive: false, // 是否是直播

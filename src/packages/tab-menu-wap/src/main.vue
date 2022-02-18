@@ -171,6 +171,7 @@
        * @example getItem('comChatWap','10468')
        */
       getItem(cuid, menuId) {
+        console.log('this.menu:', this.menu);
         return this.menu.find(item => {
           const precise = item.cuid === cuid && item.cotentId === menuId;
           const fuzzy = item.cuid === cuid;
@@ -184,7 +185,9 @@
        * @param {String|Number} menuId [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
       setVisible(visible, cuid, menuId) {
+        console.log('-------ss', visible, cuid, menuId);
         const tab = this.getItem(cuid, menuId);
+        console.log('-------tab', tab);
         if (!tab) return;
 
         tab.visible = visible;
