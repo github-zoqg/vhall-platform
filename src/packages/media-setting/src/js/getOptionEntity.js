@@ -1,21 +1,18 @@
 export function getOptionEntity() {
-  const i18n = window.$globalConfig.currentI18n;
   return [
     { id: 'basic-setting', text: '基础设置' },
-    { id: 'video-setting', text: i18n.t('setting.setting_1003') },
-    { id: 'audio-in-setting', text: i18n.t('setting.setting_1004') },
-    { id: 'audio-out-setting', text: i18n.t('setting.setting_1005') }
+    { id: 'video-setting', text: 'setting.setting_1003' },
+    { id: 'audio-in-setting', text: 'setting.setting_1004' },
+    { id: 'audio-out-setting', text: 'setting.setting_1005' }
   ];
 }
 
 export function getDefinitionMap() {
-  const i18n = window.$globalConfig.currentI18n;
-
   return new Map([
     ['RTC_VIDEO_PROFILE_240P_16x9_M', '流畅'],
-    ['RTC_VIDEO_PROFILE_480P_16x9_M', i18n.t('player.player_1003')],
-    ['RTC_VIDEO_PROFILE_360P_16x9_M', i18n.t('player.player_1004')],
-    ['RTC_VIDEO_PROFILE_720P_16x9_M', i18n.t('player.player_1005')],
+    ['RTC_VIDEO_PROFILE_480P_16x9_M', 'player.player_1003'],
+    ['RTC_VIDEO_PROFILE_360P_16x9_M', 'player.player_1004'],
+    ['RTC_VIDEO_PROFILE_720P_16x9_M', 'player.player_1005'],
     ['240', 'RTC_VIDEO_PROFILE_240P_16x9_M'],
     ['480', 'RTC_VIDEO_PROFILE_480P_16x9_M'],
     ['360', 'RTC_VIDEO_PROFILE_360P_16x9_M'],
