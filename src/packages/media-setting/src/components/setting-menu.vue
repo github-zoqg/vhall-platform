@@ -8,7 +8,7 @@
       :key="item.id"
       @click="onClickItem(item)"
     >
-      {{ item.text }}
+      {{ $t(item.text) }}
     </li>
   </ul>
 </template>

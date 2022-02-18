@@ -387,7 +387,6 @@
             temp.data = JSON.parse(temp.data);
             temp.context = JSON.parse(temp.context);
           }
-          console.log(temp, '原始消息');
           const { type = '' } = temp.data || {};
           switch (type) {
             case 'disable':
@@ -1078,8 +1077,8 @@
           }
         }
         //主持人/助理进入小组
-        function handleHostJoin(msg) {
-          console.log(msg);
+        function handleHostJoin() {
+          //msg
           // if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
           //   // 进入小组
           //   if (msg.data.group_ids[0] == 0) {
@@ -1378,7 +1377,7 @@
 
         //todo 待micServer这边完善方法
         this.disabledSwitchHand = true;
-        useMicServer()
+        this.micServer
           .setHandsUp(params)
           .then(res => {
             console.log('switch-mic-status', res);
@@ -1485,7 +1484,7 @@
           receive_account_id: accountId
         };
         //todo 待联调，domain的可能暂时不可用
-        useMicServer()
+        this.micServer
           .hostAgreeApply(params)
           .then(res => {
             console.log(res);
@@ -1512,7 +1511,7 @@
             // EventBus.$emit('applyByHost');
           } else {
             //todo 待domain micServer完善这部分
-            useMicServer()
+            this.micServer
               .inviteMic({
                 room_id: this.roomId,
                 receive_account_id: accountId

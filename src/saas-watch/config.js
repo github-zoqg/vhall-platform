@@ -265,6 +265,15 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    component: 'VmpLotteryWatch'
+    // component: 'VmpLotteryWatch'
+  },
+  // 章节
+  comChapter: {
+    component: 'VmpChapter',
+    emitChangePlayTime: {
+      cuid: ['comPcPlayer'],
+      method: 'changePlayTime',
+      args: ['$0']
+    }
   }
 };
