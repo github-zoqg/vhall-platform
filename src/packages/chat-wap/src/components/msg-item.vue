@@ -81,14 +81,14 @@
             >
               {{ msg.roleName | roleFilter }}
             </span>
-            <span class="nickname">{{ msg.nickName }}</span>
+            <span class="nickname">{{ msg.nickname }}</span>
           </p>
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
             <template v-if="msg.replyMsg && msg.replyMsg.type && msg.atList.length == 0">
               <p class="reply-msg">
-                <span v-html="msg.replyMsg.nickName" />
+                <span v-html="msg.replyMsg.nick_name" />
                 ：
                 <span v-html="msg.replyMsg.content.text_content" />
               </p>

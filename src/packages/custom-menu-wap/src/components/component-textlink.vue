@@ -1,0 +1,48 @@
+<template>
+  <div class="vmp-custom-menu-textlink">
+    <div class="textlink-previewbox">
+      <div class="textlink">
+        <span @click="jump">{{ info.text }}</span>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  /**
+   * 文字连接自定义菜单
+   */
+  export default {
+    name: 'component-textlink',
+    props: {
+      info: {
+        required: false
+      }
+    },
+    methods: {
+      jump() {
+        if (!this.info || !this.info.src) return;
+        window.open(this.info.src);
+      }
+    }
+  };
+</script>
+<style lang="less">
+  .vmp-custom-menu-textlink {
+    margin-bottom: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0px 24px;
+    .textlink {
+      width: 100%;
+      height: 24px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #3562fa !important;
+      line-height: 24px;
+      text-align: center;
+      & > span:hover {
+        cursor: pointer;
+      }
+    }
+  }
+</style>

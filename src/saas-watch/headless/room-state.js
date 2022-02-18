@@ -73,7 +73,8 @@ export default async function () {
       'room-tool',
       'goods-default',
       'announcement',
-      'sign'
+      'sign',
+      'timer'
     ]
   });
 
@@ -86,14 +87,16 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-  await interactiveServer.init();
+  // await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
 
   // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
+  window.micServer = micServer;
 }

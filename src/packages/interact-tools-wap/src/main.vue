@@ -26,8 +26,8 @@
       </a>
       <!-- 点赞 -->
       <div auth="{ 'ui.watch_hide_like': 0 }">
-        <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i>
-        <!-- <praise :hideChatHistory="joinInfoInGift.hideChatHistory" :totalLike="totalLike" /> -->
+        <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
+        <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
     </div>
   </div>
@@ -37,31 +37,32 @@
   import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
+  import Parise from './component/parise.vue';
   export default {
     name: 'VmpInteractToolsWap',
-    components: { GiftCard, RewardCard },
+    components: { GiftCard, RewardCard, Parise },
     data() {
       let { configList } = useRoomBaseServer().state;
       let { groupInitData } = useGroupServer().state;
       let roomBaseState = useRoomBaseServer().state;
       let localRoomInfo = {
-        OnlineNum: 0,
-        authId: 'visit_v1493542725516496896',
-        insertChannelId: '',
-        isEmbed: false,
-        isLogin: false,
-        isNeedLogin: true,
+        authId: roomBaseState.watchInitData.join_info.third_party_user_id,
+        insertChannelId: roomBaseState.watchInitData.webinar.rebroadcast
+          ? roomBaseState.watchInitData.webinar.rebroadcast.channel_id
+          : '',
+        isEmbed: /embed/.test(this.$route.path),
+        isLogin: sessionStorage.getItem('isLogin'),
+        isNeedLogin: !sessionStorage.getItem('isLogin'),
         isShowGift: true,
         isShowOnselfMdess: false,
-        like: '',
-        roomId: 'lss_cb5550b1',
-        saasJoinId: 1962556,
         showLike: true,
         showShare: true,
-        staticSrc: 'https://t-alistatic01.e.vhall.com',
-        type: 1,
-        uploadSrc: 'https://t-alistatic01.e.vhall.com/upload',
-        webSrc: '//t.e.vhall.com/v3',
+        roomId: roomBaseState.watchInitData.interact.room_id,
+        saasJoinId: roomBaseState.watchInitData.join_info.join_id,
+        staticSrc: roomBaseState.watchInitData.urls.static_url,
+        type: roomBaseState.watchInitData.webinar.type,
+        uploadSrc: roomBaseState.watchInitData.urls.upload_url,
+        webSrc: roomBaseState.watchInitData.urls.web_url,
         webinarId: '723145973'
       };
       let webinarData = roomBaseState.watchInitData.webinar;
@@ -73,13 +74,17 @@
         groupInitData,
         joinInfoInGift: {},
         showInviteCard: false,
-        totalLike: '',
         location:
           window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
         qwe: 1
       };
     },
     mounted() {
+      this.joinInfoInGift = {
+        avatar: this.roomBaseState.watchInitData.join_info.avatar,
+        nickname: this.roomBaseState.watchInitData.join_info.nickname,
+        hideChatHistory: this.configList['ui.hide_chat_history'] == 1
+      };
       console.log(this.roomBaseState, 'roomBaseState');
     },
     methods: {
@@ -108,6 +113,7 @@
     }
     .vh-saas-iconfont {
       font-size: 47px;
+      color: #666666;
     }
   }
 </style>
