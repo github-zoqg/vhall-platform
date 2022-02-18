@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useGoodServer } from 'middle-domain';
+  import { useRoomBaseServer, useGoodServer, useMenuServer } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import Pullup from '@better-scroll/pull-up';
@@ -93,12 +93,17 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.goodServer = useGoodServer();
+      this.menuServer = useMenuServer();
       // console.log('wap this.goodServer------->', this.goodServer);
     },
     mounted() {
       // this.webinar_id = this.roomBaseServer.state.watchInitData.webinar.id;
       this.buildDataList(this.roomBaseServer.state.goodsDefault, false);
       this.handlerInitScroll();
+
+      this.menuServer.$on('tab-switched', function (data) {
+        console.log('tab-switched from goods comp', data);
+      });
     },
     methods: {
       /**
