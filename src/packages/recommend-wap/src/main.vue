@@ -17,7 +17,6 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import { useRoomBaseServer, useMenuServer } from 'middle-domain';
 
   export default {

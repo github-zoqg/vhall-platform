@@ -1538,7 +1538,7 @@
           receive_account_id: accountId
         };
         const request = this.micServer
-          .userSpeakOff(data)
+          .speakOff(data)
           .then(res => {
             //todo 埋点上报
             return res;

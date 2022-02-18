@@ -42,7 +42,6 @@
         clearInterval(this.waitInterval);
       }
       useMsgServer().$onMsg('ROOM_MSG', rawMsg => {
-        console.log('房间消息-4-4-4-4-4-4', rawMsg);
         let temp = Object.assign({}, rawMsg);
         if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
           temp.data = JSON.parse(temp.data);
@@ -70,24 +69,29 @@
     methods: {
       // 接受邀请
       confirmSave() {
-        console.log(this.roomBaseState);
         useMicServer()
           .userAgreeInvite({
-            room_id: this.roomBaseState.watchInitData.interact.room_id
+            room_id: this.roomBaseState.watchInitData.interact.room_id,
+            type: 0 // 0=邀请上麦|1=邀请演示
           })
           .then(res => {
-            console.log('接受邀请111,callback');
-            console.log(res);
+            useMicServer().userSpeakOn();
+            clearInterval(this.waitInterval);
+            this.btnText = '确认';
             this.isConfirmVisible = false;
           });
       },
       // 拒绝邀请
       closeConfirm() {
         useMicServer()
-          .userRejectInvite()
+          .userRejectInvite({
+            room_id: this.roomBaseState.watchInitData.interact.room_id,
+            type: 0 // 0=邀请上麦|1=邀请演示
+          })
           .then(res => {
-            console.log('拒绝邀请222,callback');
-            console.log(res);
+            clearInterval(this.waitInterval);
+            this.btnText = '确认';
+            this.isConfirmVisible = false;
           });
       }
     }

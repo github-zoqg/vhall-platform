@@ -12,7 +12,7 @@
       </el-button>
     </div>
     <div>
-      <el-button @click="userSpeakOff" type="primary" size="medium" v-if="isSpeakOn" round>
+      <el-button @click="speakOff" type="primary" size="medium" v-if="isSpeakOn" round>
         下麦
       </el-button>
     </div>
@@ -80,8 +80,8 @@
     },
     methods: {
       // 下麦
-      userSpeakOff() {
-        useMicServer().userSpeakOff();
+      speakOff() {
+        useMicServer().speakOff();
       },
       // 举手按钮点击事件
       handleHandClick() {
