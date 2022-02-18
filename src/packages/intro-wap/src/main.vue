@@ -41,7 +41,6 @@
 
 <script>
   import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
-  import { useVirtualAudienceServer } from 'middle-domain';
   export default {
     name: 'VmpIntroWap',
     filters: {
@@ -60,12 +59,6 @@
         NoDelayImg,
         type: 'default' // default、subscribe
       };
-    },
-    beforeCreate() {
-      this.virtualClientStartServer = useVirtualAudienceServer();
-    },
-    created() {
-      this.onlineState = this.virtualClientStartServer.state;
     },
     computed: {
       watchInitData() {
@@ -95,7 +88,10 @@
       },
       // 在线人数或订阅人数 Type:String
       personCount() {
-        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
+        );
       },
       // 简介富文本正文 Type:String
       content() {

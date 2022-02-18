@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerPlayer', 'layerBodyCenter', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog']
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
@@ -18,17 +18,17 @@ export const serverConfig = {
     children: ['comHeaderWatch']
   },
   // 中间主区域容器
-  // layerBody: {
-  //   component: 'VmpContainer',
-  //   className: 'vmp-basic-bd',
-  //   children: ['layerPlayer', 'layerBodyCenter']
-  // },
-  layerPlayer: {
+  layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
-    children: ['comWaStreamLocal']
-    // comWapPlayer 编写互动功能，暂时注释
+    children: ['comWapBody']
   },
+  // layerPlayer: {
+  //   component: 'VmpContainer',
+  //   className: 'vmp-basic-bd',
+  //   children: ['comWaStreamLocal']
+  //   // comWapPlayer 编写互动功能，暂时注释
+  // },
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
@@ -58,6 +58,11 @@ export const serverConfig = {
         method: 'openOfficial'
       }
     ]
+  },
+  // 播放器容器和推流容器
+  comWapBody: {
+    component: 'VmpWapBody',
+    children: ['comWapPlayer', 'comWaStreamLocal']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'

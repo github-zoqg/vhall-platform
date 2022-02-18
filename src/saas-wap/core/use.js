@@ -44,6 +44,9 @@ import VmpWapQrCode from '@/packages/qrcode-wap';
 // Wap互动推流组件
 import VmpWapStreamLocal from '@/packages/wap-stream-local';
 
+// 用来判断显示播放器还是流
+import VmpWapBody from '@/packages/wap-body';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -72,4 +75,5 @@ export function initUse() {
   Vue.use(VmpSignWap);
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapStreamLocal);
+  Vue.use(VmpWapBody);
 }
