@@ -262,6 +262,7 @@
       },
       // 创建本地流
       async createLocalStream() {
+        console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         switch (this.$domainStore.state.mediaSettingServer.videoType) {
           case 'camera':
             await this.interactiveServer
