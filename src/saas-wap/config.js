@@ -101,9 +101,8 @@ export const serverConfig = {
     component: 'VmpIntroWap',
     addTab: [
       {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
+        cuid: ['comGoodSaasWap'],
+        method: 'addItem'
       }
     ]
   },
