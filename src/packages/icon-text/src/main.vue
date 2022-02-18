@@ -1,12 +1,12 @@
 <template>
   <a
     href="javascript:;"
+    v-if="!hidden"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
     :data-kind="kind"
     :class="[className, selected ? 'selected' : '', disable ? 'disable' : '']"
-    :style="{ display: hidden ? 'none' : 'flex' }"
     @click="handleClick"
   >
     <i :class="icon"></i>

@@ -32,7 +32,7 @@ export function getItemEntity({
   // set Visible
   // let visible = status == 1 || status == 3 ? true : false;
   let visible = true;
-  if (type === 2) visible = false;
+  // if (type === 2) visible = false;
 
   return {
     type,
