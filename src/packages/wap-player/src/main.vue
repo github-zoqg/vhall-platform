@@ -15,12 +15,12 @@
         <img v-if="isShowPoster" class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
       </div>
       <!-- 播放 按钮 -->
-      <div v-if="isPlayering" class="vmp-wap-player-pause">
+      <div v-if="!isPlayering" class="vmp-wap-player-pause">
         <p @click="startPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-player">
+      <div id="vmp-player" @click.stop="videoShowIcon">
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -67,25 +67,34 @@
           <p class="vmp-wap-player-ending-box-reset">重新播放</p>
         </div>
       </div>
-      <!-- 观看次数  :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"-->
-      <div class="vmp-wap-player-header">
+      <!-- 观看次数  -->
+      <div
+        class="vmp-wap-player-header"
+        v-show="roomBaseState.watchInitData.pv.show && isPlayering"
+        :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
+      >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
           &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 倍速、清晰度切换 -->
-      <div class="vmp-wap-player-tips" :class="{ tipsWapOpcity: isSetQuality || isSetSpeed }">
+      <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
         已为您切换到
-        <span v-if="isSetQuality">{{ currentQualitys.def | fromalText }}</span>
+        <span v-if="isSetQuality">{{ formatQualityText(currentQualitys.def) }}</span>
         <span v-if="isSetSpeed">{{ currentSpeed == 1 ? '正常' : currentSpeed }}倍速</span>
       </div>
       <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
-      <div>
+      <div
+        :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
+        v-show="isPlayering"
+      >
         <!-- 倍速和画质合并 -->
         <div class="vmp-wap-player-speed">
-          <span @click="openSpeed">倍速</span>
-          <span @click="openQuality">原画</span>
+          <span @click="openSpeed" v-if="!isLiving">
+            {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+          </span>
+          <span @click="openQuality">{{ formatQualityText(currentQualitys.def) }}</span>
         </div>
         <div class="vmp-wap-player-control">
           <div class="vmp-wap-player-control-preview" v-if="false">
@@ -143,20 +152,20 @@
                   @click.stop="refresh"
                   v-if="isLiving"
                 ></i>
-                <span class="vmp-wap-player-control-icons-left-time">
+                <span class="vmp-wap-player-control-icons-left-time" v-if="!isLiving">
                   {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
                 </span>
               </span>
               <!-- 右侧icon集合 v-if="playerOtherOptions.barrage_button" -->
               <p class="vmp-wap-player-control-icons-right">
-                <span @click="switchBarrage">
+                <span @click="openBarrage" v-if="isLiving">
                   <i
                     :class="`vh-iconfont ${
                       danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
                     }`"
                   ></i>
                 </span>
-                <span v-if="!audioMode">
+                <span v-if="!isAudio" @click="enterFullscreen">
                   <i
                     :class="`vh-iconfont ${
                       isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -168,6 +177,42 @@
           </div>
         </div>
       </div>
+      <van-popup
+        v-model="isOpenSpeed"
+        :overlay="false"
+        position="right"
+        style="z-index: 12"
+        class="vmp-wap-player-popup"
+      >
+        <ul>
+          <li
+            v-for="item in UsableSpeed"
+            :key="item"
+            :class="{ 'popup-active': currentSpeed == item }"
+            @click="changeSpeed(item)"
+          >
+            {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
+          </li>
+        </ul>
+      </van-popup>
+      <van-popup
+        v-model="isOpenQuality"
+        :overlay="false"
+        position="right"
+        style="z-index: 12"
+        class="vmp-wap-player-popup"
+      >
+        <ul>
+          <li
+            v-for="item in qualitysList"
+            :key="item.def"
+            :class="{ 'popup-active': currentQualitys.def == item.def }"
+            @click="changeQualitys(item)"
+          >
+            {{ formatQualityText(item.def) }}
+          </li>
+        </ul>
+      </van-popup>
     </div>
   </div>
 </template>
@@ -182,29 +227,6 @@
     filters: {
       secondToDate(val) {
         return secondToDateZH(val);
-      },
-      fromalText(val) {
-        let text;
-        switch (val) {
-          case 'same':
-            text = '原画';
-            break;
-          case '720p':
-            text = '超清';
-            break;
-          case '480p':
-            text = '高清';
-            break;
-          case 'a':
-            text = '音频';
-            break;
-          case '360p':
-            text = '标清';
-            break;
-          default:
-            text = '标清';
-        }
-        return text;
       },
       formatHotNum(value) {
         value = parseInt(value);
@@ -261,6 +283,8 @@
         playerState,
         isNoBuffer: false,
         promptFlag: false,
+        isOpenSpeed: false,
+        isOpenQuality: false,
         iconShow: false, // 5秒后操作栏icon消失
         prompt: '内容即将呈现...', // 刚开始点击时展示文案
         loadingFlag: false,
@@ -330,16 +354,6 @@
         }
         this.initPlayer();
       },
-      // 设置播放时间
-      setVideoCurrentTime(val) {
-        if (!this.playerServer) return;
-
-        console.log('video val', val);
-        this.playerServer.setCurrentTime(val, () => {
-          this.$toast('设置当前时间失败,请稍后重试');
-          console.error('设置当前播放时间失败');
-        });
-      },
       refresh() {
         console.log('11woshi我是刷新');
       },
@@ -352,6 +366,76 @@
           // 派发播放器时间更新事件，通知章节当前播放的时间节点
           // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, this.currentTime);
         });
+      },
+      changeSlider(value) {
+        this.currentTime = (value / 100) * this.totalTime;
+        this.playerServer.setCurrentTime(this.currentTime, () => {
+          this.$toast('调整播放时间失败');
+        });
+      },
+      // 全屏
+      enterFullscreen() {
+        if (this.isFullscreen) {
+          this.isFullscreen = false;
+          if (
+            !(
+              document.exitFullscreen ||
+              document.mozCancelFullScreen ||
+              document.webkitExitFullscreen ||
+              document.msExitFullscreen
+            )
+          ) {
+            this.playerServer.exitFullScreen(event => {});
+          }
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        } else {
+          this.isFullscreen = true;
+          const element = document.getElementById('videoWapBox');
+          if (
+            !(
+              element.requestFullscreen ||
+              element.mozRequestFullScreen ||
+              element.webkitRequestFullscreen ||
+              element.msRequestFullscreen
+            )
+          ) {
+            this.playerServer.enterFullScreen(event => {});
+          }
+          if (element.requestFullscreen) element.requestFullscreen();
+          else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+          else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+          else if (element.msRequestFullscreen) element.msRequestFullscreen();
+        }
+      },
+      handleAuth() {
+        console.log('shikan试看权限');
+      },
+      openSpeed() {
+        this.iconShow = true;
+        this.isOpenSpeed = true;
+      },
+      openQuality() {
+        this.isOpenQuality = true;
+        this.iconShow = true;
+      },
+      videoShowIcon() {
+        this.iconShow = false;
+        this.isOpenQuality = false;
+        this.isOpenSpeed = false;
+        this.fiveDown();
+      },
+      fiveDown() {
+        // 5秒后消失
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.iconShow = true;
+        }, 5000);
+      },
+      replay() {
+        console.log('回放');
       }
     }
   };
@@ -541,6 +625,18 @@
           font-size: 28px;
         }
       }
+      &.opcity-flase {
+        // opacity: 0;
+        display: none;
+        transition: all 1s;
+        -webkit-transition: all 1s;
+      }
+      &.opcity-true {
+        opacity: 1;
+        transition: all 1s;
+        z-index: 6;
+        -webkit-transition: all 1s;
+      }
     }
     &-tips {
       padding: 24px;
@@ -555,13 +651,9 @@
       text-align: center;
       z-index: 2;
       transform: translateX(-50%);
-      display: none;
       span {
         color: #fb2626;
         padding-left: 5px;
-      }
-      &.tipsWapOpcity {
-        display: block;
       }
     }
     &-speed {
@@ -630,7 +722,6 @@
           height: 24px;
           border-radius: 50%;
           display: block;
-          position: relative;
           img {
             position: absolute;
             left: 0%;
@@ -664,6 +755,36 @@
         //   font-size: 34px;
         //   vertical-align: middle;
         // }
+      }
+    }
+    &-popup {
+      width: 200px;
+      position: absolute;
+      // transform: none;
+      height: 100%;
+      // top: 0;
+      background: rgba(0, 0, 0, 0.7);
+      ul {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        padding: 30px 0;
+        li {
+          width: 100%;
+          height: 60px;
+          line-height: 60px;
+          font-size: 28px;
+          font-family: PingFangSC-Regular, PingFang SC;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 1);
+          text-align: center;
+          &.popup-active {
+            color: #fb2626;
+          }
+        }
       }
     }
   }

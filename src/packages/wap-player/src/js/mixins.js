@@ -16,6 +16,8 @@ const playerMixins = {
     },
     // 播放
     play() {
+      this.iconShow = false;
+      this.fiveDown();
       this.playerServer && this.playerServer.play();
     },
     // 暂停
@@ -384,7 +386,7 @@ const playerMixins = {
           this.audioStatus = false;
         }
       });
-      console.log(this.qualityList, this.currentQualitys, '?????1111111');
+      console.log(this.qualitysList, this.currentQualitys, '?????1111111');
     },
     // 获取倍速列表和当前倍速
     getInitSpeed() {
@@ -413,6 +415,7 @@ const playerMixins = {
     },
     // 修改视频清晰度
     changeQualitys(item) {
+      console.log('12334324', item);
       let sucess = true;
       this.playerServer.setQuality(item, err => {
         sucess = false;
@@ -426,10 +429,18 @@ const playerMixins = {
           this.audioStatus = false;
         }
         this.isSetQuality = true;
+        this.isOpenQuality = false;
         this.currentQualitys = item;
         sessionStorage.setItem('localQualityValue', item.def);
         this.setChange();
       }
+    },
+    // 开启/关闭弹幕
+    openBarrage() {
+      this.danmuIsOpen = !this.danmuIsOpen;
+      this.danmuIsOpen
+        ? this.playerServer && this.playerServer.openBarrage()
+        : this.playerServer && this.playerServer.closeBarrage();
     },
     // 修改视频倍速
     changeSpeed(item) {
@@ -442,6 +453,7 @@ const playerMixins = {
         console.log('设置倍速成功--------', item);
         sessionStorage.setItem('localSpeedValue', item);
         this.isSetSpeed = true;
+        this.isOpenSpeed = false;
         this.currentSpeed = item;
         this.setChange();
       }
@@ -454,6 +466,43 @@ const playerMixins = {
         this.isSetSpeed = false;
         this.isSetQuality = false;
       }, 2000);
+    },
+    // 设置播放时间
+    setVideoCurrentTime(val) {
+      if (!this.playerServer) return;
+
+      console.log('video val', val);
+
+      this.playerServer.setCurrentTime(val, () => {
+        this.$message({
+          type: 'error',
+          message: '设置当前时间失败,请稍后重试'
+        });
+        console.error('设置当前播放时间失败');
+      });
+    },
+    formatQualityText(val) {
+      let text;
+      switch (val) {
+        case 'same':
+          text = '原画';
+          break;
+        case '720p':
+          text = '超清';
+          break;
+        case '480p':
+          text = '高清';
+          break;
+        case 'a':
+          text = '音频';
+          break;
+        case '360p':
+          text = '标清';
+          break;
+        default:
+          text = '标清';
+      }
+      return text;
     }
   }
 };
