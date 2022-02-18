@@ -24,6 +24,7 @@ import VmpContainerRightWap from '@/packages/basic-right-container-wap';
 //wap公告
 import VmpNoticeWap from '@/packages/notice-watch-wap';
 import VmpRecommendWap from '@/packages/recommend-wap';
+import VmpMemberListWap from '@/packages/member-list-wap';
 
 // 自定义菜单
 import VmpCustomMenuWap from '@/packages/custom-menu-wap';
@@ -38,6 +39,9 @@ import VmpSignWap from '@/packages/interact-sign-wap';
 
 // 二维码弹框
 import VmpWapQrCode from '@/packages/qrcode-wap';
+
+// Wap互动推流组件
+import VmpWapStreamLocal from '@/packages/wap-stream-local';
 
 // 全局注册组件
 export function initUse() {
@@ -64,4 +68,6 @@ export function initUse() {
   Vue.use(VmpChatWap);
   Vue.use(VmpCustomMenuWap);
   Vue.use(VmpSignWap);
+  Vue.use(VmpMemberListWap);
+  Vue.use(VmpWapStreamLocal);
 }

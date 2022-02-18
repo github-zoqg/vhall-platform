@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useInteractiveServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
 

@@ -105,7 +105,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -155,6 +155,7 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.micServer = useMicServer();
     },
     mounted() {
       this.subscribeRemoteStream();
@@ -202,7 +203,11 @@
           receive_account_id: this.stream.accountId
         });
       },
-      speakOff() {},
+      speakOff() {
+        this.micServer.speakOff({
+          receive_account_id: this.stream.accountId
+        });
+      },
       fullScreen() {
         this.interactiveServer.setStreamFullscreen({
           streamId: this.stream.streamId,

@@ -13,7 +13,6 @@ import { Integrations } from '@sentry/tracing';
 // 初始化
 initGlobalAPI();
 
-window.$globalConfig.currentI18n = i18n;
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 

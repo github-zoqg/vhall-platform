@@ -17,7 +17,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useMenuServer } from 'middle-domain';
 
   export default {
     name: 'VmpRecommendWap',
@@ -39,8 +39,8 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.menuServer = useMenuServer();
     },
-
     watch: {
       advsInfo: {
         handler(val) {
@@ -67,16 +67,6 @@
     methods: {
       handlerInitScroll() {
         this.$nextTick(() => {
-          // const wrapper = document.querySelector('.recommendWrapper');
-          // this.scroll = new BScroll(wrapper, {
-          //   pullUpLoad: true,
-          //   bindToWrapper: true,
-          //   scrollX: false,
-          //   scrollY: true,
-          //   bounce: true,
-          //   click: true,
-          //   tap: 'tap'
-          // });
           this.scroll && this.handleBindScrollEvent();
           this.scroll && this.scroll.refresh();
         });
