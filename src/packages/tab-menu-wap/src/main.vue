@@ -94,6 +94,8 @@
     },
     async mounted() {
       await this.$nextTick(0);
+
+      this.selectDefault();
     },
 
     methods: {
@@ -234,9 +236,10 @@
     flex-direction: column;
 
     &__header {
+      position: relative;
       width: 100%;
       height: 90px;
-      position: relative;
+      flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
 
