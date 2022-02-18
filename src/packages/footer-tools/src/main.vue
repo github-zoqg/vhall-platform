@@ -21,6 +21,8 @@
     <div class="vmp-footer-tools__center" v-if="isInteractLive">
       <handup></handup>
     </div>
+    <!-- 用户被邀请dialog -->
+    <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
       <li>
@@ -81,6 +83,8 @@
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
+  import getInvited from './component/getInvited/index.vue';
+
   export default {
     name: 'VmpFooterTools',
     // mixins: [onlineMixin],
@@ -100,7 +104,8 @@
       reward,
       vhGifts,
       notice,
-      praise
+      praise,
+      getInvited
     },
     filters: {
       formatHotNum(value) {
