@@ -41,6 +41,8 @@ import VmpLotteryWatch from '@/packages/lottery/watch'; // 观看端计时器
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
+// 开屏海报
+import VmpScreenPost from '@/packages/screen-post';
 
 // 全局注册组件
 export function initUse() {
@@ -77,4 +79,5 @@ export function initUse() {
   Vue.use(VmpGoodList);
   Vue.use(VmpLotteryWatch);
   Vue.use(VmpChapter);
+  Vue.use(VmpScreenPost);
 }
