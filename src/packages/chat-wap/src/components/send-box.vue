@@ -52,13 +52,8 @@
           "
         ></div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
-          <!-- 礼物 -->
-          <div class="icon-wrapper liwu"></div>
-          <!-- 打赏 -->
-          <div class="icon-wrapper" v-if="!isEmbed"></div>
-          <!-- 邀请卡 -->
-          <!-- 点赞-->
-          <div class="icon-wrapper"></div>
+          <!-- 底部互动工具组件 comChatWap-->
+          <vmp-air-container cuid="comChatWap"></vmp-air-container>
         </div>
       </div>
     </div>
