@@ -95,7 +95,6 @@ export const serverConfig = {
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
-    children: ['comChatWap', 'comIntroWap', 'comRecommendWap'],
     options: {}
   },
   comIntroWap: {
@@ -118,14 +117,7 @@ export const serverConfig = {
   },
   // 广告（推荐）
   comRecommendWap: {
-    component: 'VmpRecommendWap',
-    addTab: [
-      {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
-      }
-    ]
+    component: 'VmpRecommendWap'
   },
   //商品列表
   comGoodSaasWap: {
