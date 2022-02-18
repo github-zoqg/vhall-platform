@@ -73,7 +73,8 @@
         console.log(this.roomBaseState);
         useMicServer()
           .userAgreeInvite({
-            room_id: this.roomBaseState.watchInitData.interact.room_id
+            room_id: this.roomBaseState.watchInitData.interact.room_id,
+            type: 0 // 0=邀请上麦|1=邀请演示
           })
           .then(res => {
             console.log('接受邀请111,callback');
@@ -84,7 +85,10 @@
       // 拒绝邀请
       closeConfirm() {
         useMicServer()
-          .userRejectInvite()
+          .userRejectInvite({
+            room_id: this.roomBaseState.watchInitData.interact.room_id,
+            type: 0 // 0=邀请上麦|1=邀请演示
+          })
           .then(res => {
             console.log('拒绝邀请222,callback');
             console.log(res);
