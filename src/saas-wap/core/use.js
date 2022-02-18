@@ -5,6 +5,7 @@ import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
 import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
 import VmpWapPlayer from '@/packages/wap-player';
+import VmpDocWap from '@/packages/doc-wap';
 import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
@@ -49,6 +50,7 @@ export function initUse() {
   Vue.use(VmpAirContainer);
   Vue.use(VmpHeaderWatchWap);
   Vue.use(VmpWapPlayer);
+  Vue.use(VmpDocWap);
   Vue.use(VmpStreamList);
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);

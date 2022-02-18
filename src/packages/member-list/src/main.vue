@@ -688,12 +688,12 @@
 
           if (isLive) {
             //todo 需要server里取数据替换这个groupUsersNumber
-            _this.totalNum = _this.isInGroup
-              ? msg.uv
-              : msg.uv -
-                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                  ? _this.$store.getters.getAllState('groupUsersNumber')
-                  : 0);
+            // _this.totalNum = _this.isInGroup
+            //   ? msg.uv
+            //   : msg.uv -
+            //     ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
+            //       ? _this.$store.getters.getAllState('groupUsersNumber')
+            //       : 0);
           }
 
           if (isWatch) {

@@ -158,5 +158,18 @@ export const serverConfig = {
   //成员列表
   comMemberListWap: {
     component: 'VmpMemberListWap'
+  },
+  //wap端文档
+  comDocWap: {
+    component: 'VmpDocWap',
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ],
+    children: ['comInteractToolsWap'],
+    options: {}
   }
 };
