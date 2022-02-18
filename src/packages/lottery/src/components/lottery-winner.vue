@@ -40,7 +40,7 @@
         </li>
       </ul>
     </div>
-    <span @click="reStart" class="continue-btn-box">
+    <span v-if="mode === 'live'" @click="reStart" class="continue-btn-box">
       <i class="continue-btn">继续抽奖</i>
     </span>
     <!-- 关闭按钮 -->
@@ -55,6 +55,9 @@
     name: 'LotteryWinner',
     inject: ['lotteryServer'],
     props: {
+      mode: {
+        type: String
+      },
       winnerList: {
         type: Array,
         required: true,
