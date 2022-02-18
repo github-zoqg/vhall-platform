@@ -15,6 +15,17 @@ const routes = [
     component: Home,
     name: 'LiveRoom',
     meta: { title: '直播间' }
+  },
+  {
+    path: '/lives/invite/:id',
+    name: 'inviteCard',
+    component: () => import('../views/InviteCard/main.vue')
+  },
+  // 错误页、升级页
+  {
+    path: '/upgrading',
+    name: 'upgrading',
+    component: () => import('../views/Upgrading.vue')
   }
   // {
   //   path: '/about',

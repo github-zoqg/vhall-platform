@@ -42,6 +42,7 @@
         :tab-cuid="cuid"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
+        @closePopup="selectDefault"
         ref="tabContent"
       ></tab-content>
     </section>
@@ -94,11 +95,7 @@
     async mounted() {
       await this.$nextTick(0);
 
-      // 选择默认项
-      if (this.visibleMenu.length > 0) {
-        const { cuid, contentId } = this.visibleMenu[0];
-        this.select(cuid, contentId);
-      }
+      this.selectDefault();
     },
 
     methods: {
@@ -111,10 +108,18 @@
       },
       // 初始化菜单选项
       initMenu() {
-        // TODO: 混入 custom-menu 的内容
-        this.tabOptions.defaultMenu.forEach(item => {
+        const list = this.$domainStore.state.roomBaseServer.customMenu.list;
+
+        for (const item of list) {
           this.addItem(item);
-        });
+        }
+      },
+      selectDefault() {
+        // 选择默认项
+        if (this.visibleMenu.length > 0) {
+          const { cuid, contentId } = this.visibleMenu[0];
+          this.select(cuid, contentId);
+        }
       },
 
       toggleSubMenuVisible() {
@@ -126,6 +131,8 @@
       },
 
       hasItem(item) {
+        item = this.getItem(item);
+
         return this.menu.some(menuItem => {
           const sameComp = item.cuid === menuItem.cuid;
           const sameContentId = item.contentId === menuItem.contentId;
@@ -134,27 +141,19 @@
       },
 
       addItem(item) {
-        if (!item || !item.cuid || !item.text) {
-          throw Error('传入的 tab item 必须有cuid、text');
-        }
-
-        if (this.hasItem(item)) {
-          throw Error('不能传入已经存在的item');
-        }
+        // if (this.hasItem(item)) {
+        //   throw Error('不能传入已经存在的item');
+        // }
+        console.log('item::::', item);
 
         item = getItemEntity(item);
-
         this.menu.push(item);
       },
 
       addItemByIndex(index, item) {
-        if (!item || !item.cuid || !item.contentId || !item.text) {
-          throw Error('传入的 tab item 必须有id、text');
-        }
-
-        if (this.hasItem(item)) {
-          throw Error('不能传入cuid和contentId都相同的item');
-        }
+        // if (this.hasItem(item)) {
+        //   throw Error('不能传入cuid和contentId都相同的item');
+        // }
 
         item = getItemEntity(item);
 
@@ -216,13 +215,6 @@
         this.selectedContentId = contentId;
 
         let payload = null;
-        // TODO: 强耦合，需更改
-        if (cuid === 'comCustomMenu') {
-          payload = {
-            method: 'queryDetail',
-            arg: [contentId]
-          };
-        }
 
         // wap端逻辑
         this.isSubMenuShow = false;
@@ -244,9 +236,10 @@
     flex-direction: column;
 
     &__header {
+      position: relative;
       width: 100%;
       height: 90px;
-      position: relative;
+      flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
 
@@ -263,6 +256,7 @@
     &__main {
       width: 100%;
       flex: 1 1 auto;
+      overflow: hidden;
     }
 
     .vmp-tab-menu-scroll-container {

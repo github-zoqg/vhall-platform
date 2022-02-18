@@ -5,7 +5,8 @@ import {
   useInteractiveServer,
   useMicServer,
   useMediaCheckServer,
-  useGroupServer
+  useGroupServer,
+  useMediaSettingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -17,6 +18,7 @@ export default async function () {
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
   const micServer = useMicServer();
+  const mediaSettingServer = useMediaSettingServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -47,11 +49,13 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  // await interactiveServer.init();
+  await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
+
+  mediaSettingServer.init();
 
   roomBaseServer.getCommonConfig({
     tags: [
@@ -81,7 +85,9 @@ export default async function () {
   useMicServer();
 
   // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
+  window.micServer = micServer;
 }

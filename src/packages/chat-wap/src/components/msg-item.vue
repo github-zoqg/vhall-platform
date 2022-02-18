@@ -81,14 +81,14 @@
             >
               {{ msg.roleName | roleFilter }}
             </span>
-            <span class="nickname">{{ msg.nickName }}</span>
+            <span class="nickname">{{ msg.nickname }}</span>
           </p>
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
             <template v-if="msg.replyMsg && msg.replyMsg.type && msg.atList.length == 0">
               <p class="reply-msg">
-                <span v-html="msg.replyMsg.nickName" />
+                <span v-html="msg.replyMsg.nick_name" />
                 ：
                 <span v-html="msg.replyMsg.content.text_content" />
               </p>
@@ -111,7 +111,7 @@
             <!-- @消息 -->
             <template v-if="msg.atList.length != 0">
               <div class="msg-content_body">
-                <span v-html="msg.content.text_content"></span>
+                <span v-html="msgContent"></span>
                 <img
                   @tap="$emit('preview', img)"
                   class="msg-content_chat-img"
@@ -159,6 +159,7 @@
     },
     data() {
       return {
+        msgContent: '',
         jiantou: require('../images/jiantou.png')
       };
     },
@@ -224,6 +225,9 @@
         return val;
       }
     },
+    mounted() {
+      this.handleAt();
+    },
     methods: {
       // 点击查看抽奖信息
       //todo 信令替代
@@ -236,6 +240,59 @@
       checkQuestionDetail(questionnaire_id) {
         console.log(questionnaire_id);
         // EventBus.$emit('checkQuestionDetail', questionnaire_id);
+      },
+      //处理@消息
+      handleAt() {
+        //todo 可以考虑domaint提供统一的处理 实现@用户
+        if (!this.msg.atList.length) {
+          this.msgContent = this.msg.content.text_content;
+        } else {
+          let at = false;
+          this.msg.atList.forEach(a => {
+            console.log('atList', a.nick_name);
+            console.log(this.msg.atList.length);
+            const userName = `@${a.nick_name} `;
+            const match =
+              this.msg.content &&
+              this.msg.content.text_content &&
+              this.msg.content.text_content.indexOf(userName) != -1;
+            console.log(match);
+            if (match) {
+              if (at) {
+                this.msgContent = this.msgContent.replace(
+                  userName,
+                  `<span style='color:#4DA1FF'>${userName}</span>`
+                );
+              } else {
+                this.msgContent = this.msg.content.text_content.replace(
+                  userName,
+                  `<span style='color:#4DA1FF'>${userName}</span>`
+                );
+              }
+              at = true;
+            } else {
+              this.msgContent = at ? this.msgContent : this.msg.content.text_content;
+            }
+          });
+        }
+        if (
+          this.msg.atList &&
+          this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+          !this.msg.isHistoryMsg
+        ) {
+          this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
+          clearTimeout(this.tipTimer);
+          this.tipTimer = setTimeout(() => {
+            this.$emit('dispatchEvent', { type: 'closeTip' });
+          }, 10000);
+        }
+        if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
+          this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
+          clearTimeout(this.tipTimer);
+          this.tipTimer = setTimeout(() => {
+            this.$emit('dispatchEvent', { type: 'closeTip' });
+          }, 10000);
+        }
       }
     }
   };

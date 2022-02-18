@@ -309,56 +309,7 @@
       }
     },
     mounted() {
-      //todo 可以考虑domaint提供统一的处理 实现@用户
-      console.log('atlist', this.msg.atList);
-      if (!this.msg.atList.length) {
-        this.msgContent = this.msg.content.text_content;
-      } else {
-        let at = false;
-        this.msg.atList.forEach(a => {
-          console.log(this.msg.atList.length);
-          const userName = `@${a.nick_name} `;
-          const match =
-            this.msg.content &&
-            this.msg.content.text_content &&
-            this.msg.content.text_content.indexOf(userName) != -1;
-          if (match) {
-            if (at) {
-              this.msgContent = this.msgContent.replace(
-                userName,
-                `<span style='color:#4DA1FF'>${userName}</span>`
-              );
-            } else {
-              this.msgContent = this.msg.content.text_content.replace(
-                userName,
-                `<span style='color:#4DA1FF'>${userName}</span>`
-              );
-            }
-            at = true;
-          } else {
-            this.msgContent = at ? this.msgContent : this.msg.content.text_content;
-          }
-        });
-      }
-
-      if (
-        this.msg.atList &&
-        this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
-        !this.msg.isHistoryMsg
-      ) {
-        this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
-        clearTimeout(this.tipTimer);
-        this.tipTimer = setTimeout(() => {
-          this.$emit('dispatchEvent', { type: 'closeTip' });
-        }, 10000);
-      }
-      if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
-        this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
-        clearTimeout(this.tipTimer);
-        this.tipTimer = setTimeout(() => {
-          this.$emit('dispatchEvent', { type: 'closeTip' });
-        }, 10000);
-      }
+      this.handleAt();
     },
     methods: {
       // 预览图片
@@ -414,6 +365,57 @@
       //todo 点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
         this.$emit('questionnaireCheck', questionnaire_id);
+      },
+      //处理@消息
+      handleAt() {
+        //todo 可以考虑domaint提供统一的处理 实现@用户
+        if (!this.msg.atList.length) {
+          this.msgContent = this.msg.content.text_content;
+        } else {
+          let at = false;
+          this.msg.atList.forEach(a => {
+            console.log(this.msg.atList.length);
+            const userName = `@${a.nick_name} `;
+            const match =
+              this.msg.content &&
+              this.msg.content.text_content &&
+              this.msg.content.text_content.indexOf(userName) != -1;
+            if (match) {
+              if (at) {
+                this.msgContent = this.msgContent.replace(
+                  userName,
+                  `<span style='color:#4DA1FF'>${userName}</span>`
+                );
+              } else {
+                this.msgContent = this.msg.content.text_content.replace(
+                  userName,
+                  `<span style='color:#4DA1FF'>${userName}</span>`
+                );
+              }
+              at = true;
+            } else {
+              this.msgContent = at ? this.msgContent : this.msg.content.text_content;
+            }
+          });
+        }
+        if (
+          this.msg.atList &&
+          this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+          !this.msg.isHistoryMsg
+        ) {
+          this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
+          clearTimeout(this.tipTimer);
+          this.tipTimer = setTimeout(() => {
+            this.$emit('dispatchEvent', { type: 'closeTip' });
+          }, 10000);
+        }
+        if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
+          this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
+          clearTimeout(this.tipTimer);
+          this.tipTimer = setTimeout(() => {
+            this.$emit('dispatchEvent', { type: 'closeTip' });
+          }, 10000);
+        }
       }
     }
   };

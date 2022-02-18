@@ -17,7 +17,6 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import { useRoomBaseServer } from 'middle-domain';
 
   export default {
@@ -64,15 +63,6 @@
         },
         immediate: true
       }
-    },
-    created() {
-      window.$middleEventSdk?.event?.send(
-        boxEventOpitons(this.cuid, 'addTab', {
-          comp: 'comRecommendWap',
-          key: 'recommend',
-          text: '推荐'
-        })
-      );
     },
     methods: {
       handlerInitScroll() {

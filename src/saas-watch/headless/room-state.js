@@ -73,7 +73,8 @@ export default async function () {
       'room-tool',
       'goods-default',
       'announcement',
-      'sign'
+      'sign',
+      'timer'
     ]
   });
 
@@ -93,7 +94,9 @@ export default async function () {
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
 
   // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
+  window.micServer = micServer;
 }

@@ -30,7 +30,7 @@
               @click="onClose"
               v-if="userInfo.role_name == 3 || userInfo.third_party_user_id == this.doc_permission"
             >
-              <i class="iconfont iconguanbi"></i>
+              <i class="vh-iconfont vh-line-close"></i>
             </span>
           </el-row>
           <!-- 时间显示区 -->
@@ -103,7 +103,7 @@
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
     name: 'VmpLiveTimer',
     directives: {
-      drag(el, bindings) {
+      drag(el) {
         el.onmousedown = function (e) {
           var disx = e.pageX - el.offsetLeft;
           var disy = e.pageY - el.offsetTop;

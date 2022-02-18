@@ -326,7 +326,6 @@
       }
     },
     mounted() {
-      this.initEvents();
       this.initData();
     },
     methods: {
@@ -361,83 +360,6 @@
       async initData() {
         await this.groupServer.getWaitingUserList();
         await this.groupServer.getGroupedUserList();
-      },
-      initEvents() {
-        // 监听消息
-        // this.msgServer.$onMsg('ROOM_MSG', this.listenRoomMsg);
-        this.msgServer.$onMsg('JOIN', this.listenJoinMsg); // 加入房间
-        this.msgServer.$onMsg('LEFT', this.listenLeftMsg); // 离开房间
-
-        this.groupServer.$on('group_room_create', () => {
-          console.log('[group] 派发消息group_room_create');
-          this.settingDialogVisible = false;
-          this.addDialogVisible = false;
-        });
-      },
-      // 使用具名消息，后面offMsg的时候使用
-      // TODO 暂时没有offMsg事件，后面有的时候加上
-      listenRoomMsg: async function (msg) {
-        console.log(
-          '[group] --ROOM_MSG--房间消息：',
-          `${msg.data.type ? 'type:' : 'event_type'}:${msg.data.type || msg.data.event_type}`
-        );
-        if (msg.data.event_type === 'group_room_create') {
-          // 【分组创建完成】
-          console.log('[group] room-msg group_room_create');
-
-          //
-        } else if (msg.data.event_type === 'group_switch_start') {
-          //【开启讨论】
-          //
-        } else if (msg.data.event_type === 'group_switch_end') {
-          //【结束讨论】
-          // console.log('[group] room-msg group_switch_end');
-          // this.groupServer.state.panelShow = false;
-          // this.roomBaseServer.setInavToolStatus('is_open_switch', 0);
-          //
-        } else if (msg.data.event_type === 'group_disband') {
-          //【解散小组】
-          console.log('[group] room-msg group_disband');
-          // this.groupServer.getWaitingUserList();
-          // this.groupServer.getGroupedUserList();
-          //
-        } else if (msg.data.type === 'group_help') {
-          //【请求协助】
-          // TODO
-        } else if (msg.data.type === 'main_room_join_change') {
-          //
-        } else if (msg.data.type === 'group_leader_change') {
-          //【主持人更改掉线组长】
-          // console.log('[group] room-msg group_leader_change:');
-          // this.groupServer.state.groupInitData.doc_permission = msg.data.account_id;
-          // this.groupServer.getGroupedUserList();
-          //
-        } else if (msg.data.type === 'group_join_change') {
-          //【切换小组】小组人员变动
-          // 如果不是自己结束之后逻辑
-          // console.log('[group] 更新列表');
-          // this.groupServer.getWaitingUserList();
-          // this.groupServer.getGroupedUserList();
-          //
-        } else if (msg.data.type === 'room_group_kickout') {
-          // 【踢出小组】
-          // console.log('[group] room-msg room_group_kickout');
-          // this.groupServer.getWaitingUserList();
-          // this.groupServer.getGroupedUserList();
-          //
-        }
-      },
-      listenJoinMsg(msg) {
-        if (msg.data.type === 'Join') {
-          // 【加入直播间】
-          this.groupServer.getWaitingUserList();
-        }
-      },
-      listenLeftMsg(msg) {
-        if (msg.data.type === 'Left') {
-          // 【离开直播间】
-          this.groupServer.getWaitingUserList();
-        }
       },
       handleNotice() {
         this.noticeDialogVisible = true;
@@ -585,9 +507,7 @@
           this.groupServer
             .groupQuit()
             .then(() => {
-              // this.groupServer.state.panelShow = true;
-              // console.log('[doc] 退出小组文档重置');
-              // this.docServer.reset();
+              this.groupServer.state.panelShow = true;
             })
             .catch(ex => {
               console.error(ex);
@@ -629,15 +549,11 @@
           cancelButtonClass: 'zdy-confirm-cancel'
           //   type: 'warning'
         }).then(() => {
-          // 用户是否在小组中
-          const isInGroup = this.groupServer.state.groupInitData.isInGroup;
           // 结束讨论
           this.groupServer.endDiscussion().then(() => {
-            this.groupServer.state.panelShow = false;
-            if (isInGroup) {
-              // 用户先前在小组中结束讨论后会到主直播间
-              this.docServer.reset();
-            }
+            // 设置开始为未讨论状态
+            useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            console.warn('结束讨论成功');
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
           });
         });

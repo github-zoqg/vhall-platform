@@ -158,7 +158,6 @@
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  const chatServer = useChatServer();
   export default {
     name: 'VmpChat',
     mixins: [eventMixin, dataReportMixin],
@@ -169,8 +168,7 @@
       ChatOperateBar
     },
     data() {
-      const { chatList } = chatServer.state;
-      // const roomBaseState = useRoomBaseServer().state;
+      const { chatList } = useChatServer().state;
       return {
         //滚动插件配置
         overlayScrollBarsOptions: {
@@ -182,7 +180,7 @@
             autoHideDelay: 200
           }
         },
-        chatServerState: chatServer.state,
+        chatServerState: useChatServer().state,
         //默认兜底头像
         defaultAvatar,
         /** domain中读取的数据 */
@@ -200,6 +198,8 @@
         userId: '',
         //聊天消息列表
         chatList: chatList,
+        //聊天消息页码
+        page: 0,
         /** domain中读取的数据结束 */
         /** 消息提示 */
         //未读消息数量
@@ -228,8 +228,8 @@
           placeholder: '参与聊天',
           disable: false
         },
-        isBanned: 0, //1禁言，0未禁言
-        allBanned: 0, //1全体禁言，0未禁言
+        isBanned: useChatServer().state.isBanned, //1禁言，0未禁言
+        allBanned: useChatServer().state.allBanned, //1全体禁言，0未禁言
         // 聊天是否需要登录
         chatLoginStatus: false,
         //欢迎信息
@@ -318,14 +318,12 @@
       this.roomBaseServer = useRoomBaseServer();
       console.log('roomBaseState', this.roomBaseServer.state);
     },
-    created() {
-      this.initInputStatus();
-    },
     mounted() {
       //初始化配置
       this.initConfig();
       //初始化视图数据，domain里取
       this.initViewData();
+      this.initInputStatus();
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
@@ -333,6 +331,8 @@
       this.initCodeLoginMessage();
       //初始化聊天区域滚动组件
       this.initScroll();
+      //拉取聊天历史
+      this.getHistoryMsg();
       //监听domain层chatServer通知
       this.listenChatServer();
     },
@@ -359,14 +359,18 @@
       },
       listenChatServer() {
         //监听禁言通知
-        chatServer.$on('banned', res => {
+        useChatServer().$on('banned', res => {
           this.isBanned = res;
           this.initInputStatus();
         });
         //监听全体禁言通知
-        chatServer.$on('allBanned', res => {
+        useChatServer().$on('allBanned', res => {
           this.allBanned = res;
           this.initInputStatus();
+        });
+        //监听分组房间变更通知
+        useChatServer().$on('changeChannel', () => {
+          this.handleChannelChange();
         });
       },
       init() {
@@ -391,7 +395,7 @@
           placeholder = '全员禁言中';
           disable = true;
         }
-
+        //主持人不受禁言限制
         if ([1, '1'].includes(this.roleName)) {
           placeholder = '参与聊天';
           disable = false;
@@ -426,9 +430,21 @@
           this.chatList.push(msg);
         });
       },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        this.clearHistoryMsg();
+        this.getHistoryMsg();
+      },
       // 获取历史消息
-      getHistoryMsg() {
-        chatServer.getHistoryMsg();
+      async getHistoryMsg() {
+        const params = {
+          room_id: this.roomId,
+          pos: Number(this.page) * 50,
+          limit: 50
+        };
+        await useChatServer().getHistoryMsg(params);
+        this.page++;
       },
       //todo domain负责 抽奖情况检查
       lotteryCheck() {},
@@ -556,7 +572,7 @@
       sendMsg(callback) {
         window.clearTimeout(this.sendTimeOut);
 
-        const { checkHasKeyword } = chatServer;
+        const { checkHasKeyword } = useChatServer();
         const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
           ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
           : '';
@@ -619,7 +635,7 @@
               });
             }
 
-            chatServer.sendMsg({ data, context });
+            useChatServer().sendMsg({ data, context });
           }
           //清空一下子组件里上传的图片
           this.clearUploadImg();
@@ -724,17 +740,19 @@
             msg_id: msgToDelete.msgId,
             room_id: this.roomId
           };
-          chatServer.deleteMessage(params).then(res => {
-            this.buriedPointReport(110121, {
-              business_uid: this.userId,
-              webinar_id: this.$route.params.il_id
+          useChatServer()
+            .deleteMessage(params)
+            .then(res => {
+              this.buriedPointReport(110121, {
+                business_uid: this.userId,
+                webinar_id: this.$route.params.il_id
+              });
+              const _index = this.chatList.findIndex(chatMsg => {
+                return chatMsg.count === count;
+              });
+              _index !== -1 && this.chatList.splice(_index, 1);
+              return res;
             });
-            const _index = this.chatList.findIndex(chatMsg => {
-              return chatMsg.count === count;
-            });
-            _index !== -1 && this.chatList.splice(_index, 1);
-            return res;
-          });
         }, 3000); // 优化 17532
       },
       //todo domain负责 @用户
@@ -831,7 +849,7 @@
           room_id: this.roomId,
           status: flag ? 1 : 0
         };
-        this.chatServer
+        useChatServer()
           .setAllBanned(params)
           .then(res => {
             this.buriedPointReport(flag ? 110116 : 110117, {
