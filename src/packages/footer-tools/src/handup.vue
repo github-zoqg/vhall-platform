@@ -36,7 +36,8 @@
       },
       // 是否开启举手
       isAllowhandup() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        return status;
       },
       // 是否已上麦
       isSpeakOn() {
@@ -107,7 +108,7 @@
           .userCancelApply()
           .then(() => {
             this.isApplyed = false;
-            clearInterval(this.waitInterval);
+            this.waitInterval && clearInterval(this.waitInterval);
             this.btnText = '举手上麦';
             this.$message({
               message: '您已取消申请上麦！',
@@ -123,7 +124,7 @@
           this.waitTime--;
           this.btnText = `等待(${this.waitTime}s)`;
           if (this.waitTime <= 0) {
-            window.clearInterval(this.waitInterval);
+            clearInterval(this.waitInterval);
             this.btnText = '举手上麦';
             this.isApplyed = false;
             useMicServer().userCancelApply();

@@ -22,7 +22,7 @@ export const serverConfig = {
   layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
-    children: ['layerBodyCenter', 'layerBodyRight']
+    children: ['layerBodyCenter', 'comFooterTools', 'layerBodyRight']
     // children: ['comGoodSaas']
     // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
@@ -265,6 +265,6 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    component: 'VmpLotteryWatch'
+    // component: 'VmpLotteryWatch'
   }
 };
