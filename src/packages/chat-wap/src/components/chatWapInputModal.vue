@@ -159,22 +159,22 @@
           border: none;
           -webkit-appearance: none;
         }
-        &--emoji {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          padding: 10px;
-          box-sizing: border-box;
-          left: 0;
-          bottom: 0;
-          overflow-y: scroll;
-          background-color: #ffffff;
-          img {
-            width: 48px;
-            height: 48px;
-            margin: 6px;
-            float: left;
-          }
+      }
+      &--emoji {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        left: 0;
+        bottom: 0;
+        overflow-y: scroll;
+        background-color: #ffffff;
+        img {
+          width: 48px;
+          height: 48px;
+          margin: 6px;
+          float: left;
         }
       }
       &--limit {
@@ -184,6 +184,10 @@
         align-items: center;
         justify-content: space-between;
         color: #555;
+        .vh-iconfont {
+          color: #797979;
+          font-size: 42px;
+        }
       }
       &--reset-text {
         color: #555555;
