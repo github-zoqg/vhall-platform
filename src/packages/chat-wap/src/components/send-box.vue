@@ -55,17 +55,8 @@
           "
         ></div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
-          <!-- 礼物 -->
-          <div class="icon-wrapper liwu" v-auth="{ 'ui.hide_gifts': 0 }"></div>
-          <!-- 打赏 -->
-          <div
-            class="icon-wrapper"
-            v-if="!localRoomInfo.isEmbed"
-            v-auth="{ 'ui.hide_reward': 0 }"
-          ></div>
-          <!-- 邀请卡 -->
-          <!-- 点赞-->
-          <div class="icon-wrapper" v-auth="{ 'ui.watch_hide_like': 0 }"></div>
+          <!-- 底部互动工具组件 comChatWap-->
+          <vmp-air-container cuid="comChatWap"></vmp-air-container>
         </div>
       </div>
       <template v-if="showInput">
@@ -457,7 +448,7 @@
       },
       textFocus() {
         // try {
-          clearTimeout(this.$inputTimer);
+        clearTimeout(this.$inputTimer);
         // } catch (e) {}
 
         if (this.vantFaildPlacer.indexOf(', 最多140字') == -1) {
