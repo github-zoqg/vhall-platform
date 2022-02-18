@@ -1,6 +1,6 @@
 <template>
   <ul class="vmp-media-setting-menu">
-    <li class="vmp-media-setting-menu__title">媒体设置</li>
+    <li class="vmp-media-setting-menu__title">{{ $t('setting.setting_1030') }}</li>
     <li
       class="vmp-media-setting-menu__item"
       :class="{ 'vmp-media-setting-menu__item--active': selectedItem === item.id }"

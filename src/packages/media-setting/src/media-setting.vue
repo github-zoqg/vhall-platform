@@ -25,11 +25,15 @@
           href="//www.vhall.com/saas/doc/1722.html"
           target="_blank"
         >
-          帮助与支持
+          {{ $t('setting.setting_1029') }}
         </a>
         <section>
-          <el-button size="small" type="primary" @click="saveSetting">确定</el-button>
-          <el-button @click="clickClose" size="small">取消</el-button>
+          <el-button size="small" type="primary" @click="saveSetting">
+            {{ $t('account.account_1062') }}
+          </el-button>
+          <el-button @click="clickClose" size="small">
+            {{ $t('account.account_1063') }}
+          </el-button>
         </section>
       </footer>
     </section>
