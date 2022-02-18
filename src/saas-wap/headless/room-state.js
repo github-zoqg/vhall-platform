@@ -3,6 +3,7 @@ import {
   useRoomBaseServer,
   useDocServer,
   useInteractiveServer,
+  useMediaCheckServer,
   useMicServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
@@ -11,12 +12,11 @@ export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
 
   const msgServer = useMsgServer();
-
   const docServer = useDocServer();
-
   const interactiveServer = useInteractiveServer();
-
   const roomBaseServer = useRoomBaseServer();
+  const mediaCheckServer = useMediaCheckServer();
+  const micServer = useMicServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -34,6 +34,13 @@ export default async function () {
     roomBaseServer.setEmbedObj(_param);
   } catch (e) {
     console.log('嵌入', e);
+  }
+
+  // 互动、分组直播进行设备检测
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    // 获取媒体许可，设置设备状态
+    mediaCheckServer.getMediaInputPermission();
+    micServer.init();
   }
 
   // TODO 设置观看端测试权限数据
@@ -56,7 +63,8 @@ export default async function () {
       'room-tool',
       'goods-default',
       'announcement',
-      'sign'
+      'sign',
+      'timer'
     ]
   });
 
@@ -71,7 +79,6 @@ export default async function () {
   });
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
 
-  const micServer = useMicServer();
   console.log(micServer);
   // micServer.init();
 }

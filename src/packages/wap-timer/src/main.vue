@@ -14,7 +14,7 @@
         </div>
       </div>
       <span class="close ps" @click="onClose">
-        <i class="iconfont iconguanbi"></i>
+        <i class="vh-iconfont vh-line-close"></i>
       </span>
       <div align="center">
         <div class="margin10 pr mt10 font_zdy">
@@ -49,7 +49,7 @@
   export default {
     name: 'VmpWapTimer',
     directives: {
-      drag(van, bindings) {
+      drag(van) {
         van.ontouchstart = function (e) {
           let touch;
           if (e.changedTouches) {
@@ -132,7 +132,7 @@
           statusStr = this.$t('interact_tools.interact_tools_1056');
         } else if (this.status == 'zanting') {
           // '已暂停';
-          statusStr = this.$t('webinar.webinar_1007');
+          statusStr = this.$t('interact_tools.interact_tools_1055');
         } else {
           // '进行中...';
           statusStr = this.$t('interact_tools.interact_tools_1057');
@@ -145,7 +145,7 @@
     },
     mounted() {
       console.log(this.roomBaseServer.state);
-      this.timerInfo = this.roomBaseServer.state?.interactToolStatus?.timer;
+      this.timerInfo = this.roomBaseServer.state?.timerInfo;
       this.timerServer.listenMsg();
       console.log(this.timerServer, 'this.timerServer');
       // 计时器开始
@@ -170,11 +170,10 @@
         if (e.data.status != 4) {
           this.timerFun(this.shijian);
         }
-        this.handleTimer();
         // 打开计时器组件
-        this.status = 'kaishi';
-        this.timerVisible = true;
         if (this.is_all_show == 1) {
+          this.status = 'kaishi';
+          this.handleTimer();
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
           );
@@ -211,12 +210,7 @@
       },
       init() {
         if (JSON.stringify(this.timerInfo) != '{}') {
-          const resData = this.timerInfo || {
-            duration: '60',
-            is_all_show: '1',
-            is_timeout: '1',
-            remain_time: '56'
-          };
+          const resData = this.timerInfo;
           this.shijian = resData.remain_time;
           this.beifenshijian = resData.duration;
           this.is_timeout = resData.is_timeout;

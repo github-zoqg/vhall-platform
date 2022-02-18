@@ -100,7 +100,7 @@
         this.childrenCom,
         this.$domainStore.state.interactiveServer.remoteStreams
       );
-      this.getStreamList();
+      // this.getStreamList();
     },
 
     mounted() {},

@@ -13,7 +13,7 @@
       >
         <template v-for="msg in chatList">
           <msg-item
-            :key="msg.count"
+            :key="msg.msgId"
             :msg="msg"
             v-show="checkMessageShow(msg)"
             :chat-options="chatOptions"
@@ -158,7 +158,7 @@
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-
+  const chatServer = useChatServer();
   export default {
     name: 'VmpChat',
     mixins: [eventMixin, dataReportMixin],
@@ -169,8 +169,7 @@
       ChatOperateBar
     },
     data() {
-      this.chatServer = useChatServer();
-      const { chatList } = this.chatServer.state;
+      const { chatList } = chatServer.state;
       // const roomBaseState = useRoomBaseServer().state;
       return {
         //滚动插件配置
@@ -183,6 +182,7 @@
             autoHideDelay: 200
           }
         },
+        chatServerState: chatServer.state,
         //默认兜底头像
         defaultAvatar,
         /** domain中读取的数据 */
@@ -228,16 +228,14 @@
           placeholder: '参与聊天',
           disable: false
         },
+        isBanned: 0, //1禁言，0未禁言
+        allBanned: 0, //1全体禁言，0未禁言
         // 聊天是否需要登录
         chatLoginStatus: false,
         //欢迎信息
         welcomeInfo: {
           required: false
         },
-        // 是否全体禁言
-        allBanned: false,
-        // 是否被禁言
-        isBanned: false,
         //插件
         plugin: {
           image: false,
@@ -249,10 +247,6 @@
         },
         //是否为嵌入页
         isEmbed: false,
-        //分页配置
-        pageConfig: {
-          page: 0
-        },
         //图片预览弹窗是否可见
         imgPreviewVisible: false,
         //聊天配置
@@ -339,6 +333,8 @@
       this.initCodeLoginMessage();
       //初始化聊天区域滚动组件
       this.initScroll();
+      //监听domain层chatServer通知
+      this.listenChatServer();
     },
     destroyed() {},
     methods: {
@@ -361,16 +357,19 @@
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
       },
+      listenChatServer() {
+        //监听禁言通知
+        chatServer.$on('banned', res => {
+          this.isBanned = res;
+          this.initInputStatus();
+        });
+        //监听全体禁言通知
+        chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+          this.initInputStatus();
+        });
+      },
       init() {
-        this.$nextTick(() => {
-          this.pageConfig.page = 0;
-          this.getHistoryMsg();
-        });
-
-        EventBus.$on('group_channel-change', msg => {
-          console.log(msg);
-          this.getHistoryMsg();
-        });
         setTimeout(() => {
           this.chatSDK = window.chatSDK;
           //todo 替换掉EventBus，拆为全局信令以及父子组件通信事件
@@ -427,24 +426,9 @@
           this.chatList.push(msg);
         });
       },
-      //处理分组讨论频道变更
-      handleChannelChange() {
-        this.pageConfig.page = 0;
-        this.chatServer.clearHistoryMsg();
-        this.getHistoryMsg();
-      },
       // 获取历史消息
       getHistoryMsg() {
-        const params = {
-          room_id: this.roomId,
-          pos: Number(this.pageConfig.page) * 50,
-          limit: 50
-        };
-
-        this.chatServer.getHistoryMsg(params, '发起端').then(result => {
-          this.pageConfig.page = Number(this.pageConfig.page) + 1;
-          return result;
-        });
+        chatServer.getHistoryMsg();
       },
       //todo domain负责 抽奖情况检查
       lotteryCheck() {},
@@ -572,7 +556,7 @@
       sendMsg(callback) {
         window.clearTimeout(this.sendTimeOut);
 
-        const { checkHasKeyword } = this.chatServer;
+        const { checkHasKeyword } = chatServer;
         const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
           ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
           : '';
@@ -635,7 +619,7 @@
               });
             }
 
-            this.chatServer.sendMsg({ data, context });
+            chatServer.sendMsg({ data, context });
           }
           //清空一下子组件里上传的图片
           this.clearUploadImg();
@@ -740,7 +724,7 @@
             msg_id: msgToDelete.msgId,
             room_id: this.roomId
           };
-          this.chatServer.deleteMessage(params).then(res => {
+          chatServer.deleteMessage(params).then(res => {
             this.buriedPointReport(110121, {
               business_uid: this.userId,
               webinar_id: this.$route.params.il_id

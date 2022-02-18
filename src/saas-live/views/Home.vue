@@ -66,7 +66,7 @@
         });
         const res = await roomState();
         // 如果浏览器不支持
-        if (res === 'isBrowserNotSuppport') {
+        if (res === 'isBrowserNotSupport') {
           this.state = 3;
           return;
         }
@@ -78,27 +78,6 @@
         this.state = 2;
         this.errMsg = ex.msg;
       }
-      this.micServer = useMicServer();
-      // FIXME:测试连麦代码，由于成员列表尚未接入，成员接入后删除
-      this.micServer.$on('vrtc_connect_apply', msg => {
-        console.log('----dingxiaodong----收到申请上麦消息', msg);
-        this.$confirm(`${msg.data.nick_name}申请上麦`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        })
-          .then(() => {
-            this.micServer.hostAgreeApply({
-              receive_account_id: msg.data.room_join_id
-            });
-          })
-          .catch(() => {
-            this.micServer.hostRejectApply({
-              receive_account_id: msg.data.room_join_id
-            });
-          });
-      });
     },
     methods: {
       // 初始化直播房间

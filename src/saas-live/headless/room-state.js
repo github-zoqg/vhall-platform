@@ -5,7 +5,8 @@ import {
   useInteractiveServer,
   useMicServer,
   useMediaCheckServer,
-  useGroupServer
+  useGroupServer,
+  useMediaSettingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -16,10 +17,12 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
+  const micServer = useMicServer();
+  const mediaSettingServer = useMediaSettingServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
-    return 'isBrowserNotSuppport';
+    return 'isBrowserNotSupport';
   }
 
   if (!roomBaseServer) {
@@ -39,6 +42,10 @@ export default async function () {
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    micServer.init();
+  }
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
@@ -47,6 +54,8 @@ export default async function () {
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
+
+  mediaSettingServer.init();
 
   roomBaseServer.getCommonConfig({
     tags: [
@@ -76,7 +85,9 @@ export default async function () {
   useMicServer();
 
   // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
+  window.micServer = micServer;
 }

@@ -17,8 +17,7 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useMenuServer } from 'middle-domain';
 
   export default {
     name: 'VmpRecommendWap',
@@ -40,8 +39,8 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.menuServer = useMenuServer();
     },
-
     watch: {
       advsInfo: {
         handler(val) {
@@ -65,28 +64,9 @@
         immediate: true
       }
     },
-    created() {
-      window.$middleEventSdk?.event?.send(
-        boxEventOpitons(this.cuid, 'addTab', {
-          comp: 'comRecommendWap',
-          key: 'recommend',
-          text: '推荐'
-        })
-      );
-    },
     methods: {
       handlerInitScroll() {
         this.$nextTick(() => {
-          // const wrapper = document.querySelector('.recommendWrapper');
-          // this.scroll = new BScroll(wrapper, {
-          //   pullUpLoad: true,
-          //   bindToWrapper: true,
-          //   scrollX: false,
-          //   scrollY: true,
-          //   bounce: true,
-          //   click: true,
-          //   tap: 'tap'
-          // });
           this.scroll && this.handleBindScrollEvent();
           this.scroll && this.scroll.refresh();
         });

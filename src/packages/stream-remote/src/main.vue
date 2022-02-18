@@ -19,8 +19,8 @@
         :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic iconfont"
-        :class="stream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`"
+        class="vmp-stream-local__bootom-mic vh-iconfont"
+        :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
     <!-- 鼠标 hover 遮罩层 -->
@@ -42,8 +42,8 @@
             @click="handleClickMuteDevice('video')"
             :class="
               stream.videoMuted
-                ? 'iconfont iconicon_shexiangtouguanbi'
-                : 'iconfont iconicon_shexiangtoukaiqi'
+                ? 'vh-iconfont vh-line-turn-off-video-camera'
+                : 'vh-iconfont vh-line-video-camera'
             "
           ></span>
         </el-tooltip>
@@ -53,16 +53,16 @@
           placement="top"
         >
           <span
-            class="vmp-stream-remote__shadow-icon iconfont"
+            class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              stream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+              stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
             "
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="stream.attributes.roleName != 1 && stream.attributes.roleName != 20"
           ></span>
@@ -77,21 +77,24 @@
         </span>
         <el-tooltip content="切换" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont iconicon_qiehuan"
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-line-copy-document"
             v-if="!isFullScreen"
             @click="exchange"
           ></span>
         </el-tooltip>
         <el-tooltip content="全屏" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont"
-            :class="{ iconicon_quanping: !isFullScreen, iconicon_quxiaoquanping: isFullScreen }"
+            class="vmp-stream-remote__shadow-icon vh-iconfont"
+            :class="{
+              'vh-line-amplification': !isFullScreen,
+              'vh-line-narrow': isFullScreen
+            }"
             @click="fullScreen"
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="stream.attributes.roleName != 1"
             @click="speakOff"
           ></span>
@@ -102,7 +105,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -152,6 +155,7 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.micServer = useMicServer();
     },
     mounted() {
       this.subscribeRemoteStream();
@@ -199,7 +203,11 @@
           receive_account_id: this.stream.accountId
         });
       },
-      speakOff() {},
+      speakOff() {
+        this.micServer.speakOff({
+          receive_account_id: this.stream.accountId
+        });
+      },
       fullScreen() {
         this.interactiveServer.setStreamFullscreen({
           streamId: this.stream.streamId,

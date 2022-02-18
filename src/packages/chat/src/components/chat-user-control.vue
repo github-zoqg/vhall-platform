@@ -80,10 +80,16 @@
       EventBus.$on(
         'set_person_status_in_chat',
         async (el, accountId, count, nickname, godMode, roleName) => {
-          if (accountId === this.userId) return; // 不能点击自己
+          if (accountId == this.userId) return; // 不能点击自己
           this.accountId = accountId;
           this.count = count;
-          // this.userStatus = await this.getUserStatus();
+          const boundedList = await this.getUserStatus();
+          this.userStatus.is_banned = boundedList[0].data.list.some(user => {
+            return user.account_id == accountId;
+          });
+          this.userStatus.is_kicked = boundedList[1].data.list.some(user => {
+            return user.account_id == accountId;
+          });
           this.isShow = true;
           this.godMode = godMode;
           this.calculate(el);
@@ -130,13 +136,10 @@
        * todo domain提供的服务 得到用户状态是否被禁言/踢出
        */
       getUserStatus() {
-        return this.roomBaseServer
-          .getRoomToolStatus({
-            room_id: this.roomId
-          })
-          .then(res => {
-            return res.data;
-          });
+        return Promise.all([
+          this.chatServer.getBannedList({ room_id: this.roomId }),
+          this.chatServer.getKickedList({ room_id: this.roomId })
+        ]);
       },
       /**
        * 禁言/取消禁言

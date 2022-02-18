@@ -60,8 +60,9 @@ export const serverConfig = {
       'comWatchAuth',
       // 'comSignUpForm',
       'comUserAccount',
-      'comCash'
-      // 'comWatchTimer'
+      'comCash',
+      // 'comLottery'
+      'comWatchTimer'
     ]
   },
 
@@ -261,5 +262,18 @@ export const serverConfig = {
   //商品列表
   comGoodSaas: {
     component: 'VmpGoodList'
+  },
+  // 抽奖
+  comLottery: {
+    // component: 'VmpLotteryWatch'
+  },
+  // 章节
+  comChapter: {
+    component: 'VmpChapter',
+    emitChangePlayTime: {
+      cuid: ['comPcPlayer'],
+      method: 'changePlayTime',
+      args: ['$0']
+    }
   }
 };

@@ -4,6 +4,11 @@
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
     </div>
+    <div class="icon-wrap" @click="handleSign" v-show="showSign">
+      <div class="have"></div>
+      <img src="./image/icon.png" />
+    </div>
+    <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
 
@@ -14,18 +19,23 @@
     data() {
       return {
         showTimer: false,
-        timerVisible: true
+        timerVisible: true,
+        showSign: false
       };
     },
     methods: {
+      changeStatus(data, status) {
+        // console.log(data, status, 'data, status');
+        this[data] = status;
+      },
       handleTimer() {
         if (!this.timerVisible) {
           this.timerVisible = true;
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimer'));
         }
       },
-      changeStatus(data, status) {
-        this[data] = status;
+      handleSign() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       }
     }
   };

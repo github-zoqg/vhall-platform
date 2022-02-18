@@ -36,9 +36,8 @@ const htmlConfig = {
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant@2.1.5/css/index.css',
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.0/iconfont.css',
-    iconfont:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas-pc/v1.0.1/iconfont.css'
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'
   },
   // dns-prefetch
   dnsPrefetch: {
@@ -72,7 +71,7 @@ module.exports = {
             rootValue: 75, // 换算的基数
             // 忽略转换正则匹配项。插件会转化所有的样式的px。比如引入了三方UI，也会被转化。目前我使用 selectorBlackList字段，来过滤
             //如果个别地方不想转化px。可以简单的使用大写的 PX 或 Px 。
-            selectorBlackList: ['ig'],
+            // selectorBlackList: ['ig'],
             propList: ['*'],
             exclude: /node_modules/
           })

@@ -1,28 +1,33 @@
 <template>
   <section class="vmp-intro">
     <section class="vmp-intro-block">
-      <header class="vmp-intro-block__headtitle">中台开发预留账号（互动直播）</header>
+      <header class="vmp-intro-block__headtitle">
+        <i v-if="isNoDelay" class="delay-icon">
+          <img :src="NoDelayImg" />
+        </i>
+        {{ title }}
+      </header>
       <main class="vmp-intro-block__detail">
         <p>
           <i class="vh-iconfont vh-line-time" />
-          开始时间 2022-01-12 18:55
+          开始时间:{{ startTime }}
         </p>
         <p>
           <i class="vh-iconfont vh-line-user"></i>
-          在线人数
+          在线人数:{{ personCount }} 人
         </p>
       </main>
     </section>
 
     <section class="vmp-intro-block vmp-intro-block-content">
       <header class="vmp-intro-block__title">活动简介</header>
-      <main v-html="introductionContent"></main>
+      <main class="vmp-intro-block__content-main" v-html="content"></main>
     </section>
 
     <aside>
       <a
         class="vmp-intro-link"
-        v-show="showCopyRight"
+        v-show="isShowCopyRight"
         href="https://www.vhall.com/saas"
         target="_blank"
       >
@@ -35,18 +40,66 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-
+  import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
+  import { useVirtualAudienceServer } from 'middle-domain';
   export default {
     name: 'VmpIntroWap',
+    filters: {
+      formatCount(num) {
+        if (num < 10000) return num;
+
+        const integer = Math.floor(num / 10000); // 整数
+        let decimals = Math.floor((num % 10000) / 1000); // 小数
+        decimals = decimals === 0 ? '' : '.' + decimals;
+
+        return integer + decimals + '万';
+      }
+    },
     data() {
       return {
-        showCopyRight: true
+        NoDelayImg,
+        type: 'default' // default、subscribe
       };
     },
+    beforeCreate() {
+      this.virtualClientStartServer = useVirtualAudienceServer();
+    },
+    created() {
+      this.onlineState = this.virtualClientStartServer.state;
+    },
     computed: {
-      introductionContent() {
-        return '<p style="font-size:15px">test test test</p>';
+      watchInitData() {
+        return this?.$domainStore?.state?.roomBaseServer?.watchInitData;
+      },
+      webinar() {
+        return this?.watchInitData?.webinar;
+      },
+      webinarTag() {
+        return this?.$domainStore?.state?.roomBaseServer?.webinarTag;
+      },
+      // 是否显示版权信息 type:Boolean
+      isShowCopyRight() {
+        return this?.webinarTag?.reserved_status === 1;
+      },
+      // 无延迟 Type:Boolean
+      isNoDelay() {
+        return this.webinar.no_delay_webinar === 1;
+      },
+      // 标题 Type:String
+      title() {
+        return this?.webinar?.subject || '';
+      },
+      // 开始时间 Type:String
+      startTime() {
+        return this?.webinar?.start_time?.substr(0, 16) || '';
+      },
+      // 在线人数或订阅人数 Type:String
+      personCount() {
+        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
+      },
+      // 简介富文本正文 Type:String
+      content() {
+        return this?.webinar?.introduction || '<p></p>';
       }
     }
   };
@@ -54,7 +107,6 @@
 
 <style lang="less">
   .vmp-intro {
-    font-size: 36px;
     background-color: #f2f2f2;
     height: 100%;
     position: relative;
@@ -74,6 +126,7 @@
       }
 
       &__headtitle {
+        font-size: 36px;
         text-overflow: -o-ellipsis-lastline;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -89,6 +142,11 @@
           display: inline-block;
           width: 116px;
           height: 50px;
+
+          img {
+            height: 100%;
+          }
+
           vertical-align: bottom;
         }
       }
@@ -129,6 +187,16 @@
           margin-top: 15px;
           display: flex;
           align-items: center;
+        }
+      }
+
+      &__content-main {
+        padding-bottom: 30px;
+        color: #666666;
+        word-break: break-all;
+        line-height: 1.2;
+        p {
+          word-break: break-all;
         }
       }
     }

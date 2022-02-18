@@ -26,9 +26,9 @@
         :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic iconfont"
+        class="vmp-stream-local__bootom-mic vh-iconfont"
         :class="
-          localStream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+          localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
       ></span>
     </section>
@@ -54,15 +54,13 @@
             class="vmp-stream-local__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              localStream.audioMuted
-                ? 'vh-line-turn-off-microphone'
-                : `iconicon_maikefeng_${audioLevel}`
+              localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
             "
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="top">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="joinInfo.role_name != 1 && role != 20"
           ></span>
@@ -91,20 +89,27 @@
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon iconfont iconicon_xiamai"
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="joinInfo.role_name != 1"
             @click="speakOff"
           ></span>
         </el-tooltip>
       </p>
     </section>
+    <ImgStream ref="imgPushStream"></ImgStream>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useRoomBaseServer,
+    usePlayerServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import ImgStream from './components/img-stream/index.vue';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -115,6 +120,9 @@
         networkStatus: 2,
         audioLevel: 1
       };
+    },
+    components: {
+      ImgStream
     },
     computed: {
       miniElement() {
@@ -149,19 +157,42 @@
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
+      this.playerServer = usePlayerServer();
+      // this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数');
-      // 主持人同意上麦
-      this.micServer.$on('vrtc_connect_agree', async () => {
-        // 调上麦接口
-        const isSuccessSpeakOn = await this.userSpeakOn();
-        if (isSuccessSpeakOn) {
-          // 如果成功，销毁播放器，初始化互动，上麦
 
-          // 如果上麦成功开始推流
+      if (this.micServer.state.isSpeakOn) {
+        this.startPush();
+      }
+
+      // 主持人同意上麦申请
+      this.micServer.$on('vrtc_connect_agree', async () => {
+        this.userSpeakOn();
+      });
+
+      // 上麦成功
+      this.micServer.$on('vrtc_connect_success', async msg => {
+        if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
+          // 如果成功，销毁播放器
+          this.playerServer.destroy();
+
+          // 实例化互动实例
+          await this.interactiveServer.init();
+
+          // 开始推流
           this.startPush();
         }
+      });
+      // 下麦成功
+      this.micServer.$on('vrtc_disconnect_success', async () => {
+        await this.stopPush();
+
+        this.interactiveServer.destroy();
+
+        // 如果成功，销毁播放器
+        this.playerServer.init();
       });
     },
     beforeDestroy() {
@@ -188,8 +219,8 @@
         return false;
       },
       // 用户下麦接口
-      userSpeakOff() {
-        return this.micServer.userSpeakOff();
+      speakOff() {
+        return this.micServer.speakOff();
       },
       // 处理上麦失败
       handleSpeakOnError(err) {
@@ -197,13 +228,13 @@
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
@@ -213,31 +244,16 @@
           // 设置旁路主屏布局失败
           console.log('设置主屏失败');
           // TODO: 设置旁路主屏布局失败错误处理
+        } else if (err == 'getCanvasStreamError') {
+          console.error('获取图片流track错误');
+        } else if (err == 'createLocalPhotoStreamError') {
+          this.$message.error('初始化图片流失败');
         } else {
+          console.error(err);
           throw new Error('代码错误');
         }
       },
-      // 开始推流并设置旁路，主持人用
-      async startPushAndSetBroadCast() {
-        try {
-          // 创建本地流
-          await this.createLocalStream();
-          // 推流
-          await this.publishLocalStream();
-          // 开启旁路
-          await this.startBroadCast();
-          // 配置旁路主屏
-          await this.setBroadCastScreen();
-          // 实时获取网络状况
-          this.getLevel();
-          // 派发事件
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
-          );
-        } catch (err) {
-          this.handleSpeakOnError(err);
-        }
-      },
+
       // 开始推流，不设置旁路，主持人之外的其他角色用
       async startPush() {
         try {
@@ -247,6 +263,10 @@
           await this.publishLocalStream();
           // 实时获取网络状况
           this.getLevel();
+
+          // TODO 配置主屏条件
+          // 配置旁路主屏
+          await this.setBroadCastScreen();
           // 派发事件
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickPublishComplate')
@@ -257,11 +277,35 @@
       },
       // 创建本地流
       async createLocalStream() {
-        await this.interactiveServer
-          .createLocalVideoStream({
-            videoNode: `stream-${this.joinInfo.third_party_user_id}`
-          })
-          .catch(() => 'createLocalStreamError');
+        console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
+        switch (this.$domainStore.state.mediaSettingServer.videoType) {
+          case 'camera':
+            await this.interactiveServer
+              .createLocalVideoStream({
+                videoNode: `stream-${this.joinInfo.third_party_user_id}`
+              })
+              .catch(() => 'createLocalStreamError');
+            break;
+          case 'pictrue':
+            await (() => {
+              setTimeout(() => {}, 1000);
+            })();
+            // eslint-disable-next-line no-case-declarations
+            let videoTracks = await this.$refs.imgPushStream.getCanvasStream();
+            if (!videoTracks) {
+              throw 'getCanvasStreamError';
+            }
+            await this.interactiveServer
+              .createLocalPhotoStream({
+                videoNode: `stream-${this.joinInfo.third_party_user_id}`,
+                videoTrack: videoTracks
+              })
+              .catch(() => 'createLocalPhotoStreamError');
+            break;
+
+          default:
+            break;
+        }
       },
       // 推流
       async publishLocalStream() {
@@ -272,26 +316,23 @@
           })
           .catch(() => 'publishStreamError');
       },
-      // 开启旁路
-      async startBroadCast() {
-        const options1 = {
-          adaptiveLayoutMode:
-            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
-        };
 
-        await this.interactiveServer.startBroadCast(options1).catch(() => 'startBroadCastError');
-      },
       // 设置主屏
       async setBroadCastScreen() {
         await this.interactiveServer.setBroadCastScreen().catch(() => 'setBroadCastScreenError');
       },
       // 结束推流
       stopPush() {
-        this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
-          this.isStreamPublished = false;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-          );
+        return new Promise(resolve => {
+          this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            this.isStreamPublished = false;
+            clearInterval(this._audioLeveInterval);
+
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          });
         });
       },
       // 点击mute按钮事件
@@ -334,7 +375,7 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.localStream.streamId) return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.localStream.streamId })
@@ -349,7 +390,7 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.localStream.streamId) return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.localStream.streamId })
@@ -361,8 +402,7 @@
               this.networkStatus = 0;
             });
         }, 2000);
-      },
-      speakOff() {}
+      }
     }
   };
 </script>

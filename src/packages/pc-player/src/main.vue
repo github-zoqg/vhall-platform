@@ -10,7 +10,7 @@
               :style="`backgroundImage: url('${webinarsBgImg}')`"
             ></div>
             <div class="vmp-player-living-btn" v-if="!isLiving">
-              <div @click="startPlay"><i class="iconfont iconbofang_icon"></i></div>
+              <div @click="startPlay"><i class="vh-iconfont vh-line-video-play"></i></div>
             </div>
             <!-- <div class="vmp-player-living-end">
               <div class="vmp-player-living-end-img">
