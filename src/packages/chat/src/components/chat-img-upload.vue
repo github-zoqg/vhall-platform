@@ -17,7 +17,7 @@
       :on-success="uploadSuccess"
       :on-error="uploadError"
     >
-      <i :class="['iconfont', 'icontupianliaotian', uploadActive ? 'active' : '']"></i>
+      <i :class="['vh-iconfont', 'vh-line-picture-outline', uploadActive ? 'active' : '']"></i>
     </el-upload>
     <!-- 上传图片预览 -->
     <div v-show="uploadActive" class="vmp-chat-img-preview-wrap">
@@ -153,7 +153,7 @@
         color: @active-color;
         cursor: pointer;
       }
-      &.icontupianliaotian {
+      &.vh-line-picture-outline {
         font-size: 18px;
       }
     }

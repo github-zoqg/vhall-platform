@@ -48,7 +48,7 @@
           @click="scrollToTarget"
         >
           {{ tipMsg }}
-          <span class="iconfont iconyourennijiantou"></span>
+          <span class="vh-iconfont vh-line-arrow-down"></span>
         </div>
       </div>
     </div>
@@ -932,7 +932,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        .iconyourennijiantou {
+        .vh-line-arrow-down {
           font-size: 12px;
           margin-left: 6px;
         }
