@@ -1,188 +1,243 @@
 <template>
-  <div class="vmp-player" :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]">
-    <div :class="{ 'vmp-player-box': displayMode != 'mini' }">
-      <div :class="{ 'vmp-player-container': displayMode != 'mini' }">
-        <div id="vmp-player" class="vmp-player-watch">
-          <div class="vmp-player-living">
+  <div
+    v-if="!isShowContainer"
+    class="vmp-player"
+    :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
+  >
+    <div>
+      <div id="vmp-player" class="vmp-player-watch">
+        <div class="vmp-player-living">
+          <div
+            v-if="isShowPoster"
+            class="vmp-player-living-background"
+            :style="`backgroundImage: url('${webinarsBgImg}')`"
+          ></div>
+          <div class="vmp-player-living-btn" v-if="isPlayering">
             <div
-              v-if="isShowPoster"
-              class="vmp-player-living-background"
-              :style="`backgroundImage: url('${webinarsBgImg}')`"
-            ></div>
-            <div class="vmp-player-living-btn" v-if="!isPlayering">
+              :class="
+                displayMode == 'mini'
+                  ? 'vmp-player-living-btn-mini'
+                  : 'vmp-player-living-btn-normal'
+              "
+              @click="startPlay"
+            >
+              <i class="vh-iconfont vh-line-video-play"></i>
+            </div>
+          </div>
+          <div class="vmp-player-living-end" v-if="isLivingEnd">
+            <div
+              :class="
+                displayMode == 'mini' ? 'vmp-player-living-end-mini' : 'vmp-player-living-end-img'
+              "
+            >
+              <img src="../src/images/liveEnd.png" alt="" />
+            </div>
+            <h1>直播已结束</h1>
+          </div>
+          <div class="vmp-player-living-vodend" v-if="isVodEnd">
+            <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
+              <h3>{{ $t('appointment.appointment_1013') }}</h3>
+              <div>
+                <p>
+                  <span
+                    @click="handleAuth(3)"
+                    :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
+                  >
+                    {{ $t('appointment.appointment_1010') }}
+                  </span>
+                  <span
+                    style="margin-left: 10px"
+                    :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
+                    @click="handleAuth(4)"
+                  >
+                    {{ $t('appointment.appointment_1011') }}
+                  </span>
+                </p>
+                <span
+                  :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
+                  @click="handleAuth"
+                >
+                  {{ authText }}
+                </span>
+              </div>
+              <p
+                class="replay-try"
+                :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
+              >
+                <i class="vh-iconfont vh-line-refresh-left"><b>重新试看</b></i>
+              </p>
+            </div>
+            <div class="vmp-player-living-vodend-isNoTry" v-else>
               <div
                 :class="
                   displayMode == 'mini'
-                    ? 'vmp-player-living-btn-mini'
-                    : 'vmp-player-living-btn-normal'
-                "
-                @click="startPlay"
-              >
-                <i class="vh-iconfont vh-line-video-play"></i>
-              </div>
-            </div>
-            <div class="vmp-player-living-end" v-if="isLivingEnd">
-              <div
-                :class="
-                  displayMode == 'mini' ? 'vmp-player-living-end-mini' : 'vmp-player-living-end-img'
+                    ? 'vmp-player-living-vodend-mini'
+                    : 'vmp-player-living-vodend-normal '
                 "
               >
-                <img src="../src/images/liveEnd.png" alt="" />
+                <i class="vh-iconfont vh-line-refresh-left"></i>
               </div>
-              <h1>直播已结束</h1>
-            </div>
-            <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
-              <div>语音播放中</div>
+              <span :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'">重新播放</span>
             </div>
           </div>
-          <!-- 控制条 进度条、弹幕、全屏、时间等 -->
+          <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
+            <div>语音播放中</div>
+          </div>
+          <div class="vmp-player-living-exchange" @click="exchangeVideoDocs">
+            <p>
+              <el-tooltip :content="$t('player.player_1008')" placement="top">
+                <i class="vh-saas-iconfont vh-saas-line-switch"></i>
+              </el-tooltip>
+            </p>
+          </div>
+        </div>
+        <!-- 控制条 进度条、弹幕、全屏、时间等 -->
+        <div
+          :class="displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'"
+          v-if="!isShowPoster"
+        >
+          <!-- 进度条 -->
+          <div class="controller_slider" v-if="!isLiving && playerOtherOptions.progress_bar">
+            <el-slider
+              ref="controllerRef"
+              class="slider_controller"
+              v-model="sliderVal"
+              :show-tooltip="false"
+              @change="changeVideo"
+            ></el-slider>
+          </div>
           <div
-            :class="displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'"
-            v-if="!isShowPoster"
+            v-if="totalTime && eventPointList.length"
+            ref="vhTailoringWrap"
+            class="vmp-player-controller-points"
           >
-            <!-- 进度条 -->
-            <div class="controller_slider" v-if="!isLiving && playerOtherOptions.progress_bar">
-              <el-slider
-                ref="controllerRef"
-                class="slider_controller"
-                v-model="sliderVal"
-                :show-tooltip="false"
-                @change="changeVideo"
-              ></el-slider>
+            <controlEventPoint
+              v-for="(item, index) in eventPointList"
+              :key="'controlEventPoint' + index"
+              :event-time="item.timePoint"
+              :event-label="item.msg"
+              :video-time="totalTime"
+              :isMini="displayMode == 'mini'"
+              @showLabel="showLabelFun"
+            ></controlEventPoint>
+          </div>
+          <div class="controller-tools">
+            <div class="controller-tools-left">
+              <div class="controller-tools-left-start" @click="startPlay">
+                <i
+                  :class="`vh-iconfont ${
+                    isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
+                  }`"
+                ></i>
+              </div>
+              <div class="controller-tools-left-time" v-if="!isLiving">
+                <span class="controller-tools-left-time-current">
+                  {{ secondToDate(currentTime) }}
+                </span>
+                <span>/</span>
+                <span class="controller-tools-left-time-total">
+                  {{ secondToDate(totalTime) }}
+                </span>
+              </div>
             </div>
-            <div
-              v-if="totalTime && eventPointList.length"
-              ref="vhTailoringWrap"
-              class="vmp-player-controller-points"
-            >
-              <controlEventPoint
-                v-for="(item, index) in eventPointList"
-                :key="'controlEventPoint' + index"
-                :event-time="item.timePoint"
-                :event-label="item.msg"
-                :video-time="totalTime"
-                :isMini="isMini"
-                @showLabel="showLabelFun"
-              ></controlEventPoint>
-            </div>
-            <div class="controller-tools">
-              <div class="controller-tools-left">
-                <div class="controller-tools-left-start" @click="startPlay">
-                  <i
-                    :class="`vh-iconfont ${
-                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
-                    }`"
-                  ></i>
-                </div>
-                <div class="controller-tools-left-time" v-if="!isLiving">
-                  <span class="controller-tools-left-time-current">
-                    {{ secondToDate(currentTime) }}
-                  </span>
-                  <span>/</span>
-                  <span class="controller-tools-left-time-total">
-                    {{ secondToDate(totalTime) }}
-                  </span>
+            <div class="controller-tools-right">
+              <div class="controller-tools-right-quality">
+                <span>{{ formatQualityText(currentQualitys.def) }}</span>
+                <ul class="controller-tools-right-list">
+                  <li
+                    v-for="(item, index) in qualitysList"
+                    :class="{ 'vmp-player-li-active': currentQualitys.def == item.def }"
+                    @click="changeQualitys(item)"
+                    :key="index"
+                  >
+                    {{ formatQualityText(item.def) }}
+                  </li>
+                </ul>
+              </div>
+              <div class="controller-tools-right-speed" v-if="!isLiving">
+                <span>
+                  {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+                </span>
+                <ul class="controller-tools-right-list">
+                  <li
+                    v-for="(val, index) in UsableSpeed"
+                    :class="{ 'vmp-player-li-active': currentSpeed == val }"
+                    @click="changeSpeed(val)"
+                    :key="index"
+                  >
+                    {{val.toString().length &lt; 3 ? `${val.toFixed(1)}X` : `${val}X`}}
+                  </li>
+                </ul>
+              </div>
+              <div class="controller-tools-right-volume">
+                <i
+                  :class="`vh-iconfont ${voice > 0 ? 'vh-line-voice' : 'vh-line-mute'}`"
+                  @click="jingYin"
+                ></i>
+                <div class="controller-tools-right-volume-slider">
+                  <el-slider
+                    v-model="voice"
+                    vertical
+                    height="100px"
+                    :show-tooltip="true"
+                  ></el-slider>
                 </div>
               </div>
-              <div class="controller-tools-right">
-                <div class="controller-tools-right-quality">
-                  <span>{{ formatQualityText(currentQualitys.def) }}</span>
-                  <ul class="controller-tools-right-list">
-                    <li
-                      v-for="(item, index) in qualitysList"
-                      :class="{ 'vmp-player-li-active': currentQualitys.def == item.def }"
-                      @click="changeQualitys(item)"
-                      :key="index"
-                    >
-                      {{ formatQualityText(item.def) }}
-                    </li>
-                  </ul>
-                </div>
-                <div class="controller-tools-right-speed" v-if="!isLiving">
-                  <span>
-                    {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
-                  </span>
-                  <ul class="controller-tools-right-list">
-                    <li
-                      v-for="(val, index) in UsableSpeed"
-                      :class="{ 'vmp-player-li-active': currentSpeed == val }"
-                      @click="changeSpeed(val)"
-                      :key="index"
-                    >
-                      {{val.toString().length &lt; 3 ? `${val.toFixed(1)}X` : `${val}X`}}
-                    </li>
-                  </ul>
-                </div>
-                <div class="controller-tools-right-volume">
-                  <i
-                    :class="`vh-iconfont ${voice > 0 ? 'vh-line-voice' : 'vh-line-mute'}`"
-                    @click="jingYin"
-                  ></i>
-                  <div class="controller-tools-right-volume-slider">
-                    <el-slider
-                      v-model="voice"
-                      vertical
-                      height="100px"
-                      :show-tooltip="true"
-                    ></el-slider>
-                  </div>
-                </div>
-                <div class="controller-tools-right-danmuis">
-                  <i
-                    :class="`vh-iconfont ${
-                      danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
-                    }`"
-                    @click="openBarrage"
-                  ></i>
-                </div>
-                <div class="controller-tools-right-fullscroll">
-                  <i
-                    :class="`vh-iconfont ${
-                      isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
-                    }`"
-                    @click="enterFullscreen"
-                  ></i>
-                </div>
+              <div class="controller-tools-right-danmuis">
+                <i
+                  :class="`vh-iconfont ${
+                    danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
+                  }`"
+                  @click="openBarrage"
+                ></i>
+              </div>
+              <div class="controller-tools-right-fullscroll">
+                <i
+                  :class="`vh-iconfont ${
+                    isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
+                  }`"
+                  @click="enterFullscreen"
+                ></i>
               </div>
             </div>
           </div>
         </div>
-        <div class="vmp-player-tips">
-          <div class="vmp-player-tips-box" v-if="isSetQuality || isSetSpeed">
-            <!-- 切换清晰度 -->
-            <div v-if="isSetQuality">
-              已为您切换到
-              <span>{{ formatQualityText(currentQualitys.def) }}</span>
-            </div>
-            <!-- 切换倍速 -->
-            <div v-if="isSetSpeed">
-              已为您切换到
-              <span>{{ currentSpeed == 1 ? '正常' : currentSpeed }}</span>
-              倍速
-            </div>
+      </div>
+      <div class="vmp-player-tips">
+        <div class="vmp-player-tips-box" v-if="isSetQuality || isSetSpeed">
+          <!-- 切换清晰度 -->
+          <div v-if="isSetQuality">
+            已为您切换到
+            <span>{{ formatQualityText(currentQualitys.def) }}</span>
           </div>
-          <!-- 试看和断点续播提示 v-if="displayMode != 'mini'" -->
-          <div class="vmp-player-tips-prew">
-            <!-- 试看 -->
-            <div v-if="vodType === 'shikan' && isTryPreview">
-              试看
-              <b>{{ recordTime }}</b>
-              分钟，观看完整视频请
-              <span v-if="authText == 6">
-                <b>付费</b>
-                或
-                <b>邀请码</b>
-              </span>
-              <span v-else>{{ authText }}</span>
-              <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
-            </div>
-            <!-- 断点续播 -->
-            <div v-if="isPickupVideo && currentTime > 0">
-              上次观看至
-              <b>{{ secondToDate(currentTime) }}</b>
-              ，已为您自动续播
-              <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
-            </div>
+          <!-- 切换倍速 -->
+          <div v-if="isSetSpeed">
+            已为您切换到
+            <span>{{ currentSpeed == 1 ? '正常' : currentSpeed }}</span>
+            倍速
+          </div>
+        </div>
+        <!-- 试看和断点续播提示 v-if="displayMode != 'mini'" -->
+        <div class="vmp-player-tips-prew">
+          <!-- 试看 -->
+          <div v-if="vodType === 'shikan' && isTryPreview">
+            试看
+            <b>{{ recordTime }}</b>
+            分钟，观看完整视频请
+            <span v-if="authText == 6">
+              <b>付费</b>
+              或
+              <b>邀请码</b>
+            </span>
+            <span v-else>{{ authText }}</span>
+            <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
+          </div>
+          <!-- 断点续播 -->
+          <div v-if="isPickupVideo && currentTime > 0">
+            上次观看至
+            <b>{{ secondToDate(currentTime) }}</b>
+            ，已为您自动续播
+            <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
         </div>
       </div>
@@ -201,12 +256,8 @@
       controlEventPoint
     },
     data() {
-      const { state: playerState } = this.playerServer;
       return {
         displayMode: 'mini', // normal: 正常; mini: 小屏; fullscreen:全屏
-        playerState,
-        roomBaseState: null,
-        isMini: false,
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
         vodType: '', //回放的类型 暖场视频还是还是试看
@@ -278,6 +329,12 @@
         } else {
           return webinar.img_url || cover;
         }
+      },
+      isShowContainer() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+          this.$domainStore.state.micServer.isSpeakOn
+        );
       }
     },
     watch: {
@@ -289,14 +346,10 @@
       }
     },
     created() {
-      this.roomBaseServer = useRoomBaseServer();
       this.roomBaseState = this.roomBaseServer.state;
+      this.playerState = this.playerServer.state;
       this.getWebinerStatus();
       this.listenEvents();
-      // this.playerServer.getPlayerConfig({
-      //   webinar_id: '876395481',
-      //   tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
-      // });
     },
     mounted() {},
     methods: {
@@ -589,6 +642,15 @@
         }
         this.initPlayer();
       },
+      exchangeVideoDocs() {
+        if (this.displayMode == 'mini') {
+          this.roomBaseServer.setChangeElement('doc');
+          this.displayMode = 'normal';
+        } else {
+          this.roomBaseServer.setChangeElement('player');
+          this.displayMode = 'mini';
+        }
+      },
       // 获取回放总时长
       getRecordTotalTime() {
         let getRecordTotalTimer = null;
@@ -646,16 +708,6 @@
   .vmp-player {
     width: 100%;
     position: relative;
-    &-box {
-      padding-top: 56.25%;
-    }
-    &-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
     &-watch {
       height: 100%;
       width: 100%;
@@ -756,6 +808,94 @@
           font-weight: 400;
         }
       }
+      &-vodend {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        background-size: cover;
+        z-index: 9;
+        > div {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          justify-content: center;
+        }
+        &-try {
+          height: 100%;
+          h3 {
+            color: #999;
+            font-size: 16px;
+            line-height: 30px;
+            font-weight: normal;
+          }
+          .replay-try {
+            margin-top: 30px;
+            color: #fff;
+            cursor: pointer;
+            b {
+              font-weight: normal;
+            }
+            &.repay--mini {
+              b {
+                font-size: 14px;
+                padding-left: 5px;
+              }
+            }
+          }
+        }
+        &-isNoTry {
+          div {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            i {
+              color: #e6e6e6;
+              opacity: 1;
+            }
+          }
+        }
+        &-normal {
+          width: 88px;
+          height: 88px;
+
+          i {
+            font-size: 34px;
+          }
+        }
+        &-mini {
+          width: 50px;
+          height: 50px;
+          i {
+            font-size: 18px;
+          }
+        }
+        span {
+          margin-top: 5px;
+          text-align: center;
+          color: #fff;
+          cursor: pointer;
+          border-radius: 20px;
+          background: #fb3a32;
+          display: inline-block;
+          &.repay--normal {
+            width: 160px;
+            height: 40px;
+            line-height: 40px;
+          }
+          &.repay--mini {
+            width: 90px;
+            height: 30px;
+            font-size: 12px;
+            line-height: 30px;
+          }
+        }
+      }
       &-audio {
         z-index: 5;
         height: 100%;
@@ -772,11 +912,45 @@
           margin-top: 42%;
         }
       }
+      &-exchange {
+        position: absolute;
+        top: 10px;
+        z-index: 7;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        // opacity: 100;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.8s;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        cursor: pointer;
+        p {
+          text-align: center;
+        }
+        span {
+          display: inline-block;
+          text-align: right;
+          font-size: 14px;
+        }
+        i {
+          font-size: 16px;
+          color: #e6e6e6;
+          opacity: 1;
+          cursor: pointer;
+          &:hover {
+            color: #fb3a32;
+          }
+        }
+      }
     }
     &-controller {
       position: absolute;
       // bottom: -48px;
-      bottom: 5px;
+      bottom: 3px;
       z-index: 10;
       width: 100%;
       height: 38px;

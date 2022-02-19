@@ -25,7 +25,7 @@
       </div>
       <!-- 直播结束 -->
       <div
-        v-if="false"
+        v-if="isLivingEnd"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
@@ -38,12 +38,12 @@
       </div>
       <!-- 回放结束（正常回放和试看回放结束） -->
       <div
-        v-if="false"
+        v-if="isVodEnd"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${videoCover}')`"
       >
         <!-- 试看播放结束 -->
-        <div class="vmp-wap-player-ending-box">
+        <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
           <p class="vmp-wap-player-ending-box-title">试看结束，观看完整视频</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
@@ -60,7 +60,7 @@
           </p>
         </div>
         <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" @click="replay">
+        <div class="vmp-wap-player-ending-box" v-else @click="replay">
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
@@ -283,9 +283,7 @@
       }
     },
     data() {
-      const { state: playerState } = this.playerServer;
       return {
-        playerState,
         isNoBuffer: false,
         promptFlag: false,
         isOpenSpeed: false,
@@ -343,6 +341,7 @@
     },
     async created() {
       this.roomBaseState = this.roomBaseServer.state;
+      this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
     },
     mounted() {
