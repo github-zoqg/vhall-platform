@@ -151,7 +151,7 @@
       showConfirm(text) {
         this.alertText = text;
         this.isConfirmVisible = true;
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           confirmListener.on(action => resolve(action));
         });
       },
