@@ -7,7 +7,7 @@
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
-          查看聊天历史消息
+          {{ $t('chat.chat_1058') }}
         </span>
       </p>
       <scroll ref="scroll" @pullingDown="handlePullingDown">
@@ -30,12 +30,13 @@
             !((messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal)
           "
         >
-          有{{ newMsgNum }}条未读消息
+          {{ $t('chat.chat_1035', newMsgNum) }}
         </span>
         <span
           v-if="(messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal"
         >
-          有人{{ messageType.atList ? '@' : '' }}{{ messageType.reply ? '回复' : '' }} 你
+          {{ $t('chat.chat_1034') }}{{ messageType.atList ? '@' : ''
+          }}{{ messageType.reply ? $t('chat.chat_1036') : '' }} {{ $t('chat.chat_1059') }}
         </span>
         <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>

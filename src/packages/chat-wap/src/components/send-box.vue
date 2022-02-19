@@ -14,8 +14,8 @@
             v-if="isNeedLogin && !isLogin && !noChatLogin"
             @click="login"
           >
-            <span class="login-btn">登录</span>
-            参与互动
+            <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
+            {{ $t('chat.chat_1043') }}
           </div>
           <div
             v-else
@@ -28,11 +28,11 @@
                 (groupInitData.isBanned && groupInitData.isInGroup)
               "
             >
-              您已被禁言
+              {{ $t('chat.chat_1006') }}
             </span>
-            <span v-else-if="isAllBanned">全体禁言中</span>
+            <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>说点什么</span>
+            <span v-else>{{ $t('chat.chat_1042') }}</span>
           </div>
         </template>
       </div>
@@ -275,7 +275,7 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(`当前活动火爆，请您在${this.waitTime}秒后再次发言`);
+            this.$message(this.$t('chat.chat_1068', this.waitTime));
           }
         } else {
           this.$refs.chatWapInputModal.openModal();
