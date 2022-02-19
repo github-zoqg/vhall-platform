@@ -92,6 +92,12 @@
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
 
+        this.addItem({
+          type: 8,
+          name: '成员',
+          status: '1'
+        });
+
         for (const item of list) {
           this.addItem(item);
         }
