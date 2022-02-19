@@ -4,7 +4,8 @@ import {
   useDocServer,
   useInteractiveServer,
   useMediaCheckServer,
-  useMicServer
+  useMicServer,
+  useUserServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -17,6 +18,7 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const micServer = useMicServer();
+  const userServer = useMicServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -67,7 +69,9 @@ export default async function () {
       'timer'
     ]
   });
-
+  if (window.localStorage.getItem('token')) {
+    await userServer.getUserInfo({ scene_id: 2 });
+  }
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 

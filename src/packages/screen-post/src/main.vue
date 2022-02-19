@@ -57,8 +57,9 @@
 
       // 关闭事件
       screenPostClose() {
-        this.screenShow = false;
+        if (!this.screenShow) return;
         this.useRoomBaseServer.screenPostClose();
+        this.screenShow = false;
       },
 
       // 开启事件
