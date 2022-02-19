@@ -80,7 +80,7 @@
       send() {
         const inputValue = this.inputValue.trim();
         if (!inputValue) {
-          this.$message('this.$t('chat.chat_1057')');
+          this.$message(this.$t('chat.chat_1057'));
           return;
         }
         this.$emit('sendMsg', inputValue);
