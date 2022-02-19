@@ -9,11 +9,48 @@
       @onReturn="isShow = false"
       @onClose="isShow = false"
     >
-      <media-setting
-        v-if="isShow"
-        @showConfirm="showConfirm"
-        @closeDlg="isShow = false"
-      ></media-setting>
+      <section v-if="isShow" class="vmp-media-setting-dialog-body">
+        <!-- 左侧菜单 -->
+        <aside class="vmp-media-setting-menu">
+          <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
+        </aside>
+
+        <!-- 右侧面板 -->
+        <section class="vmp-media-setting-content">
+          <main class="vmp-media-setting-content-main">
+            <!-- 基础设置 -->
+            <basic-setting
+              v-show="selectedMenuItem === 'basic-setting'"
+              @rateChangeToHD="rateChangeToHD"
+            />
+            <!-- 摄像头 -->
+            <video-setting v-show="selectedMenuItem === 'video-setting'" />
+            <!-- 麦克风 -->
+            <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
+            <!-- 扬声器 -->
+            <audio-out-setting v-show="selectedMenuItem === 'audio-out-setting'" />
+          </main>
+
+          <!-- 底部按钮区域 -->
+          <footer class="vmp-media-setting-content-footer">
+            <a
+              class="vmp-media-setting-content-footer__help"
+              href="//www.vhall.com/saas/doc/1722.html"
+              target="_blank"
+            >
+              {{ $t('setting.setting_1029') }}
+            </a>
+            <section>
+              <el-button size="small" type="primary" @click="saveMediaSetting">
+                {{ $t('account.account_1062') }}
+              </el-button>
+              <el-button @click="hiddenMediaSetting" size="small">
+                {{ $t('account.account_1063') }}
+              </el-button>
+            </section>
+          </footer>
+        </section>
+      </section>
     </saas-dialog>
 
     <!-- 弹窗容器 -->
@@ -40,45 +77,358 @@
    */
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import SaasDialog from '@/packages/pc-alert/src/dialog.vue';
-  import MediaSetting from './media-setting.vue';
+
+  import SettingMenu from './components/setting-menu.vue';
+  import BasicSetting from './components/pages/basic-setting.vue';
+  import VideoSetting from './components/pages/video-setting.vue';
+  import AudioInSetting from './components/pages/audio-in-setting.vue';
+  import AudioOutSetting from './components/pages/audio-out-setting.vue';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+
+  import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
+
+  import { getDiffObject } from './js/getDiffObject';
+
+  const confirmListener = {
+    cb: null,
+    on(cb) {
+      this.cb = cb;
+    },
+    emit(action) {
+      this.cb(action);
+    }
+  };
 
   export default {
     name: 'VmpPcMediaSetting',
     components: {
       SaasAlert,
       SaasDialog,
-      MediaSetting
+
+      SettingMenu,
+      BasicSetting,
+      VideoSetting,
+      AudioInSetting,
+      AudioOutSetting
     },
     data() {
       return {
-        isShow: false,
-        isConfirmVisible: false,
+        mediaState: this.mediaSettingServer.state,
+        isShow: false, // dialog可视性
+        isConfirmVisible: false, // 确定框可视性
+        selectedMenuItem: 'basic-setting',
         alertText: '修改设置后会导致重新推流，是否继续保存？',
-        selectedItem: 'audio-in-setting'
+        isRateChangeToHD: false,
+        liveMode: 0 // 1-音频 2-视频 3-互动
       };
+    },
+    computed: {
+      devices() {
+        return this.mediaState.devices;
+      }
+    },
+    beforeCreate() {
+      this.mediaSettingServer = useMediaSettingServer();
+    },
+    created() {
+      this._originCaptureState = {};
+    },
+    async mounted() {
+      const { watchInitData } = useRoomBaseServer().state;
+      this.liveMode = watchInitData?.webinar?.mode;
+      this.webinar = watchInitData.webinar;
     },
     methods: {
       showMediaSetting() {
         this.isShow = true;
+        this.restart();
       },
-      showConfirm(text, cb, context) {
+
+      closeMediaSetting() {
+        this.isShow = false;
+      },
+
+      showConfirm(text) {
         this.alertText = text;
         this.isConfirmVisible = true;
-        this._confirmCb = cb;
-        this._confirmCbContext = context;
+        return new Promise((resolve, reject) => {
+          confirmListener.on(action => resolve(action));
+        });
       },
-      closeConfirm() {
-        this.alertText = '修改设置后会导致重新推流，是否继续保存？'; // reset default
-        this.isConfirmVisible = false;
-      },
-      // saveSetting() {
-      //   // TODO: 开播才弹出对话框
-      //   this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
-      // },
+
       confirmSave() {
         this.isConfirmVisible = false;
-        this._confirmCb && this._confirmCb.call(this._confirmCbContext);
+        confirmListener.emit('confirm');
+      },
+
+      closeConfirm() {
+        this.isConfirmVisible = false;
+        confirmListener.emit('close');
+      },
+
+      rateChangeToHD(value) {
+        this.rateChangeToHD = value;
+      },
+      changeSelectedMenuItem(id) {
+        this.selectedMenuItem = id;
+      },
+      restart() {
+        try {
+          this.getVideoDeviceInfo();
+        } catch (error) {
+          console.error('error:', error);
+        }
+      },
+      /**
+       * 保存确认
+       */
+      async saveMediaSetting() {
+        // const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+        // if (watchInitData.webinar.type === 1) {
+        let text = '修改设置后导致重新推流，是否继续保存';
+        if (this.isRateChangeToHD) {
+          text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+        }
+        const action = await this.showConfirm(text);
+        if (action === 'confirm') {
+          this.updateDeviceSetting();
+          this.closeMediaSetting();
+          this.sendChangeEvent();
+        }
+      },
+      getDiffOptions() {
+        const source = this._originCaptureState;
+        let current = { ...this.mediaState };
+
+        const ignoreKeys = ['devices', 'videoPreivewStreamId', 'videoPreviewStream'];
+
+        return getDiffObject(source, current, { ignoreKeys });
+      },
+      sendChangeEvent() {
+        const diffOptions = this.getDiffOptions();
+        console.log('diffOptions:', diffOptions);
+        if (Object.keys(diffOptions) === 0) return;
+
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
+      },
+      /**
+       * 更新设置并缓存字段
+       */
+      async updateDeviceSetting() {
+        const { watchInitData } = useRoomBaseServer().state;
+
+        if (watchInitData?.join_info?.role_name == '1') {
+          // 配置上传服务器
+          await this.mediaSettingServer.setStream({
+            room_id: watchInitData.interact.room_id,
+            definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
+            layout: this.mediaState.layout || 0,
+            screen_definition: this.mediaState.screenRate // 桌面共享清晰度
+          });
+        } else {
+          // TODO: event.deviceSplit(options)&selectVideoType
+        }
+
+        this.saveSelected();
+        this.$message.success(this.$t('common.common_1034'));
+      },
+      /**
+       * 获取视频设备信息
+       */
+      async getVideoDeviceInfo() {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(trackInput => trackInput.stop());
+        this.getDevices();
+      },
+      /**
+       * 获取所有设备
+       */
+      async getDevices() {
+        // 获取视频列表
+        await this.mediaSettingServer.getCameras(
+          item => item.label && item.deviceId !== 'desktopScreen'
+        );
+
+        // 获取话筒
+        await this.mediaSettingServer.getMicrophones(
+          d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
+        );
+
+        // 获取扬声器
+        await this.mediaSettingServer.getSpeakers(item => item.label);
+
+        this.setDefaultSelected(); // 从localstorage和sessionStorage中恢复设置
+        this.getStateCapture();
+      },
+      getStateCapture() {
+        // 关心的都是浅拷贝数据
+        let state = { ...this.mediaSettingServer.state };
+
+        this._originCaptureState = state;
+      },
+      /**
+       * 缓存设置字段
+       */
+      saveSelected() {
+        const canvasObj = JSON.stringify({
+          flag: this.mediaState.videoType === 'picture',
+          streamUrl: this.mediaState.canvasImgUrl
+        });
+
+        const localMap = new Map([
+          [`saveCanvasObj_${this.webinar.id}`, canvasObj],
+          [`selectVideoType_${this.webinar.id}`, this.mediaState.videoType || 'camera']
+        ]);
+
+        const sessionMap = new Map([
+          ['selectedVideoDeviceId', this.mediaState.video || ''],
+          ['selectedAudioDeviceId', this.mediaState.audioInput || ''],
+          ['selectedAudioOutputDeviceId', this.mediaState.audioInput || ''],
+          ['selectedRate', this.mediaState.rate || ''],
+          ['selectedScreenRate', this.mediaState.screenRate || ''],
+          ['layout', this.mediaState.layout || '']
+        ]);
+
+        // 记录
+        for (const [key, value] of localMap) {
+          localStorage.setItem(key, value);
+        }
+        for (const [key, value] of sessionMap) {
+          sessionStorage.setItem(key, value);
+        }
+
+        console.log('[media-setting] 记录字段成功');
+      },
+
+      setDefaultSelected() {
+        const {
+          videoInputDevices = [],
+          audioInputDevices = [],
+          audioOutputDevices = []
+        } = this.devices;
+
+        // 视频
+        if (videoInputDevices.length > 0) {
+          const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
+          this.mediaState.video = sessionVideoId || videoInputDevices[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedVideoDeviceId');
+        }
+
+        // 麦克风
+        if (audioInputDevices.length > 0) {
+          const sessionAudioId = sessionStorage.getItem('selectedAudioDeviceId');
+          this.mediaState.audioInput = sessionAudioId || audioInputDevices[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedAudioDeviceId');
+        }
+
+        // 扬声器
+        if (audioOutputDevices.length > 0) {
+          const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
+          this.mediaState.audioOutput = sessionAudioOutputId || audioOutputDevices[0].deviceId;
+        } else {
+          sessionStorage.removeItem('selectedAudioOutputDeviceId');
+        }
       }
     }
   };
 </script>
+
+<style lang="less">
+  .vmp-media-setting-dialog-body {
+    .el-radio__input.is-checked + .el-radio__label {
+      color: #606266;
+    }
+
+    background: #fff;
+    display: flex;
+    // height: 100%;
+    height: 500px;
+    box-sizing: border-box;
+
+    // 左侧菜单
+    .vmp-media-setting-menu {
+      height: 100%;
+      width: 120px;
+      flex: 0 0 auto;
+    }
+
+    // 右侧正文
+    .vmp-media-setting-content {
+      height: 100%;
+      flex: 1 1 auto;
+      box-sizing: border-box;
+      background-color: #f7f7f7;
+      display: flex;
+      flex-direction: column;
+      width: 360px;
+      padding: 64px 32px 24px 32px;
+
+      &-main {
+        flex: 1;
+
+        // 复用元素
+        .vmp-media-setting-item {
+          margin-bottom: 16px;
+          display: flex;
+
+          &__label {
+            width: 58px;
+            font-size: 14px;
+            flex: 0 0 auto;
+            text-align: left;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+          }
+
+          &__content {
+            flex: 1;
+
+            &--column {
+              flex-direction: column;
+            }
+          }
+        }
+
+        .vmp-media-setting-tips {
+          padding-top: 16px;
+
+          &__title {
+            font-size: 14px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+          }
+
+          &__content {
+            p {
+              font-size: 13px;
+              color: #666;
+            }
+          }
+        }
+      }
+
+      &-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        & > * {
+          margin-top: 8px;
+        }
+
+        &__help {
+          color: #666;
+          cursor: pointer;
+          font-size: 14px;
+          margin-top: 8px;
+          &:hover {
+            color: #3562fa;
+          }
+        }
+      }
+    }
+  }
+</style>
