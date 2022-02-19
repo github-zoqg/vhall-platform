@@ -12,7 +12,8 @@
           <i class="vh-iconfont vh-line-time" />
           开始时间:{{ startTime }}
         </p>
-        <p>
+        <!-- 直播中才展示在线人数 -->
+        <p v-if="watchInitData.online.show">
           <i class="vh-iconfont vh-line-user"></i>
           在线人数:{{ personCount }} 人
         </p>

@@ -69,7 +69,7 @@ export const serverConfig = {
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
         { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
         { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
-        { type: 8, cuid: 'comMemberList', text: '' } // 成员
+        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
       ]
     }
   },

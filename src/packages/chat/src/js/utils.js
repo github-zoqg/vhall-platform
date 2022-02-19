@@ -210,7 +210,7 @@ export function checkUploadType(file, that, type = 1) {
   img.onload = function () {
     // 我在这里就可以获取到图片的宽度和高度了 img.width 、img.height
     if (img.width !== 1280 && img.height !== 720) {
-      that.$message.warning('请上传1280*720尺寸图片!');
+      that.$message.warning('请上传1280*720尺寸图片!'); // TODO: 缺翻译
       return false;
     }
   };
