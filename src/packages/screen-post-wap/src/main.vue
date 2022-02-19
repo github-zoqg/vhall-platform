@@ -1,18 +1,14 @@
 <template>
-  <div class="vmp-screen-post" v-if="screenShow" @click="handleLink">
+  <div class="vmp-screen-post-wap" v-if="screenShow" @click="handleLink">
     <img
-      v-if="useRoomBaseServer.state.screenPosterInfo.img"
-      :src="useRoomBaseServer.state.screenPosterInfo.img"
+      v-if="useRoomBaseServer.state.screenPosterInfo.m_img"
+      :src="useRoomBaseServer.state.screenPosterInfo.m_img"
       alt=""
-      class="vmp-screen-post-img"
+      class="vmp-screen-post-wap-img"
     />
-    <div
-      class="vmp-screen-post-close-tip"
-      :class="{ time: useRoomBaseServer.state.screenPosterInfo.shutdown_type }"
-      @click.stop="screenPostClose"
-    >
-      <span v-if="useRoomBaseServer.state.screenPosterInfo.shutdown_type">{{ time }}s</span>
+    <div class="vmp-screen-post-wap-close-tip" @click.stop="screenPostClose">
       {{ $t('webinar.webinar_1001') }}
+      <span v-if="useRoomBaseServer.state.screenPosterInfo.shutdown_type">{{ time }}s</span>
     </div>
   </div>
 </template>
@@ -20,7 +16,7 @@
 <script>
   import { useRoomBaseServer } from 'middle-domain';
   export default {
-    name: 'VmpScreenPost',
+    name: 'VmpScreenPostWap',
     data() {
       return {
         useRoomBaseServer: {},
@@ -57,9 +53,8 @@
 
       // 关闭事件
       screenPostClose() {
-        if (!this.screenShow) return;
-        this.useRoomBaseServer.screenPostClose();
         this.screenShow = false;
+        this.useRoomBaseServer.screenPostClose();
       },
 
       // 开启事件
@@ -73,8 +68,8 @@
 </script>
 
 <style lang="less">
-  .vmp-screen-post {
-    position: fixed;
+  .vmp-screen-post-wap {
+    position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
@@ -82,33 +77,23 @@
     z-index: 49;
     background: #333;
 
-    .vmp-screen-post-img {
+    .vmp-screen-post-wap-img {
       display: block;
       width: 100%;
       height: 100%;
     }
 
-    .vmp-screen-post-close-tip {
+    .vmp-screen-post-wap-close-tip {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      min-width: 64px;
-      height: 38px;
-      text-align: center;
-      line-height: 38px;
-      border-radius: 19px;
-      color: #ffffff;
-      background: rgba(0, 0, 0, 0.65);
-      font-size: 16px;
-      span {
-        margin-right: 4px;
-      }
-      &:hover {
-        cursor: pointer;
-      }
-    }
-    .time {
-      width: 88px;
+      top: 1.333333rem;
+      right: 0.4rem;
+      color: #fff;
+      padding: 0 0.266667rem;
+      height: 0.8rem;
+      line-height: 0.8rem;
+      border-radius: 0.4rem;
+      background: rgba(0, 0, 0, 0.7);
+      user-select: none;
     }
   }
 </style>

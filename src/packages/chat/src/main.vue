@@ -30,7 +30,9 @@
           v-if="[1, '1'].includes(configList['ui.hide_chat_history']) && !chatList.length"
           class="chat-content__get-list-btn-container"
         >
-          <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
+          <span class="chat-content__get-list-btn" @click="getHistoryMsg">
+            {{ $t('chat.chat_1058') }}
+          </span>
         </p>
       </overlay-scrollbars>
       <div
@@ -225,7 +227,7 @@
         tipMsg: '',
         // 输入框状态
         inputStatus: {
-          placeholder: '参与聊天',
+          placeholder: this.$t('chat.chat_1021'),
           disable: false
         },
         isBanned: 0, //1禁言，0未禁言
@@ -378,22 +380,22 @@
       },
       //初始化聊天输入框数据
       initInputStatus() {
-        let placeholder = '参与聊天';
+        let placeholder = this.$t('chat.chat_1021');
         let disable = false;
 
         //如果是单人被禁言
         if (this.isBanned) {
-          placeholder = '您已被禁言';
+          placeholder = this.$t('chat.chat_1006');
           disable = true;
         }
         //如果是全体禁言
         if (this.allBanned) {
-          placeholder = '全员禁言中';
+          placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
           disable = true;
         }
 
         if ([1, '1'].includes(this.roleName)) {
-          placeholder = '参与聊天';
+          placeholder = this.$t('chat.chat_1021');
           disable = false;
         }
 
@@ -412,7 +414,7 @@
           if (![1, '1'].includes(this.roleName) && ['', null, void 0].includes(this.userId)) {
             // 需要登录
             this.chatLoginStatus = true;
-            this.inputStatus.placeholder = '登录后参与互动';
+            this.inputStatus.placeholder = this.$t('chat.chat_1001', this.$t('nav.nav_1005'));
           }
         } else {
           // 不需要登录
@@ -569,7 +571,7 @@
             return;
           }
           if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
-            return this.$message.warning('内容不能为空');
+            return this.$message.warning(this.$t('chat.chat_1009'));
           }
           const data = {};
           if (inputValue) {
@@ -640,7 +642,7 @@
         if (this.chatGap > 0) {
           this.lock = sessionStorage.getItem('chatLock');
           if (this.lock && this.lock == 'true') {
-            this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
+            this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
           }
         } else {
           this.sendMsg(() => {
@@ -652,7 +654,7 @@
                 if (!this.lock || this.lock == 'false') {
                   sessionStorage.setItem('chatLock', true);
                 } else {
-                  this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
+                  this.$message.warning(this.$t('chat.chat_1080', this.chatGap));
                 }
                 this.chatGap = this.chatGap - 1;
               } else {
@@ -686,22 +688,23 @@
           }
         }
         // 删除要回复的用户名逻辑
-        const lastReplyIndex = firstPart.lastIndexOf('回复');
+        const replyText = this.$t('chat.chat_1036');
+        const lastReplyIndex = firstPart.lastIndexOf(replyText);
         if (lastReplyIndex != -1) {
           const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          console.log(`回复${this.replyMsg.nickname}:` == replyUserName);
-          if (`回复${this.replyMsg.nickname}:` == replyUserName) {
+          console.log(`${replyText}${this.replyMsg.nickname}:` == replyUserName);
+          if (`${replyText}${this.replyMsg.nickname}:` == replyUserName) {
             this.inputValue = this.inputValue.replace(replyUserName, '');
             this.replyMsg = {};
           } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickname}: `) == -1 &&
+            this.inputValue.indexOf(`${replyText}${this.replyMsg.nickname}: `) == -1 &&
               (this.replyMsg = {});
           }
         }
       },
       //处理聊天内容
       trimPlaceHolder() {
-        return this.inputValue.replace(/^[回复].+[:]\s/, '');
+        return this.inputValue.replace(/^[回复].+[:]\s/, ''); // TODO: 正则用翻译文案
       },
       //回复消息
       reply(count) {
@@ -769,7 +772,9 @@
       onScrollElementHandle(el) {
         this.showTip = true;
         this.elements.push(el);
-        this.tipMsg = this.replyElement ? '有多条未读消息' : '有人@你';
+        this.tipMsg = this.replyElement
+          ? this.$t('chat.chat_1035', this.unReadMessageCount) // TODO:确认是否+1
+          : this.$t('chat.chat_1075');
       },
       //关闭提示
       onCloseTipHandle() {
@@ -780,7 +785,9 @@
       onReplyMsg(el, msg) {
         if (this.userId !== msg.sendId) return;
         this.showTip = true;
-        this.tipMsg = this.elements.length ? '有多条未读消息' : '有人回复你';
+        this.tipMsg = this.elements.length
+          ? this.$t('chat.chat_1035', this.unReadMessageCount) // TODO:确认是否+1
+          : this.$t('chat.chat_1076');
         this.replyElement = el;
       },
       //底部输入框输入较多内容，聊天区域也调整高度

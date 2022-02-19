@@ -30,8 +30,8 @@
       class="vmp-chat-input__textarea-placeholder"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
-        <span class="chat-login-btn" @click="callLogin">登录</span>
-        后参与聊天
+        <span class="chat-login-btn" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
+        {{ $t('chat.chat_1001') }}
       </span>
       <span v-show="inputStatus.disable && !chatLoginStatus" class="textarea-placeholder_no-login">
         {{ inputStatus.placeholder }}
@@ -92,7 +92,7 @@
         //聊天输入框的值
         inputValue: '',
         //聊天框提示文字
-        placeholder: '参与聊天',
+        placeholder: this.$t('chat.chat_1021'),
         //字数限制
         inputMaxLength: 140,
         //显示字数限制提示
@@ -122,9 +122,10 @@
         if (Object.keys(this.replyMsg || {}).length == 0) {
           this.inputValue = this.trimPlaceHolder('reply');
         } else {
+          const replyText = this.$t('chat.chat_1036');
           this.inputValue = this.inputValue
-            ? `回复${this.replyMsg.nickname}: ${this.trimPlaceHolder('reply')}`
-            : `回复${this.replyMsg.nickname}: `;
+            ? `${replyText}${this.replyMsg.nickname}: ${this.trimPlaceHolder('reply')}`
+            : `${replyText}${this.replyMsg.nickname}: `;
         }
       },
       inputValue(newValue) {
@@ -219,14 +220,15 @@
           }
         }
         // 删除要回复的用户名逻辑
-        const lastReplyIndex = firstPart.lastIndexOf('回复');
+        const replyText = this.$t('chat.chat_1036');
+        const lastReplyIndex = firstPart.lastIndexOf(replyText);
         if (lastReplyIndex !== -1) {
           const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          if (`回复${this.replyMsg.nickname}:` === replyUserName) {
+          if (`${replyText}${this.replyMsg.nickname}:` === replyUserName) {
             this.inputValue = this.inputValue.replace(replyUserName, '');
             this.replyMsg = {};
           } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickname}: `) === -1 &&
+            this.inputValue.indexOf(`${replyText}${this.replyMsg.nickname}: `) === -1 &&
               (this.replyMsg = {});
           }
         }
@@ -242,7 +244,7 @@
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
-          return this.$message.warning('内容不能为空');
+          return this.$message.warning(this.$t('chat.chat_1009'));
         }
         const curmsg = chatServer.createCurMsg();
         //将文本消息加入消息体
@@ -298,7 +300,7 @@
         if (this.chatGap > 0) {
           this.lock = sessionStorage.getItem('chatLock');
           if (this.lock && this.lock == 'true') {
-            this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
+            this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
           }
         } else {
           this.sendMsg(() => {
@@ -310,7 +312,7 @@
                 if (!this.lock || this.lock == 'false') {
                   sessionStorage.setItem('chatLock', true);
                 } else {
-                  this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
+                  this.$message.warning(this.$t('chat.chat_1080', this.chatGap));
                 }
                 this.chatGap = this.chatGap - 1;
               } else {

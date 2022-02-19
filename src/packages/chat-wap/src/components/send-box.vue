@@ -3,7 +3,7 @@
     <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isShowUser">
-        <div class="user-avatar-wrap__avatar">
+        <div class="user-avatar-wrap__avatar" @click="showUserPopup">
           <img class="avatar-img" :src="avatar" srcset />
         </div>
       </div>
@@ -69,7 +69,8 @@
     useRoomBaseServer,
     useChatServer,
     useMediaCheckServer,
-    useMsgServer
+    useMsgServer,
+    useUserServer
   } from 'middle-domain';
   import getAvatar from '@/packages/chat/src/js/get-avatar';
   import Msg from '@/packages/chat/src/js/msg-class';
@@ -195,6 +196,7 @@
       this.chatServer = useChatServer();
       this.mediaCheckServer = useMediaCheckServer();
       this.msgServer = useMsgServer();
+      this.userServer = useUserServer();
     },
     created() {
       this.initViewData();
@@ -222,19 +224,13 @@
       },
       // 判断登录
       checkIsLogin() {
+        const { userInfo = {} } = this.userServer.state;
         // 若用户已经登录
-        if (window.sessionStorage.getItem('token')) {
+        if (Object.keys(userInfo).length) {
           this.isLogin = true;
           // 若用户已经登录过，获取userInfo
-          const userVo = sessionStorage.getItem('userInfo')
-            ? JSON.parse(sessionStorage.getItem('userInfo'))
-            : {};
-          if (userVo) {
-            this.isShowUser = true;
-            this.avatar = userVo.avatar || require('../images/default_avatar.png');
-          } else {
-            this.isShowUser = false;
-          }
+          this.isShowUser = true;
+          this.avatar = userInfo.avatar || require('../images/default_avatar.png');
         } else {
           this.isShowUser = false;
         }
@@ -356,6 +352,11 @@
           showTime: handleTime(item.sendTime)
         });
         filterStatus && this.chatList.push(tempData);
+      },
+
+      // 打开个人中心
+      showUserPopup() {
+        this.$emit('showUserPopup');
       }
     }
   };
