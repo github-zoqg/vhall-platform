@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-player" :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]">
+  <div
+    v-if="!isShowContainer"
+    class="vmp-player"
+    :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
+  >
     <div>
       <div id="vmp-player" class="vmp-player-watch">
         <div class="vmp-player-living">
@@ -325,6 +329,12 @@
         } else {
           return webinar.img_url || cover;
         }
+      },
+      isShowContainer() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+          this.$domainStore.state.micServer.isSpeakOn
+        );
       }
     },
     watch: {
