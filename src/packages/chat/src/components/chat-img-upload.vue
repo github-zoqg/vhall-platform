@@ -17,7 +17,7 @@
       :on-success="uploadSuccess"
       :on-error="uploadError"
     >
-      <i :class="['iconfont', 'icontupianliaotian', uploadActive ? 'active' : '']"></i>
+      <i :class="['vh-iconfont', 'vh-line-picture-outline', uploadActive ? 'active' : '']"></i>
     </el-upload>
     <!-- 上传图片预览 -->
     <div v-show="uploadActive" class="vmp-chat-img-preview-wrap">
@@ -102,11 +102,11 @@
       //todo 可以升级为知客的上传多张 上传图片前置处理
       beforeUpload() {
         if (this.disable) {
-          this.$message.error('您已被禁言');
+          this.$message.error(this.$t('chat.chat_1006'));
           return false;
         }
         if (this.uploadActive >= 4) {
-          this.$message.error('一次最多上传4张图片');
+          this.$message.error('一次最多上传4张图片'); // TODO: 翻译确实
           return false;
         }
         return true;
@@ -153,7 +153,7 @@
         color: @active-color;
         cursor: pointer;
       }
-      &.icontupianliaotian {
+      &.vh-line-picture-outline {
         font-size: 18px;
       }
     }

@@ -57,6 +57,7 @@ module.exports = {
       filename: 'index.html',
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
+      isWap: true,
       ...htmlConfig
     }
   },

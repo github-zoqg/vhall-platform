@@ -6,16 +6,20 @@
   >
     <div class="send-msg">
       <!--用户个人信息，提现，修改头像-->
-      <div class="user-advatar-panel" v-if="!isEmbed && isShowUser">
-        <div class="user-advatar-box">
-          <img class="user-img" :src="avatar" srcset />
+      <div class="user-avatar-wrap" v-if="!isEmbed && isShowUser">
+        <div class="user-avatar-wrap__avatar" @click="showUserPopup">
+          <img class="avatar-img" :src="avatar" srcset />
         </div>
       </div>
       <div class="need-input">
         <template v-if="chatShow">
-          <div class="placeholder" v-if="isNeedLogin && !isLogin && !noChatLogin" @click="login">
-            <span class="login-btn">登录</span>
-            参与互动
+          <div
+            class="content-input__placeholder"
+            v-if="isNeedLogin && !isLogin && !noChatLogin"
+            @click="login"
+          >
+            <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
+            {{ $t('chat.chat_1043') }}
           </div>
           <div v-else class="update-chat placeholder" @click="saySomething">
             <span
@@ -24,11 +28,11 @@
                 (groupInitData.isBanned && groupInitData.isInGroup)
               "
             >
-              您已被禁言
+              {{ $t('chat.chat_1006') }}
             </span>
-            <span v-else-if="isAllBanned">全体禁言中</span>
+            <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>说点什么</span>
+            <span v-else>{{ $t('chat.chat_1042') }}</span>
           </div>
         </template>
       </div>
@@ -63,10 +67,19 @@
 </template>
 <script>
   import chatWapInputModal from './chatWapInputModal';
-  import Vue from 'vue';
-  const EventBus = new Vue();
-  import { faceArr, emojiToPath } from '@/packages/chat/src/js/emoji';
-  import { useGroupServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import EventBus from '../js/Events';
+  import { emojiToPath, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import {
+    useGroupServer,
+    useRoomBaseServer,
+    useChatServer,
+    useMediaCheckServer,
+    useMsgServer,
+    useUserServer
+  } from 'middle-domain';
+  import getAvatar from '@/packages/chat/src/js/get-avatar';
+  import Msg from '@/packages/chat/src/js/msg-class';
+  import { formatTime, handleTime } from '@/packages/chat/src/js/handle-time';
 
   export default {
     props: {
@@ -129,30 +142,19 @@
       const { state: roomBaseState } = this.roomBaseServer;
       return {
         roomBaseState,
-        $inputTimer: null,
-        isShowMyQA: false,
-        timmer: {},
+        //定时器
+        timer: {},
+        //是否可以发送消息，发送限频
         canSend: true,
+        //限频时间
         time: 15,
+        //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
-        chatValue: '', // 输入框的值
-        showEmojiIcon: false, // 打开表情icon
-        showEmojiArr: false, // 表情集合
-        // needInput: false, // 是否需要输入功能
-        // needEmoji: false, // 是否需要表情功能
-        // // tab的类型  分类1自定义,2文档,3聊天,4简介,5商品,6推荐
-        // type: 3,
-        showInput: false, // 展示聊天
-        emojiArr: faceArr,
-        isReadonly: false, // 是否进行只读操作
-        vantFaildPlacer: '说点什么',
-        location:
-          window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
+        //是否展示用户头像
         isShowUser: false,
         connectMicShow: false, // 连麦入口按钮
         disabledAll: false, // 全员禁言
-        deviceStatus: false, // 是否支持上麦
         //是否是嵌入端
         isEmbed: false,
         //活动信息
@@ -160,7 +162,9 @@
         //是否已经登录
         isLogin: false,
         //配置列表
-        configList: {}
+        configList: {},
+        //用户头像
+        avatar: require('../images/default_avatar.png')
       };
     },
     computed: {
@@ -191,6 +195,9 @@
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
+      this.mediaCheckServer = useMediaCheckServer();
+      this.msgServer = useMsgServer();
+      this.userServer = useUserServer();
     },
     created() {
       this.initViewData();
@@ -218,19 +225,13 @@
       },
       // 判断登录
       checkIsLogin() {
+        const { userInfo = {} } = this.userServer.state;
         // 若用户已经登录
-        if (window.sessionStorage.getItem('token')) {
+        if (Object.keys(userInfo).length) {
           this.isLogin = true;
           // 若用户已经登录过，获取userInfo
-          const userVo = sessionStorage.getItem('userInfo')
-            ? JSON.parse(sessionStorage.getItem('userInfo'))
-            : {};
-          if (userVo) {
-            this.isShowUser = true;
-            this.avatar = userVo.avatar || require('../images/default_avatar.png');
-          } else {
-            this.isShowUser = false;
-          }
+          this.isShowUser = true;
+          this.avatar = userInfo.avatar || require('../images/default_avatar.png');
         } else {
           this.isShowUser = false;
         }
@@ -345,7 +346,7 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(`当前活动火爆，请您在${this.waitTime}秒后再次发言`);
+            this.$message(this.$t('chat.chat_1068', this.waitTime));
           }
         } else {
           this.$refs.chatWapInputModal.openModal();

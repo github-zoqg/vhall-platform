@@ -135,16 +135,12 @@
         return this.$t(map.get(label));
       },
       rateChange(selected) {
-        let text = '';
-        let payload = {};
+        let isRateChangeToHD = false;
 
         if (selected === 'RTC_VIDEO_PROFILE_720P_16x9_M') {
-          text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
-        } else {
-          text = '修改设置后会导致重新推流，是否继续保存？';
+          isRateChangeToHD = true;
         }
-
-        this.$emit('showConfirm', text, payload);
+        this.$emit('rateChangeToHD', isRateChangeToHD);
       }
     }
   };

@@ -12,7 +12,8 @@
           <i class="vh-iconfont vh-line-time" />
           开始时间:{{ startTime }}
         </p>
-        <p>
+        <!-- 直播中才展示在线人数 -->
+        <p v-if="watchInitData.online.show">
           <i class="vh-iconfont vh-line-user"></i>
           在线人数:{{ personCount }} 人
         </p>
@@ -41,7 +42,6 @@
 
 <script>
   import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
-  import { useVirtualAudienceServer } from 'middle-domain';
   export default {
     name: 'VmpIntroWap',
     filters: {
@@ -60,12 +60,6 @@
         NoDelayImg,
         type: 'default' // default、subscribe
       };
-    },
-    beforeCreate() {
-      this.virtualClientStartServer = useVirtualAudienceServer();
-    },
-    created() {
-      this.onlineState = this.virtualClientStartServer.state;
     },
     computed: {
       watchInitData() {
@@ -95,7 +89,10 @@
       },
       // 在线人数或订阅人数 Type:String
       personCount() {
-        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
+        );
       },
       // 简介富文本正文 Type:String
       content() {

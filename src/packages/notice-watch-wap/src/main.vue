@@ -23,7 +23,7 @@
       return {
         announcement: {
           content: '12313',
-          isShow: true
+          isShow: false
         }
       };
     },

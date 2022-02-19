@@ -54,7 +54,6 @@
         if (id === undefined || id === null) {
           return;
         }
-
         const res = await this.customMenuServer.getCustomMenuDetail({
           menu_id: id
         });

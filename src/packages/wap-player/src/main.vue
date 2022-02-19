@@ -91,13 +91,13 @@
       >
         <!-- 倍速和画质合并 -->
         <div class="vmp-wap-player-speed">
-          <span @click="openSpeed" v-if="!isLiving">
+          <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed">
             {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
           </span>
           <span @click="openQuality">{{ formatQualityText(currentQualitys.def) }}</span>
         </div>
         <div class="vmp-wap-player-control">
-          <div class="vmp-wap-player-control-preview" v-if="false">
+          <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             试看
             <span class="vmp-wap-player-control-preview-red">{{ recordTime }}</span>
             分钟, 观看完整视频请
@@ -109,12 +109,11 @@
             <span v-else class="vmp-wap-player-control-preview-red" @click="handleAuth">
               {{ authText }}
             </span>
-            <i class="vh-iconfont vh-line-close" @click="isShiKanVideo = false"></i>
+            <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
           </div>
-          <div class="vmp-wap-player-control-preview" v-if="false">
+          <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
             上次观看至
-            <!-- {{ currentTime | secondToDate }} -->
-            <span class="red">11111</span>
+            <span class="red">{{ currentTime | secondToDate }}</span>
             , 已为您自动续播
             <i class="vh-iconfont vh-line-close" @click="isShowDuanXuboVideo = false"></i>
           </div>
@@ -130,6 +129,7 @@
               ></controlEventPoint>
             </div>
             <van-slider
+              v-if="!isLiving && playerOtherOptions.progress_bar"
               v-model="sliderVal"
               active-color="rgba(252,86,89,.7)"
               inactive-color="rgba(255,255,255,.3)"
@@ -156,9 +156,9 @@
                   {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
                 </span>
               </span>
-              <!-- 右侧icon集合 v-if="playerOtherOptions.barrage_button" -->
+              <!-- 右侧icon集合 -->
               <p class="vmp-wap-player-control-icons-right">
-                <span @click="openBarrage" v-if="isLiving">
+                <span @click="openBarrage" v-if="playerOtherOptions.barrage_button">
                   <i
                     :class="`vh-iconfont ${
                       danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
@@ -219,8 +219,9 @@
 <script>
   import { secondToDateZH, isMse } from './js/utils';
   import controlEventPoint from './components/control-event-point.vue';
-  import { useRoomBaseServer, usePlayerServer, useVirtualAudienceServer } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
+  // import { create } from 'qrcode';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -271,10 +272,14 @@
       },
       // 是否正在直播
       isLiving() {
-        return this.roomBaseState.watchInitData.webinar.type == 1;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
       hotNum() {
-        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
+        );
       }
     },
     data() {
@@ -294,6 +299,7 @@
         vodOption: {}, //回放时回放id
         vodType: '', //回放的类型 暖场视频还是还是试看
         authText: '',
+        recordTime: '', //试看的时间
         isTryPreview: false, // 是否是试看
         isWarnPreview: false, // 是否是暖场视频
         currentTime: 0, // 视频当前播放时长
@@ -316,6 +322,8 @@
         recordHistoryTime: '', // 记录播放的时间
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
+        isLivingEnd: false, // 直播结束
+        isVodEnd: false, // 回放结束
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -329,16 +337,67 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
-      this.virtualClientStartServer = useVirtualAudienceServer();
+    },
+    beforeDestroy() {
+      this.playerServer.destroy();
     },
     async created() {
       this.roomBaseState = this.roomBaseServer.state;
-      this.onlineState = this.virtualClientStartServer.state;
       this.embedObj = this.roomBaseState.embedObj;
+    },
+    mounted() {
       this.getWebinerStatus();
       this.listenEvents();
     },
     methods: {
+      startPlay() {
+        this.isPlayering ? this.pause() : this.play();
+      },
+      // 播放
+      play() {
+        this.iconShow = false;
+        this.fiveDown();
+        this.playerServer && this.playerServer.play();
+      },
+      // 暂停
+      pause() {
+        this.playerServer && this.playerServer.pause();
+      },
+      // 判断是直播还是回放 活动状态
+      getWebinerStatus() {
+        const { webinar, warmup, record } = this.roomBaseState.watchInitData;
+        if (this.roomBaseState.watchInitData.status === 'live') {
+          if (webinar.type === 1) {
+            // 直播
+            this.isLive = true;
+            this.optionTypeInfo('live');
+          } else if (webinar.type === 5) {
+            // 回放
+            this.optionTypeInfo('vod', this.roomBaseState.watchInitData.paas_record_id);
+            this.recordHistoryTime = sessionStorage.getItem(
+              this.roomBaseState.watchInitData.paas_record_id
+            )
+              ? Number(sessionStorage.getItem(this.roomBaseState.watchInitData.paas_record_id))
+              : 0;
+          }
+        } else {
+          if (webinar.type === 3) return; //结束状态
+          let _id = warmup.warmup_paas_record_id
+            ? warmup.warmup_paas_record_id
+            : record.preview_paas_record_id;
+          this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
+          if (this.vodType === 'shikan') {
+            this.isTryPreview = true;
+          } else if (this.vodType === 'warm') {
+            this.isWarnPreview = true;
+          }
+          this.optionTypeInfo('vod', _id);
+        }
+        // 暖场视频或者试看
+        if (!this.isWarnPreview) {
+          this.initPlayerOtherInfo();
+        }
+      },
       optionTypeInfo(type, id) {
         this.playerServer.setType(type);
         if (type === 'live') {
@@ -354,61 +413,212 @@
         }
         this.initPlayer();
       },
+      // 初始化播放器配置项
+      initConfig() {
+        const { interact, join_info } = this.roomBaseState.watchInitData;
+        console.log(this.roomBaseState, '????====zhangxiao');
+        let params = {
+          appId: interact.paas_app_id || '', // 应用ID，必填
+          accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
+          token: interact.paas_access_token || '', // access_token，必填
+          videoNode: 'vmp-player',
+          type: this.playerState.type, // live 直播  vod 点播  必填
+          poster: '',
+          autoplay: false,
+          forceMSE: false,
+          subtitleOption: {
+            enable: true
+          },
+          // 强制卡顿切线
+          thornOption: {
+            enable: true
+          },
+          barrageSetting: {
+            positionRange: [0, 1],
+            speed: 15000,
+            style: {
+              fontSize: 16
+            }
+          },
+          peer5Option: {
+            open: this.roomBaseState.configList['ui.browser_peer5'] == '1',
+            customerId: 'ds6mupmtq5gnwa4qmtqf',
+            fallback: true
+          }
+        };
+        if (this.playerState.type == 'live') {
+          params = Object.assign(params, {
+            liveOption: this.liveOption
+          });
+        } else if (this.playerState.type === 'vod') {
+          params = Object.assign(params, {
+            vodOption: this.vodOption
+          });
+          params.pursueOption = { enable: true };
+        } else {
+          throw new Error('参数异常--2');
+        }
+        if (!this.isWarnPreview) {
+          params = Object.assign({}, params, this.getPlayerInfo());
+        }
+        return params;
+      },
+      // 初始化播放器
+      initPlayer() {
+        this.initSDK().then(() => {
+          this.getQualitys(); // 获取清晰度列表和当前清晰度
+          if (this.playerState.type === 'vod') {
+            this.getRecordTotalTime(); // 获取视频总时长
+            this.initSlider(); // 初始化播放进度条
+            this.getInitSpeed(); // 获取倍速列表和当前倍速
+          }
+          this.getListenPlayer();
+        });
+      },
+      async initSDK() {
+        const defineQuality = this.setDefaultQuality();
+        if (this.playerState.type == 'live') {
+          this.liveOption.defaultDefinition = defineQuality || '';
+        } else if (this.playerState.type == 'vod') {
+          this.vodOption.defaultDefinition = defineQuality || '';
+        }
+        const params = this.initConfig();
+        return new Promise(resolve => {
+          this.playerServer.init(params).then(() => {
+            this.eventPointList = this.playerServer.state.markPoints;
+            this.$nextTick(() => {
+              if (this.water && this.water.watermark_open == 1) {
+                const watermarkContainer = document.getElementById('vh-watermark-container');
+                watermarkContainer && (watermarkContainer.style.width = '80px');
+                const waterMark = document.getElementById('vh-watermark');
+                // waterMark && (waterMark.style.width = '80px')
+                waterMark && (waterMark.style.height = '35px');
+              }
+            });
+            try {
+              document.getElementsByTagName('video')[0].setAttribute('x5-video-player-type', 'h5');
+            } catch (e) {
+              console.log(e);
+            }
+
+            this.playerServer.openControls(false);
+            this.playerServer.openUI(false);
+            if (this.isLiving) {
+              resolve();
+            } else {
+              this.playerServer.$on(VhallPlayer.LOADED, () => {
+                resolve();
+              });
+            }
+          });
+        });
+      },
+      initPlayerOtherInfo() {
+        const { webinar } = this.roomBaseState.watchInitData;
+        this.playerServer
+          .getPlayerConfig({
+            webinar_id: webinar.id,
+            tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.definitionConfig = res.data.definition.data.default_definition;
+              this.marquee = res.data['screen-config'].data;
+              this.waterInfo = res.data['water-mark'].data;
+              this.playerOtherOptions = res.data['basic-config'].data;
+            }
+          });
+      },
+      // 获取跑马灯、水印等播放器配置
+      getPlayerInfo() {
+        const { join_info } = this.roomBaseState.watchInitData;
+        let playerParams = {
+          marqueeOption: {
+            text: '',
+            enable: false
+          },
+          watermarkOption: {
+            enable: false
+          }
+        };
+        // 跑马灯
+        if (this.marquee && this.marquee.scrolling_open == 1) {
+          let marqueeText = '';
+          if (this.marquee.text_type == 1) {
+            marqueeText = this.marquee.text;
+          } else {
+            let text = '';
+            if (join_info.join_id) {
+              text = `${join_info.join_id}-${join_info.nickname}`;
+            } else {
+              if (localStorage.getItem('userInfo')) {
+                text = localStorage.getItem('userInfo').nick_name;
+              } else {
+                text = '';
+              }
+            }
+            marqueeText = `${this.marquee.text}-${text}`;
+          }
+          playerParams.marqueeOption = {
+            enable: true,
+            text: marqueeText, // 跑马灯的文字
+            alpha: this.marquee.alpha, // 透明度,100完全显示,0 隐藏
+            size: this.marquee.size, // 文字大小
+            color: this.marquee.color, // 文字颜色
+            interval: this.marquee.scroll_type == 1 ? this.marquee.interval : 1, // 下次跑马灯开始与本次结束的时间间隔 ， 秒为单位
+            speed: this.marquee.speed || 6000, // 跑马灯移动速度:3000快,6000中,10000慢
+            displayType: this.marquee.scroll_type == 1 ? 0 : 1,
+            position: this.marquee.position // 跑马灯位置 , 1 随机 2上,3中 4下
+          };
+        }
+        // 水印
+        if (this.water && this.water.watermark_open == 1) {
+          const alianMap = new Map([
+            [1, 'tl'],
+            [2, 'tr'],
+            [3, 'br'],
+            [4, 'bl']
+          ]);
+          const align = alianMap.get(parseInt(this.water.img_position));
+
+          playerParams.watermarkOption = {
+            enable: true,
+            url: this.water.img_url, // 水印图片的路径
+            align, // 图片的对其方式， tl | tr | bl | br 分别对应：左上，右上，左下，右下
+            position: ['20px', '20px'], // 对应的横纵位置，支持px,vh,vw,%
+            size: ['8%'], // 水印大小，支持px,vh,vw,%
+            alpha: this.water.img_alpha
+          };
+        }
+        return playerParams;
+      },
+      getDuanxuPreview() {
+        let endTime;
+        const parsedTotalTime = parseInt(this.totalTime);
+        if (this.recordHistoryTime != '') {
+          endTime = parseFloat(this.recordHistoryTime);
+          const parsedEndTime = parseInt(this.recordHistoryTime);
+          if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
+            const seekTime = endTime < 6 ? 0 : endTime - 5;
+            if (seekTime) {
+              this.isPickupVideo = true;
+              setTimeout(() => {
+                this.isPickupVideo = false;
+              }, 5000);
+            }
+            this.setVideoCurrentTime(seekTime);
+          }
+        } else {
+          endTime = sessionStorage.getItem(this.vodOption.recordId);
+          const parsedEndTime = parseInt(endTime);
+          if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
+            const seekTime = endTime < 6 ? 0 : endTime - 5;
+            this.setVideoCurrentTime(seekTime);
+          }
+        }
+      },
       refresh() {
         console.log('11woshi我是刷新');
-      },
-      initSlider() {
-        this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {
-          this.currentTime = this.playerServer.getCurrentTime(() => {
-            console.log('获取当前视频播放时间失败----------');
-          });
-          this.sliderVal = (this.currentTime / this.totalTime) * 100;
-          // 派发播放器时间更新事件，通知章节当前播放的时间节点
-          // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, this.currentTime);
-        });
-      },
-      changeSlider(value) {
-        this.currentTime = (value / 100) * this.totalTime;
-        this.playerServer.setCurrentTime(this.currentTime, () => {
-          this.$toast('调整播放时间失败');
-        });
-      },
-      // 全屏
-      enterFullscreen() {
-        if (this.isFullscreen) {
-          this.isFullscreen = false;
-          if (
-            !(
-              document.exitFullscreen ||
-              document.mozCancelFullScreen ||
-              document.webkitExitFullscreen ||
-              document.msExitFullscreen
-            )
-          ) {
-            this.playerServer.exitFullScreen(event => {});
-          }
-          if (document.exitFullscreen) document.exitFullscreen();
-          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          else if (document.msExitFullscreen) document.msExitFullscreen();
-        } else {
-          this.isFullscreen = true;
-          const element = document.getElementById('videoWapBox');
-          if (
-            !(
-              element.requestFullscreen ||
-              element.mozRequestFullScreen ||
-              element.webkitRequestFullscreen ||
-              element.msRequestFullscreen
-            )
-          ) {
-            this.playerServer.enterFullScreen(event => {});
-          }
-          if (element.requestFullscreen) element.requestFullscreen();
-          else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
-          else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
-          else if (element.msRequestFullscreen) element.msRequestFullscreen();
-        }
       },
       handleAuth() {
         console.log('shikan试看权限');

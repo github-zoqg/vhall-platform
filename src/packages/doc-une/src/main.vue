@@ -1,7 +1,11 @@
 <template>
   <div
     class="vmp-doc-une"
-    :class="[{ 'is-watch': isWatch }, `vmp-doc-une--${displayMode}`]"
+    :class="[
+      { 'is-watch': isWatch },
+      `vmp-doc-une--${displayMode}`,
+      { 'has-stream-list': hasStreamList }
+    ]"
     v-show="showInWatch"
     ref="docWrapper"
   >
@@ -117,7 +121,13 @@
 <script>
   import VmpDocToolbar from './toolbar/main.vue';
   import screenfull from 'screenfull';
-  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useDocServer,
+    useMsgServer,
+    useGroupServer,
+    useInteractiveServer
+  } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
@@ -138,7 +148,8 @@
         displayMode: 'normal', // normal: 正常; small: 小屏 fullscreen:全屏
         keepAspectRatio: true,
         hasPager: true, // 是否有分页操作(观看端没有)
-        thumbnailShow: false // 文档缩略是否显示
+        thumbnailShow: false, // 文档缩略是否显示
+        hasStreamList: false
       };
     },
     computed: {
@@ -172,7 +183,7 @@
         return (
           this.roomBaseServer.state.clientType === 'send' ||
           (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus) ||
-          this.groupServer.state.groupInitData.join_role == 20
+          this.groupServer.state.groupInitData.isInGroup
         );
       },
       // 是否文档演示权限
@@ -181,6 +192,7 @@
       }
     },
     watch: {
+      // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
         if (newval) {
@@ -197,6 +209,14 @@
         console.log('-[doc]---大小屏变更', newval); // newval 取值 doc, stream-list
         const mode = newval === 'doc' ? 'small' : 'normal';
         this.setDisplayMode(mode);
+      },
+      // 监听流列表高度变化
+      ['interactiveServer.state.streamListHeightInWatch']: {
+        handler(newval) {
+          console.log('[doc] streamListHeight:', newval);
+          this.hasStreamList = newval < 1 ? false : true;
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -204,6 +224,7 @@
       this.docServer = useDocServer();
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
+      this.interactiveServer = useInteractiveServer();
     },
     methods: {
       /**
@@ -244,6 +265,7 @@
         }
         await this.$nextTick();
         // 文档大小的改变，会自动触发 erd.listenTo 事件;
+        this.resize();
       },
       /**
        * 屏幕缩放
@@ -284,7 +306,10 @@
         }
         this.docViewRect = { width: w, height: h };
         // console.log('[doc] this.docViewRect:', this.docViewRect);
-        if (this.docServer.state.currentCid) {
+        if (
+          this.docServer.state.currentCid &&
+          document.getElementById(this.docServer.state.currentCid)
+        ) {
           this.docServer.setSize(w, h);
         }
       },
@@ -292,6 +317,24 @@
        * 初始化各种事件
        */
       initEvents() {
+        if (this.isWatch) {
+          // 观看端事件
+          // 文档是否可见状态变化事件
+          this.$on('dispatch_doc_switch_change', val => {
+            if (val) {
+              this.recoverLastDocs();
+            }
+          });
+
+          // 直播结束
+          this.msgServer.$on('live_over', () => {
+            console.log('[doc]---直播结束---');
+            this.hasStreamList = 0;
+          });
+        } else {
+          // 主持端事件
+        }
+
         // 监控文档区域大小改变事件
         let erd = elementResizeDetectorMaker();
         erd.listenTo(this.$refs.docWrapper, throttle(this.resize, 200));
@@ -314,31 +357,6 @@
           }
         });
 
-        this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
-          // if (this.hasDocPermission) return;
-          console.log('==========控制文档开关=============', status);
-          this.docServer.state.switchStatus = status === 'on';
-          if (this.isWatch && this.docServer.state.switchStatus) {
-            this.recoverLastDocs();
-          }
-        });
-
-        this.docServer.on(VHDocSDK.Event.DELETE_CONTAINER, data => {
-          // if (this.roleName != 1 && this.liveStatus != 1) {
-          //   return;
-          // }
-          console.log('=========删除容器=============', data);
-          // const index = this.cids.indexOf(data.id);
-          // if (index > -1) {
-          //   this.cids.splice(index, 1);
-          //   this.docServer.destroyContainer({ id: data.id });
-          // }
-          // if (this.currentCid == data.id) {
-          //   this.currentCid = '';
-          //   this.docInfo.docShowType = '';
-          // }
-        });
-
         //
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
@@ -356,41 +374,6 @@
             console.log('[doc] cid:', cid);
             this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
           }
-        });
-
-        this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
-          if (this.isWatch && !this.showInWatch) return;
-          // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
-          //   return;
-          // }
-          console.log('===========创建容器===========', data);
-          const { id: cid, docId } = data;
-          if (this.docServer.state.containerList.findIndex(item => item.cid === data.id) > -1) {
-            return;
-          }
-          this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-        });
-
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
-          //   return;
-          // }
-          console.log('[doc] ===========选择容器======', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          this.docServer.state.currentCid = data.id;
-          // 判断容器是否存在
-          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-          if (currentItem) {
-            this.docServer.activeContainer(data.id);
-          } else {
-            const { id: cid, docId } = data;
-            console.log('[doc] cid:', cid);
-            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-          }
-        });
-
-        this.msgServer.$on('DOC_MSG', msg => {
-          console.log('------DOC_MSG-----文档消息：', msg);
         });
       },
       /**
@@ -616,6 +599,7 @@
       }
     },
     mounted() {
+      console.log('[doc] this.docServer.state.switchStatus:', this.docServer.state.switchStatus);
       // 初始化事件
       this.initEvents();
       // 清空
@@ -813,6 +797,10 @@
       min-height: auto;
     }
 
+    &.vmp-doc-une--normal.has-stream-list {
+      top: 80px;
+    }
+
     //small模式
     &.vmp-doc-une--small {
       position: absolute;
@@ -822,10 +810,6 @@
       top: 0;
       right: 0;
       z-index: 10;
-    }
-
-    // 全屏模式
-    &.vmp-doc-une--fullscreen {
     }
 
     .vmp-doc-toolbar {

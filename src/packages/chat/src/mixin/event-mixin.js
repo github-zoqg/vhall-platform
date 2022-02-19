@@ -66,10 +66,10 @@ const eventMixin = {
           // 发起抽奖
           if (msg.type === 'lottery_push' && [2, '2'].includes(this.roleName)) {
             const data = new Msg({
-              nickname: '抽奖',
+              nickname: this.$t('interact_tools.interact_tools_1003'),
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '正在进行抽奖环节'
+                text_content: this.$t('interact_tools.interact_tools_1021')
               },
               interactStatus: true,
               type: msg.type
@@ -102,8 +102,8 @@ const eventMixin = {
                         content: {
                           text_content:
                             res.data.lottery_status == 1 && res.data.win == 1
-                              ? '恭喜您中奖了！'
-                              : '很遗憾，您没有中奖！',
+                              ? this.$t('interact_tools.interact_tools_1023')
+                              : this.$t('interact_tools.interact_tools_1022'),
                           msg: msg,
                           userId: this.userId,
                           Show: res.data.lottery_status == 1 && res.data.win == 1
@@ -132,7 +132,10 @@ const eventMixin = {
               nickname: '',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: index >= 0 ? '恭喜您中奖了！' : '很遗憾，您没有中奖！',
+                text_content:
+                  index >= 0
+                    ? this.$t('interact_tools.interact_tools_1023')
+                    : this.$t('interact_tools.interact_tools_1022'),
                 msg: msg,
                 userId: this.userId,
                 Show: index >= 0
@@ -156,7 +159,7 @@ const eventMixin = {
               content: {
                 text_content: msg.data.reward_describe
                   ? msg.data.reward_describe
-                  : '很精彩，赞一个！',
+                  : this.$t('chat.chat_1037'),
                 num: msg.data.reward_amount
               },
               sendId: this.userId,
@@ -192,7 +195,7 @@ const eventMixin = {
               nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '开启了问答'
+                text_content: this.$t('chat.chat_1026')
               },
               roleName: msg.data.role_name,
               type: msg.type,
@@ -205,10 +208,10 @@ const eventMixin = {
           if (msg.type === 'question_answer_close') {
             EventBus.$emit('close_qa');
             const data = new Msg({
-              nickname: '问答',
+              nickname: this.$t('common.common_1004'),
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: `${msg.nick_name}关闭了问答`
+                text_content: `${msg.nick_name}${this.$t('chat.chat_1081')}`
               },
               type: msg.type,
               interactStatus: true
@@ -222,7 +225,7 @@ const eventMixin = {
               nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '发起了问卷',
+                text_content: this.$t('chat.chat_1030'),
                 questionnaire_id: msg.questionnaire_id
               },
               roleName: msg.data.room_role,
@@ -239,7 +242,7 @@ const eventMixin = {
               nickname: msg.data.sign_creator_nickname,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '发起了签到'
+                text_content: this.$t('chat.chat_1027')
               },
               type: msg.type,
               interactStatus: true
@@ -248,13 +251,13 @@ const eventMixin = {
           }
           // 结束签到
           if (msg.type === 'sign_end') {
-            const text = msg.data.sign_creator_nickname || '主持人';
+            const text = msg.data.sign_creator_nickname || this.$t('chat.chat_1022');
             const data = new Msg({
               roleName: msg.role_name,
               nickname: text,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '结束了签到'
+                text_content: this.$t('chat.chat_1028')
               },
               type: msg.type,
               interactStatus: true
@@ -265,10 +268,10 @@ const eventMixin = {
           if (msg.type === 'timer_start') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickname: '计时器',
+              nickname: '计时器', // TODO: 缺翻译
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: `${text}发起了计时器`
+                text_content: `${text}发起了计时器` // TODO：缺翻译
               },
               type: msg.type,
               interactStatus: true
@@ -386,7 +389,7 @@ const eventMixin = {
               content: {
                 text_content: msg.data.reward_describe
                   ? msg.data.reward_describe
-                  : '很精彩，赞一个！',
+                  : this.$t('chat.chat_1037'),
                 num: msg.data.reward_amount
               },
               sendId: this.userId,
@@ -477,7 +480,12 @@ const eventMixin = {
         }
       });
       EventBus.$on('timer_pause', msg => {
-        const text = msg.data.role_name == 3 ? '助理' : msg.data.role_name == 1 ? '主持人' : '嘉宾';
+        const text =
+          msg.data.role_name == 3
+            ? this.$t('chat.chat_1024')
+            : msg.data.role_name == 1
+            ? this.$t('chat.chat_1022')
+            : this.$t('chat.chat_1023');
         const data = new Msg({
           nickname: '计时器',
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',

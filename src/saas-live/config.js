@@ -49,26 +49,30 @@ export const serverConfig = {
     children: [
       // 'comMemberList'
       // 'comChat',
-      'comTabMenu',
-      'comTabContent'
+      'comTabMenu'
     ]
   },
   /*** 布局定义end */
 
   comTabMenu: {
     component: 'VmpTabMenu',
-    handleSelect: [
-      {
-        cuid: ['comTabContent'],
-        method: 'switchTo',
-        args: ['$0', '$1', '$2']
-      }
-    ]
-  },
-
-  comTabContent: {
-    component: 'VmpTabContainer',
-    children: ['comChat', 'comNotice', 'comMemberList', 'comRecommend', 'comCustomMenu']
+    options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
+        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
+        { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
+        { type: 'notice', cuid: 'comNotice', text: '公告' },
+        // { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
+        { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
+        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
+      ]
+    }
   },
 
   /*** 所有弹窗集合 */
@@ -283,7 +287,7 @@ export const serverConfig = {
   comGroupMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'vh-saas-iconfont vh-saas-a-color-groupinglive',
+      icon: 'vh-iconfont vh-line-group',
       text: 'aside_menu.aside_menu_1008',
       kind: 'group',
       disable: true
@@ -521,14 +525,7 @@ export const serverConfig = {
     component: 'VmpRebroadcast'
   },
   comRecommend: {
-    component: 'VmpRecommend',
-    addTab: [
-      {
-        cuid: ['comTabMenu'],
-        method: 'addItemByIndex',
-        args: ['$0', '$1']
-      }
-    ]
+    component: 'VmpRecommend'
   },
   comLottery: {
     component: 'VmpLotteryLive'

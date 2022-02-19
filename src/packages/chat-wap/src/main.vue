@@ -7,7 +7,7 @@
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
-          查看聊天历史消息
+          {{ $t('chat.chat_1058') }}
         </span>
       </p>
       <scroll ref="scroll" @pullingDown="handlePullingDown">
@@ -30,14 +30,15 @@
             !((messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal)
           "
         >
-          有{{ newMsgNum }}条未读消息
+          {{ $t('chat.chat_1035', newMsgNum) }}
         </span>
         <span
           v-if="(messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal"
         >
-          有人{{ messageType.atList ? '@' : '' }}{{ messageType.reply ? '回复' : '' }} 你
+          {{ $t('chat.chat_1034') }}{{ messageType.atList ? '@' : ''
+          }}{{ messageType.reply ? $t('chat.chat_1036') : '' }} {{ $t('chat.chat_1059') }}
         </span>
-        <i class="iconfont iconxiangxia"></i>
+        <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
     <send-box
@@ -48,6 +49,7 @@
       :noChatLogin="noChatLogin"
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
+      @showUserPopup="showUserPopup"
     ></send-box>
   </div>
 </template>
@@ -59,7 +61,7 @@
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from './images/default_avatar.png';
-  import { browserType } from '@/packages/app-shared/utils/tool';
+  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpChatWap',
     components: {
@@ -278,6 +280,9 @@
           noNormal: false
         };
         this.newMsgNum = 0;
+      },
+      showUserPopup() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
       }
     }
   };
@@ -319,7 +324,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        .iconfont {
+        .vh-iconfont {
           font-size: 16px;
           margin-left: 19px;
         }

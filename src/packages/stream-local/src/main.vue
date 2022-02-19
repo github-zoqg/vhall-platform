@@ -174,15 +174,22 @@
 
       // 上麦成功
       this.micServer.$on('vrtc_connect_success', async msg => {
+        console.log('上麦成功', msg);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          // 如果成功，销毁播放器
-          this.playerServer.destroy();
-
-          // 实例化互动实例
-          await this.interactiveServer.init();
-
-          // 开始推流
-          this.startPush();
+          if (
+            this.joinInfo.role_name == 3 ||
+            (this.joinInfo.role_name == 1 && !this.localStream.streamId)
+          ) {
+            // 开始推流
+            this.startPush();
+          } else if (this.joinInfo.role_name == 2) {
+            // 如果成功，销毁播放器
+            this.playerServer.destroy();
+            // 实例化互动实例
+            await this.interactiveServer.init();
+            // 开始推流
+            this.startPush();
+          }
         }
       });
       // 下麦成功
@@ -205,6 +212,13 @@
       }
     },
     methods: {
+      sleep(time = 1000) {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve(true);
+          }, time);
+        });
+      },
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
@@ -253,8 +267,7 @@
           throw new Error('代码错误');
         }
       },
-
-      // 开始推流，不设置旁路，主持人之外的其他角色用
+      // 开始推流
       async startPush() {
         try {
           // 创建本地流
@@ -264,9 +277,10 @@
           // 实时获取网络状况
           this.getLevel();
 
-          // TODO 配置主屏条件
-          // 配置旁路主屏
-          await this.setBroadCastScreen();
+          // 主持人配置旁路主屏
+          if (this.joinInfo.role_name == 1) {
+            await this.setBroadCastScreen();
+          }
           // 派发事件
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickPublishComplate')
@@ -278,33 +292,24 @@
       // 创建本地流
       async createLocalStream() {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
-        switch (this.$domainStore.state.mediaSettingServer.videoType) {
-          case 'camera':
-            await this.interactiveServer
-              .createLocalVideoStream({
-                videoNode: `stream-${this.joinInfo.third_party_user_id}`
-              })
-              .catch(() => 'createLocalStreamError');
-            break;
-          case 'pictrue':
-            await (() => {
-              setTimeout(() => {}, 1000);
-            })();
-            // eslint-disable-next-line no-case-declarations
-            let videoTracks = await this.$refs.imgPushStream.getCanvasStream();
-            if (!videoTracks) {
-              throw 'getCanvasStreamError';
-            }
-            await this.interactiveServer
-              .createLocalPhotoStream({
-                videoNode: `stream-${this.joinInfo.third_party_user_id}`,
-                videoTrack: videoTracks
-              })
-              .catch(() => 'createLocalPhotoStreamError');
-            break;
-
-          default:
-            break;
+        if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          await this.interactiveServer
+            .createLocalVideoStream({
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`
+            })
+            .catch(() => 'createLocalStreamError');
+        } else {
+          await this.sleep();
+          const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
+          if (!videoTracks) {
+            throw 'getCanvasStreamError';
+          }
+          await this.interactiveServer
+            .createLocalPhotoStream({
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`,
+              videoTrack: videoTracks
+            })
+            .catch(() => 'createLocalPhotoStreamError');
         }
       },
       // 推流
