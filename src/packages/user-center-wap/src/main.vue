@@ -1,36 +1,83 @@
 <template>
   <div class="vmp-user-center-wap">
-    <van-popup v-model="show" position="bottom">
-      <van-cell title="单元格" icon="location-o" />
-      <van-cell title="单元格" icon="location-o" />
+    <van-popup
+      class="user-advatar-popup"
+      v-model="visible"
+      position="bottom"
+      safe-area-inset-bottom
+    >
+      <div class="user-menu-item" @click="changeUserState">
+        <div class="user-menu-box">
+          <i class="vh-iconfont vh-line-account"></i>
+        </div>
+        <p>{{ $t('account.account_1001') }}</p>
+      </div>
+      <div class="user-menu-item" @click="changeCashState">
+        <div class="user-menu-box">
+          <i class="vh-iconfont vh-a-line-financialcenter"></i>
+        </div>
+        <p>{{ $t('nav.nav_1028') }}</p>
+      </div>
     </van-popup>
   </div>
 </template>
 
 <script>
-  import { useUserServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpUserCenterWap',
     data() {
       return {
-        show: true
+        visible: true
       };
-    },
-    created() {
-      const obj = useUserServer();
-      // obj.getUserInfo();
-      console.log('+++++++++++++++++++++', obj);
     },
     methods: {
       openUserCenterWap() {
-        this.show = true;
+        this.visible = true;
       },
 
       closeUserCenterWap() {
-        this.show = false;
+        this.visible = false;
+      },
+
+      // 打开个人资料
+      changeUserState() {
+        console.log('changeUserState');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
+      },
+
+      // 打开提现管理
+      changeCashState() {
+        console.log('changeCashState');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
       }
     }
   };
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+  .vmp-user-center-wap {
+    .user-advatar-popup {
+      box-sizing: border-box;
+      padding: 20px 30px 40px 30px;
+      .user-menu-item {
+        text-align: left;
+        margin-top: 0;
+        height: 88px;
+        line-height: 88px;
+        i.vh-iconfont {
+          font-size: 48px;
+        }
+        .user-menu-box {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: 20px;
+        }
+        p {
+          display: inline-block;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+</style>
