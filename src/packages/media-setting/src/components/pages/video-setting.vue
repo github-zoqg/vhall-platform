@@ -100,7 +100,7 @@
       // this.setDefaultVideoType();
     },
     beforeDestroy() {
-      this.destroyStream();
+      // this.destroyStream();
     },
     methods: {
       // setDefaultVideoType() {

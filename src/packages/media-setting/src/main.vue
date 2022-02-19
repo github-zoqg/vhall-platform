@@ -11,7 +11,6 @@
     >
       <media-setting
         v-if="isShow"
-        @submit="isShow = false"
         @showConfirm="showConfirm"
         @closeDlg="isShow = false"
       ></media-setting>
@@ -62,20 +61,23 @@
       showMediaSetting() {
         this.isShow = true;
       },
-      showConfirm(text) {
+      showConfirm(text, cb, context) {
         this.alertText = text;
         this.isConfirmVisible = true;
+        this._confirmCb = cb;
+        this._confirmCbContext = context;
       },
       closeConfirm() {
         this.alertText = '修改设置后会导致重新推流，是否继续保存？'; // reset default
         this.isConfirmVisible = false;
       },
-      saveSetting() {
-        // TODO: 开播才弹出对话框
-        this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
-      },
+      // saveSetting() {
+      //   // TODO: 开播才弹出对话框
+      //   this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
+      // },
       confirmSave() {
         this.isConfirmVisible = false;
+        this._confirmCb && this._confirmCb.call(this._confirmCbContext);
       }
     }
   };

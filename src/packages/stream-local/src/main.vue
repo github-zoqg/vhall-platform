@@ -212,6 +212,13 @@
       }
     },
     methods: {
+      sleep(time = 1000) {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve(true);
+          }, time);
+        });
+      },
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
@@ -292,6 +299,7 @@
             })
             .catch(() => 'createLocalStreamError');
         } else {
+          await this.sleep();
           const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
           if (!videoTracks) {
             throw 'getCanvasStreamError';
