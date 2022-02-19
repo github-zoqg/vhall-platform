@@ -118,6 +118,14 @@
         this.docServer.zoomReset();
       },
       initEvents() {
+        // 文档是否可见状态变化事件
+        this.docServer.$on('dispatch_doc_switch_change', val => {
+          if (val) {
+            this.recoverLastDocs();
+          }
+        });
+        //
+
         // 全屏/退出全屏事件
         screenfull.onchange(() => {
           // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
@@ -128,33 +136,6 @@
           }
         });
 
-        this.docServer.on(VHDocSDK.Event.SWITCH_CHANGE, status => {
-          // if (this.hasDocPermission) return;
-          console.log('==========控制文档开关=============', status);
-          this.docServer.state.switchStatus = status === 'on';
-          console.log('this.$parent:', this.$parent);
-          if (this.docServer.state.switchStatus) {
-            this.recoverLastDocs();
-          }
-        });
-
-        this.docServer.on(VHDocSDK.Event.DELETE_CONTAINER, data => {
-          // if (this.roleName != 1 && this.liveStatus != 1) {
-          //   return;
-          // }
-          console.log('=========删除容器=============', data);
-          // const index = this.cids.indexOf(data.id);
-          // if (index > -1) {
-          //   this.cids.splice(index, 1);
-          //   this.docServer.destroyContainer({ id: data.id });
-          // }
-          // if (this.currentCid == data.id) {
-          //   this.currentCid = '';
-          //   this.docInfo.docShowType = '';
-          // }
-        });
-
-        //
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           console.log('[doc] ===========选择容器======', data);
           // this.docInfo.docShowType = data.id.split('-')[0];
@@ -168,18 +149,6 @@
             console.log('[doc] cid:', cid);
             this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
           }
-        });
-
-        this.docServer.on(VHDocSDK.Event.CREATE_CONTAINER, data => {
-          // if ((this.roleName != 1 && this.liveStatus != 1) || this.cids.includes(data.id)) {
-          //   return;
-          // }
-          console.log('===========创建容器===========', data);
-          // const { id: cid, docId } = data;
-          // if (this.docServer.state.containerList.findIndex(item => item.cid === data.id) > -1) {
-          //   return;
-          // }
-          // this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
         });
       },
 
@@ -210,7 +179,10 @@
         }
         this.docViewRect = { width: w, height: h };
         console.log('[doc] this.docViewRect:', this.docViewRect);
-        if (this.docServer.state.currentCid) {
+        if (
+          this.docServer.state.currentCid &&
+          document.getElementById(this.docServer.state.currentCid)
+        ) {
           this.docServer.setSize(w, h);
         }
       },
