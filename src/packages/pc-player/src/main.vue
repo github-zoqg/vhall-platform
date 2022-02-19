@@ -1,11 +1,7 @@
 <template>
-  <div
-    class="vmp-player"
-    :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
-    v-if="isShowPlayer"
-  >
-    <div class="vmp-player-box">
-      <div class="vmp-player-container">
+  <div class="vmp-player" :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]">
+    <div :class="{ 'vmp-player-box': displayMode != 'mini' }">
+      <div :class="{ 'vmp-player-container': displayMode != 'mini' }">
         <div id="vmp-player" class="vmp-player-watch">
           <div class="vmp-player-living">
             <div
@@ -13,28 +9,45 @@
               class="vmp-player-living-background"
               :style="`backgroundImage: url('${webinarsBgImg}')`"
             ></div>
-            <div class="vmp-player-living-btn" v-if="!isLiving">
-              <div @click="startPlay"><i class="vh-iconfont vh-line-video-play"></i></div>
+            <div class="vmp-player-living-btn" v-if="!isPlayering">
+              <div
+                :class="
+                  displayMode == 'mini'
+                    ? 'vmp-player-living-btn-mini'
+                    : 'vmp-player-living-btn-normal'
+                "
+                @click="startPlay"
+              >
+                <i class="vh-iconfont vh-line-video-play"></i>
+              </div>
             </div>
-            <!-- <div class="vmp-player-living-end">
-              <div class="vmp-player-living-end-img">
+            <div class="vmp-player-living-end" v-if="isLivingEnd">
+              <div
+                :class="
+                  displayMode == 'mini' ? 'vmp-player-living-end-mini' : 'vmp-player-living-end-img'
+                "
+              >
                 <img src="../src/images/liveEnd.png" alt="" />
               </div>
-              <h1>重新播放</h1>
-            </div> -->
+              <h1>直播已结束</h1>
+            </div>
             <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
               <div>语音播放中</div>
             </div>
           </div>
           <!-- 控制条 进度条、弹幕、全屏、时间等 -->
-          <div class="vmp-player-controller" v-if="!isShowPoster">
+          <div
+            :class="displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'"
+            v-if="!isShowPoster"
+          >
             <!-- 进度条 -->
-            <div class="vmp-player-controller-slider" v-if="!isLive">
+            <div class="controller_slider" v-if="!isLiving && playerOtherOptions.progress_bar">
               <el-slider
                 ref="controllerRef"
+                class="slider_controller"
                 v-model="sliderVal"
                 :show-tooltip="false"
-                @change="setVideo"
+                @change="changeVideo"
               ></el-slider>
             </div>
             <div
@@ -52,25 +65,29 @@
                 @showLabel="showLabelFun"
               ></controlEventPoint>
             </div>
-            <div class="vmp-player-controller-tools">
-              <div class="vmp-player-controller-tools-left">
-                <div class="vmp-player-controller-tools-left-start" @click="startPlay">
-                  <i :class="`iconfont ${isLiving ? 'iconzanting_icon' : 'iconbofang_icon'}`"></i>
+            <div class="controller-tools">
+              <div class="controller-tools-left">
+                <div class="controller-tools-left-start" @click="startPlay">
+                  <i
+                    :class="`vh-iconfont ${
+                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
+                    }`"
+                  ></i>
                 </div>
-                <div class="vmp-player-controller-tools-left-time" v-if="!isLive">
-                  <span class="vmp-player-controller-tools-left-time-current">
+                <div class="controller-tools-left-time" v-if="!isLiving">
+                  <span class="controller-tools-left-time-current">
                     {{ secondToDate(currentTime) }}
                   </span>
                   <span>/</span>
-                  <span class="vmp-player-controller-tools-left-time-total">
+                  <span class="controller-tools-left-time-total">
                     {{ secondToDate(totalTime) }}
                   </span>
                 </div>
               </div>
-              <div class="vmp-player-controller-tools-right">
-                <div class="vmp-player-controller-tools-right-quality">
+              <div class="controller-tools-right">
+                <div class="controller-tools-right-quality">
                   <span>{{ formatQualityText(currentQualitys.def) }}</span>
-                  <ul class="vmp-player-controller-tools-right-list">
+                  <ul class="controller-tools-right-list">
                     <li
                       v-for="(item, index) in qualitysList"
                       :class="{ 'vmp-player-li-active': currentQualitys.def == item.def }"
@@ -81,11 +98,11 @@
                     </li>
                   </ul>
                 </div>
-                <div class="vmp-player-controller-tools-right-speed" v-if="!isLive">
+                <div class="controller-tools-right-speed" v-if="!isLiving">
                   <span>
                     {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
                   </span>
-                  <ul class="vmp-player-controller-tools-right-list">
+                  <ul class="controller-tools-right-list">
                     <li
                       v-for="(val, index) in UsableSpeed"
                       :class="{ 'vmp-player-li-active': currentSpeed == val }"
@@ -96,14 +113,12 @@
                     </li>
                   </ul>
                 </div>
-                <div class="vmp-player-controller-tools-right-volume">
+                <div class="controller-tools-right-volume">
                   <i
-                    :class="`iconfont ${
-                      voice > 0 ? 'iconyinliang_icon' : 'iconyinliangguanbi_icon'
-                    }`"
+                    :class="`vh-iconfont ${voice > 0 ? 'vh-line-voice' : 'vh-line-mute'}`"
                     @click="jingYin"
                   ></i>
-                  <div class="vmp-player-controller-tools-right-volume-slider">
+                  <div class="controller-tools-right-volume-slider">
                     <el-slider
                       v-model="voice"
                       vertical
@@ -112,18 +127,18 @@
                     ></el-slider>
                   </div>
                 </div>
-                <div class="vmp-player-controller-tools-right-danmuis">
+                <div class="controller-tools-right-danmuis">
                   <i
-                    :class="`iconfont ${
-                      danmuIsOpen ? 'iconicon-pcdanmukaiqi-011' : 'iconicon-pcdanmuguanbi'
+                    :class="`vh-iconfont ${
+                      danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
                     }`"
                     @click="openBarrage"
                   ></i>
                 </div>
-                <div class="vmp-player-controller-tools-right-fullscroll">
+                <div class="controller-tools-right-fullscroll">
                   <i
-                    :class="`iconfont ${
-                      isFullscreen ? 'iconicon_quxiaoquanping' : 'iconicon_quanping'
+                    :class="`vh-iconfont ${
+                      isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
                     }`"
                     @click="enterFullscreen"
                   ></i>
@@ -146,7 +161,7 @@
               倍速
             </div>
           </div>
-          <!-- 试看和断点续播提示 -->
+          <!-- 试看和断点续播提示 v-if="displayMode != 'mini'" -->
           <div class="vmp-player-tips-prew">
             <!-- 试看 -->
             <div v-if="vodType === 'shikan' && isTryPreview">
@@ -159,14 +174,14 @@
                 <b>邀请码</b>
               </span>
               <span v-else>{{ authText }}</span>
-              <i class="iconfont iconguanbichabo_icon" @click="vodType = ''"></i>
+              <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
             </div>
             <!-- 断点续播 -->
-            <div v-if="isPickupVideo">
+            <div v-if="isPickupVideo && currentTime > 0">
               上次观看至
               <b>{{ secondToDate(currentTime) }}</b>
               ，已为您自动续播
-              <i class="iconfont iconguanbichabo_icon" @click="isPickupVideo = false"></i>
+              <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
             </div>
           </div>
         </div>
@@ -192,10 +207,8 @@
         playerState,
         roomBaseState: null,
         isMini: false,
-        isShowPlayer: true,
+        isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
-        isLiving: false, // 是否是播放状态
-        isLive: false, // 是否是直播
         vodType: '', //回放的类型 暖场视频还是还是试看
         liveOption: {}, //直播时播放器liveOption参数
         vodOption: {}, //回放时回放id
@@ -223,6 +236,8 @@
         recordHistoryTime: '', // 记录播放的时间
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
+        isLivingEnd: false, // 直播结束
+        isVodEnd: false, // 回放结束
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -245,6 +260,10 @@
       //判断是否是音频直播模式
       isAudio() {
         return this.roomBaseState.watchInitData.webinar.mode == 1;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
       // 背景图片
       webinarsBgImg() {
@@ -388,7 +407,7 @@
             this.eventPointList = this.playerServer.state.markPoints;
             this.playerServer.openControls(false);
             this.playerServer.openUI(false);
-            if (this.isLive) {
+            if (this.isLiving) {
               resolve();
             } else {
               this.playerServer.$on(VhallPlayer.LOADED, () => {
@@ -474,7 +493,7 @@
         return playerParams;
       },
       startPlay() {
-        this.isLiving ? this.pause() : this.play();
+        this.isPlayering ? this.pause() : this.play();
       },
       // 播放
       play() {
@@ -484,10 +503,26 @@
       pause() {
         this.playerServer && this.playerServer.pause();
       },
-      setVideo() {
+      initPlayerOtherInfo() {
+        const { webinar } = this.roomBaseState.watchInitData;
+        this.playerServer
+          .getPlayerConfig({
+            webinar_id: webinar.id,
+            tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.definitionConfig = res.data.definition.data.default_definition;
+              this.marquee = res.data['screen-config'].data;
+              this.waterInfo = res.data['water-mark'].data;
+              this.playerOtherOptions = res.data['basic-config'].data;
+            }
+          });
+      },
+      changeVideo() {
         const time = (this.sliderVal / 100) * this.totalTime; // 快进
         this.setVideoCurrentTime(time);
-
+        this.setTime();
         this.play();
       },
       // 判断是直播还是回放 活动状态
@@ -496,7 +531,6 @@
         if (this.roomBaseState.watchInitData.status === 'live') {
           if (webinar.type === 1) {
             // 直播
-            this.isLive = true;
             this.optionTypeInfo('live');
           } else if (webinar.type === 5) {
             // 回放
@@ -520,6 +554,10 @@
           }
           // 暖场视频或者试看
           this.optionTypeInfo('vod', _id);
+        }
+        // 暖场视频或者试看
+        if (!this.isWarnPreview) {
+          this.initPlayerOtherInfo();
         }
       },
       optionTypeInfo(type, id) {
@@ -648,8 +686,6 @@
         justify-content: center;
         z-index: 9;
         div {
-          width: 88px;
-          height: 88px;
           background: rgba(0, 0, 0, 0.4);
           border-radius: 50%;
           display: flex;
@@ -657,9 +693,23 @@
           justify-content: center;
           cursor: pointer;
           i {
-            font-size: 34px;
             color: #e6e6e6;
             opacity: 1;
+          }
+        }
+        &-normal {
+          width: 88px;
+          height: 88px;
+
+          i {
+            font-size: 34px;
+          }
+        }
+        &-mini {
+          width: 50px;
+          height: 50px;
+          i {
+            font-size: 18px;
           }
         }
       }
@@ -679,6 +729,16 @@
         &-img {
           width: 164px;
           height: 120px;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
+        }
+        &-mini {
+          width: 120px;
+          height: 80px;
 
           img {
             width: 100%;
@@ -723,7 +783,7 @@
       box-sizing: border-box;
       background: rgba(0, 0, 0, 0.7);
       transition: all 0.8s;
-      &-slider {
+      .controller_slider {
         position: absolute;
         top: -4px;
         width: 100%;
@@ -759,13 +819,13 @@
           }
         }
       }
-      &-tools {
+      .controller-tools {
         height: 38px;
         display: flex;
         line-height: 38px;
         justify-content: space-between;
         font-size: 14px;
-        .iconfont {
+        .vh-iconfont {
           font-size: 20px;
           color: @font-error-low;
           cursor: pointer;
@@ -801,7 +861,7 @@
             position: relative;
             color: @font-error-low;
           }
-          .iconfont {
+          .vh-iconfont {
             font-size: 18px;
             &:hover {
               color: @font-error;
@@ -847,7 +907,7 @@
             position: relative;
             cursor: pointer;
             &:hover {
-              .vmp-player-controller-tools-right-volume-slider {
+              .controller-tools-right-volume-slider {
                 display: block;
               }
             }
@@ -872,6 +932,180 @@
                 height: 12px;
                 top: 10px;
                 left: 12px;
+                border: 0;
+                background-color: @bg-error-light;
+                box-shadow: 0 0 10px @bg-error-light;
+              }
+            }
+          }
+        }
+      }
+    }
+    &-controllerMini {
+      position: absolute;
+      // bottom: -48px;
+      bottom: 3px;
+      z-index: 10;
+      width: 100%;
+      height: 38px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.7);
+      transition: all 0.8s;
+      .controller_slider {
+        position: absolute;
+        top: -4px;
+        width: 100%;
+        left: 0;
+        .el-slider__runway {
+          margin: 0;
+          height: 2px;
+          background-color: rgba(255, 255, 255, 0.3);
+        }
+        .el-slider__bar {
+          height: 2px;
+          background-color: @bg-error-light;
+        }
+        .el-slider__button {
+          width: 5px;
+          height: 5px;
+          border: 0;
+          position: absolute;
+          top: 13px;
+          left: 16px;
+          background-color: @bg-error-light;
+          box-shadow: 0 0 10px @bg-error-light;
+        }
+        &:hover {
+          .el-slider__runway,
+          .el-slider__bar {
+            height: 5px;
+          }
+          .el-slider__button {
+            width: 10px;
+            height: 10px;
+            transform: scale(1) !important;
+          }
+        }
+      }
+      .controller-tools {
+        height: 38px;
+        display: flex;
+        line-height: 38px;
+        justify-content: space-between;
+        font-size: 14px;
+        .vh-iconfont {
+          font-size: 14px;
+          color: @font-error-low;
+          cursor: pointer;
+          &:hover {
+            color: @font-error-low;
+          }
+        }
+        &-left {
+          padding-left: 12px;
+          display: flex;
+          color: @font-error-low;
+          > div {
+            padding-right: 5px;
+          }
+          &-time {
+            color: @font-error-low;
+            &-current {
+              display: inline-block;
+              min-width: 40px;
+              height: 40px;
+              max-width: 56px;
+              line-height: 40px;
+              font-size: 12px;
+            }
+            &-total {
+              color: @font-light-low;
+              font-size: 12px;
+            }
+          }
+        }
+        &-right {
+          display: flex;
+          > div {
+            padding-right: 12px;
+            position: relative;
+            color: @font-error-low;
+            font-size: 12px;
+          }
+          .vh-iconfont {
+            font-size: 14px;
+            &:hover {
+              color: @font-error;
+            }
+          }
+          span {
+            &:hover {
+              cursor: pointer;
+              color: @font-error;
+            }
+          }
+          &-quality,
+          &-speed {
+            &:hover {
+              .controller-tools-right-list {
+                display: block;
+              }
+            }
+          }
+          &-list {
+            list-style: none;
+            position: absolute;
+            bottom: 100%;
+            left: -45%;
+            width: 55px;
+            padding: 5px 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 4px;
+            line-height: 25px;
+            font-size: 12px;
+            display: none;
+            li {
+              text-align: center;
+              cursor: pointer;
+              &:hover {
+                color: @font-error;
+              }
+            }
+            .vmp-player-li-active {
+              color: @font-error;
+            }
+          }
+          &-volume {
+            position: relative;
+            cursor: pointer;
+            &:hover {
+              .controller-tools-right-volume-slider {
+                display: block;
+              }
+            }
+            &-slider {
+              width: 30px;
+              position: absolute;
+              bottom: 100%;
+              left: -20%;
+              background-color: rgba(0, 0, 0, 0.7);
+              display: none;
+              border-radius: 4px;
+              .is-vertical .el-slider__runway {
+                margin: 10px auto 10px;
+                width: 4px;
+                background-color: rgba(255, 255, 255, 0.3);
+              }
+              .el-slider__bar {
+                width: 4px;
+                background-color: @bg-error-light;
+              }
+              .el-slider__button {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                top: 10px;
+                left: 13px;
                 border: 0;
                 background-color: @bg-error-light;
                 box-shadow: 0 0 10px @bg-error-light;
@@ -923,7 +1157,7 @@
           color: @font-error;
           cursor: pointer;
         }
-        .iconfont {
+        .vh-iconfont {
           font-size: 20px;
           padding-left: 12px;
           vertical-align: middle;

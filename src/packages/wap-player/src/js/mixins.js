@@ -46,11 +46,19 @@ const playerMixins = {
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('播放完毕');
+        this.isVodEnd = true;
         this.isShowPoster = true;
       });
-      // 销毁播放器，播放器组件隐藏
-      this.playerServer.$on('destroy', () => {
-        this.isShowPlayer = false;
+      // 打开弹幕
+      this.playerServer.$on('push_barrage', data => {
+        if (!this.danmuIsOpen) return;
+        this.addBarrage(data);
+      });
+
+      // 结束直播
+      this.playerServer.$on('live_over', data => {
+        console.log(data);
+        this.isLivingEnd = true;
       });
     },
     listenEvents() {
@@ -89,6 +97,19 @@ const playerMixins = {
       this.playerServer.setCurrentTime(this.currentTime, () => {
         this.$toast('调整播放时间失败');
       });
+    },
+    /**
+     * 发送弹幕
+     */
+    addBarrage(text) {
+      try {
+        this.playerServer &&
+          this.playerServer.addBarrage(text, e => {
+            console.log(e, '添加弹幕失败');
+          });
+      } catch (e) {
+        console.log(e);
+      }
     },
     // 全屏
     enterFullscreen() {
