@@ -183,7 +183,7 @@
         return (
           this.roomBaseServer.state.clientType === 'send' ||
           (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus) ||
-          this.groupServer.state.groupInitData.join_role == 20
+          this.groupServer.state.groupInitData.isInGroup
         );
       },
       // 是否文档演示权限
@@ -192,6 +192,7 @@
       }
     },
     watch: {
+      // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
         if (newval) {
@@ -208,6 +209,14 @@
         console.log('-[doc]---大小屏变更', newval); // newval 取值 doc, stream-list
         const mode = newval === 'doc' ? 'small' : 'normal';
         this.setDisplayMode(mode);
+      },
+      // 监听流列表高度变化
+      ['interactiveServer.state.streamListHeightInWatch']: {
+        handler(newval) {
+          console.log('[doc] streamListHeight:', newval);
+          this.hasStreamList = newval < 1 ? false : true;
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -297,7 +306,10 @@
         }
         this.docViewRect = { width: w, height: h };
         // console.log('[doc] this.docViewRect:', this.docViewRect);
-        if (this.docServer.state.currentCid) {
+        if (
+          this.docServer.state.currentCid &&
+          document.getElementById(this.docServer.state.currentCid)
+        ) {
           this.docServer.setSize(w, h);
         }
       },
@@ -306,15 +318,18 @@
        */
       initEvents() {
         if (this.isWatch) {
-          this.interactiveServer.$on('has-stream-list', val => {
-            console.log('[doc] hasStreamList: ', val);
-            this.hasStreamList = val;
-          });
           // 观看端事件
-          this.$on('doc-switch-change', val => {
+          // 文档是否可见状态变化事件
+          this.$on('dispatch_doc_switch_change', val => {
             if (val) {
               this.recoverLastDocs();
             }
+          });
+
+          // 直播结束
+          this.msgServer.$on('live_over', () => {
+            console.log('[doc]---直播结束---');
+            this.hasStreamList = 0;
           });
         } else {
           // 主持端事件
