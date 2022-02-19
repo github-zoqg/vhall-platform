@@ -27,11 +27,11 @@ export default {
       default() {
         return {};
       }
-    },
+    }
   },
   data() {
     return {
       noLotteryImg: require('../img/noWin.png')
-    }
+    };
   }
-}
+};
