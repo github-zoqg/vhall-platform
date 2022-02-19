@@ -100,7 +100,7 @@
                     width="34"
                     height="34"
                     :src="img"
-                    alt="聊天图片加载失败"
+                    :alt="this.$t('chat.chat_1065')"
                     @click="previewImg($event, index, msg.replyMsg.content.image_urls)"
                   />
                 </div>
@@ -173,7 +173,7 @@
               class="interact-content__click-detail"
               @click="clickToView(msg.type, msg.content)"
             >
-              点击查看
+              {{ $t('nav.nav_1027') }}
             </span>
           </div>
         </div>
@@ -196,7 +196,7 @@
                 'interact-tools-content__img-reward': !msg.content.gift_url
               }"
               :src="msg.content.gift_url || require('../images/red-package-1.png')"
-              alt="礼物"
+              :alt="this.$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="msg.type === 'reward_pay_ok'" />
             <span v-if="msg.type === 'reward_pay_ok'" style="color: #fa9a32">
@@ -262,19 +262,19 @@
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = '主持人';
+            ret = this.$t('chat.chat_1022');
             break;
           case 3:
-            ret = '助理';
+            ret = this.$t('chat.chat_1024');
             break;
           case 4:
-            ret = '嘉宾';
+            ret = this.$t('chat.chat_1023');
             break;
           case 20:
-            ret = '组长';
+            ret = this.$t('chat.chat_1064');
             break;
           default:
-            ret = '未定义';
+            ret = this.$t('chat.chat_1062');
         }
         return ret;
       },

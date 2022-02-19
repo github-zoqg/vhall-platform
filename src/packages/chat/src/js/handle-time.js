@@ -12,13 +12,13 @@ const handleTime = date => {
     const time = `${padZero(hour)}:${padZero(minutes)}`;
     let desc = '';
     if (hour >= 0 && hour < 6) {
-      desc = '凌晨';
+      desc = '凌晨'; // webinar.webinar_1027
     } else if (hour >= 6 && hour < 12) {
-      desc = '早上';
+      desc = '早上'; //  webinar.webinar_1028
     } else if (hour >= 12 && hour < 18) {
-      desc = '下午';
+      desc = '下午'; // webinar.webinar_1029
     } else if (hour >= 18 && hour < 24) {
-      desc = '晚上';
+      desc = '晚上'; // webinar.webinar_1030
     } else {
       desc = '';
     }
