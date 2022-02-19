@@ -196,6 +196,9 @@
           this.sendChangeEvent();
         }
       },
+      /**
+       * 获得产生变化的字段
+       */
       getDiffOptions() {
         const source = this._originCaptureState;
         let current = { ...this.mediaState };
@@ -204,6 +207,9 @@
 
         return getDiffObject(source, current, { ignoreKeys });
       },
+      /**
+       * 发送变化事件
+       */
       sendChangeEvent() {
         const diffOptions = this.getDiffOptions();
         console.log('diffOptions:', diffOptions);
