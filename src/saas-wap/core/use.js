@@ -42,6 +42,8 @@ import VmpWapQrCode from '@/packages/qrcode-wap';
 
 // Wap互动推流组件
 import VmpWapStreamLocal from '@/packages/wap-stream-local';
+// wap 抽奖
+import VmpLotteryWap from '@/packages/lottery-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -70,4 +72,5 @@ export function initUse() {
   Vue.use(VmpSignWap);
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapStreamLocal);
+  Vue.use(VmpLotteryWap);
 }

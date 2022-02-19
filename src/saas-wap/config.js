@@ -38,7 +38,14 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: [
+      'compRegLoginWap',
+      'comOfficial',
+      'comShare',
+      'comWatchTimer',
+      'comSignUpForm',
+      'compLotteryWap'
+    ]
   },
   // 顶部
   comHeaderWatch: {
@@ -158,5 +165,9 @@ export const serverConfig = {
   //成员列表
   comMemberListWap: {
     component: 'VmpMemberListWap'
+  },
+  // 抽奖
+  compLotteryWap: {
+    component: 'VmpLotteryWap'
   }
 };
