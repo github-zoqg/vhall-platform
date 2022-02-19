@@ -44,6 +44,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
+  import { useMenuServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -67,6 +68,9 @@
         return this.menu.filter(item => item.visible);
       }
     },
+    beforeCreate() {
+      this.menuServer = useMenuServer();
+    },
     created() {
       this.initConfig();
       this.initMenu();
@@ -89,18 +93,22 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
+        const roomState = this.$domainStore.state.roomBaseServer;
+        let list = [];
+
         // 从接口拉取的配置
-        const list = this.$domainStore.state.roomBaseServer.customMenu.list;
+        if (roomState.clientType === 'send') {
+          list = [...this.menuServer.state.list];
+        } else {
+          list = [...roomState.customMenu.list];
+        }
 
-        this.addItem({
-          type: 8,
-          name: '成员',
-          status: '1'
-        });
-
+        console.log('menu list:', list);
         for (const item of list) {
           this.addItem(item);
         }
+
+        window.tabMenu = this;
       },
       /**
        * 选中默认的菜单项（第一项）
@@ -206,6 +214,7 @@
         const item = this.getItem({ type, id });
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
+        this.menuServer.$emit('tab-switched', item);
       },
       /**
        * 设置菜单项显隐
