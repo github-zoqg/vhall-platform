@@ -54,7 +54,9 @@
       <div class="operate-container__tool-bar__right">
         <template v-if="chatOptions && chatOptions.enableChatSetting">
           <!--聊天设置-->
-          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
+          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">
+            {{ $t('common.common_1008') }}
+          </i>
           <div class="chat-setting-btn--chat-auth">
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
@@ -139,7 +141,7 @@
         type: Object,
         default: () => {
           return {
-            placeholder: '参与聊天',
+            placeholder: this.$t('chat.chat_1021'),
             disable: false
           };
         }
@@ -205,12 +207,12 @@
       //切换表情模态窗展示
       toggleEmoji() {
         if (this.chatLoginStatus) {
-          this.$message.warning('未登录');
+          this.$message.warning(this.$t('510008'));
           return;
         }
 
         if (this.inputStatus.disable) {
-          this.$message.warning('您已被禁言');
+          this.$message.warning(this.$t('chat.chat_1006'));
           return;
         }
         this.$refs.emoji.toggleShow();
@@ -230,7 +232,7 @@
       },
       //只看主办方
       onClickOnlyShowSponsor(status) {
-        let message = status ? '已开启只看主办方' : '已关闭只看主办方';
+        let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
         this.$message({
           message: message,
           showClose: true,
@@ -242,7 +244,7 @@
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
-        let message = status ? '已屏蔽特效' : '已开启特效';
+        let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
         this.$message({
           message: message,
           showClose: true,
