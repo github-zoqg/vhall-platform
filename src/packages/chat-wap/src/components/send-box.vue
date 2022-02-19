@@ -3,7 +3,7 @@
     <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isShowUser">
-        <div class="user-avatar-wrap__avatar">
+        <div class="user-avatar-wrap__avatar" @click="showUserPopup">
           <img class="avatar-img" :src="avatar" srcset />
         </div>
       </div>
@@ -352,6 +352,11 @@
           showTime: handleTime(item.sendTime)
         });
         filterStatus && this.chatList.push(tempData);
+      },
+
+      // 打开个人中心
+      showUserPopup() {
+        this.$emit('showUserPopup');
       }
     }
   };

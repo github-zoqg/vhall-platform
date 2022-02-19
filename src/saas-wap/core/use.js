@@ -48,6 +48,8 @@ import VmpWapStreamLocal from '@/packages/wap-stream-local';
 import VmpWapBody from '@/packages/wap-body';
 // 开屏页
 import VmpScreenPostWap from '@/packages/screen-post-wap';
+// 打开 个人中心
+import VmpUserCenterWap from '@/packages/user-center-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -79,4 +81,5 @@ export function initUse() {
   Vue.use(VmpWapStreamLocal);
   Vue.use(VmpWapBody);
   Vue.use(VmpScreenPostWap);
+  Vue.use(VmpUserCenterWap);
 }

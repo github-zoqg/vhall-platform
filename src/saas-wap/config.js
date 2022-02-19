@@ -44,7 +44,8 @@ export const serverConfig = {
       'comShare',
       'comWatchTimer',
       'comSignUpForm',
-      'comScreenPostWap'
+      'comScreenPostWap',
+      'comUserCenterWap'
     ]
   },
   // 顶部
@@ -170,6 +171,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitOpenUserCenterWap: [
+      {
+        cuid: ['comUserCenterWap'],
+        method: 'openUserCenterWap',
+        args: ['$0']
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -202,5 +210,8 @@ export const serverConfig = {
   // 开屏页
   comScreenPostWap: {
     component: 'VmpScreenPostWap'
+  },
+  comUserCenterWap: {
+    component: 'VmpUserCenterWap'
   }
 };
