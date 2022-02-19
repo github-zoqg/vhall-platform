@@ -29,11 +29,27 @@
           >
             <div class="normal-msg__avatar" @click="setPersonStatus($event, msg)">
               <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+              <img
+                v-if="msg.client === 'h5_browser'"
+                class="chat-phone"
+                width="9"
+                height="12"
+                src="../images/phone.png"
+                alt
+              />
             </div>
           </template>
           <template v-else>
             <div class="normal-msg__avatar">
               <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+              <img
+                v-if="msg.client === 'h5_browser'"
+                class="chat-phone"
+                width="9"
+                height="12"
+                src="../images/phone.png"
+                alt
+              />
             </div>
           </template>
 
@@ -374,8 +390,8 @@
         } else {
           let at = false;
           this.msg.atList.forEach(a => {
-            console.log(this.msg.atList.length);
-            const userName = `@${a.nick_name} `;
+            // TODO历史列表aList与直播中格式不一致作
+            const userName = `@${a.nick_name || a.nickName} `;
             const match =
               this.msg.content &&
               this.msg.content.text_content &&
@@ -474,11 +490,17 @@
           width: 28px;
           height: 28px;
           border-radius: 14px;
-          overflow: hidden;
+          position: relative;
           .normal-msg__avatar-img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
             object-fit: cover;
+          }
+          .chat-phone {
+            position: absolute;
+            bottom: 0;
+            right: 0;
           }
         }
         .normal-msg__content {

@@ -88,7 +88,7 @@
             <!-- 回复消息 -->
             <template v-if="msg.replyMsg && msg.replyMsg.type && msg.atList.length == 0">
               <p class="reply-msg">
-                <span v-html="msg.replyMsg.nick_name" />
+                <span v-html="msg.replyMsg.nick_name || msg.replyMsg.nickname" />
                 ：
                 <span v-html="msg.replyMsg.content.text_content" />
               </p>

@@ -221,12 +221,12 @@
       },
       //更新输入框组件里的图片
       updateImgUrls() {
-        const images = this.$refs.chatImgUpload.getImgUrls();
+        const images = this.$refs.chatImgUpload && this.$refs.chatImgUpload.getImgUrls();
         this.$refs.chatInput.updateImgUrls(images);
       },
       //清空上传图片组件里的图片
       clearUploadImg() {
-        this.$refs.chatImgUpload.clearImgUrls();
+        this.$refs.chatImgUpload && this.$refs.chatImgUpload.clearImgUrls();
       },
       //只看主办方
       onClickOnlyShowSponsor(status) {

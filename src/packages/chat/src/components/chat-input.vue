@@ -358,6 +358,30 @@
             index: currentIndex
           });
         }
+      },
+      /**
+       * 获取根据人数和系数获取延迟时间
+       * @param n 人数
+       * @param o 非必传，系数，不传递默认为1
+       * @returns {number}
+       */
+      delayTime(n, o) {
+        n = n || 0;
+        o = o || 1;
+        let result = 0;
+        if (n <= 1000) {
+          result = 0;
+        } else if (n <= 10000) {
+          // 大于1千，小于1万
+          result = n / 1000;
+        } else if (n <= 50000) {
+          // 大于1万，小于5万
+          result = 20 + (10 * (n - 10000)) / 10000;
+        } else if (n > 50000) {
+          // 大于5万
+          result = 60;
+        }
+        return Math.floor(o * result);
       }
     }
   };
