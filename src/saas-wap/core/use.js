@@ -47,6 +47,8 @@ import VmpWapBody from '@/packages/wap-body';
 import VmpScreenPostWap from '@/packages/screen-post-wap';
 // 打开 个人中心
 import VmpUserCenterWap from '@/packages/user-center-wap';
+// wap 抽奖
+import VmpLotteryWap from '@/packages/lottery-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -78,4 +80,5 @@ export function initUse() {
   Vue.use(VmpWapBody);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
+  Vue.use(VmpLotteryWap);
 }
