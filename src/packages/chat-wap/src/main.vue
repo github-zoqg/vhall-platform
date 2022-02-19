@@ -43,7 +43,7 @@
     </div>
     <send-box
       :currentTab="3"
-      :isAllBanned="isAllBanned"
+      :isAllBanned="allBanned"
       :isBanned="isBanned"
       :isHandsUp="isHandsUp"
       :noChatLogin="noChatLogin"
@@ -98,9 +98,12 @@
         //房间号
         roomId: '',
         //是否是嵌入端
-        isEmbed: false
+        isEmbed: false,
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
+
     computed: {
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
@@ -116,16 +119,6 @@
       isHandsUp() {
         const { interactToolStatus = {} } = this.roomBaseServer.state;
         return interactToolStatus && !!interactToolStatus['is_handsup'];
-      },
-      //是否是全体禁言
-      isAllBanned() {
-        const { allBanned = 0 } = this.chatServer.state;
-        return allBanned === 1;
-      },
-      //是否是自己被禁言
-      isBanned() {
-        const { banned = 0 } = this.chatServer.state;
-        return banned === 1;
       },
       //是否不登陆也可以参与聊天
       noChatLogin() {
@@ -210,7 +203,10 @@
       // 给聊天服务保存一份关键词
       this.chatServer.setKeywordList(this.keywordList);
     },
-    mounted() {},
+    mounted() {
+      console.log('useChatServer', useChatServer().state);
+      this.listenChatServer();
+    },
     methods: {
       //初始化视图数据
       initViewData() {
@@ -223,6 +219,21 @@
         this.configList = configList;
         this.roomId = interact.room_id;
         this.isEmbed = embed;
+      },
+      listenChatServer() {
+        //监听禁言通知
+        useChatServer().$on('banned', res => {
+          alert(res);
+          this.isBanned = res;
+        });
+        //监听全体禁言通知
+        useChatServer().$on('allBanned', res => {
+          this.allBanned = res;
+        });
+        //监听分组房间变更通知
+        useChatServer().$on('changeChannel', () => {
+          this.handleChannelChange();
+        });
       },
       // 获取历史消息
       async getHistoryMessage() {

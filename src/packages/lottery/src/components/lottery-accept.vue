@@ -122,7 +122,7 @@
       // 表单校验
       validateWinnerInfo() {
         try {
-          this.stepHtmlList.forEach((ele, index) => {
+          this.stepHtmlList.forEach(ele => {
             if (ele.is_required == 1) {
               if (
                 this.reciveInfo[ele.field_key] == '' ||

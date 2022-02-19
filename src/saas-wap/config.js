@@ -45,7 +45,8 @@ export const serverConfig = {
       'comWatchTimer',
       'comSignUpForm',
       'comScreenPostWap',
-      'comUserCenterWap'
+      'comUserCenterWap',
+      'compLotteryWap'
     ]
   },
   // 顶部
@@ -220,5 +221,9 @@ export const serverConfig = {
   },
   comUserCenterWap: {
     component: 'VmpUserCenterWap'
+  },
+  // 抽奖
+  compLotteryWap: {
+    component: 'VmpLotteryWap'
   }
 };
