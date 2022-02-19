@@ -38,7 +38,15 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: [
+      'compRegLoginWap',
+      'comOfficial',
+      'comShare',
+      'comWatchTimer',
+      'comSignUpForm',
+      'comScreenPostWap',
+      'comUserCenterWap'
+    ]
   },
   // 顶部
   comHeaderWatch: {
@@ -163,6 +171,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitOpenUserCenterWap: [
+      {
+        cuid: ['comUserCenterWap'],
+        method: 'openUserCenterWap',
+        args: ['$0']
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -191,5 +206,12 @@ export const serverConfig = {
     ],
     children: ['comInteractToolsWap'],
     options: {}
+  },
+  // 开屏页
+  comScreenPostWap: {
+    component: 'VmpScreenPostWap'
+  },
+  comUserCenterWap: {
+    component: 'VmpUserCenterWap'
   }
 };
