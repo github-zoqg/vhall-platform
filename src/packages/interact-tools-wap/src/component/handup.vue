@@ -35,7 +35,7 @@
           </button>
           <button class="btn" @click="offConnect">
             <i class="vh-iconfont iconfont-bottom vh-a-line-handsdown"></i>
-            <div class="btn-text">{{ handText }}</div>
+            <div class="btn-text">{{ $t('interact.interact_1007') }}</div>
           </button>
         </div>
         <button class="btn btn-handsup" v-if="!isSpeakOn" @click="handsUpToConnect">
@@ -65,16 +65,13 @@
     },
     computed: {
       localStream() {
-        const status = this.$domainStore.state.interactiveServer.localStream;
-        console.log('麦克风状态------------status', status);
-        return status;
+        return this.$domainStore.state.interactiveServer.localStream;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
       // 是否是上麦状态
       isSpeakOn() {
-        console.log('是否是上麦状态', this.$domainStore.state.micServer);
         return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
@@ -92,7 +89,6 @@
     created() {
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
-        console.log('用户上麦的监听', msg);
         this.closeConnectPop();
         this.$emit('handupLoading', false);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {

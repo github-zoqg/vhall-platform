@@ -160,7 +160,6 @@
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  const chatServer = useChatServer();
   export default {
     name: 'VmpChat',
     mixins: [eventMixin, dataReportMixin],
@@ -171,8 +170,7 @@
       ChatOperateBar
     },
     data() {
-      const { chatList } = chatServer.state;
-      // const roomBaseState = useRoomBaseServer().state;
+      const { chatList } = useChatServer().state;
       return {
         //滚动插件配置
         overlayScrollBarsOptions: {
@@ -184,7 +182,7 @@
             autoHideDelay: 200
           }
         },
-        chatServerState: chatServer.state,
+        chatServerState: useChatServer().state,
         //默认兜底头像
         defaultAvatar,
         /** domain中读取的数据 */
@@ -202,6 +200,8 @@
         userId: '',
         //聊天消息列表
         chatList: chatList,
+        //聊天消息页码
+        page: 0,
         /** domain中读取的数据结束 */
         /** 消息提示 */
         //未读消息数量
@@ -230,8 +230,8 @@
           placeholder: this.$t('chat.chat_1021'),
           disable: false
         },
-        isBanned: 0, //1禁言，0未禁言
-        allBanned: 0, //1全体禁言，0未禁言
+        isBanned: useChatServer().state.isBanned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
         // 聊天是否需要登录
         chatLoginStatus: false,
         //欢迎信息
@@ -320,14 +320,12 @@
       this.roomBaseServer = useRoomBaseServer();
       console.log('roomBaseState', this.roomBaseServer.state);
     },
-    created() {
-      this.initInputStatus();
-    },
     mounted() {
       //初始化配置
       this.initConfig();
       //初始化视图数据，domain里取
       this.initViewData();
+      this.initInputStatus();
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
@@ -335,6 +333,8 @@
       this.initCodeLoginMessage();
       //初始化聊天区域滚动组件
       this.initScroll();
+      //拉取聊天历史
+      this.getHistoryMsg();
       //监听domain层chatServer通知
       this.listenChatServer();
     },
@@ -360,6 +360,18 @@
         this.userId = join_info.user_id;
       },
       listenChatServer() {
+        const chatServer = useChatServer();
+        //监听@我的消息
+        chatServer.$on('atMe', () => {
+          this.isHasUnreadAtMeMsg = true;
+          this.tipMsg = '有人@你';
+        });
+        //监听回复我的消息
+        chatServer.$on('replyMe', () => {});
+        //监听到新消息过来
+        chatServer.$on('receiveMsg', () => {
+          this.unReadMessageCount++;
+        });
         //监听禁言通知
         chatServer.$on('banned', res => {
           this.isBanned = res;
@@ -369,6 +381,10 @@
         chatServer.$on('allBanned', res => {
           this.allBanned = res;
           this.initInputStatus();
+        });
+        //监听分组房间变更通知
+        chatServer.$on('changeChannel', () => {
+          this.handleChannelChange();
         });
       },
       init() {
@@ -393,7 +409,7 @@
           placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
           disable = true;
         }
-
+        //主持人不受禁言限制
         if ([1, '1'].includes(this.roleName)) {
           placeholder = this.$t('chat.chat_1021');
           disable = false;
@@ -428,9 +444,21 @@
           this.chatList.push(msg);
         });
       },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        this.clearHistoryMsg();
+        this.getHistoryMsg();
+      },
       // 获取历史消息
-      getHistoryMsg() {
-        chatServer.getHistoryMsg();
+      async getHistoryMsg() {
+        const params = {
+          room_id: this.roomId,
+          pos: Number(this.page) * 50,
+          limit: 50
+        };
+        await useChatServer().getHistoryMsg(params);
+        this.page++;
       },
       //todo domain负责 抽奖情况检查
       lotteryCheck() {},
@@ -555,116 +583,116 @@
         }
       },
       //todo domain负责组装 发送消息
-      sendMsg(callback) {
-        window.clearTimeout(this.sendTimeOut);
+      // sendMsg(callback) {
+      //   window.clearTimeout(this.sendTimeOut);
 
-        const { checkHasKeyword } = chatServer;
-        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
-          ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
-          : '';
-        //子组件里上传的图片
-        const imgUrls = this.getUploadImg();
+      //   const { checkHasKeyword } = useChatServer();
+      //   const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
+      //     ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
+      //     : '';
+      //   //子组件里上传的图片
+      //   const imgUrls = this.getUploadImg();
 
-        this.sendTimeOut = setTimeout(() => {
-          const inputValue = this.trimPlaceHolder('reply');
-          if (this.inputStatus.disable) {
-            return;
-          }
-          if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
-            return this.$message.warning(this.$t('chat.chat_1009'));
-          }
-          const data = {};
-          if (inputValue) {
-            data.type = 'text';
-            data.barrageTxt = inputValue
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n/g, '<br/>');
-            data.text_content = inputValue;
-          }
-          //如果有聊天图片
-          if (imgUrls.length) {
-            data.image_urls = imgUrls;
-            data.type = 'image';
-          }
-          const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-          console.warn('获取当前的本地用户信息', userInfo);
-          let name = '';
-          if (userInfo) {
-            if (userInfo.nickname) {
-              name = userInfo.nickname;
-            } else {
-              name = userInfo.nick_name;
-            }
-          } else {
-            name = joinDefaultName;
-          }
-          if (this.roleName === 2 && this.join_name) {
-            name = this.join_name;
-          }
-          const context = {
-            nickname: name, // 昵称
-            avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
-            role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
-            replyMsg: this.replyMsg, // 回复消息
-            atList: this.atList // @用户列表
-          };
-          let filterStatus = true;
-          if (sessionStorage.getItem('watch')) {
-            filterStatus = checkHasKeyword(inputValue);
-          }
+      //   this.sendTimeOut = setTimeout(() => {
+      //     const inputValue = this.trimPlaceHolder('reply');
+      //     if (this.inputStatus.disable) {
+      //       return;
+      //     }
+      //     if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
+      //       return this.$message.warning('内容不能为空');
+      //     }
+      //     const data = {};
+      //     if (inputValue) {
+      //       data.type = 'text';
+      //       data.barrageTxt = inputValue
+      //         .replace(/</g, '&lt;')
+      //         .replace(/>/g, '&gt;')
+      //         .replace(/\n/g, '<br/>');
+      //       data.text_content = inputValue;
+      //     }
+      //     //如果有聊天图片
+      //     if (imgUrls.length) {
+      //       data.image_urls = imgUrls;
+      //       data.type = 'image';
+      //     }
+      //     const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+      //     console.warn('获取当前的本地用户信息', userInfo);
+      //     let name = '';
+      //     if (userInfo) {
+      //       if (userInfo.nickname) {
+      //         name = userInfo.nickname;
+      //       } else {
+      //         name = userInfo.nick_name;
+      //       }
+      //     } else {
+      //       name = joinDefaultName;
+      //     }
+      //     if (this.roleName === 2 && this.join_name) {
+      //       name = this.join_name;
+      //     }
+      //     const context = {
+      //       nickname: name, // 昵称
+      //       avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
+      //       role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
+      //       replyMsg: this.replyMsg, // 回复消息
+      //       atList: this.atList // @用户列表
+      //     };
+      //     let filterStatus = true;
+      //     if (sessionStorage.getItem('watch')) {
+      //       filterStatus = checkHasKeyword(inputValue);
+      //     }
 
-          if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-            if (this.atList.length && data.text_content) {
-              this.atList.forEach(a => {
-                data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
-              });
-            }
+      //     if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
+      //       if (this.atList.length && data.text_content) {
+      //         this.atList.forEach(a => {
+      //           data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
+      //         });
+      //       }
 
-            chatServer.sendMsg({ data, context });
-          }
-          //清空一下子组件里上传的图片
-          this.clearUploadImg();
-          this.inputValue = '';
-          this.replyMsg = {};
-          this.$refs.emoji.isShow = false;
+      //       useChatServer().sendMsg({ data, context });
+      //     }
+      //     //清空一下子组件里上传的图片
+      //     this.clearUploadImg();
+      //     this.inputValue = '';
+      //     this.replyMsg = {};
+      //     this.$refs.emoji.isShow = false;
 
-          this.atList = [];
-          callback && callback();
-        }, 300);
-      },
-      // 发送聊天节流
-      sendMsgThrottle() {
-        if (this.roleName !== 2) {
-          this.sendMsg();
-          return;
-        }
-        if (this.chatGap > 0) {
-          this.lock = sessionStorage.getItem('chatLock');
-          if (this.lock && this.lock == 'true') {
-            this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
-          }
-        } else {
-          this.sendMsg(() => {
-            window.clearInterval(this.chatGapInterval);
-            this.lock = sessionStorage.getItem('chatLock');
-            this.chatGap = this.delayTime(this.onlineUsers);
-            this.chatGapInterval = window.setInterval(() => {
-              if (this.chatGap > 0) {
-                if (!this.lock || this.lock == 'false') {
-                  sessionStorage.setItem('chatLock', true);
-                } else {
-                  this.$message.warning(this.$t('chat.chat_1080', this.chatGap));
-                }
-                this.chatGap = this.chatGap - 1;
-              } else {
-                window.clearInterval(this.chatGapInterval);
-                sessionStorage.setItem('chatLock', false);
-              }
-            }, 1000);
-          });
-        }
-      },
+      //     this.atList = [];
+      //     callback && callback();
+      //   }, 300);
+      // },
+      // // 发送聊天节流
+      // sendMsgThrottle() {
+      //   if (this.roleName !== 2) {
+      //     this.sendMsg();
+      //     return;
+      //   }
+      //   if (this.chatGap > 0) {
+      //     this.lock = sessionStorage.getItem('chatLock');
+      //     if (this.lock && this.lock == 'true') {
+      //       this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
+      //     }
+      //   } else {
+      //     this.sendMsg(() => {
+      //       window.clearInterval(this.chatGapInterval);
+      //       this.lock = sessionStorage.getItem('chatLock');
+      //       this.chatGap = this.delayTime(this.onlineUsers);
+      //       this.chatGapInterval = window.setInterval(() => {
+      //         if (this.chatGap > 0) {
+      //           if (!this.lock || this.lock == 'false') {
+      //             sessionStorage.setItem('chatLock', true);
+      //           } else {
+      //             this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
+      //           }
+      //           this.chatGap = this.chatGap - 1;
+      //         } else {
+      //           window.clearInterval(this.chatGapInterval);
+      //           sessionStorage.setItem('chatLock', false);
+      //         }
+      //       }, 1000);
+      //     });
+      //   }
+      // },
       backspace() {
         if (!this.inputValue) {
           this.atList = [];
@@ -727,17 +755,19 @@
             msg_id: msgToDelete.msgId,
             room_id: this.roomId
           };
-          chatServer.deleteMessage(params).then(res => {
-            this.buriedPointReport(110121, {
-              business_uid: this.userId,
-              webinar_id: this.$route.params.il_id
+          useChatServer()
+            .deleteMessage(params)
+            .then(res => {
+              this.buriedPointReport(110121, {
+                business_uid: this.userId,
+                webinar_id: this.$route.params.il_id
+              });
+              const _index = this.chatList.findIndex(chatMsg => {
+                return chatMsg.count === count;
+              });
+              _index !== -1 && this.chatList.splice(_index, 1);
+              return res;
             });
-            const _index = this.chatList.findIndex(chatMsg => {
-              return chatMsg.count === count;
-            });
-            _index !== -1 && this.chatList.splice(_index, 1);
-            return res;
-          });
         }, 3000); // 优化 17532
       },
       //todo domain负责 @用户
@@ -838,7 +868,7 @@
           room_id: this.roomId,
           status: flag ? 1 : 0
         };
-        this.chatServer
+        useChatServer()
           .setAllBanned(params)
           .then(res => {
             this.buriedPointReport(flag ? 110116 : 110117, {

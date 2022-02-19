@@ -3,9 +3,7 @@
     <div
       class="vmp-stream-list__local-container"
       :class="{
-        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__max': maxElement == 'mainScreen' && joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__mini': miniElement == 'mainScreen' && joinInfo.third_party_user_id == mainScreen
+        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
       }"
     >
       <div class="vmp-stream-list__remote-container-h">
@@ -18,9 +16,7 @@
         :key="stream.id"
         class="vmp-stream-list__remote-container"
         :class="{
-          'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-          'vmp-dom__max': maxElement == 'mainScreen' && stream.accountId == mainScreen,
-          'vmp-dom__mini': miniElement == 'mainScreen' && stream.accountId == mainScreen
+          'vmp-stream-list__main-screen': stream.accountId == mainScreen
         }"
       >
         <div class="vmp-stream-list__remote-container-h">
@@ -123,20 +119,26 @@
 
 <style lang="less">
   .vmp-stream-list {
-    height: 80px;
+    height: 83px;
     width: 100%;
-    background-color: #242424;
     display: flex;
     justify-content: center;
     .vmp-stream-list__local-container {
-      width: 142px;
+      width: 148px;
+    }
+    .vmp-stream-list__remote-container {
+      width: 148px;
+      &-h {
+        height: 100%;
+      }
     }
 
     // 流列表高度不为0
     .vmp-stream-list__main-screen {
       position: absolute;
-      top: 80px;
-      width: calc(100% - 380px);
+      top: 83px;
+      width: 597px;
+      height: 337px;
       .vmp-stream-list__remote-container {
         &-h {
           padding-top: 56.25%;
@@ -153,27 +155,12 @@
       }
     }
 
-    .vmp-stream-list__remote-container {
-      width: 142px;
-      &-h {
-        height: 100%;
-      }
-    }
-
     // 流列表高度为0
     &-h0 {
       height: 0;
       .vmp-stream-list__main-screen {
         top: 0;
       }
-    }
-
-    // 主屏在小窗的样式
-    .vmp-dom__mini {
-      right: 0;
-      top: 0;
-      width: 360px;
-      z-index: 1;
     }
   }
 </style>

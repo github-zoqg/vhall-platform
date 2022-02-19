@@ -73,9 +73,10 @@
               <!--              </div>-->
               <div class="chat-setting-box__item switch-box">
                 <span class="switch-title">全体禁言</span>
+
                 <el-switch
                   class="switch"
-                  v-model="enableMutedAll"
+                  v-model="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
                   active-color="#fc5659"
@@ -111,6 +112,7 @@
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
   import { useRoomBaseServer } from 'middle-domain';
+  import { bold } from 'chalk';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -148,8 +150,8 @@
       },
       // 是否全体禁言
       allBanned: {
-        type: Number,
-        default: () => 0
+        type: Boolean,
+        default: () => false
       },
       //活动id
       webinarId: {
@@ -190,15 +192,13 @@
         //聊天审核链接 todo 暂时写死
         chatFilterUrl: [location.origin, `/lives/chat-auth/${this.webinarId}`].join(''),
         //是否是助理
-        assistantType: this.$route.query.assistantType,
-        //是否开启全体禁言
-        enableMutedAll: this.allBanned
+        assistantType: this.$route.query.assistantType
       };
     },
     methods: {
       //切换全体禁言开关状态
       toggleMutedAllStatus() {
-        this.$emit('changeAllBanned', this.enableMutedAll);
+        this.$emit('changeAllBanned', this.allBanned);
       },
       //进入聊天审核
       joinChatAuth() {
@@ -223,12 +223,12 @@
       },
       //更新输入框组件里的图片
       updateImgUrls() {
-        const images = this.$refs.chatImgUpload.getImgUrls();
+        const images = this.$refs.chatImgUpload && this.$refs.chatImgUpload.getImgUrls();
         this.$refs.chatInput.updateImgUrls(images);
       },
       //清空上传图片组件里的图片
       clearUploadImg() {
-        this.$refs.chatImgUpload.clearImgUrls();
+        this.$refs.chatImgUpload && this.$refs.chatImgUpload.clearImgUrls();
       },
       //只看主办方
       onClickOnlyShowSponsor(status) {
