@@ -37,7 +37,7 @@
         >
           有人{{ messageType.atList ? '@' : '' }}{{ messageType.reply ? '回复' : '' }} 你
         </span>
-        <i class="iconfont iconxiangxia"></i>
+        <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
     <send-box
@@ -312,7 +312,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        .iconfont {
+        .vh-iconfont {
           font-size: 16px;
           margin-left: 19px;
         }

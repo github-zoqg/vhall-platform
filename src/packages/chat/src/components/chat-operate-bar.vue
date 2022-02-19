@@ -2,8 +2,8 @@
   <div class="vmp-chat-operate-container" ref="chatOperateContainer">
     <div class="operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
-        <!--表情过滤按钮-->
-        <i class="icon iconfont iconbiaoqing" @click.stop="toggleEmoji"></i>
+        <!--表情-->
+        <i class="vh-iconfont vh-line-expression" @click.stop="toggleEmoji"></i>
         <!--上传图片-->
         <template v-if="chatOptions && chatOptions.hasImgUpload">
           <!-- 聊天图片上传 -->
@@ -17,7 +17,7 @@
         </template>
         <!--只看主办方按钮-->
         <i
-          class="icon iconfont iconmeitishezhi"
+          class="vh-iconfont vh-line-setting"
           @click.stop="onClickFilterSetting"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
@@ -406,7 +406,7 @@
         position: absolute;
         top: -11px;
         transform: translateY(-100%);
-        .iconmeitishezhi {
+        .vh-line-setting {
           font-size: 19px;
           color: #999;
           margin-left: 10px;
@@ -441,7 +441,7 @@
           color: #999999;
         }
       }
-      .iconfont {
+      .vh-iconfont {
         color: #999;
         font-size: 19px;
         cursor: pointer;
@@ -455,7 +455,7 @@
         &.pic-disabled {
           pointer-events: none;
         }
-        &.icontupianliaotian {
+        &.vh-line-expression {
           font-size: 18px;
         }
 
@@ -470,7 +470,7 @@
         background-repeat: no-repeat;
         background-position: center;
       }
-      .iconbiaoqing {
+      .vh-line-expression {
         font-size: 19px;
         color: #999;
         margin-left: 0;
