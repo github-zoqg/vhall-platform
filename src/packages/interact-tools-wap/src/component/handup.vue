@@ -19,7 +19,7 @@
               class="vh-iconfont iconfont-bottom vh-line-video-camera"
               v-show="localStream.videoMuted"
             ></i>
-            <div class="btn-text">{{ localStream.videoMuted }}{{ $t('setting.setting_1003') }}</div>
+            <div class="btn-text">{{ $t('setting.setting_1003') }}</div>
           </button>
           <!-- 麦克风按钮 -->
           <button class="btn" @click="handleClickMuteDevice('audio')">
@@ -91,6 +91,7 @@
     created() {
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
+        console.log('用户上麦的监听', msg);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           clearInterval(this.lowerWheatFun);
           this.lowerWheatFun = null;
