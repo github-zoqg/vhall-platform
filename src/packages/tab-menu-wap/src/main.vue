@@ -39,10 +39,10 @@
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
       <tab-content
+        ref="tabContent"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
         @closePopup="selectDefault"
-        ref="tabContent"
       />
     </section>
   </section>
@@ -143,7 +143,6 @@
        */
       addItem(item) {
         item = getItemEntity(item, this.tabOptions.menuConfig);
-        console.log('addItem:::', item);
         this.menu.push(item);
       },
       /**
