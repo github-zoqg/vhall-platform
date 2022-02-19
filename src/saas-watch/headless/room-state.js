@@ -39,13 +39,6 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    // 获取媒体许可，设置设备状态
-    mediaCheckServer.getMediaInputPermission();
-    micServer.init();
-  }
-
   await roomBaseServer.getConfigList();
   await roomBaseServer.getLowerConfigList({
     params: {},
@@ -60,7 +53,7 @@ export default async function () {
     hasToolbar: false
   };
   // 调用聚合接口
-  roomBaseServer.getCommonConfig({
+  await roomBaseServer.getCommonConfig({
     tags: [
       'skin',
       'screen-poster',
@@ -79,6 +72,12 @@ export default async function () {
       'timer'
     ]
   });
+  // 互动、分组直播进行设备检测
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    // 获取媒体许可，设置设备状态
+    mediaCheckServer.getMediaInputPermission();
+    micServer.init();
+  }
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
   }
