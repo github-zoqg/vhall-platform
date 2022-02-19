@@ -32,10 +32,11 @@
                   :is-interact="isInteract"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="docPermissionId"
+                  :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
+                  :status="liveStatus"
                 ></member-item>
               </template>
             </template>
@@ -65,10 +66,11 @@
                   :is-interact="isInteract"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="docPermissionId"
+                  :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
+                  :status="liveStatus"
                 ></member-item>
               </template>
             </template>
@@ -97,10 +99,11 @@
                   :is-interact="isInteract"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="docPermissionId"
+                  :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
+                  :status="liveStatus"
                 ></member-item>
               </template>
             </template>
@@ -112,7 +115,7 @@
     <div class="vmp-member-list__operate-container">
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
-        <i class="vh-iconfont vh-saas-a-line-Onlinelist"></i>
+        <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
         <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
         <span class="info-panel__refresh-btn" @click="refreshList">刷新</span>
         <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
@@ -292,15 +295,14 @@
       //开始初始化流程
       this.init();
       this.listenEvent();
-
-      this.currentSpeakerId = this.groupInitData.doc_permission;
+      //初始化主讲人id
+      this.currentSpeakerId = this.groupInitData.isInGroup
+        ? this.groupInitData.doc_permission
+        : this.interactToolStatus.doc_permission;
       this.presentation_screen = this.groupInitData.presentation_screen;
       this.memberOptions.platformType === 'watch' && this.changeSpeakerList();
     },
     watch: {
-      currentSpeakerId(newVal) {
-        this.currentSpeakerId = newVal;
-      },
       roleName(newVal, oldVal) {
         this.roleName = newVal;
         console.log(oldVal);
@@ -366,7 +368,7 @@
         this.mode = webinar.mode;
         this.isInteract = webinar.mode == 3 || webinar.mode == 6 ? 1 : 0;
         this.roleName = join_info.role_name;
-        this.userId = join_info.user_id;
+        this.userId = join_info.third_party_user_id;
         this.roomId = interact.room_id;
         this.allowRaiseHand = parseInt(this.roomBaseServer.state.interactToolStatus.is_handsup)
           ? true
