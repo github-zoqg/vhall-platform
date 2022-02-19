@@ -18,7 +18,7 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const micServer = useMicServer();
-  const userServer = useMicServer();
+  const userServer = useUserServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
