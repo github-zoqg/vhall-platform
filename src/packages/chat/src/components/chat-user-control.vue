@@ -3,7 +3,7 @@
     <div class="vmp-chat-user-control" :style="style">
       <div class="vmp-chat-user-control__item" @click="reply(count)">
         <i></i>
-        <span>回复</span>
+        <span>{{ $t('chat.chat_1036') }}</span>
       </div>
       <div
         :class="
@@ -18,7 +18,7 @@
       </div>
       <div class="vmp-chat-user-control__item" @click="deleteMsg(count)" v-if="godMode">
         <i></i>
-        <span>删除</span>
+        <span>{{ $t('account.account_1068') }}</span>
       </div>
       <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode">
         <i></i>
