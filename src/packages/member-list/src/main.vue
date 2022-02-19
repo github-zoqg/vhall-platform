@@ -112,7 +112,7 @@
     <div class="vmp-member-list__operate-container">
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
-        <i class="iconfont iconzaixianrenshu"></i>
+        <i class="vh-iconfont vh-saas-a-line-Onlinelist"></i>
         <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
         <span class="info-panel__refresh-btn" @click="refreshList">刷新</span>
         <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
@@ -1852,7 +1852,7 @@
       background-color: #34363a;
       box-sizing: border-box;
       color: #e2e2e2;
-      .iconzaixianrenshu {
+      .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
         margin-right: 4px;

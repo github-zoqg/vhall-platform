@@ -88,7 +88,14 @@
         }
       }
     },
-
+    watch: {
+      isStreamListH0: {
+        handler(newval) {
+          this.interactiveServer.setStreamListHeightInWatch(newval ? 0 : 80);
+        },
+        immediate: true
+      }
+    },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
     },

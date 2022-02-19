@@ -40,7 +40,7 @@
 
     <div class="vmp-chat-input__send-btn-box">
       <div class="vmp-chat-input__send-btn" @click="sendMsgThrottle">
-        <i class="icon iconfont iconfasong_icon"></i>
+        <i class="vh-iconfont vh-line-send"></i>
       </div>
     </div>
   </div>
@@ -483,7 +483,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      .iconfasong_icon {
+      .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;
       }

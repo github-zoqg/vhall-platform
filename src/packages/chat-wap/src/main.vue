@@ -37,7 +37,7 @@
         >
           有人{{ messageType.atList ? '@' : '' }}{{ messageType.reply ? '回复' : '' }} 你
         </span>
-        <i class="iconfont iconxiangxia"></i>
+        <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
     <send-box
@@ -48,6 +48,7 @@
       :noChatLogin="noChatLogin"
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
+      @showUserPopup="showUserPopup"
     ></send-box>
   </div>
 </template>
@@ -59,7 +60,7 @@
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from './images/default_avatar.png';
-  import { browserType } from '@/packages/app-shared/utils/tool';
+  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpChatWap',
     components: {
@@ -267,6 +268,9 @@
           noNormal: false
         };
         this.newMsgNum = 0;
+      },
+      showUserPopup() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
       }
     }
   };
@@ -308,7 +312,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        .iconfont {
+        .vh-iconfont {
           font-size: 16px;
           margin-left: 19px;
         }

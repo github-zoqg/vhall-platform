@@ -44,7 +44,8 @@ export const serverConfig = {
       'comShare',
       'comWatchTimer',
       'comSignUpForm',
-      'comScreenPostWap'
+      'comScreenPostWap',
+      'comUserCenterWap'
     ]
   },
   // 顶部
@@ -69,13 +70,20 @@ export const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWaStreamLocal']
+    children: ['comWapPlayer', 'comWapStreamList']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
   },
-  comWaStreamLocal: {
+  comWapStreamList: {
+    component: 'VmpWapStreamList',
+    children: ['comWapStreamLocal']
+  },
+  comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
+  },
+  comWapStreamRemote: {
+    component: 'VmpWapStreamRemote'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
@@ -170,6 +178,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitOpenUserCenterWap: [
+      {
+        cuid: ['comUserCenterWap'],
+        method: 'openUserCenterWap',
+        args: ['$0']
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -202,5 +217,8 @@ export const serverConfig = {
   // 开屏页
   comScreenPostWap: {
     component: 'VmpScreenPostWap'
+  },
+  comUserCenterWap: {
+    component: 'VmpUserCenterWap'
   }
 };
