@@ -11,16 +11,16 @@
         <span
           v-if="images.length !== 1"
           slot="button-next"
-          class="preview-img__button preview-img__button-next hide icon iconfont iconzuofanye"
+          class="preview-img__button preview-img__button-next hide vh-iconfont vh-line-arrow-left"
         ></span>
         <span
           v-if="images.length !== 1"
           slot="button-prev"
-          class="preview-img__button preview-img__button-prev hide icon iconfont iconyoufanye"
+          class="preview-img__button preview-img__button-prev hide vh-iconfont vh-line-arrow-right"
         ></span>
       </swiper>
       <span
-        class="preview-img__close-icon icon iconfont iconguanbi_icon"
+        class="preview-img__close-icon icon vh-iconfont vh-line-close"
         @click="closePreview"
       ></span>
     </div>
@@ -82,7 +82,7 @@
           this.swiper.autoplay.start();
         };
       },
-      //todo 有时间解决下图片闪一下的问题 跳转到指定的图片
+      //跳转到指定的图片
       jumpToTargetImg(index) {
         this.swiper.slideTo(index, 0);
       },

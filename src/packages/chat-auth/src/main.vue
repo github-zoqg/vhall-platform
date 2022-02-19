@@ -28,7 +28,7 @@
           :class="{ disabled: !enableChatAuth }"
           @click="openAutoSettingModal"
         >
-          <i class="iconfont iconshezhi"></i>
+          <i class="vh-iconfont vh-line-setting"></i>
           自动审核设置
         </span>
       </div>
@@ -793,7 +793,7 @@
           font-size: 20px;
           font-weight: bold;
           color: #222;
-          .iconfont {
+          .vh-iconfont {
             display: inline-block;
             color: #888;
             margin-right: 10px;
@@ -810,7 +810,7 @@
           cursor: pointer;
           color: @color-blue-hover;
         }
-        .iconfont {
+        .vh-iconfont {
           display: inline-block;
           vertical-align: middle;
           margin-right: 6px;
@@ -904,7 +904,7 @@
           i {
             font-size: 20px;
           }
-          .iconfont {
+          .vh-iconfont {
             display: inline-block;
             width: 20px;
             height: 20px;
