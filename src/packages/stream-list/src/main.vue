@@ -91,8 +91,7 @@
     watch: {
       isStreamListH0: {
         handler(newval) {
-          console.log('emit has-stream-list:', !newval);
-          this.interactiveServer.$emit('has-stream-list', !newval);
+          this.interactiveServer.setStreamListHeightInWatch(newval ? 0 : 80);
         },
         immediate: true
       }
