@@ -18,8 +18,8 @@
         <div class="interact-msg" @tap="checkLotteryDetail($event, msg)">
           {{ msg.content.text_content }}
           <template v-if="msg.content.Show">
-            点击
-            <span class="highlight">查看详情</span>
+            {{ $t('common.common_1030') }}
+            <span class="highlight">{{ $t('chat.chat_1031') }}</span>
           </template>
         </div>
       </div>
@@ -28,8 +28,8 @@
     <template v-else-if="msg.type == 'questionnaire_push'">
       <div class="msg-item interact">
         <div class="interact-msg" @tap="checkQuestionDetail(msg.content.questionnaire_id)">
-          1{{ msg.content.text_content }}，点击
-          <span class="highlight">查看问卷</span>
+          1{{ msg.content.text_content }},{{ $t('common.common_1030') }}
+          <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
     </template>
@@ -41,7 +41,8 @@
             {{ msg.nickName | textOverflowSlice(10) }}
           </p>
           <p class="new-gift-content">
-            打赏{{ msg.content.num }}元,{{ msg.content.text_content | textOverflowSlice(6) }}
+            {{ $t('interact_tools.interact_tools_1044') }}{{ msg.content.num
+            }}{{ $t('cash.cash_1003') }},{{ msg.content.text_content | textOverflowSlice(6) }}
           </p>
         </div>
         <img class="new-award-img" src="../images/red-package.png" />
@@ -59,7 +60,7 @@
             {{ msg.nickName | textOverflowSlice(10) }}
           </p>
           <p class="new-gift-content">
-            送出一个 {{ msg.content.gift_name | textOverflowSlice(10) }}
+            {{ $t('chat.chat_1061') }} {{ msg.content.gift_name | textOverflowSlice(10) }}
           </p>
         </div>
         <img class="new-gift-img" :src="msg.content.gift_url" />
@@ -93,7 +94,7 @@
                 <span v-html="msg.replyMsg.content.text_content" />
               </p>
               <div class="msg-content_body">
-                <span class="reply-color">回复：</span>
+                <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
                 <span v-html="msg.content.text_content"></span>
                 <img
                   @tap="$emit('preview', img)"
@@ -103,7 +104,7 @@
                   v-for="(img, index) in msg.content.image_urls"
                   :key="index"
                   :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
-                  :alt="'聊天图片加载失败'"
+                  :alt="$t('chat.chat_1065')"
                 />
                 <img class="jian-left" :src="jiantou" alt />
               </div>
@@ -120,7 +121,7 @@
                   v-for="(img, index) in msg.content.image_urls"
                   :key="index"
                   :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
-                  :alt="'聊天图片加载失败'"
+                  :alt="$t('chat.chat_1065')"
                 />
                 <img class="jian-left" :src="jiantou" alt />
               </div>
@@ -138,7 +139,7 @@
                   v-for="(img, index) in msg.content.image_urls"
                   :key="index"
                   :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
-                  :alt="'聊天图片加载失败'"
+                  :alt="$t('chat.chat_1065')"
                 />
                 <img class="jian-left" :src="jiantou" alt />
               </div>
@@ -168,19 +169,19 @@
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = '主持人';
+            ret = this.$t('chat.chat_1022');
             break;
           case 3:
-            ret = '助理';
+            ret = this.$t('chat.chat_1024');
             break;
           case 4:
-            ret = '嘉宾';
+            ret = this.$t('chat.chat_1023');
             break;
           case 20:
-            ret = '组长';
+            ret = this.$t('chat.chat_1064');
             break;
           default:
-            ret = '未定义';
+            ret = this.$t('chat.chat_1062');
         }
         return ret;
       },

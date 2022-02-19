@@ -110,7 +110,7 @@
             class="vmp-member-item__control__down-mic"
             @click="downMic(userInfo.account_id)"
           >
-            下麦
+            {{ $t('interact.interact_1007') }}
           </i>
           <!--我要演示-->
           <i
@@ -272,16 +272,16 @@
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = '主持人';
+            ret = this.$t('chat.chat_1022');
             break;
           case 3:
-            ret = '助理';
+            ret = this.$t('chat.chat_1024');
             break;
           case 4:
-            ret = '嘉宾';
+            ret = this.$t('chat.chat_1023');
             break;
           case 20:
-            ret = '组长';
+            ret = this.$t('chat.chat_1064');
             break;
           default:
             ret = '';
