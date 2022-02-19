@@ -11,16 +11,12 @@
         <div class="vmp-user-account-wrap-item">
           <label>{{ $t('account.account_1002') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{
-              this.useUserServer.state.userInfo
-                ? this.useUserServer.state.userInfo.phone
-                : $t('account.account_1003')
-            }}
+            {{ useUserServer.state.userInfo.phone || $t('account.account_1003') }}
           </div>
           <div>
             <el-button type="text" @click="openPhoneDialog">
               {{
-                this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.phone
+                useUserServer.state.userInfo.phone
                   ? $t('account.account_1004')
                   : $t('account.account_1005')
               }}
@@ -31,11 +27,7 @@
           <label>{{ $t('account.account_1006') }}</label>
           <div class="vmp-user-account-wrap-item__center nick-item">
             <span v-if="!isNickNameEdit">
-              {{
-                (this.useUserServer.state.userInfo && this.useUserServer.state.userInfo.nick_name
-                  ? this.useUserServer.state.userInfo.nick_name
-                  : '') | splitLenStr(6)
-              }}
+              {{ useUserServer.state.userInfo.nick_name | splitLenStr(6) }}
             </span>
             <el-input
               v-if="isNickNameEdit"
@@ -87,7 +79,7 @@
           <label>{{ $t('account.account_1013') }}</label>
           <div class="vmp-user-account-wrap-item__center">
             {{
-              useUserServer.state.userInfo && useUserServer.state.userInfo.has_password > 0
+              useUserServer.state.userInfo.has_password !== 0
                 ? $t('account.account_1014')
                 : $t('account.account_1015')
             }}
@@ -95,7 +87,7 @@
           <div>
             <el-button type="text" @click="openPwdHandler">
               {{
-                useUserServer.state.userInfo && useUserServer.state.userInfo.has_password > 0
+                useUserServer.state.userInfo.has_password !== 0
                   ? $t('account.account_1016')
                   : $t('account.account_1017')
               }}
@@ -145,18 +137,15 @@
       </div>
 
       <!-- 设置手机号 -->
-      <!-- <Phone v-model="phoneDialog.visible" :phoneDatas="phoneData"></Phone> -->
       <Phones v-model="phoneData" />
 
       <!-- 设置密码 -->
-      <Password v-model="pwdDialog.visible" :pwdData="pwdData"></Password>
+      <Password v-model="pwdData.visible" :pwdData="pwdData"></Password>
     </el-dialog>
   </div>
 </template>
 <script>
-  // import { mapState, mapMutations } from 'vuex';
   import Upload from './components/upload/upload.vue';
-  // import Phone from './components/phone/phone.vue';
   import Phones from './components/phones/index.vue';
   import Password from './components/password/password.vue';
   import { useUserServer } from 'middle-domain';
@@ -164,75 +153,34 @@
     name: 'VmpUserAccount',
     components: {
       Upload,
-      // Phone,
       Phones,
       Password
     },
     data() {
       return {
         dialogVisible: false,
-        accountVo: {
-          nick_name: '', // 昵称
-          avatar: '', // 头像
-          phone: '', // 手机号
-          has_password: '' // 是否设置密码
-        },
         isNickNameEdit: false,
         nickName: '',
         nickError: '',
         avatar: '',
         domain_url: '',
-
-        Weixin: null,
-        QQ: null,
-        useUserServer: null,
-        /** *********设置手机号相关-start***************/
-        phoneDialog: {
-          visible: false,
-          type: 'add',
-          step: 1,
-          phone: ''
-        },
-        /** *********设置手机号相关-end***************/
-        /** *********设置密码相关-start***************/
-        pwdDialog: {
-          visible: false,
-          type: 'add'
-        },
-        /** *********设置密码相关-end***************/
-
+        useUserServer: {},
         phoneData: {
           dialogShow: false,
           type: 'add',
           step: 1,
           phone: ''
+        },
+        pwdData: {
+          type: 'add',
+          visible: false
         }
       };
     },
     created() {
       this.useUserServer = useUserServer();
     },
-    computed: {
-      // ...mapState('watchBase', ['toolsCount', 'languages'])
-      // phoneData() {
-      //   return {
-      //     type: this.useUserServer.state.userInfo.phone ? 'edit': 'add',
-      //     step: 1,
-      //     phone: this.useUserServer.state.userInfo.phone
-      //   }
-      // },
-      pwdData() {
-        return {
-          type:
-            this.useUserServer.state.userInfo &&
-            this.useUserServer.state.userInfo.has_password === 1
-              ? 'edit'
-              : 'add'
-        };
-      }
-    },
     methods: {
-      // ...mapMutations('watchBase', ['setLoginToken', 'setUserInfo', 'setIsLogin']),
       // 上传、替换头像
       handleUploadSuccess(res) {
         if (res.data) {
@@ -346,57 +294,10 @@
           });
       },
 
-      getUserInfo(type) {
-        this.$vhallapi.nav
-          .getInfo({
-            scene_id: 2
-          })
-          .then(res => {
-            if (res && res.code == 200) {
-              // this.setUserInfo(res.data); TODO
-              this.accountVo = res.data;
-              // 设置用户昵称
-              this.nickName = res.data.nick_name;
-              if (type === 2) {
-                // 昵称修改成功调用
-                // this.$VhallEventBus.$emit(this.$VhallEventType.Chat.CHAT_NICKNAME_CHANGE, res.data.nick_name)
-              }
-              // QQ信息
-              const QQ = res.data.user_thirds.filter(item => item.type === 2);
-              if (QQ && QQ.length > 0) {
-                this.QQ = QQ[0];
-              } else {
-                this.QQ = {};
-              }
-              // 微信信息
-              const Weixin = res.data.user_thirds.filter(item => item.type === 3);
-              if (Weixin && Weixin.length > 0) {
-                this.Weixin = Weixin[0];
-              } else {
-                this.Weixin = {};
-              }
-              // 用户头像
-              this.avatar = res.data.avatar;
-              if (type === 1) {
-                // 头像修改成功调用
-                // this.$VhallEventBus.$emit(this.$VhallEventType.Chat.CHAT_AVATAR_CHANGE, res.data.avatar)
-              }
-              this.domain_url = res.data.avatar;
-            } else {
-              // this.setUserInfo(null); TODO
-            }
-          })
-          .catch(e => {
-            console.log(e);
-            // this.setUserInfo(null); TODO
-          });
-      },
       // 设置手机号 or 修改手机号
       openPhoneDialog() {
-        this.phoneDialog.visible = true;
         this.phoneData.dialogShow = true;
-        // this.phoneData.type = this.useUserServer.state.userInfo.phone ? 'edit': 'add';
-        this.phoneData.type = 'edit';
+        this.phoneData.type = this.useUserServer.state.userInfo.phone ? 'edit' : 'add';
         this.phoneData.phone = this.useUserServer.state.userInfo.phone;
         this.phoneData.step = 1;
       },
@@ -450,7 +351,8 @@
       },
       // 设置密码 or 修改密码
       openPwdHandler() {
-        this.pwdDialog.visible = true;
+        this.pwdData.visible = true;
+        this.pwdData.type = this.useUserServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
       },
       // QQ绑定 or QQ解绑
       editQQHandler() {
