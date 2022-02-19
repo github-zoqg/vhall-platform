@@ -7,7 +7,7 @@
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
-          查看聊天历史消息
+          {{ $t('chat.chat_1058') }}
         </span>
       </p>
       <scroll ref="scroll" @pullingDown="handlePullingDown">
@@ -30,19 +30,20 @@
             !((messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal)
           "
         >
-          有{{ newMsgNum }}条未读消息
+          {{ $t('chat.chat_1035', newMsgNum) }}
         </span>
         <span
           v-if="(messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal"
         >
-          有人{{ messageType.atList ? '@' : '' }}{{ messageType.reply ? '回复' : '' }} 你
+          {{ $t('chat.chat_1034') }}{{ messageType.atList ? '@' : ''
+          }}{{ messageType.reply ? $t('chat.chat_1036') : '' }} {{ $t('chat.chat_1059') }}
         </span>
         <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
     <send-box
       :currentTab="3"
-      :isAllBanned="isAllBanned"
+      :isAllBanned="allBanned"
       :isBanned="isBanned"
       :isHandsUp="isHandsUp"
       :noChatLogin="noChatLogin"
@@ -97,9 +98,12 @@
         //房间号
         roomId: '',
         //是否是嵌入端
-        isEmbed: false
+        isEmbed: false,
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
+
     computed: {
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
@@ -115,16 +119,6 @@
       isHandsUp() {
         const { interactToolStatus = {} } = this.roomBaseServer.state;
         return interactToolStatus && !!interactToolStatus['is_handsup'];
-      },
-      //是否是全体禁言
-      isAllBanned() {
-        const { allBanned = 0 } = this.chatServer.state;
-        return allBanned === 1;
-      },
-      //是否是自己被禁言
-      isBanned() {
-        const { banned = 0 } = this.chatServer.state;
-        return banned === 1;
       },
       //是否不登陆也可以参与聊天
       noChatLogin() {
@@ -209,7 +203,10 @@
       // 给聊天服务保存一份关键词
       this.chatServer.setKeywordList(this.keywordList);
     },
-    mounted() {},
+    mounted() {
+      console.log('useChatServer', useChatServer().state);
+      this.listenChatServer();
+    },
     methods: {
       //初始化视图数据
       initViewData() {
@@ -222,6 +219,21 @@
         this.configList = configList;
         this.roomId = interact.room_id;
         this.isEmbed = embed;
+      },
+      listenChatServer() {
+        //监听禁言通知
+        useChatServer().$on('banned', res => {
+          alert(res);
+          this.isBanned = res;
+        });
+        //监听全体禁言通知
+        useChatServer().$on('allBanned', res => {
+          this.allBanned = res;
+        });
+        //监听分组房间变更通知
+        useChatServer().$on('changeChannel', () => {
+          this.handleChannelChange();
+        });
       },
       // 获取历史消息
       async getHistoryMessage() {

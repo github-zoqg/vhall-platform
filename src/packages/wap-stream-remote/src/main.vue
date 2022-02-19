@@ -23,84 +23,6 @@
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
-    <!-- 鼠标 hover 遮罩层 -->
-    <section class="vmp-stream-remote__shadow-box">
-      <p class="vmp-stream-remote__shadow-first-line">
-        <span
-          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
-          class="vmp-stream-local__shadow-label"
-        >
-          {{ stream.attributes.roleName | roleNameFilter }}
-        </span>
-        <el-tooltip
-          v-if="isShowVideoControl"
-          :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'"
-          placement="top"
-        >
-          <span
-            class="vmp-stream-remote__shadow-icon"
-            @click="handleClickMuteDevice('video')"
-            :class="
-              stream.videoMuted
-                ? 'vh-iconfont vh-line-turn-off-video-camera'
-                : 'vh-iconfont vh-line-video-camera'
-            "
-          ></span>
-        </el-tooltip>
-        <el-tooltip
-          v-if="isShowAudioControl"
-          :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'"
-          placement="top"
-        >
-          <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont"
-            @click="handleClickMuteDevice('audio')"
-            :class="
-              stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
-            "
-          ></span>
-        </el-tooltip>
-        <el-tooltip content="下麦" placement="bottom">
-          <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            @click="speakOff"
-            v-if="stream.attributes.roleName != 1 && stream.attributes.roleName != 20"
-          ></span>
-        </el-tooltip>
-      </p>
-      <p class="vmp-stream-remote__shadow-second-line">
-        <span
-          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
-          class="vmp-stream-local__shadow-label"
-        >
-          视图
-        </span>
-        <el-tooltip content="切换" placement="bottom">
-          <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-line-copy-document"
-            v-if="!isFullScreen"
-            @click="exchange"
-          ></span>
-        </el-tooltip>
-        <el-tooltip content="全屏" placement="bottom">
-          <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont"
-            :class="{
-              'vh-line-amplification': !isFullScreen,
-              'vh-line-narrow': isFullScreen
-            }"
-            @click="fullScreen"
-          ></span>
-        </el-tooltip>
-        <el-tooltip content="下麦" placement="bottom">
-          <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="stream.attributes.roleName != 1"
-            @click="speakOff"
-          ></span>
-        </el-tooltip>
-      </p>
-    </section>
   </div>
 </template>
 
@@ -194,28 +116,10 @@
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
-      // 点击mute按钮事件
-      handleClickMuteDevice(deviceType) {
-        const status = this.stream[`${deviceType}Muted`] ? 1 : 0;
-        this.interactiveServer.setDeviceStatus({
-          device: deviceType == 'video' ? 2 : 1,
-          status,
-          receive_account_id: this.stream.accountId
-        });
-      },
       speakOff() {
         this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
-      },
-      fullScreen() {
-        this.interactiveServer.setStreamFullscreen({
-          streamId: this.stream.streamId,
-          vNode: `vmp-stream-remote__${this.stream.streamId}`
-        });
-      },
-      exchange() {
-        this.roomBaseServer.requestChangeMiniElement('stream-list');
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -342,52 +246,6 @@
         }
         &__2 {
           background-image: url(./images/network2.png);
-        }
-      }
-    }
-    // 遮罩层样式
-    .vmp-stream-remote__shadow-box {
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      .vmp-stream-remote__shadow-first-line {
-        line-height: 36px;
-      }
-      .vmp-stream-remote__shadow-second-line {
-        line-height: 36px;
-      }
-      .vmp-stream-local__shadow-label {
-        display: inline-block;
-        width: 54px;
-        margin-right: 10px;
-        text-align: right;
-        color: #ffffff;
-        font-size: 12px;
-      }
-      .vmp-stream-remote__shadow-icon {
-        cursor: pointer;
-        text-align: center;
-        display: inline-block;
-        color: #fff;
-        font-size: 16px;
-        width: 28px;
-        height: 28px;
-        line-height: 28px;
-        background: hsla(0, 0%, 100%, 0.3);
-        border-radius: 100%;
-        margin-right: 10px;
-        &:hover {
-          background-color: #fc5659;
-        }
-        &:last-child {
-          margin-right: 0;
         }
       }
     }
