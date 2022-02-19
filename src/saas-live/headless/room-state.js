@@ -57,25 +57,6 @@ export default async function () {
 
   mediaSettingServer.init();
 
-  await roomBaseServer.getCommonConfig({
-    tags: [
-      'skin',
-      'screen-poster',
-      'like',
-      'keywords',
-      'public-account',
-      'webinar-tag',
-      'menu',
-      'adv-default',
-      'invite-card',
-      'red-packet',
-      'room-tool',
-      'goods-default',
-      'announcement',
-      'sign'
-    ]
-  });
-
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
     await groupServer.init();

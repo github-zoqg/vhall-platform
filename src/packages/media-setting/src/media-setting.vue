@@ -119,7 +119,7 @@
 
         // 角色为1
         if (watchInitData?.join_info?.role_name == '1') {
-          const res = await this.mediaSettingServer.setStream({
+          await this.mediaSettingServer.setStream({
             room_id: watchInitData.interact.room_id,
             definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
             layout: this.mediaState.layout || 0,
