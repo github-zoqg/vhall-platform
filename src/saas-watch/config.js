@@ -268,6 +268,7 @@ export const serverConfig = {
   comLottery: {
     // component: 'VmpLotteryWatch'
   },
+  // 开屏页
   comScreenPost: {
     component: 'VmpScreenPost'
   },

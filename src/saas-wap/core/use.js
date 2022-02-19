@@ -46,6 +46,8 @@ import VmpWapStreamLocal from '@/packages/wap-stream-local';
 
 // 用来判断显示播放器还是流
 import VmpWapBody from '@/packages/wap-body';
+// 开屏页
+import VmpScreenPostWap from '@/packages/screen-post-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -76,4 +78,5 @@ export function initUse() {
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapStreamLocal);
   Vue.use(VmpWapBody);
+  Vue.use(VmpScreenPostWap);
 }
