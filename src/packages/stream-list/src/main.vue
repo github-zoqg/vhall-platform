@@ -88,7 +88,15 @@
         }
       }
     },
-
+    watch: {
+      isStreamListH0: {
+        handler(newval) {
+          console.log('emit has-stream-list:', !newval);
+          this.interactiveServer.$emit('has-stream-list', !newval);
+        },
+        immediate: true
+      }
+    },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
     },
