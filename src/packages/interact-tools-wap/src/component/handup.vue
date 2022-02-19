@@ -74,6 +74,7 @@
       },
       // 是否是上麦状态
       isSpeakOn() {
+        console.log('是否是上麦状态', this.$domainStore.state.micServer);
         return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
@@ -92,17 +93,21 @@
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
         console.log('用户上麦的监听', msg);
+        this.closeConnectPop();
+        this.$emit('handupLoading', false);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           clearInterval(this.lowerWheatFun);
           this.lowerWheatFun = null;
           this.isWaitting = false;
-          this.handText = this.$t('interact.interact_1001');
+          this.handText = this.$t('interact.interact_1007');
         }
       });
     },
     methods: {
       // 下麦操作
       offConnect() {
+        this.$emit('handupLoading', false);
+        this.closeConnectPop();
         useMicServer().speakOff();
       },
       // / 举手上麦
