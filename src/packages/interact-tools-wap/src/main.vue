@@ -1,6 +1,11 @@
 <template>
   <div class="tools-box">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
+      <!-- 上麦 -->
+      <div v-if="isAllowhandup" auth="{ 'ui.hide_reward': 0 }">
+        <i class="vh-saas-iconfont vh-line-link" @click="$refs.handup.openConnectPop()"></i>
+        <Handup ref="handup" />
+      </div>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
         <GiftCard
@@ -29,6 +34,8 @@
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
         <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
+      <!-- 被邀请上麦 -->
+      <invite-handup :roomBaseState="roomBaseState" />
     </div>
   </div>
 </template>
@@ -38,9 +45,12 @@
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
+  import Handup from './component/handup.vue';
+  import InviteHandup from './component/InviteHandup.vue';
+
   export default {
     name: 'VmpInteractToolsWap',
-    components: { GiftCard, RewardCard, Parise },
+    components: { GiftCard, RewardCard, Parise, Handup, InviteHandup },
     data() {
       let { configList } = useRoomBaseServer().state;
       let { groupInitData } = useGroupServer().state;
@@ -65,6 +75,7 @@
         webSrc: roomBaseState.watchInitData.urls.web_url,
         webinarId: '723145973'
       };
+      console.log('localRoomInfo------', localRoomInfo);
       let webinarData = roomBaseState.watchInitData.webinar;
       return {
         roomBaseState,
@@ -78,6 +89,13 @@
           window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
         qwe: 1
       };
+    },
+    computed: {
+      // 是否开启举手
+      isAllowhandup() {
+        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        return status;
+      }
     },
     mounted() {
       this.joinInfoInGift = {

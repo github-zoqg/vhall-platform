@@ -9,7 +9,10 @@
     <section class="vmp-media-setting-content">
       <main class="vmp-media-setting-content-main">
         <!-- 基础设置 -->
-        <basic-setting v-show="selectedMenuItem === 'basic-setting'" @showConfirm="showConfirm" />
+        <basic-setting
+          v-show="selectedMenuItem === 'basic-setting'"
+          @rateChangeToHD="rateChangeToHD"
+        />
         <!-- 摄像头 -->
         <video-setting v-show="selectedMenuItem === 'video-setting'" />
         <!-- 麦克风 -->
@@ -68,7 +71,7 @@
         mediaState: this.mediaSettingServer.state,
         isShow: true,
         selectedMenuItem: 'basic-setting',
-
+        isRateChangeToHD: false,
         liveMode: 0 // 1-音频 2-视频 3-互动
       };
     },
@@ -93,12 +96,12 @@
       clickClose() {
         this.$emit('closeDlg');
       },
+      rateChangeToHD(value) {
+        this.rateChangeToHD = value;
+      },
       changeSelectedMenuItem(id) {
         console.log('on click on lick', id);
         this.selectedMenuItem = id;
-      },
-      showConfirm(text = '', payload = {}) {
-        this.$emit('showConfirm', text, payload);
       },
       restart() {
         try {
@@ -110,8 +113,11 @@
       saveSetting() {
         // const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
         // if (watchInitData.webinar.type === 1) {
-        this.showConfirm(`修改设置后导致重新推流，是否继续保存?`);
-        this.updateDeviceSetting();
+        let text = '修改设置后导致重新推流，是否继续保存';
+        if (this.isRateChangeToHD) {
+          text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+        }
+        this.$emit('showConfirm', text, this.updateDeviceSetting, this);
         // }
       },
       async updateDeviceSetting() {
@@ -119,7 +125,7 @@
 
         // 角色为1
         if (watchInitData?.join_info?.role_name == '1') {
-          const res = await this.mediaSettingServer.setStream({
+          await this.mediaSettingServer.setStream({
             room_id: watchInitData.interact.room_id,
             definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
             layout: this.mediaState.layout || 0,
@@ -130,16 +136,13 @@
           this.saveSelected();
         } else {
           // TODO: event.deviceSplit(options)&selectVideoType
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions'));
 
           this.saveSelected();
 
           this.$message.success('保存成功！');
         }
 
-        // 这里发送事件通知 stream 变化
-        this.mediaSettingServer.stopVideoPreview();
-        this.$emit('submit', false);
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions'));
       },
       async getVideoDeviceInfo() {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });

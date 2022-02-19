@@ -26,8 +26,7 @@
       return {
         isConfirmVisible: false,
         btnText: '确认',
-        waitTime: 30,
-        roomInfo: {}
+        waitTime: 30
       };
     },
     props: {
@@ -49,7 +48,6 @@
         }
         const { type = '' } = temp.data || {};
         if (type === 'vrtc_connect_invite') {
-          this.roomInfo = temp;
           this.isConfirmVisible = true;
           this.waitTime = 30;
           clearInterval(this.waitInterval);
