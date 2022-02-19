@@ -6,9 +6,9 @@ import VmpAirContainer from '@/packages/air-container';
 import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
 import VmpWapPlayer from '@/packages/wap-player';
 import VmpDocWap from '@/packages/doc-wap';
-import VmpStreamList from '@/packages/stream-list';
-import VmpStreamLocal from '@/packages/stream-local';
-import VmpStreamRemote from '@/packages/stream-remote';
+import VmpWapStreamList from '@/packages/wap-stream-list';
+import VmpWapStreamLocal from '@/packages/wap-stream-local';
+import VmpWapStreamRemote from '@/packages/wap-stream-remote';
 import VmpRegLoginWap from '@/packages/reg-login-wap';
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
@@ -41,9 +41,6 @@ import VmpSignWap from '@/packages/interact-sign-wap';
 // 二维码弹框
 import VmpWapQrCode from '@/packages/qrcode-wap';
 
-// Wap互动推流组件
-import VmpWapStreamLocal from '@/packages/wap-stream-local';
-
 // 用来判断显示播放器还是流
 import VmpWapBody from '@/packages/wap-body';
 // 开屏页
@@ -58,9 +55,9 @@ export function initUse() {
   Vue.use(VmpHeaderWatchWap);
   Vue.use(VmpWapPlayer);
   Vue.use(VmpDocWap);
-  Vue.use(VmpStreamList);
-  Vue.use(VmpStreamLocal);
-  Vue.use(VmpStreamRemote);
+  Vue.use(VmpWapStreamList);
+  Vue.use(VmpWapStreamLocal);
+  Vue.use(VmpWapStreamRemote);
   Vue.use(VmpRegLoginWap);
   Vue.use(VmpMemberList);
   Vue.use(VmpWatchPrivateChat);
@@ -78,7 +75,6 @@ export function initUse() {
   Vue.use(VmpCustomMenuWap);
   Vue.use(VmpSignWap);
   Vue.use(VmpMemberListWap);
-  Vue.use(VmpWapStreamLocal);
   Vue.use(VmpWapBody);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);

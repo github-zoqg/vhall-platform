@@ -70,13 +70,20 @@ export const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWaStreamLocal']
+    children: ['comWapPlayer', 'comWapStreamList']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
   },
-  comWaStreamLocal: {
+  comWapStreamList: {
+    component: 'VmpWapStreamList',
+    children: ['comWapStreamLocal']
+  },
+  comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
+  },
+  comWapStreamRemote: {
+    component: 'VmpWapStreamRemote'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
