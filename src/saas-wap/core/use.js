@@ -47,6 +47,9 @@ import VmpWapStreamLocal from '@/packages/wap-stream-local';
 // 用来判断显示播放器还是流
 import VmpWapBody from '@/packages/wap-body';
 
+// 送礼物飘屏动画
+import VmpWapRewardEffect from '@/packages/wap-reward-effect';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -76,4 +79,5 @@ export function initUse() {
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapStreamLocal);
   Vue.use(VmpWapBody);
+  Vue.use(VmpWapRewardEffect);
 }

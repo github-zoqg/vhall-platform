@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog', 'comWapRewardEffect']
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
@@ -190,6 +190,12 @@ export const serverConfig = {
       }
     ],
     children: ['comInteractToolsWap'],
+    options: {}
+  },
+  // wap礼物飘屏动画
+  comWapRewardEffect: {
+    component: 'VmpWapRewardEffect',
+    children: [],
     options: {}
   }
 };
