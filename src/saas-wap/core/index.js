@@ -3,6 +3,7 @@ import { initUse } from './use';
 import { initPureServer } from './pure';
 import { initMixin } from './mixin';
 import { initI18n } from './lang';
+import './filters';
 import './setFontSize';
 
 // 初始化全局属性

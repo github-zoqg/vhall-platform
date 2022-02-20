@@ -4,6 +4,14 @@
   white-space: nowrap;
 }
 
+.flex(@justify: flex-start, @align-items: center, @dir: row, @wrap: nowrap, @align-content: stretch) {
+  display: flex;
+  flex-flow: @dir @wrap;
+  justify-content: @justify;
+  align-items: @align-items;
+  align-content: @align-content;
+}
+
 // @mixin border-1px-direction($direction, $color: #e6e6e6, $borderRadius: 8PX) {
 //   position: relative;
 //   border-width: 0;
