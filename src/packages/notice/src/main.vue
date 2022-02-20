@@ -123,9 +123,10 @@
         }
 
         const params = {
-          room_id: this.watchInitData.interact.room_id,
+          messageType: 1,
+          roomId: this.watchInitData.interact.room_id,
           channel_id: this.watchInitData.interact.channel_id,
-          body: this.inputVal
+          content: this.inputVal
         };
 
         try {

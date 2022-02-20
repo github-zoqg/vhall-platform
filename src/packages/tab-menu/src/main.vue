@@ -44,6 +44,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
+  import { useMenuServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -67,6 +68,9 @@
         return this.menu.filter(item => item.visible);
       }
     },
+    beforeCreate() {
+      this.menuServer = useMenuServer();
+    },
     created() {
       this.initConfig();
       this.initMenu();
@@ -89,18 +93,22 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
+        const roomState = this.$domainStore.state.roomBaseServer;
+        let list = [];
+
         // 从接口拉取的配置
-        const list = this.$domainStore.state.roomBaseServer.customMenu.list;
+        if (roomState.clientType === 'send') {
+          list = [...this.menuServer.state.list];
+        } else {
+          list = [...roomState.customMenu.list];
+        }
 
-        this.addItem({
-          type: 8,
-          name: '成员',
-          status: '1'
-        });
-
+        console.log('menu list:', list);
         for (const item of list) {
           this.addItem(item);
         }
+
+        window.tabMenu = this;
       },
       /**
        * 选中默认的菜单项（第一项）
@@ -206,6 +214,69 @@
         const item = this.getItem({ type, id });
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
+        this.menuServer.$emit('tab-switched', item);
+      },
+      /**
+       * 设置菜单项显隐
+       * @param {Boolean} visible [true|false] 显隐值
+       * @param {String} cuid cuid
+       * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       */
+      setVisible({ visible = true, type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+
+        tab.visible = visible;
+        visible === false && this.jumpToNearestItemById(id);
+      },
+      /**
+       * 切换某个菜单tab的可视性
+       * @param {*} cuid
+       * @param {*} menuId [非必传]
+       * @example toggleVisible('comChatWap','')
+       */
+      toggleVisible({ type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+
+        tab.visible = !tab.visible;
+      },
+      /**
+       * 设置小红点的显隐
+       * @param {Boolean} visible [true|false] 显隐值
+       * @param {String} cuid cuid
+       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       * @example setTipsVisible(true,'comChatWap','10186')
+       */
+      setTipsVisible({ visible, type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+
+        tab.tipsVisible = visible;
+      },
+      /**
+       * 跳转到最近的item
+       */
+      jumpToNearestItemById(id) {
+        const index = this.visibleMenu.findIndex(item => item.id === id);
+
+        // 向后跳
+        const nextItem = this.visibleMenu[index + 1];
+        if (index < this.visibleMenu.length && nextItem !== undefined) {
+          const { type, id } = nextItem;
+          this.select({ type, id });
+        }
+
+        // 向前跳
+        const lastItem = this.visibleMenu[index - 1];
+        if (index > 0 && lastItem !== undefined) {
+          const { type, id } = lastItem;
+          this.select({ type, id });
+        }
+
+        // 前后都没有清空任何选择(基本不会发生的极端情况)
+        this.selectedId = '';
+        this.selectedType = '';
       }
     }
   };

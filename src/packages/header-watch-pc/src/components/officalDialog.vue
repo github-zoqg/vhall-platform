@@ -20,10 +20,15 @@
   </el-dialog>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'OfficaialDialog',
     props: {
       officicalInfo: {
+        type: Object,
+        default: () => {}
+      },
+      screenPosterInfo: {
         type: Object,
         default: () => {}
       }
@@ -38,7 +43,13 @@
             this.officicalInfo.alert_type == 0 &&
             this.officicalInfo.status == 0
           ) {
-            this.officialVisible = true;
+            if (this.screenPosterInfo.status == 1) {
+              this.officialVisible = true;
+            } else {
+              this.roomBaseServer.$on('screenPostClose', () => {
+                this.officialVisible = true;
+              });
+            }
           }
         }
       }
@@ -47,6 +58,9 @@
       return {
         officialVisible: false
       };
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
     }
   };
 </script>

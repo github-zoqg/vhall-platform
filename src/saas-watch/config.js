@@ -33,15 +33,15 @@ export const serverConfig = {
   },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
-    children: [
-      'comStreamList',
-      'comPcPlayer',
-      'comFooterTools',
-      'comNoticeColumn',
-      'comDocUne',
-      'comWatchAsideMenu'
-    ]
-    // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
+    children: ['layerBodyCenterHeader', 'layerBodyCenterMain']
+  },
+  layerBodyCenterHeader: {
+    component: 'VmpAirContainer',
+    children: ['comStreamList']
+  },
+  layerBodyCenterMain: {
+    component: 'VmpBasicCenterMain',
+    children: ['comPcPlayer', 'comWatchAsideMenu', 'comDocUne', 'comFooterTools', 'comNoticeColumn']
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -268,6 +268,7 @@ export const serverConfig = {
   comLottery: {
     // component: 'VmpLotteryWatch'
   },
+  // 开屏页
   comScreenPost: {
     component: 'VmpScreenPost'
   },

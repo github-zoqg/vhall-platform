@@ -187,7 +187,8 @@
     .menu-fold {
       position: absolute;
       z-index: 6;
-      top: 21px;
+      left: 0;
+      bottom: 60%;
       cursor: pointer;
       display: inline-block;
       width: 32px;

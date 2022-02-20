@@ -7,11 +7,7 @@
       v-if="!isShowContainer"
     ></vmp-air-container>
     <!-- 流列表 -->
-    <vmp-air-container
-      :cuid="childrenComp[1]"
-      :oneself="true"
-      v-if="isShowContainer"
-    ></vmp-air-container>
+    <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
   </div>
 </template>
 <script>
@@ -25,8 +21,8 @@
     computed: {
       isShowContainer() {
         return (
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6 ||
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+          this.$domainStore.state.micServer.isSpeakOn
         );
       }
     },

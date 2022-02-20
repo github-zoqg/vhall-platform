@@ -38,7 +38,16 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: [
+      'compRegLoginWap',
+      'comOfficial',
+      'comShare',
+      'comWatchTimer',
+      'comSignUpForm',
+      'comScreenPostWap',
+      'comUserCenterWap',
+      'compLotteryWap'
+    ]
   },
   // 顶部
   comHeaderWatch: {
@@ -62,13 +71,20 @@ export const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWaStreamLocal']
+    children: ['comWapPlayer', 'comWapStreamList']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
   },
-  comWaStreamLocal: {
+  comWapStreamList: {
+    component: 'VmpWapStreamList',
+    children: ['comWapStreamLocal']
+  },
+  comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
+  },
+  comWapStreamRemote: {
+    component: 'VmpWapStreamRemote'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
@@ -163,6 +179,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitOpenUserCenterWap: [
+      {
+        cuid: ['comUserCenterWap'],
+        method: 'openUserCenterWap',
+        args: ['$0']
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -197,5 +220,16 @@ export const serverConfig = {
     component: 'VmpWapRewardEffect',
     children: [],
     options: {}
+  },
+  // 开屏页
+  comScreenPostWap: {
+    component: 'VmpScreenPostWap'
+  },
+  comUserCenterWap: {
+    component: 'VmpUserCenterWap'
+  },
+  // 抽奖
+  compLotteryWap: {
+    component: 'VmpLotteryWap'
   }
 };
