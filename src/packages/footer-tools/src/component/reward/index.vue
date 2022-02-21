@@ -297,6 +297,7 @@
             margin-top: 30px;
             width: 216px;
             .pay-checkbox-item {
+              line-height: 1;
               .pay-checkbox-item__left {
                 float: left;
                 .pay-icon {
