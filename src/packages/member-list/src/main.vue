@@ -1548,7 +1548,7 @@
             // center: true
           }).then(() => {
             this.micServer
-              .userSpeakOff(data)
+              .speakOff(data)
               .then(res => {
                 //todo 埋点上报
                 return res;
@@ -1559,7 +1559,7 @@
           });
         } else {
           this.micServer
-            .userSpeakOff(data)
+            .speakOff(data)
             .then(res => {
               //todo 埋点上报
               return res;

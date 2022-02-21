@@ -21,6 +21,7 @@
           :isShowSplitScreen="isShowSplitScreen"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
+          @thirdPushStream="thirdPushStream"
         ></headerControl>
       </div>
       <div class="vmp-header-right_full"><i class="vh-iconfont vh-line-amplification"></i></div>
@@ -83,6 +84,13 @@
       // 打开虚拟人数的弹窗
       openVirtualProple() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
+      },
+      // 第三方推流和网页
+      thirdPushStream(flag) {
+        console.log(flag, '??!234');
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickThirdStream', [{ status: flag }])
+        );
       },
       // 推流成功事件
       async handlePublishComplate() {

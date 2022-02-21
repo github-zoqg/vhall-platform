@@ -34,7 +34,7 @@
         <!--被禁言标识 -->
         <template v-if="[1, 3].includes(tabIndex) && userInfo.is_banned === 1">
           <i
-            class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-line-blacklist"
+            class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
             style="color: #cccccc"
           ></i>
         </template>
@@ -131,7 +131,7 @@
         <!--被禁言-->
         <i
           v-if="[1, 3].includes(tabIndex) && [1, '1'].includes(userInfo.is_banned)"
-          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-line-blacklist"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
           style="color: #cccccc"
         ></i>
         <!--申请上麦-->
@@ -153,7 +153,7 @@
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
-          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-line-blacklist"
+          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-Onthemicrophone1"
           style="color: #fb3a32; font-size: 15px"
         ></i>
         <!--设备有问题-->
