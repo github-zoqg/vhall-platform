@@ -161,7 +161,7 @@
       // this.listenEvents();
     },
     async mounted() {
-      console.log('本地流组件mounted钩子函数');
+      console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
 
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
@@ -212,6 +212,10 @@
       }
     },
     methods: {
+      // 媒体切换后进行无缝切换
+      switchStreamType() {
+        console.warn('切换设置后进行的无缝切换');
+      },
       sleep(time = 1000) {
         return new Promise(resolve => {
           setTimeout(() => {
