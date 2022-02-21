@@ -1,9 +1,8 @@
-// pc观看端右侧聊天区域容器组件
-import VmpBasicRightContainer from './src/main';
+// pc观看端左侧主区域
+import VmpBasicCenterContainer from './src/main';
 
-/* istanbul ignore next */
-VmpBasicRightContainer.install = function (Vue) {
-  Vue.component(VmpBasicRightContainer.name, VmpBasicRightContainer);
+VmpBasicCenterContainer.install = function (Vue) {
+  Vue.component(VmpBasicCenterContainer.name, VmpBasicCenterContainer);
 };
 
-export default VmpBasicRightContainer;
+export default VmpBasicCenterContainer;

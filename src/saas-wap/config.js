@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog', 'comWapRewardEffect']
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
@@ -47,7 +47,8 @@ export const serverConfig = {
       'comScreenPostWap',
       'comUserCenterWap',
       'comUserAccountWap',
-      'comCashWap'
+      'comCashWap',
+      'compLotteryWap'
     ]
   },
   // 顶部
@@ -72,13 +73,20 @@ export const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWaStreamLocal']
+    children: ['comWapPlayer', 'comWapStreamList']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
   },
-  comWaStreamLocal: {
+  comWapStreamList: {
+    component: 'VmpWapStreamList',
+    children: ['comWapStreamLocal']
+  },
+  comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
+  },
+  comWapStreamRemote: {
+    component: 'VmpWapStreamRemote'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
@@ -110,7 +118,7 @@ export const serverConfig = {
   },
   // 登录弹窗
   compRegLoginWap: {
-    // component: 'VmpRegLoginWap'
+    component: 'VmpRegLoginWap'
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
@@ -209,6 +217,12 @@ export const serverConfig = {
     children: ['comInteractToolsWap'],
     options: {}
   },
+  // wap礼物飘屏动画
+  comWapRewardEffect: {
+    component: 'VmpWapRewardEffect',
+    children: [],
+    options: {}
+  },
   // 开屏页
   comScreenPostWap: {
     component: 'VmpScreenPostWap'
@@ -238,5 +252,9 @@ export const serverConfig = {
   // 提现管理
   comCashWap: {
     component: 'VmpCashWap'
+  },
+  // 抽奖
+  compLotteryWap: {
+    component: 'VmpLotteryWap'
   }
 };

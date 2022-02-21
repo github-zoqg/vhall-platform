@@ -12,11 +12,11 @@
           <!-- 摄像头按钮 -->
           <button class="btn" @click="handleClickMuteDevice('video')">
             <i
-              class="iconfont iconfont-bottom icona-icon_shexiangtou_guanbi2x"
+              class="vh-iconfont iconfont-bottom vh-line-turn-off-video-camera"
               v-show="!localStream.videoMuted"
             ></i>
             <i
-              class="iconfont iconfont-bottom icona-icon_shexiangtou2x"
+              class="vh-iconfont iconfont-bottom vh-line-video-camera"
               v-show="localStream.videoMuted"
             ></i>
             <div class="btn-text">{{ $t('setting.setting_1003') }}</div>
@@ -24,24 +24,24 @@
           <!-- 麦克风按钮 -->
           <button class="btn" @click="handleClickMuteDevice('audio')">
             <i
-              class="iconfont iconfont-bottom icona-icon_maikefeng_guanbi2x"
+              class="vh-iconfont iconfont-bottom vh-line-turn-off-microphone"
               v-show="!localStream.audioMuted"
             ></i>
             <i
-              class="iconfont iconfont-bottom icona-icon_maikefeng2x"
+              class="vh-iconfont iconfont-bottom vh-line-microphone"
               v-show="localStream.audioMuted"
             ></i>
             <div class="btn-text">{{ $t('setting.setting_1004') }}</div>
           </button>
           <button class="btn" @click="offConnect">
-            <i class="iconfont iconfont-bottom icona-icon_jushou2x"></i>
-            <div class="btn-text">{{ handText }}</div>
+            <i class="vh-iconfont iconfont-bottom vh-a-line-handsdown"></i>
+            <div class="btn-text">{{ $t('interact.interact_1007') }}</div>
           </button>
         </div>
         <button class="btn btn-handsup" v-if="!isSpeakOn" @click="handsUpToConnect">
           <i
-            v-if="handText.search('等待中...') != -1"
-            class="iconfont iconfont-bottom icona-icon_jushou2x"
+            v-if="handText.search('等待...') != -1"
+            class="vh-iconfont iconfont-bottom vh-a-line-handsup"
           ></i>
           <div class="btn-text">{{ handText }}</div>
         </button>
@@ -51,7 +51,7 @@
   </section>
 </template>
 <script>
-  import { useMicServer } from 'middle-domain';
+  import { useMicServer, useInteractiveServer } from 'middle-domain';
   export default {
     name: 'Handup',
     data() {
@@ -89,17 +89,21 @@
     created() {
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
+        this.closeConnectPop();
+        this.$emit('handupLoading', false);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           clearInterval(this.lowerWheatFun);
           this.lowerWheatFun = null;
           this.isWaitting = false;
-          this.handText = this.$t('interact.interact_1001');
+          this.handText = this.$t('interact.interact_1007');
         }
       });
     },
     methods: {
       // 下麦操作
       offConnect() {
+        this.$emit('handupLoading', false);
+        this.closeConnectPop();
         useMicServer().speakOff();
       },
       // / 举手上麦
@@ -131,16 +135,18 @@
               1、更新文案，为倒计时，倒计时结束，主持人拒绝，提示拒绝上麦
               */
             this.lowerWheatTimer = 30;
-            this.handText = `${this.$t('other.other_1008')}...(${this.lowerWheatTimer}s)`;
+            this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
+            this.$emit('handupLoading', true);
             this.lowerWheatFun = setInterval(() => {
               this.lowerWheatTimer--;
-              this.handText = `${this.$t('other.other_1008')}...(${this.lowerWheatTimer}s)`;
+              this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
               this.isWaitting = true;
               if (this.lowerWheatTimer <= 0) {
                 clearInterval(this.lowerWheatFun);
                 this.lowerWheatFun = null;
                 this.isWaitting = false;
                 this.handText = this.$t('interact.interact_1001');
+                this.$emit('handupLoading', false);
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
               }
@@ -148,8 +154,8 @@
           });
       },
       handleClickMuteDevice(deviceType) {
-        const status = this.interactiveServer.state.localStream[`${deviceType}Muted`] ? 1 : 0;
-        this.interactiveServer.setDeviceStatus({
+        const status = useInteractiveServer().state.localStream[`${deviceType}Muted`] ? 1 : 0;
+        useInteractiveServer().setDeviceStatus({
           device: deviceType == 'video' ? 2 : 1,
           status,
           receive_account_id: this.joinInfo.third_party_user_id

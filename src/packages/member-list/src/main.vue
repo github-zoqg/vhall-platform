@@ -32,10 +32,11 @@
                   :is-interact="isInteract"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="docPermissionId"
+                  :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
+                  :status="liveStatus"
                 ></member-item>
               </template>
             </template>
@@ -65,10 +66,11 @@
                   :is-interact="isInteract"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="docPermissionId"
+                  :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
+                  :status="liveStatus"
                 ></member-item>
               </template>
             </template>
@@ -97,10 +99,11 @@
                   :is-interact="isInteract"
                   :mode="mode"
                   :member-options="memberOptions"
-                  :current-speaker-id="docPermissionId"
+                  :current-speaker-id="currentSpeakerId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
+                  :status="liveStatus"
                 ></member-item>
               </template>
             </template>
@@ -112,9 +115,11 @@
     <div class="vmp-member-list__operate-container">
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
-        <i class="iconfont iconzaixianrenshu"></i>
+        <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
         <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
-        <span class="info-panel__refresh-btn" @click="refreshList">刷新</span>
+        <span class="info-panel__refresh-btn" @click="refreshList">
+          {{ $t('webinar.webinar_1032') }}
+        </span>
         <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
           <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
           <el-switch
@@ -175,7 +180,9 @@
           placeholder="输入成员名称…"
         />
         <a href="javascript:;" @click="clearSearchInput" class="search-panel__clear-btn"></a>
-        <span class="search-panel__confirm" @click="doSearch">确定</span>
+        <span class="search-panel__confirm" @click="doSearch">
+          {{ $t('account.account_1062') }}
+        </span>
       </div>
     </div>
   </div>
@@ -292,15 +299,14 @@
       //开始初始化流程
       this.init();
       this.listenEvent();
-
-      this.currentSpeakerId = this.groupInitData.doc_permission;
+      //初始化主讲人id
+      this.currentSpeakerId = this.groupInitData.isInGroup
+        ? this.groupInitData.doc_permission
+        : this.interactToolStatus.doc_permission;
       this.presentation_screen = this.groupInitData.presentation_screen;
       this.memberOptions.platformType === 'watch' && this.changeSpeakerList();
     },
     watch: {
-      currentSpeakerId(newVal) {
-        this.currentSpeakerId = newVal;
-      },
       roleName(newVal, oldVal) {
         this.roleName = newVal;
         console.log(oldVal);
@@ -366,7 +372,7 @@
         this.mode = webinar.mode;
         this.isInteract = webinar.mode == 3 || webinar.mode == 6 ? 1 : 0;
         this.roleName = join_info.role_name;
-        this.userId = join_info.user_id;
+        this.userId = join_info.third_party_user_id;
         this.roomId = interact.room_id;
         this.allowRaiseHand = parseInt(this.roomBaseServer.state.interactToolStatus.is_handsup)
           ? true
@@ -834,9 +840,9 @@
           }
           let role = '';
           if (msg.room_role == 2) {
-            role = '观众';
+            role = _this.$t('chat.chat_1063');
           } else if (msg.room_role == 4) {
-            role = '嘉宾';
+            role = _this.$t('chat.chat_1023');
           }
           if (msg.extra_params == _this.userId) {
             _this.$message.warning({
@@ -914,7 +920,7 @@
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
           if (isLive && msg.sender_id != _this.userId) {
-            _this.$message.warning('观众结束了演示');
+            _this.$message.warning(_this.$t('chat.chat_1070', msg.nick_name));
           } else {
             _this.presentation_screen = _this.leader_id;
           }
@@ -1162,8 +1168,8 @@
         function handleLeaderChange(msg) {
           // 原组长提示
           if (_this.leader_id == _this.userId && _this.isInGroup) {
-            _this.$alert('组长身份已变更', '提示', {
-              confirmButtonText: '确定',
+            _this.$alert('组长身份已变更', _this.$t('account.account_1061'), {
+              confirmButtonText: _this.$t('account.account_1062'),
               customClass: 'zdy-message-box',
               cancelButtonClass: 'zdy-confirm-cancel'
               // type: 'info',
@@ -1174,8 +1180,8 @@
           if (msg.account_id == _this.userId && _this.isInGroup) {
             _this.presentation_screen = msg.account_id;
             _this
-              .$alert('您被提升为组长', '提示', {
-                confirmButtonText: '确定',
+              .$alert('您被提升为组长', _this.$t('account.account_1061'), {
+                confirmButtonText: _this.$t('account.account_1062'),
                 customClass: 'zdy-message-box',
                 cancelButtonClass: 'zdy-confirm-cancel'
                 // type: 'info',
@@ -1362,7 +1368,7 @@
       onSwitchAllowRaiseHand(status) {
         if (this.liveStatus !== 1) {
           this.allowRaiseHand = false;
-          this.$message.error('活动尚未开始');
+          this.$message.error(this.$t('512521'));
           return;
         }
         const params = {
@@ -1378,7 +1384,7 @@
             console.log('switch-mic-status', res);
             //todo 上报埋点
             this.disabledSwitchHand = false;
-            this.$message.success({ message: '设置成功' });
+            this.$message.success({ message: this.$t('account.account_1059') });
           })
           .catch(err => {
             this.disabledSwitchHand = false;
@@ -1494,7 +1500,7 @@
        */
       upMic(isApply, accountId) {
         if (this.liveStatus !== 1) {
-          this.$message.error('活动还未开始');
+          this.$message.error(this.$t('512521'));
           return;
         }
 
@@ -1515,7 +1521,7 @@
                 console.warn(res, '邀请上麦');
                 if (res.code == 200) {
                   //todo 这里需要上报埋点
-                  this.$message.success({ message: '邀请发送成功' });
+                  this.$message.success({ message: this.$t('message.message_1033') });
                 } else {
                   this.$message.error(res.msg);
                 }
@@ -1533,16 +1539,16 @@
           receive_account_id: accountId
         };
         if (this.isInGroup) {
-          this.$confirm('下麦后，演示将自动结束，是否下麦？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
+          this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
+            confirmButtonText: this.$t('account.account_1062'),
+            cancelButtonText: this.$t('account.account_1063'),
             customClass: 'zdy-message-box',
             cancelButtonClass: 'zdy-confirm-cancel'
             // type: 'info',
             // center: true
           }).then(() => {
             this.micServer
-              .userSpeakOff(data)
+              .speakOff(data)
               .then(res => {
                 //todo 埋点上报
                 return res;
@@ -1553,7 +1559,7 @@
           });
         } else {
           this.micServer
-            .userSpeakOff(data)
+            .speakOff(data)
             .then(res => {
               //todo 埋点上报
               return res;
@@ -1570,12 +1576,16 @@
           return false;
         }
         // 设置主讲人
-        this.$confirm('演示后，您可使用小组中的白板、文档、桌面共享功能，是否要演示？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        }).then(() => {
+        this.$confirm(
+          '演示后，您可使用小组中的白板、文档、桌面共享功能，是否要演示？',
+          this.$t('account.account_1061'),
+          {
+            confirmButtonText: this.$t('account.account_1062'),
+            cancelButtonText: this.$t('account.account_1063'),
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          }
+        ).then(() => {
           this.$fetch('presentation', {
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id
           })
@@ -1676,7 +1686,7 @@
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')
               } else {
-                this.$message.success('邀请演示发送成功');
+                this.$message.success(this.$t('message.message_1033'));
               }
             }
           })
@@ -1733,9 +1743,9 @@
         const { kickedUser } = this.memberServer;
         const nextStatus = [1, '1'].includes(isKicked) ? 0 : 1;
         const confirmText = nextStatus ? '您确定要执行踢出操作？' : '您确定要执行取消踢出操作？';
-        this.$confirm(confirmText, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(confirmText, this.$t('account.account_1061'), {
+          confirmButtonText: this.$t('account.account_1062'),
+          cancelButtonText: this.$t('account.account_1063'),
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
           // type: 'info',
@@ -1852,7 +1862,7 @@
       background-color: #34363a;
       box-sizing: border-box;
       color: #e2e2e2;
-      .iconzaixianrenshu {
+      .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
         margin-right: 4px;

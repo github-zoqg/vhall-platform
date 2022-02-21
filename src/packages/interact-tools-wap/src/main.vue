@@ -2,9 +2,30 @@
   <div class="tools-box">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
-      <div v-if="isAllowhandup" auth="{ 'ui.hide_reward': 0 }">
-        <i class="vh-saas-iconfont vh-line-link" @click="$refs.handup.openConnectPop()"></i>
-        <Handup ref="handup" />
+      <div
+        v-if="isAllowhandup || isSpeakOn"
+        style="position: relative"
+        auth="{ 'ui.hide_reward': 0 }"
+      >
+        <i
+          v-if="!handUpStatus"
+          class="vh-saas-iconfont vh-saas-line-drag"
+          @click="$refs.handup.openConnectPop()"
+        ></i>
+        <i
+          v-else
+          class="vh-saas-iconfont vh-saas-a-line-offthemicrophone"
+          @click="$refs.handup.openConnectPop()"
+        ></i>
+        <span class="red-dot" v-if="handUpStatus"></span>
+        <Handup
+          ref="handup"
+          @handupLoading="
+            s => {
+              handUpStatus = s;
+            }
+          "
+        />
       </div>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
@@ -75,7 +96,6 @@
         webSrc: roomBaseState.watchInitData.urls.web_url,
         webinarId: '723145973'
       };
-      console.log('localRoomInfo------', localRoomInfo);
       let webinarData = roomBaseState.watchInitData.webinar;
       return {
         roomBaseState,
@@ -87,7 +107,8 @@
         showInviteCard: false,
         location:
           window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
-        qwe: 1
+        qwe: 1,
+        handUpStatus: false
       };
     },
     computed: {
@@ -95,6 +116,10 @@
       isAllowhandup() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
         return status;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     mounted() {
@@ -132,6 +157,16 @@
     .vh-saas-iconfont {
       font-size: 47px;
       color: #666666;
+    }
+
+    .red-dot {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      background-color: #ff3030;
+      border-radius: 10px;
     }
   }
 </style>

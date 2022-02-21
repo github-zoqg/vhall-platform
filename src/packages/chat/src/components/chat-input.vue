@@ -40,7 +40,7 @@
 
     <div class="vmp-chat-input__send-btn-box">
       <div class="vmp-chat-input__send-btn" @click="sendMsgThrottle">
-        <i class="icon iconfont iconfasong_icon"></i>
+        <i class="vh-iconfont vh-line-send"></i>
       </div>
     </div>
   </div>
@@ -49,7 +49,6 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  const chatServer = useChatServer();
   export default {
     name: 'VmpChatInput',
     props: {
@@ -246,7 +245,7 @@
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
           return this.$message.warning(this.$t('chat.chat_1009'));
         }
-        const curmsg = chatServer.createCurMsg();
+        const curmsg = useChatServer().createCurMsg();
         //将文本消息加入消息体
         curmsg.setText(inputValue);
         //将图片消息加入消息体
@@ -256,29 +255,9 @@
         //将@消息加入消息体
         curmsg.setAt(this.atList);
         //发送消息
-        chatServer.sendMsg(curmsg);
+        useChatServer().sendMsg(curmsg);
         //清除发送后的消息
-        chatServer.clearCurMsg();
-        //判断一下是否是分组讨论的组长
-        // const { groupInitData = {} } = this.roomBaseState;
-        // if (groupInitData.isInGroup && groupInitData.join_role == 20) {
-        //   context.role_name = 20;
-        // }
-
-        // let filterStatus = true;
-        // if (sessionStorage.getItem('watch')) {
-        //   filterStatus = chatServer.checkHasKeyword(inputValue);
-        // }
-
-        // if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-        //   if (this.atList.length && data.text_content) {
-        //     this.atList.forEach(a => {
-        //       data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
-        //     });
-        //   }
-        //   chatServer.createMsg();
-        //   chatServer.sendMsg(data, context);
-        // }
+        useChatServer().clearCurMsg();
         //清空一下子组件里上传的图片
         this.clearImgUrls();
         this.inputValue = '';
@@ -381,6 +360,30 @@
             index: currentIndex
           });
         }
+      },
+      /**
+       * 获取根据人数和系数获取延迟时间
+       * @param n 人数
+       * @param o 非必传，系数，不传递默认为1
+       * @returns {number}
+       */
+      delayTime(n, o) {
+        n = n || 0;
+        o = o || 1;
+        let result = 0;
+        if (n <= 1000) {
+          result = 0;
+        } else if (n <= 10000) {
+          // 大于1千，小于1万
+          result = n / 1000;
+        } else if (n <= 50000) {
+          // 大于1万，小于5万
+          result = 20 + (10 * (n - 10000)) / 10000;
+        } else if (n > 50000) {
+          // 大于5万
+          result = 60;
+        }
+        return Math.floor(o * result);
       }
     }
   };
@@ -483,7 +486,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      .iconfasong_icon {
+      .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;
       }

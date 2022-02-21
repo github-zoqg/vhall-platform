@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-player" v-if="isShowPlayer">
+  <div class="vmp-wap-player">
     <p v-show="isNoBuffer" class="vmp-wap-player-prompt">
       <span>{{ prompt }}</span>
     </p>
@@ -25,7 +25,7 @@
       </div>
       <!-- 直播结束 -->
       <div
-        v-if="false"
+        v-if="isLivingEnd"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
@@ -36,14 +36,17 @@
           <h1 class="vmp-wap-player-ending-box-text">直播已结束</h1>
         </div>
       </div>
+      <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
+        <p>语音播放中</p>
+      </div>
       <!-- 回放结束（正常回放和试看回放结束） -->
       <div
-        v-if="false"
+        v-if="isVodEnd"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${videoCover}')`"
       >
         <!-- 试看播放结束 -->
-        <div class="vmp-wap-player-ending-box">
+        <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
           <p class="vmp-wap-player-ending-box-title">试看结束，观看完整视频</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
@@ -60,7 +63,7 @@
           </p>
         </div>
         <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" @click="replay">
+        <div class="vmp-wap-player-ending-box" v-else @click="replay">
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
@@ -97,7 +100,7 @@
           <span @click="openQuality">{{ formatQualityText(currentQualitys.def) }}</span>
         </div>
         <div class="vmp-wap-player-control">
-          <div class="vmp-wap-player-control-preview" v-if="false">
+          <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             试看
             <span class="vmp-wap-player-control-preview-red">{{ recordTime }}</span>
             分钟, 观看完整视频请
@@ -109,9 +112,9 @@
             <span v-else class="vmp-wap-player-control-preview-red" @click="handleAuth">
               {{ authText }}
             </span>
-            <i class="vh-iconfont vh-line-close" @click="isShiKanVideo = false"></i>
+            <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
           </div>
-          <div class="vmp-wap-player-control-preview" v-if="false">
+          <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
             上次观看至
             <span class="red">{{ currentTime | secondToDate }}</span>
             , 已为您自动续播
@@ -283,10 +286,7 @@
       }
     },
     data() {
-      const { state: playerState } = this.playerServer;
       return {
-        playerState,
-        isShowPlayer: true,
         isNoBuffer: false,
         promptFlag: false,
         isOpenSpeed: false,
@@ -300,6 +300,7 @@
         vodOption: {}, //回放时回放id
         vodType: '', //回放的类型 暖场视频还是还是试看
         authText: '',
+        recordTime: '', //试看的时间
         isTryPreview: false, // 是否是试看
         isWarnPreview: false, // 是否是暖场视频
         currentTime: 0, // 视频当前播放时长
@@ -322,6 +323,8 @@
         recordHistoryTime: '', // 记录播放的时间
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
+        isLivingEnd: false, // 直播结束
+        isVodEnd: false, // 回放结束
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -336,8 +339,12 @@
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
     },
+    beforeDestroy() {
+      this.playerServer.destroy();
+    },
     async created() {
       this.roomBaseState = this.roomBaseServer.state;
+      this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
     },
     mounted() {
@@ -859,6 +866,20 @@
       span {
         color: #fb2626;
         padding-left: 5px;
+      }
+    }
+    &-audie {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url('./images/video.gif') no-repeat;
+      background-size: 100% 100%;
+      p {
+        font-size: 28px;
+        color: #fff;
+        margin-top: 40%;
+        text-align: center;
       }
     }
     &-speed {
