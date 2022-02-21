@@ -23,10 +23,13 @@
       margin: 20px 0px;
       font-size: 14px;
       font-weight: 400;
-      color: #f7f7f7;
-      line-height: 22px;
-      text-align: center;
+      text-align: left;
       padding: 0px 24px;
+      padding-left: 20px;
+      line-height: 1.2;
+      border-left: 2px solid #fc5659;
+      color: #333;
+      font-weight: 500;
     }
   }
 </style>
