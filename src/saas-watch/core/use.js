@@ -49,6 +49,8 @@ import VmpGoodList from '@/packages/good';
 // 开屏海报
 import VmpScreenPost from '@/packages/screen-post';
 
+import VmpIntro from '@/packages/intro';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -90,4 +92,5 @@ export function initUse() {
   Vue.use(VmpCustomMenu);
   Vue.use(VmpRecommend);
   Vue.use(VmpPcMediaSetting);
+  Vue.use(VmpIntro);
 }

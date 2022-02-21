@@ -295,7 +295,7 @@
       },
       //判断是否是音频直播模式
       isAudio() {
-        return this.roomBaseState.watchInitData.webinar.mode == 1;
+        return this.roomBaseServer.state.watchInitData.webinar.mode == 1;
       },
       // 是否正在直播
       isLiving() {
@@ -304,7 +304,7 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
+        const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
         if (warmup && warmup.warmup_paas_record_id) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
@@ -330,25 +330,21 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[doc]---大小屏变更miniElement：', newval); // newval 取值 doc, player
-        if (newval === 'player') {
-          this.displayMode = 'mini';
-        } else {
-          this.displayMode = 'normal';
-        }
+        console.log('-[player]---大小屏变更miniElement：', newval);
+        this.displayMode = newval === 'player' ? 'mini' : 'normal';
       }
     },
     created() {
-      this.roomBaseState = this.roomBaseServer.state;
-      this.playerState = this.playerServer.state;
       this.getWebinerStatus();
       this.listenEvents();
     },
-    mounted() {},
+    mounted() {
+      console.log('[player] mounted');
+    },
     methods: {
       listenEvents() {
         // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-        if (this.playerState.type === 'vod') {
+        if (this.playerServer.state.type === 'vod') {
           window.addEventListener('beforeunload', () => {
             this.endTime = this.playerServer.getCurrentTime(() => {
               console.log('获取当前视频播放时间失败----------');
@@ -358,7 +354,7 @@
               console.log('获取视频总时长失败');
             });
             const curLocalHistoryTime = window.sessionStorage.getItem(
-              this.roomBaseState.watchInitData.paas_record_id
+              this.roomBaseServer.state.watchInitData.paas_record_id
             );
             if (!curLocalHistoryTime && this.recordHistoryTime) {
               return;
@@ -391,14 +387,14 @@
       },
       // 初始化播放器配置项
       initConfig() {
-        const { interact, join_info } = this.roomBaseState.watchInitData;
-        console.log(this.roomBaseState, '????====zhangxiao');
+        const { interact, join_info } = this.roomBaseServer.state.watchInitData;
+        console.log(this.roomBaseServer.state, '????====zhangxiao');
         let params = {
           appId: interact.paas_app_id || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
           videoNode: 'vmp-player',
-          type: this.playerState.type, // live 直播  vod 点播  必填
+          type: this.playerServer.state.type, // live 直播  vod 点播  必填
           poster: '',
           autoplay: false,
           forceMSE: false,
@@ -417,16 +413,16 @@
             }
           },
           peer5Option: {
-            open: this.roomBaseState.configList['ui.browser_peer5'] == '1',
+            open: this.roomBaseServer.state.configList['ui.browser_peer5'] == '1',
             customerId: 'ds6mupmtq5gnwa4qmtqf',
             fallback: true
           }
         };
-        if (this.playerState.type == 'live') {
+        if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
             liveOption: this.liveOption
           });
-        } else if (this.playerState.type === 'vod') {
+        } else if (this.playerServer.state.type === 'vod') {
           params = Object.assign(params, {
             vodOption: this.vodOption
           });
@@ -442,9 +438,9 @@
       async initSDK() {
         const defineQuality = this.setDefaultQuality();
         console.log(defineQuality, '====<<1111111');
-        if (this.playerState.type == 'live') {
+        if (this.playerServer.state.type == 'live') {
           this.liveOption.defaultDefinition = defineQuality || '';
-        } else if (this.playerState.type == 'vod') {
+        } else if (this.playerServer.state.type == 'vod') {
           this.vodOption.defaultDefinition = defineQuality || '';
         }
         const params = this.initConfig();
@@ -467,7 +463,7 @@
       initPlayer() {
         this.initSDK().then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
-          if (this.playerState.type === 'vod') {
+          if (this.playerServer.state.type === 'vod') {
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
@@ -477,7 +473,7 @@
       },
       // 获取跑马灯、水印等播放器配置
       getPlayerInfo() {
-        const { join_info } = this.roomBaseState.watchInitData;
+        const { join_info } = this.roomBaseServer.state.watchInitData;
         let playerParams = {
           marqueeOption: {
             text: '',
@@ -550,7 +546,7 @@
         this.playerServer && this.playerServer.pause();
       },
       initPlayerOtherInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
+        const { webinar } = this.roomBaseServer.state.watchInitData;
         this.playerServer
           .getPlayerConfig({
             webinar_id: webinar.id,
@@ -573,18 +569,20 @@
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus() {
-        const { webinar, warmup, record } = this.roomBaseState.watchInitData;
-        if (this.roomBaseState.watchInitData.status === 'live') {
+        const { webinar, warmup, record } = this.roomBaseServer.state.watchInitData;
+        if (this.roomBaseServer.state.watchInitData.status === 'live') {
           if (webinar.type === 1) {
             // 直播
             this.optionTypeInfo('live');
           } else if (webinar.type === 5) {
             // 回放
-            this.optionTypeInfo('vod', this.roomBaseState.watchInitData.paas_record_id);
+            this.optionTypeInfo('vod', this.roomBaseServer.state.watchInitData.paas_record_id);
             this.recordHistoryTime = sessionStorage.getItem(
-              this.roomBaseState.watchInitData.paas_record_id
+              this.roomBaseServer.state.watchInitData.paas_record_id
             )
-              ? Number(sessionStorage.getItem(this.roomBaseState.watchInitData.paas_record_id))
+              ? Number(
+                  sessionStorage.getItem(this.roomBaseServer.state.watchInitData.paas_record_id)
+                )
               : 0;
           }
         } else {
@@ -614,10 +612,11 @@
           this.vodOption = {};
           this.liveOption = {
             type:
-              this.roomBaseState.configList['media_server.watch.rtmp_pc_to_hls'] === '1' || isIE()
+              this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] === '1' ||
+              isIE()
                 ? 'hls'
                 : 'flv',
-            roomId: this.roomBaseState.watchInitData.interact.room_id
+            roomId: this.roomBaseServer.state.watchInitData.interact.room_id
           };
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
