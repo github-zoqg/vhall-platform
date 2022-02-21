@@ -40,6 +40,9 @@
     methods: {
       getCanvasStream() {
         return useCanvasStreamServer().getCanvasStream();
+      },
+      updateCanvasImg() {
+        return useCanvasStreamServer().checkImgStream();
       }
     }
   };

@@ -105,7 +105,8 @@
     useInteractiveServer,
     useMicServer,
     useRoomBaseServer,
-    usePlayerServer
+    usePlayerServer,
+    useMediaSettingServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -213,8 +214,18 @@
     },
     methods: {
       // 媒体切换后进行无缝切换
-      switchStreamType() {
-        console.warn('切换设置后进行的无缝切换');
+      async switchStreamType(param) {
+        // 图片信息
+        if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+          if (param.canvasImgUrl) {
+            useMediaSettingServer().state.canvasImgUrl = param.canvasImgUrl;
+          }
+          await this.$refs.imgPushStream.updateCanvasImg();
+        }
+        if (this.isStreamPublished) {
+          await this.stopPush();
+          await this.startPush();
+        }
       },
       sleep(time = 1000) {
         return new Promise(resolve => {
