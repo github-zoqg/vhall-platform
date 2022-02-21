@@ -22,7 +22,7 @@
       :class="userInfo.role_name | roleClassFilter"
       v-if="![2, '2'].includes(userInfo.role_name)"
     >
-      {{ userInfo.role_name | roleFilter }}
+      {{ roleFilter(userInfo.role_name) }}
     </span>
     <div class="vmp-member-item__control">
       <template v-if="memberOptions.platformType === 'live'">
@@ -267,27 +267,6 @@
   export default {
     name: 'VmpMemberItem',
     filters: {
-      //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 3:
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 4:
-            ret = this.$t('chat.chat_1023');
-            break;
-          case 20:
-            ret = this.$t('chat.chat_1064');
-            break;
-          default:
-            ret = '';
-        }
-        return ret;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人
@@ -471,6 +450,30 @@
       };
     },
     computed: {
+      //角色转换
+      roleFilter() {
+        const _this = this;
+        return function (value) {
+          let ret = '';
+          switch (Number(value)) {
+            case 1:
+              ret = _this.$t('chat.chat_1022');
+              break;
+            case 3:
+              ret = _this.$t('chat.chat_1024');
+              break;
+            case 4:
+              ret = _this.$t('chat.chat_1023');
+              break;
+            case 20:
+              ret = _this.$t('chat.chat_1064');
+              break;
+            default:
+              ret = '';
+          }
+          return ret;
+        };
+      },
       //人员操作项是否显示(PC发起)
       showUserControl() {
         return (
