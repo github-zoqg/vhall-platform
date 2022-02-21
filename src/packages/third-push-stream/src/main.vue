@@ -1,71 +1,73 @@
 <template>
-  <div class="vmp-third-stream">
+  <div class="vmp-third-stream" v-if="isShowThirdStream">
     <!-- 第三方推流 -->
-    <div class="vmp-third-stream-title">推流设置</div>
-    <div class="vmp-third-stream-wrap">
-      <div class="vmp-third-stream-wrap-left">
-        <div class="vmp-third-stream-wrap-left-step">
-          <div class="vmp-third-stream-wrap-left-step-round"><span></span></div>
-          <div class="vmp-third-stream-wrap-left-step-line"></div>
-          <div class="vmp-third-stream-wrap-left-step-round"><span></span></div>
+    <div class="vmp-third-stream-box">
+      <div class="vmp-third-stream-title">推流设置</div>
+      <div class="vmp-third-stream-wrap">
+        <div class="vmp-third-stream-wrap-left">
+          <div class="vmp-third-stream-wrap-left-step">
+            <div class="vmp-third-stream-wrap-left-step-round"><span></span></div>
+            <div class="vmp-third-stream-wrap-left-step-line"></div>
+            <div class="vmp-third-stream-wrap-left-step-round"><span></span></div>
+          </div>
+          <div class="vmp-third-stream-wrap-left-text">
+            <span>
+              获取
+              <br />
+              推流地址
+            </span>
+            <span>
+              使用第三方
+              <br />
+              推流工具
+            </span>
+          </div>
         </div>
-        <div class="vmp-third-stream-wrap-left-text">
-          <span>
-            获取
-            <br />
-            推流地址
-          </span>
-          <span>
-            使用第三方
-            <br />
-            推流工具
-          </span>
-        </div>
-      </div>
-      <div class="vmp-third-stream-wrap-right">
-        <div class="vmp-third-stream-wrap-right-top">
-          <div>
-            <label>RTMP URL</label>
-            <div class="vmp-third-stream-wrap-right-top-input">
-              <el-input id="vmp-third-watch" v-model="thirdWatchWebUrl" readOnly></el-input>
-              <span @click="doCopy(1)">复制</span>
+        <div class="vmp-third-stream-wrap-right">
+          <div class="vmp-third-stream-wrap-right-top">
+            <div>
+              <label>RTMP URL</label>
+              <div class="vmp-third-stream-wrap-right-top-input">
+                <el-input id="vmp-third-watch" v-model="thirdWatchWebUrl" readOnly></el-input>
+                <span @click="doCopy(1)">复制</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px">
+              <label>播放路径/串流码</label>
+              <div class="vmp-third-stream-wrap-right-top-input">
+                <el-input id="vmp-third-play" v-model="thirdPlayUrl" readOnly></el-input>
+                <span @click="doCopy(2)">复制</span>
+              </div>
             </div>
           </div>
-          <div style="margin-top: 16px">
-            <label>播放路径/串流码</label>
-            <div class="vmp-third-stream-wrap-right-top-input">
-              <el-input id="vmp-third-play" v-model="thirdPlayUrl" readOnly></el-input>
-              <span @click="doCopy(2)">复制</span>
+          <div class="vmp-third-stream-wrap-right-bottom">
+            <div style="padding-bottom: 20px; border-bottom: 1px solid #ddd">
+              <p>
+                <i></i>
+                使用第三方推流
+              </p>
+              <ul>
+                <li>1.在第三方工具中添加RTMP URL与串流码</li>
+                <li>2.使用第三方工具推流</li>
+                <li>3.点击右上方的“开始直播”按钮</li>
+                <li>4.播放路径/串流码的有效期为7天，建议定期更新</li>
+              </ul>
             </div>
-          </div>
-        </div>
-        <div class="vmp-third-stream-wrap-right-bottom">
-          <div style="padding-bottom: 20px; border-bottom: 1px solid #ddd">
-            <p>
-              <i></i>
-              使用第三方推流
+            <div style="margin-top: 20px">
+              <p>
+                <i></i>
+                使用设备推流
+              </p>
+              <ul>
+                <li>1.在设备中添加RTMP URL与串流码</li>
+                <li>2.使用设备推流</li>
+                <li>3.点击右上方的“开始直播”按钮</li>
+              </ul>
+            </div>
+            <p class="vmp-third-stream-wrap-right-bottom-detail">
+              <a href="https://www.vhall.com/saas/doc/1698.html" target="_blank">详细教程</a>
             </p>
-            <ul>
-              <li>1.在第三方工具中添加RTMP URL与串流码</li>
-              <li>2.使用第三方工具推流</li>
-              <li>3.点击右上方的“开始直播”按钮</li>
-              <li>4.播放路径/串流码的有效期为7天，建议定期更新</li>
-            </ul>
           </div>
-          <div style="margin-top: 20px">
-            <p>
-              <i></i>
-              使用设备推流
-            </p>
-            <ul>
-              <li>1.在设备中添加RTMP URL与串流码</li>
-              <li>2.使用设备推流</li>
-              <li>3.点击右上方的“开始直播”按钮</li>
-            </ul>
-          </div>
-          <p class="vmp-third-stream-wrap-right-bottom-detail">
-            <a href="https://www.vhall.com/saas/doc/1698.html" target="_blank">详细教程</a>
-          </p>
         </div>
       </div>
     </div>
@@ -78,16 +80,18 @@
     data() {
       return {
         thirdWatchWebUrl: '',
-        thirdPlayUrl: ''
+        thirdPlayUrl: '',
+        isShowThirdStream: false
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
     },
-    created() {
-      this.getThirdPushStream();
-    },
     methods: {
+      showThirdStream(info) {
+        this.isShowThirdStream = info.status;
+        info.status && this.getThirdPushStream();
+      },
       getThirdPushStream() {
         this.roomBaseServer.getThirdPushStreamAddress().then(res => {
           if (res.code == 200) {
@@ -118,11 +122,19 @@
 </script>
 <style lang="less">
   .vmp-third-stream {
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 60px;
+    width: calc(100% - 370px);
     height: 100%;
     background: #f1f1f1;
-    margin: 0 auto;
-    padding-top: 50px;
+    z-index: 3;
+    &-box {
+      padding-top: 50px;
+      margin: 0 auto;
+      width: 100%;
+      height: 100%;
+    }
     &-title {
       height: 40px;
       line-height: 40px;

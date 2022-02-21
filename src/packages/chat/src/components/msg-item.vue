@@ -65,7 +65,7 @@
                 class="info-wrap__role-name"
                 :class="msg.roleName | roleClassFilter"
               >
-                {{ msg.roleName | roleFilter }}
+                {{ roleFilter(msg.roleName) }}
               </span>
             </p>
             <!-- 被回复的消息 -->
@@ -116,7 +116,7 @@
                     width="34"
                     height="34"
                     :src="img"
-                    :alt="this.$t('chat.chat_1065')"
+                    :alt="$t('chat.chat_1065')"
                     @click="previewImg($event, index, msg.replyMsg.content.image_urls)"
                   />
                 </div>
@@ -175,7 +175,7 @@
               class="interact-content__role-name"
               :class="msg.roleName | roleClassFilterForMsg"
             >
-              {{ msg.roleName | roleFilter }}
+              {{ roleFilter(msg.roleName) }}
             </span>
             <img
               v-if="msg.type == 'red_envelope_ok'"
@@ -212,7 +212,7 @@
                 'interact-tools-content__img-reward': !msg.content.gift_url
               }"
               :src="msg.content.gift_url || require('../images/red-package-1.png')"
-              :alt="this.$t('interact_tools.interact_tools_1029')"
+              :alt="$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="msg.type === 'reward_pay_ok'" />
             <span v-if="msg.type === 'reward_pay_ok'" style="color: #fa9a32">
@@ -261,7 +261,32 @@
         isEmbed: false
       };
     },
-    computed: {},
+    computed: {
+      //角色转换
+      roleFilter() {
+        const _this = this;
+        return function (value) {
+          let ret = '';
+          switch (Number(value)) {
+            case 1:
+              ret = _this.$t('chat.chat_1022');
+              break;
+            case 3:
+              ret = _this.$t('chat.chat_1024');
+              break;
+            case 4:
+              ret = _this.$t('chat.chat_1023');
+              break;
+            case 20:
+              ret = _this.$t('chat.chat_1064');
+              break;
+            default:
+              ret = _this.$t('chat.chat_1062');
+          }
+          return ret;
+        };
+      }
+    },
     filters: {
       //文字过长截取
       textOverflowSlice(val = '', len = 0) {
@@ -272,27 +297,6 @@
           return val.substring(0, len) + '...';
         }
         return val;
-      },
-      //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 3:
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 4:
-            ret = this.$t('chat.chat_1023');
-            break;
-          case 20:
-            ret = this.$t('chat.chat_1064');
-            break;
-          default:
-            ret = this.$t('chat.chat_1062');
-        }
-        return ret;
       },
       //角色标签样式
       roleClassFilter(value) {

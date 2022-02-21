@@ -12,7 +12,7 @@
             class="vmp-player-living-background"
             :style="`backgroundImage: url('${webinarsBgImg}')`"
           ></div>
-          <div class="vmp-player-living-btn" v-if="isPlayering">
+          <div class="vmp-player-living-btn" v-if="!isPlayering">
             <div
               :class="
                 displayMode == 'mini'
@@ -38,32 +38,17 @@
             <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
               <h3>{{ $t('appointment.appointment_1013') }}</h3>
               <div>
-                <p>
-                  <span
-                    @click="handleAuth(3)"
-                    :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-                  >
+                <p v-if="authText == 6">
+                  <span @click="handleAuth(3)">
                     {{ $t('appointment.appointment_1010') }}
                   </span>
-                  <span
-                    style="margin-left: 10px"
-                    :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-                    @click="handleAuth(4)"
-                  >
+                  <span style="margin-left: 10px" @click="handleAuth(4)">
                     {{ $t('appointment.appointment_1011') }}
                   </span>
                 </p>
-                <span
-                  :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-                  @click="handleAuth"
-                >
-                  {{ authText }}
-                </span>
+                <span v-else @click="handleAuth">{{ authText }}</span>
               </div>
-              <p
-                class="replay-try"
-                :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-              >
+              <p class="replay-try">
                 <i class="vh-iconfont vh-line-refresh-left"><b>重新试看</b></i>
               </p>
             </div>
@@ -257,7 +242,7 @@
     },
     data() {
       return {
-        displayMode: 'mini', // normal: 正常; mini: 小屏; fullscreen:全屏
+        displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
         vodType: '', //回放的类型 暖场视频还是还是试看
@@ -837,12 +822,26 @@
             cursor: pointer;
             b {
               font-weight: normal;
+              margin-left: 5px;
             }
-            &.repay--mini {
-              b {
-                font-size: 14px;
-                padding-left: 5px;
-              }
+          }
+          span {
+            margin-top: 5px;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 20px;
+            background: #fb3a32;
+            display: inline-block;
+            width: 160px;
+            height: 40px;
+            line-height: 40px;
+          }
+          p {
+            span {
+              width: 90px;
+              height: 40px;
+              line-height: 40px;
             }
           }
         }
@@ -859,6 +858,26 @@
               opacity: 1;
             }
           }
+          span {
+            margin-top: 5px;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 20px;
+            background: #fb3a32;
+            display: inline-block;
+            &.repay--normal {
+              width: 160px;
+              height: 40px;
+              line-height: 40px;
+            }
+            &.repay--mini {
+              width: 90px;
+              height: 30px;
+              font-size: 12px;
+              line-height: 30px;
+            }
+          }
         }
         &-normal {
           width: 88px;
@@ -873,26 +892,6 @@
           height: 50px;
           i {
             font-size: 18px;
-          }
-        }
-        span {
-          margin-top: 5px;
-          text-align: center;
-          color: #fff;
-          cursor: pointer;
-          border-radius: 20px;
-          background: #fb3a32;
-          display: inline-block;
-          &.repay--normal {
-            width: 160px;
-            height: 40px;
-            line-height: 40px;
-          }
-          &.repay--mini {
-            width: 90px;
-            height: 30px;
-            font-size: 12px;
-            line-height: 30px;
           }
         }
       }
@@ -1332,7 +1331,7 @@
           cursor: pointer;
         }
         .vh-iconfont {
-          font-size: 20px;
+          font-size: 14px;
           padding-left: 12px;
           vertical-align: middle;
           cursor: pointer;

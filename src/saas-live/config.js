@@ -32,7 +32,13 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion', 'comInsertStream']
+    children: [
+      'comStreamList',
+      'comDocUne',
+      'comGroupDiscussion',
+      'comInsertStream',
+      'comThirdStream'
+    ]
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -136,6 +142,13 @@ export const serverConfig = {
         cuid: 'comMediaSetting',
         method: 'showMediaSetting'
       }
+    ],
+    emitClickThirdStream: [
+      {
+        cuid: 'comThirdStream',
+        method: 'showThirdStream',
+        args: ['$0']
+      }
     ]
   },
   // 顶部左侧组件
@@ -231,10 +244,6 @@ export const serverConfig = {
       kind: 'insertMedia'
     },
     handleClick: [
-      {
-        cuid: 'comGroupDiscussion',
-        method: 'hiddenAll'
-      },
       {
         cuid: 'comInsertVideo',
         method: 'openInserVideoDialog',
@@ -473,7 +482,12 @@ export const serverConfig = {
   },
   comMediaSetting: {
     component: 'VmpPcMediaSetting',
-    saveOptions: []
+    saveOptions: [
+      {
+        cuid: 'VmpStreamLocal',
+        method: 'switchStreamType'
+      }
+    ]
   },
   comPcMediaCheck: {
     component: 'VmpPcMediaCheck'

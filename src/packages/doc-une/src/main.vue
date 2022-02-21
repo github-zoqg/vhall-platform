@@ -6,7 +6,7 @@
       `vmp-doc-une--${displayMode}`,
       { 'has-stream-list': hasStreamList }
     ]"
-    v-show="showInWatch"
+    v-show="show"
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
@@ -177,14 +177,9 @@
       isWatch() {
         return this.roomBaseServer.state.clientType !== 'send';
       },
-      // 文档在观看端是否可见
-      showInWatch() {
-        // 主持端始终可见，观看端
-        return (
-          this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus) ||
-          this.groupServer.state.groupInitData.isInGroup
-        );
+      // 文档是否可见
+      show() {
+        return this.docServer.state.show;
       },
       // 是否文档演示权限
       hasDocPermission() {
@@ -206,7 +201,7 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[doc]---大小屏变更', newval); // newval 取值 doc, stream-list
+        console.log('-[doc]---大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
         const mode = newval === 'doc' ? 'small' : 'normal';
         this.setDisplayMode(mode);
       },
@@ -599,7 +594,6 @@
       }
     },
     mounted() {
-      console.log('[doc] this.docServer.state.switchStatus:', this.docServer.state.switchStatus);
       // 初始化事件
       this.initEvents();
       // 清空
