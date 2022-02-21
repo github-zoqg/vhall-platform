@@ -50,6 +50,9 @@ import VmpUserCenterWap from '@/packages/user-center-wap';
 // wap 抽奖
 import VmpLotteryWap from '@/packages/lottery-wap';
 
+// 送礼物飘屏动画
+import VmpWapRewardEffect from '@/packages/wap-reward-effect';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -78,6 +81,7 @@ export function initUse() {
   Vue.use(VmpSignWap);
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapBody);
+  Vue.use(VmpWapRewardEffect);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
   Vue.use(VmpLotteryWap);
