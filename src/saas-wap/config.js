@@ -91,7 +91,7 @@ export const serverConfig = {
   },
   // 登录弹窗
   compRegLoginWap: {
-    // component: 'VmpRegLoginWap'
+    component: 'VmpRegLoginWap'
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
