@@ -397,6 +397,10 @@
         chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
         });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
+        });
       },
       init() {
         setTimeout(() => {
