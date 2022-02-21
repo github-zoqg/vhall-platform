@@ -610,6 +610,7 @@
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
               setTimeout(() => {
+                console.log(_this.$refs.scroll);
                 _this.$refs.scroll.refresh();
               }, 100);
               if (msg.context.role_name == 4) {
