@@ -11,10 +11,11 @@
         :options="overlayScrollBarsOptions"
         style="height: 100%"
       >
-        <template v-for="msg in chatList">
+        <template v-for="(msg, index) in chatList">
           <msg-item
             :key="msg.msgId"
             :msg="msg"
+            :pre-msg="chatList[index - 1]"
             v-show="checkMessageShow(msg)"
             :chat-options="chatOptions"
             :role-name="roleName"
@@ -397,6 +398,10 @@
         chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
         });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
+        });
       },
       init() {
         setTimeout(() => {
@@ -754,10 +759,10 @@
         this.$refs.chatOperator.handleReply(count);
       },
       //todo domain负责 删除消息（主持人，助理）
-      deleteMsg(msgId) {
+      deleteMsg(count) {
         const msgToDelete =
           this.chatList.find(chatMsg => {
-            return chatMsg.msgId === msgId;
+            return chatMsg.count === count;
           }) || {};
         setTimeout(() => {
           const params = {

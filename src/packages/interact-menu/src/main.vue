@@ -45,7 +45,7 @@
       title="问答"
       :retry="isQAEnabled ? '关闭问答' : '开启问答'"
       :visible="qaVisible"
-      @onClose="closeQAPopup"
+      @onClose="qaVisible = false"
       @onSubmit="handleQASubmit"
     >
       <div slot="content">
@@ -87,7 +87,8 @@
         kind: '', // 类型
         disable: false, // 是否禁用
         hidden: false, // 是否隐藏
-        disTimer: false
+        disTimer: false,
+        assistantType: false // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
       };
     },
     methods: {

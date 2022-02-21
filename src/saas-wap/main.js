@@ -15,7 +15,7 @@ import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import * as Sentry from '@sentry/vue';
 import { Integrations } from '@sentry/tracing';
 
-// code码相关翻译方法
+// code码相关翻译方法 老代码
 Vue.prototype.$tes = function (path) {
   return this.$te(path) ? this.$t(path) : undefined;
 };
