@@ -161,7 +161,7 @@
       // this.listenEvents();
     },
     async mounted() {
-      console.log('本地流组件mounted钩子函数');
+      console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
 
       if (this.micServer.state.isSpeakOn) {
         this.startPush();

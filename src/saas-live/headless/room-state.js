@@ -42,9 +42,7 @@ export default async function () {
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    micServer.init();
-  }
+  micServer.init();
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
