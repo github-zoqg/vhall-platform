@@ -39,6 +39,7 @@ import VmpWatchNavMenu from '@/packages/watch-nav-menu'; // 观看端侧边栏
 import VmpWatchTimer from '@/packages/watch-timer'; // 观看端计时器
 import VmpChapter from '@/packages/watch-chapter-pc'; // 观看端章节
 import VmpLotteryWatch from '@/packages/lottery/watch'; // 观看端计时器
+import VmpPcRewardEffect from '@/packages/pc-reward-effect'; // 观看端计时器
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -82,4 +83,5 @@ export function initUse() {
   Vue.use(VmpLotteryWatch);
   Vue.use(VmpChapter);
   Vue.use(VmpScreenPost);
+  Vue.use(VmpPcRewardEffect);
 }

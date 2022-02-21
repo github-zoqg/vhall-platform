@@ -45,7 +45,7 @@ export const serverConfig = {
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comChat']
+    children: ['comChat', 'comPcRewardEffect']
   },
   /*** 布局定义end */
 
@@ -280,5 +280,9 @@ export const serverConfig = {
       method: 'changePlayTime',
       args: ['$0']
     }
+  },
+  // 礼物动画组件
+  comPcRewardEffect: {
+    component: 'VmpPcRewardEffect'
   }
 };
