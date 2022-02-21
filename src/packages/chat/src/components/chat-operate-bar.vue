@@ -189,11 +189,15 @@
           //屏蔽特效
           isShieldingEffects: false
         },
-        //聊天审核链接 todo 暂时写死
-        chatFilterUrl: [location.origin, `/lives/chat-auth/${this.webinarId}`].join(''),
+        //聊天审核链接
+        chatFilterUrl: '',
         //是否是助理
         assistantType: this.$route.query.assistantType
       };
+    },
+    mounted() {
+      //todo 暂时写死
+      this.chatFilterUrl = [location.origin, `/lives/chat-auth/${this.webinarId}`].join('');
     },
     methods: {
       //切换全体禁言开关状态

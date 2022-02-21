@@ -373,6 +373,8 @@
       background-color: #f3f3f3;
       color: #444;
       width: 100%;
+      max-height: 352px;
+      overflow-y: scroll;
 
       &__item {
         display: flex;

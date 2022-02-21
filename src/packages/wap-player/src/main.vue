@@ -4,7 +4,7 @@
       <span>{{ prompt }}</span>
     </p>
     <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
-      <!-- 背景图片 -->
+      <!-- 播放器背景图片 -->
       <div class="vmp-wap-player-prompt">
         <span v-if="!isAudio && promptFlag">{{ prompt }}</span>
         <img
