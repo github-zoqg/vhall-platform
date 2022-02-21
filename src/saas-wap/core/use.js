@@ -45,8 +45,12 @@ import VmpWapQrCode from '@/packages/qrcode-wap';
 import VmpWapBody from '@/packages/wap-body';
 // 开屏页
 import VmpScreenPostWap from '@/packages/screen-post-wap';
-// 打开 个人中心
+// 个人中心
 import VmpUserCenterWap from '@/packages/user-center-wap';
+// 个人资料
+import VmpUserAccountWap from '@/packages/user-account-wap';
+// 提现管理
+import VmpCashWap from '@/packages/cash-wap';
 // wap 抽奖
 import VmpLotteryWap from '@/packages/lottery-wap';
 
@@ -84,5 +88,7 @@ export function initUse() {
   Vue.use(VmpWapRewardEffect);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
+  Vue.use(VmpUserAccountWap);
+  Vue.use(VmpCashWap);
   Vue.use(VmpLotteryWap);
 }
