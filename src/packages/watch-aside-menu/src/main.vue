@@ -64,7 +64,7 @@
     name: 'VmpWatchAsideMenu',
     data() {
       return {
-        isCollapse: false,
+        isCollapse: true,
         selectedMenu: '',
         disableMenus: ['document', 'board', 'desktopShare', 'assistance']
       };

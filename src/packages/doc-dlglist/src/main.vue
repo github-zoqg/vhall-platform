@@ -511,15 +511,13 @@
       },
       // 上传文档
       handleUpload(param) {
-        console.log('----param:', param);
         param.onError = (err, file) => {
           this.dataList.forEach(item => {
             if (file.uid === item.uid) {
               item.docStatus = 'uploadfailed'; //上传失败
             }
           });
-          console.log('---上传错误---');
-          console.log(err);
+          console.error('上传失败：', err);
         };
         param.onSuccess = async (res, file) => {
           // console.log(' 文档的上传完成:', res, file, fileList);
@@ -576,7 +574,7 @@
           }
         };
         param.onProgress = (percent, file) => {
-          console.log('[doc] 上传进度：', percent);
+          // console.log('[doc] 上传进度：', percent);
           const fuid = file.uid;
           this.dataList.forEach(item => {
             if (fuid === item.uid) {
