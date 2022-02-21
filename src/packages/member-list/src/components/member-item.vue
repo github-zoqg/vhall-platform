@@ -341,7 +341,7 @@
       },
       //直播状态，0未开始，1已开始，2已结束
       status: {
-        type: [Array, String],
+        type: [Array, String, Number],
         default: () => {
           return 0;
         }
