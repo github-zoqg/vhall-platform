@@ -388,10 +388,9 @@
     justify-content: space-between;
     height: 72px;
     width: 100%;
-    margin: 0 32px 0 8px;
-    padding-left: 8px;
     &-left {
       margin-right: 7px;
+      padding-left: 8px;
       &-logo {
         width: 120px;
         height: 44px;
