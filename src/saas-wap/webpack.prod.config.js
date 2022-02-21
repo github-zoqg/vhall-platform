@@ -4,7 +4,8 @@ const baseConfig = require('./webpack.base.config');
 const htmlConfig = {
   cdnJs: {
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    MiddleDomain: '//cnstatic01.e.vhall.com/common-static/middle/1.0.2/middle-domain.js'
+    MiddleDomain:
+      '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.0.2/middle-domain.js'
   },
   cdnCss: {
     iconfontCommon:
