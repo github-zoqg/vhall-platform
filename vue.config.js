@@ -102,7 +102,10 @@ function getPlugins() {
  * 共享配置
  */
 const sharedConfig = {
-  publicPath: '/',
+  publicPath:
+    process.env.NODE_ENV != 'development'
+      ? `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`
+      : '/',
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
