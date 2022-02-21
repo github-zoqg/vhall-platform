@@ -363,14 +363,25 @@
         const chatServer = useChatServer();
         //监听@我的消息
         chatServer.$on('atMe', () => {
-          this.isHasUnreadAtMeMsg = true;
-          this.tipMsg = '有人@你';
+          if (this.osInstance.scroll().ratio.y != 1) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = '有人@你';
+          }
         });
         //监听回复我的消息
-        chatServer.$on('replyMe', () => {});
+        chatServer.$on('replyMe', () => {
+          if (this.osInstance.scroll().ratio.y != 1) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = '有人回复你';
+          }
+        });
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
-          this.unReadMessageCount++;
+          if (this.osInstance.scroll().ratio.y != 1) {
+            this.isHasUnreadAtMeMsg = true;
+            this.unReadMessageCount++;
+            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
+          }
         });
         //监听禁言通知
         chatServer.$on('banned', res => {
@@ -385,6 +396,10 @@
         //监听分组房间变更通知
         chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
+        });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
         });
       },
       init() {
@@ -748,7 +763,6 @@
           this.chatList.find(chatMsg => {
             return chatMsg.count === count;
           }) || {};
-
         setTimeout(() => {
           const params = {
             channel_id: msgToDelete.channel,
@@ -762,10 +776,6 @@
                 business_uid: this.userId,
                 webinar_id: this.$route.params.il_id
               });
-              const _index = this.chatList.findIndex(chatMsg => {
-                return chatMsg.count === count;
-              });
-              _index !== -1 && this.chatList.splice(_index, 1);
               return res;
             });
         }, 3000); // 优化 17532

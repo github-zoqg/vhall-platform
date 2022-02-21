@@ -28,6 +28,9 @@
       },
       localRoomInfo: {
         require: false
+      },
+      cuid: {
+        required: true
       }
     },
     watch: {

@@ -20,12 +20,12 @@
             @change="toggleChatAuth"
           ></el-switch>
           <span class="switch-title sub-title">
-            {{ enableChatAuth ? '已开启' : '已关闭' }}，开启后可进行聊天人工审核
+            {{ enableChatAuth === 2 ? '已开启' : '已关闭' }}，开启后可进行聊天人工审核
           </span>
         </div>
         <span
           class="header-bar__auto-set-btn"
-          :class="{ disabled: !enableChatAuth }"
+          :class="{ 'operate-disable': enableChatAuth === 1 }"
           @click="openAutoSettingModal"
         >
           <i class="vh-iconfont vh-line-setting"></i>
@@ -36,7 +36,7 @@
     <div class="vmp-chat-auth__main">
       <div class="main-container">
         <!--列表操作栏-->
-        <div class="main-container__header">
+        <div class="main-container__header" :class="{ 'operate-disable': enableChatAuth === 1 }">
           <!--          <div-->
           <!--            class="table-select"-->
           <!--            :class="{ disabled: selectMenuType !== 'auth' || (auditList && !auditList.length) }"-->
@@ -959,6 +959,14 @@
       font-size: 14px;
       color: #888;
       cursor: pointer;
+    }
+    .operate-disable {
+      pointer-events: none;
+      opacity: 0.6;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
   }
 </style>

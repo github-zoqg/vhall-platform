@@ -75,7 +75,7 @@ export default class TaskQueue {
     if (queueTaskItem) {
       await queueTaskItem.playRewardEffect();
       this.running--;
-      await this.sleep(this.minTaskTime * this.running);
+      await this.sleep(this.minTaskTime * (this.running || 1));
       await queueTaskItem.removeRewardEffect();
     }
     this.execute();

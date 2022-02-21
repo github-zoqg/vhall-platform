@@ -204,9 +204,7 @@
       submit() {
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons('comInteractToolsWap', 'emitNeedLogin')
-          );
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           // EventBus.$emit('showChatLogin');
           return;
         }

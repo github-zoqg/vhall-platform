@@ -46,6 +46,8 @@ export const serverConfig = {
       'comSignUpForm',
       'comScreenPostWap',
       'comUserCenterWap',
+      'comUserAccountWap',
+      'comCashWap',
       'compLotteryWap'
     ]
   },
@@ -186,6 +188,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -225,8 +234,31 @@ export const serverConfig = {
   comScreenPostWap: {
     component: 'VmpScreenPostWap'
   },
+  // 个人中心
   comUserCenterWap: {
-    component: 'VmpUserCenterWap'
+    component: 'VmpUserCenterWap',
+    emitOpenUserAccountWap: [
+      {
+        cuid: ['comUserAccountWap'],
+        method: 'openUserAccountWap',
+        args: ['$0']
+      }
+    ],
+    emitOpenCashWap: [
+      {
+        cuid: ['comCashWap'],
+        method: 'openCashWap',
+        args: ['$0']
+      }
+    ]
+  },
+  // 个人资料
+  comUserAccountWap: {
+    component: 'VmpUserAccountWap'
+  },
+  // 提现管理
+  comCashWap: {
+    component: 'VmpCashWap'
   },
   // 抽奖
   compLotteryWap: {
