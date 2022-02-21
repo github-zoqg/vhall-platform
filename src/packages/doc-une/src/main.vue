@@ -179,7 +179,13 @@
       },
       // 文档是否可见
       show() {
-        return this.docServer.state.show;
+        return (
+          this.roomBaseServer.state.clientType === 'send' ||
+          (this.roomBaseServer.state.clientType !== 'send' &&
+            (this.docServer.state.switchStatus ||
+              this.groupServer.state.isInGroup ||
+              this.docServer.state.hasDocPermission))
+        );
       },
       // 是否文档演示权限
       hasDocPermission() {
