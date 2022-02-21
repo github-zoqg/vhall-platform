@@ -463,7 +463,7 @@
       //处理分组讨论频道变更
       handleChannelChange() {
         this.page = 0;
-        this.clearHistoryMsg();
+        useChatServer().clearHistoryMsg();
         this.getHistoryMsg();
       },
       // 获取历史消息
