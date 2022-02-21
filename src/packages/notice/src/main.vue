@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-list" v-if="noticeNum">
+  <div class="vmp-notice-list">
     <main class="vmp-notice-list-container">
       <ul>
         <li
@@ -100,9 +100,9 @@
           ...this.pageInfo
         };
 
-        const result = await this.noticeServer.getNoticeList({ params, flag });
-        const { backData: res, state } = result;
+        const res = await this.noticeServer.getNoticeList({ params, flag });
         if (res.code == 200 && res.data) {
+          const state = this.noticeServer.state;
           this.noticeList = state.noticeList;
           this.totalPages = state.totalPages;
           this.total = state.total;
