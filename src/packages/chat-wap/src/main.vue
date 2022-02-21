@@ -221,17 +221,22 @@
         this.isEmbed = embed;
       },
       listenChatServer() {
+        const chatServer = useChatServer();
         //监听禁言通知
-        useChatServer().$on('banned', res => {
+        chatServer.$on('banned', res => {
           this.isBanned = res;
         });
         //监听全体禁言通知
-        useChatServer().$on('allBanned', res => {
+        chatServer.$on('allBanned', res => {
           this.allBanned = res;
         });
         //监听分组房间变更通知
-        useChatServer().$on('changeChannel', () => {
+        chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
+        });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
         });
       },
       // 获取历史消息
