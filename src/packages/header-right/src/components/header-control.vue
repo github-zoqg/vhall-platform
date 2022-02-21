@@ -158,13 +158,19 @@
         // 第三方发起
         if (this.isLiving) {
           this.$message.warning('请先结束直播');
+          return;
         }
+        this.$emit('thirdPushStream', true);
+        this.thirtPushStreamimg = true;
       },
       thirdPartyClose() {
         // 网页发起 第三方发起关闭
         if (this.isLiving) {
           this.$message.warning('请先结束直播');
+          return;
         }
+        this.$emit('thirdPushStream', false);
+        this.thirtPushStreamimg = false;
       },
       openVirtualAudience() {
         // 虚拟人数弹窗

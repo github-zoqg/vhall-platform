@@ -36,6 +36,9 @@
           <h1 class="vmp-wap-player-ending-box-text">直播已结束</h1>
         </div>
       </div>
+      <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
+        <p>语音播放中</p>
+      </div>
       <!-- 回放结束（正常回放和试看回放结束） -->
       <div
         v-if="isVodEnd"
@@ -863,6 +866,20 @@
       span {
         color: #fb2626;
         padding-left: 5px;
+      }
+    }
+    &-audie {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url('./images/video.gif') no-repeat;
+      background-size: 100% 100%;
+      p {
+        font-size: 28px;
+        color: #fff;
+        margin-top: 40%;
+        text-align: center;
       }
     }
     &-speed {
