@@ -11,10 +11,11 @@
         :options="overlayScrollBarsOptions"
         style="height: 100%"
       >
-        <template v-for="msg in chatList">
+        <template v-for="(msg, index) in chatList">
           <msg-item
             :key="msg.msgId"
             :msg="msg"
+            :pre-msg="chatList[index - 1]"
             v-show="checkMessageShow(msg)"
             :chat-options="chatOptions"
             :role-name="roleName"
