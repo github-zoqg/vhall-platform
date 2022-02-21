@@ -80,7 +80,7 @@ export const serverConfig = {
         { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
         { type: 'notice', cuid: 'comNotice', text: '公告' },
-        // { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
+        { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
         { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
         { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
@@ -311,6 +311,9 @@ export const serverConfig = {
   // 推荐
   comRecommend: {
     component: 'VmpRecommend'
+  },
+  comIntro: {
+    component: 'VmpIntro'
   },
   // 媒体设置
   comMediaSetting: {
