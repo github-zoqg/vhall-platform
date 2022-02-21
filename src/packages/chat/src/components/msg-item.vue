@@ -65,7 +65,7 @@
                 class="info-wrap__role-name"
                 :class="msg.roleName | roleClassFilter"
               >
-                {{ roleFilter(msg.roleName) }}
+                {{ msg.roleName | roleFilter(this) }}
               </span>
             </p>
             <!-- 被回复的消息 -->
@@ -175,7 +175,7 @@
               class="interact-content__role-name"
               :class="msg.roleName | roleClassFilterForMsg"
             >
-              {{ roleFilter(msg.roleName) }}
+              {{ msg.roleName | roleFilter(this) }}
             </span>
             <img
               v-if="msg.type == 'red_envelope_ok'"
@@ -261,32 +261,7 @@
         isEmbed: false
       };
     },
-    computed: {
-      //角色转换
-      roleFilter() {
-        const _this = this;
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = _this.$t('chat.chat_1022');
-              break;
-            case 3:
-              ret = _this.$t('chat.chat_1024');
-              break;
-            case 4:
-              ret = _this.$t('chat.chat_1023');
-              break;
-            case 20:
-              ret = _this.$t('chat.chat_1064');
-              break;
-            default:
-              ret = _this.$t('chat.chat_1062');
-          }
-          return ret;
-        };
-      }
-    },
+    computed: {},
     filters: {
       //文字过长截取
       textOverflowSlice(val = '', len = 0) {
@@ -297,6 +272,27 @@
           return val.substring(0, len) + '...';
         }
         return val;
+      },
+      //角色转换
+      roleFilter: (value, vm) => {
+        let ret = '';
+        switch (Number(value)) {
+          case 1:
+            ret = vm.$t('chat.chat_1022');
+            break;
+          case 3:
+            ret = vm.$t('chat.chat_1024');
+            break;
+          case 4:
+            ret = vm.$t('chat.chat_1023');
+            break;
+          case 20:
+            ret = vm.$t('chat.chat_1064');
+            break;
+          default:
+            ret = vm.$t('chat.chat_1062');
+        }
+        return ret;
       },
       //角色标签样式
       roleClassFilter(value) {
@@ -347,7 +343,7 @@
             'set_person_status_in_chat',
             event.target,
             msg.sendId,
-            msg.count,
+            msg.msgId,
             msg.nickname,
             false,
             msg.roleName
@@ -362,7 +358,7 @@
           'set_person_status_in_chat',
           event.target,
           msg.sendId,
-          msg.count,
+          msg.msgId,
           msg.nickname,
           true,
           msg.roleName

@@ -2,7 +2,11 @@
   <div class="tools-box">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
-      <div v-if="isAllowhandup" style="position: relative" auth="{ 'ui.hide_reward': 0 }">
+      <div
+        v-if="isAllowhandup || isSpeakOn"
+        style="position: relative"
+        auth="{ 'ui.hide_reward': 0 }"
+      >
         <i
           v-if="!handUpStatus"
           class="vh-saas-iconfont vh-saas-line-drag"
@@ -112,6 +116,10 @@
       isAllowhandup() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
         return status;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     mounted() {
