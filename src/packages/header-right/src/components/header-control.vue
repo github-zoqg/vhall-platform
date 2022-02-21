@@ -94,10 +94,6 @@
       isShowSupport: {
         default: false,
         type: Boolean
-      },
-      isShowSplitScreen: {
-        default: false,
-        type: Boolean
       }
     },
     computed: {
