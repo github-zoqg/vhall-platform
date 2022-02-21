@@ -223,7 +223,6 @@
       listenChatServer() {
         //监听禁言通知
         useChatServer().$on('banned', res => {
-          alert(res);
           this.isBanned = res;
         });
         //监听全体禁言通知

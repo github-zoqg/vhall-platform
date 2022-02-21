@@ -16,7 +16,7 @@
         <i></i>
         <span>@TA</span>
       </div>
-      <div class="vmp-chat-user-control__item" @click="deleteMsg(msgId)" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="deleteMsg(count)" v-if="godMode">
         <i></i>
         <span>删除</span>
       </div>
@@ -65,8 +65,7 @@
         },
         nickname: '',
         godMode: false,
-        assistantType: '',
-        msgId: ''
+        assistantType: ''
       };
     },
     beforeCreate() {
@@ -80,10 +79,10 @@
       //todo 待改为信令
       EventBus.$on(
         'set_person_status_in_chat',
-        async (el, accountId, msgId, nickname, godMode, roleName) => {
+        async (el, accountId, count, nickname, godMode, roleName) => {
           if (accountId == this.userId) return; // 不能点击自己
           this.accountId = accountId;
-          this.msgId = msgId;
+          this.count = count;
           const boundedList = await this.getUserStatus();
           this.userStatus.is_banned = boundedList[0].data.list.some(user => {
             return user.account_id == accountId;
@@ -114,8 +113,8 @@
       });
     },
     methods: {
-      deleteMsg(msgId) {
-        this.$emit('deleteMsg', msgId);
+      deleteMsg(count) {
+        this.$emit('deleteMsg', count);
       },
       calculate(el) {
         const rect = el.getBoundingClientRect();
