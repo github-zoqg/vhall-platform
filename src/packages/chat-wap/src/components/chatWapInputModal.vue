@@ -15,7 +15,7 @@
             v-model="inputValue"
             id="textareaChat"
             ref="textarea"
-            placeholder="{{ $t('webinar.webinar_1011') }}"
+            :placeholder="$t('webinar.webinar_1011')"
             :rows="3"
             maxlength="140"
             @blur="handleOnBlur"

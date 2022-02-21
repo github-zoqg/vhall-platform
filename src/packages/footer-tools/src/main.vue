@@ -57,6 +57,8 @@
             v-show="showGift && roomBaseState.watchInitData.interact.room_id"
             :roomId="roomBaseState.watchInitData.interact.room_id"
             :show-gift-count="showGiftCount"
+            @changeShowGift="changeStatus"
+            :cuid="cuid"
           />
         </div>
       </li>
@@ -179,6 +181,7 @@
         });
       },
       changeStatus(data, status) {
+        console.log(data, status, 'data, status');
         this[data] = status;
       },
       // 打开计时器弹框
@@ -197,8 +200,11 @@
       },
       // 打开打赏弹框
       onClickReward() {
-        // TODO:需校验是否登陆
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+        // 需校验是否登陆
+        if (this.roomBaseState.watchInitData.join_info.user_id == 0) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          return false;
+        }
         this.$refs.reward.onClickReward();
       }
     }

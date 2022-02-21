@@ -50,7 +50,66 @@
       return {
         select: '',
         isMyClick: false,
-        chapterInfo: [
+        chapterInfo: [],
+        osComponentOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
+      };
+    },
+    // props: ['chapterInfo'],
+    filters: {
+      filterTime: val => {
+        const result = parseInt(val);
+        let hour = Math.floor(result / 3600);
+        let minute = Math.floor((result / 60) % 60);
+        let second = Math.floor(result % 60);
+        if (hour == 0) {
+          hour = '00';
+        } else if (hour < 10) {
+          hour = '0' + hour;
+        }
+        if (minute == 0) {
+          minute = '00';
+        } else if (minute < 10) {
+          minute = '0' + minute;
+        }
+        if (second == 0) {
+          second = '00';
+        } else if (second < 10) {
+          second = '0' + second;
+        }
+        return hour + ':' + minute + ':' + second;
+      }
+    },
+    components: {},
+    created() {
+      // this.acceptChapter();
+      // this.$VhallEventBus.$on(this.$VhallEventType.Doc.VOD_CUEPOINT_LOAD_COMPLETE, chapters => {
+      //   this.chapterInfo = chapters;
+      // });
+      // this.$VhallEventBus.$on(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, currentTime => {
+      //   if (this.isMyClick) {
+      //     this.isMyClick = false;
+      //     return false;
+      //   }
+      //   const currentNode = this.computeBeforeNode(currentTime);
+      //   if (currentNode) {
+      //     this.select = currentNode.createTime;
+      //   } else {
+      //     this.select = 0;
+      //   }
+      // });
+    },
+    methods: {
+      // 接受章节数据
+      acceptChapter(chapters) {
+        this.chapterInfo = chapters || [
           {
             slideIndex: 1,
             stepIndex: 0,
@@ -139,65 +198,7 @@
             createTime: 14.796,
             docId: '0a9798f6'
           }
-        ],
-        osComponentOptions: {
-          resize: 'none',
-          paddingAbsolute: true,
-          className: 'os-theme-light os-theme-vhall',
-          scrollbars: {
-            autoHide: 'leave',
-            autoHideDelay: 200
-          }
-        }
-      };
-    },
-    // props: ['chapterInfo'],
-    filters: {
-      filterTime: val => {
-        const result = parseInt(val);
-        let hour = Math.floor(result / 3600);
-        let minute = Math.floor((result / 60) % 60);
-        let second = Math.floor(result % 60);
-        if (hour == 0) {
-          hour = '00';
-        } else if (hour < 10) {
-          hour = '0' + hour;
-        }
-        if (minute == 0) {
-          minute = '00';
-        } else if (minute < 10) {
-          minute = '0' + minute;
-        }
-        if (second == 0) {
-          second = '00';
-        } else if (second < 10) {
-          second = '0' + second;
-        }
-        return hour + ':' + minute + ':' + second;
-      }
-    },
-    components: {},
-    created() {
-      // this.$VhallEventBus.$on(this.$VhallEventType.Doc.VOD_CUEPOINT_LOAD_COMPLETE, chapters => {
-      //   this.chapterInfo = chapters;
-      // });
-      // this.$VhallEventBus.$on(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, currentTime => {
-      //   if (this.isMyClick) {
-      //     this.isMyClick = false;
-      //     return false;
-      //   }
-      //   const currentNode = this.computeBeforeNode(currentTime);
-      //   if (currentNode) {
-      //     this.select = currentNode.createTime;
-      //   } else {
-      //     this.select = 0;
-      //   }
-      // });
-    },
-    methods: {
-      // 接受章节数据
-      acceptChapter(chapters) {
-        this.chapterInfo = chapters;
+        ];
       },
       // 接受当前时间
       acceptCurrentTime(currentTime) {
@@ -216,8 +217,8 @@
       changeTime(t) {
         this.isMyClick = true;
         this.select = t;
-        console.log('点击的章节', this.$VhallEventType.Chapter);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePlayTime', [t]));
+        // console.log('点击的章节', this.$VhallEventType.Chapter);
         // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.CHAPTER_CLICK, t);
       },
       computeBeforeNode(currentTime) {
