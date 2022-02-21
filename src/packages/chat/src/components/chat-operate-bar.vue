@@ -2,8 +2,8 @@
   <div class="vmp-chat-operate-container" ref="chatOperateContainer">
     <div class="operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
-        <!--表情过滤按钮-->
-        <i class="icon iconfont iconbiaoqing" @click.stop="toggleEmoji"></i>
+        <!--表情-->
+        <i class="vh-iconfont vh-line-expression" @click.stop="toggleEmoji"></i>
         <!--上传图片-->
         <template v-if="chatOptions && chatOptions.hasImgUpload">
           <!-- 聊天图片上传 -->
@@ -17,7 +17,7 @@
         </template>
         <!--只看主办方按钮-->
         <i
-          class="icon iconfont iconmeitishezhi"
+          class="vh-iconfont vh-line-setting"
           @click.stop="onClickFilterSetting"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
@@ -54,7 +54,9 @@
       <div class="operate-container__tool-bar__right">
         <template v-if="chatOptions && chatOptions.enableChatSetting">
           <!--聊天设置-->
-          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
+          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">
+            {{ $t('common.common_1008') }}
+          </i>
           <div class="chat-setting-btn--chat-auth">
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
@@ -71,9 +73,10 @@
               <!--              </div>-->
               <div class="chat-setting-box__item switch-box">
                 <span class="switch-title">全体禁言</span>
+
                 <el-switch
                   class="switch"
-                  v-model="enableMutedAll"
+                  v-model="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
                   active-color="#fc5659"
@@ -108,7 +111,6 @@
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
-  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -139,15 +141,15 @@
         type: Object,
         default: () => {
           return {
-            placeholder: '参与聊天',
+            placeholder: this.$t('chat.chat_1021'),
             disable: false
           };
         }
       },
       // 是否全体禁言
       allBanned: {
-        type: Number,
-        default: () => 0
+        type: Boolean,
+        default: () => false
       },
       //活动id
       webinarId: {
@@ -173,9 +175,7 @@
       }
     },
     data() {
-      const roomBaseState = useRoomBaseServer().state;
       return {
-        roomBaseState,
         //显示观众的过滤设置
         isFilterShow: false,
         //过滤状态集合
@@ -185,32 +185,33 @@
           //屏蔽特效
           isShieldingEffects: false
         },
-        //聊天审核链接 todo 暂时写死
-        chatFilterUrl: [location.origin, `/lives/chat-auth/${this.webinarId}`].join(''),
+        //聊天审核链接
+        chatFilterUrl: '',
         //是否是助理
-        assistantType: this.$route.query.assistantType,
-        //是否开启全体禁言
-        enableMutedAll: this.allBanned
+        assistantType: this.$route.query.assistantType
       };
     },
+    mounted() {},
     methods: {
       //切换全体禁言开关状态
       toggleMutedAllStatus() {
-        this.$emit('changeAllBanned', this.enableMutedAll);
+        this.$emit('changeAllBanned', this.allBanned);
       },
       //进入聊天审核
       joinChatAuth() {
-        window.open(this.chatFilterUrl, '_blank');
+        //todo 暂时写死
+        const url = [location.origin, `/lives/chat-auth/${this.webinarId}`].join('');
+        window.open(url, '_blank');
       },
       //切换表情模态窗展示
       toggleEmoji() {
         if (this.chatLoginStatus) {
-          this.$message.warning('未登录');
+          this.$message.warning(this.$t('510008'));
           return;
         }
 
         if (this.inputStatus.disable) {
-          this.$message.warning('您已被禁言');
+          this.$message.warning(this.$t('chat.chat_1006'));
           return;
         }
         this.$refs.emoji.toggleShow();
@@ -221,16 +222,16 @@
       },
       //更新输入框组件里的图片
       updateImgUrls() {
-        const images = this.$refs.chatImgUpload.getImgUrls();
+        const images = this.$refs.chatImgUpload && this.$refs.chatImgUpload.getImgUrls();
         this.$refs.chatInput.updateImgUrls(images);
       },
       //清空上传图片组件里的图片
       clearUploadImg() {
-        this.$refs.chatImgUpload.clearImgUrls();
+        this.$refs.chatImgUpload && this.$refs.chatImgUpload.clearImgUrls();
       },
       //只看主办方
       onClickOnlyShowSponsor(status) {
-        let message = status ? '已开启只看主办方' : '已关闭只看主办方';
+        let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
         this.$message({
           message: message,
           showClose: true,
@@ -242,7 +243,7 @@
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
-        let message = status ? '已屏蔽特效' : '已开启特效';
+        let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
         this.$message({
           message: message,
           showClose: true,
@@ -404,7 +405,7 @@
         position: absolute;
         top: -11px;
         transform: translateY(-100%);
-        .iconmeitishezhi {
+        .vh-line-setting {
           font-size: 19px;
           color: #999;
           margin-left: 10px;
@@ -439,7 +440,7 @@
           color: #999999;
         }
       }
-      .iconfont {
+      .vh-iconfont {
         color: #999;
         font-size: 19px;
         cursor: pointer;
@@ -453,7 +454,7 @@
         &.pic-disabled {
           pointer-events: none;
         }
-        &.icontupianliaotian {
+        &.vh-line-expression {
           font-size: 18px;
         }
 
@@ -468,7 +469,7 @@
         background-repeat: no-repeat;
         background-position: center;
       }
-      .iconbiaoqing {
+      .vh-line-expression {
         font-size: 19px;
         color: #999;
         margin-left: 0;

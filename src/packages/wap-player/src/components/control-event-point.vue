@@ -108,7 +108,7 @@
     }
   };
 </script>
-<style lang="scss">
+<style lang="less">
   .vh-video-tailoring__control-event-point {
     position: absolute;
     width: 6px;

@@ -18,12 +18,14 @@
         <headerControl
           :isShowQuit="isShowQuit"
           :isShowSupport="isShowSupport"
-          :isShowSplitScreen="isShowSplitScreen"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
+          @thirdPushStream="thirdPushStream"
         ></headerControl>
       </div>
-      <div class="vmp-header-right_full"><i class="vh-iconfont vh-line-amplification"></i></div>
+      <div class="vmp-header-right_full" @click="fullScreen('body')">
+        <i :class="`vh-iconfont ${isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'}`"></i>
+      </div>
     </section>
   </div>
 </template>
@@ -38,9 +40,10 @@
       return {
         liveStep: 1, // 1未开始 2启动中 3直播中 4结束中
         liveDuration: '',
+        isFullscreen: false,
+        assistantType: this.$route.query.assistantType,
         isShowQuit: false, //是否显示退出
-        isShowSupport: false, //是否显示技术支持
-        isShowSplitScreen: false //是否显示分屏
+        isShowSupport: false //是否显示技术支持
       };
     },
     computed: {
@@ -60,6 +63,7 @@
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.initConfig();
+      this.listenEvents();
     },
     mounted() {
       const { watchInitData } = this.roomBaseServer.state;
@@ -70,6 +74,30 @@
       }
     },
     methods: {
+      listenEvents() {
+        // 全屏事件
+        const setFullscreen = () => {
+          const fullscreenElement =
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullscreenElement ||
+            document.msFullscreenElement;
+          if (
+            fullscreenElement &&
+            fullscreenElement.className &&
+            fullscreenElement.className.indexOf('vmp-basic-container') != -1
+          ) {
+            this.isFullscreen = true;
+          } else {
+            this.isFullscreen = false;
+          }
+        };
+        window.addEventListener('fullscreenchange', setFullscreen);
+        window.addEventListener('webkitfullscreenchange', setFullscreen);
+        window.addEventListener('mozfullscreenchange', setFullscreen);
+        window.addEventListener('msfullscreenchange', setFullscreen);
+        window.addEventListener('MSFullscreenChange', setFullscreen);
+      },
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
         if (widget && widget.options) {
@@ -83,6 +111,12 @@
       // 打开虚拟人数的弹窗
       openVirtualProple() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
+      },
+      // 第三方推流和网页
+      thirdPushStream(flag) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickThirdStream', [{ status: flag }])
+        );
       },
       // 推流成功事件
       async handlePublishComplate() {
@@ -131,6 +165,33 @@
         this._durationInterval = window.setInterval(() => {
           this.liveDuration++;
         }, 1000);
+      },
+      // 全屏
+      fullScreen(el) {
+        this.isFullscreen = !this.isFullscreen;
+        if (this.isFullscreen) {
+          this.enterFullscreen(el);
+        } else {
+          this.exitFullscreen(el);
+        }
+      },
+      enterFullscreen() {
+        const element = document.querySelector('.vmp-basic-container');
+        if (!this.assistantType) {
+          if (element.requestFullscreen) element.requestFullscreen();
+          else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+          else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+          } else if (element.msRequestFullscreen) element.msRequestFullscreen();
+        }
+      },
+      exitFullscreen() {
+        if (!this.assistantType) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
       }
     }
   };

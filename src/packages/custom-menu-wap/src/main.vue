@@ -54,7 +54,6 @@
         if (id === undefined || id === null) {
           return;
         }
-
         const res = await this.customMenuServer.getCustomMenuDetail({
           menu_id: id
         });
@@ -74,6 +73,7 @@
   .vmp-custom-menu {
     height: 100%;
     width: 100%;
+    padding: 30px;
 
     &-wrapper {
       height: 100%;

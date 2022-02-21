@@ -2,7 +2,7 @@
   <div id="header" class="vh-header-box">
     <span class="host-user-info">
       <img
-        v-if="signInfo.organizers_status == 1"
+        v-if="webinarTag && webinarTag.organizers_status == 1"
         class="img-box"
         :src="hostAvatar"
         @click="skipAction"
@@ -10,8 +10,8 @@
       />
       {{ watchInitData.webinar.userinfo.nickname | splitLenStr(8) }}
     </span>
-    <span class="tool-box">
-      <i class="vh-iconfont vh-line-house" :style="{ color: themeColor }" @click="goUser"></i>
+    <span class="tool-box" :style="{ color: themeClass.pageStyle }">
+      <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
         class="attention"
         :class="{
@@ -19,12 +19,10 @@
           'vh-iconfont vh-a-line-collectionsuccess': attentionStatus == 1
         }"
         v-if="groupInitData && !groupInitData.isInGroup && watchInitData.webinar.mode != 6"
-        :style="{ color: themeColor }"
         @click="attentionApi"
       ></i>
       <i
         class="vh-saas-iconfont vh-saas-a-color-officialaccount"
-        :style="{ color: themeColor }"
         @click="showPublic"
         v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
       ></i>
@@ -44,7 +42,12 @@
         attentionStatus: 0, // 关注状态
         // headInfo: null,
         // showSponsor: true,
-        userInfo: {}
+        userInfo: {},
+        themeClass: {
+          bgColor: 'light',
+          background: '#cccccc',
+          pageStyle: '' // icon默认色
+        }
       };
     },
     filters: {
@@ -68,6 +71,9 @@
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
       this.autoShowPublic();
+
+      //设置品牌皮肤
+      this.setSkinInfo(this.skinInfo);
     },
     computed: {
       /**
@@ -77,24 +83,14 @@
         return this.$domainStore.state.roomBaseServer.officicalInfo;
       },
       /**
-       * 主题颜色
-       */
-      themeColor() {
-        if (this.skinInfo && this.skinInfo.pageStyle) {
-          return this.skinInfo.pageStyle;
-        } else {
-          return '#333';
-        }
-      },
-      /**
        * 皮肤信息
        */
       skinInfo() {
         return this.$domainStore.state.roomBaseServer.skinInfo;
       },
       // 签名信息
-      signInfo() {
-        return this.$domainStore.state.roomBaseServer.signInfo;
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
       },
       // 参会信息
       watchInitData() {
@@ -132,6 +128,17 @@
         }
       },
       /**
+       * 设置品牌设置信息
+       */
+      setSkinInfo(skin) {
+        if (skin && skin.skin_json_wap && skin.status == 1) {
+          const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_wap) || '';
+          this.themeClass.pageStyle = pageStyle;
+          this.themeClass.background = background;
+          this.themeClass.bgColor = bgColor;
+        }
+      },
+      /**
        * 初始化登录信息
        */
       initUserLoginStatus() {
@@ -146,8 +153,8 @@
         }
       },
       skipAction() {
-        if (this.signInfo.skip_url) {
-          window.location.href = this.signInfo.skip_url;
+        if (this.webinarTag.skip_url) {
+          window.location.href = this.webinarTag.skip_url;
         }
       },
       /**
@@ -240,6 +247,16 @@
       i {
         margin-left: 37px;
         font-size: 38px;
+      }
+    }
+    .icon-default {
+      &:hover {
+        cursor: pointer;
+        i,
+        p {
+          cursor: pointer;
+          color: @font-high-light-normal !important;
+        }
       }
     }
   }

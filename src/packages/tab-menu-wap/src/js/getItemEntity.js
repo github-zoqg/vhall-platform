@@ -1,34 +1,33 @@
-const typeMap = new Map([
-  [1, 'comCustomMenuWap'], // 自定义
-  [2, 'comDocWap'], // 文档
-  [3, 'comChatWap'], // 聊天
-  [4, 'comIntroWap'], //简介
-  [5, 'comGoodSaasWap'], //商品
-  [6, 'comRecommendWap'], //广告、推荐
-  [7, 'comChapter'] // 章节
-]);
+let localId = 0;
 
-export function getItemEntity({
-  type = 2,
-  id = '', // MENU ID
-  name,
-  payload = {},
-  status = '1',
-  showIcon = false
-}) {
-  const cuid = typeMap.get(type);
-  let visible = status == 1 || status == 3 ? true : false;
-  if (type === 2) visible = false;
+export function getItemEntity(
+  {
+    type = 2,
+    id = `local_${localId++}`, //menu id
+    name,
+    status = '1'
+  },
+  typeMap
+) {
+  const item = typeMap.find(config => config.type === type);
+  if (!item) return false;
+
+  const text = type === 1 ? name : item.text;
+  let { visible = true, tipsVisible = false, iconVisible = false } = item;
+  visible = status == '1'; //
 
   return {
+    // 原始字段
     type,
-    cuid,
-    id,
-    contentId: id, // 等同于 id
-    text: name,
-    payload,
     status,
+    id,
+    name,
+
+    // 新增字段
+    cuid: item.cuid,
+    text,
     visible,
-    showIcon
+    tipsVisible,
+    iconVisible
   };
 }

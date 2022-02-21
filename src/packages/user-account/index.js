@@ -1,8 +1,8 @@
-import UserAccount from './src/main';
+import VmpUserAccount from './src/main';
 
 /* istanbul ignore next */
-UserAccount.install = function (Vue) {
-  Vue.component(UserAccount.name, UserAccount);
+VmpUserAccount.install = function (Vue) {
+  Vue.component(VmpUserAccount.name, VmpUserAccount);
 };
 
-export default UserAccount;
+export default VmpUserAccount;

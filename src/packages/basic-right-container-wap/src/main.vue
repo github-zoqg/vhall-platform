@@ -8,6 +8,7 @@
       <div class="have"></div>
       <img src="./image/icon.png" />
     </div>
+    <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
 
@@ -44,7 +45,6 @@
   .base-box {
     display: flex;
     flex-direction: column;
-    background: #ddd;
     position: absolute;
     display: inline-block;
     right: 26px;

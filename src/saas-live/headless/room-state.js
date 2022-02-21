@@ -22,7 +22,7 @@ export default async function () {
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
-    return 'isBrowserNotSuppport';
+    return 'isBrowserNotSupport';
   }
 
   if (!roomBaseServer) {
@@ -42,9 +42,7 @@ export default async function () {
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    micServer.init();
-  }
+  micServer.init();
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
@@ -56,25 +54,6 @@ export default async function () {
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
 
   mediaSettingServer.init();
-
-  roomBaseServer.getCommonConfig({
-    tags: [
-      'skin',
-      'screen-poster',
-      'like',
-      'keywords',
-      'public-account',
-      'webinar-tag',
-      'menu',
-      'adv-default',
-      'invite-card',
-      'red-packet',
-      'room-tool',
-      'goods-default',
-      'announcement',
-      'sign'
-    ]
-  });
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息

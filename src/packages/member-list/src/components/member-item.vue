@@ -22,26 +22,26 @@
       :class="userInfo.role_name | roleClassFilter"
       v-if="![2, '2'].includes(userInfo.role_name)"
     >
-      {{ userInfo.role_name | roleFilter }}
+      {{ roleFilter(userInfo.role_name) }}
     </span>
     <div class="vmp-member-item__control">
       <template v-if="memberOptions.platformType === 'live'">
         <!-- 主讲人标识 -->
         <template v-if="isShowSpeakerFlag">
-          <i class="vmp-member-item__control__user-icon iconfont iconxing"></i>
+          <i class="vmp-member-item__control__user-icon vh-iconfont vh-line-star-off"></i>
         </template>
 
         <!--被禁言标识 -->
         <template v-if="[1, 3].includes(tabIndex) && userInfo.is_banned === 1">
           <i
-            class="vmp-member-item__control__user-icon iconfont iconjinyan"
+            class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
             style="color: #cccccc"
           ></i>
         </template>
         <!--被踢出标识 -->
         <template v-if="tabIndex === 3 && userInfo.is_kicked">
           <i
-            class="vmp-member-item__control__user-icon iconfont icontichu"
+            class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-KickedoutMembers"
             style="color: #cccccc"
           ></i>
         </template>
@@ -49,13 +49,13 @@
         <template
           v-if="
             [1, 2].includes(this.tabIndex) &&
-            userInfo.isApply &&
+            [1, '1'].includes(userInfo.is_apply) &&
             applyUsers.find(u => u.account_id == userInfo.account_id) &&
             !userInfo.is_speak
           "
         >
           <i
-            class="vmp-member-item__control__user-icon iconfont iconxiamai"
+            class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
             style="color: #cccccc; font-size: 15px"
           ></i>
         </template>
@@ -69,7 +69,7 @@
           "
         >
           <i
-            class="vmp-member-item__control__user-icon iconfont iconxiamai1"
+            class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
             style="color: #fc5659; font-size: 15px"
           ></i>
         </template>
@@ -92,7 +92,7 @@
         >
           <i
             style="color: #fc5659; font-size: 15px; vertical-align: middle"
-            class="iconfont iconhebingxingzhuang vmp-member-item__control__device-abnormal"
+            class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"
           ></i>
         </template>
         <template v-if="tabIndex === 1">
@@ -100,7 +100,7 @@
           <i
             v-if="isShowUpMic"
             class="vmp-member-item__control__up-mic"
-            @click="upMic(userInfo.isApply, userInfo.account_id)"
+            @click="upMic(userInfo.is_apply, userInfo.account_id)"
           >
             上麦
           </i>
@@ -110,7 +110,7 @@
             class="vmp-member-item__control__down-mic"
             @click="downMic(userInfo.account_id)"
           >
-            下麦
+            {{ $t('interact.interact_1007') }}
           </i>
           <!--我要演示-->
           <i
@@ -126,23 +126,23 @@
         <!-- 主讲人 -->
         <i
           v-if="tabIndex === 1 && userInfo.is_kicked !== 1 && [1, '1'].includes(userInfo.role_name)"
-          class="vmp-member-item__control__user-icon iconfont icona-icon_chengyuanliebiao_zhujiangren2x"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-line-star-off"
         ></i>
         <!--被禁言-->
         <i
           v-if="[1, 3].includes(tabIndex) && [1, '1'].includes(userInfo.is_banned)"
-          class="vmp-member-item__control__user-icon iconfont icona-icon_chengyuanliebiaoshouxianchengyuan2x"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
           style="color: #cccccc"
         ></i>
         <!--申请上麦-->
         <i
           v-if="
             [1, 2].includes(tabIndex) &&
-            userInfo.isApply &&
+            [1, '1'].includes(userInfo.is_apply) &&
             applyUsers.find(u => u.account_id === userInfo.account_id) &&
             !userInfo.is_speak
           "
-          class="vmp-member-item__control__user-icon iconfont icona-icon_jushoushangmai2x"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
           style="color: #cccccc; font-size: 15px"
         ></i>
         <!--上麦中-->
@@ -153,7 +153,7 @@
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
-          class="vmp-member-item__control__user-icon iconfont icona-icon_shangmaizhong2x"
+          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-Onthemicrophone1"
           style="color: #fb3a32; font-size: 15px"
         ></i>
         <!--设备有问题-->
@@ -164,12 +164,12 @@
             [2, '2'].includes(userInfo.device_status)
           "
           style="color: #fb3a32; font-size: 15px; vertical-align: middle"
-          class="iconfont icona-icon_chengyuanliebiao_shebeiyichang2x vmp-member-item__control__user-icon"
+          class="vh-iconfont vh-full-warning vmp-member-item__control__user-icon"
         ></i>
         <!--被踢出-->
         <i
           v-if="tabIndex === 3 && userInfo.is_kicked"
-          class="vmp-member-item__control__user-icon iconfont icontichu"
+          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-KickedoutMembers"
           style="color: #cccccc"
         ></i>
         <!-- 显示条件：列表中该用户是是组长 -->
@@ -190,7 +190,7 @@
               currentSpeakerId !== userInfo.account_id
             "
             class="vmp-member-item__control__up-mic"
-            @click="upMic(userInfo.isApply, userInfo.account_id)"
+            @click="upMic(userInfo.is_apply, userInfo.account_id)"
           >
             上麦
           </i>
@@ -267,27 +267,6 @@
   export default {
     name: 'VmpMemberItem',
     filters: {
-      //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = '主持人';
-            break;
-          case 3:
-            ret = '助理';
-            break;
-          case 4:
-            ret = '嘉宾';
-            break;
-          case 20:
-            ret = '组长';
-            break;
-          default:
-            ret = '';
-        }
-        return ret;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人
@@ -359,7 +338,17 @@
       applyUsers: {
         type: Array,
         default: () => []
+      },
+      //直播状态，0未开始，1已开始，2已结束
+      status: {
+        type: [Array, String, Number],
+        default: () => {
+          return 0;
+        }
       }
+    },
+    mounted() {
+      console.log(this.currentSpeakerId, '当前主讲人的id');
     },
     data() {
       return {
@@ -461,6 +450,30 @@
       };
     },
     computed: {
+      //角色转换
+      roleFilter() {
+        const _this = this;
+        return function (value) {
+          let ret = '';
+          switch (Number(value)) {
+            case 1:
+              ret = _this.$t('chat.chat_1022');
+              break;
+            case 3:
+              ret = _this.$t('chat.chat_1024');
+              break;
+            case 4:
+              ret = _this.$t('chat.chat_1023');
+              break;
+            case 20:
+              ret = _this.$t('chat.chat_1064');
+              break;
+            default:
+              ret = '';
+          }
+          return ret;
+        };
+      },
       //人员操作项是否显示(PC发起)
       showUserControl() {
         return (
@@ -582,31 +595,36 @@
       //是否显示上麦标识
       isShowUpMic() {
         let isShow = false;
+        if (this.isHost) {
+          isShow =
+            [1, '1'].includes(this.isInteract) &&
+            !this.userInfo.is_speak &&
+            [1, '1'].includes(this.status);
+          return isShow;
+        }
+        //如果不是主持人
         if (this.isNotHost) {
-          return (
+          isShow =
             [1, '1'].includes(this.isInteract) &&
             !this.userInfo.is_banned &&
             !this.userInfo.is_speak &&
-            [1, '1'].includes(this.userInfo.device_status)
-          );
+            [1, '1'].includes(this.userInfo.device_status);
         }
-        if (this.isHost) {
-          //todo 可能需要一个检查直播开始结束状态的判断
-          isShow = [1, '1'].includes(this.isInteract) && !this.userInfo.is_speak;
-        }
+
         return isShow;
       },
       //是否显示下麦标识
       isShowDownMic() {
         let isShow = false;
-        if (this.isNotHost) {
-          return [1, '1'].includes(this.isInteract) && this.userInfo.is_speak;
-        }
         if (this.isHost) {
-          isShow =
+          return (
             [1, '1'].includes(this.isInteract) &&
             this.userInfo.is_speak &&
-            this.currentSpeakerId !== this.userId;
+            this.currentSpeakerId !== this.userId
+          );
+        }
+        if (this.isNotHost) {
+          isShow = [1, '1'].includes(this.isInteract) && this.userInfo.is_speak;
         }
         return isShow;
       },

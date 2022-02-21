@@ -17,7 +17,7 @@
   export default {
     data() {
       return {
-        canvasImg: require('./../imgs/canvasDefault.png'),
+        canvasImg: require('../../images/canvasDefault.png'),
         canvasData: {
           width: 1280,
           height: 720
@@ -26,19 +26,23 @@
     },
 
     async mounted() {
-      this.imgStreamServer = useCanvasStreamServer({
+      const canvasStreamServer = useCanvasStreamServer();
+      canvasStreamServer.init({
         canvasDom: this.$refs.capCanvas,
         canvasImgDom: this.$refs.capImage
       });
       try {
-        await this.imgStreamServer.checkImgStream();
+        await canvasStreamServer.checkImgStream();
       } catch (error) {
         this.$message.error('非默认图片推流设置失败');
       }
     },
     methods: {
       getCanvasStream() {
-        return this.imgStreamServer.getCanvasStream();
+        return useCanvasStreamServer().getCanvasStream();
+      },
+      updateCanvasImg() {
+        return useCanvasStreamServer().checkImgStream();
       }
     }
   };

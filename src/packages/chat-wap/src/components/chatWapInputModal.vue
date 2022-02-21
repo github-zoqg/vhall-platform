@@ -2,10 +2,12 @@
   <van-popup v-model="visible" class="vmp-chat-wap-input-modal" get-container="body">
     <div class="vmp-chat-wap-input-modal__send-box">
       <div class="send-box__top">
-        <span class="send-box__top--cancel-btn" @click="cancel">取消</span>
+        <span class="send-box__top--cancel-btn" @click="cancel">
+          {{ $t('account.account_1063') }}
+        </span>
         <!-- 聊天 -->
-        <span class="send-box__top--title">聊天</span>
-        <span class="send-box__top--send-btn" @click="send">发送</span>
+        <span class="send-box__top--title">{{ $t('menu.menu_1002') }}</span>
+        <span class="send-box__top--send-btn" @click="send">{{ $t('webinar.webinar_1010') }}</span>
       </div>
       <div class="send-box__bottom">
         <div class="send-box__bottom--textarea">
@@ -13,7 +15,7 @@
             v-model="inputValue"
             id="textareaChat"
             ref="textarea"
-            placeholder="输入想说的话"
+            :placeholder="$t('webinar.webinar_1011')"
             :rows="3"
             maxlength="140"
             @blur="handleOnBlur"
@@ -78,7 +80,7 @@
       send() {
         const inputValue = this.inputValue.trim();
         if (!inputValue) {
-          this.$message('输入内容不能为空');
+          this.$message(this.$t('chat.chat_1057'));
           return;
         }
         this.$emit('sendMsg', inputValue);
@@ -159,22 +161,22 @@
           border: none;
           -webkit-appearance: none;
         }
-        &--emoji {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          padding: 10px;
-          box-sizing: border-box;
-          left: 0;
-          bottom: 0;
-          overflow-y: scroll;
-          background-color: #ffffff;
-          img {
-            width: 48px;
-            height: 48px;
-            margin: 6px;
-            float: left;
-          }
+      }
+      &--emoji {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        left: 0;
+        bottom: 0;
+        overflow-y: scroll;
+        background-color: #ffffff;
+        img {
+          width: 48px;
+          height: 48px;
+          margin: 6px;
+          float: left;
         }
       }
       &--limit {
@@ -184,6 +186,10 @@
         align-items: center;
         justify-content: space-between;
         color: #555;
+        .vh-iconfont {
+          color: #797979;
+          font-size: 42px;
+        }
       }
       &--reset-text {
         color: #555555;

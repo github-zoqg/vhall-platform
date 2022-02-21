@@ -119,16 +119,8 @@ export default {
     },
     // open支付金额设置弹框
     onClickReward() {
-      // if (this.$VhallStorage.get('userInfo', 'local')) {
-      // 读取用户是否登陆
-      if (!localStorage.getItem('userInfo')) {
-        this.showRewardDialog = true;
-        // this.setDialogZIndexQueue('reward');
-      } else {
-        // 调起登录弹窗进行登录
-        window.$middleEventSdk?.event?.send(boxEventOpitons('comFooterTools', 'emitNeedLogin'));
-        // this.$VhallEventBus.$emit(this.$VhallEventType.Nav.NAV_LOGIN_SHOW, true);
-      }
+      this.showRewardDialog = true;
+      // this.setDialogZIndexQueue('reward');
     },
     // 选择支付金额
     onClickRewardItem(index) {

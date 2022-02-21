@@ -88,7 +88,14 @@
         }
       }
     },
-
+    watch: {
+      isStreamListH0: {
+        handler(newval) {
+          this.interactiveServer.setStreamListHeightInWatch(newval ? 0 : 80);
+        },
+        immediate: true
+      }
+    },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
     },
@@ -100,8 +107,7 @@
         this.childrenCom,
         this.$domainStore.state.interactiveServer.remoteStreams
       );
-      console.error('sssss', this.interactiveServer);
-      this.getStreamList();
+      // this.getStreamList();
     },
 
     mounted() {},

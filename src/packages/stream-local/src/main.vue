@@ -10,7 +10,25 @@
       :id="`stream-${joinInfo.third_party_user_id}`"
     ></section>
     <!-- videoMuted 的时候显示流占位图 -->
-    <section v-if="localStream.videoMuted" class="vmp-stream-local__stream-box__mute"></section>
+    <section
+      v-if="localStream.videoMuted && mode != 1"
+      class="vmp-stream-local__stream-box__mute"
+    ></section>
+
+    <!-- 主持人 - 直播未开始 ， 音频直播 ， 音频直播 结束 遮罩图 -->
+    <section
+      v-if="joinInfo.role_name == 1 && mode == 1"
+      :class="
+        liveStatus == 1
+          ? 'vmp-stream-local__stream-box__audio'
+          : 'vmp-stream-local__stream-box__audio--beforestart'
+      "
+    >
+      <div class="vmp-stream-local__stream-box__audio--bg">
+        <span></span>
+      </div>
+    </section>
+
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="isStreamPublished">
       <span
@@ -32,8 +50,68 @@
         "
       ></span>
     </section>
-    <!-- 遮罩层 -->
-    <section class="vmp-stream-local__shadow-box">
+    <!-- 遮罩层 主屏-->
+    <section v-if="mainScreen == joinInfo.third_party_user_id" class="vmp-stream-local__shadow-box">
+      <p class="vmp-stream-local__shadow-first-line">
+        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
+          {{ joinInfo.role_name | roleNameFilter }}
+        </span>
+        <el-tooltip :content="localStream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+          <span
+            class="vmp-stream-local__shadow-icon"
+            @click="handleClickMuteDevice('video')"
+            :class="
+              localStream.videoMuted
+                ? 'vh-iconfont vh-line-turn-off-video-camera'
+                : 'vh-iconfont vh-line-video-camera'
+            "
+          ></span>
+        </el-tooltip>
+
+        <el-tooltip :content="localStream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+          <span
+            class="vmp-stream-local__shadow-icon vh-iconfont"
+            @click="handleClickMuteDevice('audio')"
+            :class="
+              localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
+            "
+          ></span>
+        </el-tooltip>
+
+        <el-tooltip content="下麦" placement="top">
+          <span
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
+            @click="speakOff"
+            v-if="joinInfo.role_name != 1 && role != 20"
+          ></span>
+        </el-tooltip>
+      </p>
+      <p class="vmp-stream-local__shadow-second-line">
+        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
+          视图
+        </span>
+        <el-tooltip content="切换" placement="bottom">
+          <span
+            class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
+            v-if="!isFullScreen"
+            @click="exchange"
+          ></span>
+        </el-tooltip>
+        <el-tooltip content="全屏" placement="bottom">
+          <span
+            class="vmp-stream-local__shadow-icon vh-iconfont"
+            :class="{
+              'vh-line-amplification': !isFullScreen,
+              'vh-line-narrow': isFullScreen
+            }"
+            @click="fullScreen"
+          ></span>
+        </el-tooltip>
+      </p>
+    </section>
+
+    <!-- 遮罩层 非主屏-->
+    <section v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           {{ joinInfo.role_name | roleNameFilter }}
@@ -66,36 +144,32 @@
           ></span>
         </el-tooltip>
       </p>
-      <p class="vmp-stream-local__shadow-second-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          视图
-        </span>
-        <el-tooltip content="切换" placement="bottom">
+      <p v-if="joinInfo.role_name == 1" class="vmp-stream-local__shadow-second-line">
+        <!-- 设为主讲人 -->
+        <el-tooltip content="设为主讲人" v-if="mode != 6" placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
-            v-if="!isFullScreen"
-            @click="exchange"
+            class="vmp-stream-local__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
+            @click="setOwner()"
           ></span>
         </el-tooltip>
-        <el-tooltip content="全屏" placement="bottom">
+
+        <!-- 设为主画面 -->
+        <el-tooltip content="设为主画面" v-else placement="bottom">
           <span
-            class="vmp-stream-local__shadow-icon vh-iconfont"
-            :class="{
-              'vh-line-amplification': !isFullScreen,
-              'vh-line-narrow': isFullScreen
-            }"
-            @click="fullScreen"
+            class="vmp-stream-local__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
+            @click="setMainScreen(false)"
           ></span>
         </el-tooltip>
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="joinInfo.role_name != 1"
             @click="speakOff"
+            v-if="showDownMic"
           ></span>
         </el-tooltip>
       </p>
     </section>
+
     <ImgStream ref="imgPushStream"></ImgStream>
   </div>
 </template>
@@ -105,7 +179,8 @@
     useInteractiveServer,
     useMicServer,
     useRoomBaseServer,
-    usePlayerServer
+    usePlayerServer,
+    useMediaSettingServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -118,7 +193,8 @@
         role: '',
         isStreamPublished: false,
         networkStatus: 2,
-        audioLevel: 1
+        audioLevel: 1,
+        showDownMic: false
       };
     },
     components: {
@@ -140,6 +216,12 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     filters: {
@@ -158,26 +240,48 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
+      // this.listenEvents();
     },
     async mounted() {
-      console.log('本地流组件mounted钩子函数');
+      console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
 
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
       }
 
+      // 主持人同意上麦申请
+      this.micServer.$on('vrtc_connect_agree', async () => {
+        this.userSpeakOn();
+      });
+
       // 上麦成功
       this.micServer.$on('vrtc_connect_success', async msg => {
+        console.log('上麦成功', msg);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          // 如果成功，销毁播放器
-          this.playerServer.destroy();
-
-          // 实例化互动实例
-          await this.interactiveServer.init();
-
-          // 开始推流
-          this.startPush();
+          if (
+            this.joinInfo.role_name == 3 ||
+            (this.joinInfo.role_name == 1 && !this.localStream.streamId)
+          ) {
+            // 开始推流
+            this.startPush();
+          } else if (this.joinInfo.role_name == 2) {
+            // 如果成功，销毁播放器
+            this.playerServer.destroy();
+            // 实例化互动实例
+            await this.interactiveServer.init();
+            // 开始推流
+            this.startPush();
+          }
         }
+      });
+      // 下麦成功
+      this.micServer.$on('vrtc_disconnect_success', async () => {
+        await this.stopPush();
+
+        this.interactiveServer.destroy();
+
+        // 如果成功，销毁播放器
+        this.playerServer.init();
       });
     },
     beforeDestroy() {
@@ -190,6 +294,27 @@
       }
     },
     methods: {
+      // 媒体切换后进行无缝切换
+      async switchStreamType(param) {
+        // 图片信息
+        if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+          if (param.canvasImgUrl) {
+            useMediaSettingServer().state.canvasImgUrl = param.canvasImgUrl;
+          }
+          await this.$refs.imgPushStream.updateCanvasImg();
+        }
+        if (this.isStreamPublished) {
+          await this.stopPush();
+          await this.startPush();
+        }
+      },
+      sleep(time = 1000) {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve(true);
+          }, time);
+        });
+      },
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
@@ -204,8 +329,8 @@
         return false;
       },
       // 用户下麦接口
-      userSpeakOff() {
-        return this.micServer.userSpeakOff();
+      speakOff() {
+        return this.micServer.speakOff();
       },
       // 处理上麦失败
       handleSpeakOnError(err) {
@@ -213,13 +338,13 @@
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
           // 下麦接口
-          this.userSpeakOff();
+          this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
@@ -238,8 +363,7 @@
           throw new Error('代码错误');
         }
       },
-
-      // 开始推流，不设置旁路，主持人之外的其他角色用
+      // 开始推流
       async startPush() {
         try {
           // 创建本地流
@@ -249,9 +373,10 @@
           // 实时获取网络状况
           this.getLevel();
 
-          // TODO 配置主屏条件
-          // 配置旁路主屏
-          await this.setBroadCastScreen();
+          // 主持人配置旁路主屏
+          if (this.joinInfo.role_name == 1) {
+            await this.setBroadCastScreen();
+          }
           // 派发事件
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickPublishComplate')
@@ -262,33 +387,25 @@
       },
       // 创建本地流
       async createLocalStream() {
-        switch (this.$domainStore.state.mediaSettingServer.videoType) {
-          case 'camera':
-            await this.interactiveServer
-              .createLocalVideoStream({
-                videoNode: `stream-${this.joinInfo.third_party_user_id}`
-              })
-              .catch(() => 'createLocalStreamError');
-            break;
-          case 'pictrue':
-            await (() => {
-              setTimeout(() => {}, 1000);
-            })();
-            // eslint-disable-next-line no-case-declarations
-            let videoTracks = await this.$refs.imgPushStream.getCanvasStream();
-            if (!videoTracks) {
-              throw 'getCanvasStreamError';
-            }
-            await this.interactiveServer
-              .createLocalPhotoStream({
-                videoNode: `stream-${this.joinInfo.third_party_user_id}`,
-                videoTrack: videoTracks
-              })
-              .catch(() => 'createLocalPhotoStreamError');
-            break;
-
-          default:
-            break;
+        console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
+        if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          await this.interactiveServer
+            .createLocalVideoStream({
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`
+            })
+            .catch(() => 'createLocalStreamError');
+        } else {
+          await this.sleep();
+          const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
+          if (!videoTracks) {
+            throw 'getCanvasStreamError';
+          }
+          await this.interactiveServer
+            .createLocalPhotoStream({
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`,
+              videoTrack: videoTracks
+            })
+            .catch(() => 'createLocalPhotoStreamError');
         }
       },
       // 推流
@@ -307,11 +424,16 @@
       },
       // 结束推流
       stopPush() {
-        this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
-          this.isStreamPublished = false;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-          );
+        return new Promise(resolve => {
+          this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            this.isStreamPublished = false;
+            clearInterval(this._audioLeveInterval);
+
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          });
         });
       },
       // 点击mute按钮事件
@@ -354,7 +476,7 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.localStream.streamId) return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.localStream.streamId })
@@ -369,7 +491,7 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localStream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.localStream.streamId) return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.localStream.streamId })
@@ -382,7 +504,48 @@
             });
         }, 2000);
       },
-      speakOff() {}
+
+      /**
+       * 设置主讲人
+       * @param {Number | String} accountId 用户ID
+       * @Function void()
+       */
+      setOwner(accountId, setMainScreen = true) {
+        // if (accountId) {
+        //   const streamInfo = this.getDesktopAndIntercutInfo();
+        //   const users = streamInfo.remoteUsers.concat(streamInfo.localUser);
+        //   const mainScreenUser = users.find(u => u.accountId == accountId) || { streams: [] };
+        //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
+        //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
+        // }
+        if (setMainScreen) {
+          this.setMainScreen();
+        }
+        this.interactiveServer
+          .setSpeaker({
+            receive_account_id: accountId || this.joinInfo.third_party_user_id
+          })
+          .then(res => {
+            console.log('setSpeaker success ::', res);
+          })
+          .catch(err => {
+            console.error('setSpeaker failed ::', err);
+          });
+      },
+
+      //  设为主画面
+      setMainScreen() {
+        this.interactiveServer
+          .setMainScreen({
+            receive_account_id: this.joinInfo.third_party_user_id
+          })
+          .then(res => {
+            console.log('setmainscreen success ::', res);
+          })
+          .catch(err => {
+            console.error('setmainscreen failed ::', err);
+          });
+      }
     }
   };
 </script>
@@ -414,6 +577,65 @@
       width: 100%;
       height: 100%;
     }
+
+    .vmp-stream-local__stream-box__audio {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-size: 400px;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #333438 url('./images/voicefrequency.png') no-repeat;
+      background-size: 100% 100%;
+      /*opacity: 0.8;*/
+      &--beforestart {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-size: 400px;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url('./images/livebg.png') no-repeat;
+        background-size: 100% 100%;
+        // background-color: black;
+        & > .vmp-stream-local__stream-box__audio--bg {
+          display: none;
+        }
+      }
+      & > .vmp-stream-local__stream-box__audio--bg {
+        color: white;
+        font-size: 20px;
+        width: 170px;
+        height: 46px;
+        background: url('./images/voice.png') left no-repeat;
+        background-size: 69px;
+        z-index: 4;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        & > span {
+          width: 96px;
+          height: 22px;
+          display: inline-block;
+          background: url('./images/voiceinprogress.png') no-repeat;
+          background-size: 100%;
+        }
+      }
+    }
+
     .vmp-stream-local__bootom {
       width: 100%;
       height: 24px;

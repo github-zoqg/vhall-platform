@@ -21,6 +21,8 @@
     <div class="vmp-footer-tools__center" v-if="isInteractLive">
       <handup></handup>
     </div>
+    <!-- 用户被邀请dialog -->
+    <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
       <li>
@@ -55,6 +57,8 @@
             v-show="showGift && roomBaseState.watchInitData.interact.room_id"
             :roomId="roomBaseState.watchInitData.interact.room_id"
             :show-gift-count="showGiftCount"
+            @changeShowGift="changeStatus"
+            :cuid="cuid"
           />
         </div>
       </li>
@@ -74,16 +78,16 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer, useVirtualAudienceServer } from 'middle-domain';
-  // import onlineMixin from './js/mixins';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
+  import getInvited from './component/getInvited/index.vue';
+
   export default {
     name: 'VmpFooterTools',
-    // mixins: [onlineMixin],
     data() {
       return {
         roomBaseState: null,
@@ -100,7 +104,8 @@
       reward,
       vhGifts,
       notice,
-      praise
+      praise,
+      getInvited
     },
     filters: {
       formatHotNum(value) {
@@ -142,22 +147,26 @@
         return this.groupServer.state.groupInitData.isInGroup;
       },
       hotNum() {
-        return Number(this.onlineState.uvHot) + Number(this.onlineState.virtualHot) + 1;
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
+        );
       },
       onlineNum() {
-        return Number(this.onlineState.uvOnline) + Number(this.onlineState.virtualOnline);
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
+        );
       }
     },
     beforeCreate() {
-      this.virtualClientStartServer = useVirtualAudienceServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
-      this.onlineState = this.virtualClientStartServer.state;
-      this.virtualClientStartServer.listenEvent();
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
@@ -172,6 +181,7 @@
         });
       },
       changeStatus(data, status) {
+        console.log(data, status, 'data, status');
         this[data] = status;
       },
       // 打开计时器弹框
@@ -190,8 +200,11 @@
       },
       // 打开打赏弹框
       onClickReward() {
-        // TODO:需校验是否登陆
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+        // 需校验是否登陆
+        if (this.roomBaseState.watchInitData.join_info.user_id == 0) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          return false;
+        }
         this.$refs.reward.onClickReward();
       }
     }

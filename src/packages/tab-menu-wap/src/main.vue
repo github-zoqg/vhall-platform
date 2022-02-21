@@ -5,16 +5,16 @@
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
         <li
           v-for="item of mainMenu"
-          :ref="`${item.cuid}_${item.key}`"
+          :ref="item.id"
           class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.cuid}_${item.contentId}` }"
-          :key="`${item.cuid}_${item.contentId}`"
-          @click="select(item.cuid, item.contentId)"
+          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
         >
-          <span class="item-text">{{ item.text }}</span>
+          <span class="item-text">{{ $t(item.text) }}</span>
         </li>
         <li
-          v-if="menu.length > 3"
+          v-if="visibleMenu.length > 3"
           class="vmp-tab-menu-more"
           :class="{ selected: isSubMenuShow }"
           @click="toggleSubMenuVisible"
@@ -28,10 +28,10 @@
         <li
           class="vmp-tab-menu-sub__item"
           v-for="item of subMenu"
-          :key="`${item.cuid}_${item.contentId}`"
-          @click="select(item.cuid, item.contentId)"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
         >
-          {{ item.text }}
+          {{ $t(item.text) }}
         </li>
       </ul>
     </section>
@@ -39,21 +39,19 @@
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
       <tab-content
-        :tab-cuid="cuid"
+        ref="tabContent"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
         @closePopup="selectDefault"
-        ref="tabContent"
-      ></tab-content>
+      />
     </section>
   </section>
 </template>
 
 <script>
+  import { useMenuServer } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
-
-  // TODO: tips
 
   export default {
     name: 'VmpTabMenuWap',
@@ -61,17 +59,14 @@
     data() {
       return {
         direciton: 'row', // row(横)，column(纵)
-        selectedCuid: '',
-        selectedContentId: '', //存在相同cuid，但不同内容的情形
+        selectedType: '',
+        selectedId: '',
         menu: [],
         isSubMenuShow: false,
         tabOptions: {}
       };
     },
     computed: {
-      selectedId() {
-        return `${this.selectedCuid}_${this.selectedContentId}`;
-      },
       visibleMenu() {
         return this.menu.filter(item => item.visible);
       },
@@ -83,10 +78,11 @@
         return this.visibleMenu.filter((item, index) => index >= 3);
       },
       selectedIndex() {
-        return this.visibleMenu.findIndex(
-          item => `${item.cuid}_${item.contentId}` === this.selectedId
-        );
+        return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       }
+    },
+    beforeCreate() {
+      this.menuServer = useMenuServer();
     },
     created() {
       this.initConfig();
@@ -94,131 +90,168 @@
     },
     async mounted() {
       await this.$nextTick(0);
+      this.selectDefault();
     },
 
     methods: {
-      // 初始化配置
+      /**
+       * 初始化配置
+       */
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
         if (widget && widget.options) {
           this.tabOptions = widget.options;
         }
       },
-      // 初始化菜单选项
+      /**
+       * 拉取接口，初始化菜单项
+       */
       initMenu() {
+        // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
-
+        console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
         }
       },
+      /**
+       * 选中默认的菜单项（第一项）
+       */
       selectDefault() {
         // 选择默认项
         if (this.visibleMenu.length > 0) {
-          const { cuid, contentId } = this.visibleMenu[0];
-          this.select(cuid, contentId);
+          const { type, id } = this.visibleMenu[0];
+          this.select({ type, id });
         }
       },
-
+      /**
+       * 切换次级菜单的显隐
+       */
       toggleSubMenuVisible() {
         this.isSubMenuShow = !this.isSubMenuShow;
       },
-
+      /**
+       * 删除某个位置的菜单项
+       * @param {*} index
+       */
       removeItemByIndex(index) {
         this.menu.splice(index);
       },
-
-      hasItem(item) {
-        item = this.getItem(item);
-
-        return this.menu.some(menuItem => {
-          const sameComp = item.cuid === menuItem.cuid;
-          const sameContentId = item.contentId === menuItem.contentId;
-          return sameComp && sameContentId;
-        });
-      },
-
+      /**
+       * 添加一个菜单项
+       * @param {*} item
+       */
       addItem(item) {
-        // if (this.hasItem(item)) {
-        //   throw Error('不能传入已经存在的item');
-        // }
-        console.log('item::::', item);
-
-        item = getItemEntity(item);
+        console.log('[menu] this.tabOptions.menuConfig:', this.tabOptions.menuConfig);
+        item = getItemEntity(item, this.tabOptions.menuConfig);
+        console.log('[menu] item:', item);
         this.menu.push(item);
       },
-
+      /**
+       * 在某个index位点添加菜单项
+       * @param {*} index
+       * @param {*} item
+       */
       addItemByIndex(index, item) {
-        // if (this.hasItem(item)) {
-        //   throw Error('不能传入cuid和contentId都相同的item');
-        // }
-
-        item = getItemEntity(item);
-
+        item = getItemEntity(item, this.tabOptions.menuConfig);
         this.menu.splice(index, 0, item);
       },
-
-      getItem(cuid, contentId) {
-        return this.menu.find(item => item.cuid === cuid && item.contentId === contentId);
-      },
-
-      setIcon(cuid, contentId) {
-        const tab = this.getItem(cuid, contentId);
-        if (!tab) return;
-        tab.showIcon = true;
-      },
-
-      hiddenIcon(cuid, contentId) {
-        const tab = this.getItem(cuid, contentId);
-        if (!tab) return;
-
-        tab.showIcon = false;
-      },
-
-      setVisible(cuid, contentId) {
-        const tab = this.getItem(cuid, contentId);
-        if (!tab) return;
-
-        tab.visible = true;
-      },
-
-      setHidden(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-
-        tab.visible = false;
-      },
-
-      // 滑动到某个item的动画效果
-      scrollToItem(comp, key) {
-        // 由于menu列表随时会增减，
-        const itemsWithPosition = this.visibleMenu.map(item => {
-          const key = `${item.comp}_${item.key}`;
-          const ref = this.$refs[key][0];
-          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
-          const left = ref.offsetLeft - paddingLeft;
-          return { key, ref, left };
-        });
-
-        const positionItem = itemsWithPosition.find(item => item.key === `${comp}_${key}`);
-
-        this.$refs['menu'].scrollTo({
-          left: positionItem.left,
-          behavior: 'smooth'
+      /**
+       * 获取某个菜单项（根据cuid和menuId获取某个菜单项）
+       * @param {String} type tab的type
+       * @param {String|Number} menuId [非必传] 菜单id，由后端返得
+       * @example getItem(2,'10468')
+       */
+      getItem({ type, id }) {
+        return this.menu.find(item => {
+          if (id !== undefined) {
+            return item.id === id;
+          } else {
+            return item.type === type;
+          }
         });
       },
+      /**
+       * 设置菜单项显隐
+       * @param {Boolean} visible [true|false] 显隐值
+       * @param {String} cuid cuid
+       * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       */
+      setVisible({ visible = true, type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
 
-      select(cuid, contentId = '') {
-        this.selectedCuid = cuid;
-        this.selectedContentId = contentId;
+        tab.visible = visible;
+        visible === false && this.jumpToNearestItemById(id);
+      },
+      /**
+       * 切换某个菜单tab的可视性
+       * @param {*} cuid
+       * @param {*} menuId [非必传]
+       * @example toggleVisible('comChatWap','')
+       */
+      toggleVisible({ type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
 
-        let payload = null;
+        tab.visible = !tab.visible;
+      },
+      /**
+       * 设置小红点的显隐
+       * @param {Boolean} visible [true|false] 显隐值
+       * @param {String} cuid cuid
+       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       * @example setTipsVisible(true,'comChatWap','10186')
+       */
+      setTipsVisible({ visible, type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
 
-        // wap端逻辑
+        tab.tipsVisible = visible;
+      },
+
+      /**
+       * 跳转到最近的item
+       */
+      jumpToNearestItemById(id) {
+        const index = this.visibleMenu.findIndex(item => item.id === id);
+
+        // 向后跳
+        const nextItem = this.visibleMenu[index + 1];
+        if (index < this.visibleMenu.length && nextItem !== undefined) {
+          const { type, id } = nextItem;
+          this.select({ type, id });
+        }
+
+        // 向前跳
+        const lastItem = this.visibleMenu[index - 1];
+        if (index > 0 && lastItem !== undefined) {
+          const { type, id } = lastItem;
+          this.select({ type, id });
+        }
+
+        // 前后都没有清空任何选择(基本不会发生的极端情况)
+        this.selectedId = '';
+        this.selectedType = '';
+      },
+
+      /**
+       * 选中一个菜单项，并显示对应内容
+       * @param {String} type tab类型
+       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
+       * @example select('comCustomMenuWap','10246')
+       */
+      select({ type, id = '' }) {
+        this.selectedType = type;
+        this.selectedId = id;
+
         this.isSubMenuShow = false;
 
-        const item = this.getItem(cuid, contentId);
-        this.$refs['tabContent'].switchTo(item, payload);
+        const item = this.getItem({ type, id });
+        item.tipsVisible = false;
+
+        this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+        this.menuServer.$emit('tab-switched', item);
       }
     }
   };
@@ -234,9 +267,10 @@
     flex-direction: column;
 
     &__header {
+      position: relative;
       width: 100%;
       height: 90px;
-      position: relative;
+      flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
 
@@ -341,6 +375,8 @@
       background-color: #f3f3f3;
       color: #444;
       width: 100%;
+      max-height: 352px;
+      overflow-y: scroll;
 
       &__item {
         display: flex;
