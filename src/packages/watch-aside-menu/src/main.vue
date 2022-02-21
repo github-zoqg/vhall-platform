@@ -1,6 +1,6 @@
 <template>
   <!-- 分组直播才有该组件 -->
-  <div class="vmp-watch-aside-menu">
+  <div class="vmp-watch-aside-menu" v-if="webinarMode === 6">
     <ul class="menu-list" v-show="!isCollapse">
       <li class="menu-item" @click="handleToggle()">
         <i class="vh-iconfont vh-line-s-fold"></i>
@@ -68,6 +68,11 @@
         selectedMenu: '',
         disableMenus: ['document', 'board', 'desktopShare', 'assistance']
       };
+    },
+    computed: {
+      webinarMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      }
     },
     beforeCreate() {
       this.docServer = useDocServer();

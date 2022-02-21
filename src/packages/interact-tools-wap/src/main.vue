@@ -35,12 +35,18 @@
           :joinInfoInGift="joinInfoInGift"
           :roomId="localRoomInfo.room_id"
           :localRoomInfo="localRoomInfo"
+          :cuid="cuid"
         />
       </div>
       <!-- 打赏 -->
       <div v-if="!localRoomInfo.isEmbed" auth="{ 'ui.hide_reward': 0 }">
         <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
-        <RewardCard ref="reward" :webinarData="webinarData" :localRoomInfo="localRoomInfo" />
+        <RewardCard
+          ref="reward"
+          :webinarData="webinarData"
+          :localRoomInfo="localRoomInfo"
+          :cuid="cuid"
+        />
       </div>
       <!-- 邀请卡 -->
       <a

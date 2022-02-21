@@ -240,6 +240,12 @@
           this.$message('您已经被踢出房间');
         });
       },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        useChatServer().clearHistoryMsg();
+        this.getHistoryMessage();
+      },
       // 获取历史消息
       async getHistoryMessage() {
         const data = {

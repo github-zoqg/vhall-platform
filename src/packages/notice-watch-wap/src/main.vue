@@ -38,13 +38,13 @@
           temp.data = JSON.parse(temp.data);
           temp.context = JSON.parse(temp.context);
         }
-        console.log(temp, '原始消息');
+        // console.log(temp, '原始消息');
         const { type = '' } = temp.data || {};
         switch (type) {
-          // 计时器开始
+          // 监听到 公告
           case 'room_announcement':
             this.announcement = {
-              content: temp.room_announcement_text,
+              content: temp.data.room_announcement_text,
               isShow: true
             };
             setTimeout(() => {
