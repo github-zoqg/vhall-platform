@@ -57,7 +57,7 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useGiftsServer } from 'middle-domain';
+  import { useGiftsServer, useMsgServer } from 'middle-domain';
   import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
   export default {
     name: 'gift',
@@ -105,6 +105,7 @@
     },
     beforeCreate() {
       this.giftsServer = useGiftsServer();
+      this.msgServer = useMsgServer();
     },
     beforeDestroy() {
       this.timer = 3;
@@ -156,7 +157,7 @@
       // 支付接口
       payProcess(params) {
         const that = this;
-        this.giftsServer.sendGift({ ...params }).then(res => {
+        this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.data && res.code == 200) {
             if (res.data.price == 0) {
               this.$toast(this.$t('interact_tools.interact_tools_1063'));
@@ -304,15 +305,6 @@
       },
       // open礼物弹框
       showgift() {
-        if (
-          !(this.localRoomInfo.isLogin || (this.joinInfoInGift.hideChatHistory && this.isEmbed))
-        ) {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons('comInteractToolsWap', 'emitNeedLogin')
-          );
-          //   EventBus.$emit('showChatLogin')
-          return;
-        }
         this.setSetingHeight();
         this.showgiftCard = true;
         // 每次点开礼物弹框的时候，默认礼物图标未选中
@@ -330,6 +322,7 @@
         }
         this._isNotFirstGetList = true;
       },
+      // 免费礼物
       payFree(params) {
         // 如果开启聊天高并发配置项，免费礼物通过聊天消息发送
         if (this.joinInfoInGift.hideChatHistory || this.isEmbed) {
@@ -350,8 +343,8 @@
             nickname: this.joinInfoInGift.nickname
           };
           // TODO: 发送什么消息
-          if (window.chatSDK) {
-            window.chatSDK.emit(msgData, context);
+          if (this.msgServer) {
+            this.msgServer.sendChatMsg(msgData, context);
             this.$toast(this.$t('interact_tools.interact_tools_1031'));
             this.close();
             this.btnDisabled = true;
@@ -368,7 +361,7 @@
           }
           return false;
         }
-        this.giftsServer.sendGift({ ...params }).then(res => {
+        this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.code == 200) {
             this.$toast(this.$t('interact_tools.interact_tools_1031'));
             this.close();

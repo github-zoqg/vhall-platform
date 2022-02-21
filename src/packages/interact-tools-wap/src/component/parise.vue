@@ -123,26 +123,7 @@
             room_id: this.localRoomInfo.roomId,
             num
           })
-          .then(() => {
-            if (window.chatSDK) {
-              // 如果开启手动加载聊天历史配置项，点赞使用聊天消息，否则使用自定义消息
-              if (this.hideChatHistory) {
-                window.chatSDK.emit({
-                  type: 'permit',
-                  event_type: 'customPraise',
-                  num,
-                  text_content: '',
-                  visitorId: sessionStorage.getItem('visitor_id')
-                });
-                return;
-              }
-              window.chatSDK.emitCustomMsg({
-                type: 'customPraise',
-                num,
-                visitorId: sessionStorage.getItem('visitor_id')
-              });
-            }
-          });
+          .then(() => {});
       }
     },
     destroyed() {
