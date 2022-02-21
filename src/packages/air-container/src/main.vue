@@ -25,7 +25,7 @@
           item.component,
           {
             props: {
-              cuid: item.cuid
+              cuid: item.cuid,
             }
           }
         )
