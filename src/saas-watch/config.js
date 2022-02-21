@@ -63,7 +63,8 @@ export const serverConfig = {
       'comCash',
       // 'comLottery'
       'comWatchTimer',
-      'comScreenPost'
+      'comScreenPost',
+      'comMediaSetting'
     ]
   },
 
@@ -310,5 +311,16 @@ export const serverConfig = {
   // 推荐
   comRecommend: {
     component: 'VmpRecommend'
+  },
+  // 媒体设置
+  comMediaSetting: {
+    component: 'VmpPcMediaSetting',
+    saveOptions: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
   }
 };

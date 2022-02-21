@@ -42,6 +42,7 @@ import VmpLotteryWatch from '@/packages/lottery/watch'; // 观看端计时器
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
+import VmpPcMediaSetting from '@/packages/media-setting';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -88,4 +89,5 @@ export function initUse() {
   Vue.use(VmpTabMenu);
   Vue.use(VmpCustomMenu);
   Vue.use(VmpRecommend);
+  Vue.use(VmpPcMediaSetting);
 }
