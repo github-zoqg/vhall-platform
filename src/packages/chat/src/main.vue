@@ -11,10 +11,11 @@
         :options="overlayScrollBarsOptions"
         style="height: 100%"
       >
-        <template v-for="msg in chatList">
+        <template v-for="(msg, index) in chatList">
           <msg-item
             :key="msg.msgId"
             :msg="msg"
+            :pre-msg="chatList[index - 1]"
             v-show="checkMessageShow(msg)"
             :chat-options="chatOptions"
             :role-name="roleName"
@@ -396,6 +397,10 @@
         //监听分组房间变更通知
         chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
+        });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
         });
       },
       init() {

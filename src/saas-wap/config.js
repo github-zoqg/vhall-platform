@@ -188,6 +188,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },

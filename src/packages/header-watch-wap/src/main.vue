@@ -10,8 +10,8 @@
       />
       {{ watchInitData.webinar.userinfo.nickname | splitLenStr(8) }}
     </span>
-    <span class="tool-box">
-      <i class="vh-iconfont vh-line-house" :style="{ color: themeColor }" @click="goUser"></i>
+    <span class="tool-box" :style="{ color: themeClass.pageStyle }">
+      <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
         class="attention"
         :class="{
@@ -19,12 +19,10 @@
           'vh-iconfont vh-a-line-collectionsuccess': attentionStatus == 1
         }"
         v-if="groupInitData && !groupInitData.isInGroup && watchInitData.webinar.mode != 6"
-        :style="{ color: themeColor }"
         @click="attentionApi"
       ></i>
       <i
         class="vh-saas-iconfont vh-saas-a-color-officialaccount"
-        :style="{ color: themeColor }"
         @click="showPublic"
         v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
       ></i>
@@ -44,7 +42,12 @@
         attentionStatus: 0, // 关注状态
         // headInfo: null,
         // showSponsor: true,
-        userInfo: {}
+        userInfo: {},
+        themeClass: {
+          bgColor: 'light',
+          background: '#cccccc',
+          pageStyle: '' // icon默认色
+        }
       };
     },
     filters: {
@@ -68,6 +71,9 @@
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
       this.autoShowPublic();
+
+      //设置品牌皮肤
+      this.setSkinInfo(this.skinInfo);
     },
     computed: {
       /**
@@ -75,16 +81,6 @@
        */
       officicalInfo() {
         return this.$domainStore.state.roomBaseServer.officicalInfo;
-      },
-      /**
-       * 主题颜色
-       */
-      themeColor() {
-        if (this.skinInfo && this.skinInfo.pageStyle) {
-          return this.skinInfo.pageStyle;
-        } else {
-          return '#333';
-        }
       },
       /**
        * 皮肤信息
@@ -129,6 +125,17 @@
           this.officicalInfo.status == 0
         ) {
           this.showPublic();
+        }
+      },
+      /**
+       * 设置品牌设置信息
+       */
+      setSkinInfo(skin) {
+        if (skin && skin.skin_json_wap && skin.status == 1) {
+          const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_wap) || '';
+          this.themeClass.pageStyle = pageStyle;
+          this.themeClass.background = background;
+          this.themeClass.bgColor = bgColor;
         }
       },
       /**
@@ -240,6 +247,16 @@
       i {
         margin-left: 37px;
         font-size: 38px;
+      }
+    }
+    .icon-default {
+      &:hover {
+        cursor: pointer;
+        i,
+        p {
+          cursor: pointer;
+          color: @font-high-light-normal !important;
+        }
       }
     }
   }
