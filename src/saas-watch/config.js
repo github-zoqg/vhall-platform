@@ -41,7 +41,14 @@ export const serverConfig = {
   },
   layerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
-    children: ['comPcPlayer', 'comWatchAsideMenu', 'comDocUne', 'comFooterTools', 'comNoticeColumn']
+    children: [
+      'comPcPlayer',
+      'comWatchAsideMenu',
+      'comDocUne',
+      'comFooterTools',
+      'comNoticeColumn',
+      'comLivingEnd'
+    ]
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -143,6 +150,10 @@ export const serverConfig = {
   // 播放器
   comPcPlayer: {
     component: 'VmpPcPlayer'
+  },
+  // 结束页面
+  comLivingEnd: {
+    component: 'VmpLivingEnd'
   },
   // 顶部
   comHeaderWatch: {

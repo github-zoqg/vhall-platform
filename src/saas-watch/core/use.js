@@ -43,6 +43,7 @@ import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
 import VmpPcMediaSetting from '@/packages/media-setting';
+import VmpLivingEnd from '@/packages/living-end-pc';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -93,4 +94,5 @@ export function initUse() {
   Vue.use(VmpRecommend);
   Vue.use(VmpPcMediaSetting);
   Vue.use(VmpIntro);
+  Vue.use(VmpLivingEnd);
 }
