@@ -17,7 +17,7 @@ const htmlConfig = {
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
     ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
-    Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant@2.1.5/js/vant.min.js',
+    Vant: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // doc: '//static.vhallyun.com/jssdk/vhall-jssdk-doc/latest/vhall-jssdk-doc-3.2.0.js',
     // chat: '//static.vhallyun.com/jssdk/vhall-jssdk-chat/latest/vhall-jssdk-chat-2.1.4.js',
     // player: '//static.vhallyun.com/jssdk/vhall-jssdk-player/latest/vhall-jssdk-player-2.4.0.js',
@@ -34,7 +34,7 @@ const htmlConfig = {
   cdnCss: {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant@2.1.5/css/index.css',
+    Vant: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant/2.12.34/dist/index.css',
     iconfontCommon:
       '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
     iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'

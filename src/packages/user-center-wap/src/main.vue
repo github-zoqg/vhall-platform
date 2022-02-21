@@ -28,7 +28,7 @@
     name: 'VmpUserCenterWap',
     data() {
       return {
-        visible: true
+        visible: false
       };
     },
     methods: {
@@ -43,13 +43,13 @@
       // 打开个人资料
       changeUserState() {
         console.log('changeUserState');
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserAccountWap'));
       },
 
       // 打开提现管理
       changeCashState() {
         console.log('changeCashState');
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenCashWap'));
       }
     }
   };

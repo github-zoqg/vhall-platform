@@ -48,8 +48,12 @@ import VmpWapStreamLocal from '@/packages/wap-stream-local';
 import VmpWapBody from '@/packages/wap-body';
 // 开屏页
 import VmpScreenPostWap from '@/packages/screen-post-wap';
-// 打开 个人中心
+// 个人中心
 import VmpUserCenterWap from '@/packages/user-center-wap';
+// 个人资料
+import VmpUserAccountWap from '@/packages/user-account-wap';
+// 提现管理
+import VmpCashWap from '@/packages/cash-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -82,4 +86,6 @@ export function initUse() {
   Vue.use(VmpWapBody);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
+  Vue.use(VmpUserAccountWap);
+  Vue.use(VmpCashWap);
 }
