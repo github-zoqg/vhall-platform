@@ -50,6 +50,7 @@
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
+      @login="handleLogin"
     ></send-box>
   </div>
 </template>
@@ -287,6 +288,10 @@
       },
       showUserPopup() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
+      },
+      //唤起登录弹窗
+      handleLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };

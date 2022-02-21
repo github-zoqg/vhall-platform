@@ -168,6 +168,10 @@
       },
       //是否需要登录
       isNeedLogin() {
+        let needLogin = true;
+        if (['', null, void 0].includes(this.configList['ui.show_chat_without_login'])) {
+          return needLogin;
+        }
         return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
       },
       //当前登录人信息
@@ -230,6 +234,7 @@
           this.isShowUser = true;
           this.avatar = userInfo.avatar || require('../images/default_avatar.png');
         } else {
+          this.isLogin = false;
           this.isShowUser = false;
         }
       },
@@ -299,8 +304,10 @@
         }
         return Math.floor(o * result);
       },
-      //登录 todo 发送信令唤起登录
-      login() {},
+      //登录
+      login() {
+        this.$emit('login');
+      },
       //发送消息
       sendMessage(value = '') {
         // 关键词过滤标识
