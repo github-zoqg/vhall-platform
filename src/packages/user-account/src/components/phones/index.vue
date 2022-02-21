@@ -36,7 +36,11 @@
         >
           <span>{{ phoneData.phone || '' }}</span>
         </el-form-item>
-        <el-form-item v-if="!(phoneData.type == 'edit' && phoneData.step === 1)" prop="phone">
+        <el-form-item
+          v-if="!(phoneData.type == 'edit' && phoneData.step === 1)"
+          key="phone"
+          prop="phone"
+        >
           <el-input
             v-model.trim="setPhoneForm.phone"
             auto-complete="off"
@@ -194,12 +198,15 @@
       // 获取验证码
       getCaptha() {
         const validateList = [];
-        this.$refs.setPhoneForm.validateField(['phone', 'imgCode'], valid => {
+        const validateProps = this.phoneData.step === 1 ? ['imgCode'] : ['phone', 'imgCode'];
+        this.$refs.setPhoneForm.validateField(validateProps, valid => {
           validateList.push(valid);
         });
         if (validateList.every(item => item === '')) {
           const data =
-            this.phoneData.type === 'edit' ? this.phoneData.phone : this.setPhoneForm.phone;
+            this.phoneData.type === 'edit' && this.phoneData.step !== 1
+              ? this.setPhoneForm.phone
+              : this.phoneData.phone;
           const validate = this.setPhoneForm.imgCode;
           const scene_id = this.setPhoneForm.scene_id;
           // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码
@@ -383,7 +390,6 @@
                 // 关闭当前弹出框
                 this.phoneData.visible = false;
                 this.$emit('input', { ...this.phoneData });
-                // TODP 此处更新用户信息
               }
             } else {
               this.$message({

@@ -2,7 +2,7 @@
   <div class="vhall-praise">
     <div ref="dianzan" class="v-praise-dom" @touchstart="support">
       <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i>
-      <span>{{ like | transformWatchNum }}</span>
+      <span v-if="like">{{ like | transformWatchNum }}</span>
     </div>
     <div>
       <div class="hello"></div>
@@ -77,7 +77,7 @@
           const n = Math.floor(num / 10000);
           let l = Math.floor((num % 10000) / 1000); // eslint-disable-line
           l = l === 0 ? '' : '.' + l;
-          return (num = n + 'w');
+          return (num = n + l + 'w');
         } else {
           return (num = '999w');
         }

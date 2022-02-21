@@ -109,7 +109,7 @@
       initMenu() {
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
-
+        console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
         }
@@ -142,7 +142,9 @@
        * @param {*} item
        */
       addItem(item) {
+        console.log('[menu] this.tabOptions.menuConfig:', this.tabOptions.menuConfig);
         item = getItemEntity(item, this.tabOptions.menuConfig);
+        console.log('[menu] item:', item);
         this.menu.push(item);
       },
       /**

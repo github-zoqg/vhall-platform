@@ -96,15 +96,6 @@
       <van-cell></van-cell>
     </van-popup>
 
-    <!-- 设置手机号 -->
-    <!-- <van-popup
-      v-model="phoneDialog.visible"
-      class="user-info-dialog"
-      v-if="phoneDialog.visible"
-      :close-on-click-overlay="false"
-      get-container="body"
-    ></van-popup> -->
-
     <!-- 设置密码 -->
     <!-- <van-popup
       v-model="pwdDialog.visible"
@@ -113,21 +104,32 @@
       :close-on-click-overlay="false"
       get-container="body"
     ></van-popup> -->
+
+    <!-- 设置手机号 -->
+    <bind-phone v-model="phoneDialog" />
   </div>
 </template>
 
 <script>
   import { useUserServer } from 'middle-domain';
   import NECaptchaLanguages from './js/setNECLanguages';
+  import BindPhone from './components/bind-phone';
   export default {
     name: 'VmpUserAccountWap',
+    components: { BindPhone },
     mixins: [NECaptchaLanguages],
     data() {
       return {
         useUserServer: {},
         visible: false,
         fileList: [],
-        nickName: ''
+        nickName: '',
+        phoneDialog: {
+          visible: false,
+          step: 1,
+          type: 'add',
+          phone: ''
+        }
       };
     },
     created() {
@@ -146,7 +148,14 @@
       },
 
       // 打开手机号弹窗
-      openPhoneHandler() {},
+      openPhoneHandler() {
+        this.phoneDialog = {
+          visible: true,
+          type: this.useUserServer.state.userInfo.phone ? 'edit' : 'add',
+          step: 1,
+          phone: this.useUserServer.state.userInfo.phone
+        };
+      },
 
       // 图片上传前的回调
       handleuploadBefore(file) {

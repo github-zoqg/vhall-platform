@@ -14,8 +14,7 @@ export function getItemEntity(
 
   const text = type === 1 ? name : item.text;
   let { visible = true, tipsVisible = false, iconVisible = false } = item;
-
-  if (status == '2') visible = false;
+  visible = status == '1'; //
 
   return {
     // 原始字段

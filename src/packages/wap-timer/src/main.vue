@@ -268,6 +268,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
               );
+              this.timerVisible = false;
               return false;
             }
           }
