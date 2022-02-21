@@ -51,7 +51,6 @@
 </template>
 
 <script>
-  import canvasDefaultImg from '../../assets/img/canvasDefault.png';
   import videoSwitchImg from '@/packages/app-shared/assets/img/video.gif';
   import videoFailImg from '@/packages/app-shared/assets/img/videoFailed.png';
   import PictureUploader from '../picture-uploader.vue';
@@ -98,20 +97,19 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
 
-      this.mediaState.canvasImgUrl = canvasDefaultImg;
-      this.setDefaultVideoType();
+      // this.setDefaultVideoType();
     },
     beforeDestroy() {
-      this.destroyStream();
+      // this.destroyStream();
     },
     methods: {
-      setDefaultVideoType() {
-        let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
-        if (param && param.flag === true && param.streamUrl !== '') {
-          this.mediaState.videoType = 'picture';
-          this.mediaState.canvasImgUrl = param.streamUrl;
-        }
-      },
+      // setDefaultVideoType() {
+      //   let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
+      //   if (param && param.flag === true && param.streamUrl !== '') {
+      //     this.mediaState.videoType = 'picture';
+      //     this.mediaState.canvasImgUrl = param.streamUrl;
+      //   }
+      // },
       async onVideoTypeChange(value) {
         this.mediaSettingServer.setState('videoType', value);
         if (value === 'picture') {

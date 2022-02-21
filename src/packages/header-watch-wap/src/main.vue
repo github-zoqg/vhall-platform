@@ -2,7 +2,7 @@
   <div id="header" class="vh-header-box">
     <span class="host-user-info">
       <img
-        v-if="signInfo.organizers_status == 1"
+        v-if="webinarTag && webinarTag.organizers_status == 1"
         class="img-box"
         :src="hostAvatar"
         @click="skipAction"
@@ -93,8 +93,8 @@
         return this.$domainStore.state.roomBaseServer.skinInfo;
       },
       // 签名信息
-      signInfo() {
-        return this.$domainStore.state.roomBaseServer.signInfo;
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
       },
       // 参会信息
       watchInitData() {
@@ -146,8 +146,8 @@
         }
       },
       skipAction() {
-        if (this.signInfo.skip_url) {
-          window.location.href = this.signInfo.skip_url;
+        if (this.webinarTag.skip_url) {
+          window.location.href = this.webinarTag.skip_url;
         }
       },
       /**

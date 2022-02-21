@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerPlayer', 'layerBodyCenter', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog', 'comWapRewardEffect']
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
@@ -18,16 +18,17 @@ export const serverConfig = {
     children: ['comHeaderWatch']
   },
   // 中间主区域容器
-  // layerBody: {
-  //   component: 'VmpContainer',
-  //   className: 'vmp-basic-bd',
-  //   children: ['layerPlayer', 'layerBodyCenter']
-  // },
-  layerPlayer: {
+  layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
-    children: ['comWapPlayer']
+    children: ['comWapBody']
   },
+  // layerPlayer: {
+  //   component: 'VmpContainer',
+  //   className: 'vmp-basic-bd',
+  //   children: ['comWaStreamLocal']
+  //   // comWapPlayer 编写互动功能，暂时注释
+  // },
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
@@ -37,7 +38,16 @@ export const serverConfig = {
   /*** 所有弹窗集合 */
   comAllDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLoginWap', 'comOfficial', 'comShare', 'comWatchTimer', 'comSignUpForm']
+    children: [
+      'compRegLoginWap',
+      'comOfficial',
+      'comShare',
+      'comWatchTimer',
+      'comSignUpForm',
+      'comScreenPostWap',
+      'comUserCenterWap',
+      'compLotteryWap'
+    ]
   },
   // 顶部
   comHeaderWatch: {
@@ -58,8 +68,23 @@ export const serverConfig = {
       }
     ]
   },
+  // 播放器容器和推流容器
+  comWapBody: {
+    component: 'VmpWapBody',
+    children: ['comWapPlayer', 'comWapStreamList']
+  },
   comWapPlayer: {
     component: 'VmpWapPlayer'
+  },
+  comWapStreamList: {
+    component: 'VmpWapStreamList',
+    children: ['comWapStreamLocal']
+  },
+  comWapStreamLocal: {
+    component: 'VmpWapStreamLocal'
+  },
+  comWapStreamRemote: {
+    component: 'VmpWapStreamRemote'
   },
   comWatchTimer: {
     component: 'VmpWapTimer',
@@ -95,15 +120,29 @@ export const serverConfig = {
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
-    options: {}
+    options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
+        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
+        { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
+        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' }, // 广告、推荐
+        { type: 7, cuid: 'comChapterWap', text: 'menu.menu_1013' }, // 章节
+        { type: 8, cuid: 'comMemberListWap', text: '' } // 成员
+      ]
+    }
   },
   comIntroWap: {
     component: 'VmpIntroWap',
     addTab: [
       {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
+        cuid: ['comGoodSaasWap'],
+        method: 'addItem'
       }
     ]
   },
@@ -140,6 +179,13 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitOpenUserCenterWap: [
+      {
+        cuid: ['comUserCenterWap'],
+        method: 'openUserCenterWap',
+        args: ['$0']
+      }
+    ],
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -155,5 +201,35 @@ export const serverConfig = {
   //成员列表
   comMemberListWap: {
     component: 'VmpMemberListWap'
+  },
+  //wap端文档
+  comDocWap: {
+    component: 'VmpDocWap',
+    addTab: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'addItem',
+        args: ['$0']
+      }
+    ],
+    children: ['comInteractToolsWap'],
+    options: {}
+  },
+  // wap礼物飘屏动画
+  comWapRewardEffect: {
+    component: 'VmpWapRewardEffect',
+    children: [],
+    options: {}
+  },
+  // 开屏页
+  comScreenPostWap: {
+    component: 'VmpScreenPostWap'
+  },
+  comUserCenterWap: {
+    component: 'VmpUserCenterWap'
+  },
+  // 抽奖
+  compLotteryWap: {
+    component: 'VmpLotteryWap'
   }
 };

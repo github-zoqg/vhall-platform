@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useGoodServer } from 'middle-domain';
+  import { useRoomBaseServer, useGoodServer, useMenuServer } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import Pullup from '@better-scroll/pull-up';
@@ -60,58 +60,88 @@
       };
     },
     // props: ['goodList', 'goodsListInfo'],
-    watch: {
-      // goodList: {
-      //   handler(val) {
-      //     if (val) {
-      //       this.list = val;
-      //     }
-      //   },
-      //   immediate: true,
-      //   deep: true
-      // },
-      // goodsListInfo: {
-      //   handler(val) {
-      //     if (val) {
-      //       this.total = val.total;
-      //       this.limit = 10;
-      //       this.pos = val.pos;
-      //     }
-      //   },
-      //   immediate: true,
-      //   deep: true
-      // },
-      // goodsList: {
-      //   handler(val) {
-      //     console.log('wap watch goodsList------------->', val);
-      //     this.$nextTick(() => {
-      //       this.scroll && this.scroll.refresh();
-      //     });
-      //   }
-      // }
-    },
+    // watch: {
+    //   // goodList: {
+    //   //   handler(val) {
+    //   //     if (val) {
+    //   //       this.list = val;
+    //   //     }
+    //   //   },
+    //   //   immediate: true,
+    //   //   deep: true
+    //   // },
+    //   // goodsListInfo: {
+    //   //   handler(val) {
+    //   //     if (val) {
+    //   //       this.total = val.total;
+    //   //       this.limit = 10;
+    //   //       this.pos = val.pos;
+    //   //     }
+    //   //   },
+    //   //   immediate: true,
+    //   //   deep: true
+    //   // },
+    //   // goodsList: {
+    //   //   handler(val) {
+    //   //     console.log('wap watch goodsList------------->', val);
+    //   //     this.$nextTick(() => {
+    //   //       this.scroll && this.scroll.refresh();
+    //   //     });
+    //   //   }
+    //   // }
+    // },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.goodServer = useGoodServer();
-      // console.log('wap this.goodServer------->', this.goodServer);
+      this.menuServer = useMenuServer();
+      console.log('wap this.menuServer------->', this.menuServer);
+    },
+    created() {
+      // 自定义菜单服务事件监听
+      this.menuServer.$on('tab-switched', data => {
+        console.log('wap tab-switched------>', this.cuid, data);
+        /**
+         * { cuid, menuId }
+         */
+        if (this.cuid == data.cuid) {
+          this.$nextTick(() => {
+            this.refreshScroll();
+          });
+        }
+      });
     },
     mounted() {
+      this.initConfig();
+
+      // 初始化滚动
+      this.handlerScroll();
+
       // this.webinar_id = this.roomBaseServer.state.watchInitData.webinar.id;
       this.buildDataList(this.roomBaseServer.state.goodsDefault, false);
-      this.handlerInitScroll();
     },
     methods: {
+      // 初始化配置
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          Object.assign(this.$data, widget.options);
+        }
+      },
       /**
        * 对外提供的更新滚动条的方法
        */
       refreshScroll() {
+        console.log('refreshScroll-------->', this.scroll);
         if (this.scroll) {
           this.scroll.refresh();
         }
       },
-      handlerInitScroll() {
+      /**
+       * 构建列表成功之后的回调, 让列表计算高滚动
+       */
+      handlerScroll() {
         const wrapper = document.querySelector('.vh-goods-wrapper');
-        this.scroll = new BScroll(wrapper, {
+        window['GoodScroll'] = this.scroll = new BScroll(wrapper, {
           pullUpLoad: true,
           bindToWrapper: true,
           scrollX: false,
@@ -121,7 +151,7 @@
           tap: 'tap'
         });
         this.handleBindScrollEvent();
-        this.refreshScroll();
+        console.log('handlerInitScroll-------->', this.scroll);
       },
       handleBindScrollEvent() {
         window.addEventListener(
@@ -168,7 +198,7 @@
        * 统一构建列表
        */
       buildDataList(data, flag) {
-        // console.log('buildDataList------->', data);
+        console.log('buildDataList------->');
         const list = data.goods_list;
         const currentGoodList = this.goodsList;
         if (list && list.length > 0) {
@@ -189,6 +219,7 @@
         this.limit = data.limit;
 
         this.$nextTick(() => {
+          console.log('buildDataList nextTick-------->');
           this.refreshScroll();
         });
       },

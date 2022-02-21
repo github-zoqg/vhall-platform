@@ -19,11 +19,11 @@
           <img class="picture-uploader-img" :src="canvasImgUrl" alt="" />
           <p class="picture-uploader-controller-panel">
             <span class="icon-wrap-con icon-wrap-change" :class="{ 'icon-wrap-only': !showDelImg }">
-              <i class="iconfont iconshuaxin"></i>
+              <i class="vh-iconfont vh-line-refresh-right"></i>
               {{ $t('account.account_1004') }}
             </span>
             <span class="icon-wrap-con icon-wrap-del" @click.stop="onRemove" v-show="showDelImg">
-              <i class="iconfont iconqingkong"></i>
+              <i class="vh-iconfont vh-line-delete"></i>
               {{ $t('setting.setting_1015') }}
             </span>
           </p>

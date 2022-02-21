@@ -124,7 +124,6 @@
   import chatList from './components/chat-list';
   import comUpload from '@/packages/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  const chatServer = useChatServer();
   export default {
     name: 'VmpLivePrivateChat',
     components: {
@@ -295,15 +294,15 @@
         ) {
           this.$message.warning('内容不能为空');
         }
-        const curmsg = chatServer.createCurMsg();
+        const curmsg = useChatServer().createCurMsg();
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
         //将图片消息加入消息体
         curmsg.setImge(this.imgList);
         //发送消息
-        chatServer.sendMsg(curmsg);
+        useChatServer().sendMsg(curmsg);
         //清除发送后的消息
-        chatServer.clearCurMsg();
+        useChatServer().clearCurMsg();
         this.imgList.length = 0;
         this.inputText = '';
       }

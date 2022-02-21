@@ -35,9 +35,12 @@ const htmlConfig = {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant@2.1.5/css/index.css',
-    iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'
+    // iconfontCommon:
+    //   '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
+    // iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css',
+    // 开发时暂时使用阿里链接，后面改成自己的cdn
+    iconfontCommon: '//at.alicdn.com/t/font_3128919_2n58q9eofef.css',
+    iconfont: '//at.alicdn.com/t/font_3120276_rr4jn6e192a.css'
   },
   // dns-prefetch
   dnsPrefetch: {
@@ -57,6 +60,7 @@ module.exports = {
       filename: 'index.html',
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
+      isWap: true,
       ...htmlConfig
     }
   },

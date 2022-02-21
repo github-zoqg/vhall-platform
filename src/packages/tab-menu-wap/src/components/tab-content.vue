@@ -20,7 +20,7 @@
         >
           <section class="vmp-tab-container-popup__body">
             <header>
-              <span>{{ curItem.text }}</span>
+              <span>{{ $t(curItem.text) }}</span>
               <i class="vh-iconfont vh-line-close" @click="closePopup"></i>
             </header>
             <main>
@@ -43,10 +43,6 @@
   export default {
     name: 'TabContent',
     props: {
-      tabCuid: {
-        type: String,
-        default: ''
-      },
       mainMenu: {
         type: Array,
         default: () => []
@@ -99,7 +95,7 @@
         const findComp = (cuid, array) => {
           if (!array || array.length === 0) return false;
           for (const item of array) {
-            // 只找cuid和空cuid下的cuid，一旦找到cuid便不再深入遍历
+            // 只找cuid，以及空cuid下的cuid，一旦找到cuid便不再深入遍历
             if (item.cuid && item.cuid === cuid) return item;
             if (item.cuid && item.cuid !== cuid) continue;
             const comp = findComp(cuid, item.$children);
@@ -115,8 +111,8 @@
         if (!child) return;
 
         // pre-show
-        if (item.cuid.startsWith('comCustomMenu')) {
-          child.queryDetail(item.contentId);
+        if (item.type === 1) {
+          child.queryDetail(item.id);
         }
 
         this.curItem = item;

@@ -29,11 +29,27 @@
           >
             <div class="normal-msg__avatar" @click="setPersonStatus($event, msg)">
               <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+              <img
+                v-if="msg.client === 'h5_browser'"
+                class="chat-phone"
+                width="9"
+                height="12"
+                src="../images/phone.png"
+                alt
+              />
             </div>
           </template>
           <template v-else>
             <div class="normal-msg__avatar">
               <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+              <img
+                v-if="msg.client === 'h5_browser'"
+                class="chat-phone"
+                width="9"
+                height="12"
+                src="../images/phone.png"
+                alt
+              />
             </div>
           </template>
 
@@ -100,7 +116,7 @@
                     width="34"
                     height="34"
                     :src="img"
-                    alt="聊天图片加载失败"
+                    :alt="this.$t('chat.chat_1065')"
                     @click="previewImg($event, index, msg.replyMsg.content.image_urls)"
                   />
                 </div>
@@ -173,7 +189,7 @@
               class="interact-content__click-detail"
               @click="clickToView(msg.type, msg.content)"
             >
-              点击查看
+              {{ $t('nav.nav_1027') }}
             </span>
           </div>
         </div>
@@ -196,7 +212,7 @@
                 'interact-tools-content__img-reward': !msg.content.gift_url
               }"
               :src="msg.content.gift_url || require('../images/red-package-1.png')"
-              alt="礼物"
+              :alt="this.$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="msg.type === 'reward_pay_ok'" />
             <span v-if="msg.type === 'reward_pay_ok'" style="color: #fa9a32">
@@ -262,19 +278,19 @@
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = '主持人';
+            ret = this.$t('chat.chat_1022');
             break;
           case 3:
-            ret = '助理';
+            ret = this.$t('chat.chat_1024');
             break;
           case 4:
-            ret = '嘉宾';
+            ret = this.$t('chat.chat_1023');
             break;
           case 20:
-            ret = '组长';
+            ret = this.$t('chat.chat_1064');
             break;
           default:
-            ret = '未定义';
+            ret = this.$t('chat.chat_1062');
         }
         return ret;
       },
@@ -309,56 +325,7 @@
       }
     },
     mounted() {
-      //todo 可以考虑domaint提供统一的处理 实现@用户
-      console.log(this.msg.atList);
-      if (!this.msg.atList.length) {
-        this.msgContent = this.msg.content.text_content;
-      } else {
-        let at = false;
-        this.msg.atList.forEach(a => {
-          console.log(this.msg.atList.length);
-          const userName = `@${a.nickname} `;
-          const match =
-            this.msg.content &&
-            this.msg.content.text_content &&
-            this.msg.content.text_content.indexOf(userName) != -1;
-          if (match) {
-            if (at) {
-              this.msgContent = this.msgContent.replace(
-                userName,
-                `<span style='color:#4DA1FF'>${userName}</span>`
-              );
-            } else {
-              this.msgContent = this.msg.content.text_content.replace(
-                userName,
-                `<span style='color:#4DA1FF'>${userName}</span>`
-              );
-            }
-            at = true;
-          } else {
-            this.msgContent = at ? this.msgContent : this.msg.content.text_content;
-          }
-        });
-      }
-
-      if (
-        this.msg.atList &&
-        this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
-        !this.msg.isHistoryMsg
-      ) {
-        this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
-        clearTimeout(this.tipTimer);
-        this.tipTimer = setTimeout(() => {
-          this.$emit('dispatchEvent', { type: 'closeTip' });
-        }, 10000);
-      }
-      if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
-        this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
-        clearTimeout(this.tipTimer);
-        this.tipTimer = setTimeout(() => {
-          this.$emit('dispatchEvent', { type: 'closeTip' });
-        }, 10000);
-      }
+      this.handleAt();
     },
     methods: {
       // 预览图片
@@ -414,6 +381,57 @@
       //todo 点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
         this.$emit('questionnaireCheck', questionnaire_id);
+      },
+      //处理@消息
+      handleAt() {
+        //todo 可以考虑domaint提供统一的处理 实现@用户
+        if (!this.msg.atList.length) {
+          this.msgContent = this.msg.content.text_content;
+        } else {
+          let at = false;
+          this.msg.atList.forEach(a => {
+            // TODO历史列表aList与直播中格式不一致作
+            const userName = `@${a.nick_name || a.nickName} `;
+            const match =
+              this.msg.content &&
+              this.msg.content.text_content &&
+              this.msg.content.text_content.indexOf(userName) != -1;
+            if (match) {
+              if (at) {
+                this.msgContent = this.msgContent.replace(
+                  userName,
+                  `<span style='color:#4DA1FF'>${userName}</span>`
+                );
+              } else {
+                this.msgContent = this.msg.content.text_content.replace(
+                  userName,
+                  `<span style='color:#4DA1FF'>${userName}</span>`
+                );
+              }
+              at = true;
+            } else {
+              this.msgContent = at ? this.msgContent : this.msg.content.text_content;
+            }
+          });
+        }
+        if (
+          this.msg.atList &&
+          this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+          !this.msg.isHistoryMsg
+        ) {
+          this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
+          clearTimeout(this.tipTimer);
+          this.tipTimer = setTimeout(() => {
+            this.$emit('dispatchEvent', { type: 'closeTip' });
+          }, 10000);
+        }
+        if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
+          this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
+          clearTimeout(this.tipTimer);
+          this.tipTimer = setTimeout(() => {
+            this.$emit('dispatchEvent', { type: 'closeTip' });
+          }, 10000);
+        }
       }
     }
   };
@@ -472,11 +490,17 @@
           width: 28px;
           height: 28px;
           border-radius: 14px;
-          overflow: hidden;
+          position: relative;
           .normal-msg__avatar-img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
             object-fit: cover;
+          }
+          .chat-phone {
+            position: absolute;
+            bottom: 0;
+            right: 0;
           }
         }
         .normal-msg__content {

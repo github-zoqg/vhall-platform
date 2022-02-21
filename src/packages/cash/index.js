@@ -1,8 +1,8 @@
-import Cash from './src/main';
+import VmpCash from './src/main';
 
 /* istanbul ignore next */
-Cash.install = function (Vue) {
-  Vue.component(Cash.name, Cash);
+VmpCash.install = function (Vue) {
+  Vue.component(VmpCash.name, VmpCash);
 };
 
-export default Cash;
+export default VmpCash;

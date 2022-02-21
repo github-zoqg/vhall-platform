@@ -96,6 +96,7 @@
       <officaial-dialog
         ref="officaialDialog"
         :officicalInfo="officicalInfo"
+        :screenPosterInfo="screenPosterInfo"
         v-if="officialImg"
       ></officaial-dialog>
       <!-- 登录、基础信息 -->
@@ -147,9 +148,10 @@
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识
+        screenPosterInfo: {}, // 开屏海报
         officicalInfo: {}, //公众号
         officialImg: '',
-        userInfo: JSON.parse(window.localStorage.getItem('userInfo')) || {}, // 用户登录之后的信息
+        // userInfo: JSON.parse(window.localStorage.getItem('userInfo')) || {}, // 用户登录之后的信息
         themeClass: {
           bgColor: 'light',
           pageBg: '#cccccc',
@@ -196,6 +198,9 @@
         return this.embedObj
           ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
           : true;
+      },
+      userInfo() {
+        return this.$domainStore.state.userServer.userInfo;
       }
     },
     beforeCreate() {
@@ -207,7 +212,6 @@
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       this.embedObj = this.roomBaseState.embedObj;
-      console.log(this.isLogin, this.userInfo.user_id, '???1132424?????');
       if (this.isLogin && this.isNotEmbed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
@@ -221,6 +225,7 @@
         this.skinInfo = this.roomBaseState.skinInfo || {};
         this.webinarTag = this.roomBaseState.webinarTag || {};
         this.officicalInfo = this.roomBaseState.officicalInfo || {};
+        this.screenPosterInfo = this.roomBaseState.screenPosterInfo || {};
         this.setOfficicalInfo(this.officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },
