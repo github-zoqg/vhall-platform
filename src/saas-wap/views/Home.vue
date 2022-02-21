@@ -7,7 +7,6 @@
   >
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
-      <!-- <div>wap观看端</div> -->
     </div>
   </div>
 </template>
