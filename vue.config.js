@@ -138,15 +138,7 @@ const sharedConfig = {
     }
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
       // 编译结束后重新组织编译结果
-      config.plugin('reorganize').use(
-        new ReorganizePlugin({
-          resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
-          dist: path.resolve('dist'),
-          project: argv.project,
-          version: argv.version,
-          routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-        })
-      );
+      //
     }
     // config.module
     //   .rule('images')
