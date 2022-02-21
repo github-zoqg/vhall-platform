@@ -140,18 +140,18 @@ const sharedConfig = {
       // 编译结束后重新组织编译结果
       //
     }
-    config.module
-      .rule('images')
-      .test(/\.(jpg|png|gif)$/)
-      .use('url-loader')
-      .loader('url-loader')
-      .options({
-        limit: 10,
-        publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
-        outputPath: '/static/img',
-        name: '[name].[hash:8].[ext]'
-      })
-      .end();
+    // config.module
+    //   .rule('images')
+    //   .test(/\.(jpg|png|gif)$/)
+    //   .use('url-loader')
+    //   .loader('url-loader')
+    //   .options({
+    //     limit: 10,
+    //     publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
+    //     outputPath: 'img',
+    //     name: '[name].[ext]'
+    //   })
+    //   .end();
   },
   // 向 CSS 相关的 loader 传递选项
   // 可支持 css\postcss\sass\less\stylus-loader
