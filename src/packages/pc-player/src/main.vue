@@ -328,6 +328,14 @@
           this.hoverTime = (val / 100) * this.totalTime;
           this.hoverLeft = (val / 100) * this.ContorlWidth;
         }
+      },
+      ['roomBaseServer.state.miniElement'](newval) {
+        console.log('-[doc]---大小屏变更miniElement：', newval); // newval 取值 doc, player
+        if (newval === 'player') {
+          this.displayMode = 'mini';
+        } else {
+          this.displayMode = 'normal';
+        }
       }
     },
     created() {
@@ -1049,7 +1057,7 @@
           &-quality,
           &-speed {
             &:hover {
-              .vmp-player-controller-tools-right-list {
+              .controller-tools-right-list {
                 display: block;
               }
             }
