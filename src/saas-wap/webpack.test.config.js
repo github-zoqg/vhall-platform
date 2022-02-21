@@ -3,10 +3,16 @@ const baseConfig = require('./webpack.base.config');
 
 const htmlConfig = {
   cdnJs: {
-    vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/dist/2.6.14/vue.js'
+    vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.js',
+    MiddleEventSdk:
+      '//t-alistatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
+    MiddleDomain: '//t-alistatic01.e.vhall.com/common-static/middle/1.0.2/middle-domain.js'
   },
   cdnCss: {
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'
+    iconfontCommon:
+      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
+    iconfont:
+      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'
   }
 };
 
