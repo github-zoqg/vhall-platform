@@ -94,17 +94,14 @@
       isShowSupport: {
         default: false,
         type: Boolean
-      },
-      isShowSplitScreen: {
-        default: false,
-        type: Boolean
       }
     },
     computed: {
       isSupportSplitScreen() {
         return (
           (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
-          this.webinarInfo.mode != 6
+          this.webinarInfo.mode != 6 &&
+          this.webinarInfo.mode != 1
         );
       },
       isLiving() {

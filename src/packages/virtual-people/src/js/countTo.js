@@ -3,7 +3,6 @@
  *
  * @export
  * @class CountTo
- * @author zhenliang.sun
  */
 export default class CountTo {
   /**

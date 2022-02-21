@@ -728,7 +728,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 9;
+        z-index: 8;
         div {
           background: rgba(0, 0, 0, 0.4);
           border-radius: 50%;
@@ -957,7 +957,7 @@
       position: absolute;
       // bottom: -48px;
       bottom: 3px;
-      z-index: 10;
+      z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
@@ -1056,7 +1056,7 @@
           &-quality,
           &-speed {
             &:hover {
-              .vmp-player-controller-tools-right-list {
+              .controller-tools-right-list {
                 display: block;
               }
             }
@@ -1125,7 +1125,7 @@
       position: absolute;
       // bottom: -48px;
       bottom: 3px;
-      z-index: 10;
+      z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
@@ -1296,7 +1296,7 @@
       }
     }
     &-tips {
-      z-index: 6;
+      z-index: 9;
       &-box {
         height: 40px;
         font-size: 14px;
