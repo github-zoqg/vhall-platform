@@ -343,7 +343,7 @@
             'set_person_status_in_chat',
             event.target,
             msg.sendId,
-            msg.msgId,
+            msg.count,
             msg.nickname,
             false,
             msg.roleName
@@ -358,7 +358,7 @@
           'set_person_status_in_chat',
           event.target,
           msg.sendId,
-          msg.msgId,
+          msg.count,
           msg.nickname,
           true,
           msg.roleName

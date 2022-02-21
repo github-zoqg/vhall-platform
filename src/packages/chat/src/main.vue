@@ -754,10 +754,10 @@
         this.$refs.chatOperator.handleReply(count);
       },
       //todo domain负责 删除消息（主持人，助理）
-      deleteMsg(msgId) {
+      deleteMsg(count) {
         const msgToDelete =
           this.chatList.find(chatMsg => {
-            return chatMsg.msgId === msgId;
+            return chatMsg.count === count;
           }) || {};
         setTimeout(() => {
           const params = {
