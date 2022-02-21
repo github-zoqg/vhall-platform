@@ -148,6 +148,18 @@ const sharedConfig = {
         })
       );
     }
+    config.module
+      .rule('images')
+      .test(/\.(jpg|png|gif)$/)
+      .use('url-loader')
+      .loader('url-loader')
+      .options({
+        limit: 10,
+        publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
+        outputPath: 'img',
+        name: '[name].[ext]'
+      })
+      .end();
   },
   // 向 CSS 相关的 loader 传递选项
   // 可支持 css\postcss\sass\less\stylus-loader
