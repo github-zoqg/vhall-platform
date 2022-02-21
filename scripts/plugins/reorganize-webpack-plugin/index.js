@@ -74,9 +74,7 @@ class ReorganizeWebpackPlugin {
         if (stat.isFile && path.extname(filename).toLowerCase() === '.js') {
           let filePath = path.join(basedir, filename);
           let content = fs.readFileSync(filePath, 'utf-8');
-          content = content
-            .replace(patternForStatic, '"../static/')
-            .replace(/(.\/img\/)/g, `"${resoucePrefix}static/img/`);
+          content = content.replace(patternForStatic, '"../../static/');
           if (basedir.indexOf(version) > -1) {
             content = content.replace(patternForRouter, `base: "${routerBase}/${version}",`);
           }
