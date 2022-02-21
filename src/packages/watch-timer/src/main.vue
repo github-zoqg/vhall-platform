@@ -1,11 +1,7 @@
 <template>
   <div class="vhsaas-praise-timer">
-    <div v-if="openTimer" class="vhsaas-timer-box">
-      <i v-if="showTimer" class="circle"></i>
-      <img class="vhsaas-timer-icon" src="./img/timer.png" alt="" @click="handleTimer" />
-    </div>
     <!-- 时间显示区 -->
-    <div v-show="timerVisible && openTimer" v-drag class="bgimg">
+    <div v-show="timerVisible" v-drag class="bgimg">
       <!-- <el-row :class="status == 'zanting'?'colorFC9600':status == 'kaishi'?'color0FBB5A':'colorFB3A32'"> -->
       <el-row class="colorFFF">
         <el-col class="ft12">
@@ -31,7 +27,7 @@
         </el-col>
       </el-row>
       <span class="close ps" @click="onClose">
-        <i class="iconfont iconguanbi_icon"></i>
+        <i class="vh-iconfont vh-line-close"></i>
       </span>
       <div class="pad20">
         <el-row class="margin10 bg000 pr mt10">
@@ -59,11 +55,12 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { useRoomBaseServer, useTimerServer } from 'middle-domain';
   export default {
     name: 'VmpWatchTimer',
     directives: {
-      drag(el, bindings) {
+      drag(el) {
         el.onmousedown = function (e) {
           var disx = e.pageX - el.offsetLeft;
           var disy = e.pageY - el.offsetTop;
@@ -95,8 +92,7 @@
       const roomBaseServer = useRoomBaseServer();
       return {
         roomBaseServer,
-        showTimer: true,
-        timerVisible: true,
+        timerVisible: false,
         status: 'kaishi',
         is_all_show: false,
         is_timeout: false,
@@ -106,7 +102,6 @@
         mon: 3,
         ten_sec: 4,
         sec: 0,
-        openTimer: true,
         timerInfo: {}
       };
     },
@@ -120,50 +115,29 @@
       }
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.timerServer = useTimerServer();
     },
     mounted() {
-      this.timerInfo = this.roomBaseServer.state?.interactToolStatus?.timer;
-      // console.log(this.$domainStore.state, this.roomBaseServer, '123132');
+      this.timerInfo = this.roomBaseServer.state?.timerInfo;
+      console.log(this.$domainStore.state, this.roomBaseServer, '123132');
       // this.init();
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器开始
-          case 'timer_start':
-            this.timer_start(temp);
-            break;
-          // 计时器结束
-          case 'timer_end':
-            this.timer_end(temp);
-            break;
-          // 计时器暂停
-          case 'timer_pause':
-            this.timer_pause(temp);
-            break;
-          // 计时器重置
-          case 'timer_reset':
-            this.timer_reset(temp);
-            break;
-          // 计时器继续
-          case 'timer_resume':
-            this.timer_resume(temp);
-            break;
-          default:
-            break;
-        }
-      });
+      this.timerServer.listenMsg();
+      console.log(this.timerServer.listenMsg, 'this.roomBaseServer');
+      // 计时器开始
+      this.timerServer.$on('timer_start', temp => this.timer_start(temp));
+      // 计时器结束
+      this.timerServer.$on('timer_end', temp => this.timer_end(temp));
+      // 计时器暂停
+      this.timerServer.$on('timer_pause', temp => this.timer_pause(temp));
+      // 计时器重置
+      this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
+      // 计时器继续
+      this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
     },
     methods: {
       // 计时器开始
       timer_start(e) {
+        console.log('计时器开始');
         this.shijian = e.data.duration;
         this.beifenshijian = e.data.duration;
         this.is_timeout = e.data.is_timeout;
@@ -175,14 +149,18 @@
         this.status = 'kaishi';
         this.timerVisible = true;
         if (this.is_all_show == 1) {
-          this.openTimer = true;
+          // 通知相应组件打开计时器Icon
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+          );
         }
-        this.showTimer = false;
       },
       // 计时器结束
       timer_end() {
-        this.showTimer = false;
-        this.openTimer = false;
+        // 通知相应组件关闭计时器Icon
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
+        );
         this.timerVisible = false;
         this.status = 'jieshu';
         clearInterval(this.timer);
@@ -197,7 +175,10 @@
       timer_reset() {
         clearInterval(this.timer);
         this.status = 'kaishi';
-        this.openTimer = false;
+        // 通知相应组件关闭计时器Icon
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
+        );
       },
       // 计时器继续
       timer_resume(e) {
@@ -206,12 +187,7 @@
       },
       init() {
         setTimeout(() => {
-          const resData = this.timerInfo || {
-            duration: '60',
-            is_all_show: '1',
-            is_timeout: '1',
-            remain_time: '56'
-          };
+          const resData = this.timerInfo;
           console.log(resData, ',,,,,,,,,,,,,,,,,,,');
           if (resData && JSON.stringify(resData) != '{}') {
             this.shijian = resData.remain_time;
@@ -228,20 +204,28 @@
             this.status = resData.status == 4 ? 'zanting' : 'kaishi';
             this.timerVisible = true;
             if (this.is_all_show == 1) {
-              this.openTimer = true;
+              // 通知相应组件打开计时器Icon
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+              );
             }
-            this.showTimer = false;
           }
         }, 100);
       },
       // open计时器弹框
       handleTimer() {
         this.timerVisible = true;
-        this.showTimer = false;
+        // 通知相应组件打开计时器Icon
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+        );
       },
       onClose() {
         this.timerVisible = false;
-        this.showTimer = true;
+        // 通知相应组件打开计时器Icon上的红点
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
+        );
       },
       // 秒转时间
       timeFormat(data) {
@@ -260,7 +244,10 @@
             }
             if (data == 0) {
               clearInterval(this.timer);
-              this.openTimer = false;
+              // 通知相应组件关闭计时器Icon
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
+              );
               return false;
             }
           }

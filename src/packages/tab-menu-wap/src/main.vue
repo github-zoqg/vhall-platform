@@ -1,143 +1,257 @@
 <template>
   <section class="vmp-tab-menu">
-    <!-- item -->
-    <ul class="vmp-tab-menu-scroll-container" ref="menu">
-      <li
-        v-for="item of menu"
-        :ref="`${item.comp}_${item.key}`"
-        class="vmp-tab-menu-item"
-        :class="{ 'vmp-tab-menu-item__active': selectedId === `${item.comp}_${item.key}` }"
-        :key="`${item.comp}_${item.key}`"
-        @click="select(item.comp, item.key)"
-      >
-        <span class="item-text">{{ item.text }}</span>
-      </li>
-      <li class="vmp-tab-menu-more">
-        <i class="vh-iconfont vh-full-more"></i>
-      </li>
-    </ul>
+    <section class="vmp-tab-menu__header">
+      <!-- 菜单区域 -->
+      <ul class="vmp-tab-menu-scroll-container" ref="menu">
+        <li
+          v-for="item of mainMenu"
+          :ref="item.id"
+          class="vmp-tab-menu-item"
+          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
+        >
+          <span class="item-text">{{ $t(item.text) }}</span>
+        </li>
+        <li
+          v-if="visibleMenu.length > 3"
+          class="vmp-tab-menu-more"
+          :class="{ selected: isSubMenuShow }"
+          @click="toggleSubMenuVisible"
+        >
+          <i class="vh-iconfont vh-full-more"></i>
+        </li>
+      </ul>
 
-    <section class="vmp-tab-menu-sub"></section>
+      <!-- 次级菜单 -->
+      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+        <li
+          class="vmp-tab-menu-sub__item"
+          v-for="item of subMenu"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
+        >
+          {{ $t(item.text) }}
+        </li>
+      </ul>
+    </section>
+
+    <!-- 正文区域 -->
+    <section class="vmp-tab-menu__main">
+      <tab-content
+        ref="tabContent"
+        :mainMenu="mainMenu"
+        :subMenu="subMenu"
+        @closePopup="selectDefault"
+      />
+    </section>
   </section>
 </template>
 
 <script>
+  import { useMenuServer } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-
-  // TODO: tips
+  import tabContent from './components/tab-content.vue';
 
   export default {
     name: 'VmpTabMenuWap',
+    components: { tabContent },
     data() {
       return {
         direciton: 'row', // row(横)，column(纵)
+        selectedType: '',
         selectedId: '',
-        menu: [{ comp: 'comIntro', key: 'intro', text: '简介', showIcon: false }]
+        menu: [],
+        isSubMenuShow: false,
+        tabOptions: {}
       };
     },
     computed: {
+      visibleMenu() {
+        return this.menu.filter(item => item.visible);
+      },
+      mainMenu() {
+        return this.visibleMenu.filter((item, index) => index < 3);
+      },
+      subMenu() {
+        if (this.visibleMenu.length <= 3) return [];
+        return this.visibleMenu.filter((item, index) => index >= 3);
+      },
       selectedIndex() {
-        return this.menu.findIndex(item => `${item.comp}_${item.key}` === this.selectedId);
+        return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       }
     },
-    methods: {
-      prev() {
-        if (this.selectedIndex === 0) return;
-        const index = this.selectedIndex - 1;
-        const item = this.menu[index];
-        this.select(item.comp, item.key);
-      },
-      next() {
-        if (this.selectedIndex >= this.menu.length - 1) return;
-        const index = this.selectedIndex + 1;
-        const item = this.menu[index];
-        this.select(item.comp, item.key);
-      },
+    beforeCreate() {
+      this.menuServer = useMenuServer();
+    },
+    created() {
+      this.initConfig();
+      this.initMenu();
+    },
+    async mounted() {
+      await this.$nextTick(0);
+      this.selectDefault();
+    },
 
+    methods: {
+      /**
+       * 初始化配置
+       */
+      initConfig() {
+        const widget = window.$serverConfig?.[this.cuid];
+        if (widget && widget.options) {
+          this.tabOptions = widget.options;
+        }
+      },
+      /**
+       * 拉取接口，初始化菜单项
+       */
+      initMenu() {
+        // 从接口拉取的配置
+        const list = this.$domainStore.state.roomBaseServer.customMenu.list;
+        console.log('[menu] list--:', list);
+        for (const item of list) {
+          this.addItem(item);
+        }
+      },
+      /**
+       * 选中默认的菜单项（第一项）
+       */
+      selectDefault() {
+        // 选择默认项
+        if (this.visibleMenu.length > 0) {
+          const { type, id } = this.visibleMenu[0];
+          this.select({ type, id });
+        }
+      },
+      /**
+       * 切换次级菜单的显隐
+       */
+      toggleSubMenuVisible() {
+        this.isSubMenuShow = !this.isSubMenuShow;
+      },
+      /**
+       * 删除某个位置的菜单项
+       * @param {*} index
+       */
       removeItemByIndex(index) {
         this.menu.splice(index);
       },
-
+      /**
+       * 添加一个菜单项
+       * @param {*} item
+       */
       addItem(item) {
-        if (!item || !item.key || !item.text) {
-          throw Error('传入的 tab item 必须有id、text');
-        }
-
-        item = getItemEntity(item);
-
+        console.log('[menu] this.tabOptions.menuConfig:', this.tabOptions.menuConfig);
+        item = getItemEntity(item, this.tabOptions.menuConfig);
+        console.log('[menu] item:', item);
         this.menu.push(item);
       },
-
+      /**
+       * 在某个index位点添加菜单项
+       * @param {*} index
+       * @param {*} item
+       */
       addItemByIndex(index, item) {
-        if (!item || !item.key || !item.text) {
-          throw Error('传入的 tab item 必须有id、text');
-        }
-
-        item = getItemEntity(item);
-
+        item = getItemEntity(item, this.tabOptions.menuConfig);
         this.menu.splice(index, 0, item);
       },
-
-      getItem(comp, key) {
-        return this.menu.find(item => item.comp === comp && item.key === key);
-      },
-
-      setIcon(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-        tab.showIcon = true;
-      },
-
-      hiddenIcon(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-
-        tab.showIcon = false;
-      },
-
-      toggleIcon(comp, key) {
-        const tab = this.getItem(comp, key);
-        if (!tab) return;
-
-        tab.showIcon = !tab.showIcon;
-      },
-
-      // 滑动到某个item的动画效果
-      scrollToItem(comp, key) {
-        // 由于menu列表随时会增减，
-        const itemsWithPosition = this.menu.map(item => {
-          const key = `${item.comp}_${item.key}`;
-          const ref = this.$refs[key][0];
-          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
-          const left = ref.offsetLeft - paddingLeft;
-          return { key, ref, left };
-        });
-
-        const positionItem = itemsWithPosition.find(item => item.key === `${comp}_${key}`);
-
-        this.$refs['menu'].scrollTo({
-          left: positionItem.left,
-          behavior: 'smooth'
+      /**
+       * 获取某个菜单项（根据cuid和menuId获取某个菜单项）
+       * @param {String} type tab的type
+       * @param {String|Number} menuId [非必传] 菜单id，由后端返得
+       * @example getItem(2,'10468')
+       */
+      getItem({ type, id }) {
+        return this.menu.find(item => {
+          if (id !== undefined) {
+            return item.id === id;
+          } else {
+            return item.type === type;
+          }
         });
       },
+      /**
+       * 设置菜单项显隐
+       * @param {Boolean} visible [true|false] 显隐值
+       * @param {String} cuid cuid
+       * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       */
+      setVisible({ visible = true, type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
 
-      select(comp, key) {
-        this.selectedId = `${comp}_${key}`;
-        let payload = null;
-        if (comp === 'comCustomMenu') {
-          payload = {
-            method: 'queryDetail',
-            arg: [key]
-          };
+        tab.visible = visible;
+        visible === false && this.jumpToNearestItemById(id);
+      },
+      /**
+       * 切换某个菜单tab的可视性
+       * @param {*} cuid
+       * @param {*} menuId [非必传]
+       * @example toggleVisible('comChatWap','')
+       */
+      toggleVisible({ type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+
+        tab.visible = !tab.visible;
+      },
+      /**
+       * 设置小红点的显隐
+       * @param {Boolean} visible [true|false] 显隐值
+       * @param {String} cuid cuid
+       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
+       * @example setTipsVisible(true,'comChatWap','10186')
+       */
+      setTipsVisible({ visible, type, id }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+
+        tab.tipsVisible = visible;
+      },
+
+      /**
+       * 跳转到最近的item
+       */
+      jumpToNearestItemById(id) {
+        const index = this.visibleMenu.findIndex(item => item.id === id);
+
+        // 向后跳
+        const nextItem = this.visibleMenu[index + 1];
+        if (index < this.visibleMenu.length && nextItem !== undefined) {
+          const { type, id } = nextItem;
+          this.select({ type, id });
         }
 
-        this.scrollToItem(comp, key);
+        // 向前跳
+        const lastItem = this.visibleMenu[index - 1];
+        if (index > 0 && lastItem !== undefined) {
+          const { type, id } = lastItem;
+          this.select({ type, id });
+        }
 
-        // 切换container内容
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'handleSelect', [comp, key, payload])
-        );
+        // 前后都没有清空任何选择(基本不会发生的极端情况)
+        this.selectedId = '';
+        this.selectedType = '';
+      },
+
+      /**
+       * 选中一个菜单项，并显示对应内容
+       * @param {String} type tab类型
+       * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
+       * @example select('comCustomMenuWap','10246')
+       */
+      select({ type, id = '' }) {
+        this.selectedType = type;
+        this.selectedId = id;
+
+        this.isSubMenuShow = false;
+
+        const item = this.getItem({ type, id });
+        item.tipsVisible = false;
+
+        this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+        this.menuServer.$emit('tab-switched', item);
       }
     }
   };
@@ -145,19 +259,35 @@
 
 <style lang="less">
   .vmp-tab-menu {
+    height: 100%;
+    position: relative;
     background: #fff;
     font-size: 32px;
     display: flex;
-    justify-content: space-around;
-    height: 90px;
-    position: relative;
-    &::before {
-      content: '';
-      position: absolute;
-      bottom: 0;
+    flex-direction: column;
+
+    &__header {
+      position: relative;
       width: 100%;
-      height: 1px;
-      border-bottom: 1px solid #d4d4d4;
+      height: 90px;
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: space-around;
+
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        border-bottom: 1px solid #d4d4d4;
+      }
+    }
+
+    &__main {
+      width: 100%;
+      flex: 1 1 auto;
+      overflow: hidden;
     }
 
     .vmp-tab-menu-scroll-container {
@@ -227,6 +357,37 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
+
+        &.selected {
+          background-color: #f3f3f3;
+        }
+      }
+    }
+
+    .vmp-tab-menu-sub {
+      position: relative;
+      font-size: 32px;
+      position: absolute;
+      top: 90px;
+      left: 0;
+      right: 0;
+      z-index: 22; // 危险值
+      background-color: #f3f3f3;
+      color: #444;
+      width: 100%;
+      max-height: 352px;
+      overflow-y: scroll;
+
+      &__item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 88px;
+        padding: 0 40px;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid #d4d4d4;
+        }
       }
     }
   }

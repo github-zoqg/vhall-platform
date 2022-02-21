@@ -32,7 +32,13 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion', 'comInsertStream']
+    children: [
+      'comStreamList',
+      'comDocUne',
+      'comGroupDiscussion',
+      'comInsertStream',
+      'comThirdStream'
+    ]
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -49,26 +55,30 @@ export const serverConfig = {
     children: [
       // 'comMemberList'
       // 'comChat',
-      'comTabMenu',
-      'comTabContent'
+      'comTabMenu'
     ]
   },
   /*** 布局定义end */
 
   comTabMenu: {
     component: 'VmpTabMenu',
-    handleSelect: [
-      {
-        cuid: ['comTabContent'],
-        method: 'switchTo',
-        args: ['$0', '$1', '$2']
-      }
-    ]
-  },
-
-  comTabContent: {
-    component: 'VmpTabContainer',
-    children: ['comChat', 'comNotice', 'comMemberList', 'comCustomMenu']
+    options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
+        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
+        { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
+        { type: 'notice', cuid: 'comNotice', text: '公告' },
+        // { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
+        { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
+        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
+      ]
+    }
   },
 
   /*** 所有弹窗集合 */
@@ -83,10 +93,9 @@ export const serverConfig = {
       'comPcMediaCheck',
       'comInsertVideo',
       'liveTimerSet',
-      'liveTimer',
-      'comRebroadcast'
+      'liveTimer'
+      // 'comRebroadcast'
     ]
-    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
   },
 
   /**** 组件定义 */
@@ -119,7 +128,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPushAndSetBroadCast'
+        method: 'startPush'
       }
     ],
     emitClickEndLive: [
@@ -132,6 +141,13 @@ export const serverConfig = {
       {
         cuid: 'comMediaSetting',
         method: 'showMediaSetting'
+      }
+    ],
+    emitClickThirdStream: [
+      {
+        cuid: 'comThirdStream',
+        method: 'showThirdStream',
+        args: ['$0']
       }
     ]
   },
@@ -150,7 +166,8 @@ export const serverConfig = {
       'comInteractMenu',
       'comGroupMenu',
       'comShareMenu',
-      'comExitGroupMenu'
+      'comExitGroupMenu',
+      'comLottery'
     ]
   },
   // 语言选择组件
@@ -179,9 +196,13 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
       }
     ]
   },
@@ -195,9 +216,13 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: ['comAsideMenu', 'comGroupDiscussion', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
       }
     ]
   },
@@ -207,8 +232,7 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
-      kind: 'deskshare',
-      disable: true
+      kind: 'desktopShare'
     }
   },
   // 插播文件
@@ -221,11 +245,6 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: 'comGroupDiscussion',
-        method: 'switchTo',
-        args: 'media'
-      },
-      {
         cuid: 'comInsertVideo',
         method: 'openInserVideoDialog',
         args: []
@@ -235,10 +254,19 @@ export const serverConfig = {
   // 互动工具
   comInteractMenu: {
     component: 'VmpInteractMenu',
+    options: {
+      kind: 'interactTool'
+    },
     emitOpenTimerSet: [
       {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
+      }
+    ],
+    emitOpenLottery: [
+      {
+        cuid: ['comLottery'],
+        method: 'open'
       }
     ]
   },
@@ -254,6 +282,13 @@ export const serverConfig = {
         cuid: ['liveTimerSet'],
         method: 'openTimerSet'
       }
+    ],
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
+      }
     ]
   },
 
@@ -261,7 +296,7 @@ export const serverConfig = {
   comGroupMenu: {
     component: 'VmpIconText',
     options: {
-      icon: 'vh-saas-iconfont vh-saas-a-color-groupinglive',
+      icon: 'vh-iconfont vh-line-group',
       text: 'aside_menu.aside_menu_1008',
       kind: 'group',
       disable: true
@@ -270,8 +305,7 @@ export const serverConfig = {
       {
         // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
-        method: 'switchTo',
-        args: 'group'
+        method: 'toggle'
       }
     ]
   },
@@ -299,7 +333,8 @@ export const serverConfig = {
       className: 'menu-footer',
       icon: 'vh-iconfont vh-line-exit',
       text: '退出小组',
-      kind: 'exitGroup'
+      kind: 'exitGroup',
+      hidden: true
     },
     handleClick: [
       {
@@ -401,11 +436,11 @@ export const serverConfig = {
     exchangeCfg: [
       {
         cuid: 'comDocUne',
-        kind: 'doc'
+        kind: 'document'
       },
       {
         cuid: 'comInsertVideo',
-        kind: 'insertvideo'
+        kind: 'insertMedia'
       }
     ],
     // 推流完成事件
@@ -447,7 +482,13 @@ export const serverConfig = {
   },
   comMediaSetting: {
     component: 'VmpPcMediaSetting',
-    saveOptions: []
+    saveOptions: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
   },
   comPcMediaCheck: {
     component: 'VmpPcMediaCheck'
@@ -497,5 +538,11 @@ export const serverConfig = {
   // 转播
   comRebroadcast: {
     component: 'VmpRebroadcast'
+  },
+  comRecommend: {
+    component: 'VmpRecommend'
+  },
+  comLottery: {
+    component: 'VmpLotteryLive'
   }
 };

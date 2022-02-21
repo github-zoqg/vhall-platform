@@ -1,8 +1,7 @@
 import Vue from 'vue';
 
-const install = _Vue => {
-  Vue = _Vue;
-  // 使用vue的混入方法，在创建之前，给每个组件都增加 $domainStore 属性
+const install = (Vue, options) => {
+  console.log('app domain store options----->', options);
   Vue.mixin({
     // 创建之前会被执行
     beforeCreate() {

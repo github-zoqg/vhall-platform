@@ -50,156 +50,6 @@ const eventMixin = {
         }
       }, 2000);
 
-      // this.msgServer.$onMsg('CHAT', rawMsg => {
-      //   let msg = parseMsg(rawMsg);
-      //   console.log('============收到聊天消息===============');
-      //   console.log(msg);
-      //   EventBus.$emit('receiveMsg', msg);
-
-      //   if (['text', 'image'].includes(msg.data.type)) {
-      //     // 问答私聊消息，不添加到聊天列表里面
-      //     if (msg.data.target_id) {
-      //       return;
-      //     }
-
-      //     // 如果是观众，并且接受到的消息是自己发的，不显示
-      //     if (this.roleName === 2 && msg.sender_id === this.userId) {
-      //       return;
-      //     }
-
-      //     let item = {};
-      //     if (this.chatList.length) {
-      //       item = this.chatList[this.chatList.length - 1];
-      //     }
-      //     // 获取聊天区域当前滚动条的状态
-      //     const osInstanceScrollStatus = this.osInstance.scroll();
-      //     if (msg.context.atList && msg.context.atList.length && msg.data.text_content) {
-      //       msg.context.atList.forEach(a => {
-      //         msg.data.text_content = msg.data.text_content.replace(
-      //           `***${a.nickname}`,
-      //           `@${a.nickname}`
-      //         );
-      //         // 判断是否是 @ 当前用户得消息
-      //         if (
-      //           osInstanceScrollStatus.max.y !== 0 &&
-      //           osInstanceScrollStatus.ratio.y !== 1 &&
-      //           this.userId === a.accountId
-      //         ) {
-      //           if (this.tipMsgTimer) {
-      //             clearTimeout(this.tipMsgTimer);
-      //             this.tipMsgTimer = null;
-      //           }
-      //           this.isHasUnreadAtMeMsg = true;
-      //           // 如果有未读普通消息或者未读回复消息，就显示有 x 条消息未读
-      //           this.tipMsg =
-      //             this.isHasUnreadNormalMsg || this.isHasUnreadReplyMsg
-      //               ? `有${this.unReadMessageCount + 1}条未读消息`
-      //               : '有人@你';
-      //           if (this.tipMsg === '有人@你') {
-      //             // 如果结果是 @ 清除之前的定时器并开启一个新的定时器，10秒后删除
-      //             this.tipMsgTimer = setTimeout(() => {
-      //               this.unReadMessageCount = 0;
-      //               this.isHasUnreadAtMeMsg = false;
-      //               this.tipMsgTimer = null;
-      //             }, 10000);
-      //           }
-      //         }
-      //       });
-      //     } else if (
-      //       osInstanceScrollStatus.max.y !== 0 &&
-      //       osInstanceScrollStatus.ratio.y !== 1 &&
-      //       msg.context.replyMsg &&
-      //       msg.context.replyMsg.content &&
-      //       this.userId === msg.context.replyMsg.sendId
-      //     ) {
-      //       // 如果是否是回复当前观众的消息
-      //       if (this.tipMsgTimer) {
-      //         clearTimeout(this.tipMsgTimer);
-      //         this.tipMsgTimer = null;
-      //       }
-      //       this.isHasUnreadReplyMsg = true;
-      //       // 如果有未读普通消息或者未读回复消息，就显示有 x 条消息未读
-      //       this.tipMsg =
-      //         this.isHasUnreadNormalMsg || this.isHasUnreadAtMeMsg
-      //           ? `有${this.unReadMessageCount + 1}条未读消息`
-      //           : `有人回复你`;
-      //       if (this.tipMsg === '有人回复你') {
-      //         // 如果结果是 回复 清除之前的定时器并开启一个新的定时器，10秒后删除
-      //         this.tipMsgTimer = setTimeout(() => {
-      //           this.unReadMessageCount = 0;
-      //           this.isHasUnreadReplyMsg = false;
-      //           this.tipMsgTimer = null;
-      //         }, 10000);
-      //       }
-      //     } else if (osInstanceScrollStatus.max.y !== 0 && osInstanceScrollStatus.ratio.y !== 1) {
-      //       // 如果是除回复、 @之外的普通消息
-      //       if (this.tipMsgTimer) {
-      //         clearTimeout(this.tipMsgTimer);
-      //         this.tipMsgTimer = null;
-      //       }
-      //       this.isHasUnreadNormalMsg = true;
-      //       this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
-      //     }
-      //     throttleChatMsg(); // 解决17618
-      //     const data = new Msg({
-      //       avatar: getAvatar(msg.context.avatar),
-      //       nickname: msg.context.nickname,
-      //       type: msg.data.type,
-      //       content: msg.data,
-      //       sendId: msg.sender_id,
-      //       sendTime: msg.date_time,
-      //       roleName: msg.context.role_name,
-      //       client: pcDevice.includes(msg.client) ? 'pc' : 'mobile',
-      //       showTime: handleTime(item, msg),
-      //       replyMsg: msg.context.replyMsg || {},
-      //       atList: msg.context.atList || [],
-      //       msgId: msg.msg_id,
-      //       channel: msg.channel
-      //     });
-      //     this.chatList.push(data);
-      //   }
-      //   // 免费礼物
-      //   if (msg.data.type === 'free_gift_send') {
-      //     let data = generateGiftMessage(msg);
-      //     this.chatList.push(data);
-      //     this.addSpecialEffect(data);
-      //     console.log(this.chatList, 'list-----------------');
-      //   }
-
-      //   // 禁言某个用户
-      //   if (msg.data.type === 'disable') {
-      //     //todo 待移除 或者其他方式替代
-      //     EventBus.$emit('disable', msg);
-      //     //todo 要设法兼容分组
-      //     if (msg.data.target_id === this.userId) {
-      //       this.isBanned = true;
-      //       this.initInputStatus();
-      //     }
-      //   }
-      //   // 取消禁言某个用户
-      //   if (msg.data.type === 'permit') {
-      //     EventBus.$emit('permit', msg);
-      //     //todo 要设法兼容分组
-      //     if (msg.data.target_id === this.userId && !this.allBanned) {
-      //       this.isBanned = false;
-      //       this.initInputStatus();
-      //     }
-      //   }
-
-      //   // 开启全体禁言
-      //   if (msg.data.type === 'disable_all') {
-      //     EventBus.$emit('disable_all', msg);
-      //     this.allBanned = true;
-      //     this.initInputStatus();
-      //   }
-      //   // 关闭全体禁言
-      //   if (msg.data.type === 'permit_all') {
-      //     EventBus.$emit('permit_all', msg);
-      //     this.allBanned = false;
-      //     this.initInputStatus();
-      //   }
-      // });
-
       //判断直播类型
       if ([1, '1'].includes(this.playerType) || this.roleName != 2) {
         // 接受房间消息
@@ -216,10 +66,10 @@ const eventMixin = {
           // 发起抽奖
           if (msg.type === 'lottery_push' && [2, '2'].includes(this.roleName)) {
             const data = new Msg({
-              nickname: '抽奖',
+              nickname: this.$t('interact_tools.interact_tools_1003'),
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '正在进行抽奖环节'
+                text_content: this.$t('interact_tools.interact_tools_1021')
               },
               interactStatus: true,
               type: msg.type
@@ -252,8 +102,8 @@ const eventMixin = {
                         content: {
                           text_content:
                             res.data.lottery_status == 1 && res.data.win == 1
-                              ? '恭喜您中奖了！'
-                              : '很遗憾，您没有中奖！',
+                              ? this.$t('interact_tools.interact_tools_1023')
+                              : this.$t('interact_tools.interact_tools_1022'),
                           msg: msg,
                           userId: this.userId,
                           Show: res.data.lottery_status == 1 && res.data.win == 1
@@ -282,7 +132,10 @@ const eventMixin = {
               nickname: '',
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: index >= 0 ? '恭喜您中奖了！' : '很遗憾，您没有中奖！',
+                text_content:
+                  index >= 0
+                    ? this.$t('interact_tools.interact_tools_1023')
+                    : this.$t('interact_tools.interact_tools_1022'),
                 msg: msg,
                 userId: this.userId,
                 Show: index >= 0
@@ -306,7 +159,7 @@ const eventMixin = {
               content: {
                 text_content: msg.data.reward_describe
                   ? msg.data.reward_describe
-                  : '很精彩，赞一个！',
+                  : this.$t('chat.chat_1037'),
                 num: msg.data.reward_amount
               },
               sendId: this.userId,
@@ -342,7 +195,7 @@ const eventMixin = {
               nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '开启了问答'
+                text_content: this.$t('chat.chat_1026')
               },
               roleName: msg.data.role_name,
               type: msg.type,
@@ -355,10 +208,10 @@ const eventMixin = {
           if (msg.type === 'question_answer_close') {
             EventBus.$emit('close_qa');
             const data = new Msg({
-              nickname: '问答',
+              nickname: this.$t('common.common_1004'),
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: `${msg.nick_name}关闭了问答`
+                text_content: `${msg.nick_name}${this.$t('chat.chat_1081')}`
               },
               type: msg.type,
               interactStatus: true
@@ -372,7 +225,7 @@ const eventMixin = {
               nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '发起了问卷',
+                text_content: this.$t('chat.chat_1030'),
                 questionnaire_id: msg.questionnaire_id
               },
               roleName: msg.data.room_role,
@@ -389,7 +242,7 @@ const eventMixin = {
               nickname: msg.data.sign_creator_nickname,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '发起了签到'
+                text_content: this.$t('chat.chat_1027')
               },
               type: msg.type,
               interactStatus: true
@@ -398,13 +251,13 @@ const eventMixin = {
           }
           // 结束签到
           if (msg.type === 'sign_end') {
-            const text = msg.data.sign_creator_nickname || '主持人';
+            const text = msg.data.sign_creator_nickname || this.$t('chat.chat_1022');
             const data = new Msg({
               roleName: msg.role_name,
               nickname: text,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: '结束了签到'
+                text_content: this.$t('chat.chat_1028')
               },
               type: msg.type,
               interactStatus: true
@@ -415,10 +268,10 @@ const eventMixin = {
           if (msg.type === 'timer_start') {
             const text = returnName(msg.data.role_name);
             const data = new Msg({
-              nickname: '计时器',
+              nickname: '计时器', // TODO: 缺翻译
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
               content: {
-                text_content: `${text}发起了计时器`
+                text_content: `${text}发起了计时器` // TODO：缺翻译
               },
               type: msg.type,
               interactStatus: true
@@ -536,7 +389,7 @@ const eventMixin = {
               content: {
                 text_content: msg.data.reward_describe
                   ? msg.data.reward_describe
-                  : '很精彩，赞一个！',
+                  : this.$t('chat.chat_1037'),
                 num: msg.data.reward_amount
               },
               sendId: this.userId,
@@ -627,7 +480,12 @@ const eventMixin = {
         }
       });
       EventBus.$on('timer_pause', msg => {
-        const text = msg.data.role_name == 3 ? '助理' : msg.data.role_name == 1 ? '主持人' : '嘉宾';
+        const text =
+          msg.data.role_name == 3
+            ? this.$t('chat.chat_1024')
+            : msg.data.role_name == 1
+            ? this.$t('chat.chat_1022')
+            : this.$t('chat.chat_1023');
         const data = new Msg({
           nickname: '计时器',
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -641,46 +499,6 @@ const eventMixin = {
         this.chatList.push(data);
       });
       EventBus.$on('room_channel_change', this.handleChannelChange);
-      //解压消息
-      function parseMsg(msg) {
-        if (typeof msg !== 'object') {
-          msg = JSON.parse(msg);
-        }
-        try {
-          if (typeof msg.context !== 'object') {
-            msg.context = JSON.parse(msg.context);
-          }
-          if (typeof msg.data !== 'object') {
-            msg.data = JSON.parse(msg.data);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-
-        if (!msg.data.barrageTxt && msg.data.text_content) {
-          msg.data.barrageTxt = msg.data.text_content
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\n/g, '<br/>');
-        }
-
-        // 判断消息中是否可能存在表情，如果可能存在，则转为对应的 img 显示
-        if (msg.data.text_content && msg.data.text_content.indexOf('[') > -1) {
-          msg.data.text_content = textToEmojiText(msg.data.text_content);
-        }
-
-        // 如果 type 为 permit, event_type 为 customPraise 设置 type = customPraise
-        if (msg.data.type === 'permit' && msg.data.event_type === 'customPraise') {
-          msg.data.type = 'customPraise';
-        }
-
-        // 如果 type 为 permit, event_type 为 free_gift_send 设置 type = free_gift_send
-        if (msg.data.type === 'permit' && msg.data.event_type === 'free_gift_send') {
-          msg.data.type = 'free_gift_send';
-        }
-
-        return msg;
-      }
       //解压普通消息
       function parseNormalMsg(rawMsg) {
         let msg = rawMsg;

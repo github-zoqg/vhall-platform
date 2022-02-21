@@ -1,29 +1,33 @@
 <template>
-  <div class="vmp-interact-menu">
-    <div :class="['vmp-interact-menu-icon', living ? 'vmp-interact-menu-disable' : '']">
+  <div
+    class="vmp-interact-menu"
+    :class="[className, disable ? 'disable' : '']"
+    :style="{ display: hidden ? 'none' : 'flex' }"
+  >
+    <div class="vmp-interact-menu-icon">
       <i class="vh-saas-iconfont vh-saas-a-line-Interactivetools"></i>
       <p>互动工具</p>
     </div>
     <div class="vmp-interact-menu-wrap">
       <div class="vmp-interact-menu-list">
-        <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-line-label"></i>
+        <div class="vmp-interact-menu-list-item" @click="openLottery">
+          <i class="vh-iconfont vh-a-line-luckydraw"></i>
           <p>抽奖</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-a-line-Signin"></i>
+          <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-color-Question"></i>
+          <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
         <div class="vmp-interact-menu-list-item vmp-interact-menu-list-disable">
-          <i class="vh-saas-iconfont vh-saas-color-questionnaire"></i>
+          <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
         <div class="vmp-interact-menu-list-item">
-          <i class="vh-saas-iconfont vh-saas-a-color-redpacket"></i>
+          <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
         </div>
         <div class="vmp-interact-menu-list-item" @click="openTimer">
@@ -36,21 +40,104 @@
         </div>
       </div>
     </div>
+    <!-- 问答 -->
+    <saas-alert
+      title="问答"
+      :retry="isQAEnabled ? '关闭问答' : '开启问答'"
+      :visible="qaVisible"
+      @onClose="qaVisible = false"
+      @onSubmit="handleQASubmit"
+    >
+      <div slot="content">
+        <template v-if="!assistantType">
+          <p v-if="!isQAEnabled">
+            开启后，右侧互动区会增加“问答”模块，可进入右下角“问答管理”对观众提问进行处理。
+          </p>
+          <p v-if="isQAEnabled">该功能已开启，是否关闭？ 当前已收集问题：{{ qaCount }} 个</p>
+        </template>
+        <template v-else>
+          <p v-if="!isQAEnabled">点击后打开“问答管理”页面，观众端显示“问答”。</p>
+          <p v-if="isQAEnabled">
+            问答关闭后，观众端将不能提问。 当前已收集问题：{{ qaCount }}
+            个
+          </p>
+        </template>
+      </div>
+    </saas-alert>
   </div>
 </template>
 <script>
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { debounce } from 'lodash';
+  import { useQaServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  const qaServer = useQaServer();
   export default {
     name: 'VmpInteractMenu',
+    components: {
+      SaasAlert
+    },
     data() {
       return {
-        living: false
+        living: false,
+        isQAEnabled: false,
+        qaVisible: false,
+        qaCount: 0,
+        className: '', // 自定义样式
+        kind: '', // 类型
+        disable: false, // 是否禁用
+        hidden: false, // 是否隐藏
+        disTimer: false,
+        assistantType: false // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
       };
     },
     methods: {
+      handleQAPopup() {
+        if (!this.qaVisible && this.isQAEnabled) {
+          qaServer.getCurrentPlayQuestionNum().then(res => {
+            if (res.code == 200) {
+              this.qaCount = res.data.num;
+            } else {
+              this.$message.error(res.msg);
+            }
+          });
+        }
+        this.qaVisible = !this.qaVisible;
+      },
+      handleQASubmit() {
+        if (this.isQAEnabled) {
+          this.closeQA();
+        } else {
+          this.enableQA();
+        }
+      },
+      enableQA: debounce(flag => {
+        console.log(qaServer);
+        qaServer.qaEnable().then(res => {
+          console.log('开启问答', res);
+        });
+      }, 500),
+      // 设置可用状态
+      setDisableState(val) {
+        this.disable = val;
+      },
+      // 设置显示隐藏状态
+      setHiddenState(val) {
+        this.hidden = val;
+      },
       // 打开计时器设置弹框
       openTimer() {
+        if (this.disTimer) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+      },
+      // 更改禁用状态
+      changeStatus(data, status) {
+        // console.log(data, status, 'data, status');
+        this[data] = status;
+      },
+      // 打开抽奖弹窗
+      openLottery() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
       }
     }
   };
@@ -58,14 +145,16 @@
 <style lang="less">
   .vmp-interact-menu {
     position: relative;
+    justify-content: center;
+
     &-icon {
       display: flex;
       flex-direction: column;
       align-items: center;
       font-size: 12px;
-      color: #ececec;
       padding: 10px 0px;
       cursor: pointer;
+      color: #ececec;
       i {
         user-select: none;
         display: block;
@@ -78,8 +167,12 @@
       p {
         font-size: 12px;
       }
+      &:hover {
+        color: #fc5659;
+      }
     }
-    &-disable {
+
+    &.disable {
       i,
       p {
         color: #777777;

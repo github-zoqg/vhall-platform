@@ -27,7 +27,7 @@
 
     <footer class="vh-media-check-footer">
       <div class="vh-check-tip">
-        <span class="iconfont iconshexiangtou_icon icon-tip"></span>
+        <span class="vh-iconfont vh-line-video-camera icon-tip"></span>
         <span>您能看到摄像头画面吗？</span>
       </div>
       <div class="button-container">
@@ -87,9 +87,6 @@
       defaultSelected(cur) {
         this.setSelectedId(cur);
       }
-    },
-    mounted() {
-      this.setSelectedId(this.defaultSelected);
     },
     methods: {
       setSelectedId(id) {

@@ -34,7 +34,7 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE) // 路由base
+        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE_URL)
       }
     })
   ];
@@ -67,6 +67,21 @@ function getPlugins() {
       }),
       // 修改文件内容替换路由标记
       new ReplaceInFileWebpackPlugin([
+        // {
+        //   dir: `dist/${argv.project}/cloud/static`,
+        //   test: /\.js$/,
+        //   rules: [{
+        //     search: '@routerBase',
+        //     replace: `${process.env.VUE_APP_ROUTER_BASE}`
+        //   }]
+        // }, {
+        //   dir: `dist/${argv.project}/cloud/${argv.version}/static`,
+        //   test: /\.js$/,
+        //   rules: [{
+        //     search: '@routerBase',
+        //     replace: `${process.env.VUE_APP_ROUTER_BASE}/${argv.version}`
+        //   }]
+        // },
         {
           dir: `dist/${argv.project}`,
           test: /\.js$/,
@@ -106,7 +121,8 @@ const sharedConfig = {
       moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
-      vant: 'vant'
+      vant: 'vant',
+      lodash: '_'
     },
     // 插件
     plugins: getPlugins()
@@ -127,7 +143,8 @@ const sharedConfig = {
           resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
           dist: path.resolve('dist'),
           project: argv.project,
-          version: argv.version
+          version: argv.version,
+          routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
         })
       );
     }
@@ -163,7 +180,10 @@ const sharedConfig = {
     // 配置全局less变量
     'style-resources-loader': {
       preProcessor: 'less',
-      patterns: [resolve(`/src/${argv.project}/assets/styles/variables.less`)]
+      patterns: [
+        resolve(`/src/${argv.project}/assets/styles/variables.less`),
+        resolve(`/src/${argv.project}/assets/styles/mixins.less`)
+      ]
     }
   },
   // 设置是否在开发环境下每次保存代码时都启用eslint验证

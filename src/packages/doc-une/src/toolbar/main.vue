@@ -2,7 +2,7 @@
   <!-- 文档工具栏 -->
   <div class="vmp-doc-toolbar" :class="[{ 'is-watch': isWatch }]">
     <!-- 左: 选择文档等操作 -->
-    <div class="vmp-doc-toolbar__hd">
+    <div class="vmp-doc-toolbar__hd" v-show="hasDocPermission">
       <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}
       </div>
@@ -32,7 +32,7 @@
     </div>
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
-      <div class="vmp-doc-toolbar__brush">
+      <div class="vmp-doc-toolbar__brush" v-show="showBrushToolbar">
         <!-- 选择 -->
         <div
           class="vmp-icon-item"
@@ -69,7 +69,7 @@
           :class="{ selected: currentBrush === 'shape' }"
           @click="handleBoardTool('shape')"
         >
-          <i class="iconfont icontuxing"></i>
+          <i class="vh-iconfont vh-a-Rectangletool"></i>
           <vmp-shape-popup></vmp-shape-popup>
         </div>
         <!-- 文本 -->
@@ -137,7 +137,7 @@
   import VmpHighlighterPopup from './highlighter-popup.vue';
   import VmpShapePopup from './shape-popup.vue';
   import VmpTextPopup from './text-popup.vue';
-  import { useRoomBaseServer, useDocServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpDocToolbar',
     components: {
@@ -205,11 +205,24 @@
       },
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
+      },
+      // 是否有演示权限
+      hasDocPermission() {
+        return this.docServer.state.hasDocPermission;
+      },
+      // 是否显示画笔工具栏
+      showBrushToolbar() {
+        // 有文档演示权限, 主持端或者 观看端+有文档内容
+        return (
+          this.hasDocPermission && (!this.isWatch || (this.isWatch && this.currentType.length > 0))
+        );
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
+      this.msgServer = useMsgServer();
+      this.groupServer = useGroupServer();
     },
     methods: {
       /**
@@ -305,6 +318,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    z-index: 2;
 
     .vmp-doc-toolbar__hd {
       max-width: 250px;
@@ -464,7 +478,8 @@
 
     .vmp-doc-toolbar__hd {
       position: absolute;
-      display: none;
+      margin-left: 60px;
+      z-index: 1;
     }
     .choose-document {
       width: 90px;
@@ -484,7 +499,8 @@
       background: rgba(0, 0, 0, 0.6);
       border-radius: 20px;
       border: 1px solid #999;
-      display: none;
+      z-index: 1;
+      margin-left: 120px;
     }
 
     .vmp-icon-item {
@@ -500,7 +516,7 @@
       }
 
       .vmp-brush-popup {
-        top: 0;
+        top: 24px;
       }
     }
     .choose-document {

@@ -1,4 +1,5 @@
 /**
+import vm from '../../../src/packages/chat/src/js/Events';
  * Created by yangxy on 2022/01/07.
  * 自定义webpack插件
  * 因为项目编译后的文件需要按照我们约定的方式通过jenkens发布，这会导致 路由及部分资源 路径指向不正确。
@@ -10,8 +11,8 @@ const chalk = require('chalk');
 const walk = require('fs-walk');
 
 const PLUGIN_NAME = 'reorganizePlugin';
-const patternForStatic = /"\/static\//gi;
-const patternForRouter = /base:[\S\s]+?(",)/gi;
+const patternForStatic = /"\/static\//g;
+const patternForRouter = /base:[\S\s]+?(",)/g;
 
 class ReorganizeWebpackPlugin {
   constructor(options) {
@@ -27,13 +28,14 @@ class ReorganizeWebpackPlugin {
         '  Building for production...<i> ' +
           chalk.bold.green('[ReorganizePlugin] reorganize the all resource in dist dir')
       );
-      const { dist, project, version, resoucePrefix } = this.options;
-      // console.log(this.options);
+      const { dist, project, version, resoucePrefix, routerBase } = this.options;
+      console.log(this.options);
       // {
       //   resoucePrefix: '//t-alistatic01.e.vhall.com/common-static/saas-live',
       //   dist: '/Users/yangxinyuan/vhall/fork-middle-platform/dist',
       //   project: 'saas-live',
       //   version: '1.0.0'
+      //   routerBase: '/v3'
       // }
       const projectPath = path.join(dist, project);
       const dockerPath = path.join(projectPath, 'docker');
@@ -75,7 +77,7 @@ class ReorganizeWebpackPlugin {
           let content = fs.readFileSync(filePath, 'utf-8');
           content = content.replace(patternForStatic, '"../static/');
           if (basedir.indexOf(version) > -1) {
-            content = content.replace(patternForRouter, `base: "/middle/${version}",`);
+            content = content.replace(patternForRouter, `base: "${routerBase}/${version}",`);
           }
           fs.writeFileSync(filePath, content, 'utf-8');
         }

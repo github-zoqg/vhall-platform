@@ -29,13 +29,14 @@ import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpGroupDiscussion from '@/packages/group-discussion';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
-import VmpTabContainer from '@/packages/tab-container';
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
 import VmpRebroadcast from '@/packages/rebroadcast';
+import VmpRecommend from '@/packages/recommend';
+import VmpLotteryLive from '@/packages/lottery/live';
 
 // 全局注册组件
 export function initUse() {
@@ -64,7 +65,6 @@ export function initUse() {
   Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
   // Vue.use(VmpGroupSetting);
-  Vue.use(VmpTabContainer);
   Vue.use(VmpTabMenu);
   Vue.use(VmpCustomMenu);
   Vue.use(VmpPcMediaSetting);
@@ -73,6 +73,8 @@ export function initUse() {
   Vue.use(VmpLiveTimerSet);
   Vue.use(VmpLiveTimer);
   Vue.use(VmpRebroadcast);
+  Vue.use(VmpRecommend);
+  Vue.use(VmpLotteryLive);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

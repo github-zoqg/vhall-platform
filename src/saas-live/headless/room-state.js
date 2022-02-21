@@ -5,7 +5,8 @@ import {
   useInteractiveServer,
   useMicServer,
   useMediaCheckServer,
-  useGroupServer
+  useGroupServer,
+  useMediaSettingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -16,10 +17,12 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
   const groupServer = useGroupServer();
+  const micServer = useMicServer();
+  const mediaSettingServer = useMediaSettingServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
-    return 'isBrowserNotSuppport';
+    return 'isBrowserNotSupport';
   }
 
   if (!roomBaseServer) {
@@ -27,16 +30,19 @@ export default async function () {
   }
   console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
 
+  // 获取媒体许可，设置设备状态
+  mediaCheckServer.getMediaInputPermission();
+
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();
 
-  console.log('[group] start1');
-  // 如果当前正在进行分组讨论，初始化小组信息
-  if (roomBaseServer.state.interactToolStatus.is_open_switch === 1) {
-    console.log('[group] start2');
-    await groupServer.groupInit();
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
-  console.log('[group] start3');
+
+  micServer.init();
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
@@ -47,5 +53,20 @@ export default async function () {
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
 
+  mediaSettingServer.init();
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
   useMicServer();
+
+  // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
+  window.roomBaseServer = roomBaseServer;
+  window.docServer = docServer;
+  window.groupServer = groupServer;
+  window.micServer = micServer;
 }

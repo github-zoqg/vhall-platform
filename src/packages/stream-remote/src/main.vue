@@ -19,55 +19,44 @@
         :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic iconfont"
-        :class="stream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`"
+        class="vmp-stream-local__bootom-mic vh-iconfont"
+        :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
+
     <!-- 鼠标 hover 遮罩层 -->
-    <section class="vmp-stream-remote__shadow-box">
-      <p class="vmp-stream-remote__shadow-first-line">
+    <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
+      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
           {{ stream.attributes.roleName | roleNameFilter }}
         </span>
-        <el-tooltip
-          v-if="isShowVideoControl"
-          :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'"
-          placement="top"
-        >
+
+        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
             :class="
               stream.videoMuted
-                ? 'iconfont iconicon_shexiangtouguanbi'
-                : 'iconfont iconicon_shexiangtoukaiqi'
+                ? 'vh-iconfont vh-line-turn-off-video-camera'
+                : 'vh-iconfont vh-line-video-camera'
             "
           ></span>
         </el-tooltip>
-        <el-tooltip
-          v-if="isShowAudioControl"
-          :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'"
-          placement="top"
-        >
+
+        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont"
+            class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
             :class="
-              stream.audioMuted ? 'iconicon_maikefeng_of' : `iconicon_maikefeng_${audioLevel}`
+              stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
             "
-          ></span>
-        </el-tooltip>
-        <el-tooltip content="下麦" placement="bottom">
-          <span
-            class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
-            @click="speakOff"
-            v-if="stream.attributes.roleName != 1 && stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
       </p>
+
       <p class="vmp-stream-remote__shadow-second-line">
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
@@ -75,25 +64,92 @@
         >
           视图
         </span>
+
         <el-tooltip content="切换" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont iconicon_qiehuan"
-            v-if="!isFullScreen"
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-line-copy-document"
+            v-if="miniElement && !isFullScreen"
             @click="exchange"
           ></span>
         </el-tooltip>
-        <el-tooltip content="全屏" placement="bottom">
+
+        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont"
-            :class="{ iconicon_quanping: !isFullScreen, iconicon_quxiaoquanping: isFullScreen }"
+            class="vmp-stream-remote__shadow-icon vh-iconfont"
+            :class="{
+              'vh-line-amplification': !isFullScreen,
+              'vh-line-narrow': isFullScreen
+            }"
             @click="fullScreen"
           ></span>
         </el-tooltip>
+
         <el-tooltip content="下麦" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon iconfont iconicon_xiamai"
-            v-if="stream.attributes.roleName != 1"
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            v-if="joinInfo.role_name == 1 && stream.attributes.roleName != 20"
             @click="speakOff"
+          ></span>
+        </el-tooltip>
+      </p>
+    </section>
+
+    <section v-else class="vmp-stream-remote__shadow-box">
+      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
+        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+          <span
+            class="vmp-stream-remote__shadow-icon"
+            @click="handleClickMuteDevice('video')"
+            :class="
+              stream.videoMuted
+                ? 'vh-iconfont vh-line-turn-off-video-camera'
+                : 'vh-iconfont vh-line-video-camera'
+            "
+          ></span>
+        </el-tooltip>
+
+        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+          <span
+            class="vmp-stream-remote__shadow-icon vh-iconfont"
+            @click="handleClickMuteDevice('audio')"
+            :class="
+              stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
+            "
+          ></span>
+        </el-tooltip>
+
+        <el-tooltip content="下麦" placement="bottom">
+          <span
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            @click="speakOff"
+            v-if="joinInfo.role_name != 1 && stream.attributes.roleName != 20"
+          ></span>
+        </el-tooltip>
+      </p>
+
+      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-second-line">
+        <el-tooltip content="设为主画面" placement="bottom">
+          <span
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            v-show="stream.attributes.roleName == 4 || stream.attributes.roleName == 1"
+            @click="setOwner(stream.accountId)"
+          ></span>
+        </el-tooltip>
+
+        <!-- 设为主画面 -->
+        <el-tooltip content="设为主画面" placement="bottom">
+          <span
+            v-show="stream.attributes.roleName == 2 || stream.attributes.roleName == 20"
+            @click="setMainScreen()"
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+          ></span>
+        </el-tooltip>
+
+        <el-tooltip content="下麦" placement="bottom">
+          <span
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            @click="speakOff"
+            v-if="stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -102,7 +158,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -119,23 +175,14 @@
       }
     },
     computed: {
-      // 是否显示摄像头开关按钮
-      isShowVideoControl() {
-        // 如果当前人是主持人,并且是主屏,显示
-        // if (this.joinInfo.role_name == 1 && this.mainScreen == this.joinInfo.third_party_user_id) {
-        //   return true
-        // } else
-        return true;
-      },
-      // 是否显示麦克风开关按钮
-      isShowAudioControl() {
-        return true;
-      },
       mainScreen() {
-        return this.$domainStore.state.interactiveServer.mainScreen;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      miniElement() {
+        return this.$domainStore.state.roomBaseServer.miniElement;
       }
     },
     filters: {
@@ -152,6 +199,7 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.micServer = useMicServer();
     },
     mounted() {
       this.subscribeRemoteStream();
@@ -199,7 +247,11 @@
           receive_account_id: this.stream.accountId
         });
       },
-      speakOff() {},
+      speakOff() {
+        this.micServer.speakOff({
+          receive_account_id: this.stream.accountId
+        });
+      },
       fullScreen() {
         this.interactiveServer.setStreamFullscreen({
           streamId: this.stream.streamId,
@@ -239,6 +291,48 @@
               this.networkStatus = 0;
             });
         }, 2000);
+      },
+
+      /**
+       * 设置主讲人
+       * @param {Number | String} accountId 用户ID
+       * @Function void()
+       */
+      setOwner(accountId, setMainScreen = true) {
+        // if (accountId) {
+        //   const streamInfo = this.getDesktopAndIntercutInfo();
+        //   const users = streamInfo.remoteUsers.concat(streamInfo.localUser);
+        //   const mainScreenUser = users.find(u => u.accountId == accountId) || { streams: [] };
+        //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
+        //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
+        // }
+        if (setMainScreen) {
+          this.setMainScreen();
+        }
+        this.interactiveServer
+          .setSpeaker({
+            receive_account_id: accountId || this.joinInfo.third_party_user_id
+          })
+          .then(res => {
+            console.log('setSpeaker success ::', res);
+          })
+          .catch(err => {
+            console.error('setSpeaker failed ::', err);
+          });
+      },
+
+      //  设为主画面
+      setMainScreen() {
+        this.interactiveServer
+          .setMainScreen({
+            receive_account_id: this.joinInfo.third_party_user_id
+          })
+          .then(res => {
+            console.log('setmainscreen success ::', res);
+          })
+          .catch(err => {
+            console.error('setmainscreen failed ::', err);
+          });
       }
     }
   };

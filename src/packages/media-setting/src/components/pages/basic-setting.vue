@@ -54,7 +54,7 @@
 
     <footer>
       <section class="vmp-media-setting-tips">
-        <section class="vmp-media-setting-tips__title">提示：</section>
+        <section class="vmp-media-setting-tips__title">{{ $t('account.account_1061') }}：</section>
         <section class="vmp-media-setting-tips__content">
           <p>1.PPT静态演示：适用于桌面共享时演示文档、图片等静态内容</p>
           <p>2.视频动态演示：适用于演示视频等多动画内容</p>
@@ -132,19 +132,15 @@
       },
       formatDefinitionLabel(label) {
         const map = getDefinitionMap();
-        return map.get(label);
+        return this.$t(map.get(label));
       },
       rateChange(selected) {
-        let text = '';
-        let payload = {};
+        let isRateChangeToHD = false;
 
         if (selected === 'RTC_VIDEO_PROFILE_720P_16x9_M') {
-          text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
-        } else {
-          text = '修改设置后会导致重新推流，是否继续保存？';
+          isRateChangeToHD = true;
         }
-
-        this.$emit('showConfirm', text, payload);
+        this.$emit('rateChangeToHD', isRateChangeToHD);
       }
     }
   };

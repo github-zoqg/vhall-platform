@@ -6,26 +6,26 @@
     custom-class="vmp-auto-setting-modal"
   >
     <div class="auto-chat-main">
-      <p>
-        <span class="switch-title">聊天严禁词：</span>
-        <el-switch
-          v-model="enableFilter"
-          inactive-color="#ccc"
-          :width="32"
-          active-color="#FFD021"
-        ></el-switch>
-        <span class="switch-title">
-          {{ enableFilter ? '已开启' : '已关闭' }}，包含严禁词的聊天将被自动阻止
-        </span>
-      </p>
-      <p>
-        <el-input
-          type="textarea"
-          :rows="4"
-          placeholder="输入禁止在本场聊天中出现的严禁词，逗号隔开，固定宽度换行"
-          v-model="filterWords"
-        ></el-input>
-      </p>
+      <!--      <p>-->
+      <!--        <span class="switch-title">聊天严禁词：</span>-->
+      <!--        <el-switch-->
+      <!--          v-model="enableFilter"-->
+      <!--          inactive-color="#ccc"-->
+      <!--          :width="32"-->
+      <!--          active-color="#FFD021"-->
+      <!--        ></el-switch>-->
+      <!--        <span class="switch-title">-->
+      <!--          {{ enableFilter ? '已开启' : '已关闭' }}，包含严禁词的聊天将被自动阻止-->
+      <!--        </span>-->
+      <!--      </p>-->
+      <!--      <p>-->
+      <!--        <el-input-->
+      <!--          type="textarea"-->
+      <!--          :rows="4"-->
+      <!--          placeholder="输入禁止在本场聊天中出现的严禁词，逗号隔开，固定宽度换行"-->
+      <!--          v-model="filterWords"-->
+      <!--        ></el-input>-->
+      <!--      </p>-->
       <!--<p>-->
       <!--<button class="default-button s-button" @click="saveChatWords">保存严禁词</button> 添加后实时生效-->
       <!--</p>-->
@@ -76,8 +76,10 @@
     },
     methods: {
       //打开模态窗
-      openModal() {
+      openModal(params = {}) {
         this.resetData();
+        const { enableAutoHandle = '1' } = params;
+        this.enableAutoHandle = enableAutoHandle;
         this.visible = true;
       },
       //重置模态窗数据
@@ -92,6 +94,7 @@
       },
       //保存
       handleConfirm() {
+        this.$emit('confirm', { switch_options: this.enableAutoHandle });
         this.handleClose();
       }
     }
@@ -106,7 +109,7 @@
       padding: 0 20px;
       line-height: 40px;
       border-radius: 4px 4px 0 0;
-      background-color: #ffd021;
+      background-color: #fc5659;
     }
     .el-dialog__title {
       font-size: 16px;

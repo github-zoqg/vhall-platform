@@ -18,11 +18,8 @@
     },
     data() {
       return {
-        isShow: true
+        isShow: false
       };
-    },
-    created() {
-      window.rebroadcast = this;
     },
     methods: {
       showRebroadcast() {

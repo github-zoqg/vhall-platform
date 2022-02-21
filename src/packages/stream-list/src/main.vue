@@ -46,7 +46,7 @@
 
     computed: {
       mainScreen() {
-        return this.$domainStore.state.interactiveServer.mainScreen;
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
       remoteStreams() {
         console.log(
@@ -88,7 +88,14 @@
         }
       }
     },
-
+    watch: {
+      isStreamListH0: {
+        handler(newval) {
+          this.interactiveServer.setStreamListHeightInWatch(newval ? 0 : 80);
+        },
+        immediate: true
+      }
+    },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
     },
@@ -100,7 +107,7 @@
         this.childrenCom,
         this.$domainStore.state.interactiveServer.remoteStreams
       );
-      this.getStreamList();
+      // this.getStreamList();
     },
 
     mounted() {},

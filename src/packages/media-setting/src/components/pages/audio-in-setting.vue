@@ -22,13 +22,13 @@
     <footer>
       <section class="vmp-media-setting-tips">
         <section class="vmp-media-setting-tips__title">
-          <p>对着麦克风讲话，看不到音量条波动？</p>
-          <p>试试以下方法：</p>
+          <p>{{ $t('setting.setting_1018') }}</p>
+          <p>{{ $t('setting.setting_1019') }}：</p>
         </section>
         <section class="vmp-media-setting-tips__content">
-          <p>1. 请允许浏览器使用麦克风权限</p>
-          <p>2. 确认麦克风没有被其他程序占用</p>
-          <p>3. 选择外置麦克风或者更换电脑</p>
+          <p>1. {{ $t('setting.setting_1020') }}</p>
+          <p>2. {{ $t('setting.setting_1021') }}</p>
+          <p>3. {{ $t('setting.setting_1022') }}</p>
         </section>
       </section>
     </footer>

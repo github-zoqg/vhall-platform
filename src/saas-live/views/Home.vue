@@ -17,7 +17,7 @@
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
-  import { Domain, useMicServer, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
@@ -38,6 +38,7 @@
         const roomBaseServer = useRoomBaseServer();
         domain.initVhallReport(
           {
+            bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
             t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -65,11 +66,10 @@
         });
         const res = await roomState();
         // 如果浏览器不支持
-        if (res === 'isBrowserNotSuppport') {
+        if (res === 'isBrowserNotSupport') {
           this.state = 3;
           return;
         }
-        window.roomBaseServer = roomBaseServer;
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
       } catch (ex) {
@@ -78,27 +78,6 @@
         this.state = 2;
         this.errMsg = ex.msg;
       }
-      this.micServer = useMicServer();
-      // FIXME:测试连麦代码，由于成员列表尚未接入，成员接入后删除
-      this.micServer.$on('vrtc_connect_apply', msg => {
-        console.log('----dingxiaodong----收到申请上麦消息', msg);
-        this.$confirm(`${msg.data.nick_name}申请上麦`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        })
-          .then(() => {
-            this.micServer.hostAgreeApply({
-              receive_account_id: msg.data.room_join_id
-            });
-          })
-          .catch(() => {
-            this.micServer.hostRejectApply({
-              receive_account_id: msg.data.room_join_id
-            });
-          });
-      });
     },
     methods: {
       // 初始化直播房间

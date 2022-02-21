@@ -29,7 +29,7 @@
             v-if="userInfo.role_name == 1 || userInfo.role_name == 4"
             @click="openMediaSettings"
           >
-            <i class="iconfont iconmeitishezhi"></i>
+            <i class="vh-iconfont vh-line-setting"></i>
             <p>媒体设置</p>
           </div>
           <div
@@ -38,7 +38,7 @@
             v-if="isSupportSplitScreen"
             @click="splitScreen"
           >
-            <i class="iconfont iconfenpingmoshi"></i>
+            <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
             <p>{{ splitStatus == 2 ? '分屏' : '关闭分屏' }}</p>
           </div>
           <!-- <div
@@ -54,7 +54,7 @@
             v-if="webinarInfo.no_delay_webinar == 0 && isThirtPushStream && !thirtPushStreamimg"
             @click="thirdPartyShow"
           >
-            <i class="iconfont iconxuniguanzhong"></i>
+            <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
             <p>第三方发起</p>
           </div>
           <div
@@ -62,16 +62,16 @@
             @click="thirdPartyClose"
             v-if="isThirtPushStream && thirtPushStreamimg"
           >
-            <i class="iconfont iconxuniguanzhong"></i>
+            <i class="vh-saas-iconfont vh-saas-a-color-webpageinitiate1"></i>
             <p>网页发起</p>
           </div>
           <div
             class="header-right_control_wrap-container-setting"
             v-if="webinarInfo.mode != 6"
             @click="openVirtualAudience"
-            :class="{ 'header-right_control_wrap-container-disabled': !virtualAudienceCanUse }"
+            :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
           >
-            <i class="iconfont iconxuniguanzhong"></i>
+            <i class="vh-saas-iconfont vh-saas-a-line-dissolutiongrouping"></i>
             <p>虚拟人数</p>
           </div>
         </div>
@@ -94,30 +94,29 @@
       isShowSupport: {
         default: false,
         type: Boolean
-      },
-      isShowSplitScreen: {
-        default: false,
-        type: Boolean
       }
     },
     computed: {
       isSupportSplitScreen() {
         return (
           (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
-          this.webinarInfo.mode != 6
+          this.webinarInfo.mode != 6 &&
+          this.webinarInfo.mode != 1
         );
+      },
+      isLiving() {
+        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
+        return this.webinarInfo.type == 1;
       }
     },
     data() {
       return {
         roomBaseState: null,
-        virtualAudienceCanUse: false, //虚拟人数是否可以使用，只有直播的时候可以使用
         isThirtPushStream: false, // 是否支持第三方推流
         thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
         webinarInfo: {}, //活动下信息
         splitStatus: 2, //分屏状态
-        isLiving: false, //是否正在直播
         roleMap: {
           1: '主持人',
           2: '观众',
@@ -131,9 +130,6 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.userInfo = this.roomBaseState.watchInitData.join_info;
       this.webinarInfo = this.roomBaseState.watchInitData.webinar;
-      if (this.webinarInfo.type == 1) {
-        this.virtualAudienceCanUse = true;
-      }
       if (this.webinarInfo.mode == 2) {
         this.isThirtPushStream = true;
       }
@@ -157,9 +153,21 @@
       },
       thirdPartyShow() {
         // 第三方发起
+        if (this.isLiving) {
+          this.$message.warning('请先结束直播');
+          return;
+        }
+        this.$emit('thirdPushStream', true);
+        this.thirtPushStreamimg = true;
       },
       thirdPartyClose() {
         // 网页发起 第三方发起关闭
+        if (this.isLiving) {
+          this.$message.warning('请先结束直播');
+          return;
+        }
+        this.$emit('thirdPushStream', false);
+        this.thirtPushStreamimg = false;
       },
       openVirtualAudience() {
         // 虚拟人数弹窗
@@ -255,9 +263,9 @@
             width: 34px;
             height: 34px;
             font-size: 19px;
-            color: @font-error-low;
+            color: #888;
+            border: 1px solid #888;
             line-height: 34px;
-            border: 1px solid @font-error-low;
             border-radius: 50%;
           }
           .iconfenpingmoshi {

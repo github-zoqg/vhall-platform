@@ -30,13 +30,13 @@ const playerMixins = {
       //  直播开始
       this.playerServer.$on(VhallPlayer.PLAY, () => {
         // 监听播放状态
-        this.isLiving = true;
+        this.isPlayering = true;
         this.isShowPoster = false;
         console.warn('PLAY');
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态
-        this.isLiving = false;
+        this.isPlayering = false;
         console.warn('PAUSE');
       });
       // 视频清晰度发生改变----卡顿切换清晰度时触发
@@ -61,9 +61,33 @@ const playerMixins = {
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('播放完毕');
+        this.isVodEnd = true;
         this.isShowPoster = true;
-        this.$emit('BackEnd', true); // 暖场视频需要参数
       });
+      // 打开弹幕
+      this.playerServer.$on('push_barrage', data => {
+        if (!this.danmuIsOpen) return;
+        this.addBarrage(data);
+      });
+
+      // 结束直播
+      this.playerServer.$on('live_over', data => {
+        console.log(data);
+        this.isLivingEnd = true;
+      });
+    },
+    /**
+     * 发送弹幕
+     */
+    addBarrage(text) {
+      try {
+        this.playerServer &&
+          this.playerServer.addBarrage(text, e => {
+            console.log(e, '添加弹幕失败');
+          });
+      } catch (e) {
+        console.log(e);
+      }
     },
     // 设置默认视频清晰度
     setDefaultQuality() {
@@ -169,7 +193,7 @@ const playerMixins = {
       }
     },
     initSlider() {
-      this.playerServer.on(window.VhallPlayer.TIMEUPDATE, () => {
+      this.playerServer.$on(window.VhallPlayer.TIMEUPDATE, () => {
         this.currentTime = this.playerServer.getCurrentTime(() => {
           console.log('获取当前视频播放时间失败----------');
         });
@@ -177,54 +201,6 @@ const playerMixins = {
         // 派发播放器时间更新事件，通知章节当前播放的时间节点
         // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, this.currentTime);
       });
-      // 拖拽显示时间
-      const dom = this.$refs.controllerRef.$el;
-      const button = document.querySelector(
-        '.vmp-player-controller-slider .el-slider__button-wrapper'
-      );
-      const initDom = () => {
-        dom.onmouseover = e => {
-          console.log('dom over', e);
-          this.TimesShow = true;
-          const totalWidth = dom.offsetWidth;
-          this.ContorlWidth = dom.offsetWidth;
-          const lef = e.layerX;
-          this.hoverTime = (lef / totalWidth) * this.totalTime;
-          this.hoverLeft = lef;
-          dom.onmousemove = event => {
-            const lef = event.layerX;
-            this.hoverTime = (lef / totalWidth) * this.totalTime;
-            this.hoverLeft = lef;
-          };
-        };
-        // eslint-disable-next-line no-unused-vars
-        dom.onmouseout = e => {
-          this.TimesShow = false;
-        };
-      };
-      initDom();
-      // eslint-disable-next-line no-unused-vars
-      button.onmousedown = e => {
-        dom.onmouseout = dom.onmousemove = dom.onmousemove = dom.onmouseover = null;
-        this.ContorlWidth = dom.offsetWidth;
-        this.onmousedownControl = true;
-        this.pause();
-        // eslint-disable-next-line no-unused-vars
-        document.onmousemove = e => {
-          this.TimesShow = true;
-        };
-        // eslint-disable-next-line no-unused-vars
-        document.onmouseup = e => {
-          document.onmousemove = null;
-          this.onmousedownControl = false;
-          this.TimesShow = false;
-          initDom();
-        };
-      };
-      button.onmouseover = e => {
-        this.TimesShow = false;
-        e.stopPropagation();
-      };
     },
     // 设置播放时间
     setVideoCurrentTime(val) {
@@ -280,6 +256,55 @@ const playerMixins = {
         this.isSetSpeed = false;
         this.isSetQuality = false;
       }, 2000);
+    },
+    setTime() {
+      // 拖拽显示时间
+      // const dom = this.$refs.controllerRef.$el;
+      const dom = document.querySelector('.slider_controller');
+      const button = document.querySelector('.controller_slider .el-slider__button-wrapper');
+      const initDom = () => {
+        dom.onmouseover = e => {
+          console.log('dom over', e);
+          this.TimesShow = true;
+          const totalWidth = dom.offsetWidth;
+          this.ContorlWidth = dom.offsetWidth;
+          const lef = e.layerX;
+          this.hoverTime = (lef / totalWidth) * this.totalTime;
+          this.hoverLeft = lef;
+          dom.onmousemove = event => {
+            const lef = event.layerX;
+            this.hoverTime = (lef / totalWidth) * this.totalTime;
+            this.hoverLeft = lef;
+          };
+        };
+        // eslint-disable-next-line no-unused-vars
+        dom.onmouseout = e => {
+          this.TimesShow = false;
+        };
+      };
+      initDom();
+      // eslint-disable-next-line no-unused-vars
+      button.onmousedown = e => {
+        dom.onmouseout = dom.onmousemove = dom.onmousemove = dom.onmouseover = null;
+        this.ContorlWidth = dom.offsetWidth;
+        this.onmousedownControl = true;
+        this.pause();
+        // eslint-disable-next-line no-unused-vars
+        document.onmousemove = e => {
+          this.TimesShow = true;
+        };
+        // eslint-disable-next-line no-unused-vars
+        document.onmouseup = e => {
+          document.onmousemove = null;
+          this.onmousedownControl = false;
+          this.TimesShow = false;
+          initDom();
+        };
+      };
+      button.onmouseover = e => {
+        this.TimesShow = false;
+        e.stopPropagation();
+      };
     },
     formatQualityText(val) {
       let text;

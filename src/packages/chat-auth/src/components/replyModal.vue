@@ -2,8 +2,9 @@
   <el-dialog
     :title="title"
     :visible.sync="visible"
-    width="500px"
+    width="480px"
     custom-class="vmp-reply-modal"
+    :close-on-click-modal="false"
     append-to-body
   >
     <div class="vmp-reply-modal__main">
@@ -34,21 +35,30 @@
         //模态窗是否可见
         visible: false,
         //回复的信息
-        replyText: ''
+        replyText: '',
+        //被处理的消息信息
+        messageInfo: null
       };
     },
     methods: {
       //打开模态窗
-      openModal() {
+      openModal(info = {}) {
+        this.resetData();
+        this.messageInfo = info;
         this.visible = true;
       },
       //重置模态窗视图信息
       resetData() {
         this.replyText = '';
+        this.messageInfo = null;
       },
       //处理确定
       handleConfirm() {
-        //todo 待完善domain后接入
+        if (this.replyText === '') {
+          return this.$message.error('回复内容不能为空');
+        }
+        this.$emit('confirm', { messageInfo: this.messageInfo, replyText: this.replyText });
+        this.handleClose();
       },
       //关闭模态窗
       handleClose() {
@@ -61,6 +71,9 @@
 <style lang="less">
   .vmp-reply-modal {
     .vmp-reply-modal__main {
+      .el-textarea__inner {
+        padding: 10px;
+      }
     }
   }
 </style>

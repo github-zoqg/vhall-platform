@@ -19,19 +19,19 @@
           <img class="picture-uploader-img" :src="canvasImgUrl" alt="" />
           <p class="picture-uploader-controller-panel">
             <span class="icon-wrap-con icon-wrap-change" :class="{ 'icon-wrap-only': !showDelImg }">
-              <i class="iconfont iconshuaxin"></i>
-              更换
+              <i class="vh-iconfont vh-line-refresh-right"></i>
+              {{ $t('account.account_1004') }}
             </span>
             <span class="icon-wrap-con icon-wrap-del" @click.stop="onRemove" v-show="showDelImg">
-              <i class="iconfont iconqingkong"></i>
-              删除
+              <i class="vh-iconfont vh-line-delete"></i>
+              {{ $t('setting.setting_1015') }}
             </span>
           </p>
         </div>
         <i v-else class="el-icon-plus picture-uploader-icon"></i>
       </el-upload>
 
-      <p class="vmp-picture-uploader-tips">建议尺寸：1280*720px，小于2MB，支持jpg、png</p>
+      <p class="vmp-picture-uploader-tips">{{ $t('setting.setting_1016') }}</p>
     </section>
   </section>
 </template>
@@ -70,7 +70,7 @@
           this.$message.warning('上传图片只能是 JPG、PNG 格式!');
         }
         if (!isLt2M) {
-          this.$message.warning('上传图片大小不能超过 2MB!');
+          this.$message.warning(this.$t('other.other_1004'));
         }
         return isJPG && isLt2M;
       },

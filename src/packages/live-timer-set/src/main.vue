@@ -31,7 +31,7 @@
           <el-col class="margin10 bg000 ft42 pr font_zdy">
             <div class="border4 ps"></div>
             <span class="close ps" @click="onClose">
-              <i class="iconfont iconguanbi"></i>
+              <i class="vh-iconfont vh-line-close"></i>
             </span>
             <div class="margin5 timerbg">
               <el-input
@@ -153,13 +153,11 @@
 </template>
 
 <script>
-  import { useLiveTimerServer, useMsgServer } from 'middle-domain';
+  import { useTimerServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',
     data() {
-      let liveTimerServer = useLiveTimerServer();
       return {
-        liveTimerServer,
         form: {
           is_all_show: false,
           is_timeout: false
@@ -172,38 +170,26 @@
       };
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.timerServer = useTimerServer();
     },
     mounted() {
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
+      this.timerServer.listenMsg();
+      // 计时器开始
+      this.timerServer.$on('timer_start', temp => {
         console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 计时器开始
-          case 'timer_start':
-            this.timerVisible = false;
-            break;
-          // 计时器结束
-          case 'timer_end':
-            console.warn('监听到了计时器结束-------');
-            this.form = {
-              is_all_show: false,
-              is_timeout: false
-            };
-            this.sec = 0;
-            this.ten_sec = 0;
-            this.mon = 0;
-            this.ten_mon = 0;
-            break;
-          default:
-            break;
-        }
+        this.timerVisible = false;
+      });
+      // 计时器结束
+      this.timerServer.$on('timer_end', temp => {
+        console.warn('监听到了计时器结束-------');
+        this.form = {
+          is_all_show: false,
+          is_timeout: false
+        };
+        this.sec = 0;
+        this.ten_sec = 0;
+        this.mon = 0;
+        this.ten_mon = 0;
       });
     },
     methods: {
@@ -228,7 +214,7 @@
           is_timeout: this.form.is_timeout,
           is_all_show: this.form.is_all_show
         });
-        this.liveTimerServer
+        this.timerServer
           .timerCreate({
             duration: time,
             is_all_show: this.form.is_all_show ? 1 : 0,

@@ -175,7 +175,7 @@
       this.roleName = this.roomBaseState.watchInitData.join_info.role_name;
     },
     mounted() {
-      this.msgServer.$on('live_start', msg => {
+      this.msgServer.$onMsg('live_start', msg => {
         //  1主持人 2观众 3助理 4嘉宾
         if (this.roleName == 3 && !this.assistantType) {
           if (msg.data.switch_type != 1) {
@@ -191,22 +191,18 @@
           }
         }
       });
-      // this.msgServer.$on('ROOM_MSG', msg => {
-      //   let msgs = JSON.parse(msg.data);
-      //   if (msgs.type == 'live_start') {
-      //   }
-      // });
     },
     methods: {
       openInserVideoDialog() {
+        console.log('??13243544');
         // 检查是否可以插播文件
-        this.checkCaptureStream();
-        // this.insertVideoVisible = true;
+        // this.checkCaptureStream();
+        this.insertVideoVisible = true;
         this.getTableList(false, true);
       },
       checkCaptureStream() {
         //是否是网页端发起的直播  助理其他端不支持插播 、并且是正在直播
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseState.state;
         if (!this.isPcStartLive && watchInitData.webinar.type == 1) {
           this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
             title: '提示',
@@ -218,7 +214,7 @@
           });
           return;
         }
-        const thirdId = this.watchInitData.join_info.third_party_user_id;
+        const thirdId = watchInitData.join_info.third_party_user_id;
         const user = this.insertVideoObj.userInfo;
         if (
           this.roleName == 3 &&
