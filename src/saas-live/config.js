@@ -484,8 +484,9 @@ export const serverConfig = {
     component: 'VmpPcMediaSetting',
     saveOptions: [
       {
-        cuid: 'VmpStreamLocal',
-        method: 'switchStreamType'
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
       }
     ]
   },
