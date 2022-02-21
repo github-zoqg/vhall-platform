@@ -1,7 +1,7 @@
-import VmpWapBody from './src/main.vue';
+import VmpPcRewardEffect from './src/main.vue';
 
-VmpWapBody.install = function (Vue) {
-  Vue.component(VmpWapBody.name, VmpWapBody);
+VmpPcRewardEffect.install = function (Vue) {
+  Vue.component(VmpPcRewardEffect.name, VmpPcRewardEffect);
 };
 
-export default VmpWapBody;
+export default VmpPcRewardEffect;
