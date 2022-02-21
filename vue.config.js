@@ -138,28 +138,20 @@ const sharedConfig = {
     }
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
       // 编译结束后重新组织编译结果
-      config.plugin('reorganize').use(
-        new ReorganizePlugin({
-          resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
-          dist: path.resolve('dist'),
-          project: argv.project,
-          version: argv.version,
-          routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-        })
-      );
+      //
     }
-    // config.module
-    //   .rule('images')
-    //   .test(/\.(jpg|png|gif)$/)
-    //   .use('url-loader')
-    //   .loader('url-loader')
-    //   .options({
-    //     limit: 10,
-    //     publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
-    //     outputPath: 'img',
-    //     name: '[name].[ext]'
-    //   })
-    //   .end();
+    config.module
+      .rule('images')
+      .test(/\.(jpg|png|gif)$/)
+      .use('url-loader')
+      .loader('url-loader')
+      .options({
+        limit: 10,
+        publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
+        outputPath: '/static/img',
+        name: '[name].[hash:8].[ext]'
+      })
+      .end();
   },
   // 向 CSS 相关的 loader 传递选项
   // 可支持 css\postcss\sass\less\stylus-loader
