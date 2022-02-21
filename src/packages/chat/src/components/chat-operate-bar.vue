@@ -111,8 +111,6 @@
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
-  import { useRoomBaseServer } from 'middle-domain';
-  import { bold } from 'chalk';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -177,9 +175,7 @@
       }
     },
     data() {
-      const roomBaseState = useRoomBaseServer().state;
       return {
-        roomBaseState,
         //显示观众的过滤设置
         isFilterShow: false,
         //过滤状态集合
@@ -195,10 +191,7 @@
         assistantType: this.$route.query.assistantType
       };
     },
-    mounted() {
-      //todo 暂时写死
-      this.chatFilterUrl = [location.origin, `/lives/chat-auth/${this.webinarId}`].join('');
-    },
+    mounted() {},
     methods: {
       //切换全体禁言开关状态
       toggleMutedAllStatus() {
@@ -206,7 +199,9 @@
       },
       //进入聊天审核
       joinChatAuth() {
-        window.open(this.chatFilterUrl, '_blank');
+        //todo 暂时写死
+        const url = [location.origin, `/lives/chat-auth/${this.webinarId}`].join('');
+        window.open(url, '_blank');
       },
       //切换表情模态窗展示
       toggleEmoji() {
