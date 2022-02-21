@@ -1,4 +1,5 @@
 import { useGiftsServer, useRoomBaseServer } from 'middle-domain';
+import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 // import { mapState, mapMutations } from 'vuex';
 export default {
   name: 'VhGifts',
@@ -29,6 +30,9 @@ export default {
     },
     showGiftCount: {
       type: Number
+    },
+    cuid: {
+      require: true
     }
   },
   beforeDestroy() {
@@ -117,24 +121,32 @@ export default {
     sendGift() {
       // this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_GIFT_SEND, this.giftInfo);
       // this.setDialogZIndexQueue('giftPay');
+      // 未登录且礼物金额不为0
+      if (this.giftInfo.price != 0 && this.watchInitData.join_info.user_id == 0) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+        return;
+      }
       this.giftsServer
-        .sendGift({
-          gift_id: this.giftInfo.id,
-          channel: 'WEIXIN',
-          service_code: 'QR_PAY', //TODO:两种支付方式 - 'ALIPAY'
-          room_id: this.watchInitData.interact.room_id
-        })
+        .sendGift(
+          {
+            gift_id: this.giftInfo.id,
+            channel: 'WEIXIN',
+            service_code: 'QR_PAY', //TODO:两种支付方式 - 'ALIPAY'
+            room_id: this.watchInitData.interact.room_id
+          },
+          this.giftInfo
+        )
         .then(res => {
           if (res.code == 200 && res.data) {
             if (this.giftInfo.price == 0) {
-              this.showGift = false;
+              this.$emit('changeShowGift', 'showGift', false);
               return;
             }
+            this.$emit('changeShowGift', 'showGift', false);
             const link = encodeURIComponent(res.data.data.pay_data.qr_code);
             const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
             this.wxQr = img;
             this.showPay = true;
-            this.showGift = false;
           }
         })
         .catch(e => {

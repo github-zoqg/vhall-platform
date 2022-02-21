@@ -199,7 +199,7 @@
       font-size: 12px;
       color: @font-error-low;
       border: solid 1px @border-tools-color;
-      z-index: 1;
+      // z-index: 1;
       white-space: nowrap;
     }
     &-bubble {
