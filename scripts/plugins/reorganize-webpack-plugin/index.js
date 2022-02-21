@@ -57,7 +57,6 @@ class ReorganizeWebpackPlugin {
             // 写入docker目录
             let content1 = content.replace(patternForStatic, `"${resoucePrefix}static/`);
             fs.writeFileSync(path.join(dockerPath, filename), content1, 'utf-8');
-
             // 写入docker/${version}目录
             let content2 = content.replace(patternForStatic, `"${resoucePrefix}${version}/static/`);
             fs.writeFileSync(path.join(dockerPath, version, filename), content2, 'utf-8');
