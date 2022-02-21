@@ -232,101 +232,32 @@
         } else {
           this.isShowUser = false;
         }
-        this.vantFaildPlacer =
-          this.currentTab == 'private'
-            ? this.$t('chat.chat_1045')
-            : this.currentTab == 'qa'
-            ? this.$t('chat.chat_1066')
-            : this.$t('chat.chat_1042');
       },
       // eventBus监听
       eventListener() {
         // 直播结束不展示入口
-        EventBus.$on('live_over', e => {
+        this.msgServer.$on('live_over', e => {
           console.log(e);
           this.connectMicShow = false;
         });
         // 接收开启连麦消息事件
-        EventBus.$on('vrtc_connect_open', msg => {
-          console.log(9999999, msg);
+        this.msgServer.$on('vrtc_connect_open', msg => {
+          console.log(msg);
           this.connectMicShow = true;
         });
-        // 全员禁言
-        EventBus.$on('disable_all', val => {
-          console.log(val);
-          this.disabledAll = true;
-        });
-        // 全员取消禁言
-        EventBus.$on('permit_all', val => {
-          console.log(val);
-          this.disabledAll = false;
-        });
+
         // 接收关闭连麦消息事件
-        EventBus.$on('vrtc_connect_close', msg => {
+        this.msgServer.$on('vrtc_connect_close', msg => {
           console.log(msg);
           this.connectMicShow = false;
         });
-        // EventBus.$on('vrtc_connect_success', (msg) => {
-        //   this.connectMicShow = true;
-        // });
 
         EventBus.$on('refreshSendBox', () => {
           this.$forceUpdate();
         });
-        EventBus.$on('sendMsg', (inputValue, showTabType) => {
-          if (showTabType == 'qa') {
-            this.canSend = false;
-            this.timmer = window.setInterval(() => {
-              this.time--;
-              if (this.time == 0) {
-                this.time = 15;
-                window.clearInterval(this.timmer);
-                this.canSend = true;
-              }
-            }, 1000);
-          } else if (showTabType == 3 || showTabType == 4) {
-            // 按在线人数 计算- 发送聊天的延时
-            this.waitTime = this.delayTime(this.localRoomInfo.OnlineNum, 1);
-            if (this.waitTime <= 0) {
-              this.waitTimeFlag = true;
-            } else {
-              this.waitTimeFlag = false;
-            }
-            this.waitTimeSet = window.setInterval(() => {
-              if (this.waitTime <= 1) {
-                this.waitTime = 1;
-                window.clearInterval(this.waitTimeSet);
-                this.waitTimeFlag = true;
-              }
-              this.waitTime--;
-            }, 1000);
-          }
-        });
-        EventBus.$on('blurEmojie', msg => {
-          console.log(msg);
-          if (this.showEmojiArr) {
-            this.showEmojiArr = false;
-          }
-        });
-        EventBus.$on('closeIcon', () => {
-          if (this.showEmojiArr) {
-            this.showEmojiArr = false;
-          }
-        });
-        EventBus.$on('zIndexShowFalse', value => {
-          /* 同下面  无使用祖先元素   先让其元素进行层级修改后根据真实状况再次修改 */
-          this.$refs.indexUpdate.style.zIndex = '21';
-          console.log(value);
-        });
-        EventBus.$on('zIndexShow', value => {
-          if (value) {
-            this.$refs.indexUpdate.style.zIndex = '21';
-          } else {
-            this.$refs.indexUpdate.style.zIndex = '22';
-          }
-        });
+
         // 头像更新
-        EventBus.$on('CHAT_AVATAR_CHANGE', avatar => {
+        this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
           this.avatar = avatar;
         });
       },
