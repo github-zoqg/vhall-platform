@@ -39,6 +39,8 @@
       docStatusStr() {
         if (this.docStatus === 'uploading') {
           return '上传中';
+        } else if (this.docStatus === 'uploadfailed') {
+          return '上传失败';
         } else if (this.docStatus === 'transwait') {
           return '等待转码';
         } else if (this.docStatus === 'transdoing') {
@@ -70,6 +72,11 @@
       }
       &.transfailed:after {
         background-color: red;
+      }
+
+      &.uploadfailed,
+      &.transfailed {
+        color: red;
       }
     }
   }
