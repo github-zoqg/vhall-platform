@@ -212,6 +212,10 @@
       }
     },
     methods: {
+      // 媒体切换后进行无缝切换
+      switchStreamType() {
+        console.warn('切换设置后进行的无缝切换');
+      },
       sleep(time = 1000) {
         return new Promise(resolve => {
           setTimeout(() => {
