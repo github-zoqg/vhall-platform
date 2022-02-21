@@ -57,6 +57,7 @@
 
 <script>
   // import EventBus from '@/utils/Events';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
   export default {
     name: 'reward',
@@ -66,6 +67,9 @@
       },
       localRoomInfo: {
         required: false
+      },
+      cuid: {
+        required: true
       }
     },
     data() {
@@ -268,10 +272,10 @@
       },
       // 打开打赏弹框
       showReward() {
-        console.log(123123, this.localRoomInfo);
+        // console.log(123123, this.localRoomInfo);
         if (!this.localRoomInfo.isLogin) {
-          // EventBus.$emit('showChatLogin');
-          // return;
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          return;
         }
         this.setSetingHeight();
         this.showRewardCard = true;
