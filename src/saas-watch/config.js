@@ -45,7 +45,7 @@ export const serverConfig = {
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comChat', 'comPcRewardEffect', 'comTabMenu']
+    children: ['comPcRewardEffect', 'comTabMenu']
   },
   /*** 布局定义end */
 

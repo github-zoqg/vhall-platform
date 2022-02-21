@@ -83,6 +83,9 @@
       },
       localRoomInfo: {
         required: false
+      },
+      cuid: {
+        required: true
       }
     },
     computed: {
