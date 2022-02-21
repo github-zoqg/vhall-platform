@@ -3,7 +3,7 @@
     <div class="vmp-chat-user-control" :style="style">
       <div class="vmp-chat-user-control__item" @click="reply(count)">
         <i></i>
-        <span>{{ $t('chat.chat_1036') }}</span>
+        <span>回复</span>
       </div>
       <div
         :class="
@@ -16,9 +16,9 @@
         <i></i>
         <span>@TA</span>
       </div>
-      <div class="vmp-chat-user-control__item" @click="deleteMsg(count)" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="deleteMsg(msgId)" v-if="godMode">
         <i></i>
-        <span>{{ $t('account.account_1068') }}</span>
+        <span>删除</span>
       </div>
       <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode">
         <i></i>
@@ -65,7 +65,8 @@
         },
         nickname: '',
         godMode: false,
-        assistantType: ''
+        assistantType: '',
+        msgId: ''
       };
     },
     beforeCreate() {
@@ -79,10 +80,10 @@
       //todo 待改为信令
       EventBus.$on(
         'set_person_status_in_chat',
-        async (el, accountId, count, nickname, godMode, roleName) => {
+        async (el, accountId, msgId, nickname, godMode, roleName) => {
           if (accountId == this.userId) return; // 不能点击自己
           this.accountId = accountId;
-          this.count = count;
+          this.msgId = msgId;
           const boundedList = await this.getUserStatus();
           this.userStatus.is_banned = boundedList[0].data.list.some(user => {
             return user.account_id == accountId;
@@ -113,8 +114,8 @@
       });
     },
     methods: {
-      deleteMsg(count) {
-        this.$emit('deleteMsg', count);
+      deleteMsg(msgId) {
+        this.$emit('deleteMsg', msgId);
       },
       calculate(el) {
         const rect = el.getBoundingClientRect();
