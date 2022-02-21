@@ -70,18 +70,18 @@ class ReorganizeWebpackPlugin {
       }
 
       // 处理cloud临时目录的数据
-      walk.walkSync(cloudPath, function (basedir, filename, stat) {
-        // console.log('basedir:', basedir, ';filename:', filename, 'stat:', stat);
-        if (stat.isFile && path.extname(filename).toLowerCase() === '.js') {
-          let filePath = path.join(basedir, filename);
-          let content = fs.readFileSync(filePath, 'utf-8');
-          content = content.replace(patternForStatic, '"../static/');
-          if (basedir.indexOf(version) > -1) {
-            content = content.replace(patternForRouter, `base: "${routerBase}/${version}",`);
-          }
-          fs.writeFileSync(filePath, content, 'utf-8');
-        }
-      });
+      // walk.walkSync(cloudPath, function (basedir, filename, stat) {
+      //   // console.log('basedir:', basedir, ';filename:', filename, 'stat:', stat);
+      //   if (stat.isFile && path.extname(filename).toLowerCase() === '.js') {
+      //     let filePath = path.join(basedir, filename);
+      //     let content = fs.readFileSync(filePath, 'utf-8');
+      //     content = content.replace(patternForStatic, '"../static/');
+      //     if (basedir.indexOf(version) > -1) {
+      //       content = content.replace(patternForRouter, `base: "${routerBase}/${version}",`);
+      //     }
+      //     fs.writeFileSync(filePath, content, 'utf-8');
+      //   }
+      // });
       // 重命名cloud目录
       fs.renameSync(cloudPath, path.join(projectPath, 'cloud'));
     });
