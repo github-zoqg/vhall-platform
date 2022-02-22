@@ -97,7 +97,7 @@
             @click="exchange"
           ></span>
         </el-tooltip>
-        <el-tooltip content="全屏" placement="bottom">
+        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont"
             :class="{
@@ -240,7 +240,7 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
-      // this.listenEvents();
+      this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
@@ -248,41 +248,6 @@
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
       }
-
-      // 主持人同意上麦申请
-      this.micServer.$on('vrtc_connect_agree', async () => {
-        this.userSpeakOn();
-      });
-
-      // 上麦成功
-      this.micServer.$on('vrtc_connect_success', async msg => {
-        console.log('上麦成功', msg);
-        if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          if (
-            this.joinInfo.role_name == 3 ||
-            (this.joinInfo.role_name == 1 && !this.localStream.streamId)
-          ) {
-            // 开始推流
-            this.startPush();
-          } else if (this.joinInfo.role_name == 2) {
-            // 如果成功，销毁播放器
-            this.playerServer.destroy();
-            // 实例化互动实例
-            await this.interactiveServer.init();
-            // 开始推流
-            this.startPush();
-          }
-        }
-      });
-      // 下麦成功
-      this.micServer.$on('vrtc_disconnect_success', async () => {
-        await this.stopPush();
-
-        this.interactiveServer.destroy();
-
-        // 如果成功，销毁播放器
-        this.playerServer.init();
-      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -294,6 +259,52 @@
       }
     },
     methods: {
+      listenEvents() {
+        window.addEventListener(
+          'fullscreenchange',
+          e => {
+            if (!document.fullscreenElement) {
+              this.isFullScreen = false;
+            }
+          },
+          true
+        );
+
+        // 主持人同意上麦申请
+        this.micServer.$on('vrtc_connect_agree', async () => {
+          this.userSpeakOn();
+        });
+
+        // 上麦成功
+        this.micServer.$on('vrtc_connect_success', async msg => {
+          console.log('上麦成功', msg);
+          if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
+            if (
+              this.joinInfo.role_name == 3 ||
+              (this.joinInfo.role_name == 1 && !this.localStream.streamId)
+            ) {
+              // 开始推流
+              this.startPush();
+            } else if (this.joinInfo.role_name == 2) {
+              // 如果成功，销毁播放器
+              this.playerServer.destroy();
+              // 实例化互动实例
+              await this.interactiveServer.init();
+              // 开始推流
+              this.startPush();
+            }
+          }
+        });
+        // 下麦成功
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          await this.stopPush();
+
+          this.interactiveServer.destroy();
+
+          // 如果成功，销毁播放器
+          this.playerServer.init();
+        });
+      },
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
         // 图片信息
