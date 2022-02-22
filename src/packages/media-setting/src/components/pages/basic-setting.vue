@@ -138,7 +138,7 @@
       setDefault() {
         const saveRate = sessionStorage.getItem('selectedRate') || '';
         const saveScreenRate =
-          sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[0];
+          sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[0].value;
         const savedLayout = sessionStorage.getItem('layout') || this.layoutConfig[0].id;
 
         this.mediaState.rate = saveRate;
