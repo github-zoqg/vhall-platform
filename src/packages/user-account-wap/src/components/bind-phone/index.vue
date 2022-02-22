@@ -56,6 +56,7 @@
             <van-button
               size="small"
               :class="bindForm.imgCode && !timer ? 'input-button-disable' : 'input-button'"
+              :disabled="bindForm.imgCode === '' || timer"
               @click.stop.prevent="getCaptha"
             >
               {{
