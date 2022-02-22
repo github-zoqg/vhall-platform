@@ -4,8 +4,9 @@
       class="vmp-stream-list__local-container"
       :class="{
         'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__max': maxElement == 'mainScreen' && joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__mini': miniElement == 'mainScreen' && joinInfo.third_party_user_id == mainScreen
+        'vmp-dom__max':
+          (miniElement == '' || miniElement == 'doc') && joinInfo.third_party_user_id == mainScreen,
+        'vmp-dom__mini': miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
       }"
     >
       <div class="vmp-stream-list__remote-container-h">
@@ -19,8 +20,9 @@
         class="vmp-stream-list__remote-container"
         :class="{
           'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-          'vmp-dom__max': maxElement == 'mainScreen' && stream.accountId == mainScreen,
-          'vmp-dom__mini': miniElement == 'mainScreen' && stream.accountId == mainScreen
+          'vmp-dom__max':
+            (miniElement == '' || miniElement == 'doc') && stream.accountId == mainScreen,
+          'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
         }"
       >
         <div class="vmp-stream-list__remote-container-h">
@@ -32,19 +34,20 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   export default {
     name: 'VmpStreamList',
 
     data() {
       return {
-        childrenCom: [],
-        miniElement: 'mainScreen',
-        maxElement: ''
+        childrenCom: []
       };
     },
 
     computed: {
+      miniElement() {
+        return this.$domainStore.state.roomBaseServer.miniElement;
+      },
       mainScreen() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
       },
@@ -98,6 +101,8 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.roomBaseServer = useRoomBaseServer();
+      this.micServer = useMicServer();
     },
 
     created() {
@@ -107,7 +112,6 @@
         this.childrenCom,
         this.$domainStore.state.interactiveServer.remoteStreams
       );
-      // this.getStreamList();
     },
 
     mounted() {},
@@ -148,6 +152,15 @@
         &-h {
           padding-top: 56.25%;
         }
+      }
+
+      // 主屏在大窗的样式
+      &.vmp-dom__max {
+        position: absolute;
+        bottom: 56px;
+        width: calc(100% - 380px);
+        height: auto;
+        min-height: auto;
       }
       // 为了保持16:9的比例，这里需要重写一下stream的样式
       .vmp-stream-remote {

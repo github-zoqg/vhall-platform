@@ -10,7 +10,7 @@
         <img
           v-if="loadingFlag && !isAudio"
           class="vmp-wap-player-prompt-load"
-          src="./images/load.gif"
+          src="./img/load.gif"
         />
         <img v-if="isShowPoster" class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
       </div>
@@ -31,7 +31,7 @@
       >
         <div class="vmp-wap-player-ending-box">
           <div class="vmp-wap-player-ending-box-img">
-            <img src="./images/livingEnd@2x.png" alt="" />
+            <img src="./img/livingEnd@2x.png" alt="" />
           </div>
           <h1 class="vmp-wap-player-ending-box-text">直播已结束</h1>
         </div>
@@ -139,7 +139,7 @@
               @change="changeSlider"
             >
               <div slot="button">
-                <img src="./images/player.png" alt />
+                <img src="./img/player.png" alt />
               </div>
             </van-slider>
             <div class="vmp-wap-player-control-icons">
@@ -261,7 +261,7 @@
       },
       // 背景图片
       webinarsBgImg() {
-        const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
+        const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseState.watchInitData;
         if (warmup && warmup.warmup_paas_record_id) {
           return warmup.warmup_img_url
@@ -873,7 +873,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background: url('./images/video.gif') no-repeat;
+      background: url('./img/video.gif') no-repeat;
       background-size: 100% 100%;
       p {
         font-size: 28px;

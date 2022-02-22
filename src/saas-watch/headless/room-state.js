@@ -49,9 +49,9 @@ export default async function () {
   console.log('%c------黄金链路请求配置项完成', 'color:pink');
   console.log(roomBaseServer.state.configList);
   // TODO 设置观看端测试权限数据
-  roomBaseServer.state.configList = {
-    hasToolbar: false
-  };
+  // roomBaseServer.state.configList = {
+  //   hasToolbar: false
+  // };
   // 调用聚合接口
   await roomBaseServer.getCommonConfig({
     tags: [
