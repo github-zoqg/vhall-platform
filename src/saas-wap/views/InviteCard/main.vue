@@ -1,5 +1,5 @@
 <template>
-  <div class="inviteWrap" style="height: 100%">
+  <div class="inviteWrap">
     <invitation-Card @changeInvite="changeInvite"></invitation-Card>
     <div @click="toWebinar" class="webinarEntrance">
       <p class="btnVal">进入活动</p>
@@ -35,6 +35,7 @@
 <style lang="less">
   .inviteWrap {
     position: relative;
+    height: 100vh;
     .webinarEntrance {
       position: absolute;
       top: 45px;
