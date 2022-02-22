@@ -1973,7 +1973,7 @@
           position: absolute;
           top: 7px;
           right: 55px;
-          background-image: url('./images/account-file-close-default.png');
+          background-image: url('img/account-file-close-default.png');
           background-repeat: no-repeat;
           background-size: 100%;
         }
