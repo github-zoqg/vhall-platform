@@ -1,6 +1,6 @@
 <template>
   <div class="inviteWrap" style="height: 100%">
-    <!-- <invitation-Card @changeInvite="changeInvite"></invitation-Card> -->
+    <invitation-Card @changeInvite="changeInvite"></invitation-Card>
     <div @click="toWebinar" class="webinarEntrance">
       <p class="btnVal">进入活动</p>
     </div>
@@ -8,10 +8,10 @@
 </template>
 
 <script>
-  // import invitationCard from '@/components/invitationCard/index.vue';
+  import invitationCard from './components/card.vue';
   export default {
     components: {
-      // invitationCard
+      invitationCard
     },
     data() {
       return {
