@@ -371,16 +371,13 @@
             })
             .catch(() => {});
         } else {
-          console.log(this.$route);
           // 绑定
-          // this.$VhallStorage.set('tag', 'bindQQ', 'local');
           localStorage.setItem('vhsaas_tag', 'bindQQ');
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
-          console.log(jumpUrlPath);
+          console.log(`${hostPath}/commons/auth/qq?jump_url=${encodeURIComponent(jumpUrlPath)}`);
           window.open(
-            `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
-              jumpUrlPath
-            )}`,
+            `${hostPath}/commons/auth/qq?jump_url=${encodeURIComponent(jumpUrlPath)}`,
             '_blank'
           );
         }
@@ -438,12 +435,15 @@
           // this.$VhallStorage.set('tag', 'bindWx', 'local');
           localStorage.setItem('vhsaas_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
+          console.log(hostPath);
           // 前端回传地址
           const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
+          console.log(
+            `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+          );
           window.open(
             `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );
-          // window.open(`${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(this.$VhallStorage.get('goHref', 'local'))}`, '_blank');
         }
       },
       // 打开个人资料弹出框

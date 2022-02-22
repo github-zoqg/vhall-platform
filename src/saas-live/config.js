@@ -93,8 +93,8 @@ export const serverConfig = {
       'comPcMediaCheck',
       'comInsertVideo',
       'liveTimerSet',
-      'liveTimer'
-      // 'comRebroadcast'
+      'liveTimer',
+      'comRebroadcast'
     ]
   },
 
@@ -274,6 +274,12 @@ export const serverConfig = {
       {
         cuid: ['comSignLive'],
         method: 'openSign'
+      }
+    ],
+    emitOpenRebroadcast: [
+      {
+        cuid: ['comRebroadcast'],
+        method: 'open'
       }
     ]
   },
