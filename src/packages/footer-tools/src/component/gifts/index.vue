@@ -18,7 +18,7 @@
                 giftInfo.price == '0' ? $t('interact_tools.interact_tools_1058') : giftInfo.price
               }}
             </span>
-            <span class="send-btn" :class="{ disable: btnDisabled }" @click="sendGift">
+            <span class="send-btn" :class="{ disable: btnDisabled }" @click="sendGift('WEIXIN')">
               {{ $t('interact_tools.interact_tools_1030') }}{{ btnDisabled ? `(${counter})` : '' }}
             </span>
           </div>

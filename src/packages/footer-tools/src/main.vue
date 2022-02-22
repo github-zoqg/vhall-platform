@@ -58,6 +58,7 @@
             :roomId="roomBaseState.watchInitData.interact.room_id"
             :show-gift-count="showGiftCount"
             @changeShowGift="changeStatus"
+            @acceptPay="acceptPay"
             :cuid="cuid"
           />
         </div>
@@ -73,6 +74,10 @@
         <!-- 点赞 -->
         <praise></praise>
       </li>
+      <!-- 支付弹框 -->
+      <li v-if="showPay">
+        <Pay :wxQr="wxQr" :zfQr="zfQr" @changeShow="changeStatus"></Pay>
+      </li>
     </ul>
   </div>
 </template>
@@ -85,6 +90,7 @@
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
   import getInvited from './component/getInvited/index.vue';
+  import Pay from './component/pay/index.vue';
 
   export default {
     name: 'VmpFooterTools',
@@ -96,7 +102,10 @@
         showGiftCount: 0,
         openTimer: false,
         showTimer: false,
-        groupInitData: {}
+        groupInitData: {},
+        wxQr: '',
+        zfQr: '',
+        showPay: false
       };
     },
     components: {
@@ -105,7 +114,8 @@
       vhGifts,
       notice,
       praise,
-      getInvited
+      getInvited,
+      Pay
     },
     filters: {
       formatHotNum(value) {
@@ -206,6 +216,11 @@
           return false;
         }
         this.$refs.reward.onClickReward();
+      },
+      // 接收支付码
+      acceptPay(data, url) {
+        this.showPay = true;
+        this[data] = url;
       }
     }
   };
