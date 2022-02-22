@@ -9,7 +9,7 @@
       @onReturn="isShow = false"
       @onClose="isShow = false"
     >
-      <section v-show="isShow" v-loading="loading" class="vmp-media-setting-dialog-body">
+      <section v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
         <aside class="vmp-media-setting-menu">
           <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
@@ -139,7 +139,6 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
-      window.mediaSetting = this;
       this.restart();
     },
     methods: {
