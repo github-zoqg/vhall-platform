@@ -23,7 +23,7 @@
             </span>
             <!-- 直播 -->
             <span v-show="webinarInfo.webinar_state == 1" class="header-content__tag live">
-              <img src="./images/live-white.gif" alt="" />
+              <img src="img/live-white.gif" alt="" />
               <label>
                 {{ $t('直播') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
               </label>
@@ -68,7 +68,7 @@
           ]"
         >
           <img v-if="webinarInfo.img_url" :src="webinarInfo.img_url" alt="背景图" />
-          <img v-else src="./images/code-login__img.png" alt="背景图" />
+          <img v-else src="img/code-login__img.png" alt="背景图" />
         </div>
         <div class="vmp-password-login__main-wrap__form">
           <div
@@ -79,7 +79,7 @@
             @click.stop.prevent="uploadAvatar"
           >
             <img :src="`${avatarUrl}`" alt="用户头像" v-if="avatarUrl" />
-            <img src="./images/advatar_default@2x.png" alt="默认头像" v-else />
+            <img src="img/advatar_default@2x.png" alt="默认头像" v-else />
             <div class="main-wrap__form__avatar-btn" v-if="![1, '1'].includes(roleName)">
               <span>编辑</span>
             </div>
