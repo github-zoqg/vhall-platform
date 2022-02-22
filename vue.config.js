@@ -113,7 +113,7 @@ function getPlugins() {
           rules: [
             {
               search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}"`
+              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
             },
             {
               search: /@projectName/g,
@@ -127,7 +127,7 @@ function getPlugins() {
           rules: [
             {
               search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}"`
+              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
             },
             {
               search: /@projectName/g,
