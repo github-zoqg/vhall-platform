@@ -28,13 +28,7 @@
         <el-button round v-if="!isCheckSuccess" @click="restart" class="confirm">
           重新检测
         </el-button>
-        <el-button
-          round
-          type="primary"
-          v-if="isCheckSuccess"
-          :class="audioOutputStatus != 'success' ? 'cancel' : 'confirm'"
-          @click="finish"
-        >
+        <el-button round type="primary" v-if="isCheckSuccess" @click="finish">
           {{ roleName == 1 ? '去直播' : '马上互动' }}
         </el-button>
       </footer>

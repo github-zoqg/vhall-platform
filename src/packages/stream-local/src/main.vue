@@ -298,29 +298,17 @@
       async switchStreamType(param) {
         // 图片信息
         console.warn('useMediaSettingServer', param, useMediaSettingServer().state);
-        // 当前选中的是图片推流
-        if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-          await this.$refs.imgPushStream.updateCanvasImg();
-        }
-        // 不存在切换 图片/音视频     只有音视频的设备变更 -> 执行无缝切换
-        if (
-          !param.videoType &&
-          this.$domainStore.state.mediaSettingServer.videoType == 'camera' &&
-          (param.video || param.audioInput)
-        ) {
-          if (param.video) {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localStream.streamId,
-                type: 'video'
-              })
-              .then(res => {
-                console.log('切换成功---', res);
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
+        // 音视频/图片推流 方式变更
+        if (param.videoType) {
+          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+            await this.$refs.imgPushStream.updateCanvasImg();
           }
+
+          if (this.isStreamPublished) {
+            await this.stopPush();
+            await this.startPush();
+          }
+        } else {
           if (param.audioInput) {
             this.interactiveServer
               .switchStream({
@@ -333,14 +321,23 @@
               .catch(err => {
                 console.error('切换失败', err);
               });
+            return;
+          } else if (
+            param.video &&
+            this.$domainStore.state.mediaSettingServer.videoType == 'camera'
+          ) {
+            this.interactiveServer
+              .switchStream({
+                streamId: this.localStream.streamId,
+                type: 'video'
+              })
+              .then(res => {
+                console.log('切换成功---', res);
+              })
+              .catch(err => {
+                console.error('切换失败', err);
+              });
           }
-          return;
-        }
-
-        // 正常进行重推操作
-        if (this.isStreamPublished) {
-          await this.stopPush();
-          await this.startPush();
         }
       },
       sleep(time = 1000) {
