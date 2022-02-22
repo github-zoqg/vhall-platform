@@ -1734,6 +1734,19 @@
           .catch(err => {
             console.warn('禁言---res', err);
           });
+        // “禁言”要关闭当前用户的在麦状态
+        if (isBanned) {
+          return;
+        }
+        this.micServer
+          .speakOff({ receive_account_id: accountId, room_id: this.roomId })
+          .then(res => {
+            //todo 埋点上报
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
+          });
       },
       /**
        * 踢出/取消踢出
@@ -1973,7 +1986,7 @@
           position: absolute;
           top: 7px;
           right: 55px;
-          background-image: url('./images/account-file-close-default.png');
+          background-image: url('img/account-file-close-default.png');
           background-repeat: no-repeat;
           background-size: 100%;
         }

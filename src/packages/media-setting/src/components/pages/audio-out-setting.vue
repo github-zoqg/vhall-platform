@@ -126,7 +126,7 @@
           console.warn('Browser does not support output device selection.');
         } else {
           audioPlayer
-            .setSinkId(this.selected.audioOutput)
+            .setSinkId(this.mediaState.audioOutput)
             .then(() => {})
             .catch(error => {
               let errorMessage = error;

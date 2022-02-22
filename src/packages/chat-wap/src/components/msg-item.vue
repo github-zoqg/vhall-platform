@@ -45,7 +45,7 @@
             }}{{ $t('cash.cash_1003') }},{{ msg.content.text_content | textOverflowSlice(6) }}
           </p>
         </div>
-        <img class="new-award-img" src="../images/red-package.png" />
+        <img class="new-award-img" src="../img/red-package.png" />
       </div>
     </template>
     <!-- 送礼物 -->
@@ -161,7 +161,7 @@
     data() {
       return {
         msgContent: '',
-        jiantou: require('../images/jiantou.png')
+        jiantou: require('../img/jiantou.png')
       };
     },
     computed: {
