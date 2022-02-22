@@ -610,7 +610,7 @@
       height: 100%;
     }
     .vmp-stream-local__stream-box__mute {
-      background-image: url(./images/no_video_bg.png);
+      background-image: url(./img/no_video_bg.png);
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -634,7 +634,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #333438 url('./images/voicefrequency.png') no-repeat;
+      background: #333438 url('./img/voicefrequency.png') no-repeat;
       background-size: 100% 100%;
       /*opacity: 0.8;*/
       &--beforestart {
@@ -650,7 +650,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: url('./images/livebg.png') no-repeat;
+        background: url('./img/livebg.png') no-repeat;
         background-size: 100% 100%;
         // background-color: black;
         & > .vmp-stream-local__stream-box__audio--bg {
@@ -662,7 +662,7 @@
         font-size: 20px;
         width: 170px;
         height: 46px;
-        background: url('./images/voice.png') left no-repeat;
+        background: url('./img/voice.png') left no-repeat;
         background-size: 69px;
         z-index: 4;
         box-sizing: border-box;
@@ -673,7 +673,7 @@
           width: 96px;
           height: 22px;
           display: inline-block;
-          background: url('./images/voiceinprogress.png') no-repeat;
+          background: url('./img/voiceinprogress.png') no-repeat;
           background-size: 100%;
         }
       }
@@ -736,15 +736,15 @@
         background-size: contain;
         height: 16px;
         width: 16px;
-        background-image: url(./images/network0.png);
+        background-image: url(./img/network0.png);
         &__0 {
-          background-image: url(./images/network0.png);
+          background-image: url(./img/network0.png);
         }
         &__1 {
-          background-image: url(./images/network1.png);
+          background-image: url(./img/network1.png);
         }
         &__2 {
-          background-image: url(./images/network2.png);
+          background-image: url(./img/network2.png);
         }
       }
     }

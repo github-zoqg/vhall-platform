@@ -381,7 +381,7 @@
       height: 100%;
     }
     .vmp-stream-remote__container__mute {
-      background-image: url(./images/no_video_bg.png);
+      background-image: url(./img/no_video_bg.png);
       background-size: cover;
       background-repeat: no-repeat;
       position: absolute;
@@ -446,15 +446,15 @@
         background-size: contain;
         height: 16px;
         width: 16px;
-        background-image: url(./images/network0.png);
+        background-image: url(./img/network0.png);
         &__0 {
-          background-image: url(./images/network0.png);
+          background-image: url(./img/network0.png);
         }
         &__1 {
-          background-image: url(./images/network1.png);
+          background-image: url(./img/network1.png);
         }
         &__2 {
-          background-image: url(./images/network2.png);
+          background-image: url(./img/network2.png);
         }
       }
     }
