@@ -203,6 +203,7 @@
           this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
+          this.getStateCapture(); // 更新快照
         }
       },
       /**
