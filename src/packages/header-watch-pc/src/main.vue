@@ -17,17 +17,16 @@
       <div class="vmp-header-watch-center-title">
         {{ webinarInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarInfo.type != 6"
+          v-if="webinarType != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
-            webinarInfo.type
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
           "
         >
-          <img v-if="webinarInfo.type == 1" src="./images/live-white.gif" alt="" />
-          <label>{{ webinarInfo.type | webinarFilter }}</label>
+          <img v-if="webinarType == 1" src="./images/live-white.gif" alt="" />
+          <label>{{ webinarType | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -75,11 +74,9 @@
               isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
             }`"
           ></i>
-          <!-- <i class="vh-iconfont vh-line-collection vh-a-line-collectionsuccess"></i> -->
           <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
         </div>
       </div>
-      <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
 
       <!-- 分享 -->
       <div class="vmp-header-watch-right-share">
@@ -182,7 +179,7 @@
     },
     computed: {
       create_user_url() {
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
           const url = watchInitData.urls.web_url || '';
           if (url.split('')[url.length - 1] == '/') {
@@ -201,6 +198,9 @@
       },
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
+      },
+      webinarType() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     beforeCreate() {
@@ -210,8 +210,7 @@
     },
     async created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
-      this.roomBaseState = this.roomBaseServer.state;
-      this.embedObj = this.roomBaseState.embedObj;
+      this.embedObj = this.roomBaseServer.state.embedObj;
       if (this.isLogin && this.isNotEmbed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
@@ -220,12 +219,12 @@
     },
     methods: {
       getWebinarInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
+        const { webinar } = this.roomBaseServer.state.watchInitData;
         this.webinarInfo = webinar || {};
-        this.skinInfo = this.roomBaseState.skinInfo || {};
-        this.webinarTag = this.roomBaseState.webinarTag || {};
-        this.officicalInfo = this.roomBaseState.officicalInfo || {};
-        this.screenPosterInfo = this.roomBaseState.screenPosterInfo || {};
+        this.skinInfo = this.roomBaseServer.state.skinInfo || {};
+        this.webinarTag = this.roomBaseServer.state.webinarTag || {};
+        this.officicalInfo = this.roomBaseServer.state.officicalInfo || {};
+        this.screenPosterInfo = this.roomBaseServer.state.screenPosterInfo || {};
         this.setOfficicalInfo(this.officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },

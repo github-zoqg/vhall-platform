@@ -199,7 +199,7 @@ const playerMixins = {
         });
         this.sliderVal = (this.currentTime / this.totalTime) * 100;
         // 派发播放器时间更新事件，通知章节当前播放的时间节点
-        // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, this.currentTime);
+        this.playerServer.emitChapterTimeUpdate(this.currentTime);
       });
     },
     // 设置播放时间
