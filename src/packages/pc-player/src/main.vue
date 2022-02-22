@@ -24,7 +24,7 @@
               <i class="vh-iconfont vh-line-video-play"></i>
             </div>
           </div>
-          <div class="vmp-player-living-end" v-if="isLivingEnd">
+          <!-- <div class="vmp-player-living-end" v-if="isLivingEnd">
             <div
               :class="
                 displayMode == 'mini' ? 'vmp-player-living-end-mini' : 'vmp-player-living-end-img'
@@ -33,7 +33,7 @@
               <img src="../src/images/liveEnd.png" alt="" />
             </div>
             <h1>直播已结束</h1>
-          </div>
+          </div> -->
           <div class="vmp-player-living-vodend" v-if="isVodEnd">
             <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
               <h3>{{ $t('appointment.appointment_1013') }}</h3>
@@ -318,7 +318,8 @@
       isShowContainer() {
         return (
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-          this.$domainStore.state.micServer.isSpeakOn
+          this.$domainStore.state.micServer.isSpeakOn ||
+          this.isLivingEnd
         );
       }
     },

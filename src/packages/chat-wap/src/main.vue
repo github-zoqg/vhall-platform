@@ -61,7 +61,7 @@
   import sendBox from './components/send-box';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
-  import defaultAvatar from './images/default_avatar.png';
+  import defaultAvatar from './img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpChatWap',
@@ -239,6 +239,12 @@
         chatServer.$on('roomKickout', () => {
           this.$message('您已经被踢出房间');
         });
+      },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        useChatServer().clearHistoryMsg();
+        this.getHistoryMessage();
       },
       // 获取历史消息
       async getHistoryMessage() {

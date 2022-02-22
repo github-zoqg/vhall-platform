@@ -125,7 +125,7 @@
         >
           <img
             class="sepcial-effect__img"
-            :src="msg.content.gift_url || require('./images/red-package-1.png')"
+            :src="msg.content.gift_url || require('./img/red-package-1.png')"
             alt=""
           />
         </div>
@@ -133,13 +133,13 @@
           v-if="msg.type == 'gift_send_success' && effectsMap[msg.content.gift_name]"
           class="sepcial-effect__img"
           :class="`sepcial-effect__img-${effectsMap[msg.content.gift_name]}`"
-          :src="msg.content.gift_url || require('./images/red-package-1.png')"
+          :src="msg.content.gift_url || require('./img/red-package-1.png')"
           alt=""
         />
         <img
           v-if="msg.type === 'reward_pay_ok'"
           class="sepcial-effect__img-reward"
-          :src="msg.content.gift_url || require('./images/red-package-1.png')"
+          :src="msg.content.gift_url || require('./img/red-package-1.png')"
           alt=""
         />
       </li>
@@ -148,7 +148,7 @@
 </template>
 
 <script>
-  import defaultAvatar from './images/my-dark@2x.png';
+  import defaultAvatar from './img/my-dark@2x.png';
   import MsgItem from './components/msg-item.vue';
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
@@ -463,7 +463,7 @@
       //处理分组讨论频道变更
       handleChannelChange() {
         this.page = 0;
-        this.clearHistoryMsg();
+        useChatServer().clearHistoryMsg();
         this.getHistoryMsg();
       },
       // 获取历史消息
@@ -995,25 +995,25 @@
         padding: 4px;
         padding-top: 11px;
         transition: all 200ms;
-        background-image: url(./images/red-package-bg.png);
+        background-image: url(img/red-package-bg.png);
         background-size: 100%;
         &.bg-applause {
-          background-image: url(./images/applause-bg.png);
+          background-image: url(img/applause-bg.png);
         }
         &.bg-coffee {
-          background-image: url(./images/coffee-bg.png);
+          background-image: url(img/coffee-bg.png);
         }
         &.bg-custom {
-          background-image: url(./images/custom-bg.png);
+          background-image: url(img/custom-bg.png);
         }
         &.bg-flower {
-          background-image: url(./images/flower-bg.png);
+          background-image: url(img/flower-bg.png);
         }
         &.bg-praise {
-          background-image: url(./images/praise-bg.png);
+          background-image: url(img/praise-bg.png);
         }
         &.bg-666 {
-          background-image: url(./images/666-bg.png);
+          background-image: url(img/666-bg.png);
         }
         &:first-child {
           animation: added 180ms;

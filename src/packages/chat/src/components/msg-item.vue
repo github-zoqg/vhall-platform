@@ -34,7 +34,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../images/phone.png"
+                src="../img/phone.png"
                 alt
               />
             </div>
@@ -47,7 +47,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../images/phone.png"
+                src="../img/phone.png"
                 alt
               />
             </div>
@@ -180,7 +180,7 @@
             <img
               v-if="msg.type == 'red_envelope_ok'"
               class="interact-content__redpackage-img"
-              src="../images/red-package-1.png"
+              src="../img/red-package-1.png"
               alt=""
             />
             <span>{{ msg.content.text_content }}</span>
@@ -211,7 +211,7 @@
                 'interact-tools-content__img-scale': msg.content.source_status === '0',
                 'interact-tools-content__img-reward': !msg.content.gift_url
               }"
-              :src="msg.content.gift_url || require('../images/red-package-1.png')"
+              :src="msg.content.gift_url || require('../img/red-package-1.png')"
               :alt="$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="msg.type === 'reward_pay_ok'" />
