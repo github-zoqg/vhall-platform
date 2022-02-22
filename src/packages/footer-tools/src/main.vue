@@ -18,7 +18,7 @@
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="isInteractLive">
+    <div class="vmp-footer-tools__center" v-if="!isBanned && isInteractLive">
       <handup></handup>
     </div>
     <!-- 用户被邀请dialog -->
@@ -83,7 +83,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useChatServer, useGroupServer } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -103,9 +103,7 @@
         openTimer: false,
         showTimer: false,
         groupInitData: {},
-        wxQr: '',
-        zfQr: '',
-        showPay: false
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     components: {
@@ -181,6 +179,16 @@
         if (this.showGift) {
           this.showGift = false;
         }
+      });
+    },
+    mounted() {
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isBanned = res;
       });
     },
     methods: {
