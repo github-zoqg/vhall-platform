@@ -263,7 +263,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/share/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpMemberItem',
     filters: {
@@ -353,7 +353,7 @@
     data() {
       return {
         //默认头像
-        defaultAvatar,
+        defaultAvatar: defaultAvatar,
         //操作项
         operateList: [
           //设为主讲
