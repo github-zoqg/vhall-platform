@@ -339,7 +339,7 @@
 </template>
 
 <script>
-  import defaultHeader from './images/formHeader.png';
+  import defaultHeader from './img/formHeader.png';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpSignUpForm',
@@ -1231,31 +1231,31 @@
         }
         .yidun_slider {
           .yidun_slider__icon {
-            background-image: url(./images/icon-slide1.png) !important;
+            background-image: url(img/icon-slide1.png) !important;
             background-size: 28px 20px;
             background-position: center;
             margin-top: -5px;
           }
           &:hover {
             .yidun_slider__icon {
-              background-image: url(./images/icon-slide.png) !important;
+              background-image: url(img/icon-slide.png) !important;
             }
           }
         }
         .yidun--success {
           .yidun_control {
             .yidun_slider__icon {
-              background-image: url(./images/icon-succeed.png) !important;
+              background-image: url(img/icon-succeed.png) !important;
             }
             .yidun_slider {
               .yidun_slider__icon {
-                background-image: url(./images/icon-succeed.png);
+                background-image: url(img/icon-succeed.png);
                 background-size: 28px 20px;
                 background-position: center;
               }
               &:hover {
                 .yidun_slider__icon {
-                  background-image: url(./images/icon-succeed.png);
+                  background-image: url(img/icon-succeed.png);
                   background-size: 28px 20px;
                   background-position: center;
                 }

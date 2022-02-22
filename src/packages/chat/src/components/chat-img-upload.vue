@@ -176,7 +176,7 @@
           position: absolute;
           width: 15px;
           height: 15px;
-          background: url('../images/img-del.png') no-repeat;
+          background: url('../img/img-del.png') no-repeat;
           background-size: contain;
           top: 0;
           right: 0;
