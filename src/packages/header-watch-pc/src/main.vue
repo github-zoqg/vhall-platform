@@ -22,7 +22,7 @@
             'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
           "
         >
-          <img v-if="webinarType == 1" src="./images/live-white.gif" alt="" />
+          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
           <label>{{ webinarType | webinarFilter }}</label>
         </span>
         <span
@@ -99,14 +99,14 @@
       <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
         <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
-          <p><img src="./images/my-dark@2x.png" alt="" /></p>
+          <p><img src="./img/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
         <div class="vmp-header-watch-right-login-user" v-else>
           <div class="vmp-header-watch-right-login-user-dropdown">
             <p>
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
-              <img v-else src="./images/my-dark@2x.png" alt="" />
+              <img v-else src="./img/my-dark@2x.png" alt="" />
             </p>
             <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
             <div class="vmp-header-watch-right-login-user-list">
@@ -141,7 +141,7 @@
       return {
         noDelayIconUrl:
           '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
-        defaultLogoUrl: require('./images/logo-red@2x.png'),
+        defaultLogoUrl: require('./img/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识

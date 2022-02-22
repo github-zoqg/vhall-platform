@@ -910,7 +910,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-image: url('../src/images/video.gif');
+        background-image: url('../src/img/video.gif');
         background-size: 100% 100%;
         div {
           text-align: center;
