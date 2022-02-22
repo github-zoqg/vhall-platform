@@ -7,10 +7,8 @@
         :key="item.adv_id"
         @click="handleJump(item.url)"
       >
-        <div class="recommend-item">
-          <img class="banner" :src="item.img_url ? item.img_url : defaultBanner" />
-          <h4 class="title ellipsis">{{ item.subject }}</h4>
-        </div>
+        <img class="banner" :src="item.img_url ? item.img_url : defaultBanner" />
+        <h4 class="title ellipsis">{{ item.subject }}</h4>
       </li>
     </ul>
     <div class="vh-loading" v-if="showLoading">加载中</div>
@@ -134,30 +132,21 @@
 <style lang="less">
   .vmp-recommend {
     background: #fff;
-    padding: 0px 30px;
+    padding: 0px 15px;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    // overflow: hidden;
     overflow-y: scroll;
     .a-wrap {
       display: block;
       width: 100%;
-      // height: 100%;
-      // overflow-y: hidden !important;
       overflow-y: scroll;
       touch-action: pan-y !important;
-      // overflow: hidden;
-      // display: flex;
-      // flex-wrap: wrap;
-      // justify-content: space-between;
-      // touch-action: pan-y;
     }
     .recommend-item {
       width: 330px;
       height: 230px;
-      margin-bottom: 30px;
-      margin-right: 8px;
+      margin: 15px;
       float: left;
       a {
         display: inline-block;
