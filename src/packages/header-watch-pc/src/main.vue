@@ -79,7 +79,7 @@
       </div>
 
       <!-- 分享 -->
-      <div class="vmp-header-watch-right-share">
+      <div class="vmp-header-watch-right-share" v-if="isShowShare">
         <div
           :class="'vmp-header-watch-right-share-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
@@ -201,6 +201,9 @@
       },
       webinarType() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      isShowShare() {
+        return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
       }
     },
     beforeCreate() {

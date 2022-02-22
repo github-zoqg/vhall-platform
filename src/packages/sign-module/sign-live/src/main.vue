@@ -1,0 +1,237 @@
+<template>
+  <div class="vmp-sign-live">
+    <el-dialog title="签到" :visible.sync="signVisible" :close-on-click-modal="false" width="440px">
+      <signinSet v-if="showSet" @start="startSign"></signinSet>
+    </el-dialog>
+    <div class="vmp-sign-live-down" v-if="signinDown">
+      <div class="vmp-sign-live-down-container">
+        <Counter
+          @close-sign="closeAutoSignin"
+          :autoSign="signInfo.autoSign"
+          :title="signInfo.signTip"
+          :total="total"
+          :remaining="remaining"
+          v-if="starting"
+          ref="counter"
+        ></Counter>
+        <signinResult
+          v-if="showResult"
+          @restartsign="resetSignState"
+          :room_id="roomId"
+          :signId="signId"
+        ></signinResult>
+        <div class="vmp-sign-live-down-container-close" @click="signinDown = false">
+          <i class="vh-iconfont vh-line-circle-close"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  import signinSet from './components/signinSet.vue';
+  import Counter from './components/counter.vue';
+  import signinResult from './components/signinResult.vue';
+  import { useSignServer } from 'middle-domain';
+  export default {
+    name: 'VmpSignLive',
+    components: {
+      signinSet,
+      Counter,
+      signinResult
+    },
+    computed: {
+      total() {
+        const { duration, autoSign, interval } = this.signInfo;
+        return autoSign ? interval : duration;
+      },
+      starting() {
+        console.warn(this.signInfo, this.remaining, '测试时间');
+        return this.signInfo !== null && !!this.remaining;
+      },
+      showSet() {
+        return this.signInfo === null;
+      },
+      showResult() {
+        return this.signInfo !== null && !this.remaining && !this.signInfo.autoSign;
+      },
+      roomId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.interact.room_id;
+      }
+    },
+    data() {
+      return {
+        signVisible: false,
+        signinDown: false,
+        signInfo: null,
+        remaining: 0, // 总时长
+        timer: null,
+        signId: '', // 签到ID
+        nowSignObj: '' // 当前自动签到信息
+      };
+    },
+    beforeCreate() {
+      this.signServer = useSignServer();
+    },
+    methods: {
+      openSign() {
+        this.getSignInfo();
+      },
+      getSignInfo() {
+        this.signServer
+          .getSignInfo({ room_id: this.roomId })
+          .then(res => {
+            if (res.data.id) {
+              this.signVisible = false;
+              this.signinDown = true;
+              this.signInfo = res.data;
+              this.signId = res.data.id;
+              this.nowSignObj = res.data;
+              this.signInfo.autoSign = res.data.is_auto_sign == 1;
+              if (res.data.is_auto_sign == 1) {
+                this.remaining = res.data.auto_sign_time_ttl;
+                this.totalTime = res.data.auto_sign_time;
+              } else {
+                this.remaining = res.data.sign_time_ttl;
+                this.totalTime = 0;
+              }
+              this.setIntervalAction();
+            } else {
+              this.signInfo = null;
+              this.signVisible = true;
+            }
+          })
+          .catch(res => {
+            this.$message.error(res.msg);
+          });
+      },
+      setIntervalAction() {
+        clearInterval(this.timer);
+        this.timer = setInterval(() => {
+          if (--this.remaining <= 0) {
+            if (sessionStorage.getItem('isAutoSign')) {
+              this.remaining = this.totalTime;
+              this.signVisible = false;
+              this.signinDown = true;
+            } else {
+              clearInterval(this.timer);
+            }
+          }
+        }, 1000);
+        this.$once('hook:beforeDestory', () => {
+          clearInterval(this.timer);
+        });
+      },
+      startSign(state) {
+        const _data = {
+          room_id: this.roomId,
+          sign_tips: state.signTip, // 签到提示语
+          show_time: state.duration, // 签到显示的时间，单位秒，默认30
+          is_auto_sign: Number(state.autoSign), // 是否自动发起签到，1自动，0取消自动，默认0
+          auto_sign_time: state.interval // 自动发起签到的轮询定时时间，单位秒
+        };
+        this.signServer.signStart(_data).then(res => {
+          if (res.code == 200) {
+            if (state.autoSign) {
+              this.totalTime = state.interval;
+              window.sessionStorage.setItem('isAutoSign', 'true');
+            }
+            this.signinDown = true;
+            this.signVisible = false;
+            this.signId = res.data.id;
+            this.setSignState({ signInfo: state });
+            this.setIntervalAction();
+          } else if (res.code == 513204) {
+            this.endSignServe();
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      },
+      endSignServe() {
+        this.signServer
+          .signClose({
+            room_id: this.roomId,
+            sign_id: this.nowSignObj.id
+          })
+          .then(res => {
+            console.log('结束当前房间的签到成功-----', res);
+            this.$message.success('关闭签到成功');
+            window.sessionStorage.removeItem('isAutoSign');
+            this.signVisible = false;
+            this.signinDown = false;
+            this.signInfo = null;
+            this.remaining = 0;
+          })
+          .catch(err => {
+            this.$message.error(err.msg);
+          });
+      },
+      // 设置状态
+      setSignState(state) {
+        this.signInfo = state.signInfo;
+        this.remaining = state.remaining ? state.remaining : this.total;
+      },
+      // 重置状态
+      resetSignState() {
+        this.signInfo = null;
+        this.remaining = 0;
+        this.signVisible = true;
+        this.signinDown = false;
+      },
+      closeAutoSignin(form) {
+        if (form == 'client') {
+          // 客户端走的方法
+          this.signVisible = false;
+          return;
+        }
+        this.$confirm('您将取消自动签到，确认关闭？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        })
+          .then(() => {
+            this.endSignServe();
+          })
+          .catch(() => {});
+      }
+    }
+  };
+</script>
+<style lang="less">
+  .vmp-sign-live {
+    .el-dialog__body {
+      padding: 10px 32px 24px 32px;
+    }
+    &-down {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.6);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 28;
+      &-container {
+        height: 469px;
+        width: 400px;
+        margin-top: 15vh;
+        background-image: url('./img/signBox@2x.png');
+        background-size: 100% 100%;
+        position: relative;
+        &-close {
+          position: absolute;
+          left: 47%;
+          bottom: -18px;
+          cursor: pointer;
+          border-radius: 50%;
+          i {
+            font-size: 24px;
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+</style>
