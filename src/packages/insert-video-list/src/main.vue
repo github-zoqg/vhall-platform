@@ -56,11 +56,7 @@
               >
                 <li v-for="video in tableData" :key="video.id">
                   <p class="insert-header-item0">
-                    <img
-                      src="./images/playing.gif"
-                      alt=""
-                      v-if="playingInsertVideoId == video.id"
-                    />
+                    <img src="./img/playing.gif" alt="" v-if="playingInsertVideoId == video.id" />
                   </p>
                   <p class="insert-header-item">
                     <i
@@ -93,14 +89,14 @@
                 </li>
               </div>
               <div class="insert-list-uncontainer" v-show="!total">
-                <span><img src="./images/no-search.png" alt="" /></span>
+                <span><img src="./img/no-search.png" alt="" /></span>
                 <p>暂未搜索到您想要的内容</p>
               </div>
             </ul>
           </div>
         </div>
         <div class="vmp-insert-video-wrap-null" v-else>
-          <img src="./images/no-create.png" alt="" />
+          <img src="./img/no-create.png" alt="" />
           <p class="vmp-insert-video-wrap-null-text">暂未上传音视频</p>
           <el-button type="primary" round @click="selectlocalVideo">选择文件</el-button>
           <div>

@@ -17,17 +17,16 @@
       <div class="vmp-header-watch-center-title">
         {{ webinarInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarInfo.type != 6"
+          v-if="webinarType != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
-            webinarInfo.type
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
           "
         >
-          <img v-if="webinarInfo.type == 1" src="./images/live-white.gif" alt="" />
-          <label>{{ webinarInfo.type | webinarFilter }}</label>
+          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ webinarType | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -75,14 +74,12 @@
               isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
             }`"
           ></i>
-          <!-- <i class="vh-iconfont vh-line-collection vh-a-line-collectionsuccess"></i> -->
           <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
         </div>
       </div>
-      <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
 
       <!-- 分享 -->
-      <div class="vmp-header-watch-right-share">
+      <div class="vmp-header-watch-right-share" v-if="isShowShare">
         <div
           :class="'vmp-header-watch-right-share-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
@@ -102,14 +99,14 @@
       <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
         <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
-          <p><img src="./images/my-dark@2x.png" alt="" /></p>
+          <p><img src="./img/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
         <div class="vmp-header-watch-right-login-user" v-else>
           <div class="vmp-header-watch-right-login-user-dropdown">
             <p>
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
-              <img v-else src="./images/my-dark@2x.png" alt="" />
+              <img v-else src="./img/my-dark@2x.png" alt="" />
             </p>
             <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
             <div class="vmp-header-watch-right-login-user-list">
@@ -144,7 +141,7 @@
       return {
         noDelayIconUrl:
           '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
-        defaultLogoUrl: require('./images/logo-red@2x.png'),
+        defaultLogoUrl: require('./img/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识
@@ -182,7 +179,7 @@
     },
     computed: {
       create_user_url() {
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
           const url = watchInitData.urls.web_url || '';
           if (url.split('')[url.length - 1] == '/') {
@@ -201,6 +198,12 @@
       },
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
+      },
+      webinarType() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      isShowShare() {
+        return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
       }
     },
     beforeCreate() {
@@ -210,8 +213,7 @@
     },
     async created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
-      this.roomBaseState = this.roomBaseServer.state;
-      this.embedObj = this.roomBaseState.embedObj;
+      this.embedObj = this.roomBaseServer.state.embedObj;
       if (this.isLogin && this.isNotEmbed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
@@ -220,12 +222,12 @@
     },
     methods: {
       getWebinarInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
+        const { webinar } = this.roomBaseServer.state.watchInitData;
         this.webinarInfo = webinar || {};
-        this.skinInfo = this.roomBaseState.skinInfo || {};
-        this.webinarTag = this.roomBaseState.webinarTag || {};
-        this.officicalInfo = this.roomBaseState.officicalInfo || {};
-        this.screenPosterInfo = this.roomBaseState.screenPosterInfo || {};
+        this.skinInfo = this.roomBaseServer.state.skinInfo || {};
+        this.webinarTag = this.roomBaseServer.state.webinarTag || {};
+        this.officicalInfo = this.roomBaseServer.state.officicalInfo || {};
+        this.screenPosterInfo = this.roomBaseServer.state.screenPosterInfo || {};
         this.setOfficicalInfo(this.officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },

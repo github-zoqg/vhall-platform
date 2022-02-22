@@ -196,7 +196,7 @@
       font-size: 20px;
       cursor: pointer;
       border-radius: 50%;
-      background: url('../images/my-dark@2x.png') no-repeat;
+      background: url('../img/my-dark@2x.png') no-repeat;
       background-size: 100% 100%;
       // background-color: hsla(0, 0%, 88.6%, 0.15);
     }

@@ -244,8 +244,11 @@ export const serverConfig = {
     emitNeedLogin: {
       cuid: ['compRegLogin'],
       method: 'open'
-    }
-    // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
+    },
+    children: ['comSignWatch']
+  },
+  comSignWatch: {
+    component: 'VmpSignWatch'
   },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'

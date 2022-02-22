@@ -167,7 +167,8 @@ export const serverConfig = {
       'comGroupMenu',
       'comShareMenu',
       'comExitGroupMenu',
-      'comLottery'
+      'comLottery',
+      'comSignLive'
     ]
   },
   // 语言选择组件
@@ -267,6 +268,12 @@ export const serverConfig = {
       {
         cuid: ['comLottery'],
         method: 'open'
+      }
+    ],
+    emitOpenSign: [
+      {
+        cuid: ['comSignLive'],
+        method: 'openSign'
       }
     ]
   },
@@ -544,5 +551,8 @@ export const serverConfig = {
   },
   comLottery: {
     component: 'VmpLotteryLive'
+  },
+  comSignLive: {
+    component: 'VmpSignLive'
   }
 };

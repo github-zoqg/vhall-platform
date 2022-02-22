@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-notice-column" v-if="isNoticeColumn">
     <div class="vmp-notice-column-wrap">
-      <span class="vmp-notice-column-wrap-icons"><img src="./images/icon.png" alt="" /></span>
+      <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
       <p class="vmp-notice-column-wrap-nowrap">
         <span class="vmp-notice-column-wrap-animated">
           <span id="vmp-notice-column-text">{{ noticeText }}</span>
