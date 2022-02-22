@@ -36,7 +36,7 @@
           </div>
         </template>
       </div>
-      <div class="interact-wrapper">
+      <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
         <div
           class="icon-wrapper"
@@ -157,7 +157,7 @@
         //配置列表
         configList: {},
         //用户头像
-        avatar: require('../images/default_avatar.png')
+        avatar: require('../img/default_avatar.png')
       };
     },
     computed: {
@@ -232,7 +232,7 @@
           this.isLogin = true;
           // 若用户已经登录过，获取userInfo
           this.isShowUser = true;
-          this.avatar = userInfo.avatar || require('../images/default_avatar.png');
+          this.avatar = userInfo.avatar || require('../img/default_avatar.png');
         } else {
           this.isLogin = false;
           this.isShowUser = false;

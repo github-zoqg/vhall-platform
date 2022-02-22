@@ -198,6 +198,11 @@ export const serverConfig = {
     children: ['comInteractToolsWap'],
     options: {}
   },
+  //wap端私聊
+  comPrivateChatWap: {
+    component: 'VmpWapPrivateChat',
+    options: {}
+  },
   // wap互动工具-签到
   comSignWap: {
     component: 'VmpSignWap',
@@ -254,11 +259,25 @@ export const serverConfig = {
   },
   // 个人资料
   comUserAccountWap: {
-    component: 'VmpUserAccountWap'
+    component: 'VmpUserAccountWap',
+    emitCloseUserCenterWap: [
+      {
+        cuid: 'comUserCenterWap',
+        method: 'closeUserCenterWap',
+        args: ['$0']
+      }
+    ]
   },
   // 提现管理
   comCashWap: {
-    component: 'VmpCashWap'
+    component: 'VmpCashWap',
+    emitCloseUserCenterWap: [
+      {
+        cuid: 'comUserCenterWap',
+        method: 'closeUserCenterWap',
+        args: ['$0']
+      }
+    ]
   },
   // 抽奖
   compLotteryWap: {

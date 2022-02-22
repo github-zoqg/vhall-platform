@@ -57,7 +57,6 @@ class ReorganizeWebpackPlugin {
             // 写入docker目录
             let content1 = content.replace(patternForStatic, `"${resoucePrefix}static/`);
             fs.writeFileSync(path.join(dockerPath, filename), content1, 'utf-8');
-
             // 写入docker/${version}目录
             let content2 = content.replace(patternForStatic, `"${resoucePrefix}${version}/static/`);
             fs.writeFileSync(path.join(dockerPath, version, filename), content2, 'utf-8');
@@ -75,7 +74,9 @@ class ReorganizeWebpackPlugin {
         if (stat.isFile && path.extname(filename).toLowerCase() === '.js') {
           let filePath = path.join(basedir, filename);
           let content = fs.readFileSync(filePath, 'utf-8');
-          content = content.replace(patternForStatic, '"../static/');
+          content = content
+            .replace(patternForStatic, '"../../static/')
+            .replace(/exports=\w.*?static\/img/g, `exports="${resoucePrefix}static/img`);
           if (basedir.indexOf(version) > -1) {
             content = content.replace(patternForRouter, `base: "${routerBase}/${version}",`);
           }

@@ -246,9 +246,8 @@
                     window.location.reload();
                   });
                 } else {
-                  // TODO待翻译
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('513041'),
+                    message: this.$tec(res.code) || res.msg,
                     showClose: true,
                     // duration: 0,
                     type: 'error',
@@ -259,7 +258,7 @@
               .catch(res => {
                 console.log(res);
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('513041'),
+                  message: this.$tec(res.code) || res.msg,
                   showClose: true,
                   // duration: 0,
                   type: 'error',

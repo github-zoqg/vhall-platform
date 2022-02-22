@@ -294,18 +294,50 @@
       }
     },
     methods: {
-      // 媒体切换后进行无缝切换
+      // 媒体切换后进行无缝切换  注：param只返回变更的信息
       async switchStreamType(param) {
         // 图片信息
-        if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-          if (param.canvasImgUrl) {
-            useMediaSettingServer().state.canvasImgUrl = param.canvasImgUrl;
+        console.warn('useMediaSettingServer', param, useMediaSettingServer().state);
+        // 音视频/图片推流 方式变更
+        if (param.videoType) {
+          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+            await this.$refs.imgPushStream.updateCanvasImg();
           }
-          await this.$refs.imgPushStream.updateCanvasImg();
-        }
-        if (this.isStreamPublished) {
-          await this.stopPush();
-          await this.startPush();
+
+          if (this.isStreamPublished) {
+            await this.stopPush();
+            await this.startPush();
+          }
+        } else {
+          if (param.audioInput) {
+            this.interactiveServer
+              .switchStream({
+                streamId: this.localStream.streamId,
+                type: 'audio'
+              })
+              .then(res => {
+                console.log('切换成功---', res);
+              })
+              .catch(err => {
+                console.error('切换失败', err);
+              });
+            return;
+          } else if (
+            param.video &&
+            this.$domainStore.state.mediaSettingServer.videoType == 'camera'
+          ) {
+            this.interactiveServer
+              .switchStream({
+                streamId: this.localStream.streamId,
+                type: 'video'
+              })
+              .then(res => {
+                console.log('切换成功---', res);
+              })
+              .catch(err => {
+                console.error('切换失败', err);
+              });
+          }
         }
       },
       sleep(time = 1000) {
