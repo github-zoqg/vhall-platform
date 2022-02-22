@@ -375,7 +375,7 @@
           // 绑定
           // this.$VhallStorage.set('tag', 'bindQQ', 'local');
           localStorage.setItem('vhsaas_tag', 'bindQQ');
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           console.log(jumpUrlPath);
           window.open(
             `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
@@ -439,7 +439,7 @@
           localStorage.setItem('vhsaas_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           // 前端回传地址
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
+          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
             `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );

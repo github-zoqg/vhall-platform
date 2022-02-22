@@ -204,7 +204,7 @@
     components: { NECaptcha },
     data() {
       return {
-        visible: true, // 提现信息组件
+        visible: false, // 提现信息组件
         cashNoticeVisible: false, // 提现说明
         cashVisible: false, // 提现表单
         useUserServer: {}, // 用户相关的接口
