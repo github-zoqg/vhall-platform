@@ -54,8 +54,24 @@ function getPlugins() {
       new FileManagerPlugin({
         events: {
           onEnd: {
-            mkdir: [`dist/${argv.project}/sourcemap`],
+            mkdir: [`dist/${argv.project}/docker`, `dist/${argv.project}/cloud`, `dist/${argv.project}/sourcemap`],
             copy: [
+              {
+                source: `dist/${argv.project}/index.html`,
+                destination: `dist/${argv.project}/docker/index.html`
+              },
+              {
+                source: `dist/${argv.project}/index.html`,
+                destination: `dist/${argv.project}/docker/${argv.version}/index.html`
+              },
+              {
+                source: `dist/${argv.project}/static`,
+                destination: `dist/${argv.project}/cloud/static`
+              },
+              {
+                source: `dist/${argv.project}/static`,
+                destination: `dist/${argv.project}/cloud/${argv.version}/static`
+              },
               {
                 source: `dist/${argv.project}/static/**/*.map`,
                 destination: `dist/${argv.project}/sourcemap`
@@ -67,21 +83,22 @@ function getPlugins() {
       }),
       // 修改文件内容替换路由标记
       new ReplaceInFileWebpackPlugin([
-        // {
-        //   dir: `dist/${argv.project}/cloud/static`,
-        //   test: /\.js$/,
-        //   rules: [{
-        //     search: '@routerBase',
-        //     replace: `${process.env.VUE_APP_ROUTER_BASE}`
-        //   }]
-        // }, {
-        //   dir: `dist/${argv.project}/cloud/${argv.version}/static`,
-        //   test: /\.js$/,
-        //   rules: [{
-        //     search: '@routerBase',
-        //     replace: `${process.env.VUE_APP_ROUTER_BASE}/${argv.version}`
-        //   }]
-        // },
+        {
+          dir: `dist/${argv.project}/docker/${argv.version}`,
+          files: ['index.html'],
+          rules: [{
+            search: /\/common-static\/(\S*)\/static/ig,
+            replace: `/common-static/${argv.project}/${argv.version}/static`
+          }]
+        },
+        {
+          dir: `dist/${argv.project}/cloud/${argv.version}/static`,
+          test: /\.js$/,
+          rules: [{
+            search: /base:"[\S\s]+?"/g,
+            replace: `base:"${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}"`
+          }]
+        },
         {
           dir: `dist/${argv.project}`,
           test: /\.js$/,
@@ -102,7 +119,7 @@ function getPlugins() {
  * 共享配置
  */
 const sharedConfig = {
-  publicPath: '/',
+  publicPath: isDev ? "/" : `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
@@ -138,15 +155,15 @@ const sharedConfig = {
     }
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
       // 编译结束后重新组织编译结果
-      config.plugin('reorganize').use(
-        new ReorganizePlugin({
-          resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
-          dist: path.resolve('dist'),
-          project: argv.project,
-          version: argv.version,
-          routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-        })
-      );
+      // config.plugin('reorganize').use(
+      //   new ReorganizePlugin({
+      //     resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
+      //     dist: path.resolve('dist'),
+      //     project: argv.project,
+      //     version: argv.version,
+      //     routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
+      //   })
+      // );
     }
   },
   // 向 CSS 相关的 loader 传递选项
