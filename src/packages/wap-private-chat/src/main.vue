@@ -19,6 +19,7 @@
   import getAvatar from '@/packages/chat/src/js/get-avatar';
   import Msg from '@/packages/chat/src/js/msg-class';
   import { formatTime } from '@/packages/chat/src/js/handle-time';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpWapPrivateChat',
     components: {
@@ -106,6 +107,9 @@
           }
           if (['text', 'image'].includes(msg.data.type)) {
             // 接收到私聊信息
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowTab', { type: 'private', visible: true })
+            );
             // 问答私聊消息，并且是自己的
             if (msg.data.target_id && msg.data.target_id == this.userId) {
               this.privateMsg = msg;

@@ -201,7 +201,18 @@ export const serverConfig = {
   //wap端私聊
   comPrivateChatWap: {
     component: 'VmpWapPrivateChat',
-    options: {}
+    options: {},
+    emitShowTab: [
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setVisible'
+      },
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setTipsVisible',
+        args: ['$0']
+      }
+    ]
   },
   // wap互动工具-签到
   comSignWap: {
