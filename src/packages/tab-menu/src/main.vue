@@ -286,8 +286,6 @@
   .vmp-tab-menu {
     height: 100%;
     font-size: 14px;
-    display: flex;
-    flex-direction: column;
 
     &__header {
       flex: 0 0 auto;
@@ -381,6 +379,7 @@
 
     &__main {
       flex: 1 1 auto;
+      height: calc(100% - 46px);
     }
   }
 </style>
