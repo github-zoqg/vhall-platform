@@ -35,6 +35,7 @@
 
 <script>
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     components: {
       SaasAlert
@@ -44,6 +45,13 @@
         popAlertCheckVisible: true,
         popAlertCheckConfirmVisible: false
       };
+    },
+    created() {
+      const { watchInitData } = useRoomBaseServer().state;
+      this.liveType = watchInitData?.webinar?.type;
+      if (this.liveType == 1) {
+        this.popAlertCheckVisible = false;
+      }
     },
     methods: {
       show() {

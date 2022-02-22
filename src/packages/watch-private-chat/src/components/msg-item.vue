@@ -130,6 +130,7 @@
         const strArr = str.split(regImg);
         // eslint-disable-next-line no-useless-escape
         const regUrl =
+          // eslint-disable-next-line no-useless-escape
           /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g;
 
         // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹

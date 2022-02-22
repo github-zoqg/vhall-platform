@@ -1,15 +1,20 @@
 <template>
-  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
-    <div
-      class="vmp-stream-list__local-container"
-      :class="{
-        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
-      }"
-    >
-      <div class="vmp-stream-list__remote-container-h">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+  <div
+    class="vmp-stream-list"
+    :class="{ 'vmp-stream-list-h0': isStreamListH0, 'vmp-stream-list-h-all': isStreamListHAll }"
+  >
+    <template v-if="micServer.state.isSpeakOn">
+      <div
+        class="vmp-stream-list__local-container"
+        :class="{
+          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
+        }"
+      >
+        <div class="vmp-stream-list__remote-container-h">
+          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+        </div>
       </div>
-    </div>
+    </template>
     <template v-if="remoteStreams.length">
       <div
         v-for="stream in remoteStreams"
@@ -24,11 +29,18 @@
         </div>
       </div>
     </template>
+    <!-- 播放 按钮 -->
+    <div class="vmp-stream-list-pause" v-show="showPlayIcon">
+      <p @click="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
+      </p>
+    </div>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import { debounce } from 'lodash';
   export default {
     name: 'VmpWapStreamList',
 
@@ -36,7 +48,9 @@
       return {
         childrenCom: [],
         miniElement: 'mainScreen',
-        maxElement: ''
+        maxElement: '',
+        playAbort: [], // 自动播放禁止的stream列表
+        showPlayIcon: false // 是否展示播放按钮
       };
     },
 
@@ -82,11 +96,19 @@
         } else {
           return false;
         }
+      },
+      isStreamListHAll() {
+        // 只存在订阅一路流的情况下进行铺满
+        return (
+          this.remoteStreams.length == 1 &&
+          !this.$domainStore.state.interactiveServer.localStream.streamId
+        );
       }
     },
 
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.micServer = useMicServer();
     },
 
     created() {
@@ -96,12 +118,29 @@
         this.childrenCom,
         this.$domainStore.state.interactiveServer.remoteStreams
       );
+      this.addSDKEvents();
+      this.replayPlay = debounce(this.replayPlay, 500);
       // this.getStreamList();
     },
 
     mounted() {},
 
     methods: {
+      addSDKEvents() {
+        // 监听到自动播放
+        this.interactiveServer.$on(VhallRTC.EVENT_STREAM_PLAYABORT, e => {
+          this.playAbort.push(e.data);
+          this.showPlayIcon = true;
+        });
+      },
+      // 恢复播放
+      replayPlay() {
+        this.playAbort.forEach(stream => {
+          this.interactiveServer.setPlay({ streamId: stream.streamId }).then(() => {
+            this.showPlayIcon = false;
+          });
+        });
+      },
       getStreamList() {
         this.interactiveServer.getRoomStreams();
         console.log('------remoteStreams------', this.remoteStreams);
@@ -133,6 +172,30 @@
       }
     }
 
+    &-pause {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      background: transparent;
+      p {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 46px;
+          color: #f5f5f5;
+        }
+      }
+    }
+
     // 流列表高度不为0
     .vmp-stream-list__main-screen {
       position: absolute;
@@ -160,6 +223,16 @@
       height: 0;
       .vmp-stream-list__main-screen {
         top: 0;
+      }
+    }
+    // 铺满全屏
+    &-h-all {
+      width: 100%;
+      top: 0;
+      .vmp-stream-list__main-screen {
+        top: 0;
+        width: 100%;
+        height: 100%;
       }
     }
   }
