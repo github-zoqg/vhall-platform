@@ -34,7 +34,7 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE_URL)
+        ROUTER_BASE_URL: isDev ? JSON.stringify("/") : JSON.stringify('@routerBaseUrl')
       }
     })
   ];
@@ -54,7 +54,11 @@ function getPlugins() {
       new FileManagerPlugin({
         events: {
           onEnd: {
-            mkdir: [`dist/${argv.project}/docker`, `dist/${argv.project}/cloud`, `dist/${argv.project}/sourcemap`],
+            mkdir: [
+              `dist/${argv.project}/docker`,
+              `dist/${argv.project}/cloud`,
+              `dist/${argv.project}/sourcemap`
+            ],
             copy: [
               {
                 source: `dist/${argv.project}/index.html`,
@@ -84,20 +88,52 @@ function getPlugins() {
       // 修改文件内容替换路由标记
       new ReplaceInFileWebpackPlugin([
         {
+          dir: `dist/${argv.project}/docker`,
+          files: ['index.html'],
+          rules: [
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}`
+            }
+          ]
+        },
+        {
           dir: `dist/${argv.project}/docker/${argv.version}`,
           files: ['index.html'],
-          rules: [{
-            search: /\/common-static\/(\S*)\/static/ig,
-            replace: `/common-static/${argv.project}/${argv.version}/static`
-          }]
+          rules: [
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}/${argv.version}`
+            }
+          ]
+        },
+        {
+          dir: `dist/${argv.project}/cloud/static`,
+          test: /\.js$/,
+          rules: [
+            {
+              search: /@routerBaseUrl/g,
+              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}"`
+            },
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}`
+            }
+          ]
         },
         {
           dir: `dist/${argv.project}/cloud/${argv.version}/static`,
           test: /\.js$/,
-          rules: [{
-            search: /base:"[\S\s]+?"/g,
-            replace: `base:"${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}"`
-          }]
+          rules: [
+            {
+              search: /@routerBaseUrl/g,
+              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}"`
+            },
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}/${argv.version}`
+            }
+          ]
         },
         {
           dir: `dist/${argv.project}`,
@@ -119,7 +155,7 @@ function getPlugins() {
  * 共享配置
  */
 const sharedConfig = {
-  publicPath: isDev ? "/" : `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
+  publicPath: isDev ? '/' : `${process.env.VUE_APP_PUBLIC_PATH}/common-static/@projectName/`,
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
