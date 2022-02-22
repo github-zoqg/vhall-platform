@@ -117,7 +117,6 @@
         }
 
         if (value === 'camera') {
-          await this.destroyStream();
           this.createPreview();
         }
       },
@@ -125,8 +124,11 @@
       async createPreview() {
         await this.destroyStream();
 
+        const videoNode = 'vmp-media-setting-preview-video';
+        document.getElementById(videoNode).innerHTML = '';
+
         const options = {
-          videoNode: 'vmp-media-setting-preview-video',
+          videoNode,
           audio: this.mediaState.audioInput === '' ? false : true,
           video: this.mediaState.video === '' ? false : true,
           profile: VhallRTC.RTC_VIDEO_PROFILE_480P_16X9_M,
@@ -152,10 +154,15 @@
       async destroyStream() {
         // if (!this.mediaState.videoPreviewStreamId) return;
         try {
-          await this.mediaSettingServer.stopVideoPreview();
+          const stoped = await this.mediaSettingServer.stopVideoPreview();
+
+          console.log('stoped:::', stoped);
+          return stoped;
         } catch (err) {
           console.error(`销毁流异常`, err);
         }
+
+        return true;
       },
       //TODO: let stream save
       saveStream() {},

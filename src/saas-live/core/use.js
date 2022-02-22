@@ -37,6 +37,7 @@ import VmpLiveTimer from '@/packages/live-timer';
 import VmpRebroadcast from '@/packages/rebroadcast';
 import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
+import VmpSignLive from '@/packages/sign-module/sign-live';
 
 // 全局注册组件
 export function initUse() {
@@ -75,6 +76,7 @@ export function initUse() {
   Vue.use(VmpRebroadcast);
   Vue.use(VmpRecommend);
   Vue.use(VmpLotteryLive);
+  Vue.use(VmpSignLive);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

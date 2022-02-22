@@ -3,7 +3,7 @@
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
-        <img src="./images/notice-icon.png" alt="" />
+        <img src="./img/notice-icon.png" alt="" />
       </div>
     </div>
     <div class="vmp-notice-list-container" v-if="isShowNotice">
@@ -163,7 +163,7 @@
       width: 492px;
       height: 382px;
       background: transparent;
-      background-image: url('./images/notice.png');
+      background-image: url('./img/notice.png');
       background-size: 100% 100%;
       &-data {
         position: absolute;

@@ -106,6 +106,7 @@
 
 <style lang="less" scoped>
   .vhsaas-reward-wrapper {
+    color: black;
     .vhsaas-reward-icon {
       width: 32px;
       cursor: pointer;

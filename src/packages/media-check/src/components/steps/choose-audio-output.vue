@@ -88,7 +88,8 @@
 
         selectedId: '',
         volume: 0.5,
-        isPaused: true
+        isPaused: true,
+        speakerReady: false
       };
     },
     watch: {

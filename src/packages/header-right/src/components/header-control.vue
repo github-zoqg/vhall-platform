@@ -159,6 +159,7 @@
         }
         this.$emit('thirdPushStream', true);
         this.thirtPushStreamimg = true;
+        this.roomBaseServer.setInavToolStatus('start_type', 4);
       },
       thirdPartyClose() {
         // 网页发起 第三方发起关闭
@@ -168,6 +169,7 @@
         }
         this.$emit('thirdPushStream', false);
         this.thirtPushStreamimg = false;
+        this.roomBaseServer.setInavToolStatus('start_type', 1);
       },
       openVirtualAudience() {
         // 虚拟人数弹窗
@@ -194,7 +196,7 @@
       font-size: 20px;
       cursor: pointer;
       border-radius: 50%;
-      background: url('../images/my-dark@2x.png') no-repeat;
+      background: url('../img/my-dark@2x.png') no-repeat;
       background-size: 100% 100%;
       // background-color: hsla(0, 0%, 88.6%, 0.15);
     }

@@ -186,7 +186,7 @@
             </el-table>
           </div>
           <div class="vmp-doc-lib__ft">
-            <div class="vmp-doc-lib__ft-tip">当前选中 {{ selectIds.length }} 个文档</div>
+            <div class="vmp-doc-lib__ft-tip">当前选中 {{ selectDocIdList.length }} 个文档</div>
             <div>
               <el-button type="primary" @click="handleDoclibSubmit">确定</el-button>
               <el-button @click="handleDoclibCancel">取消</el-button>
@@ -224,7 +224,7 @@
         // 资料库文档列表相关
         doclibSearchKey: '',
         doclibList: [],
-        selectIds: [], // 选中的文档ID列表
+        selectDocIdList: [], // 选中的文档ID列表
         isCheckAll: false
       };
     },
@@ -438,7 +438,7 @@
         }
       },
       cancelCheckHandle() {
-        this.selectIds = [];
+        this.selectDocIdList = [];
         this.doclibSearchKey = '';
         try {
           this.$refs.doclibTable.clearSelection();
