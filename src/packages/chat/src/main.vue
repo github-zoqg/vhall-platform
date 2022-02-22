@@ -879,6 +879,7 @@
           room_id: this.roomId,
           status: flag ? 1 : 0
         };
+        console.log('全体禁言：：：：', flag);
         useChatServer()
           .setAllBanned(params)
           .then(res => {

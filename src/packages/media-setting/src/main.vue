@@ -9,7 +9,7 @@
       @onReturn="isShow = false"
       @onClose="isShow = false"
     >
-      <section v-if="isShow" class="vmp-media-setting-dialog-body">
+      <section v-show="isShow" v-loading="loading" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
         <aside class="vmp-media-setting-menu">
           <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
@@ -113,6 +113,7 @@
     },
     data() {
       return {
+        loading: false,
         mediaState: this.mediaSettingServer.state,
         isShow: false, // dialog可视性
         isConfirmVisible: false, // 确定框可视性
@@ -137,11 +138,12 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
+      window.mediaSetting = this;
+      this.restart();
     },
     methods: {
       showMediaSetting() {
         this.isShow = true;
-        this.restart();
       },
 
       closeMediaSetting() {
@@ -174,6 +176,7 @@
       },
       restart() {
         try {
+          this.loading = true;
           this.getVideoDeviceInfo();
         } catch (error) {
           console.error('error:', error);
@@ -183,17 +186,24 @@
        * 保存确认
        */
       async saveMediaSetting() {
-        // const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
-        // if (watchInitData.webinar.type === 1) {
-        let text = '修改设置后导致重新推流，是否继续保存';
-        if (this.isRateChangeToHD) {
-          text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+        const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+
+        let action = 'not-living';
+
+        // 直播中
+        if (watchInitData.webinar.type === 1) {
+          let text = '修改设置后导致重新推流，是否继续保存';
+          if (this.isRateChangeToHD) {
+            text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+          }
+          action = await this.showConfirm(text);
         }
-        const action = await this.showConfirm(text);
-        if (action === 'confirm') {
+
+        if (action === 'not-living' || action === 'confirm') {
           this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
+          this.getStateCapture(); // 更新快照
         }
       },
       /**
@@ -265,6 +275,7 @@
 
         this.setDefaultSelected(); // 从localstorage和sessionStorage中恢复设置
         this.getStateCapture();
+        this.loading = false;
       },
       getStateCapture() {
         // 关心的都是浅拷贝数据

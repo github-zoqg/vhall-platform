@@ -21,6 +21,7 @@
         <label class="vmp-media-setting-item__label">桌面共享</label>
         <el-select
           class="vmp-media-setting-item__content"
+          :disabled="liveStatus === 1"
           v-model="mediaState.screenRate"
           placeholder="请选择桌面共享模式"
         >
@@ -39,7 +40,8 @@
           <div
             class="vmp-media-setting-item-layout__item"
             :class="{
-              'vmp-media-setting-item-layout__item--selected': mediaState.layout === item.id
+              'vmp-media-setting-item-layout__item--selected': mediaState.layout === item.id,
+              disabled: liveStatus === 1
             }"
             v-for="item of layoutConfig"
             :key="item.id"
@@ -75,6 +77,7 @@
   export default {
     data() {
       return {
+        loading: false,
         mediaState: this.mediaSettingServer.state,
 
         // v-for config
@@ -87,8 +90,10 @@
         ])
       };
     },
-    beforeCreate() {
-      this.mediaSettingServer = useMediaSettingServer();
+    computed: {
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      }
     },
     watch: {
       'mediaState.video'(cur, old) {
@@ -96,10 +101,19 @@
         this.getVideoConstraints(cur);
       }
     },
+    beforeCreate() {
+      this.mediaSettingServer = useMediaSettingServer();
+    },
+    created() {
+      window.basicSetting = this;
+      this.setDefault();
+      this.getVideoConstraints();
+    },
     methods: {
       async getVideoConstraints(deviceId) {
-        console.log('getVideoConstraints', deviceId);
+        deviceId = deviceId || this.mediaState.video;
         if (!deviceId) return;
+        this.loading = true;
 
         const constraints = await VhallRTC.vhallrtc.getVideoConstraints({ deviceId });
         console.log('媒体设置获取设备分辨率列表和对应设备ID', constraints, deviceId);
@@ -113,23 +127,25 @@
         this.ratesConfig = constraints.filter(item => {
           return availableRates.includes(item.label);
         });
+        this.loading = false;
       },
 
       setLayout(id) {
+        if (this.liveStatus === 1) return;
         this.mediaState.layout = id;
       },
 
       setDefault() {
-        const saveRate = sessionStorage.getItem('selectedRate');
-        const savedLayout = sessionStorage.getItem('layout');
+        const saveRate = sessionStorage.getItem('selectedRate') || '';
+        const saveScreenRate =
+          sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[0].value;
+        const savedLayout = sessionStorage.getItem('layout') || this.layoutConfig[0].id;
 
-        this.saveRate = this.saveRate || saveRate;
-
-        this.selectedLayout =
-          this.selectedLayout ||
-          (savedLayout != 'null' && savedLayout != 'undefined' ? savedLayout : '') ||
-          'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE';
+        this.mediaState.rate = saveRate;
+        this.mediaState.screenRate = saveScreenRate;
+        this.mediaState.layout = savedLayout;
       },
+
       formatDefinitionLabel(label) {
         const map = getDefinitionMap();
         return this.$t(map.get(label));
@@ -162,6 +178,10 @@
 
       &--selected {
         border: 1px solid #fc5659;
+      }
+
+      &.disabled {
+        cursor: not-allowed;
       }
 
       img {

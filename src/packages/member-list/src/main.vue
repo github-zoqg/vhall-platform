@@ -1734,6 +1734,19 @@
           .catch(err => {
             console.warn('禁言---res', err);
           });
+        // “禁言”要关闭当前用户的在麦状态
+        if (isBanned) {
+          return;
+        }
+        this.micServer
+          .speakOff({ receive_account_id: accountId, room_id: this.roomId })
+          .then(res => {
+            //todo 埋点上报
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
+          });
       },
       /**
        * 踢出/取消踢出

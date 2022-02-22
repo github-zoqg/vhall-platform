@@ -186,7 +186,7 @@
           isShieldingEffects: false
         },
         //聊天审核链接
-        chatFilterUrl: '',
+        chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
         //是否是助理
         assistantType: this.$route.query.assistantType
       };
@@ -199,8 +199,7 @@
       },
       //进入聊天审核
       joinChatAuth() {
-        //todo 暂时写死
-        const url = [location.origin, `/lives/chat-auth/${this.webinarId}`].join('');
+        const url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}`].join('');
         window.open(url, '_blank');
       },
       //切换表情模态窗展示

@@ -301,9 +301,9 @@
 </script>
 
 <style lang="less">
-  c {
+  .vh-goods {
     width: 100%;
-    height: 500px;
+    height: 100%;
     overflow-y: scroll;
 
     .vh-goods_item {
@@ -441,6 +441,7 @@
     }
 
     &.subscribe_goods {
+      height: 500px;
       padding: 16px 24px;
       box-sizing: border-box;
       .vh-goods_item {

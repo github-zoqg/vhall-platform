@@ -294,15 +294,52 @@
       }
     },
     methods: {
-      // 媒体切换后进行无缝切换
+      // 媒体切换后进行无缝切换  注：param只返回变更的信息
       async switchStreamType(param) {
         // 图片信息
+        console.warn('useMediaSettingServer', param, useMediaSettingServer().state);
+        // 当前选中的是图片推流
         if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-          if (param.canvasImgUrl) {
-            useMediaSettingServer().state.canvasImgUrl = param.canvasImgUrl;
-          }
           await this.$refs.imgPushStream.updateCanvasImg();
         }
+        // 音频设备的无缝切换   不和videoType进行关联
+        if (param.audioInput) {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localStream.streamId,
+              type: 'audio'
+            })
+            .then(res => {
+              console.log('切换成功---', res);
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
+        }
+        // 不存在切换 图片/音视频     只有音视频的设备变更 -> 执行无缝切换
+        if (
+          !param.videoType &&
+          this.$domainStore.state.mediaSettingServer.videoType == 'camera' &&
+          param.video
+        ) {
+          if (param.video) {
+            this.interactiveServer
+              .switchStream({
+                streamId: this.localStream.streamId,
+                type: 'video'
+              })
+              .then(res => {
+                console.log('切换成功---', res);
+              })
+              .catch(err => {
+                console.error('切换失败', err);
+              });
+          }
+          return;
+        }
+
+        // 正常进行重推操作
         if (this.isStreamPublished) {
           await this.stopPush();
           await this.startPush();

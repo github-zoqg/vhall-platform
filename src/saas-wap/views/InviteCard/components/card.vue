@@ -152,9 +152,10 @@
 <script>
   import Html2canvas from 'html2canvas';
   import defaultAvator from './images/default_avator.png';
-  import initWeChat from '@/utils/weChat';
+  import wechatMixin from '../js/wechatMixin';
   export default {
     name: 'invitationCard',
+    mixins: [wechatMixin],
     data() {
       return {
         selectBgDataInit: [
@@ -229,12 +230,8 @@
         };
       });
     },
-    mixins: [initWeChat],
     methods: {
       getRoomStatus() {
-        // 如果没有传递type=1表示非控制台触发，调用watch-get-info接口。若是传递了type=1，表示控制台扫码观看触发，调用邀请卡信息get-info接口
-        // const apiName = this.$route.query.type == 1 ? 'showInvite' : 'createInvite'
-        const apiName = 'createInvite';
         const params = {
           webinar_id: this.$route.params.id
         };
@@ -246,16 +243,8 @@
           params.invite_id = this.$route.query.join_id;
         }
         console.log('邀请卡信息获取...', params);
-        /*, {
-        headers: {
-          token: token,
-          interact_token: interact_token
-        }
-      }*/
-        this.$axios(apiName, params).then(res => {
-          if (apiName === 'showInvite') {
-            this.submitCreateHistory(res.data.join_id);
-          }
+
+        this.$axios('createInvite', params).then(res => {
           this.showInvite = parseInt(res.data.status) === 1 ? 'true' : 'false';
           this.webinarInfo.avatar = res.data.avatar || defaultAvator;
           this.webinarInfo.title = res.data.invite_card.title;

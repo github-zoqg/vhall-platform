@@ -3,7 +3,7 @@
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
       <div
-        v-if="isAllowhandup || isSpeakOn"
+        v-if="!isBanned && (isAllowhandup || isSpeakOn)"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
       >
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useChatServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
@@ -114,7 +114,8 @@
         location:
           window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
-        handUpStatus: false
+        handUpStatus: false,
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     computed: {
@@ -134,7 +135,14 @@
         nickname: this.roomBaseState.watchInitData.join_info.nickname,
         hideChatHistory: this.configList['ui.hide_chat_history'] == 1
       };
-      console.log(this.roomBaseState, 'roomBaseState');
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isBanned = res;
+      });
     },
     methods: {
       opneGifts() {
