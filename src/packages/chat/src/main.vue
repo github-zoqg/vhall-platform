@@ -231,7 +231,7 @@
           placeholder: this.$t('chat.chat_1021'),
           disable: false
         },
-        isBanned: useChatServer().state.isBanned, //true禁言，false未禁言
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
         // 聊天是否需要登录
         chatLoginStatus: false,
