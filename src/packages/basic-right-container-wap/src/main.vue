@@ -45,7 +45,6 @@
   .base-box {
     display: flex;
     flex-direction: column;
-    background: #ddd;
     position: absolute;
     display: inline-block;
     right: 26px;

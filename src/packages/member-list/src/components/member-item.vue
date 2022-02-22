@@ -12,7 +12,7 @@
         class="vmp-member-item__avatar-wrapper__phone"
         width="9"
         height="12"
-        src="../images/phone.png"
+        src="../img/phone.png"
         alt
       />
     </div>
@@ -341,7 +341,7 @@
       },
       //直播状态，0未开始，1已开始，2已结束
       status: {
-        type: [Array, String],
+        type: [Array, String, Number],
         default: () => {
           return 0;
         }
@@ -823,7 +823,7 @@
         margin-left: 3px;
         color: #cccccc;
         font-size: 12px;
-        background: url('../images/more.png') no-repeat center;
+        background: url('../img/more.png') no-repeat center;
         background-size: 13px 3px;
         border-radius: 4px;
         &:hover {

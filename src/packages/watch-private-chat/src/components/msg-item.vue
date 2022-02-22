@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
   export default {
     name: 'VmpWatchPrivateChatMsgTemplate',
     filters: {

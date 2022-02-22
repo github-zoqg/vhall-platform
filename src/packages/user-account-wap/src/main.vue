@@ -97,37 +97,37 @@
     </van-popup>
 
     <!-- 设置手机号 -->
-    <!-- <van-popup
-      v-model="phoneDialog.visible"
-      class="user-info-dialog"
-      v-if="phoneDialog.visible"
-      :close-on-click-overlay="false"
-      get-container="body"
-    ></van-popup> -->
+    <bind-phone v-model="phoneDialog" />
 
     <!-- 设置密码 -->
-    <!-- <van-popup
-      v-model="pwdDialog.visible"
-      class="user-info-dialog"
-      v-if="pwdDialog.visible"
-      :close-on-click-overlay="false"
-      get-container="body"
-    ></van-popup> -->
+    <bind-password v-model="pwdData" />
   </div>
 </template>
 
 <script>
   import { useUserServer } from 'middle-domain';
-  import NECaptchaLanguages from './js/setNECLanguages';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import BindPhone from './components/bind-phone';
+  import BindPassword from './components/bind-password';
   export default {
     name: 'VmpUserAccountWap',
-    mixins: [NECaptchaLanguages],
+    components: { BindPhone, BindPassword },
     data() {
       return {
         useUserServer: {},
         visible: false,
         fileList: [],
-        nickName: ''
+        nickName: '',
+        phoneDialog: {
+          visible: false,
+          step: 1,
+          type: 'add',
+          phone: ''
+        },
+        pwdData: {
+          type: 'add',
+          visible: false
+        }
       };
     },
     created() {
@@ -143,10 +143,18 @@
       // 关闭弹窗
       closePopup() {
         this.visible = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCloseUserCenterWap'));
       },
 
       // 打开手机号弹窗
-      openPhoneHandler() {},
+      openPhoneHandler() {
+        this.phoneDialog = {
+          visible: true,
+          type: this.useUserServer.state.userInfo.phone ? 'edit' : 'add',
+          step: 1,
+          phone: this.useUserServer.state.userInfo.phone
+        };
+      },
 
       // 图片上传前的回调
       handleuploadBefore(file) {
@@ -239,7 +247,10 @@
       },
 
       // 修改密码
-      openPwdHandler() {}
+      openPwdHandler() {
+        this.pwdData.visible = true;
+        this.pwdData.type = this.useUserServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
+      }
     }
   };
 </script>

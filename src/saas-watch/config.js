@@ -1,6 +1,5 @@
 export const globalConfig = {
-  lang: 'zh',
-  skin: 'new-year'
+  lang: 'zh'
 };
 
 // 服务配置
@@ -41,11 +40,18 @@ export const serverConfig = {
   },
   layerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
-    children: ['comPcPlayer', 'comWatchAsideMenu', 'comDocUne', 'comFooterTools', 'comNoticeColumn']
+    children: [
+      'comPcPlayer',
+      'comWatchAsideMenu',
+      'comDocUne',
+      'comFooterTools',
+      'comNoticeColumn',
+      'comLivingEnd'
+    ]
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comTabMenu']
+    children: ['comPcRewardEffect', 'comTabMenu']
   },
   /*** 布局定义end */
 
@@ -143,6 +149,10 @@ export const serverConfig = {
   // 播放器
   comPcPlayer: {
     component: 'VmpPcPlayer'
+  },
+  // 结束页面
+  comLivingEnd: {
+    component: 'VmpLivingEnd'
   },
   // 顶部
   comHeaderWatch: {
@@ -307,6 +317,10 @@ export const serverConfig = {
       method: 'changePlayTime',
       args: ['$0']
     }
+  },
+  // 礼物动画组件
+  comPcRewardEffect: {
+    component: 'VmpPcRewardEffect'
   },
   // 推荐
   comRecommend: {

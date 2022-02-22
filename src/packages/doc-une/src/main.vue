@@ -323,19 +323,19 @@
           // 文档是否可见状态变化事件
           this.docServer.$on('dispatch_doc_switch_change', val => {
             console.log('===[doc]=======dispatch_doc_switch_change=============', val);
-            if (val) {
+            if (val && this.show) {
               this.recoverLastDocs();
             }
           });
-
-          // 直播结束
-          this.msgServer.$on('live_over', () => {
-            console.log('[doc]---直播结束---');
-            this.hasStreamList = 0;
-          });
-        } else {
-          // 主持端事件
         }
+
+        // 直播结束
+        this.msgServer.$on('live_over', () => {
+          console.log('[doc]---直播结束---');
+          this.docServer.state.switchStatus = false;
+          useRoomBaseServer().setChangeElement('doc');
+          this.hasStreamList = false;
+        });
 
         // 监控文档区域大小改变事件
         let erd = elementResizeDetectorMaker();

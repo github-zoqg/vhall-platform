@@ -1,13 +1,16 @@
 <template>
-  <div
-    class="vmp-basic-layout"
-    v-loading="state === 0"
-    element-loading-text="加载中..."
-    element-loading-background="rgba(255, 255, 255, 0.1)"
-  >
+  <div class="vmp-basic-layout">
+    <van-loading
+      v-show="state === 0"
+      size="32px"
+      type="spinner"
+      :vertical="true"
+      style="margin-top: 40%"
+    >
+      加载中...
+    </van-loading>
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
-      <!-- <div>wap观看端</div> -->
     </div>
   </div>
 </template>
@@ -87,4 +90,3 @@
     }
   };
 </script>
-<style lang="less"></style>

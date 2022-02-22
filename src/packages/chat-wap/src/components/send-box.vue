@@ -1,17 +1,13 @@
 <template>
-  <div
-    ref="indexUpdate"
-    class="send-msg-wrapper"
-    :class="[className, { 'send-msg-wrapper-top': showEmojiArr }]"
-  >
-    <div class="send-msg">
+  <div class="vmp-send-box" :class="[className]">
+    <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isShowUser">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
           <img class="avatar-img" :src="avatar" srcset />
         </div>
       </div>
-      <div class="need-input">
+      <div class="content-input">
         <template v-if="chatShow">
           <div
             class="content-input__placeholder"
@@ -21,7 +17,11 @@
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
             {{ $t('chat.chat_1043') }}
           </div>
-          <div v-else class="update-chat placeholder" @click="saySomething">
+          <div
+            v-else
+            class="content-input__update-chat content-input__placeholder"
+            @click="saySomething"
+          >
             <span
               v-if="
                 (isBanned && !groupInitData.isInGroup) ||
@@ -60,10 +60,11 @@
     <chat-wap-input-modal ref="chatWapInputModal" @sendMsg="sendMessage"></chat-wap-input-modal>
   </div>
 </template>
+
 <script>
   import chatWapInputModal from './chatWapInputModal';
   import EventBus from '../js/Events';
-  import { emojiToPath, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import { emojiToPath } from '@/packages/chat/src/js/emoji';
   import {
     useGroupServer,
     useRoomBaseServer,
@@ -72,9 +73,6 @@
     useMsgServer,
     useUserServer
   } from 'middle-domain';
-  import getAvatar from '@/packages/chat/src/js/get-avatar';
-  import Msg from '@/packages/chat/src/js/msg-class';
-  import { formatTime, handleTime } from '@/packages/chat/src/js/handle-time';
 
   export default {
     props: {
@@ -159,7 +157,7 @@
         //配置列表
         configList: {},
         //用户头像
-        avatar: require('../images/default_avatar.png')
+        avatar: require('../img/default_avatar.png')
       };
     },
     computed: {
@@ -170,6 +168,10 @@
       },
       //是否需要登录
       isNeedLogin() {
+        let needLogin = true;
+        if (['', null, void 0].includes(this.configList['ui.show_chat_without_login'])) {
+          return needLogin;
+        }
         return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
       },
       //当前登录人信息
@@ -177,6 +179,10 @@
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {} } = watchInitData;
         return join_info;
+      },
+      //设备状态
+      deviceStatus() {
+        return this.mediaCheckServer.state.isBrowserNotSupport;
       }
     },
     watch: {
@@ -226,105 +232,37 @@
           this.isLogin = true;
           // 若用户已经登录过，获取userInfo
           this.isShowUser = true;
-          this.avatar = userInfo.avatar || require('../images/default_avatar.png');
+          this.avatar = userInfo.avatar || require('../img/default_avatar.png');
         } else {
+          this.isLogin = false;
           this.isShowUser = false;
         }
-        this.vantFaildPlacer =
-          this.currentTab == 'private'
-            ? this.$t('chat.chat_1045')
-            : this.currentTab == 'qa'
-            ? this.$t('chat.chat_1066')
-            : this.$t('chat.chat_1042');
       },
       // eventBus监听
       eventListener() {
         // 直播结束不展示入口
-        EventBus.$on('live_over', e => {
+        this.msgServer.$on('live_over', e => {
           console.log(e);
           this.connectMicShow = false;
         });
         // 接收开启连麦消息事件
-        EventBus.$on('vrtc_connect_open', msg => {
-          console.log(9999999, msg);
+        this.msgServer.$on('vrtc_connect_open', msg => {
+          console.log(msg);
           this.connectMicShow = true;
         });
-        // 全员禁言
-        EventBus.$on('disable_all', val => {
-          console.log(val);
-          this.disabledAll = true;
-        });
-        // 全员取消禁言
-        EventBus.$on('permit_all', val => {
-          console.log(val);
-          this.disabledAll = false;
-        });
+
         // 接收关闭连麦消息事件
-        EventBus.$on('vrtc_connect_close', msg => {
+        this.msgServer.$on('vrtc_connect_close', msg => {
           console.log(msg);
           this.connectMicShow = false;
         });
-        // EventBus.$on('vrtc_connect_success', (msg) => {
-        //   this.connectMicShow = true;
-        // });
 
         EventBus.$on('refreshSendBox', () => {
           this.$forceUpdate();
         });
-        EventBus.$on('sendMsg', (inputValue, showTabType) => {
-          if (showTabType == 'qa') {
-            this.canSend = false;
-            this.timmer = window.setInterval(() => {
-              this.time--;
-              if (this.time == 0) {
-                this.time = 15;
-                window.clearInterval(this.timmer);
-                this.canSend = true;
-              }
-            }, 1000);
-          } else if (showTabType == 3 || showTabType == 4) {
-            // 按在线人数 计算- 发送聊天的延时
-            this.waitTime = this.delayTime(this.localRoomInfo.OnlineNum, 1);
-            if (this.waitTime <= 0) {
-              this.waitTimeFlag = true;
-            } else {
-              this.waitTimeFlag = false;
-            }
-            this.waitTimeSet = window.setInterval(() => {
-              if (this.waitTime <= 1) {
-                this.waitTime = 1;
-                window.clearInterval(this.waitTimeSet);
-                this.waitTimeFlag = true;
-              }
-              this.waitTime--;
-            }, 1000);
-          }
-        });
-        EventBus.$on('blurEmojie', msg => {
-          console.log(msg);
-          if (this.showEmojiArr) {
-            this.showEmojiArr = false;
-          }
-        });
-        EventBus.$on('closeIcon', () => {
-          if (this.showEmojiArr) {
-            this.showEmojiArr = false;
-          }
-        });
-        EventBus.$on('zIndexShowFalse', value => {
-          /* 同下面  无使用祖先元素   先让其元素进行层级修改后根据真实状况再次修改 */
-          this.$refs.indexUpdate.style.zIndex = '21';
-          console.log(value);
-        });
-        EventBus.$on('zIndexShow', value => {
-          if (value) {
-            this.$refs.indexUpdate.style.zIndex = '21';
-          } else {
-            this.$refs.indexUpdate.style.zIndex = '22';
-          }
-        });
+
         // 头像更新
-        EventBus.$on('CHAT_AVATAR_CHANGE', avatar => {
+        this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
           this.avatar = avatar;
         });
       },
@@ -366,8 +304,10 @@
         }
         return Math.floor(o * result);
       },
-      //登录 todo 发送信令唤起登录
-      login() {},
+      //登录
+      login() {
+        this.$emit('login');
+      },
       //发送消息
       sendMessage(value = '') {
         // 关键词过滤标识
@@ -383,46 +323,16 @@
           //清除当前消息
           chatServer.clearCurMsg();
         }
+      },
+      // 打开个人中心
+      showUserPopup() {
+        this.$emit('showUserPopup');
       }
     }
   };
 </script>
 <style lang="less" scoped>
-  .vh-chat-InputArea {
-    width: 100%;
-    height: 196px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    z-index: 900;
-    input {
-      position: absolute;
-      left: 0;
-      right: 100px;
-    }
-    p {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 80px;
-      display: inline-block;
-      text-align: center;
-      height: 80px;
-      background: #fc5659;
-      margin-left: 24px;
-      border-radius: 50%;
-      vertical-align: baseline;
-      padding: 25px 6px 20px 0;
-      color: #fff;
-      overflow: hidden;
-      i {
-        font-size: 36px;
-      }
-    }
-  }
-  .send-msg-wrapper {
+  .vmp-send-box {
     &::after {
       content: '';
       position: absolute;
@@ -437,19 +347,12 @@
 
     position: absolute;
     left: 0;
-    bottom: 0px;
+    bottom: 0;
     width: 100%;
     position: fixed;
     transition: 0.35s all;
     z-index: 22;
-    .enterbase {
-      height: 100%;
-      width: calc(100% - 50px);
-      float: left;
-      padding: 0;
-      background: #f5f5f5;
-    }
-    .send-msg {
+    &__content {
       width: 100%;
       height: 120px;
       background-color: #ffffff;
@@ -457,20 +360,11 @@
       box-sizing: border-box;
       display: flex;
       align-items: center;
-      .need-input {
+      .content-input {
         flex: 1;
         display: flex;
         align-items: center;
-        .emoji {
-          margin-right: 10px;
-          overflow: hidden;
-          height: 100%;
-          .iconbiaoqing {
-            font-size: 40px;
-            color: #a6a6a6;
-          }
-        }
-        .placeholder {
+        .content-input__placeholder {
           background-color: #f5f5f5;
           color: #444444;
           border-radius: 40px;
@@ -485,7 +379,7 @@
         }
       }
       // add 新增
-      .update-chat ::v-deep {
+      .content-input__update-chat ::v-deep {
         height: 60px;
         line-height: 60px;
         width: 100%;
@@ -520,65 +414,9 @@
           }
         }
       }
-      .sendBox {
-        width: 80px;
-        display: inline-block;
-        text-align: center;
-        height: 80px;
-        background: #fc5659;
-        margin-left: 24px;
-        border-radius: 50%;
-        vertical-align: baseline;
-        padding: 25px 6px 20px 0;
-        color: #fff;
-        overflow: hidden;
-        i {
-          font-size: 36px;
-        }
-      }
-      &.v-private {
-        .need-input {
-          width: 100%;
-        }
-      }
-      &.v-qa {
-        .need-input {
-          width: 540px;
-          margin-right: 30px;
-        }
-        .send-box {
-          padding: 20px 30px;
-          &::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            /* prettier-ignore */
-            border-bottom: 1PX solid #e2e2e2;
-            left: 0;
-            top: 0;
-            transform-origin: 0 bottom;
-            opacity: 1;
-          }
-          display: flex;
-          align-items: center;
-          color: #444444;
-          .input-wrapper {
-            // padding: 19px 20px;
-            margin-right: 30px;
-            flex: 1;
-            background-color: #f5f5f5;
-            border-radius: 50px;
-            font-size: 30px;
-            line-height: 42px;
-          }
-        }
-        .only-my {
-          color: #fc5659;
-        }
-      }
     }
   }
-  .user-advatar-panel {
+  .user-avatar-wrap {
     vertical-align: middle;
     display: inline-flex;
     margin-right: 12px;
@@ -589,7 +427,7 @@
       border-radius: 100%;
     }
   }
-  .user-advatar-box {
+  .user-avatar-wrap__avatar {
     width: 60px;
     height: 60px;
     vertical-align: middle;
@@ -600,28 +438,6 @@
       height: 100%;
       object-fit: cover;
       border-radius: 100%;
-    }
-  }
-  .user-advatar-popup {
-    box-sizing: border-box;
-    padding: 20px 30px 40px 30px;
-    .user-menu-item {
-      text-align: left;
-      margin-top: 0;
-      height: 88px;
-      line-height: 88px;
-      i.iconfont {
-        font-size: 48px;
-      }
-      .user-menu-box {
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 20px;
-      }
-      p {
-        display: inline-block;
-        vertical-align: middle;
-      }
     }
   }
   @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {

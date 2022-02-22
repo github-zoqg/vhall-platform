@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-chat-msg-item">
     <!--消息发送时间-->
-    <div v-if="msg.showTime" class="vmp-chat-msg-item__showtime">{{ msg.showTime }}</div>
+    <div v-if="showTime" class="vmp-chat-msg-item__showtime">{{ showTime }}</div>
     <!--常规消息-->
     <div
       :class="[
@@ -34,7 +34,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../images/phone.png"
+                src="../img/phone.png"
                 alt
               />
             </div>
@@ -47,7 +47,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../images/phone.png"
+                src="../img/phone.png"
                 alt
               />
             </div>
@@ -180,7 +180,7 @@
             <img
               v-if="msg.type == 'red_envelope_ok'"
               class="interact-content__redpackage-img"
-              src="../images/red-package-1.png"
+              src="../img/red-package-1.png"
               alt=""
             />
             <span>{{ msg.content.text_content }}</span>
@@ -211,7 +211,7 @@
                 'interact-tools-content__img-scale': msg.content.source_status === '0',
                 'interact-tools-content__img-reward': !msg.content.gift_url
               }"
-              :src="msg.content.gift_url || require('../images/red-package-1.png')"
+              :src="msg.content.gift_url || require('../img/red-package-1.png')"
               :alt="$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="msg.type === 'reward_pay_ok'" />
@@ -226,6 +226,7 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
+  import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',
     props: {
@@ -252,6 +253,11 @@
         default: () => {
           return {};
         }
+      },
+      //前一条消息
+      preMsg: {
+        type: Object,
+        default: null
       }
     },
     data() {
@@ -261,7 +267,14 @@
         isEmbed: false
       };
     },
-    computed: {},
+    computed: {
+      showTime() {
+        if (!this.preMsg) {
+          return handleChatShowTime('', this.msg.sendTime);
+        }
+        return handleChatShowTime(this.preMsg.sendTime, this.msg.sendTime);
+      }
+    },
     filters: {
       //文字过长截取
       textOverflowSlice(val = '', len = 0) {
@@ -343,7 +356,7 @@
             'set_person_status_in_chat',
             event.target,
             msg.sendId,
-            msg.msgId,
+            msg.count,
             msg.nickname,
             false,
             msg.roleName
@@ -358,7 +371,7 @@
           'set_person_status_in_chat',
           event.target,
           msg.sendId,
-          msg.msgId,
+          msg.count,
           msg.nickname,
           true,
           msg.roleName
