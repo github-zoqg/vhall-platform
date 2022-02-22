@@ -133,6 +133,7 @@
     },
     created() {
       this._originCaptureState = {};
+      this._diffOptions = {};
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
@@ -190,8 +191,10 @@
 
         let action = 'not-living';
 
+        this._diffOptions = this.getDiffOptions();
+        const videoTypeChanged = this._diffOptions.videoType !== undefined;
         // 直播中
-        if (watchInitData.webinar.type === 1) {
+        if (watchInitData.webinar.type === 1 && videoTypeChanged) {
           let text = '修改设置后导致重新推流，是否继续保存';
           if (this.isRateChangeToHD) {
             text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
@@ -221,8 +224,8 @@
        * 发送变化事件
        */
       sendChangeEvent() {
-        const diffOptions = this.getDiffOptions();
-        console.log('diffOptions:', diffOptions);
+        const diffOptions = this._diffOptions;
+
         if (Object.keys(diffOptions) === 0) return;
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));

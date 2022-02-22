@@ -68,7 +68,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useChatServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
@@ -129,6 +129,11 @@
         return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
+    created() {
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
+    },
     mounted() {
       this.joinInfoInGift = {
         avatar: this.roomBaseState.watchInitData.join_info.avatar,
@@ -142,6 +147,9 @@
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
         this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
       });
     },
     methods: {

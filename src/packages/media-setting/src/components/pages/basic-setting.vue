@@ -10,9 +10,9 @@
         >
           <el-option
             v-for="rate in ratesConfig"
-            :key="rate.label"
-            :value="rate.label"
-            :label="formatDefinitionLabel(rate.label)"
+            :key="rate"
+            :value="rate"
+            :label="formatDefinitionLabel(rate)"
           ></el-option>
         </el-select>
       </section>
@@ -79,9 +79,12 @@
       return {
         loading: false,
         mediaState: this.mediaSettingServer.state,
-
-        // v-for config
-        ratesConfig: [],
+        ratesConfig: Object.freeze([
+          'RTC_VIDEO_PROFILE_720P_16x9_M', // 超清
+          'RTC_VIDEO_PROFILE_480P_16x9_M', // 高清
+          'RTC_VIDEO_PROFILE_360P_16x9_M', // 标清
+          'RTC_VIDEO_PROFILE_240P_16x9_M' // 流畅
+        ]),
         screenRatesConfig: getScreenOptions(),
         layoutConfig: Object.freeze([
           { id: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE', img: FloatImg, text: '主次浮窗' },
@@ -95,41 +98,14 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
-    watch: {
-      'mediaState.video'(cur, old) {
-        if (cur === old) return;
-        this.getVideoConstraints(cur);
-      }
-    },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
     },
     created() {
       window.basicSetting = this;
       this.setDefault();
-      this.getVideoConstraints();
     },
     methods: {
-      async getVideoConstraints(deviceId) {
-        deviceId = deviceId || this.mediaState.video;
-        if (!deviceId) return;
-        this.loading = true;
-
-        const constraints = await VhallRTC.vhallrtc.getVideoConstraints({ deviceId });
-        console.log('媒体设置获取设备分辨率列表和对应设备ID', constraints, deviceId);
-        const availableRates = [
-          'RTC_VIDEO_PROFILE_720P_16x9_M',
-          'RTC_VIDEO_PROFILE_480P_16x9_M',
-          'RTC_VIDEO_PROFILE_360P_16x9_M',
-          'RTC_VIDEO_PROFILE_720P_16x9_M',
-          'RTC_VIDEO_PROFILE_240P_16x9_M'
-        ];
-        this.ratesConfig = constraints.filter(item => {
-          return availableRates.includes(item.label);
-        });
-        this.loading = false;
-      },
-
       setLayout(id) {
         if (this.liveStatus === 1) return;
         this.mediaState.layout = id;

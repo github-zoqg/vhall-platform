@@ -83,7 +83,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useChatServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -131,6 +131,10 @@
       }
     },
     computed: {
+      // 是否已上麦
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       isInteractLive() {
         const { watchInitData } = this.roomBaseState;
         return (
@@ -180,6 +184,9 @@
           this.showGift = false;
         }
       });
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
     },
     mounted() {
       //监听禁言通知
@@ -189,6 +196,9 @@
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
         this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
       });
     },
     methods: {
