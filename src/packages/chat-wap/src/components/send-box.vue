@@ -36,7 +36,7 @@
           </div>
         </template>
       </div>
-      <div class="interact-wrapper">
+      <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
         <div
           class="icon-wrapper"

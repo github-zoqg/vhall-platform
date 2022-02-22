@@ -198,6 +198,11 @@ export const serverConfig = {
     children: ['comInteractToolsWap'],
     options: {}
   },
+  //wap端私聊
+  comPrivateChatWap: {
+    component: 'VmpWapPrivateChat',
+    options: {}
+  },
   // wap互动工具-签到
   comSignWap: {
     component: 'VmpSignWap',
