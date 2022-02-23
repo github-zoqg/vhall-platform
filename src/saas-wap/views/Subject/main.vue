@@ -183,7 +183,6 @@
             desc = info.intro.replace(/&nbsp;/g, '');
             desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
             desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
-            console.log(9191, desc);
 
             // this.initWeChatSdk(
             //   { ...params },
