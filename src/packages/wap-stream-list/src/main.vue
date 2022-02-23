@@ -3,18 +3,17 @@
     class="vmp-stream-list"
     :class="{ 'vmp-stream-list-h0': isStreamListH0, 'vmp-stream-list-h-all': isStreamListHAll }"
   >
-    <template v-if="micServer.state.isSpeakOn">
-      <div
-        class="vmp-stream-list__local-container"
-        :class="{
-          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
-        }"
-      >
-        <div class="vmp-stream-list__remote-container-h">
-          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-        </div>
+    <div
+      class="vmp-stream-list__local-container"
+      :class="{
+        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
+      }"
+      v-show="micServer.state.isSpeakOn"
+    >
+      <div class="vmp-stream-list__remote-container-h">
+        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
-    </template>
+    </div>
     <template v-if="remoteStreams.length">
       <div
         v-for="stream in remoteStreams"
