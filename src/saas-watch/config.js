@@ -342,5 +342,34 @@ export const serverConfig = {
         args: ['$0']
       }
     ]
+  },
+
+  // 预约页面配置
+  layerSubscribeRoot: {
+    component: 'VmpAirContainer',
+    children: ['layerSubscribeHeader', 'layerSubscribeBody', 'layerSubscribeFooter', 'comAllDialog']
+  },
+  // 顶部header容器
+  layerSubscribeHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-hd',
+    children: ['comHeaderWatch']
+  },
+  // 中间主区域容器
+  layerSubscribeBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-bd',
+    children: ['comVmpSubscribeBody']
+    // children: ['comGoodSaas']
+    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
+  },
+  // 底部主区域容器
+  layerSubscribeFooter: {
+    component: 'VmpFooter',
+    className: 'vmp-footer'
+  },
+  comVmpSubscribeBody: {
+    component: 'VmpSubscribeBody',
+    children: ['comTabMenu']
   }
 };
