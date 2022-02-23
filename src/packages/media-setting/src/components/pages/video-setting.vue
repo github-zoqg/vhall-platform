@@ -23,7 +23,7 @@
       </section>
 
       <section v-show="mediaState.videoType === 'camera'" class="vmp-media-setting-video-canvas">
-        <div id="vmp-media-setting-preview-video" style="height: 100%"></div>
+        <div ref="videoPreviewer" id="vmp-media-setting-preview-video" style="height: 100%"></div>
         <div
           v-show="isVideoSwitching || isVideoError"
           class="vmp-media-setting-preview-loading-container"
@@ -79,15 +79,8 @@
     },
     watch: {
       'mediaState.video'(val) {
-        this.mediaSettingServer.setState('video', val);
+        if (val === undefined || val === '') return;
         this.createPreview();
-      },
-      devices(val) {
-        if (val && val.length) {
-          this.mediaSettingServer.setState('video', val[0].deviceId);
-        } else {
-          sessionStorage.removeItem('selectedVideoDeviceId');
-        }
       }
     },
     beforeCreate() {
@@ -96,20 +89,11 @@
     created() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
-
-      // this.setDefaultVideoType();
     },
     beforeDestroy() {
-      // this.destroyStream();
+      this.destroyStream();
     },
     methods: {
-      // setDefaultVideoType() {
-      //   let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
-      //   if (param && param.flag === true && param.streamUrl !== '') {
-      //     this.mediaState.videoType = 'picture';
-      //     this.mediaState.canvasImgUrl = param.streamUrl;
-      //   }
-      // },
       async onVideoTypeChange(value) {
         this.mediaSettingServer.setState('videoType', value);
         if (value === 'picture') {
@@ -117,13 +101,14 @@
         }
 
         if (value === 'camera') {
-          await this.destroyStream();
           this.createPreview();
         }
       },
       // 创建视频流
       async createPreview() {
         await this.destroyStream();
+
+        this.$refs['videoPreviewer'].innerHTML = '';
 
         const options = {
           videoNode: 'vmp-media-setting-preview-video',
@@ -150,12 +135,14 @@
         }
       },
       async destroyStream() {
-        // if (!this.mediaState.videoPreviewStreamId) return;
         try {
-          await this.mediaSettingServer.stopVideoPreview();
+          const stoped = await this.mediaSettingServer.stopVideoPreview();
+          return stoped;
         } catch (err) {
           console.error(`销毁流异常`, err);
         }
+
+        return true;
       },
       //TODO: let stream save
       saveStream() {},

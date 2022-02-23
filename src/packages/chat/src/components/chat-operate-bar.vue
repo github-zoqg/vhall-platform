@@ -17,7 +17,7 @@
         </template>
         <!--只看主办方按钮-->
         <i
-          class="vh-iconfont vh-line-setting"
+          class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
           @click.stop="onClickFilterSetting"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
@@ -404,7 +404,7 @@
         position: absolute;
         top: -11px;
         transform: translateY(-100%);
-        .vh-line-setting {
+        .vh-saas-a-line-zhikanzhubanfang {
           font-size: 19px;
           color: #999;
           margin-left: 10px;

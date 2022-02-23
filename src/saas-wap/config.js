@@ -129,7 +129,7 @@ export const serverConfig = {
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
+        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001' }, // 文档
         { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
         { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
         { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
@@ -201,7 +201,18 @@ export const serverConfig = {
   //wap端私聊
   comPrivateChatWap: {
     component: 'VmpWapPrivateChat',
-    options: {}
+    options: {},
+    emitShowTab: [
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setVisible'
+      },
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setTipsVisible',
+        args: ['$0']
+      }
+    ]
   },
   // wap互动工具-签到
   comSignWap: {
@@ -282,5 +293,9 @@ export const serverConfig = {
   // 抽奖
   compLotteryWap: {
     component: 'VmpLotteryWap'
+  },
+  // 章节
+  comChapterWap: {
+    component: 'VmpChapterWap'
   }
 };

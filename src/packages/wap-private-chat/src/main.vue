@@ -19,6 +19,7 @@
   import getAvatar from '@/packages/chat/src/js/get-avatar';
   import Msg from '@/packages/chat/src/js/msg-class';
   import { formatTime } from '@/packages/chat/src/js/handle-time';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpWapPrivateChat',
     components: {
@@ -105,7 +106,10 @@
             console.log(e);
           }
           if (['text', 'image'].includes(msg.data.type)) {
-            // 接收到私聊信息
+            // 接收到私聊信息,发送信令显示私聊tab，并且更新小红点
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowTab', { type: 'private', visible: true })
+            );
             // 问答私聊消息，并且是自己的
             if (msg.data.target_id && msg.data.target_id == this.userId) {
               this.privateMsg = msg;
@@ -130,7 +134,7 @@
           source: 'mobile'
         };
         // 发送socket消息
-        window.chatSDK.emit(data, context);
+        this.chatServer.sendMsg({ data, context });
         // 先发送消息   然后改变自身的data里的表情属性值   不可改变顺序
         data.text_content = textToEmojiText(data.text_content);
         const tempData = new Msg({

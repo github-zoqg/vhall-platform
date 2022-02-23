@@ -97,7 +97,7 @@
             @click="exchange"
           ></span>
         </el-tooltip>
-        <el-tooltip content="全屏" placement="bottom">
+        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont"
             :class="{
@@ -240,7 +240,7 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
-      // this.listenEvents();
+      this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
@@ -248,41 +248,6 @@
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
       }
-
-      // 主持人同意上麦申请
-      this.micServer.$on('vrtc_connect_agree', async () => {
-        this.userSpeakOn();
-      });
-
-      // 上麦成功
-      this.micServer.$on('vrtc_connect_success', async msg => {
-        console.log('上麦成功', msg);
-        if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          if (
-            this.joinInfo.role_name == 3 ||
-            (this.joinInfo.role_name == 1 && !this.localStream.streamId)
-          ) {
-            // 开始推流
-            this.startPush();
-          } else if (this.joinInfo.role_name == 2) {
-            // 如果成功，销毁播放器
-            this.playerServer.destroy();
-            // 实例化互动实例
-            await this.interactiveServer.init();
-            // 开始推流
-            this.startPush();
-          }
-        }
-      });
-      // 下麦成功
-      this.micServer.$on('vrtc_disconnect_success', async () => {
-        await this.stopPush();
-
-        this.interactiveServer.destroy();
-
-        // 如果成功，销毁播放器
-        this.playerServer.init();
-      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -294,36 +259,84 @@
       }
     },
     methods: {
-      // 媒体切换后进行无缝切换  注：param只返回变更的信息
+      listenEvents() {
+        window.addEventListener(
+          'fullscreenchange',
+          e => {
+            if (!document.fullscreenElement) {
+              this.isFullScreen = false;
+            }
+          },
+          true
+        );
+
+        // 主持人同意上麦申请
+        this.micServer.$on('vrtc_connect_agree', async () => {
+          this.userSpeakOn();
+        });
+
+        // 上麦成功
+        this.micServer.$on('vrtc_connect_success', async msg => {
+          console.log('上麦成功', msg);
+          if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
+            if (
+              this.joinInfo.role_name == 3 ||
+              (this.joinInfo.role_name == 1 && !this.localStream.streamId)
+            ) {
+              // 开始推流
+              this.startPush();
+            } else if (this.joinInfo.role_name == 2) {
+              // 如果成功，销毁播放器
+              this.playerServer.destroy();
+              // 实例化互动实例
+              await this.interactiveServer.init();
+              // 开始推流
+              this.startPush();
+            }
+          }
+        });
+        // 下麦成功
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          await this.stopPush();
+
+          this.interactiveServer.destroy();
+
+          // 如果成功，销毁播放器
+          this.playerServer.init();
+        });
+      },
+      // 媒体切换后进行无缝切换
       async switchStreamType(param) {
         // 图片信息
         console.warn('useMediaSettingServer', param, useMediaSettingServer().state);
-        // 当前选中的是图片推流
-        if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-          await this.$refs.imgPushStream.updateCanvasImg();
-        }
-        // 音频设备的无缝切换   不和videoType进行关联
-        if (param.audioInput) {
-          this.interactiveServer
-            .switchStream({
-              streamId: this.localStream.streamId,
-              type: 'audio'
-            })
-            .then(res => {
-              console.log('切换成功---', res);
-            })
-            .catch(err => {
-              console.error('切换失败', err);
-            });
-          return;
-        }
-        // 不存在切换 图片/音视频     只有音视频的设备变更 -> 执行无缝切换
-        if (
-          !param.videoType &&
-          this.$domainStore.state.mediaSettingServer.videoType == 'camera' &&
-          param.video
-        ) {
-          if (param.video) {
+        // 音视频/图片推流 方式变更
+        if (param.videoType || param.canvasImgUrl) {
+          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+            await this.$refs.imgPushStream.updateCanvasImg();
+          }
+
+          if (this.isStreamPublished) {
+            await this.interactiveServer.unpublishStream(this.localStream.streamId);
+            await this.startPush();
+          }
+        } else {
+          if (param.audioInput) {
+            this.interactiveServer
+              .switchStream({
+                streamId: this.localStream.streamId,
+                type: 'audio'
+              })
+              .then(res => {
+                console.log('切换成功---', res);
+              })
+              .catch(err => {
+                console.error('切换失败', err);
+              });
+            return;
+          } else if (
+            param.video &&
+            this.$domainStore.state.mediaSettingServer.videoType == 'camera'
+          ) {
             this.interactiveServer
               .switchStream({
                 streamId: this.localStream.streamId,
@@ -336,13 +349,6 @@
                 console.error('切换失败', err);
               });
           }
-          return;
-        }
-
-        // 正常进行重推操作
-        if (this.isStreamPublished) {
-          await this.stopPush();
-          await this.startPush();
         }
       },
       sleep(time = 1000) {
@@ -604,7 +610,7 @@
       height: 100%;
     }
     .vmp-stream-local__stream-box__mute {
-      background-image: url(./images/no_video_bg.png);
+      background-image: url(./img/no_video_bg.png);
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -628,7 +634,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #333438 url('./images/voicefrequency.png') no-repeat;
+      background: #333438 url('./img/voicefrequency.png') no-repeat;
       background-size: 100% 100%;
       /*opacity: 0.8;*/
       &--beforestart {
@@ -644,7 +650,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: url('./images/livebg.png') no-repeat;
+        background: url('./img/livebg.png') no-repeat;
         background-size: 100% 100%;
         // background-color: black;
         & > .vmp-stream-local__stream-box__audio--bg {
@@ -656,7 +662,7 @@
         font-size: 20px;
         width: 170px;
         height: 46px;
-        background: url('./images/voice.png') left no-repeat;
+        background: url('./img/voice.png') left no-repeat;
         background-size: 69px;
         z-index: 4;
         box-sizing: border-box;
@@ -667,7 +673,7 @@
           width: 96px;
           height: 22px;
           display: inline-block;
-          background: url('./images/voiceinprogress.png') no-repeat;
+          background: url('./img/voiceinprogress.png') no-repeat;
           background-size: 100%;
         }
       }
@@ -730,15 +736,15 @@
         background-size: contain;
         height: 16px;
         width: 16px;
-        background-image: url(./images/network0.png);
+        background-image: url(./img/network0.png);
         &__0 {
-          background-image: url(./images/network0.png);
+          background-image: url(./img/network0.png);
         }
         &__1 {
-          background-image: url(./images/network1.png);
+          background-image: url(./img/network1.png);
         }
         &__2 {
-          background-image: url(./images/network2.png);
+          background-image: url(./img/network2.png);
         }
       }
     }

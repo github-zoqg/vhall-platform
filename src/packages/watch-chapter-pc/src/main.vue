@@ -43,6 +43,7 @@
   </div>
 </template>
 <script>
+  import { usePlayerServer, useDocServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpChapter',
@@ -88,23 +89,19 @@
       }
     },
     components: {},
+    beforeCreate() {
+      this.docServer = useDocServer();
+      this.playerServer = usePlayerServer();
+    },
     created() {
-      // this.acceptChapter();
-      // this.$VhallEventBus.$on(this.$VhallEventType.Doc.VOD_CUEPOINT_LOAD_COMPLETE, chapters => {
-      //   this.chapterInfo = chapters;
-      // });
-      // this.$VhallEventBus.$on(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, currentTime => {
-      //   if (this.isMyClick) {
-      //     this.isMyClick = false;
-      //     return false;
-      //   }
-      //   const currentNode = this.computeBeforeNode(currentTime);
-      //   if (currentNode) {
-      //     this.select = currentNode.createTime;
-      //   } else {
-      //     this.select = 0;
-      //   }
-      // });
+      // 接受文档server消息 获取章节信息
+      this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', msg => {
+        this.acceptChapter(msg);
+      });
+      // 接受播放器server消息 更改章节item
+      this.playerServer.$on('chapter_time_update', currentTime => {
+        this.acceptCurrentTime(currentTime);
+      });
     },
     methods: {
       // 接受章节数据
@@ -217,9 +214,7 @@
       changeTime(t) {
         this.isMyClick = true;
         this.select = t;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePlayTime', [t]));
-        // console.log('点击的章节', this.$VhallEventType.Chapter);
-        // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.CHAPTER_CLICK, t);
+        this.playerServer.setCurrentTime(t);
       },
       computeBeforeNode(currentTime) {
         let beforeNode = null;

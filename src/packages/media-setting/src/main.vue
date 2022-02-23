@@ -6,10 +6,10 @@
       width="480px"
       style="min-width: 480px"
       :showDefault="false"
-      @onReturn="isShow = false"
-      @onClose="isShow = false"
+      @onReturn="closeMediaSetting"
+      @onClose="closeMediaSetting"
     >
-      <section v-show="isShow" v-loading="loading" class="vmp-media-setting-dialog-body">
+      <section v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
         <aside class="vmp-media-setting-menu">
           <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
@@ -24,7 +24,7 @@
               @rateChangeToHD="rateChangeToHD"
             />
             <!-- 摄像头 -->
-            <video-setting v-show="selectedMenuItem === 'video-setting'" />
+            <video-setting ref="videoSetting" v-show="selectedMenuItem === 'video-setting'" />
             <!-- 麦克风 -->
             <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
             <!-- 扬声器 -->
@@ -133,21 +133,22 @@
     },
     created() {
       this._originCaptureState = {};
+      this._diffOptions = {};
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
-      window.mediaSetting = this;
-      this.restart();
     },
     methods: {
       showMediaSetting() {
         this.isShow = true;
+        this.restart();
       },
 
       closeMediaSetting() {
         this.isShow = false;
+        this.$refs['videoSetting'].destroyStream();
       },
 
       showConfirm(text) {
@@ -190,8 +191,14 @@
 
         let action = 'not-living';
 
+        this._diffOptions = this.getDiffOptions();
+        const videoTypeChanged = this._diffOptions.videoType !== undefined;
+        const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
+
+        console.log('diffOptions', this._diffOptions);
+
         // 直播中
-        if (watchInitData.webinar.type === 1) {
+        if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
           let text = '修改设置后导致重新推流，是否继续保存';
           if (this.isRateChangeToHD) {
             text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
@@ -221,8 +228,8 @@
        * 发送变化事件
        */
       sendChangeEvent() {
-        const diffOptions = this.getDiffOptions();
-        console.log('diffOptions:', diffOptions);
+        const diffOptions = this._diffOptions;
+
         if (Object.keys(diffOptions) === 0) return;
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
@@ -330,6 +337,14 @@
           this.mediaState.video = sessionVideoId || videoInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedVideoDeviceId');
+        }
+
+        // 视频类型
+        // 设置图片推流
+        let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
+        if (param && param.flag === true && param.streamUrl !== '') {
+          this.mediaState.videoType = 'picture';
+          this.mediaState.canvasImgUrl = param.streamUrl;
         }
 
         // 麦克风

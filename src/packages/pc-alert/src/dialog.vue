@@ -8,13 +8,13 @@
           </span>
           <h3>{{ title }}</h3>
           <span class="close" @click="onClose" v-if="isClose">
-            <i class="iconfont iconguanbi"></i>
+            <i class="vh-iconfont vh-line-close"></i>
           </span>
         </div>
       </template>
       <template v-else>
         <span class="close new-close" @click="onClose">
-          <i class="iconfont iconguanbi"></i>
+          <i class="vh-iconfont vh-line-close"></i>
         </span>
       </template>
       <slot></slot>

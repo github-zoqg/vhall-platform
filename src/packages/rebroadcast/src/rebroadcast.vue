@@ -66,7 +66,7 @@
   import NoCreateImg from './images/no-create@2x.png';
   import NoSearchImg from './images/no-search@2x.png';
   export default {
-    name: 'VmpRebroadcast',
+    name: 'VmpRebroadcastContent',
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.rebroadcastServer = useRebroadcastServer();

@@ -17,7 +17,7 @@
   export default {
     data() {
       return {
-        canvasImg: require('../../images/canvasDefault.png'),
+        canvasImg: require('../../img/canvasDefault.png'),
         canvasData: {
           width: 1280,
           height: 720
