@@ -20,7 +20,7 @@
         <div class="vmp-doc-cur" v-show="mode === 1">
           <!-- 无数据 -->
           <div class="vmp-doc-cur__empty" v-show="dataList.length === 0">
-            <img src="/static/img/no-file.png" />
+            <img src="./img/no-file.png" />
             <p>您还没有文档，快来上传吧</p>
             <div>
               <!-- 上传文档 -->

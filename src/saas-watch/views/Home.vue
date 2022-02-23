@@ -14,8 +14,10 @@
 <script>
   import { Domain } from 'middle-domain';
   import roomState from '../headless/room-state.js';
+  import authCheck from '../mixins/chechAuth';
   export default {
     name: 'Home',
+    mixins: [authCheck],
     data() {
       return {
         state: 0
@@ -25,8 +27,12 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
+        await this.initCheckAuth();
         await this.initReceiveLive();
         await roomState();
+        // 是否跳转预约页
+        this.goSubscribePage();
+        console.log(this.$domainStore.state.roomBaseServer.watchInitData, '??hahh哈哈哈哈');
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
       } catch (ex) {
@@ -58,6 +64,15 @@
             clientType: 'standard' //客户端类型
           }
         });
+      },
+      goSubscribePage() {
+        if (
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+          !this.$domainStore.state.roomBaseServer.watchInitData.preview_paas_record_id
+        ) {
+          // ${process.env.VUE_APP_ROUTE_BASE}
+          window.location.href = `${window.location.origin}/lives/subscribe/${this.$domainStore.state.roomBaseServer.watchInitData.webinar.id}${window.location.search}`;
+        }
       }
     }
   };

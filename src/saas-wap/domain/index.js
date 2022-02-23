@@ -11,7 +11,10 @@ import {
   useVirtualAudienceServer
 } from 'middle-domain';
 
-setBaseUrl('https://t-saas-dispatch.vhall.com');
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL
+});
 setRequestHeaders({
   platform: 7
 });
