@@ -12,7 +12,10 @@ import {
   useUserServer
 } from 'middle-domain';
 
-setBaseUrl(process.env.VUE_APP_BASE_URL);
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL
+});
 setRequestHeaders({
   platform: 7
 });
