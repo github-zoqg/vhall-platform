@@ -39,7 +39,7 @@
       this.praiseServer = usePraiseServer();
     },
     created() {
-      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum;
+      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum || 0;
       this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
       this.praiseServer.listenMsg();
     },

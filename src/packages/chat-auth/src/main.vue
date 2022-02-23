@@ -294,7 +294,6 @@
       this.init();
     },
     methods: {
-      //todo 初始化方法
       async init() {
         //提取Url参数
         this.urlParams = this.extractionUrlParams();

@@ -42,7 +42,7 @@
       <li>
         <!-- 红包 -->
       </li>
-      <li v-if="isLiving">
+      <li v-if="1">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -60,7 +60,7 @@
             :show-gift-count="showGiftCount"
             @changeShowGift="changeStatus"
             @acceptPay="acceptPay"
-            :cuid="cuid"
+            @needLogin="needLogin"
           />
         </div>
       </li>
@@ -104,6 +104,9 @@
         openTimer: false,
         showTimer: false,
         groupInitData: {},
+        showPay: false,
+        zfQr: '',
+        wxQr: '',
         isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
@@ -232,7 +235,8 @@
       onClickReward() {
         // 需校验是否登陆
         if (this.roomBaseState.watchInitData.join_info.user_id == 0) {
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          this.needLogin();
+          // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           return false;
         }
         this.$refs.reward.onClickReward();
@@ -241,6 +245,9 @@
       acceptPay(data, url) {
         this.showPay = true;
         this[data] = url;
+      },
+      needLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       }
     }
   };

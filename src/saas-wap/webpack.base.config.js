@@ -22,7 +22,9 @@ const htmlConfig = {
     Vant: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
-    jsencrypt: '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js'
+    jsencrypt:
+      '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
+    wx: '//res.wx.qq.com/open/js/jweixin-1.4.0.js'
   },
   // cdn css
   cdnCss: {
@@ -46,6 +48,7 @@ module.exports = {
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
       version: pkg.version,
+      hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
       isWap: true,
       ...htmlConfig
     }

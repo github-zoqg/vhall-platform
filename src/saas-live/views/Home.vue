@@ -88,7 +88,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: token || localStorage.getItem('token')
           },
