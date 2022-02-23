@@ -79,7 +79,8 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'report'],
           requestHeaders: {
-            token: token || localStorage.getItem('token')
+            token: token || localStorage.getItem('token'),
+            'gray-id': sessionStorage.getItem('initGrayId')
           },
           initRoom: {
             webinar_id: id, //活动id
