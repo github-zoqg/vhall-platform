@@ -27,14 +27,19 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initCheckAuth();
         await this.initReceiveLive();
+        await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
-        // 是否跳转预约页
-        this.goSubscribePage();
-        console.log(this.$domainStore.state.roomBaseServer.watchInitData, '??hahh哈哈哈哈');
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
+        // 是否跳转预约页
+        if (
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+          !this.$domainStore.state.roomBaseServer.watchInitData.preview_paas_record_id
+        ) {
+          this.goSubscribePage();
+        }
+        // this.goSubscribePage();
       } catch (ex) {
         console.error('---初始化直播房间出现异常--');
         console.error(ex);
@@ -66,13 +71,7 @@
         });
       },
       goSubscribePage() {
-        if (
-          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.preview_paas_record_id
-        ) {
-          // ${process.env.VUE_APP_ROUTE_BASE}
-          window.location.href = `${window.location.origin}/lives/subscribe/${this.$domainStore.state.roomBaseServer.watchInitData.webinar.id}${window.location.search}`;
-        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
       }
     }
   };
