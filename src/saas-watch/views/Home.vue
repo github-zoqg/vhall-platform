@@ -27,15 +27,15 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initCheckAuth();
         await this.initReceiveLive();
+        await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转预约页
         if (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.preview_paas_record_id
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         ) {
           this.goSubscribePage();
         }
@@ -62,7 +62,8 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: localStorage.getItem('token') || '',
+            'gray-id': sessionStorage.getItem('initGrayId')
           },
           initRoom: {
             webinar_id: id, //活动id

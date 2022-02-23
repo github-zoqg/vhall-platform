@@ -6,8 +6,9 @@
           <!-- 背景图片 未完成验证-->
           <img :src="webinarsBgImg" />
         </div>
-        <div>
+        <div v-if="showVideo">
           <!-- 完成验证、并且有暖场视频 加载播放器 -->
+          <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
         </div>
       </div>
       <!--活动时间信息-->
@@ -21,17 +22,21 @@
         ></bottom-tab>
       </div>
     </div>
-    <div class="vmp-subscribe-body-tab"></div>
+    <div class="vmp-subscribe-body-tab">
+      <vmp-air-container cuid="comTabMenu" :oneself="true"></vmp-air-container>
+    </div>
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpSubscribeBody',
     data() {
       return {
         showBottom: true,
+        showVideo: false, // 显示暖场视频
         subOption: {
           startTime: '',
           type: 0,
@@ -61,35 +66,48 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.subscribeServer = useSubscribeServer();
     },
     created() {
       this.handlerInitInfo();
     },
     methods: {
       handlerInitInfo() {
-        const { webinar, subscribe } = this.roomBaseServer.state.watchInitData;
+        const { webinar, subscribe, join_info, warmup } = this.roomBaseServer.state.watchInitData;
         this.subOption.type = webinar.type;
         this.subOption.startTime = webinar.start_time;
         this.subOption.verify = webinar.verify;
         this.subOption.fee = webinar.fee || 0;
-        this.subOption.verified = this.roomBaseServer.state.watchInitData.verified;
-        this.subOption.is_subscribe = this.roomBaseServer.state.watchInitData.is_subscribe;
+        this.subOption.verified = join_info.verified;
+        this.subOption.is_subscribe = join_info.is_subscribe;
         this.subOption.actual_start_time = webinar.actual_start_time;
         this.subOption.show = subscribe.show;
         this.subOption.num = subscribe.num;
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        // if (
-        //   this.roomBaseServer.state.watchInitData.is_subscribe == 1 &&
-        //   warmup.warmup_paas_record_id &&
-        //   webinar.type == 2
-        // ) {
-        //   this.showVideo = true;
-        // }
+        if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
+          this.showVideo = true;
+        }
       },
-      feeAuth() {},
-      handleAuthCheck() {}
+      feeAuth(params) {
+        const { webinar } = this.roomBaseServer.state.watchInitData;
+        let data = {
+          webinar_id: webinar.id,
+          refer: this.$route.query.refer,
+          record_id: this.$route.query.record_id,
+          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...params
+        };
+        this.subscribeServer.watchAuth(data).then(res => {
+          if (res.code == 510008) {
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+          }
+        });
+      },
+      handleAuthCheck() {
+        this.feeAuth({ type: this.subOption.verify });
+      }
     }
   };
 </script>
@@ -112,13 +130,13 @@
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: fill;
           border-radius: 4px 4px 0 0;
         }
       }
     }
     &-tab {
-      background: #1a1a1a;
+      background: #2a2a2a;
       margin: 0px auto;
     }
   }
