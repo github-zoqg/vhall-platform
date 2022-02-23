@@ -558,9 +558,10 @@
       // 轮询微信扫码绑定情况
       async startPolling(type) {
         this.initPollTimer();
+        await this.withdrawIsBind(true);
         const pollingFn = async () => {
           // 微信扫码绑定情况
-          const bindData = await this.withdrawIsBind(type);
+          const bindData = await this.withdrawIsBind();
           if (type == 1 && bindData.data.is_bind == 1) {
             console.log('第一次绑定, 当前已经授权过...');
             this.initPollTimer();
@@ -585,9 +586,9 @@
       },
 
       // 获取当前的微信绑定状态 1初次绑定 2更换绑定
-      withdrawIsBind(type) {
+      withdrawIsBind(isInit = false) {
         const params = {};
-        type === 2 && (params.is_change = 1); // 更换绑定增加参数
+        isInit && (params.is_change = 1); // 告知后端初始化更换状态的查询
         return this.useCashServer.withdrawIsBind(params);
       },
 
