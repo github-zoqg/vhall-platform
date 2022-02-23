@@ -1,5 +1,5 @@
 <template>
-  <section class="vh-invitation__warp">
+  <section class="vmp-invitation">
     <template v-if="isInviteVisible">
       <img
         style="display: none"
@@ -26,7 +26,7 @@
                   <!-- <img src="./images/111.png" alt=""> -->
                 </div>
                 <p>{{ webinarInfo.nick_name }}</p>
-                <p>邀请你一起看直播</p>
+                <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="watch-middle-box">
                 <div class="watch-middle-insidebox">
@@ -50,9 +50,9 @@
                   <img :src="invite_qr_url" alt="" />
                 </div>
                 <div class="watch-action">
-                  <p class="qr-value">扫/描/二/维/码</p>
-                  <h1>立即参与活动</h1>
-                  <p>长按保存图片后分享</p>
+                  <p class="qr-value">{{ $t('nav.nav_1046') }}</p>
+                  <h1>{{ $t('nav.nav_1045') }}</h1>
+                  <p>{{ $t('nav.nav_1047') }}</p>
                 </div>
               </div>
             </div>
@@ -69,7 +69,7 @@
                 <!-- <img src="./images/1.jpg" alt=""> -->
               </div>
               <p>{{ webinarInfo.nick_name }}</p>
-              <p>邀请你一起看直播</p>
+              <p>{{ $t('nav.nav_1044') }}</p>
             </div>
             <div class="bottom-content">
               <div class="look-text">
@@ -103,7 +103,7 @@
                   <!-- <img src="./images/1.jpg" alt=""> -->
                 </div>
                 <p>{{ webinarInfo.nick_name }}</p>
-                <p>邀请你一起看直播</p>
+                <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="show-middle-box">
                 <div class="show-middle-container">
@@ -113,12 +113,12 @@
                   </div>
                   <div v-if="webinarInfo.date" class="show-time">
                     <p class="top-border"></p>
-                    <p class="show-time-item no-padding-bottom">时间</p>
+                    <p class="show-time-item no-padding-bottom">{{ $t('nav.nav_1048') }}</p>
                     <p class="show-time-item no-padding-top">{{ webinarInfo.date }}</p>
                   </div>
                   <div v-if="webinarInfo.location" class="show-location">
                     <p class="top-border"></p>
-                    <p class="show-time-item no-padding-bottom">地点</p>
+                    <p class="show-time-item no-padding-bottom">{{ $t('nav.nav_1049') }}</p>
                     <p class="show-time-item no-padding-top no-padding-bottom">
                       {{ webinarInfo.location }}
                     </p>
@@ -131,9 +131,9 @@
                   <img :src="invite_qr_url" alt="" />
                 </div>
                 <div class="show-action">
-                  <p class="qr-value">扫/描/二/维/码</p>
-                  <h1>立即参与活动</h1>
-                  <p>长按保存图片后分享</p>
+                  <p class="qr-value">{{ $t('nav.nav_1046') }}</p>
+                  <h1>{{ $t('nav.nav_1045') }}</h1>
+                  <p>{{ $t('nav.nav_1047') }}</p>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@
       </div>
     </template>
 
-    <div class="vh-invitation__no-data" v-if="!isInviteVisible && inited">
+    <div class="vmp-invitation__no-data" v-if="!isInviteVisible && inited">
       <img src="../img/nodata-img@2x.png" alt />
       <p>{{ $t('nav.nav_1050') }}</p>
       <p>{{ $t('appointment.appointment_1031') }}</p>
@@ -154,9 +154,10 @@
   import Html2canvas from 'html2canvas';
   import defaultAvatarImg from '../img/default_avatar.png';
 
-  import { getBase64Image } from '../js/utils';
+  import { getBase64Image, padStringWhenTooLang, formatDesc } from '../js/utils';
   import { bgImgOptions } from '../js/getOptions';
-  import { initWeChatSdk } from '../js/useWechat';
+  import { sleep } from '@/packages/app-shared/utils/tool';
+  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import { useInviteServer } from 'middle-domain';
 
   export default {
@@ -186,57 +187,50 @@
     },
     beforeCreate() {
       this.inviteServer = useInviteServer();
-      console.log('inviteServer', this.inviteServer);
     },
-    created() {
-      setTimeout(() => {
-        this.inited = true;
-      }, 2000);
+    async created() {
       this.getRoomStatus();
+      await sleep(2000);
+      this.inited = true;
     },
     methods: {
       async getRoomStatus() {
         let params = {
           webinar_id: this.$route.params.id
         };
-        if (this.$route.query.invite_id) {
-          params.invite_id = this.$route.query.invite_id;
-        }
-        if (this.$route.query.join_id) {
-          // 兼容join_id写法
-          params.invite_id = this.$route.query.join_id;
+        if (this.$route.query) {
+          params.invite_id = this.$route.query.join_id || this.$route.query.invite_id;
         }
 
         const res = await this.inviteServer.createInvite(params);
+        const data = res.data;
 
-        this.webinarInfo.avatar = res.data.avatar || defaultAvatarImg;
-        this.webinarInfo.title = res.data.invite_card.title;
-        this.webinarInfo.img = res.data.invite_card.img;
-        this.webinarInfo.company = res.data.invite_card.company;
-        this.webinarInfo.nick_name = res.data.nick_name;
-        this.webinarInfo.date = res.data.invite_card.webinar_date;
-        this.webinarInfo.location = res.data.invite_card.location;
-        this.webinarInfo.desciption = res.data.invite_card.desciption;
-        this.webinarInfo.isShowWaterMark = res.data.invite_card.is_show_watermark == 0;
-        this.webinarInfo.show_type = res.data.invite_card.show_type;
-        this.webinarInfo.img_type = res.data.invite_card.img_type;
-        this.invite_qr_url += `?invite=${res.data.invite}`;
-        this.$emit('changeInvite', res.data.invite);
+        this.webinarInfo.avatar = data.avatar || defaultAvatarImg;
+        this.webinarInfo.title = data.invite_card.title;
+        this.webinarInfo.img = data.invite_card.img;
+        this.webinarInfo.company = data.invite_card.company;
+        this.webinarInfo.nick_name = data.nick_name;
+        this.webinarInfo.date = data.invite_card.webinar_date;
+        this.webinarInfo.location = data.invite_card.location;
+        this.webinarInfo.desciption = data.invite_card.desciption;
+        this.webinarInfo.isShowWaterMark = data.invite_card.is_show_watermark == 0;
+        this.webinarInfo.show_type = data.invite_card.show_type;
+        this.webinarInfo.img_type = data.invite_card.img_type;
+        this.invite_qr_url += `?invite=${data.invite}`;
+        this.$emit('changeInvite', data.invite);
+
         if (this.webinarInfo.img_type == 0) {
           // 默认
           this.webinarInfo.showImg =
-            res.data.invite_card.img + '?x-oss-process=image/resize,m_fill,w_560,h_920,limit_0';
+            data.invite_card.img + '?x-oss-process=image/resize,m_fill,w_560,h_920,limit_0';
         } else {
           this.webinarInfo.showImg = this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl;
         }
 
-        this.nickname =
-          res.data.nick_name.length > 5
-            ? res.data.nick_name.slice(0, 4) + '...'
-            : res.data.nick_name;
+        this.nickname = padStringWhenTooLang(data.nick_name, '...', 5);
         this.loading = false;
 
-        this.isInviteVisible = parseInt(res.data.status) === 1 ? true : false;
+        this.isInviteVisible = parseInt(data.status) === 1 ? true : false;
         this.inited = true;
         if (this.isInviteVisible === true) {
           this.$nextTick(() => {
@@ -245,40 +239,49 @@
         }
         this.wxShareInfo();
       },
+      getWxShareUrl() {
+        const protocol = window.location.protocol;
+        const url = process.env.VUE_APP_WAP_WATCH;
+        const id = this.$route.params.id;
+        const search = window.location.search;
+        return `${protocol}${url}/v3/lives/invite/${id}${search}`;
+      },
       // 获取微信分享信息
       async wxShareInfo() {
-        const wxShareUrl = `${window.location.protocol}${process.env.VUE_APP_WATCH_URL}${process.env.VUE_APP_WEB_KEY}/lives/invite/${this.$route.params.id}${window.location.search}`;
+        const wxShareUrl = this.getWxShareUrl();
+
         const res = await this.inviteServer.wechatShare({
           wx_url: wxShareUrl
         });
-        if (res.code == 200 && res.data) {
-          console.log('获取微信分享数据', res.data);
-          const params = {
-            appId: res.data.appId,
-            timestamp: res.data.timestamp,
-            nonceStr: res.data.nonceStr,
-            signature: res.data.signature
-          };
-          let desc = null;
-          if (this.webinarInfo.desciption) {
-            desc = this.webinarInfo.desciption.replace(/&nbsp;/g, '');
-            desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
-            desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
-            console.log(9191, desc);
-          } else {
-            desc = '邀请你一起看直播';
-          }
 
-          // initWeChatSdk(
-          //   { ...params },
-          //   {
-          //     title: this.webinarInfo.title,
-          //     desc,
-          //     link: wxShareUrl,
-          //     imgUrl: this.webinarInfo.avatar
-          //   }
-          // );
+        if (res.code != 200 || !res.data) return;
+
+        const params = {
+          appId: res.data.appId,
+          timestamp: res.data.timestamp,
+          nonceStr: res.data.nonceStr,
+          signature: res.data.signature
+        };
+
+        // set desc
+        let desc = null;
+        if (this.webinarInfo.desciption) {
+          desc = formatDesc(this.webinarInfo.desciption);
+        } else {
+          desc = this.$t('nav.nav_1044'); // 邀请你一起看直播
         }
+
+        // wechat-sdk 初始化
+        const initData = { ...params };
+        const shareData = {
+          title: this.webinarInfo.title,
+          desc,
+          link: wxShareUrl,
+          imgUrl: this.webinarInfo.avatar
+        };
+        const wechatRes = await initWeChatSdk(initData, shareData);
+        const shareSuccessStr = this.$t('webinar.webinar_1038');
+        wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       // 记录生成邀请卡, /create-invite-self-relation 传递了join_id
       async submitCreateHistory(join_id) {
@@ -309,12 +312,12 @@
             imaObj.setAttribute('crossorigin', 'anonymous');
             imaObj.onload = () => {
               count++;
-
               img.src = getBase64Image(imaObj);
 
               if (img.getAttribute('class') == 'hsrc invitation__show__show-img') {
                 this.webinarInfo.showImg = getBase64Image(imaObj);
               }
+
               if (imgList.length === count) {
                 Html2canvas(dom, {
                   allowTaint: true,
@@ -343,7 +346,7 @@
 </script>
 
 <style lang="less">
-  .vh-invitation__warp {
+  .vmp-invitation {
     overflow: hidden;
     height: 100%;
     position: relative;
@@ -787,7 +790,7 @@
         }
       }
     }
-    .vh-invitation__no-data {
+    .vmp-invitation__no-data {
       img {
         width: 416px;
         margin: 100px auto 30px;

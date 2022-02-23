@@ -16,6 +16,13 @@ const routes = [
     name: 'LiveRoom',
     meta: { title: '直播间' }
   },
+  // 专题
+  {
+    path: '/special/detail',
+    name: 'subject',
+    component: () => import('../views/Subject/main.vue')
+  },
+  // 邀请卡
   {
     path: '/lives/invite/:id',
     name: 'inviteCard',
@@ -26,6 +33,12 @@ const routes = [
     path: '/upgrading',
     name: 'upgrading',
     component: () => import('../views/Upgrading.vue')
+  },
+  {
+    path: '/lives/bind/:id',
+    name: 'bind',
+    component: () => import('../views/bind'),
+    meta: { grayType: '' }
   }
   // {
   //   path: '/about',

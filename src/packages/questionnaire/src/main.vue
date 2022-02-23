@@ -13,7 +13,7 @@
           v-if="!showQuestionnaireTable"
           class="vh-iconfont vh-line-arrow-left back-btn"
           style="cursor: pointer"
-          @click="showQuestionnaireTable = true"
+          @click="initPage"
         />
         问卷
       </header>
@@ -50,10 +50,15 @@
               </el-input>
             </div>
             <div class="popbody">
-              <el-table :data="questionnaireList" style="width: 100%" max-height="400">
+              <el-table
+                :data="questionnaireList"
+                v-loading="loading"
+                style="width: 100%"
+                max-height="400"
+              >
                 <!-- 没有搜到数据 -->
                 <div slot="empty" class="show-no-msg">
-                  <span class="no-img">
+                  <span v-if="!loading" class="no-img">
                     <img src="./images/no-search@2x.png" alt="" />
                   </span>
                   <p class="no-msg">暂未搜索到您想要的内容！</p>
@@ -88,7 +93,9 @@
                         class="qn-more__dropdown"
                         slot="dropdown"
                       >
-                        <el-dropdown-item command="data">数据</el-dropdown-item>
+                        <el-dropdown-item v-if="scope.row.publish === 1" command="data">
+                          数据
+                        </el-dropdown-item>
                         <el-dropdown-item command="copy">复制</el-dropdown-item>
                         <el-dropdown-item command="del">删除</el-dropdown-item>
                       </el-dropdown-menu>
@@ -99,8 +106,15 @@
             </div>
           </template>
         </div>
-        <section class="qn-server-warp" v-show="!showQuestionnaireTable">
+        <section
+          class="qn-server-warp"
+          :class="{
+            preview: prevQuestionnaireId
+          }"
+          v-show="!showQuestionnaireTable"
+        >
           <div id="qn-server-box"></div>
+          <el-button class="publish-btn" round v-if="prevQuestionnaireId">发布</el-button>
         </section>
       </section>
     </el-dialog>
@@ -147,7 +161,8 @@
         },
         questionnaireCreateInfo: null, // 已创建弹窗的中转
         saveDialogVisible: false, // 同步问卷弹窗
-        shareQuestionnaire: true // 同步到管理
+        shareQuestionnaire: true, // 同步到管理
+        prevQuestionnaireId: false // 显示预览状态的相关UI
       };
     },
     computed: {
@@ -161,28 +176,44 @@
         );
       }
     },
-    beforeCreate() {
-      this.questionnaireServer = useQuestionnaireServer({
-        uploadUrl: process.env.VUE_APP_BASE_URL,
-        creatSelector: '#qs-create-box',
-        mode: 'live'
-      });
-    },
-    created() {
-      this.initEvent();
-    },
-    async mounted() {
-      this.queryQuestionnaireList();
-    },
     methods: {
       open() {
+        if (!this.questionnaireServer) {
+          this.initSDK();
+        }
+        this.initPage();
         this.dialogVisible = true;
+      },
+      initPage() {
+        this.firstLoad = false;
+        this.queryParams = {
+          // 问卷列表搜索参数
+          limit: 10,
+          pos: 0,
+          pageNum: 1,
+          keyword: ''
+        };
+        this.showQuestionnaireTable = true;
+        this.queryQuestionnaireList();
+      },
+      initSDK() {
+        this.questionnaireServer = useQuestionnaireServer({
+          uploadUrl: process.env.VUE_APP_BASE_URL,
+          creatSelector: '#qs-create-box',
+          mode: 'live'
+        });
+        this.initEvent();
       },
       initEvent() {
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.CREATE, data => {
           this.questionnaireCreateInfo = data;
           this.saveDialogVisible = true;
           this.shareQuestionnaire = true;
+        });
+        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.UPDATE, res => {
+          if (res.code === 200) {
+            this.initPage();
+          }
         });
       },
       /**
@@ -220,6 +251,7 @@
       createQuestion() {
         const selector = '#qn-server-box';
         this.showQuestionnaireTable = false;
+        this.prevQuestionnaireId = null;
         this.questionnaireServer.renderCreatQuestionnaire(selector);
       },
       /**
@@ -228,6 +260,7 @@
       editQuestion(id) {
         const selector = '#qn-server-box';
         this.showQuestionnaireTable = false;
+        this.prevQuestionnaireId = null;
         this.questionnaireServer.renderCreatQuestionnaire(selector, id);
       },
       /**
@@ -236,6 +269,7 @@
       prevQuestion(id) {
         const selector = '#qn-server-box';
         this.showQuestionnaireTable = false;
+        this.prevQuestionnaireId = id;
         this.questionnaireServer.renderQuestionnaire4Watch(selector, id);
       },
       /**
@@ -308,12 +342,11 @@
         const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
         const { webinar } = watchInitData;
         if (webinar.type !== 1) {
-          return this.this.$message({
+          return this.$message({
             type: 'warning',
             message: '请在直播开始后使用'
           });
         }
-        console.log();
         this.questionnaireServer.publishQuestionnaire(questionnaireItem.question_id).then(res => {
           if (res.code === 200) {
             this.$message({
@@ -441,34 +474,24 @@
   .qn-server-warp {
     padding: 10px 20px 20px;
     background: #f7f7f7;
-  }
-  #qn-server-box {
-    background: #f7f7f7;
-  }
-  #qs-preview-box {
-    height: 500px;
-    overflow: auto;
-    background: #fff;
-    .btn-container {
-      display: flex;
-      justify-content: center;
-      padding-bottom: 20px;
-      .vhall-question-btn {
-        margin: 20px;
-        display: block;
-        width: 160px;
-        height: 40px;
-        line-height: 36px;
-        border-radius: 20px;
-        font-size: 14px;
-      }
-      .blue-line {
-        background: #fb3a32;
-        border: none;
-        color: #fff;
+    &.preview {
+      padding: 0;
+      background: #fff;
+      .q-btns {
+        display: none; // 隐藏提交问卷
       }
     }
   }
+
+  .publish-btn {
+    display: block;
+    width: 160px;
+    border: none;
+    margin: 40px auto;
+    background-color: #fb3a32;
+    color: #fff !important;
+  }
+
   .async__body {
     background: #fff;
     padding: 10px 32px 24px;

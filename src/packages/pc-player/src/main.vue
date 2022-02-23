@@ -313,9 +313,10 @@
       },
       isShowContainer() {
         return (
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-          this.$domainStore.state.micServer.isSpeakOn ||
-          this.isLivingEnd
+          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+            this.$domainStore.state.micServer.isSpeakOn ||
+            this.isLivingEnd) &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
         );
       },
       isVisibleMiniElement() {
@@ -660,7 +661,7 @@
             if (this.recordTime === 0) {
               this.recordTime = 1;
             }
-            this.authText = this.getShiPreview();
+            // this.authText = this.getShiPreview();
           }
           this.getDuanxuPreview(); //断点续播逻辑
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);

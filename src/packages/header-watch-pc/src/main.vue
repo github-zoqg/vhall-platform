@@ -17,16 +17,17 @@
       <div class="vmp-header-watch-center-title">
         {{ webinarInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarType != 6"
+          v-if="webinarInfo.type != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
+            webinarInfo.type
           "
         >
-          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
-          <label>{{ webinarType | webinarFilter }}</label>
+          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ webinarInfo.type | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -45,7 +46,7 @@
     </div>
     <div class="vmp-header-watch-right">
       <!-- 多语言 -->
-      <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+      <!-- <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container> -->
 
       <!-- 公众号 -->
       <div class="vmp-header-watch-right-officical" v-if="officialImg">
@@ -212,7 +213,7 @@
       this.userServer = useUserServer();
     },
     async created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
+      // this.childrenComp = window.$serverConfig[this.cuid].children;
       this.embedObj = this.roomBaseServer.state.embedObj;
       if (this.isLogin && this.isNotEmbed) {
         // 通过活动ID，获取关注信息

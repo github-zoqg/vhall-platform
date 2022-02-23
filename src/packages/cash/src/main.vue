@@ -209,7 +209,7 @@
             <div
               class="vmp-qr-reload"
               v-if="countPoll === 12"
-              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1)"
+              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1 ? 2 : 1)"
             >
               <i class="vh-iconfont vh-a-line-clockwiserotation"></i>
             </div>
@@ -531,7 +531,8 @@
           .getBindKey()
           .then(res => {
             if (res.code == 200) {
-              const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
+              console.log(res.data);
+              const jump_url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/bind/${res.data.mark}`;
               this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
               console.log(`二维码请求地址: ${this.qrcode}`);
               // 轮询微信扫码绑定情况
@@ -558,9 +559,10 @@
       // 轮询微信扫码绑定情况
       async startPolling(type) {
         this.initPollTimer();
+        await this.withdrawIsBind(true);
         const pollingFn = async () => {
           // 微信扫码绑定情况
-          const bindData = await this.withdrawIsBind(type);
+          const bindData = await this.withdrawIsBind();
           if (type == 1 && bindData.data.is_bind == 1) {
             console.log('第一次绑定, 当前已经授权过...');
             this.initPollTimer();
@@ -585,9 +587,9 @@
       },
 
       // 获取当前的微信绑定状态 1初次绑定 2更换绑定
-      withdrawIsBind(type) {
+      withdrawIsBind(isInit = false) {
         const params = {};
-        type === 2 && (params.is_change = 1); // 更换绑定增加参数
+        isInit && (params.is_change = 1); // 告知后端初始化更换状态的查询
         return this.useCashServer.withdrawIsBind(params);
       },
 
