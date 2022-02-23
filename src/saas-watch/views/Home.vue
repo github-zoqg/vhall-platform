@@ -27,8 +27,8 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initCheckAuth();
         await this.initReceiveLive();
+        await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;

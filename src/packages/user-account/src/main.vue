@@ -371,14 +371,12 @@
             })
             .catch(() => {});
         } else {
-          // 绑定
           localStorage.setItem('vmp_auth_tag', 'bindQQ');
-          const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
-          console.log(`${hostPath}/commons/auth/qq?jump_url=${encodeURIComponent(jumpUrlPath)}`);
+
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL;
+          const jumpUrlPath = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/commons/auth/qq?jump_url=${encodeURIComponent(jumpUrlPath)}`,
-            '_blank'
+            `${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );
         }
       },
@@ -432,17 +430,13 @@
             .catch(() => {});
         } else {
           // 绑定
-          // this.$VhallStorage.set('tag', 'bindWx', 'local');
           localStorage.setItem('vmp_auth_tag', 'bindWx');
-          const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
-          console.log(hostPath);
-          // 前端回传地址
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
-          console.log(
-            `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
-          );
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL;
+          const jumpUrlPath = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+            `${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
+              jumpUrlPath
+            )}`
           );
         }
       },
