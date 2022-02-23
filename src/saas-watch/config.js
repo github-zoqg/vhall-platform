@@ -263,7 +263,7 @@ export const serverConfig = {
       //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
       hasImgUpload: false,
       //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
-      hasChatFilterBtn: false,
+      hasChatFilterBtn: true,
       //是否开启聊天设置功能
       enableChatSetting: false,
       //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】

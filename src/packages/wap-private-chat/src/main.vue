@@ -106,7 +106,7 @@
             console.log(e);
           }
           if (['text', 'image'].includes(msg.data.type)) {
-            // 接收到私聊信息
+            // 接收到私聊信息,发送信令显示私聊tab，并且更新小红点
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitShowTab', { type: 'private', visible: true })
             );
@@ -134,7 +134,7 @@
           source: 'mobile'
         };
         // 发送socket消息
-        window.chatSDK.emit(data, context);
+        this.chatServer.sendMsg({ data, context });
         // 先发送消息   然后改变自身的data里的表情属性值   不可改变顺序
         data.text_content = textToEmojiText(data.text_content);
         const tempData = new Msg({
