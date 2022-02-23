@@ -80,13 +80,6 @@
       volume(value) {
         if (!this.$refs.outputAudioPlayer) return;
         this.$refs.outputAudioPlayer.volume = value;
-      },
-      devices(val) {
-        if (val && val.length) {
-          this.mediaState.audioOutput = val[0].deviceId;
-        } else {
-          sessionStorage.removeItem('selectedAudioOutputDeviceId');
-        }
       }
     },
     beforeCreate() {

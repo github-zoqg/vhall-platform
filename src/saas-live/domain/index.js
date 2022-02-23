@@ -14,7 +14,7 @@ import {
   useMediaSettingServer
 } from 'middle-domain';
 
-setBaseUrl('https://t-saas-dispatch.vhall.com');
+setBaseUrl(process.env.VUE_APP_BASE_URL);
 setRequestHeaders({
   platform: 7, // 7:PC网页版
   token: localStorage.getItem('token') || '',
