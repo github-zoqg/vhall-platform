@@ -37,8 +37,7 @@
         <p v-html="detailInfo.webinar_subject.intro"></p>
       </div>
       <p @click="handleOpenHide" class="subject-intro_switch">
-        <!-- <img src="../../common/images/icon_arrow_down.png" alt="" v-show="!open_hide" /> -->
-        <!-- <img src="../../common/images/icon_arrow_up.png" alt="" v-show="open_hide" /> -->
+        <i class="vh-iconfont" :class="[open_hide ? 'vh-line-arrow-up' : 'vh-line-arrow-down']" />
       </p>
     </section>
     <section class="subject-menu">
@@ -76,7 +75,9 @@
 </template>
 
 <script>
-  // import initWeChat from '@/utils/weChat';
+  import { useSubjectServer } from 'middle-domain';
+  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { urlToLink, padStringWhenTooLang } from './js/utils.js';
   export default {
     data() {
       return {
@@ -118,85 +119,73 @@
         ]
       };
     },
+    beforeCreate() {
+      this.subjectServer = useSubjectServer();
+    },
     created() {
       this.getDetail();
       this.hasDelayPermission = this.$route.query.delay;
     },
-    // mixins: [initWeChat],
     methods: {
-      getDetail() {
-        this.$axios('subjectInfo', {
-          subject_id: this.$route.query.id
-        })
-          .then(res => {
-            this.detailInfo = res.data;
-            this.detailInfo.webinar_subject.intro = this.urlToLink(
-              this.detailInfo.webinar_subject.intro
-            );
-            this.wxShareInfo(res.data.webinar_subject);
-          })
-          .catch(err => {
-            this.$toast(err.msg);
+      async getDetail() {
+        try {
+          const res = await this.subjectServer.getSubjectInfo({
+            subject_id: this.$route.query.id
           });
-      },
-      urlToLink(str) {
-        if (!str) return '';
-        const regImg = /<img.*?(?:>|\/>)/g;
-        const imgArr = str.match(regImg);
-        const strArr = str.split(regImg);
-        const regUrl = /(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/g;
-        strArr.forEach((item, index) => {
-          const tempStr = item.replace(regUrl, function (match) {
-            return `<a class='show-link' href='${match}' target='_blank'>${match}</a>`;
-          });
-          strArr[index] = tempStr;
-        });
-        if (imgArr) {
-          const imgArrLength = imgArr.length;
-          let imgIndex = 0;
-          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
-            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
-            imgIndex++;
+          if (res.code !== 200) {
+            this.$toast(res.msg);
+            return;
           }
+
+          this.detailInfo = res.data;
+          this.detailInfo.webinar_subject.intro = urlToLink(this.detailInfo.webinar_subject.intro);
+          this.wxShareInfo(res.data.webinar_subject);
+        } catch (err) {
+          this.$toast(err.msg);
         }
-        return strArr.join('');
       },
       // 获取微信分享信息
-      wxShareInfo(info) {
-        this.$axios('weiXinShare', {
-          wx_url:
-            window.location.protocol +
-            process.env.VUE_APP_WATCH_URL +
-            process.env.VUE_APP_WEB_KEY +
-            `/special/detail?id=${this.$route.query.id}`
-        }).then(res => {
-          if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
-            const params = {
-              appId: res.data.appId,
-              timestamp: res.data.timestamp,
-              nonceStr: res.data.nonceStr,
-              signature: res.data.signature
-            };
-            let desc = null;
-            desc = info.intro.replace(/&nbsp;/g, '');
-            desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
-            desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
+      async wxShareInfo(info) {
+        const wx_url =
+          window.location.protocol +
+          process.env.VUE_APP_WATCH_URL +
+          process.env.VUE_APP_WEB_KEY +
+          `/special/detail?id=${this.$route.query.id}`;
 
-            // this.initWeChatSdk(
-            //   { ...params },
-            //   {
-            //     title: info.title,
-            //     desc,
-            //     link:
-            //       window.location.protocol +
-            //       `${process.env.VUE_APP_WATCH_URL}${process.env.VUE_APP_WEB_KEY}/special/detail?id=${this.$route.query.id}`,
-            //     imgUrl: info.cover
-            //   }
-            // );
-          }
+        const res = await this.subjectServer.wechatShare({
+          wx_url
         });
+        if (res.code != 200 || !res.data) return;
+        console.log('获取微信分享数据', res.data);
+
+        const params = {
+          appId: res.data.appId,
+          timestamp: res.data.timestamp,
+          nonceStr: res.data.nonceStr,
+          signature: res.data.signature
+        };
+
+        // set desc
+        let desc = info.intro.replace(/&nbsp;/g, '');
+        desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
+        desc = padStringWhenTooLang(desc, '...', 32);
+
+        const link =
+          window.location.protocol +
+          `${process.env.VUE_APP_WATCH_URL}${process.env.VUE_APP_WEB_KEY}/special/detail?id=${this.$route.query.id}`;
+
+        // wechat-sdk 初始化
+        const wechatRes = await initWeChatSdk(
+          { ...params },
+          {
+            title: info.title,
+            desc,
+            link,
+            imgUrl: info.cover
+          }
+        );
+        const shareSuccessStr = this.$t('webinar.webinar_1038');
+        wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       handleOpenHide() {
         this.open_hide = !this.open_hide;
