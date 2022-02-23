@@ -9,13 +9,13 @@
             :style="{ color: themeClass.pageBg }"
           ></i>
         </span>
-        <p :style="{ color: themeClass.pageBg }">简体中文</p>
+        <p :style="{ color: themeClass.pageBg }">{{ lang.label }}</p>
       </div>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item
-          :command="item.type"
+          :command="item.key"
           :key="index"
-          :class="{ active: item.type == lang }"
+          :class="{ active: item.key == lang.key }"
           v-for="(item, index) in languageList"
         >
           {{ item.label }}
@@ -25,6 +25,19 @@
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpLanguageChoice',
     data() {
@@ -32,51 +45,36 @@
         themeClass: {
           pageBg: '#3562fa'
         },
-        label: '',
-        lang: 'zh',
-        languageList: [
-          {
-            type: 'zh',
-            label: '简体中文'
-          },
-          {
-            type: 'cn',
-            label: 'English'
-          }
-        ]
+        lang: {},
+        languageList: []
       };
     },
     mounted() {
       this.initConfig();
     },
-    watch: {
-      lang(newValue) {
-        localStorage.setItem('lang', newValue);
-      }
+    created() {
+      const roomBaseServer = useRoomBaseServer();
+      this.languageList = roomBaseServer.state.languages.langList.map(item => {
+        return langMap[item.language_type];
+      });
+      const curLang = roomBaseServer.state.languages.curLang;
+      this.lang =
+        langMap[sessionStorage.getItem('lang')] ||
+        langMap[this.$route.query.lang] ||
+        langMap[curLang.language_type];
+      this.$i18n.locale = this.lang.type;
+      sessionStorage.setItem('lang', this.lang.type);
     },
+    watch: {},
     methods: {
       // 初始化配置
       initConfig() {
-        const lan = localStorage.getItem('lang');
-        if (lan) {
-          this.lang = lan;
-        }
-        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('choices')) {
-            this.choices = widget.options.choices;
-          }
-          // eslint-disable-next-line
-          if (!this.lang && widget.options.hasOwnProperty('lang')) {
-            this.lang = widget.options.lang;
-          }
-        }
         // if (!this.lang) {
         //   this.lang = window.$layoutConfig.lang;
         // }
       },
-      handleChangeLang: function () {
+      handleChangeLang: function (key) {
+        sessionStorage.setItem('lang', key);
         window.location.reload();
       }
     }

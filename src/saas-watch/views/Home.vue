@@ -35,7 +35,7 @@
         // 是否跳转预约页
         if (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.preview_paas_record_id
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         ) {
           this.goSubscribePage();
         }
@@ -62,7 +62,8 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: localStorage.getItem('token') || '',
+            'gray-id': sessionStorage.getItem('initGrayId')
           },
           initRoom: {
             webinar_id: id, //活动id
