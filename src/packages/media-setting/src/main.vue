@@ -6,8 +6,8 @@
       width="480px"
       style="min-width: 480px"
       :showDefault="false"
-      @onReturn="isShow = false"
-      @onClose="isShow = false"
+      @onReturn="closeMediaSetting"
+      @onClose="closeMediaSetting"
     >
       <section v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
@@ -24,7 +24,7 @@
               @rateChangeToHD="rateChangeToHD"
             />
             <!-- 摄像头 -->
-            <video-setting v-show="selectedMenuItem === 'video-setting'" />
+            <video-setting ref="videoSetting" v-show="selectedMenuItem === 'video-setting'" />
             <!-- 麦克风 -->
             <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
             <!-- 扬声器 -->
@@ -148,6 +148,7 @@
 
       closeMediaSetting() {
         this.isShow = false;
+        this.$refs['videoSetting'].destroyStream();
       },
 
       showConfirm(text) {
@@ -336,6 +337,14 @@
           this.mediaState.video = sessionVideoId || videoInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedVideoDeviceId');
+        }
+
+        // 视频类型
+        // 设置图片推流
+        let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
+        if (param && param.flag === true && param.streamUrl !== '') {
+          this.mediaState.videoType = 'picture';
+          this.mediaState.canvasImgUrl = param.streamUrl;
         }
 
         // 麦克风
