@@ -276,7 +276,7 @@ export const serverConfig = {
       {
         cuid: ['comQuestionnaire'],
         method: 'open'
-      },
+      }
     ],
     emitOpenSign: [
       {
