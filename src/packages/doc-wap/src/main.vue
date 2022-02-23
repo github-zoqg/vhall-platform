@@ -1,5 +1,10 @@
 <template>
-  <div class="vmp-doc-wap" :class="[`vmp-doc-wap--${displayMode}`]" ref="docWrapper">
+  <div
+    id="docWrapper"
+    class="vmp-doc-wap"
+    :class="[`vmp-doc-wap--${displayMode}`]"
+    ref="docWrapper"
+  >
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
@@ -129,6 +134,7 @@
         // 全屏/退出全屏事件
         screenfull.onchange(() => {
           // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+          if (screenfull.element.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {
