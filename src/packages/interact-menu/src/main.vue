@@ -18,7 +18,7 @@
           <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div class="vmp-interact-menu-list-item" @click="emitOpenQuestionnaire">
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
@@ -137,6 +137,10 @@
       // 打开抽奖弹窗
       openLottery() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
+      },
+      // 打开问卷弹窗
+      emitOpenQuestionnaire() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenQuestionnaire'));
       }
     }
   };
