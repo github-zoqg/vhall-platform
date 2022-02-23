@@ -97,19 +97,19 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
 
-      // this.setDefaultVideoType();
+      this.setDefaultVideoType();
     },
     beforeDestroy() {
-      // this.destroyStream();
+      this.destroyStream();
     },
     methods: {
-      // setDefaultVideoType() {
-      //   let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
-      //   if (param && param.flag === true && param.streamUrl !== '') {
-      //     this.mediaState.videoType = 'picture';
-      //     this.mediaState.canvasImgUrl = param.streamUrl;
-      //   }
-      // },
+      setDefaultVideoType() {
+        let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
+        if (param && param.flag === true && param.streamUrl !== '') {
+          this.mediaState.videoType = 'picture';
+          this.mediaState.canvasImgUrl = param.streamUrl;
+        }
+      },
       async onVideoTypeChange(value) {
         this.mediaSettingServer.setState('videoType', value);
         if (value === 'picture') {

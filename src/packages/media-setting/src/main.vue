@@ -139,11 +139,11 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
-      this.restart();
     },
     methods: {
       showMediaSetting() {
         this.isShow = true;
+        this.restart();
       },
 
       closeMediaSetting() {
@@ -192,8 +192,12 @@
 
         this._diffOptions = this.getDiffOptions();
         const videoTypeChanged = this._diffOptions.videoType !== undefined;
+        const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
+
+        console.log('diffOptions', this._diffOptions);
+
         // 直播中
-        if (watchInitData.webinar.type === 1 && videoTypeChanged) {
+        if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
           let text = '修改设置后导致重新推流，是否继续保存';
           if (this.isRateChangeToHD) {
             text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
