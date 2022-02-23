@@ -68,7 +68,7 @@
     }
   };
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .binding {
     font-size: 40px;
     margin-top: 40%;
