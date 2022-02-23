@@ -45,7 +45,7 @@
     </div>
     <div class="vmp-header-watch-right">
       <!-- 多语言 -->
-      <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+      <!-- <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container> -->
 
       <!-- 公众号 -->
       <div class="vmp-header-watch-right-officical" v-if="officialImg">
@@ -212,7 +212,7 @@
       this.userServer = useUserServer();
     },
     async created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
+      // this.childrenComp = window.$serverConfig[this.cuid].children;
       this.embedObj = this.roomBaseServer.state.embedObj;
       if (this.isLogin && this.isNotEmbed) {
         // 通过活动ID，获取关注信息
