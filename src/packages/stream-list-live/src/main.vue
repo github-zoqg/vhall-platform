@@ -1,31 +1,65 @@
 <template>
-  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': !remoteStreams.length }">
-    <div
-      class="vmp-stream-list__local-container"
-      :class="[
-        joinInfo.third_party_user_id == mainScreen ? 'vmp-stream-list__main-screen' : '',
-        miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
-          ? 'vmp-dom__mini'
-          : 'vmp-dom__max'
-      ]"
-    >
-      <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-    </div>
-    <template v-if="remoteStreams.length">
+  <div
+    class="vmp-stream-list"
+    ref="streamList"
+    :class="{ 'vmp-stream-list-h0': !remoteStreams.length, shrink: isShrink }"
+  >
+    <div class="vmp-stream-list__stream-wrapper">
       <div
-        v-for="stream in remoteStreams"
-        :key="stream.id"
-        class="vmp-stream-list__remote-container"
+        class="vmp-stream-list__local-container"
         :class="[
-          stream.accountId == mainScreen ? 'vmp-stream-list__main-screen' : '',
-          miniElement == 'stream-list' && stream.accountId == mainScreen
+          joinInfo.third_party_user_id == mainScreen ? 'vmp-stream-list__main-screen' : '',
+          miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
             ? 'vmp-dom__mini'
-            : 'vmp-dom__max'
+            : 'vmp-dom__max',
+          isMainScreenHeightLower && !isShrink ? 'height-lower' : ''
         ]"
       >
-        <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
-    </template>
+      <template v-if="remoteStreams.length">
+        <div
+          v-for="stream in remoteStreams"
+          :key="stream.id"
+          class="vmp-stream-list__remote-container"
+          :class="[
+            stream.accountId == mainScreen ? 'vmp-stream-list__main-screen' : '',
+            miniElement == 'stream-list' && stream.accountId == mainScreen
+              ? 'vmp-dom__mini'
+              : 'vmp-dom__max'
+          ]"
+        >
+          <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+        </div>
+      </template>
+    </div>
+
+    <div
+      class="vmp-stream-list__folder"
+      v-show="remoteStreams.length > 0 || (splited && speakerList.length > 0)"
+      v-if="!isSplited"
+    >
+      <span
+        class="vmp-stream-list__folder--up"
+        :class="{
+          disable:
+            isShrink ||
+            (!splited && remoteStreams.length <= remoteMaxLength) ||
+            (splited && speakerList.length - 1 <= remoteMaxLength)
+        }"
+        @click="toggleShrink(true)"
+      ></span>
+      <span
+        class="vmp-stream-list__folder--down"
+        :class="{
+          disable:
+            !isShrink ||
+            (!splited && remoteStreams.length <= remoteMaxLength) ||
+            (splited && speakerList.length - 1 <= remoteMaxLength)
+        }"
+        @click="toggleShrink(false)"
+      ></span>
+    </div>
   </div>
 </template>
 
@@ -37,7 +71,13 @@
     data() {
       return {
         childrenCom: [],
-        maxElement: ''
+        maxElement: '',
+        isSplited: false,
+        splited: false,
+        isShrink: false, // 是否收起
+        isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
+        remoteMaxLength: 0, //一行最大数
+        speakerList: []
       };
     },
 
@@ -101,12 +141,45 @@
 
     mounted() {
       console.log(this.joinInfo, '----stream-list----joinInfo');
+
+      // 计算一行最多放几个
+      this.remoteMaxLength = parseInt(this.$refs.streamList.offsetWidth / 142);
+
+      // 监听流列表高度变化
+      this.computTop();
     },
 
     methods: {
       getStreamList() {
         this.interactiveServer.getRoomStreams();
         console.log('------remoteStreams------', this.remoteStreams);
+      },
+      toggleShrink(flag) {
+        this.isShrink = flag;
+        // const target = document.querySelector('#vhall-remote-strams-box');
+        // setTimeout(() => {
+        //   if (this.$store.state.screenMainTop == target.offsetHeight) {
+        //     return;
+        //   }
+        //   const resizeEvent = new Event('resize');
+        //   window.dispatchEvent(resizeEvent);
+        //   this.$store.commit('SETSCREENMAINTOP', target.offsetHeight);
+        // }, 100);
+      },
+      /**
+       * 计算
+       */
+      computTop() {
+        const MutationObserver =
+          window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+        const _this = this;
+        const observer = new MutationObserver(function () {
+          console.log('监听到streamList变动了', _this.$refs.streamList.offsetHeight);
+
+          _this.isMainScreenHeightLower = _this.$refs.streamList.offsetHeight === 160;
+        });
+        observer.observe(this.$refs.streamList, { childList: true, subtree: true });
       }
       // exchange(compName) {
       //   window.$middleEventSdk?.event?.send({
@@ -121,12 +194,18 @@
 
 <style lang="less">
   .vmp-stream-list {
-    height: 80px;
     width: 100%;
     background-color: #242424;
     display: flex;
     justify-content: center;
 
+    &__stream-wrapper {
+      flex: 1;
+      justify-content: center;
+      display: flex;
+      overflow-y: hidden;
+      flex-wrap: wrap;
+    }
     // 除了主屏流，还有其他上麦流存在的情况
     .vmp-stream-list__main-screen {
       position: absolute;
@@ -136,9 +215,13 @@
         position: absolute;
         top: 80px;
         bottom: 0px;
-        width: calc(100% - 370px);
         height: auto;
         min-height: auto;
+        left: 60px;
+        right: 310px;
+        &.height-lower {
+          top: 160px;
+        }
         // 本地流大窗样式
         .vmp-stream-local {
           .vmp-stream-local__shadow-box {
@@ -182,9 +265,63 @@
       }
     }
 
+    // 收起流列表
+    &.shrink {
+      height: 80px;
+    }
+
     .vmp-stream-list__remote-container {
       width: 142px;
-      height: 100%;
+      height: 80px;
+    }
+
+    &__folder {
+      flex: none;
+      width: 25px;
+      height: auto;
+      display: flex;
+      background: #242424;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      position: relative;
+
+      span {
+        width: 18px;
+        height: 18px;
+        text-align: center;
+        line-height: 18px;
+        color: #d9d9d9;
+        font-size: 12px;
+        border-radius: 50%;
+        position: absolute;
+      }
+      &--up {
+        top: 10px;
+        background: url('./img/uparr.png');
+        background-size: 100%;
+        cursor: pointer;
+        &.disable {
+          cursor: auto;
+          // pointer-events: none;
+          background-image: url('./img/downarr.png');
+          transform: rotateZ(180deg);
+        }
+      }
+      &--down {
+        top: 50px;
+        background: url('./img/uparr.png');
+        background-size: 100%;
+        transform: rotateZ(180deg);
+
+        cursor: pointer;
+        &.disable {
+          transform: rotateZ(0deg);
+          // pointer-events: none;
+          cursor: auto;
+          background-image: url('./img/downarr.png');
+        }
+      }
     }
   }
 </style>

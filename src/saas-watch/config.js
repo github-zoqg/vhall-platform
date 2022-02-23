@@ -194,6 +194,22 @@ export const serverConfig = {
       }
     ]
   },
+  // 语言选择组件
+  compLanguageChoice: {
+    component: 'VmpLanguageChoice',
+    options: {
+      choices: [
+        {
+          value: 'zh',
+          label: 'language_choice.language_choice_1001'
+        },
+        {
+          value: 'en',
+          label: 'language_choice.language_choice_1002'
+        }
+      ]
+    }
+  },
   comAttention: {
     component: 'VmpAttention',
     emitClickLogin: [
@@ -370,6 +386,13 @@ export const serverConfig = {
   },
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
-    children: ['comTabMenu']
+    children: ['comTabMenu', 'comPcPlayer'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   }
 };

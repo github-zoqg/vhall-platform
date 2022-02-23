@@ -39,39 +39,47 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  await roomBaseServer.getConfigList();
-  await roomBaseServer.getLowerConfigList({
-    params: {},
-    environment: process.env.NODE_ENV != 'production' ? 'test' : 'production',
-    systemKey: 2,
-    time: 5
-  });
+  await Promise.all([
+    roomBaseServer.getConfigList(),
+    //黄金链路
+    roomBaseServer.getLowerConfigList({
+      params: {},
+      environment: process.env.NODE_ENV != 'production' ? 'test' : 'production',
+      systemKey: 2,
+      time: 5
+    }),
+    //多语言接口
+    roomBaseServer.getLangList(),
+    // 调用聚合接口
+    roomBaseServer.getCommonConfig({
+      tags: [
+        'skin',
+        'screen-poster',
+        'like',
+        'keywords',
+        'public-account',
+        'webinar-tag',
+        'menu',
+        'adv-default',
+        'invite-card',
+        'red-packet',
+        'room-tool',
+        'goods-default',
+        'announcement',
+        'sign',
+        'timer'
+      ]
+    })
+  ]);
   console.log('%c------黄金链路请求配置项完成', 'color:pink');
   console.log(roomBaseServer.state.configList);
+  console.log('%c------多语言请求配置', 'color:pink');
+  console.log(roomBaseServer.state.languages);
   // TODO 设置观看端测试权限数据
   // roomBaseServer.state.configList = {
   //   hasToolbar: false
   // };
-  // 调用聚合接口
-  await roomBaseServer.getCommonConfig({
-    tags: [
-      'skin',
-      'screen-poster',
-      'like',
-      'keywords',
-      'public-account',
-      'webinar-tag',
-      'menu',
-      'adv-default',
-      'invite-card',
-      'red-packet',
-      'room-tool',
-      'goods-default',
-      'announcement',
-      'sign',
-      'timer'
-    ]
-  });
+
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态

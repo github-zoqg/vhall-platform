@@ -31,6 +31,12 @@ const routes = [
     name: 'upgrading',
     component: () => import('../views/Upgrading.vue'),
     meta: { grayType: '' }
+  },
+  {
+    path: '/lives/bind/:id',
+    name: 'bind',
+    component: () => import('../views/bind'),
+    meta: { grayType: '' }
   }
 ];
 
