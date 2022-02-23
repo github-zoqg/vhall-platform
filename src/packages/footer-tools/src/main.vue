@@ -104,6 +104,9 @@
         openTimer: false,
         showTimer: false,
         groupInitData: {},
+        showPay: false,
+        zfQr: '',
+        wxQr: '',
         isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },

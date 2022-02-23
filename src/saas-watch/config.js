@@ -83,7 +83,7 @@ export const serverConfig = {
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
+        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001' }, // 文档
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
         { type: 'notice', cuid: 'comNotice', text: '公告' },
         { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
@@ -263,7 +263,7 @@ export const serverConfig = {
       //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
       hasImgUpload: false,
       //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
-      hasChatFilterBtn: false,
+      hasChatFilterBtn: true,
       //是否开启聊天设置功能
       enableChatSetting: false,
       //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】

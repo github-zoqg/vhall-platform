@@ -17,7 +17,7 @@
         </template>
         <!--只看主办方按钮-->
         <i
-          class="vh-iconfont vh-line-setting"
+          class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
           @click.stop="onClickFilterSetting"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
@@ -186,7 +186,7 @@
           isShieldingEffects: false
         },
         //聊天审核链接
-        chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
+        chatFilterUrl: `${process.env.VUE_APP_ROUTER_BASE_URL}${process.env.VUE_APP_WEB_KEY}`,
         //是否是助理
         assistantType: this.$route.query.assistantType
       };
@@ -199,7 +199,14 @@
       },
       //进入聊天审核
       joinChatAuth() {
-        const url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}`].join('');
+        let url = '';
+        if (location.search === '') {
+          url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}`].join('');
+        } else {
+          url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}${location.search}`].join(
+            ''
+          );
+        }
         window.open(url, '_blank');
       },
       //切换表情模态窗展示
@@ -404,7 +411,7 @@
         position: absolute;
         top: -11px;
         transform: translateY(-100%);
-        .vh-line-setting {
+        .vh-saas-a-line-zhikanzhubanfang {
           font-size: 19px;
           color: #999;
           margin-left: 10px;

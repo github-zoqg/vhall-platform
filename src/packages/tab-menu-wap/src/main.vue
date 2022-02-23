@@ -12,6 +12,7 @@
           @click="select({ type: item.type, id: item.id })"
         >
           <span class="item-text">{{ $t(item.text) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
         </li>
         <li
           v-if="visibleMenu.length > 3"
@@ -31,7 +32,8 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          {{ $t(item.text) }}
+          <span>{{ $t(item.text) }}</span>
+          <i class="tips" v-show="item.tipsVisible"></i>
         </li>
       </ul>
     </section>
@@ -112,6 +114,17 @@
         console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
+        }
+
+        // TODO: temp，增加私聊
+        const chatIndex = this.menu.findIndex(el => el.type === 3);
+        if (chatIndex >= -1) {
+          this.addItemByIndex(chatIndex + 1, {
+            type: 'private',
+            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '私聊', // 同上
+            status: 2
+          });
         }
       },
       /**
@@ -302,7 +315,6 @@
         width: calc((100% - 100px) / 4);
         position: relative;
         display: inline-flex;
-        flex-direction: column;
         height: 100%;
         justify-content: center;
         align-items: center;
@@ -314,6 +326,17 @@
         .item-text {
           display: flex;
           align-items: center;
+          line-height: 1.2;
+        }
+
+        .tips {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ff0005;
+          border: 9px solid #ff0005;
+          transform: translate(30%, -100%);
         }
 
         .bottom-line {
@@ -381,12 +404,22 @@
       &__item {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         width: 100%;
         height: 88px;
         padding: 0 40px;
 
         &:not(:last-child) {
           border-bottom: 1px solid #d4d4d4;
+        }
+
+        .tips {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ff0005;
+          border: 9px solid #ff0005;
         }
       }
     }

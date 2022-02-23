@@ -26,7 +26,7 @@
           <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div class="vmp-interact-menu-list-item" @click="emitOpenQuestionnaire">
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
@@ -55,6 +55,7 @@
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openRebroadcast"
         >
           <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
@@ -156,6 +157,10 @@
         if (this.disTimer) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
       },
+      //  打开转播
+      openRebroadcast() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRebroadcast'));
+      },
       // 更改禁用状态
       changeStatus(data, status) {
         // console.log(data, status, 'data, status');
@@ -164,6 +169,10 @@
       // 打开抽奖弹窗
       openLottery() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
+      },
+      // 打开问卷弹窗
+      emitOpenQuestionnaire() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenQuestionnaire'));
       },
       // 打开签到弹窗
       openSign() {

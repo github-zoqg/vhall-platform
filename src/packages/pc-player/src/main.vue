@@ -4,7 +4,7 @@
     class="vmp-player"
     :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
   >
-    <div>
+    <div style="height: 100%; width: 100%">
       <div id="vmp-player" class="vmp-player-watch">
         <div class="vmp-player-living">
           <div
@@ -313,9 +313,10 @@
       },
       isShowContainer() {
         return (
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-          this.$domainStore.state.micServer.isSpeakOn ||
-          this.isLivingEnd
+          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+            this.$domainStore.state.micServer.isSpeakOn ||
+            this.isLivingEnd) &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
         );
       },
       isVisibleMiniElement() {

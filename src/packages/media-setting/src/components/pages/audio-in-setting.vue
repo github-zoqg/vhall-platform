@@ -55,13 +55,6 @@
     watch: {
       'mediaState.audioInput'(val) {
         this.setAudioInput(val);
-      },
-      devices(val) {
-        if (val && val.length) {
-          this.mediaState.audioInput = val[0].deviceId;
-        } else {
-          sessionStorage.removeItem('selectedAudioDeviceId');
-        }
       }
     },
     beforeCreate() {
