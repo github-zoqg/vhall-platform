@@ -290,7 +290,6 @@
         useUserServer: {}, // 用户相关的接口
         useCashServer: {}, // 提现相关的接口
         step: 0, // 当前步骤
-        cashCaptVo: {}, // 待删除
         bindForm: {
           money: '',
           phone: '',

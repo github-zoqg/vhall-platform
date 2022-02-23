@@ -310,13 +310,13 @@
         // 图片信息
         console.warn('useMediaSettingServer', param, useMediaSettingServer().state);
         // 音视频/图片推流 方式变更
-        if (param.videoType) {
+        if (param.videoType || param.canvasImgUrl) {
           if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
             await this.$refs.imgPushStream.updateCanvasImg();
           }
 
           if (this.isStreamPublished) {
-            await this.stopPush();
+            await this.interactiveServer.unpublishStream(this.localStream.streamId);
             await this.startPush();
           }
         } else {
