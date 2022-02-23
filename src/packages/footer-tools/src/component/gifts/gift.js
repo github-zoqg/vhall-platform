@@ -30,9 +30,6 @@ export default {
     },
     showGiftCount: {
       type: Number
-    },
-    cuid: {
-      require: true
     }
   },
   beforeDestroy() {
@@ -126,7 +123,8 @@ export default {
       // this.setDialogZIndexQueue('giftPay');
       // 未登录且礼物金额不为0
       if (this.giftInfo.price != 0 && this.watchInitData.join_info.user_id == 0) {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+        this.$emit('needLogin');
+        // window.$middleEventSdk?.event?.send(boxEventOpitons('comFooterTools', 'emitNeedLogin'));
         return;
       }
 
