@@ -262,7 +262,7 @@
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
-          e => {
+          () => {
             if (!document.fullscreenElement) {
               this.isFullScreen = false;
             }
