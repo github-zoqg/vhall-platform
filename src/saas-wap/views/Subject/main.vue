@@ -37,8 +37,7 @@
         <p v-html="detailInfo.webinar_subject.intro"></p>
       </div>
       <p @click="handleOpenHide" class="subject-intro_switch">
-        <!-- <img src="../../common/images/icon_arrow_down.png" alt="" v-show="!open_hide" /> -->
-        <!-- <img src="../../common/images/icon_arrow_up.png" alt="" v-show="open_hide" /> -->
+        <i class="vh-iconfont" :class="[open_hide ? 'vh-line-arrow-up' : 'vh-line-arrow-down']" />
       </p>
     </section>
     <section class="subject-menu">
@@ -133,11 +132,15 @@
           const res = await this.subjectServer.getSubjectInfo({
             subject_id: this.$route.query.id
           });
+          if (res.code !== 200) {
+            this.$toast(res.msg);
+            return;
+          }
+
           this.detailInfo = res.data;
           this.detailInfo.webinar_subject.intro = urlToLink(this.detailInfo.webinar_subject.intro);
           this.wxShareInfo(res.data.webinar_subject);
         } catch (err) {
-          console.error(err);
           this.$toast(err.msg);
         }
       },
