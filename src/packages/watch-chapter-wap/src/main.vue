@@ -32,8 +32,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { useRoomBaseServer, useDocServer, usePlayerServer } from 'middle-domain';
   import { isMse } from '../../wap-player/src/js/utils';
   export default {
     name: 'VmpChapterWap',
@@ -42,7 +41,8 @@
         select: '',
         moment: null,
         support: true,
-        chapterData: {},
+        isMyClick: false,
+        chapterData: [],
         webinarData: {}
       };
     },
@@ -73,6 +73,8 @@
     },
     beforeCreate() {
       this.webinarData = useRoomBaseServer().state.watchInitDate;
+      this.docServer = useDocServer();
+      this.playerServer = usePlayerServer();
     },
     created() {
       // this.acceptChapterData();
@@ -85,12 +87,23 @@
         this.support = false;
       }
     },
+    mounted() {
+      // 接受文档server消息 获取章节信息
+      this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', msg => {
+        console.log('dispatch_doc_vod_cuepoint_load_complate', msg);
+        this.acceptChapterData(msg);
+      });
+      // 接受播放器server消息 更改章节item
+      this.playerServer.$on('chapter_time_update', currentTime => {
+        this.acceptCurrentTime(currentTime);
+      });
+    },
     methods: {
       // 更改播放器时间
       changeTime(t) {
+        this.isMyClick = true;
         this.select = t;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePlayTime', [t]));
-        // this.$emit('changPlayTime', t);
+        this.playerServer.setCurrentTime(t);
       },
       // 接受章节数据
       acceptChapterData(data) {
@@ -184,6 +197,61 @@
             docId: '0a9798f6'
           }
         ];
+      },
+      // 接受当前时间
+      acceptCurrentTime(currentTime) {
+        if (this.isMyClick) {
+          this.isMyClick = false;
+          return false;
+        }
+        const currentNode = this.computeBeforeNode(currentTime);
+        if (currentNode) {
+          this.select = currentNode.createTime;
+        } else {
+          this.select = 0;
+        }
+      },
+      computeBeforeNode(currentTime) {
+        let beforeNode = null;
+        // 这块查询有点绕，后来的大佬有思路可以优化一下
+        for (let i = 0; i < this.chapterData.length; i++) {
+          if (this.chapterData[i].createTime == currentTime) {
+            // 如果当前节点的时间等于播放器当前时间，直接返回当前节点
+            return this.chapterData[i];
+          }
+          if (this.chapterData[i].createTime > currentTime) {
+            // 如果当前节点的时间大于播放器当前时间，直接返回 beforeNode
+            return beforeNode;
+          }
+          // 如果当前节点时间小于播放器当前时间，需要判断当前节点是否存在子节点，如果有子节点，遍历子节点
+          if (this.chapterData[i].sub.length) {
+            // 如果当前节点有子节点，遍历子节点列表
+            for (let j = 0; j < this.chapterData[i].sub.length; j++) {
+              if (this.chapterData[i].createTime == currentTime) {
+                // 如果当前节点的时间等于播放器当前时间，直接返回当前节点
+                return this.chapterData[i].sub[j];
+              }
+              if (this.chapterData[i].sub[j].createTime > currentTime) {
+                // 如果当前节点的时间大于播放器当前时间，直接返回 beforeNode
+                return beforeNode;
+              } else {
+                // 更新 beforeNode
+                beforeNode = this.chapterData[i].sub[j];
+                if (j === this.chapterData[i].sub.length - 1 && i === this.chapterData.length - 1) {
+                  // 如果是最后一个节点，直接返回最后一个节点
+                  return beforeNode;
+                }
+              }
+            }
+          } else {
+            // 更新 beforeNode
+            beforeNode = this.chapterData[i];
+            if (i === this.chapterData.length - 1) {
+              // 如果是最后一个节点，直接返回最后一个节点
+              return beforeNode;
+            }
+          }
+        }
       }
     }
   };
