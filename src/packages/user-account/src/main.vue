@@ -372,7 +372,7 @@
             .catch(() => {});
         } else {
           // 绑定
-          localStorage.setItem('vhsaas_tag', 'bindQQ');
+          localStorage.setItem('vmp_auth_tag', 'bindQQ');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           console.log(`${hostPath}/commons/auth/qq?jump_url=${encodeURIComponent(jumpUrlPath)}`);
@@ -433,7 +433,7 @@
         } else {
           // 绑定
           // this.$VhallStorage.set('tag', 'bindWx', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindWx');
+          localStorage.setItem('vmp_auth_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
           console.log(hostPath);
           // 前端回传地址
