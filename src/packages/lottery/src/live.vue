@@ -69,7 +69,7 @@
             if (data.lottery_status === 0) {
               // 抽奖进行中
               this.handleStartLottery(data);
-            } else if (data.lottery_status === 1) {
+            } else {
               // 上一轮抽奖已结束
               this.lotteryContentShow = true;
               this.lotteryInfoId = null;

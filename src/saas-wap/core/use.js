@@ -57,6 +57,9 @@ import VmpLotteryWap from '@/packages/lottery-wap';
 // 送礼物飘屏动画
 import VmpWapRewardEffect from '@/packages/wap-reward-effect';
 
+// 章节
+import VmpChapterWap from '@/packages/watch-chapter-wap';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -91,4 +94,5 @@ export function initUse() {
   Vue.use(VmpUserAccountWap);
   Vue.use(VmpCashWap);
   Vue.use(VmpLotteryWap);
+  Vue.use(VmpChapterWap);
 }

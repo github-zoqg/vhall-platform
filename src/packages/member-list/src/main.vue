@@ -604,7 +604,8 @@
                 is_banned: Number(context.is_banned),
                 nickname: context.nick_name,
                 role_name: context.role_name,
-                is_speak: speakIndex >= 0 ? 1 : 0
+                is_speak: speakIndex >= 0 ? 1 : 0,
+                is_apply: 0
               };
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -650,7 +651,8 @@
                     device_status: context.device_status,
                     device_type: context.device_type,
                     role_name: context.role_name,
-                    is_speak: speakIndex >= 0 ? 1 : 0
+                    is_speak: speakIndex >= 0 ? 1 : 0,
+                    is_apply: 0
                   };
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -664,7 +666,8 @@
                   is_banned: Number(context.is_banned),
                   nickname: context.nickname,
                   role_name: context.role_name,
-                  is_speak: speakIndex >= 0 ? 1 : 0
+                  is_speak: speakIndex >= 0 ? 1 : 0,
+                  is_apply: 0
                 };
                 _this.onlineUsers.push(user);
                 _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -764,7 +767,7 @@
         }
         //用户取消上麦申请
         function handleCancelApplyConnect(msg) {
-          const { member_info = {} } = msg;
+          const { member_info = { is_apply: 0 } } = msg;
           _this.raiseHandTip = false;
           _this._deleteUser(msg.room_join_id, _this.applyUsers);
           _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, member_info);
@@ -948,7 +951,8 @@
               is_banned: msg.isBanned,
               account_id: msg.accountId,
               role_name: msg.role_name == 20 ? 2 : msg.role_name,
-              device_type: msg.device_type
+              device_type: msg.device_type,
+              is_apply: 0
             });
           } else {
             _this.onlineUsers.forEach((item, index) => {
@@ -1060,7 +1064,8 @@
                   is_banned: msg.is_banned,
                   role_name: msg.join_role,
                   is_speak: speakIndex >= 0 ? 1 : 0,
-                  nickname: msg.nickname
+                  nickname: msg.nickname,
+                  is_apply: 0
                 });
               }
             });
@@ -1071,7 +1076,8 @@
               is_banned: msg.is_banned,
               role_name: msg.join_role,
               is_speak: speakIndex >= 0 ? 1 : 0,
-              nickname: msg.nickname
+              nickname: msg.nickname,
+              is_apply: 0
             };
             _this.onlineUsers.push(user);
             _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
