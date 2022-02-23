@@ -6,7 +6,7 @@
   >
     <div>
       <div class="vmp-player-living-end-img">
-        <img src="../src/images/liveEnd.png" alt="" />
+        <img src="../src/img/liveEnd.png" alt="" />
       </div>
       <h1>直播已结束</h1>
     </div>

@@ -102,7 +102,7 @@
           :title="$t('usual.clear')"
           @click="fullscreen"
         >
-          <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+          <i class="vh-iconfont vh-line-narrow"></i>
         </div>
 
         <!-- 这个章节按钮用于观看端文档显示，主持端章节按钮在最右边 -->
@@ -119,7 +119,7 @@
     <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
     <div class="vmp-doc-toolbar__ft" v-if="!isWatch">
       <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
-        <i class="vh-iconfont vh-a-line-fullscreen"></i>
+        <i class="vh-iconfont vh-line-amplification"></i>
       </div>
       <div
         v-show="currentType !== 'board'"

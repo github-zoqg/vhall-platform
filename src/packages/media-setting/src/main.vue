@@ -9,7 +9,7 @@
       @onReturn="isShow = false"
       @onClose="isShow = false"
     >
-      <section v-show="isShow" v-loading="loading" class="vmp-media-setting-dialog-body">
+      <section v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
         <aside class="vmp-media-setting-menu">
           <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
@@ -133,12 +133,12 @@
     },
     created() {
       this._originCaptureState = {};
+      this._diffOptions = {};
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
-      window.mediaSetting = this;
       this.restart();
     },
     methods: {
@@ -190,8 +190,10 @@
 
         let action = 'not-living';
 
+        this._diffOptions = this.getDiffOptions();
+        const videoTypeChanged = this._diffOptions.videoType !== undefined;
         // 直播中
-        if (watchInitData.webinar.type === 1) {
+        if (watchInitData.webinar.type === 1 && videoTypeChanged) {
           let text = '修改设置后导致重新推流，是否继续保存';
           if (this.isRateChangeToHD) {
             text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
@@ -203,6 +205,7 @@
           this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
+          this.getStateCapture(); // 更新快照
         }
       },
       /**
@@ -220,8 +223,8 @@
        * 发送变化事件
        */
       sendChangeEvent() {
-        const diffOptions = this.getDiffOptions();
-        console.log('diffOptions:', diffOptions);
+        const diffOptions = this._diffOptions;
+
         if (Object.keys(diffOptions) === 0) return;
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));

@@ -128,9 +128,9 @@
       </p>
 
       <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-second-line">
-        <el-tooltip content="设为主画面" placement="bottom">
+        <el-tooltip content="设为主讲人" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
             v-show="stream.attributes.roleName == 4 || stream.attributes.roleName == 1"
             @click="setOwner(stream.accountId)"
           ></span>
@@ -140,8 +140,8 @@
         <el-tooltip content="设为主画面" placement="bottom">
           <span
             v-show="stream.attributes.roleName == 2 || stream.attributes.roleName == 20"
-            @click="setMainScreen()"
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            @click="setMainScreen"
+            class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
         </el-tooltip>
 
@@ -158,7 +158,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer, useRoomBaseServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -203,6 +203,17 @@
     },
     mounted() {
       this.subscribeRemoteStream();
+
+      window.addEventListener(
+        'fullscreenchange',
+        () => {
+          if (!document.fullscreenElement) {
+            // 离开全屏
+            this.isFullScreen = false;
+          }
+        },
+        true
+      );
     },
     beforeDestroy() {
       // 清空计时器
@@ -253,13 +264,29 @@
         });
       },
       fullScreen() {
-        this.interactiveServer.setStreamFullscreen({
-          streamId: this.stream.streamId,
-          vNode: `vmp-stream-remote__${this.stream.streamId}`
-        });
+        if (!this.isFullScreen) {
+          this.interactiveServer
+            .setStreamFullscreen({
+              streamId: this.stream.streamId,
+              vNode: `vmp-stream-remote__${this.stream.streamId}`
+            })
+            .then(() => {
+              this.isFullScreen = true;
+            });
+        } else {
+          this.interactiveServer
+            .exitStreamFullscreen({
+              streamId: this.stream.streamId,
+              vNode: `vmp-stream-remote__${this.stream.streamId}`
+            })
+            .then(() => {
+              this.isFullScreen = false;
+            });
+        }
       },
       exchange() {
-        this.roomBaseServer.requestChangeMiniElement('stream-list');
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.requestChangeMiniElement('stream-list');
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -311,7 +338,7 @@
         }
         this.interactiveServer
           .setSpeaker({
-            receive_account_id: accountId || this.joinInfo.third_party_user_id
+            receive_account_id: accountId || this.stream.accountId
           })
           .then(res => {
             console.log('setSpeaker success ::', res);
@@ -325,7 +352,7 @@
       setMainScreen() {
         this.interactiveServer
           .setMainScreen({
-            receive_account_id: this.joinInfo.third_party_user_id
+            receive_account_id: this.stream.accountId
           })
           .then(res => {
             console.log('setmainscreen success ::', res);
@@ -354,7 +381,7 @@
       height: 100%;
     }
     .vmp-stream-remote__container__mute {
-      background-image: url(./images/no_video_bg.png);
+      background-image: url(./img/no_video_bg.png);
       background-size: cover;
       background-repeat: no-repeat;
       position: absolute;
@@ -419,15 +446,15 @@
         background-size: contain;
         height: 16px;
         width: 16px;
-        background-image: url(./images/network0.png);
+        background-image: url(./img/network0.png);
         &__0 {
-          background-image: url(./images/network0.png);
+          background-image: url(./img/network0.png);
         }
         &__1 {
-          background-image: url(./images/network1.png);
+          background-image: url(./img/network1.png);
         }
         &__2 {
-          background-image: url(./images/network2.png);
+          background-image: url(./img/network2.png);
         }
       }
     }

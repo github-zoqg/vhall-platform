@@ -18,7 +18,7 @@
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="isInteractLive">
+    <div class="vmp-footer-tools__center" v-if="!isBanned && isInteractLive">
       <handup></handup>
     </div>
     <!-- 用户被邀请dialog -->
@@ -34,6 +34,7 @@
       </li>
       <li>
         <!-- 签到 -->
+        <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
@@ -83,7 +84,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -103,9 +104,7 @@
         openTimer: false,
         showTimer: false,
         groupInitData: {},
-        wxQr: '',
-        zfQr: '',
-        showPay: false
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     components: {
@@ -133,6 +132,10 @@
       }
     },
     computed: {
+      // 是否已上麦
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       isInteractLive() {
         const { watchInitData } = this.roomBaseState;
         return (
@@ -175,11 +178,28 @@
       this.groupServer = useGroupServer();
     },
     created() {
+      this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
+        }
+      });
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
+    },
+    mounted() {
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
         }
       });
     },

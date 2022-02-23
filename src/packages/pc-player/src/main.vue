@@ -24,16 +24,6 @@
               <i class="vh-iconfont vh-line-video-play"></i>
             </div>
           </div>
-          <!-- <div class="vmp-player-living-end" v-if="isLivingEnd">
-            <div
-              :class="
-                displayMode == 'mini' ? 'vmp-player-living-end-mini' : 'vmp-player-living-end-img'
-              "
-            >
-              <img src="../src/images/liveEnd.png" alt="" />
-            </div>
-            <h1>直播已结束</h1>
-          </div> -->
           <div class="vmp-player-living-vodend" v-if="isVodEnd">
             <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
               <h3>{{ $t('appointment.appointment_1013') }}</h3>
@@ -49,7 +39,9 @@
                 <span v-else @click="handleAuth">{{ authText }}</span>
               </div>
               <p class="replay-try">
-                <i class="vh-iconfont vh-line-refresh-left"><b>重新试看</b></i>
+                <i class="vh-iconfont vh-line-refresh-left">
+                  <b>{{ $t('appointment.appointment_1014') }}</b>
+                </i>
               </p>
             </div>
             <div class="vmp-player-living-vodend-isNoTry" v-else>
@@ -68,7 +60,11 @@
           <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
             <div>语音播放中</div>
           </div>
-          <div class="vmp-player-living-exchange" @click="exchangeVideoDocs">
+          <div
+            class="vmp-player-living-exchange"
+            @click="exchangeVideoDocs"
+            v-if="isVisibleMiniElement"
+          >
             <p>
               <el-tooltip :content="$t('player.player_1008')" placement="top">
                 <i class="vh-saas-iconfont vh-saas-line-switch"></i>
@@ -321,6 +317,10 @@
           this.$domainStore.state.micServer.isSpeakOn ||
           this.isLivingEnd
         );
+      },
+      isVisibleMiniElement() {
+        // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
+        return this.$domainStore.state.docServer.switchStatus;
       }
     },
     watch: {
@@ -910,7 +910,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-image: url('../src/images/video.gif');
+        background-image: url('../src/img/video.gif');
         background-size: 100% 100%;
         div {
           text-align: center;

@@ -1,6 +1,6 @@
 <template>
-  <div class="inviteWrap" style="height: 100%">
-    <!-- <invitation-Card @changeInvite="changeInvite"></invitation-Card> -->
+  <div class="inviteWrap">
+    <invitation-Card @changeInvite="changeInvite"></invitation-Card>
     <div @click="toWebinar" class="webinarEntrance">
       <p class="btnVal">进入活动</p>
     </div>
@@ -8,10 +8,10 @@
 </template>
 
 <script>
-  // import invitationCard from '@/components/invitationCard/index.vue';
+  import invitationCard from './components/card.vue';
   export default {
     components: {
-      // invitationCard
+      invitationCard
     },
     data() {
       return {
@@ -35,6 +35,7 @@
 <style lang="less">
   .inviteWrap {
     position: relative;
+    height: 100vh;
     .webinarEntrance {
       position: absolute;
       top: 45px;

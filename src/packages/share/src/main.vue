@@ -205,7 +205,7 @@
         }
         &-chat {
           span {
-            background: url('./images/wechat@2x.png') 50% no-repeat;
+            background: url('./img/wechat@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -214,7 +214,7 @@
         }
         &-qq {
           span {
-            background: url('./images/qq@2x.png') 50% no-repeat;
+            background: url('./img/qq@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -223,7 +223,7 @@
         }
         &-weibo {
           span {
-            background: url('./images/weibo@2x.png') 50% no-repeat;
+            background: url('./img/weibo@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -232,7 +232,7 @@
         }
         &-invite {
           span {
-            background: url('./images/inv-card@2x.png') 50% no-repeat;
+            background: url('./img/inv-card@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {

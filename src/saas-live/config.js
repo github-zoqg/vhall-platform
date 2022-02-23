@@ -93,8 +93,8 @@ export const serverConfig = {
       'comPcMediaCheck',
       'comInsertVideo',
       'liveTimerSet',
-      'liveTimer'
-      // 'comRebroadcast'
+      'liveTimer',
+      'comRebroadcast'
     ]
   },
 
@@ -167,7 +167,8 @@ export const serverConfig = {
       'comGroupMenu',
       'comShareMenu',
       'comExitGroupMenu',
-      'comLottery'
+      'comLottery',
+      'comSignLive'
     ]
   },
   // 语言选择组件
@@ -266,6 +267,18 @@ export const serverConfig = {
     emitOpenLottery: [
       {
         cuid: ['comLottery'],
+        method: 'open'
+      }
+    ],
+    emitOpenSign: [
+      {
+        cuid: ['comSignLive'],
+        method: 'openSign'
+      }
+    ],
+    emitOpenRebroadcast: [
+      {
+        cuid: ['comRebroadcast'],
         method: 'open'
       }
     ]
@@ -544,5 +557,8 @@ export const serverConfig = {
   },
   comLottery: {
     component: 'VmpLotteryLive'
+  },
+  comSignLive: {
+    component: 'VmpSignLive'
   }
 };

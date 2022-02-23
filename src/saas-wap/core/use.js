@@ -13,7 +13,7 @@ import VmpRegLoginWap from '@/packages/reg-login-wap';
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
-import VmpWatchPrivateChat from '@/packages/watch-private-chat';
+import VmpWapPrivateChat from '@/packages/wap-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpTabMenuWap from '@/packages/tab-menu-wap';
@@ -72,7 +72,7 @@ export function initUse() {
   Vue.use(VmpWapStreamRemote);
   Vue.use(VmpRegLoginWap);
   Vue.use(VmpMemberList);
-  Vue.use(VmpWatchPrivateChat);
+  Vue.use(VmpWapPrivateChat);
   Vue.use(VmpSignUpForm);
   Vue.use(VmpTabMenuWap);
   Vue.use(VmpIntroWap);

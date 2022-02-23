@@ -10,11 +10,19 @@
     </div>
     <div class="vmp-interact-menu-wrap">
       <div class="vmp-interact-menu-list">
-        <div class="vmp-interact-menu-list-item" @click="openLottery">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="openLottery"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+        >
           <i class="vh-iconfont vh-a-line-luckydraw"></i>
           <p>抽奖</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openSign"
+        >
           <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
@@ -22,19 +30,33 @@
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
-        <div class="vmp-interact-menu-list-item vmp-interact-menu-list-disable">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+        >
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
-          <i class="vh-iconfont vh-a-line-redpacket"></i>
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+        >
+          <i class="vh-iconfont vh-a-redpacket"></i>
           <p>红包</p>
         </div>
-        <div class="vmp-interact-menu-list-item" @click="openTimer">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="openTimer"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+        >
           <i class="vh-iconfont vh-line-time"></i>
           <p>计时器</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openRebroadcast"
+        >
           <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
         </div>
@@ -91,6 +113,11 @@
         assistantType: false // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
       };
     },
+    computed: {
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      }
+    },
     methods: {
       handleQAPopup() {
         if (!this.qaVisible && this.isQAEnabled) {
@@ -130,6 +157,10 @@
         if (this.disTimer) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
       },
+      //  打开转播
+      openRebroadcast() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRebroadcast'));
+      },
       // 更改禁用状态
       changeStatus(data, status) {
         // console.log(data, status, 'data, status');
@@ -138,6 +169,10 @@
       // 打开抽奖弹窗
       openLottery() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
+      },
+      // 打开签到弹窗
+      openSign() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       }
     }
   };
