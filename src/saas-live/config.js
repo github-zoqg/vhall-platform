@@ -94,6 +94,8 @@ export const serverConfig = {
       'comInsertVideo',
       'liveTimerSet',
       'liveTimer',
+      'comQuestionnaire',
+      // 'comRebroadcast'
       'comRebroadcast'
     ]
   },
@@ -269,6 +271,12 @@ export const serverConfig = {
         cuid: ['comLottery'],
         method: 'open'
       }
+    ],
+    emitOpenQuestionnaire: [
+      {
+        cuid: ['comQuestionnaire'],
+        method: 'open'
+      },
     ],
     emitOpenSign: [
       {
@@ -557,6 +565,9 @@ export const serverConfig = {
   },
   comLottery: {
     component: 'VmpLotteryLive'
+  },
+  comQuestionnaire: {
+    component: 'VmpQuestionnaire'
   },
   comSignLive: {
     component: 'VmpSignLive'
