@@ -4,7 +4,7 @@
     class="vmp-player"
     :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
   >
-    <div style="height: 100%; width: 100%">
+    <div>
       <div id="vmp-player" class="vmp-player-watch">
         <div class="vmp-player-living">
           <div
