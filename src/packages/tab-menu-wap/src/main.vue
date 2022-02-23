@@ -12,6 +12,7 @@
           @click="select({ type: item.type, id: item.id })"
         >
           <span class="item-text">{{ $t(item.text) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
         </li>
         <li
           v-if="visibleMenu.length > 3"
@@ -31,7 +32,8 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          {{ $t(item.text) }}
+          <span>{{ $t(item.text) }}</span>
+          <i class="tips" v-show="item.tipsVisible"></i>
         </li>
       </ul>
     </section>
@@ -109,7 +111,7 @@
       initMenu() {
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
-
+        console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
         }
@@ -142,7 +144,9 @@
        * @param {*} item
        */
       addItem(item) {
+        console.log('[menu] this.tabOptions.menuConfig:', this.tabOptions.menuConfig);
         item = getItemEntity(item, this.tabOptions.menuConfig);
+        console.log('[menu] item:', item);
         this.menu.push(item);
       },
       /**
@@ -300,7 +304,6 @@
         width: calc((100% - 100px) / 4);
         position: relative;
         display: inline-flex;
-        flex-direction: column;
         height: 100%;
         justify-content: center;
         align-items: center;
@@ -312,6 +315,17 @@
         .item-text {
           display: flex;
           align-items: center;
+          line-height: 1.2;
+        }
+
+        .tips {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ff0005;
+          border: 9px solid #ff0005;
+          transform: translate(30%, -100%);
         }
 
         .bottom-line {
@@ -373,16 +387,28 @@
       background-color: #f3f3f3;
       color: #444;
       width: 100%;
+      max-height: 352px;
+      overflow-y: scroll;
 
       &__item {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         width: 100%;
         height: 88px;
         padding: 0 40px;
 
         &:not(:last-child) {
           border-bottom: 1px solid #d4d4d4;
+        }
+
+        .tips {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ff0005;
+          border: 9px solid #ff0005;
         }
       }
     }

@@ -94,17 +94,14 @@
       isShowSupport: {
         default: false,
         type: Boolean
-      },
-      isShowSplitScreen: {
-        default: false,
-        type: Boolean
       }
     },
     computed: {
       isSupportSplitScreen() {
         return (
           (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
-          this.webinarInfo.mode != 6
+          this.webinarInfo.mode != 6 &&
+          this.webinarInfo.mode != 1
         );
       },
       isLiving() {
@@ -158,13 +155,21 @@
         // 第三方发起
         if (this.isLiving) {
           this.$message.warning('请先结束直播');
+          return;
         }
+        this.$emit('thirdPushStream', true);
+        this.thirtPushStreamimg = true;
+        this.roomBaseServer.setInavToolStatus('start_type', 4);
       },
       thirdPartyClose() {
         // 网页发起 第三方发起关闭
         if (this.isLiving) {
           this.$message.warning('请先结束直播');
+          return;
         }
+        this.$emit('thirdPushStream', false);
+        this.thirtPushStreamimg = false;
+        this.roomBaseServer.setInavToolStatus('start_type', 1);
       },
       openVirtualAudience() {
         // 虚拟人数弹窗
@@ -191,7 +196,7 @@
       font-size: 20px;
       cursor: pointer;
       border-radius: 50%;
-      background: url('../images/my-dark@2x.png') no-repeat;
+      background: url('../img/my-dark@2x.png') no-repeat;
       background-size: 100% 100%;
       // background-color: hsla(0, 0%, 88.6%, 0.15);
     }

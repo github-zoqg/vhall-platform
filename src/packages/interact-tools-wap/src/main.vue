@@ -2,7 +2,11 @@
   <div class="tools-box">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
-      <div v-if="isAllowhandup" style="position: relative" auth="{ 'ui.hide_reward': 0 }">
+      <div
+        v-if="!isBanned && (isAllowhandup || isSpeakOn)"
+        style="position: relative"
+        auth="{ 'ui.hide_reward': 0 }"
+      >
         <i
           v-if="!handUpStatus"
           class="vh-saas-iconfont vh-saas-line-drag"
@@ -31,12 +35,18 @@
           :joinInfoInGift="joinInfoInGift"
           :roomId="localRoomInfo.room_id"
           :localRoomInfo="localRoomInfo"
+          :cuid="cuid"
         />
       </div>
       <!-- 打赏 -->
       <div v-if="!localRoomInfo.isEmbed" auth="{ 'ui.hide_reward': 0 }">
         <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
-        <RewardCard ref="reward" :webinarData="webinarData" :localRoomInfo="localRoomInfo" />
+        <RewardCard
+          ref="reward"
+          :webinarData="webinarData"
+          :localRoomInfo="localRoomInfo"
+          :cuid="cuid"
+        />
       </div>
       <!-- 邀请卡 -->
       <a
@@ -58,7 +68,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
@@ -104,7 +114,8 @@
         location:
           window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
-        handUpStatus: false
+        handUpStatus: false,
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     computed: {
@@ -112,6 +123,15 @@
       isAllowhandup() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
         return status;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      }
+    },
+    created() {
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
       }
     },
     mounted() {
@@ -120,7 +140,17 @@
         nickname: this.roomBaseState.watchInitData.join_info.nickname,
         hideChatHistory: this.configList['ui.hide_chat_history'] == 1
       };
-      console.log(this.roomBaseState, 'roomBaseState');
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
+      });
     },
     methods: {
       opneGifts() {

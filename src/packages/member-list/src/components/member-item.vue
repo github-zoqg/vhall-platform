@@ -12,7 +12,7 @@
         class="vmp-member-item__avatar-wrapper__phone"
         width="9"
         height="12"
-        src="../images/phone.png"
+        src="../img/phone.png"
         alt
       />
     </div>
@@ -22,7 +22,7 @@
       :class="userInfo.role_name | roleClassFilter"
       v-if="![2, '2'].includes(userInfo.role_name)"
     >
-      {{ userInfo.role_name | roleFilter }}
+      {{ roleFilter(userInfo.role_name) }}
     </span>
     <div class="vmp-member-item__control">
       <template v-if="memberOptions.platformType === 'live'">
@@ -34,7 +34,7 @@
         <!--被禁言标识 -->
         <template v-if="[1, 3].includes(tabIndex) && userInfo.is_banned === 1">
           <i
-            class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-line-blacklist"
+            class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
             style="color: #cccccc"
           ></i>
         </template>
@@ -131,7 +131,7 @@
         <!--被禁言-->
         <i
           v-if="[1, 3].includes(tabIndex) && [1, '1'].includes(userInfo.is_banned)"
-          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-line-blacklist"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
           style="color: #cccccc"
         ></i>
         <!--申请上麦-->
@@ -153,7 +153,7 @@
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
-          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-line-blacklist"
+          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-Onthemicrophone1"
           style="color: #fb3a32; font-size: 15px"
         ></i>
         <!--设备有问题-->
@@ -263,31 +263,10 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/share/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpMemberItem',
     filters: {
-      //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 3:
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 4:
-            ret = this.$t('chat.chat_1023');
-            break;
-          case 20:
-            ret = this.$t('chat.chat_1064');
-            break;
-          default:
-            ret = '';
-        }
-        return ret;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人
@@ -362,7 +341,7 @@
       },
       //直播状态，0未开始，1已开始，2已结束
       status: {
-        type: [Array, String],
+        type: [Array, String, Number],
         default: () => {
           return 0;
         }
@@ -374,7 +353,7 @@
     data() {
       return {
         //默认头像
-        defaultAvatar,
+        defaultAvatar: defaultAvatar,
         //操作项
         operateList: [
           //设为主讲
@@ -471,6 +450,30 @@
       };
     },
     computed: {
+      //角色转换
+      roleFilter() {
+        const _this = this;
+        return function (value) {
+          let ret = '';
+          switch (Number(value)) {
+            case 1:
+              ret = _this.$t('chat.chat_1022');
+              break;
+            case 3:
+              ret = _this.$t('chat.chat_1024');
+              break;
+            case 4:
+              ret = _this.$t('chat.chat_1023');
+              break;
+            case 20:
+              ret = _this.$t('chat.chat_1064');
+              break;
+            default:
+              ret = '';
+          }
+          return ret;
+        };
+      },
       //人员操作项是否显示(PC发起)
       showUserControl() {
         return (
@@ -820,7 +823,7 @@
         margin-left: 3px;
         color: #cccccc;
         font-size: 12px;
-        background: url('../images/more.png') no-repeat center;
+        background: url('../img/more.png') no-repeat center;
         background-size: 13px 3px;
         border-radius: 4px;
         &:hover {

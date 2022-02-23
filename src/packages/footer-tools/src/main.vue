@@ -18,7 +18,7 @@
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="isInteractLive">
+    <div class="vmp-footer-tools__center" v-if="!isBanned && isInteractLive">
       <handup></handup>
     </div>
     <!-- 用户被邀请dialog -->
@@ -34,6 +34,7 @@
       </li>
       <li>
         <!-- 签到 -->
+        <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
@@ -57,6 +58,9 @@
             v-show="showGift && roomBaseState.watchInitData.interact.room_id"
             :roomId="roomBaseState.watchInitData.interact.room_id"
             :show-gift-count="showGiftCount"
+            @changeShowGift="changeStatus"
+            @acceptPay="acceptPay"
+            :cuid="cuid"
           />
         </div>
       </li>
@@ -71,18 +75,23 @@
         <!-- 点赞 -->
         <praise></praise>
       </li>
+      <!-- 支付弹框 -->
+      <li v-if="showPay">
+        <Pay :wxQr="wxQr" :zfQr="zfQr" @changeShow="changeStatus"></Pay>
+      </li>
     </ul>
   </div>
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
   import getInvited from './component/getInvited/index.vue';
+  import Pay from './component/pay/index.vue';
 
   export default {
     name: 'VmpFooterTools',
@@ -94,7 +103,11 @@
         showGiftCount: 0,
         openTimer: false,
         showTimer: false,
-        groupInitData: {}
+        groupInitData: {},
+        showPay: false,
+        zfQr: '',
+        wxQr: '',
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     components: {
@@ -103,7 +116,8 @@
       vhGifts,
       notice,
       praise,
-      getInvited
+      getInvited,
+      Pay
     },
     filters: {
       formatHotNum(value) {
@@ -121,6 +135,10 @@
       }
     },
     computed: {
+      // 是否已上麦
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       isInteractLive() {
         const { watchInitData } = this.roomBaseState;
         return (
@@ -163,11 +181,28 @@
       this.groupServer = useGroupServer();
     },
     created() {
+      this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
+        }
+      });
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
+    },
+    mounted() {
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
         }
       });
     },
@@ -179,6 +214,7 @@
         });
       },
       changeStatus(data, status) {
+        console.log(data, status, 'data, status');
         this[data] = status;
       },
       // 打开计时器弹框
@@ -197,9 +233,17 @@
       },
       // 打开打赏弹框
       onClickReward() {
-        // TODO:需校验是否登陆
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+        // 需校验是否登陆
+        if (this.roomBaseState.watchInitData.join_info.user_id == 0) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          return false;
+        }
         this.$refs.reward.onClickReward();
+      },
+      // 接收支付码
+      acceptPay(data, url) {
+        this.showPay = true;
+        this[data] = url;
       }
     }
   };

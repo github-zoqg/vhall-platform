@@ -11,10 +11,11 @@
         :options="overlayScrollBarsOptions"
         style="height: 100%"
       >
-        <template v-for="msg in chatList">
+        <template v-for="(msg, index) in chatList">
           <msg-item
             :key="msg.msgId"
             :msg="msg"
+            :pre-msg="chatList[index - 1]"
             v-show="checkMessageShow(msg)"
             :chat-options="chatOptions"
             :role-name="roleName"
@@ -124,7 +125,7 @@
         >
           <img
             class="sepcial-effect__img"
-            :src="msg.content.gift_url || require('./images/red-package-1.png')"
+            :src="msg.content.gift_url || require('./img/red-package-1.png')"
             alt=""
           />
         </div>
@@ -132,13 +133,13 @@
           v-if="msg.type == 'gift_send_success' && effectsMap[msg.content.gift_name]"
           class="sepcial-effect__img"
           :class="`sepcial-effect__img-${effectsMap[msg.content.gift_name]}`"
-          :src="msg.content.gift_url || require('./images/red-package-1.png')"
+          :src="msg.content.gift_url || require('./img/red-package-1.png')"
           alt=""
         />
         <img
           v-if="msg.type === 'reward_pay_ok'"
           class="sepcial-effect__img-reward"
-          :src="msg.content.gift_url || require('./images/red-package-1.png')"
+          :src="msg.content.gift_url || require('./img/red-package-1.png')"
           alt=""
         />
       </li>
@@ -147,7 +148,7 @@
 </template>
 
 <script>
-  import defaultAvatar from './images/my-dark@2x.png';
+  import defaultAvatar from './img/my-dark@2x.png';
   import MsgItem from './components/msg-item.vue';
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
@@ -363,14 +364,25 @@
         const chatServer = useChatServer();
         //监听@我的消息
         chatServer.$on('atMe', () => {
-          this.isHasUnreadAtMeMsg = true;
-          this.tipMsg = '有人@你';
+          if (this.osInstance.scroll().ratio.y != 1) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = '有人@你';
+          }
         });
         //监听回复我的消息
-        chatServer.$on('replyMe', () => {});
+        chatServer.$on('replyMe', () => {
+          if (this.osInstance.scroll().ratio.y != 1) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = '有人回复你';
+          }
+        });
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
-          this.unReadMessageCount++;
+          if (this.osInstance.scroll().ratio.y != 1) {
+            this.isHasUnreadAtMeMsg = true;
+            this.unReadMessageCount++;
+            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
+          }
         });
         //监听禁言通知
         chatServer.$on('banned', res => {
@@ -385,6 +397,10 @@
         //监听分组房间变更通知
         chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
+        });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
         });
       },
       init() {
@@ -447,7 +463,7 @@
       //处理分组讨论频道变更
       handleChannelChange() {
         this.page = 0;
-        this.clearHistoryMsg();
+        useChatServer().clearHistoryMsg();
         this.getHistoryMsg();
       },
       // 获取历史消息
@@ -748,7 +764,6 @@
           this.chatList.find(chatMsg => {
             return chatMsg.count === count;
           }) || {};
-
         setTimeout(() => {
           const params = {
             channel_id: msgToDelete.channel,
@@ -762,10 +777,6 @@
                 business_uid: this.userId,
                 webinar_id: this.$route.params.il_id
               });
-              const _index = this.chatList.findIndex(chatMsg => {
-                return chatMsg.count === count;
-              });
-              _index !== -1 && this.chatList.splice(_index, 1);
               return res;
             });
         }, 3000); // 优化 17532
@@ -984,25 +995,25 @@
         padding: 4px;
         padding-top: 11px;
         transition: all 200ms;
-        background-image: url(./images/red-package-bg.png);
+        background-image: url(img/red-package-bg.png);
         background-size: 100%;
         &.bg-applause {
-          background-image: url(./images/applause-bg.png);
+          background-image: url(img/applause-bg.png);
         }
         &.bg-coffee {
-          background-image: url(./images/coffee-bg.png);
+          background-image: url(img/coffee-bg.png);
         }
         &.bg-custom {
-          background-image: url(./images/custom-bg.png);
+          background-image: url(img/custom-bg.png);
         }
         &.bg-flower {
-          background-image: url(./images/flower-bg.png);
+          background-image: url(img/flower-bg.png);
         }
         &.bg-praise {
-          background-image: url(./images/praise-bg.png);
+          background-image: url(img/praise-bg.png);
         }
         &.bg-666 {
-          background-image: url(./images/666-bg.png);
+          background-image: url(img/666-bg.png);
         }
         &:first-child {
           animation: added 180ms;

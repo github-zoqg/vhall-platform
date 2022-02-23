@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
   export default {
     name: 'VmpWatchPrivateChatMsgTemplate',
     filters: {
@@ -130,6 +130,7 @@
         const strArr = str.split(regImg);
         // eslint-disable-next-line no-useless-escape
         const regUrl =
+          // eslint-disable-next-line no-useless-escape
           /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g;
 
         // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹

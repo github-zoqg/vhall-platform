@@ -26,18 +26,8 @@
         <span>对着麦克风讲话，您能看到音量条波动么？</span>
       </div>
       <div class="button-container button-container__microphone">
-        <el-button
-          round
-          class="confirm"
-          type="primary"
-          :class="{ disable: !audioReady }"
-          @click="success"
-        >
-          能看到
-        </el-button>
-        <el-button round class="cancel" :class="{ disable: !audioReady }" @click="fail">
-          看不到
-        </el-button>
+        <el-button round class="confirm" type="primary" @click="success">能看到</el-button>
+        <el-button round class="cancel" @click="fail">看不到</el-button>
       </div>
     </footer>
   </section>

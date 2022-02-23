@@ -45,7 +45,7 @@
             }}{{ $t('cash.cash_1003') }},{{ msg.content.text_content | textOverflowSlice(6) }}
           </p>
         </div>
-        <img class="new-award-img" src="../images/red-package.png" />
+        <img class="new-award-img" src="../img/red-package.png" />
       </div>
     </template>
     <!-- 送礼物 -->
@@ -80,7 +80,7 @@
               class="role"
               :class="msg.roleName | roleClassFilter"
             >
-              {{ msg.roleName | roleFilter }}
+              {{ roleFilter(msg.roleName) }}
             </span>
             <span class="nickname">{{ msg.nickname }}</span>
           </p>
@@ -161,31 +161,36 @@
     data() {
       return {
         msgContent: '',
-        jiantou: require('../images/jiantou.png')
+        jiantou: require('../img/jiantou.png')
       };
     },
-    filters: {
+    computed: {
       //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 3:
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 4:
-            ret = this.$t('chat.chat_1023');
-            break;
-          case 20:
-            ret = this.$t('chat.chat_1064');
-            break;
-          default:
-            ret = this.$t('chat.chat_1062');
-        }
-        return ret;
-      },
+      roleFilter() {
+        const _this = this;
+        return function (value) {
+          let ret = '';
+          switch (Number(value)) {
+            case 1:
+              ret = _this.$t('chat.chat_1022');
+              break;
+            case 3:
+              ret = _this.$t('chat.chat_1024');
+              break;
+            case 4:
+              ret = _this.$t('chat.chat_1023');
+              break;
+            case 20:
+              ret = _this.$t('chat.chat_1064');
+              break;
+            default:
+              ret = _this.$t('chat.chat_1062');
+          }
+          return ret;
+        };
+      }
+    },
+    filters: {
       //角色标签样式
       roleClassFilter(value) {
         //主持人

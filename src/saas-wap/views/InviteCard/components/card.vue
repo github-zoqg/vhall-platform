@@ -1,6 +1,6 @@
 <template>
   <section class="vh-invitation__warp">
-    <template v-if="showInvite == 'true'">
+    <template v-if="isInviteVisible">
       <img
         style="display: none"
         :src="webinarInfo.showImg"
@@ -9,9 +9,9 @@
       />
       <img style="display: none" :src="invite_qr_url" alt class="hsrc" />
       <div class="vh-invitation__down-warp">
-        <img :src="canvasImgUrl" alt />
+        <img v-show="canvasImgUrl" :src="canvasImgUrl" alt />
       </div>
-      <div class="vh-invitation__card-preview-content-download" ref="drewCanvasDom">
+      <div class="vh-invitation__card-preview-content-download" ref="drawCanvasDom">
         <div class="vh-invitation__card-preview-content-warp">
           <div
             class="watch-img"
@@ -141,60 +141,32 @@
         </div>
       </div>
     </template>
-    <div class="vh-invitation__no-data" v-if="showInvite == 'false'">
-      <img src="./images/nodata-img@2x.png" alt />
-      <p>{{ $t('mess.主播还未开启邀请哦') }}</p>
-      <p>{{ $t('mess.请耐心等待') }}</p>
+
+    <div class="vh-invitation__no-data" v-if="!isInviteVisible && inited">
+      <img src="../img/nodata-img@2x.png" alt />
+      <p>{{ $t('nav.nav_1050') }}</p>
+      <p>{{ $t('appointment.appointment_1031') }}</p>
     </div>
   </section>
 </template>
 
 <script>
   import Html2canvas from 'html2canvas';
-  import defaultAvator from './images/default_avator.png';
-  import initWeChat from '@/utils/weChat';
+  import defaultAvatarImg from '../img/default_avatar.png';
+
+  import { getBase64Image } from '../js/utils';
+  import { bgImgOptions } from '../js/getOptions';
+  import { initWeChatSdk } from '../js/useWechat';
+  import { useInviteServer } from 'middle-domain';
+
   export default {
     name: 'invitationCard',
     data() {
       return {
-        selectBgDataInit: [
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_1@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_2@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_3@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_4@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_5@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_6@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_7@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_8@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          },
-          {
-            imageUrl:
-              'https://t-alistatic01.e.vhall.com/static/images/invitation/bg_9@2x.png?x-oss-process=image/resize,m_fill,w_100,h_100,limit_0'
-          }
-        ], // 展示添加封面背景数据
+        isInviteVisible: false, // 是否开启邀请卡
+        inited: false,
+        // 展示添加封面背景数据
+        selectBgDataInit: Object.freeze(bgImgOptions),
         webinarInfo: {
           title: '', // 标题
           img: '', // 背景图
@@ -209,131 +181,110 @@
         },
         invite_qr_url: `//aliqr.e.vhall.com/qr.png?t=https:${process.env.VUE_APP_WATCH_URL}${process.env.VUE_APP_WEB_KEY}/lives/watch/${this.$route.params.id}`,
         canvasImgUrl: '',
-        showInvite: '', // 是否开启邀请卡
         nickname: ''
       };
     },
-    components: {},
-    created() {
-      this.getRoomStatus();
-      this.$nextTick(() => {
-        Image.prototype.getBase64Image = function () {
-          const img = this;
-          var canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, img.width, img.height);
-          var dataURL = canvas.toDataURL('image/png');
-          return dataURL;
-        };
-      });
+    beforeCreate() {
+      this.inviteServer = useInviteServer();
+      console.log('inviteServer', this.inviteServer);
     },
-    mixins: [initWeChat],
+    created() {
+      setTimeout(() => {
+        this.inited = true;
+      }, 2000);
+      this.getRoomStatus();
+    },
     methods: {
-      getRoomStatus() {
-        // 如果没有传递type=1表示非控制台触发，调用watch-get-info接口。若是传递了type=1，表示控制台扫码观看触发，调用邀请卡信息get-info接口
-        // const apiName = this.$route.query.type == 1 ? 'showInvite' : 'createInvite'
-        const apiName = 'createInvite';
-        const params = {
+      async getRoomStatus() {
+        let params = {
           webinar_id: this.$route.params.id
         };
         if (this.$route.query.invite_id) {
           params.invite_id = this.$route.query.invite_id;
         }
         if (this.$route.query.join_id) {
-          // 兼容之前卡片带了join_id的
+          // 兼容join_id写法
           params.invite_id = this.$route.query.join_id;
         }
-        console.log('邀请卡信息获取...', params);
-        /*, {
-        headers: {
-          token: token,
-          interact_token: interact_token
-        }
-      }*/
-        this.$axios(apiName, params).then(res => {
-          if (apiName === 'showInvite') {
-            this.submitCreateHistory(res.data.join_id);
-          }
-          this.showInvite = parseInt(res.data.status) === 1 ? 'true' : 'false';
-          this.webinarInfo.avatar = res.data.avatar || defaultAvator;
-          this.webinarInfo.title = res.data.invite_card.title;
-          this.webinarInfo.img = res.data.invite_card.img;
-          this.webinarInfo.company = res.data.invite_card.company;
-          this.webinarInfo.nick_name = res.data.nick_name;
-          this.webinarInfo.date = res.data.invite_card.webinar_date;
-          this.webinarInfo.location = res.data.invite_card.location;
-          this.webinarInfo.desciption = res.data.invite_card.desciption;
-          this.webinarInfo.isShowWaterMark = res.data.invite_card.is_show_watermark == 0;
-          this.webinarInfo.show_type = res.data.invite_card.show_type;
-          this.webinarInfo.img_type = res.data.invite_card.img_type;
-          this.invite_qr_url += `?invite=${res.data.invite}`;
-          this.$emit('changeInvite', res.data.invite);
-          if (this.webinarInfo.img_type == 0) {
-            // 默认
-            this.webinarInfo.showImg =
-              res.data.invite_card.img + '?x-oss-process=image/resize,m_fill,w_560,h_920,limit_0';
-          } else {
-            this.webinarInfo.showImg =
-              this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl;
-          }
 
-          this.nickname =
-            res.data.nick_name.length > 5
-              ? res.data.nick_name.slice(0, 4) + '...'
-              : res.data.nick_name;
-          this.loading = false;
-          if (this.showInvite == 'true') {
-            this.$nextTick(() => {
-              this.drewCanvas();
-            });
-          }
-          this.wxShareInfo();
-        });
+        const res = await this.inviteServer.createInvite(params);
+
+        this.webinarInfo.avatar = res.data.avatar || defaultAvatarImg;
+        this.webinarInfo.title = res.data.invite_card.title;
+        this.webinarInfo.img = res.data.invite_card.img;
+        this.webinarInfo.company = res.data.invite_card.company;
+        this.webinarInfo.nick_name = res.data.nick_name;
+        this.webinarInfo.date = res.data.invite_card.webinar_date;
+        this.webinarInfo.location = res.data.invite_card.location;
+        this.webinarInfo.desciption = res.data.invite_card.desciption;
+        this.webinarInfo.isShowWaterMark = res.data.invite_card.is_show_watermark == 0;
+        this.webinarInfo.show_type = res.data.invite_card.show_type;
+        this.webinarInfo.img_type = res.data.invite_card.img_type;
+        this.invite_qr_url += `?invite=${res.data.invite}`;
+        this.$emit('changeInvite', res.data.invite);
+        if (this.webinarInfo.img_type == 0) {
+          // 默认
+          this.webinarInfo.showImg =
+            res.data.invite_card.img + '?x-oss-process=image/resize,m_fill,w_560,h_920,limit_0';
+        } else {
+          this.webinarInfo.showImg = this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl;
+        }
+
+        this.nickname =
+          res.data.nick_name.length > 5
+            ? res.data.nick_name.slice(0, 4) + '...'
+            : res.data.nick_name;
+        this.loading = false;
+
+        this.isInviteVisible = parseInt(res.data.status) === 1 ? true : false;
+        this.inited = true;
+        if (this.isInviteVisible === true) {
+          this.$nextTick(() => {
+            this.drawCanvas();
+          });
+        }
+        this.wxShareInfo();
       },
       // 获取微信分享信息
-      wxShareInfo() {
+      async wxShareInfo() {
         const wxShareUrl = `${window.location.protocol}${process.env.VUE_APP_WATCH_URL}${process.env.VUE_APP_WEB_KEY}/lives/invite/${this.$route.params.id}${window.location.search}`;
-        // console.log('微信分享信息地址', wxShareUrl)
-        this.$axios('weiXinShare', {
+        const res = await this.inviteServer.wechatShare({
           wx_url: wxShareUrl
-        }).then(res => {
-          if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
-            const params = {
-              appId: res.data.appId,
-              timestamp: res.data.timestamp,
-              nonceStr: res.data.nonceStr,
-              signature: res.data.signature
-            };
-            let desc = null;
-            if (this.webinarInfo.desciption) {
-              desc = this.webinarInfo.desciption.replace(/&nbsp;/g, '');
-              desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
-              desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
-              console.log(9191, desc);
-            } else {
-              desc = '邀请你一起看直播';
-            }
-            this.initWeChatSdk(
-              { ...params },
-              {
-                title: this.webinarInfo.title,
-                desc,
-                link: wxShareUrl,
-                imgUrl: this.webinarInfo.avatar
-              }
-            );
-          }
         });
+        if (res.code == 200 && res.data) {
+          console.log('获取微信分享数据', res.data);
+          const params = {
+            appId: res.data.appId,
+            timestamp: res.data.timestamp,
+            nonceStr: res.data.nonceStr,
+            signature: res.data.signature
+          };
+          let desc = null;
+          if (this.webinarInfo.desciption) {
+            desc = this.webinarInfo.desciption.replace(/&nbsp;/g, '');
+            desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
+            desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
+            console.log(9191, desc);
+          } else {
+            desc = '邀请你一起看直播';
+          }
+
+          // initWeChatSdk(
+          //   { ...params },
+          //   {
+          //     title: this.webinarInfo.title,
+          //     desc,
+          //     link: wxShareUrl,
+          //     imgUrl: this.webinarInfo.avatar
+          //   }
+          // );
+        }
       },
       // 记录生成邀请卡, /create-invite-self-relation 传递了join_id
-      submitCreateHistory(join_id) {
+      async submitCreateHistory(join_id) {
         const token = this.$route.query.token || '';
-        this.$axios(
-          'createInviteItem',
+
+        await this.inviteServer.createInvite(
           {
             webinar_id: this.$route.params.id,
             join_id
@@ -343,27 +294,26 @@
               token: token
             }
           }
-        ).then(res => {
-          console.log(res);
-        });
+        );
       },
       /**
        * 生成图片
        */
-      drewCanvas() {
-        const dom = this.$refs.drewCanvasDom;
+      drawCanvas() {
+        const dom = this.$refs.drawCanvasDom;
         const imgList = document.querySelectorAll('img.hsrc');
         let count = 0;
-        const _this = this;
         return new Promise(resolve => {
           imgList.forEach(img => {
             const imaObj = new Image();
             imaObj.setAttribute('crossorigin', 'anonymous');
-            imaObj.onload = function () {
+            imaObj.onload = () => {
               count++;
-              img.src = imaObj.getBase64Image();
-              if (img.getAttribute('class') == 'hsrc vh-invitation__show-img') {
-                _this.webinarInfo.showImg = imaObj.getBase64Image();
+
+              img.src = getBase64Image(imaObj);
+
+              if (img.getAttribute('class') == 'hsrc invitation__show__show-img') {
+                this.webinarInfo.showImg = getBase64Image(imaObj);
               }
               if (imgList.length === count) {
                 Html2canvas(dom, {
@@ -376,7 +326,7 @@
                   scale: 3
                 })
                   .then(canvas => {
-                    _this.canvasImgUrl = canvas.toDataURL();
+                    this.canvasImgUrl = canvas.toDataURL();
                     resolve();
                   })
                   .catch(err => {

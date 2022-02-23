@@ -39,11 +39,22 @@ import VmpWatchNavMenu from '@/packages/watch-nav-menu'; // 观看端侧边栏
 import VmpWatchTimer from '@/packages/watch-timer'; // 观看端计时器
 import VmpChapter from '@/packages/watch-chapter-pc'; // 观看端章节
 import VmpLotteryWatch from '@/packages/lottery/watch'; // 观看端计时器
+import VmpPcRewardEffect from '@/packages/pc-reward-effect'; // 观看端计时器
+import VmpTabMenu from '@/packages/tab-menu';
+import VmpCustomMenu from '@/packages/custom-menu';
+import VmpRecommend from '@/packages/recommend';
+import VmpPcMediaSetting from '@/packages/media-setting';
+import VmpLivingEnd from '@/packages/living-end-pc';
+import 'overlayscrollbars/css/OverlayScrollbars.css';
+import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
+import VmpSignWatch from '@/packages/sign-module/sign-watch';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
 // 开屏海报
 import VmpScreenPost from '@/packages/screen-post';
+
+import VmpIntro from '@/packages/intro';
 
 // 全局注册组件
 export function initUse() {
@@ -82,4 +93,15 @@ export function initUse() {
   Vue.use(VmpLotteryWatch);
   Vue.use(VmpChapter);
   Vue.use(VmpScreenPost);
+  Vue.use(VmpPcRewardEffect);
+  Vue.use(VmpTabMenu);
+  Vue.use(VmpCustomMenu);
+  Vue.use(VmpRecommend);
+  Vue.use(VmpPcMediaSetting);
+  Vue.use(VmpIntro);
+  Vue.use(VmpLivingEnd);
+  Vue.use(VmpSignWatch);
+
+  //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
+  Vue.use(OverlayScrollbarsPlugin);
 }

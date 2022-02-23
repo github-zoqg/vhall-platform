@@ -20,7 +20,7 @@
         <div class="vmp-doc-cur" v-show="mode === 1">
           <!-- 无数据 -->
           <div class="vmp-doc-cur__empty" v-show="dataList.length === 0">
-            <img src="/static/img/no-file.png" />
+            <img src="./img/no-file.png" />
             <p>您还没有文档，快来上传吧</p>
             <div>
               <!-- 上传文档 -->
@@ -186,7 +186,7 @@
             </el-table>
           </div>
           <div class="vmp-doc-lib__ft">
-            <div class="vmp-doc-lib__ft-tip">当前选中 {{ selectIds.length }} 个文档</div>
+            <div class="vmp-doc-lib__ft-tip">当前选中 {{ selectDocIdList.length }} 个文档</div>
             <div>
               <el-button type="primary" @click="handleDoclibSubmit">确定</el-button>
               <el-button @click="handleDoclibCancel">取消</el-button>
@@ -224,7 +224,7 @@
         // 资料库文档列表相关
         doclibSearchKey: '',
         doclibList: [],
-        selectIds: [], // 选中的文档ID列表
+        selectDocIdList: [], // 选中的文档ID列表
         isCheckAll: false
       };
     },
@@ -438,7 +438,7 @@
         }
       },
       cancelCheckHandle() {
-        this.selectIds = [];
+        this.selectDocIdList = [];
         this.doclibSearchKey = '';
         try {
           this.$refs.doclibTable.clearSelection();
@@ -511,15 +511,13 @@
       },
       // 上传文档
       handleUpload(param) {
-        console.log('----param:', param);
         param.onError = (err, file) => {
           this.dataList.forEach(item => {
             if (file.uid === item.uid) {
               item.docStatus = 'uploadfailed'; //上传失败
             }
           });
-          console.log('---上传错误---');
-          console.log(err);
+          console.error('上传失败：', err);
         };
         param.onSuccess = async (res, file) => {
           // console.log(' 文档的上传完成:', res, file, fileList);
@@ -576,7 +574,7 @@
           }
         };
         param.onProgress = (percent, file) => {
-          console.log('[doc] 上传进度：', percent);
+          // console.log('[doc] 上传进度：', percent);
           const fuid = file.uid;
           this.dataList.forEach(item => {
             if (fuid === item.uid) {

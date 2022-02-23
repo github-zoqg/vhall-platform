@@ -133,10 +133,12 @@
 
       // 主屏在大窗的样式
       &.vmp-dom__max {
+        position: absolute;
         top: 80px;
-        left: 60px;
-        right: 310px;
-        bottom: 0;
+        bottom: 0px;
+        width: calc(100% - 370px);
+        height: auto;
+        min-height: auto;
         // 本地流大窗样式
         .vmp-stream-local {
           .vmp-stream-local__shadow-box {

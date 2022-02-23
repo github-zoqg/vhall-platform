@@ -1,8 +1,8 @@
-import UserAccountWap from './src/main';
+import VmpUserAccountWap from './src/main';
 
 /* istanbul ignore next */
-UserAccountWap.install = function (Vue) {
-  Vue.component(UserAccountWap.name, UserAccountWap);
+VmpUserAccountWap.install = function (Vue) {
+  Vue.component(VmpUserAccountWap.name, VmpUserAccountWap);
 };
 
-export default UserAccountWap;
+export default VmpUserAccountWap;

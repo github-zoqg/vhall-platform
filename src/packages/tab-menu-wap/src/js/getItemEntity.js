@@ -13,7 +13,8 @@ export function getItemEntity(
   if (!item) return false;
 
   const text = type === 1 ? name : item.text;
-  const { visible = true, tipsVisible = false, iconVisible = false } = item;
+  let { visible = true, tipsVisible = false, iconVisible = false } = item;
+  if (status == '2' || status == '4') visible = false;
 
   return {
     // 原始字段

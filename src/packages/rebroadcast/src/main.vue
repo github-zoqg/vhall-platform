@@ -1,6 +1,13 @@
 <template>
   <section class="vmp-rebroadcast">
-    <saas-dialog :visible="isShow" title="转播" width="800px" style="min-width: 800px">
+    <saas-dialog
+      :visible="isShow"
+      :isClose="true"
+      @onClose="close"
+      title="转播"
+      width="800px"
+      style="min-width: 800px"
+    >
       <rebroadcast />
     </saas-dialog>
   </section>
@@ -22,7 +29,10 @@
       };
     },
     methods: {
-      showRebroadcast() {
+      open() {
+        this.isShow = true;
+      },
+      close() {
         this.isShow = false;
       }
     }

@@ -2,8 +2,12 @@
   <section class="vmp-tab-container">
     <main>
       <!-- 主菜单区域 -->
-      <section class="vmp-tab-container-mainarea">
-        <section v-for="tab of mainMenu" :key="tab.cuid" v-show="curItem.cuid === tab.cuid">
+      <section class="vmp-tab-container-mainarea" ref="mainArea">
+        <section
+          v-for="tab of mainMenu"
+          :key="tab.cuid"
+          v-show="curItem.cuid === tab.cuid && mainMenu.find(item => item.id === curItem.id)"
+        >
           <vmp-air-container :cuid="tab.cuid" :oneself="true" />
         </section>
       </section>
@@ -13,7 +17,7 @@
         <van-popup
           v-model="isPopupVisible"
           position="bottom"
-          closeable
+          ref="subArea"
           :lazy-render="false"
           :overlay="false"
           :style="{ height: popHeight + 'px' }"
@@ -26,7 +30,7 @@
             <main>
               <section
                 v-for="tab of filterSubMenu"
-                v-show="curItem.cuid === tab.cuid"
+                v-show="curItem.cuid === tab.cuid && subMenu.find(item => item.id === curItem.id)"
                 :key="tab.cuid"
               >
                 <vmp-air-container :cuid="tab.cuid" :oneself="true" />
@@ -71,7 +75,13 @@
       },
       isPopupVisible: {
         get() {
-          return Boolean(this.subMenu.find(item => item.cuid === this.curItem.cuid));
+          return Boolean(
+            this.subMenu.find(item => {
+              const sameComp = item.cuid === this.curItem.cuid;
+              const sameId = item.id === this.curItem.id;
+              return sameComp && sameId;
+            })
+          );
         },
         set() {}
       }
@@ -80,6 +90,9 @@
       isPopupVisible() {
         this.popHeight = this.getTabContentHeight();
       }
+    },
+    created() {
+      window.tabContent = this;
     },
     methods: {
       getTabContentHeight() {
@@ -90,7 +103,7 @@
         }
         return 200;
       },
-      getComp(cuid) {
+      getComp(cuid, arr) {
         // 由于air-container不一定是本组件的直系chilren，需要深入遍历查找
         const findComp = (cuid, array) => {
           if (!array || array.length === 0) return false;
@@ -104,10 +117,20 @@
           return false;
         };
 
-        return findComp(cuid, this.$children);
+        return findComp(cuid, arr);
       },
       switchTo(item) {
-        const child = this.getComp(item.cuid);
+        let child = null;
+
+        child = this.getComp(item.cuid, this.$children);
+
+        // hack(TODO: 临时，后面需要改)
+        const onSubMenu = this.subMenu.find(i => i.id === item.id);
+        const isNotMainComp = ![...this.$refs['subArea'].$el.children].includes(el => el === child);
+        if (onSubMenu && isNotMainComp) {
+          child = this.getComp(item.cuid, this.$refs['subArea'].$children);
+        }
+
         if (!child) return;
 
         // pre-show

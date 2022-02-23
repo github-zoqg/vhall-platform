@@ -5,7 +5,7 @@
       <img
         class="vmp-praise-icon-img"
         :class="isActive ? 'active' : ''"
-        src="./images/praise-icon.png"
+        src="./img/praise-icon.png"
         alt=""
         @click="handlePraise"
       />
@@ -39,7 +39,7 @@
       this.praiseServer = usePraiseServer();
     },
     created() {
-      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum;
+      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum || 0;
       this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
       this.praiseServer.listenMsg();
     },
@@ -199,7 +199,7 @@
       font-size: 12px;
       color: @font-error-low;
       border: solid 1px @border-tools-color;
-      z-index: 1;
+      // z-index: 1;
       white-space: nowrap;
     }
     &-bubble {
@@ -221,7 +221,7 @@
       }
     }
     &__bubble01 {
-      background-image: url(./images/666.png);
+      background-image: url(./img/666.png);
       animation: bubble_1 @bubble_time linear 1 forwards,
         bubble_y_1 @bubble_y_time ease-out 1 forwards;
     }
@@ -247,7 +247,7 @@
       }
     }
     &__bubble02 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_2 @bubble_time linear 1 forwards,
         bubble_y_2 @bubble_y_time ease-out 1 forwards;
     }
@@ -273,7 +273,7 @@
       }
     }
     &__bubble03 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_3 @bubble_time linear 1 forwards,
         bubble_y_3 @bubble_y_time ease-out 1 forwards;
     }
@@ -299,7 +299,7 @@
       }
     }
     &__bubble04 {
-      background-image: url(./images/face.png);
+      background-image: url(./img/face.png);
       animation: bubble_4 @bubble_time linear 1 forwards,
         bubble_y_4 @bubble_y_time ease-out 1 forwards;
     }
@@ -326,7 +326,7 @@
     }
 
     &__bubble05 {
-      background-image: url(./images/yellow-star.png);
+      background-image: url(./img/yellow-star.png);
       animation: bubble_5 @bubble_time linear 1 forwards,
         bubble_y_5 @bubble_y_time ease-out 1 forwards;
     }
@@ -352,7 +352,7 @@
       }
     }
     &__bubble06 {
-      background-image: url(./images/line1.png);
+      background-image: url(./img/line1.png);
       animation: bubble_6 @bubble_time linear 1 forwards,
         bubble_y_6 @bubble_y_time ease-out 1 forwards;
     }
@@ -379,7 +379,7 @@
     }
 
     &__bubble07 {
-      background-image: url(./images/line2.png);
+      background-image: url(./img/line2.png);
       animation: bubble_7 @bubble_time linear 1 forwards,
         bubble_y_7 @bubble_y_time ease-out 1 forwards;
     }
@@ -406,7 +406,7 @@
     }
 
     &__bubble08 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_8 @bubble_time linear 1 forwards,
         bubble_y_8 @bubble_y_time ease-out 1 forwards;
     }
@@ -433,7 +433,7 @@
     }
 
     &__bubble09 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_9 @bubble_time linear 1 forwards,
         bubble_y_9 @bubble_y_time ease-out 1 forwards;
     }
@@ -459,7 +459,7 @@
       }
     }
     &__bubble10 {
-      background-image: url(./images/gray-ellipse.png);
+      background-image: url(./img/gray-ellipse.png);
       animation: bubble_10 @bubble_time linear 1 forwards,
         bubble_y_10 @bubble_y_time ease-out 1 forwards;
     }
@@ -486,7 +486,7 @@
     }
 
     &__bubble11 {
-      background-image: url(./images/blue-ellipse.png);
+      background-image: url(./img/blue-ellipse.png);
       animation: bubble_11 @bubble_time linear 1 forwards,
         bubble_y_11 @bubble_y_time ease-out 1 forwards;
     }
@@ -512,7 +512,7 @@
       }
     }
     &__bubble12 {
-      background-image: url(./images/yellow-star.png);
+      background-image: url(./img/yellow-star.png);
       animation: bubble_12 @bubble_time linear 1 forwards,
         bubble_y_12 @bubble_y_time ease-out 1 forwards;
     }
@@ -539,7 +539,7 @@
     }
 
     &__bubble13 {
-      background-image: url(./images/praise-icon1.png);
+      background-image: url(./img/praise-icon1.png);
       animation: bubble_13 @bubble_time linear 1 forwards,
         bubble_y_13 @bubble_y_time ease-out 1 forwards;
     }
@@ -566,7 +566,7 @@
     }
 
     &__bubble14 {
-      background-image: url(./images/face.png);
+      background-image: url(./img/face.png);
       animation: bubble_14 @bubble_time linear 1 forwards,
         bubble_y_14 @bubble_y_time ease-out 1 forwards;
     }
@@ -593,7 +593,7 @@
     }
 
     &__bubble15 {
-      background-image: url(./images/yellow-ellipse.png);
+      background-image: url(./img/yellow-ellipse.png);
       animation: bubble_15 @bubble_time linear 1 forwards,
         bubble_y_15 @bubble_y_time ease-out 1 forwards;
     }
@@ -620,7 +620,7 @@
     }
 
     &__bubble16 {
-      background-image: url(./images/blue-star.png);
+      background-image: url(./img/blue-star.png);
       animation: bubble_16 @bubble_time linear 1 forwards,
         bubble_y_16 @bubble_y_time ease-out 1 forwards;
     }
@@ -646,7 +646,7 @@
       }
     }
     &__bubble17 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_17 @bubble_time linear 1 forwards,
         bubble_y_17 @bubble_y_time ease-out 1 forwards;
     }
@@ -672,7 +672,7 @@
       }
     }
     &__bubble18 {
-      background-image: url(./images/praise-icon1.png);
+      background-image: url(./img/praise-icon1.png);
       animation: bubble_18 @bubble_time linear 1 forwards,
         bubble_y_18 @bubble_y_time ease-out 1 forwards;
     }
@@ -699,7 +699,7 @@
     }
 
     &__bubble19 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_19 @bubble_time linear 1 forwards,
         bubble_y_19 @bubble_y_time ease-out 1 forwards;
     }
@@ -726,7 +726,7 @@
     }
 
     &__bubble20 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_20 @bubble_time linear 1 forwards,
         bubble_y_20 @bubble_y_time ease-out 1 forwards;
     }
@@ -752,7 +752,7 @@
       }
     }
     &__bubble21 {
-      background-image: url(./images/yellow-ellipse.png);
+      background-image: url(./img/yellow-ellipse.png);
       animation: bubble_21 @bubble_time linear 1 forwards,
         bubble_y_21 @bubble_y_time ease-out 1 forwards;
     }
@@ -779,7 +779,7 @@
     }
 
     &__bubble22 {
-      background-image: url(./images/yellow-star.png);
+      background-image: url(./img/yellow-star.png);
       animation: bubble_22 @bubble_time linear 1 forwards,
         bubble_y_22 @bubble_y_time ease-out 1 forwards;
     }
@@ -805,7 +805,7 @@
       }
     }
     &__bubble23 {
-      background-image: url(./images/blue-ellipse.png);
+      background-image: url(./img/blue-ellipse.png);
       animation: bubble_23 @bubble_time linear 1 forwards,
         bubble_y_23 @bubble_y_time ease-out 1 forwards;
     }
@@ -832,7 +832,7 @@
     }
 
     &__bubble24 {
-      background-image: url(./images/666.png);
+      background-image: url(./img/666.png);
       animation: bubble_24 @bubble_time linear 1 forwards,
         bubble_y_24 @bubble_y_time ease-out 1 forwards;
     }
@@ -858,7 +858,7 @@
       }
     }
     &__bubble25 {
-      background-image: url(./images/line3.png);
+      background-image: url(./img/line3.png);
       animation: bubble_25 @bubble_time linear 1 forwards,
         bubble_y_25 @bubble_y_time ease-out 1 forwards;
     }
@@ -885,7 +885,7 @@
     }
 
     &__bubble26 {
-      background-image: url(./images/diamond.png);
+      background-image: url(./img/diamond.png);
       animation: bubble_26 @bubble_time linear 1 forwards,
         bubble_y_26 @bubble_y_time ease-out 1 forwards;
     }
@@ -912,7 +912,7 @@
     }
 
     &__bubble27 {
-      background-image: url(./images/face.png);
+      background-image: url(./img/face.png);
       animation: bubble_27 @bubble_time linear 1 forwards,
         bubble_y_27 @bubble_y_time ease-out 1 forwards;
     }
@@ -939,7 +939,7 @@
     }
 
     &__bubble28 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_28 @bubble_time linear 1 forwards,
         bubble_y_28 @bubble_y_time ease-out 1 forwards;
     }
@@ -965,7 +965,7 @@
       }
     }
     &__bubble29 {
-      background-image: url(./images/heart.png);
+      background-image: url(./img/heart.png);
       animation: bubble_29 @bubble_time linear 1 forwards,
         bubble_y_29 @bubble_y_time ease-out 1 forwards;
     }

@@ -32,7 +32,13 @@ export const serverConfig = {
   layerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['comStreamList', 'comDocUne', 'comGroupDiscussion', 'comInsertStream']
+    children: [
+      'comStreamList',
+      'comDocUne',
+      'comGroupDiscussion',
+      'comInsertStream',
+      'comThirdStream'
+    ]
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -88,8 +94,9 @@ export const serverConfig = {
       'comInsertVideo',
       'liveTimerSet',
       'liveTimer',
-      'comQuestionnaire'
+      'comQuestionnaire',
       // 'comRebroadcast'
+      'comRebroadcast'
     ]
   },
 
@@ -137,6 +144,13 @@ export const serverConfig = {
         cuid: 'comMediaSetting',
         method: 'showMediaSetting'
       }
+    ],
+    emitClickThirdStream: [
+      {
+        cuid: 'comThirdStream',
+        method: 'showThirdStream',
+        args: ['$0']
+      }
     ]
   },
   // 顶部左侧组件
@@ -155,7 +169,8 @@ export const serverConfig = {
       'comGroupMenu',
       'comShareMenu',
       'comExitGroupMenu',
-      'comLottery'
+      'comLottery',
+      'comSignLive'
     ]
   },
   // 语言选择组件
@@ -233,10 +248,6 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: 'comGroupDiscussion',
-        method: 'hiddenAll'
-      },
-      {
         cuid: 'comInsertVideo',
         method: 'openInserVideoDialog',
         args: []
@@ -264,6 +275,18 @@ export const serverConfig = {
     emitOpenQuestionnaire: [
       {
         cuid: ['comQuestionnaire'],
+        method: 'open'
+      },
+    ],
+    emitOpenSign: [
+      {
+        cuid: ['comSignLive'],
+        method: 'openSign'
+      }
+    ],
+    emitOpenRebroadcast: [
+      {
+        cuid: ['comRebroadcast'],
         method: 'open'
       }
     ]
@@ -480,7 +503,13 @@ export const serverConfig = {
   },
   comMediaSetting: {
     component: 'VmpPcMediaSetting',
-    saveOptions: []
+    saveOptions: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
   },
   comPcMediaCheck: {
     component: 'VmpPcMediaCheck'
@@ -539,5 +568,8 @@ export const serverConfig = {
   },
   comQuestionnaire: {
     component: 'VmpQuestionnaire'
+  },
+  comSignLive: {
+    component: 'VmpSignLive'
   }
 };

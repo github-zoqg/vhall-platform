@@ -1,4 +1,5 @@
 <template>
+  <!-- 文档组件， 适用于 PC发起端和观看端。 -->
   <div
     class="vmp-doc-une"
     :class="[
@@ -6,7 +7,7 @@
       `vmp-doc-une--${displayMode}`,
       { 'has-stream-list': hasStreamList }
     ]"
-    v-show="showInWatch"
+    v-show="show"
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
@@ -145,7 +146,7 @@
     data() {
       return {
         className: '',
-        displayMode: 'normal', // normal: 正常; small: 小屏 fullscreen:全屏
+        displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
         keepAspectRatio: true,
         hasPager: true, // 是否有分页操作(观看端没有)
         thumbnailShow: false, // 文档缩略是否显示
@@ -177,13 +178,14 @@
       isWatch() {
         return this.roomBaseServer.state.clientType !== 'send';
       },
-      // 文档在观看端是否可见
-      showInWatch() {
-        // 主持端始终可见，观看端
+      // 文档是否可见
+      show() {
         return (
           this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer.state.clientType !== 'send' && this.docServer.state.switchStatus) ||
-          this.groupServer.state.groupInitData.isInGroup
+          (this.roomBaseServer.state.clientType !== 'send' &&
+            (this.docServer.state.switchStatus ||
+              this.groupServer.state.isInGroup ||
+              this.docServer.state.hasDocPermission))
         );
       },
       // 是否文档演示权限
@@ -206,11 +208,11 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[doc]---大小屏变更', newval); // newval 取值 doc, stream-list
-        const mode = newval === 'doc' ? 'small' : 'normal';
+        console.log('-[doc][player]---大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
+        const mode = newval === 'doc' ? 'mini' : 'normal';
         this.setDisplayMode(mode);
       },
-      // 监听流列表高度变化
+      // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
           console.log('[doc] streamListHeight:', newval);
@@ -241,8 +243,8 @@
       },
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
-        if (!['normal', 'small', 'fullscreen'].includes(mode)) {
-          console.error('展示模式必须是normal, small, fullscreen中的一个');
+        if (!['normal', 'mini', 'fullscreen'].includes(mode)) {
+          console.error('展示模式必须是normal, mini, fullscreen中的一个');
           return;
         }
         if (this.displayMode === mode) {
@@ -264,8 +266,7 @@
           this.displayMode = mode;
         }
         await this.$nextTick();
-        // 文档大小的改变，会自动触发 erd.listenTo 事件;
-        this.resize();
+        // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
       },
       /**
        * 屏幕缩放
@@ -273,7 +274,7 @@
       resize() {
         let rect;
         if (this.isWatch) {
-          if (this.displayMode === 'small') {
+          if (this.displayMode === 'mini') {
             rect = {
               width: 360,
               height: 204
@@ -320,20 +321,21 @@
         if (this.isWatch) {
           // 观看端事件
           // 文档是否可见状态变化事件
-          this.$on('dispatch_doc_switch_change', val => {
-            if (val) {
+          this.docServer.$on('dispatch_doc_switch_change', val => {
+            console.log('===[doc]=======dispatch_doc_switch_change=============', val);
+            if (val && this.show) {
               this.recoverLastDocs();
             }
           });
-
-          // 直播结束
-          this.msgServer.$on('live_over', () => {
-            console.log('[doc]---直播结束---');
-            this.hasStreamList = 0;
-          });
-        } else {
-          // 主持端事件
         }
+
+        // 直播结束
+        this.msgServer.$on('live_over', () => {
+          console.log('[doc]---直播结束---');
+          this.docServer.state.switchStatus = false;
+          useRoomBaseServer().setChangeElement('doc');
+          this.hasStreamList = false;
+        });
 
         // 监控文档区域大小改变事件
         let erd = elementResizeDetectorMaker();
@@ -440,6 +442,7 @@
         // 确定文档最外层节点显示，并且文档dom绑定ID成功
         await this.$nextTick();
 
+        console.log('[doc] recoverLastDocs resize');
         // 初始化文档最外层节点大小
         this.resize();
         console.log('[doc] recoverLastDocs docViewRect:', this.docViewRect);
@@ -599,7 +602,6 @@
       }
     },
     mounted() {
-      console.log('[doc] this.docServer.state.switchStatus:', this.docServer.state.switchStatus);
       // 初始化事件
       this.initEvents();
       // 清空
@@ -756,7 +758,7 @@
     }
   }
 
-  .vmp-doc-une.vmp-doc-une--small {
+  .vmp-doc-une.vmp-doc-une--mini {
     position: absolute !important;
     width: 309px;
     height: 240px;
@@ -801,8 +803,8 @@
       top: 80px;
     }
 
-    //small模式
-    &.vmp-doc-une--small {
+    //mini模式
+    &.vmp-doc-une--mini {
       position: absolute;
       width: 360px;
       height: 204px;

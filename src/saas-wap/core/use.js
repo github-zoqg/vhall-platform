@@ -13,7 +13,7 @@ import VmpRegLoginWap from '@/packages/reg-login-wap';
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
-import VmpWatchPrivateChat from '@/packages/watch-private-chat';
+import VmpWapPrivateChat from '@/packages/wap-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpTabMenuWap from '@/packages/tab-menu-wap';
@@ -45,13 +45,20 @@ import VmpWapQrCode from '@/packages/qrcode-wap';
 import VmpWapBody from '@/packages/wap-body';
 // 开屏页
 import VmpScreenPostWap from '@/packages/screen-post-wap';
-// 打开 个人中心
+// 个人中心
 import VmpUserCenterWap from '@/packages/user-center-wap';
+// 个人资料
+import VmpUserAccountWap from '@/packages/user-account-wap';
+// 提现管理
+import VmpCashWap from '@/packages/cash-wap';
 // wap 抽奖
 import VmpLotteryWap from '@/packages/lottery-wap';
 
 // 送礼物飘屏动画
 import VmpWapRewardEffect from '@/packages/wap-reward-effect';
+
+// 章节
+import VmpChapterWap from '@/packages/watch-chapter-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -65,7 +72,7 @@ export function initUse() {
   Vue.use(VmpWapStreamRemote);
   Vue.use(VmpRegLoginWap);
   Vue.use(VmpMemberList);
-  Vue.use(VmpWatchPrivateChat);
+  Vue.use(VmpWapPrivateChat);
   Vue.use(VmpSignUpForm);
   Vue.use(VmpTabMenuWap);
   Vue.use(VmpIntroWap);
@@ -84,5 +91,8 @@ export function initUse() {
   Vue.use(VmpWapRewardEffect);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
+  Vue.use(VmpUserAccountWap);
+  Vue.use(VmpCashWap);
   Vue.use(VmpLotteryWap);
+  Vue.use(VmpChapterWap);
 }

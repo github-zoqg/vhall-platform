@@ -232,10 +232,8 @@
         applyUsers: [],
         //受限人数
         limitedUsers: [],
-        //上麦人员列表 todo 这个需要从server取，没法从props获取
+        //上麦人员列表
         speakerList: [],
-        //上麦人员列表 todo 这个要从Server获取
-        speaker_list: [],
         //房间号
         roomId: '',
         //mod 6代表分组活动
@@ -272,8 +270,6 @@
           page: 0,
           limit: 10
         },
-        //当前的分组活动id todo 待求证，未在房间信息中找到
-        groupId: '',
         // 举手列表定时器列表
         handsUpTimerList: {},
         // 上麦人员掉线处理计时器map
@@ -377,6 +373,8 @@
         this.allowRaiseHand = parseInt(this.roomBaseServer.state.interactToolStatus.is_handsup)
           ? true
           : false;
+        //初始化一下视图里初始的上麦列表
+        this.changeSpeakerList();
       },
       //统一初始化方法
       init() {
@@ -552,18 +550,19 @@
             let index = _this._getUserIndex(msg.sender_id, _this.onlineUsers);
 
             if (isWatch) {
-              //todo 需要从主房间取speakerList
-              _this.speakerList = _this.isInGroup ? _this.groupInitData.speaker_list : [];
+              _this.speakerList = _this.isInGroup
+                ? _this.groupInitData.speaker_list
+                : _this.interactToolStatus.speaker_list || [];
               _this.totalNum = msg.uv;
             }
 
             if (isLive) {
-              //todo 这里暂时没有$store,需要替换为从server取分组里的成员数
+              const groupUsersNumber = _this.groupServer.state.groupedUserList.length || 0;
               _this.totalNum = _this.isInGroup
                 ? msg.uv
                 : msg.uv -
                   ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                    ? _this.$store.getters.getAllState('groupUsersNumber')
+                    ? groupUsersNumber
                     : 0);
             }
 
@@ -605,11 +604,13 @@
                 is_banned: Number(context.is_banned),
                 nickname: context.nick_name,
                 role_name: context.role_name,
-                is_speak: speakIndex >= 0 ? 1 : 0
+                is_speak: speakIndex >= 0 ? 1 : 0,
+                is_apply: 0
               };
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
               setTimeout(() => {
+                console.log(_this.$refs.scroll);
                 _this.$refs.scroll.refresh();
               }, 100);
               if (msg.context.role_name == 4) {
@@ -650,7 +651,8 @@
                     device_status: context.device_status,
                     device_type: context.device_type,
                     role_name: context.role_name,
-                    is_speak: speakIndex >= 0 ? 1 : 0
+                    is_speak: speakIndex >= 0 ? 1 : 0,
+                    is_apply: 0
                   };
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -664,7 +666,8 @@
                   is_banned: Number(context.is_banned),
                   nickname: context.nickname,
                   role_name: context.role_name,
-                  is_speak: speakIndex >= 0 ? 1 : 0
+                  is_speak: speakIndex >= 0 ? 1 : 0,
+                  is_apply: 0
                 };
                 _this.onlineUsers.push(user);
                 _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -764,7 +767,7 @@
         }
         //用户取消上麦申请
         function handleCancelApplyConnect(msg) {
-          const { member_info = {} } = msg;
+          const { member_info = { is_apply: 0 } } = msg;
           _this.raiseHandTip = false;
           _this._deleteUser(msg.room_join_id, _this.applyUsers);
           _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, member_info);
@@ -948,7 +951,8 @@
               is_banned: msg.isBanned,
               account_id: msg.accountId,
               role_name: msg.role_name == 20 ? 2 : msg.role_name,
-              device_type: msg.device_type
+              device_type: msg.device_type,
+              is_apply: 0
             });
           } else {
             _this.onlineUsers.forEach((item, index) => {
@@ -1046,7 +1050,7 @@
           if (isWatch) {
             _this.speakerList = _this.groupInitData.isInGroup
               ? msg.data.speaker_list
-              : _this.speaker_list;
+              : _this.interactToolStatus.speaker_list || [];
           }
 
           // 是否已添加
@@ -1060,7 +1064,8 @@
                   is_banned: msg.is_banned,
                   role_name: msg.join_role,
                   is_speak: speakIndex >= 0 ? 1 : 0,
-                  nickname: msg.nickname
+                  nickname: msg.nickname,
+                  is_apply: 0
                 });
               }
             });
@@ -1071,7 +1076,8 @@
               is_banned: msg.is_banned,
               role_name: msg.join_role,
               is_speak: speakIndex >= 0 ? 1 : 0,
-              nickname: msg.nickname
+              nickname: msg.nickname,
+              is_apply: 0
             };
             _this.onlineUsers.push(user);
             _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -1217,10 +1223,9 @@
       },
       // 更新上麦人员列表
       changeSpeakerList() {
-        //todo 需要micServer提供一下speakerList,若不是分组则从server取
         this.speakerList = this.groupServer.state.groupInitData.isInGroup
           ? this.groupInitData.speaker_list || []
-          : this.speaker_list || [];
+          : this.interactToolStatus.speaker_list || [];
       },
       handleLeaderChange(newVal, oldVal) {
         // 如果被设为了组长，接管权限拥有者掉线的异常处理
@@ -1548,7 +1553,7 @@
             // center: true
           }).then(() => {
             this.micServer
-              .userSpeakOff(data)
+              .speakOff(data)
               .then(res => {
                 //todo 埋点上报
                 return res;
@@ -1559,7 +1564,7 @@
           });
         } else {
           this.micServer
-            .userSpeakOff(data)
+            .speakOff(data)
             .then(res => {
               //todo 埋点上报
               return res;
@@ -1694,15 +1699,15 @@
             this.$message.warning(err.msg);
           });
       },
-      //设为组长 todo 这里接口有点问题，需要协调完善一下分组讨论server
+      //设为组长
       setLeader(accountId = '') {
         const params = {
           room_id: this.roomId,
           leader_account_id: accountId,
-          group_id: this.groupId
+          group_id: this.groupInitData.group_id || ''
         };
-        this.memberServer
-          .setGroupLeader(params)
+        this.groupServer
+          .setLeader(params.group_id, accountId)
           .then(res => {
             this.onlineUsers.forEach(item => {
               if ([20, '20'].includes(item.role_name)) {
@@ -1734,6 +1739,19 @@
           })
           .catch(err => {
             console.warn('禁言---res', err);
+          });
+        // “禁言”要关闭当前用户的在麦状态
+        if (isBanned) {
+          return;
+        }
+        this.micServer
+          .speakOff({ receive_account_id: accountId, room_id: this.roomId })
+          .then(res => {
+            //todo 埋点上报
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
           });
       },
       /**
@@ -1974,7 +1992,7 @@
           position: absolute;
           top: 7px;
           right: 55px;
-          background-image: url('./images/account-file-close-default.png');
+          background-image: url('img/account-file-close-default.png');
           background-repeat: no-repeat;
           background-size: 100%;
         }

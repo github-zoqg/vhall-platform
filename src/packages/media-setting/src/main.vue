@@ -6,10 +6,10 @@
       width="480px"
       style="min-width: 480px"
       :showDefault="false"
-      @onReturn="isShow = false"
-      @onClose="isShow = false"
+      @onReturn="closeMediaSetting"
+      @onClose="closeMediaSetting"
     >
-      <section v-if="isShow" class="vmp-media-setting-dialog-body">
+      <section v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
         <aside class="vmp-media-setting-menu">
           <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
@@ -24,7 +24,7 @@
               @rateChangeToHD="rateChangeToHD"
             />
             <!-- 摄像头 -->
-            <video-setting v-show="selectedMenuItem === 'video-setting'" />
+            <video-setting ref="videoSetting" v-show="selectedMenuItem === 'video-setting'" />
             <!-- 麦克风 -->
             <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
             <!-- 扬声器 -->
@@ -113,6 +113,7 @@
     },
     data() {
       return {
+        loading: false,
         mediaState: this.mediaSettingServer.state,
         isShow: false, // dialog可视性
         isConfirmVisible: false, // 确定框可视性
@@ -132,6 +133,7 @@
     },
     created() {
       this._originCaptureState = {};
+      this._diffOptions = {};
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
@@ -146,6 +148,7 @@
 
       closeMediaSetting() {
         this.isShow = false;
+        this.$refs['videoSetting'].destroyStream();
       },
 
       showConfirm(text) {
@@ -174,6 +177,7 @@
       },
       restart() {
         try {
+          this.loading = true;
           this.getVideoDeviceInfo();
         } catch (error) {
           console.error('error:', error);
@@ -183,17 +187,30 @@
        * 保存确认
        */
       async saveMediaSetting() {
-        // const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
-        // if (watchInitData.webinar.type === 1) {
-        let text = '修改设置后导致重新推流，是否继续保存';
-        if (this.isRateChangeToHD) {
-          text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+        const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+
+        let action = 'not-living';
+
+        this._diffOptions = this.getDiffOptions();
+        const videoTypeChanged = this._diffOptions.videoType !== undefined;
+        const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
+
+        console.log('diffOptions', this._diffOptions);
+
+        // 直播中
+        if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
+          let text = '修改设置后导致重新推流，是否继续保存';
+          if (this.isRateChangeToHD) {
+            text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+          }
+          action = await this.showConfirm(text);
         }
-        const action = await this.showConfirm(text);
-        if (action === 'confirm') {
+
+        if (action === 'not-living' || action === 'confirm') {
           this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
+          this.getStateCapture(); // 更新快照
         }
       },
       /**
@@ -211,8 +228,8 @@
        * 发送变化事件
        */
       sendChangeEvent() {
-        const diffOptions = this.getDiffOptions();
-        console.log('diffOptions:', diffOptions);
+        const diffOptions = this._diffOptions;
+
         if (Object.keys(diffOptions) === 0) return;
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
@@ -265,6 +282,7 @@
 
         this.setDefaultSelected(); // 从localstorage和sessionStorage中恢复设置
         this.getStateCapture();
+        this.loading = false;
       },
       getStateCapture() {
         // 关心的都是浅拷贝数据
@@ -319,6 +337,14 @@
           this.mediaState.video = sessionVideoId || videoInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedVideoDeviceId');
+        }
+
+        // 视频类型
+        // 设置图片推流
+        let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
+        if (param && param.flag === true && param.streamUrl !== '') {
+          this.mediaState.videoType = 'picture';
+          this.mediaState.canvasImgUrl = param.streamUrl;
         }
 
         // 麦克风

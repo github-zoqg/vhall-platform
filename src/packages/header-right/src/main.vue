@@ -18,13 +18,28 @@
         <headerControl
           :isShowQuit="isShowQuit"
           :isShowSupport="isShowSupport"
-          :isShowSplitScreen="isShowSplitScreen"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
+          @thirdPushStream="thirdPushStream"
         ></headerControl>
       </div>
-      <div class="vmp-header-right_full"><i class="vh-iconfont vh-line-amplification"></i></div>
+      <div class="vmp-header-right_full" @click="fullScreen('body')">
+        <i :class="`vh-iconfont ${isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'}`"></i>
+      </div>
     </section>
+    <!-- 是否生成回放的弹窗 -->
+    <saas-alert
+      :visible="popAlert.visible"
+      :confirm="popAlert.confirm"
+      :knowText="'知道了'"
+      :confirmText="'确定'"
+      :cancelText="'取消'"
+      @onSubmit="handleSetDefaultRecord"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+    >
+      <main slot="content">{{ popAlert.text }}</main>
+    </saas-alert>
   </div>
 </template>
 
@@ -32,15 +47,23 @@
   import headerControl from './components/header-control.vue';
   import { useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpHeaderRight',
     data() {
       return {
         liveStep: 1, // 1未开始 2启动中 3直播中 4结束中
         liveDuration: '',
+        isFullscreen: false,
+        assistantType: this.$route.query.assistantType,
         isShowQuit: false, //是否显示退出
         isShowSupport: false, //是否显示技术支持
-        isShowSplitScreen: false //是否显示分屏
+        isShowSplitScreen: false, //是否显示分屏
+        popAlert: {
+          text: '',
+          visible: false,
+          confirm: true
+        }
       };
     },
     computed: {
@@ -55,11 +78,13 @@
       }
     },
     components: {
-      headerControl
+      headerControl,
+      SaasAlert
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.initConfig();
+      this.listenEvents();
     },
     mounted() {
       const { watchInitData } = this.roomBaseServer.state;
@@ -70,6 +95,30 @@
       }
     },
     methods: {
+      listenEvents() {
+        // 全屏事件
+        const setFullscreen = () => {
+          const fullscreenElement =
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullscreenElement ||
+            document.msFullscreenElement;
+          if (
+            fullscreenElement &&
+            fullscreenElement.className &&
+            fullscreenElement.className.indexOf('vmp-basic-container') != -1
+          ) {
+            this.isFullscreen = true;
+          } else {
+            this.isFullscreen = false;
+          }
+        };
+        window.addEventListener('fullscreenchange', setFullscreen);
+        window.addEventListener('webkitfullscreenchange', setFullscreen);
+        window.addEventListener('mozfullscreenchange', setFullscreen);
+        window.addEventListener('msfullscreenchange', setFullscreen);
+        window.addEventListener('MSFullscreenChange', setFullscreen);
+      },
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
         if (widget && widget.options) {
@@ -83,6 +132,12 @@
       // 打开虚拟人数的弹窗
       openVirtualProple() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
+      },
+      // 第三方推流和网页
+      thirdPushStream(flag) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickThirdStream', [{ status: flag }])
+        );
       },
       // 推流成功事件
       async handlePublishComplate() {
@@ -101,7 +156,8 @@
       // 调开始直播接口
       postStartLive() {
         return this.roomBaseServer.startLive({
-          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+          start_type: this.roomBaseServer.state.interactToolStatus.start_type
         });
       },
       // 开始直播
@@ -114,14 +170,61 @@
       async handleEndClick() {
         this.liveStep = 4;
         const res = await this.roomBaseServer.endLive({
-          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+          end_type: this.roomBaseServer.state.interactToolStatus.start_type
         });
-        if (res.code == 200) {
+        if (res.code == 200 && this.roomBaseServer.state.interactToolStatus.start_type == 4) {
+          this.handleSaveVod();
+          this.liveStep = 1;
+        } else {
           // 派发结束直播事件
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
+      // 生成回放
+      async handleSaveVod() {
+        window.clearInterval(this._durationInterval);
+        if (this.liveDuration < 30) {
+          this.liveDuration = 0;
+          const type = this.roomBaseServer.state.watchInitData.webinar.mode == 1 ? '音频' : '视频';
+          this.popAlert.text = `${type}时长过短，不支持生成回放`;
+          this.popAlert.visible = true;
+          this.popAlert.confirm = false;
+        } else {
+          this.liveDuration = 0;
+          const res = await this.roomBaseServer.createRecord({
+            webinar_id: this.roomBaseServer.state.watchInitData.webinar.id
+          });
+          if (res.code == 200 && this.roomBaseServer.state.watchInitData.record_tip == 1) {
+            this.popAlert.text = '自动生成回放成功，是否设置为默认回放？';
+            this.popAlert.visible = true;
+            this.popAlert.confirm = true;
+            this.popAlert._recordId = res.data.record_id;
+          }
+        }
+      },
+      // 设置默认回放
+      async handleSetDefaultRecord() {
+        try {
+          const res = await this.roomBaseServer.setDefaultRecord({
+            webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+            record_id: this.popAlert._recordId,
+            type: 1
+          });
+          if (res.code == 200) {
+            this.popAlert.visible = false;
+            this.$message.success('设置成功');
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      // 关闭弹窗
+      closeConfirm() {
+        this.popAlert.visible = false;
+      },
       handleUnpublishComplate() {
+        this.handleSaveVod();
         this.liveStep = 1;
       },
       calculateLiveDuration() {
@@ -131,6 +234,33 @@
         this._durationInterval = window.setInterval(() => {
           this.liveDuration++;
         }, 1000);
+      },
+      // 全屏
+      fullScreen(el) {
+        this.isFullscreen = !this.isFullscreen;
+        if (this.isFullscreen) {
+          this.enterFullscreen(el);
+        } else {
+          this.exitFullscreen(el);
+        }
+      },
+      enterFullscreen() {
+        const element = document.querySelector('.vmp-basic-container');
+        if (!this.assistantType) {
+          if (element.requestFullscreen) element.requestFullscreen();
+          else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+          else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+          } else if (element.msRequestFullscreen) element.msRequestFullscreen();
+        }
+      },
+      exitFullscreen() {
+        if (!this.assistantType) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
       }
     }
   };

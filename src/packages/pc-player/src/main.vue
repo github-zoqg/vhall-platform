@@ -4,7 +4,7 @@
     class="vmp-player"
     :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
   >
-    <div>
+    <div style="height: 100%; width: 100%">
       <div id="vmp-player" class="vmp-player-watch">
         <div class="vmp-player-living">
           <div
@@ -12,7 +12,7 @@
             class="vmp-player-living-background"
             :style="`backgroundImage: url('${webinarsBgImg}')`"
           ></div>
-          <div class="vmp-player-living-btn" v-if="isPlayering">
+          <div class="vmp-player-living-btn" v-if="!isPlayering">
             <div
               :class="
                 displayMode == 'mini'
@@ -24,47 +24,24 @@
               <i class="vh-iconfont vh-line-video-play"></i>
             </div>
           </div>
-          <div class="vmp-player-living-end" v-if="isLivingEnd">
-            <div
-              :class="
-                displayMode == 'mini' ? 'vmp-player-living-end-mini' : 'vmp-player-living-end-img'
-              "
-            >
-              <img src="../src/images/liveEnd.png" alt="" />
-            </div>
-            <h1>直播已结束</h1>
-          </div>
           <div class="vmp-player-living-vodend" v-if="isVodEnd">
             <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
               <h3>{{ $t('appointment.appointment_1013') }}</h3>
               <div>
-                <p>
-                  <span
-                    @click="handleAuth(3)"
-                    :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-                  >
+                <p v-if="authText == 6">
+                  <span @click="handleAuth(3)">
                     {{ $t('appointment.appointment_1010') }}
                   </span>
-                  <span
-                    style="margin-left: 10px"
-                    :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-                    @click="handleAuth(4)"
-                  >
+                  <span style="margin-left: 10px" @click="handleAuth(4)">
                     {{ $t('appointment.appointment_1011') }}
                   </span>
                 </p>
-                <span
-                  :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-                  @click="handleAuth"
-                >
-                  {{ authText }}
-                </span>
+                <span v-else @click="handleAuth">{{ authText }}</span>
               </div>
-              <p
-                class="replay-try"
-                :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-              >
-                <i class="vh-iconfont vh-line-refresh-left"><b>重新试看</b></i>
+              <p class="replay-try">
+                <i class="vh-iconfont vh-line-refresh-left">
+                  <b>{{ $t('appointment.appointment_1014') }}</b>
+                </i>
               </p>
             </div>
             <div class="vmp-player-living-vodend-isNoTry" v-else>
@@ -83,7 +60,11 @@
           <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
             <div>语音播放中</div>
           </div>
-          <div class="vmp-player-living-exchange" @click="exchangeVideoDocs">
+          <div
+            class="vmp-player-living-exchange"
+            @click="exchangeVideoDocs"
+            v-if="isVisibleMiniElement"
+          >
             <p>
               <el-tooltip :content="$t('player.player_1008')" placement="top">
                 <i class="vh-saas-iconfont vh-saas-line-switch"></i>
@@ -257,7 +238,7 @@
     },
     data() {
       return {
-        displayMode: 'mini', // normal: 正常; mini: 小屏; fullscreen:全屏
+        displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
         vodType: '', //回放的类型 暖场视频还是还是试看
@@ -310,7 +291,7 @@
       },
       //判断是否是音频直播模式
       isAudio() {
-        return this.roomBaseState.watchInitData.webinar.mode == 1;
+        return this.roomBaseServer.state.watchInitData.webinar.mode == 1;
       },
       // 是否正在直播
       isLiving() {
@@ -319,7 +300,7 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
+        const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
         if (warmup && warmup.warmup_paas_record_id) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
@@ -333,8 +314,13 @@
       isShowContainer() {
         return (
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-          this.$domainStore.state.micServer.isSpeakOn
+          this.$domainStore.state.micServer.isSpeakOn ||
+          this.isLivingEnd
         );
+      },
+      isVisibleMiniElement() {
+        // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
+        return this.$domainStore.state.docServer.switchStatus;
       }
     },
     watch: {
@@ -343,19 +329,23 @@
           this.hoverTime = (val / 100) * this.totalTime;
           this.hoverLeft = (val / 100) * this.ContorlWidth;
         }
+      },
+      ['roomBaseServer.state.miniElement'](newval) {
+        console.log('-[player]---大小屏变更miniElement：', newval);
+        this.displayMode = newval === 'player' ? 'mini' : 'normal';
       }
     },
     created() {
-      this.roomBaseState = this.roomBaseServer.state;
-      this.playerState = this.playerServer.state;
       this.getWebinerStatus();
       this.listenEvents();
     },
-    mounted() {},
+    mounted() {
+      console.log('[player] mounted');
+    },
     methods: {
       listenEvents() {
         // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-        if (this.playerState.type === 'vod') {
+        if (this.playerServer.state.type === 'vod') {
           window.addEventListener('beforeunload', () => {
             this.endTime = this.playerServer.getCurrentTime(() => {
               console.log('获取当前视频播放时间失败----------');
@@ -365,7 +355,7 @@
               console.log('获取视频总时长失败');
             });
             const curLocalHistoryTime = window.sessionStorage.getItem(
-              this.roomBaseState.watchInitData.paas_record_id
+              this.roomBaseServer.state.watchInitData.paas_record_id
             );
             if (!curLocalHistoryTime && this.recordHistoryTime) {
               return;
@@ -398,14 +388,14 @@
       },
       // 初始化播放器配置项
       initConfig() {
-        const { interact, join_info } = this.roomBaseState.watchInitData;
-        console.log(this.roomBaseState, '????====zhangxiao');
+        const { interact, join_info } = this.roomBaseServer.state.watchInitData;
+        console.log(this.roomBaseServer.state, '????====zhangxiao');
         let params = {
           appId: interact.paas_app_id || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
           videoNode: 'vmp-player',
-          type: this.playerState.type, // live 直播  vod 点播  必填
+          type: this.playerServer.state.type, // live 直播  vod 点播  必填
           poster: '',
           autoplay: false,
           forceMSE: false,
@@ -424,16 +414,16 @@
             }
           },
           peer5Option: {
-            open: this.roomBaseState.configList['ui.browser_peer5'] == '1',
+            open: this.roomBaseServer.state.configList['ui.browser_peer5'] == '1',
             customerId: 'ds6mupmtq5gnwa4qmtqf',
             fallback: true
           }
         };
-        if (this.playerState.type == 'live') {
+        if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
             liveOption: this.liveOption
           });
-        } else if (this.playerState.type === 'vod') {
+        } else if (this.playerServer.state.type === 'vod') {
           params = Object.assign(params, {
             vodOption: this.vodOption
           });
@@ -449,9 +439,9 @@
       async initSDK() {
         const defineQuality = this.setDefaultQuality();
         console.log(defineQuality, '====<<1111111');
-        if (this.playerState.type == 'live') {
+        if (this.playerServer.state.type == 'live') {
           this.liveOption.defaultDefinition = defineQuality || '';
-        } else if (this.playerState.type == 'vod') {
+        } else if (this.playerServer.state.type == 'vod') {
           this.vodOption.defaultDefinition = defineQuality || '';
         }
         const params = this.initConfig();
@@ -474,7 +464,7 @@
       initPlayer() {
         this.initSDK().then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
-          if (this.playerState.type === 'vod') {
+          if (this.playerServer.state.type === 'vod') {
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
@@ -484,7 +474,7 @@
       },
       // 获取跑马灯、水印等播放器配置
       getPlayerInfo() {
-        const { join_info } = this.roomBaseState.watchInitData;
+        const { join_info } = this.roomBaseServer.state.watchInitData;
         let playerParams = {
           marqueeOption: {
             text: '',
@@ -557,7 +547,7 @@
         this.playerServer && this.playerServer.pause();
       },
       initPlayerOtherInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
+        const { webinar } = this.roomBaseServer.state.watchInitData;
         this.playerServer
           .getPlayerConfig({
             webinar_id: webinar.id,
@@ -580,18 +570,20 @@
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus() {
-        const { webinar, warmup, record } = this.roomBaseState.watchInitData;
-        if (this.roomBaseState.watchInitData.status === 'live') {
+        const { webinar, warmup, record } = this.roomBaseServer.state.watchInitData;
+        if (this.roomBaseServer.state.watchInitData.status === 'live') {
           if (webinar.type === 1) {
             // 直播
             this.optionTypeInfo('live');
           } else if (webinar.type === 5) {
             // 回放
-            this.optionTypeInfo('vod', this.roomBaseState.watchInitData.paas_record_id);
+            this.optionTypeInfo('vod', this.roomBaseServer.state.watchInitData.paas_record_id);
             this.recordHistoryTime = sessionStorage.getItem(
-              this.roomBaseState.watchInitData.paas_record_id
+              this.roomBaseServer.state.watchInitData.paas_record_id
             )
-              ? Number(sessionStorage.getItem(this.roomBaseState.watchInitData.paas_record_id))
+              ? Number(
+                  sessionStorage.getItem(this.roomBaseServer.state.watchInitData.paas_record_id)
+                )
               : 0;
           }
         } else {
@@ -621,10 +613,11 @@
           this.vodOption = {};
           this.liveOption = {
             type:
-              this.roomBaseState.configList['media_server.watch.rtmp_pc_to_hls'] === '1' || isIE()
+              this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] === '1' ||
+              isIE()
                 ? 'hls'
                 : 'flv',
-            roomId: this.roomBaseState.watchInitData.interact.room_id
+            roomId: this.roomBaseServer.state.watchInitData.interact.room_id
           };
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
@@ -736,7 +729,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 9;
+        z-index: 8;
         div {
           background: rgba(0, 0, 0, 0.4);
           border-radius: 50%;
@@ -837,12 +830,26 @@
             cursor: pointer;
             b {
               font-weight: normal;
+              margin-left: 5px;
             }
-            &.repay--mini {
-              b {
-                font-size: 14px;
-                padding-left: 5px;
-              }
+          }
+          span {
+            margin-top: 5px;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 20px;
+            background: #fb3a32;
+            display: inline-block;
+            width: 160px;
+            height: 40px;
+            line-height: 40px;
+          }
+          p {
+            span {
+              width: 90px;
+              height: 40px;
+              line-height: 40px;
             }
           }
         }
@@ -857,6 +864,26 @@
             i {
               color: #e6e6e6;
               opacity: 1;
+            }
+          }
+          span {
+            margin-top: 5px;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 20px;
+            background: #fb3a32;
+            display: inline-block;
+            &.repay--normal {
+              width: 160px;
+              height: 40px;
+              line-height: 40px;
+            }
+            &.repay--mini {
+              width: 90px;
+              height: 30px;
+              font-size: 12px;
+              line-height: 30px;
             }
           }
         }
@@ -875,26 +902,6 @@
             font-size: 18px;
           }
         }
-        span {
-          margin-top: 5px;
-          text-align: center;
-          color: #fff;
-          cursor: pointer;
-          border-radius: 20px;
-          background: #fb3a32;
-          display: inline-block;
-          &.repay--normal {
-            width: 160px;
-            height: 40px;
-            line-height: 40px;
-          }
-          &.repay--mini {
-            width: 90px;
-            height: 30px;
-            font-size: 12px;
-            line-height: 30px;
-          }
-        }
       }
       &-audio {
         z-index: 5;
@@ -903,7 +910,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-image: url('../src/images/video.gif');
+        background-image: url('../src/img/video.gif');
         background-size: 100% 100%;
         div {
           text-align: center;
@@ -951,7 +958,7 @@
       position: absolute;
       // bottom: -48px;
       bottom: 3px;
-      z-index: 10;
+      z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
@@ -1050,7 +1057,7 @@
           &-quality,
           &-speed {
             &:hover {
-              .vmp-player-controller-tools-right-list {
+              .controller-tools-right-list {
                 display: block;
               }
             }
@@ -1119,7 +1126,7 @@
       position: absolute;
       // bottom: -48px;
       bottom: 3px;
-      z-index: 10;
+      z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
@@ -1290,7 +1297,7 @@
       }
     }
     &-tips {
-      z-index: 6;
+      z-index: 9;
       &-box {
         height: 40px;
         font-size: 14px;
@@ -1332,7 +1339,7 @@
           cursor: pointer;
         }
         .vh-iconfont {
-          font-size: 20px;
+          font-size: 14px;
           padding-left: 12px;
           vertical-align: middle;
           cursor: pointer;

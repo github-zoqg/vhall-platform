@@ -50,6 +50,7 @@
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
+      @login="handleLogin"
     ></send-box>
   </div>
 </template>
@@ -60,7 +61,7 @@
   import sendBox from './components/send-box';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
-  import defaultAvatar from './images/default_avatar.png';
+  import defaultAvatar from './img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpChatWap',
@@ -221,19 +222,29 @@
         this.isEmbed = embed;
       },
       listenChatServer() {
+        const chatServer = useChatServer();
         //监听禁言通知
-        useChatServer().$on('banned', res => {
-          alert(res);
+        chatServer.$on('banned', res => {
           this.isBanned = res;
         });
         //监听全体禁言通知
-        useChatServer().$on('allBanned', res => {
+        chatServer.$on('allBanned', res => {
           this.allBanned = res;
         });
         //监听分组房间变更通知
-        useChatServer().$on('changeChannel', () => {
+        chatServer.$on('changeChannel', () => {
           this.handleChannelChange();
         });
+        //监听被提出房间消息
+        chatServer.$on('roomKickout', () => {
+          this.$message('您已经被踢出房间');
+        });
+      },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        useChatServer().clearHistoryMsg();
+        this.getHistoryMessage();
       },
       // 获取历史消息
       async getHistoryMessage() {
@@ -283,6 +294,10 @@
       },
       showUserPopup() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
+      },
+      //唤起登录弹窗
+      handleLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };
