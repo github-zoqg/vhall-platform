@@ -2,14 +2,16 @@
   <div class="vmp-subscribe-body">
     <div class="vmp-subscribe-body-intro">
       <div class="subscribe-img">
-        <div>
+        <div class="subscribe-img-box">
           <!-- 背景图片 未完成验证-->
           <img :src="webinarsBgImg" />
         </div>
         <div>
           <!-- 完成验证、并且有暖场视频 加载播放器 -->
         </div>
-        <!--活动时间信息-->
+      </div>
+      <!--活动时间信息-->
+      <div class="subscribe-img-bottom">
         <bottom-tab
           v-if="showBottom"
           ref="bottomTab"
@@ -85,25 +87,33 @@
         // ) {
         //   this.showVideo = true;
         // }
-      }
+      },
+      feeAuth() {},
+      handleAuthCheck() {}
     }
   };
 </script>
 <style lang="less">
   .vmp-subscribe-body {
-    position: relative;
+    height: 100%;
+    width: 100%;
     &-intro {
-      padding-top: 56.25%;
+      position: relative;
       .subscribe-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        padding-top: 56.25%;
+        &-box {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 4px;
+        }
         img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          border-radius: 4px 4px 0 0;
         }
       }
     }
@@ -116,6 +126,7 @@
     .vmp-subscribe-body-intro,
     .vmp-subscribe-body-tab {
       width: 828px;
+      margin: 0 auto;
     }
   }
 
@@ -123,18 +134,21 @@
     .vmp-subscribe-body-intro,
     .vmp-subscribe-body-tab {
       width: 980px;
+      margin: 0 auto;
     }
   }
   @media screen and (min-width: 1601px) and (max-width: 1920px) {
     .vmp-subscribe-body-intro,
     .vmp-subscribe-body-tab {
       width: 1528px;
+      margin: 0 auto;
     }
   }
   @media screen and (min-width: 1921px) {
     .vmp-subscribe-body-intro,
     .vmp-subscribe-body-tab {
       width: 1528px;
+      margin: 0 auto;
     }
   }
 </style>
