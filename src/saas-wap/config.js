@@ -293,5 +293,9 @@ export const serverConfig = {
   // 抽奖
   compLotteryWap: {
     component: 'VmpLotteryWap'
+  },
+  // 章节
+  comChapterWap: {
+    component: 'VmpChapterWap'
   }
 };
