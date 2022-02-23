@@ -6,6 +6,17 @@ export const hasOwnProperty = function (obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 };
 
+/**
+ * 延迟执行(setTimeout的promify写法)
+ * @param {*} ms 毫秒数
+ * @returns {Promise}
+ */
+export const sleep = function (ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+};
+
 //防抖
 export function debounce(fn, t = 300) {
   let lastTime;

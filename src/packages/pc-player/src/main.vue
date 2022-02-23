@@ -313,9 +313,10 @@
       },
       isShowContainer() {
         return (
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-          this.$domainStore.state.micServer.isSpeakOn ||
-          this.isLivingEnd
+          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+            this.$domainStore.state.micServer.isSpeakOn ||
+            this.isLivingEnd) &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
         );
       },
       isVisibleMiniElement() {

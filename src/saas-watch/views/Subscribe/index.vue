@@ -1,23 +1,13 @@
 <template>
-  <div
-    class="vmp-basic-layout"
-    v-loading="state === 0"
-    element-loading-text="加载中..."
-    element-loading-background="rgba(255, 255, 255, 0.1)"
-  >
-    <div class="vmp-basic-container" v-if="state === 1">
-      <vmp-air-container cuid="layerRoot"></vmp-air-container>
-    </div>
+  <div class="vmp-subscribe" v-if="state">
+    <vmp-air-container cuid="layerSubscribeRoot"></vmp-air-container>
   </div>
 </template>
-
 <script>
   import { Domain } from 'middle-domain';
-  import roomState from '../headless/room-state.js';
-  import authCheck from '../mixins/chechAuth';
+  import subscribeState from '../../headless/subscribe-state.js';
   export default {
-    name: 'Home',
-    mixins: [authCheck],
+    name: 'vmpSubscribe',
     data() {
       return {
         state: 0
@@ -27,34 +17,18 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initCheckAuth();
         await this.initReceiveLive();
-        await roomState();
+        await subscribeState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
-        // 是否跳转预约页
-        if (
-          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.preview_paas_record_id
-        ) {
-          this.goSubscribePage();
+        // 是否跳转观看页
+        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
+          this.goWatchPage();
         }
-        // this.goSubscribePage();
       } catch (ex) {
         console.error('---初始化直播房间出现异常--');
         console.error(ex);
-        // this.state = 2;
-        // this.errMsg = ex.msg;
       }
-    },
-    mounted() {
-      // 派发推流事件
-      // setTimeout(() => {
-      //   window.$middleEventSdk?.event?.send({
-      //     cuid: 'comStreamLocal',
-      //     method: 'startPush'
-      //   });
-      // }, 3000);
     },
     methods: {
       initReceiveLive() {
@@ -70,13 +44,32 @@
           }
         });
       },
-      goSubscribePage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
+      goWatchPage() {
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}${window.location.search}`;
       }
     }
   };
 </script>
 <style lang="less">
+  .vmp-subscribe {
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+      '微软雅黑', Arial, sans-serif;
+    .vmp-basic-bd {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      margin: 0 auto;
+      margin-top: 20px;
+    }
+  }
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {
     .vmp-basic-bd {
