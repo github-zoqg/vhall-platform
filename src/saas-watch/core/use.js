@@ -56,6 +56,9 @@ import VmpScreenPost from '@/packages/screen-post';
 
 import VmpIntro from '@/packages/intro';
 
+// 预约页面配置
+import VmpSubscribeBody from '@/packages/subscribe-body/index';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -101,6 +104,8 @@ export function initUse() {
   Vue.use(VmpIntro);
   Vue.use(VmpLivingEnd);
   Vue.use(VmpSignWatch);
+
+  Vue.use(VmpSubscribeBody);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

@@ -17,16 +17,17 @@
       <div class="vmp-header-watch-center-title">
         {{ webinarInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarType != 6"
+          v-if="webinarInfo.type != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
+            webinarInfo.type
           "
         >
-          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
-          <label>{{ webinarType | webinarFilter }}</label>
+          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ webinarInfo.type | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
