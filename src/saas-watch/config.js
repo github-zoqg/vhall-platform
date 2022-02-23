@@ -370,6 +370,13 @@ export const serverConfig = {
   },
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
-    children: ['comTabMenu']
+    children: ['comTabMenu', 'comPcPlayer'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   }
 };

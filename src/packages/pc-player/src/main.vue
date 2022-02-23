@@ -661,7 +661,7 @@
             if (this.recordTime === 0) {
               this.recordTime = 1;
             }
-            this.authText = this.getShiPreview();
+            // this.authText = this.getShiPreview();
           }
           this.getDuanxuPreview(); //断点续播逻辑
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);
