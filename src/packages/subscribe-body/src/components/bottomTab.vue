@@ -260,7 +260,7 @@
         this.$emit('authFetch');
       },
       payMore() {
-        this.$emit('payMore');
+        this.$emit('payMore', { type: 3 });
       }
     }
   };
