@@ -43,6 +43,12 @@ const routes = [
     name: 'bind',
     component: () => import('../views/bind'),
     meta: { grayType: '' }
+  },
+  // 独立报名表单
+  {
+    path: '/lives/entryform/:id',
+    name: 'entryform',
+    component: () => import('../views/entryform/index.vue')
   }
 ];
 
