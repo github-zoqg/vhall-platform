@@ -341,10 +341,9 @@
             }
           });
 
+          // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-            console.log('[doc] ssssss');
             const data = this.docServer.getVodAllCids();
-            console.log('[doc] data:', data);
             this.docServer.state.containerList = data.map(item => {
               return {
                 cid: item.cid
