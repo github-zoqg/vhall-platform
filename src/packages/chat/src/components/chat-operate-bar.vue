@@ -186,7 +186,7 @@
           isShieldingEffects: false
         },
         //聊天审核链接
-        chatFilterUrl: `${process.env.VUE_APP_ROUTER_BASE_URL}${process.env.VUE_APP_WEB_KEY}`,
+        chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
         //是否是助理
         assistantType: this.$route.query.assistantType
       };
