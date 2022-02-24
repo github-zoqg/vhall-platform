@@ -1,6 +1,7 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
+      <record-control></record-control>
       <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
         开始直播
       </div>
@@ -45,6 +46,7 @@
 
 <script>
   import headerControl from './components/header-control.vue';
+  import RecordControl from './components/record-control.vue';
   import { useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -79,7 +81,8 @@
     },
     components: {
       headerControl,
-      SaasAlert
+      SaasAlert,
+      RecordControl
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
