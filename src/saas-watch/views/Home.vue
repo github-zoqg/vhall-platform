@@ -8,6 +8,11 @@
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
+    <errorPage v-if="state === 2" :prop-type="errorData.errorPageTitle">
+      <template v-if="errorData.errorPageText" slot="body">
+        <p>{{ errorData.errorPageText }}</p>
+      </template>
+    </errorPage>
   </div>
 </template>
 
@@ -15,12 +20,20 @@
   import { Domain } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import authCheck from '../mixins/chechAuth';
+  import ErrorPage from './ErrorPage';
   export default {
     name: 'Home',
+    components: {
+      ErrorPage
+    },
     mixins: [authCheck],
     data() {
       return {
-        state: 0
+        state: 0,
+        errorData: {
+          errorPageTitle: '',
+          errorPageText: ''
+        }
       };
     },
     async created() {
@@ -39,28 +52,19 @@
         ) {
           this.goSubscribePage();
         }
-        // this.goSubscribePage();
-      } catch (ex) {
+      } catch (err) {
         console.error('---初始化直播房间出现异常--');
-        console.error(ex);
-        // this.state = 2;
-        // this.errMsg = ex.msg;
+        console.error(err);
+        this.state = 2;
+        this.handleErrorCode(err);
+        // this.errMsg = err.msg;
       }
-    },
-    mounted() {
-      // 派发推流事件
-      // setTimeout(() => {
-      //   window.$middleEventSdk?.event?.send({
-      //     cuid: 'comStreamLocal',
-      //     method: 'startPush'
-      //   });
-      // }, 3000);
     },
     methods: {
       initReceiveLive() {
         const { id } = this.$route.params;
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
@@ -73,11 +77,45 @@
       },
       goSubscribePage() {
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
+      },
+      handleErrorCode(err) {
+        switch (err.code) {
+          case 512002:
+            this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了
+            break;
+          case 512542: // 访客数据信息不全
+          case 516324:
+          case 512562: // 无极版流量已达上限
+          case 512543:
+            this.errorData.errorPageTitle = 'video_null'; // 此视频暂时下线了
+            break;
+          case 512571:
+            this.errorData.errorPageTitle = 'video_null'; // 流量用户欠费超过100G，暂不能进入
+            break;
+          case 512541:
+            this.errorData.errorPageTitle = 'surpass_limit'; // 活动现场太火爆，已超过人数上限
+            break;
+          case 512522:
+            this.errorData.errorPageTitle = 'clear_cookie'; // 主持人、嘉宾或助理直播时不能进入观看端
+            break;
+          case 512514:
+            this.errorData.errorPageTitle = 'un_auth'; // 您已被禁止访问当前活动，被踢出直播间
+            break;
+          case 512539:
+            this.errorData.errorPageTitle = 'embed_verify'; // 观看页为嵌入页，设置观看限制为付费、邀请码、白名单、付费or邀请码、设置了报名报单时，访问观看页时，页面提示
+            break;
+          default:
+            this.errorData.errorPageTitle = 'embed_verify';
+            this.errorData.errorPageText = err.msg;
+        }
       }
     }
   };
 </script>
 <style lang="less">
+  body {
+    overflow: hidden;
+  }
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {
     .vmp-basic-bd {

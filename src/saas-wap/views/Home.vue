@@ -12,6 +12,7 @@
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
+    <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
   </div>
 </template>
 
@@ -19,12 +20,17 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
+  import MsgTip from './MsgTip.vue';
 
   export default {
     name: 'Home',
+    components: {
+      MsgTip
+    },
     data() {
       return {
-        state: 0
+        state: 0,
+        liveErrorTip: ''
       };
     },
     async created() {
@@ -36,6 +42,7 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
+        document.title = roomBaseServer.state.watchInitData.webinar.subject;
 
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
@@ -59,13 +66,12 @@
           }
         );
         window.vhallReport.report('ENTER_WATCH');
-
         this.state = 1;
-      } catch (ex) {
+      } catch (err) {
         console.error('---初始化直播房间出现异常--');
-        console.error(ex);
-        // this.state = 2;
-        // this.errMsg = ex.msg;
+        console.error(err);
+        this.state = 2;
+        this.handleErrorCode(err);
       }
     },
     mounted() {},
@@ -77,7 +83,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
@@ -87,6 +93,29 @@
             clientType: 'standard' //客户端类型
           }
         });
+      },
+      handleErrorCode(err) {
+        if (err.code == 512522) {
+          this.liveErrorTip = this.$t('message.message_1009');
+        } else if (err.code == 512541) {
+          this.liveErrorTip = this.$t('message.message_1008');
+        } else if (
+          err.code == 516324 ||
+          err.code == 516324 ||
+          err.code == 512562 ||
+          err.code == 512562 ||
+          err.code == 512571 ||
+          err.code == 512002
+        ) {
+          this.liveErrorTip = this.$t('message.message_1004');
+        } else if (err.code == 512503 || err.code == 512502) {
+          window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+        } else if (err.code == 512534) {
+          // 第三方k值校验失败 跳转指定地址
+          window.location.href = err.data.url;
+        } else {
+          this.liveErrorTip = this.$tes(err.code) || err.msg;
+        }
       }
     }
   };

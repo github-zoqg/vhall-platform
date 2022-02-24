@@ -57,6 +57,13 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     filters: {
@@ -95,7 +102,7 @@
           ) {
             // 开始推流
             this.startPush();
-          } else if (this.joinInfo.role_name == 2) {
+          } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
             // 实例化互动实例
             await this.interactiveServer.init();
             // 开始推流
@@ -108,6 +115,19 @@
         await this.stopPush();
 
         this.interactiveServer.destroy();
+        if (this.isNoDelay === 1 || this.mode === 6) {
+          // 实例化互动实例
+          this.interactiveServer.init();
+        }
+      });
+
+      //监听直播结束的通知，下麦并停止推流
+      this.micServer.$on('live_over', async () => {
+        if (this.micServer.state.isSpeakOn) {
+          await this.micServer.speakOff();
+          await this.stopPush();
+          this.interactiveServer.destroy();
+        }
       });
     },
     beforeDestroy() {
@@ -200,7 +220,7 @@
       // 创建本地流
       async createLocalStream() {
         await this.interactiveServer
-          .createLocalVideoStream({
+          .createWapLocalStream({
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
           .catch(() => 'createLocalStreamError');

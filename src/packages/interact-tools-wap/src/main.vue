@@ -68,7 +68,13 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer
+  } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';

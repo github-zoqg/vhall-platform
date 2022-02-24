@@ -59,8 +59,7 @@ export default {
             if (sceneId !== 2) {
               // 非提现功能时，绑定成功，界面初始化刷新(去掉user_auth_key参数)
               // TODO: url后续得改
-              // const url = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`
-              const url = `${window.location.origin}/lives/watch/${this.$route.params.id}`;
+              const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
               window.location.href = url;
             }
           } else {

@@ -22,8 +22,6 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
-    // children: ['comGoodSaas']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerFooter: {
@@ -67,10 +65,12 @@ export const serverConfig = {
       // 'comSignUpForm',
       'comUserAccount',
       'comCash',
-      // 'comLottery'
+      'comLottery',
       'comWatchTimer',
       'comScreenPost',
-      'comMediaSetting'
+      'comMediaSetting',
+      'comWatchPayFee',
+      'comQuestionnaireWatch'
     ]
   },
 
@@ -148,7 +148,30 @@ export const serverConfig = {
   },
   // 播放器
   comPcPlayer: {
-    component: 'VmpPcPlayer'
+    component: 'VmpPcPlayer',
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
+    ],
+    emitClickPay: [
+      // 权限付费弹窗
+      {
+        cuid: 'comWatchPayFee',
+        method: 'openPayFee',
+        args: ['$0']
+      }
+    ],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 结束页面
   comLivingEnd: {
@@ -272,6 +295,9 @@ export const serverConfig = {
   comWatchAuth: {
     component: 'VmpWatchAuth'
   },
+  comWatchPayFee: {
+    component: 'VmpWatchPayFee'
+  },
   //聊天组件
   comChat: {
     component: 'VmpChat',
@@ -322,7 +348,7 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    // component: 'VmpLotteryWatch'
+    component: 'VmpLotteryWatch'
   },
   // 开屏页
   comScreenPost: {
@@ -376,14 +402,13 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['comVmpSubscribeBody']
-    // children: ['comGoodSaas']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerSubscribeFooter: {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
+
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
     children: ['comTabMenu', 'comPcPlayer'],
@@ -393,6 +418,27 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
+    ],
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
+    ],
+    emitClickPay: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchPayFee',
+        method: 'openPayFee',
+        args: ['$0']
+      }
     ]
+  },
+
+  // 抽奖
+  comQuestionnaireWatch: {
+    component: 'VmpQuestionnaireWatch'
   }
 };
