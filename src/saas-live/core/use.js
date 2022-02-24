@@ -34,7 +34,8 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
-import VmpRebroadcast from '@/packages/rebroadcast';
+import VmpRebroadcastList from '@/packages/rebroadcast-list';
+import VmpRebroadCastStream from '@/packages/rebroadcast-stream';
 import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
@@ -75,7 +76,8 @@ export function initUse() {
   Vue.use(VmpNoticeList);
   Vue.use(VmpLiveTimerSet);
   Vue.use(VmpLiveTimer);
-  Vue.use(VmpRebroadcast);
+  Vue.use(VmpRebroadcastList);
+  Vue.use(VmpRebroadCastStream);
   Vue.use(VmpRecommend);
   Vue.use(VmpLotteryLive);
   Vue.use(VmpQuestionnaire);
