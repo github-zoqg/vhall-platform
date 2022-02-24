@@ -269,6 +269,9 @@
     },
     computed: {
       showTime() {
+        if (!this.msg.sendTime) {
+          return '';
+        }
         if (!this.preMsg) {
           return handleChatShowTime('', this.msg.sendTime);
         }
@@ -398,7 +401,7 @@
       //处理@消息
       handleAt() {
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.msg.atList.length) {
+        if (!this.msg.atList || !this.msg.atList.length) {
           this.msgContent = this.msg.content.text_content;
         } else {
           let at = false;

@@ -56,7 +56,7 @@
           >
             {{ stateArr[item.webinar_state - 1].value }}
             <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
-              | 无延迟
+              | {{ $t('common.common_1023') }}
             </span>
           </span>
           <!-- <span class="item-type">付费</span> -->
@@ -97,23 +97,23 @@
         },
         stateArr: [
           {
-            value: '直播',
+            value: this.$t('common.common_1018'),
             bgcolor: '#fc5659'
           },
           {
-            value: '预告',
+            value: this.$t('common.common_1019'),
             bgcolor: '#5ea6ec'
           },
           {
-            value: '结束',
+            value: this.$t('common.common_1020'),
             bgcolor: '#999999'
           },
           {
-            value: '点播',
+            value: this.$t('common.common_1024'),
             bgcolor: '#ff8834'
           },
           {
-            value: '回放',
+            value: this.$t('common.common_1021'),
             bgcolor: '#2ab804'
           }
         ]

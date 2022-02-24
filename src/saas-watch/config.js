@@ -67,10 +67,11 @@ export const serverConfig = {
       // 'comSignUpForm',
       'comUserAccount',
       'comCash',
-      // 'comLottery'
+      'comLottery',
       'comWatchTimer',
       'comScreenPost',
-      'comMediaSetting'
+      'comMediaSetting',
+      'comQuestionnaireWatch'
     ]
   },
 
@@ -322,7 +323,7 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    // component: 'VmpLotteryWatch'
+    component: 'VmpLotteryWatch'
   },
   // 开屏页
   comScreenPost: {
@@ -384,6 +385,7 @@ export const serverConfig = {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
+
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
     children: ['comTabMenu', 'comPcPlayer'],
@@ -393,6 +395,19 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
+    ],
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
     ]
+  },
+
+  // 抽奖
+  comQuestionnaireWatch: {
+    component: 'VmpQuestionnaireWatch'
   }
 };

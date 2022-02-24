@@ -107,7 +107,7 @@
           <div>
             <el-button type="text" @click="editQQHandler">
               {{
-                useUserServer.state.thirdInfo.QQbind
+                useUserServer.state.thirdInfo.QQBind
                   ? $t('account.account_1021')
                   : $t('account.account_1022')
               }}
@@ -374,7 +374,7 @@
           localStorage.setItem('vmp_auth_tag', 'bindQQ');
 
           const hostPath = process.env.VUE_APP_BIND_BASE_URL;
-          const jumpUrlPath = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
+          const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
             `${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );
@@ -432,7 +432,7 @@
           // 绑定
           localStorage.setItem('vmp_auth_tag', 'bindWx');
           const hostPath = process.env.VUE_APP_BIND_BASE_URL;
-          const jumpUrlPath = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
+          const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
             `${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
               jumpUrlPath
