@@ -20,5 +20,5 @@ module.exports = {
   // bracketSameLine: false,
 
   // embeddedLanguageFormatting: 'auto'
-  endOfLine: 'auto',
+  endOfLine: 'auto'
 };
