@@ -238,6 +238,11 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitShowMenuTab: {
+      cuid: ['comTabMenuWap'],
+      method: 'setVisible',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap'],
     options: {}
   },
