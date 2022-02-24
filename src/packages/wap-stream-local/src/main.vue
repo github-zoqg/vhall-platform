@@ -120,6 +120,15 @@
           this.interactiveServer.init();
         }
       });
+
+      //监听直播结束的通知，下麦并停止推流
+      this.micServer.$on('live_over', async () => {
+        if (this.micServer.state.isSpeakOn) {
+          await this.micServer.speakOff();
+          await this.stopPush();
+          this.interactiveServer.destroy();
+        }
+      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -211,7 +220,7 @@
       // 创建本地流
       async createLocalStream() {
         await this.interactiveServer
-          .createLocalVideoStream({
+          .createWapLocalStream({
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
           .catch(() => 'createLocalStreamError');
