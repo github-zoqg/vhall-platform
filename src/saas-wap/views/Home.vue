@@ -42,6 +42,7 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
+        document.title = roomBaseServer.state.watchInitData.webinar.subject;
 
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
