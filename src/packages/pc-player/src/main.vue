@@ -2,7 +2,9 @@
   <div
     v-if="!isShowContainer"
     class="vmp-player"
-    :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
+    :class="[{ 'is-watch': isWatch }, isSubscribe ? '' : `vmp-player--${displayMode}`]"
+    @mousemove="wrapEnter"
+    @mouseleave="wrapLeave"
   >
     <div>
       <div id="vmp-player" class="vmp-player-watch">
@@ -29,14 +31,15 @@
               <h3>{{ $t('appointment.appointment_1013') }}</h3>
               <div>
                 <p v-if="authText == 6">
-                  <span @click="handleAuth(3)">
+                  <span @click="authTryWatch(3)">
                     {{ $t('appointment.appointment_1010') }}
                   </span>
-                  <span style="margin-left: 10px" @click="handleAuth(4)">
+                  {{ $t('interact.interact_1020') }}
+                  <span style="margin-left: 10px" @click="authTryWatch(4)">
                     {{ $t('appointment.appointment_1011') }}
                   </span>
                 </p>
-                <span v-else @click="handleAuth">{{ authText }}</span>
+                <span v-else @click="authTryWatch">{{ authText }}</span>
               </div>
               <p class="replay-try">
                 <i class="vh-iconfont vh-line-refresh-left">
@@ -54,16 +57,18 @@
               >
                 <i class="vh-iconfont vh-line-refresh-left"></i>
               </div>
-              <span :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'">重新播放</span>
+              <span :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'">
+                {{ $t('player.player_1016') }}
+              </span>
             </div>
           </div>
           <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
-            <div>语音播放中</div>
+            <div>{{ $t('player.player_1014') }}</div>
           </div>
           <div
             class="vmp-player-living-exchange"
             @click="exchangeVideoDocs"
-            v-if="isVisibleMiniElement"
+            v-if="isVisibleMiniElement && hoveVideo"
           >
             <p>
               <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -74,11 +79,18 @@
         </div>
         <!-- 控制条 进度条、弹幕、全屏、时间等 -->
         <div
-          :class="displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'"
-          v-if="!isShowPoster"
+          :class="[
+            { 'active-control': hoveVideo, 'previre-control': isTryPreview },
+            displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'
+          ]"
+          @mouseenter="controllerMouseEnter"
+          @mouseleave="controllerMouseLeave"
         >
           <!-- 进度条 -->
-          <div class="controller_slider" v-if="!isLiving && playerOtherOptions.progress_bar">
+          <div
+            class="controller_slider"
+            v-if="!isLiving && (playerOtherOptions.progress_bar || isWarnPreview)"
+          >
             <el-slider
               ref="controllerRef"
               class="slider_controller"
@@ -88,7 +100,7 @@
             ></el-slider>
           </div>
           <div
-            v-if="totalTime && eventPointList.length"
+            v-if="totalTime && eventPointList.length && !isWarnPreview"
             ref="vhTailoringWrap"
             class="vmp-player-controller-points"
           >
@@ -122,7 +134,7 @@
               </div>
             </div>
             <div class="controller-tools-right">
-              <div class="controller-tools-right-quality">
+              <div class="controller-tools-right-quality" v-if="!isWarnPreview && !isTryPreview">
                 <span>{{ formatQualityText(currentQualitys.def) }}</span>
                 <ul class="controller-tools-right-list">
                   <li
@@ -135,9 +147,9 @@
                   </li>
                 </ul>
               </div>
-              <div class="controller-tools-right-speed" v-if="!isLiving">
+              <div class="controller-tools-right-speed" v-if="!isLiving && !isWarnPreview">
                 <span>
-                  {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+                  {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
                 </span>
                 <ul class="controller-tools-right-list">
                   <li
@@ -164,7 +176,7 @@
                   ></el-slider>
                 </div>
               </div>
-              <div class="controller-tools-right-danmuis">
+              <div class="controller-tools-right-danmuis" v-if="!isWarnPreview">
                 <i
                   :class="`vh-iconfont ${
                     danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
@@ -188,36 +200,41 @@
         <div class="vmp-player-tips-box" v-if="isSetQuality || isSetSpeed">
           <!-- 切换清晰度 -->
           <div v-if="isSetQuality">
-            已为您切换到
+            {{ $t('player.player_1009') }}
             <span>{{ formatQualityText(currentQualitys.def) }}</span>
           </div>
           <!-- 切换倍速 -->
           <div v-if="isSetSpeed">
-            已为您切换到
-            <span>{{ currentSpeed == 1 ? '正常' : currentSpeed }}</span>
-            倍速
+            <i18n path="player.player_1015" style="color: #fff">
+              <span place="n">
+                {{ currentSpeed == 1 ? $t('player.player_1025') : currentSpeed }}
+              </span>
+            </i18n>
           </div>
         </div>
-        <!-- 试看和断点续播提示 v-if="displayMode != 'mini'" -->
-        <div class="vmp-player-tips-prew">
+        <!-- 试看和断点续播提示 -->
+        <div class="vmp-player-tips-prew" v-if="displayMode != 'mini'">
           <!-- 试看 -->
           <div v-if="vodType === 'shikan' && isTryPreview">
-            试看
-            <b>{{ recordTime }}</b>
-            分钟，观看完整视频请
+            <i18n path="appointment.appointment_1012">
+              <span class="red" place="n">{{ recordTime }}</span>
+            </i18n>
             <span v-if="authText == 6">
-              <b>付费</b>
-              或
-              <b>邀请码</b>
+              <b @click="authTryWatch(3)">{{ $t('appointment.appointment_1010') }}</b>
+              <i style="color: #fff">{{ $t('interact.interact_1020') }}</i>
+              <b @click="authTryWatch(4)">{{ $t('appointment.appointment_1011') }}</b>
             </span>
-            <span v-else>{{ authText }}</span>
+            <span v-else @click="authTryWatch()">{{ authText }}</span>
             <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
           </div>
           <!-- 断点续播 -->
           <div v-if="isPickupVideo && currentTime > 0">
-            上次观看至
+            <i18n path="player.player_1012">
+              <span place="n" class="red">{{ secondToDate(currentTime) }}</span>
+            </i18n>
+            <!-- 上次观看至
             <b>{{ secondToDate(currentTime) }}</b>
-            ，已为您自动续播
+            ，已为您自动续播 -->
             <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
         </div>
@@ -226,10 +243,11 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
   import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -260,14 +278,15 @@
         isFullscreen: false, // 是否是全屏
         isSetSpeed: false, // 是否切换倍速
         isSetQuality: false, // 是否切换清晰度
-        authText: '', // 试看的权限判断
         recordTime: 0, // 试看的时间
         isTryPreview: false, // 是否是试看
+        authText: '', // 试看的权限判断
         isWarnPreview: false, // 是否是暖场视频
         isPickupVideo: false, // 是否是断点续播
         recordHistoryTime: '', // 记录播放的时间
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
+        hoveVideo: true, //显示控制条
         isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
         marquee: {}, // 跑马灯
@@ -283,6 +302,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
+      this.subscribeServer = useSubscribeServer();
     },
     computed: {
       // 是否观看端
@@ -322,6 +342,12 @@
       isVisibleMiniElement() {
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
         return this.$domainStore.state.docServer.switchStatus;
+      },
+      isSubscribe() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+        );
       }
     },
     watch: {
@@ -329,6 +355,14 @@
         if (this.onmousedownControl) {
           this.hoverTime = (val / 100) * this.totalTime;
           this.hoverLeft = (val / 100) * this.ContorlWidth;
+        }
+      },
+      hoveVideo(newValue) {
+        if (newValue) {
+          clearTimeout(this.hoverVideoTimer);
+          this.hoverVideoTimer = setTimeout(() => {
+            this.hoveVideo = false;
+          }, 3000);
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
@@ -346,7 +380,7 @@
     methods: {
       listenEvents() {
         // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-        if (this.playerServer.state.type === 'vod') {
+        if (this.playerServer.state.type === 'vod' && !this.isTryPreview) {
           window.addEventListener('beforeunload', () => {
             this.endTime = this.playerServer.getCurrentTime(() => {
               console.log('获取当前视频播放时间失败----------');
@@ -381,6 +415,10 @@
             this.isFullscreen = false;
           }
         };
+        clearTimeout(this.hoverVideoTimer);
+        this.hoverVideoTimer = setTimeout(() => {
+          this.hoveVideo = false;
+        }, 3000);
         window.addEventListener('fullscreenchange', setFullscreen);
         window.addEventListener('webkitfullscreenchange', setFullscreen);
         window.addEventListener('mozfullscreenchange', setFullscreen);
@@ -536,6 +574,106 @@
         }
         return playerParams;
       },
+      authTryWatch(type) {
+        let params = {
+          type: this.authText == 6 ? type : this.roomBaseServer.state.watchInitData.webinar.verify
+        };
+        this.feeAuth(params);
+      },
+      feeAuth(params) {
+        let data = {
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+          refer: this.$route.query.refer,
+          record_id: this.$route.query.record_id,
+          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...params
+        };
+        this.subscribeServer.watchAuth(data).then(res => {
+          if (res.code == 200) {
+            if (res.data.status == 'live') {
+              const queryString = this.$route.query.refer
+                ? `?refer=${this.$route.query.refer}`
+                : '';
+              window.location.href =
+                window.location.origin +
+                process.env.VUE_APP_ROUTER_BASE_URL +
+                `/lives/watch/${this.roomBaseServer.state.watchInitData.webinar.id}${queryString}`;
+            } else {
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            }
+          } else {
+            this.handleAuthErrorCode(res.code, res.msg);
+          }
+        });
+      },
+      handleAuthErrorCode(code, msg) {
+        let placeHolder = '';
+        switch (code) {
+          case 510008: // 未登录
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+            break;
+          case 512002:
+          case 512522:
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+            break;
+          case 512531:
+            // 邀请码
+            placeHolder =
+              this.roomBaseServer.state.watchInitData.webinar.verify_tip ||
+              this.$t('appointment.appointment_1024');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+            );
+            break;
+          case 512528:
+            // 密码
+            placeHolder = this.authText || this.$t('appointment.appointment_1022');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+            );
+            break;
+          case 512532:
+            //白名单
+            placeHolder = this.authText || this.$t('common.common_1006');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+            );
+            break;
+          case 512526:
+            this.$message({
+              message: this.$t('common.common_1007'),
+              showClose: true,
+              // duration: 0,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            break;
+          case 512523:
+            // 付费
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
+            );
+            break;
+          default:
+            this.$message({
+              message: this.$tec(code) || msg,
+              showClose: true,
+              // duration: 0,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            break;
+        }
+      },
+      closePayFee() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickPay', { flag: false })
+        );
+      },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();
       },
@@ -595,6 +733,7 @@
           this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
           if (this.vodType === 'shikan') {
             this.isTryPreview = true;
+            this.getShiPreview();
           } else if (this.vodType === 'warm') {
             this.isWarnPreview = true;
           }
@@ -655,15 +794,15 @@
             this.playerServer.getDuration(() => {
               console.log('获取视频总时长失败');
             });
-          console.log(this.totalTime, 'zog总时间');
-          if (this.isTryPreview && this.totalTime > 0) {
+          if (this.isTryPreview && this.totalTime) {
             this.recordTime = computeRecordTime(this.totalTime);
             if (this.recordTime === 0) {
               this.recordTime = 1;
             }
-            // this.authText = this.getShiPreview();
+            console.log(this.isTryPreview, '???1323');
+          } else {
+            this.getDuanxuPreview(); //断点续播逻辑
           }
-          this.getDuanxuPreview(); //断点续播逻辑
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);
         }, 50);
       },
@@ -701,7 +840,9 @@
 <style lang="less">
   .vmp-player {
     width: 100%;
+    height: 100%;
     position: relative;
+    overflow: hidden;
     &-watch {
       height: 100%;
       width: 100%;
@@ -717,7 +858,7 @@
         top: 0;
         left: 0;
         background-size: 100% 100%;
-        z-index: 8;
+        z-index: 2;
       }
       &-btn {
         position: absolute;
@@ -957,14 +1098,19 @@
     }
     &-controller {
       position: absolute;
-      // bottom: -48px;
-      bottom: 3px;
+      bottom: -48px;
       z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
       background: rgba(0, 0, 0, 0.7);
       transition: all 0.8s;
+      &.active-control {
+        bottom: 2px;
+      }
+      &.previre-control {
+        bottom: 2px;
+      }
       .controller_slider {
         position: absolute;
         top: -4px;
@@ -1327,16 +1473,24 @@
         position: absolute;
         bottom: 60px;
         left: 10px;
-        z-index: 6;
+        z-index: 9;
         > div {
           padding: 0 12px;
         }
         b {
           font-weight: normal;
           color: @font-error;
+          padding: 5px;
+        }
+        .red {
+          color: @font-error;
+          padding: 0 3px;
+        }
+        i {
+          font-style: normal;
         }
         span {
-          color: @font-error;
+          color: #f7f7f7;
           cursor: pointer;
         }
         .vh-iconfont {

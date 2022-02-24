@@ -48,6 +48,7 @@ import VmpLivingEnd from '@/packages/living-end-pc';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
+import VmpWatchPayFee from '@/packages/pay-fee-auth/';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -104,6 +105,7 @@ export function initUse() {
   Vue.use(VmpIntro);
   Vue.use(VmpLivingEnd);
   Vue.use(VmpSignWatch);
+  Vue.use(VmpWatchPayFee);
 
   Vue.use(VmpSubscribeBody);
 
