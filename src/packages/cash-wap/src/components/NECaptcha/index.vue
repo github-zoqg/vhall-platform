@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="captchaDom" class="vhsaas-yundun-captcha">
-      <el-input v-model.trim="imgCode"></el-input>
+      <input v-model.trim="imgCode" />
     </div>
   </div>
 </template>

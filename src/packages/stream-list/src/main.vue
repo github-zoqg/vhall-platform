@@ -1,35 +1,49 @@
 <template>
   <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
-    <div
-      class="vmp-stream-list__local-container"
-      :class="{
-        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__max':
-          (miniElement == '' || miniElement == 'doc') && joinInfo.third_party_user_id == mainScreen,
-        'vmp-dom__mini': miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
-      }"
-    >
-      <div class="vmp-stream-list__remote-container-h">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-      </div>
-    </div>
-    <template v-if="remoteStreams.length">
+    <!-- 左翻页 -->
+    <span class="vmp-stream-list__scroll-btn left-btn" @click="domScrollLeft">
+      <i class="vh-iconfont vh-line-arrow-left" />
+    </span>
+
+    <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
+    <div class="vmp-stream-list__stream-wrapper">
       <div
-        v-for="stream in remoteStreams"
-        :key="stream.id"
-        class="vmp-stream-list__remote-container"
+        class="vmp-stream-list__local-container"
         :class="{
-          'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__max':
-            (miniElement == '' || miniElement == 'doc') && stream.accountId == mainScreen,
-          'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
+            (miniElement == '' || miniElement == 'doc') &&
+            joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__mini':
+            miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
         }"
       >
         <div class="vmp-stream-list__remote-container-h">
-          <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-    </template>
+      <template v-if="remoteStreams.length">
+        <div
+          v-for="stream in remoteStreams"
+          :key="stream.id"
+          class="vmp-stream-list__remote-container"
+          :class="{
+            'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+            'vmp-dom__max':
+              (miniElement == '' || miniElement == 'doc') && stream.accountId == mainScreen,
+            'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
+          }"
+        >
+          <div class="vmp-stream-list__remote-container-h">
+            <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <span class="vmp-stream-list__scroll-btn right-btn" @click="domScrollRight">
+      <i class="vh-iconfont vh-line-arrow-right" />
+    </span>
   </div>
 </template>
 
@@ -40,11 +54,16 @@
 
     data() {
       return {
-        childrenCom: []
+        childrenCom: [],
+        isShowInteract: true, // 是否展示互动区
+        showScrollDom: true // 是否展示左右按钮
       };
     },
 
     computed: {
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
@@ -127,7 +146,10 @@
           method: 'exchange',
           args: [compName, 2]
         });
-      }
+      },
+
+      domScrollLeft() {},
+      domScrollRight() {}
     }
   };
 </script>
@@ -139,45 +161,13 @@
     background-color: #242424;
     display: flex;
     justify-content: center;
-    .vmp-stream-list__local-container {
-      width: 142px;
-    }
+    background: #000;
+    border-bottom: 1px solid #1f1f1f;
 
-    // 流列表高度不为0
-    .vmp-stream-list__main-screen {
-      position: absolute;
-      top: 80px;
-      width: calc(100% - 380px);
-      .vmp-stream-list__remote-container {
-        &-h {
-          padding-top: 56.25%;
-        }
-      }
-
-      // 主屏在大窗的样式
-      &.vmp-dom__max {
-        position: absolute;
-        bottom: 56px;
-        width: calc(100% - 380px);
-        height: auto;
-        min-height: auto;
-      }
-      // 为了保持16:9的比例，这里需要重写一下stream的样式
-      .vmp-stream-remote {
-        position: absolute;
-        top: 0;
-      }
-      .vmp-stream-local {
-        position: absolute;
-        top: 0;
-      }
-    }
-
-    .vmp-stream-list__remote-container {
-      width: 142px;
-      &-h {
-        height: 100%;
-      }
+    &__stream-wrapper {
+      flex: 1;
+      justify-content: center;
+      display: flex;
     }
 
     // 流列表高度为0
@@ -188,12 +178,79 @@
       }
     }
 
-    // 主屏在小窗的样式
-    .vmp-dom__mini {
-      right: 0;
-      top: 0;
-      width: 360px;
-      z-index: 1;
+    &__scroll-btn {
+      width: 22px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      filter: blur(0);
+      & > i {
+        font-size: 12px;
+        color: #e6e6e6;
+      }
+
+      // 左箭头
+      &.left-btn {
+        background: linear-gradient(270deg, rgba(84, 84, 84, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
+
+        border-radius: 4px 0 0 0;
+      }
+
+      // 右箭头
+      &.right-btn {
+        border-radius: 0 4px 0 0;
+        background: linear-gradient(90deg, rgba(84, 84, 84, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
+      }
     }
+  }
+  .vmp-stream-list__local-container {
+    width: 142px;
+  }
+
+  // 流列表高度不为0
+  .vmp-stream-list__main-screen {
+    position: absolute;
+    top: 80px;
+    width: calc(100% - 380px);
+    .vmp-stream-list__remote-container {
+      &-h {
+        padding-top: 56.25%;
+      }
+    }
+
+    // 主屏在大窗的样式
+    &.vmp-dom__max {
+      position: absolute;
+      bottom: 56px;
+      width: calc(100% - 380px);
+      height: auto;
+      min-height: auto;
+    }
+    // 为了保持16:9的比例，这里需要重写一下stream的样式
+    .vmp-stream-remote {
+      position: absolute;
+      top: 0;
+    }
+    .vmp-stream-local {
+      position: absolute;
+      top: 0;
+    }
+  }
+
+  .vmp-stream-list__remote-container {
+    width: 142px;
+    &-h {
+      height: 100%;
+    }
+  }
+
+  // 主屏在小窗的样式
+  .vmp-dom__mini {
+    right: 0;
+    top: 0;
+    width: 360px;
+    z-index: 1;
   }
 </style>

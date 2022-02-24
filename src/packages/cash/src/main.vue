@@ -209,7 +209,7 @@
             <div
               class="vmp-qr-reload"
               v-if="countPoll === 12"
-              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1)"
+              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1 ? 2 : 1)"
             >
               <i class="vh-iconfont vh-a-line-clockwiserotation"></i>
             </div>
@@ -531,7 +531,8 @@
           .getBindKey()
           .then(res => {
             if (res.code == 200) {
-              const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
+              console.log(res.data);
+              const jump_url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/bind/${res.data.mark}`;
               this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
               console.log(`二维码请求地址: ${this.qrcode}`);
               // 轮询微信扫码绑定情况

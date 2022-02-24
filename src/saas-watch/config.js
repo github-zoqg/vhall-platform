@@ -83,7 +83,7 @@ export const serverConfig = {
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001' }, // 文档
+        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
         { type: 'notice', cuid: 'comNotice', text: '公告' },
         { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
@@ -193,6 +193,22 @@ export const serverConfig = {
         method: 'openCashDialog'
       }
     ]
+  },
+  // 语言选择组件
+  compLanguageChoice: {
+    component: 'VmpLanguageChoice',
+    options: {
+      choices: [
+        {
+          value: 'zh',
+          label: 'language_choice.language_choice_1001'
+        },
+        {
+          value: 'en',
+          label: 'language_choice.language_choice_1002'
+        }
+      ]
+    }
   },
   comAttention: {
     component: 'VmpAttention',
@@ -340,6 +356,42 @@ export const serverConfig = {
         cuid: 'comStreamLocal',
         method: 'switchStreamType',
         args: ['$0']
+      }
+    ]
+  },
+
+  // 预约页面配置
+  layerSubscribeRoot: {
+    component: 'VmpAirContainer',
+    children: ['layerSubscribeHeader', 'layerSubscribeBody', 'layerSubscribeFooter', 'comAllDialog']
+  },
+  // 顶部header容器
+  layerSubscribeHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-hd',
+    children: ['comHeaderWatch']
+  },
+  // 中间主区域容器
+  layerSubscribeBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-bd',
+    children: ['comVmpSubscribeBody']
+    // children: ['comGoodSaas']
+    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
+  },
+  // 底部主区域容器
+  layerSubscribeFooter: {
+    component: 'VmpFooter',
+    className: 'vmp-footer'
+  },
+  comVmpSubscribeBody: {
+    component: 'VmpSubscribeBody',
+    children: ['comTabMenu', 'comPcPlayer'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
       }
     ]
   }
