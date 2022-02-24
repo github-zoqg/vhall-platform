@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Subscribe from '../views/Subscribe/index.vue';
+import entryForm from '../views/Subscribe/entryForm.vue';
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,12 @@ const routes = [
     component: Subscribe,
     name: 'Subscribe',
     meta: { title: '预约' }
+  },
+  {
+    path: '/lives/entryform/:id',
+    component: entryForm,
+    name: 'entryForm',
+    meta: { title: '独立报名表单' }
   }
   // {
   //   path: '/about',
