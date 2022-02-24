@@ -70,7 +70,8 @@ export const serverConfig = {
       'comLottery',
       'comWatchTimer',
       'comScreenPost',
-      'comMediaSetting'
+      'comMediaSetting',
+      'comQuestionnaireWatch'
     ]
   },
 
@@ -384,6 +385,7 @@ export const serverConfig = {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
+
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
     children: ['comTabMenu', 'comPcPlayer'],
@@ -402,5 +404,10 @@ export const serverConfig = {
         args: ['$0']
       }
     ]
+  },
+
+  // 抽奖
+  comQuestionnaireWatch: {
+    component: 'VmpQuestionnaireWatch'
   }
 };

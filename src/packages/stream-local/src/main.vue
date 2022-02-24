@@ -219,6 +219,10 @@
       },
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     filters: {
@@ -275,6 +279,7 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           console.log('上麦成功', msg);
+
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (
               this.joinInfo.role_name == 3 ||
@@ -282,7 +287,8 @@
             ) {
               // 开始推流
               this.startPush();
-            } else if (this.joinInfo.role_name == 2) {
+            } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
+              // 无延迟｜分组直播
               // 如果成功，销毁播放器
               this.playerServer.destroy();
               // 实例化互动实例
@@ -300,6 +306,10 @@
 
           // 如果成功，销毁播放器
           this.playerServer.init();
+          if (this.isNoDelay === 1 || this.mode === 6) {
+            // 实例化互动实例
+            this.interactiveServer.init();
+          }
         });
       },
       // 媒体切换后进行无缝切换

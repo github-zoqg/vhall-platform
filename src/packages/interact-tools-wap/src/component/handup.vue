@@ -24,11 +24,11 @@
           <!-- 麦克风按钮 -->
           <button class="btn" @click="handleClickMuteDevice('audio')">
             <i
-              class="vh-iconfont iconfont-bottom vh-line-turn-off-microphone"
+              class="vh-iconfont iconfont-bottom vh-line-microphone"
               v-show="!localStream.audioMuted"
             ></i>
             <i
-              class="vh-iconfont iconfont-bottom vh-line-microphone"
+              class="vh-iconfont iconfont-bottom vh-line-turn-off-microphone"
               v-show="localStream.audioMuted"
             ></i>
             <div class="btn-text">{{ $t('setting.setting_1004') }}</div>
