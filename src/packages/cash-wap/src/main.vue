@@ -224,10 +224,14 @@
     watch: {
       step(val) {
         if (val === 1 || val === 2) {
-          this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-          this.initInterval(); // 初始化定时器
+          defaltCashForm.money =
+            this.useCashServer.state.cashInfo.red_packet_balance * 1 > 800
+              ? 800
+              : this.useCashServer.state.cashInfo.red_packet_balance;
           this.cashForm = Object.assign({}, defaltCashForm);
           this.errorTip = Object.assign({}, defaultErrorTip);
+          this.initInterval(); // 初始化定时器
+          this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
         }
       }
     },
@@ -342,7 +346,10 @@
             this.errorTip.money = this.$t('cash.cash_1031');
             return false;
           } else if (this.cashForm.money - 800 > 0) {
-            this.cashForm.money = 800;
+            this.cashForm.money =
+              this.useCashServer.state.cashInfo.red_packet_balance * 1 > 800
+                ? 800
+                : this.useCashServer.state.cashInfo.red_packet_balance;
             this.errorTip.money = '';
             return true;
           } else if (
@@ -384,6 +391,7 @@
       // 提现表单关闭
       cashDrawClose() {
         this.cashVisible = false;
+        this.step = 1;
         this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
         this.initInterval(); // 初始化定时器
         this.cashForm = Object.assign({}, defaltCashForm);
@@ -440,32 +448,36 @@
 
       // 提现
       async drawMoney() {
-        if (this.validtorMoney() && this.validtorCode()) {
-          const bindCheck = await this.withdrawalWap();
-          console.log('自动绑定提现结果查看', bindCheck);
-          bindCheck &&
-            bindCheck.code === 200 &&
-            this.useCashServer
-              .withdraw({
-                verification_code: this.cashForm.code,
-                fee: this.cashForm.money,
-                type: 1,
-                user_type: 2
-              })
-              .then(res => {
-                if (res && res.code == 200) {
-                  this.step = 3;
-                  this.drawErrorTip = this.$t('cash.cash_1036');
-                } else {
-                  console.log(res);
+        try {
+          if (this.validtorMoney() && this.validtorCode()) {
+            const bindCheck = await this.withdrawalWap();
+            console.log('自动绑定提现结果查看', bindCheck);
+            bindCheck &&
+              bindCheck.code === 200 &&
+              this.useCashServer
+                .withdraw({
+                  verification_code: this.cashForm.code,
+                  fee: this.cashForm.money,
+                  type: 1,
+                  user_type: 2
+                })
+                .then(res => {
+                  if (res && res.code == 200) {
+                    this.step = 3;
+                    this.drawErrorTip = this.$t('cash.cash_1036');
+                  } else {
+                    console.log(res);
+                    this.step = 4;
+                    this.drawErrorTip = this.$tes(res.code) || res.msg || this.$t('cash.cash_1037');
+                  }
+                })
+                .catch(err => {
                   this.step = 4;
-                  this.drawErrorTip = this.$tes(res.code) || res.msg || this.$t('cash.cash_1037');
-                }
-              })
-              .catch(err => {
-                this.step = 4;
-                this.drawErrorTip = this.$tes(err.code) || err.msg || this.$t('cash.cash_1037');
-              });
+                  this.drawErrorTip = this.$tes(err.code) || err.msg || this.$t('cash.cash_1037');
+                });
+          }
+        } catch (err) {
+          console.log(err);
         }
       },
 
@@ -484,10 +496,16 @@
           const params = open_id ? { open_id } : {};
           this.useCashServer.withdrawalWap(params).then(
             res => {
-              resolve(res);
+              if (res.code === 200) {
+                resolve(res);
+              } else {
+                this.$toast(this.$tes(res.code) || res.msg || this.$t('cash.cash_1040'));
+                reject(res);
+              }
             },
-            res => {
-              this.$toast(this.$tes(res.code) || res.msg || this.$t('cash.cash_1040'));
+            err => {
+              this.$toast(this.$tes(err.code) || err.msg || this.$t('cash.cash_1040'));
+              reject(err);
             }
           );
         });

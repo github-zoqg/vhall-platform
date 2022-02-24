@@ -40,6 +40,7 @@
         <span>桌面共享</span>
       </li>
       <li
+        v-if="showAssistance"
         @click="handleClickItem('assistance')"
         class="menu-item"
         :class="[
@@ -72,6 +73,10 @@
     computed: {
       webinarMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      // 请求协助菜单，在小组中才显示
+      showAssistance() {
+        return this.groupServer.state.groupInitData.isInGroup;
       }
     },
     beforeCreate() {
@@ -182,6 +187,17 @@
 
         if (kind === 'document' || kind === 'board') {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClickDoc', [kind]));
+        } else if (kind === 'assistance') {
+          this.groupServer
+            .needHelp()
+            .then(res => {
+              if (res.code == 200) {
+                this.$message.success('请求协助发送成功');
+              }
+            })
+            .catch(err => {
+              console.info('请求协助发送异常', err);
+            });
         }
       }
     }
