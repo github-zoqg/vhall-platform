@@ -13,7 +13,7 @@
     name: 'VmpQuestionnaireWap',
     data() {
       return {
-        popupVisible: true,
+        popupVisible: false,
         questionLastId: '', // 最后一个问卷id
         questionnaireId: '' // 问卷Id
       };
@@ -40,9 +40,10 @@
         this.popupVisible = false;
       },
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, questionnaireId => {
-          this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
+        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async questionnaireId => {
           this.popupVisible = true;
+          await this.$nextTick();
+          this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
           if (res.code === 200) {
