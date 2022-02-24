@@ -276,7 +276,7 @@
     height: 70px;
     box-sizing: border-box;
     padding: 0px 24px;
-    z-index: 5;
+    z-index: 12;
     &-time {
       display: inline-block;
       width: 50%;
