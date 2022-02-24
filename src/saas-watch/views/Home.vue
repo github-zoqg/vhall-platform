@@ -78,6 +78,9 @@
   };
 </script>
 <style lang="less">
+  body {
+    overflow: hidden;
+  }
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {
     .vmp-basic-bd {
