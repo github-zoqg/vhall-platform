@@ -434,7 +434,11 @@ export const serverConfig = {
         method: 'openPayFee',
         args: ['$0']
       }
-    ]
+    ],
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
   },
 
   // 抽奖

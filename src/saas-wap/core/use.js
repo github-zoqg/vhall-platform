@@ -62,6 +62,9 @@ import VmpChapterWap from '@/packages/watch-chapter-wap';
 // 问卷
 import VmpQuestionnaireWap from '@/packages/questionnaire-wap';
 
+// 预约页面
+import VmpSubscribeBody from '@/packages/wap-subscribe-body';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -98,4 +101,6 @@ export function initUse() {
   Vue.use(VmpLotteryWap);
   Vue.use(VmpChapterWap);
   Vue.use(VmpQuestionnaireWap);
+
+  Vue.use(VmpSubscribeBody);
 }
