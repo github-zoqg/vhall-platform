@@ -165,7 +165,7 @@
       },
       // 开始直播
       handleStartClick() {
-        // this.liveStep = 2;
+        this.liveStep = 2;
         // 派发推流事件
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       },
