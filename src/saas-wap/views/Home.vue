@@ -65,7 +65,6 @@
           }
         );
         window.vhallReport.report('ENTER_WATCH');
-
         this.state = 1;
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -83,7 +82,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
