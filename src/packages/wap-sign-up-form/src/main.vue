@@ -326,10 +326,10 @@
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
-  import { useRoomBaseServer, userSignUpFormServer } from 'middle-domain';
+  import { userSignUpFormServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   export default {
-    name: 'VmpSignUpForm',
+    name: 'VmpWapSignUpForm',
     data() {
       return {
         //活动id
@@ -569,7 +569,6 @@
       }
     },
     beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = userSignUpFormServer();
     },
     async mounted() {
@@ -585,7 +584,6 @@
           this.formOpenLinkStatus = 1;
           return;
         }
-        console.log(this.roomBaseServer, 'roomBaseServer');
         const params = {
           webinar_id: this.webinar_id,
           visit_id: sessionStorage.getItem('visitor_id')
