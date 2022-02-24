@@ -200,7 +200,7 @@
       // 创建本地流
       async createLocalStream() {
         await this.interactiveServer
-          .createLocalVideoStream({
+          .createWapLocalStream({
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
           .catch(() => 'createLocalStreamError');

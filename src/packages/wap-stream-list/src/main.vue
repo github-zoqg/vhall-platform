@@ -1,45 +1,59 @@
 <template>
-  <div
-    class="vmp-stream-list"
-    :class="{ 'vmp-stream-list-h0': isStreamListH0, 'vmp-stream-list-h-all': isStreamListHAll }"
-  >
+  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap">
     <div
-      class="vmp-stream-list__local-container"
-      :class="{
-        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
-      }"
-      v-show="micServer.state.isSpeakOn"
+      ref="vmp-wap-stream-list"
+      class="vmp-stream-list"
+      :class="{ 'vmp-stream-list-h0': isStreamListH0, 'vmp-stream-list-h-all': isStreamListHAll }"
     >
-      <div class="vmp-stream-list__remote-container-h">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-      </div>
-    </div>
-    <template v-if="remoteStreams.length">
       <div
-        v-for="stream in remoteStreams"
-        :key="stream.id"
-        class="vmp-stream-list__remote-container"
+        class="vmp-stream-list__local-container"
         :class="{
-          'vmp-stream-list__main-screen': stream.accountId == mainScreen
+          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
         }"
+        v-show="micServer.state.isSpeakOn"
       >
         <div class="vmp-stream-list__remote-container-h">
-          <vmp-wap-stream-remote :stream="stream"></vmp-wap-stream-remote>
+          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-    </template>
-    <!-- 播放 按钮 -->
-    <div class="vmp-stream-list-pause" v-show="showPlayIcon">
-      <p @click="replayPlay">
-        <i class="vh-iconfont vh-line-video-play"></i>
-      </p>
+      <template v-if="remoteStreams.length">
+        <div
+          v-for="stream in remoteStreams"
+          :key="stream.id"
+          class="vmp-stream-list__remote-container"
+          :class="{
+            'vmp-stream-list__main-screen': stream.accountId == mainScreen
+          }"
+        >
+          <div class="vmp-stream-list__remote-container-h">
+            <vmp-wap-stream-remote :stream="stream"></vmp-wap-stream-remote>
+          </div>
+        </div>
+      </template>
+      <!-- 播放 按钮 showPlayIcon-->
+      <div class="vmp-stream-list-pause" v-show="false">
+        <p @click="replayPlay">
+          <i class="vh-iconfont vh-line-video-play"></i>
+        </p>
+      </div>
+
+      <!-- 左右滑动Mask 待做 -->
+
+      <!-- 默认进入触发权限弹窗 待做 -->
     </div>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useMsgServer,
+    roomBaseServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   import { debounce } from 'lodash';
+  import BScroll from '@better-scroll/core';
   export default {
     name: 'VmpWapStreamList',
 
@@ -49,7 +63,9 @@
         miniElement: 'mainScreen',
         maxElement: '',
         playAbort: [], // 自动播放禁止的stream列表
-        showPlayIcon: false // 是否展示播放按钮
+        showPlayIcon: false, // 是否展示播放按钮
+        scroll: null,
+        mainScreenDom: null
       };
     },
 
@@ -107,7 +123,9 @@
 
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      useMediaCheckServer().checkSystemRequirements();
       this.micServer = useMicServer();
+      this.msgServer = useMsgServer();
     },
 
     created() {
@@ -118,20 +136,63 @@
         this.$domainStore.state.interactiveServer.remoteStreams
       );
       this.addSDKEvents();
+      if (!useMediaCheckServer().state.isBrowserNotSupport) {
+        this.$message.error('浏览器不支持互动');
+      }
+      if (
+        [3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode) &&
+        roomBaseServer.state.watchInitData.webinar.type == 1
+      ) {
+        // TODO: 弹出确认框 触发用户操作
+      }
       this.replayPlay = debounce(this.replayPlay, 500);
-      // this.getStreamList();
     },
 
-    mounted() {},
+    mounted() {
+      this.createBScroll();
+    },
+    beforeDestroy() {
+      if (this.scroll) {
+        this.scroll.destroy();
+      }
+    },
 
     methods: {
+      // 事件监听
       addSDKEvents() {
         // 监听到自动播放
         this.interactiveServer.$on(VhallRTC.EVENT_STREAM_PLAYABORT, e => {
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          const str = roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+          this.$message.error(`${msg.nick_name}设置成为${str}`);
+        });
       },
+
+      // 创建betterScroll
+      createBScroll() {
+        this.$nextTick(() => {
+          if (this.scroll) {
+            this.scroll.destroy();
+          }
+          this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
+            scrollX: true,
+            probeType: 3 // listening scroll event
+          });
+          this.scroll.on('scroll', ({ x }) => {
+            if (this.mainScreenDom) {
+              this.mainScreenDom.style.left = `${30 + -x}px`;
+            } else {
+              this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+            }
+          });
+        });
+      },
+
       // 恢复播放
       replayPlay() {
         this.playAbort.forEach(stream => {
@@ -139,10 +200,6 @@
             this.showPlayIcon = false;
           });
         });
-      },
-      getStreamList() {
-        this.interactiveServer.getRoomStreams();
-        console.log('------remoteStreams------', this.remoteStreams);
       },
       exchange(compName) {
         window.$middleEventSdk?.event?.send({
@@ -156,16 +213,23 @@
 </script>
 
 <style lang="less">
+  .vmp-wap-stream-wrap {
+    white-space: nowrap;
+    height: 422px;
+    width: 100%;
+  }
   .vmp-stream-list {
     height: 83px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+    display: inline-block;
     .vmp-stream-list__local-container {
       width: 148px;
+      height: 100%;
+      display: inline-block;
     }
     .vmp-stream-list__remote-container {
       width: 148px;
+      height: 100%;
+      display: inline-block;
       &-h {
         height: 100%;
       }
@@ -201,6 +265,8 @@
       top: 83px;
       width: 597px;
       height: 337px;
+      left: 76px;
+      display: inline-block;
       .vmp-stream-list__remote-container {
         &-h {
           padding-top: 56.25%;
