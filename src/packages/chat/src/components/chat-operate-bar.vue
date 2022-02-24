@@ -311,6 +311,16 @@
       height: 18px;
       margin-bottom: 9px;
       position: relative;
+      .vh-saas-a-line-zhikanzhubanfang {
+        font-size: 19px;
+        color: #999;
+        margin-left: 10px;
+        margin-bottom: 1px;
+        &:hover {
+          color: @active-color;
+          cursor: pointer;
+        }
+      }
       &__left {
         display: flex;
         justify-content: flex-start;
@@ -411,16 +421,6 @@
         position: absolute;
         top: -11px;
         transform: translateY(-100%);
-        .vh-saas-a-line-zhikanzhubanfang {
-          font-size: 19px;
-          color: #999;
-          margin-left: 10px;
-          margin-bottom: 1px;
-          &:hover {
-            color: @active-color;
-            cursor: pointer;
-          }
-        }
         .filter-item {
           height: 40px;
           line-height: 40px;
