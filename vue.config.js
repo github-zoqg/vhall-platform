@@ -272,6 +272,7 @@ const sharedConfig = {
 if (['serve', 'build'].includes(cmd)) {
   // 动态修改运行环境的版本号
   process.env.VUE_APP_BUILD_VERSION = argv.version;
+  process.env.VUE_APP_BUILD_HASH = argv.hash;
 
   // 根据参数获取专用配置信息
   const specialConfig = btool.createSpecialConfig(argv.project);

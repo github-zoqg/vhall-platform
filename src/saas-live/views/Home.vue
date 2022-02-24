@@ -72,11 +72,17 @@
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
-      } catch (ex) {
+      } catch (err) {
         console.error('---初始化直播房间出现异常--');
-        console.error(ex);
+        console.error(err);
+        if (err.code == 510008) {
+          // 未登录
+          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
+            location.search
+          }`;
+        }
         this.state = 2;
-        this.errMsg = ex.msg;
+        this.errMsg = err.msg;
       }
     },
     methods: {
@@ -88,9 +94,10 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
+          plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: token || localStorage.getItem('token')
+            token: localStorage.getItem('token') || '',
+            'gray-id': sessionStorage.getItem('initGrayId')
           },
           initRoom: {
             webinar_id: id, //活动id

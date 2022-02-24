@@ -21,7 +21,11 @@
             <span></span>
             <p>{{ $t('nav.nav_1017') }}</p>
           </div>
-          <div class="vmp-share-wrap-imgs-invite" @click="shareOtherDialog(4)" v-if="isInviteShare">
+          <div
+            class="vmp-share-wrap-imgs-invite"
+            @click="shareOtherDialog(4)"
+            v-if="isInviteShare && isWatchInvite"
+          >
             <span></span>
             <p>{{ $t('nav.nav_1015') }}</p>
           </div>
@@ -65,27 +69,25 @@
         watchWebUrl: `https://t-webinar.e.vhall.com/v3/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
-        isInviteShare: false
+        isInviteShare: false,
+        isWatchInvite: false
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
     },
-    mounted() {
-      this.initConfig();
-    },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
     },
     methods: {
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          Object.assign(this.$data, widget.options);
-        }
-      },
       openShareDialog() {
         this.shareVisible = true;
+        if (!this.isInviteShare) return; //发起端不用判断是否开启邀请卡
+        if (this.roomBaseState.inviteCard.status == '1') {
+          this.isWatchInvite = true;
+        } else {
+          this.isWatchInvite = false;
+        }
       },
       shareOtherDialog(index) {
         this.shareUrl = '';

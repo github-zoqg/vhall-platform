@@ -4,7 +4,7 @@
     class="vmp-player"
     :class="[{ 'is-watch': isWatch }, `vmp-player--${displayMode}`]"
   >
-    <div style="height: 100%; width: 100%">
+    <div>
       <div id="vmp-player" class="vmp-player-watch">
         <div class="vmp-player-living">
           <div
@@ -661,7 +661,7 @@
             if (this.recordTime === 0) {
               this.recordTime = 1;
             }
-            this.authText = this.getShiPreview();
+            // this.authText = this.getShiPreview();
           }
           this.getDuanxuPreview(); //断点续播逻辑
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);

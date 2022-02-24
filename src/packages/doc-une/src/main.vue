@@ -1,6 +1,7 @@
 <template>
   <!-- 文档组件， 适用于 PC发起端和观看端。 -->
   <div
+    id="docWrapper"
     class="vmp-doc-une"
     :class="[
       { 'is-watch': isWatch },
@@ -34,7 +35,7 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <i class="iconfont iconzanwuwendang"></i>
+          <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
           <span v-if="hasDocPermission">暂未分享任何文档</span>
           <span v-else>主讲人正在准备文档，请稍等...</span>
         </div>
@@ -150,7 +151,8 @@
         keepAspectRatio: true,
         hasPager: true, // 是否有分页操作(观看端没有)
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false
+        hasStreamList: false,
+        watchDocShow: true
       };
     },
     computed: {
@@ -185,7 +187,8 @@
           (this.roomBaseServer.state.clientType !== 'send' &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
-              this.docServer.state.hasDocPermission))
+              this.docServer.state.hasDocPermission ||
+              this.docServer.state.watchDocShow))
         );
       },
       // 是否文档演示权限
@@ -198,13 +201,15 @@
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
         if (newval) {
-          this.docServer.state.isChannelChanged = false;
-          // 初始化事件
-          this.initEvents();
-          // 清空
-          // this.docServer.resetContainer();
-          // 恢复上一次的文档数据;
-          this.recoverLastDocs();
+          if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+            this.docServer.state.isChannelChanged = false;
+            // 初始化事件
+            this.initEvents();
+            // 清空
+            // this.docServer.resetContainer();
+            // 恢复上一次的文档数据;
+            this.recoverLastDocs();
+          }
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
@@ -281,6 +286,14 @@
             };
           } else {
             rect = this.$refs.docWrapper?.getBoundingClientRect();
+            if (rect.width === 0) {
+              const parentNode = this.$refs.docWrapper.parentNode;
+              const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
+              rect = {
+                width: cWidth,
+                height: (cWidth / 16) * 9
+              };
+            }
           }
         } else {
           rect = screenfull.isFullscreen
@@ -327,6 +340,32 @@
               this.recoverLastDocs();
             }
           });
+
+          this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
+            console.log('[doc] ssssss');
+            const data = this.docServer.getVodAllCids();
+            console.log('[doc] data:', data);
+            this.docServer.state.containerList = data.map(item => {
+              return {
+                cid: item.cid
+              };
+            });
+            await this.$nextTick();
+
+            this.resize();
+            // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
+            const { width, height } = this.docViewRect;
+            if (!width || !height) return;
+
+            for (const item of data) {
+              this.docServer.initContainer({
+                cid: item.cid,
+                width,
+                height,
+                fileType: item.type.toLowerCase()
+              });
+            }
+          });
         }
 
         // 直播结束
@@ -343,7 +382,8 @@
 
         // 全屏/退出全屏事件
         screenfull.onchange(() => {
-          // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+          // console.log('[doc] screenfull.isFullscreen:', screenfull);
+          if (screenfull.element.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {
@@ -606,8 +646,11 @@
       this.initEvents();
       // 清空
       // this.docServer.resetContainer();
-      // 恢复上一次的文档数据;
-      this.recoverLastDocs();
+      if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+        // 直播中才执行
+        // 恢复上一次的文档数据;
+        this.recoverLastDocs();
+      }
     }
   };
 </script>
