@@ -73,11 +73,11 @@
   .vmp-custom-menu {
     height: 100%;
     width: 100%;
-    padding: 30px;
 
     &-wrapper {
       height: 100%;
       width: 100%;
+      padding: 30px;
       overflow-y: scroll;
     }
   }
