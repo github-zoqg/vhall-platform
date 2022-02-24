@@ -31,8 +31,8 @@
                 :key="item.id"
                 @click="select(item.room_id, item.id)"
               >
+                <i class="right-tag" v-show="item.is_stream == 1">转播中</i>
                 <section class="item-logo">
-                  <i v-show="item.is_stream == 1">转播中</i>
                   <img :src="item.img_url || nologoImg" alt="" />
                   <i>直播</i>
                 </section>
@@ -54,19 +54,27 @@
 
       <section class="vmp-rebroadcast-preview-panel">
         <header class="vmp-rebroadcast-preview-title">预览</header>
-        <main></main>
+        <main>
+          <section v-if="isPreviewVisible">
+            <video-preview ref="videoPreview" :videoParam="videoParam" />
+          </section>
+          <button @click="startRebroadcast">开始直播</button>
+          <button @click="stopRebroadcast">结束转播</button>
+        </main>
       </section>
     </main>
   </div>
 </template>
 <script>
   import { useRoomBaseServer, useRebroadcastServer } from 'middle-domain';
-  // import VideoPreview from '@/packages/app-shared/components/video-preview';
+  import { sleep } from '@/packages/app-shared/utils/tool';
+  import VideoPreview from '@/packages/app-shared/components/video-preview';
 
   import NoCreateImg from './images/no-create@2x.png';
   import NoSearchImg from './images/no-search@2x.png';
   export default {
     name: 'VmpRebroadcastContent',
+    components: { VideoPreview },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.rebroadcastServer = useRebroadcastServer();
@@ -79,12 +87,32 @@
         previewLoading: false,
         list: [],
         domainState: this.rebroadcastServer.state,
-        tipsImg: NoSearchImg,
-        tipsText: '暂未搜索到您想要的内容', //暂无可转播的直播 暂未搜索到您想要的内容
-        nologoImg: '//t-alistatic01.e.vhall.com/static/img/video_default_nologo.png'
+        nologoImg: '//t-alistatic01.e.vhall.com/static/img/video_default_nologo.png',
+        pushStreamSeperately: false,
+        isPreviewVisible: false,
+        videoParam: {}
       };
     },
+    computed: {
+      tipsImg() {
+        if (this.inputVal) return NoSearchImg;
+        return NoCreateImg;
+      },
+      tipsText() {
+        if (this.inputVal) return this.$t('webinar.webinar_1042');
+        return `暂无可转播直播`;
+      }
+    },
+    created() {
+      this.open();
+    },
     methods: {
+      open() {
+        this.getList();
+      },
+      /**
+       * 获取(更新)转播列表
+       */
       async getList() {
         this.loading = true;
         await this.rebroadcastServer.getList({
@@ -94,21 +122,107 @@
         });
         this.loading = false;
       },
-      select(id, sourceWebinarId) {
+      /**
+       * 选择转播房间
+       * @param {*} id 目标房间id
+       * @param {*} sourceWebinarId 目标活动id
+       */
+      async select(id, sourceWebinarId) {
         this.current = id;
         this.previewLoading = true;
         this.sourceWebinarId = sourceWebinarId;
+        this.isPreviewVisible = false;
 
         const { watchInitData } = this.roomBaseServer.state;
 
-        // preview
-        // this.getPreviewInfo
-        this.rebroadcastServer.preview({
-          webinar_id: watchInitData.webinar.id,
-          source_id: sourceWebinarId
-        });
+        try {
+          const res = await this.rebroadcastServer.preview({
+            webinar_id: watchInitData.webinar.id,
+            source_id: sourceWebinarId
+          });
+
+          this.videoParam.type = 'live'; // 未生效
+          this.videoParam.paas_record_id = ''; // 录播
+          // rebroadcast = true
+          // this.videoParam.poster = posterUrl // 未生效
+          // isAudio // 不可配
+
+          this.isPreviewVisible = true;
+          console.log('res:::', res);
+          await sleep(600);
+          this.previewLoading = false;
+        } catch (err) {
+          this.$message.warning(err.msg);
+          console.error(err);
+        }
       },
-      getPreviewInfo() {}
+      /**
+       * 开始转播
+       */
+      async startRebroadcast() {
+        // if !refs.preview return
+        // if status!==1 清闲开始直播
+        if (this.status !== 1) return this.$message(`请先开始直播`);
+
+        try {
+          const res = await this.rebroadcastServer.start({
+            webinar_id: this.webinar_id,
+            source_id: this.sourceWebinarId
+          });
+          if (res.code !== 200) {
+            return this.$message.error(`转播失败!`);
+          }
+
+          this.getList(); // get-list
+          this.rebroadcastRoomId = this.current; // 记录
+          this.report();
+          window?.middleEvent?.send(); // 事件·开始执行
+          this.$message.success(`转播成功！`);
+        } catch (err) {
+          this.$message.error(`转播失败!`);
+        }
+      },
+      /**
+       * 停止转播
+       */
+      async stopRebroadcast() {
+        try {
+          const res = await this.rebroadcastServer.stopRebroadcast({
+            webinar_id: this.webinar_id,
+            source_id: this.sourceWebinarId
+          });
+
+          if (res.code === 200) {
+            this.$message.success('停止转播成功!');
+          } else {
+            this.$message.error('停止转播失败!');
+          }
+        } catch (error) {
+          this.$message.error('停止转播失败!');
+        }
+      },
+      report() {
+        // window.vhallReport.report({
+        //   k: 120001,
+        //   data: {
+        //     business_uid: this.webinar.third_party_user_id,
+        //     user_id: '',
+        //     webinar_id: this.webinar_id,
+        //     refer: '',
+        //     s: '',
+        //     report_extra: {},
+        //     ref_url: '',
+        //     req_url: ''
+        //   }
+        // });
+      },
+      /**
+       * 推本地流
+       */
+      pushLocalStream() {
+        // this.$EventBus.$emit('rebroadcastPushStream');
+        // this.$emit('onClose');
+      }
     }
   };
 </script>
@@ -159,9 +273,13 @@
       }
 
       .vmp-rebroadcast-control-panel {
+        overflow-y: scroll;
+        scroll-behavior: smooth;
         height: 338px;
+        margin-bottom: 20px;
 
         .vmp-rebroadcast-item {
+          position: relative;
           display: flex;
           padding: 8px 0;
           border-bottom: 1px solid #e6e6e6;
@@ -169,6 +287,20 @@
 
           &:hover {
             background-color: #f7f7f7;
+          }
+
+          .right-tag {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0 3px 0 4px;
+            height: 18px;
+            line-height: 18px;
+            font-size: 12px;
+            color: #fff;
+            background: #fb3a32;
+            font-style: normal;
+            border-radius: 0 0 0 10px;
           }
 
           .item-logo {
@@ -239,6 +371,7 @@
     &-preview-panel {
       flex: 0 0 auto;
       width: 330px;
+      margin-left: 8px;
 
       .vmp-rebroadcast-preview-title {
         padding: 80px 0 12px 0;

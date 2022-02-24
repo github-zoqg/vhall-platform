@@ -8,7 +8,7 @@
       width="800px"
       style="min-width: 800px"
     >
-      <rebroadcast />
+      <rebroadcast v-if="isShow" />
     </saas-dialog>
   </section>
 </template>
@@ -39,4 +39,8 @@
   };
 </script>
 
-<style></style>
+<style>
+  .test {
+    height: 20px; /**no**/
+  }
+</style>
