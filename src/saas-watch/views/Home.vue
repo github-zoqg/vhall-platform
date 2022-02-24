@@ -39,20 +39,10 @@
         ) {
           this.goSubscribePage();
         }
-        // this.goSubscribePage();
       } catch (ex) {
         console.error('---初始化直播房间出现异常--');
         console.error(ex);
       }
-    },
-    mounted() {
-      // 派发推流事件
-      // setTimeout(() => {
-      //   window.$middleEventSdk?.event?.send({
-      //     cuid: 'comStreamLocal',
-      //     method: 'startPush'
-      //   });
-      // }, 3000);
     },
     methods: {
       initReceiveLive() {

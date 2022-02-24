@@ -24,10 +24,13 @@ const htmlConfig = {
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
     jsencrypt:
       '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
-    wx: '//res.wx.qq.com/open/js/jweixin-1.4.0.js'
+    wx: '//res.wx.qq.com/open/js/jweixin-1.4.0.js',
+    ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js'
   },
   // cdn css
   cdnCss: {
+    ElementUi:
+      '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     Vant: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant/2.12.34/dist/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
     iconfontCommon: '//at.alicdn.com/t/font_3128919_wa3mcobacyp.css',

@@ -48,7 +48,8 @@ export const serverConfig = {
       'comUserCenterWap',
       'comUserAccountWap',
       'comCashWap',
-      'compLotteryWap'
+      'compLotteryWap',
+      'compQuestionnaireWap'
     ]
   },
   // 顶部
@@ -298,5 +299,17 @@ export const serverConfig = {
   // 章节
   comChapterWap: {
     component: 'VmpChapterWap'
+  },
+  // 问卷
+  compQuestionnaireWap: {
+    component: 'VmpQuestionnaireWap',
+    emitQuestionnaireVisible: [
+      // 问卷弹窗的显示和隐藏(全屏)
+      {
+        cuid: '',
+        method: '',
+        args: ['$0']
+      }
+    ]
   }
 };

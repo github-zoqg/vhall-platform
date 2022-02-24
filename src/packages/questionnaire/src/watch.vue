@@ -95,7 +95,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vhall-question-box {
+  .vhall-question-box2222 {
     width: 100%;
     height: 100%;
     position: fixed;
