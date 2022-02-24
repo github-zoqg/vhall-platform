@@ -58,7 +58,7 @@
   </div>
 </template>
 <script>
-  import { useDocServer, useGroupServer, useMsgServer } from 'middle-domain';
+  import { useDocServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
