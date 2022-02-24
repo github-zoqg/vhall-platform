@@ -674,6 +674,13 @@
             font-weight: 400;
             color: #f4f4f4;
             line-height: 22px;
+
+            .colFA9A32 {
+              font-size: 14px;
+              font-weight: 400;
+              color: #fa9a32;
+              line-height: 22px;
+            }
           }
           .split-card__menus {
             flex: 1;
