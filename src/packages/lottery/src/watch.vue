@@ -14,9 +14,7 @@
   </div>
 </template>
 <script>
-  import { useLotteryServer, useRoomBaseServer } from 'middle-domain';
-  const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
-  const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
+  import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
   export default {
     name: 'VmpLotteryWatch',
     components: {
@@ -57,24 +55,39 @@
        * @description 注册事件
        */
       initMsgEvent() {
-        this.lotteryServer.$on(LOTTERY_PUSH, this.callBackLotteryPush);
-        this.lotteryServer.$on(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        //监听发起抽奖
+        this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
+        //监听结束抽奖
+        this.lotteryServer.$on(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
       },
       removeMsgEvent() {
-        this.lotteryServer.$off(LOTTERY_PUSH, this.callBackLotteryPush);
-        this.lotteryServer.$off(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
+        this.lotteryServer.$off(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
       },
       // 抽奖开始消息推送
-      callBackLotteryPush(msgData) {
-        this.setFitment(msgData);
+      callBackLotteryPush(msg) {
+        this.setFitment(msg.data);
         this.lotteryView = 'LotteryPending';
         this.dialogVisible = true;
+        useChatServer().addChatToList({
+          content: {
+            text_content: this.$t('interact_tools.interact_tools_1021')
+          },
+          type: msg.type,
+          interactStatus: true
+        });
       },
       // 抽奖结果消息推送
-      callBackResultNotice(msgData) {
-        this.lotteryId = msgData.lottery_id;
-        this.setFitment(msgData);
-        const winnerList = msgData.lottery_winners.split(',');
+      callBackResultNotice(msg) {
+        this.lotteryId = msg.data.lottery_id;
+        this.setFitment(msg.data);
+        const winnerList = msg.data.lottery_winners.split(',');
         const lotteryResult = winnerList.some(userId => {
           return this.isSelf(userId);
         });
@@ -85,8 +98,22 @@
           // 未中奖
           this.lotteryView = 'LotteryMiss';
         }
-        this.showWinnerList = !!msgData.publish_winner;
+        this.showWinnerList = !!msg.data.publish_winner;
         this.dialogVisible = true;
+        const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
+        useChatServer().addChatToList({
+          content: {
+            text_content: lotteryResult
+              ? this.$t('interact_tools.interact_tools_1023')
+              : this.$t('interact_tools.interact_tools_1022'),
+            msg: msg,
+            userId: join_info.user_id || join_info.third_party_user_id,
+            Show: msg.data.lottery_status == 1 && msg.data.win == 1
+          },
+          type: msg.type,
+          interactStatus: true,
+          isCheck: lotteryResult
+        });
       },
       close() {
         this.dialogVisible = false;
@@ -121,11 +148,9 @@
        */
       isSelf(id) {
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
-        console.log();
         if (join_info && typeof join_info === 'object') {
           const userId = join_info.user_id || join_info.third_party_user_id;
-          console.log(userId, id);
-          return userId === `${id}`;
+          return userId == id;
         }
         return false;
       }
