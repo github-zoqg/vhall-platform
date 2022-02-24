@@ -175,17 +175,14 @@
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
           case 512525: // 填写表单
-            this.showSignForm = true;
-            this.showAuthModel = false;
+            // this.showSignForm = true;
+            // this.showAuthModel = false;
             break;
           case 512002:
           case 512522:
-            this.isErrorPage = true;
-            if (code == 512002) {
-              this.propTitle = 'active_lost';
-            } else if (code == 512522) {
-              this.propTitle = 'clear_cookie';
-            }
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
             break;
           case 512531:
             // 邀请码
