@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Subscribe from '../views/Subscribe/index.vue';
 import entryForm from '../views/Subscribe/entryForm.vue';
+import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
@@ -25,6 +26,12 @@ const routes = [
     component: entryForm,
     name: 'entryForm',
     meta: { title: '独立报名表单' }
+  },
+  {
+    path: '/forgetPwd',
+    component: forgetPwd,
+    name: 'forgetPwd',
+    meta: { title: '忘记密码' }
   }
 ];
 

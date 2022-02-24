@@ -42,7 +42,12 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
-
+        document.title = roomBaseServer.state.watchInitData.webinar.subject;
+        // 是否跳转预约页
+        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          this.goSubscribePage();
+          return;
+        }
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
         // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
@@ -65,7 +70,6 @@
           }
         );
         window.vhallReport.report('ENTER_WATCH');
-
         this.state = 1;
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -83,7 +87,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
@@ -116,6 +120,9 @@
         } else {
           this.liveErrorTip = this.$tes(err.code) || err.msg;
         }
+      },
+      goSubscribePage() {
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
       }
     }
   };

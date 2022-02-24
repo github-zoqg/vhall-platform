@@ -6,7 +6,7 @@
           <!-- 背景图片 未完成验证-->
           <img :src="webinarsBgImg" />
         </div>
-        <div v-else>
+        <div class="subscribe-img-box" v-else>
           <!-- 完成验证、并且有暖场视频 加载播放器 -->
           <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
         </div>
@@ -25,7 +25,6 @@
     <div class="vmp-subscribe-body-tab">
       <vmp-air-container cuid="comTabMenu" :oneself="true"></vmp-air-container>
     </div>
-    <pay v-if="showPay" :wx-qr="wxQr" :zf-qr="zfQr" @closePay="handlerClosePay"></pay>
     <div class="vmp-subscribe-body-live" v-if="isLiving">
       <div class="vmp-subscribe-body-live-start">
         <div class="subscribe-cover"></div>
@@ -36,9 +35,8 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
-  import pay from './components/pay';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpSubscribeBody',
@@ -46,7 +44,6 @@
       return {
         showBottom: true,
         showVideo: false, // 显示暖场视频
-        showPay: false, // 付费的弹窗
         isLiving: false,
         wxQr: '',
         zfQr: '',
@@ -64,8 +61,7 @@
       };
     },
     components: {
-      BottomTab,
-      pay
+      BottomTab
     },
     computed: {
       // 背景图片
@@ -87,6 +83,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
+      this.playerServer = usePlayerServer();
     },
     created() {
       this.handlerInitInfo();
@@ -113,13 +110,21 @@
               customClass: 'zdy-info-box'
             });
             this.fetchAuth({ type: 3 });
-            this.showPay = false;
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
+            );
           }
         });
 
         this.subscribeServer.$on('live_over', data => {
           this.subOption.type = 3;
           console.log(data);
+        });
+        this.playerServer.$on(VhallPlayer.PLAY, () => {
+          this.showBottom = false;
+        });
+        this.playerServer.$on(VhallPlayer.ENDED, () => {
+          this.showBottom = true;
         });
       },
       handlerInitInfo() {
@@ -174,7 +179,10 @@
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
-          case 512525: // 填写表单
+          case 512525: // 填写表单emitClickOpenSignUpForm
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
             // this.showSignForm = true;
             // this.showAuthModel = false;
             break;
@@ -221,8 +229,9 @@
             break;
           case 512523:
             // 付费
-            this.handleShowPay('wx');
-            this.handleShowPay('zfb');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
+            );
             break;
           default:
             this.$message({
@@ -239,40 +248,8 @@
         let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
         this.feeAuth({ type: type });
       },
-      handleShowPay(type) {
-        const params = {
-          user_id: this.userInfo ? this.userInfo.user_id : '',
-          webinar_id: this.webinarId,
-          show_url: window.location.href,
-          service_code: 'QR_PAY'
-        };
-        if (type == 'wx') {
-          params.type = 2;
-        } else {
-          params.type = 1;
-        }
-        this.subscribeServer
-          .payWay({
-            ...params
-          })
-          .then(res => {
-            if (res.code == 200 && res.data) {
-              const link = encodeURIComponent(res.data.link);
-              const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
-              if (type == 'wx') {
-                this.wxQr = img;
-              } else {
-                this.zfQr = img;
-              }
-              this.showPay = true;
-            }
-          });
-      },
       livingLink() {
         this.handleAuthCheck();
-      },
-      handlerClosePay() {
-        this.showPay = false;
       }
     }
   };

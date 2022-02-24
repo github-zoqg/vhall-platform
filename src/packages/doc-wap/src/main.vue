@@ -3,6 +3,7 @@
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[`vmp-doc-wap--${displayMode}`]"
+    v-show="watchDocShow"
     ref="docWrapper"
   >
     <!-- 文档白板内容区 -->
@@ -23,7 +24,7 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <i class="vh-iconfont vh-a-line-registrationform"></i>
+          <img src="./img/doc_null.png" style="width: 100px; margin-bottom: 20px" />
           <span>主讲人未添加文档，请稍等...</span>
         </div>
       </div>
@@ -36,13 +37,15 @@
     </div>
     <!-- 文档拖动后还原 -->
     <div @click="restore" class="btn-doc-restore">
-      <i class="vh-saas-iconfont vh-saas-a-line-11"></i>
+      <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
     </div>
   </div>
 </template>
 <script>
   import screenfull from 'screenfull';
   import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpDocWap',
 
@@ -59,19 +62,24 @@
       },
       currentCid() {
         return this.docServer.state.currentCid;
+      },
+      watchDocShow() {
+        return this.docServer.state.watchDocShow;
       }
     },
     watch: {
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
         if (newval) {
-          this.docServer.state.isChannelChanged = false;
-          // 初始化事件
-          this.initEvents();
-          // 清空
-          // this.docServer.resetContainer();
-          // 恢复上一次的文档数据;
-          this.recoverLastDocs();
+          if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+            this.docServer.state.isChannelChanged = false;
+            // 初始化事件
+            this.initEvents();
+            // 清空
+            // this.docServer.resetContainer();
+            // 恢复上一次的文档数据;
+            this.recoverLastDocs();
+          }
         }
       }
     },
@@ -81,13 +89,17 @@
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
     },
-    mounted() {
+    created() {
       // 初始化事件
       this.initEvents();
+    },
+    mounted() {
       // 清空
       // this.docServer.resetContainer();
-      // 恢复上一次的文档数据;
-      this.recoverLastDocs();
+      if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+        // 恢复上一次的文档数据;
+        this.recoverLastDocs();
+      }
     },
     methods: {
       /**
@@ -129,12 +141,60 @@
             this.recoverLastDocs();
           }
         });
-        //
+
+        // 回放文档加载事件
+        this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
+          if (
+            this.roomBaseServer.state.watchInitData.webinar.type == 4 ||
+            this.roomBaseServer.state.watchInitData.webinar.type == 5
+          ) {
+            if (this.docServer.state.containerList.length === 0) {
+              const data = this.docServer.getVodAllCids();
+              this.docServer.state.containerList = data.map(item => {
+                return {
+                  cid: item.cid
+                };
+              });
+              console.log('[doc] containerList:', this.docServer.state.containerList);
+              this.docServer.state.watchDocShow = this.docServer.state.containerList.length > 0;
+              await this.$nextTick();
+              console.log('[doc] watchDocShow:', this.docServer.state.watchDocShow);
+              if (this.docServer.state.watchDocShow) {
+                //  emitShowMenuTab
+                this.resize();
+                // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
+                const { width, height } = this.docViewRect;
+                if (!width || !height) return;
+                for (const item of data) {
+                  this.docServer.initContainer({
+                    cid: item.cid,
+                    width,
+                    height,
+                    fileType: item.type.toLowerCase()
+                  });
+                }
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                    visible: true,
+                    type: 2
+                  })
+                );
+              } else {
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                    visible: false,
+                    type: 2
+                  })
+                );
+              }
+            }
+          }
+        });
 
         // 全屏/退出全屏事件
-        screenfull.onchange(() => {
+        screenfull.onchange(ev => {
           // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-          if (screenfull.element.id !== 'docWrapper') return;
+          if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {

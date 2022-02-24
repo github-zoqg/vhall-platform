@@ -64,7 +64,7 @@
       initReceiveLive() {
         const { id } = this.$route.params;
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')

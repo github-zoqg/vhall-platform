@@ -48,6 +48,8 @@ import VmpLivingEnd from '@/packages/living-end-pc';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
+import VmpWatchPayFee from '@/packages/pay-fee-auth/';
+import VmpQuestionnaireWatch from '@/packages/questionnaire/watch';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -104,8 +106,10 @@ export function initUse() {
   Vue.use(VmpIntro);
   Vue.use(VmpLivingEnd);
   Vue.use(VmpSignWatch);
+  Vue.use(VmpWatchPayFee);
 
   Vue.use(VmpSubscribeBody);
+  Vue.use(VmpQuestionnaireWatch);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

@@ -59,6 +59,13 @@ import VmpWapRewardEffect from '@/packages/wap-reward-effect';
 
 // 章节
 import VmpChapterWap from '@/packages/watch-chapter-wap';
+// 问卷
+import VmpQuestionnaireWap from '@/packages/questionnaire-wap';
+// 报名表单
+import VmpWapSignUpForm from '@/packages/wap-sign-up-form';
+
+// 预约页面
+import VmpSubscribeBody from '@/packages/wap-subscribe-body';
 
 // 全局注册组件
 export function initUse() {
@@ -95,4 +102,8 @@ export function initUse() {
   Vue.use(VmpCashWap);
   Vue.use(VmpLotteryWap);
   Vue.use(VmpChapterWap);
+  Vue.use(VmpQuestionnaireWap);
+
+  Vue.use(VmpSubscribeBody);
+  Vue.use(VmpWapSignUpForm);
 }
