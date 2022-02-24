@@ -179,7 +179,10 @@
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
-          case 512525: // 填写表单
+          case 512525: // 填写表单emitClickOpenSignUpForm
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
             // this.showSignForm = true;
             // this.showAuthModel = false;
             break;

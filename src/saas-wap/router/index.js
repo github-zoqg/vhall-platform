@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import grayInit from '@/packages/app-shared/gray-init';
+import Subscribe from '../views/subscribe/index.vue';
 
 Vue.use(VueRouter);
 
@@ -11,6 +12,12 @@ const routes = [
     component: Home,
     name: 'LiveRoom',
     meta: { title: '直播间', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/subscribe/:id',
+    component: Subscribe,
+    name: 'SubcribeRoom',
+    meta: { title: '预约页', grayType: 'webinar' }
   },
   // 专题
   {
