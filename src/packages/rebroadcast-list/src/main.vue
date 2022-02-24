@@ -1,86 +1,105 @@
 <template>
-  <div class="vmp-rebroadcast">
-    <main class="vmp-rebroadcast-body">
-      <!-- 控制面板 -->
-      <section class="vmp-rebroadcast-control-panel" v-loading="loading">
-        <!-- 搜索区域 -->
-        <header class="vmp-rebroadcast-search">
-          <span class="my-live">我的直播</span>
-          <el-button type="mini" round @click="getList">刷新</el-button>
-          <el-input
-            style="margin-left: 6px; width: 185px; border-radius: 20px"
-            round
-            v-model="inputVal"
-            class="go-search"
-            placeholder="请输入直播标题"
-            clearable
-            @keyup.enter.native="getList"
-            @change="getList"
-          >
-            <i slot="prefix" class="el-input__icon el-icon-search" @click="getList"></i>
-          </el-input>
-        </header>
-
-        <!-- 列表区域 -->
-        <main class="vmp-rebroadcast-control-panel">
-          <section>
-            <ul>
-              <li
-                class="vmp-rebroadcast-item"
-                v-for="item in domainState.list"
-                :key="item.id"
-                @click="select(item.room_id, item.id)"
+  <section class="vmp-rebroadcast">
+    <saas-dialog
+      :visible="isShow"
+      :isClose="true"
+      @onClose="close"
+      title="转播"
+      width="800px"
+      style="min-width: 800px"
+    >
+      <div class="vmp-rebroadcast">
+        <main class="vmp-rebroadcast-body">
+          <!-- 控制面板 -->
+          <section class="vmp-rebroadcast-control-panel" v-loading="loading">
+            <!-- 搜索区域 -->
+            <header class="vmp-rebroadcast-search">
+              <span class="my-live">我的直播</span>
+              <el-button type="mini" round @click="getList">刷新</el-button>
+              <el-input
+                style="margin-left: 6px; width: 185px; border-radius: 20px"
+                round
+                v-model="inputVal"
+                class="go-search"
+                placeholder="请输入直播标题"
+                clearable
+                @keyup.enter.native="getList"
+                @change="getList"
               >
-                <i class="right-tag" v-show="item.is_stream == 1">转播中</i>
-                <section class="item-logo">
-                  <img :src="item.img_url || nologoImg" alt="" />
-                  <i>直播</i>
-                </section>
-                <section class="item-content">
-                  <p class="broadcast-title">{{ item.subject }}</p>
-                  <p class="broadcast-time">{{ item.start_time }}</p>
-                </section>
-              </li>
-            </ul>
-            <section v-if="domainState.list.length === 0" class="vmp-search-result">
-              <section>
-                <img :src="tipsImg" alt="" />
-                <p>{{ tipsText }}</p>
-              </section>
-            </section>
-          </section>
-        </main>
-      </section>
+                <i slot="prefix" class="el-input__icon el-icon-search" @click="getList"></i>
+              </el-input>
+            </header>
 
-      <section class="vmp-rebroadcast-preview-panel">
-        <header class="vmp-rebroadcast-preview-title">预览</header>
-        <main>
-          <section v-if="isPreviewVisible">
-            <video-preview ref="videoPreview" :videoParam="videoParam" />
+            <!-- 列表区域 -->
+            <main class="vmp-rebroadcast-control-panel">
+              <section>
+                <ul>
+                  <li
+                    class="vmp-rebroadcast-item"
+                    v-for="item in domainState.list"
+                    :key="item.id"
+                    @click="select(item.room_id, item.id)"
+                  >
+                    <i class="right-tag" v-show="item.is_stream == 1">转播中</i>
+                    <section class="item-logo">
+                      <img :src="item.img_url || nologoImg" alt="" />
+                      <i>直播</i>
+                    </section>
+                    <section class="item-content">
+                      <p class="broadcast-title">{{ item.subject }}</p>
+                      <p class="broadcast-time">{{ item.start_time }}</p>
+                    </section>
+                  </li>
+                </ul>
+                <section v-if="domainState.list.length === 0" class="vmp-search-result">
+                  <section>
+                    <img :src="tipsImg" alt="" />
+                    <p>{{ tipsText }}</p>
+                  </section>
+                </section>
+              </section>
+            </main>
           </section>
-          <button @click="startRebroadcast">开始直播</button>
-          <button @click="stopRebroadcast">结束转播</button>
+
+          <section v-loading="previewLoading" class="vmp-rebroadcast-preview-panel">
+            <header class="vmp-rebroadcast-preview-title">预览</header>
+            <main>
+              <section v-if="isPreviewVisible">
+                <video-preview ref="videoPreview" :videoParam="videoParam" />
+              </section>
+              <button @click="startRebroadcast">开始直播</button>
+              <button @click="stopRebroadcast">结束转播</button>
+            </main>
+          </section>
         </main>
-      </section>
-    </main>
-  </div>
+      </div>
+    </saas-dialog>
+  </section>
 </template>
+
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import SaasDialog from '@/packages/pc-alert/src/dialog.vue';
   import { useRoomBaseServer, useRebroadcastServer } from 'middle-domain';
   import { sleep } from '@/packages/app-shared/utils/tool';
   import VideoPreview from '@/packages/app-shared/components/video-preview';
 
-  import NoCreateImg from './images/no-create@2x.png';
-  import NoSearchImg from './images/no-search@2x.png';
+  import NoCreateImg from './img/no-create@2x.png';
+  import NoSearchImg from './img/no-search@2x.png';
+
   export default {
-    name: 'VmpRebroadcastContent',
-    components: { VideoPreview },
+    name: 'VmpRebroadcastList',
+    components: {
+      SaasDialog,
+      VideoPreview
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.rebroadcastServer = useRebroadcastServer();
     },
     data() {
       return {
+        isShow: false,
         current: '',
         inputVal: '',
         loading: false,
@@ -103,12 +122,13 @@
         return `暂无可转播直播`;
       }
     },
-    created() {
-      this.open();
-    },
     methods: {
       open() {
+        this.isShow = true;
         this.getList();
+      },
+      close() {
+        this.isShow = false;
       },
       /**
        * 获取(更新)转播列表
@@ -130,7 +150,7 @@
       async select(id, sourceWebinarId) {
         this.current = id;
         this.previewLoading = true;
-        this.sourceWebinarId = sourceWebinarId;
+        this.domainState.sourceWebinarId = sourceWebinarId;
         this.isPreviewVisible = false;
 
         const { watchInitData } = this.roomBaseServer.state;
@@ -140,15 +160,24 @@
             webinar_id: watchInitData.webinar.id,
             source_id: sourceWebinarId
           });
+          if (res.code !== 200) {
+            return this.$message(this.$t(res.msg));
+          }
 
-          this.videoParam.type = 'live'; // 未生效
-          this.videoParam.paas_record_id = ''; // 录播
-          // rebroadcast = true
-          // this.videoParam.poster = posterUrl // 未生效
-          // isAudio // 不可配
+          const { token, appId, accountId, roomId } = this.domainState;
+          this.videoParam = {
+            token,
+            type: 'live',
+            appId,
+            accountId,
+            liveOption: {
+              defaultDefinition: '360p',
+              type: 'flv',
+              roomId
+            }
+          };
 
           this.isPreviewVisible = true;
-          console.log('res:::', res);
           await sleep(600);
           this.previewLoading = false;
         } catch (err) {
@@ -162,22 +191,24 @@
       async startRebroadcast() {
         // if !refs.preview return
         // if status!==1 清闲开始直播
-        if (this.status !== 1) return this.$message(`请先开始直播`);
+        // if (this.status !== 1) return this.$message(`请先开始直播`);
+        const { watchInitData } = this.roomBaseServer.state;
 
         try {
           const res = await this.rebroadcastServer.start({
-            webinar_id: this.webinar_id,
-            source_id: this.sourceWebinarId
+            webinar_id: watchInitData.webinar.id,
+            source_id: this.domainState.sourceWebinarId
           });
           if (res.code !== 200) {
             return this.$message.error(`转播失败!`);
           }
 
           this.getList(); // get-list
-          this.rebroadcastRoomId = this.current; // 记录
+          // this.rebroadcastRoomId = this.current; // 记录
           this.report();
-          window?.middleEvent?.send(); // 事件·开始执行
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
           this.$message.success(`转播成功！`);
+          this.close();
         } catch (err) {
           this.$message.error(`转播失败!`);
         }
@@ -186,18 +217,22 @@
        * 停止转播
        */
       async stopRebroadcast() {
+        const { watchInitData } = this.roomBaseServer.state;
+
         try {
-          const res = await this.rebroadcastServer.stopRebroadcast({
-            webinar_id: this.webinar_id,
+          const res = await this.rebroadcastServer.stop({
+            webinar_id: watchInitData.webinar.id,
             source_id: this.sourceWebinarId
           });
 
           if (res.code === 200) {
             this.$message.success('停止转播成功!');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'stopRebroadcast'));
           } else {
             this.$message.error('停止转播失败!');
           }
         } catch (error) {
+          console.error('error:', error);
           this.$message.error('停止转播失败!');
         }
       },
@@ -226,6 +261,7 @@
     }
   };
 </script>
+
 <style lang="less">
   .vmp-rebroadcast {
     background: #fff;

@@ -38,7 +38,8 @@ export const serverConfig = {
       'comGroupDiscussion',
       'comInsertStream',
       'comThirdStream',
-      'comDesktopScreen'
+      'comDesktopScreen',
+      'comRebroadcastSteam'
     ]
   },
   layerBodyRight: {
@@ -96,8 +97,7 @@ export const serverConfig = {
       'liveTimerSet',
       'liveTimer',
       'comQuestionnaire',
-      // 'comRebroadcast'
-      'comRebroadcast'
+      'comRebroadcastList'
     ]
   },
 
@@ -299,7 +299,7 @@ export const serverConfig = {
     ],
     emitOpenRebroadcast: [
       {
-        cuid: ['comRebroadcast'],
+        cuid: ['comRebroadcastList'],
         method: 'open'
       }
     ]
@@ -569,9 +569,25 @@ export const serverConfig = {
       }
     ]
   },
-  // 转播
-  comRebroadcast: {
-    component: 'VmpRebroadcast'
+  // 转播列表
+  comRebroadcastList: {
+    component: 'VmpRebroadcastList',
+    startRebroadcast: [
+      {
+        cuid: 'comRebroadcastSteam',
+        method: 'open'
+      }
+    ],
+    stopRebroadcast: [
+      {
+        cuid: 'comRebroadcastSteam',
+        method: 'close'
+      }
+    ]
+  },
+  //  转播流
+  comRebroadcastSteam: {
+    component: 'VmpRebroadcastStream'
   },
   comRecommend: {
     component: 'VmpRecommend'
