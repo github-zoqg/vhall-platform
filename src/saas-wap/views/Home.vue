@@ -59,13 +59,10 @@
           }
         );
         window.vhallReport.report('ENTER_WATCH');
-
         this.state = 1;
       } catch (ex) {
         console.error('---初始化直播房间出现异常--');
         console.error(ex);
-        // this.state = 2;
-        // this.errMsg = ex.msg;
       }
     },
     mounted() {},
