@@ -393,6 +393,14 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
+    ],
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
     ]
   }
 };

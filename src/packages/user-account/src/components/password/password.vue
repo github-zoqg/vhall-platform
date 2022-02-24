@@ -381,5 +381,8 @@
         }
       }
     }
+    .iconxianshi {
+      width: 32px;
+    }
   }
 </style>
