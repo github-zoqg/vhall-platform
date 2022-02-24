@@ -201,9 +201,6 @@
       ImgStream
     },
     computed: {
-      miniElement() {
-        return this.$domainStore.roomBaseServer.miniElement;
-      },
       localStream() {
         console.log(
           '----localStream更新了----',

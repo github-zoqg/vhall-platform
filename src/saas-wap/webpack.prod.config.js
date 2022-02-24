@@ -7,11 +7,6 @@ const htmlConfig = {
     MiddleDomain:
       '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.0.2/middle-domain.js'
   },
-  cdnCss: {
-    iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.0/iconfont.css'
-  },
   // dns-prefetch
   dnsPrefetch: {
     open: true, //是否开启dns预解析
