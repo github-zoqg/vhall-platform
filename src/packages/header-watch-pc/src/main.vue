@@ -17,17 +17,16 @@
       <div class="vmp-header-watch-center-title">
         {{ webinarInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarInfo.type != 6"
+          v-if="webinarType != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
-            webinarInfo.type
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
           "
         >
-          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
-          <label>{{ webinarInfo.type | webinarFilter }}</label>
+          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ webinarType | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -63,7 +62,7 @@
       <!-- 关注 -->
       <div
         class="vmp-header-watch-right-attention"
-        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.type != 6"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarType != 6"
       >
         <div
           :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"

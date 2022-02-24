@@ -40,6 +40,11 @@
         required: true
       }
     },
+    computed: {
+      join_info() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      }
+    },
     mounted() {
       //房间消息
       if (this.inviteFun) {
@@ -53,6 +58,10 @@
         }
         const { type = '' } = temp.data || {};
         if (type === 'vrtc_connect_invite') {
+          // 是本人的时候，弹出邀请弹框
+          if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
+            return;
+          }
           this.showInviteConnectMic = true;
           this.inviteTime = 30;
           clearInterval(this.inviteFun);

@@ -107,7 +107,7 @@
           <div>
             <el-button type="text" @click="editQQHandler">
               {{
-                useUserServer.state.thirdInfo.QQbind
+                useUserServer.state.thirdInfo.QQBind
                   ? $t('account.account_1021')
                   : $t('account.account_1022')
               }}
