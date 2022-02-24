@@ -380,9 +380,9 @@
         erd.listenTo(this.$refs.docWrapper, throttle(this.resize, 200));
 
         // 全屏/退出全屏事件
-        screenfull.onchange(() => {
+        screenfull.onchange(ev => {
           // console.log('[doc] screenfull.isFullscreen:', screenfull);
-          if (screenfull.element.id !== 'docWrapper') return;
+          if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {

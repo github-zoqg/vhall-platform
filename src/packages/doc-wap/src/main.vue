@@ -192,9 +192,9 @@
         });
 
         // 全屏/退出全屏事件
-        screenfull.onchange(() => {
+        screenfull.onchange(ev => {
           // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-          if (screenfull.element.id !== 'docWrapper') return;
+          if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {
