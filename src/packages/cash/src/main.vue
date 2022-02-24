@@ -719,6 +719,7 @@
         position: relative;
         .vmp-cash_btn_hover {
           display: none;
+          height: 38px;
         }
         &.is-disabled:hover {
           .vmp-cash_btn_hover {
@@ -727,11 +728,11 @@
             top: -1px;
             border-radius: 4px;
             word-break: break-all;
-            line-height: 20px;
+            line-height: 38px;
             background: rgba(26, 26, 26, 0.8);
             font-size: 12px;
             color: #fff;
-            padding: 8px 12px;
+            padding: 0 12px;
             text-align: left;
             right: 0;
           }
@@ -843,12 +844,12 @@
           background: rgba(0, 0, 0, 0.9);
           border-radius: 4px;
           padding: 23px 27px;
-          text-align: left;
           overflow-y: auto;
           p {
             font-size: 12px;
             font-weight: 400;
             color: #ffffff;
+            text-align: justify;
             line-height: 17px;
             span {
               font-size: 20px;

@@ -11,7 +11,7 @@ module.exports = {
   trailingComma: 'none', // 末尾不需要逗号（ 默认:es5 ）
   arrowParens: 'avoid', // 箭头函数只有一个参数的时候不带圆括号（ 默认:always ）
   htmlWhitespaceSensitivity: 'ignore', // 空格被认为是不敏感的（ 默认:css ）
-  vueIndentScriptAndStyle: true
+  vueIndentScriptAndStyle: true,
   // tabWidth: 2,
   // useTabs: false,
   // quoteProps: 'as-needed',
@@ -20,5 +20,5 @@ module.exports = {
   // bracketSameLine: false,
 
   // embeddedLanguageFormatting: 'auto'
-  // endOfLine: 'lf',
+  endOfLine: 'auto',
 };
