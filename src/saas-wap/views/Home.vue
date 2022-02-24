@@ -42,6 +42,7 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
+        document.title = roomBaseServer.state.watchInitData.webinar.subject;
 
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
@@ -65,7 +66,6 @@
           }
         );
         window.vhallReport.report('ENTER_WATCH');
-
         this.state = 1;
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -83,7 +83,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
