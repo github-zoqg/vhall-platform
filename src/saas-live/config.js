@@ -37,7 +37,8 @@ export const serverConfig = {
       'comDocUne',
       'comGroupDiscussion',
       'comInsertStream',
-      'comThirdStream'
+      'comThirdStream',
+      'comDesktopScreen'
     ]
   },
   layerBodyRight: {
@@ -229,14 +230,26 @@ export const serverConfig = {
       }
     ]
   },
-  // 桌面共享
+  // 桌面共享按钮
   comShareDesktopMenu: {
     component: 'VmpIconText',
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
       kind: 'desktopShare'
-    }
+    },
+    handleClick: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'showConfirm',
+        args: []
+      }
+    ]
+  },
+
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen'
   },
   // 插播文件
   comMediaPlayMenu: {
