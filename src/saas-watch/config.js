@@ -67,7 +67,7 @@ export const serverConfig = {
       // 'comSignUpForm',
       'comUserAccount',
       'comCash',
-      // 'comLottery'
+      'comLottery',
       'comWatchTimer',
       'comScreenPost',
       'comMediaSetting'
@@ -322,7 +322,7 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    // component: 'VmpLotteryWatch'
+    component: 'VmpLotteryWatch'
   },
   // 开屏页
   comScreenPost: {
