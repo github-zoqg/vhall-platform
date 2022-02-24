@@ -68,7 +68,13 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer
+  } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
@@ -150,6 +156,10 @@
         if (this.isSpeakOn) {
           useMicServer().speakOff();
         }
+      });
+      //监听直播结束的通知，下麦并停止推流
+      useMsgServer().$on('live_over', e => {
+        useMicServer().speakOff();
       });
     },
     methods: {
