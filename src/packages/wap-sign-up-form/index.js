@@ -1,7 +1,7 @@
-import VmpSignUpForm from './src/main.vue';
+import VmpWapSignUpForm from './src/main.vue';
 
-VmpSignUpForm.install = function (Vue) {
-  Vue.component(VmpSignUpForm.name, VmpSignUpForm);
+VmpWapSignUpForm.install = function (Vue) {
+  Vue.component(VmpWapSignUpForm.name, VmpWapSignUpForm);
 };
 
-export default VmpSignUpForm;
+export default VmpWapSignUpForm;
