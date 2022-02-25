@@ -37,7 +37,9 @@ export const serverConfig = {
       'comDocUne',
       'comGroupDiscussion',
       'comInsertStream',
-      'comThirdStream'
+      'comThirdStream',
+      'comDesktopScreen',
+      'comRebroadcastSteam'
     ]
   },
   layerBodyRight: {
@@ -95,9 +97,9 @@ export const serverConfig = {
       'liveTimerSet',
       'liveTimer',
       'comQuestionnaire',
-      // 'comRebroadcast'
       'comRebroadcast',
-      'comRedPacket'
+      'comRedPacket',
+      'comRebroadcastList'
     ]
   },
 
@@ -230,14 +232,26 @@ export const serverConfig = {
       }
     ]
   },
-  // 桌面共享
+  // 桌面共享按钮
   comShareDesktopMenu: {
     component: 'VmpIconText',
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
       kind: 'desktopShare'
-    }
+    },
+    handleClick: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'showConfirm',
+        args: []
+      }
+    ]
+  },
+
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen'
   },
   // 插播文件
   comMediaPlayMenu: {
@@ -287,7 +301,7 @@ export const serverConfig = {
     ],
     emitOpenRebroadcast: [
       {
-        cuid: ['comRebroadcast'],
+        cuid: ['comRebroadcastList'],
         method: 'open'
       }
     ],
@@ -563,9 +577,25 @@ export const serverConfig = {
       }
     ]
   },
-  // 转播
-  comRebroadcast: {
-    component: 'VmpRebroadcast'
+  // 转播列表
+  comRebroadcastList: {
+    component: 'VmpRebroadcastList',
+    startRebroadcast: [
+      {
+        cuid: 'comRebroadcastSteam',
+        method: 'open'
+      }
+    ],
+    stopRebroadcast: [
+      {
+        cuid: 'comRebroadcastSteam',
+        method: 'close'
+      }
+    ]
+  },
+  //  转播流
+  comRebroadcastSteam: {
+    component: 'VmpRebroadcastStream'
   },
   comRecommend: {
     component: 'VmpRecommend'

@@ -16,32 +16,51 @@
               </p>
             </div>
             <!-- 预告 -->
-            <span v-show="webinarInfo.webinar_state == 2" class="header-content__tag subscribe">
+            <span
+              v-show="[2, '2'].includes(webinarInfo.webinar_state)"
+              class="header-content__tag subscribe"
+            >
               <label>
-                {{ $t('预告') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
+                {{ $t('预告')
+                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
               </label>
             </span>
             <!-- 直播 -->
-            <span v-show="webinarInfo.webinar_state == 1" class="header-content__tag live">
+            <span
+              v-show="[1, '1'].includes(webinarInfo.webinar_state)"
+              class="header-content__tag live"
+            >
               <img src="img/live-white.gif" alt="" />
               <label>
-                {{ $t('直播') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
+                {{ $t('直播')
+                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
               </label>
             </span>
             <!-- 结束 -->
-            <span v-show="webinarInfo.webinar_state == 3" class="header-content__tag end">
+            <span
+              v-show="[3, '3'].includes(webinarInfo.webinar_state)"
+              class="header-content__tag end"
+            >
               <label>
-                {{ $t('结束') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
+                {{ $t('结束')
+                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
               </label>
             </span>
             <!-- 回放 -->
-            <span v-show="webinarInfo.webinar_state == 5" class="header-content__tag playback">
+            <span
+              v-show="[5, '5'].includes(webinarInfo.webinar_state)"
+              class="header-content__tag playback"
+            >
               <label>
-                {{ $t('回放') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
+                {{ $t('回放')
+                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
               </label>
             </span>
             <!-- 点播 -->
-            <span v-show="webinarInfo.webinar_state == 4" class="header-content__tag demand">
+            <span
+              v-show="[4, '4'].includes(webinarInfo.webinar_state)"
+              class="header-content__tag demand"
+            >
               <label>
                 {{ $t('点播') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
               </label>
@@ -79,7 +98,7 @@
             @click.stop.prevent="uploadAvatar"
           >
             <img :src="`${avatarUrl}`" alt="用户头像" v-if="avatarUrl" />
-            <img src="img/advatar_default@2x.png" alt="默认头像" v-else />
+            <img :src="defaultAvatar" alt="默认头像" v-else />
             <div class="main-wrap__form__avatar-btn" v-if="![1, '1'].includes(roleName)">
               <span>编辑</span>
             </div>
@@ -152,7 +171,8 @@
 <script>
   //todo 后续应替换为全局工具服务里的
   import { uuid } from '@/packages/chat/src/js/utils';
-
+  const defaultAvatar = require('./img/advatar_default@2x.png');
+  import { useKeyLoginServer } from 'middle-domain';
   export default {
     name: 'VmpPasswordLogin',
     filters: {
@@ -169,6 +189,8 @@
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //是否是手机端
         isMobile: false,
         //活动信息
@@ -185,12 +207,6 @@
         imgUrl: '',
         //用户角色
         roleName: this.$route.params.role_name,
-        //上传的请求头信息
-        uploadHeader: {},
-        //上传的地址
-        actionUrl: '',
-        //地址
-        pathUrl: '',
         //登录的表单视图模型
         loginForm: {
           //昵称
@@ -210,100 +226,114 @@
       };
     },
     computed: {
-      // 无延迟图片地址 todo 待替换 为VUE_APP_PUBLIC_PATH
+      //编辑头像的请求头
+      uploadHeader() {
+        return { platform: 17, 'request-id': uuid(), 'gray-id': this.grayId };
+      },
+      //图片保存的路径
+      pathUrl() {
+        return `webinars/join-avatar/${this.$moment().format('YYYYMM')}`;
+      },
+      //上传图片地址
+      actionUrl() {
+        return `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`;
+      },
+      //无延迟图标的地址(注意这是生产环境地址，测试环境地址是阿里的)
       noDelayIconUrl() {
-        return `//t-alistatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`;
+        return `${process.env.VUE_APP_PUBLIC_PATH}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`;
       }
     },
-    beforeCreate() {},
-    created() {
+    beforeCreate() {
+      this.keyLoginServer = useKeyLoginServer();
+    },
+    async created() {
       this.checkIsMobile();
+      //窗口大小变更监听
+      window.addEventListener('resize', this.checkIsMobile, false);
       this.checkIsHost();
+      await this.getGrayConfig();
       this.getWebinarInfo();
-      this.initUploadInfo();
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.checkIsMobile, false);
+      this.keyLoginServer.setHeader({ 'gray-id': null });
     },
     mounted() {},
     methods: {
-      //初始化上传信息
-      initUploadInfo() {
-        this.uploadHeader = { platform: 17, 'request-id': uuid(), 'gray-id': this.grayId };
-      },
-      //获取活动信息 todo domain
-      getWebinarInfo() {
-        //todo 假数据，待移除
-        this.webinarInfo = {
-          id: 768635971,
-          alias_name: '',
-          user_id: 16422770,
-          subject: '黄金链路预约',
-          introduction: '<p></p>',
-          img_url:
-            'http://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/upload/common/static-imgs/c0/e7/c0e7569408de296971eb4b98945c240b.png',
-          category: '1',
-          start_time: '2021-12-29 22:16',
-          actual_start_time: '2022-01-18 14:52',
-          end_time: '2022-01-19 03:00',
-          pv: 93,
-          is_open: 1,
-          reg_form: 0,
-          verify: 0,
-          password: '111',
-          fee: '0',
-          is_custom: 0,
-          auto_record: 1,
-          is_fms: 2,
-          is_chat: 0,
-          top: 0,
-          is_allow: 2,
-          is_old: 0,
-          use_global_k: 1,
-          exist_3rd_auth: 0,
-          auth_url: '',
-          failure_url: '',
-          jump_url: '',
-          buffer: 0,
-          document_id: 0,
-          created_at: '2021-12-28 22:06:40',
-          is_demand: 0,
-          is_new_version: 3,
-          welcome_content: '',
-          player: 2,
-          vss_room_id: 'lss_5b351cd7',
-          vss_inav_id: 'inav_0bcd72ef',
-          vss_channel_id: 'ch_979n4oNE',
-          is_private: 0,
-          hide_pv: 1,
-          hide_appointment: 1,
-          hide_watch: 1,
-          is_adi_watch_doc: 0,
-          is_capacity: 0,
-          new_channel_id: 'ch_wZ13FRdG',
-          no_delay_webinar: 0,
-          biz_id: 2,
-          business_account_id: 0,
-          inav_num: 16,
-          biz_application_id: 'fd8d3653',
-          webinar_state: 5,
-          webinar_type: 3,
-          webinar_curr_num: 0,
-          webinar_show_type: 1,
-          auto_speak: 0,
-          view_num: 0,
-          first_broad: '2021-12-30 15:30',
-          record_subject: '',
-          duration: '00:00:00',
-          paas_record_id: '',
-          msg_url: '',
-          record_id: 0,
-          valid_status: 'N',
-          count_down: 0,
-          user_name: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
-          time: 1642674825
+      //获取灰度配置
+      getGrayConfig() {
+        const _this = this;
+        const params = {
+          webinar_id: this.$route.params.id
         };
+        return this.keyLoginServer
+          .getGrayConfig(params)
+          .then(res => {
+            if ([200, '200'].includes(res.code) && res.data) {
+              this.grayId = res.data.user_id;
+            } else {
+              console.log(`观看-灰度ID-获取活动by用户信息失败~${res.msg}`);
+              this.grayId = null;
+            }
+          })
+          .catch(e => {
+            console.log(`观看-灰度ID-获取活动by用户信息失败~${e}`);
+            this.grayId = null;
+          })
+          .finally(() => {
+            _this.keyLoginServer.setHeaders({ 'gray-id': _this.grayId });
+          });
       },
-      //获取配置信息 todo domain
-      getConfigList() {},
-      //检查是否是手机端 todo utils服务提供，或者domain提供
+      //获取活动信息
+      getWebinarInfo() {
+        const params = {
+          webinarId: this.$route.params.id,
+          is_no_check: 1
+        };
+        return this.keyLoginServer
+          .getWebinarInfo(params)
+          .then(res => {
+            const { code = '', data = {}, msg = '' } = res || {};
+            if ([200, '200'].includes(code)) {
+              this.webinarInfo = data;
+              this.showDelay = [1, '1'].includes(data.no_delay_webinar);
+              return this.getConfigList(data.user_id);
+            } else {
+              this.$message({
+                message: msg,
+                showClose: true,
+                // duration: 0,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+          })
+          .catch(error => {
+            let { msg = '活动信息获取失败' } = error || {};
+            this.$message({
+              message: msg,
+              showClose: true,
+              // duration: 0,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+      //获取配置信息
+      getConfigList(id) {
+        const params = {
+          webinar_id: this.$route.params.id,
+          webinar_user_id: id,
+          scene_id: 2
+        };
+        return this.keyLoginServer.getConfigList(params).then(res => {
+          if ([200, '200'].includes(res.code) && res.data && res.data.permissions) {
+            let configList = JSON.parse(res.data.permissions);
+            this.hasDelayPermission = [1, '1'].includes(configList['no.delay.webinar']);
+          }
+        });
+      },
+      //检查是否是手机端
       checkIsMobile() {
         const reg = /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i;
         // 若是手机
@@ -318,8 +348,96 @@
         this.nameErrorShow = value === '';
         value === '' ? callback(new Error('参会昵称不能为空')) : callback();
       },
-      //处理进入直播
-      handleEntryLive() {},
+      //处理进入直播 todo
+      handleEntryLive() {
+        const _this = this;
+        this.$refs.loginForm.validate(valid => {
+          valid && _this.handleLogin();
+        });
+      },
+      //处理登录
+      handleLogin() {
+        const params = this.handleRoleLoginParams();
+        this.keyLoginServer
+          .roleLogin(params)
+          .then(res => {
+            const { code = '', msg = '' } = res || {};
+            if ([200, '200'].includes(code)) {
+              sessionStorage.setItem('interact_token', res.data.live_token);
+              sessionStorage.setItem('visitorId', res.data.visitor_id);
+              this.handleJump(params.type, res.data.live_token);
+            } else {
+              this.$message({
+                message: msg,
+                showClose: true,
+                // duration: 0,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+            return res;
+          })
+          .catch(error => {
+            this.$message({
+              message: error.msg || '口令登录失败',
+              showClose: true,
+              // duration: 0,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+      //处理口令登录参数
+      handleRoleLoginParams() {
+        const visitorId = sessionStorage.getItem('visitorId');
+        let params = {
+          webinar_id: this.$route.params.id,
+          refer: '',
+          // 1主持人 2嘉宾 3助理
+          type: '',
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : '',
+          avatar: this.imgUrl || '',
+          ...this.loginForm
+        };
+
+        //转换角色
+        if ([1, '1'].includes(this.$route.params.role_name)) {
+          params.type = 1;
+        }
+        if (![1, '1'].includes(this.$route.params.role_name)) {
+          params.type = [4, '4'].includes(this.$route.params.role_name) ? 2 : 3;
+        }
+        return params;
+      },
+      //处理登录成功跳转
+      handleJump(role = '', token = '') {
+        const _this = this;
+        setTimeout(() => {
+          if ([3, '3'].includes(role)) {
+            _this.$router.push({
+              name: 'LiveRoom',
+              params: { il_id: _this.$route.params.id },
+              query: { liveT: token }
+            });
+            return;
+          }
+
+          if ([1, '1'].includes(role) && _this.webinarInfo.webinar_type == 1) {
+            _this.$router.push({
+              name: 'LiveRoom',
+              params: { il_id: _this.$route.params.id },
+              query: { liveT: token }
+            });
+            return;
+          }
+
+          window.location.href =
+            window.location.protocol +
+            `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/chooseWay/${
+              _this.$route.params.id
+            }/${role}?type=code&liveT=${token}`;
+        }, 300);
+      },
       //上传图片
       uploadAvatar() {
         // 非主持人角色时，可上传头像
@@ -329,7 +447,7 @@
         }
       },
       //上传头像成功
-      uploadSuccess(res, file) {
+      uploadSuccess(res) {
         if (res.data) {
           this.imgUrl = res.data.file_url || '';
           this.avatarUrl = res.data.domain_url || '';
@@ -379,7 +497,7 @@
         });
       },
       uploadPreview(file) {
-        console.log('uploadPreview', file);
+        console.log('图片预览', file);
       }
     }
   };

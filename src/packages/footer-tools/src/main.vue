@@ -84,7 +84,13 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer
+  } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -201,6 +207,12 @@
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
         this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
+      });
+      //监听直播结束的通知，下麦并停止推流
+      useMsgServer().$on('live_over', e => {
         if (this.isSpeakOn) {
           useMicServer().speakOff();
         }

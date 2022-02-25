@@ -178,13 +178,13 @@
       },
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       // 文档是否可见
       show() {
         return (
-          this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer.state.clientType !== 'send' &&
+          this.roomBaseServer.state.watchInitData.join_info.role_name != 2 ||
+          (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
               this.docServer.state.hasDocPermission ||
@@ -272,6 +272,7 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
+        this.resize();
       },
       /**
        * 屏幕缩放
@@ -296,9 +297,10 @@
             }
           }
         } else {
-          rect = screenfull.isFullscreen
-            ? this.$refs.docWrapper?.getBoundingClientRect()
-            : this.$refs.docContent?.getBoundingClientRect();
+          rect =
+            this.displayMode === 'fullscreen'
+              ? this.$refs.docWrapper?.getBoundingClientRect()
+              : this.$refs.docContent?.getBoundingClientRect();
         }
         if (!rect) return;
         let { width, height } = rect;
@@ -341,10 +343,9 @@
             }
           });
 
+          // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-            console.log('[doc] ssssss');
             const data = this.docServer.getVodAllCids();
-            console.log('[doc] data:', data);
             this.docServer.state.containerList = data.map(item => {
               return {
                 cid: item.cid
@@ -381,9 +382,9 @@
         erd.listenTo(this.$refs.docWrapper, throttle(this.resize, 200));
 
         // 全屏/退出全屏事件
-        screenfull.onchange(() => {
+        screenfull.onchange(ev => {
           // console.log('[doc] screenfull.isFullscreen:', screenfull);
-          if (screenfull.element.id !== 'docWrapper') return;
+          if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {
@@ -495,7 +496,7 @@
             await this.$nextTick();
           }
         });
-        if (this.roomBaseServer.state.clientType === 'send') {
+        if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])

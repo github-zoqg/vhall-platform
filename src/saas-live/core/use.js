@@ -34,12 +34,14 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
-import VmpRebroadcast from '@/packages/rebroadcast';
+import VmpRebroadcastList from '@/packages/rebroadcast-list';
+import VmpRebroadCastStream from '@/packages/rebroadcast-stream';
 import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
 import VmpSignLive from '@/packages/sign-module/sign-live';
 import VmpRedPacketLive from '@/packages/red-packet/live';
+import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 
 // 全局注册组件
 export function initUse() {
@@ -75,7 +77,8 @@ export function initUse() {
   Vue.use(VmpNoticeList);
   Vue.use(VmpLiveTimerSet);
   Vue.use(VmpLiveTimer);
-  Vue.use(VmpRebroadcast);
+  Vue.use(VmpRebroadcastList);
+  Vue.use(VmpRebroadCastStream);
   Vue.use(VmpRecommend);
   Vue.use(VmpLotteryLive);
   Vue.use(VmpQuestionnaire);
@@ -84,4 +87,5 @@ export function initUse() {
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);
+  Vue.use(VmpStreamDesktopScreen);
 }
