@@ -340,23 +340,27 @@
 
 <script>
   import defaultHeader from './img/formHeader.png';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useSignUpFormServer } from 'middle-domain';
   export default {
     name: 'VmpSignUpForm',
     data() {
       return {
         //默认的兜底的banner图
         defaultHeader,
-        //todo 后续从node的环境变量里面取
-        baseUrl: 'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/upload/',
+        //todo 询问下环境变量是否正确
+        baseUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
+        // 是否是独立表单
+        isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
+        //是否是预览
+        isPreview: this.$route.path.indexOf('/live/signup') !== -1,
+        //活动id
+        webinarId: '',
         //表单信息
         formInfo: {},
         //简介内容是否超长
         overflowStatus: false,
         //模态窗是否可见
-        visible: true,
-        //是否是预览
-        isPreview: false,
+        visible: false,
         //当前登陆人的电话号码
         currentPhone: '',
         //表单视图模型
@@ -456,16 +460,26 @@
             validator: this.validCode,
             trigger: 'blur'
           }
-        }
+        },
+        //联动选项是第几题
+        colNum: '',
+        //区域选项
+        regionalId: '',
+        //是否是短信验证码错误
+        isVerifyCodeErr: false,
+        //地域验证是否通过
+        isValidRegional: true
       };
     },
     watch: {
+      //省份
       province(newVal, oldVal) {
         if (newVal != oldVal) {
           this.city = '';
           this.county = '';
         }
       },
+      //城市
       city(newVal, oldVal) {
         if (newVal != oldVal) {
           this.county = '';
@@ -474,26 +488,27 @@
       isPhoneValidate: {
         immediate: true,
         handler(newVal) {
+          const _this = this;
           // 根据是否开启短信验证，生成相应的手机号验证规则
           if (newVal) {
-            this.verifyRules.phone = {
+            _this.verifyRules.phone = {
               required: true,
-              validator: this.validPhone,
+              validator: _this.validPhone,
               trigger: 'blur'
             };
           } else {
-            this.verifyRules.phone = {
+            _this.verifyRules.phone = {
               type: 'number',
               required: true,
-              message: this.$t('acount.account_1069'),
+              message: _this.$t('acount.account_1069'),
               trigger: 'blur'
             };
           }
           // 云盾实例
           if (newVal) {
-            this.$nextTick(() => {
-              this.callCaptcha('#setCaptcha');
-              this.callCaptcha('#setCaptcha1');
+            _this.$nextTick(() => {
+              _this.callCaptcha('#setCaptcha');
+              _this.callCaptcha('#setCaptcha1');
             });
           }
         }
@@ -623,9 +638,27 @@
       }
     },
     computed: {
+      // 与网易易盾图片插件语言匹配
+      langNECaptcha() {
+        const locale = window.$globalConfig.currentLang;
+        let lang = 'zh-CN';
+        switch (locale) {
+          case 'zh':
+            lang = 'zh-CN';
+            break;
+          case 'spain':
+            lang = 'es';
+            break;
+          default:
+            lang = locale;
+        }
+        return lang;
+      },
+      //输入提示的多语言转换
       findPlaceHolder() {
+        const _this = this;
         return function (type) {
-          return this.placeholderMap[type] || this.$t('form.form_1014');
+          return _this.placeholderMap[type] || _this.$t('form.form_1014');
         };
       },
       //城市列表
@@ -642,26 +675,40 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {
-      //todo 临时测试用待移除
-      this.openModal();
-    },
+    mounted() {},
     methods: {
       //打开模态窗
-      openModal() {
+      async openModal() {
         this.initViewData();
-        this.getWebinarInfo();
-        this.getQuestionInfo();
         this.visible = true;
+        await this.getWebinarType();
+        this.getBaseInfo();
+        this.getQuestionList();
+      },
+      //获取活动类型
+      getWebinarType() {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        return this.signUpFormServer
+          .getWebinarType(params)
+          .then(res => {
+            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+          })
+          .catch(error => {
+            if (error.code == 512503 || error.code == 512502) {
+              window.location.href = `${window.location.origin}/${this.webinarId}`;
+            }
+          });
       },
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        //设置活动类型
-        this.isSubscribe = webinar.type === 2 ? 1 : 2;
-        //初始化默认激活的tab
-        this.activeTab = webinar.type === 2 ? 1 : 2;
+        //活动id
+        this.webinarId = webinar.id || '';
       },
       // 手机号验证
       validPhone(rule, value, callback) {
@@ -671,7 +718,6 @@
           return callback ? callback(new Error(this.$t('account.account_1025'))) : false;
         } else if (!reg.test(value)) {
           this.isValidPhone = false;
-          // TODO待翻译
           return callback ? callback(new Error(this.$t('acount.account_1069'))) : false;
         } else {
           this.isValidPhone = true;
@@ -694,214 +740,278 @@
           }
         }
       },
-      //todo 邮件验证
+      //邮件验证
       validEmail(rule, value, callback) {
-        console.log(rule, value, callback);
-      },
-      //校验验证码 todo
-      validCode(rule, value, callback) {
-        console.log(rule, value, callback);
-      },
-      //地域验证 todo
-      validRegional(rule, value, callback) {
-        console.log(rule, value, callback);
-      },
-      //初始化活动信息 todo 假数据替换
-      getWebinarInfo() {
-        this.$set(this, 'formInfo', {
-          webinar_id: 768635971,
-          title: '测试用报名表单',
-          intro: '测试用报名介绍',
-          cover: 'sys/img_url/74/22/742222c698ad6d990e2c4d0d079098bb.jpeg',
-          theme_color: 'red',
-          tab_verify_title: '我已报名',
-          tab_form_title: '活动报名',
-          open_link: 0,
-          created_at: '2022-01-21 11:10:49',
-          updated_at: '2022-01-21 11:11:05',
-          enable_status: 1,
-          phone: ''
-        });
-      },
-      //初始化表单问题信息 todo 待更换假数据
-      getQuestionInfo() {
-        let res = {
-          data: {
-            ques_list: [
-              {
-                id: 31353,
-                type: 0,
-                default_type: 1,
-                subject: '姓名',
-                order_num: 4,
-                is_must: 1,
-                options: '',
-                items: []
-              },
-              {
-                id: 32644,
-                type: 0,
-                default_type: 4,
-                subject: '性别',
-                order_num: 5,
-                is_must: 1,
-                options: '',
-                items: []
-              },
-              {
-                id: 32642,
-                type: 2,
-                default_type: 0,
-                subject: '单选题',
-                order_num: 6,
-                is_must: 1,
-                options: '',
-                items: [
-                  {
-                    id: 12465,
-                    ques_id: 32642,
-                    subject: '选项1',
-                    type: 0
-                  },
-                  {
-                    id: 12466,
-                    ques_id: 32642,
-                    subject: '选项2',
-                    type: 0
-                  }
-                ]
-              },
-              {
-                id: 32643,
-                type: 3,
-                default_type: 0,
-                subject: '多选题',
-                order_num: 7,
-                is_must: 1,
-                options: '',
-                items: [
-                  {
-                    id: 12467,
-                    ques_id: 32643,
-                    subject: '选项1',
-                    type: 0
-                  },
-                  {
-                    id: 12468,
-                    ques_id: 32643,
-                    subject: '选项2',
-                    type: 0
-                  }
-                ]
-              },
-              {
-                id: 32645,
-                type: 1,
-                default_type: 0,
-                subject: '今年是哪一年',
-                order_num: 8,
-                is_must: 0,
-                options: '',
-                items: []
-              },
-              {
-                id: 32647,
-                type: 4,
-                default_type: 0,
-                subject: '下拉题',
-                order_num: 9,
-                is_must: 1,
-                options: '',
-                items: [
-                  {
-                    id: 12469,
-                    ques_id: 32647,
-                    subject: '选项1',
-                    type: 0
-                  },
-                  {
-                    id: 12470,
-                    ques_id: 32647,
-                    subject: '选项2',
-                    type: 0
-                  },
-                  {
-                    id: 12471,
-                    ques_id: 32647,
-                    subject: '选项3',
-                    type: 0
-                  },
-                  {
-                    id: 12472,
-                    ques_id: 32647,
-                    subject: '选项4',
-                    type: 0
-                  }
-                ]
-              },
-              {
-                id: 31354,
-                type: 0,
-                default_type: 2,
-                subject: '手机',
-                order_num: 10,
-                is_must: 1,
-                options: '{"open_verify":1}',
-                items: []
-              },
-              {
-                id: 32646,
-                type: 6,
-                default_type: 0,
-                subject: '隐私声明',
-                order_num: 11,
-                is_must: 1,
-                options:
-                  '[{"id":32646,"webinar_id":768635971,"user_id":16422770,"type":6,"default_type":0,"subject":"隐私声明","order_num":11,"is_must":1,"created_at":"2022-01-21 11:12:26","updated_at":"2022-01-21 11:12:35","options":"{\\"content\\":\\"\\\\u6211\\\\u4eec\\\\u6839\\\\u636e\\\\u300a\\\\u9690\\\\u79c1\\\\u58f0\\\\u660e\\\\u300b\\\\u4fdd\\\\u62a4\\\\u60a8\\\\u586b\\\\u5199\\\\u7684\\\\u6240\\\\u6709\\\\u4fe1\\\\u606f\\",\\"color_text\\":\\"\\\\u300a\\\\u9690\\\\u79c1\\\\u58f0\\\\u660e\\\\u300b\\",\\"url\\":\\"\\"}"}]',
-                items: []
-              }
-            ],
-            phone: '15351234596'
-          }
-        };
-        // 按照 order_num 从小到大排序
-        const list = res.data.ques_list.sort(this.compare('order_num'));
-        !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
-        // 手机号验证开启状态
-        const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
-        this.isPhoneValidate = phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
-        // 默认填写手机号
-        !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
-        this.list = list;
-        //todo  地域 options 格式化处理
-        this.list.some(item => {
-          if (item.type == 5) {
-            this.isValidRegional = !!item.is_must;
-            item.options = JSON.parse(item.options);
-            item.colNum = 8;
-            item.options.show_district == 0 && (item.colNum = 12);
-            item.options.show_city == 0 && (item.colNum = 24);
-            this.colNum = item.colNum;
-            this.regionalId = item.id;
+        const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+        console.log(!reg.test(value));
+        if (!value && rule.required) {
+          return callback ? callback(new Error(this.$t('form.form_1007'))) : false;
+        } else if (value.length > 80) {
+          return callback ? callback(new Error(this.$t('form.form_1009'))) : false;
+        } else if (value && !reg.test(value)) {
+          console.log('请填写正确的邮箱');
+          return callback ? callback(new Error(this.$t('form.form_1010'))) : false;
+        } else {
+          if (callback) {
+            callback();
+          } else {
             return true;
           }
-        });
-        // 隐私声明格式处理
-        const lastQuestion = this.list[this.list.length - 1];
-        if (lastQuestion.subject === '隐私声明') {
-          this.privacy = lastQuestion;
-          this.privacy && this.privacyFormatter();
         }
-        list.some(item => item.type === 5) && this.getAreaList();
       },
-      //获取区域列表 todo domain获取
-      getAreaList() {},
+      //校验验证码
+      validCode(rule, value, callback) {
+        console.log(rule, value, callback);
+        if (this.isVerifyCodeErr) {
+          return callback ? callback(new Error(this.$t('511057'))) : false;
+        } else {
+          callback();
+        }
+      },
+      //地域验证
+      validRegional(rule, value, callback) {
+        console.log(rule, value, callback);
+        if (!this.isValidRegional) {
+          callback();
+        }
+        if (!this.province) {
+          return callback ? callback(new Error(this.$t('form.form_1004'))) : false;
+        } else if (!this.city && this.colNum <= 12) {
+          return callback ? callback(new Error(this.$t('form.form_1005'))) : false;
+        } else if (!this.county && this.colNum <= 8) {
+          return callback ? callback(new Error(this.$t('form.form_1006'))) : false;
+        } else {
+          callback();
+        }
+      },
+      //初始化活动信息
+      getBaseInfo() {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        this.signUpFormServer.getFormBaseInfo(params).then(res => {
+          const { code = '', data = {} } = res || {};
+          if ([200, '200'].includes(code)) {
+            this.formInfo = data;
+            this.$nextTick(() => {
+              this.calculateText();
+            });
+          } else {
+            this.$message({
+              message: this.$t('form.form_1031'),
+              showClose: true,
+              // duration: 0,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
+      //计算简介是否太长
+      calculateText() {
+        const txtDom = this.$refs.intro;
+        if (!txtDom) {
+          return;
+        }
+        const twoHeight = 40;
+        const curHeight = txtDom.offsetHeight;
+        if (curHeight > twoHeight) {
+          this.overflowStatus = true;
+        }
+      },
+      //初始化表单问题信息
+      getQuestionList() {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        this.signUpFormServer.getQuestionsList(params).then(res => {
+          // 按照 order_num 从小到大排序
+          const list = res.data.ques_list.sort(this.compare('order_num'));
+          !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
+          // 手机号验证开启状态
+          const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
+          console.log(phoneItem, 'phoneItem');
+          this.isPhoneValidate =
+            phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+          // 默认填写手机号
+          !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
+          this.list = list;
+          //地域 options 格式化处理
+          this.list.some(item => {
+            if (item.type == 5) {
+              this.isValidRegional = !!item.is_must;
+              item.options = JSON.parse(item.options);
+              item.colNum = 8;
+              item.options.show_district == 0 && (item.colNum = 12);
+              item.options.show_city == 0 && (item.colNum = 24);
+              this.colNum = item.colNum;
+              this.regionalId = item.id;
+              return true;
+            }
+          });
+          // 隐私声明格式处理
+          const lastQuestion = this.list[this.list.length - 1];
+          if (lastQuestion.subject === '隐私声明') {
+            this.privacy = lastQuestion;
+            this.privacy && this.privacyFormatter();
+          }
+          list.some(item => item.type === 5) && this.getAreaList();
+        });
+      },
+      //生成表单提交参数
+      generateFormParams() {
+        const answer = {};
+        (this.list || []).forEach(item => {
+          if (item.type === 0) {
+            // 系统题目
+            !answer.default && (answer.default = []);
+            answer.default.push({
+              id: item.id,
+              content: this.form[item.id] || '',
+              default_type: item.default_type
+            });
+          } else if (item.type === 1) {
+            // 问答
+            const opts = item.options && JSON.parse(item.options);
+            let options = [];
+            opts && opts.type === 7 && (options = { type: 7 });
+            !answer.text && (answer.text = []);
+            answer.text.push({
+              id: item.id,
+              content: this.form[item.id] || '',
+              options: options
+            });
+          } else if (item.type === 2) {
+            // 单选
+            !answer.radio && (answer.radio = []);
+            const element = item.items.find(elem => elem.id === this.form[item.id]);
+            let content = '';
+            if (element) {
+              content =
+                element.type !== 1
+                  ? {
+                      id: element.id,
+                      content: element.subject
+                    }
+                  : {
+                      id: element.id,
+                      content: this.form[`${item.id}${element.id}`]
+                        ? this.form[`${item.id}${element.id}`]
+                        : '其他'
+                    };
+            }
+            answer.radio.push({
+              id: item.id,
+              content: content
+            });
+          } else if (item.type === 3) {
+            // 多选
+            !answer.checkbox && (answer.checkbox = []);
+            const content = [];
+            this.form[item.id].forEach(checkOpt => {
+              const element = item.items.find(elem => elem.id === checkOpt);
+              if (element) {
+                const obj =
+                  element.type !== 1
+                    ? {
+                        id: element.id,
+                        content: element.subject
+                      }
+                    : {
+                        id: element.id,
+                        content: this.form[`${item.id}${element.id}`]
+                          ? this.form[`${item.id}${element.id}`]
+                          : '其他'
+                      };
+                content.push(obj);
+              }
+            });
+            answer.checkbox.push({
+              id: item.id,
+              content: content
+            });
+          } else if (item.type === 4) {
+            // 下拉
+            !answer.select && (answer.select = []);
+            const element = item.items.find(elem => elem.subject === this.form[item.id]);
+            element &&
+              answer.select.push({
+                id: item.id,
+                content: {
+                  id: element.id,
+                  jobTxt: item.subject,
+                  content: element.subject
+                }
+              });
+          } else if (item.type === 5) {
+            // 地域
+            !answer.address && (answer.address = []);
+            const provinec = this.provinces.find(ele => ele.value == this.province) || {
+              label: '',
+              value: ''
+            };
+            const city = this.cityList.find(ele => ele.value == this.city) || {
+              label: '',
+              value: ''
+            };
+            const county = this.countyList.find(ele => ele.value == this.form[item.id]) || {
+              label: '',
+              value: ''
+            };
+            answer.address.push({
+              id: item.id,
+              content: `${provinec.label}${city.label}${county.label}`,
+              contentDe: [
+                {
+                  id: provinec.value,
+                  content: provinec.label
+                },
+                {
+                  id: city.value,
+                  content: city.label
+                },
+                {
+                  id: county.value,
+                  content: county.label
+                }
+              ]
+            });
+          } else if (item.type === 6) {
+            // 隐私协议勾选
+            !answer.statement && (answer.statement = []);
+            answer.statement.push({
+              id: item.id,
+              content: this.form[item.id] ? this.$t('form.form_1035') : this.$t('form.form_1036')
+            });
+          }
+        });
+        return answer;
+      },
+      //获取区域列表
+      getAreaList() {
+        this.signUpFormServer
+          .getAreaList()
+          .then(res => {
+            this.provinces = res.provinces;
+            this.cities = res.cities;
+            this.counties = res.counties;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
       //切换tab
       switchTab(type) {
         if (type === this.activeTab) {
           return;
         }
         this.activeTab = type;
+        //重置下云盾
+        this.showCaptcha = false;
+        this.mobileKey = '';
+        if (this.isPhoneValidate) {
+          type == 1 ? this.callCaptcha('#setCaptcha') : this.callCaptcha('#setCaptcha1');
+        }
       },
       //关闭模态窗
       handleClose() {
@@ -944,20 +1054,19 @@
         } else {
           phone = this.verifyForm.phone;
           this.$refs.verifyForm.validateField('phone', err => {
-            if (!err) {
-              isPhoneValid = true;
-            } else {
-              isPhoneValid = false;
-            }
+            isPhoneValid = !err;
           });
         }
         if (!isPhoneValid) {
           return false;
         }
 
-        //todo 获取短信验证码
+        //获取短信验证码
         if (this.mobileKey) {
-          this.countDown(isForm);
+          const params = { webinar_id: this.webinarId, phone: phone, captcha: this.mobileKey };
+          this.signUpFormServer.sendVerifyCode(params).then(() => {
+            this.countDown(isForm);
+          });
         }
       },
       // 倒计时函数
@@ -985,8 +1094,7 @@
         initNECaptcha({
           captchaId: that.captchakey,
           element: id,
-          //todo 动态读取项目的中英文设置
-          lang: 'zh-CN',
+          lang: that.langNECaptcha,
           mode: 'float',
           onReady(instance) {
             console.log('instance', instance);
@@ -995,11 +1103,9 @@
             if (data) {
               that.mobileKey = data.validate;
               that.showCaptcha = true;
-              console.log('data>>>', data);
               that.errorMsgShow = '';
             } else {
               that[captcha] = '';
-              console.log('errr>>>', err);
               that.errorMsgShow = true;
             }
           },
@@ -1040,10 +1146,199 @@
 
         this.privacyText = text;
       },
-      //todo 提交报名表单
-      submitForm() {},
-      //提交已报名的表单
-      submitVerify() {}
+      //提交报名表单
+      submitForm() {
+        this.$refs.form.validate((valid, object) => {
+          console.log(object);
+          if (valid) {
+            let form = this.generateFormParams();
+            const params = {
+              webinar_id: this.webinarId,
+              form: JSON.stringify(form)
+            };
+            this.isPhoneValidate && (params.verify_code = this.form.code);
+            const visitorId = sessionStorage.getItem('visitorId');
+            if (visitorId) {
+              params.visit_id = visitorId;
+            }
+            this.$route.query.refer && (params.refer = this.$route.query.refer);
+            this.signUpFormServer.submitSignUpForm(params).then(res => {
+              if (res.code == 200) {
+                res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
+                // 报名成功的操作，跳转到直播间
+                // 判断当前直播状态，进行相应的跳转
+                this.getWebinarStatus(true);
+              } else if (res.code == 512809 || res.code == 512570) {
+                // 短信验证码验证失败，触发表单验证失败
+                // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
+                this.isVerifyCodeErr = true;
+                this.$refs.form.validateField('code', res => {
+                  console.log(res);
+                  // 还原状态
+                  this.isVerifyCodeErr = false;
+                });
+              } else if (res.code == 512814 || res.code == 512815) {
+                // 报名成功的操作，跳转到直播间
+                this.closePreview();
+                // 判断当前直播状态，进行相应的跳转
+                this.$message({
+                  message: this.$t('form.form_1033'),
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+                this.getWebinarStatus();
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            });
+          } else {
+            return false;
+          }
+        });
+      },
+      //我已报名--验证
+      submitVerify() {
+        this.$refs.verifyForm.validate(valid => {
+          if (valid) {
+            const params = {
+              webinar_id: this.webinarId,
+              phone: this.verifyForm.phone,
+              verify_code: this.verifyForm.code
+            };
+            const visitorId = sessionStorage.getItem('visitorId');
+            if (visitorId) {
+              params.visit_id = visitorId;
+            }
+            this.signUpFormServer.checkIsRegistered(params).then(res => {
+              if (res.code == 200) {
+                // 如果已经报名
+                if (res.data.has_registed == 1) {
+                  // 已报名，跳转到直播间
+                  this.closePreview();
+                  sessionStorage.setItem('visitor_id', res.data.visit_id);
+                  this.$message({
+                    message: this.$t('form.form_1033'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  // 判断当前直播状态，进行相应的跳转
+                  this.getWebinarStatus();
+                } else {
+                  this.$message({
+                    message: this.$t('form.form_1034'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'warning',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.activeTab = 1;
+                }
+              } else if (res.code == 512809 || res.code == 512570) {
+                // 短信验证码验证失败，触发表单验证失败
+                // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
+                this.isVerifyCodeErr = true;
+                this.$refs.verifyForm.validateField('code', () => {
+                  // 还原状态
+                  this.isVerifyCodeErr = false;
+                });
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            });
+          } else {
+            return false;
+          }
+        });
+      },
+      // 获取当前活动状态，如果直播中，跳转到直播间
+      getWebinarStatus(isSubmitForm) {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        this.signUpFormServer.getWebinarType(params).then(res => {
+          if (res.code == 512503 || res.code == 512502) {
+            window.location.href = `${window.location.origin}/${this.webinar_id}`;
+            return false;
+          }
+          // 如果是独立链接，判断状态进行跳转
+          if (this.isEntryForm) {
+            const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+            if (res.data.status == 'live') {
+              window.location.href =
+                window.location.origin +
+                process.env.VUE_APP_WEB_KEY +
+                `/lives/watch/${this.webinar_id}${queryString}`;
+            } else {
+              // 如果预约或结束，跳转到预约页
+              if (res.data.webinar.type == 2 && isSubmitForm) {
+                // 如果是预约状态，显示开播时间提醒
+                this.$alert(
+                  this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
+                  this.$t('account.account_1061'),
+                  {
+                    confirmButtonText: this.$t('common.common_1033'),
+                    customClass: 'zdy-alert-box',
+                    callback: action => {
+                      console.log(action);
+                      this.closePreview();
+                      window.location.href =
+                        window.location.origin +
+                        process.env.VUE_APP_WEB_KEY +
+                        `/lives/subscribe/${this.webinar_id}${queryString}`;
+                    }
+                  }
+                );
+              } else {
+                window.location.href =
+                  window.location.origin +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/subscribe/${this.webinar_id}${queryString}`;
+              }
+            }
+          } else {
+            if (res.data.webinar.type == 2 && isSubmitForm) {
+              // 如果是预约状态，显示开播时间提醒
+              this.$alert(
+                this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
+                this.$t('account.account_1061'),
+                {
+                  confirmButtonText: this.$t('common.common_1033'),
+                  customClass: 'zdy-alert-box',
+                  callback: action => {
+                    console.log(action);
+                    this.closePreview();
+                    //todo 可能需要信令通知其他组件验证成功
+                  }
+                }
+              );
+            } else {
+              this.closePreview();
+              //todo 可能需要信令通知其他组件验证成功
+            }
+          }
+        });
+      },
+      //关闭当前视图
+      closePreview() {
+        this.handleClose();
+        //todo 发送信令，关闭独立预约页
+      }
     }
   };
 </script>
