@@ -16,6 +16,12 @@ const routes = [
     meta: { title: '直播间', grayType: 'webinar' }
   },
   {
+    path: '/lives/embedclient/watch/:id',
+    component: Home,
+    name: 'LiveRoom',
+    meta: { title: '直播间', grayType: 'webinar' }
+  },
+  {
     path: '/lives/subscribe/:id',
     component: Subscribe,
     name: 'Subscribe',

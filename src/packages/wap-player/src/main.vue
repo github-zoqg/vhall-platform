@@ -351,6 +351,7 @@
     mounted() {
       this.getWebinerStatus();
       this.listenEvents();
+      console.log(this.isNotEmbed, '?????????zhangxiao');
     },
     methods: {
       startPlay() {
