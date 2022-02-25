@@ -31,6 +31,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpWatchAuth',
     data() {
@@ -84,6 +85,11 @@
                 window.location.reload();
               }, 1000);
             }
+          } else if (res.code === 512525) {
+            // 填写报名表单
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
