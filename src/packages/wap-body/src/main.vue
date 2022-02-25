@@ -37,6 +37,7 @@
 <script>
   import { useMsgServer } from 'middle-domain';
   import move from './js/move';
+  import { Dialog } from 'vant';
   export default {
     name: 'VmpWapBody',
     mixins: [move],
@@ -63,7 +64,16 @@
     beforeCreate() {
       this.msgServer = useMsgServer();
     },
-    created() {
+    async created() {
+      if (
+        [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
+        this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
+      ) {
+        await Dialog.alert({
+          title: '提示',
+          message: '本场直播支持视频连线，建议您允许系统启用相应设备以使用该功能。'
+        });
+      }
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
     mounted() {

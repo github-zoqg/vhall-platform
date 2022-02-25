@@ -62,7 +62,7 @@ export const serverConfig = {
       'comOfficial',
       'comShare',
       'comWatchAuth',
-      // 'comSignUpForm',
+      'comSignUpForm',
       'comUserAccount',
       'comCash',
       'comLottery',

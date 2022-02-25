@@ -1709,10 +1709,18 @@
       },
       //邀请上麦
       inviteMic(accountId = '') {
-        if (accountId === this.currentSpeakerId) {
+        if (this.memberOptions.platformType === 'watch' && accountId === this.leader_id) {
           return;
         }
-        const params = { room_id: this.roomId, receive_account_id: accountId, type: 1 };
+
+        if (this.memberOptions.platformType === 'watch' && accountId === this.currentSpeakerId) {
+          return;
+        }
+        const params = {
+          room_id: this.roomId,
+          receive_account_id: accountId,
+          type: 1
+        };
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {
