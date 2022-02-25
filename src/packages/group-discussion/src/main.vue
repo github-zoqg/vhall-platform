@@ -326,9 +326,34 @@
       }
     },
     mounted() {
+      this.initEvent();
       this.initData();
     },
     methods: {
+      // 初始化事件
+      initEvent() {
+        // 发起端收到拒绝邀请演示
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
+          // 如果申请人是自己, 或者自己不是主持人
+          if (
+            msg.data.room_join_id == this.userId ||
+            this.roomBaseServer.state.watchInitData.join_info.role_name != 1
+          ) {
+            return;
+          }
+          let role = '';
+          if (msg.data.room_role == 2) {
+            role = '观众';
+          } else if (msg.data.room_role == 4) {
+            role = '嘉宾';
+          }
+          if (msg.data.extra_params == this.userId) {
+            this.$message.warning({
+              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
+            });
+          }
+        });
+      },
       // 正在演示的人，切换channel需要自己结束演示
       handleEndDemonstrateInChannelChange() {
         if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {

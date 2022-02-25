@@ -3,7 +3,7 @@
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[`vmp-doc-wap--${displayMode}`]"
-    v-show="watchDocShow"
+    v-show="switchStatus"
     ref="docWrapper"
   >
     <!-- 文档白板内容区 -->
@@ -63,8 +63,8 @@
       currentCid() {
         return this.docServer.state.currentCid;
       },
-      watchDocShow() {
-        return this.docServer.state.watchDocShow;
+      switchStatus() {
+        return this.docServer.state.switchStatus;
       }
     },
     watch: {
@@ -144,49 +144,43 @@
 
         // 回放文档加载事件
         this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-          if (
-            this.roomBaseServer.state.watchInitData.webinar.type == 4 ||
-            this.roomBaseServer.state.watchInitData.webinar.type == 5
-          ) {
-            if (this.docServer.state.containerList.length === 0) {
-              const data = this.docServer.getVodAllCids();
-              this.docServer.state.containerList = data.map(item => {
-                return {
-                  cid: item.cid
-                };
-              });
-              console.log('[doc] containerList:', this.docServer.state.containerList);
-              this.docServer.state.watchDocShow = this.docServer.state.containerList.length > 0;
-              await this.$nextTick();
-              console.log('[doc] watchDocShow:', this.docServer.state.watchDocShow);
-              if (this.docServer.state.watchDocShow) {
-                //  emitShowMenuTab
-                this.resize();
-                // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
-                const { width, height } = this.docViewRect;
-                if (!width || !height) return;
-                for (const item of data) {
-                  this.docServer.initContainer({
-                    cid: item.cid,
-                    width,
-                    height,
-                    fileType: item.type.toLowerCase()
-                  });
-                }
-                window.$middleEventSdk?.event?.send(
-                  boxEventOpitons(this.cuid, 'emitShowMenuTab', {
-                    visible: true,
-                    type: 2
-                  })
-                );
-              } else {
-                window.$middleEventSdk?.event?.send(
-                  boxEventOpitons(this.cuid, 'emitShowMenuTab', {
-                    visible: false,
-                    type: 2
-                  })
-                );
+          if (this.docServer.state.containerList.length === 0) {
+            const data = this.docServer.getVodAllCids();
+            this.docServer.state.containerList = data.map(item => {
+              return {
+                cid: item.cid
+              };
+            });
+            console.log('[doc] containerList:', this.docServer.state.containerList);
+            this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
+            await this.$nextTick();
+            if (this.docServer.state.switchStatus) {
+              // emitShowMenuTab
+              this.resize();
+              // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
+              const { width, height } = this.docViewRect;
+              if (!width || !height) return;
+              for (const item of data) {
+                this.docServer.initContainer({
+                  cid: item.cid,
+                  width,
+                  height,
+                  fileType: item.type.toLowerCase()
+                });
               }
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                  visible: true,
+                  type: 2
+                })
+              );
+            } else {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                  visible: false,
+                  type: 2
+                })
+              );
             }
           }
         });
