@@ -195,7 +195,7 @@
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
         console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       switchStatus: {
         get() {
@@ -287,10 +287,15 @@
         if (brush === 'clear') {
           // TODO 提示文本进行国际化处理
           try {
-            await this.$confirm('确定要清空白板么？', '提示', {
+            await this.$confirm('<p>确定要清空文档标记么？</p>', '提示', {
+              customClass: 'saas-message-box',
+              dangerouslyUseHTMLString: true,
+              closeOnClickModal: false,
+              roundButton: true,
               confirmButtonText: '确定',
               cancelButtonText: '取消',
-              type: 'warning'
+              confirmButtonClass: 'btn-saas',
+              cancelButtonClass: 'btn-saas btn-saas-cancel'
             });
             this.docServer.clear();
           } catch (err) {

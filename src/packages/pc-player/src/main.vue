@@ -307,7 +307,7 @@
     computed: {
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       //判断是否是音频直播模式
       isAudio() {

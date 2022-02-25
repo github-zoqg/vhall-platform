@@ -178,13 +178,13 @@
       },
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       // 文档是否可见
       show() {
         return (
-          this.roomBaseServer.state.clientType === 'send' ||
-          (this.roomBaseServer.state.clientType !== 'send' &&
+          this.roomBaseServer.state.watchInitData.join_info.role_name != 2 ||
+          (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
               this.docServer.state.hasDocPermission ||
@@ -272,6 +272,7 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
+        this.resize();
       },
       /**
        * 屏幕缩放
@@ -296,9 +297,10 @@
             }
           }
         } else {
-          rect = screenfull.isFullscreen
-            ? this.$refs.docWrapper?.getBoundingClientRect()
-            : this.$refs.docContent?.getBoundingClientRect();
+          rect =
+            this.displayMode === 'fullscreen'
+              ? this.$refs.docWrapper?.getBoundingClientRect()
+              : this.$refs.docContent?.getBoundingClientRect();
         }
         if (!rect) return;
         let { width, height } = rect;
@@ -494,7 +496,7 @@
             await this.$nextTick();
           }
         });
-        if (this.roomBaseServer.state.clientType === 'send') {
+        if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])

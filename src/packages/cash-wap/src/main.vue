@@ -656,6 +656,7 @@
       position: relative;
       font-size: 28px;
       color: #1a1a1a;
+      text-align: justify;
       line-height: 40px;
 
       .vh-line-close {

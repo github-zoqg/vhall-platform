@@ -1210,9 +1210,11 @@
           }, 1000);
         }
         //切换小组
-        function handleGroupChange(msg) {
+        async function handleGroupChange(msg) {
           // 进入小组重置演示人id
           _this.presentation_screen = msg.main_screen;
+          // 初始化互动实例
+          await this.interactiveServer.init();
         }
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {

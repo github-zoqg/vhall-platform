@@ -81,7 +81,6 @@
       },
 
       record() {
-        alert(this.recorded);
         if (!this.recorded) {
           this.recorded = true;
           this.statusText = '录制中';

@@ -213,7 +213,9 @@
       });
       //监听直播结束的通知，下麦并停止推流
       useMsgServer().$on('live_over', e => {
-        useMicServer().speakOff();
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
       });
     },
     methods: {

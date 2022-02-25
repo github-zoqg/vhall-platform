@@ -326,7 +326,7 @@
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
-  import { userSignUpFormServer } from 'middle-domain';
+  import { useSignUpFormServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   export default {
     name: 'VmpWapSignUpForm',
@@ -569,7 +569,7 @@
       }
     },
     beforeCreate() {
-      this.signUpFormServer = userSignUpFormServer();
+      this.signUpFormServer = useSignUpFormServer();
     },
     async mounted() {
       await this.getFormLinkStatus();
