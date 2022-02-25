@@ -293,7 +293,11 @@ export const serverConfig = {
     component: 'VmpNoticeColumn'
   },
   comWatchAuth: {
-    component: 'VmpWatchAuth'
+    component: 'VmpWatchAuth',
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
   },
   comWatchPayFee: {
     component: 'VmpWatchPayFee'

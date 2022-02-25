@@ -183,8 +183,6 @@
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
             );
-            // this.showSignForm = true;
-            // this.showAuthModel = false;
             break;
           case 512002:
           case 512522:

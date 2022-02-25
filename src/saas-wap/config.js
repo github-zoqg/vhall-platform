@@ -322,7 +322,7 @@ export const serverConfig = {
 
   subcribeRoot: {
     component: 'VmpAirContainer',
-    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'subcribeFooter', 'comAllDialog']
+    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog']
   },
   // 顶部header容器
   subcribeHeader: {
@@ -341,11 +341,15 @@ export const serverConfig = {
     className: 'tab-content',
     children: ['comTabMenuWap']
   },
-  subcribeFooter: {
-    component: 'VmpAirContainer'
-  },
   comSubcribeWapBody: {
-    component: 'VmpSubscribeBody'
-    // children: ['comWapPlayer']
+    component: 'VmpSubscribeBody',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ],
+    children: ['comWapPlayer']
   }
 };
