@@ -12,7 +12,7 @@
           <i class="vh-iconfont vh-line-time" />
           开始时间:{{ startTime }}
         </p>
-        <template v-if="watchInitData.status == 'subscribe' && webinar.type != 1">
+        <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
           <p v-if="watchInitData.subscribe.show">
             <i class="vh-iconfont vh-line-user"></i>
             预约人数:{{ watchInitData.subscribe.num }} 人
@@ -26,7 +26,10 @@
           </p>
         </template>
       </main>
-      <div class="vmp-intro-block__auth">
+      <div
+        class="vmp-intro-block__auth"
+        v-if="watchInitData.status == 'subscribe' && webinar.type != 1"
+      >
         <span>
           {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}
           {{
