@@ -24,7 +24,7 @@
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
-      <div
+      <!-- <div
         v-if="isLivingEnd"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
@@ -35,7 +35,7 @@
           </div>
           <h1 class="vmp-wap-player-ending-box-text">直播已结束</h1>
         </div>
-      </div>
+      </div> -->
       <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
         <p>语音播放中</p>
       </div>
@@ -325,7 +325,6 @@
         recordHistoryTime: '', // 记录播放的时间
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
-        isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
         marquee: {}, // 跑马灯
         water: {}, //水印
@@ -656,9 +655,9 @@
 </script>
 <style lang="less">
   .vmp-wap-player {
-    height: 422px;
-    width: 100%;
-    position: relative;
+    // height: 422px;
+    // width: 100%;
+    // position: relative;
     &-opcity-flase {
       // opacity: 0;
       display: none;

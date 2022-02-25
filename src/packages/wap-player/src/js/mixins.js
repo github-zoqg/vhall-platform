@@ -57,11 +57,11 @@ const playerMixins = {
         this.addBarrage(data);
       });
 
-      // 结束直播
-      this.playerServer.$on('live_over', data => {
-        console.log(data);
-        this.isLivingEnd = true;
-      });
+      // // 结束直播
+      // this.playerServer.$on('live_over', data => {
+      //   console.log(data);
+      //   this.isLivingEnd = true;
+      // });
     },
     listenEvents() {
       // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑

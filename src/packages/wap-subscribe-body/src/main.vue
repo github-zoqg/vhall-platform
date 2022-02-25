@@ -45,6 +45,18 @@
       @authSubmit="authSubmit"
       @authClose="authClose"
     ></authBox>
+    <!-- 弹出直播提醒 -->
+    <van-dialog
+      use-slot
+      v-model="popupLivingStart"
+      :title="$t('webinar.webinar_1019')"
+      :confirmButtonText="$t('common.common_1010')"
+      class="vmp-wap-body-popup"
+      @confirm="livingStartConfirm"
+      @close="livingCloseConfirm"
+    >
+      <p>{{ $t('player.player_1018') }}</p>
+    </van-dialog>
   </div>
 </template>
 <script>
@@ -57,6 +69,7 @@
       return {
         showVideo: false, // 显示暖场视频
         isSubscribeShow: false,
+        popupLivingStart: false, // 开播提醒
         countDownTime: '',
         subscribeText: '',
         showBottomBtn: true,
@@ -115,8 +128,10 @@
         this.subscribeServer.$on('live_start', data => {
           console.log(data, '???zhangxiao');
           this.subOption.type = 1;
-          this.isLiving = true;
-          // this.$refs.bottomTab && this.$refs.bottomTab.changeTime();
+          if (this.countDowntimer) clearInterval(this.countDowntimer);
+          this.countDownTime = '';
+          this.popupLivingStart = true;
+          this.subscribeText = this.$t('webinar.webinar_1020');
         });
 
         this.subscribeServer.$on('pay_success', data => {
@@ -127,10 +142,6 @@
               type: 'success',
               customClass: 'zdy-info-box'
             });
-            // this.fetchAuth({ type: 3 });
-            // window.$middleEventSdk?.event?.send(
-            //   boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
-            // );
           }
         });
 
@@ -138,12 +149,6 @@
           this.subOption.type = 3;
           console.log(data);
         });
-        // this.playerServer.$on(VhallPlayer.PLAY, () => {
-        //   this.showBottom = false;
-        // });
-        // this.playerServer.$on(VhallPlayer.ENDED, () => {
-        //   this.showBottom = true;
-        // });
       },
       handlerInitInfo() {
         const { webinar, join_info, warmup } = this.roomBaseServer.state.watchInitData;
@@ -380,6 +385,17 @@
           this.countDownTime = this.$t('player.player_1017');
         }
       },
+      livingStartConfirm() {
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
+      },
+      livingCloseConfirm() {
+        this.popupLivingStart = false;
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
+      },
       /**
        * 倒计时是否开启
        */
@@ -515,6 +531,34 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
+      }
+    }
+    &-popup {
+      min-height: 360px;
+      border-radius: 14px;
+      .van-dialog__header {
+        font-size: 36px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        font-weight: 400;
+        color: rgba(0, 0, 0, 1);
+        line-height: 40px;
+        padding-top: 40px;
+        font-weight: bolder;
+      }
+      .van-dialog__content {
+        height: 184px;
+        font-size: 32px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        font-weight: 400;
+        padding: 68px 0 70px;
+        color: #333;
+        p {
+          text-align: center;
+        }
+      }
+      .van-dialog__confirm {
+        font-size: 36px;
+        color: #fc5659;
       }
     }
   }

@@ -1,21 +1,40 @@
 <template>
   <div class="vmp-wap-body">
+    <!-- 直播结束 -->
+    <div
+      v-if="isLivingEnd"
+      class="vmp-wap-body-ending"
+      :style="`backgroundImage: url('${webinarsBgImg}')`"
+    >
+      <div class="vmp-wap-body-ending-box">
+        <div class="vmp-wap-body-ending-box-img">
+          <img src="./img/livingEnd@2x.png" alt="" />
+        </div>
+        <h1 class="vmp-wap-body-ending-box-text">直播已结束</h1>
+      </div>
+    </div>
     <!-- 播放器 -->
     <vmp-air-container
       :cuid="childrenComp[0]"
       :oneself="true"
-      v-if="!isShowContainer"
+      v-if="!isShowContainer && !isLivingEnd"
     ></vmp-air-container>
     <!-- 流列表 -->
-    <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+    <vmp-air-container
+      v-if="isShowContainer && !isLivingEnd"
+      :cuid="childrenComp[1]"
+      :oneself="true"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
+  import { useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpWapBody',
     data() {
       return {
-        childrenComp: []
+        childrenComp: [],
+        isLivingEnd: false
       };
     },
     computed: {
@@ -25,11 +44,73 @@
             this.$domainStore.state.micServer.isSpeakOn) &&
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
         );
+      },
+      webinarsBgImg() {
+        const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url || cover;
       }
+    },
+    beforeCreate() {
+      this.msgServer = useMsgServer();
     },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
+    mounted() {
+      this.msgServer.$onMsg('ROOM_MSG', msg => {
+        // live_over 结束直播
+        if (msg.data.type == 'live_over') {
+          this.isLivingEnd = true;
+        }
+        // 分组直播 没有结束讨论 直接结束直播
+        if (msg.data.type == 'group_switch_end') {
+          if (msg.data.over_live) {
+            this.isLivingEnd = true;
+          }
+        }
+      });
+    },
     methods: {}
   };
 </script>
+<style lang="less">
+  .vmp-wap-body {
+    &-ending {
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      &-box {
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        &-img {
+          width: 141px;
+          height: 104px;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
+        }
+        &-text {
+          font-size: 28px;
+          line-height: 50px;
+          height: 50px;
+          color: #fff;
+          padding-left: 25px;
+          font-weight: 400;
+          padding-top: 30px;
+        }
+      }
+    }
+  }
+</style>
