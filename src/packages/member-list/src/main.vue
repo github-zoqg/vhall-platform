@@ -1709,7 +1709,11 @@
       },
       //邀请上麦
       inviteMic(accountId = '') {
-        if (accountId === this.currentSpeakerId) {
+        if (this.memberOptions.platformType === 'watch' && accountId === this.leader_id) {
+          return;
+        }
+
+        if (this.memberOptions.platformType === 'watch' && accountId === this.currentSpeakerId) {
           return;
         }
         const params = {
