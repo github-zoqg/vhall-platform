@@ -272,6 +272,7 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
+        this.resize();
       },
       /**
        * 屏幕缩放
@@ -296,9 +297,10 @@
             }
           }
         } else {
-          rect = screenfull.isFullscreen
-            ? this.$refs.docWrapper?.getBoundingClientRect()
-            : this.$refs.docContent?.getBoundingClientRect();
+          rect =
+            this.displayMode === 'fullscreen'
+              ? this.$refs.docWrapper?.getBoundingClientRect()
+              : this.$refs.docContent?.getBoundingClientRect();
         }
         if (!rect) return;
         let { width, height } = rect;

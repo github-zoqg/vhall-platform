@@ -147,7 +147,7 @@
     },
     computed: {
       isAudio() {
-        const videoType = this.videoParam.msg_url || this.videoParam.file_type;
+        const videoType = this.videoParam.msg_url || this.videoParam.file_type || '.mp3';
         return videoType.toLowerCase() == '.mp3' || videoType.toLowerCase() == '.mav';
       }
     },
@@ -177,20 +177,35 @@
       },
       async initSDK() {
         const { interact, join_info } = this.roomBaseState.watchInitData;
-        const params = {
+        const { videoParam } = this;
+        let params = {
           appId: interact.paas_app_id || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
-          type: 'vod', // live 直播  vod 点播  必填
+          type: videoParam.type || 'vod', // live 直播  vod 点播  必填
           videoNode: 'videoDom' + this.timestamp, // 播放器的容器， div的id 必填
           poster: '', // 封面地址  仅支持.jpg
           autoplay: false,
           forceMSE: false,
-          vodOption: { recordId: this.videoParam.paas_record_id, forceMSE: false },
+
           subtitleOption: {
             enable: true
           }
         };
+
+        params = Object.assign(params, videoParam);
+
+        if (videoParam.type === 'live') {
+          Object.assign(params, {
+            liveOption: videoParam.liveOption
+          });
+        }
+
+        if (videoParam.type === 'vod') {
+          Object.assign(params, {
+            vodOption: { recordId: videoParam.paas_record_id, forceMSE: false }
+          });
+        }
         return new Promise(resolve => {
           this.playerServer.init(params).then(() => {
             this.playerServer.openControls(false);

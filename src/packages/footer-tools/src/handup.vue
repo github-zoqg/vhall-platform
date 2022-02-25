@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer, useRoomBaseServer } from 'middle-domain';
+  import { useMicServer, useRoomBaseServer, useInteractiveServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -70,6 +70,7 @@
       });
       // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {
+        // 非自动上麦，默认以“静音”的形式上麦
         console.log(msg);
       });
       // 主持人拒绝上麦申请
