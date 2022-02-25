@@ -12,14 +12,44 @@
           <i class="vh-iconfont vh-line-time" />
           开始时间:{{ startTime }}
         </p>
-        <!-- 直播中才展示在线人数 -->
-        <p v-if="watchInitData.online.show">
-          <i class="vh-iconfont vh-line-user"></i>
-          在线人数:{{ personCount }} 人
-        </p>
+        <template v-if="watchInitData.status == 'subscribe' && webinar.type != 1">
+          <p v-if="watchInitData.subscribe.show">
+            <i class="vh-iconfont vh-line-user"></i>
+            预约人数:{{ watchInitData.subscribe.num }} 人
+          </p>
+        </template>
+        <template v-if="watchInitData.status != 'subscribe'">
+          <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+          <p v-if="watchInitData.online.show">
+            <i class="vh-iconfont vh-line-user"></i>
+            在线人数:{{ personCount }} 人
+          </p>
+        </template>
       </main>
+      <div class="vmp-intro-block__auth">
+        <span>
+          {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}
+          {{
+            ((webinar.verify == 4 || webinar.verify == 1) && Number(webinar.reg_form) && '/') || ''
+          }}
+          {{
+            webinar.verify == 0
+              ? ''
+              : webinar.verify == 1
+              ? $t('form.form_1079')
+              : webinar.verify == 2
+              ? $t('appointment.appointment_1032')
+              : webinar.verify == 3
+              ? ''
+              : webinar.verify == 4
+              ? $t('appointment.appointment_1011')
+              : webinar.verify == 5
+              ? $t('form.form_1078')
+              : ''
+          }}
+        </span>
+      </div>
     </section>
-
     <section class="vmp-intro-block vmp-intro-block-content">
       <header class="vmp-intro-block__title">活动简介</header>
       <main class="vmp-intro-block__content-main" v-html="content"></main>
@@ -113,6 +143,7 @@
     .vmp-intro-block {
       padding: 0.4rem;
       background-color: #fff;
+      position: relative;
 
       &:not(:first-child) {
         margin-top: 20px;
@@ -194,6 +225,23 @@
         line-height: 1.2;
         p {
           word-break: break-all;
+        }
+      }
+
+      &__auth {
+        position: absolute;
+        bottom: 14px;
+        right: 30px;
+        display: flex;
+        flex-direction: column;
+        span {
+          height: 50px;
+          font-size: 32px;
+          font-family: PingFangSC;
+          font-weight: bold;
+          color: rgba(252, 86, 89, 1);
+          line-height: 36px;
+          text-align: right;
         }
       }
     }

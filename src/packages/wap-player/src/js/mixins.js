@@ -46,8 +46,10 @@ const playerMixins = {
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('播放完毕');
-        this.isVodEnd = true;
         this.isShowPoster = true;
+        this.isPlayering = false;
+        if (this.isWarnPreview) return;
+        this.isVodEnd = true;
       });
       // 打开弹幕
       this.playerServer.$on('push_barrage', data => {

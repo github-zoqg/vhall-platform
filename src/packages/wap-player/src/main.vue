@@ -43,7 +43,7 @@
       <div
         v-if="isVodEnd"
         class="vmp-wap-player-ending"
-        :style="`backgroundImage: url('${videoCover}')`"
+        :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
         <!-- 试看播放结束 -->
         <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
@@ -73,7 +73,7 @@
       <!-- 观看次数  -->
       <div
         class="vmp-wap-player-header"
-        v-show="roomBaseState.watchInitData.pv.show && isPlayering"
+        v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview"
         :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
       >
         <p>
@@ -97,7 +97,9 @@
           <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed">
             {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
           </span>
-          <span @click="openQuality">{{ formatQualityText(currentQualitys.def) }}</span>
+          <span @click="openQuality" v-if="!isWarnPreview">
+            {{ formatQualityText(currentQualitys.def) }}
+          </span>
         </div>
         <div class="vmp-wap-player-control">
           <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
@@ -132,7 +134,7 @@
               ></controlEventPoint>
             </div>
             <van-slider
-              v-if="!isLiving && playerOtherOptions.progress_bar"
+              v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
               v-model="sliderVal"
               active-color="rgba(252,86,89,.7)"
               inactive-color="rgba(255,255,255,.3)"

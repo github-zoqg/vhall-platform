@@ -343,13 +343,13 @@ export const serverConfig = {
   },
   comSubcribeWapBody: {
     component: 'VmpSubscribeBody',
+    children: ['comWapPlayer'],
     emitClickLogin: [
       //登录弹窗
       {
         cuid: 'compRegLoginWap',
         method: 'open'
       }
-    ],
-    children: ['comWapPlayer']
+    ]
   }
 };

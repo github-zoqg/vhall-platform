@@ -5,25 +5,27 @@
         <img :src="webinarsBgImg" alt="" />
       </div>
       <div class="" v-if="showVideo">
-        <vmp-air-container :cuid="comWapPlayer" :oneself="true"></vmp-air-container>
+        <vmp-air-container :cuid="cuid"></vmp-air-container>
       </div>
-      <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
-        {{ countDownTime }}
-      </div>
-      <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
-      <div class="subscribe-status" :class="`subscribe-status-${webinarType}`">
-        {{
-          webinarType == 1
-            ? $t('webinar.webinar_1018')
-            : webinarType == 2
-            ? $t('common.common_1019')
-            : webinarType == 3
-            ? $t('common.common_1020')
-            : webinarType == 4
-            ? $t('common.common_1024')
-            : $t('common.common_1021')
-        }}
-      </div>
+      <template v-if="!showVideo">
+        <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
+          {{ countDownTime }}
+        </div>
+        <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
+        <div class="subscribe-status" :class="`subscribe-status-${webinarType}`">
+          {{
+            webinarType == 1
+              ? $t('webinar.webinar_1018')
+              : webinarType == 2
+              ? $t('common.common_1019')
+              : webinarType == 3
+              ? $t('common.common_1020')
+              : webinarType == 4
+              ? $t('common.common_1024')
+              : $t('common.common_1021')
+          }}
+        </div>
+      </template>
     </div>
     <template v-if="showBottomBtn">
       <div class="vmp-wap-body-auth">
@@ -192,14 +194,17 @@
       },
       handleAuthErrorCode(code, msg) {
         let params = {};
+        let queryString = '';
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
-          case 512525: // 填写表单emitClickOpenSignUpForm
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
-            );
+          case 512525: // 填写表单
+            queryString = this.$route.query.refer
+              ? `?refer=${this.$route.query.refer}&isIndependent=0`
+              : '?isIndependent=0';
+            queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
             break;
           case 512002:
           case 512522:
@@ -293,6 +298,7 @@
           });
       },
       authSubmit(value) {
+        let queryString = '';
         let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
         let params = {
           type: type,
@@ -319,7 +325,11 @@
             }
           } else if (res.code === 512525) {
             // 填写报名表单
-            console.log('1111111');
+            queryString = this.$route.query.refer
+              ? `?refer=${this.$route.query.refer}&isIndependent=0`
+              : '?isIndependent=0';
+            queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
           } else {
             this.$toast(this.$tes(res.code) || res.msg);
           }
@@ -470,17 +480,17 @@
         color: #fff;
         line-height: 0.56rem;
         font-style: normal;
-        &.video-status-1 {
+        &-1 {
           background: #ff3333;
         }
-        &.video-status-2 {
+        &-2 {
           background: #1087dc;
         }
-        &.video-status-3 {
+        &-3 {
           background: #757575;
         }
-        &.video-status-4,
-        &.video-status-5 {
+        &-4,
+        &-5 {
           background: #2ab804;
         }
       }
