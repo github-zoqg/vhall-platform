@@ -103,7 +103,7 @@
             // 开始推流
             this.startPush();
           } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-            // 实例化互动实例
+            //  初始化互动实例
             await this.interactiveServer.init();
             // 开始推流
             this.startPush();
@@ -116,7 +116,7 @@
 
         this.interactiveServer.destroy();
         if (this.isNoDelay === 1 || this.mode === 6) {
-          // 实例化互动实例
+          //  初始化互动实例
           this.interactiveServer.init();
         }
       });
