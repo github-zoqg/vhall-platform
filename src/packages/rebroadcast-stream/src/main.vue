@@ -27,6 +27,11 @@
       this.interactiveServer = useInteractiveServer();
       this.rebroadcastServer = useRebroadcastServer();
     },
+    mounted() {
+      // if (this.rebroadcastServer.state.roomId) {
+      //   this.open();
+      // }
+    },
     methods: {
       open() {
         this.interactiveServer.unpublishStream();
