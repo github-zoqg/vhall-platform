@@ -18,7 +18,7 @@
       // uploadfailed: '上传失败'
       // transwait: 等待转码 （上传成功后会转到此状态）
       // transdoing: 转码中
-      // transcompleted: 转码完成
+      // transcompleted: 转码成功
       // transfailed: 转码失败
       docStatus: {
         type: String,
@@ -46,7 +46,7 @@
         } else if (this.docStatus === 'transdoing') {
           return '转码中';
         } else if (this.docStatus === 'transcompleted') {
-          return '转码完成';
+          return '转码成功';
         } else if (this.docStatus === 'transfailed') {
           return '转码失败';
         } else return '';

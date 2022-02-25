@@ -1684,7 +1684,11 @@
         if (accountId === this.currentSpeakerId) {
           return;
         }
-        const params = { room_id: this.roomId, receive_account_id: accountId, type: 1 };
+        const params = {
+          room_id: this.roomId,
+          receive_account_id: accountId,
+          type: 1
+        };
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {

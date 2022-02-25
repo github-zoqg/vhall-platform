@@ -349,6 +349,7 @@
                 cid: item.cid
               };
             });
+            //
             this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
             await this.$nextTick();
             if (this.docServer.state.switchStatus) {
