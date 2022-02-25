@@ -291,7 +291,7 @@
               // 无延迟｜分组直播
               // 如果成功，销毁播放器
               this.playerServer.destroy();
-              // 实例化互动实例
+              //  初始化互动实例
               await this.interactiveServer.init();
               // 开始推流
               this.startPush();
@@ -307,7 +307,7 @@
           // 如果成功，销毁播放器
           this.playerServer.init();
           if (this.isNoDelay === 1 || this.mode === 6) {
-            // 实例化互动实例
+            //  初始化互动实例
             this.interactiveServer.init();
           }
         });
