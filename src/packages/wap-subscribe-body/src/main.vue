@@ -1,10 +1,10 @@
 <template>
-  <div class="vmp-wap-body">
-    <div class="vmp-wap-body-container">
+  <div class="vmp-subscribe-body">
+    <div class="vmp-subscribe-body-container">
       <div class="subscribe-bg" v-if="!showVideo">
         <img :src="webinarsBgImg" alt="" />
       </div>
-      <div class="" v-if="showVideo">
+      <div v-if="showVideo">
         <vmp-air-container :cuid="cuid"></vmp-air-container>
       </div>
       <template v-if="!showVideo">
@@ -28,8 +28,8 @@
       </template>
     </div>
     <template v-if="showBottomBtn">
-      <div class="vmp-wap-body-auth">
-        <div class="vmp-wap-body-auth-two" v-if="subOption.verify == 6">
+      <div class="vmp-subscribe-body-auth">
+        <div class="vmp-subscribe-body-auth-two" v-if="subOption.verify == 6">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
@@ -51,7 +51,7 @@
       v-model="popupLivingStart"
       :title="$t('webinar.webinar_1019')"
       :confirmButtonText="$t('common.common_1010')"
-      class="vmp-wap-body-popup"
+      class="vmp-subscribe-body-popup"
       @confirm="livingStartConfirm"
       @close="livingCloseConfirm"
     >
@@ -454,11 +454,11 @@
   };
 </script>
 <style lang="less">
-  .vmp-wap-body {
+  .vmp-subscribe-body {
     height: 422px;
     width: 100%;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     &-container {
       height: 100%;
       width: 100%;

@@ -13,28 +13,38 @@
         <h1 class="vmp-wap-body-ending-box-text">直播已结束</h1>
       </div>
     </div>
-    <!-- 播放器 -->
-    <vmp-air-container
-      :cuid="childrenComp[0]"
-      :oneself="true"
-      v-if="!isShowContainer && !isLivingEnd"
-    ></vmp-air-container>
-    <!-- 流列表 -->
-    <vmp-air-container
-      v-if="isShowContainer && !isLivingEnd"
-      :cuid="childrenComp[1]"
-      :oneself="true"
-    ></vmp-air-container>
+    <div
+      id="wap-player-mini"
+      :class="[mini ? 'vmp-wap-body-mini' : '']"
+      @touchstart="touchstart($event)"
+      @touchmove.prevent="touchmove($event)"
+    >
+      <!-- 播放器 -->
+      <vmp-air-container
+        :cuid="childrenComp[0]"
+        :oneself="true"
+        v-if="!isShowContainer && !isLivingEnd"
+      ></vmp-air-container>
+      <!-- 流列表 -->
+      <vmp-air-container
+        v-if="isShowContainer && !isLivingEnd"
+        :cuid="childrenComp[1]"
+        :oneself="true"
+      ></vmp-air-container>
+    </div>
   </div>
 </template>
 <script>
   import { useMsgServer } from 'middle-domain';
+  import move from './js/move';
   export default {
     name: 'VmpWapBody',
+    mixins: [move],
     data() {
       return {
         childrenComp: [],
-        isLivingEnd: false
+        isLivingEnd: false,
+        mini: false
       };
     },
     computed: {
@@ -61,6 +71,7 @@
         // live_over 结束直播
         if (msg.data.type == 'live_over') {
           this.isLivingEnd = true;
+          this.mini = false;
         }
         // 分组直播 没有结束讨论 直接结束直播
         if (msg.data.type == 'group_switch_end') {
@@ -68,13 +79,21 @@
             this.isLivingEnd = true;
           }
         }
+        if (msg.data.type == 'questionnaire_push') {
+          this.mini = true;
+        }
       });
     },
-    methods: {}
+    methods: {
+      changeBodyMini(flag) {
+        this.mini = flag;
+      }
+    }
   };
 </script>
 <style lang="less">
   .vmp-wap-body {
+    position: relative;
     &-ending {
       background-repeat: no-repeat;
       background-size: 100% 100%;
@@ -110,6 +129,19 @@
           font-weight: 400;
           padding-top: 30px;
         }
+      }
+    }
+    &-mini {
+      position: fixed;
+      height: 168px;
+      left: 55%;
+      top: 70%;
+      width: 300px;
+      z-index: 5000;
+      overflow: hidden;
+      .vmp-wap-player-header,
+      .vmp-wap-player-footer {
+        display: none;
       }
     }
   }
