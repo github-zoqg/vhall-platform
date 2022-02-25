@@ -16,7 +16,6 @@
         <span class="pageTitle">{{ $t('login.login_1033') }}</span>
       </div>
       <!-- 主体内容区域 -->
-      <!--TOD待翻译-->
       <div class="forget__layout">
         <el-steps :active="findStep" class="forget__step" align-center>
           <el-step :title="$t('login.login_1034')">
@@ -304,9 +303,6 @@
         isType: 'phone',
         codeKey: 0,
         isFindCode: false,
-        captchakey: 'b7982ef659d64141b7120a6af27e19a0', // 云盾key
-        mobileKey: '', // 云盾值
-        captcha: null, // 云盾本身
         dynamicForm: { phone: '', password: '', text: null, checkPassword: '', code: '' },
         loginRules: {
           phone: [{ validator: validatePhone, trigger: 'blur' }],
@@ -327,10 +323,6 @@
         this.isType = type;
         this.findStep = 2;
         this.isFindCode = false;
-        this.mobileKey = '';
-        if (type === 'phone') {
-          this.$refs.NECaptcha.refreshNECaptha();
-        }
         if (index) {
           this.$refs.checkDynamicForm.resetFields();
         }
@@ -428,8 +420,6 @@
                   this.codeKey = res.data.key;
                   this.findStep = 3;
                 } else {
-                  this.mobileKey = '';
-
                   this.$message({
                     message: this.$tec(res.code) || res.msg,
                     showClose: true,
@@ -440,8 +430,6 @@
                 }
               })
               .catch(res => {
-                this.mobileKey = '';
-
                 this.$message({
                   message: this.$tec(res.code) || res.msg,
                   showClose: true,
@@ -521,8 +509,6 @@
             this.countDown();
           }, 1000);
         } else {
-          this.mobileKey = '';
-
           this.time = 60;
         }
       },
@@ -874,52 +860,6 @@
       line-height: 20px;
       strong {
         color: #fc5659;
-      }
-    }
-  }
-  #captcha-box {
-    .captcha {
-      // 云盾样式重置
-      /deep/.yidun_tips {
-        color: #999999;
-        line-height: 38px !important;
-        .yidun_tips__text {
-          vertical-align: initial;
-        }
-      }
-      /deep/.yidun_slider {
-        .yidun_slider__icon {
-          background-image: url(./images/icon-slide1.png) !important;
-          background-size: 28px 20px;
-          background-position: center;
-          margin-top: -5px;
-        }
-        &:hover {
-          .yidun_slider__icon {
-            background-image: url(./images/icon-slide.png) !important;
-          }
-        }
-      }
-      /deep/ .yidun--success {
-        .yidun_control {
-          .yidun_slider__icon {
-            background-image: url(./images/icon-succeed.png) !important;
-          }
-          .yidun_slider {
-            .yidun_slider__icon {
-              background-image: url(./images/icon-succeed.png);
-              background-size: 28px 20px;
-              background-position: center;
-            }
-            &:hover {
-              .yidun_slider__icon {
-                background-image: url(./images/icon-succeed.png);
-                background-size: 28px 20px;
-                background-position: center;
-              }
-            }
-          }
-        }
       }
     }
   }
