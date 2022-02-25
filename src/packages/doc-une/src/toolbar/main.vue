@@ -195,7 +195,7 @@
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
         console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       switchStatus: {
         get() {
