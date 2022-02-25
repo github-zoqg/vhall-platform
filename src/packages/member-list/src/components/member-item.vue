@@ -149,7 +149,7 @@
         <i
           v-if="
             tabIndex === 1 &&
-            currentSpeakerId !== userInfo.account_id &&
+            leaderId !== userInfo.account_id &&
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -187,7 +187,7 @@
             v-if="
               [1, '1'].includes(isInteract) &&
               !userInfo.is_speak &&
-              currentSpeakerId !== userInfo.account_id
+              leaderId !== userInfo.account_id
             "
             class="vmp-member-item__control__up-mic"
             @click="upMic(userInfo.is_apply, userInfo.account_id)"
@@ -197,9 +197,7 @@
           <!-- 显示条件：当前登录者是主持人  正在上麦 -->
           <i
             v-if="
-              [1, '1'].includes(isInteract) &&
-              userInfo.is_speak &&
-              currentSpeakerId !== userInfo.account_id
+              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId !== userInfo.account_id
             "
             class="vmp-member-item__control__down-mic"
             @click="downMic(userInfo.account_id)"
@@ -213,7 +211,7 @@
             tabIndex === 2 &&
             [1, '1'].includes(isInteract) &&
             !userInfo.is_speak &&
-            currentSpeakerId !== userInfo.account_id
+            leaderId !== userInfo.account_id
           "
           class="vmp-member-item__control__up-mic"
           @click="handleConsent(userInfo.account_id)"
@@ -242,7 +240,13 @@
         </el-dropdown>
       </template>
       <template v-if="memberOptions.platformType === 'watch'">
-        <el-dropdown @command="handleWatchCommand" v-show="isInGroup" trigger="hover">
+        <el-dropdown
+          @command="handleWatchCommand"
+          v-show="
+            [20, '20', 1, '1', 3, '3'].includes(roleName) && [2, '2'].includes(userInfo.role_name)
+          "
+          trigger="hover"
+        >
           <i class="vmp-member-item__control__more"></i>
           <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
             <template v-for="item in watchOperateList">
@@ -320,6 +324,11 @@
       //当前主讲人id
       currentSpeakerId: {
         type: [Number, String]
+      },
+      //当前的组长的id
+      leaderId: {
+        type: [Number, String],
+        default: () => ''
       },
       //当前登录用户的id
       userId: {
@@ -416,7 +425,7 @@
             command: 'inviteMic',
             isShow: 'isShowWatchInvitation',
             //todo 确认下presentation_screen
-            disable: this.userInfo.account_id === this.currentSpeakerId,
+            disable: this.userInfo.account_id === this.leaderId,
             text: '邀请演示',
             sequence: 1
           },
