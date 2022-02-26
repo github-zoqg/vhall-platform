@@ -61,7 +61,13 @@
         </scroll>
       </div>
     </div>
-    <send-box currentTab="qa" key="qa" :is-banned="isBanned" :is-all-banned="allBanned"></send-box>
+    <send-box
+      currentTab="qa"
+      @sendQa="sendQa"
+      key="qa"
+      :is-banned="isBanned"
+      :is-all-banned="allBanned"
+    ></send-box>
   </div>
 </template>
 <script>
@@ -69,6 +75,7 @@
   import { textToEmojiText } from '@/packages/chat/src/js/emoji';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
+  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQaWap',
     data() {
@@ -160,7 +167,6 @@
         const qaServer = useQaServer();
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           msg.data.content = textToEmojiText(msg.data.content);
-          alert(JSON.stringify(msg.data));
           this.list.push(msg.data);
         });
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
@@ -188,12 +194,6 @@
         }
         return ret;
       },
-      // 接收到新的问题
-      createQAFn(msg) {
-        msg.data.content = textToEmojiText(msg.data.content);
-        this.listCopy.push(msg.data);
-        this.toggleShowMyQA(true);
-      },
       /**
        * 获取历史问答
        */
@@ -214,12 +214,18 @@
       /**
        * 观众发送问题
        */
-      sendQuestion(inputValue) {
+      sendQa(inputValue) {
         const data = {
           room_id: this.webinarId,
           content: inputValue
         };
-        this.$axios('sendQa', data);
+        useQaServer()
+          .sendQaMsg(data)
+          .then(() => {});
+      },
+      //唤起登录弹窗
+      handleLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };
