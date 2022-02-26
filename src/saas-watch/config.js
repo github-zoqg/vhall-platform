@@ -451,5 +451,4 @@ export const serverConfig = {
   comRedPacket: {
     component: 'VmpRedPacketWatch'
   }
-
 };
