@@ -50,6 +50,7 @@ import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
 import VmpWatchPayFee from '@/packages/pay-fee-auth/';
 import VmpQuestionnaireWatch from '@/packages/questionnaire/watch';
+import VmpRedPacketWatch from '@/packages/red-packet/watch';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -107,6 +108,7 @@ export function initUse() {
   Vue.use(VmpLivingEnd);
   Vue.use(VmpSignWatch);
   Vue.use(VmpWatchPayFee);
+  Vue.use(VmpRedPacketWatch);
 
   Vue.use(VmpSubscribeBody);
   Vue.use(VmpQuestionnaireWatch);
