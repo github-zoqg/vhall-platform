@@ -55,7 +55,8 @@ const serverConfig = {
       'comUserAccountWap',
       'comCashWap',
       'compLotteryWap',
-      'compQuestionnaireWap'
+      'compQuestionnaireWap',
+      'comRedPacketWap'
     ]
   },
   // 顶部
@@ -80,7 +81,7 @@ const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList','comWapDesktopScreen']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
@@ -89,10 +90,9 @@ const serverConfig = {
     component: 'VmpWapStreamList',
     children: ['comWapStreamLocal']
   },
-  comWapDesktopScreen:{
+  comWapDesktopScreen: {
     component: 'VmpWapDesktopScreen'
-  }
-  ,
+  },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
   },
@@ -361,6 +361,9 @@ const serverConfig = {
         method: 'open'
       }
     ]
+  },
+  comRedPacketWap: {
+    component: 'VmpRedPacketWap'
   }
 };
 
