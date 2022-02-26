@@ -264,7 +264,7 @@
     computed: {
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       }
     },
     watch: {

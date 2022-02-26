@@ -76,8 +76,7 @@
         //     req_url: ''
         //   }
         // });
-        console.log(useRoomBaseServer().pauseRecord);
-        useRoomBaseServer().pauseRecord();
+        useRoomBaseServer().pauseRecordInLive();
       },
 
       record() {
@@ -99,8 +98,7 @@
           //   }
           // });
           this.recording = true;
-          console.log(useRoomBaseServer().startRecord);
-          useRoomBaseServer().startRecord();
+          useRoomBaseServer().startRecordInLive();
         }
       },
 
@@ -125,7 +123,7 @@
         this.recording = false;
         if (!isLiveStop) {
           // 增加isLiveStop  是否为结束直播导致停止录制    新版这种情况不掉接口
-          useRoomBaseServer().endRecord();
+          useRoomBaseServer().endRecordInLive();
         }
         if (mark) {
           this.$message.success('直播结束后，打点录制的直播将自动生成回放');
@@ -136,7 +134,7 @@
         this.paused = false;
         this.statusText = '录制中';
         this.recording = true;
-        useRoomBaseServer().startRecord();
+        useRoomBaseServer().startRecordInLive();
       }
     }
   };
