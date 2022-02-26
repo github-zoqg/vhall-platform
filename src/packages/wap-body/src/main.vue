@@ -26,8 +26,6 @@
         v-if="!isShowContainer && !isLivingEnd"
       ></vmp-air-container>
 
-
-
       <!-- 流列表 -->
       <vmp-air-container
         v-if="isShowContainer && !isLivingEnd"
@@ -36,11 +34,7 @@
       ></vmp-air-container>
 
       <!-- wap端订阅桌面共享的容器 -->
-      <vmp-air-container
-        :cuid="childrenComp[2]"
-        :oneself="true"
-        v-if="!isLivingEnd"
-      />
+      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-if="!isLivingEnd" />
     </div>
   </div>
 </template>
@@ -114,6 +108,7 @@
 <style lang="less">
   .vmp-wap-body {
     position: relative;
+    height: 100%;
     &-ending {
       background-repeat: no-repeat;
       background-size: 100% 100%;
