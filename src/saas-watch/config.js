@@ -42,6 +42,7 @@ export const serverConfig = {
       'comPcPlayer',
       'comWatchAsideMenu',
       'comDocUne',
+      'comDesktopScreen',
       'comFooterTools',
       'comNoticeColumn',
       'comLivingEnd'
@@ -70,7 +71,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comQuestionnaireWatch'
+      'comQuestionnaire',
+      'comRedPacket'
     ]
   },
 
@@ -145,6 +147,10 @@ export const serverConfig = {
   },
   comStreamRemote: {
     component: 'VmpStreamRemote'
+  },
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen'
   },
   // 播放器
   comPcPlayer: {
@@ -449,7 +455,12 @@ export const serverConfig = {
   },
 
   // 抽奖
-  comQuestionnaireWatch: {
+  comQuestionnaire: {
     component: 'VmpQuestionnaireWatch'
+  },
+
+  // 红包
+  comRedPacket: {
+    component: 'VmpRedPacketWatch'
   }
 };

@@ -16,6 +16,12 @@ const routes = [
     meta: { title: '直播间', grayType: 'webinar' }
   },
   {
+    path: '/lives/recordvideo/:id',
+    component: () => import('../views/RecordVideo/index.vue'),
+    name: 'RecordVideo',
+    meta: { title: '录制视频' }
+  },
+  {
     path: '/lives/keylogin/:id/:role_name',
     name: 'KeyLogin',
     component: PasswordLogin,

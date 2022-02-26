@@ -6,7 +6,8 @@ import {
   useMicServer,
   useMediaCheckServer,
   useGroupServer,
-  useMediaSettingServer
+  useMediaSettingServer,
+  useRebroadcastServer
 } from 'middle-domain';
 
 export default async function () {
@@ -19,6 +20,7 @@ export default async function () {
   const groupServer = useGroupServer();
   const micServer = useMicServer();
   const mediaSettingServer = useMediaSettingServer();
+  const rebroadcastServer = useRebroadcastServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -40,6 +42,12 @@ export default async function () {
     // 如果是分组直播，初始化分组信息
     await groupServer.init();
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
+  // 如果存在rebroadcast
+  if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {
+    await rebroadcastServer.init();
+    console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', msgServer);
   }
 
   micServer.init();
@@ -66,6 +74,7 @@ export default async function () {
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
+  window.interactiveServer = interactiveServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
   window.micServer = micServer;

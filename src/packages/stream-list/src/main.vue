@@ -17,8 +17,7 @@
           :class="{
             'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
             'vmp-dom__max':
-              (miniElement == '' || miniElement == 'doc') &&
-              joinInfo.third_party_user_id == mainScreen,
+              miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen,
             'vmp-dom__mini':
               miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
           }"
@@ -34,8 +33,7 @@
             class="vmp-stream-list__remote-container"
             :class="{
               'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-              'vmp-dom__max':
-                (miniElement == '' || miniElement == 'doc') && stream.accountId == mainScreen,
+              'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen,
               'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
             }"
           >
@@ -151,7 +149,6 @@
     methods: {
       getStreamList() {
         this.interactiveServer.getRoomStreams();
-        console.log('------remoteStreams------', this.remoteStreams);
       },
       exchange(compName) {
         window.$middleEventSdk?.event?.send({

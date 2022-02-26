@@ -26,7 +26,10 @@
     computed: {
       isVisibleMiniElement() {
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
-        return this.$domainStore.state.docServer.switchStatus;
+        return (
+          this.$domainStore.state.docServer.switchStatus ||
+          this.$domainStore.state.roomBaseServer.isShareScreen
+        );
       },
       isTryWatch() {
         return (

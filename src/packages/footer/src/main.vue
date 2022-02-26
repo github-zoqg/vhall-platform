@@ -268,7 +268,7 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .vmp-footer {
     color: #666;
     width: 100%;
