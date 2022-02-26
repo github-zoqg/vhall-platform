@@ -939,7 +939,7 @@
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
           if (isLive && msg.sender_id != _this.userId) {
-            _this.$message.warning(_this.$t('chat.chat_1070', msg.nick_name));
+            console.log('这里不需要提示,其它组件处理了');
           } else {
             _this.presentation_screen = _this.leader_id;
           }

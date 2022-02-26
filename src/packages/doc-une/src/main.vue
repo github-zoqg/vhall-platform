@@ -17,6 +17,17 @@
       v-show="hasDocPermission && (displayMode === 'normal' || displayMode === 'fullscreen')"
     ></VmpDocToolbar>
 
+    <!-- 结束演示按钮 -->
+    <el-button
+      round
+      size="mini"
+      v-if="displayMode === 'normal' && renderEndDemonstrateBtn"
+      @click="handleEndDemonstrate"
+      class="end-demonstrate"
+    >
+      结束演示
+    </el-button>
+
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
@@ -128,7 +139,8 @@
     useDocServer,
     useMsgServer,
     useGroupServer,
-    useInteractiveServer
+    useInteractiveServer,
+    useMemberServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -155,6 +167,12 @@
       };
     },
     computed: {
+      watchInitData() {
+        return this.roomBaseServer.state.watchInitData;
+      },
+      groupInitData() {
+        return this.groupServer.state.groupInitData;
+      },
       docLoadComplete() {
         return this.docServer.state.docLoadComplete;
       },
@@ -186,12 +204,74 @@
           (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
-              this.docServer.state.hasDocPermission))
+              this.hasDocPermission))
         );
       },
+
       // 是否文档演示权限
       hasDocPermission() {
-        return this.docServer.state.hasDocPermission;
+        return (
+          this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+          this.watchInitData.join_info.third_party_user_id
+        );
+      },
+      /**
+       * @description 是否显示结束演示按钮
+       * 1.分组活动下没有嘉宾
+       * 2.助理在主房间和小组都只是禁言踢人相关操作
+       * 3.主直播间可以邀请演示
+       * 4.小组可以邀请自己和别人演示
+       * 5.主直播间主持人不结束自己演示,都是结束别人演示
+       * 6.小组内主持人结束自己
+       * 7.助理不能邀请演示和结束演示(分组没嘉宾)
+       */
+      renderEndDemonstrateBtn() {
+        // 非开播状态不渲染
+        if (this.watchInitData.webinar.type !== 1) return false;
+        // 非分组活动不渲染
+        if (this.watchInitData.webinar.mode != 6) return false;
+        // 助理不显示
+        if (this.watchInitData.join_info.role_name == 3) return false;
+        if (this.isInGroup) {
+          // 在小组内
+          // 如果是主持人或组长，演示人不是自己，说明有人在演示. 主持人和组长都可以结束演示。
+          if (
+            (this.groupInitData.join_role == 1 || this.groupInitData.join_role == 20) &&
+            this.groupInitData.presentation_screen !=
+              this.watchInitData.join_info.third_party_user_id
+          ) {
+            return true;
+          }
+          // 如果是观众，演示人是自己。
+          if (
+            this.watchInitData.join_role == 2 ||
+            this.groupInitData.presentation_screen ==
+              this.watchInitData.join_info.third_party_user_id
+          ) {
+            return true;
+          }
+          return false;
+        } else {
+          // 在主直播间内
+          // 如果是主持人，演示人不是自己，说明有人在演示
+          if (
+            this.watchInitData.join_info.role_name == 1 &&
+            this.roomBaseServer.state.interactToolStatus.presentation_screen !=
+              this.watchInitData.join_info.third_party_user_id
+          ) {
+            return true;
+          }
+          // 如果不是主持人, 演示者是自己
+          if (
+            this.watchInitData.join_info.role_name != 1 &&
+            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+              this.watchInitData.join_info.third_party_user_id
+          ) {
+            return true;
+          }
+          console.log('123-----5');
+          return false;
+        }
       }
     },
     watch: {
@@ -230,6 +310,7 @@
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
+      this.memberServer = useMemberServer();
     },
     methods: {
       /**
@@ -389,14 +470,6 @@
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
-          }
-        });
-
-        // 开启分组讨论
-        this.groupServer.$on('dispatch_group_switch_start', () => {
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            // this.resetMenus();
-            // this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
 
@@ -640,6 +713,51 @@
           const page = Number(index);
           this.docServer.gotoPage({ id: this.docServer.currentCid, page });
         }
+      },
+
+      /**
+       * 结束演示
+       * 1.主持人在小组中,且主持人正在演示中,则结束 - 自己演示
+       * 2.主持人在主直播间或小组内，别人演示中, 则结束 - 他人演示
+       */
+      async handleEndDemonstrate() {
+        if (this.isInGroup) {
+          // 在小组内
+          // if (this.roomBaseServer.state.watchInitData.join_info.role_name == 2) {
+          //   // 观众
+          //   confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
+          // }
+        } else {
+          // 在主直播间
+          let confirmTip = '结束演示';
+          if (this.roomBaseServer.state.watchInitData.join_info.role_name == 2) {
+            confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
+          }
+          try {
+            await this.$confirm(confirmTip, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+            });
+            if (this.hasDocPermission) {
+              console.log('结束自己的演示');
+              // 结束自己的演示
+              await this.memberServer.userEndPresentation({
+                room_id: this.roomBaseServer.state.watchInitData.interact.room_id
+              });
+            } else {
+              // 结束他人的演示
+              console.log('结束他人的演示');
+              await this.memberServer.endUserPresentation({
+                room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
+                receive_account_id: this.roomBaseServer.state.interactToolStatus.presentation_screen
+              });
+            }
+          } catch (ex) {
+            return;
+          }
+        }
       }
     },
     mounted() {
@@ -677,6 +795,25 @@
       flex: 1;
       position: relative;
     }
+
+    // 结束演示按钮
+    .end-demonstrate {
+      position: absolute;
+      z-index: 3;
+      top: 27px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 97px;
+      border: 1px solid #666;
+      color: #fff;
+      cursor: pointer;
+      &:hover {
+        background: #fc5659;
+        border-color: #fc5659;
+        color: #fff;
+      }
+    }
+
     .vmp-doc-placeholder {
       // display: none;
       position: absolute;
