@@ -153,7 +153,7 @@
 </template>
 
 <script>
-  import { useTimerServer } from 'middle-domain';
+  import { useTimerServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',
     data() {
@@ -248,7 +248,7 @@
         this[data] = '';
       },
       changeAllShow() {
-        if (sessionStorage.getItem('delay_status') != 1) {
+        if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar != 1) {
           this.$message({
             type: 'warning',
             message: '当前活动非无延迟模式，不支持此功能'
