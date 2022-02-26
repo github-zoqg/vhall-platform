@@ -341,7 +341,7 @@ export const serverConfig = {
     children: ['comSubcribeWapBody']
   },
   subcribeCenter: {
-    component: 'VmpAirContainer',
+    component: 'VmpContainer',
     className: 'tab-content',
     children: ['comTabMenuWap']
   },
