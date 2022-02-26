@@ -429,6 +429,7 @@
         );
       },
       subscribeInster(currentStreams) {
+        if (!currentStreams) return;
         let owner = null;
         currentStreams.forEach(stream => {
           const obj = JSON.parse(stream.attributes);
