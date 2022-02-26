@@ -72,7 +72,7 @@
               <img :src="domainState.docUrl || posterUrl" />
               <section
                 v-if="isPreviewVisible"
-                :class="{ 'mini-video-box': domainState.docUrl !== '' }"
+                :class="[domainState.docUrl === '' ? 'full-video-box ':'mini-video-box']"
               >
                 <video-preview ref="videoPreview" :videoParam="videoParam" />
               </section>
@@ -476,6 +476,14 @@
         img {
           width: 100%;
           height: 100%;
+        }
+
+        .full-video-box {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
         }
 
         .mini-video-box {
