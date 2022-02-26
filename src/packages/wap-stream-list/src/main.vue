@@ -214,14 +214,6 @@
       // 全屏
       setFullScreen() {
         // this.interactiveServer.setPlay({ streamId: stream.streamId, vNode: '' })
-      },
-
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
       }
     }
   };
