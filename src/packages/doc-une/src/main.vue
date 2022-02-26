@@ -182,7 +182,8 @@
       // 文档是否可见
       show() {
         return (
-          this.roomBaseServer.state.watchInitData.join_info.role_name != 2 ||
+          (this.roomBaseServer.state.watchInitData.join_info.role_name != 2 &&
+            !this.roomBaseServer.state.isShareScreen) ||
           (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||

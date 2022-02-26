@@ -1,10 +1,21 @@
 <template>
-  <div class="vmp-desktop-screen" v-show="isShowWrapper">
+  <div
+    class="vmp-desktop-screen"
+    v-show="isShowWrapper"
+    :class="[
+      miniElement === 'screen' ? 'mini' : 'normal',
+      { 'is-watch': isWatch },
+      { 'has-stream-list': hasStreamList }
+    ]"
+  >
     <!-- 推桌面共享容器 -->
-    <div id="vmp-desktop-screen-container" style="width: 0; height: 0; position: relative"></div>
+    <div id="vmp-desktop-screen-publish" style="width: 0; height: 0; position: relative"></div>
+
+    <!-- 订阅桌面共享容器 -->
+    <div id="vmp-desktop-screen-subscribe"></div>
 
     <!-- 推桌面共享时占位图 -->
-    <div class="vmp-desktop-screen__tip" v-show="isShareScreen">
+    <div class="vmp-desktop-screen__tip" v-show="isShareScreen && streamId">
       <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
       <br />
       <p>桌面共享中...</p>
@@ -57,13 +68,23 @@
           confirm: true
         },
         isShowAccessDeniedAlert: false, // 是否显示没有权限桌面共享的弹窗
-        isShareScreen: false
+        hasStreamList: false
       };
     },
     computed: {
+      // 是否观看端
+      isWatch() {
+        return this.roomBaseServer.state.clientType !== 'send';
+      },
       //是否在分组里
       isInGroup() {
         return this.groupServer.state.groupInitData.isInGroup;
+      },
+      miniElement() {
+        return this.$domainStore.state.roomBaseServer.miniElement;
+      },
+      isShareScreen() {
+        return this.$domainStore.state.roomBaseServer.isShareScreen;
       },
       isShowWrapper() {
         return this.isShareScreen || this.popAlert.visible || this.isShowAccessDeniedAlert;
@@ -83,25 +104,45 @@
       this.streamId = '';
       this.addEvents();
     },
-    mounted() {},
+    mounted() {
+      // 刷新或者上麦 重新订阅
+      let stream = this.interactiveServer.getDesktopAndIntercutInfo();
+
+      if (stream && stream.streamType === 3) {
+        this.subscribeStream(stream.streamId);
+      }
+    },
     watch: {
-      isShareScreen(newval) {
-        this.roomBaseServer.setShareScreenStatus(newval);
-      },
-      ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[doc][player]---大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
-        const mode = newval === 'doc' ? 'mini' : 'normal';
-        // this.setDisplayMode(mode);
+      // 监听流列表高度变
+      ['interactiveServer.state.streamListHeightInWatch']: {
+        handler(newval) {
+          console.log('[doc] streamListHeight:', newval);
+          this.hasStreamList = newval < 1 ? false : true;
+        },
+        immediate: true
       }
     },
     methods: {
       addEvents() {
-        // 桌面共享 流结束
-        this.interactiveServer.on(VhallRTC.EVENT_REMOTESTREAM_REMOVED, e => {
-          if (e.data.streamId == this.streamId) {
-            this.streamId = '';
-            this.isShareScreen = false;
-          }
+        this.desktopShareServer.$on('screen_stream_add', e => {
+          this.subscribeStream(e.data.streamId);
+        });
+        this.desktopShareServer.$on('screen_stream_remove', e => {
+          useRoomBaseServer().setShareScreenStatus(false);
+          useRoomBaseServer().setChangeElement('');
+        });
+      },
+      // 订阅流
+      subscribeStream(streamId) {
+        const opt = {
+          streamId: streamId,
+          videoNode: 'vmp-desktop-screen-subscribe', // 远端流显示容器，必填
+          mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
+        };
+
+        this.desktopShareServer.subscribeDesktopShareStream(opt).then(() => {
+          useRoomBaseServer().setShareScreenStatus(true);
+          useRoomBaseServer().setChangeElement('stream-list');
         });
       },
       showConfirm() {
@@ -117,7 +158,7 @@
           profile = VhallRTC[configuredProfile];
         }
         const options = {
-          videoNode: 'vmp-desktop-screen-container', // 传入本地视频显示容器，必填
+          videoNode: 'vmp-desktop-screen-publish', // 传入本地视频显示容器，必填
           profile // 自定义分辨率，使用分辨率模板，选填，与videoQuality参数互斥，优先使用profile参数，推荐使用。
         };
 
@@ -128,22 +169,10 @@
             this.desktopShareServer
               .publishDesktopShareStream(data.streamId)
               .then(() => {
-                const {
-                  state: {
-                    watchInitData: {
-                      join_info: { role_name }
-                    }
-                  }
-                } = this.roomBaseServer;
+                // 重新布局旁路
+                this.interactiveServer.resetLayout();
 
-                if (role_name == 1 && !this.isInGroup) {
-                  this.interactiveServer.setBroadCastScreen({ mainScreenStreamId: data.streamId });
-                  this.interactiveServer.setBroadCastLayout({
-                    layout: VhallRTC.CANVAS_LAYOUT_PATTERN_GRID_1
-                  });
-                }
-
-                this.isShareScreen = true;
+                useRoomBaseServer().setShareScreenStatus(true);
                 console.log('[screen] 桌面共享推流成功');
               })
               .catch(error => {
@@ -201,6 +230,7 @@
     height: 100%;
     background: #2d2d2d;
     position: relative;
+
     &__tip {
       text-align: center;
       position: absolute;
@@ -223,6 +253,39 @@
         font-size: 16px;
         color: #999;
       }
+    }
+  }
+
+  // 发起端小屏
+  .vmp-desktop-screen.mini {
+    position: absolute;
+    width: 309px;
+    height: 240px;
+    top: 0;
+    right: 0;
+    z-index: 10;
+  }
+
+  // 观看端
+  .vmp-desktop-screen.is-watch {
+    &.normal {
+      position: absolute;
+      top: 0;
+      bottom: 56px;
+      width: calc(100% - 380px);
+      height: auto;
+      min-height: auto;
+      &.has-stream-list {
+        top: 80px;
+      }
+    }
+    &.mini {
+      width: 360px;
+      height: 204px;
+      min-height: 204px;
+      top: 0;
+      right: 0;
+      z-index: 10;
     }
   }
 </style>
