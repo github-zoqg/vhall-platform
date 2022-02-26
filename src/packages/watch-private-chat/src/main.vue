@@ -39,7 +39,8 @@
   import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
   import msgItem from './components/msg-item';
   import chatOperate from './components/chat-operate';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
+  import { textToEmoji } from '@/packages/chat/src/js/emoji';
   export default {
     name: 'VmpWatchPrivateChat',
     components: {
@@ -50,59 +51,7 @@
       return {
         defaultAvatar,
         //私聊的列表 todo 假数据待移除，由domain维护
-        chatList: [
-          {
-            uv: 1,
-            data: '6666\n',
-            msg_source: 'prefix01',
-            pv: 1,
-            channel: 'ch_ZKv4Oe7c',
-            sender_id: '16422770',
-            service_type: 'service_im',
-            bu: '1',
-            date_time: '2022-01-19 16:58:23',
-            context: {
-              role_name: 1,
-              app: 'vhall',
-              user_role: 1,
-              form: 'self',
-              user_id: '16422770',
-              user_name: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
-              nick_name: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
-              nickname: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
-              avatar:
-                'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/08/2e/082ea1e5abcba87b5d5c57600c1bbec3.jpg',
-              to: '100696'
-            },
-            client: 'pc_browser',
-            msg_id: 'msg_7cbeb9b0578f4da7b62f89b03623d2b8',
-            app_id: 'fd8d3653'
-          },
-          {
-            uv: 1,
-            data: '9999<img width="24" height="24" style="vertical-align:text-bottom;" src="https://cnstatic01.e.vhall.com/static/img/arclist/Expression_1@2x.png"/>',
-            msg_source: 'prefix01',
-            pv: 1,
-            channel: 'ch_ZKv4Oe7c',
-            sender_id: '100696',
-            service_type: 'service_im',
-            bu: '1',
-            date_time: '2022-01-19 17:22:03',
-            context: {
-              role_name: 2,
-              app: 'vhall',
-              account_id: '100696',
-              user_id: '100696',
-              user_name: '春有百花秋有月 夏有凉风冬有雪，若无闲事挂心头便是人间好时节',
-              nick_name: '测试人员5',
-              to: '16422770',
-              avatar: ''
-            },
-            client: 'pc_browser',
-            msg_id: 'msg_f1a51f206f664db4a8254a98188a2372',
-            app_id: 'fd8d3653'
-          }
-        ],
+        chatList: [],
         //私聊是否需要登录
         chatLoginStatus: false,
         //滚动插件配置
@@ -130,10 +79,6 @@
           disable: false,
           placeholder: '参与聊天'
         },
-        //禁言状态 todo domain提供事件监听
-        isBanned: false,
-        //全体禁言状态 todo domain提供事件监听
-        allBanned: false,
         //是否是初始化私聊tab todo 预留
         isFirstPrivateChat: false,
         //最新的消息 todo domain负责事件那部分提供提示消息
@@ -143,23 +88,247 @@
         //配置信息
         configList: {},
         //提示消息 todo domain负责事件那部分提供提示消息
-        tipMsg: {}
+        tipMsg: {},
+        //是否是嵌入端
+        isEmbed: false,
+        //登录信息
+        joinInfo: null,
+        //活动信息
+        webinar: null,
+        //观看端初始化的信息
+        watchInitData: null,
+        //房间号
+        roomId: ''
       };
+    },
+    watch: {
+      chatList: {
+        deep: true,
+        handler() {
+          // 如果滚动条未滚动至最底部
+          if (this.osInstance.scroll().ratio.y !== 1) {
+            this.unReadMessageCount++;
+          }
+          // 如果当前自定义菜单显示的是私聊，return
+          if (this.isFirstPrivateChat) {
+            this.isFirstPrivateChat = false;
+            return;
+          }
+          // 如果当前自定义菜单显示的非私聊，显示小红点 todo 信令发送事件给tab
+        }
+      },
+      configList: {
+        deep: true,
+        handler(val, oldVal) {
+          // 如果滚动条未滚动至最底部
+          if (val['ui.watch_record_no_chatting'] != oldVal['ui.watch_record_no_chatting']) {
+            this.initInputStatus();
+          }
+          if (val['ui.show_chat_without_login'] != oldVal['ui.show_chat_without_login']) {
+            this.initLoginStatus();
+          }
+        }
+      }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.chatServer = useChatServer();
+      this.msgServer = useMsgServer();
     },
-    mounted() {},
+    computed: {
+      //是否被禁言
+      isBanned() {
+        return this.chatServer.state.banned;
+      },
+      //是否是全体禁言
+      allBanned() {
+        return this.chatServer.state.allBanned;
+      }
+    },
+    mounted() {
+      this.initViewData();
+      this.listenEvents();
+      this.initInputStatus();
+      this.initLoginStatus();
+      this.scrollInit();
+      this.getHistoryMsg();
+    },
     methods: {
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
-        const { join_info = {} } = watchInitData;
+        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        const { embed = false } = embedObj;
+        this.roomId = interact.room_id;
         this.configList = configList;
         this.roleName = join_info.role_name;
+        this.isEmbed = embed;
+        this.joinInfo = join_info;
+        this.webinar = webinar;
+        this.watchInitData = watchInitData;
+      },
+      // 初始化聊天登录状态
+      initLoginStatus() {
+        if (this.configList['ui.show_chat_without_login'] == '0') {
+          if (this.joinInfo || this.isEmbed) {
+            // 嵌入或者未登录并且需要登录
+            this.chatLoginStatus = false;
+          } else {
+            // 非嵌入并或者是没有登录
+            this.chatLoginStatus = true;
+            this.inputStatus.placeholder = '';
+          }
+        } else {
+          // 不需要登录
+          this.chatLoginStatus = false;
+        }
+      },
+      //初始化输入框状态
+      initInputStatus() {
+        this.inputStatus.disable = this.isBanned || this.allBanned;
+        if (this.isBanned) {
+          this.inputStatus.placeholder = this.$t('chat.chat_1079');
+        } else if (this.allBanned) {
+          this.inputStatus.placeholder = this.$t('chat.chat_1079');
+        } else {
+          this.inputStatus.placeholder = this.$t('chat.chat_1021');
+        }
+        const isVod = this.webinar.type == 5 && this.watchInitData.paas_record_id;
+        // 判断控制台回放禁言状态
+        if (isVod && this.configList && this.configList['ui.watch_record_no_chatting'] == 1) {
+          this.inputStatus.disable = true;
+          this.inputStatus.placeholder = this.$t('chat.chat_1079');
+        }
+      },
+      //初始化滚动
+      scrollInit() {
+        this.osInstance = this.$refs.chatContent.osInstance();
+        const that = this;
+        this.overlayScrollBarsOptions.callbacks = {
+          onHostSizeChanged: function () {
+            if (that.doScroll) {
+              that.performScroll();
+            }
+          },
+          onContentSizeChanged: function () {
+            if (that.doScroll) {
+              that.performScroll();
+            }
+          },
+          onScroll: that.setDoScroll,
+          onInitialized: that.setDoScroll,
+          onOverflowChanged: function (e) {
+            if (e.y) {
+              that.performScroll();
+            }
+          },
+          onScrollStop: this.handleScrollStop
+        };
+        this.osInstance.options(this.overlayScrollBarsOptions);
+      },
+      //事件监听
+      listenEvents() {
+        this.msgServer.$on('CHAT', msg => {
+          try {
+            if (typeof msg !== 'object') {
+              msg = JSON.parse(msg);
+            }
+            if (typeof msg.context !== 'object') {
+              msg.context = JSON.parse(msg.context);
+            }
+            if (typeof msg.data !== 'object') {
+              msg.data = JSON.parse(msg.data);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+          //非私聊消息，退出
+          if (!msg.data.target_id) {
+            return;
+          }
+          //空消息，退出
+          if (!msg.data.text_content) {
+            return;
+          }
+
+          msg.data = msg.data.text_content;
+          // 判断是否是跟当前用户有关的私聊消息
+          if (
+            msg.sender_id == this.joinInfo.third_party_user_id ||
+            msg.context.to == this.joinInfo.third_party_user_id
+          ) {
+            if (msg.sender_id != this.joinInfo.third_party_user_id) {
+              // 如果是本用户收发的消息放到私聊消息队列
+              this.latestMessage = msg;
+            }
+            if (msg.isFirstPrivateChat) {
+              this.isFirstPrivateChat = true;
+            }
+            this.chatList.push(msg);
+            if (
+              this.osInstance.scroll().max.y !== 0 &&
+              this.osInstance.scroll().ratio.y !== 1 &&
+              msg.context.to !== 'all'
+            ) {
+              // 如果是除回复、 @之外的普通消息
+              this.isHasUnreadNormalMsg = true;
+              this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
+            }
+          }
+        });
+      },
+      //获取历史的私聊消息
+      getHistoryMsg() {
+        const params = {
+          room_id: this.roomId
+        };
+        this.chatServer.getPrivateChatHistoryList(params).then(res => {
+          console.warn(res, '历史私聊记录');
+          const list = res.data.list.map(h => {
+            return { ...h, content: this.emojiToText(h.content) };
+          });
+          this.chatList = list;
+        });
+      },
+      //表情转换
+      emojiToText(value) {
+        return textToEmoji(value)
+          .map(c => {
+            return c.msgType == 'text'
+              ? c.msgCont
+              : `<img width="24" src="${c.msgImage}" border="0" />`;
+          })
+          .join(' ');
+      },
+      setDoScroll() {
+        this.$nextTick(() => {
+          if (!this.animationRunning) {
+            this.doScroll = this.osInstance.scroll().ratio.y === 1;
+          } else {
+            this.doScroll = true;
+          }
+        });
       },
       //滚动到指定目标处
-      scrollToTarget() {},
+      scrollToTarget() {
+        const _this = this;
+        this.animationRunning = true;
+        this.osInstance.scrollStop().scroll(
+          {
+            el: this.osInstance.getElements().content.children[
+              _this.chatList.length - _this.unReadMessageCount
+            ],
+            block: { y: 'end' }
+          },
+          250,
+          'linear',
+          () => {
+            _this.animationRunning = false;
+            _this.unReadMessageCount = 0;
+            _this.isHasUnreadNormalMsg = false;
+          }
+        );
+      },
       //响应高度变化
       handleHeightChange(height) {
         this.operatorHieght = height;
