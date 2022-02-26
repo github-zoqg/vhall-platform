@@ -78,7 +78,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     .vmp-intro-block {
       padding: 0.4rem;
@@ -88,7 +88,6 @@
         padding: 16px 24px 12px 24px;
         width: 100%;
         height: 100%;
-        overflow-y: scroll;
         background: transparent;
         font-size: 14px;
         font-weight: 400;

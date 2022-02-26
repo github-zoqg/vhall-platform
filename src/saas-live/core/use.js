@@ -40,6 +40,7 @@ import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
 import VmpSignLive from '@/packages/sign-module/sign-live';
+import VmpQa from '@/packages/qa';
 import VmpRedPacketLive from '@/packages/red-packet/live';
 import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 import VmpRecordVideoSuccess from '@/packages/record-video-success';
@@ -84,6 +85,7 @@ export function initUse() {
   Vue.use(VmpLotteryLive);
   Vue.use(VmpQuestionnaire);
   Vue.use(VmpSignLive);
+  Vue.use(VmpQa);
   Vue.use(VmpRecordVideoSuccess);
   Vue.use(VmpRedPacketLive);
 
