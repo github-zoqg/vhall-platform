@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-footer-tools">
+  <div class="vmp-footer-tools" v-if="!isEmbedVideo">
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
@@ -180,6 +180,10 @@
           Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
+      },
+      isEmbedVideo() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     beforeCreate() {
