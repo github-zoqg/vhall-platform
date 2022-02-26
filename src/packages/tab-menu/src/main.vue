@@ -405,6 +405,7 @@
 
     &__main {
       height: calc(100% - 46px);
+      overflow:hidden;
     }
   }
 </style>
