@@ -67,6 +67,8 @@ import VmpWapSignUpForm from '@/packages/wap-sign-up-form';
 // 预约页面
 import VmpSubscribeBody from '@/packages/wap-subscribe-body';
 
+import VmpWapDesktopScreen from '@/packages/stream-desktop-screen-wap';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -106,4 +108,5 @@ export function initUse() {
 
   Vue.use(VmpSubscribeBody);
   Vue.use(VmpWapSignUpForm);
+  Vue.use(VmpWapDesktopScreen);
 }
