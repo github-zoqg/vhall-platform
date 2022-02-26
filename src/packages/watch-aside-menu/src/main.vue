@@ -55,19 +55,33 @@
     <span class="menu-fold" v-show="isCollapse" @click="handleToggle()">
       <i class="vh-iconfont vh-line-s-unfold"></i>
     </span>
+
+    <!-- 邀请演示对话框 -->
+    <GroupInvitaion
+      :show.sync="dialogVisibleInvite"
+      :senderId="senderId"
+      :inviteName="inviteName"
+    ></GroupInvitaion>
   </div>
 </template>
 <script>
-  import { useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import GroupInvitaion from './group-invitation.vue';
 
   export default {
     name: 'VmpWatchAsideMenu',
+    components: {
+      GroupInvitaion
+    },
     data() {
       return {
         isCollapse: true,
         selectedMenu: '',
-        disableMenus: ['document', 'board', 'desktopShare', 'assistance']
+        disableMenus: ['document', 'board', 'desktopShare', 'assistance'],
+        dialogVisibleInvite: false, //邀请演示对话框是否显示
+        senderId: '', //邀请人id
+        inviteName: '' //邀请人身份
       };
     },
     computed: {
@@ -77,9 +91,20 @@
       // 请求协助菜单，在小组中才显示
       showAssistance() {
         return this.groupServer.state.groupInitData.isInGroup;
+      },
+      userId() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      // 是否文档演示权限
+      hasDocPermission() {
+        return (
+          this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+          this.roomBaseServer.state.watchInitData.join_info.third_party_user_id
+        );
       }
     },
-    beforeCreate() {
+    created() {
+      this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.groupServer = useGroupServer();
     },
@@ -90,35 +115,35 @@
     methods: {
       initEvent() {
         // 开启分组讨论
-        this.groupServer.$on('dispatch_group_switch_start', () => {
+        this.groupServer.$on('GROUP_SWITCH_START', () => {
           if (this.groupServer.state.groupInitData.isInGroup) {
             this.resetMenus();
             this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
         // 结束分组讨论
-        this.groupServer.$on('dispatch_group_switch_end', () => {
+        this.groupServer.$on('GROUP_SWITCH_END', () => {
           this.isCollapse = true;
           this.resetMenus();
           this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
         // 小组解散
-        this.groupServer.$on('dispatch_group_disband', () => {
+        this.groupServer.$on('GROUP_DISBAND', () => {
           this.isCollapse = true;
           this.resetMenus();
           this.gobackHome(4);
         });
 
         // 本人被踢出来
-        this.groupServer.$on('dispatch_room_group_kickout', () => {
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
           this.isCollapse = true;
           this.resetMenus();
           this.gobackHome(5, this.groupServer.state.groupInitData.name);
         });
 
         // 组长变更
-        this.groupServer.$on('dispatch_group_leader_change', () => {
+        this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
           this.isCollapse = true;
           this.resetMenus();
           console.log('[group] 组长变更：', this.groupServer.state.groupInitData.join_role);
@@ -126,6 +151,45 @@
             this.gobackHome(6);
           } else {
             this.gobackHome(7);
+          }
+        });
+        // 观看端监听到邀请演示的消息处理
+        // (主直播间主持人邀请其它成员演示，小组内组长邀请其它成员演示)
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION', msg => {
+          // 如果是自己被邀请
+          if (this.userId == msg.data.target_id) {
+            this.senderId = msg.sender_id; // 邀请人id
+            // 邀请人身份
+            this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人';
+            this.dialogVisibleInvite = true;
+          }
+        });
+
+        // 观看端收到拒绝邀请演示，只能是小组内
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
+          const { join_role, isInGroup } = this.groupServer.state.groupInitData;
+          // 如果是组长，并且在小组内
+          if (join_role == 20 && isInGroup) {
+            this.$message.warning(`观众${msg.nick_name}拒绝了你的演示邀请`);
+          }
+        });
+
+        // 观看端收到同意演示成功消息
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', () => {
+          this.resetMenus();
+        });
+
+        // 观看端收到结束演示成功消息
+        this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
+          this.resetMenus();
+          if (msg.sender_id != this.userId) {
+            if (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) {
+              this.$message.warning('组长结束了演示');
+            } else if (!this.isInGroup) {
+              this.$message.warning('演示权限已变更');
+            }
+          } else {
+            this.$message.success('结束演示');
           }
         });
       },
@@ -170,7 +234,7 @@
         // （2）普通组员：只有请求协助按钮可用
         // else
         //  菜单都是禁用状态
-        if (this.docServer.state.hasDocPermission) {
+        if (this.hasDocPermission) {
           this.disableMenus = [];
           this.selectedMenu = 'document';
         } else {

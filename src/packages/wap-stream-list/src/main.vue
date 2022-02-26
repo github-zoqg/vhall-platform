@@ -3,7 +3,11 @@
     <div
       ref="vmp-wap-stream-list"
       class="vmp-stream-list"
-      :class="{ 'vmp-stream-list-h0': isStreamListH0, 'vmp-stream-list-h-all': isStreamListHAll }"
+      :class="{
+        'vmp-stream-list-h0': isStreamListH0,
+        'vmp-stream-list-h-all': isStreamListHAll,
+        'vmp-stream-list-no-speack': !micServer.state.isSpeakOn
+      }"
     >
       <div
         class="vmp-stream-list__local-container"
@@ -38,8 +42,6 @@
       </div>
 
       <!-- 左右滑动Mask 待做 -->
-
-      <!-- 默认进入触发权限弹窗 待做 -->
     </div>
   </div>
 </template>
@@ -49,11 +51,13 @@
     useInteractiveServer,
     useMicServer,
     useMsgServer,
-    roomBaseServer,
+    useRoomBaseServer,
     useMediaCheckServer
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
+  import { Toast } from 'vant';
+
   export default {
     name: 'VmpWapStreamList',
 
@@ -78,6 +82,10 @@
           '----远端流列表更新----',
           this.$domainStore.state.interactiveServer.remoteStreams
         );
+        if (this.micServer.state.isSpeakOn) {
+          // 远端流个数改变且 在推流 才进行初始化BScroll
+          this.createBScroll();
+        }
         return this.$domainStore.state.interactiveServer.remoteStreams;
       },
       joinInfo() {
@@ -116,7 +124,9 @@
         // 只存在订阅一路流的情况下进行铺满
         return (
           this.remoteStreams.length == 1 &&
-          !this.$domainStore.state.interactiveServer.localStream.streamId
+          this.remoteStreams[0].accountId == this.mainScreen &&
+          !this.$domainStore.state.interactiveServer.localStream.streamId &&
+          this.interactToolStatus?.auto_speak
         );
       }
     },
@@ -124,32 +134,26 @@
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       useMediaCheckServer().checkSystemRequirements();
+      this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
       this.msgServer = useMsgServer();
     },
 
-    created() {
+    async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
-      console.log(
-        '-- this.childrenCom:',
-        this.childrenCom,
-        this.$domainStore.state.interactiveServer.remoteStreams
-      );
       this.addSDKEvents();
-      if (!useMediaCheckServer().state.isBrowserNotSupport) {
-        this.$message.error('浏览器不支持互动');
-      }
-      if (
-        [3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode) &&
-        roomBaseServer.state.watchInitData.webinar.type == 1
-      ) {
-        // TODO: 弹出确认框 触发用户操作
+
+      if (useMediaCheckServer().state.isBrowserNotSupport) {
+        return Toast(`浏览器不支持互动`);
       }
       this.replayPlay = debounce(this.replayPlay, 500);
     },
 
     mounted() {
-      this.createBScroll();
+      // 在麦上 才存在滑动情况
+      if (this.micServer.state.isSpeakOn) {
+        this.createBScroll();
+      }
     },
     beforeDestroy() {
       if (this.scroll) {
@@ -168,8 +172,9 @@
 
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
-          const str = roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-          this.$message.error(`${msg.nick_name}设置成为${str}`);
+          const str =
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+          Toast(`${msg.data.nick_name}设置成为${str}`);
         });
       },
 
@@ -177,17 +182,21 @@
       createBScroll() {
         this.$nextTick(() => {
           if (this.scroll) {
-            this.scroll.destroy();
+            this.scroll.refresh();
+            // this.scroll.destroy();
+          } else {
+            this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
+              scrollX: true,
+              probeType: 3 // listening scroll event
+            });
           }
-          this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
-            scrollX: true,
-            probeType: 3 // listening scroll event
-          });
+          if (!this.mainScreenDom) {
+            this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+          }
+          this.mainScreenDom.style.left = `${1.02667}rem`;
           this.scroll.on('scroll', ({ x }) => {
             if (this.mainScreenDom) {
               this.mainScreenDom.style.left = `${30 + -x}px`;
-            } else {
-              this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
             }
           });
         });
@@ -201,6 +210,12 @@
           });
         });
       },
+
+      // 全屏
+      setFullScreen() {
+        // this.interactiveServer.setPlay({ streamId: stream.streamId, vNode: '' })
+      },
+
       exchange(compName) {
         window.$middleEventSdk?.event?.send({
           cuid: 'ps.surface',
@@ -235,6 +250,7 @@
       }
     }
 
+    // 播放暂停按钮
     &-pause {
       height: 100%;
       width: 100%;
@@ -265,7 +281,6 @@
       top: 83px;
       width: 597px;
       height: 337px;
-      left: 76px;
       display: inline-block;
       .vmp-stream-list__remote-container {
         &-h {
@@ -288,6 +303,31 @@
       height: 0;
       .vmp-stream-list__main-screen {
         top: 0;
+      }
+    }
+
+    // 未上麦样式进行覆盖
+    &-no-speack {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      align-content: flex-end;
+      height: 422px;
+      .vmp-stream-list__remote-container {
+        // align-items: center;
+        width: 150px;
+        height: 85px;
+      }
+      .vmp-stream-list__local-container {
+        width: 150px;
+        height: 85px;
+      }
+      .vmp-stream-list__main-screen {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: calc(100% - 85px);
       }
     }
     // 铺满全屏

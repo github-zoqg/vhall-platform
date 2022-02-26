@@ -27,7 +27,10 @@ export default async function () {
 
   // 判断是否是嵌入/单视频嵌入
   try {
-    const _param = {};
+    const _param = {
+      isEmbed: false,
+      isEmbedVideo: false
+    };
     if (location.pathname.indexOf('embedclient') != -1) {
       _param.isEmbed = true;
     }
@@ -107,6 +110,7 @@ export default async function () {
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
+  window.interactiveServer = interactiveServer;
   window.docServer = docServer;
   window.groupServer = groupServer;
   window.micServer = micServer;

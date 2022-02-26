@@ -343,7 +343,6 @@
             avatar: this.joinInfoInGift.avatar,
             nickname: this.joinInfoInGift.nickname
           };
-          // TODO: 发送什么消息
           if (this.msgServer) {
             this.msgServer.sendChatMsg(msgData, context);
             this.$toast(this.$t('interact_tools.interact_tools_1031'));

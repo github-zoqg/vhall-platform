@@ -24,7 +24,7 @@
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
-      <div
+      <!-- <div
         v-if="isLivingEnd"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
@@ -35,7 +35,7 @@
           </div>
           <h1 class="vmp-wap-player-ending-box-text">直播已结束</h1>
         </div>
-      </div>
+      </div> -->
       <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
         <p>语音播放中</p>
       </div>
@@ -43,7 +43,7 @@
       <div
         v-if="isVodEnd"
         class="vmp-wap-player-ending"
-        :style="`backgroundImage: url('${videoCover}')`"
+        :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
         <!-- 试看播放结束 -->
         <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
@@ -73,7 +73,7 @@
       <!-- 观看次数  -->
       <div
         class="vmp-wap-player-header"
-        v-show="roomBaseState.watchInitData.pv.show && isPlayering"
+        v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview"
         :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
       >
         <p>
@@ -89,15 +89,17 @@
       </div>
       <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
       <div
+        class="vmp-wap-player-footer"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
-        v-show="isPlayering"
       >
         <!-- 倍速和画质合并 -->
         <div class="vmp-wap-player-speed">
           <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed">
             {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
           </span>
-          <span @click="openQuality">{{ formatQualityText(currentQualitys.def) }}</span>
+          <span @click="openQuality" v-if="!isWarnPreview">
+            {{ formatQualityText(currentQualitys.def) }}
+          </span>
         </div>
         <div class="vmp-wap-player-control">
           <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
@@ -132,7 +134,7 @@
               ></controlEventPoint>
             </div>
             <van-slider
-              v-if="!isLiving && playerOtherOptions.progress_bar"
+              v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
               v-model="sliderVal"
               active-color="rgba(252,86,89,.7)"
               inactive-color="rgba(255,255,255,.3)"
@@ -323,7 +325,6 @@
         recordHistoryTime: '', // 记录播放的时间
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
-        isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
         marquee: {}, // 跑马灯
         water: {}, //水印
@@ -350,6 +351,7 @@
     mounted() {
       this.getWebinerStatus();
       this.listenEvents();
+      console.log(this.isNotEmbed, '?????????zhangxiao');
     },
     methods: {
       startPlay() {
@@ -654,9 +656,9 @@
 </script>
 <style lang="less">
   .vmp-wap-player {
-    height: 422px;
-    width: 100%;
-    position: relative;
+    // height: 422px;
+    // width: 100%;
+    // position: relative;
     &-opcity-flase {
       // opacity: 0;
       display: none;

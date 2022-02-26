@@ -1,9 +1,9 @@
-export const globalConfig = {
+const globalConfig = {
   lang: 'zh'
 };
 
 // 服务配置
-export const serverConfig = {
+const serverConfig = {
   /*** 布局定义start */
   // 根节点
   layerRoot: {
@@ -322,7 +322,7 @@ export const serverConfig = {
 
   subcribeRoot: {
     component: 'VmpAirContainer',
-    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'subcribeFooter', 'comAllDialog']
+    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog']
   },
   // 顶部header容器
   subcribeHeader: {
@@ -337,15 +337,24 @@ export const serverConfig = {
     children: ['comSubcribeWapBody']
   },
   subcribeCenter: {
-    component: 'VmpAirContainer',
+    component: 'VmpContainer',
     className: 'tab-content',
     children: ['comTabMenuWap']
   },
-  subcribeFooter: {
-    component: 'VmpAirContainer'
-  },
   comSubcribeWapBody: {
-    component: 'VmpSubscribeBody'
-    // children: ['comWapPlayer']
+    component: 'VmpSubscribeBody',
+    children: ['comWapPlayer'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
   }
+};
+
+export default {
+  globalConfig: globalConfig,
+  serverConfig: serverConfig
 };

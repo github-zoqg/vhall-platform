@@ -32,7 +32,11 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initReceiveLive();
+        let clientType = 'standard';
+        if (location.pathname.indexOf('embedclient') != -1) {
+          clientType = 'embed';
+        }
+        await this.initReceiveLive(clientType);
         await subscribeState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
@@ -47,7 +51,7 @@
       }
     },
     methods: {
-      initReceiveLive() {
+      initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
@@ -56,7 +60,7 @@
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'standard' //客户端类型
+            clientType: clientType //客户端类型
           }
         });
       },
