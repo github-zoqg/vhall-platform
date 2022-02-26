@@ -48,7 +48,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useGiftsServer } from 'middle-domain';
+  import { useRoomBaseServer, useGiftsServer, useChatServer } from 'middle-domain';
   import TaskQueue from './taskQueue';
   import { uuid } from '@/packages/app-shared/utils/tool';
 
@@ -81,6 +81,7 @@
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.giftsServer = useGiftsServer();
+      this.chatServer = useChatServer();
       console.log('wap this.roomBaseServer------->', this.roomBaseServer);
       this.listenServer();
     },
@@ -133,6 +134,21 @@
       listenServer() {
         this.giftsServer.$on('gift_send_success', msg => {
           console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
+          const data = {
+            nickname:
+              msg.data.gift_user_nickname.length > 8
+                ? msg.data.gift_user_nickname.substr(0, 8) + '...'
+                : msg.data.gift_user_nickname,
+            avatar: msg.data.avatar,
+            content: {
+              gift_name: msg.data.gift_name,
+              gift_url: `${msg.data.gift_image_url}`,
+              source_status: msg.data.source_status
+            },
+            type: msg.data.type
+            // interactToolsStatus: true
+          };
+          this.chatServer.addChatToList(data);
           this.addRewardEffect(msg);
         });
       },

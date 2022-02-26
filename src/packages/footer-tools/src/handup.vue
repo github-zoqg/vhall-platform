@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer, useRoomBaseServer } from 'middle-domain';
+  import { useMicServer, useRoomBaseServer, useInteractiveServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -64,6 +64,8 @@
           this.btnText = '举手上麦';
         }
       });
+      /**
+       *
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         console.log('---申请下麦消息---', join_info, msg);
@@ -76,7 +78,7 @@
       useMicServer().$on('user_apply_host_reject', msg => {
         // TODO:被拒绝的处理
         console.log(msg);
-      });
+      });**/
     },
     methods: {
       // 下麦

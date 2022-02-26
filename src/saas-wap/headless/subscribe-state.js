@@ -13,7 +13,10 @@ export default async function () {
 
   // 判断是否是嵌入/单视频嵌入
   try {
-    const _param = {};
+    const _param = {
+      isEmbed: false,
+      isEmbedVideo: false
+    };
     if (location.pathname.indexOf('embedclient') != -1) {
       _param.isEmbed = true;
     }

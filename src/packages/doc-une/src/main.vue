@@ -151,8 +151,7 @@
         keepAspectRatio: true,
         hasPager: true, // 是否有分页操作(观看端没有)
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false,
-        watchDocShow: true
+        hasStreamList: false
       };
     },
     computed: {
@@ -178,18 +177,17 @@
       },
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       // 文档是否可见
       show() {
         return (
-          (this.roomBaseServer.state.clientType === 'send' &&
+          (this.roomBaseServer.state.watchInitData.join_info.role_name != 2 &&
             !this.roomBaseServer.state.isShareScreen) ||
-          (this.roomBaseServer.state.clientType !== 'send' &&
+          (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
-              this.docServer.state.hasDocPermission ||
-              this.docServer.state.watchDocShow))
+              this.docServer.state.hasDocPermission))
         );
       },
       // 是否文档演示权限
@@ -352,20 +350,22 @@
                 cid: item.cid
               };
             });
+            //
+            this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
             await this.$nextTick();
-
-            this.resize();
-            // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
-            const { width, height } = this.docViewRect;
-            if (!width || !height) return;
-
-            for (const item of data) {
-              this.docServer.initContainer({
-                cid: item.cid,
-                width,
-                height,
-                fileType: item.type.toLowerCase()
-              });
+            if (this.docServer.state.switchStatus) {
+              this.resize();
+              // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
+              const { width, height } = this.docViewRect;
+              if (!width || !height) return;
+              for (const item of data) {
+                this.docServer.initContainer({
+                  cid: item.cid,
+                  width,
+                  height,
+                  fileType: item.type.toLowerCase()
+                });
+              }
             }
           });
         }
@@ -497,7 +497,7 @@
             await this.$nextTick();
           }
         });
-        if (this.roomBaseServer.state.clientType === 'send') {
+        if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])

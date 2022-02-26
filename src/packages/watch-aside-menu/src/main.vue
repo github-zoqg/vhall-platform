@@ -55,19 +55,33 @@
     <span class="menu-fold" v-show="isCollapse" @click="handleToggle()">
       <i class="vh-iconfont vh-line-s-unfold"></i>
     </span>
+
+    <!-- 邀请演示对话框 -->
+    <GroupInvitaion
+      :show.sync="dialogVisibleInvite"
+      :senderId="senderId"
+      :inviteName="inviteName"
+    ></GroupInvitaion>
   </div>
 </template>
 <script>
-  import { useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useGroupServer, useMicServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import GroupInvitaion from './group-invitation.vue';
 
   export default {
     name: 'VmpWatchAsideMenu',
+    components: {
+      GroupInvitaion
+    },
     data() {
       return {
         isCollapse: true,
         selectedMenu: '',
-        disableMenus: ['document', 'board', 'desktopShare', 'assistance']
+        disableMenus: ['document', 'board', 'desktopShare', 'assistance'],
+        dialogVisibleInvite: false, //邀请演示对话框是否显示
+        senderId: '', //邀请人id
+        inviteName: '' //邀请人身份
       };
     },
     computed: {
@@ -77,9 +91,13 @@
       // 请求协助菜单，在小组中才显示
       showAssistance() {
         return this.groupServer.state.groupInitData.isInGroup;
+      },
+      userId() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
       }
     },
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.groupServer = useGroupServer();
     },
@@ -126,6 +144,27 @@
             this.gobackHome(6);
           } else {
             this.gobackHome(7);
+          }
+        });
+        // 邀请演示(主直播间主持人邀请其它成员演示，小组内组长邀请其它成员演示)
+        this.groupServer.$on('dispatch_vrtc_connect_presentation', msg => {
+          console.log('[group] 收到邀请演示 msg', msg);
+          console.log('[group] 收到邀请演示 userId：', this.userId);
+          console.log('[group] 收到邀请演示 target_id：', msg.data.target_id);
+          // 如果邀请的是自己
+          if (this.userId == msg.data.target_id) {
+            this.dialogVisibleInvite = true;
+            this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人'; // 邀请人身份
+            this.senderId = msg.sender_id; // 邀请人id
+            // console.log('[group] inviteName：', this.inviteName);
+          }
+        });
+
+        // 观看端收到拒绝邀请演示，只能是小组内
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
+          const { join_role, isInGroup } = this.groupServer.state.groupInitData;
+          if (join_role == 20 && isInGroup) {
+            this.$message.warning(`观众${msg.nick_name}拒绝了你的演示邀请`);
           }
         });
       },
