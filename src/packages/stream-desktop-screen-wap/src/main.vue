@@ -18,7 +18,7 @@
     data() {
       return {
         streamId: null, // 桌面共享流Id
-        isShowWapDesktopScreen:false, // wap端是否显示桌面共享容器
+        isShowWapDesktopScreen: false, // wap端是否显示桌面共享容器
         popAlert: {
           text: '请确认开启桌面共享，为了体验更好，建议选择“您的整个屏幕”',
           visible: false,
@@ -58,11 +58,11 @@
     methods: {
       // 订阅桌面共享流
       subscribeDesktopScreen(streamId) {
-      //订阅时展示桌面共享容器
-      this.isShowWapDesktopScreen = true
-      //存一下当前的流Id，刷新后使用
-      sessionStorage.setItem('currentDesktopStreamID',streamId)
-      const opt = {
+        //订阅时展示桌面共享容器
+        this.isShowWapDesktopScreen = true;
+        //存一下当前的流Id，刷新后使用
+        sessionStorage.setItem('currentDesktopStreamID', streamId);
+        const opt = {
           streamId,
           videoNode: 'vmp-wap-desktop-screen', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
@@ -74,13 +74,15 @@
       addEvents() {
         // 监听桌面共享流加入
         this.desktopShareServer.$on('screen_stream_add', e => {
-          this.streamId = e.data.streamId
+          this.streamId = e.data.streamId;
           this.subscribeDesktopScreen(e.data.streamId);
         });
         // 监听桌面共享流离开
         this.desktopShareServer.$on('screen_stream_remove', e => {
           // ()中的逻辑，如果刷新之后，没有streamId的值，需要从sessionStorage中取当前的流Id
-          if (e.data.streamId == (this.streamId || sessionStorage.getItem('currentDesktopStreamID'))) {
+          if (
+            e.data.streamId == (this.streamId || sessionStorage.getItem('currentDesktopStreamID'))
+          ) {
             this.streamId = '';
             this.isShowWapDesktopScreen = false;
           }
@@ -91,7 +93,7 @@
 </script>
 
 <style lang="less">
-#vmp-wap-desktop-screen {
+  #vmp-wap-desktop-screen {
     width: 100%;
     height: 100%;
     background: #2d2d2d;

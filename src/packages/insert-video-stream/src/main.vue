@@ -145,7 +145,7 @@
             msg_url: '.MP4'
           }
         },
-        constrolUp: false,
+        constrolUp: false, // 控制栏显示、隐藏
         conctorObj: {
           TimesShow: false,
           hoverTime: 0,
