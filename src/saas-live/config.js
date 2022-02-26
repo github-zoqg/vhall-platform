@@ -97,6 +97,8 @@ export const serverConfig = {
       'liveTimerSet',
       'liveTimer',
       'comQuestionnaire',
+      'comRebroadcast',
+      'comRedPacket',
       'comRebroadcastList'
     ]
   },
@@ -303,6 +305,12 @@ export const serverConfig = {
     emitOpenRebroadcast: [
       {
         cuid: ['comRebroadcastList'],
+        method: 'open'
+      }
+    ],
+    emitOpenRedPacket: [
+      {
+        cuid: ['comRedPacket'],
         method: 'open'
       }
     ]
@@ -603,6 +611,10 @@ export const serverConfig = {
   },
   comSignLive: {
     component: 'VmpSignLive'
+  },
+  // 红包
+  comRedPacket: {
+    component: 'VmpRedPacketLive'
   },
 
   // *******录制页面****开始
