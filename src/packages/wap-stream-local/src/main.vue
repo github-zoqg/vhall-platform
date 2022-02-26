@@ -1,5 +1,9 @@
 <template>
-  <div :id="`vmp-stream-local__${joinInfo.third_party_user_id}`" class="vmp-stream-local">
+  <div
+    :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
+    class="vmp-stream-local"
+    @click.stop="showExitScreen"
+  >
     <!-- 流容器 -->
     <section
       class="vmp-stream-local__stream-box"
@@ -28,11 +32,19 @@
         "
       ></span>
     </section>
+    <!-- 退出全屏 -->
+    <div
+      class="vmp-stream-remote-exitscreen"
+      :class="[exitScreenStatus ? 'opcity-true' : 'opcity-flase']"
+      @click.stop="exitFullScreen"
+    >
+      <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+    </div>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer, useChatServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -57,6 +69,19 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      interactToolStatus() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus;
+      },
+      exitScreenStatus() {
+        return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
     filters: {
@@ -74,10 +99,23 @@
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
+      this.chatServer = useChatServer();
     },
     async mounted() {
+      /*
+       * 刷新进入页面 是否自动上麦
+       *     1、默认在麦上  ------>   不论什么活动直接上麦
+       *     2、默认不在麦上 ----->
+       *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
+       */
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
+      } else if (
+        this.mode === 6 &&
+        !this.chatServer.state.banned &&
+        !this.chatServer.state.allBanned
+      ) {
+        await this.micServer.userSpeakOn();
       }
 
       // 主持人同意上麦申请
@@ -95,19 +133,33 @@
           ) {
             // 开始推流
             this.startPush();
-          } else if (this.joinInfo.role_name == 2) {
-            // 实例化互动实例
+          } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
+            //  初始化互动实例
             await this.interactiveServer.init();
             // 开始推流
             this.startPush();
           }
         }
       });
+
       // 下麦成功
       this.micServer.$on('vrtc_disconnect_success', async () => {
         await this.stopPush();
 
         this.interactiveServer.destroy();
+        if (this.isNoDelay === 1 || this.mode === 6) {
+          //  初始化互动实例
+          this.interactiveServer.init();
+        }
+      });
+
+      //监听直播结束的通知，下麦并停止推流
+      this.micServer.$on('live_over', async () => {
+        if (this.micServer.state.isSpeakOn) {
+          await this.micServer.speakOff();
+          await this.stopPush();
+          this.interactiveServer.destroy();
+        }
       });
     },
     beforeDestroy() {
@@ -200,9 +252,17 @@
       // 创建本地流
       async createLocalStream() {
         await this.interactiveServer
-          .createLocalVideoStream({
-            videoNode: `stream-${this.joinInfo.third_party_user_id}`
-          })
+          .createWapLocalStream(
+            {
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`
+            },
+            {
+              mute: {
+                audio: this.mode === 6 && this.interactToolStatus?.auto_speak == 1, // 是否是分组且开启了自动上麦
+                video: false
+              }
+            }
+          )
           .catch(() => 'createLocalStreamError');
       },
       // 推流
@@ -259,6 +319,27 @@
               this.networkStatus = 0;
             });
         }, 2000);
+      },
+
+      showExitScreen() {
+        if (!this.exitScreenStatus) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.interactiveServer.state.fullScreenType = false;
+        }, 5000);
+      },
+      exitFullScreen() {
+        this.interactiveServer
+          .exitStreamFullscreen({
+            streamId: this.stream.streamId,
+            vNode: `vmp-stream-remote__${this.stream.streamId}`
+          })
+          .then(res => {
+            console.warn('res----', res);
+            this.interactiveServer.state.fullScreenType = false;
+          });
       }
     }
   };

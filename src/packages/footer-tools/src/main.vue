@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-footer-tools">
+  <div class="vmp-footer-tools" v-if="!isEmbedVideo">
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
@@ -84,7 +84,13 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer
+  } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
@@ -174,6 +180,10 @@
           Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
+      },
+      isEmbedVideo() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     beforeCreate() {
@@ -201,6 +211,12 @@
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
         this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
+      });
+      //监听直播结束的通知，下麦并停止推流
+      useMsgServer().$on('live_over', e => {
         if (this.isSpeakOn) {
           useMicServer().speakOff();
         }

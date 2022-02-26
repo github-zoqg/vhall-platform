@@ -8,10 +8,10 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog']
     // children: ['layerBody']
   },
-  // 顶部header容器
+  // 顶部header 容器嵌入不用这个组件
   layerHeader: {
     component: 'VmpContainer',
     className: 'vmp-basic-hd',
@@ -22,8 +22,6 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
-    // children: ['comGoodSaas']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerFooter: {
@@ -44,6 +42,7 @@ export const serverConfig = {
       'comPcPlayer',
       'comWatchAsideMenu',
       'comDocUne',
+      'comDesktopScreen',
       'comFooterTools',
       'comNoticeColumn',
       'comLivingEnd'
@@ -64,13 +63,16 @@ export const serverConfig = {
       'comOfficial',
       'comShare',
       'comWatchAuth',
-      // 'comSignUpForm',
+      'comSignUpForm',
       'comUserAccount',
       'comCash',
       'comLottery',
       'comWatchTimer',
       'comScreenPost',
-      'comMediaSetting'
+      'comMediaSetting',
+      'comWatchPayFee',
+      'comQuestionnaire',
+      'comRedPacket'
     ]
   },
 
@@ -147,9 +149,36 @@ export const serverConfig = {
   comStreamRemote: {
     component: 'VmpStreamRemote'
   },
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen'
+  },
   // 播放器
   comPcPlayer: {
-    component: 'VmpPcPlayer'
+    component: 'VmpPcPlayer',
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
+    ],
+    emitClickPay: [
+      // 权限付费弹窗
+      {
+        cuid: 'comWatchPayFee',
+        method: 'openPayFee',
+        args: ['$0']
+      }
+    ],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 结束页面
   comLivingEnd: {
@@ -271,7 +300,14 @@ export const serverConfig = {
     component: 'VmpNoticeColumn'
   },
   comWatchAuth: {
-    component: 'VmpWatchAuth'
+    component: 'VmpWatchAuth',
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
+  },
+  comWatchPayFee: {
+    component: 'VmpWatchPayFee'
   },
   //聊天组件
   comChat: {
@@ -292,7 +328,10 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'watch'
+    }
   },
   //私聊组件
   comWatchPrivateChat: {
@@ -380,14 +419,13 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['comVmpSubscribeBody']
-    // children: ['comGoodSaas']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerSubscribeFooter: {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
+
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
     children: ['comTabMenu', 'comPcPlayer'],
@@ -405,6 +443,28 @@ export const serverConfig = {
         method: 'openAuthDialog',
         args: ['$0']
       }
-    ]
+    ],
+    emitClickPay: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchPayFee',
+        method: 'openPayFee',
+        args: ['$0']
+      }
+    ],
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
+  },
+
+  // 抽奖
+  comQuestionnaire: {
+    component: 'VmpQuestionnaireWatch'
+  },
+
+  // 红包
+  comRedPacket: {
+    component: 'VmpRedPacketWatch'
   }
 };

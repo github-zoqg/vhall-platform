@@ -6,7 +6,6 @@
       <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}
       </div>
-
       <!-- 观看端没有观众可见的按钮 -->
       <div class="audience-visible" v-if="!isWatch">
         <span style="margin-right: 5px">
@@ -192,10 +191,17 @@
       }
     },
     computed: {
+      watchInitData() {
+        return this.roomBaseServer.state.watchInitData;
+      },
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
         console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       },
       switchStatus: {
         get() {
@@ -206,9 +212,19 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
-      // 是否有演示权限
+      // 是否文档演示权限
       hasDocPermission() {
-        return this.docServer.state.hasDocPermission;
+        if (this.isInGroup) {
+          return (
+            this.groupServer.state.groupInitData.presentation_screen ==
+            this.watchInitData.join_info.third_party_user_id
+          );
+        } else {
+          return (
+            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+            this.watchInitData.join_info.third_party_user_id
+          );
+        }
       },
       // 是否显示画笔工具栏
       showBrushToolbar() {
@@ -287,10 +303,15 @@
         if (brush === 'clear') {
           // TODO 提示文本进行国际化处理
           try {
-            await this.$confirm('确定要清空白板么？', '提示', {
+            await this.$confirm('<p>确定要清空文档标记么？</p>', '提示', {
+              customClass: 'saas-message-box',
+              dangerouslyUseHTMLString: true,
+              closeOnClickModal: false,
+              roundButton: true,
               confirmButtonText: '确定',
               cancelButtonText: '取消',
-              type: 'warning'
+              confirmButtonClass: 'btn-saas',
+              cancelButtonClass: 'btn-saas btn-saas-cancel'
             });
             this.docServer.clear();
           } catch (err) {

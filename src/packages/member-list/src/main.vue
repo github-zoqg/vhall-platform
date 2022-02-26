@@ -33,6 +33,7 @@
                   :mode="mode"
                   :member-options="memberOptions"
                   :current-speaker-id="currentSpeakerId"
+                  :leader-id="leader_id"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -67,6 +68,7 @@
                   :mode="mode"
                   :member-options="memberOptions"
                   :current-speaker-id="currentSpeakerId"
+                  :leader-id="leader_id"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -100,6 +102,7 @@
                   :mode="mode"
                   :member-options="memberOptions"
                   :current-speaker-id="currentSpeakerId"
+                  :leader-id="leader_id"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -112,7 +115,7 @@
       </scroll>
     </div>
     <!--底部操作区域-->
-    <div class="vmp-member-list__operate-container">
+    <div class="vmp-member-list__operate-container" v-if="isShowBottom">
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
@@ -275,7 +278,9 @@
         // 上麦人员掉线处理计时器map
         speakerLeaveIntervalMap: {},
         //切换举手状态,防连点
-        disabledSwitchHand: false
+        disabledSwitchHand: false,
+        //组长的id
+        leaderId: ''
       };
     },
     beforeCreate() {
@@ -287,11 +292,11 @@
       this.groupServer = useGroupServer();
     },
     beforeDestroy() {},
-    mounted() {
+    async mounted() {
       //初始化配置
       this.initConfig();
       //初始化视图数据
-      this.initViewData();
+      await this.initViewData();
       //开始初始化流程
       this.init();
       this.listenEvent();
@@ -328,6 +333,17 @@
       }
     },
     computed: {
+      //是否显示底部区域
+      isShowBottom() {
+        let show = true;
+        if (this.memberOptions.platformType === 'watch') {
+          return this.leader_id == this.userId && this.isInGroup;
+        }
+        if (this.memberOptions.platformType === 'live') {
+          show = true;
+        }
+        return show;
+      },
       //是否在分组里
       isInGroup() {
         return this.groupServer.state.groupInitData.isInGroup;
@@ -923,7 +939,7 @@
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
           if (isLive && msg.sender_id != _this.userId) {
-            _this.$message.warning(_this.$t('chat.chat_1070', msg.nick_name));
+            console.log('这里不需要提示,其它组件处理了');
           } else {
             _this.presentation_screen = _this.leader_id;
           }
@@ -1210,9 +1226,11 @@
           }, 1000);
         }
         //切换小组
-        function handleGroupChange(msg) {
+        async function handleGroupChange(msg) {
           // 进入小组重置演示人id
           _this.presentation_screen = msg.main_screen;
+          // 初始化互动实例
+          await this.interactiveServer.init();
         }
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {
@@ -1289,6 +1307,7 @@
       },
       //获取在线人员列表
       getOnlineUserList(pos) {
+        const _this = this;
         const { getOnlineUserList } = this.memberServer;
         const params = {
           room_id: this.roomId,
@@ -1305,6 +1324,17 @@
             if (res.code === 200) {
               this.$refs.scroll.finishPullUp();
               this.onlineUsers = this.memberServer.state.onlineUsers || [];
+              (this.onlineUsers || []).forEach(item => {
+                if (
+                  _this.memberOptions.platformType === 'watch' &&
+                  item.account_id == _this.userId
+                ) {
+                  _this.roleName = item.role_name;
+                }
+                if ([20, '20'].includes(item.role_name)) {
+                  _this.leader_id = item.account_id;
+                }
+              });
               if (!this.onlineUsers.length) {
                 this.pageConfig.page--;
               }
@@ -1679,10 +1709,18 @@
       },
       //邀请上麦
       inviteMic(accountId = '') {
-        if (accountId === this.currentSpeakerId) {
+        if (this.memberOptions.platformType === 'watch' && accountId === this.leader_id) {
           return;
         }
-        const params = { room_id: this.roomId, receive_account_id: accountId, type: 1 };
+
+        if (this.memberOptions.platformType === 'watch' && accountId === this.currentSpeakerId) {
+          return;
+        }
+        const params = {
+          room_id: this.roomId,
+          receive_account_id: accountId,
+          type: 1
+        };
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {

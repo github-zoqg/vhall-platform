@@ -275,7 +275,12 @@
       setSetingHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
-        this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
+        let baseHeight = 522;
+        if (this.isEmbed) {
+          baseHeight = 422;
+        }
+        this.popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
         // const headerDom = document.getElementById('header');
         // const interactDoc = document.getElementById('interactBox');
         // if (headerDom) {
@@ -343,7 +348,6 @@
             avatar: this.joinInfoInGift.avatar,
             nickname: this.joinInfoInGift.nickname
           };
-          // TODO: 发送什么消息
           if (this.msgServer) {
             this.msgServer.sendChatMsg(msgData, context);
             this.$toast(this.$t('interact_tools.interact_tools_1031'));

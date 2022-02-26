@@ -40,7 +40,11 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initReceiveLive();
+        let clientType = 'standard';
+        if (location.pathname.indexOf('embedclient') != -1) {
+          clientType = 'embed';
+        }
+        await this.initReceiveLive(clientType);
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
@@ -48,9 +52,10 @@
         // 是否跳转预约页
         if (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type != 3
         ) {
-          this.goSubscribePage();
+          this.goSubscribePage(clientType);
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -61,22 +66,26 @@
       }
     },
     methods: {
-      initReceiveLive() {
+      initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'standard' //客户端类型
+            clientType: clientType //客户端类型
           }
         });
       },
-      goSubscribePage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
+      goSubscribePage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
         switch (err.code) {

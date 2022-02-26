@@ -4,12 +4,32 @@
       :visible.sync="dialogVisible"
       @open="handlOpen"
       :before-close="handleClose"
+      :close-on-click-modal="false"
       width="800px"
     >
+      <!-- 内层嵌套对话框 -->
+      <el-dialog
+        width="400px"
+        title="提示"
+        :show-close="false"
+        custom-class="doc-dlg-sharetip"
+        :close-on-click-modal="false"
+        :visible.sync="innerVisible"
+        top="30vh"
+        append-to-body
+      >
+        <p style="padding-bottom: 10px">上传文档同时共享至资料管理，便于其他活动使用？</p>
+        <p><el-checkbox v-model="isShare">共享到资料管理</el-checkbox></p>
+        <div class="dialog-footer">
+          <el-button type="primary" round @click="handleShareSubmit">确 定</el-button>
+          <el-button round @click="handleShareCancel">取 消</el-button>
+        </div>
+      </el-dialog>
+
       <!-- 标题栏 -->
       <template slot="title">
         <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
-          <i class="iconfont iconzuofanye"></i>
+          <i class="vh-iconfont vh-line-arrow-left" style="font-size: 14px; color: #666"></i>
         </span>
         <span>{{ $t('usual.chooseDocument') }}</span>
       </template>
@@ -52,9 +72,9 @@
                 list-type="text"
                 :show-file-list="false"
               >
-                <el-button type="primary">{{ $t('usual.upload') }}</el-button>
+                <el-button type="primary" round>{{ $t('usual.upload') }}</el-button>
               </el-upload>
-              <el-button v-if="!isWatch" @click="handleGotoDoclib">
+              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
                 {{ $t('doc_list.doclib') }}
               </el-button>
 
@@ -74,7 +94,10 @@
                     <p>择静态版（无动画效果）快速演示</p>
                   </div>
                 </div>
-                <i style="margin-left: 5px" class="el-tooltip iconfont iconicon_help_m"></i>
+                <i
+                  style="font-size: 16px; color: #999; margin-left: 8px"
+                  class="el-tooltip vh-iconfont vh-line-question"
+                ></i>
               </el-tooltip>
 
               <el-input
@@ -82,7 +105,7 @@
                 placeholder="请输入文档名称"
                 v-model="docSearchKey"
                 clearable
-                @keydown.enter.stop.native="handleDocSearch"
+                @keydown.enter.stop.native="handleDocSearch()"
               >
                 <i slot="prefix" class="el-input__icon el-icon-search" @click="handleDocSearch"></i>
               </el-input>
@@ -152,7 +175,8 @@
               placeholder="请输入文档名称"
               v-model="doclibSearchKey"
               clearable
-              @keydown.enter.stop.native="handleDoclibSearch"
+              @clear="handleDoclibSearch()"
+              @keydown.enter.stop.native="handleDoclibSearch()"
             >
               <i
                 slot="prefix"
@@ -186,7 +210,11 @@
             </el-table>
           </div>
           <div class="vmp-doc-lib__ft">
-            <div class="vmp-doc-lib__ft-tip">当前选中 {{ selectDocIdList.length }} 个文档</div>
+            <div class="vmp-doc-lib__ft-tip">
+              当前选中
+              <span style="color: #fc5659">{{ selectDocIdList.length }}</span>
+              个文档
+            </div>
             <div>
               <el-button type="primary" @click="handleDoclibSubmit">确定</el-button>
               <el-button @click="handleDoclibCancel">取消</el-button>
@@ -225,7 +253,11 @@
         doclibSearchKey: '',
         doclibList: [],
         selectDocIdList: [], // 选中的文档ID列表
-        isCheckAll: false
+        isCheckAll: false,
+
+        innerVisible: false, //内嵌对话框是否显示
+        isShare: true, // 是否共享到资料管理
+        shareDocumentId: '' // 要共享的文档Id
       };
     },
     beforeCreate() {
@@ -236,7 +268,7 @@
     computed: {
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
       }
     },
     watch: {
@@ -328,6 +360,7 @@
        * 对话框打开事事件
        */
       handlOpen() {
+        this.docSearchKey = '';
         this.handleDocSearch();
       },
       handleClose() {
@@ -352,7 +385,6 @@
        */
       demonstrate(docId, docType) {
         this.dialogVisible = false;
-        console.log('演示文档ID：', docId);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitDemonstrateDoc', [docId, docType, this.switchStatus])
         );
@@ -405,7 +437,7 @@
         try {
           const result = await this.docServer.getWebinarDocList({
             pos: 0,
-            limit: 200,
+            limit: 1000,
             type: 2,
             webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id
@@ -427,6 +459,8 @@
        */
       async handleDoclibSearch() {
         const result = await this.docServer.getSharedDocList({
+          pos: 0,
+          limit: 1000,
           keyword: this.doclibSearchKey,
           type: 2,
           room_id: this.roomBaseServer.state.watchInitData.interact.room_id
@@ -531,46 +565,16 @@
             // page: 1
             // size: 362733
             const fuid = file.uid;
-            let documentId;
             this.dataList.forEach(item => {
               if (fuid === item.uid) {
-                documentId = res.data.document_id;
+                this.shareDocumentId = res.data.document_id;
                 item.document_id = res.data.document_id;
                 item.id = res.data.id;
                 item.docStatus = 'transwait'; //上传成功，等待转码
               }
             });
             this.dataList = [...this.dataList];
-            this.$message({
-              message: '上传成功',
-              type: 'success'
-            });
-            try {
-              await this.$confirm('是否同步上传的文档共享至资料库，便于其他活动使用？', '提示', {
-                confirmButtonText: '同步',
-                cancelButtonText: '不同步'
-              });
-            } catch (ex) {
-              // 取消
-              return;
-            }
-            const params = {
-              document_id: documentId,
-              tag: 1
-            };
-            try {
-              const result = await this.docServer.syncDoc(params);
-              if (result && result.code === 200) {
-                this.$message({
-                  message: '同步成功',
-                  type: 'success'
-                });
-              } else {
-                this.$message.error('同步失败');
-              }
-            } catch (err) {
-              this.$message.warning(err.msg);
-            }
+            this.innerVisible = true;
           }
         };
         param.onProgress = (percent, file) => {
@@ -586,6 +590,33 @@
         };
         // 开始上传
         this.docServer.uploadFile(param, this.uploadUrl);
+      },
+
+      // 共享对话框提示确认
+      async handleShareSubmit() {
+        if (this.isShare) {
+          try {
+            await this.docServer.syncDoc({
+              document_id: this.shareDocumentId,
+              tag: 1
+            });
+          } catch (err) {
+            this.$message.error(err.msg);
+          }
+        }
+        this.$message({
+          message: '上传成功',
+          type: 'success'
+        });
+        this.innerVisible = false;
+      },
+      // 共享对话框提示取消（关闭）
+      handleShareCancel() {
+        this.$message({
+          message: '上传成功',
+          type: 'success'
+        });
+        this.innerVisible = false;
       }
     }
   };
@@ -667,6 +698,28 @@
     .doc-uploader {
       display: inline;
       margin-right: 20px;
+    }
+  }
+
+  .doc-dlg-sharetip {
+    width: 400px;
+    height: 200px;
+    box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+    margin-top: -10%;
+
+    .el-checkbox {
+      font-weight: 400 !important;
+    }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #606266 !important;
+    }
+
+    .dialog-footer {
+      text-align: right;
+      margin-top: 20px;
     }
   }
 </style>

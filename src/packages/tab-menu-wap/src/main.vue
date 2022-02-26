@@ -1,5 +1,5 @@
 <template>
-  <section class="vmp-tab-menu">
+  <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
     <section class="vmp-tab-menu__header">
       <!-- 菜单区域 -->
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
@@ -81,6 +81,10 @@
       },
       selectedIndex() {
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       }
     },
     beforeCreate() {

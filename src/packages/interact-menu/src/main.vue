@@ -41,6 +41,7 @@
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openRedPacket"
         >
           <i class="vh-iconfont vh-a-redpacket"></i>
           <p>红包</p>
@@ -195,6 +196,10 @@
       // 打开签到弹窗
       openSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      // 打开红包弹窗
+      openRedPacket() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       }
     }
   };

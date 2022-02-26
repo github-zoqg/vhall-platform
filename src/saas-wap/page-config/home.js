@@ -1,14 +1,20 @@
-export const globalConfig = {
+const globalConfig = {
   lang: 'zh'
 };
 
 // 服务配置
-export const serverConfig = {
+const serverConfig = {
   /*** 布局定义start */
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog', 'comWapRewardEffect']
+    children: [
+      'comHeaderWatch',
+      'layerBody',
+      'layerBodyCenter',
+      'comAllDialog',
+      'comWapRewardEffect'
+    ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
@@ -31,7 +37,7 @@ export const serverConfig = {
   // },
   layerBodyCenter: {
     component: 'VmpContainer',
-    className: 'tab-content',
+    className: /embed/.test(location.pathname) ? 'tab-content-embed' : 'tab-content',
     children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   /*** 布局定义end */
@@ -48,7 +54,9 @@ export const serverConfig = {
       'comUserCenterWap',
       'comUserAccountWap',
       'comCashWap',
-      'compLotteryWap'
+      'compLotteryWap',
+      'compQuestionnaireWap',
+      'comRedPacketWap'
     ]
   },
   // 顶部
@@ -73,7 +81,7 @@ export const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
@@ -81,6 +89,9 @@ export const serverConfig = {
   comWapStreamList: {
     component: 'VmpWapStreamList',
     children: ['comWapStreamLocal']
+  },
+  comWapDesktopScreen: {
+    component: 'VmpWapDesktopScreen'
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
@@ -242,6 +253,11 @@ export const serverConfig = {
         args: ['$0']
       }
     ],
+    emitShowMenuTab: {
+      cuid: ['comTabMenuWap'],
+      method: 'setVisible',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -302,5 +318,60 @@ export const serverConfig = {
   // 章节
   comChapterWap: {
     component: 'VmpChapterWap'
+  },
+  // 问卷
+  compQuestionnaireWap: {
+    component: 'VmpQuestionnaireWap',
+    emitQuestionnaireVisible: [
+      // 问卷弹窗的显示和隐藏(全屏)
+      {
+        cuid: '',
+        method: '',
+        args: ['$0']
+      }
+    ]
+  },
+
+  // 预约页配置
+
+  subcribeRoot: {
+    component: 'VmpAirContainer',
+    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog']
+  },
+  // 顶部header容器
+  subcribeHeader: {
+    component: 'VmpAirContainer',
+    className: 'vmp-basic-hd',
+    children: ['comHeaderWatch']
+  },
+  // 中间主区域容器
+  subcribeBody: {
+    component: 'VmpAirContainer',
+    className: 'vmp-basic-bd',
+    children: ['comSubcribeWapBody']
+  },
+  subcribeCenter: {
+    component: 'VmpContainer',
+    className: 'tab-content',
+    children: ['comTabMenuWap']
+  },
+  comSubcribeWapBody: {
+    component: 'VmpSubscribeBody',
+    children: ['comWapPlayer'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
+  },
+  comRedPacketWap: {
+    component: 'VmpRedPacketWap'
   }
+};
+
+export default {
+  globalConfig: globalConfig,
+  serverConfig: serverConfig
 };

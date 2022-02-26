@@ -9,7 +9,7 @@ const pkg = require('./package.json');
 const htmlConfig = {
   // cdn js
   cdnJs: {
-    lodash: '//cnstatic01.e.vhall.com/common-static/middle/lodash/4.17.21/lodash.min.js',
+    lodash: '//s1.e.vhall.com/common-static/middle/lodash/4.17.21/lodash.min.js',
     vue: '//cnstatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.min.js',
     VueRouter:
       '//cnstatic01.e.vhall.com/common-static/middle/vue-router/3.5.3/dist/vue-router.min.js',
@@ -19,16 +19,18 @@ const htmlConfig = {
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
 
-    Vant: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
+    Vant: '//s1.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
-    jsencrypt:
-      '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
-    wx: '//res.wx.qq.com/open/js/jweixin-1.4.0.js'
+    jsencrypt: '//s1.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
+    loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
+    // wx: '//res.wx.qq.com/open/js/jweixin-1.4.0.js',
+    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js'
   },
   // cdn css
   cdnCss: {
-    Vant: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/middle/vant/2.12.34/dist/index.css',
+    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
+    Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
     iconfontCommon: '//at.alicdn.com/t/font_3128919_wa3mcobacyp.css',
     iconfont: '//at.alicdn.com/t/font_3120276_to9ja89x0p.css'

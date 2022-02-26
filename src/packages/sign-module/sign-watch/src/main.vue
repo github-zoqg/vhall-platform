@@ -26,7 +26,7 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer } from 'middle-domain';
+  import { useSignServer, useChatServer } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
@@ -68,6 +68,18 @@
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
         this.countDownTime();
+
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: this.$t('chat.chat_1027')
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
       });
       this.signServer.$on('sign_end', () => {
         this.showSign = false;

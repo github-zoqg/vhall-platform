@@ -1,47 +1,55 @@
 <template>
   <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
     <!-- 左翻页 -->
-    <span class="vmp-stream-list__scroll-btn left-btn" @click="domScrollLeft">
+    <span
+      v-show="isShowControlArrow"
+      class="vmp-stream-list__scroll-btn left-btn"
+      @click="scrollStream('left')"
+    >
       <i class="vh-iconfont vh-line-arrow-left" />
     </span>
 
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
-    <div class="vmp-stream-list__stream-wrapper">
-      <div
-        class="vmp-stream-list__local-container"
-        :class="{
-          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
-          'vmp-dom__max':
-            (miniElement == '' || miniElement == 'doc') &&
-            joinInfo.third_party_user_id == mainScreen,
-          'vmp-dom__mini':
-            miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
-        }"
-      >
-        <div class="vmp-stream-list__remote-container-h">
-          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-        </div>
-      </div>
-      <template v-if="remoteStreams.length">
+    <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
+      <div class="vmp-stream-list__stream-wrapper-scroll">
         <div
-          v-for="stream in remoteStreams"
-          :key="stream.id"
-          class="vmp-stream-list__remote-container"
+          class="vmp-stream-list__local-container"
           :class="{
-            'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+            'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
             'vmp-dom__max':
-              (miniElement == '' || miniElement == 'doc') && stream.accountId == mainScreen,
-            'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
+              miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen,
+            'vmp-dom__mini':
+              miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
-            <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+            <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
           </div>
         </div>
-      </template>
+        <template v-if="remoteStreams.length">
+          <div
+            v-for="stream in remoteStreams"
+            :key="stream.id"
+            class="vmp-stream-list__remote-container"
+            :class="{
+              'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+              'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen,
+              'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
+            }"
+          >
+            <div class="vmp-stream-list__remote-container-h">
+              <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+            </div>
+          </div>
+        </template>
+      </div>
     </div>
 
-    <span class="vmp-stream-list__scroll-btn right-btn" @click="domScrollRight">
+    <span
+      v-show="isShowControlArrow"
+      class="vmp-stream-list__scroll-btn right-btn"
+      @click="scrollStream('right')"
+    >
       <i class="vh-iconfont vh-line-arrow-right" />
     </span>
   </div>
@@ -56,7 +64,7 @@
       return {
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
-        showScrollDom: true // 是否展示左右按钮
+        isShowControlArrow: false // 是否展示左右按钮
       };
     },
 
@@ -116,6 +124,9 @@
           this.interactiveServer.setStreamListHeightInWatch(newval ? 0 : 80);
         },
         immediate: true
+      },
+      'remoteStreams.length'(newval) {
+        this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
       }
     },
     beforeCreate() {
@@ -138,7 +149,6 @@
     methods: {
       getStreamList() {
         this.interactiveServer.getRoomStreams();
-        console.log('------remoteStreams------', this.remoteStreams);
       },
       exchange(compName) {
         window.$middleEventSdk?.event?.send({
@@ -148,8 +158,16 @@
         });
       },
 
-      domScrollLeft() {},
-      domScrollRight() {}
+      scrollStream(direction) {
+        const scrollLeft = this.$refs.streamWrapper.scrollLeft;
+        if (direction === 'left') {
+          this.$refs.streamWrapper.scrollLeft = scrollLeft <= 142 ? 0 : scrollLeft - 142;
+        } else {
+          const scrollWidth = this.$refs.streamWrapper.scrollWidth;
+          this.$refs.streamWrapper.scrollLeft =
+            scrollLeft <= scrollWidth ? scrollLeft + 142 : scrollWidth;
+        }
+      }
     }
   };
 </script>
@@ -166,8 +184,18 @@
 
     &__stream-wrapper {
       flex: 1;
-      justify-content: center;
+      overflow: hidden;
       display: flex;
+      &-scroll {
+        display: flex;
+        justify-content: center;
+        min-width: 100%;
+        flex: none;
+      }
+      &::-webkit-scrollbar {
+        /*隐藏滚轮*/
+        display: none;
+      }
     }
 
     // 流列表高度为0
@@ -223,6 +251,7 @@
     // 主屏在大窗的样式
     &.vmp-dom__max {
       position: absolute;
+      left: 0;
       bottom: 56px;
       width: calc(100% - 380px);
       height: auto;

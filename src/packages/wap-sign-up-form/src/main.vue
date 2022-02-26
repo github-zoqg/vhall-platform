@@ -1,0 +1,1864 @@
+<template>
+  <div class="vmp-wap-sign-up-form">
+    <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
+      <header>
+        <img
+          v-show="formInfo.cover !== 1"
+          :src="formInfo.cover ? `${defaultImgUrl}${formInfo.cover}` : defaultHeader"
+          alt=""
+        />
+      </header>
+      <div class="vmp-wap-sign-up-form__content">
+        <div class="vmp-wap-sign-up-form__content__title-box">
+          <h1 class="title-box__title-text">{{ formInfo.title }}</h1>
+          <p
+            ref="intro"
+            v-if="formInfo.intro"
+            :class="[
+              'title-box__intro-text',
+              overflowStatus ? 'title-box__intro-text-ellipsis' : ''
+            ]"
+          >
+            {{ formInfo.intro }}
+            <span @click="changeFoldStatus(false)" class="text-tail" v-show="overflowStatus">
+              <span class="is-ellipsis">...</span>
+              {{ $t('form.form_1011') }}
+            </span>
+            <span @click="changeFoldStatus(true)" class="text-tail" v-show="!overflowStatus">
+              <span class="is-ellipsis"></span>
+              {{ $t('form.form_1012') }}
+            </span>
+          </p>
+        </div>
+        <div class="vmp-wap-sign-up-form__content__tab-box">
+          <template v-for="tab in tabConfig[isSubscribe]">
+            <p
+              :class="[activeTab === tab.code ? 'active' : '', formInfo.theme_color]"
+              :key="tab.code"
+              @click="switchTab(tab.code)"
+            >
+              {{ tab.text }}
+            </p>
+          </template>
+        </div>
+        <!--报名表单-->
+        <ul v-show="activeTab === 1" class="vmp-wap-sign-up-form__content__tab-content">
+          <li
+            v-show="![6, '6'].includes(question.type)"
+            v-for="(question, quesIndex) in list"
+            :key="question.id"
+          >
+            <p class="title-text">
+              <span v-if="!!question.is_must" class="star" style="font-family: monospace">*</span>
+              <span class="num" v-if="quesIndex < 9">0{{ quesIndex + 1 }}.</span>
+              <span class="num" v-else>{{ quesIndex + 1 }}.</span>
+              <span class="label">{{ convertLanguage(question.subject, question) }}</span>
+            </p>
+            <!-- 输入框 -->
+            <template
+              v-if="(question.type === 0 && question.default_type !== 4) || question.type === 1"
+            >
+              <input
+                :ref="question.id"
+                @input="onValidate(question)"
+                v-model="form[question.id]"
+                :placeholder="placeholderMap[question.default_type] || $t('form.form_1014')"
+                type="text"
+                maxlength="60"
+              />
+              <p v-show="!!errMsgMap[question.id]" class="err-msg">
+                {{ errMsgMap[question.id] }}
+              </p>
+            </template>
+            <!-- 单选框 -->
+            <template v-if="question.default_type === 4 || question.type === 2">
+              <template v-if="question.default_type === 4">
+                <div @click="handleRadioClick(question, '男')" class="radio-item">
+                  <span :class="{ 'radio-value': true, active: '男' == form[question.id] }">
+                    {{ $t('form.form_1015') }}
+                  </span>
+                </div>
+                <div @click="handleRadioClick(question, '女')" class="radio-item">
+                  <span :class="{ 'radio-value': true, active: '女' == form[question.id] }">
+                    {{ $t('form.form_1016') }}
+                  </span>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  @click="handleRadioClick(question, radioItem)"
+                  class="radio-item"
+                  v-for="radioItem in question.items"
+                  :key="radioItem.id"
+                >
+                  <span :class="{ 'radio-value': true, active: radioItem.id == form[question.id] }">
+                    {{ radioItem.subject }}
+                  </span>
+                  <textarea
+                    v-model="form[`${question.id}${radioItem.id}`]"
+                    v-if="radioItem.type === 1 && radioItem.id == form[question.id]"
+                    maxlength="60"
+                    :placeholder="$t('form.form_1080')"
+                    type="text"
+                  ></textarea>
+                </div>
+              </template>
+              <p v-show="!!errMsgMap[question.id]" class="err-msg">
+                {{ errMsgMap[question.id] }}
+              </p>
+            </template>
+            <!-- 多选框 -->
+            <template v-if="question.type === 3">
+              <div
+                @click="handleCheckBoxClick(question, checkItem)"
+                class="radio-item"
+                v-for="checkItem in question.items"
+                :key="checkItem.id"
+              >
+                <span
+                  :class="{
+                    'checkbox-value': true,
+                    active: form[question.id].some(item => checkItem.id == item)
+                  }"
+                >
+                  <i class="vh-iconfont vh-line-check"></i>
+                  {{ checkItem.subject }}
+                </span>
+                <textarea
+                  @click.stop="preventClick"
+                  v-model="form[`${question.id}${checkItem.id}`]"
+                  v-if="
+                    checkItem.type === 1 && form[question.id].some(item => checkItem.id == item)
+                  "
+                  maxlength="60"
+                  :placeholder="$t('form.form_1080')"
+                  type="text"
+                ></textarea>
+              </div>
+              <p v-show="!!errMsgMap[question.id].length" class="err-msg">
+                {{ errMsgMap[question.id] }}
+              </p>
+            </template>
+            <!-- 下拉 -->
+            <template v-if="question.type === 4">
+              <div class="select-box">
+                <div class="select-xl">
+                  <select
+                    :ref="question.id"
+                    @change="onValidate(question)"
+                    v-model="form[question.id]"
+                    class="select-item"
+                  >
+                    <option value disabled selected hidden>{{ $t('form.form_1018') }}</option>
+                    <option v-for="option in question.items" :key="option.id">
+                      {{ option.subject }}
+                    </option>
+                  </select>
+                  <label class="select-arrow"></label>
+                </div>
+              </div>
+              <p v-show="!!errMsgMap[question.id]" class="err-msg">
+                {{ errMsgMap[question.id] }}
+              </p>
+            </template>
+            <!-- 地域选择 -->
+            <template v-if="question.type === 5">
+              <!-- 省 -->
+              <div class="select-box">
+                <div class="select-xl">
+                  <select
+                    :ref="question.id"
+                    @change="onValidate(question)"
+                    v-model="province"
+                    class="select-item"
+                  >
+                    <option value disabled selected hidden>{{ $t('form.form_1004') }}</option>
+                    <option v-for="opt in provinces" :key="opt.value" :value="opt.value">
+                      {{ opt.label }}
+                    </option>
+                  </select>
+                  <label class="select-arrow"></label>
+                </div>
+              </div>
+              <!-- 市 -->
+              <div class="select-box" v-if="question.options.show_city == 1">
+                <div class="select-xl">
+                  <select @change="onValidate(question)" v-model="city" class="select-item">
+                    <option value disabled selected hidden>{{ $t('form.form_1005') }}</option>
+                    <option v-for="opt in currentCityList" :key="opt.value" :value="opt.value">
+                      {{ opt.label }}
+                    </option>
+                  </select>
+                  <label class="select-arrow"></label>
+                </div>
+              </div>
+              <!-- 区 -->
+              <div class="select-box" v-if="question.options.show_district == 1">
+                <div class="select-xl">
+                  <select @change="onValidate(question)" v-model="county" class="select-item">
+                    <option value disabled selected hidden>{{ $t('form.form_1006') }}</option>
+                    <option v-for="opt in currentCountyList" :key="opt.value" :value="opt.value">
+                      {{ opt.label }}
+                    </option>
+                  </select>
+                  <label class="select-arrow"></label>
+                </div>
+              </div>
+              <p v-show="!!errMsgMap[question.id]" class="err-msg">
+                {{ errMsgMap[question.id] }}
+              </p>
+            </template>
+          </li>
+          <li v-if="isPhoneValidate">
+            <div id="setCaptcha1" class="captcha">
+              <input v-model.trim="form.imgCode" type="text" />
+            </div>
+            <p class="err-msg" v-show="errorMsgShow">{{ $t('account.account_1028') }}</p>
+          </li>
+          <li v-if="isPhoneValidate">
+            <div>
+              <input
+                type="number"
+                pattern="[0-9]*"
+                maxlength="6"
+                oninput="if(value.length>6) value = value.slice(0,6)"
+                ref="code"
+                :placeholder="$t('form.form_1020')"
+                @input="onValidateCode"
+                class="verify-code"
+                v-model.trim="form.code"
+              />
+              <button
+                :disabled="time != 60"
+                @click="getDyCode(true)"
+                :class="{ 'code-btn': true, enable: codeEnable && time === 60 }"
+              >
+                {{ time === 60 ? $t('form.form_1021') : `${time}s` }}
+              </button>
+            </div>
+            <p v-show="!!errMsgMap.code" class="err-msg">{{ errMsgMap.code }}</p>
+          </li>
+          <li v-if="privacy">
+            <div class="provicyBox clearfix" @click="handleClickPrivacy(privacy)">
+              <i
+                class="privicyitem vh-iconfont vh-line-check"
+                :class="{ active: form[privacy.id] }"
+              ></i>
+              <span v-html="privacyText"></span>
+            </div>
+            <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
+          </li>
+          <li>
+            <button @click="submit" :class="['submit-btn', formInfo.theme_color]">
+              {{ $t('form.form_1019') }}
+            </button>
+          </li>
+        </ul>
+        <!--验证码表单-->
+        <ul v-show="activeTab === 2" class="vmp-wap-sign-up-form__content__tab-content">
+          <li>
+            <p class="title-text">
+              <span class="star" style="font-family: monospace">*</span>
+              <span class="label">{{ $t('form.form_1081') }}</span>
+            </p>
+            <input
+              ref="verifyphone"
+              @input="onValidateVerify(true)"
+              v-model="verifyForm.phone"
+              :placeholder="$t('account.account_1025')"
+              type="text"
+            />
+            <p class="err-msg" v-show="errPhone">{{ errPhoneMsg }}</p>
+          </li>
+          <li v-if="isPhoneValidate">
+            <div id="setCaptcha2" class="captcha">
+              <input style="margin-top: 0" v-model.trim="verifyForm.imgCode" type="text" />
+            </div>
+            <p class="err-msg" v-show="errorMsgShow">{{ $t('account.account_1028') }}</p>
+          </li>
+          <li v-if="isPhoneValidate">
+            <div>
+              <input
+                type="number"
+                pattern="[0-9]*"
+                maxlength="6"
+                oninput="if(value.length>6) value = value.slice(0,6)"
+                ref="verifycode"
+                :placeholder="$t('form.form_1020')"
+                @input="onValidateVerify(false)"
+                class="verify-code"
+                v-model.trim="verifyForm.code"
+              />
+              <button
+                :disabled="verifyTime != 60"
+                @click="getDyCode(false)"
+                :class="{ 'code-btn': true, enable: verifyCodeEnable && verifyTime === 60 }"
+              >
+                {{ verifyTime === 60 ? $t('form.form_1021') : `${verifyTime}s` }}
+              </button>
+            </div>
+            <p v-show="errCode" class="err-msg">{{ errCode }}</p>
+          </li>
+          <li>
+            <button @click="submitVerify" :class="['submit-btn', formInfo.theme_color]">
+              {{ $t('form.form_1082') }}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div v-if="formOpenLinkStatus == 2" class="no-authority-wrap">
+      <p>
+        {{ $t('message.message_1006') }}
+        <br />
+        {{ $t('message.message_1025') }}
+      </p>
+    </div>
+    <!-- 这个元素不显示用于计算两行的高度 -->
+    <p id="sign-up-title-intor" ref="noVisible">
+      &nbsp;
+      <br />
+      &nbsp;
+    </p>
+  </div>
+</template>
+
+<script>
+  import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
+  import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
+  import { useSignUpFormServer } from 'middle-domain';
+  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  export default {
+    name: 'VmpWapSignUpForm',
+    data() {
+      return {
+        //活动id
+        webinar_id: this.$route.params.id,
+        //报名表单独立链接是否有效
+        formOpenLinkStatus: 0,
+        //默认的图片前缀地址
+        defaultImgUrl: process.env.VUE_APP_PUBLIC_PATH,
+        //基础信息
+        formInfo: {
+          cover: 1
+        },
+        //表单模板
+        form: {},
+        //默认的banner图
+        defaultHeader: defaultHeader,
+        //初始化的活动类型
+        isSubscribe: 0,
+        //简介文字是否超长
+        overflowStatus: false,
+        //tab栏的配置
+        tabConfig: {
+          1: [
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            },
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            },
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            }
+          ]
+        },
+        //当前激活的tab
+        activeTab: 1,
+        // 手机短信验证是都开启
+        isPhoneValidate: false,
+        //表单的问题列表
+        list: [],
+        //题目的类型中文翻译
+        langDefaultZH: [
+          '姓名',
+          '性别',
+          '手机',
+          '邮箱',
+          '地域',
+          '公司',
+          '职务',
+          '隐私声明',
+          '活动报名',
+          '我已报名',
+          '单选题',
+          '多选题',
+          '问答题',
+          '下拉题'
+        ],
+        //题目的类型的英文翻译
+        langDefaultCode: [
+          'form.form_1001',
+          'form.form_1055',
+          'form.form_1064',
+          'form.form_1003',
+          'form.form_1002',
+          'form.form_1054',
+          'form.form_1056',
+          'form.form_1013',
+          'form.form_1025',
+          'form.form_1024',
+          'form.form_1068',
+          'form.form_1069',
+          'form.form_1070',
+          'form.form_1071'
+        ],
+        //输入文字提示的map
+        placeholderMap: {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1004'),
+            city: this.$t('form.form_1005'),
+            county: this.$t('form.form_1006')
+          },
+          6: this.$t('form.form_1020')
+        },
+        //错误信息的map
+        errMsgMap: {},
+        //省份
+        province: '',
+        //城市
+        city: '',
+        //国家
+        county: '',
+        //省份列表
+        provinces: [],
+        //城市列表
+        cityList: {},
+        //国家列表
+        countyList: {},
+        //是否有错误信息
+        errorMsgShow: false,
+        //是否电话号码有误
+        errPhone: false,
+        //是否验证码有误
+        errCode: false,
+        //电话号码错误的提示信息
+        errPhoneMsg: '',
+        //需要单独校验的表单项
+        verifyForm: {
+          phone: '',
+          imgCode: '',
+          code: ''
+        },
+        time: 60,
+        //验证码倒计时
+        verifyTime: 60,
+        //当前用户的手机号
+        currentPhone: '',
+        //区域选项id
+        regionalId: '',
+        //区域选项条件
+        regionalOptions: {},
+        refArr: [],
+        //是否有隐私声明
+        privacy: false,
+        //隐私声明文字
+        privacyText: '',
+        //答案
+        answer: {},
+        //
+        codeEnable: false,
+        verifyCodeEnable: false,
+        showCaptcha: false, // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用
+        captchakey: 'b7982ef659d64141b7120a6af27e19a0', // 云盾key
+        mobileKey: '', // 云盾值
+        captcha1: null, // 云盾实例
+        captcha2: null, // 云盾实例
+        //是第一次验证
+        isFirstChange: true
+      };
+    },
+    computed: {
+      // 与网易易盾图片插件语言匹配
+      langNECaptcha() {
+        const locale = window.$globalConfig.currentLang;
+        let lang = 'zh-CN';
+        switch (locale) {
+          case 'zh':
+            lang = 'zh-CN';
+            break;
+          case 'spain':
+            lang = 'es';
+            break;
+          default:
+            lang = locale;
+        }
+        return lang;
+      },
+      //当前的城市列表
+      currentCityList() {
+        return this.cityList[this.province];
+      },
+      //当前的国家列表
+      currentCountyList() {
+        return this.countyList[this.city];
+      }
+    },
+    watch: {
+      province(newVal, oldVal) {
+        if (newVal != oldVal) {
+          this.city = '';
+          this.county = '';
+        }
+      },
+      city(newVal, oldVal) {
+        if (newVal != oldVal) {
+          this.county = '';
+        }
+      },
+      isPhoneValidate: {
+        immediate: true,
+        handler(newVal) {
+          // 云盾实例
+          if (newVal) {
+            this.$nextTick(() => {
+              this.callCaptcha('#setCaptcha1');
+              this.callCaptcha('#setCaptcha2');
+            });
+          }
+        }
+      },
+      list: {
+        deep: true,
+        handler(newList) {
+          const form = {};
+          let phoneId = '';
+          newList &&
+            newList.length &&
+            newList.forEach(item => {
+              form[item.id] = '';
+              if (item.type === 3) {
+                form[item.id] = [];
+              } else if (item.type === 0 && item.default_type === 2 && this.currentPhone) {
+                // 手机号
+                form[item.id] = this.currentPhone;
+                phoneId = item.id;
+              }
+              if (item.items && item.items.length) {
+                item.items.forEach(elem => {
+                  if (elem.type === 1) {
+                    form[`${item.id}${elem.id}`] = '';
+                  }
+                });
+              }
+            });
+          this.form = {
+            imgCode: '',
+            code: '',
+            ...form
+          };
+          this.errMsgMap = {
+            code: '',
+            ...JSON.parse(JSON.stringify(form))
+          };
+          this.errMsgMap[phoneId] = '';
+        }
+      }
+    },
+    beforeCreate() {
+      this.signUpFormServer = useSignUpFormServer();
+    },
+    async mounted() {
+      await this.getFormLinkStatus();
+      this.getWebinarType();
+      this.getBaseInfo();
+      this.getQuestionList();
+    },
+    methods: {
+      //获取报名独立链接状态
+      getFormLinkStatus() {
+        if (this.$route.query.isIndependent == 0) {
+          this.formOpenLinkStatus = 1;
+          return;
+        }
+        const params = {
+          webinar_id: this.webinar_id,
+          visit_id: sessionStorage.getItem('visitor_id')
+        };
+        return this.signUpFormServer.getFormLinkStatus(params).then(res => {
+          // 如果独立链接无效，显示无效页
+          this.formOpenLinkStatus = res.data.available == 0 ? 2 : 1;
+        });
+      },
+      //获取活动类型
+      getWebinarType() {
+        const params = {
+          webinar_id: this.webinar_id
+        };
+        return this.signUpFormServer
+          .getWebinarType(params)
+          .then(res => {
+            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+            this.wxShareInfo(res.data.webinar);
+          })
+          .catch(error => {
+            if (error.code == 512503 || error.code == 512502) {
+              window.location.href = `${window.location.origin}/${this.webinar_id}`;
+            }
+          });
+      },
+      //获取表单基本信息
+      getBaseInfo() {
+        const params = {
+          webinar_id: this.webinar_id
+        };
+        console.log(2);
+        this.signUpFormServer.getFormBaseInfo(params).then(res => {
+          if (res.data.tab_form_title) {
+            res.data.tab_form_title =
+              this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
+                ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
+                : res.data.tab_form_title;
+          }
+          if (res.data.tab_verify_title) {
+            res.data.tab_verify_title =
+              this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
+                ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
+                : res.data.tab_verify_title;
+          }
+          this.formInfo = res.data;
+          this.$nextTick(() => {
+            this.calculateText();
+          });
+        });
+      },
+      //计算简介文字是否过长
+      calculateText() {
+        const txtDom = this.$refs.intro;
+        if (!txtDom) return false;
+        const twoHeight = this.$refs.noVisible.offsetHeight;
+        const curHeight = txtDom.offsetHeight;
+        if (curHeight > twoHeight) {
+          this.overflowStatus = true;
+        }
+      },
+      //获取问题列表
+      getQuestionList() {
+        const params = {
+          webinar_id: this.webinar_id
+        };
+        this.signUpFormServer
+          .getQuestionsList(params)
+          .then(res => {
+            // 按照 order_num 从小到大排序
+            const list = res.data.ques_list.sort(this.compare('order_num'));
+            this.currentPhone = res.data.phone;
+            // 手机号验证开启状态
+            const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
+            this.isPhoneValidate =
+              phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+            // 默认填写手机号
+            res.data.phone && (this.verifyForm.phone = res.data.phone);
+
+            this.list = list;
+            // 地域 options 格式化处理
+            this.list.some(item => {
+              if (item.type == 5) {
+                item.options = JSON.parse(item.options);
+                this.regionalOptions = item.options;
+                this.regionalId = item.id;
+                return true;
+              }
+            });
+            // 隐私声明格式处理
+            const lastQuestion = this.list[this.list.length - 1];
+            if (lastQuestion.subject === '隐私声明') {
+              this.privacy = lastQuestion;
+              this.privacy && this.privacyFormatter();
+            }
+            // 获取地域列表
+            list.some(item => item.type === 5) && this.getAreaList();
+            // 生成可以获取焦点的题目列表
+            this.generateRefArr(list);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      // 生成需要获取焦点的题目id列表
+      generateRefArr(list) {
+        list.forEach(item => {
+          if (
+            (item.type == 0 && item.default_type != 4) ||
+            item.type == 1 ||
+            item.type == 4 ||
+            item.type == 5
+          ) {
+            this.refArr.push(item.id);
+          }
+        });
+      },
+      // 获取地域列表
+      getAreaList() {
+        const _this = this;
+        this.signUpFormServer
+          .getAreaList()
+          .then(res => {
+            console.log(_this.cityList, _this.countyList);
+            _this.$set(_this, 'provinces', res.provinces);
+            _this.$set(_this, 'cityList', res.cities);
+            _this.$set(_this, 'countyList', res.counties);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //初始化网易易盾图片验证码
+      callCaptcha(id) {
+        const captcha = id === '#setCaptcha1' ? 'captcha1' : 'captcha2';
+        const that = this;
+        // eslint-disable-next-line
+        initNECaptcha({
+          captchaId: that.captchakey,
+          element: id,
+          mode: 'float',
+          // lang: sessionStorage.getItem('lang') || 'zh-CN',
+          lang: this.langNECaptcha,
+          onReady(instance) {
+            console.log(instance);
+          },
+          onVerify(err, data) {
+            if (data) {
+              that.mobileKey = data.validate;
+              that.showCaptcha = true;
+              that.errorMsgShow = '';
+              if (captcha === 'captcha1') {
+                that.codeEnable = true;
+              } else {
+                that.verifyCodeEnable = true;
+              }
+            } else {
+              that[captcha] = '';
+              that.errorMsgShow = true;
+              if (captcha === 'captcha1') {
+                that.codeEnable = false;
+              } else {
+                that.verifyCodeEnable = false;
+              }
+            }
+          },
+          onload(instance) {
+            that[captcha] = instance;
+            if (captcha === 'captcha1') {
+              that.codeEnable = false;
+            } else {
+              that.verifyCodeEnable = false;
+            }
+          }
+        });
+      },
+      //格式化隐私声明
+      privacyFormatter() {
+        const parseOpts = JSON.parse(this.privacy.options);
+        const parseOptsFir = parseOpts[0] && JSON.parse(parseOpts[0].options);
+        const parseOptsSec = parseOpts[1] && JSON.parse(parseOpts[1].options);
+
+        let text = parseOptsFir.content;
+        const matchPrivacy1 = parseOptsFir.color_text.trim()
+          ? text.match(parseOptsFir.color_text)
+          : null;
+        if (matchPrivacy1) {
+          const reg = new RegExp(`(${matchPrivacy1[0]})`);
+          text = text.replace(
+            reg,
+            `<a href="${parseOptsFir.url || 'javascript:void(0);'}" target="_blank">$1</a>`
+          );
+        }
+        const matchPrivacy2 =
+          parseOptsSec && parseOptsSec.privacy_info.trim()
+            ? text.match(parseOptsSec.privacy_info)
+            : null;
+        if (matchPrivacy2) {
+          const reg = new RegExp(`(${matchPrivacy2[0]})`, 'g');
+          text = text.replace(
+            reg,
+            `<a href="${parseOptsSec.privacy_link || 'javascript:void(0);'}" target="_blank">$1</a>`
+          );
+        }
+
+        this.privacyText = text;
+      },
+      //提交报名表单
+      submit() {
+        this.list.forEach(question => {
+          // 表单验证
+          this.onValidate(question, true);
+        });
+        this.isPhoneValidate && this.onValidateCode();
+        let firstErrIndex = 'first';
+        let isValidate = true;
+        let item;
+        // 遍历 errMsgList 判断是否所有的表单都验证通过
+        for (item in this.errMsgMap) {
+          if (this.errMsgMap[item] != '') {
+            this.refArr.forEach((refItem, index) => {
+              if (refItem == item) {
+                console.log(item, refItem);
+                firstErrIndex == 'first'
+                  ? (firstErrIndex = index)
+                  : firstErrIndex > index && (firstErrIndex = index);
+              }
+            });
+            isValidate = false;
+          }
+        }
+        // 如果除验证码之外的表单全部验证通过，则判断验证码（这里不需要判断是否开启手机验证）
+        firstErrIndex == 'first' && this.errMsgMap.code && (firstErrIndex = 'code');
+
+        if (isValidate) {
+          console.log(this.form);
+          // const refer = this.getQueryVariable('refer')
+          this.formHandler();
+          this.submitSignUpForm();
+        } else {
+          // 验证失败，获取焦点
+          if (firstErrIndex != 'first') {
+            const firstErrRef =
+              firstErrIndex == 'code' ? this.$refs.code : this.$refs[this.refArr[firstErrIndex]][0];
+            firstErrRef.focus();
+          }
+        }
+      },
+      //提交表单到服务器
+      submitSignUpForm() {
+        const phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
+        const nameItem = this.list.find(item => item.type === 0 && item.default_type === 1);
+
+        const params = {
+          webinar_id: this.webinar_id,
+          phone: this.form[phoneItem.id],
+          form: JSON.stringify(this.answer),
+          report: JSON.stringify({
+            phone: this.form[phoneItem.id],
+            real_name: this.form[nameItem.id]
+          })
+        };
+
+        if (this.isPhoneValidate) {
+          params.verify_code = this.form.code;
+        }
+
+        if (this.$route.query.refer) {
+          params.refer = this.$route.query.refer;
+        }
+
+        if (sessionStorage.getItem('visitor_id')) {
+          params.visit_id = sessionStorage.getItem('visitor_id');
+        }
+
+        return this.signUpFormServer
+          .submitSignUpForm(params)
+          .then(res => {
+            sessionStorage.setItem('visitor_id', res.data.visit_id);
+            // 报名成功
+            this.getWebinarStatus();
+          })
+          .catch(err => {
+            if (err.code == 512809 || err.code == 512570) {
+              // 短信验证码验证失败，触发表单验证失败
+              // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
+              this.errMsgMap.code = this.$t('cash.cash_1039');
+            } else if (err.code == 512814 || err.code == 512815) {
+              this.$toast(this.$t('form.form_1033'));
+              let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+              if (queryString && this.$route.query.invite) {
+                queryString += this.$route.query.invite
+                  ? `&invite=${this.$route.query.invite}`
+                  : '';
+              } else if (this.$route.query.invite) {
+                queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
+              }
+              window.location.href =
+                window.location.protocol +
+                process.env.VUE_APP_WAP_WATCH +
+                process.env.VUE_APP_WEB_KEY +
+                `/lives/watch/${this.webinar_id}${queryString}`;
+              // this.$router.push(`/lives/watch/${this.webinar_id}`)
+            } else {
+              this.$toast(this.$tes(err.code) || err.msg);
+            }
+          });
+      },
+      //获取活动报名状态
+      getWebinarStatus() {
+        const params = {
+          webinar_id: this.webinar_id
+        };
+        this.signUpFormServer
+          .getWebinarType(params)
+          .then(res => {
+            let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+            if (queryString && this.$route.query.invite) {
+              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+            } else if (this.$route.query.invite) {
+              queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
+            }
+            if (res.data.webinar.type == 2) {
+              this.$dialog
+                .alert({
+                  message: this.$t('form.form_1032', { n: res.data.webinar.start_time })
+                })
+                .then(() => {
+                  window.location.href =
+                    window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinar_id}${queryString}`;
+                  // this.$router.push(`/lives/watch/${this.webinar_id}`)
+                });
+            } else {
+              // this.$router.push(`/lives/watch/${this.webinar_id}`)
+              window.location.href =
+                window.location.protocol +
+                process.env.VUE_APP_WAP_WATCH +
+                process.env.VUE_APP_WEB_KEY +
+                `/lives/watch/${this.webinar_id}${queryString}`;
+            }
+          })
+          .catch(e => {
+            if (e.code == 512503 || e.code == 512502) {
+              window.location.href = `${window.location.origin}/${this.webinar_id}`;
+            }
+          });
+      },
+      //将原始表单转化为答案
+      formHandler() {
+        const answer = {};
+        this.list.forEach(item => {
+          if (item.type === 0) {
+            // 系统题目
+            !answer.default && (answer.default = []);
+            answer.default.push({
+              id: item.id,
+              content: this.form[item.id] || '',
+              default_type: item.default_type
+            });
+          } else if (item.type === 1) {
+            // 问答
+            const opts = item.options && JSON.parse(item.options);
+            let options = [];
+            opts && opts.type === 7 && (options = { type: 7 });
+            !answer.text && (answer.text = []);
+            answer.text.push({
+              id: item.id,
+              content: this.form[item.id] || '',
+              options: options
+            });
+          } else if (item.type === 2) {
+            // 单选
+            !answer.radio && (answer.radio = []);
+            const element = item.items.find(elem => elem.id === this.form[item.id]);
+            let content = '';
+            if (element) {
+              content =
+                element.type !== 1
+                  ? {
+                      id: element.id,
+                      content: element.subject
+                    }
+                  : {
+                      id: element.id,
+                      content: this.form[`${item.id}${element.id}`]
+                        ? this.form[`${item.id}${element.id}`]
+                        : this.$t('form.form_1063')
+                    };
+            }
+            answer.radio.push({
+              id: item.id,
+              content: content
+            });
+          } else if (item.type === 3) {
+            // 多选
+            !answer.checkbox && (answer.checkbox = []);
+            const content = [];
+            this.form[item.id].forEach(checkOpt => {
+              const element = item.items.find(elem => elem.id === checkOpt);
+              if (element) {
+                const obj =
+                  element.type !== 1
+                    ? {
+                        id: element.id,
+                        content: element.subject
+                      }
+                    : {
+                        id: element.id,
+                        content: this.form[`${item.id}${element.id}`]
+                          ? this.form[`${item.id}${element.id}`]
+                          : this.$t('form.form_1063')
+                      };
+                content.push(obj);
+              }
+            });
+            answer.checkbox.push({
+              id: item.id,
+              content: content
+            });
+          } else if (item.type === 4) {
+            // 下拉
+            !answer.select && (answer.select = []);
+            const element = item.items.find(elem => elem.subject === this.form[item.id]);
+            element &&
+              answer.select.push({
+                id: item.id,
+                content: {
+                  id: element.id,
+                  jobTxt: item.subject,
+                  content: element.subject
+                }
+              });
+          } else if (item.type === 5) {
+            // 地域
+            !answer.address && (answer.address = []);
+            const provinec = this.provinces.find(ele => ele.value == this.province) || {
+              label: '',
+              value: ''
+            };
+            const city =
+              this.regionalOptions.show_city == 1 && this.currentCityList
+                ? this.currentCityList.find(ele => ele.value == this.city)
+                : { label: '', value: '' };
+            const county =
+              this.regionalOptions.show_district == 1 && this.currentCountyList
+                ? this.currentCountyList.find(ele => ele.value == this.county)
+                : { label: '', value: '' };
+            answer.address.push({
+              id: item.id,
+              content: `${provinec.label}${city.label}${county.label}`,
+              contentDe: [
+                {
+                  id: provinec.value,
+                  content: provinec.label
+                },
+                {
+                  id: city.value,
+                  content: city.label
+                },
+                {
+                  id: county.value,
+                  content: county.label
+                }
+              ]
+            });
+          } else if (item.type === 6) {
+            // 隐私协议勾选
+            !answer.statement && (answer.statement = []);
+            answer.statement.push({
+              id: item.id,
+              content: this.form[item.id] ? this.$t('form.form_1035') : this.$t('form.form_1036')
+            });
+          }
+        });
+        this.answer = answer;
+      },
+      //排序
+      compare(property) {
+        return function (a, b) {
+          let value1 = a[property];
+          let value2 = b[property];
+          return value1 - value2;
+        };
+      },
+      // 获取微信分享信息
+      wxShareInfo(info) {
+        const wx_url =
+          window.location.protocol +
+          process.env.VUE_APP_WAP_WATCH +
+          process.env.VUE_APP_WEB_KEY +
+          `/lives/entryform/${this.webinar_id}`;
+        this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
+          if (res.code == 200 && res.data) {
+            console.log('获取微信分享数据', res.data);
+            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
+            const params = {
+              appId: res.data.appId,
+              timestamp: res.data.timestamp,
+              nonceStr: res.data.nonceStr,
+              signature: res.data.signature
+            };
+            let desc = null;
+            desc = info.introduction.replace(/&nbsp;/g, '');
+            desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
+            desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
+            initWeChatSdk(
+              { ...params },
+              {
+                title: info.subject,
+                desc,
+                link:
+                  window.location.protocol +
+                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/entryform/${this.webinar_id}`,
+                imgUrl: info.img_url
+              }
+            );
+          }
+        });
+      },
+      //切换展开/收起状态
+      changeFoldStatus(status) {
+        this.overflowStatus = status;
+      },
+      //切换tab
+      switchTab(type) {
+        if (type === this.activeTab) {
+          return;
+        }
+        this.activeTab = type;
+      },
+      //多语言翻译
+      convertLanguage(title, vo) {
+        if (
+          (vo.default_type == 0 && [1, 4, 5, 2, 3].includes(vo.type)) ||
+          (vo.type == 0 && [1, 4, 3, 2].includes(vo.default_type))
+        ) {
+          // 地域 & 公司 & 职务 +  姓名 & 性别 & 邮箱 翻译标题 翻译标题
+          return this.langDefaultZH.indexOf(title) > -1
+            ? this.$t(this.langDefaultCode[this.langDefaultZH.indexOf(title)])
+            : title;
+        } else {
+          // 不翻译
+          return title;
+        }
+      },
+      //表单验证
+      onValidate(question, isSubmit = false) {
+        // 如果验证的是隐私声明，并且是第一次验证，则直接通过
+        if (question.type === 6 && this.isFirstChange && !isSubmit) {
+          this.isFirstChange = false;
+          return false;
+        }
+        // 邮箱 required 为 false 的时候，如果有值仍需校验格式
+        if (!question.is_must && !(question.type === 0 && question.default_type === 3)) {
+          return false;
+        }
+        // 输入框
+        if (question.type === 0 && question.default_type === 1) {
+          // 姓名
+          this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1026') : '';
+        } else if (question.type === 0 && question.default_type === 2) {
+          // 手机号
+          if (this.isPhoneValidate) {
+            this.errMsgMap[question.id] =
+              validPhone('', this.form[question.id], this) === true
+                ? ''
+                : validPhone('', this.form[question.id], this);
+          } else {
+            this.errMsgMap[question.id] =
+              this.form[question.id] && isNaN(this.form[question.id]) === false
+                ? ''
+                : this.$t('account.account_1069');
+          }
+        } else if (question.type === 0 && question.default_type === 3) {
+          // 邮箱
+          this.errMsgMap[question.id] =
+            validEmail(question.is_must, this.form[question.id], this) === true
+              ? ''
+              : validEmail(question.is_must, this.form[question.id], this);
+        } else if (question.type === 1) {
+          // 问答
+          this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1028') : '';
+        } else if (question.type === 0 && question.default_type === 4) {
+          // 性别
+          this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1027') : '';
+        } else if (question.type === 2 || question.type === 4) {
+          // 单选/下拉
+          this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1029') : '';
+        } else if (question.type === 3) {
+          // 多选
+          this.errMsgMap[question.id] = !this.form[question.id].length
+            ? this.$t('form.form_1029')
+            : '';
+        } else if (question.type === 5) {
+          // 地域
+          this.errMsgMap[question.id] = !this.province ? this.$t('form.form_1004') : '';
+          if (this.errMsgMap[question.id]) return false;
+          question.options.show_city == 1 &&
+            (this.errMsgMap[question.id] = !this.city ? this.$t('form.form_1005') : '');
+          if (this.errMsgMap[question.id]) return false;
+          question.options.show_district == 1 &&
+            (this.errMsgMap[question.id] = !this.county ? this.$t('form.form_1006') : '');
+          if (this.errMsgMap[question.id]) return false;
+        } else if (question.type === 6) {
+          if (this.isFirstChange) {
+            this.isFirstChange = false;
+          }
+          // 隐私
+          this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1030') : '';
+        }
+      },
+      //校验验证码
+      onValidateCode() {
+        this.errMsgMap.code = !this.form.code ? this.$t('cash.cash_1039') : '';
+      },
+      //隐私协议选框点击事件
+      handleClickPrivacy(privacy) {
+        this.form[privacy.id] = !this.form[privacy.id];
+        this.onValidate(privacy);
+      },
+      // 单选选项点击事件
+      handleRadioClick(question, radioItem) {
+        if (radioItem === '男') {
+          this.form[question.id] = '男';
+        } else if (radioItem === '女') {
+          this.form[question.id] = '女';
+        } else {
+          this.form[question.id] = radioItem.id;
+        }
+        this.onValidate(question);
+      },
+      // 多选题选项点击事件
+      handleCheckBoxClick(question, checkItem) {
+        const index = this.form[question.id].findIndex(item => item === checkItem.id);
+        index !== -1
+          ? this.form[question.id].splice(index, 1)
+          : this.form[question.id].push(checkItem.id);
+        this.onValidate(question);
+      },
+      //阻止事件冒泡
+      preventClick() {
+        return false;
+      },
+      //获取短信验证码
+      getDyCode(isForm) {
+        let phone = '';
+        let phoneItem = '';
+        let isValidate = '';
+        if (isForm) {
+          phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
+          phone = this.form[phoneItem.id];
+          this.errMsgMap[phoneItem.id] =
+            validPhone('', phone, this) === true ? '' : validPhone('', phone, this);
+          isValidate = this.errMsgMap[phoneItem.id] === '';
+        } else {
+          phone = this.verifyForm.phone;
+          this.onValidateVerify(true);
+          isValidate = !this.errPhone;
+        }
+        // 获取短信验证码
+        if (isValidate && this.mobileKey) {
+          this.countDown(isForm);
+          const params = { webinar_id: this.webinar_id, phone: phone, captcha: this.mobileKey };
+          this.signUpFormServer.sendVerifyCode(params);
+        }
+      },
+      // 倒计时函数
+      countDown(isForm) {
+        const key = isForm ? 'time' : 'verifyTime';
+        if (this[key]) {
+          this[key]--;
+          setTimeout(() => {
+            this.countDown(isForm);
+          }, 1000);
+        } else {
+          this[key] = 60;
+          this.mobileKey = '';
+          isForm ? this.callCaptcha('#setCaptcha1') : this.callCaptcha('#setCaptcha2');
+          isForm ? (this.codeEnable = false) : (this.verifyCodeEnable = false);
+        }
+      },
+      //校验表单项
+      onValidateVerify(isPhone) {
+        if (isPhone) {
+          // 如果开启手机短信验证
+          if (this.isPhoneValidate) {
+            if (validPhone('', this.verifyForm.phone, this) === true) {
+              this.errPhone = false;
+              this.errPhoneMsg = '';
+            } else {
+              this.errPhone = true;
+              this.errPhoneMsg = validPhone('', this.verifyForm.phone, this);
+            }
+          } else {
+            // 如果没有开启手机验证
+            if (this.verifyForm.phone && isNaN(this.verifyForm.phone) === false) {
+              this.errPhone = false;
+              this.errPhoneMsg = '';
+            } else {
+              this.errPhone = true;
+              this.errPhoneMsg = this.$t('account.account_1069');
+            }
+          }
+        } else {
+          this.errCode = this.verifyForm.code == '' ? this.$t('cash.cash_1039') : '';
+        }
+      },
+      //取得可用的查询参数
+      getQueryVariable(variable) {
+        let query = window.location.search.substring(1);
+        let vars = query.split('&');
+        for (let i = 0; i < vars.length; i++) {
+          let pair = vars[i].split('=');
+          if (pair[0] == variable) {
+            return pair[1];
+          }
+        }
+        return false;
+      },
+      //我已报名--验证
+      submitVerify() {
+        this.onValidateVerify(true);
+        this.isPhoneValidate && this.onValidateVerify(false);
+        if (!this.errPhone && !this.errCode) {
+          const refer = this.getQueryVariable('refer');
+          const params = {
+            webinar_id: this.webinar_id,
+            phone: this.verifyForm.phone,
+            refer
+          };
+
+          if (this.isPhoneValidate) {
+            params.verify_code = this.verifyForm.code;
+          }
+
+          if (sessionStorage.getItem('visitor_id')) {
+            params.visit_id = sessionStorage.getItem('visitor_id');
+          }
+
+          console.log(this.signUpFormServer);
+
+          this.signUpFormServer
+            .checkIsRegistered(params)
+            .then(res => {
+              // 如果已经报名
+              if (res.data.has_registed == 1) {
+                sessionStorage.setItem('visitor_id', res.data.visit_id);
+                this.$toast(this.$t('form.form_1033'));
+                let queryString = this.$route.query.refer
+                  ? `?refer=${this.$route.query.refer}`
+                  : '';
+                if (queryString && this.$route.query.invite) {
+                  queryString += this.$route.query.invite
+                    ? `&invite=${this.$route.query.invite}`
+                    : '';
+                } else if (this.$route.query.invite) {
+                  queryString = this.$route.query.invite
+                    ? `?invite=${this.$route.query.invite}`
+                    : '';
+                }
+                window.location.href =
+                  window.location.protocol +
+                  process.env.VUE_APP_WAP_WATCH +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/watch/${this.webinar_id}${queryString}`;
+              } else {
+                this.$toast(this.$t('form.form_1034'));
+                this.activeTab = 1;
+              }
+            })
+            .catch(err => {
+              // 如果已经报名
+              if (err.code == 512809 || err.code == 512570) {
+                // 短信验证码验证失败，触发表单验证失败
+                // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
+                this.errCode = this.$t('cash.cash_1039');
+              } else if (err.code == 512002) {
+                this.$toast(this.$t('message.message_1020'));
+              } else if (err.code == 512502) {
+                this.$toast(this.$t('message.message_1021'));
+              }
+            });
+        } else {
+          this.errPhone ? this.$refs.verifyphone.focus() : this.$refs.verifycode.focus();
+        }
+      }
+    }
+  };
+</script>
+
+<style lang="less">
+  .vmp-wap-sign-up-form {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    position: relative;
+    background: #fff;
+    &__wrap {
+      header {
+        width: 100%;
+        max-height: 2.3rem;
+        overflow: hidden;
+        display: -webkit-box;
+        display: flex;
+        -webkit-box-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        align-items: center;
+        img {
+          height: 100%;
+          width: 100%;
+        }
+      }
+    }
+    &__content {
+      font-family: Arial, 'Microsoft Yahei' !important;
+      width: 100%;
+      padding: 0 0.47rem;
+      margin-bottom: 0.27rem;
+      font-size: 0.32rem;
+      &__title-box {
+        .title-box__title-text {
+          margin: 0.4rem auto 0;
+          font-size: 0.48rem;
+          text-align: center;
+          color: #232323;
+          word-break: break-word;
+          line-height: 50px;
+        }
+        .title-box__intro-text {
+          margin: 0.4rem auto 0;
+          color: #555;
+          font-size: 0.373rem;
+          word-break: break-word;
+          position: relative;
+          line-height: 38px;
+          &.title-box__intro-text-ellipsis {
+            word-break: break-all;
+            display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+            -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+            -webkit-line-clamp: 2; /** 显示的行数 **/
+            overflow: hidden; /** 隐藏超出的内容 **/
+            text-overflow: -o-ellipsis-lastline;
+            text-overflow: ellipsis;
+          }
+          .text-tail {
+            position: absolute;
+            bottom: 0px;
+            right: 4px;
+            cursor: pointer;
+            background-color: #fff;
+            color: #3562fa;
+            .is-ellipsis {
+              color: #666666;
+            }
+          }
+        }
+      }
+      &__tab-box {
+        margin: 0.4rem auto;
+        border-radius: 0.11rem;
+        height: 1.067rem;
+        display: flex;
+
+        p {
+          width: calc(50% - 0.02rem);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.37rem;
+          &:first-child {
+            border: 0.02rem solid #d2d2d2;
+            border-right: none;
+            border-radius: 0.053rem 0 0 0.053rem;
+            &.active {
+              border-right: 0.02rem solid #d2d2d2;
+            }
+          }
+          &:last-child {
+            border: 0.02rem solid #d2d2d2;
+            border-left: none;
+            border-radius: 0 0.053rem 0.053rem 0;
+            &.active {
+              border-left: 0.02rem solid #d2d2d2;
+            }
+          }
+          &.active {
+            color: #fff;
+            &.red {
+              border-color: #fb3a32;
+              background-color: #ffebeb;
+              color: #fb3a32;
+            }
+            &.blue {
+              border-color: #3562fa;
+              background-color: #ebefff;
+              color: #3562fa;
+            }
+            &.purple {
+              border-color: #8d57a4;
+              background-color: #f5bdea;
+              color: #8d57a4;
+            }
+          }
+        }
+      }
+      &__tab-content {
+        li {
+          margin-top: 0.52rem;
+          position: relative;
+          margin-bottom: 0.02rem;
+          &:last-child {
+            margin-top: 90px;
+          }
+        }
+        input {
+          // line-height: 1.04rem !important;
+          height: 1.04rem;
+          line-height: 0.84rem;
+          width: 9.07rem;
+          border: 0.02rem solid #d2d2d2;
+          border-radius: 0.11rem;
+          font-size: 0.37rem;
+          padding: 0.1rem 0.2rem;
+          outline: none;
+          margin-top: 0.27rem;
+          resize: none;
+          color: #1a1a1a;
+          &.verify-code {
+            width: 5.23rem;
+            margin-top: 0;
+            float: left;
+          }
+          &::-webkit-input-placeholder {
+            line-height: 0.84rem;
+          }
+        }
+        .code-btn {
+          display: inline-block;
+          height: 1.06rem;
+          width: 3.56rem;
+          color: #fff;
+          margin-left: 0.27rem;
+          text-align: center;
+          line-height: 0.4rem;
+          outline: none;
+          border-radius: 0.11rem;
+          box-shadow: none;
+          outline: #fff;
+          cursor: default !important;
+          background: #dedede !important;
+          border: 0.02rem solid #dedede !important;
+          &.enable {
+            border: 0.02rem solid #fb3a32 !important;
+            background-color: #fb3a32 !important;
+          }
+        }
+      }
+    }
+    .vmp-wap-sign-up-form__content__tab-box {
+    }
+    .title-text {
+      position: relative;
+      min-width: 1.52rem;
+      max-width: 9rem;
+      font-size: 0.37rem;
+      .num {
+        color: #666;
+        margin-left: 0.1rem;
+      }
+      .label {
+        word-break: break-word;
+        margin-left: 0.1rem;
+        color: #333;
+      }
+      .star {
+        font-family: monospace;
+        color: red !important;
+        display: inline-block;
+        margin-left: 0.133rem;
+        font-size: 0.26rem !important;
+        opacity: 0.8;
+        position: relative;
+        top: -0.06rem;
+      }
+    }
+    .err-msg {
+      position: absolute;
+      /* display: none; */
+      bottom: -0.4rem;
+      left: 0;
+      font-size: 0.32rem;
+      color: red;
+    }
+    .radio-item {
+      position: relative;
+      // min-height: 1.067rem;
+      padding: 0.267rem 0.2rem 0 0.2rem;
+      // border: 0.02rem solid #d2d2d2;
+      border-radius: 0.11rem;
+      margin-top: 0.267rem;
+      max-width: 9.07rem;
+      textarea {
+        word-break: break-all;
+        resize: none;
+        display: block;
+        overflow-y: hidden;
+        padding: 0.267rem 0.2rem 0.2rem;
+        margin: 0.267rem auto 0;
+        width: 94%;
+        height: 0.517rem;
+        border-radius: 0.1rem;
+        border: solid 0.02rem #d2d2d2;
+        font-size: 0.37rem;
+        line-height: 0.48rem;
+        font-family: Arial, 'Microsoft Yahei';
+        color: #1a1a1a;
+      }
+      .radio-value {
+        display: block;
+        padding: 0.07rem 0 0 0.7rem;
+        line-height: 0.4rem;
+        color: #1a1a1a;
+        word-break: break-all;
+        font-size: 0.37rem;
+        &:before {
+          content: '';
+          display: block;
+          position: absolute;
+          left: 0.267rem;
+          top: 0.32rem;
+          /* prettier-ignore */
+          width: 15Px; /*no*/
+          /* prettier-ignore */
+          height: 15Px; /*no*/
+          border-radius: 50%;
+          /* prettier-ignore */
+          border: 1Px solid #999; /*no*/
+          box-sizing: border-box;
+        }
+        &.active:before {
+          border: 0.1rem solid #fb3a32;
+        }
+      }
+      .checkbox-value {
+        display: block;
+        padding: 0.07rem 0 0 0.7rem;
+        line-height: 0.4rem;
+        font-size: 0.37rem;
+        color: #1a1a1a;
+        word-break: break-all;
+        .vh-line-check {
+          position: absolute;
+          left: 0.267rem;
+          top: 0.32rem;
+          /* prettier-ignore */
+          width: 15Px; /*no*/
+          /* prettier-ignore */
+          height: 15Px; /*no*/
+          border-radius: 0.1rem;
+          /* prettier-ignore */
+          border: 1Px solid #999; /*no*/
+          box-sizing: border-box;
+          line-height: 0.38rem;
+          font-size: 0.28rem;
+          text-align: center;
+          &:before {
+            display: none;
+          }
+        }
+        &.active {
+          .vh-line-check {
+            background-color: #fb3a32;
+            border-color: #fb3a32;
+            color: #fff;
+            &:before {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+    .select-box {
+      .select-xl {
+        position: relative;
+      }
+      .select-item {
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        display: inline-block;
+        width: 9.07rem;
+        height: 1.07rem;
+        line-height: 1.04rem;
+        padding: 0 0.7rem 0 0.2rem;
+        margin-top: 0.27rem;
+        background-color: #fff;
+        border: 0.02rem solid #d2d2d2;
+        outline: none;
+        color: #1a1a1a;
+        font-size: 0.37rem;
+        border-radius: 0.11rem;
+      }
+      .select-arrow {
+        display: inline-block;
+        position: absolute;
+        width: 0.27rem;
+        height: 0.2rem;
+        top: 0.71rem;
+        right: 0.25rem;
+        background: url(./img/arrow-down-mobile.png) no-repeat scroll right center transparent;
+        background-size: 100%;
+      }
+    }
+    .provicyBox {
+      min-height: 0.5rem;
+      span {
+        float: left;
+        line-height: 0.42rem;
+        margin-left: 0.1rem;
+        width: calc(100% - 0.52rem);
+      }
+    }
+    .privicyitem {
+      &.vh-line-check {
+        float: left;
+        width: 0.38rem;
+        height: 0.38rem;
+        border-radius: 0.1rem;
+        border: 0.03rem solid #999;
+        box-sizing: border-box;
+        line-height: 0.38rem;
+        font-size: 0.28rem;
+        text-align: center;
+        margin-right: 3px;
+        &:before {
+          display: none;
+        }
+        &.active {
+          background-color: #fb3a32;
+          border-color: #fb3a32;
+          color: #fff;
+          &:before {
+            display: block;
+          }
+        }
+      }
+    }
+    .submit-btn {
+      border: 0.024rem solid #fc5659;
+      background-color: #fc5659;
+      font-size: 0.37rem;
+      color: #fff;
+      outline: none;
+      width: 9.07rem;
+      height: 1.25rem;
+      border-radius: 0.12rem;
+      &.red {
+        border-color: #fb3a32;
+        background-color: #fb3a32;
+      }
+      &.blue {
+        border-color: #3562fa;
+        background-color: #3562fa;
+      }
+      &.purple {
+        border-color: #8d57a4;
+        background-color: #8d57a4;
+      }
+    }
+    .no-authority-wrap {
+      width: 100%;
+      height: 100%;
+      background: url(./img/webinar.png) no-repeat center;
+      background-size: cover;
+      position: relative;
+      p {
+        text-align: center;
+        color: #fff;
+        font-size: 36px;
+        line-height: 2;
+        width: 100%;
+        height: 144px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+      }
+    }
+    // 云盾样式重置,注释部分为设计稿样式，暂时不删除，有备无患
+    .captcha {
+      ::v-deep .yidun_tips {
+        color: #999999 !important;
+        line-height: 1.05rem !important;
+        // .yidun_tips__text {
+        // vertical-align: initial!important;
+        // }
+      }
+      ::v-deep .yidun_slide_indicator {
+        line-height: 1.07rem !important;
+        height: 1.07rem !important;
+      }
+      ::v-deep .yidun_control {
+        line-height: 1.07rem !important;
+        height: 1.07rem !important;
+      }
+      ::v-deep .yidun_slider {
+        .yidun_slider__icon {
+          width: 0.42rem !important;
+          margin-left: -0.19rem !important;
+          background-image: url(./img/icon-slide1.png) !important;
+          background-size: 0.77rem 0.53rem !important;
+          background-position: center !important;
+          margin-top: -0.13rem !important;
+        }
+        &:hover {
+          .yidun_slider__icon {
+            background-image: url(./img/icon-slide.png) !important;
+          }
+        }
+      }
+      ::v-deep
+        .yidun.yidun--light
+        .yidun_control.yidun_control--moving
+        .yidun_slider
+        .yidun_slider__icon {
+        background-image: url(./img/icon-slide.png) !important;
+      }
+      ::v-deep .yidun.yidun--light.yidun--success {
+        .yidun_control {
+          // border-color: #3562FA!important;
+          .yidun_slider__icon {
+            background-image: url(./img/icon-succeed.png) !important;
+          }
+          .yidun_slider {
+            .yidun_slider__icon {
+              background-image: url(./img/icon-succeed.png) !important;
+              background-size: 0.77rem 0.53rem !important;
+              background-position: center !important;
+            }
+            &:hover {
+              .yidun_slider__icon {
+                background-image: url(./img/icon-succeed.png) !important;
+                background-size: 0.77rem 0.53rem !important;
+                background-position: center !important;
+              }
+            }
+          }
+        }
+      }
+      ::v-deep .yidun.yidun--light.yidun--success.yidun--jigsaw {
+        .yidun_control .yidun_slider {
+          background-color: #3562fa;
+        }
+        .yidun_slide_indicator {
+          border-color: #3562fa;
+          background-color: #f0f1fe;
+        }
+      }
+      ::v-deep .yidun.yidun--light {
+        .yidun_feedback {
+          background-position: 0px -6.4rem;
+          height: 0.53rem;
+        }
+        .yidun_refresh {
+          background-position: 0px -9.1rem;
+        }
+      }
+    }
+  }
+</style>

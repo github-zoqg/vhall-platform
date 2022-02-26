@@ -12,18 +12,18 @@ const playerMixins = {
   methods: {
     // 试看的权限
     getShiPreview() {
-      const { webinar } = this.roomBaseState.watchInitData;
+      const { webinar } = this.roomBaseServer.state.watchInitData;
       const authType = webinar.verify;
       if (authType == 1) {
-        return webinar.verify_tip || '输入密码';
+        this.authText = webinar.verify_tip || this.$t('other.other_1002');
       } else if (authType == 2) {
-        return webinar.verify_tip || '输入手机号/邮箱/工号';
+        this.authText = webinar.verify_tip || this.$t('appointment.appointment_1002');
       } else if (authType == 3) {
-        return webinar.verify_tip || '付费';
+        this.authText = webinar.verify_tip || this.$t('appointment.appointment_1010');
       } else if (authType == 4) {
-        return webinar.verify_tip || '输入邀请码';
+        this.authText = webinar.verify_tip || this.$t('other.other_1003');
       } else if (authType == 6) {
-        return 6;
+        this.authText = 6;
       }
     },
     getListenPlayer() {
@@ -61,8 +61,9 @@ const playerMixins = {
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('播放完毕');
-        this.isVodEnd = true;
         this.isShowPoster = true;
+        if (this.isWarnPreview) return;
+        this.isVodEnd = true;
       });
       // 打开弹幕
       this.playerServer.$on('push_barrage', data => {
@@ -75,6 +76,39 @@ const playerMixins = {
         console.log(data);
         this.isLivingEnd = true;
       });
+      // 支付成功
+      this.playerServer.$on('pay_success', data => {
+        const userInfo = this.$domainStore.state.userServer.userInfo;
+        if (data.target_id == userInfo.user_id) {
+          this.$message({
+            message: this.$t('common.common_1005'),
+            showClose: true,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
+          this.feeAuth({ type: 3 });
+          this.closePayFee();
+        }
+      });
+    },
+    controllerMouseLeave() {
+      clearTimeout(this.hoverVideoTimer);
+      this.hoverVideoTimer = setTimeout(() => {
+        this.hoveVideo = false;
+      }, 3000);
+    },
+    controllerMouseEnter() {
+      clearTimeout(this.hoverVideoTimer);
+      this.hoveVideo = true;
+    },
+    wrapEnter() {
+      this.hoveVideo = true;
+    },
+    wrapLeave() {
+      clearTimeout(this.hoverVideoTimer);
+      this.hoverVideoTimer = setTimeout(() => {
+        this.hoveVideo = false;
+      }, 3000);
     },
     /**
      * 发送弹幕

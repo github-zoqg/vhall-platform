@@ -27,7 +27,7 @@
           "
         />
       </div>
-      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }">
+      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
         <GiftCard
           ref="gifts"
@@ -39,7 +39,10 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-if="!localRoomInfo.isEmbed" auth="{ 'ui.hide_reward': 0 }">
+      <div
+        v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward"
+        auth="{ 'ui.hide_reward': 0 }"
+      >
         <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
         <RewardCard
           ref="reward"
@@ -57,7 +60,7 @@
         <i class="vh-saas-iconfont iconyaoqingka"></i>
       </a>
       <!-- 点赞 -->
-      <div auth="{ 'ui.watch_hide_like': 0 }">
+      <div auth="{ 'ui.watch_hide_like': 0 }" v-if="localRoomInfo.showLike">
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
         <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
@@ -68,7 +71,13 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer
+  } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
@@ -88,19 +97,19 @@
           ? roomBaseState.watchInitData.webinar.rebroadcast.channel_id
           : '',
         isEmbed: /embed/.test(this.$route.path),
-        isLogin: sessionStorage.getItem('isLogin'),
-        isNeedLogin: !sessionStorage.getItem('isLogin'),
-        isShowGift: true,
-        isShowOnselfMdess: false,
-        showLike: true,
-        showShare: true,
+        isLogin: !!roomBaseState.watchInitData.join_info.user_id,
+        isNeedLogin: !roomBaseState.watchInitData.join_info.user_id,
+        isShowGift: configList['ui.hide_gifts'] != 1,
+        showLike: configList['ui.watch_hide_like'] != 1,
+        showShare: configList['ui.watch_hide_share'] != 1,
+        isShowReward: configList['ui.hide_reward'] != 1,
         roomId: roomBaseState.watchInitData.interact.room_id,
         saasJoinId: roomBaseState.watchInitData.join_info.join_id,
         staticSrc: roomBaseState.watchInitData.urls.static_url,
         type: roomBaseState.watchInitData.webinar.type,
         uploadSrc: roomBaseState.watchInitData.urls.upload_url,
         webSrc: roomBaseState.watchInitData.urls.web_url,
-        webinarId: '723145973'
+        webinarId: roomBaseState.watchInitData.webinar.id
       };
       let webinarData = roomBaseState.watchInitData.webinar;
       return {
@@ -135,6 +144,7 @@
       }
     },
     mounted() {
+      console.log(this.configList, useRoomBaseServer().state, 'this.configList');
       this.joinInfoInGift = {
         avatar: this.roomBaseState.watchInitData.join_info.avatar,
         nickname: this.roomBaseState.watchInitData.join_info.nickname,

@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import grayInit from '@/packages/app-shared/gray-init';
+import Subscribe from '../views/subscribe/index.vue';
 
 Vue.use(VueRouter);
 
@@ -11,6 +12,24 @@ const routes = [
     component: Home,
     name: 'LiveRoom',
     meta: { title: '直播间', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/embedclient/watch/:id',
+    component: Home,
+    name: 'LiveEmbedclientRoom',
+    meta: { title: '直播间嵌入', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/subscribe/:id',
+    component: Subscribe,
+    name: 'SubcribeRoom',
+    meta: { title: '预约页', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/embedclient/subscribe/:id',
+    component: Subscribe,
+    name: 'SubcribeEmbedclientRoom',
+    meta: { title: '预约嵌入页', grayType: 'webinar' }
   },
   // 专题
   {
@@ -25,6 +44,12 @@ const routes = [
     component: () => import('../views/InviteCard/main.vue'),
     meta: { title: '邀请卡', grayType: 'webinar' }
   },
+  {
+    path: '/lives/entryform/:id',
+    name: 'signup',
+    component: () => import('@/packages/wap-sign-up-form'),
+    meta: { grayType: 'webinar' }
+  },
   // 错误页、升级页
   {
     path: '/upgrading',
@@ -37,6 +62,12 @@ const routes = [
     name: 'bind',
     component: () => import('../views/bind'),
     meta: { grayType: '' }
+  },
+  // 独立报名表单
+  {
+    path: '/lives/entryform/:id',
+    name: 'entryform',
+    component: () => import('../views/entryform/index.vue')
   }
 ];
 

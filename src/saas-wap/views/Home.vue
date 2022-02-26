@@ -37,12 +37,21 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        const domain = await this.initReceiveLive();
+        let clientType = 'standard';
+        if (location.pathname.indexOf('embedclient') != -1) {
+          clientType = 'embed';
+        }
+        const domain = await this.initReceiveLive(clientType);
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
-
+        document.title = roomBaseServer.state.watchInitData.webinar.subject;
+        // 是否跳转预约页
+        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          this.goSubscribePage(clientType);
+          return;
+        }
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
         // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
@@ -65,7 +74,6 @@
           }
         );
         window.vhallReport.report('ENTER_WATCH');
-
         this.state = 1;
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -76,21 +84,21 @@
     },
     mounted() {},
     methods: {
-      initReceiveLive() {
+      initReceiveLive(clientType) {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'standard' //客户端类型
+            clientType: clientType //客户端类型
           }
         });
       },
@@ -116,6 +124,13 @@
         } else {
           this.liveErrorTip = this.$tes(err.code) || err.msg;
         }
+      },
+      goSubscribePage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
       }
     }
   };

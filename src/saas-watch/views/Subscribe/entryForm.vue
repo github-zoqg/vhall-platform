@@ -2,18 +2,18 @@
   <div class="openlink-wrap">
     <vmp-sign-up-form v-if="formOpenLinkStatus == 1"></vmp-sign-up-form>
     <div v-if="formOpenLinkStatus == 2" class="no-open">
-      <!-- <errorPage prop-type="stop_serve"></errorPage> -->
+      <errorPage prop-type="stop_serve"></errorPage>
     </div>
   </div>
 </template>
 
 <script>
   import { useEntryformServer } from 'middle-domain';
-  // import errorPage from '@/views/other-error/index';
+  import errorPage from '../ErrorPage/index.vue';
   export default {
     name: 'Entryform',
     components: {
-      // errorPage
+      errorPage
     },
     data() {
       return {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="vmp-subscribe" v-if="state === 1">
+    <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerSubscribeRoot"></vmp-air-container>
     </div>
     <errorPage v-if="state === 2" :prop-type="errorData.errorPageTitle">
@@ -32,13 +32,17 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initReceiveLive();
+        let clientType = 'standard';
+        if (location.pathname.indexOf('embedclient') != -1) {
+          clientType = 'embed';
+        }
+        await this.initReceiveLive(clientType);
         await subscribeState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转观看页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
-          this.goWatchPage();
+          this.goWatchPage(clientType);
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--', err);
@@ -47,7 +51,7 @@
       }
     },
     methods: {
-      initReceiveLive() {
+      initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
@@ -56,12 +60,16 @@
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'standard' //客户端类型
+            clientType: clientType //客户端类型
           }
         });
       },
-      goWatchPage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}${window.location.search}`;
+      goWatchPage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
         switch (err.code) {
@@ -101,7 +109,7 @@
   body {
     overflow-y: auto;
   }
-  .vmp-subscribe {
+  .vmp-basic-container {
     width: 100%;
     height: 100%;
     background: #1a1a1a;

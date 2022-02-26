@@ -8,6 +8,10 @@ import domainStore from './domain';
 import './assets/styles/common.less';
 // import './assets/styles/skins/index.less';
 
+// sentry模块
+import * as Sentry from '@sentry/vue';
+import { Integrations } from '@sentry/tracing';
+
 // 初始化
 initGlobalAPI();
 
@@ -16,6 +20,34 @@ Vue.config.devtools = true;
 Vue.prototype.$tec = function (path) {
   return this.$te(path) ? this.$t(path) : undefined;
 };
+
+if (process.env.NODE_ENV !== 'development') {
+  // Sentry监控探针
+  Sentry.init({
+    Vue,
+    dsn: 'https://840242dc84b6435fbe79ebd7850f2a9a@sentry.vhall.com/20',
+    release: `${process.env.VUE_APP_BUILD_VERSION}`,
+    // environment 上报的环境 建议 按照 测试、生产区分
+    environment: process.env.NODE_ENV,
+    integrations: [
+      new Integrations.BrowserTracing({
+        routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+        tracingOrigins: [
+          'test4-saas-webinar.vhall.com/',
+          'dev-csd-saas-watch.vhall.com',
+          'test-csd-saas-watch.vhall.com',
+          'csd-saas-watch.vhall.com',
+          // 'e.vhall.com',
+          /^\//
+        ]
+      })
+    ],
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0
+  });
+}
 
 // 限制按钮重复点击
 Vue.directive('preventReClick', {

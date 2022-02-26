@@ -1,5 +1,5 @@
 <template>
-  <div id="header" class="vh-header-box">
+  <div id="header" class="vh-header-box" v-if="!embedObj.embed">
     <span class="host-user-info">
       <img
         v-if="webinarTag && webinarTag.organizers_status == 1"
@@ -111,6 +111,10 @@
           avatar = require('./images/default_avatar.png');
         }
         return avatar;
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       }
     },
     methods: {
