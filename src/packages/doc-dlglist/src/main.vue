@@ -112,7 +112,18 @@
             </div>
             <div class="vmp-doc-cur__bd">
               <el-table :data="dataList" style="width: 100%" height="370px">
-                <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
+                <el-table-column prop="file_name" label="文档名称" width="180">
+                  <template slot-scope="scope">
+                    <p class="text">
+                      <span
+                        class="vh-iconfont"
+                        :class="scope.row.ext | fileIconCss(false)"
+                        :style="scope.row.ext | fileIconCss(true)"
+                      ></span>
+                      {{ scope.row.file_name }}
+                    </p>
+                  </template>
+                </el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
                 <el-table-column prop="page" label="页码"></el-table-column>
                 <el-table-column prop="uploadPropress" label="进度">
@@ -195,7 +206,18 @@
               @select-all="handleChangeSelectall"
             >
               <el-table-column type="selection" width="55" align="left"></el-table-column>
-              <el-table-column prop="file_name" label="文档名称" width="180"></el-table-column>
+              <el-table-column prop="file_name" label="文档名称" width="180">
+                <template slot-scope="scope">
+                  <p class="text">
+                    <span
+                      class="vh-iconfont"
+                      :class="scope.row.ext | fileIconCss(false)"
+                      :style="scope.row.ext | fileIconCss(true)"
+                    ></span>
+                    {{ scope.row.file_name }}
+                  </p>
+                </template>
+              </el-table-column>
               <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
               <el-table-column prop="page" label="页码"></el-table-column>
               <el-table-column prop="uploadPropress" label="进度" width="200">
@@ -285,6 +307,36 @@
     mounted() {
       // 初始化事件
       this.initEvents();
+    },
+    filters: {
+      fileIconCss: (ext, isColor) => {
+        ext = ext.toLowerCase();
+        if (ext === 'pdf') {
+          return isColor ? 'color:#E34522 ' : 'vh-fill-pdf';
+        } else if (
+          ext === 'png' ||
+          ext === 'jpg' ||
+          ext === 'jpeg' ||
+          ext === 'bmp' ||
+          ext === 'gif'
+        ) {
+          return isColor ? 'color:#794CC5' : 'vh-fill-jpg';
+        } else if (ext === 'video') {
+          return isColor ? 'color:#3562FA' : 'vh-fill-video';
+        } else if (ext === 'doc' || ext === 'docx') {
+          return isColor ? 'color:#3562FA' : 'vh-fill-word';
+        } else if (ext === 'ppt' || ext === 'pptx') {
+          return isColor ? 'color:#FA9A32' : 'vh-fill-ppt';
+        } else if (ext === 'csv') {
+          return isColor ? 'color:#14BA6A' : 'vh-fill-csv';
+        } else if (ext === 'xls' || ext === 'xlsx') {
+          return isColor ? 'color:#14BA6A' : 'vh-fill-excel';
+        } else if (ext === 'media') {
+          return isColor ? 'color:#3562FA' : 'vh-fill-video';
+        } else {
+          return isColor ? 'color:#14BA6A' : 'vh-fill-industry';
+        }
+      }
     },
     methods: {
       initEvents() {
