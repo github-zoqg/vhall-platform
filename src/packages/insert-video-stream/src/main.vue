@@ -197,7 +197,7 @@
     },
     methods: {
       async openInsertShow(File, type) {
-        console.log('=====zhangxiao----', type);
+        console.log('=====zhangxiao----', File, type);
         this.pushStreamSucces = true;
         const { watchInitData } = this.roomBaseServer.state;
         this.isLiving = watchInitData.webinar.type;
