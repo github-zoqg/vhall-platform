@@ -3,11 +3,8 @@ import {
   useRoomBaseServer,
   useDocServer,
   useInteractiveServer,
-  useMicServer,
   useMediaCheckServer,
-  useGroupServer,
-  useMediaSettingServer,
-  useRebroadcastServer
+  useMediaSettingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -17,10 +14,7 @@ export default async function () {
   const interactiveServer = useInteractiveServer();
   const roomBaseServer = useRoomBaseServer();
   const mediaCheckServer = useMediaCheckServer();
-  const groupServer = useGroupServer();
-  const micServer = useMicServer();
   const mediaSettingServer = useMediaSettingServer();
-  const rebroadcastServer = useRebroadcastServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -38,20 +32,6 @@ export default async function () {
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();
 
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
-
-  // 如果存在rebroadcast
-  if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {
-    await rebroadcastServer.init();
-    console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', msgServer);
-  }
-
-  micServer.init();
-
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
@@ -63,19 +43,8 @@ export default async function () {
 
   mediaSettingServer.init();
 
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
-
-  useMicServer();
-
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
-  window.interactiveServer = interactiveServer;
   window.docServer = docServer;
-  window.groupServer = groupServer;
-  window.micServer = micServer;
 }

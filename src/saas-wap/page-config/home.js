@@ -8,7 +8,13 @@ const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerBodyCenter', 'comAllDialog', 'comWapRewardEffect']
+    children: [
+      'comHeaderWatch',
+      'layerBody',
+      'layerBodyCenter',
+      'comAllDialog',
+      'comWapRewardEffect'
+    ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
   // 顶部header容器
@@ -31,7 +37,7 @@ const serverConfig = {
   // },
   layerBodyCenter: {
     component: 'VmpContainer',
-    className: 'tab-content',
+    className: /embed/.test(location.pathname) ? 'tab-content-embed' : 'tab-content',
     children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   /*** 布局定义end */
@@ -75,7 +81,7 @@ const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList']
+    children: ['comWapPlayer', 'comWapStreamList','comWapDesktopScreen']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer'
@@ -84,6 +90,10 @@ const serverConfig = {
     component: 'VmpWapStreamList',
     children: ['comWapStreamLocal']
   },
+  comWapDesktopScreen:{
+    component: 'VmpWapDesktopScreen'
+  }
+  ,
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
   },
