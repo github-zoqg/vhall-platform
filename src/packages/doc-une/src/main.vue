@@ -140,7 +140,8 @@
     useMsgServer,
     useGroupServer,
     useInteractiveServer,
-    useMemberServer
+    useMemberServer,
+    useRebroadcastServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -464,6 +465,23 @@
           this.docServer.state.switchStatus = false;
           useRoomBaseServer().setChangeElement('doc');
           this.hasStreamList = false;
+        });
+
+        const reBroadcastServer = useRebroadcastServer();
+        // 转播开始事件
+        reBroadcastServer.$on('live_broadcast_start', () => {
+          this.docServer.setRole(VHDocSDK.RoleType.HOST);
+          this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+          this.recoverLastDocs();
+        });
+        // 转播结束事件
+        reBroadcastServer.$on('live_broadcast_stop', () => {
+          // 如果当前人拥有直播间文档操作权限，设为 host 角色
+          if (this.hasDocPermission) {
+            this.docServer.setRole(VHDocSDK.RoleType.GUEST);
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+          }
+          this.recoverLastDocs();
         });
 
         // 监控文档区域大小改变事件
