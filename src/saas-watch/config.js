@@ -87,6 +87,7 @@ export const serverConfig = {
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
         { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
+        { type: 'private', cuid: 'comWatchPrivateChat', text: 'common.common_1008' }, // 私聊
         { type: 'notice', cuid: 'comNotice', text: '公告' },
         { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
