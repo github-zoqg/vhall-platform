@@ -69,8 +69,8 @@
           <section class="vmp-rebroadcast-preview-panel">
             <header class="vmp-rebroadcast-preview-title">预览</header>
             <main class="vmp-rebroadcast-preview-box" v-loading="previewLoading">
-              <img v-if="!currentRoomId" :src="posterUrl" />
-              <section v-if="isPreviewVisible">
+              <img  :src="domainState.docUrl || posterUrl" />
+              <section v-if="isPreviewVisible" :class="{ 'mini-video-box': domainState.docUrl!=='' }">
                 <video-preview ref="videoPreview" :videoParam="videoParam" />
               </section>
             </main>
@@ -112,6 +112,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.rebroadcastServer = useRebroadcastServer();
+      window.rebroadcast = this
     },
     data() {
       return {
@@ -461,12 +462,26 @@
       }
 
       .vmp-rebroadcast-preview-box {
+        position:relative;
         background-color: #dfdfdf;
         border: #dfdfdf;
         width: 100%;
         height: 186px;
         border-radius: 4px;
         overflow: hidden;
+
+        img {
+          width:100%;
+          height:100%;
+        }
+
+        .mini-video-box {
+          width: 118px;
+          height: 89px;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
       }
 
       &__footer {
