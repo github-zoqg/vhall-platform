@@ -16,7 +16,7 @@
             :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
-            <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
+            <span class="wrap__left-item__group-name">{{ group.chat_name }}</span>
             <i
               class="el-icon-circle-close wrap__left-item__close-icon"
               @click.stop="delChatItem(index)"
@@ -26,7 +26,10 @@
         <div
           class="wrap__right"
           :class="{
-            'hide-tip': activeGroupIndex !== -1 && chatGroupList[activeGroupIndex].type == 2
+            'hide-tip':
+              activeGroupIndex !== -1 &&
+              chatGroupList[activeGroupIndex] &&
+              chatGroupList[activeGroupIndex].type == 2
           }"
         >
           <span class="wrap__right__header">提示：如想结束当前聊天，关闭左侧用户窗口即可</span>
@@ -195,19 +198,21 @@
     },
     mounted() {
       this.initViewData();
+      this.getPrivateContactList();
     },
     methods: {
       //打开模态窗
       openModal() {
         console.log('收到打开窗口的信令');
         this.visible = true;
-        this.getPrivateContactList();
       },
       //获取私聊联系人列表
       getPrivateContactList() {
+        const roomId = this.roomBaseServer.state.watchInitData.interact.room_id;
+        const webinarId = this.roomBaseServer.state.watchInitData.webinar.id;
         const params = {
-          room_id: this.roomId,
-          webinar_id: this.webinarId
+          room_id: roomId,
+          webinar_id: webinarId
         };
         return this.chatServer
           .getPrivateContactList(params)
