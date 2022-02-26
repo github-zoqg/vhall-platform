@@ -27,7 +27,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSignServer } from 'middle-domain';
+  import { useRoomBaseServer, useSignServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   // import EventBus from '../../utils/Events';
   import CountDown from './countDown.vue';
@@ -79,6 +79,18 @@
         this.duration = Number(e.data.sign_show_time);
         this.openSignIn(e.data.sign_id, e.data.sign_show_time);
         this.title = e.data.title;
+
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1027')}`
+          },
+          type: e.data.type
+        };
+        console.log(useChatServer(), data, '1323');
+        useChatServer().addChatToList(data);
       });
       // 签到结束
       this.signServer.$on('sign_end', e => {

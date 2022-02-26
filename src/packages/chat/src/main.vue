@@ -158,7 +158,7 @@
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGiftsServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -362,6 +362,7 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        const giftsServer = useGiftsServer();
         //监听@我的消息
         chatServer.$on('atMe', () => {
           if (this.osInstance.scroll().ratio.y != 1) {
@@ -401,6 +402,27 @@
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
           this.$message('您已经被踢出房间');
+        });
+        // 发起端 礼物消息接受
+        giftsServer.$on('gift_send_success', msg => {
+          console.log('VmpWapRewardEffect-------->', this.$route);
+          if (this.$route.path.includes('/lives/room')) {
+            const data = {
+              nickname:
+                msg.data.gift_user_nickname.length > 8
+                  ? msg.data.gift_user_nickname.substr(0, 8) + '...'
+                  : msg.data.gift_user_nickname,
+              avatar: msg.data.avatar,
+              content: {
+                gift_name: msg.data.gift_name,
+                gift_url: `${msg.data.gift_image_url}`,
+                source_status: msg.data.source_status
+              },
+              type: msg.data.type,
+              interactToolsStatus: true
+            };
+            chatServer.addChatToList(data);
+          }
         });
       },
       init() {
