@@ -1506,7 +1506,7 @@
       }
     }
     &-tips {
-      z-index: 9;
+      z-index: 5;
       &-box {
         height: 40px;
         font-size: 14px;
@@ -1535,7 +1535,7 @@
         position: absolute;
         bottom: 60px;
         left: 10px;
-        z-index: 9;
+        z-index: 6;
         > div {
           padding: 0 12px;
         }

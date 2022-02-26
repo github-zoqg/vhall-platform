@@ -66,7 +66,7 @@
       return {
         shareVisible: false,
         shareOtherVisible: false,
-        watchWebUrl: `https://t-webinar.e.vhall.com/v3/lives/watch/${this.$route.params.id}`,
+        watchWebUrl: `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
         isInviteShare: false,
@@ -158,9 +158,9 @@
         const { join_info } = this.roomBaseState.watchInitData;
         if (join_info) {
           const url = encodeURIComponent(
-            `https://t-webinar.e.vhall.com/v3/lives/invite/${this.$route.params.id}?invite_id=${
-              join_info.join_id || ''
-            }`
+            `https:${process.env.VUE_APP_WAP_WATCH}${
+              process.env.VUE_APP_ROUTER_BASE_URL
+            }/lives/invite/${this.$route.params.id}?invite_id=${join_info.join_id || ''}`
           );
           this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         }
