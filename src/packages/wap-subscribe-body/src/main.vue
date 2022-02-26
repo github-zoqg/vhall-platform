@@ -180,13 +180,14 @@
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
-              const queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}`
-                : '';
+              let pageUrl = '';
+              if (location.pathname.indexOf('embedclient') != -1) {
+                pageUrl = '/embedclient';
+              }
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives/watch/${this.webinarId}${queryString}`;
+                `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
@@ -316,13 +317,14 @@
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
-              const queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}`
-                : '';
+              let pageUrl = '';
+              if (location.pathname.indexOf('embedclient') != -1) {
+                pageUrl = '/embedclient';
+              }
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives/watch/${this.webinarId}${queryString}`;
+                `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();

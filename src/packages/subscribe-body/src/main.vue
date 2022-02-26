@@ -11,8 +11,11 @@
           <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
         </div>
       </div>
+      <div class="subscribe-img-box-embed" v-if="isEmbed && showBottom">
+        <EmbedTime ref="embedTime" :sub-option="subOption" @authFetch="handleAuthCheck"></EmbedTime>
+      </div>
       <!--活动时间信息-->
-      <div class="subscribe-img-bottom">
+      <div class="subscribe-img-bottom" v-if="!isEmbed">
         <bottom-tab
           v-if="showBottom"
           ref="bottomTab"
@@ -22,7 +25,7 @@
         ></bottom-tab>
       </div>
     </div>
-    <div class="vmp-subscribe-body-tab">
+    <div class="vmp-subscribe-body-tab" v-if="!isEmbed">
       <vmp-air-container cuid="comTabMenu" :oneself="true"></vmp-air-container>
     </div>
     <div class="vmp-subscribe-body-live" v-if="isLiving">
@@ -37,6 +40,7 @@
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
+  import EmbedTime from './components/embedTime.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpSubscribeBody',
@@ -61,7 +65,8 @@
       };
     },
     components: {
-      BottomTab
+      BottomTab,
+      EmbedTime
     },
     computed: {
       // 背景图片
@@ -78,6 +83,10 @@
       },
       webinarId() {
         return this.roomBaseServer.state.watchInitData.webinar.id;
+      },
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     beforeCreate() {
@@ -141,8 +150,15 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
-          this.showVideo = true;
+        if (this.isEmbed) {
+          // 嵌入的暖场视频只有免费的时候显示
+          if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
+            this.showVideo = true;
+          }
+        } else {
+          if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
+            this.showVideo = true;
+          }
         }
       },
       feeAuth(params) {
@@ -156,13 +172,14 @@
         this.subscribeServer.watchAuth(data).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
-              const queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}`
-                : '';
+              let pageUrl = '';
+              if (location.pathname.indexOf('embedclient') != -1) {
+                pageUrl = '/embedclient';
+              }
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives/watch/${this.webinarId}${queryString}`;
+                `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
@@ -246,6 +263,7 @@
         let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
         this.feeAuth({ type: type });
       },
+      handlePlay() {},
       livingLink() {
         this.handleAuthCheck();
       }

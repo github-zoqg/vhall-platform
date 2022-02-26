@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+    @click.stop="showExitScreen"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图 -->
@@ -23,6 +27,14 @@
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
+    <!-- 退出全屏 -->
+    <div
+      class="vmp-stream-remote-exitscreen"
+      :class="[exitScreenStatus ? 'opcity-true' : 'opcity-flase']"
+      @click.stop="exitFullScreen"
+    >
+      <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+    </div>
   </div>
 </template>
 
@@ -61,6 +73,9 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      exitScreenStatus() {
+        return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
     filters: {
@@ -151,6 +166,26 @@
               this.networkStatus = 0;
             });
         }, 2000);
+      },
+      showExitScreen() {
+        if (!this.exitScreenStatus) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.interactiveServer.state.fullScreenType = false;
+        }, 5000);
+      },
+      exitFullScreen() {
+        this.interactiveServer
+          .exitStreamFullscreen({
+            streamId: this.stream.streamId,
+            vNode: `vmp-stream-remote__${this.stream.streamId}`
+          })
+          .then(res => {
+            console.warn('res----', res);
+            this.interactiveServer.state.fullScreenType = false;
+          });
       }
     }
   };
@@ -248,6 +283,30 @@
           background-image: url(./img/network2.png);
         }
       }
+    }
+    &-exitscreen {
+      width: 64px;
+      height: 64px;
+      line-height: 64px;
+      z-index: 4;
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      text-align: center;
+      transform: translate(-32px, -32px);
+      border-radius: 50%;
+    }
+    .opcity-flase {
+      display: none;
+      transition: all 1s;
+      -webkit-transition: all 1s;
+    }
+    .opcity-true {
+      opacity: 1;
+      transition: all 1s;
+      z-index: 6;
+      -webkit-transition: all 1s;
     }
   }
 </style>

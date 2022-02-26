@@ -14,10 +14,22 @@ const routes = [
     meta: { title: '直播间', grayType: 'webinar' }
   },
   {
+    path: '/lives/embedclient/watch/:id',
+    component: Home,
+    name: 'LiveEmbedclientRoom',
+    meta: { title: '直播间嵌入', grayType: 'webinar' }
+  },
+  {
     path: '/lives/subscribe/:id',
     component: Subscribe,
     name: 'SubcribeRoom',
     meta: { title: '预约页', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/embedclient/subscribe/:id',
+    component: Subscribe,
+    name: 'SubcribeEmbedclientRoom',
+    meta: { title: '预约嵌入页', grayType: 'webinar' }
   },
   // 专题
   {
@@ -56,6 +68,12 @@ const routes = [
     path: '/lives/entryform/:id',
     name: 'entryform',
     component: () => import('../views/entryform/index.vue')
+  },
+  // 嵌入页
+  {
+    path: '/lives/embedclient/watch/:id',
+    name: 'embedclient',
+    component: Home
   }
 ];
 
