@@ -41,10 +41,7 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  // TODO 设置观看端测试权限数据
-  roomBaseServer.state.configList = {
-    hasToolbar: false
-  };
+  await roomBaseServer.getConfigList();
   // 调用聚合接口
   await roomBaseServer.getCommonConfig({
     tags: [

@@ -1,5 +1,5 @@
 <template>
-  <div class="timer">
+  <div class="timer" v-if="!embedObj.embedVideo">
     <!-- 时间显示区 -->
     <div v-show="timerVisible" class="bgimg" id="timer" v-drag>
       <div>
@@ -138,16 +138,19 @@
           statusStr = this.$t('interact_tools.interact_tools_1057');
         }
         return `${timeStr} ${this.$t('interact_tools.interact_tools_1054')} ${statusStr}`;
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       }
     },
     beforeCreate() {
       this.timerServer = useTimerServer();
     },
     mounted() {
-      console.log(this.roomBaseServer.state);
       this.timerInfo = this.roomBaseServer.state?.timerInfo;
       this.timerServer.listenMsg();
-      console.log(this.timerServer, 'this.timerServer');
+      // console.log(this.timerServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
