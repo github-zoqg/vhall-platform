@@ -14,7 +14,11 @@
           <section class="vmp-rebroadcast-control-panel" v-loading="loading">
             <!-- 搜索区域 -->
             <header class="vmp-rebroadcast-search">
-              <span class="my-live">我的直播</span>
+              <span class="my-live">
+                我的直播
+                <i class="vh-iconfont vh-line-question"></i>
+                <div class="tips">暂只支持转播直播</div>
+              </span>
               <el-button type="mini" round @click="getList">刷新</el-button>
               <el-input
                 style="margin-left: 6px; width: 185px; border-radius: 20px"
@@ -61,15 +65,27 @@
             </main>
           </section>
 
-          <section v-loading="previewLoading" class="vmp-rebroadcast-preview-panel">
+          <!-- 预览区域 -->
+          <section class="vmp-rebroadcast-preview-panel">
             <header class="vmp-rebroadcast-preview-title">预览</header>
-            <main>
+            <main class="vmp-rebroadcast-preview-box" v-loading="previewLoading">
+              <img v-if="!currentRoomId" :src="posterUrl" />
               <section v-if="isPreviewVisible">
                 <video-preview ref="videoPreview" :videoParam="videoParam" />
               </section>
-              <button @click="startRebroadcast">开始直播</button>
-              <button @click="stopRebroadcast">结束转播</button>
             </main>
+            <footer class="vmp-rebroadcast-preview-panel__footer">
+              <section>
+                <p v-if="pushStreamSeperately" class="start-local-stream" @click="pushLocalStream">
+                  开始本地推流
+                </p>
+                <!-- <el-checkbox v-model="localStream">同时开始本地推流</el-checkbox> -->
+              </section>
+              <section>
+                <el-button round @click="start">开始转播</el-button>
+                <el-button round @click="stop">结束转播</el-button>
+              </section>
+            </footer>
           </section>
         </main>
       </div>
@@ -100,13 +116,16 @@
     data() {
       return {
         isShow: false,
-        current: '',
+        currentRoomId: '',
         inputVal: '',
         loading: false,
         previewLoading: false,
         list: [],
         domainState: this.rebroadcastServer.state,
         nologoImg: '//t-alistatic01.e.vhall.com/static/img/video_default_nologo.png',
+        posterUrl:
+          '//t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/upload/common/static-imgs/c0/e7/c0e7569408de296971eb4b98945c240b.png',
+
         pushStreamSeperately: false,
         isPreviewVisible: false,
         videoParam: {}
@@ -148,10 +167,13 @@
        * @param {*} sourceWebinarId 目标活动id
        */
       async select(id, sourceWebinarId) {
-        this.current = id;
+        this.currentRoomId = '';
+        this.isPreviewVisible = false;
+        await sleep(1000); // 等待video-preview destroy掉
+
+        this.currentRoomId = id;
         this.previewLoading = true;
         this.domainState.sourceWebinarId = sourceWebinarId;
-        this.isPreviewVisible = false;
 
         const { watchInitData } = this.roomBaseServer.state;
 
@@ -170,6 +192,7 @@
             type: 'live',
             appId,
             accountId,
+            autoplay: true,
             liveOption: {
               defaultDefinition: '360p',
               type: 'flv',
@@ -188,22 +211,17 @@
       /**
        * 开始转播
        */
-      async startRebroadcast() {
-        // if !refs.preview return
-        // if status!==1 清闲开始直播
-        // if (this.status !== 1) return this.$message(`请先开始直播`);
+      async start() {
         const { watchInitData } = this.roomBaseServer.state;
+        if (watchInitData.webinar.type !== 1) return this.$message(`请先开始直播`);
 
         try {
           const res = await this.rebroadcastServer.start({
             webinar_id: watchInitData.webinar.id,
             source_id: this.domainState.sourceWebinarId
           });
-          if (res.code !== 200) {
-            return this.$message.error(`转播失败!`);
-          }
+          if (res.code !== 200) return this.$message.error(`转播失败!`);
 
-          this.getList(); // get-list
           // this.rebroadcastRoomId = this.current; // 记录
           this.report();
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
@@ -216,13 +234,13 @@
       /**
        * 停止转播
        */
-      async stopRebroadcast() {
+      async stop() {
         const { watchInitData } = this.roomBaseServer.state;
 
         try {
           const res = await this.rebroadcastServer.stop({
             webinar_id: watchInitData.webinar.id,
-            source_id: this.sourceWebinarId
+            source_id: this.domainState.sourceWebinarId
           });
 
           if (res.code === 200) {
@@ -287,6 +305,35 @@
           position: relative;
           font-size: 14px;
           color: #1a1a1a;
+
+          i {
+            color: #999;
+          }
+
+          .tips {
+            display: none;
+            position: absolute;
+            top: 28px;
+            left: -20px;
+            padding: 0 10px;
+            width: 120px;
+            z-index: 999;
+            color: #fff;
+            font-size: 12px;
+            border-radius: 4px;
+            background-color: rgba(51, 51, 51, 0.8);
+            box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+            height: 40px;
+            box-sizing: border-box;
+          }
+
+          &:hover {
+            .tips {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+          }
         }
 
         .el-button {
@@ -411,6 +458,22 @@
 
       .vmp-rebroadcast-preview-title {
         padding: 80px 0 12px 0;
+      }
+
+      .vmp-rebroadcast-preview-box {
+        background-color: #dfdfdf;
+        border: #dfdfdf;
+        width: 100%;
+        height: 186px;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      &__footer {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
     }
   }
