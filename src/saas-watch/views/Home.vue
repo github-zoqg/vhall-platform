@@ -52,9 +52,10 @@
         // 是否跳转预约页
         if (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type != 3
         ) {
-          this.goSubscribePage();
+          this.goSubscribePage(clientType);
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -79,8 +80,12 @@
           }
         });
       },
-      goSubscribePage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
+      goSubscribePage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
         switch (err.code) {
