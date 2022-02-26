@@ -109,6 +109,7 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
+        const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         console.log('[menu] list--:', list);
@@ -124,6 +125,12 @@
             name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '私聊', // 同上
             status: 2
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'v5',
+            name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '问答', // 同上
+            status: roomState.interactToolStatus.question_status ? 1 : 2
           });
         }
       },

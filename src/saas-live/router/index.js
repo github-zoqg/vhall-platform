@@ -36,7 +36,7 @@ const routes = [
   {
     path: '/lives/qa/:id',
     name: 'qa',
-    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa/main.vue'),
+    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa-admin/main.vue'),
     meta: { title: '问答', grayType: 'webinar' }
   },
   {

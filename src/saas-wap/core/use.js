@@ -59,7 +59,8 @@ import VmpWapRewardEffect from '@/packages/wap-reward-effect';
 
 // 章节
 import VmpChapterWap from '@/packages/watch-chapter-wap';
-
+//问答
+import VmpQaWap from '@/packages/qa-wap/index.js';
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -95,4 +96,5 @@ export function initUse() {
   Vue.use(VmpCashWap);
   Vue.use(VmpLotteryWap);
   Vue.use(VmpChapterWap);
+  Vue.use(VmpQaWap);
 }

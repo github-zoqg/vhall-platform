@@ -76,7 +76,8 @@ export const serverConfig = {
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
         { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
         { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
-        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
+        { type: 8, cuid: 'comMemberList', text: '成员' }, // 成员
+        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } //问答
       ]
     }
   },
@@ -289,6 +290,13 @@ export const serverConfig = {
         cuid: ['comRebroadcast'],
         method: 'open'
       }
+    ],
+    emitHandleQa: [
+      {
+        cuid: ['comTabMenu'],
+        method: 'setVisible',
+        args: ['$0']
+      }
     ]
   },
   // 互动工具-计时器设置
@@ -408,6 +416,9 @@ export const serverConfig = {
       //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
       platformType: 'live'
     }
+  },
+  comQa: {
+    component: 'VmpQa'
   },
   // 文档白板组件
   comDocUne: {

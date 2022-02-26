@@ -154,7 +154,6 @@
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
 
-  import EventBus from './js/Events.js';
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
@@ -330,8 +329,6 @@
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
-      // 口令登录显示  自身显示消息
-      this.initCodeLoginMessage();
       //初始化聊天区域滚动组件
       this.initScroll();
       //拉取聊天历史
@@ -378,7 +375,7 @@
         });
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
-          if (this.osInstance.scroll().ratio.y != 1) {
+          if (this.osInstance.scroll().ratio.y != 1 && this.osInstance.scroll().max.y > 0) {
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
             this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
@@ -452,13 +449,6 @@
           // 不需要登录
           this.chatLoginStatus = false;
         }
-      },
-      //todo 信令完成这个或者domain 初始化口令登录自身显示的消息
-      initCodeLoginMessage() {
-        EventBus.$on('codeText', msg => {
-          // 口令登录显示  自身显示消息
-          this.chatList.push(msg);
-        });
       },
       //处理分组讨论频道变更
       handleChannelChange() {
