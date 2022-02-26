@@ -8,8 +8,13 @@
         @click="handleJump(item.url)"
       >
         <div class="recommend-item">
-          <img class="banner" :src="item.img_url ? item.img_url : defaultBanner" />
-          <h4 class="title ellipsis">{{ item.subject }}</h4>
+          <div class="banner">
+            <img :src="item.img_url ? item.img_url : defaultBanner" />
+          </div>
+          <div class="info">
+            <h4 class="title ellipsis">{{ item.subject }}</h4>
+            <button class="check-btn">查看</button>
+          </div>
         </div>
       </li>
     </ul>
@@ -149,6 +154,7 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
+    padding: 0 14px 16px;
     // overflow: hidden;
     overflow-y: scroll;
     .a-wrap {
@@ -164,13 +170,15 @@
       // touch-action: pan-y;
     }
     .recommend-item {
-      height: 80px;
+      width: 100%;
+      height: 113px;
       display: flex;
       flex-direction: row;
       align-items: center;
+      box-sizing: border-box;
       border-bottom: 1px solid #444;
-      padding: 16px 0;
-      float: left;
+      padding: 16px 5px;
+
       a {
         display: inline-block;
         margin-bottom: 30px;
@@ -178,17 +186,56 @@
       .banner {
         width: 40%;
         height: 100%;
+        text-align: center;
+        background: #1a1a1a;
         border-radius: 8px;
-        object-fit: scale-down;
-        border: 1px solid #e6e6e6;
+        margin-right: 12px;
+        flex: 0 0 auto;
+        max-width: 180px;
+
+        img {
+          height: 100%;
+          object-fit: scale-down;
+        }
       }
       .title {
-        margin-top: 15px;
-        font-size: 28px;
+        font-size: 14px;
         font-weight: bold;
-        color: rgba(51, 51, 51, 1);
+        color: @font-dark-normal;
         line-height: 30px;
         height: 34px;
+      }
+
+      .info {
+        height: 100%;
+        position: relative;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .check-btn {
+          background: transparent;
+          width: 64px;
+          height: 26px;
+          border-radius: 15px;
+          border: 1px solid #ccc;
+          color: #fff;
+          text-align: center;
+          line-height: 26px;
+        }
+      }
+
+      &:hover {
+        background: #3c3c3c;
+        border-radius: 4px;
+        cursor: pointer;
+        border-bottom-color: transparent;
+
+        .check-btn {
+          background: #fb3a32;
+          border-color: #fb3a32;
+        }
       }
     }
   }
