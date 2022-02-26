@@ -6,7 +6,6 @@
       <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
         {{ $t('usual.chooseDocument') }}
       </div>
-
       <!-- 观看端没有观众可见的按钮 -->
       <div class="audience-visible" v-if="!isWatch">
         <span style="margin-right: 5px">
@@ -206,9 +205,12 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
-      // 是否有演示权限
+      // 是否文档演示权限
       hasDocPermission() {
-        return this.docServer.state.hasDocPermission;
+        return (
+          this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+          this.roomBaseServer.state.watchInitData.join_info.third_party_user_id
+        );
       },
       // 是否显示画笔工具栏
       showBrushToolbar() {

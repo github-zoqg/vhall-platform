@@ -72,12 +72,11 @@
         this.dialogVisible = false;
         this.$emit('update:show', false);
       },
-      // 拒绝邀请
+      // 拒绝邀请演示
       handleClose: async function () {
         clearInterval(this.timer);
         this.close();
         try {
-          // 拒绝邀请上麦
           const res = await this.micServer.userRejectInvite({
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
             type: 1, // 0-拒绝上麦 , 1-拒绝演示
@@ -96,17 +95,17 @@
           return;
         }
       },
-      // 同意邀请
+      // 同意邀请演示
       handleSubmit: async function () {
         try {
-          // 同意邀请上麦
-          const res = await this.micServer.userAgreeInvite({
+          // 同意邀请演示
+          await this.micServer.userAgreeInvite({
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
-            type: 1,
+            type: 1, // 0-同意上麦 , 1-同意演示
             extra_params: this.senderId
           });
         } catch (ex) {
-          console.error('[group] 同意邀请上麦:', ex);
+          console.error('[group] 同意邀请演示:', ex);
           return;
         }
         // 设置主讲人
