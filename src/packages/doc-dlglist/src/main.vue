@@ -210,7 +210,11 @@
             </el-table>
           </div>
           <div class="vmp-doc-lib__ft">
-            <div class="vmp-doc-lib__ft-tip">当前选中 {{ selectDocIdList.length }} 个文档</div>
+            <div class="vmp-doc-lib__ft-tip">
+              当前选中
+              <span style="color: #fc5659">{{ selectDocIdList.length }}</span>
+              个文档
+            </div>
             <div>
               <el-button type="primary" @click="handleDoclibSubmit">确定</el-button>
               <el-button @click="handleDoclibCancel">取消</el-button>
@@ -433,7 +437,7 @@
         try {
           const result = await this.docServer.getWebinarDocList({
             pos: 0,
-            limit: 200,
+            limit: 1000,
             type: 2,
             webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id
@@ -455,6 +459,8 @@
        */
       async handleDoclibSearch() {
         const result = await this.docServer.getSharedDocList({
+          pos: 0,
+          limit: 1000,
           keyword: this.doclibSearchKey,
           type: 2,
           room_id: this.roomBaseServer.state.watchInitData.interact.room_id

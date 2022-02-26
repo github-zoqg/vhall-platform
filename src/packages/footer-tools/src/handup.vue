@@ -64,20 +64,21 @@
           this.btnText = '举手上麦';
         }
       });
+      /**
+       *
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         console.log('---申请下麦消息---', join_info, msg);
       });
       // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {
-        // 非自动上麦，默认以“静音”的形式上麦
         console.log(msg);
       });
       // 主持人拒绝上麦申请
       useMicServer().$on('user_apply_host_reject', msg => {
         // TODO:被拒绝的处理
         console.log(msg);
-      });
+      });**/
     },
     methods: {
       // 下麦

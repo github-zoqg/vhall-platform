@@ -8,10 +8,10 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog']
     // children: ['layerBody']
   },
-  // 顶部header容器
+  // 顶部header 容器嵌入不用这个组件
   layerHeader: {
     component: 'VmpContainer',
     className: 'vmp-basic-hd',
@@ -62,7 +62,7 @@ export const serverConfig = {
       'comOfficial',
       'comShare',
       'comWatchAuth',
-      // 'comSignUpForm',
+      'comSignUpForm',
       'comUserAccount',
       'comCash',
       'comLottery',
@@ -293,7 +293,11 @@ export const serverConfig = {
     component: 'VmpNoticeColumn'
   },
   comWatchAuth: {
-    component: 'VmpWatchAuth'
+    component: 'VmpWatchAuth',
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
   },
   comWatchPayFee: {
     component: 'VmpWatchPayFee'
@@ -317,7 +321,10 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'watch'
+    }
   },
   //私聊组件
   comWatchPrivateChat: {

@@ -94,8 +94,8 @@
           ? roomBaseState.watchInitData.webinar.rebroadcast.channel_id
           : '',
         isEmbed: /embed/.test(this.$route.path),
-        isLogin: sessionStorage.getItem('isLogin'),
-        isNeedLogin: !sessionStorage.getItem('isLogin'),
+        isLogin: !!roomBaseState.watchInitData.join_info.user_id,
+        isNeedLogin: !roomBaseState.watchInitData.join_info.user_id,
         isShowGift: true,
         isShowOnselfMdess: false,
         showLike: true,
@@ -106,7 +106,7 @@
         type: roomBaseState.watchInitData.webinar.type,
         uploadSrc: roomBaseState.watchInitData.urls.upload_url,
         webSrc: roomBaseState.watchInitData.urls.web_url,
-        webinarId: '723145973'
+        webinarId: roomBaseState.watchInitData.webinar.id
       };
       let webinarData = roomBaseState.watchInitData.webinar;
       return {
