@@ -147,7 +147,8 @@
     },
     computed: {
       isAudio() {
-        const videoType = this.videoParam.msg_url || this.videoParam.file_type || '.mp3';
+        const videoType = this.videoParam.msg_url || this.videoParam.file_type;
+        if (!videoType) return false;
         return videoType.toLowerCase() == '.mp3' || videoType.toLowerCase() == '.mav';
       }
     },
@@ -185,7 +186,7 @@
           type: videoParam.type || 'vod', // live 直播  vod 点播  必填
           videoNode: 'videoDom' + this.timestamp, // 播放器的容器， div的id 必填
           poster: '', // 封面地址  仅支持.jpg
-          autoplay: false,
+          autoplay: videoParam.autoplay || false,
           forceMSE: false,
 
           subtitleOption: {
@@ -206,6 +207,8 @@
             vodOption: { recordId: videoParam.paas_record_id, forceMSE: false }
           });
         }
+
+        console.log('video init params', params);
         return new Promise(resolve => {
           this.playerServer.init(params).then(() => {
             this.playerServer.openControls(false);

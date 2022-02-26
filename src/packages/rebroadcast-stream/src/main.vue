@@ -1,5 +1,10 @@
 <template>
   <section class="vmp-rebroadcast-stream" v-show="isShow">
+    <span class="toggle-tips" @click="toggleScreen">
+      <el-tooltip content="切换">
+        <i class="vh-iconfont vh-line-copy-document"></i>
+      </el-tooltip>
+    </span>
     <video-preview v-if="isShow" :videoParam="videoParam" />
   </section>
 </template>
@@ -13,7 +18,6 @@
     components: { VideoPreview },
     data() {
       const { state: interactiveState } = this.interactiveServer;
-
       const { state: domainState } = this.rebroadcastServer;
 
       return {
@@ -27,33 +31,67 @@
       this.interactiveServer = useInteractiveServer();
       this.rebroadcastServer = useRebroadcastServer();
     },
+    mounted() {
+      if (this.rebroadcastServer.state.rebroadcastId) {
+        this.open();
+      }
+    },
     methods: {
-      open() {
-        this.interactiveServer.unpublishStream();
+      async open() {
+        await this.interactiveServer.unpublishStream();
 
-        this.isShow = true;
         const { token, appId, accountId, roomId } = this.domainState;
+
+        console.log('open rebroadcast stream:', { token, appId, accountId, roomId });
+
         this.videoParam = {
           token,
           type: 'live',
           appId,
           accountId,
+          autoplay: true,
           liveOption: {
             defaultDefinition: '360p',
             type: 'flv',
             roomId
           }
         };
+        console.log('videoParam:', this.videoParam);
+        this.isShow = true;
       },
-      close(options = {}) {
+      async close(options = {}) {
         if (options.pushLocalStream === true) {
-          this.interactiveServer.publishStream();
+          await this.interactiveServer.publishStream();
         }
 
         this.isShow = false;
-      }
+      },
+      toggleScreen() {}
     }
   };
 </script>
 
-<style></style>
+<style lang="less">
+  .vmp-rebroadcast-stream {
+    position: relative;
+
+    .toggle-tips {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      position: absolute;
+      background: #000;
+      color: #fff;
+      right: 10px;
+      top: 10px;
+      z-index: 10;
+
+      &:hover {
+        background: @bg-error-light;
+      }
+    }
+  }
+</style>
