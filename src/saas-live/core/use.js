@@ -40,6 +40,7 @@ import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
 import VmpSignLive from '@/packages/sign-module/sign-live';
+import VmpRedPacketLive from '@/packages/red-packet/live';
 import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 
 // 全局注册组件
@@ -82,6 +83,7 @@ export function initUse() {
   Vue.use(VmpLotteryLive);
   Vue.use(VmpQuestionnaire);
   Vue.use(VmpSignLive);
+  Vue.use(VmpRedPacketLive);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

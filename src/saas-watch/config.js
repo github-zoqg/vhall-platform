@@ -71,7 +71,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comQuestionnaireWatch'
+      'comQuestionnaire',
+      'comRedPacket'
     ]
   },
 
@@ -454,7 +455,12 @@ export const serverConfig = {
   },
 
   // 抽奖
-  comQuestionnaireWatch: {
+  comQuestionnaire: {
     component: 'VmpQuestionnaireWatch'
+  },
+
+  // 红包
+  comRedPacket: {
+    component: 'VmpRedPacketWatch'
   }
 };
