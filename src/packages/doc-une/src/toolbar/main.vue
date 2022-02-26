@@ -191,6 +191,13 @@
       }
     },
     computed: {
+      watchInitData() {
+        return this.roomBaseServer.state.watchInitData;
+      },
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
         console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
@@ -207,10 +214,17 @@
       },
       // 是否文档演示权限
       hasDocPermission() {
-        return (
-          this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-          this.roomBaseServer.state.watchInitData.join_info.third_party_user_id
-        );
+        if (this.isInGroup) {
+          return (
+            this.groupServer.state.groupInitData.presentation_screen ==
+            this.watchInitData.join_info.third_party_user_id
+          );
+        } else {
+          return (
+            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+            this.watchInitData.join_info.third_party_user_id
+          );
+        }
       },
       // 是否显示画笔工具栏
       showBrushToolbar() {
