@@ -191,7 +191,7 @@
         border-radius: 8px;
         margin-right: 12px;
         flex: 0 0 auto;
-        max-width:180px;
+        max-width: 180px;
 
         img {
           height: 100%;
