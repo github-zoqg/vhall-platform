@@ -1,9 +1,9 @@
-export const globalConfig = {
+const globalConfig = {
   lang: 'zh'
 };
 
 // 服务配置
-export const serverConfig = {
+const serverConfig = {
   /*** 布局定义start */
   // 根节点
   layerRoot: {
@@ -311,8 +311,8 @@ export const serverConfig = {
     emitQuestionnaireVisible: [
       // 问卷弹窗的显示和隐藏(全屏)
       {
-        cuid: 'comWapBody',
-        method: 'changeBodyMini',
+        cuid: '',
+        method: '',
         args: ['$0']
       }
     ]
@@ -337,7 +337,7 @@ export const serverConfig = {
     children: ['comSubcribeWapBody']
   },
   subcribeCenter: {
-    component: 'VmpAirContainer',
+    component: 'VmpContainer',
     className: 'tab-content',
     children: ['comTabMenuWap']
   },
@@ -352,4 +352,9 @@ export const serverConfig = {
       }
     ]
   }
+};
+
+export default {
+  globalConfig: globalConfig,
+  serverConfig: serverConfig
 };

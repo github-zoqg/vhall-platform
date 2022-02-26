@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { globalConfig, serverConfig } from '../config';
+import { globalConfig, serverConfig } from '../page-config';
 import clipboard from 'clipboard';
 import moment from 'moment';
 
