@@ -66,6 +66,8 @@ import VmpWapSignUpForm from '@/packages/wap-sign-up-form';
 
 // 预约页面
 import VmpSubscribeBody from '@/packages/wap-subscribe-body';
+// 红包
+import VmpRedPacketWap from '@/packages/red-packet-wap/index';
 
 // 全局注册组件
 export function initUse() {
@@ -103,6 +105,7 @@ export function initUse() {
   Vue.use(VmpLotteryWap);
   Vue.use(VmpChapterWap);
   Vue.use(VmpQuestionnaireWap);
+  Vue.use(VmpRedPacketWap);
 
   Vue.use(VmpSubscribeBody);
   Vue.use(VmpWapSignUpForm);

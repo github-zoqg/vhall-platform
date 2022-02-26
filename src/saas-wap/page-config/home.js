@@ -49,7 +49,8 @@ const serverConfig = {
       'comUserAccountWap',
       'comCashWap',
       'compLotteryWap',
-      'compQuestionnaireWap'
+      'compQuestionnaireWap',
+      'comRedPacketWap'
     ]
   },
   // 顶部
@@ -351,6 +352,9 @@ const serverConfig = {
         method: 'open'
       }
     ]
+  },
+  comRedPacketWap: {
+    component: 'VmpRedPacketWap',
   }
 };
 
