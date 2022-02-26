@@ -127,7 +127,7 @@
         this.desktopShareServer.$on('screen_stream_add', e => {
           this.subscribeStream(e.data.streamId);
         });
-        this.desktopShareServer.$on('screen_stream_remove', e => {
+        this.desktopShareServer.$on('screen_stream_remove', () => {
           useRoomBaseServer().setShareScreenStatus(false);
           useRoomBaseServer().setChangeElement('');
         });

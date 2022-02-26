@@ -46,7 +46,7 @@ export default async function () {
 
   // 如果存在rebroadcast
   if (roomBaseServer.state.watchInitData.rebroadcast) {
-    await rebroadcastServer.init();
+    // await rebroadcastServer.init();
     console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', msgServer);
   }
 
