@@ -138,11 +138,10 @@
           });
         }
 
-
-        this.menu = this.menu.map(item=>{
-          if(item.status==1)item.visible = false
-          return item
-        })
+        this.menu = this.menu.map(item => {
+          if (item.status == 1) item.visible = false;
+          return item;
+        });
       },
       /**
        * 选中默认的菜单项（第一项）

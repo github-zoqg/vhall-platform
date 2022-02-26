@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="vmp-subscribe-container">
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerSubscribeRoot"></vmp-air-container>
     </div>
@@ -109,23 +109,26 @@
   body {
     overflow-y: auto;
   }
-  .vmp-basic-container {
-    width: 100%;
-    height: 100%;
-    background: #1a1a1a;
-    font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
-      '微软雅黑', Arial, sans-serif;
-    .vmp-basic-bd {
+  .vmp-subscribe-container {
+    height: 100vh;
+    .vmp-basic-container {
       width: 100%;
       height: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      flex: 1;
-      overflow: hidden;
-      margin: 0 auto;
-      margin-top: 20px;
+      background: #1a1a1a;
+      font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+        '微软雅黑', Arial, sans-serif;
+      .vmp-basic-bd {
+        width: 100%;
+        // height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+        margin: 0 auto;
+        margin-top: 20px;
+      }
     }
   }
   // 媒体查询分辨率下效果
