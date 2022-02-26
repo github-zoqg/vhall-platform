@@ -404,15 +404,7 @@
         </div>
       </div>
     </div>
-    <!-- <PrivateChat
-      ref="privateChat"
-      :userInfo="baseObj"
-      :webinar_id="webinar_id"
-      :onlyChatMess="onlyChatMess"
-      :priteChatList="priteChatList"
-      @close="privateClose"
-      @sendMsg="privateSendMsg"
-    ></PrivateChat> -->
+    <PrivateChat ref="privateChat" @sendMsg="privateSendMsg"></PrivateChat>
     <el-dialog
       :title="$t('chat.chat_1082')"
       custom-class="text-reply"
@@ -453,14 +445,14 @@
 
 <script>
   import { useRoomBaseServer, useQaAdminServer } from 'middle-domain';
-  // import PrivateChat from './components/private-chat/index';
+  import PrivateChat from '@/packages/live-private-chat/src/main.vue';
   import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { debounce } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQaAdmin',
     components: {
-      // PrivateChat
+      PrivateChat
     },
     filters: {
       filterRoleName(val) {
@@ -600,6 +592,9 @@
       await this.qaServer
         .initChatMess({
           webinar_id: this.webinar_id
+        })
+        .then(res => {
+          this.roomBaseServer.state.watchInitData = res.data;
         })
         .catch(err => {
           this.$message.error(err.msg);
@@ -741,13 +736,14 @@
       reply(val, item, index) {
         if (typeof val == 'object') {
           if (val.type == 'private') {
-            console.log(item);
-            this.$refs.privateChat.addChatItem({
-              type: 1,
-              id: item.user_id,
-              chat_name: item.nick_name
-            });
             this.$refs.privateChat.openModal();
+            this.$nextTick(() => {
+              this.$refs.privateChat.addChatItem({
+                type: 1,
+                id: item.user_id,
+                chat_name: item.nick_name
+              });
+            });
           } else {
             this.qaServer
               .replyUserQuestion({
@@ -785,7 +781,7 @@
       async messClick() {
         console.warn('qa messClick---------->', this.priteChatList);
         this.privateFlag = true;
-        await this.chatPrivateGetRankList({}).then(res => {});
+        await this.chatPrivateGetRankList().then(res => {});
         this.$refs.privateChat.openModal();
         //todo 调用私聊组件中的方法, 需要通过事件驱动
         // this.$nextTick(() => {
