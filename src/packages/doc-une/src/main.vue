@@ -183,7 +183,8 @@
       // 文档是否可见
       show() {
         return (
-          this.roomBaseServer.state.clientType === 'send' ||
+          (this.roomBaseServer.state.clientType === 'send' &&
+            !this.roomBaseServer.state.isShareScreen) ||
           (this.roomBaseServer.state.clientType !== 'send' &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
