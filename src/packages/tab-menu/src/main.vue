@@ -44,7 +44,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useRoomBaseServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -78,8 +78,18 @@
     async mounted() {
       await this.$nextTick(0);
       this.selectDefault();
+      this.listenEvents();
     },
     methods: {
+      listenEvents() {
+        const qaServer = useQaServer();
+        qaServer.$on(qaServer.Events.QA_OPEN, () => {
+          this.setVisible({ visible: true, type: 'v5' });
+        });
+        qaServer.$on(qaServer.Events.QA_CLOSE, () => {
+          this.setVisible({ visible: false, type: 'v5' });
+        });
+      },
       /**
        * 初始化配置
        */
@@ -104,10 +114,26 @@
         }
 
         console.log('menu list:', list);
+        console.log(useRoomBaseServer().state);
         for (const item of list) {
           this.addItem(item);
         }
-
+        // TODO: temp，增加私聊
+        const chatIndex = this.menu.findIndex(el => el.type === 3);
+        if (chatIndex >= -1) {
+          this.addItemByIndex(chatIndex + 1, {
+            type: 'private',
+            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '私聊', // 同上
+            status: 2
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'v5',
+            name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '问答', // 同上
+            status: roomState.interactToolStatus.question_status ? 1 : 2
+          });
+        }
         window.tabMenu = this;
       },
       /**
@@ -378,7 +404,6 @@
     }
 
     &__main {
-      flex: 1 1 auto;
       height: calc(100% - 46px);
     }
   }

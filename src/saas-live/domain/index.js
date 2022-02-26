@@ -8,7 +8,7 @@ import {
   useRoomBaseServer,
   useMicServer,
   useMemberServer,
-  useQaServer,
+  useQaAdminServer,
   useGroupServer,
   useChatAuthServer,
   useMediaSettingServer
@@ -20,8 +20,7 @@ setBaseUrl({
 });
 setRequestHeaders({
   platform: 7, // 7:PC网页版
-  token: localStorage.getItem('token') || '',
-  'interact-token': sessionStorage.getItem('interact_token') || ''
+  token: localStorage.getItem('token') || ''
 });
 
 Vue.use(DomainStore);
@@ -33,7 +32,7 @@ export default new DomainStore.Store({
     interactiveServer: useInteractiveServer().state,
     micServer: useMicServer().state,
     memberServer: useMemberServer().state,
-    qaServer: useQaServer().state,
+    qaServer: useQaAdminServer().state,
     groupServer: useGroupServer().state,
     chatAuthServer: useChatAuthServer().state,
     mediaSettingServer: useMediaSettingServer().state

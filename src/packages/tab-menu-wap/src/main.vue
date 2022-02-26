@@ -1,5 +1,5 @@
 <template>
-  <section class="vmp-tab-menu">
+  <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
     <section class="vmp-tab-menu__header">
       <!-- 菜单区域 -->
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
@@ -81,6 +81,10 @@
       },
       selectedIndex() {
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       }
     },
     beforeCreate() {
@@ -109,6 +113,7 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
+        const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         console.log('[menu] list--:', list);
@@ -125,7 +130,19 @@
             text: '私聊', // 同上
             status: 2
           });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'v5',
+            name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '问答', // 同上
+            status: roomState.interactToolStatus.question_status ? 1 : 2
+          });
         }
+
+
+        this.menu = this.menu.map(item=>{
+          if(item.status==1)item.visible = false
+          return item
+        })
       },
       /**
        * 选中默认的菜单项（第一项）

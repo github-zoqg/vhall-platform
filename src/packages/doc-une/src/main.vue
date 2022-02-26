@@ -212,10 +212,17 @@
 
       // 是否文档演示权限
       hasDocPermission() {
-        return (
-          this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-          this.watchInitData.join_info.third_party_user_id
-        );
+        if (this.isInGroup) {
+          return (
+            this.groupServer.state.groupInitData.presentation_screen ==
+            this.watchInitData.join_info.third_party_user_id
+          );
+        } else {
+          return (
+            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
+            this.watchInitData.join_info.third_party_user_id
+          );
+        }
       },
       /**
        * @description 是否显示结束演示按钮
@@ -236,17 +243,18 @@
         if (this.watchInitData.join_info.role_name == 3) return false;
         if (this.isInGroup) {
           // 在小组内
-          // 如果是主持人或组长，演示人不是自己，说明有人在演示. 主持人和组长都可以结束演示。
+          // 如果是主持人或组长，演示人不是自己也不是组长，说明有人观众在演示. 主持人和组长都可以结束演示。
           if (
             (this.groupInitData.join_role == 1 || this.groupInitData.join_role == 20) &&
             this.groupInitData.presentation_screen !=
-              this.watchInitData.join_info.third_party_user_id
+              this.watchInitData.join_info.third_party_user_id &&
+            this.groupInitData.presentation_screen != this.groupInitData.doc_permission
           ) {
             return true;
           }
           // 如果是观众，演示人是自己。
           if (
-            this.watchInitData.join_role == 2 ||
+            this.groupInitData.join_role == 2 &&
             this.groupInitData.presentation_screen ==
               this.watchInitData.join_info.third_party_user_id
           ) {
@@ -271,7 +279,6 @@
           ) {
             return true;
           }
-          console.log('123-----5');
           return false;
         }
       }
@@ -740,42 +747,37 @@
        * 2.主持人在主直播间或小组内，别人演示中, 则结束 - 他人演示
        */
       async handleEndDemonstrate() {
-        if (this.isInGroup) {
-          // 在小组内
-          // if (this.roomBaseServer.state.watchInitData.join_info.role_name == 2) {
-          //   // 观众
-          //   confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
-          // }
-        } else {
-          // 在主直播间
-          let confirmTip = '结束演示';
-          if (this.roomBaseServer.state.watchInitData.join_info.role_name == 2) {
-            confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
-          }
-          try {
-            await this.$confirm(confirmTip, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel'
+        // 在主直播间
+        let confirmTip = '结束演示';
+        if (
+          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) ||
+          (!this.isInGroup && this.roomBaseServer.state.watchInitData.join_info.role_name == 2)
+        ) {
+          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
+        }
+        try {
+          await this.$confirm(confirmTip, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          });
+          if (this.hasDocPermission) {
+            console.log('结束自己的演示');
+            // 结束自己的演示
+            await this.memberServer.userEndPresentation({
+              room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             });
-            if (this.hasDocPermission) {
-              console.log('结束自己的演示');
-              // 结束自己的演示
-              await this.memberServer.userEndPresentation({
-                room_id: this.roomBaseServer.state.watchInitData.interact.room_id
-              });
-            } else {
-              // 结束他人的演示
-              console.log('结束他人的演示');
-              await this.memberServer.endUserPresentation({
-                room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
-                receive_account_id: this.roomBaseServer.state.interactToolStatus.presentation_screen
-              });
-            }
-          } catch (ex) {
-            return;
+          } else {
+            // 结束他人的演示
+            console.log('结束他人的演示');
+            await this.memberServer.endUserPresentation({
+              room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
+              receive_account_id: this.roomBaseServer.state.interactToolStatus.presentation_screen
+            });
           }
+        } catch (ex) {
+          return;
         }
       }
     },

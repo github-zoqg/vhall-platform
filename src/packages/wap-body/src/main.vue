@@ -108,6 +108,7 @@
 <style lang="less">
   .vmp-wap-body {
     position: relative;
+    height: 100%;
     &-ending {
       background-repeat: no-repeat;
       background-size: 100% 100%;

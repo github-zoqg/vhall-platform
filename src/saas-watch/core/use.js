@@ -41,6 +41,7 @@ import VmpChapter from '@/packages/watch-chapter-pc'; // 观看端章节
 import VmpLotteryWatch from '@/packages/lottery/watch'; // 观看端计时器
 import VmpPcRewardEffect from '@/packages/pc-reward-effect'; // 观看端计时器
 import VmpTabMenu from '@/packages/tab-menu';
+import VmpQa from '@/packages/qa';
 import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
 import VmpPcMediaSetting from '@/packages/media-setting';
@@ -112,6 +113,7 @@ export function initUse() {
   Vue.use(VmpRedPacketWatch);
 
   Vue.use(VmpSubscribeBody);
+  Vue.use(VmpQa);
   Vue.use(VmpQuestionnaireWatch);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用

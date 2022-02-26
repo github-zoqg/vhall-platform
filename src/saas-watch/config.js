@@ -87,12 +87,14 @@ export const serverConfig = {
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
         { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
+        { type: 'private', cuid: 'comWatchPrivateChat', text: 'common.common_1008' }, // 私聊
         { type: 'notice', cuid: 'comNotice', text: '公告' },
         { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
         { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
         { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
-        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
+        { type: 8, cuid: 'comMemberList', text: '成员' }, // 成员
+        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } //问答
       ]
     }
   },
@@ -386,6 +388,9 @@ export const serverConfig = {
   },
   comIntro: {
     component: 'VmpIntro'
+  },
+  comQa: {
+    component: 'VmpQa'
   },
   // 媒体设置
   comMediaSetting: {
