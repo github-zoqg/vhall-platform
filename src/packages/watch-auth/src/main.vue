@@ -31,6 +31,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpWatchAuth',
     data() {
@@ -72,18 +73,24 @@
         this.subscribeServer.watchAuth(data).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
-              const queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}`
-                : '';
+              let pageUrl = '';
+              if (location.pathname.indexOf('embedclient') != -1) {
+                pageUrl = '/embedclient';
+              }
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives/watch/${webinar.id}${queryString}`;
+                `/lives${pageUrl}/watch/${webinar.id}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
               }, 1000);
             }
+          } else if (res.code === 512525) {
+            // 填写报名表单
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,

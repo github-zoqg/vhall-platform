@@ -302,6 +302,10 @@
       isOpenSwitch() {
         return this.roomBaseServer.state.interactToolStatus.is_open_switch;
       },
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 待分配人员列表
       waitingUserList() {
         return this.groupServer.state.waitingUserList;
@@ -326,14 +330,52 @@
       }
     },
     mounted() {
+      this.initEvent();
       this.initData();
     },
     methods: {
+      // 初始化事件
+      initEvent() {
+        // 发起端收到拒绝邀请演示
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
+          // 如果申请人是自己, 或者自己不是主持人
+          if (
+            msg.data.room_join_id == this.userId ||
+            this.roomBaseServer.state.watchInitData.join_info.role_name != 1
+          ) {
+            return;
+          }
+          let role = '';
+          if (msg.data.room_role == 2) {
+            role = '观众';
+          } else if (msg.data.room_role == 4) {
+            role = '嘉宾';
+          }
+          if (msg.data.extra_params == this.userId) {
+            this.$message.warning({
+              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
+            });
+          }
+        });
+
+        // 发起端收到同意演示成功消息
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', () => {
+          // if (msg.sender_id != this.userId) {
+          //    // 如果是主持人演示
+          // }
+        });
+
+        // 发起端收到结束演示成功消息
+        this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
+          if (msg.sender_id != this.userId) {
+            this.$message.warning('观众结束了演示');
+          }
+        });
+      },
       // 正在演示的人，切换channel需要自己结束演示
       handleEndDemonstrateInChannelChange() {
-        if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
-          this.groupServer.endSelft;
-        }
+        // if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
+        // }
       },
       hiddenAll() {
         this.settingDialogVisible = false;

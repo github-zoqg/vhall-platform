@@ -16,6 +16,12 @@ const routes = [
     meta: { title: '直播间', grayType: 'webinar' }
   },
   {
+    path: '/lives/recordvideo/:id',
+    component: () => import('../views/RecordVideo/index.vue'),
+    name: 'RecordVideo',
+    meta: { title: '录制视频' }
+  },
+  {
     path: '/lives/keylogin/:id/:role_name',
     name: 'KeyLogin',
     component: PasswordLogin,
@@ -36,7 +42,7 @@ const routes = [
   {
     path: '/lives/qa/:id',
     name: 'qa',
-    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa/main.vue'),
+    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa-admin/main.vue'),
     meta: { title: '问答', grayType: 'webinar' }
   },
   {

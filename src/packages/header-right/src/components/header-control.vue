@@ -26,7 +26,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             :class="{ 'header-right_control_wrap-container-disabled': thirtPushStreamimg }"
-            v-if="userInfo.role_name == 1 || userInfo.role_name == 4"
+            v-if="isShowMediaSetting && (userInfo.role_name == 1 || userInfo.role_name == 4)"
             @click="openMediaSettings"
           >
             <i class="vh-iconfont vh-line-setting"></i>
@@ -35,7 +35,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
-            v-if="isSupportSplitScreen"
+            v-if="isShowSplitScreen && isSupportSplitScreen"
             @click="splitScreen"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
@@ -51,7 +51,12 @@
           </div> -->
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="webinarInfo.no_delay_webinar == 0 && isThirtPushStream && !thirtPushStreamimg"
+            v-if="
+              isShowThirdParty &&
+              webinarInfo.no_delay_webinar == 0 &&
+              isThirtPushStream &&
+              !thirtPushStreamimg
+            "
             @click="thirdPartyShow"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
@@ -60,14 +65,14 @@
           <div
             class="header-right_control_wrap-container-setting"
             @click="thirdPartyClose"
-            v-if="isThirtPushStream && thirtPushStreamimg"
+            v-if="isShowThirdParty && isThirtPushStream && thirtPushStreamimg"
           >
             <i class="vh-saas-iconfont vh-saas-a-color-webpageinitiate1"></i>
             <p>网页发起</p>
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="webinarInfo.mode != 6"
+            v-if="isShowVirtualAudience && webinarInfo.mode != 6"
             @click="openVirtualAudience"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
           >
@@ -87,11 +92,27 @@
   export default {
     name: 'HeaderControl',
     props: {
+      isShowMediaSetting: {
+        default: false,
+        type: Boolean
+      },
       isShowQuit: {
         default: false,
         type: Boolean
       },
       isShowSupport: {
+        default: false,
+        type: Boolean
+      },
+      isShowSplitScreen: {
+        default: false,
+        type: Boolean
+      },
+      isShowVirtualAudience: {
+        default: false,
+        type: Boolean
+      },
+      isShowThirdParty: {
         default: false,
         type: Boolean
       }

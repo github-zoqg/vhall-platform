@@ -97,7 +97,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useTimerServer, useMsgServer } from 'middle-domain';
+  import { useRoomBaseServer, useTimerServer, useMsgServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
@@ -172,6 +172,28 @@
       this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
     },
     methods: {
+      returnName(data) {
+        const identity = [
+          {
+            name: '主持人',
+            code: 1
+          },
+          {
+            name: '观众',
+            code: 2
+          },
+          {
+            name: '助理',
+            code: 3
+          },
+          {
+            name: '嘉宾',
+            code: 4
+          }
+        ];
+        const obj = identity.find(item => item.code == data);
+        return obj.name ? obj.name : data;
+      },
       // 计时器开始
       timer_start(e) {
         console.warn('监听到了计时器开始-------', e);
@@ -188,6 +210,17 @@
           boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
         );
         this.$emit('disTimer', true);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}发起了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       // 计时器结束
       timer_end(e) {
@@ -198,6 +231,17 @@
         );
         this.$emit('disTimer', true);
         clearInterval(this.timer);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}关闭了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       // 计时器暂停
       timer_pause(e) {
@@ -205,9 +249,31 @@
         this.status = 'zanting';
         this.timeFormat(Math.abs(e.data.remain_time));
         clearInterval(this.timer);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}暂停了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       // 计时器重置
       timer_reset(e) {
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}重置了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
         console.warn('监听到了计时器重置-------', e);
         clearInterval(this.timer);
         this.timerVisible = false;
@@ -228,6 +294,17 @@
         console.warn('监听到了计时器继续-------', e);
         this.status = 'kaishi';
         this.timerFun(this.shijian);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}继续了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       init() {
         this.timerServer

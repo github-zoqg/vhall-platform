@@ -33,6 +33,7 @@
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="handleQAPopup"
         >
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
@@ -40,6 +41,7 @@
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openRedPacket"
         >
           <i class="vh-iconfont vh-a-redpacket"></i>
           <p>红包</p>
@@ -91,9 +93,8 @@
 <script>
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { debounce } from 'lodash';
-  import { useQaServer } from 'middle-domain';
+  import { useQaServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const qaServer = useQaServer();
   export default {
     name: 'VmpInteractMenu',
     components: {
@@ -102,7 +103,7 @@
     data() {
       return {
         living: false,
-        isQAEnabled: false,
+        isQAEnabled: useRoomBaseServer().state.interactToolStatus.question_status,
         qaVisible: false,
         qaCount: 0,
         className: '', // 自定义样式
@@ -121,13 +122,15 @@
     methods: {
       handleQAPopup() {
         if (!this.qaVisible && this.isQAEnabled) {
-          qaServer.getCurrentPlayQuestionNum().then(res => {
-            if (res.code == 200) {
-              this.qaCount = res.data.num;
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
+          useQaServer()
+            .getCurrentPlayQuestionNum()
+            .then(res => {
+              if (res.code == 200) {
+                this.qaCount = res.data.num;
+              } else {
+                this.$message.error(res.msg);
+              }
+            });
         }
         this.qaVisible = !this.qaVisible;
       },
@@ -138,11 +141,27 @@
           this.enableQA();
         }
       },
-      enableQA: debounce(flag => {
-        console.log(qaServer);
-        qaServer.qaEnable().then(res => {
-          console.log('开启问答', res);
-        });
+      enableQA: debounce(function (flag) {
+        useQaServer()
+          .qaEnable()
+          .then(res => {
+            this.isQAEnabled = true;
+            this.qaVisible = false;
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
+            );
+          });
+      }, 500),
+      closeQA: debounce(function (flag) {
+        useQaServer()
+          .qaDisable()
+          .then(res => {
+            this.isQAEnabled = false;
+            this.qaVisible = false;
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
+            );
+          });
       }, 500),
       // 设置可用状态
       setDisableState(val) {
@@ -177,6 +196,10 @@
       // 打开签到弹窗
       openSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      // 打开红包弹窗
+      openRedPacket() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       }
     }
   };

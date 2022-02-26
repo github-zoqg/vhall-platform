@@ -26,7 +26,10 @@ export default async function () {
 
   // 判断是否是嵌入/单视频嵌入
   try {
-    const _param = {};
+    const _param = {
+      isEmbed: false,
+      isEmbedVideo: false
+    };
     if (location.pathname.indexOf('embedclient') != -1) {
       _param.isEmbed = true;
     }
@@ -38,10 +41,7 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  // TODO 设置观看端测试权限数据
-  roomBaseServer.state.configList = {
-    hasToolbar: false
-  };
+  await roomBaseServer.getConfigList();
   // 调用聚合接口
   await roomBaseServer.getCommonConfig({
     tags: [

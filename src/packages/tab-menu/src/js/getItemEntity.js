@@ -11,7 +11,6 @@ export function getItemEntity(
 ) {
   const item = typeMap.find(config => config.type === type);
   if (!item) return false;
-
   const text = type === 1 ? name : item.text;
   let { visible = true, tipsVisible = false, iconVisible = false } = item;
 

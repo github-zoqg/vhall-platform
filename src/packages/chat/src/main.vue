@@ -154,11 +154,10 @@
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
 
-  import EventBus from './js/Events.js';
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGiftsServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -330,8 +329,6 @@
       this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
-      // 口令登录显示  自身显示消息
-      this.initCodeLoginMessage();
       //初始化聊天区域滚动组件
       this.initScroll();
       //拉取聊天历史
@@ -362,6 +359,7 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        const giftsServer = useGiftsServer();
         //监听@我的消息
         chatServer.$on('atMe', () => {
           if (this.osInstance.scroll().ratio.y != 1) {
@@ -378,7 +376,7 @@
         });
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
-          if (this.osInstance.scroll().ratio.y != 1) {
+          if (this.osInstance.scroll().ratio.y != 1 && this.osInstance.scroll().max.y > 0) {
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
             this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
@@ -401,6 +399,27 @@
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
           this.$message('您已经被踢出房间');
+        });
+        // 发起端 礼物消息接受
+        giftsServer.$on('gift_send_success', msg => {
+          console.log('VmpWapRewardEffect-------->', this.$route);
+          if (this.$route.path.includes('/lives/room')) {
+            const data = {
+              nickname:
+                msg.data.gift_user_nickname.length > 8
+                  ? msg.data.gift_user_nickname.substr(0, 8) + '...'
+                  : msg.data.gift_user_nickname,
+              avatar: msg.data.avatar,
+              content: {
+                gift_name: msg.data.gift_name,
+                gift_url: `${msg.data.gift_image_url}`,
+                source_status: msg.data.source_status
+              },
+              type: msg.data.type,
+              interactToolsStatus: true
+            };
+            chatServer.addChatToList(data);
+          }
         });
       },
       init() {
@@ -452,13 +471,6 @@
           // 不需要登录
           this.chatLoginStatus = false;
         }
-      },
-      //todo 信令完成这个或者domain 初始化口令登录自身显示的消息
-      initCodeLoginMessage() {
-        EventBus.$on('codeText', msg => {
-          // 口令登录显示  自身显示消息
-          this.chatList.push(msg);
-        });
       },
       //处理分组讨论频道变更
       handleChannelChange() {

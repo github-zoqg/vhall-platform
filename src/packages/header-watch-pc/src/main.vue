@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-header-watch">
+  <div
+    class="vmp-header-watch"
+    :class="embedObj.embed ? 'vmp-basic-hd' : ''"
+    v-if="!embedObj.embed"
+  >
     <div class="vmp-header-watch-left">
       <!-- 品牌设置-标识图片 -->
       <div
@@ -191,10 +195,8 @@
           return 'javascript:void(0);';
         }
       },
-      isNotEmbed() {
-        return this.embedObj
-          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
-          : true;
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       },
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
@@ -213,8 +215,7 @@
     },
     async created() {
       // this.childrenComp = window.$serverConfig[this.cuid].children;
-      this.embedObj = this.roomBaseServer.state.embedObj;
-      if (this.isLogin && this.isNotEmbed) {
+      if (this.isLogin && !this.embedObj.embed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
       }
@@ -390,6 +391,11 @@
     justify-content: space-between;
     height: 72px;
     width: 100%;
+    margin-bottom: 20px;
+    background: #2a2a2a;
+    &.vmp-basic-hd {
+      display: none;
+    }
     &-left {
       margin-right: 7px;
       padding-left: 8px;

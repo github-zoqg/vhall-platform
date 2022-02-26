@@ -25,7 +25,11 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initReceiveLive();
+        let clientType = 'standard';
+        if (location.pathname.indexOf('embedclient') != -1) {
+          clientType = 'embed';
+        }
+        await this.initReceiveLive(clientType);
         await subscribeState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
@@ -33,7 +37,7 @@
         document.title = roomBaseServer.state.watchInitData.webinar.subject;
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
-          this.goWatchPage();
+          this.goWatchPage(clientType);
         }
 
         // 初始化数据上报
@@ -49,7 +53,7 @@
     },
     mounted() {},
     methods: {
-      initReceiveLive() {
+      initReceiveLive(clientType) {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
         if (token) {
@@ -63,7 +67,7 @@
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'standard' //客户端类型
+            clientType: clientType //客户端类型
           }
         });
       },
@@ -90,8 +94,12 @@
           this.liveErrorTip = this.$tes(err.code) || err.msg;
         }
       },
-      goWatchPage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}${window.location.search}`;
+      goWatchPage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       }
     }
   };

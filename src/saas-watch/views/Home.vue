@@ -5,7 +5,11 @@
     element-loading-text="加载中..."
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
-    <div class="vmp-basic-container" v-if="state === 1">
+    <div
+      class="vmp-basic-container"
+      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : ''"
+      v-if="state === 1"
+    >
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <errorPage v-if="state === 2" :prop-type="errorData.errorPageTitle">
@@ -30,6 +34,7 @@
     data() {
       return {
         state: 0,
+        clientType: 'standard',
         errorData: {
           errorPageTitle: '',
           errorPageText: ''
@@ -40,7 +45,10 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initReceiveLive();
+        if (location.pathname.indexOf('embedclient') != -1) {
+          this.clientType = 'embed';
+        }
+        await this.initReceiveLive(this.clientType);
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
@@ -48,9 +56,10 @@
         // 是否跳转预约页
         if (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type != 3
         ) {
-          this.goSubscribePage();
+          this.goSubscribePage(this.clientType);
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -61,7 +70,7 @@
       }
     },
     methods: {
-      initReceiveLive() {
+      initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
@@ -71,12 +80,16 @@
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'standard' //客户端类型
+            clientType: clientType //客户端类型
           }
         });
       },
-      goSubscribePage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.$route.params.id}${window.location.search}`;
+      goSubscribePage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
         switch (err.code) {
@@ -115,6 +128,12 @@
 <style lang="less">
   body {
     overflow: hidden;
+  }
+  .vmp-basic-container-embed {
+    .vmp-basic-bd {
+      max-width: unset;
+      height: 100%;
+    }
   }
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {

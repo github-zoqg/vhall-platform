@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-right-container">
+  <div class="vmp-basic-right-container" v-if="!isEmbedVideo">
     <template v-if="isTryWatch">
       <div class="vmp-try-watch">
         <img src="./img/try@2x.png" alt="" />
@@ -26,13 +26,20 @@
     computed: {
       isVisibleMiniElement() {
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
-        return this.$domainStore.state.docServer.switchStatus;
+        return (
+          this.$domainStore.state.docServer.switchStatus ||
+          this.$domainStore.state.roomBaseServer.isShareScreen
+        );
       },
       isTryWatch() {
         return (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
           this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         );
+      },
+      isEmbedVideo() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     created() {
