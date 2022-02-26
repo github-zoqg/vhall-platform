@@ -354,7 +354,7 @@ const serverConfig = {
     ]
   },
   comRedPacketWap: {
-    component: 'VmpRedPacketWap',
+    component: 'VmpRedPacketWap'
   }
 };
 
