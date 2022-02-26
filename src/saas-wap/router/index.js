@@ -68,12 +68,6 @@ const routes = [
     path: '/lives/entryform/:id',
     name: 'entryform',
     component: () => import('../views/entryform/index.vue')
-  },
-  // 嵌入页
-  {
-    path: '/lives/embedclient/watch/:id',
-    name: 'embedclient',
-    component: Home
   }
 ];
 
