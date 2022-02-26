@@ -404,7 +404,7 @@
         </div>
       </div>
     </div>
-    <PrivateChat
+    <!-- <PrivateChat
       ref="privateChat"
       :userInfo="baseObj"
       :webinar_id="webinar_id"
@@ -412,7 +412,7 @@
       :priteChatList="priteChatList"
       @close="privateClose"
       @sendMsg="privateSendMsg"
-    ></PrivateChat>
+    ></PrivateChat> -->
     <el-dialog
       :title="$t('chat.chat_1082')"
       custom-class="text-reply"
@@ -452,15 +452,15 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useQaServer } from 'middle-domain';
-  import PrivateChat from './components/private-chat/index';
+  import { useRoomBaseServer, useQaAdminServer } from 'middle-domain';
+  // import PrivateChat from './components/private-chat/index';
   import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { debounce } from '@/packages/app-shared/utils/tool';
   export default {
-    name: 'VmpQa',
+    name: 'VmpQaAdmin',
     components: {
-      PrivateChat
+      // PrivateChat
     },
     filters: {
       filterRoleName(val) {
@@ -588,7 +588,7 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      this.qaServer = useQaServer();
+      this.qaServer = useQaAdminServer();
     },
     async mounted() {
       this.webinar_id = this.$router.currentRoute.params.id;
@@ -728,7 +728,6 @@
           keyword: keyword || '',
           sort_sequence: 1
         };
-
         this.qaServer.getTextReply(data).then(res => {
           if (res.code != 200) {
             this.$message.error(res.msg);

@@ -16,8 +16,7 @@ import {
 setBaseUrl(process.env.VUE_APP_BASE_URL);
 setRequestHeaders({
   platform: 7, // 7:PC网页版
-  token: localStorage.getItem('token') || '',
-  'interact-token': sessionStorage.getItem('interact_token') || ''
+  token: localStorage.getItem('token') || ''
 });
 
 Vue.use(DomainStore);
