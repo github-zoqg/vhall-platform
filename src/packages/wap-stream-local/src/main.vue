@@ -1,5 +1,9 @@
 <template>
-  <div :id="`vmp-stream-local__${joinInfo.third_party_user_id}`" class="vmp-stream-local">
+  <div
+    :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
+    class="vmp-stream-local"
+    @click.stop="showExitScreen"
+  >
     <!-- 流容器 -->
     <section
       class="vmp-stream-local__stream-box"
@@ -28,6 +32,14 @@
         "
       ></span>
     </section>
+    <!-- 退出全屏 -->
+    <div
+      class="vmp-stream-remote-exitscreen"
+      :class="[exitScreenStatus ? 'opcity-true' : 'opcity-flase']"
+      @click.stop="exitFullScreen"
+    >
+      <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+    </div>
   </div>
 </template>
 
@@ -67,6 +79,9 @@
       },
       interactToolStatus() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus;
+      },
+      exitScreenStatus() {
+        return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
     filters: {
@@ -304,6 +319,27 @@
               this.networkStatus = 0;
             });
         }, 2000);
+      },
+
+      showExitScreen() {
+        if (!this.exitScreenStatus) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.interactiveServer.state.fullScreenType = false;
+        }, 5000);
+      },
+      exitFullScreen() {
+        this.interactiveServer
+          .exitStreamFullscreen({
+            streamId: this.stream.streamId,
+            vNode: `vmp-stream-remote__${this.stream.streamId}`
+          })
+          .then(res => {
+            console.warn('res----', res);
+            this.interactiveServer.state.fullScreenType = false;
+          });
       }
     }
   };

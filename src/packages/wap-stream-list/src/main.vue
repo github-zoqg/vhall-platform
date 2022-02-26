@@ -1,7 +1,6 @@
 <template>
-  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap">
+  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop="videoShowIcon">
     <div
-      ref="vmp-wap-stream-list"
       class="vmp-stream-list"
       :class="{
         'vmp-stream-list-h0': isStreamListH0,
@@ -35,13 +34,39 @@
         </div>
       </template>
       <!-- 播放 按钮 showPlayIcon-->
-      <div class="vmp-stream-list-pause" v-show="false">
-        <p @click="replayPlay">
+      <div class="vmp-stream-list-pause" v-show="false"></div>
+      <!-- 左右滑动Mask 待做 -->
+    </div>
+    <div class="vmp-wap-stream-wrap-mask">
+      <!-- 热度 -->
+      <div
+        class="vmp-wap-stream-wrap-mask-heat"
+        :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
+      >
+        <p>
+          <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+          &nbsp;{{ hotNum | formatHotNum }}
+        </p>
+      </div>
+      <!-- 播放 -->
+      <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
+        <p @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-
-      <!-- 左右滑动Mask 待做 -->
+      <!-- 进入全屏 -->
+      <div
+        class="vmp-wap-stream-wrap-mask-screen"
+        :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
+        @click.stop="setFullScreen"
+      >
+        <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+      </div>
+    </div>
+    <!-- 小组协作中 -->
+    <div class="vmp-wap-stream-wrap-group" v-show="showGroupMask">
+      <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+      小组协作中
     </div>
   </div>
 </template>
@@ -52,7 +77,8 @@
     useMicServer,
     useMsgServer,
     useRoomBaseServer,
-    useMediaCheckServer
+    useMediaCheckServer,
+    useGroupServer
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
@@ -68,11 +94,27 @@
         maxElement: '',
         playAbort: [], // 自动播放禁止的stream列表
         showPlayIcon: false, // 是否展示播放按钮
-        scroll: null,
-        mainScreenDom: null
+        scroll: null, // BScroll 插件
+        mainScreenDom: null, // 主屏Dom
+        iconShow: false, // 5 秒的展示
+        is_host_in_group: this.roomBaseServer.state.interactToolStatus?.is_host_in_group // 主持人是否在小组中
       };
     },
-
+    filters: {
+      formatHotNum(value) {
+        value = parseInt(value);
+        let unit = '';
+        const k = 99999;
+        const sizes = ['', '万', '亿', '万亿'];
+        let i;
+        if (value > k) {
+          i = Math.floor(Math.log(value) / Math.log(k));
+          value = (value / Math.pow(k / 10, i)).toFixed(1);
+          unit = sizes[i];
+        }
+        return value + unit;
+      }
+    },
     computed: {
       mainScreen() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
@@ -125,8 +167,23 @@
         return (
           this.remoteStreams.length == 1 &&
           this.remoteStreams[0].accountId == this.mainScreen &&
-          !this.$domainStore.state.interactiveServer.localStream.streamId &&
-          this.interactToolStatus?.auto_speak
+          !this.$domainStore.state.interactiveServer.localStream.streamId
+        );
+      },
+      // 小组协作中
+      showGroupMask() {
+        // 分组活动 + 自己不在小组 + 主持人不在小组
+        let _flag =
+          !this.$domainStore.state.groupServer.groupInitData.isInGroup &&
+          this.is_host_in_group &&
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6;
+        return _flag;
+      },
+      hotNum() {
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
         );
       }
     },
@@ -154,6 +211,7 @@
       if (this.micServer.state.isSpeakOn) {
         this.createBScroll();
       }
+      this.fiveDown();
     },
     beforeDestroy() {
       if (this.scroll) {
@@ -176,6 +234,15 @@
             this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
           Toast(`${msg.data.nick_name}设置成为${str}`);
         });
+
+        // 主持人进入退出小组 消息监听
+        useGroupServer().$on('dispatch_group_enter', msg => {
+          if (msg.data.status == 'enter') {
+            this.is_host_in_group = true;
+          } else if (msg.data.status == 'quit') {
+            this.is_host_in_group = false;
+          }
+        });
       },
 
       // 创建betterScroll
@@ -187,12 +254,11 @@
           } else {
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
               scrollX: true,
+              click: true,
               probeType: 3 // listening scroll event
             });
           }
-          if (!this.mainScreenDom) {
-            this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
-          }
+          this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           this.mainScreenDom.style.left = `${1.02667}rem`;
           this.scroll.on('scroll', ({ x }) => {
             if (this.mainScreenDom) {
@@ -213,7 +279,43 @@
 
       // 全屏
       setFullScreen() {
-        // this.interactiveServer.setPlay({ streamId: stream.streamId, vNode: '' })
+        let allStream = this.interactiveServer.getRoomStreams();
+        let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
+        console.warn('点击全屏-----', this.interactiveServer.state, allStream, mainScreenStream);
+        if (mainScreenStream) {
+          if (mainScreenStream.streamSource == 'remote') {
+            this.interactiveServer.setStreamFullscreen({
+              streamId: mainScreenStream.streamId,
+              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+            });
+          } else {
+            this.interactiveServer.setStreamFullscreen({
+              streamId: mainScreenStream.streamId,
+              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+            });
+          }
+          this.interactiveServer.state.fullScreenType = true;
+        }
+      },
+
+      exchange(compName) {
+        window.$middleEventSdk?.event?.send({
+          cuid: 'ps.surface',
+          method: 'exchange',
+          args: [compName, 2]
+        });
+      },
+
+      videoShowIcon() {
+        this.iconShow = false;
+        this.fiveDown();
+      },
+      // 5秒后消失
+      fiveDown() {
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.iconShow = true;
+        }, 5000);
       }
     }
   };
@@ -224,6 +326,103 @@
     white-space: nowrap;
     height: 422px;
     width: 100%;
+    position: relative;
+    background: #000;
+    &-group {
+      position: absolute;
+      top: 100px;
+      display: flex;
+      width: 100%;
+      height: 50%;
+      flex-direction: column;
+      justify-content: center;
+      color: #999;
+      text-align: center;
+      font-size: 28px;
+      z-index: 1;
+      i {
+        display: block;
+        font-size: 70px;
+        margin-bottom: 14px;
+      }
+    }
+    &-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: flex-start;
+      &-heat {
+        top: 24px;
+        left: 24px;
+        padding: 0 24px;
+        color: #fff;
+        position: absolute;
+        font-size: 28px;
+        z-index: 5;
+        p {
+          border-radius: 44px;
+          height: 48px;
+          line-height: 48px;
+          padding: 0 16px;
+          text-align: center;
+          background: rgba(0, 0, 0, 0.5);
+          i {
+            vertical-align: bottom;
+            font-size: 28px;
+          }
+        }
+      }
+      &-pause {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 4;
+        background: transparent;
+        p {
+          width: 108px;
+          height: 108px;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          i {
+            font-size: 46px;
+            color: #f5f5f5;
+          }
+        }
+      }
+      &-screen {
+        width: 64px;
+        height: 64px;
+        line-height: 64px;
+        z-index: 4;
+        background: rgba(0, 0, 0, 0.4);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        text-align: center;
+        transform: translate(-32px, -32px);
+        border-radius: 50%;
+      }
+      .opcity-flase {
+        display: none;
+        transition: all 1s;
+        -webkit-transition: all 1s;
+      }
+      .opcity-true {
+        opacity: 1;
+        transition: all 1s;
+        z-index: 6;
+        -webkit-transition: all 1s;
+      }
+    }
   }
   .vmp-stream-list {
     height: 83px;
@@ -239,31 +438,6 @@
       display: inline-block;
       &-h {
         height: 100%;
-      }
-    }
-
-    // 播放暂停按钮
-    &-pause {
-      height: 100%;
-      width: 100%;
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 4;
-      background: transparent;
-      p {
-        width: 108px;
-        height: 108px;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        i {
-          font-size: 46px;
-          color: #f5f5f5;
-        }
       }
     }
 

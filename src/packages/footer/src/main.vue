@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-footer" v-if="isNotEmbed && webinarTag && webinarTag.reserved_status">
+  <div class="vmp-footer" v-if="!isEmbed && webinarTag && webinarTag.reserved_status">
     <div class="vmp-footer-text">
       <a href="https://www.vhall.com/saas" target="_blank">{{ $t('footer.footer_1021') }}</a>
       <b>|</b>
@@ -147,10 +147,9 @@
           return this.feedBackOptions;
         }
       },
-      isNotEmbed() {
-        return this.embedObj
-          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
-          : true;
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     beforeCreate() {

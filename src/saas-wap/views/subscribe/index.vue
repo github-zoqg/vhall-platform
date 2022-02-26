@@ -37,7 +37,7 @@
         document.title = roomBaseServer.state.watchInitData.webinar.subject;
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
-          this.goWatchPage();
+          this.goWatchPage(clientType);
         }
 
         // 初始化数据上报
@@ -94,8 +94,12 @@
           this.liveErrorTip = this.$tes(err.code) || err.msg;
         }
       },
-      goWatchPage() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}${window.location.search}`;
+      goWatchPage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       }
     }
   };
