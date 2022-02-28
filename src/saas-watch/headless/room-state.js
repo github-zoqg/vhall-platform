@@ -42,7 +42,7 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  await Promise.all([
+  const promiseList = [
     roomBaseServer.getConfigList(),
     //黄金链路
     roomBaseServer.getLowerConfigList({
@@ -73,7 +73,16 @@ export default async function () {
         'timer'
       ]
     })
-  ]);
+  ];
+
+  // 互动、分组直播进行设备检测
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    // 获取媒体许可，设置设备状态
+    promiseList.push(mediaCheckServer.getMediaInputPermission());
+    micServer.init();
+  }
+
+  await Promise.all(promiseList);
   console.log('%c------黄金链路请求配置项完成', 'color:pink');
   console.log(roomBaseServer.state.configList);
   console.log('%c------多语言请求配置', 'color:pink');
@@ -83,12 +92,6 @@ export default async function () {
   //   hasToolbar: false
   // };
 
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    // 获取媒体许可，设置设备状态
-    mediaCheckServer.getMediaInputPermission();
-    micServer.init();
-  }
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
   }
