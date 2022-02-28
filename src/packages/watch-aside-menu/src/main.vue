@@ -155,11 +155,12 @@
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
           this.isCollapse = true;
-          console.log('[group] 组长变更：', this.groupServer.state.groupInitData.join_role);
-          if (this.groupServer.state.groupInitData.join_role == 20) {
-            this.gobackHome(6);
-          } else {
-            this.gobackHome(7);
+          if (this.isInGroup) {
+            if (this.groupServer.state.groupInitData.join_role == 20) {
+              this.gobackHome(6);
+            } else {
+              this.gobackHome(7);
+            }
           }
         });
         // 观看端监听到邀请演示的消息处理
@@ -189,11 +190,7 @@
         // 观看端收到结束演示成功消息
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
           if (msg.sender_id != this.userId) {
-            if (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) {
-              this.$message.warning('组长结束了演示');
-            } else if (!this.isInGroup) {
-              this.$message.warning('演示权限已变更');
-            }
+            this.$message.warning('演示权限已变更');
           } else {
             this.$message.success('结束演示');
           }

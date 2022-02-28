@@ -19,19 +19,19 @@
           >
             <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
-              主持人
+              {{ $t('chat.chat_1022') }}
             </span>
             <span
               class="user-status user-assistant"
               v-else-if="[3, '3'].includes(chat.context.role_name)"
             >
-              助理
+              {{ $t('chat.chat_1024') }}
             </span>
             <span
               class="user-status user-admin"
               v-else-if="[4, '4'].includes(chat.context.role_name)"
             >
-              嘉宾
+              {{ $t('chat.chat_1023') }}
             </span>
             <template v-if="chat.context.avatar">
               <span
@@ -62,19 +62,19 @@
               </span>
             </template>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
-              主持人
+              {{ $t('chat.chat_1022') }}
             </span>
             <span
               class="user-status user-assistant"
               v-else-if="[3, '3'].includes(chat.context.role_name)"
             >
-              助理
+              {{ $t('chat.chat_1024') }}
             </span>
             <span
               class="user-status user-admin"
               v-else-if="[4, '4'].includes(chat.context.role_name)"
             >
-              嘉宾
+              {{ $t('chat.chat_1023') }}
             </span>
             <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
           </template>
