@@ -54,9 +54,9 @@
       <div class="operate-container__tool-bar__right">
         <template v-if="chatOptions && chatOptions.enableChatSetting">
           <!--聊天设置-->
-          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">
-            {{ $t('common.common_1008') }}
-          </i>
+          <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
+          <!--            {{ $t('common.common_1008') }}-->
+          <!--          </i>-->
           <div class="chat-setting-btn--chat-auth">
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
@@ -99,6 +99,7 @@
         :chat-options="chatOptions"
         :chat-list="chatList"
         :at-list="atList"
+        @needLogin="handleLogin"
         @clearUploadImg="clearUploadImg"
         @getUploadImg="updateImgUrls"
         @inputHeightChange="chatInputHeightChangeHandle"
@@ -208,6 +209,10 @@
           );
         }
         window.open(url, '_blank');
+      },
+      //唤起登录
+      handleLogin() {
+        this.$emit('needLogin');
       },
       //切换表情模态窗展示
       toggleEmoji() {
