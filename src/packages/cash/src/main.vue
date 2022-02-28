@@ -717,11 +717,14 @@
         border-radius: 20px;
         text-align: center;
         position: relative;
+        height: 38px;
+        font-weight: 500;
         .vmp-cash_btn_hover {
           display: none;
           height: 38px;
         }
         &.is-disabled:hover {
+          opacity: 1 !important;
           .vmp-cash_btn_hover {
             display: block;
             position: absolute;
