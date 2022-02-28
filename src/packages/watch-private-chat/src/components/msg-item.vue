@@ -21,7 +21,11 @@
         <span class="msg-item__content__time">{{ msg.date_time.slice(-8) }}</span>
       </div>
       <!-- 文本 -->
-      <p v-if="msg.data" class="msg-item__content__content-text" v-html="messageContent"></p>
+      <p
+        v-if="msg.data.text_content"
+        class="msg-item__content__content-text"
+        v-html="messageContent"
+      ></p>
     </div>
   </div>
 </template>
@@ -115,7 +119,7 @@
       //处理消息内容
       handleMessageContent() {
         if (this.msg.data) {
-          this.messageContent = this.urlToLink(this.msg.data);
+          this.messageContent = this.urlToLink(this.msg.data.text_content);
         }
       },
       // 将聊天消息中的链接用 a 标签包裹

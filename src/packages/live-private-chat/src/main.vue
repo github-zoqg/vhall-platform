@@ -13,10 +13,10 @@
             v-for="(group, index) in chatGroupList"
             :class="{ active: activeGroupIndex === index }"
             @click="selectGroup(index)"
-            :key="group.id"
+            :key="group.user_id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
-            <span class="wrap__left-item__group-name">{{ group.chat_name }}</span>
+            <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
             <i
               class="el-icon-circle-close wrap__left-item__close-icon"
               @click.stop="delChatItem(index)"
@@ -198,12 +198,12 @@
     },
     mounted() {
       this.initViewData();
-      this.getPrivateContactList();
     },
     methods: {
       //打开模态窗
-      openModal() {
+      async openModal() {
         console.log('收到打开窗口的信令');
+        await this.getPrivateContactList();
         this.visible = true;
       },
       //获取私聊联系人列表
@@ -264,7 +264,7 @@
       //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
         const isExit = this.chatGroupList.some((chatItem, index) => {
-          if (chatItemInfo.id == chatItem.id) {
+          if (chatItemInfo.id == chatItem.user_id) {
             this.selectGroup(index);
             return true;
           } else {
@@ -272,7 +272,8 @@
           }
         });
         if (!isExit) {
-          this.chatGroupList.push(chatItemInfo);
+          const { id, chat_name } = chatItemInfo;
+          this.chatGroupList.push({ user_id: id, nickname: chat_name });
           this.selectGroup(this.chatGroupList.length - 1);
         }
       },
@@ -345,6 +346,8 @@
           this.$message.warning('内容不能为空');
         }
         const curmsg = useChatServer().createCurMsg();
+        const target = this.chatGroupList[this.activeGroupIndex].id;
+        curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
         //将图片消息加入消息体

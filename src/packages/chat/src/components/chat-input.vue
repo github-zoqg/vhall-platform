@@ -30,8 +30,9 @@
       class="vmp-chat-input__textarea-placeholder"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
-        <span class="chat-login-btn" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
-        {{ $t('chat.chat_1001') }}
+        <i18n path="chat.chat_1001">
+          <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
+        </i18n>
       </span>
       <span v-show="inputStatus.disable && !chatLoginStatus" class="textarea-placeholder_no-login">
         {{ inputStatus.placeholder }}
