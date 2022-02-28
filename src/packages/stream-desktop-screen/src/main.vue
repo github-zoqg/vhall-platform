@@ -56,7 +56,7 @@
     useGroupServer,
     useDesktopShareServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  // import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpStreamDesktopScreen',
@@ -109,7 +109,7 @@
       if (this.interactiveServer.interactiveInstance) {
         let stream = this.interactiveServer.getDesktopAndIntercutInfo();
 
-        if (stream && stream.streamType === 3) {
+        if (stream && stream.streamType === 3 || stream?.streamType === 4) {
           this.subscribeStream(stream.streamId);
         }
       }

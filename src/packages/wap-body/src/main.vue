@@ -99,7 +99,7 @@
       });
     },
     methods: {
-      changeBodyMini(flag) {
+      questionnaireVisible(flag) {
         this.mini = flag;
       }
     }
@@ -156,6 +156,20 @@
       overflow: hidden;
       .vmp-wap-player-header,
       .vmp-wap-player-footer {
+        display: none;
+      }
+      .vmp-wap-stream-wrap {
+        height: 100%;
+        .vmp-stream-list__main-screen {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
+      .vmp-wap-stream-wrap-mask-screen {
         display: none;
       }
     }
