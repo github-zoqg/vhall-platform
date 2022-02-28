@@ -34,13 +34,16 @@ export const serverConfig = {
     className: 'vmp-basic-center',
     children: [
       'comStreamList',
-      'comDocUne',
+      'layerBodyCenterBottom',
       'comGroupDiscussion',
-      'comInsertStream',
       'comThirdStream',
-      'comDesktopScreen',
       'comRebroadcastSteam'
     ]
+  },
+  layerBodyCenterBottom: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-center-bottom',
+    children: ['comInsertStream', 'comDesktopScreen', 'comDocUne']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -94,7 +97,7 @@ export const serverConfig = {
       'comLivePrivateChat',
       'comMediaSetting',
       'comPcMediaCheck',
-      'comInsertVideo',
+      'comInsertVideoList',
       'liveTimerSet',
       'liveTimer',
       'comQuestionnaire',
@@ -267,7 +270,7 @@ export const serverConfig = {
     },
     handleClick: [
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         method: 'openInserVideoDialog',
         args: []
       }
@@ -495,7 +498,7 @@ export const serverConfig = {
         kind: 'document'
       },
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         kind: 'insertMedia'
       }
     ],
@@ -526,8 +529,8 @@ export const serverConfig = {
   comThirdStream: {
     component: 'VmpThirdStream'
   },
-  comInsertVideo: {
-    component: 'VmpInsertVideo',
+  comInsertVideoList: {
+    component: 'VmpInsertVideoList',
     emitOnchange: [
       {
         cuid: 'comInsertStream',
@@ -553,21 +556,21 @@ export const serverConfig = {
     component: 'VmpInsertStream',
     emitClose: [
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         method: 'closeInserVideoDialog',
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ],
     emitOpen: [
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         method: 'openInserVideoDialog',
         args: []
       }
     ],
     emitInsertInfo: [
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         method: 'getInsertingInfo',
         args: ['$0']
       }

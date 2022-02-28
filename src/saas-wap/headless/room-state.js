@@ -41,33 +41,48 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  await roomBaseServer.getConfigList();
-  // 调用聚合接口
-  await roomBaseServer.getCommonConfig({
-    tags: [
-      'skin',
-      'screen-poster',
-      'like',
-      'keywords',
-      'public-account',
-      'webinar-tag',
-      'menu',
-      'adv-default',
-      'invite-card',
-      'red-packet',
-      'room-tool',
-      'goods-default',
-      'announcement',
-      'sign',
-      'timer'
-    ]
-  });
+  const promiseList = [
+    roomBaseServer.getConfigList(),
+    //黄金链路
+    roomBaseServer.getLowerConfigList({
+      params: {},
+      environment: process.env.NODE_ENV != 'production' ? 'test' : 'production',
+      systemKey: 2,
+      time: 5
+    }),
+    //多语言接口
+    roomBaseServer.getLangList(),
+    // 调用聚合接口
+    roomBaseServer.getCommonConfig({
+      tags: [
+        'skin',
+        'screen-poster',
+        'like',
+        'keywords',
+        'public-account',
+        'webinar-tag',
+        'menu',
+        'adv-default',
+        'invite-card',
+        'red-packet',
+        'room-tool',
+        'goods-default',
+        'announcement',
+        'sign',
+        'timer'
+      ]
+    })
+  ];
+
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态
-    mediaCheckServer.getMediaInputPermission();
+    promiseList.push(mediaCheckServer.getMediaInputPermission());
     micServer.init();
   }
+
+  await Promise.all(promiseList);
+
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
   }

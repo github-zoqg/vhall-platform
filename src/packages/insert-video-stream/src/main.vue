@@ -260,36 +260,40 @@
         //   return;
         // }
         const { watchInitData } = this.roomBaseServer.state;
-        this.creatLoaclStream().then(res => {
-          this.insertFileServer
-            .publishInsertStream({ streamId: res })
-            .then(e => {
-              this._LoclaStreamId = e.streamId;
-              console.log('插播推流成功', e, this._LoclaStreamId);
-              this._isHasLocalStreamIdBeforeInit = true;
-              this.pushStreamSucces = true;
-              const obj = {
-                accountId: watchInitData.webinar.userinfo.user_id,
-                role: watchInitData.join_info.role_name,
-                nickname: watchInitData.join_info.nickname,
-                stream_type: 4,
-                has_video: this.isAudio ? 0 : 1
-              };
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitInsertInfo', [obj])
-              );
-              // 开始插播事件
-              // this.$nextTick(() => {
-              //   // 文档需要调整大小
-              //   // 手动触发window resize 事件
-              //   const resizeEvent = new Event('resize');
-              //   window.dispatchEvent(resizeEvent);
-              // });
-            })
-            .catch(e => {
-              this.$message.warning('插播推送失败，请重新选择');
-            });
-        });
+        this.creatLoaclStream()
+          .then(res => {
+            this.insertFileServer
+              .publishInsertStream({ streamId: res.streamId })
+              .then(e => {
+                this._LoclaStreamId = e.streamId;
+                console.log('插播推流成功', e, this._LoclaStreamId);
+                this._isHasLocalStreamIdBeforeInit = true;
+                this.pushStreamSucces = true;
+                const obj = {
+                  accountId: watchInitData.webinar.userinfo.user_id,
+                  role: watchInitData.join_info.role_name,
+                  nickname: watchInitData.join_info.nickname,
+                  stream_type: 4,
+                  has_video: this.isAudio ? 0 : 1
+                };
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitInsertInfo', [obj])
+                );
+                // 开始插播事件
+                // this.$nextTick(() => {
+                //   // 文档需要调整大小
+                //   // 手动触发window resize 事件
+                //   const resizeEvent = new Event('resize');
+                //   window.dispatchEvent(resizeEvent);
+                // });
+              })
+              .catch(e => {
+                this.$message.warning('插播推送失败，请重新选择');
+              });
+          })
+          .catch(err => {
+            console.log('创建插播流失败', err);
+          });
       },
       InitVideoEvent() {
         // 本地插播
