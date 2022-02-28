@@ -16,7 +16,7 @@
 // <i class="iconfont-v3 saasicon_divider" v-if="item.component_id == 8"></i>
 
 const compoentMap = {
-  // 图文
+  // 图文(富文本)
   1: 'desimg',
   // 二维码
   2: 'qrcode',
