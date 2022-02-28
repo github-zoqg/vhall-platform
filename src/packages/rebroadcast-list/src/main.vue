@@ -36,32 +36,38 @@
 
             <!-- 列表区域 -->
             <main class="vmp-rebroadcast-control-panel">
-              <section>
-                <ul>
-                  <li
-                    class="vmp-rebroadcast-item"
-                    v-for="item in domainState.list"
-                    :key="item.id"
-                    @click="select(item.room_id, item.id)"
-                  >
-                    <i class="right-tag" v-show="item.is_stream == 1">转播中</i>
-                    <section class="item-logo">
-                      <img :src="item.img_url || nologoImg" alt="" />
-                      <i>直播</i>
+              <overlay-scrollbars
+                ref="rebroadcastListScroll"
+                :options="overlayScrollBarsOptions"
+                style="height: 100%"
+              >
+                <section>
+                  <ul>
+                    <li
+                      class="vmp-rebroadcast-item"
+                      v-for="item in domainState.list"
+                      :key="item.id"
+                      @click="select(item.room_id, item.id)"
+                    >
+                      <i class="right-tag" v-show="item.is_stream == 1">转播中</i>
+                      <section class="item-logo">
+                        <img :src="item.img_url || nologoImg" alt="" />
+                        <i>直播</i>
+                      </section>
+                      <section class="item-content">
+                        <p class="broadcast-title">{{ item.subject }}</p>
+                        <p class="broadcast-time">{{ item.start_time }}</p>
+                      </section>
+                    </li>
+                  </ul>
+                  <section v-if="domainState.list.length === 0" class="vmp-search-result">
+                    <section>
+                      <img :src="tipsImg" alt="" />
+                      <p>{{ tipsText }}</p>
                     </section>
-                    <section class="item-content">
-                      <p class="broadcast-title">{{ item.subject }}</p>
-                      <p class="broadcast-time">{{ item.start_time }}</p>
-                    </section>
-                  </li>
-                </ul>
-                <section v-if="domainState.list.length === 0" class="vmp-search-result">
-                  <section>
-                    <img :src="tipsImg" alt="" />
-                    <p>{{ tipsText }}</p>
                   </section>
                 </section>
-              </section>
+              </overlay-scrollbars>
             </main>
           </section>
 
@@ -132,7 +138,16 @@
 
         pushStreamSeperately: false,
         isPreviewVisible: false,
-        videoParam: {}
+        videoParam: {},
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-dark os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     computed: {
@@ -360,7 +375,6 @@
       }
 
       .vmp-rebroadcast-control-panel {
-        overflow-y: scroll;
         scroll-behavior: smooth;
         height: 338px;
         margin-bottom: 20px;

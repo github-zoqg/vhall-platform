@@ -1,14 +1,16 @@
 <template>
   <section class="vmp-custom-menu">
-    <div class="vmp-custom-menu-wrapper">
-      <component
-        v-for="(block, index) in customTabs"
-        :is="block.componentName"
-        :key="index"
-        :info="block"
-        :room-id="roomId"
-      />
-    </div>
+    <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
+      <div class="vmp-custom-menu-wrapper">
+        <component
+          v-for="(block, index) in customTabs"
+          :is="block.componentName"
+          :key="index"
+          :info="block"
+          :room-id="roomId"
+        />
+      </div>
+    </overlay-scrollbars>
   </section>
 </template>
 
@@ -43,7 +45,16 @@
     data() {
       return {
         customTabs: [],
-        roomId: ''
+        roomId: '',
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     beforeCreate() {
@@ -76,9 +87,9 @@
     width: 100%;
 
     &-wrapper {
-      height: 100%;
+      padding-top: 16px;
+      height: calc(100% - 16px);
       width: 100%;
-      overflow-y: scroll;
     }
   }
 </style>

@@ -109,7 +109,7 @@
       if (this.interactiveServer.interactiveInstance) {
         let stream = this.interactiveServer.getDesktopAndIntercutInfo();
 
-        if (stream && stream.streamType === 3) {
+        if (stream && stream.streamType === 3 || 4) {
           this.subscribeStream(stream.streamId);
         }
       }

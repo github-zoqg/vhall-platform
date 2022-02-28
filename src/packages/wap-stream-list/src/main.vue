@@ -45,7 +45,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          热度 &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -60,7 +60,7 @@
         :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         @click.stop="setFullScreen"
       >
-        <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+        <i class="vh-iconfont vh-a-line-enterfullscreen"></i>
       </div>
     </div>
     <!-- 小组协作中 -->
@@ -210,6 +210,9 @@
       // 在麦上 才存在滑动情况
       if (this.micServer.state.isSpeakOn) {
         this.createBScroll();
+        if (window.orientation == 90 || window.orientation == -90) {
+          this.setFullScreen();
+        }
       }
       this.fiveDown();
     },
@@ -241,6 +244,13 @@
             this.is_host_in_group = true;
           } else if (msg.data.status == 'quit') {
             this.is_host_in_group = false;
+          }
+        });
+
+        // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
+        window.addEventListener('orientationchange', () => {
+          if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
+            this.setFullScreen();
           }
         });
       },
