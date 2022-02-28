@@ -4,7 +4,7 @@
     <div class="vhsaas-interact-mask">
       <components
         :is="componentsView"
-        :amount="222"
+        :amount="redPacketServerState.amount"
         :red-packet-info="redPacketServerState.info"
         @navTo="navTo"
       >
@@ -58,7 +58,7 @@
         });
       },
       initEvent() {
-        this.redPacketServer.$on('RED_ENVELOPE_OK', data => {
+        this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
           const uuid = data.red_packet_uuid;
           this.open(uuid);
         });

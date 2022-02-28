@@ -1,10 +1,12 @@
 <template>
   <section class="vmp-intro">
-    <section class="vmp-intro-block vmp-intro-block-content">
-      <main v-if="content" class="vmp-intro-block__content-main">
-        <section v-html="content"></section>
-      </main>
-    </section>
+    <overlay-scrollbars ref="introScroll" :options="overlayScrollBarsOptions" style="height: 100%">
+      <section class="vmp-intro-block vmp-intro-block-content">
+        <main v-if="content" class="vmp-intro-block__content-main">
+          <section v-html="content"></section>
+        </main>
+      </section>
+    </overlay-scrollbars>
   </section>
 </template>
 
@@ -15,7 +17,16 @@
     data() {
       return {
         IntroEmptyImg,
-        type: 'default' // default、subscribe
+        type: 'default', // default、subscribe
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     computed: {
@@ -78,7 +89,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
 
     .vmp-intro-block {
       padding: 0.4rem;

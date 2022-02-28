@@ -99,14 +99,14 @@
       joinId() {
         return this.watchInitData.join_info.join_id;
       },
+      userId() {
+        return this.watchInitData.join_info.user_id;
+      },
       roomId() {
         return this.watchInitData.interact.room_id;
       },
       webinarId() {
         return this.watchInitData.webinar.id;
-      },
-      isEmbed() {
-        return this.embedObj.embed || this.embedObj.embedVideo;
       }
     },
     watch: {},
@@ -114,8 +114,7 @@
       this.scrollInit();
       this.listenEvents();
       this.getQaHistoryMsg();
-      // const userInfo = this.$VhallStorage.get('userInfo', 'local')
-      // this.logedIn = (userInfo && userInfo.length == undefined) || this.isEmbed
+      this.initLoginStatus();
     },
     filters: {},
     methods: {
@@ -153,17 +152,11 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        if (this.configList['ui.show_chat_without_login'] == '0') {
-          if (this.$VhallStorage.get('userInfo', 'local') || this.isEmbed) {
-            // 嵌入或者未登录并且需要登录
-            this.chatLoginStatus = false;
-          } else {
-            // 非嵌入并或者是没有登录
-            this.chatLoginStatus = true;
-            this.inputStatus.placeholder = '';
-          }
+        if (![1, '1'].includes(this.roleName) && ['', null, 0].includes(this.userId)) {
+          this.chatLoginStatus = true;
+          this.inputStatus.placeholder = '';
         } else {
-          // 不需要登录
+          // 非嵌入并或者是没有登录
           this.chatLoginStatus = false;
         }
       },

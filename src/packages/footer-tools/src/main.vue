@@ -40,6 +40,7 @@
         <!-- 抽奖 -->
       </li>
       <li>
+        <red-packet-icon />
         <!-- 红包 -->
       </li>
       <li v-if="1">
@@ -98,9 +99,20 @@
   import praise from './component/praise/index.vue';
   import getInvited from './component/getInvited/index.vue';
   import Pay from './component/pay/index.vue';
+  import RedPacketIcon from './component/red-packet-icon/index.vue';
 
   export default {
     name: 'VmpFooterTools',
+    components: {
+      handup,
+      reward,
+      vhGifts,
+      notice,
+      praise,
+      getInvited,
+      Pay,
+      RedPacketIcon
+    },
     data() {
       return {
         roomBaseState: null,
@@ -115,15 +127,6 @@
         wxQr: '',
         isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
-    },
-    components: {
-      handup,
-      reward,
-      vhGifts,
-      notice,
-      praise,
-      getInvited,
-      Pay
     },
     filters: {
       formatHotNum(value) {

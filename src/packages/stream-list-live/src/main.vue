@@ -64,7 +64,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useSplitScreenServer } from 'middle-domain';
   export default {
     name: 'VmpStreamListLive',
 
@@ -127,6 +127,7 @@
 
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.splitScreenServer = useSplitScreenServer();
     },
 
     created() {
@@ -156,15 +157,6 @@
       },
       toggleShrink(flag) {
         this.isShrink = flag;
-        // const target = document.querySelector('#vhall-remote-strams-box');
-        // setTimeout(() => {
-        //   if (this.$store.state.screenMainTop == target.offsetHeight) {
-        //     return;
-        //   }
-        //   const resizeEvent = new Event('resize');
-        //   window.dispatchEvent(resizeEvent);
-        //   this.$store.commit('SETSCREENMAINTOP', target.offsetHeight);
-        // }, 100);
       },
       /**
        * 计算
@@ -180,14 +172,13 @@
           _this.isMainScreenHeightLower = _this.$refs.streamList.offsetHeight === 160;
         });
         observer.observe(this.$refs.streamList, { childList: true, subtree: true });
+      },
+      // 开启 / 关闭分屏
+      toggleSplitScreen(command) {
+        if (command === 'open') {
+          this.splitScreenServer.startSplit();
+        }
       }
-      // exchange(compName) {
-      //   window.$middleEventSdk?.event?.send({
-      //     cuid: 'ps.surface',
-      //     method: 'exchange',
-      //     args: [compName, 2]
-      //   });
-      // }
     }
   };
 </script>

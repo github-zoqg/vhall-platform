@@ -1,6 +1,348 @@
 <template>
-  <div class="vmp-sign-up-form">
-    <el-dialog title="" :visible.sync="visible" width="720px" custom-class="vmp-sign-up-form">
+  <div class="vmp-sign-up-form" :class="[isEntryForm ? 'vmp-sign-up-form--entry-from' : '']">
+    <template v-if="!isEntryForm">
+      <el-dialog title="" :visible.sync="visible" width="720px" custom-class="vmp-sign-up-form">
+        <div class="vmp-sign-up-form__wrap">
+          <!--顶部banner图-->
+          <div class="vmp-sign-up-form__banner">
+            <img :src="formInfo.cover ? `${baseUrl}${formInfo.cover}` : defaultHeader" alt="" />
+          </div>
+          <div class="vmp-sign-up-form__content">
+            <!--表单名称-->
+            <div class="vmp-sign-up-form__title">{{ formInfo.title }}</div>
+            <!--表单简介-->
+            <div
+              class="vmp-sign-up-form__introduction"
+              v-if="formInfo.intro"
+              ref="intro"
+              :class="[overflowStatus ? 'vmp-sign-up-form__introduction-fold' : '']"
+            >
+              {{ formInfo.intro }}
+              <span
+                v-show="overflowStatus"
+                class="vmp-sign-up-form__introduction__detail"
+                @click="changeFoldStatus(false)"
+              >
+                <span class="is-ellipsis">...</span>
+                {{ $t('form.form_1011') }}
+              </span>
+              <span
+                v-show="!overflowStatus"
+                class="vmp-sign-up-form__introduction__detail"
+                @click="changeFoldStatus(true)"
+              >
+                <span class="is-ellipsis"></span>
+                {{ $t('form.form_1012') }}
+              </span>
+            </div>
+            <!--切换的tab-->
+            <div class="vmp-sign-up-form__tab-bar">
+              <div :class="['vmp-sign-up-form__tab-bar-tabs', formInfo.theme_color + '1']">
+                <template v-for="tab in tabConfig[isSubscribe]">
+                  <div
+                    :class="{ active: activeTab === tab.code }"
+                    :key="tab.code"
+                    @click="switchTab(tab.code)"
+                  >
+                    {{ tab.text }}
+                  </div>
+                </template>
+              </div>
+            </div>
+            <!--报名表单-->
+            <div class="vmp-sign-up-form__main-form" v-show="activeTab === 1">
+              <!-- 报名表单 -->
+              <template>
+                <el-form
+                  ref="form"
+                  :model="form"
+                  class="entryForm"
+                  :rules="rules"
+                  label-position="top"
+                >
+                  <el-form-item
+                    v-for="(question, quesIndex) in list"
+                    v-show="question.type != 6"
+                    :key="question.id"
+                    :prop="question.id + ''"
+                    :label="
+                      question.subject === '隐私声明'
+                        ? ''
+                        : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$t(
+                            question.subject
+                          )}`
+                    "
+                  >
+                    <!-- 输入框 -->
+                    <template
+                      v-if="
+                        (question.type === 0 && question.default_type !== 4) || question.type === 1
+                      "
+                    >
+                      <el-input
+                        v-if="question.type == 0 && question.default_type == 2"
+                        v-model.number="form[question.id]"
+                        :maxlength="question.type == 0 ? '' : 60"
+                        :show-word-limit="question.type != 0"
+                        autocomplete="off"
+                        :placeholder="findPlaceHolder(question.default_type)"
+                      ></el-input>
+                      <el-input
+                        v-else
+                        v-model="form[question.id]"
+                        :maxlength="
+                          question.type == 0 && question.default_type == 1
+                            ? 50
+                            : question.type == 0
+                            ? ''
+                            : 60
+                        "
+                        :show-word-limit="question.type != 0"
+                        autocomplete="off"
+                        :placeholder="findPlaceHolder(question.default_type)"
+                      ></el-input>
+                    </template>
+                    <!-- 单选 -->
+                    <template v-if="question.default_type === 4 || question.type === 2">
+                      <el-radio-group v-model="form[question.id]">
+                        <template v-if="question.default_type === 4">
+                          <div>
+                            <el-radio :label="$t('form.form_1015')" name="gender"></el-radio>
+                          </div>
+                          <div>
+                            <el-radio :label="$t('form.form_1016')" name="gender"></el-radio>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <div v-for="radioItem in question.items" :key="radioItem.id">
+                            <el-radio :label="radioItem.id" :name="question.id + ''">
+                              {{ radioItem.subject }}
+                            </el-radio>
+                            <template v-if="radioItem.type === 1">
+                              <el-radio
+                                v-show="form[question.id] == radioItem.id"
+                                v-model="form[`${question.id}${radioItem.id}`]"
+                                maxlength="60"
+                                autocomplete="off"
+                                show-word-limit
+                                :placeholder="$t('form.form_1017')"
+                                style="margin-top: 10px"
+                                class="radio-input"
+                              ></el-radio>
+                            </template>
+                          </div>
+                        </template>
+                      </el-radio-group>
+                    </template>
+                    <!-- 多选 -->
+                    <template v-if="question.type === 3">
+                      <el-checkbox-group v-model="form[question.id]">
+                        <div v-for="checkItem in question.items" :key="checkItem.id">
+                          <el-checkbox :label="checkItem.id" :name="question.id + ''">
+                            {{ checkItem.subject }}
+                          </el-checkbox>
+                          <template v-if="checkItem.type === 1">
+                            <el-input
+                              v-show="form[question.id].some(id => id == checkItem.id)"
+                              v-model="form[`${question.id}${checkItem.id}`]"
+                              :maxlength="60"
+                              autocomplete="off"
+                              show-word-limit
+                              :placeholder="$t('form.form_1017')"
+                              style="margin-top: 10px"
+                              class="radioInput"
+                            ></el-input>
+                          </template>
+                        </div>
+                      </el-checkbox-group>
+                    </template>
+                    <!-- 下拉 -->
+                    <template v-if="question.type === 4">
+                      <el-select
+                        ref="autoCloseRefFlag"
+                        v-model="form[question.id]"
+                        style="width: 100%"
+                        :placeholder="$t('form.form_1018')"
+                      >
+                        <el-option
+                          v-for="option in question.items"
+                          :key="option.id"
+                          :label="option.subject"
+                          :value="option.subject"
+                        ></el-option>
+                      </el-select>
+                    </template>
+                    <!-- 地域选择 -->
+                    <template v-if="question.type === 5">
+                      <el-row :gutter="20">
+                        <el-col :span="question.colNum">
+                          <el-input
+                            v-show="false"
+                            v-model="form[question.id]"
+                            autocomplete="off"
+                          ></el-input>
+                          <el-select
+                            ref="autoCloseRefFlag"
+                            v-model="province"
+                            :placeholder="$t('form.form_1004')"
+                            @change="regionalChange('province')"
+                          >
+                            <el-option
+                              v-for="opt in provinces"
+                              :key="opt.value"
+                              :label="opt.label"
+                              :value="opt.value"
+                            ></el-option>
+                          </el-select>
+                        </el-col>
+                        <el-col v-if="question.options.show_city == 1" :span="question.colNum">
+                          <el-select
+                            ref="autoCloseRefFlag"
+                            v-model="city"
+                            :placeholder="$t('form.form_1005')"
+                            @change="regionalChange('city')"
+                          >
+                            <el-option
+                              v-for="opt in cityList"
+                              :key="opt.value"
+                              :label="opt.label"
+                              :value="opt.value"
+                            ></el-option>
+                          </el-select>
+                        </el-col>
+                        <el-col v-if="question.options.show_district == 1" :span="question.colNum">
+                          <el-select
+                            ref="autoCloseRefFlag"
+                            v-model="county"
+                            :placeholder="$t('form.form_1006')"
+                            @change="regionalChange('county')"
+                          >
+                            <el-option
+                              v-for="opt in countyList"
+                              :key="opt.value"
+                              :label="opt.label"
+                              :value="opt.value"
+                            ></el-option>
+                          </el-select>
+                        </el-col>
+                      </el-row>
+                    </template>
+                  </el-form-item>
+                  <el-form-item
+                    v-if="isPhoneValidate"
+                    class="verify-code-box"
+                    :required="false"
+                    prop="code"
+                  >
+                    <el-row :gutter="20">
+                      <el-col :span="12">
+                        <div id="setCaptcha" class="captcha">
+                          <el-input v-model.trim="form.imgCode" autocomplete="off"></el-input>
+                        </div>
+                      </el-col>
+                      <el-col :span="12">
+                        <el-input
+                          v-model.trim="form.code"
+                          auto-complete="off"
+                          :placeholder="$t('form.form_1020')"
+                        ></el-input>
+                        <el-button
+                          :disabled="time !== 60 || isPreview"
+                          class="send-code-btn"
+                          :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                          size="mini"
+                          @click="time === 60 && getDyCode(true)"
+                        >
+                          {{ time === 60 ? $t('form.form_1021') : `${time}s` }}
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+                  <!-- 隐私声明 -->
+                  <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
+                    <template>
+                      <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
+                        <p v-html="privacyText"></p>
+                      </el-checkbox>
+                    </template>
+                  </el-form-item>
+                  <div class="btn-box">
+                    <el-button
+                      style="margin-top: 11px"
+                      :disabled="isPreview"
+                      :class="[formInfo.theme_color + '1']"
+                      round
+                      type="primary"
+                      @click="submitForm"
+                    >
+                      {{ $t('form.form_1019') }}
+                    </el-button>
+                  </div>
+                </el-form>
+              </template>
+            </div>
+            <!--验证码表单-->
+            <div class="vmp-sign-up-form__verify-form" v-show="activeTab === 2">
+              <!-- 验证 -->
+              <template>
+                <el-form
+                  ref="verifyForm"
+                  class="entryForm"
+                  :model="verifyForm"
+                  :rules="verifyRules"
+                >
+                  <el-form-item :label="$t('form.form_1022')" prop="phone">
+                    <el-input
+                      v-model.number.trim="verifyForm.phone"
+                      type="number"
+                      auto-complete="off"
+                      :placeholder="$t('account.account_1025')"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item v-if="isPhoneValidate" class="verify-code-box" prop="code">
+                    <el-row :gutter="20">
+                      <el-col :span="12">
+                        <div id="setCaptcha1" class="captcha">
+                          <el-input v-model.trim="verifyForm.imgCode" autocomplete="off"></el-input>
+                        </div>
+                      </el-col>
+                      <el-col :span="12">
+                        <el-input
+                          v-model.trim="verifyForm.code"
+                          auto-complete="off"
+                          :placeholder="$t('form.form_1076')"
+                        ></el-input>
+                        <el-button
+                          :disabled="verifyTime !== 60 || isPreview"
+                          :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                          size="mini"
+                          class="send-code-btn"
+                          @click="verifyTime === 60 && getDyCode(false)"
+                        >
+                          {{ verifyTime === 60 ? $t('form.form_1021') : `${verifyTime}s` }}
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+                  <div class="btn-box">
+                    <el-button
+                      :disabled="isPreview"
+                      :class="[formInfo.theme_color + '1']"
+                      round
+                      type="primary"
+                      @click="submitVerify"
+                    >
+                      {{ $t('interact_tools.interact_tools_1019') }}
+                    </el-button>
+                  </div>
+                </el-form>
+              </template>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+    </template>
+    <template v-else>
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
@@ -334,7 +676,7 @@
           </div>
         </div>
       </div>
-    </el-dialog>
+    </template>
   </div>
 </template>
 
@@ -677,12 +1019,26 @@
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {},
+    mounted() {
+      //因为这个组件也会在独立报名表单页使用，所以增加一下判断
+      if (this.isEntryForm) {
+        this.init();
+      }
+    },
     methods: {
       //打开模态窗
       async openModal() {
         this.initViewData();
         this.visible = true;
+        await this.getWebinarType();
+        this.getBaseInfo();
+        this.getQuestionList();
+      },
+      //独立报名表单的初始化逻辑
+      async init() {
+        //因为是独立页面，活动id只能从路由取
+        this.webinarId =
+          this.$route.params.id || this.$route.params.str || this.$route.params.il_id;
         await this.getWebinarType();
         this.getBaseInfo();
         this.getQuestionList();
@@ -1591,6 +1947,31 @@
     }
     .btn-box {
       text-align: center;
+    }
+  }
+  .vmp-sign-up-form--entry-from {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 101;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #1a1a1a;
+    .vmp-sign-up-form__wrap {
+      overflow-y: auto;
+      height: 85%;
+      border-radius: 4px;
+      background: #fff;
+      position: relative;
+      z-index: 101;
+      max-width: 720px;
+      margin: 0 auto;
+      padding-bottom: 87px;
     }
   }
 </style>

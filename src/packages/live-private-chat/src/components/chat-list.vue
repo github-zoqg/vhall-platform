@@ -17,22 +17,6 @@
               loginInfo.user_id == chat.user_id || loginInfo.third_party_user_id == chat.user_id
             "
           >
-            <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
-            <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
-              主持人
-            </span>
-            <span
-              class="user-status user-assistant"
-              v-else-if="[3, '3'].includes(chat.context.role_name)"
-            >
-              助理
-            </span>
-            <span
-              class="user-status user-admin"
-              v-else-if="[4, '4'].includes(chat.context.role_name)"
-            >
-              嘉宾
-            </span>
             <template v-if="chat.context.avatar">
               <span
                 class="list-item__user-info__avatar"
@@ -41,6 +25,23 @@
                 }"
               ></span>
             </template>
+            <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
+            <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
+              {{ $t('chat.chat_1022') }}
+            </span>
+            <span
+              class="user-status user-assistant"
+              v-else-if="[3, '3'].includes(chat.context.role_name)"
+            >
+              {{ $t('chat.chat_1024') }}
+            </span>
+            <span
+              class="user-status user-admin"
+              v-else-if="[4, '4'].includes(chat.context.role_name)"
+            >
+              {{ $t('chat.chat_1023') }}
+            </span>
+
             <template v-else>
               <span class="list-item__user-info__avatar">
                 {{ chat.context.nick_name ? chat.context.nick_name.substr(0, 1) : '' }}
@@ -62,19 +63,19 @@
               </span>
             </template>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
-              主持人
+              {{ $t('chat.chat_1022') }}
             </span>
             <span
               class="user-status user-assistant"
               v-else-if="[3, '3'].includes(chat.context.role_name)"
             >
-              助理
+              {{ $t('chat.chat_1024') }}
             </span>
             <span
               class="user-status user-admin"
               v-else-if="[4, '4'].includes(chat.context.role_name)"
             >
-              嘉宾
+              {{ $t('chat.chat_1023') }}
             </span>
             <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
           </template>
@@ -82,7 +83,7 @@
         <div
           class="list-item__chat-txt"
           v-if="chat.data || chat.data.text_content"
-          v-html="chat.text_content"
+          v-html="chat.data.text_content"
         ></div>
         <div class="list-item__chat-img-list" v-if="chat.type === 'image'">
           <div
@@ -189,6 +190,7 @@
     mounted() {
       // this.initEvent();
       // this.initScroll();
+      this.listenEvents();
     },
     methods: {
       init() {
@@ -206,51 +208,13 @@
         this.count = 0;
       },
       initEvent() {
-        //todo domain代替EventBus完成监听新的私聊消息
-        // EventBus.$on('new_chat', msg => {
-        //   this.finishData = true;
-        //   this.listenChat(msg, 'push');
-        // });
-        this.listenEvents();
         this.queryChatList();
         this.finishData = true;
       },
       //事件监听
       listenEvents() {
-        this.msgServer.$on('CHAT', msg => {
-          try {
-            if (typeof msg !== 'object') {
-              msg = JSON.parse(msg);
-            }
-            if (typeof msg.context !== 'object') {
-              msg.context = JSON.parse(msg.context);
-            }
-            if (typeof msg.data !== 'object') {
-              msg.data = JSON.parse(msg.data);
-            }
-          } catch (e) {
-            console.log(e);
-          }
-
-          if (msg.context.form == 'self') {
-            return;
-          }
-
-          msg.text_content = textToEmojiText(msg.text_content);
-
-          if (['text', 'image'].includes(msg.data.type)) {
-            if (this.selectUserId == msg.user_id) {
-              console.warn('最新的私聊msg--', msg);
-              if (msg.context.to && msg.context.to != '') {
-                const time = msg.date_time;
-                if (time) {
-                  msg.date_time = this.$moment(time).format('HH:mm:ss');
-                }
-                this.chatList.push(msg);
-                this.scrollBottom();
-              }
-            }
-          }
+        this.chatServer.$on('receivePrivateMsg', msg => {
+          this.chatList.push(msg);
         });
       },
       //todo 待替换

@@ -49,9 +49,9 @@
       this.addEvents();
     },
     mounted() {
-      // 刷新或者上麦 重新订阅
+      // 刷新或者上麦 重新订阅桌面共享流或者插播流
       let stream = this.interactiveServer.getDesktopAndIntercutInfo();
-      if (stream?.streamType === 3) {
+      if (stream?.streamType === 3 || stream?.streamType === 4) {
         this.subscribeDesktopScreen(stream.streamId);
       }
     },
@@ -72,12 +72,12 @@
         });
       },
       addEvents() {
-        // 监听桌面共享流加入
+        // 监听桌面共享或者插播流加入
         this.desktopShareServer.$on('screen_stream_add', e => {
-          this.streamId = e.data.streamId;
-          this.subscribeDesktopScreen(e.data.streamId);
+          this.streamId = e;
+          this.subscribeDesktopScreen(e);
         });
-        // 监听桌面共享流离开
+        // 监听桌面共享或者插播流离开
         this.desktopShareServer.$on('screen_stream_remove', e => {
           // ()中的逻辑，如果刷新之后，没有streamId的值，需要从sessionStorage中取当前的流Id
           if (
