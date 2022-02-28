@@ -46,8 +46,8 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <!-- <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" /> -->
-          <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i>
+          <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
+          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
           <span v-if="hasDocPermission">暂未分享任何文档</span>
           <span v-else>主讲人正在准备文档，请稍等...</span>
         </div>
