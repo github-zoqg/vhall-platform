@@ -198,12 +198,12 @@
     },
     mounted() {
       this.initViewData();
-      this.getPrivateContactList();
     },
     methods: {
       //打开模态窗
-      openModal() {
+      async openModal() {
         console.log('收到打开窗口的信令');
+        await this.getPrivateContactList();
         this.visible = true;
       },
       //获取私聊联系人列表
@@ -345,6 +345,8 @@
           this.$message.warning('内容不能为空');
         }
         const curmsg = useChatServer().createCurMsg();
+        const target = this.chatGroupList[this.activeGroupIndex].id;
+        curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
         //将图片消息加入消息体

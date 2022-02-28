@@ -462,10 +462,9 @@
             this.chatLoginStatus = false;
             return;
           }
-          if (![1, '1'].includes(this.roleName) && ['', null, void 0].includes(this.userId)) {
+          if (![1, '1'].includes(this.roleName) && ['', null, 0].includes(this.userId)) {
             // 需要登录
             this.chatLoginStatus = true;
-            this.inputStatus.placeholder = this.$t('chat.chat_1001', this.$t('nav.nav_1005'));
           }
         } else {
           // 不需要登录
