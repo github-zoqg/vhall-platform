@@ -56,15 +56,6 @@
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <script src="<%= js %>"></script>
     <% } }%>
-    <script>
-      loadjs(['//res.wx.qq.com/open/js/jweixin-1.4.0.js'], { returnPromise: true })
-        .then(function () {
-          console.log('%c%s-------->', 'color:green;', 'jweixin加载成功');
-        })
-        .catch(function (pathsNotFound) {
-          console.log('%c%s-------->', 'color:red;', pathsNotFound);
-          loadjs(['//res2.wx.qq.com/open/js/jweixin-1.4.0.js']);
-        });
-    </script>
+    <script></script>
   </body>
 </html>

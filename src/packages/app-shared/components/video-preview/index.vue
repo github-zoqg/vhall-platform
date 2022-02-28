@@ -194,15 +194,15 @@
           }
         };
 
-        params = Object.assign(params, videoParam);
+        // params = Object.assign(videoParam, params);
 
-        if (videoParam.type === 'live') {
+        if (params.type === 'live') {
           Object.assign(params, {
             liveOption: videoParam.liveOption
           });
         }
 
-        if (videoParam.type === 'vod') {
+        if (params.type === 'vod') {
           Object.assign(params, {
             vodOption: { recordId: videoParam.paas_record_id, forceMSE: false }
           });

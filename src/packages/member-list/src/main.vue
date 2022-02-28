@@ -1621,9 +1621,10 @@
             cancelButtonClass: 'zdy-confirm-cancel'
           }
         ).then(() => {
-          this.$fetch('presentation', {
-            room_id: this.roomBaseServer.state.watchInitData.interact.room_id
-          })
+          this.memberServer
+            .userPresentation({
+              room_id: this.roomBaseServer.state.watchInitData.interact.room_id
+            })
             .then(res => {
               console.log(res, 'presentation');
             })

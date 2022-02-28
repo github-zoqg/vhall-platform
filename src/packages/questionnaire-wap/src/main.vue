@@ -1,6 +1,6 @@
 <template>
   <van-popup v-model="popupVisible" position="bottom" :overlay="false" style="height: 100vh">
-    <i class="vh-iconfont vh-line-circle-close close-btn" @click="close"></i>
+    <i class="vh-iconfont vh-full-error close-btn" @click="close"></i>
     <!-- 问卷标题 -->
     <div id="qs-content-box"></div>
   </van-popup>

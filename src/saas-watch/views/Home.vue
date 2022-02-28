@@ -5,7 +5,11 @@
     element-loading-text="加载中..."
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
-    <div class="vmp-basic-container" v-if="state === 1">
+    <div
+      class="vmp-basic-container"
+      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : ''"
+      v-if="state === 1"
+    >
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <errorPage v-if="state === 2" :prop-type="errorData.errorPageTitle">
@@ -30,6 +34,7 @@
     data() {
       return {
         state: 0,
+        clientType: 'standard',
         errorData: {
           errorPageTitle: '',
           errorPageText: ''
@@ -40,11 +45,10 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        let clientType = 'standard';
         if (location.pathname.indexOf('embedclient') != -1) {
-          clientType = 'embed';
+          this.clientType = 'embed';
         }
-        await this.initReceiveLive(clientType);
+        await this.initReceiveLive(this.clientType);
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
@@ -55,7 +59,7 @@
           !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id &&
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.type != 3
         ) {
-          this.goSubscribePage(clientType);
+          this.goSubscribePage(this.clientType);
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -124,6 +128,12 @@
 <style lang="less">
   body {
     overflow: hidden;
+  }
+  .vmp-basic-container-embed {
+    .vmp-basic-bd {
+      max-width: unset;
+      height: 100%;
+    }
   }
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {

@@ -145,7 +145,7 @@
             msg_url: '.MP4'
           }
         },
-        constrolUp: false,
+        constrolUp: false, // 控制栏显示、隐藏
         conctorObj: {
           TimesShow: false,
           hoverTime: 0,
@@ -197,7 +197,7 @@
     },
     methods: {
       async openInsertShow(File, type) {
-        console.log('=====zhangxiao----', type);
+        console.log('=====zhangxiao----', File, type);
         this.pushStreamSucces = true;
         const { watchInitData } = this.roomBaseServer.state;
         this.isLiving = watchInitData.webinar.type;
@@ -429,6 +429,7 @@
         );
       },
       subscribeInster(currentStreams) {
+        if (!currentStreams) return;
         let owner = null;
         currentStreams.forEach(stream => {
           const obj = JSON.parse(stream.attributes);
