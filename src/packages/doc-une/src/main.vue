@@ -763,7 +763,7 @@
         // 在主直播间
         let confirmTip = '结束演示';
         if (
-          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) ||
+          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 2) ||
           (!this.isInGroup && this.roomBaseServer.state.watchInitData.join_info.role_name == 2)
         ) {
           confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
@@ -786,7 +786,9 @@
             console.log('结束他人的演示');
             await this.memberServer.endUserPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
-              receive_account_id: this.roomBaseServer.state.interactToolStatus.presentation_screen
+              receive_account_id: this.isInGroup
+                ? this.groupServer.state.groupInitData.presentation_screen
+                : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
           }
         } catch (ex) {
