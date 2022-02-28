@@ -70,13 +70,16 @@
         this.lotteryServer.$off(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
       },
       // 抽奖开始消息推送
-      callBackLotteryPush(msgData) {
+      callBackLotteryPush(msg) {
+        const msgData = msg.data;
         this.setFitment(msgData);
         this.lotteryView = 'LotteryPending';
         this.popupVisible = true;
       },
       // 抽奖结果消息推送
-      callBackResultNotice(msgData) {
+      callBackResultNotice(msg) {
+        const msgData = msg.data;
+        this.setFitment(msgData);
         this.lotteryId = msgData.lottery_id;
         this.setFitment(msgData);
         const winnerList = msgData.lottery_winners.split(',');

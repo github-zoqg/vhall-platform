@@ -75,11 +75,16 @@ export default async function () {
     })
   ];
 
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    promiseList.push(groupServer.init());
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission());
-    micServer.init();
   }
 
   await Promise.all(promiseList);
@@ -92,13 +97,13 @@ export default async function () {
   //   hasToolbar: false
   // };
 
+  // 互动、分组直播进行设备检测
+  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+    micServer.init();
+  }
+
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
-  }
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
   await msgServer.init();
