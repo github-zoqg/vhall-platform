@@ -109,7 +109,7 @@
       if (this.interactiveServer.interactiveInstance) {
         let stream = this.interactiveServer.getDesktopAndIntercutInfo();
 
-        if (stream && stream.streamType === 3 || 4) {
+        if (stream?.streamType === 3 || stream?.streamType === 4) {
           this.subscribeStream(stream.streamId);
         }
       }
@@ -183,7 +183,7 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
-            if (error.data.error.type == 'access-denied') {
+            if (error?.data?.error?.type == 'access-denied') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
               }

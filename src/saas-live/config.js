@@ -750,6 +750,13 @@ export const serverConfig = {
         cuid: 'comMediaSetting',
         method: 'showMediaSetting'
       }
+    ],
+    emitSplitScreenClick: [
+      {
+        cuid: 'comStreamList',
+        method: 'toggleSplitScreen',
+        args: ['$0'] // 获取动态参数的第一个
+      }
     ]
   },
   // 【录制页面】上麦流列表
