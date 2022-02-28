@@ -380,7 +380,6 @@
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
-        console.log(this.roomBaseServer.state,'1111111111111111111');
         this.mode = webinar.mode;
         this.isInteract = webinar.mode == 3 || webinar.mode == 6 ? 1 : 0;
         this.roleName = join_info.role_name;
@@ -1573,7 +1572,7 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        if (this.isInGroup) {
+        if (this.isInGroup && accountId !== this.userId) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
             cancelButtonText: this.$t('account.account_1063'),
