@@ -64,7 +64,7 @@
   import Emoji from '@/packages/chat/src/components/emoji';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
-  import { useChatServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'vmpWatchPrivateChatOperate',
     components: {
@@ -258,44 +258,16 @@
           });
         }
 
-        //获取当前用户信息
-        const userInfo = this.joinInfo;
-
-        console.warn('获取当前的本地用户信息', this.joinInfo);
-        let name = '';
-
-        if (this.joinInfo) {
-          if (this.joinInfo.nickname) {
-            name = this.joinInfo.nickname;
-          } else {
-            name = this.joinInfo.nick_name;
-          }
-        }
         const msg = this.inputValue.trim();
-
-        const latestMessage = this.latestMessage;
-        const _data = {
-          // 头像
-          avatar: this.joinInfo.avatar ? this.joinInfo.avatar : defaultAvatar,
-          target_id: latestMessage.context.user_id, // 这里发 target_id ,是为了在消息接收方判断除，是否是私聊消息
-          type: 'text',
-          text_content: msg,
-          barrageTxt: this.emojiToText(msg)
-        };
-        // 为保持一致   故传了多个不同key  同value
-        const _content = {
-          to: latestMessage.context.user_id,
-          nick_name: name,
-          user_id: this.joinInfo.third_party_user_id,
-          account_id: this.joinInfo.third_party_user_id,
-          role_name: this.joinInfo.role_name, // 角色 1主持人2观众3助理4嘉宾
-          app: 'vhall',
-          avatar: this.joinInfo.avatar ? this.joinInfo.avatar : defaultAvatar,
-          user_name: latestMessage.context.user_name
-        };
-
-        this.chatServer.sendChatMsg({ data: _data, context: _content });
-
+        const curmsg = useChatServer().createCurMsg();
+        const target = useRoomBaseServer().state.watchInitData.webinar.userinfo.user_id;
+        curmsg.setTarget(target);
+        //将文本消息加入消息体
+        curmsg.setText(msg);
+        //发送消息
+        useChatServer().sendMsg(curmsg);
+        //清除发送后的消息
+        useChatServer().clearCurMsg();
         this.inputValue = '';
         this.$nextTick(() => {
           // 输入框内容发生变化，更新滚动条

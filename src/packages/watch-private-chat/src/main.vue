@@ -108,10 +108,6 @@
       chatList: {
         deep: true,
         handler() {
-          // 如果滚动条未滚动至最底部
-          if (this.osInstance.scroll().ratio.y !== 1) {
-            this.unReadMessageCount++;
-          }
           // 如果当前自定义菜单显示的是私聊，return
           if (this.isFirstPrivateChat) {
             this.isFirstPrivateChat = false;
@@ -235,52 +231,15 @@
       },
       //事件监听
       listenEvents() {
-        this.msgServer.$on('CHAT', msg => {
-          try {
-            if (typeof msg !== 'object') {
-              msg = JSON.parse(msg);
-            }
-            if (typeof msg.context !== 'object') {
-              msg.context = JSON.parse(msg.context);
-            }
-            if (typeof msg.data !== 'object') {
-              msg.data = JSON.parse(msg.data);
-            }
-          } catch (e) {
-            console.log(e);
+        this.chatServer.$on('receivePrivateMsg', msg => {
+          if (msg.isFirstPrivateChat) {
+            this.isFirstPrivateChat = true;
           }
-          //非私聊消息，退出
-          if (!msg.data.target_id) {
-            return;
-          }
-          //空消息，退出
-          if (!msg.data.text_content) {
-            return;
-          }
-
-          msg.data = msg.data.text_content;
-          // 判断是否是跟当前用户有关的私聊消息
-          if (
-            msg.sender_id == this.joinInfo.third_party_user_id ||
-            msg.context.to == this.joinInfo.third_party_user_id
-          ) {
-            if (msg.sender_id != this.joinInfo.third_party_user_id) {
-              // 如果是本用户收发的消息放到私聊消息队列
-              this.latestMessage = msg;
-            }
-            if (msg.isFirstPrivateChat) {
-              this.isFirstPrivateChat = true;
-            }
-            this.chatList.push(msg);
-            if (
-              this.osInstance.scroll().max.y !== 0 &&
-              this.osInstance.scroll().ratio.y !== 1 &&
-              msg.context.to !== 'all'
-            ) {
-              // 如果是除回复、 @之外的普通消息
-              this.isHasUnreadNormalMsg = true;
-              this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
-            }
+          this.chatList.push(msg);
+          if (this.osInstance.scroll().max.y > -1 && this.osInstance.scroll().ratio.y !== 1) {
+            // 如果是除回复、 @之外的普通消息
+            this.isHasUnreadNormalMsg = true;
+            this.tipMsg = `有${++this.unReadMessageCount}条未读消息`;
           }
         });
       },
