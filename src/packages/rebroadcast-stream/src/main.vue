@@ -1,5 +1,5 @@
 <template>
-  <section class="vmp-rebroadcast-stream" v-show="isShow">
+  <section class="vmp-rebroadcast-stream mini" v-show="isShow">
     <span class="toggle-tips" @click="toggleScreen">
       <el-tooltip content="切换">
         <i class="vh-iconfont vh-line-copy-document"></i>
@@ -74,6 +74,18 @@
 <style lang="less">
   .vmp-rebroadcast-stream {
     position: relative;
+    width: 100%;
+    height: 100%;
+
+    &.mini {
+      position: absolute;
+      right: 0;
+      left: auto;
+      top: 0;
+      width: 309px;
+      height: 240px;
+      z-index: 1;
+    }
 
     .toggle-tips {
       width: 32px;
