@@ -1467,7 +1467,7 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
-        console.log(type, params);
+        console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
           case 'setBanned':
@@ -1710,6 +1710,7 @@
       },
       //邀请上麦
       inviteMic(accountId = '') {
+        console.log('[member] accountId:', accountId);
         if (this.memberOptions.platformType === 'watch' && accountId === this.leader_id) {
           return;
         }
@@ -1720,7 +1721,7 @@
         const params = {
           room_id: this.roomId,
           receive_account_id: accountId,
-          type: 1
+          type: 1 // 0=邀请上麦|1=邀请演示
         };
         return this.memberServer
           .inviteUserToInteract(params)
