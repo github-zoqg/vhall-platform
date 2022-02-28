@@ -3,7 +3,7 @@
     <div class="private-chat-operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
         <!--表情按钮-->
-        <i class="icon iconfont iconbiaoqing" @click.stop="toggleEmoji"></i>
+        <i class="vh-iconfont vh-line-expression" @click.stop="toggleEmoji"></i>
         <!-- 表情选择 -->
         <div class="operate-container__tool-bar__emoji-wrap">
           <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
@@ -52,7 +52,7 @@
       </div>
       <div class="input-bar__textarea-box__send-btn-box">
         <div class="input-bar__textarea-box__send-btn" @click="sendMessage">
-          <i class="icon iconfont iconfasong_icon"></i>
+          <i class="vh-iconfont vh-line-send"></i>
         </div>
       </div>
     </div>
@@ -65,7 +65,6 @@
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   import { useChatServer } from 'middle-domain';
-  import { boxEventOpitons } from "@/packages/app-shared/utils/tool";
   export default {
     name: 'vmpWatchPrivateChatOperate',
     components: {
@@ -353,7 +352,7 @@
         transform: translateY(-100%);
         left: 0;
       }
-      .iconfont {
+      .vh-iconfont {
         color: #999;
         font-size: 19px;
         cursor: pointer;
@@ -373,7 +372,7 @@
 
         margin-left: 10px;
       }
-      .iconbiaoqing {
+      .vh-line-expression {
         font-size: 19px;
         color: #999;
         margin-left: 0;
@@ -472,7 +471,7 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        .iconfasong_icon {
+        .vh-line-send {
           font-size: 18px;
           color: #e6e6e6;
         }
