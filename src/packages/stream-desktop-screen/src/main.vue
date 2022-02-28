@@ -56,7 +56,7 @@
     useGroupServer,
     useDesktopShareServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  // import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpStreamDesktopScreen',
