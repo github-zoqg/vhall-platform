@@ -16,7 +16,7 @@
               class="empty-container"
               :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
             >
-              <span class="iconzanwusousuo iconfont"></span>
+              <span class="vh-saas-iconfont vh-saas-zanwusousuo"></span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
             <template v-else style="overflow: auto">
@@ -51,7 +51,7 @@
               class="empty-container"
               :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
             >
-              <span class="iconzanwujushou iconfont"></span>
+              <span class="vh-saas-iconfont vh-saas-zanwujushou"></span>
               <p>暂无人举手</p>
             </div>
             <template v-else>
@@ -86,7 +86,7 @@
               class="empty-container"
               :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
             >
-              <span class="iconzanwuchengyuan iconfont"></span>
+              <span class="vh-saas-iconfont vh-saas-zanwuchengyuan"></span>
               <p>没有禁言或者踢出的成员</p>
             </div>
             <template v-else>
@@ -380,7 +380,6 @@
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
-        console.log(this.roomBaseServer.state,'1111111111111111111');
         this.mode = webinar.mode;
         this.isInteract = webinar.mode == 3 || webinar.mode == 6 ? 1 : 0;
         this.roleName = join_info.role_name;
@@ -1573,7 +1572,7 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        if (this.isInGroup) {
+        if (this.isInGroup && accountId !== this.userId) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
             cancelButtonText: this.$t('account.account_1063'),

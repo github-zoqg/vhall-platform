@@ -323,7 +323,14 @@ export const serverConfig = {
       userControlOptions: {
         enable: false
       }
-    }
+    },
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   //成员列表组件
   comMemberList: {
@@ -336,7 +343,14 @@ export const serverConfig = {
   //私聊组件
   comWatchPrivateChat: {
     component: 'VmpWatchPrivateChat',
-    options: {}
+    options: {},
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   //报名表单
   comSignUpForm: {

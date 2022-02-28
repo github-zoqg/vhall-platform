@@ -51,7 +51,7 @@
     mounted() {
       // 刷新或者上麦 重新订阅桌面共享流或者插播流
       let stream = this.interactiveServer.getDesktopAndIntercutInfo();
-      if (stream?.streamType === 3 || 4) {
+      if (stream?.streamType === 3 || stream?.streamType === 4) {
         this.subscribeDesktopScreen(stream.streamId);
       }
     },

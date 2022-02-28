@@ -132,6 +132,7 @@
                 <el-table-column prop="uploadPropress" label="进度">
                   <template slot-scope="scope">
                     <DocProgressStatus
+                      :docExt="scope.row.ext"
                       :docStatus="scope.row.docStatus"
                       :transformProcess="scope.row.transformProcess"
                       :uploadPropress="scope.row.uploadPropress"
@@ -226,6 +227,8 @@
               <el-table-column prop="uploadPropress" label="进度" width="200">
                 <template slot-scope="scope">
                   <DocProgressStatus
+                    :isInDoclib="true"
+                    :docExt="scope.row.ext"
                     :docStatus="scope.row.docStatus"
                     :transformProcess="scope.row.transformProcess"
                     :uploadPropress="scope.row.uploadPropress"
@@ -392,8 +395,11 @@
                   item.transformProcess = 0;
                 } else if (statusJpeg === 100 || status === 100) {
                   item.docStatus = 'transdoing'; // 转码中
+                } else if (statusJpeg === 200 && status === 100 && /pptx?/.test(item.ext)) {
+                  // 静态转码成功，动态转码中...
+                  item.docStatus = 'transh5doing'; // 动态转码中，ppt文件特有状态
                 } else if (statusJpeg === 200 || status === 200) {
-                  item.docStatus = 'transcompleted'; // 转码完成
+                  item.docStatus = 'transcompleted'; // 转码成功
                   item.transformProcess = 100;
                 } else {
                   item.docStatus = 'transfailed'; // 转码失败
@@ -521,6 +527,7 @@
           room_id: this.roomBaseServer.state.watchInitData.interact.room_id
         });
         if (result && result.code === 200) {
+          console.log('this.doclibList：', this.doclibList);
           this.doclibList = result.data.list;
         } else {
           this.$message.error('查询失败');
