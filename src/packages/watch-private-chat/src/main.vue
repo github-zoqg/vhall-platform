@@ -80,7 +80,7 @@
         //输入框状态
         inputStatus: {
           disable: false,
-          placeholder: '参与聊天'
+          placeholder: this.$t('chat.chat_1021')
         },
         //是否是初始化私聊tab todo 预留
         isFirstPrivateChat: false,

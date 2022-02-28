@@ -934,7 +934,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: scroll;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      border-radius: 0;
+      background-color: #000 !important;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transpar ent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      height: 60px;
+      border-radius: 10px;
+      border: 1px solid #fff;
+      background: #000 !important;
+    }
 
     li.doc-thumbnailbar__opt {
       height: 63px;

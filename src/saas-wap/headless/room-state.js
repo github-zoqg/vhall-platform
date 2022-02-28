@@ -5,7 +5,8 @@ import {
   useInteractiveServer,
   useMediaCheckServer,
   useMicServer,
-  useUserServer
+  useUserServer,
+  useGroupServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -19,6 +20,7 @@ export default async function () {
   const mediaCheckServer = useMediaCheckServer();
   const micServer = useMicServer();
   const userServer = useUserServer();
+  const groupServer = useGroupServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -85,6 +87,11 @@ export default async function () {
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
+  }
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');

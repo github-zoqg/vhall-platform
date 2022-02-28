@@ -40,8 +40,10 @@
         class="input-bar__textarea-box__textarea-placeholder"
       >
         <span v-show="chatLoginStatus" class="input-bar__textarea-box__no-login">
-          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">登录</span>
-          后参与聊天
+          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">
+            {{ $t('nav.nav_1005') }}
+          </span>
+          {{ $t('chat.chat_1001', '') }}
         </span>
         <span
           v-show="inputStatus.disable && !chatLoginStatus"
