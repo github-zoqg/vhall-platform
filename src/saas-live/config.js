@@ -472,7 +472,7 @@ export const serverConfig = {
   // 上麦流列表
   comStreamList: {
     component: 'VmpStreamListLive',
-    children: ['comStreamLocal', 'comStreamRemote']
+    children: ['comStreamLocal']
   },
   // 远端流
   comStreamRemote: {
