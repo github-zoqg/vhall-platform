@@ -106,10 +106,12 @@
     },
     mounted() {
       // 刷新或者上麦 重新订阅
-      let stream = this.interactiveServer.getDesktopAndIntercutInfo();
+      if (this.interactiveServer.interactiveInstance) {
+        let stream = this.interactiveServer.getDesktopAndIntercutInfo();
 
-      if (stream && stream.streamType === 3) {
-        this.subscribeStream(stream.streamId);
+        if (stream && stream.streamType === 3) {
+          this.subscribeStream(stream.streamId);
+        }
       }
     },
     watch: {
@@ -124,10 +126,10 @@
     },
     methods: {
       addEvents() {
-        this.desktopShareServer.$on('screen_stream_add', e => {
-          this.subscribeStream(e.data.streamId);
+        this.desktopShareServer.$on('screen_stream_add', streamId => {
+          this.subscribeStream(streamId);
         });
-        this.desktopShareServer.$on('screen_stream_remove', e => {
+        this.desktopShareServer.$on('screen_stream_remove', () => {
           useRoomBaseServer().setShareScreenStatus(false);
           useRoomBaseServer().setChangeElement('');
         });
