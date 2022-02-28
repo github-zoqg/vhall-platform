@@ -724,7 +724,7 @@
           height: 38px;
         }
         &.is-disabled:hover {
-          opacity: 1 !important;
+          opacity: 1;
           .vmp-cash_btn_hover {
             display: block;
             position: absolute;
