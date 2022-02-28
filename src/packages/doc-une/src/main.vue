@@ -162,7 +162,6 @@
         className: '',
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
         keepAspectRatio: true,
-        hasPager: true, // 是否有分页操作(观看端没有)
         thumbnailShow: false, // 文档缩略是否显示
         hasStreamList: false
       };
@@ -281,6 +280,12 @@
           }
           return false;
         }
+      },
+      // 是否有翻页操作权限
+      hasPager() {
+        return (
+          this.hasDocPermission || this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
+        );
       }
     },
     watch: {
@@ -499,7 +504,14 @@
           }
         });
 
-        //
+        // 文档不存在或已删除
+        this.docServer.on('dispatch_doc_not_exit', () => {
+          this.$message({
+            type: 'error',
+            message: '文档不存在或已删除'
+          });
+        });
+
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
           //   return;
@@ -656,6 +668,7 @@
         for (const item of this.docServer.state.containerList) {
           if (String.prototype.startsWith.call(item.cid, 'document')) {
             // 文档容器删除
+            console.log('[doc] 删除文档容器：', item.cid);
             await this.docServer.destroyContainer(item.cid);
           }
         }
