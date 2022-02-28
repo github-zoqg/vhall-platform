@@ -63,8 +63,14 @@ input[type='number'] {
 }
 
 ::-webkit-scrollbar {
-  width: 0px;
+  width: 6px;
   height: 6px;
   border-radius: 10px;
-  background-color: #e0e0e0;
+  background-color: #fff;
+}
+&::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  height: 60px;
+  border-radius: 10px;
+  background: #e0e0e0 !important;
 }
