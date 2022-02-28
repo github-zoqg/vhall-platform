@@ -380,7 +380,7 @@
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
-        console.log(this.roomBaseServer.state);
+        console.log(this.roomBaseServer.state,'1111111111111111111');
         this.mode = webinar.mode;
         this.isInteract = webinar.mode == 3 || webinar.mode == 6 ? 1 : 0;
         this.roleName = join_info.role_name;
@@ -1100,25 +1100,25 @@
           }
         }
         //主持人/助理进入小组
-        function handleHostJoin() {
+        function handleHostJoin(msg) {
           //msg
-          // if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
-          //   // 进入小组
-          //   if (msg.data.group_ids[0] == 0) {
-          //     setTimeout(() => {
-          //       _this.onlineUsers = [];
-          //       _this.getOnlineUserList();
-          //     }, 1000);
-          //   }
-          //   // 返回主房间
-          //   if (msg.data.group_ids[1] == 0) {
-          //     //todo 这里的host_uid可能要从分组server取
-          //     if (sessionStorage.getItem('host_uid').includes(msg.sender_id)) {
-          //       _this.onlineUsers = [];
-          //       _this.getOnlineUserList();
-          //     }
-          //   }
-          // }
+          if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
+            // 进入小组
+            if (msg.data.group_ids[0] == 0) {
+              setTimeout(() => {
+                _this.onlineUsers = [];
+                _this.getOnlineUserList();
+              }, 1000);
+            }
+            // 返回主房间
+            if (msg.data.group_ids[1] == 0) {
+              const hostUserId = this.roomBaseServer.state.webinar.userInfo.user_id;
+              if (hostUserId === msg.sender_id) {
+                _this.onlineUsers = [];
+                _this.getOnlineUserList();
+              }
+            }
+          }
         }
         //分组--开始讨论
         function handleStartGroupDiscuss(msg) {
