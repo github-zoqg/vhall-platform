@@ -108,6 +108,7 @@
        *     2、默认不在麦上 ----->
        *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
        */
+
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
       } else if (
@@ -162,13 +163,18 @@
         }
       });
     },
-    beforeDestroy() {
+    async beforeDestroy() {
       // 清空计时器
       if (this._audioLeveInterval) {
         clearInterval(this._audioLeveInterval);
       }
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
+      }
+      if (this.micServer.state.isSpeakOn) {
+        await this.micServer.speakOff();
+        await this.stopPush();
+        this.interactiveServer.destroy();
       }
     },
     methods: {
@@ -433,6 +439,17 @@
           background-image: url(./img/network2.png);
         }
       }
+    }
+    .opcity-flase {
+      display: none;
+      transition: all 1s;
+      -webkit-transition: all 1s;
+    }
+    .opcity-true {
+      opacity: 1;
+      transition: all 1s;
+      z-index: 6;
+      -webkit-transition: all 1s;
     }
   }
 </style>

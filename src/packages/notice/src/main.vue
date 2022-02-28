@@ -64,7 +64,7 @@
         overlayScrollBarsOptions: {
           resize: 'none',
           paddingAbsolute: true,
-          className: 'os-theme-light os-theme-vhall',
+          className: 'os-theme-dark os-theme-vhall',
           scrollbars: {
             autoHide: 'leave',
             autoHideDelay: 200
