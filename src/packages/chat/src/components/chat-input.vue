@@ -306,8 +306,10 @@
       trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
-      //todo 利用信令 唤起登录
-      callLogin() {},
+      //利用信令 唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      },
       //选择了表情,这个方法是通过ref暴露给父组件使用
       emojiInput(val = '') {
         if (this.inputStatus.disable) {

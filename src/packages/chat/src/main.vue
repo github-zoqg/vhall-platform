@@ -70,6 +70,7 @@
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @ononSwitchShowSponsor="onSwitchShowSponsor"
         @updateHeight="chatOperateBarHeightChange"
+        @needLogin="handleLogin"
       ></chat-operate-bar>
       <img-preview
         ref="imgPreview"
@@ -356,6 +357,10 @@
         this.roomId = interact.room_id;
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
+      },
+      //处理唤起登录
+      handleLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       listenChatServer() {
         const chatServer = useChatServer();
