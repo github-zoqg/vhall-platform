@@ -50,11 +50,14 @@
                 :http-request="handleUpload"
                 :before-upload="beforeUpload"
                 accept="*/*"
+                list-type="text"
                 :show-file-list="false"
               >
                 <el-button type="primary">{{ $t('usual.upload') }}</el-button>
               </el-upload>
-              <el-button @click="handleGotoDoclib">
+
+              <!-- 观看端不能操作资料库 -->
+              <el-button v-if="!isWatch" @click="handleGotoDoclib">
                 {{ $t('doc_list.doclib') }}
               </el-button>
             </div>
@@ -626,7 +629,9 @@
               }
             });
             this.dataList = [...this.dataList];
-            this.innerVisible = true;
+            if (!this.isWatch) {
+              this.innerVisible = true;
+            }
           }
         };
         param.onProgress = (percent, file) => {
