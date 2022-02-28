@@ -80,7 +80,7 @@
         //输入框状态
         inputStatus: {
           disable: false,
-          placeholder: '参与聊天'
+          placeholder: this.$t('chat.chat_1021')
         },
         //是否是初始化私聊tab todo 预留
         isFirstPrivateChat: false,
@@ -279,7 +279,7 @@
             ) {
               // 如果是除回复、 @之外的普通消息
               this.isHasUnreadNormalMsg = true;
-              this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
+              this.tipMsg = this.$t('chat.chat_1035', this.unReadMessageCount + 1);
             }
           }
         });

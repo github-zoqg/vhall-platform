@@ -22,7 +22,11 @@
             >
               <label>
                 {{ $t('预告')
-                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
+                }}{{
+                  [5, '5'].includes(webinarInfo.webinar_type)
+                    ? ` | ${$t('common.common_1022')}`
+                    : ''
+                }}
               </label>
             </span>
             <!-- 直播 -->
@@ -33,7 +37,11 @@
               <img src="img/live-white.gif" alt="" />
               <label>
                 {{ $t('直播')
-                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
+                }}{{
+                  [5, '5'].includes(webinarInfo.webinar_type)
+                    ? ` | ${$t('common.common_1022')}`
+                    : ''
+                }}
               </label>
             </span>
             <!-- 结束 -->
@@ -43,7 +51,11 @@
             >
               <label>
                 {{ $t('结束')
-                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
+                }}{{
+                  [5, '5'].includes(webinarInfo.webinar_type)
+                    ? ` | ${$t('common.common_1022')}`
+                    : ''
+                }}
               </label>
             </span>
             <!-- 回放 -->
@@ -53,7 +65,11 @@
             >
               <label>
                 {{ $t('回放')
-                }}{{ [5, '5'].includes(webinarInfo.webinar_type) ? ' | 定时直播' : '' }}
+                }}{{
+                  [5, '5'].includes(webinarInfo.webinar_type)
+                    ? ` | ${$t('common.common_1022')}`
+                    : ''
+                }}
               </label>
             </span>
             <!-- 点播 -->
@@ -62,7 +78,8 @@
               class="header-content__tag demand"
             >
               <label>
-                {{ $t('点播') }}{{ webinarInfo.webinar_type == 5 ? ' | 定时直播' : '' }}
+                {{ $t('点播')
+                }}{{ webinarInfo.webinar_type == 5 ? ` | ${$t('common.common_1022')}` : '' }}
               </label>
             </span>
             <!-- 分组直播默认无延迟，不展示无延迟标记。其它若选择是无延迟且有权限则展示 -->
@@ -100,7 +117,7 @@
             <img :src="`${avatarUrl}`" alt="用户头像" v-if="avatarUrl" />
             <img :src="defaultAvatar" alt="默认头像" v-else />
             <div class="main-wrap__form__avatar-btn" v-if="![1, '1'].includes(roleName)">
-              <span>编辑</span>
+              <span>{{ $t('account.account_1008') }}</span>
             </div>
           </div>
           <el-upload
@@ -135,7 +152,7 @@
             >
               <el-input
                 v-model.trim="loginForm.nickname"
-                placeholder="姓名"
+                :placeholder="$t('form.form_1001')"
                 :maxlength="30"
               ></el-input>
             </el-form-item>
@@ -148,7 +165,7 @@
             </el-form-item>
             <el-form-item class="main-wrap__form__inner">
               <el-button class="main-wrap__form__red-button length-max" @click="handleEntryLive">
-                进入直播
+                {{ $t('webinar.webinar_1023') }}
               </el-button>
             </el-form-item>
           </el-form>
@@ -163,7 +180,7 @@
       <!--主体  -->
     </template>
     <template v-else>
-      <div class="vmp-password-login__no-auth">只能通过PC端进入</div>
+      <div class="vmp-password-login__no-auth">{{ $t('webinar.webinar_1016') }}</div>
     </template>
   </div>
 </template>

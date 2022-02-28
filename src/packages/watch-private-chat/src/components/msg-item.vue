@@ -15,7 +15,7 @@
             :class="msg.context.role_name | roleClassFilter"
             v-if="showRoleName(msg.context.role_name)"
           >
-            {{ msg.context.role_name | roleFilter }}
+            {{ msg.context.role_name | roleFilter(this) }}
           </span>
         </div>
         <span class="msg-item__content__time">{{ msg.date_time.slice(-8) }}</span>
@@ -45,23 +45,23 @@
         return 'guest';
       },
       //角色转换
-      roleFilter(value) {
+      roleFilter(value, vm) {
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = '主持人';
+            ret = vm.$t('chat.chat_1022');
             break;
           case 3:
-            ret = '助理';
+            ret = vm.$t('chat.chat_1024');
             break;
           case 4:
-            ret = '嘉宾';
+            ret = vm.$t('chat.chat_1023');
             break;
           case 20:
-            ret = '组长';
+            ret = vm.$t('chat.chat_1064');
             break;
           default:
-            ret = '';
+            ret = vm.$t('chat.chat_1062');
         }
         return ret;
       }
