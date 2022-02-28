@@ -82,7 +82,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast } from 'vant';
+  import { Toast, Dialog } from 'vant';
 
   export default {
     name: 'VmpWapStreamList',
@@ -240,8 +240,12 @@
         });
 
         // 房间信令异常断开事件
-        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', e => {
-          Toast(`网络异常导致互动房间连接失败`);
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
+          Dialog.alert({
+            message: '网络异常导致互动房间连接失败'
+          }).then(() => {
+            window.location.reload();
+          });
         });
 
         // 主持人进入退出小组 消息监听
@@ -370,7 +374,7 @@
           } else {
             this.interactiveServer.setStreamFullscreen({
               streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+              vNode: `vmp-stream-local__${mainScreenStream.streamId}`
             });
           }
           this.interactiveServer.state.fullScreenType = true;
