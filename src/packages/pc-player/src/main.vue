@@ -2,7 +2,11 @@
   <div
     v-if="!isShowContainer"
     class="vmp-player"
-    :class="[{ 'is-watch': isWatch }, isSubscribe ? '' : `vmp-player--${displayMode}`]"
+    :class="[
+      { 'is-watch': isWatch },
+      { 'vmp-player-embed': isEmbedVideo },
+      isSubscribe ? '' : `vmp-player--${displayMode}`
+    ]"
     @mousemove="wrapEnter"
     @mouseleave="wrapLeave"
   >
@@ -14,18 +18,29 @@
             class="vmp-player-living-background"
             :style="`backgroundImage: url('${webinarsBgImg}')`"
           ></div>
-          <div class="vmp-player-living-btn" v-if="!isPlayering">
-            <div
-              :class="
-                displayMode == 'mini'
-                  ? 'vmp-player-living-btn-mini'
-                  : 'vmp-player-living-btn-normal'
-              "
-              @click="startPlay"
-            >
+          <div
+            v-if="isEmbed && isSubscribe && isWarnPreview && !isPlayering"
+            class="vmp-player-living-play"
+          >
+            <div class="vmp-player-living-play-normal" @click="startPlay">
               <i class="vh-iconfont vh-line-video-play"></i>
             </div>
           </div>
+          <template v-else>
+            <div class="vmp-player-living-btn" v-if="!isPlayering">
+              <div
+                :class="
+                  displayMode == 'mini'
+                    ? 'vmp-player-living-btn-mini'
+                    : 'vmp-player-living-btn-normal'
+                "
+                @click="startPlay"
+              >
+                <i class="vh-iconfont vh-line-video-play"></i>
+              </div>
+            </div>
+          </template>
+
           <div class="vmp-player-living-vodend" v-if="isVodEnd">
             <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
               <h3>{{ $t('appointment.appointment_1013') }}</h3>
@@ -41,7 +56,7 @@
                 </p>
                 <span v-else @click="authTryWatch">{{ authText }}</span>
               </div>
-              <p class="replay-try">
+              <p class="replay-try" @click="startPlay">
                 <i class="vh-iconfont vh-line-refresh-left">
                   <b>{{ $t('appointment.appointment_1014') }}</b>
                 </i>
@@ -57,7 +72,10 @@
               >
                 <i class="vh-iconfont vh-line-refresh-left"></i>
               </div>
-              <span :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'">
+              <span
+                :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
+                @click="startPlay"
+              >
                 {{ $t('player.player_1016') }}
               </span>
             </div>
@@ -348,6 +366,13 @@
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
           !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         );
+      },
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      isEmbedVideo() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     watch: {
@@ -375,7 +400,10 @@
       this.listenEvents();
     },
     mounted() {
-      console.log('[player] mounted');
+      if (this.isEmbedVideo) {
+        const centerDom = document.querySelector('.vmp-basic-center');
+        centerDom.style.width = '100%';
+      }
     },
     methods: {
       listenEvents() {
@@ -858,7 +886,7 @@
         top: 0;
         left: 0;
         background-size: 100% 100%;
-        z-index: 2;
+        z-index: 8;
       }
       &-btn {
         position: absolute;
@@ -897,6 +925,40 @@
           height: 50px;
           i {
             font-size: 18px;
+          }
+        }
+      }
+      &-play {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        background-size: cover;
+        display: flex;
+        // align-items: center;
+        justify-content: center;
+        z-index: 8;
+        div {
+          margin-top: 28vh;
+          background: rgba(0, 0, 0, 0.4);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          i {
+            color: #e6e6e6;
+            opacity: 1;
+          }
+        }
+        &-normal {
+          width: 72px;
+          height: 72px;
+
+          i {
+            font-size: 34px;
           }
         }
       }
@@ -1099,7 +1161,7 @@
     &-controller {
       position: absolute;
       bottom: -48px;
-      z-index: 8;
+      z-index: 7;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
@@ -1513,6 +1575,10 @@
       width: calc(100% - 380px);
       height: auto;
       min-height: auto;
+      &.vmp-player-embed {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     &.vmp-player--mini {

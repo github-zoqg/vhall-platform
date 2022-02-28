@@ -302,6 +302,10 @@
       isOpenSwitch() {
         return this.roomBaseServer.state.interactToolStatus.is_open_switch;
       },
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 待分配人员列表
       waitingUserList() {
         return this.groupServer.state.waitingUserList;
@@ -353,12 +357,25 @@
             });
           }
         });
+
+        // 发起端收到同意演示成功消息
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', () => {
+          // if (msg.sender_id != this.userId) {
+          //    // 如果是主持人演示
+          // }
+        });
+
+        // 发起端收到结束演示成功消息
+        this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
+          if (msg.sender_id != this.userId) {
+            this.$message.warning('观众结束了演示');
+          }
+        });
       },
       // 正在演示的人，切换channel需要自己结束演示
       handleEndDemonstrateInChannelChange() {
-        if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
-          this.groupServer.endSelft;
-        }
+        // if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
+        // }
       },
       hiddenAll() {
         this.settingDialogVisible = false;

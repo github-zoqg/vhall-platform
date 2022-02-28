@@ -392,6 +392,7 @@
     height: 72px;
     width: 100%;
     margin-bottom: 20px;
+    background: #2a2a2a;
     &.vmp-basic-hd {
       display: none;
     }
