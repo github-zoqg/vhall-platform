@@ -19,7 +19,11 @@ import { Integrations } from '@sentry/tracing';
 Vue.prototype.$tes = function (path) {
   return this.$te(path) ? this.$t(path) : undefined;
 };
-
+try {
+  new window.VConsole();
+} catch (e) {
+  console.log(e);
+}
 // 初始化
 initGlobalAPI();
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
