@@ -269,16 +269,17 @@ export const serverConfig = {
   },
   // 底部
   comFooter: {
-    component: 'VmpFooter',
-    emitClickMediaSetting: {
-      cuid: 'comMediaSetting',
-      method: 'showMediaSetting'
-    }
+    component: 'VmpFooter'
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    //todo 后续正式的需要调整或移除，此处仅为测试配置
+    //TODO: 后续正式的需要调整或移除，此处仅为测试配置
+    // 打开媒体设置
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
+    },
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
       method: 'openModal'
