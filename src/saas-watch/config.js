@@ -79,7 +79,7 @@ export const serverConfig = {
     component: 'VmpTabMenu',
     options: {
       // 是否展示左右按钮
-      isToggleBtnVisible: false,
+      isToggleBtnVisible: true,
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
@@ -270,9 +270,9 @@ export const serverConfig = {
   // 底部
   comFooter: {
     component: 'VmpFooter',
-    emitClickMediaCheck: {
-      cuid: 'comMediaCheck',
-      method: 'showSetting'
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
     }
   },
   // 底部工具栏（如人数， 热度等）

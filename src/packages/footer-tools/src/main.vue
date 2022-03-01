@@ -227,10 +227,7 @@
     },
     methods: {
       settingShow() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickMediaCheck' // TODO 设置媒体的弹窗方法
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
       },
       changeStatus(data, status) {
         console.log(data, status, 'data, status');
