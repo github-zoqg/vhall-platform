@@ -5,7 +5,13 @@
       size="32px"
       type="spinner"
       :vertical="true"
-      style="margin-top: 40%"
+      style="
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      "
     >
       加载中...
     </van-loading>
