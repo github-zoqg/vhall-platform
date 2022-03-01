@@ -1177,6 +1177,7 @@
       },
       //初始化表单问题信息
       getQuestionList() {
+        const _this = this;
         const params = {
           webinar_id: this.webinarId
         };
@@ -1191,6 +1192,15 @@
             phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
           // 默认填写手机号
           !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
+          if (!_this.isPreview) {
+            _this.$refs.verifyForm.validateField('phone', err => {
+              if (!err) {
+                _this.isValidPhone = true;
+              } else {
+                _this.isValidPhone = false;
+              }
+            });
+          }
           this.list = list;
           //地域 options 格式化处理
           this.list.some(item => {
@@ -1679,13 +1689,14 @@
                   callback: action => {
                     console.log(action);
                     this.closePreview();
-                    //todo 可能需要信令通知其他组件验证成功
+                    //验证成功,刷新页面
+                    location.reload();
                   }
                 }
               );
             } else {
               this.closePreview();
-              //todo 可能需要信令通知其他组件验证成功
+              location.reload();
             }
           }
         });
