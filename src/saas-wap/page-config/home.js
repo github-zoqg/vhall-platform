@@ -325,8 +325,8 @@ const serverConfig = {
     emitQuestionnaireVisible: [
       // 问卷弹窗的显示和隐藏(全屏)
       {
-        cuid: '',
-        method: '',
+        cuid: 'comWapBody',
+        method: 'questionnaireVisible',
         args: ['$0']
       }
     ]

@@ -56,7 +56,7 @@
     useGroupServer,
     useDesktopShareServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  // import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpStreamDesktopScreen',
@@ -106,10 +106,12 @@
     },
     mounted() {
       // 刷新或者上麦 重新订阅
-      let stream = this.interactiveServer.getDesktopAndIntercutInfo();
+      if (this.interactiveServer.interactiveInstance) {
+        let stream = this.interactiveServer.getDesktopAndIntercutInfo();
 
-      if (stream && stream.streamType === 3) {
-        this.subscribeStream(stream.streamId);
+        if (stream?.streamType === 3 || stream?.streamType === 4) {
+          this.subscribeStream(stream.streamId);
+        }
       }
     },
     watch: {
@@ -124,10 +126,10 @@
     },
     methods: {
       addEvents() {
-        this.desktopShareServer.$on('screen_stream_add', e => {
-          this.subscribeStream(e.data.streamId);
+        this.desktopShareServer.$on('screen_stream_add', streamId => {
+          this.subscribeStream(streamId);
         });
-        this.desktopShareServer.$on('screen_stream_remove', e => {
+        this.desktopShareServer.$on('screen_stream_remove', () => {
           useRoomBaseServer().setShareScreenStatus(false);
           useRoomBaseServer().setChangeElement('');
         });
@@ -181,7 +183,7 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
-            if (error.data.error.type == 'access-denied') {
+            if (error?.data?.error?.type == 'access-denied') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
               }

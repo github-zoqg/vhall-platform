@@ -30,8 +30,9 @@
       class="vmp-chat-input__textarea-placeholder"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
-        <span class="chat-login-btn" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
-        {{ $t('chat.chat_1001') }}
+        <i18n path="chat.chat_1001">
+          <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
+        </i18n>
       </span>
       <span v-show="inputStatus.disable && !chatLoginStatus" class="textarea-placeholder_no-login">
         {{ inputStatus.placeholder }}
@@ -306,8 +307,10 @@
       trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
-      //todo 利用信令 唤起登录
-      callLogin() {},
+      //利用信令 唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      },
       //选择了表情,这个方法是通过ref暴露给父组件使用
       emojiInput(val = '') {
         if (this.inputStatus.disable) {

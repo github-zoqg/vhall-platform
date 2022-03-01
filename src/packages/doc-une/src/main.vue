@@ -47,6 +47,7 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
+          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
           <span v-if="hasDocPermission">暂未分享任何文档</span>
           <span v-else>主讲人正在准备文档，请稍等...</span>
         </div>
@@ -162,7 +163,6 @@
         className: '',
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
         keepAspectRatio: true,
-        hasPager: true, // 是否有分页操作(观看端没有)
         thumbnailShow: false, // 文档缩略是否显示
         hasStreamList: false
       };
@@ -281,6 +281,12 @@
           }
           return false;
         }
+      },
+      // 是否有翻页操作权限
+      hasPager() {
+        return (
+          this.hasDocPermission || this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
+        );
       }
     },
     watch: {
@@ -443,6 +449,7 @@
             this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
             await this.$nextTick();
             if (this.docServer.state.switchStatus) {
+              // 回放只在观看端可用
               this.resize();
               // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
               const { width, height } = this.docViewRect;
@@ -455,6 +462,7 @@
                   fileType: item.type.toLowerCase()
                 });
               }
+              this.docServer.loadVodIframe();
             }
           });
         }
@@ -499,7 +507,14 @@
           }
         });
 
-        //
+        // 文档不存在或已删除
+        this.docServer.on('dispatch_doc_not_exit', () => {
+          this.$message({
+            type: 'error',
+            message: '文档不存在或已删除'
+          });
+        });
+
         this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
           // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
           //   return;
@@ -656,6 +671,7 @@
         for (const item of this.docServer.state.containerList) {
           if (String.prototype.startsWith.call(item.cid, 'document')) {
             // 文档容器删除
+            console.log('[doc] 删除文档容器：', item.cid);
             await this.docServer.destroyContainer(item.cid);
           }
         }
@@ -750,7 +766,7 @@
         // 在主直播间
         let confirmTip = '结束演示';
         if (
-          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) ||
+          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 2) ||
           (!this.isInGroup && this.roomBaseServer.state.watchInitData.join_info.role_name == 2)
         ) {
           confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
@@ -773,7 +789,9 @@
             console.log('结束他人的演示');
             await this.memberServer.endUserPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
-              receive_account_id: this.roomBaseServer.state.interactToolStatus.presentation_screen
+              receive_account_id: this.isInGroup
+                ? this.groupServer.state.groupInitData.presentation_screen
+                : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
           }
         } catch (ex) {
@@ -919,7 +937,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: scroll;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      border-radius: 0;
+      background-color: #000 !important;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transpar ent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      height: 60px;
+      border-radius: 10px;
+      border: 1px solid #fff;
+      background: #000 !important;
+    }
 
     li.doc-thumbnailbar__opt {
       height: 63px;

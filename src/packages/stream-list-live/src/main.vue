@@ -60,11 +60,25 @@
         @click="toggleShrink(false)"
       ></span>
     </div>
+
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>网络异常导致互动房间连接失败</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useInteractiveServer, useSplitScreenServer } from 'middle-domain';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+
   export default {
     name: 'VmpStreamListLive',
 
@@ -77,10 +91,15 @@
         isShrink: false, // 是否收起
         isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
         remoteMaxLength: 0, //一行最大数
-        speakerList: []
+        speakerList: [],
+        PopAlertOffline: {
+          visible: false
+        }
       };
     },
-
+    components: {
+      SaasAlert
+    },
     computed: {
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
@@ -127,6 +146,7 @@
 
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
+      this.splitScreenServer = useSplitScreenServer();
     },
 
     created() {
@@ -136,6 +156,11 @@
         this.childrenCom,
         this.$domainStore.state.interactiveServer.remoteStreams
       );
+
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
+        this.PopAlertOffline.visible = true;
+      });
       // this.getStreamList();
     },
 
@@ -156,15 +181,6 @@
       },
       toggleShrink(flag) {
         this.isShrink = flag;
-        // const target = document.querySelector('#vhall-remote-strams-box');
-        // setTimeout(() => {
-        //   if (this.$store.state.screenMainTop == target.offsetHeight) {
-        //     return;
-        //   }
-        //   const resizeEvent = new Event('resize');
-        //   window.dispatchEvent(resizeEvent);
-        //   this.$store.commit('SETSCREENMAINTOP', target.offsetHeight);
-        // }, 100);
       },
       /**
        * 计算
@@ -180,14 +196,19 @@
           _this.isMainScreenHeightLower = _this.$refs.streamList.offsetHeight === 160;
         });
         observer.observe(this.$refs.streamList, { childList: true, subtree: true });
+      },
+      // 开启 / 关闭分屏
+      toggleSplitScreen(command) {
+        if (command === 'open') {
+          this.splitScreenServer.startSplit();
+        }
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
-      // exchange(compName) {
-      //   window.$middleEventSdk?.event?.send({
-      //     cuid: 'ps.surface',
-      //     method: 'exchange',
-      //     args: [compName, 2]
-      //   });
-      // }
     }
   };
 </script>

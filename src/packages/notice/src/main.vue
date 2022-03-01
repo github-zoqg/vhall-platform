@@ -1,20 +1,26 @@
 <template>
   <div class="vmp-notice-list">
     <main class="vmp-notice-list-container">
-      <ul>
-        <li
-          class="vmp-notice-list-container__item"
-          v-for="(item, index) of noticeList"
-          :key="index"
-        >
-          <i class="iconfont icongonggao" />
-          <p>
-            <span class="v-type">[公告]</span>
-            <span>{{ item.content.content }}</span>
-          </p>
-          <p class="vmp-notice-item__time">{{ item.created_at }}</p>
-        </li>
-      </ul>
+      <overlay-scrollbars
+        ref="noticeScroll"
+        :options="overlayScrollBarsOptions"
+        style="height: 100%"
+      >
+        <ul>
+          <li
+            class="vmp-notice-list-container__item"
+            v-for="(item, index) of noticeList"
+            :key="index"
+          >
+            <i class="vh-iconfont vh-line-voice" />
+            <p>
+              <span class="v-type">[公告]</span>
+              <span>{{ item.content.content }}</span>
+            </p>
+            <p class="vmp-notice-item__time">{{ item.created_at }}</p>
+          </li>
+        </ul>
+      </overlay-scrollbars>
     </main>
 
     <footer class="vmp-notice-list-textarea">
@@ -54,7 +60,16 @@
         },
         totalPages: 0,
         total: 0,
-        inputVal: ''
+        inputVal: '',
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-dark os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     computed: {
@@ -68,31 +83,44 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     created() {
+      this.noticeServer.listenMsg();
       this.roomBaseState = this.roomBaseServer.state;
-      this.getNoticeHistoryList();
+      this.getNoticeList(false);
       this.initNotice();
     },
     methods: {
+      /**
+       * 初始化scroll区域
+       */
+      initScroll() {
+        this.osInstance = this.$refs.noticeScroll.osInstance();
+        this.osInstance.options(this.overlayScrollBarsOptions);
+      },
+      /**
+       * 初始化notice
+       */
       initNotice() {
-        // 公告消息
-        this.msgServer.$onMsg('ROOM_MSG', msg => {
-          let msgs = msg.data;
-          if (msgs.type == 'room_announcement') {
-            this.noticeNum++;
-            this.noticeList.unshift({
-              created_at: msgs.push_time,
-              content: {
-                content: msgs.room_announcement_text
-              }
-            });
+        this.noticeServer.$on('room_announcement', msg => this.addNotice(msg));
+      },
+
+      /**
+       *添加一条消息
+       * @param {Object} msg
+       */
+      addNotice(msg) {
+        this.noticeNum++;
+        this.noticeList.unshift({
+          created_at: msg.push_time,
+          content: {
+            content: msg.room_announcement_text
           }
         });
       },
-      getNoticeHistoryList() {
-        this.isShowNotice = true;
-        this.getNoticeList(false);
-      },
-      async getNoticeList(flag) {
+      /**
+       * 获取历史消息列表
+       * @param {Boolean} isLoadMore
+       */
+      async getNoticeList(isLoadMore = true) {
         const { watchInitData } = this.roomBaseState;
         const params = {
           room_id: watchInitData.interact.room_id,
@@ -100,7 +128,7 @@
           ...this.pageInfo
         };
 
-        const res = await this.noticeServer.getNoticeList({ params, flag });
+        const res = await this.noticeServer.getNoticeList({ params, flag: isLoadMore });
         if (res.code == 200 && res.data) {
           const state = this.noticeServer.state;
           this.noticeList = state.noticeList;
@@ -109,6 +137,9 @@
           this.noticeNum = state.total;
         }
       },
+      /**
+       * 读取更多data
+       */
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
           return false;
@@ -117,6 +148,9 @@
         this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
         this.getNoticeList(true);
       },
+      /**
+       * 发送一条公告
+       */
       async sendNotice() {
         if (this.inputVal === '' || this.inputVal === undefined) {
           return this.$message.warning('内容不能为空');
@@ -146,7 +180,6 @@
     position: relative;
     &-container {
       height: calc(100% - 52px);
-      overflow-y: scroll;
       width: 100%;
       background: transparent;
       background-size: 100% 100%;
@@ -162,10 +195,10 @@
           margin-top: 1px;
         }
 
-        i.iconfont {
+        i.vh-iconfont {
           display: inline-block;
           position: absolute;
-          top: 15px;
+          top: 17px;
           font-size: 14px;
           color: #fba511;
           left: 15px;

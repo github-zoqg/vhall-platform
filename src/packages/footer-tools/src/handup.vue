@@ -82,8 +82,11 @@
     },
     methods: {
       // 下麦
-      speakOff() {
-        useMicServer().speakOff();
+      async speakOff() {
+        const { code, msg } = await useMicServer().speakOff();
+        if (code === 513035) {
+          this.$message.error(msg);
+        }
       },
       // 举手按钮点击事件
       handleHandClick() {

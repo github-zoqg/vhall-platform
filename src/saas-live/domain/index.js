@@ -11,7 +11,8 @@ import {
   useQaAdminServer,
   useGroupServer,
   useChatAuthServer,
-  useMediaSettingServer
+  useMediaSettingServer,
+  useUserServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -35,6 +36,7 @@ export default new DomainStore.Store({
     qaServer: useQaAdminServer().state,
     groupServer: useGroupServer().state,
     chatAuthServer: useChatAuthServer().state,
-    mediaSettingServer: useMediaSettingServer().state
+    mediaSettingServer: useMediaSettingServer().state,
+    userServer: useUserServer().state
   }
 });

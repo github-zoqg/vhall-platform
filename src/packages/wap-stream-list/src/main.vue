@@ -45,7 +45,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          热度 &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -60,7 +60,7 @@
         :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         @click.stop="setFullScreen"
       >
-        <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+        <i class="vh-iconfont vh-a-line-enterfullscreen"></i>
       </div>
     </div>
     <!-- 小组协作中 -->
@@ -82,7 +82,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast } from 'vant';
+  import { Toast, Dialog } from 'vant';
 
   export default {
     name: 'VmpWapStreamList',
@@ -194,6 +194,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
       this.msgServer = useMsgServer();
+      this.groupServer = useGroupServer();
     },
 
     async created() {
@@ -210,6 +211,9 @@
       // 在麦上 才存在滑动情况
       if (this.micServer.state.isSpeakOn) {
         this.createBScroll();
+        if (window.orientation == 90 || window.orientation == -90) {
+          this.setFullScreen();
+        }
       }
       this.fiveDown();
     },
@@ -223,7 +227,7 @@
       // 事件监听
       addSDKEvents() {
         // 监听到自动播放
-        this.interactiveServer.$on(VhallRTC.EVENT_STREAM_PLAYABORT, e => {
+        this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });
@@ -235,14 +239,91 @@
           Toast(`${msg.data.nick_name}设置成为${str}`);
         });
 
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
+          Dialog.alert({
+            message: '网络异常导致互动房间连接失败'
+          }).then(() => {
+            window.location.reload();
+          });
+        });
+
         // 主持人进入退出小组 消息监听
-        useGroupServer().$on('dispatch_group_enter', msg => {
+        this.groupServer.$on('dispatch_group_enter', msg => {
           if (msg.data.status == 'enter') {
             this.is_host_in_group = true;
           } else if (msg.data.status == 'quit') {
             this.is_host_in_group = false;
           }
         });
+
+        // 开启分组讨论
+        this.groupServer.$on('GROUP_SWITCH_START', () => {
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(1, this.groupServer.state.groupInitData.name);
+          }
+        });
+
+        // 结束分组讨论
+        this.groupServer.$on('GROUP_SWITCH_END', () => {
+          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+        });
+
+        // 小组解散
+        this.groupServer.$on('GROUP_DISBAND', () => {
+          this.gobackHome(4);
+        });
+
+        // 本人被踢出来
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
+          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        });
+
+        // 组长变更
+        this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
+          if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
+            if (this.groupServer.state.groupInitData.join_role == 20) {
+              this.gobackHome(6);
+            } else {
+              this.gobackHome(7);
+            }
+          }
+        });
+
+        // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
+        window.addEventListener('orientationchange', () => {
+          if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
+            this.setFullScreen();
+          }
+        });
+      },
+      // 返回主房间提示
+      gobackHome(index, name) {
+        let title = '';
+        switch (index) {
+          case 1:
+            title = '主持人开启了分组讨论，您将进入' + name + '组参与讨论';
+            break;
+          case 2:
+            title = '主持人已将您分配至' + name + '组';
+            break;
+          case 3:
+            title = '主持人结束了分组讨论，您将返回主直播间';
+            break;
+          case 4:
+            title = '主持人解散了分组，您将返回主直播间';
+            break;
+          case 5:
+            title = '您已被踢出该小组';
+            break;
+          case 6:
+            title = '您被提升为组长!';
+            break;
+          case 7:
+            title = '组长身份已变更';
+            break;
+        }
+        Toast(title);
       },
 
       // 创建betterScroll
@@ -259,7 +340,9 @@
             });
           }
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
-          this.mainScreenDom.style.left = `${1.02667}rem`;
+          if (this.mainScreenDom) {
+            this.mainScreenDom.style.left = `${1.02667}rem`;
+          }
           this.scroll.on('scroll', ({ x }) => {
             if (this.mainScreenDom) {
               this.mainScreenDom.style.left = `${30 + -x}px`;
@@ -291,7 +374,7 @@
           } else {
             this.interactiveServer.setStreamFullscreen({
               streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+              vNode: `vmp-stream-local__${mainScreenStream.streamId}`
             });
           }
           this.interactiveServer.state.fullScreenType = true;

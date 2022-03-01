@@ -18,7 +18,7 @@
           @click="scrollToTarget"
         >
           {{ tipMsg }}
-          <span class="iconfont iconyourennijiantou"></span>
+          <span class="vh-iconfont vh-d-arrow-down"></span>
         </div>
       </div>
     </div>
@@ -29,8 +29,10 @@
       :chat-login-status="chatLoginStatus"
       :input-status="inputStatus"
       :latestMessage="latestMessage"
+      :join-info="joinInfo"
       @chatTextareaHeightChange="handleHeightChange"
       @performScroll="performScroll"
+      @needLogin="handleLogin"
     ></chat-operate>
   </div>
 </template>
@@ -41,6 +43,7 @@
   import chatOperate from './components/chat-operate';
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpWatchPrivateChat',
     components: {
@@ -70,24 +73,24 @@
         operatorHeight: 91,
         //是否在执行动画
         animationRunning: false,
-        //是否有正常的未读消息 todo domain提供事件监听
+        //是否有正常的未读消息
         isHasUnreadNormalMsg: false,
         //未读消息数量
         unReadMessageCount: 0,
         //输入框状态
         inputStatus: {
           disable: false,
-          placeholder: '参与聊天'
+          placeholder: this.$t('chat.chat_1021')
         },
         //是否是初始化私聊tab todo 预留
         isFirstPrivateChat: false,
-        //最新的消息 todo domain负责事件那部分提供提示消息
+        //最新的消息
         latestMessage: {},
         //用户角色
         roleName: '',
         //配置信息
         configList: {},
-        //提示消息 todo domain负责事件那部分提供提示消息
+        //提示消息
         tipMsg: {},
         //是否是嵌入端
         isEmbed: false,
@@ -105,10 +108,6 @@
       chatList: {
         deep: true,
         handler() {
-          // 如果滚动条未滚动至最底部
-          if (this.osInstance.scroll().ratio.y !== 1) {
-            this.unReadMessageCount++;
-          }
           // 如果当前自定义菜单显示的是私聊，return
           if (this.isFirstPrivateChat) {
             this.isFirstPrivateChat = false;
@@ -200,6 +199,10 @@
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
         }
       },
+      //处理唤起登录
+      handleLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
       //初始化滚动
       scrollInit() {
         this.osInstance = this.$refs.chatContent.osInstance();
@@ -228,52 +231,15 @@
       },
       //事件监听
       listenEvents() {
-        this.msgServer.$on('CHAT', msg => {
-          try {
-            if (typeof msg !== 'object') {
-              msg = JSON.parse(msg);
-            }
-            if (typeof msg.context !== 'object') {
-              msg.context = JSON.parse(msg.context);
-            }
-            if (typeof msg.data !== 'object') {
-              msg.data = JSON.parse(msg.data);
-            }
-          } catch (e) {
-            console.log(e);
+        this.chatServer.$on('receivePrivateMsg', msg => {
+          if (msg.isFirstPrivateChat) {
+            this.isFirstPrivateChat = true;
           }
-          //非私聊消息，退出
-          if (!msg.data.target_id) {
-            return;
-          }
-          //空消息，退出
-          if (!msg.data.text_content) {
-            return;
-          }
-
-          msg.data = msg.data.text_content;
-          // 判断是否是跟当前用户有关的私聊消息
-          if (
-            msg.sender_id == this.joinInfo.third_party_user_id ||
-            msg.context.to == this.joinInfo.third_party_user_id
-          ) {
-            if (msg.sender_id != this.joinInfo.third_party_user_id) {
-              // 如果是本用户收发的消息放到私聊消息队列
-              this.latestMessage = msg;
-            }
-            if (msg.isFirstPrivateChat) {
-              this.isFirstPrivateChat = true;
-            }
-            this.chatList.push(msg);
-            if (
-              this.osInstance.scroll().max.y !== 0 &&
-              this.osInstance.scroll().ratio.y !== 1 &&
-              msg.context.to !== 'all'
-            ) {
-              // 如果是除回复、 @之外的普通消息
-              this.isHasUnreadNormalMsg = true;
-              this.tipMsg = `有${this.unReadMessageCount + 1}条未读消息`;
-            }
+          this.chatList.push(msg);
+          if (this.osInstance.scroll().max.y > -1 && this.osInstance.scroll().ratio.y !== 1) {
+            // 如果是除回复、 @之外的普通消息
+            this.isHasUnreadNormalMsg = true;
+            this.tipMsg = `有${++this.unReadMessageCount}条未读消息`;
           }
         });
       },
@@ -378,7 +344,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        .iconyourennijiantou {
+        .vh-d-arrow-down {
           font-size: 12px;
           margin-left: 6px;
         }

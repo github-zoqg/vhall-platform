@@ -26,15 +26,15 @@
               v-model="searchKey"
               placeholder="请输入音视频文件名称"
               style="width: 220px; float: right"
-              @keyup.enter.native="searchTableList"
-              @clear="searchTableList"
+              @keyup.enter.native="getTableList(false)"
+              @clear="getTableList(false)"
               clearable
             >
               <i
                 slot="prefix"
                 class="el-icon-search el-input__icon"
                 style="cursor: pointer; line-height: 36px"
-                @click="searchTableList"
+                @click="getTableList(false)"
               ></i>
             </el-input>
           </div>
@@ -130,7 +130,7 @@
   import videoPreview from '@/packages/app-shared/components/video-preview';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
-    name: 'VmpInsertVideo',
+    name: 'VmpInsertVideoList',
     data() {
       return {
         insertVideoVisible: false,
@@ -140,7 +140,6 @@
         videoParam: {}, //预览数据
         webinarId: '876395481' || this.$route.params.id,
         playingInsertVideoId: '',
-        isPcStartLive: true, // 是不是网页发起
         tableData: [],
         pageInfo: {
           pos: 0,
@@ -170,24 +169,7 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.roleName = this.roomBaseState.watchInitData.join_info.role_name;
     },
-    mounted() {
-      this.msgServer.$onMsg('live_start', msg => {
-        //  1主持人 2观众 3助理 4嘉宾
-        if (this.roleName == 3 && !this.assistantType) {
-          if (msg.data.switch_type != 1) {
-            // 1为网页发起
-            clearTimeout(this._setTimeoutlive_start);
-            this._setTimeoutlive_start = setTimeout(() => {
-              this.autoPlay();
-            }, 1000);
-            // 当前为助理，并且是由客户端发起的
-            this.isPcStartLive = false; // 是否是网页端发起的直播  助理其他端不支持插播
-          } else {
-            this.isPcStartLive = true;
-          }
-        }
-      });
-    },
+    mounted() {},
     methods: {
       openInserVideoDialog() {
         console.log('??13243544');
@@ -205,8 +187,7 @@
             confirmButtonText: '知道了',
             // center: true,
             customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            callback: action => {}
+            cancelButtonClass: 'zdy-confirm-cancel'
           });
           return;
         }
@@ -222,8 +203,7 @@
               title: '提示',
               confirmButtonText: '确定',
               customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel',
-              callback: action => {}
+              cancelButtonClass: 'zdy-confirm-cancel'
             });
             return;
           }
@@ -231,9 +211,8 @@
             title: '提示',
             confirmButtonText: '确定',
             customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
+            cancelButtonClass: 'zdy-confirm-cancel'
             // center: true,
-            callback: action => {}
           });
           return;
         } else if (
@@ -278,9 +257,6 @@
       getInsertingInfo(obj) {
         console.log(obj, '====???1zhangxiao-------');
         this.insertVideoObj.userInfo = obj;
-      },
-      searchTableList() {
-        this.getTableList(false);
       },
       selectlocalVideo() {
         if (!this.insertFileServer.isCanUseCaptureStream()) {

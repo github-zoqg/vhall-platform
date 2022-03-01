@@ -444,7 +444,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useQaAdminServer } from 'middle-domain';
+  import { useRoomBaseServer, useQaAdminServer, Domain, useMsgServer } from 'middle-domain';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
   import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
@@ -582,24 +582,27 @@
       this.roomBaseServer = useRoomBaseServer();
       this.qaServer = useQaAdminServer();
     },
-    async mounted() {
+    async created() {
       this.webinar_id = this.$router.currentRoute.params.id;
 
       if (location.search.includes('assistant_token=')) {
         sessionStorage.setItem('vhall_client_token', getQueryString('assistant_token') || '');
       }
-
-      await this.qaServer
+      await new Domain({
+        plugins: ['chat'],
+        isNotInitRoom: true
+      });
+      const watchInitData = await this.qaServer
         .initChatMess({
           webinar_id: this.webinar_id
         })
         .then(res => {
-          this.roomBaseServer.state.watchInitData = res.data;
+          return (this.roomBaseServer.state.watchInitData = res.data);
         })
         .catch(err => {
           this.$message.error(err.msg);
         });
-
+      await useMsgServer().initMaintMsg(watchInitData);
       await this.chatPrivateGetRankList();
 
       this.getChat(0); // 待处理
@@ -607,7 +610,7 @@
       this.getChat(2); // 直播中回答
       this.setReply(); // 文字回复
 
-      this.qaServer.initChatInstance({}, () => {});
+      this.qaServer.initQaAdmin();
     },
     methods: {
       /**
@@ -733,10 +736,10 @@
       replyBut(val) {
         this.reply(val, val.item, val.index);
       },
-      reply(val, item, index) {
+      async reply(val, item, index) {
         if (typeof val == 'object') {
           if (val.type == 'private') {
-            this.$refs.privateChat.openModal();
+            await this.$refs.privateChat.openModal();
             this.$nextTick(() => {
               this.$refs.privateChat.addChatItem({
                 type: 1,
