@@ -74,6 +74,5 @@
 <style lang="less" scoped>
   .vmp-chat-wap-scroll {
     width: 100%;
-    height: 100%;
   }
 </style>
