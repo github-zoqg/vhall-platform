@@ -28,13 +28,18 @@
 
       <!-- 流列表 -->
       <vmp-air-container
-        v-if="isShowContainer && !isLivingEnd"
+        v-show="isShowContainer && !isLivingEnd"
         :cuid="childrenComp[1]"
         :oneself="true"
       ></vmp-air-container>
 
       <!-- wap端订阅桌面共享的容器 -->
-      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-if="!isLivingEnd" />
+      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+      <!-- 
+        注意：
+          由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
+            此处不能用v-if 
+       -->
     </div>
   </div>
 </template>
