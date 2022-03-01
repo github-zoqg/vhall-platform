@@ -245,6 +245,7 @@
       overflow: hidden;
       .qa-content {
         height: 100%;
+        overflow: auto;
         .qa-item-wrapper {
           padding: 0 30px;
           .question {

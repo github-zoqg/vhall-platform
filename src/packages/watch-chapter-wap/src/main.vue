@@ -19,7 +19,7 @@
             @click.stop="changeTime(sub.createTime)"
             :class="{ active: select == sub.createTime }"
           >
-            <span class="title">{{ index + 1 }}-{{ i + 1 }}.{{ $tdefault(sub.title) }}</span>
+            <span class="title">{{ index + 1 }}-{{ i + 1 }}.{{ $t(sub.title) }}</span>
             <span class="time">{{ sub.createTime | filterTime }}</span>
           </div>
         </template>

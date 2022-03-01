@@ -406,7 +406,14 @@ export const serverConfig = {
     component: 'VmpIntro'
   },
   comQa: {
-    component: 'VmpQa'
+    component: 'VmpQa',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 媒体设置
   comMediaSetting: {

@@ -33,6 +33,8 @@ import VmpCustomMenuWap from '@/packages/custom-menu-wap';
 // 商品列表
 import VmpGoodListWap from '@/packages/good-wap';
 import VmpChatWap from '@/packages/chat-wap';
+import VmpGoodsDetail from '@/packages/wap-goods-detail';
+
 //wap互动工具box
 import VmpInteractToolsWap from '@/packages/interact-tools-wap';
 // wap互动工具-签到
@@ -97,6 +99,7 @@ export function initUse() {
   Vue.use(VmpNoticeWap);
   Vue.use(VmpRecommendWap);
   Vue.use(VmpGoodListWap);
+  Vue.use(VmpGoodsDetail);
   Vue.use(VmpWapQrCode);
   Vue.use(VmpInteractToolsWap);
   Vue.use(VmpChatWap);

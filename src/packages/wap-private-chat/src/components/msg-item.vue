@@ -24,7 +24,7 @@
           >
             {{ roleFilter(msg.roleName) }}
           </span>
-          <span class="nickname">{{ msg.nickName }}</span>
+          <span class="nickname">{{ msg.nickname }}</span>
         </p>
         <!-- 图文消息 -->
         <p

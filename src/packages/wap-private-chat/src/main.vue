@@ -7,7 +7,12 @@
         </template>
       </div>
     </div>
-    <send-box currentTab="private" :is-banned="isMuted" :is-all-banned="isAllMuted"></send-box>
+    <send-box
+      currentTab="private"
+      :is-banned="isMuted"
+      :is-all-banned="isAllMuted"
+      @sendPrivate="sendMsg"
+    ></send-box>
   </div>
 </template>
 
@@ -15,10 +20,6 @@
   import msgItem from './components/msg-item';
   import { useChatServer, useRoomBaseServer, useUserServer, useMsgServer } from 'middle-domain';
   import sendBox from '@/packages/chat-wap/src/components/send-box';
-  import { textToEmojiText } from '@/packages/chat/src/js/emoji';
-  import getAvatar from '@/packages/chat/src/js/get-avatar';
-  import Msg from '@/packages/chat/src/js/msg-class';
-  import { formatTime } from '@/packages/chat/src/js/handle-time';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpWapPrivateChat',
@@ -29,7 +30,7 @@
     data() {
       return {
         //私聊列表
-        privateChatList: [],
+        privateChatList: useChatServer().state.privateChatList,
         //当前@的对象
         currentAtPerson: {
           hostName: '',
@@ -91,88 +92,21 @@
       },
       //事件监听
       listenEvents() {
-        this.msgServer.$on('CHAT', msg => {
-          try {
-            if (typeof msg !== 'object') {
-              msg = JSON.parse(msg);
-            }
-            if (typeof msg.context !== 'object') {
-              msg.context = JSON.parse(msg.context);
-            }
-            if (typeof msg.data !== 'object') {
-              msg.data = JSON.parse(msg.data);
-            }
-          } catch (e) {
-            console.log(e);
-          }
-          if (['text', 'image'].includes(msg.data.type)) {
-            // 接收到私聊信息,发送信令显示私聊tab，并且更新小红点
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitShowTab', { type: 'private', visible: true })
-            );
-            // 问答私聊消息，并且是自己的
-            if (msg.data.target_id && msg.data.target_id == this.userId) {
-              this.privateMsg = msg;
-              this.privateSendId = msg.sender_id;
-            }
-          }
-        });
+        // this.chatServer.$on('receivePrivateMsg', msg => {
+        //   this.privateChatList.push(msg);
+        // });
       },
       //发送消息
       sendMsg(value) {
-        const data = {
-          type: 'text',
-          text_content: value,
-          target_id: this.currentAtPerson.hostJoinId || this.privateSendId
-        };
-        const context = {
-          to: this.currentAtPerson.hostJoinId || this.privateSendId,
-          nickname: this.userInfo.nickname,
-          avatar: getAvatar(this.userInfo.avatar),
-          role_name: 2, // 角色 1主持人2观众3助理4嘉宾
-          event: JSON.stringify(data),
-          source: 'mobile'
-        };
-        // 发送socket消息
-        this.chatServer.sendMsg({ data, context });
-        // 先发送消息   然后改变自身的data里的表情属性值   不可改变顺序
-        data.text_content = textToEmojiText(data.text_content);
-        const tempData = new Msg({
-          avatar: getAvatar(this.userInfo.avatar),
-          nickName: this.userInfo.nickname,
-          type: 'text',
-          content: data,
-          sendId: this.userId,
-          sendTime: formatTime(new Date()),
-          roleName: 2,
-          client: 'mobile',
-          self: true
-          // showTime: handleTime(item.sendTime)
-        });
-        this.privateChatList.push(tempData);
-        this.scrollTop();
-      },
-      //组装消息
-      handleMsg(val) {
-        const json = JSON.stringify(val);
-        const msg = JSON.parse(json);
-        if (msg.data.text_content) {
-          msg.data.text_content = textToEmojiText(msg.data.text_content);
-        }
-        this.currentAtPerson.hostName = msg.context.nickName;
-        this.currentAtPerson.hostJoinId = msg.context.user_id;
-        const data = new Msg({
-          avatar: getAvatar(msg.context.avatar),
-          nickName: msg.context.nickname,
-          type: msg.data.type,
-          content: msg.data,
-          sendId: msg.sender_id,
-          sendTime: msg.date_time,
-          roleName: msg.context.role_name,
-          client: 'mobile'
-        });
-        this.privateChatList.push(data);
-        this.scrollTop();
+        const curmsg = useChatServer().createCurMsg();
+        const target = useRoomBaseServer().state.watchInitData.webinar.userinfo.user_id;
+        curmsg.setTarget(target);
+        //将文本消息加入消息体
+        curmsg.setText(value);
+        //发送消息
+        useChatServer().sendMsg(curmsg);
+        //清除发送后的消息
+        useChatServer().clearCurMsg();
       },
       //滚动到顶部
       scrollTop() {
