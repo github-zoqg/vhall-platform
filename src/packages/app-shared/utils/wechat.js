@@ -37,7 +37,7 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
   });
 }
 
-export function initHideChatSdk(initData = {}, failedCb = () => {}) {
+export function initHideChatSdk(initData = {}, failedCb = () => { }) {
   let hideConfigSdk = {
     debug: false,
     jsApiList: ['hideMenuItems'],
@@ -88,7 +88,7 @@ export function authByWx(isEmbed, path, _next) {
       params.source = params.source != '' ? params.source : 'web'; //默认为web pc的话传pc
       params.jump_url =
         window.location.protocol +
-        process.env.VUE_APP_WATCH_URL +
+        process.env.VUE_APP_WAP_WATCH +
         process.env.VUE_APP_WEB_KEY +
         `${path}?purpose=login${_search ? '&' + _search : ''}`;
       // 请求授权接口

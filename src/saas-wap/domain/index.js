@@ -16,7 +16,8 @@ setBaseUrl({
   middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL
 });
 setRequestHeaders({
-  platform: 7
+  // platform: 7
+  platform: 10
 });
 
 Vue.use(DomainStore);
