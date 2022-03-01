@@ -34,7 +34,7 @@
       </li>
       <li>
         <!-- 签到 -->
-        <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+        <vmp-air-container :cuid="comSignWatch"></vmp-air-container>
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
@@ -191,7 +191,6 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
