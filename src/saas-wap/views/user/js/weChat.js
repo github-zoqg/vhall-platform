@@ -15,11 +15,7 @@ const mixins = {
         timestamp: initData.timestamp,
         nonceStr: initData.nonceStr,
         signature: initData.signature,
-        jsApiList: [
-          'chooseWXPay',
-          'updateAppMessageShareData',
-          'updateTimelineShareData'
-        ]
+        jsApiList: ['chooseWXPay', 'updateAppMessageShareData', 'updateTimelineShareData']
       };
       console.log('wxConfig', configParams, initData, shareData);
       // wx.config({ ...params, ...initData })
@@ -49,7 +45,7 @@ const mixins = {
         });
       });
     },
-    initHideChatSdk (initData = {}) {
+    initHideChatSdk(initData = {}) {
       const hideConfigSdk = {
         debug: false,
         jsApiList: ['hideMenuItems'],
@@ -60,7 +56,7 @@ const mixins = {
       };
       // console.log('wxhideConfig', hideConfigSdk, initData)
       wx.config(hideConfigSdk);
-      wx.ready(function() {
+      wx.ready(function () {
         wx.hideMenuItems({
           menuList: [
             'menuItem:share:appMessage',

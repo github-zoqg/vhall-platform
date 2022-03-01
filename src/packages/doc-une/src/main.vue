@@ -49,7 +49,7 @@
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
           <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
           <span v-if="hasDocPermission">暂未分享任何文档</span>
-          <span v-else>主讲人正在准备文档，请稍等...</span>
+          <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
       </div>
 
@@ -127,7 +127,7 @@
         <svg viewBox="25 25 50 50" class="circular">
           <circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
         </svg>
-        <p class="el-loading-text">文档加载中</p>
+        <p class="el-loading-text">{{ $t('doc.doc_1001') }}</p>
       </div>
     </div>
   </div>
@@ -196,14 +196,13 @@
       },
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
+        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
       },
       // 文档是否可见
       show() {
         return (
-          (this.roomBaseServer.state.watchInitData.join_info.role_name != 2 &&
-            !this.roomBaseServer.state.isShareScreen) ||
-          (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
+          (!this.isWatch && !this.roomBaseServer.state.isShareScreen) ||
+          (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
               this.hasDocPermission))
@@ -219,8 +218,9 @@
           );
         } else {
           return (
+            ['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
             this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-            this.watchInitData.join_info.third_party_user_id
+              this.watchInitData.join_info.third_party_user_id
           );
         }
       },

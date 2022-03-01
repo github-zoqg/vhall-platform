@@ -142,7 +142,8 @@
           });
       },
       handleJump(url) {
-        location.href = url;
+        // location.href = url;
+        window.open(url, '_blank');
       },
       start(item, e) {
         this.startY = e.targetTouches[0].pageY;
@@ -157,7 +158,8 @@
       },
 
       toHref(item) {
-        location.href = item;
+        window.open(item, '_blank');
+        // location.href = item;
       }
     }
   };

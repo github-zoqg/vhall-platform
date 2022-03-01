@@ -253,9 +253,9 @@
           display: inline-block;
           width: calc(100% - 220px);
           padding-left: 25px;
-          font-size: 32px;
+          font-size: 30px;
           .title {
-            line-height: 42px;
+            line-height: 34px;
             color: rgba(34, 34, 34, 1);
           }
           .price {
