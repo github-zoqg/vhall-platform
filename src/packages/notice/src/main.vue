@@ -99,7 +99,16 @@
       /**
        * 初始化notice
        */
-      initNotice() {},
+      initNotice() {
+        this.noticeServer.$on('room_announcement', msg => {
+          this.domainState.noticeList.unshift({
+            created_at: msg.push_time,
+            content: {
+              content: msg.room_announcement_text
+            }
+          });
+        });
+      },
 
       /**
        * 获取历史消息列表
