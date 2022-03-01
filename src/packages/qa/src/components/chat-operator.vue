@@ -188,7 +188,9 @@
         });
       },
       // 登录
-      loginVisible() {},
+      loginVisible() {
+        this.$emit('needLogin');
+      },
       // 切换表情显示
       toggleEmoji() {
         if (this.chatLoginStatus) {

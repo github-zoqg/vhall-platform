@@ -404,7 +404,7 @@
         </div>
       </div>
     </div>
-    <PrivateChat ref="privateChat" @sendMsg="privateSendMsg"></PrivateChat>
+    <PrivateChat v-if="ready" ref="privateChat"></PrivateChat>
     <el-dialog
       :title="$t('chat.chat_1082')"
       custom-class="text-reply"
@@ -497,6 +497,7 @@
     data() {
       return {
         $Chat: null, // 聊天句柄
+        ready: false,
         privateFlag: false,
         testAnswer: 2,
         testAnswerSelects: [
@@ -597,7 +598,8 @@
           webinar_id: this.webinar_id
         })
         .then(res => {
-          return (this.roomBaseServer.state.watchInitData = res.data);
+          this.roomBaseServer.state.watchInitData = res.data;
+          return res.data;
         })
         .catch(err => {
           this.$message.error(err.msg);
@@ -611,6 +613,7 @@
       this.setReply(); // 文字回复
 
       this.qaServer.initQaAdmin();
+      this.ready = true;
     },
     methods: {
       /**
@@ -795,12 +798,6 @@
       },
       privateClose() {
         this.privateFlag = false;
-      },
-      /**
-       * 发送私聊内容
-       */
-      privateSendMsg(data, msg) {
-        this.qaServer.chatInstance.emit(data, msg);
       },
       // 撤销回复
       revoke(val, index, fatherIndex) {
