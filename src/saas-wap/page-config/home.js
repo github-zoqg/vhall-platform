@@ -13,7 +13,8 @@ const serverConfig = {
       'layerBody',
       'layerBodyCenter',
       'comAllDialog',
-      'comWapRewardEffect'
+      'comWapRewardEffect',
+      'comGoodsDetail'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
@@ -176,7 +177,15 @@ const serverConfig = {
   },
   //商品列表
   comGoodSaasWap: {
-    component: 'VmpGoodListWap'
+    component: 'VmpGoodListWap',
+    emitShowDetail: {
+      cuid: ['comGoodsDetail'],
+      method: 'open',
+      args: ['$0']
+    }
+  },
+  comGoodsDetail: {
+    component: 'VmpGoodsDetail'
   },
   comCustomMenuWap: {
     component: 'VmpCustomMenuWap'
