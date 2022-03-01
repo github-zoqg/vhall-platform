@@ -319,7 +319,7 @@
     computed: {
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
+        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
       },
       //判断是否是音频直播模式
       isAudio() {
@@ -859,6 +859,7 @@
     position: relative;
     overflow: hidden;
     background: #1a1a1a;
+    z-index: 2;
     &-watch {
       height: 100%;
       width: 100%;
