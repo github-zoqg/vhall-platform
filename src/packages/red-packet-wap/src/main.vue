@@ -34,7 +34,7 @@
       return {
         redPacketServerState,
         dialogVisible: false, // 组件显示
-        componentsView: 'RedPacketWinners'
+        componentsView: 'RedPacketAccept'
       };
     },
     beforeCreate() {
