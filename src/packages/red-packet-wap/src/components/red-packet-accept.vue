@@ -3,12 +3,13 @@
   <div class="vhsaas-interact-dialog close">
     <div class="vhsaas-red-packet-body">
       <!-- 开 - 小金币按钮 -->
-      <img
-        :class="['vhsaas-close-open', opened ? 'open' : 'scale']"
-        src="../images/close-open@2x.png"
-        alt=""
-        @click="openRedPacket"
-      />
+      <div @click="openRedPacket">
+        <img
+          :class="['vhsaas-close-open', opened ? 'open' : 'scale']"
+          src="../images/close-open@2x.png"
+          alt=""
+        />
+      </div>
       <!-- 文案 -->
       <h1>
         {{
@@ -58,8 +59,8 @@
     },
     methods: {
       openRedPacket() {
-        if (this.accepted) return;
-        this.accepted = true;
+        // if (this.accepted) return;
+        // this.accepted = true;
         this.redPacketServer.openRedPacket().then(res => {
           if (res.code === 200) {
             this.opened = true;
