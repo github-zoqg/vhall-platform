@@ -29,7 +29,6 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.noticeServer.listenMsg();
       const { latestNotice } = this.noticeServer.state;
       if (latestNotice.total) {
         this.isNoticeColumn = true;

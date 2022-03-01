@@ -491,7 +491,6 @@
                 const watermarkContainer = document.getElementById('vh-watermark-container');
                 watermarkContainer && (watermarkContainer.style.width = '80px');
                 const waterMark = document.getElementById('vh-watermark');
-                // waterMark && (waterMark.style.width = '80px')
                 waterMark && (waterMark.style.height = '35px');
               }
             });
