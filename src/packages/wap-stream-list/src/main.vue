@@ -41,7 +41,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
+        :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
@@ -57,7 +57,7 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
+        :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -396,14 +396,14 @@
       },
 
       videoShowIcon() {
-        this.iconShow = false;
+        this.iconShow = true;
         this.fiveDown();
       },
       // 5秒后消失
       fiveDown() {
         clearTimeout(this.setIconTime);
         this.setIconTime = setTimeout(() => {
-          this.iconShow = true;
+          this.iconShow = false;
         }, 5000);
       }
     }
@@ -509,6 +509,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 1;
+        background: #000;
         img {
           width: 88px;
           height: 88px;
