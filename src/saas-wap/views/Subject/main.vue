@@ -148,7 +148,7 @@
       async wxShareInfo(info) {
         const wx_url =
           window.location.protocol +
-          process.env.VUE_APP_WATCH_URL +
+          process.env.VUE_APP_WAP_WATCH +
           process.env.VUE_APP_WEB_KEY +
           `/special/detail?id=${this.$route.query.id}`;
 
@@ -172,7 +172,7 @@
 
         const link =
           window.location.protocol +
-          `${process.env.VUE_APP_WATCH_URL}${process.env.VUE_APP_WEB_KEY}/special/detail?id=${this.$route.query.id}`;
+          `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/special/detail?id=${this.$route.query.id}`;
 
         // wechat-sdk 初始化
         const wechatRes = await initWeChatSdk(
