@@ -28,13 +28,18 @@
 
       <!-- 流列表 -->
       <vmp-air-container
-        v-if="isShowContainer && !isLivingEnd"
+        v-show="isShowContainer && !isLivingEnd"
         :cuid="childrenComp[1]"
         :oneself="true"
       ></vmp-air-container>
 
       <!-- wap端订阅桌面共享的容器 -->
-      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-if="!isLivingEnd" />
+      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+      <!-- 
+        注意：
+          由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
+            此处不能用v-if 
+       -->
     </div>
   </div>
 </template>
@@ -99,7 +104,7 @@
       });
     },
     methods: {
-      changeBodyMini(flag) {
+      questionnaireVisible(flag) {
         this.mini = flag;
       }
     }
@@ -156,6 +161,20 @@
       overflow: hidden;
       .vmp-wap-player-header,
       .vmp-wap-player-footer {
+        display: none;
+      }
+      .vmp-wap-stream-wrap {
+        height: 100%;
+        .vmp-stream-list__main-screen {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
+      .vmp-wap-stream-wrap-mask-screen {
         display: none;
       }
     }

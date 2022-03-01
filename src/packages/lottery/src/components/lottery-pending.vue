@@ -10,7 +10,7 @@
       {{ fitment.text ? fitment.text : `${$t('interact_tools.interact_tools_1002')}....` }}
     </p>
     <p
-      v-if="showEndBtn"
+      v-if="mode === 'live'"
       class="prize-pending__end-button"
       @click="endLottery"
       :class="[
@@ -21,7 +21,8 @@
         { disabled: disabledTime > 0 && disabledTime <= 5 }
       ]"
     >
-      {{ $t('interact_tools.interact_tools_1008') }}
+      结束抽奖
+      <!-- {{ $t('interact_tools.interact_tools_1008') }} -->
       <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
     </p>
     <i class="prize-pending__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
@@ -38,16 +39,16 @@
         type: Object,
         required: true
       },
-      showEndBtn: {
+      mode: {
         // 是否显示结束抽奖(发起端)
-        type: Boolean,
+        type: String,
         default() {
-          return false;
+          return 'watch';
         }
       }
     },
     mounted() {
-      if (this.showEndBtn) {
+      if (this.mode === 'live') {
         this.coutDown();
       }
     },

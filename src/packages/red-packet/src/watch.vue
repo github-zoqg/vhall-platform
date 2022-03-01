@@ -46,7 +46,7 @@
     methods: {
       // 开启红包弹窗
       open(uuid) {
-        this.this.redPacketServer.getRedPacketInfo(uuid).then(res => {
+        this.redPacketServer.getRedPacketInfo(uuid).then(res => {
           const data = res.data;
           if (data.status == 1 || data.red_packet.number == data.red_packet.get_user_count) {
             // 本人已经抢到, 或者被强光
@@ -58,8 +58,7 @@
         });
       },
       initEvent() {
-        console.log(1111);
-        this.redPacketServer.$on('RED_ENVELOPE_OK', data => {
+        this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
           const uuid = data.red_packet_uuid;
           this.open(uuid);
         });

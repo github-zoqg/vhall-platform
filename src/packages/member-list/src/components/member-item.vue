@@ -681,7 +681,7 @@
       handleSetBanned() {
         this.$emit('operateUser', { type: 'setBanned', params: this.userInfo });
       },
-      //邀请演示
+      // 邀请演示，主直播间和小组内都会调用
       handleInviteMic() {
         this.$emit('operateUser', { type: 'inviteMic', params: this.userInfo });
       },
@@ -697,6 +697,7 @@
           case 'setGroupKicked':
             this.handleSetKicked();
             break;
+          // 主直播间主持人邀请成员演示
           case 'inviteMic':
             this.handleInviteMic();
             break;
@@ -716,7 +717,13 @@
           case 'setGroupKicked':
             this.handleSetKicked();
             break;
+          // 组长邀请成员演示
           case 'inviteMic':
+            this.handleInviteMic();
+            break;
+          // 升为组长
+          case 'setLeader':
+            this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
             break;
           default:
             break;

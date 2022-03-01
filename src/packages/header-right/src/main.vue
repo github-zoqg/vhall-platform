@@ -25,6 +25,7 @@
           :isShowThirdParty="isShowThirdParty"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
+          @startSplit="startSplit"
           @thirdPushStream="thirdPushStream"
         ></headerControl>
       </div>
@@ -155,6 +156,10 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
+      },
+      // 打开分屏
+      startSplit() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSplitScreenClick'));
       },
       // 打开媒体设置弹窗
       openMediaSettings() {

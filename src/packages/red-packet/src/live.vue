@@ -166,6 +166,7 @@
       this.redPacketServer.$on(RED_ENVELOPE_OK, () => {
         this.paySuccess = true;
         this.qrCodeDialogVisible = true;
+        this.sendDialogVisible = false;
       });
     },
     methods: {
@@ -513,10 +514,10 @@
         vertical-align: middle;
         padding: 0 3px;
       }
-      .iconzhifubao {
+      .vh-zhifubao {
         color: #0fa9f1;
       }
-      .iconweixinzhifu {
+      .vh-weixinzhifu {
         color: #30bb07;
       }
       label {

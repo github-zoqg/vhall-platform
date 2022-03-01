@@ -16,7 +16,7 @@
               class="empty-container"
               :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
             >
-              <span class="iconzanwusousuo iconfont"></span>
+              <span class="vh-saas-iconfont vh-saas-zanwusousuo"></span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
             <template v-else style="overflow: auto">
@@ -51,7 +51,7 @@
               class="empty-container"
               :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
             >
-              <span class="iconzanwujushou iconfont"></span>
+              <span class="vh-saas-iconfont vh-saas-zanwujushou"></span>
               <p>暂无人举手</p>
             </div>
             <template v-else>
@@ -86,7 +86,7 @@
               class="empty-container"
               :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
             >
-              <span class="iconzanwuchengyuan iconfont"></span>
+              <span class="vh-saas-iconfont vh-saas-zanwuchengyuan"></span>
               <p>没有禁言或者踢出的成员</p>
             </div>
             <template v-else>
@@ -380,7 +380,6 @@
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
-        console.log(this.roomBaseServer.state);
         this.mode = webinar.mode;
         this.isInteract = webinar.mode == 3 || webinar.mode == 6 ? 1 : 0;
         this.roleName = join_info.role_name;
@@ -615,10 +614,14 @@
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
-                device_status: context.device_status,
-                device_type: context.device_type,
-                is_banned: Number(context.is_banned),
-                nickname: context.nick_name,
+                device_status: !['', void 0, null].includes(context.device_status)
+                  ? context.device_status
+                  : 1,
+                device_type: !['', void 0, null].includes(context.device_status)
+                  ? context.device_type
+                  : 2,
+                is_banned: isNaN(Number(context.is_banned)) ? 0 : Number(context.is_banned),
+                nickname: context.nick_name || context.nickname,
                 role_name: context.role_name,
                 is_speak: speakIndex >= 0 ? 1 : 0,
                 is_apply: 0
@@ -626,8 +629,7 @@
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
               setTimeout(() => {
-                console.log(_this.$refs.scroll);
-                _this.$refs.scroll.refresh();
+                _this.refresh();
               }, 100);
               if (msg.context.role_name == 4) {
                 if (msg.sender_id == _this.userId) {
@@ -713,12 +715,12 @@
 
           if (isLive) {
             //todo 需要server里取数据替换这个groupUsersNumber
-            // _this.totalNum = _this.isInGroup
-            //   ? msg.uv
-            //   : msg.uv -
-            //     ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-            //       ? _this.$store.getters.getAllState('groupUsersNumber')
-            //       : 0);
+            _this.totalNum = _this.isInGroup
+              ? msg.uv
+              : msg.uv -
+                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
+                  ? _this.groupServer.state.groupedUserList.length
+                  : 0);
           }
 
           if (isWatch) {
@@ -726,9 +728,9 @@
           }
           _this.totalNum < 0 && (_this.totalNum = 0);
           _this._deleteUser(msg.sender_id, _this.onlineUsers, 'leave');
-          _this._deleteUser(msg.sender_id, _this.applyUsers); // 14273
+          _this._deleteUser(msg.sender_id, _this.applyUsers);
           setTimeout(() => {
-            _this.$refs.scroll.refresh();
+            _this.refresh();
           }, 50);
           if (msg.context.role_name == 1 && _this.roleName != 1) {
             _this.$message.warning({ message: _this.$t('message.message_1027') });
@@ -1100,25 +1102,25 @@
           }
         }
         //主持人/助理进入小组
-        function handleHostJoin() {
+        function handleHostJoin(msg) {
           //msg
-          // if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
-          //   // 进入小组
-          //   if (msg.data.group_ids[0] == 0) {
-          //     setTimeout(() => {
-          //       _this.onlineUsers = [];
-          //       _this.getOnlineUserList();
-          //     }, 1000);
-          //   }
-          //   // 返回主房间
-          //   if (msg.data.group_ids[1] == 0) {
-          //     //todo 这里的host_uid可能要从分组server取
-          //     if (sessionStorage.getItem('host_uid').includes(msg.sender_id)) {
-          //       _this.onlineUsers = [];
-          //       _this.getOnlineUserList();
-          //     }
-          //   }
-          // }
+          if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
+            // 进入小组
+            if (msg.data.group_ids[0] == 0) {
+              setTimeout(() => {
+                _this.onlineUsers = [];
+                _this.getOnlineUserList();
+              }, 1000);
+            }
+            // 返回主房间
+            if (msg.data.group_ids[1] == 0) {
+              const hostUserId = this.roomBaseServer.state.webinar.userInfo.user_id;
+              if (hostUserId === msg.sender_id) {
+                _this.onlineUsers = [];
+                _this.getOnlineUserList();
+              }
+            }
+          }
         }
         //分组--开始讨论
         function handleStartGroupDiscuss(msg) {
@@ -1341,7 +1343,7 @@
               //在线总人数
               this.totalNum = this.memberServer.state.totalNum;
               setTimeout(() => {
-                this.$refs.scroll.refresh();
+                this.refresh();
               }, 50);
             }
             if (![200, '200'].includes(res.code)) {
@@ -1441,12 +1443,11 @@
         } else if (index === 3) {
           this.getLimitUserList();
         }
-        //todo scroll调整
         if (this.$refs.scroll && this.$refs.scroll.$refs && this.$refs.scroll.$refs.scrollBox) {
           this.emptyContainerPaddingTop = this.$refs.scroll.$refs.scrollBox.scrollHeight / 2 - 60;
         }
         setTimeout(() => {
-          this.$refs.scroll.refresh();
+          this.refresh();
         }, 50);
       },
       //清空人员搜索
@@ -1467,7 +1468,7 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
-        console.log(type, params);
+        console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
           case 'setBanned':
@@ -1573,7 +1574,7 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        if (this.isInGroup) {
+        if (this.isInGroup && accountId !== this.userId) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
             cancelButtonText: this.$t('account.account_1063'),
@@ -1710,6 +1711,7 @@
       },
       //邀请上麦
       inviteMic(accountId = '') {
+        console.log('[member] accountId:', accountId);
         if (this.memberOptions.platformType === 'watch' && accountId === this.leader_id) {
           return;
         }
@@ -1720,7 +1722,7 @@
         const params = {
           room_id: this.roomId,
           receive_account_id: accountId,
-          type: 1
+          type: 1 // 0=邀请上麦|1=邀请演示
         };
         return this.memberServer
           .inviteUserToInteract(params)
@@ -1848,6 +1850,12 @@
       loadMore() {
         this.page++;
         this.getOnlineUserList();
+      },
+      //滚动条位置更新
+      refresh() {
+        if (this.$refs && this.$refs.scroll) {
+          this.$refs.scroll.refresh();
+        }
       }
     }
   };

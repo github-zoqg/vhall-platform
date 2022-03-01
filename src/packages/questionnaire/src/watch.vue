@@ -1,6 +1,6 @@
 <template>
-  <div class="vhall-question">
-    <div v-show="dialogVisible" class="vhall-question-box">
+  <div class="vhall-question" v-if="dialogVisible">
+    <div class="vhall-question-box">
       <div class="question-box">
         <div class="question-close" @click="dialogVisible = false">
           <i class="vh-iconfont vh-line-close"></i>
@@ -44,12 +44,13 @@
     },
     methods: {
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, questionnaireId => {
+        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async questionnaireId => {
+          this.dialogVisible = true;
+          await this.$nextTick(); // 等dom渲染
           this.questionnaireServer.renderQuestionnaire4Watch(
             '#qs-preview-box-content',
             questionnaireId
           );
-          this.dialogVisible = true;
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
           if (res.code === 200) {
@@ -95,7 +96,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vhall-question-box2222 {
+  .vhall-question-box {
     width: 100%;
     height: 100%;
     position: fixed;

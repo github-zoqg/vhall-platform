@@ -78,6 +78,8 @@ export const serverConfig = {
   comTabMenu: {
     component: 'VmpTabMenu',
     options: {
+      // 是否展示左右按钮
+      isToggleBtnVisible: false,
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
@@ -323,7 +325,14 @@ export const serverConfig = {
       userControlOptions: {
         enable: false
       }
-    }
+    },
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   //成员列表组件
   comMemberList: {
@@ -336,7 +345,14 @@ export const serverConfig = {
   //私聊组件
   comWatchPrivateChat: {
     component: 'VmpWatchPrivateChat',
-    options: {}
+    options: {},
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   //报名表单
   comSignUpForm: {

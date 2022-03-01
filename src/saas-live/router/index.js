@@ -46,6 +46,12 @@ const routes = [
     meta: { title: '问答', grayType: 'webinar' }
   },
   {
+    path: '/lives/split-screen/:id',
+    name: 'SplitScreen',
+    component: () => import('../views/SplitScreen.vue'),
+    meta: { title: '分屏' }
+  },
+  {
     // 其它没有匹配到的路由都会跳至此模块(404）
     // 该路由为必须路由，不需要权限，必须放在最后
     path: '*',

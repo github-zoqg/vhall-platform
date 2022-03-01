@@ -34,12 +34,13 @@
       </li>
       <li>
         <!-- 签到 -->
-        <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
       </li>
       <li>
+        <red-packet-icon />
         <!-- 红包 -->
       </li>
       <li v-if="1">
@@ -64,14 +65,14 @@
           />
         </div>
       </li>
-      <li>
+      <li v-if="roomBaseState.configList['ui.hide_reward'] === '0'">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
           <reward ref="reward" />
         </div>
       </li>
-      <li>
+      <li v-if="roomBaseState.configList['ui.watch_hide_like'] == '0'">
         <!-- 点赞 -->
         <praise></praise>
       </li>
@@ -98,9 +99,20 @@
   import praise from './component/praise/index.vue';
   import getInvited from './component/getInvited/index.vue';
   import Pay from './component/pay/index.vue';
+  import RedPacketIcon from './component/red-packet-icon/index.vue';
 
   export default {
     name: 'VmpFooterTools',
+    components: {
+      handup,
+      reward,
+      vhGifts,
+      notice,
+      praise,
+      getInvited,
+      Pay,
+      RedPacketIcon
+    },
     data() {
       return {
         roomBaseState: null,
@@ -115,15 +127,6 @@
         wxQr: '',
         isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
-    },
-    components: {
-      handup,
-      reward,
-      vhGifts,
-      notice,
-      praise,
-      getInvited,
-      Pay
     },
     filters: {
       formatHotNum(value) {
@@ -191,7 +194,7 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {

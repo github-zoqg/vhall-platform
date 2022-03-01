@@ -21,9 +21,9 @@
   </section>
 </template>
 <script>
-  import { useMsgServer, useMicServer } from 'middle-domain';
+  import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   export default {
-    name: 'InviteHandup',
+    name: 'VmpInviteHandup',
     data() {
       return {
         refusedText: this.$t('interact.interact_1010'),
@@ -33,16 +33,12 @@
         inviteTime: 30
       };
     },
-
-    props: {
-      roomBaseState: {
-        type: Object,
-        required: true
-      }
-    },
     computed: {
       join_info() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      roomBaseState() {
+        return useRoomBaseServer().state;
       }
     },
     mounted() {

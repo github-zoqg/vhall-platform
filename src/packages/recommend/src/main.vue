@@ -1,25 +1,29 @@
 <template>
-  <div class="vmp-recommend recommendWrapper" refs="recommendWrapper">
-    <ul class="a-wrap">
-      <li
-        class="recommend-item"
-        v-for="item in advDefault.adv_list"
-        :key="item.adv_id"
-        @click="handleJump(item.url)"
-      >
-        <div class="recommend-item">
-          <div class="banner">
-            <img :src="item.img_url ? item.img_url : defaultBanner" />
-          </div>
-          <div class="info">
-            <h4 class="title ellipsis">{{ item.subject }}</h4>
-            <button class="check-btn">查看</button>
-          </div>
-        </div>
-      </li>
-    </ul>
-    <div class="vh-loading" v-if="showLoading">加载中</div>
-  </div>
+  <section class="vmp-recommend">
+    <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
+      <div class="vmp-recommend-wrapper">
+        <ul class="a-wrap">
+          <li
+            class="recommend-item"
+            v-for="item in advDefault.adv_list"
+            :key="item.adv_id"
+            @click="handleJump(item.url)"
+          >
+            <div class="recommend-item">
+              <div class="banner">
+                <img :src="item.img_url ? item.img_url : defaultBanner" />
+              </div>
+              <div class="info">
+                <h4 class="title ellipsis">{{ item.subject }}</h4>
+                <button class="check-btn">查看</button>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="vh-loading" v-if="showLoading">加载中</div>
+      </div>
+    </overlay-scrollbars>
+  </section>
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -154,20 +158,15 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    padding: 0 14px 16px;
-    // overflow: hidden;
-    overflow-y: scroll;
+
+    &-wrapper {
+      padding: 0 14px 16px;
+    }
+
     .a-wrap {
       display: block;
       width: 100%;
-      // height: 100%;
-      // overflow-y: hidden !important;
-      touch-action: pan-y !important;
-      // overflow: hidden;
-      // display: flex;
-      // flex-wrap: wrap;
-      // justify-content: space-between;
-      // touch-action: pan-y;
+      touch-action: pan-y;
     }
     .recommend-item {
       width: 100%;

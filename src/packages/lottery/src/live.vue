@@ -1,7 +1,13 @@
 <template>
   <div class="vhall-lottery" v-if="dialogVisible">
     <!-- 抽奖中 -->
-    <lottery-pending v-if="prizeShow" :fitment="fitment" @close="close" @end="handleEndLottery" />
+    <lottery-pending
+      v-if="prizeShow"
+      mode="live"
+      :fitment="fitment"
+      @close="close"
+      @end="handleEndLottery"
+    />
     <lottery-winner
       mode="live"
       v-else-if="lotteryResultShow"
