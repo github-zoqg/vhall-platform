@@ -129,14 +129,14 @@
 </template>
 <script>
   import QRcode from 'qrcode';
-  import { useRedPacketServer, useMemberServer } from 'middle-domain';
+  import { useRedPacketServer } from 'middle-domain';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
     name: 'VmpRedPacketLive',
     data() {
-      const memberServerState = this.memberServer.state;
+      const redPacketServerState = this.redPacketServer.state;
       return {
-        memberServerState,
+        redPacketServerState,
         sendDialogVisible: false, // 发送红包的dialog界面
         qrCodeDialogVisible: false, // 微信支付和成功的弹窗
         paySuccess: false,
@@ -155,12 +155,13 @@
     },
     computed: {
       onlineAmount() {
-        return this.memberServerState.totalNum;
+        return this.redPacketServerState.online;
       }
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
-      this.memberServer = useMemberServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'live'
+      });
     },
     created() {
       this.redPacketServer.$on(RED_ENVELOPE_OK, () => {
@@ -175,6 +176,7 @@
         this.sendDialogVisible = true;
         this.qrCodeDialogVisible = false;
         this.paySuccess = false;
+        this.redPacketServer.getOnline();
       },
       backPay() {
         this.qrCodeDialogVisible = false;

@@ -58,8 +58,8 @@
     },
     methods: {
       openRedPacket() {
-        if (this.accepted) return;
-        this.accepted = true;
+        // if (this.accepted) return;
+        // this.accepted = true;
         this.redPacketServer.openRedPacket().then(res => {
           if (res.code === 200) {
             this.opened = true;
