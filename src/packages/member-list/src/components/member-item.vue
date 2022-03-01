@@ -96,6 +96,14 @@
           ></i>
         </template>
         <template v-if="tabIndex === 1">
+          <!--我要演示-->
+          <i
+            v-if="isShowMyPresentation"
+            class="vmp-member-item__control__up-mic widthAuto"
+            @click="myPresentation(userInfo.account_id)"
+          >
+            我要演示
+          </i>
           <!--上麦-->
           <i
             v-if="isShowUpMic"
@@ -111,14 +119,6 @@
             @click="downMic(userInfo.account_id)"
           >
             {{ $t('interact.interact_1007') }}
-          </i>
-          <!--我要演示-->
-          <i
-            v-if="isShowMyPresentation"
-            class="vmp-member-item__control__up-mic widthAuto"
-            @click="myPresentation(userInfo.account_id)"
-          >
-            我要演示
           </i>
         </template>
       </template>
@@ -223,7 +223,7 @@
       <!-- more显示条件：1、当前登录者是主持人-->
       <!-- more显示条件：2、当前登录者是嘉宾助理并且所选用户是观众 -->
       <template v-if="memberOptions.platformType === 'live'">
-        <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="hover">
+        <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="click">
           <i class="vmp-member-item__control__more"></i>
           <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
             <template v-for="item in operateList">
@@ -245,7 +245,7 @@
           v-show="
             [20, '20', 1, '1', 3, '3'].includes(roleName) && [2, '2'].includes(userInfo.role_name)
           "
-          trigger="hover"
+          trigger="click"
         >
           <i class="vmp-member-item__control__more"></i>
           <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
@@ -752,14 +752,19 @@
 <style lang="less">
   .vmp-member-item {
     position: relative;
-    box-sizing: content-box;
-    height: 44px;
-    font-size: 12px;
-    padding: 2px 24px;
     color: #999999;
+    height: 44px;
     line-height: 44px;
+    padding: 8px 10px 8px 14px;
+    font-size: 12px;
+    box-sizing: content-box;
     &:hover {
       background-color: #2d2d2d;
+      .vmp-member-item__control {
+        &__more {
+          opacity: 1;
+        }
+      }
     }
     &__avatar-wrapper {
       display: inline-block;
@@ -777,20 +782,21 @@
     }
     &__name {
       display: inline-block;
-      max-width: 100px;
+      max-width: 55px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       vertical-align: middle;
-      margin: 0 2px 0 9px;
-      font-size: 14px;
+      margin-left: 9px;
     }
     &__role {
+      display: inline-block;
       text-align: center;
-      padding: 0 4px;
-      border-radius: 100px;
+      line-height: 15px;
       vertical-align: middle;
+      padding: 0 4px;
       font-size: 10px;
+      border-radius: 10px;
       &.host {
         background-color: rgba(252, 86, 89, 0.15);
         color: #fb3a32;
@@ -812,33 +818,39 @@
       float: right;
       &__user-icon {
         color: #ff9446;
-        font-size: 16px;
+        font-size: 13px;
         vertical-align: middle;
-        padding: 0 3px;
+        margin-right: 6px;
       }
       &__up-mic,
       &__down-mic {
         display: inline-block;
         width: 30px;
-        height: 20px;
+        height: 16px;
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
         color: #dddddd;
         text-align: center;
         vertical-align: middle;
-        line-height: 20px;
+        line-height: 16px;
         font-style: normal;
         letter-spacing: 1px;
         cursor: pointer;
       }
+      .widthAuto {
+        width: auto;
+        padding: 0 2px;
+        margin-right: 4px;
+      }
       &__more {
         display: inline-block;
-        width: 27px;
-        height: 20px;
+        width: 13px;
+        height: 13px;
         vertical-align: middle;
         margin-left: 3px;
         color: #cccccc;
         font-size: 12px;
+        opacity: 0;
         background: url('../img/more.png') no-repeat center;
         background-size: 13px 3px;
         border-radius: 4px;

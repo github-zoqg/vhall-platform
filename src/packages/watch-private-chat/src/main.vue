@@ -54,7 +54,7 @@
       return {
         defaultAvatar,
         //私聊的列表 todo 假数据待移除，由domain维护
-        chatList: [],
+        chatList: useChatServer().state.privateChatList,
         //私聊是否需要登录
         chatLoginStatus: false,
         //滚动插件配置
@@ -231,12 +231,8 @@
       },
       //事件监听
       listenEvents() {
-        this.chatServer.$on('receivePrivateMsg', msg => {
-          if (msg.isFirstPrivateChat) {
-            this.isFirstPrivateChat = true;
-          }
-          this.chatList.push(msg);
-          if (this.osInstance.scroll().max.y > -1 && this.osInstance.scroll().ratio.y !== 1) {
+        this.chatServer.$on('receivePrivateMsg', () => {
+          if (this.osInstance.scroll().max.y > 0 && this.osInstance.scroll().ratio.y !== 1) {
             // 如果是除回复、 @之外的普通消息
             this.isHasUnreadNormalMsg = true;
             this.tipMsg = `有${++this.unReadMessageCount}条未读消息`;
@@ -245,16 +241,7 @@
       },
       //获取历史的私聊消息
       getHistoryMsg() {
-        const params = {
-          room_id: this.roomId
-        };
-        this.chatServer.getPrivateChatHistoryList(params).then(res => {
-          console.warn(res, '历史私聊记录');
-          const list = res.data.list.map(h => {
-            return { ...h, content: this.emojiToText(h.content) };
-          });
-          this.chatList = list;
-        });
+        this.chatServer.getPrivateChatHistoryList();
       },
       //表情转换
       emojiToText(value) {
@@ -294,6 +281,12 @@
             _this.isHasUnreadNormalMsg = false;
           }
         );
+      },
+      handleScrollStop() {
+        if (this.osInstance.scroll().ratio.y === 1) {
+          this.badgeNumber = 0;
+          this.isHasUnreadNormalMsg = false;
+        }
       },
       //响应高度变化
       handleHeightChange(height) {

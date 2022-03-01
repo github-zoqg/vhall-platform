@@ -236,22 +236,16 @@
       // 开始推流
       async startPush() {
         try {
+          this.interactiveServer.state.defaultStreamBg = true;
           // 创建本地流
           await this.createLocalStream();
           // 推流
           await this.publishLocalStream();
           // 实时获取网络状况
           this.getLevel();
-
-          // 主持人配置旁路主屏
-          if (this.joinInfo.role_name == 1) {
-            await this.setBroadCastScreen();
-          }
-          // 派发事件
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
-          );
+          this.interactiveServer.state.defaultStreamBg = false;
         } catch (err) {
+          this.interactiveServer.state.defaultStreamBg = false;
           this.handleSpeakOnError(err);
         }
       },

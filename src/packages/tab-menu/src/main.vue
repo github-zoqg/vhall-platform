@@ -4,6 +4,7 @@
       <!-- prev-btn -->
       <span
         class="vmp-tab-menu-page-btn prev-btn"
+        v-if="isToggleBtnVisible"
         :class="{ disabledClick: selectedIndex === 0 }"
         @click="prev"
       >
@@ -27,6 +28,7 @@
 
       <!-- next btn -->
       <span
+        v-if="isToggleBtnVisible"
         class="vmp-tab-menu-page-btn next-btn"
         :class="{ disabledClick: selectedIndex === menu.length - 1 }"
         @click="next"
@@ -44,7 +46,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer, useQaServer, useRoomBaseServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useRoomBaseServer, useChatServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -55,6 +57,7 @@
     },
     data() {
       return {
+        isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
         direciton: 'row', // row(横)，column(纵)
         selectedId: '',
         menu: []
@@ -72,32 +75,34 @@
       this.menuServer = useMenuServer();
     },
     created() {
-      this.initConfig();
+      // initConfig
+      const widget = window.$serverConfig?.[this.cuid];
+      if (widget && widget.options) {
+        this.tabOptions = widget.options;
+      }
       this.initMenu();
+      this.listenEvents();
     },
     async mounted() {
       await this.$nextTick(0);
       this.selectDefault();
-      this.listenEvents();
     },
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        const chatServer = useChatServer();
+        //收到问答开启消息
         qaServer.$on(qaServer.Events.QA_OPEN, () => {
           this.setVisible({ visible: true, type: 'v5' });
         });
+        //收到问答关闭消息
         qaServer.$on(qaServer.Events.QA_CLOSE, () => {
           this.setVisible({ visible: false, type: 'v5' });
         });
-      },
-      /**
-       * 初始化配置
-       */
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          this.tabOptions = widget.options;
-        }
+        //收到私聊消息
+        chatServer.$on('receivePrivateMsg', () => {
+          this.setVisible({ visible: true, type: 'private' });
+        });
       },
       /**
        * 拉取接口，初始化菜单项
@@ -125,7 +130,7 @@
             type: 'private',
             name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '私聊', // 同上
-            status: 1
+            status: 2
           });
           this.addItemByIndex(chatIndex + 2, {
             type: 'v5',
@@ -134,7 +139,6 @@
             status: roomState.interactToolStatus.question_status ? 1 : 2
           });
         }
-        window.tabMenu = this;
       },
       /**
        * 选中默认的菜单项（第一项）
@@ -174,14 +178,19 @@
         this.menu.splice(index);
       },
 
+      getItemEntity(item) {
+        console.log('menuConfig:', this.tabOptions.menuConfig);
+        return getItemEntity(item, this.tabOptions.menuConfig);
+      },
+
       addItem(item) {
-        item = getItemEntity(item, this.tabOptions.menuConfig);
+        item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.push(item);
       },
 
       addItemByIndex(index, item) {
-        item = getItemEntity(item, this.tabOptions.menuConfig);
+        item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.splice(index, 0, item);
       },

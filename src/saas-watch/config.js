@@ -78,6 +78,8 @@ export const serverConfig = {
   comTabMenu: {
     component: 'VmpTabMenu',
     options: {
+      // 是否展示左右按钮
+      isToggleBtnVisible: true,
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
@@ -267,16 +269,17 @@ export const serverConfig = {
   },
   // 底部
   comFooter: {
-    component: 'VmpFooter',
-    emitClickMediaCheck: {
-      cuid: 'comMediaCheck',
-      method: 'showSetting'
-    }
+    component: 'VmpFooter'
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    //todo 后续正式的需要调整或移除，此处仅为测试配置
+    //TODO: 后续正式的需要调整或移除，此处仅为测试配置
+    // 打开媒体设置
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
+    },
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
       method: 'openModal'
@@ -403,7 +406,14 @@ export const serverConfig = {
     component: 'VmpIntro'
   },
   comQa: {
-    component: 'VmpQa'
+    component: 'VmpQa',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 媒体设置
   comMediaSetting: {

@@ -6,100 +6,86 @@
         class="private-chat__list-item"
         :class="{
           'self-item':
-            loginInfo.user_id == chat.user_id || loginInfo.third_party_user_id == chat.user_id
+            loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId
         }"
         v-for="(chat, idx) in chatList"
         :key="idx"
       >
         <div class="list-item__user-info">
           <template
-            v-if="
-              loginInfo.user_id == chat.user_id || loginInfo.third_party_user_id == chat.user_id
-            "
+            v-if="loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId"
           >
-            <template v-if="chat.context.avatar">
+            <template v-if="chat.avatar">
               <span
                 class="list-item__user-info__avatar"
                 :style="{
-                  backgroundImage: `url(${chat.context.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
                 }"
               ></span>
             </template>
-            <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
-            <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
+            <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
+            <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ $t('chat.chat_1022') }}
             </span>
-            <span
-              class="user-status user-assistant"
-              v-else-if="[3, '3'].includes(chat.context.role_name)"
-            >
+            <span class="user-status user-assistant" v-else-if="[3, '3'].includes(chat.roleName)">
               {{ $t('chat.chat_1024') }}
             </span>
-            <span
-              class="user-status user-admin"
-              v-else-if="[4, '4'].includes(chat.context.role_name)"
-            >
+            <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
               {{ $t('chat.chat_1023') }}
             </span>
 
             <template v-else>
               <span class="list-item__user-info__avatar">
-                {{ chat.context.nick_name ? chat.context.nick_name.substr(0, 1) : '' }}
+                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
               </span>
             </template>
           </template>
           <template v-else>
-            <template v-if="chat.context.avatar">
+            <template v-if="chat.avatar">
               <span
                 class="list-item__user-info__avatar"
                 :style="{
-                  backgroundImage: `url(${chat.context.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
                 }"
               ></span>
             </template>
             <template v-else>
               <span class="list-item__user-info__avatar">
-                {{ chat.context.nick_name ? chat.context.nick_name.substr(0, 1) : '' }}
+                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
               </span>
             </template>
-            <span class="user-status user-host" v-if="[1, '1'].includes(chat.context.role_name)">
+            <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ $t('chat.chat_1022') }}
             </span>
-            <span
-              class="user-status user-assistant"
-              v-else-if="[3, '3'].includes(chat.context.role_name)"
-            >
+            <span class="user-status user-assistant" v-else-if="[3, '3'].includes(chat.roleName)">
               {{ $t('chat.chat_1024') }}
             </span>
-            <span
-              class="user-status user-admin"
-              v-else-if="[4, '4'].includes(chat.context.role_name)"
-            >
+            <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
               {{ $t('chat.chat_1023') }}
             </span>
-            <span class="list-item__user-info__user-name">{{ chat.context.nick_name }}</span>
+            <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
           </template>
         </div>
         <div
           class="list-item__chat-txt"
-          v-if="chat.data || chat.data.text_content"
-          v-html="chat.data.text_content"
+          v-if="chat.content || chat.content.text_content"
+          v-html="chat.content.text_content"
         ></div>
         <div class="list-item__chat-img-list" v-if="chat.type === 'image'">
           <div
             class="chat-img-item"
-            v-for="(imgUrl, imgIdx) in chat.img_list"
+            v-for="(imgUrl, imgIdx) in chat.content.img_list"
             :key="imgIdx"
             :style="{
               backgroundImage: `url(${imgUrl}?x-oss-process=image/resize,m_lfit,w_100${
                 isWebp ? '/format,webp' : ''
               })`
             }"
-            @click="showImgBrowser(imgIdx, chat.img_list)"
+            @click="showImgBrowser(imgIdx, chat.content.img_list)"
           ></div>
         </div>
         <span class="list-item__chat-time">
-          {{ chat.date_time | chatTime }}
+          {{ chat.sendTime | chatTime }}
         </span>
       </li>
     </ul>

@@ -40,6 +40,7 @@
       @performScroll="performScroll"
       @onOnlyMine="onOnlyMine"
       @onInputStatus="onInputStatus"
+      @needLogin="handleLogin"
     ></chat-operator>
   </div>
 </template>
@@ -49,6 +50,7 @@
   import MsgItem from './components/msg-item';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQa',
     components: {
@@ -272,6 +274,10 @@
         } else {
           window.open(`${base}lives/qa/${this.webinarId}${location.search}`);
         }
+      },
+      //处理唤起登录
+      handleLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };

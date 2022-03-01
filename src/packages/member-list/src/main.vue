@@ -297,6 +297,7 @@
       this.initConfig();
       //初始化视图数据
       await this.initViewData();
+      this.memberOptions.platformType === 'live' && this.handleStartGroup();
       //开始初始化流程
       this.init();
       this.listenEvent();
@@ -385,15 +386,36 @@
         this.roleName = join_info.role_name;
         this.userId = join_info.third_party_user_id;
         this.roomId = interact.room_id;
-        this.allowRaiseHand = parseInt(this.roomBaseServer.state.interactToolStatus.is_handsup)
-          ? true
-          : false;
+        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
         //初始化一下视图里初始的上麦列表
         this.changeSpeakerList();
       },
       //统一初始化方法
       init() {
         this.getOnlineUserList();
+      },
+      //开始讨论后的处理（发起端）
+      handleStartGroup() {
+        const _this = this;
+        // 开始讨论后重新初始化页面
+        console.log('开始分组讨论');
+        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
+          let temp = Object.assign({}, rawMsg);
+          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+            temp.data = JSON.parse(temp.data);
+            temp.context = JSON.parse(temp.context);
+          }
+          const { type = '' } = temp.data || {};
+          if (type === 'start_discussion') {
+            _this.init();
+            _this.listenEvent();
+            //初始化主讲人id
+            _this.currentSpeakerId = _this.groupInitData.isInGroup
+              ? _this.groupInitData.doc_permission
+              : _this.interactToolStatus.doc_permission;
+            _this.presentation_screen = _this.groupInitData.presentation_screen;
+          }
+        });
       },
       listenEvent() {
         const _this = this;
@@ -535,6 +557,11 @@
         //直播结束
         function handleLiveOver(msg) {
           console.log(msg);
+          const hostUserId = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
+          // 结束直播时当前主讲人不是主持人， 就设置为主持人
+          if (this.currentSpeakerId != hostUserId) {
+            this.currentSpeakerId = hostUserId;
+          }
           setTimeout(() => {
             _this.refreshList();
           }, 1000);
@@ -614,10 +641,14 @@
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
-                device_status: context.device_status,
-                device_type: context.device_type,
-                is_banned: Number(context.is_banned),
-                nickname: context.nick_name,
+                device_status: !['', void 0, null].includes(context.device_status)
+                  ? context.device_status
+                  : 1,
+                device_type: !['', void 0, null].includes(context.device_status)
+                  ? context.device_type
+                  : 2,
+                is_banned: isNaN(Number(context.is_banned)) ? 0 : Number(context.is_banned),
+                nickname: context.nick_name || context.nickname,
                 role_name: context.role_name,
                 is_speak: speakIndex >= 0 ? 1 : 0,
                 is_apply: 0
@@ -625,8 +656,7 @@
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
               setTimeout(() => {
-                console.log(_this.$refs.scroll);
-                _this.$refs.scroll.refresh();
+                _this.refresh();
               }, 100);
               if (msg.context.role_name == 4) {
                 if (msg.sender_id == _this.userId) {
@@ -712,12 +742,12 @@
 
           if (isLive) {
             //todo 需要server里取数据替换这个groupUsersNumber
-            // _this.totalNum = _this.isInGroup
-            //   ? msg.uv
-            //   : msg.uv -
-            //     ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-            //       ? _this.$store.getters.getAllState('groupUsersNumber')
-            //       : 0);
+            _this.totalNum = _this.isInGroup
+              ? msg.uv
+              : msg.uv -
+                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
+                  ? _this.groupServer.state.groupedUserList.length
+                  : 0);
           }
 
           if (isWatch) {
@@ -725,9 +755,9 @@
           }
           _this.totalNum < 0 && (_this.totalNum = 0);
           _this._deleteUser(msg.sender_id, _this.onlineUsers, 'leave');
-          _this._deleteUser(msg.sender_id, _this.applyUsers); // 14273
+          _this._deleteUser(msg.sender_id, _this.applyUsers);
           setTimeout(() => {
-            _this.$refs.scroll.refresh();
+            _this.refresh();
           }, 50);
           if (msg.context.role_name == 1 && _this.roleName != 1) {
             _this.$message.warning({ message: _this.$t('message.message_1027') });
@@ -1111,8 +1141,8 @@
             }
             // 返回主房间
             if (msg.data.group_ids[1] == 0) {
-              const hostUserId = this.roomBaseServer.state.webinar.userInfo.user_id;
-              if (hostUserId === msg.sender_id) {
+              const hostUserId = _this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
+              if (hostUserId == msg.sender_id) {
                 _this.onlineUsers = [];
                 _this.getOnlineUserList();
               }
@@ -1340,7 +1370,7 @@
               //在线总人数
               this.totalNum = this.memberServer.state.totalNum;
               setTimeout(() => {
-                this.$refs.scroll.refresh();
+                this.refresh();
               }, 50);
             }
             if (![200, '200'].includes(res.code)) {
@@ -1440,12 +1470,11 @@
         } else if (index === 3) {
           this.getLimitUserList();
         }
-        //todo scroll调整
         if (this.$refs.scroll && this.$refs.scroll.$refs && this.$refs.scroll.$refs.scrollBox) {
           this.emptyContainerPaddingTop = this.$refs.scroll.$refs.scrollBox.scrollHeight / 2 - 60;
         }
         setTimeout(() => {
-          this.$refs.scroll.refresh();
+          this.refresh();
         }, 50);
       },
       //清空人员搜索
@@ -1848,6 +1877,12 @@
       loadMore() {
         this.page++;
         this.getOnlineUserList();
+      },
+      //滚动条位置更新
+      refresh() {
+        if (this.$refs && this.$refs.scroll) {
+          this.$refs.scroll.refresh();
+        }
       }
     }
   };

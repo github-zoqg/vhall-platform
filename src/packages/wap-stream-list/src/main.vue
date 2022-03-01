@@ -60,7 +60,10 @@
         :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         @click.stop="setFullScreen"
       >
-        <i class="vh-iconfont vh-a-line-enterfullscreen"></i>
+        <i class="vh-iconfont vh-a-line-fullscreen"></i>
+      </div>
+      <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
+        <img src="./../img/load.gif" />
       </div>
     </div>
     <!-- 小组协作中 -->
@@ -185,6 +188,10 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
           1
         );
+      },
+      // 开始推流到成功期间展示默认图
+      defaultBg() {
+        return this.interactiveServer.state.defaultStreamBg;
       }
     },
 
@@ -364,7 +371,6 @@
       setFullScreen() {
         let allStream = this.interactiveServer.getRoomStreams();
         let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
-        console.warn('点击全屏-----', this.interactiveServer.state, allStream, mainScreenStream);
         if (mainScreenStream) {
           if (mainScreenStream.streamSource == 'remote') {
             this.interactiveServer.setStreamFullscreen({
@@ -493,6 +499,20 @@
         text-align: center;
         transform: translate(-32px, -32px);
         border-radius: 50%;
+      }
+      &-background {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img {
+          width: 88px;
+          height: 88px;
+        }
       }
       .opcity-flase {
         display: none;

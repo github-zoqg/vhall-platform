@@ -51,7 +51,7 @@
 </template>
 
 <script>
-  import { useMenuServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useChatServer } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
@@ -93,6 +93,7 @@
     created() {
       this.initConfig();
       this.initMenu();
+      this.listenEvents();
     },
     async mounted() {
       await this.$nextTick(0);
@@ -100,6 +101,20 @@
     },
 
     methods: {
+      listenEvents() {
+        const qaServer = useQaServer();
+        const chatServer = useChatServer();
+        qaServer.$on(qaServer.Events.QA_OPEN, () => {
+          this.setVisible({ visible: true, type: 'v5' });
+        });
+        qaServer.$on(qaServer.Events.QA_CLOSE, () => {
+          this.setVisible({ visible: false, type: 'v5' });
+        });
+        //收到私聊消息
+        chatServer.$on('receivePrivateMsg', () => {
+          this.setVisible({ visible: true, type: 'private' });
+        });
+      },
       /**
        * 初始化配置
        */
@@ -204,7 +219,6 @@
       setVisible({ visible = true, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
-
         tab.visible = visible;
         visible === false && this.jumpToNearestItemById(id);
       },
