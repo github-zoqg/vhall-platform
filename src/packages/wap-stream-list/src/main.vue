@@ -33,8 +33,6 @@
           </div>
         </div>
       </template>
-      <!-- 播放 按钮 showPlayIcon-->
-      <div class="vmp-stream-list-pause" v-show="false"></div>
       <!-- 左右滑动Mask 待做 -->
     </div>
     <div class="vmp-wap-stream-wrap-mask">
@@ -358,6 +356,7 @@
             this.showPlayIcon = false;
           });
         });
+        this.playAbort = [];
       },
 
       // 全屏
