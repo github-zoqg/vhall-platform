@@ -29,5 +29,21 @@
     padding: 0 24px;
     box-sizing: border-box;
     text-align: left;
+
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 0px auto;
+    }
+
+    p {
+      margin: 4px 0px;
+      word-break: break-all;
+      span {
+        display: block;
+        width: 100%;
+        word-break: break-all;
+      }
+    }
   }
 </style>

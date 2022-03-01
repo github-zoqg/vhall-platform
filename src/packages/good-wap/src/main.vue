@@ -26,33 +26,34 @@
     </ul>
     <div class="vh-loading" v-if="showLoading">{{ $t('common.common_1001') }}</div>
     <!-- 商品详情 -->
-    <goods-info
+    <!-- <goods-info
       v-if="openGoodInfo && goodItem"
       :info="goodItem"
       @close="openGoodInfo = false"
-    ></goods-info>
+    ></goods-info> -->
   </div>
 </template>
 
 <script>
   import { useRoomBaseServer, useGoodServer, useMenuServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import Pullup from '@better-scroll/pull-up';
   BScroll.use(Pullup);
-  import goodsInfo from './detail';
+  // import goodsInfo from './detail';
 
   export default {
     name: 'VmpGoodListWap',
-    components: {
-      goodsInfo
-    },
+    // components: {
+    //   goodsInfo
+    // },
     data() {
       return {
         goodsList: [],
         scroll: null,
-        openGoodInfo: false,
-        goodItem: null,
+        // openGoodInfo: false,
+        // goodItem: null,
         showLoading: false,
         total: 0,
         limit: 10,
@@ -224,8 +225,10 @@
         });
       },
       showDetailDialog(good) {
-        this.openGoodInfo = true;
-        this.goodItem = good;
+        // this.openGoodInfo = true;
+        // this.goodItem = good;
+
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShowDetail', [good]));
       }
     }
   };

@@ -4,13 +4,13 @@
     <saas-alert
       :visible="isConfirmVisible"
       :confirm="true"
-      :confirmText="btnText"
-      cancelText="取消"
+      :confirmText="$t('common.common_1010')"
+      :cancelText="btnText"
       @onSubmit="confirmSave"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
     >
-      <main slot="content">是否接受上麦邀请，请确认？</main>
+      <main slot="content">{{ $t('interact.interact_1031', { n: roleName }) }}</main>
     </saas-alert>
   </aside>
 </template>
@@ -25,8 +25,9 @@
     data() {
       return {
         isConfirmVisible: false,
-        btnText: '确认',
-        waitTime: 30
+        btnText: this.$t('account.account_1063'),
+        waitTime: 30,
+        roleName: this.$t('chat.chat_1022')
       };
     },
     props: {
@@ -38,6 +39,9 @@
     computed: {
       join_info() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     mounted() {
@@ -57,16 +61,21 @@
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
           }
+          if (this.isInGroup) {
+            this.roleName = this.$t('chat.chat_1064');
+          } else {
+            this.roleName = this.$t('chat.chat_1022');
+          }
           this.isConfirmVisible = true;
           this.waitTime = 30;
           clearInterval(this.waitInterval);
-          this.btnText = `确认(${this.waitTime}s)`;
+          this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
           this.waitInterval = setInterval(() => {
             this.waitTime--;
-            this.btnText = `确认(${this.waitTime}s)`;
+            this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
               clearInterval(this.waitInterval);
-              this.btnText = '确认';
+              this.btnText = this.$t('account.account_1063');
               this.isConfirmVisible = false;
             }
           }, 1000);
@@ -84,7 +93,7 @@
           .then(res => {
             useMicServer().userSpeakOn();
             clearInterval(this.waitInterval);
-            this.btnText = '确认';
+            this.btnText = this.$t('account.account_1063');
             this.isConfirmVisible = false;
           });
       },
@@ -97,7 +106,7 @@
           })
           .then(res => {
             clearInterval(this.waitInterval);
-            this.btnText = '确认';
+            this.btnText = this.$t('account.account_1063');
             this.isConfirmVisible = false;
           });
       }

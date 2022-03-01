@@ -346,7 +346,7 @@
           this.$message.warning('内容不能为空');
         }
         const curmsg = useChatServer().createCurMsg();
-        const target = this.chatGroupList[this.activeGroupIndex].id;
+        const target = this.chatGroupList[this.activeGroupIndex].user_id;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);

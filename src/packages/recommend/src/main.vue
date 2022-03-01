@@ -39,7 +39,16 @@
         limit: 10,
         wrapWidth: 0,
         selectIndex: 0,
-        showLoading: false
+        showLoading: false,
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     computed: {
