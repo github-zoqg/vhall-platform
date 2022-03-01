@@ -31,7 +31,7 @@
         <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
           <i class="vh-iconfont vh-line-arrow-left" style="font-size: 14px; color: #666"></i>
         </span>
-        <span>{{ $t('usual.chooseDocument') }}</span>
+        <span>{{ $t('doc.doc_1012') }}</span>
       </template>
 
       <!-- 内容区域 -->
@@ -53,12 +53,12 @@
                 list-type="text"
                 :show-file-list="false"
               >
-                <el-button type="primary">{{ $t('usual.upload') }}</el-button>
+                <el-button type="primary">{{ $t('doc.doc_1027') }}</el-button>
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
               <el-button v-if="!isWatch" @click="handleGotoDoclib">
-                {{ $t('doc_list.doclib') }}
+                {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
           </div>
@@ -75,10 +75,10 @@
                 list-type="text"
                 :show-file-list="false"
               >
-                <el-button type="primary" round>{{ $t('usual.upload') }}</el-button>
+                <el-button type="primary" round>{{ $t('doc.doc_1027') }}</el-button>
               </el-upload>
               <el-button v-if="!isWatch" round @click="handleGotoDoclib">
-                {{ $t('doc_list.doclib') }}
+                {{ $t('doc.doc_1015') }}
               </el-button>
 
               <el-tooltip placement="right">

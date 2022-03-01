@@ -1,24 +1,4 @@
 export const zh = {
-  usual: {
-    copySucceeded: '复制成功！',
-    copyFailed: '复制失败！',
-    close: '关闭',
-    upload: '上传',
-    fullscreen: '全屏',
-    chooseDocument: '选择文档',
-    audienceVisible: '观众可见',
-    choose: '选择',
-    eraser: '橡皮擦',
-    pencil: '画笔',
-    highlighter: '荧光笔',
-    shape: '形状',
-    text: '文本',
-    clear: '清除',
-    docThumb: '文档缩略图'
-  },
-  doc_list: {
-    doclib: '资料库'
-  },
   language_choice: {
     language_choice_1000: '选择语言',
     language_choice_1001: '中文',
@@ -52,23 +32,6 @@ export const zh = {
   }
 };
 export const en = {
-  usual: {
-    copySucceeded: 'Copy succeeded！',
-    copyFailed: 'Copy failed !',
-    close: 'close',
-    upload: 'upload',
-    fullscreen: 'fullscreen',
-    chooseDocument: 'choose doc',
-    audienceVisible: 'audience visible',
-    choose: 'choose',
-    eraser: 'eraser',
-    pencil: 'pencil',
-    highlighter: 'highlighter',
-    shape: 'shape',
-    text: 'text',
-    clear: 'clear',
-    docThumb: 'document thumbnail'
-  },
   doc_list: {
     doclib: 'document library'
   },

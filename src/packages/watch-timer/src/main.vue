@@ -144,15 +144,15 @@
         this.is_all_show = e.data.is_all_show;
         this.timeFormat(this.shijian);
         this.timerFun(e.data.duration);
-        this.handleTimer();
         // 打开计时器组件
         this.status = 'kaishi';
-        this.timerVisible = true;
         if (this.is_all_show == 1) {
           // 通知相应组件打开计时器Icon
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
-          );
+          this.handleTimer();
+          // this.timerVisible = true;
+          // window.$middleEventSdk?.event?.send(
+          //   boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
+          // );
         }
       },
       // 计时器结束
@@ -174,6 +174,7 @@
       // 计时器重置
       timer_reset() {
         clearInterval(this.timer);
+        this.timerVisible = false;
         this.status = 'kaishi';
         // 通知相应组件关闭计时器Icon
         window.$middleEventSdk?.event?.send(
