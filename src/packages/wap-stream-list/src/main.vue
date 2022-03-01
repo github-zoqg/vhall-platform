@@ -63,7 +63,7 @@
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
       <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
-        <!-- <img src="./../img/load.gif" /> -->
+        <img src="./../img/load.gif" />
       </div>
     </div>
     <!-- 小组协作中 -->
