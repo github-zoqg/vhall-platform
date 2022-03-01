@@ -296,6 +296,7 @@
         const id = this.selectedQuestionnarie.question_id;
         switch (command) {
           case 'data':
+            this.goDetail(this.selectedQuestionnarie);
             break;
           case 'copy':
             this.copy(id);
@@ -304,6 +305,14 @@
             this.delete(id);
             break;
         }
+      },
+      // 查看数据
+      goDetail(questionnaireItem) {
+        const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+        const { webinar, interact } = watchInitData;
+        window.open(
+          `/v3/live/lookSingleQuestion/${webinar.id}?surveyId=${questionnaireItem.question_id}&subject=${questionnaireItem.title}&roomId=${interact.room_id}`
+        );
       },
       // 复制功能
       copy(id) {
