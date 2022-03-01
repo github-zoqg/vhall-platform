@@ -2,7 +2,7 @@
   <chrome v-if="downloadChrome" :type="'master'"></chrome>
   <tip v-else-if="tipMsg" :text="tipMsg"></tip>
   <div v-else class="publish-wrap">
-    <div v-if="roomStatus.show">
+    <div v-if="roomStatus.show" class="vh-embed-live">
       <!-- 聊天 -->
       <vmp-chat v-if="componentName == 'Chat'"></vmp-chat>
       <div v-if="componentName == 'Doc'">
@@ -24,7 +24,13 @@
   </div>
 </template>
 <script>
-  import { Domain, useRoomBaseServer, useEntryformServer } from 'middle-domain';
+  import {
+    Domain,
+    useRoomBaseServer,
+    useEntryformServer,
+    useMsgServer,
+    useDocServer
+  } from 'middle-domain';
   // import VhallReport from '@/components/VhallReport/main';
   import { browserSupport } from '@/packages/app-shared/utils/tool.js';
   import { QWebChannel } from '@/packages/app-shared/utils/qwebchannel';
@@ -66,7 +72,8 @@
         docLowPriority: '', // 文档转换优先级
         recordTip: '', // 是否弹出默认回放弹框
         tipMsg: '', // info接口返回的错误信息
-        componentName: ''
+        componentName: '',
+        domain: null
       };
     },
     beforeCreate() {
@@ -179,120 +186,121 @@
         };
       },
       // 初始化房间
-      getUserinfo() {
-        return new Promise((resolve, reject) => {
-          const _data = {
-            webinar_id: this.il_id,
-            check_online: 0,
-            clientType: 'clientEmbed'
-          };
-          if (this.$route.query.nickname) {
-            _data.nickname = this.$route.query.nickname;
-          }
-          if (this.$route.query.email) {
-            _data.email = this.$route.query.email;
-          }
+      async getUserinfo() {
+        const _data = {
+          webinar_id: this.il_id,
+          check_online: 0,
+          clientType: 'clientEmbed'
+        };
+        if (this.$route.query.nickname) {
+          _data.nickname = this.$route.query.nickname;
+        }
+        if (this.$route.query.email) {
+          _data.email = this.$route.query.email;
+        }
 
-          _data.token = sessionOrLocal.get('token', 'localStorage') || '';
+        _data.token = sessionOrLocal.get('token', 'localStorage') || '';
 
-          if (location.search.includes('liveT') || location.search.includes('live_token')) {
-            _data.live_token = getQueryString('liveT') || getQueryString('live_token');
-            // 只要 queryString 中存在 live_token 就不需要传 token 了
-            _data.token = '';
-          }
+        if (location.search.includes('liveT') || location.search.includes('live_token')) {
+          _data.live_token = getQueryString('liveT') || getQueryString('live_token');
+          // 只要 queryString 中存在 live_token 就不需要传 token 了
+          _data.token = '';
+        }
 
-          if (location.search.includes('assistant_token=')) {
-            _data.token = sessionStorage.getItem('vhall_client_token');
+        if (location.search.includes('assistant_token=')) {
+          _data.token = sessionStorage.getItem('vhall_client_token');
 
-            if (location.search.includes('token_type=')) {
-              // 1: livetoken   0:token
-              const isNull = getQueryString('token_type') == 1;
-              if (isNull) {
-                _data.token = '';
-                if (_data.live_token == '' || !_data.live_token) {
-                  _data.live_token = sessionStorage.getItem('vhall_client_token');
-                }
-              } else {
-                _data.token = sessionStorage.getItem('vhall_client_token');
-                _data.live_token = '';
+          if (location.search.includes('token_type=')) {
+            // 1: livetoken   0:token
+            const isNull = getQueryString('token_type') == 1;
+            if (isNull) {
+              _data.token = '';
+              if (_data.live_token == '' || !_data.live_token) {
+                _data.live_token = sessionStorage.getItem('vhall_client_token');
               }
+            } else {
+              _data.token = sessionStorage.getItem('vhall_client_token');
+              _data.live_token = '';
             }
           }
+        }
 
-          this.roomBaseServer
-            .initLive({
-              ..._data
-            })
-            .then(async res => {
-              const { watchInitData } = this.roomBaseServer.state;
+        this.domain = await this.initSendLive(_data);
+        await useMsgServer().init();
+        console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-              const mockResult = (this.rootActive = watchInitData);
-              console.warn('*************this.rootActive*************', this.rootActive);
-              sessionStorage.setItem(
-                'host_uid',
-                JSON.stringify(mockResult.join_info.third_party_user_id)
-              );
-              sessionStorage.setItem('user', JSON.stringify(mockResult.join_info));
-              sessionStorage.setItem('userInfo', JSON.stringify(mockResult.join_info));
-              sessionStorage.setItem('vss_token', mockResult.join_info.interact_token);
-              sessionStorage.setItem('roomId', mockResult.interact.room_id);
-              sessionStorage.setItem('report_extra', JSON.stringify(mockResult.report_data));
-              sessionStorage['vhall-vsstoken'] = mockResult.join_info.interact_token;
-              sessionStorage.setItem(
-                'defaultMainscreenDefinition',
-                mockResult.push_definition || ''
-              );
-              sessionStorage.setItem(
-                'defaultSmallscreenDefinition',
-                mockResult.hd_definition || ''
-              );
-              sessionStorage.setItem('interact_token', mockResult.interact.interact_token);
-              this.shareId = mockResult.share_id;
-              this.userInfo = mockResult.join_info;
-              this.roomId = mockResult.interact.room_id;
-              this.vss_token = mockResult.interact.paas_access_token;
-              this.third_party_user_id = mockResult.join_info.third_party_user_id;
-              this.saas_join_id = mockResult.join_info.join_id;
-              this.params_verify_token = ''; // 先注为空  后续进行删除
-              this.permission = mockResult.permission;
-              this.qaStatus = mockResult.qa_open || 0;
-              // 单独增加 static、upload、web  为了减少修改，将这个
-              this.domains = {
-                ...(mockResult.urls || {}),
-                ...{
-                  static: mockResult.urls.static_url,
-                  upload: mockResult.urls.upload_url,
-                  webinar: '',
-                  web: mockResult.urls.web_url
-                }
-              };
-              sessionStorage.setItem('vhall_domain', JSON.stringify(this.domains));
-              this.duration = mockResult.webinar.live_time;
-              this.is_interact = mockResult.webinar.mode == 3 ? 1 : 0; // 做一下判断 ??? mode 直播模式：1-音频、2-视频、3-互动
-              this.document_id = mockResult.webinar.document_id;
-              this.cut_record_status = mockResult.cut_record_status;
-              this.record_notice = mockResult.record_notice || 3; // 设置默认回放视频提示 ???
-              this.docLowPriority = mockResult.doc_low_priority || 0; // ???  互动工具
-              this.recordTip = mockResult.record_tip;
-              await this.getTools(mockResult.interact.room_id);
-              // 初始化数据上报
-              this.initVHallReport(mockResult);
-              console.warn(324234444444444444444444444444444);
+        await useDocServer().init();
+        console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
+        // this.roomBaseServer
+        //   .initLive({
+        //     ..._data
+        //   })
+        //   .then(async res => {
+        const { watchInitData } = this.roomBaseServer.state;
 
-              resolve();
-            })
-            .catch(err => {
-              resolve();
-              this.tipMsg = err.msg;
-              console.log('catch', err);
-            });
-        });
+        const mockResult = (this.rootActive = watchInitData);
+        console.warn(
+          '*************this.rootActive*************',
+          this.roomBaseServer.state.watchInitData,
+          watchInitData,
+          this.rootActive
+        );
+        sessionStorage.setItem(
+          'host_uid',
+          JSON.stringify(mockResult.join_info.third_party_user_id)
+        );
+        sessionStorage.setItem('user', JSON.stringify(mockResult.join_info));
+        sessionStorage.setItem('userInfo', JSON.stringify(mockResult.join_info));
+        sessionStorage.setItem('vss_token', mockResult.join_info.interact_token);
+        sessionStorage.setItem('roomId', mockResult.interact.room_id);
+        sessionStorage.setItem('report_extra', JSON.stringify(mockResult.report_data));
+        sessionStorage['vhall-vsstoken'] = mockResult.join_info.interact_token;
+        sessionStorage.setItem('defaultMainscreenDefinition', mockResult.push_definition || '');
+        sessionStorage.setItem('defaultSmallscreenDefinition', mockResult.hd_definition || '');
+        sessionStorage.setItem('interact_token', mockResult.interact.interact_token);
+        this.shareId = mockResult.share_id;
+        this.userInfo = mockResult.join_info;
+        this.roomId = mockResult.interact.room_id;
+        this.vss_token = mockResult.interact.paas_access_token;
+        this.third_party_user_id = mockResult.join_info.third_party_user_id;
+        this.saas_join_id = mockResult.join_info.join_id;
+        this.params_verify_token = ''; // 先注为空  后续进行删除
+        this.permission = mockResult.permission;
+        this.qaStatus = mockResult.qa_open || 0;
+        // 单独增加 static、upload、web  为了减少修改，将这个
+        this.domains = {
+          ...(mockResult.urls || {}),
+          ...{
+            static: mockResult.urls.static_url,
+            upload: mockResult.urls.upload_url,
+            webinar: '',
+            web: mockResult.urls.web_url
+          }
+        };
+        sessionStorage.setItem('vhall_domain', JSON.stringify(this.domains));
+        this.duration = mockResult.webinar.live_time;
+        this.is_interact = mockResult.webinar.mode == 3 ? 1 : 0; // 做一下判断 ??? mode 直播模式：1-音频、2-视频、3-互动
+        this.document_id = mockResult.webinar.document_id;
+        this.cut_record_status = mockResult.cut_record_status;
+        this.record_notice = mockResult.record_notice || 3; // 设置默认回放视频提示 ???
+        this.docLowPriority = mockResult.doc_low_priority || 0; // ???  互动工具
+        this.recordTip = mockResult.record_tip;
+        this.getTools(mockResult.interact.room_id);
+        // // 初始化数据上报
+        // this.initVHallReport();
+
+        // })
+        // .catch(err => {
+        //   resolve();
+        //   this.tipMsg = err.msg;
+        //   console.log('catch', err);
+        // });
       },
       // 获取房间互动工具状态
       getTools(roomId) {
         return new Promise((resolve, reject) => {
           this.roomBaseServer
-            .getRoomToolStatus({ room_id: roomId })
+            .getInavToolStatus({ room_id: roomId })
             .then(res => {
               res.data.show = true;
               this.roomStatus = res.data;
@@ -306,8 +314,7 @@
         });
       },
       // 初始化直播房间
-      initSendLive() {
-        const { id } = this.$route.params;
+      initSendLive(params) {
         const { token } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
@@ -318,15 +325,12 @@
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
           },
-          initRoom: {
-            webinar_id: id, //活动id
-            clientType: 'send' //客户端类型
-          }
+          initRoom: params
         });
       },
-      async initVHallReport(roominfo) {
-        const domain = await this.initSendLive();
-        domain.initVhallReport({
+      initVHallReport(roominfo) {
+        console.log(this.domain, 'this.domain');
+        this.domain.initVhallReport({
           user_id: this.rootActive.join_info.join_id,
           webinar_id: this.rootActive.webinar.id,
           t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -342,6 +346,9 @@
   };
 </script>
 <style lang="less" scoped>
+  .vh-embed-live {
+    height: 100%;
+  }
   a {
     text-decoration: none;
   }
