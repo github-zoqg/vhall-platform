@@ -101,13 +101,12 @@
           ...this.pageInfo
         };
 
-        getNoticeList({ params, flag }).then(result => {
-          const { backData: res, state } = result;
-          if (res.code == 200 && res.data) {
-            this.noticeList = state.noticeList;
-            this.totalPages = state.totalPages;
-            this.total = state.total;
-            this.noticeNum = state.total;
+        this.noticeServer.getNoticeList({ params, flag }).then(result => {
+          if (result.code == 200 && result.data) {
+            this.noticeList = result.data.list;
+            this.totalPages = ++this.totalPages;
+            this.total = result.data.total;
+            this.noticeNum = result.data.total;
           }
         });
       },

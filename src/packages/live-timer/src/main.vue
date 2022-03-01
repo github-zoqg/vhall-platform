@@ -170,10 +170,6 @@
       // 计时器继续
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
       this.userInfo = this.roomBaseServer.state.watchInitData.join_info;
-      console.log(
-        this.roomBaseServer.state.watchInitData,
-        'this.roomBaseServer.state.watchInitData'
-      );
       this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
     },
     methods: {

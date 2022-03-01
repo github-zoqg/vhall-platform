@@ -57,6 +57,7 @@
 
 <script>
   // import EventBus from '@/utils/Events';
+  import { useWatchRewardServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
   export default {
@@ -90,6 +91,7 @@
       };
     },
     mounted() {
+      this.rewardServer = useWatchRewardServer();
       // EventBus.$on('reward_pay_ok', this.rewardFn);
     },
     beforeDestroy() {
@@ -193,7 +195,7 @@
       // 确认支付
       payProcess(params) {
         const that = this;
-        this.watchRewardServer
+        this.rewardServer
           .createReward({ ...params })
           .then(res => {
             if (res.data) {
