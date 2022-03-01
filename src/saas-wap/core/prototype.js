@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { globalConfig, serverConfig } from '../page-config';
-import clipboard from 'clipboard';
 import moment from 'moment';
 
 export function initGlobalPrototype() {
@@ -9,7 +8,6 @@ export function initGlobalPrototype() {
   window.$serverConfig = serverConfig;
 
   // 初始化全局变量挂载的 vue 实例上
-  Vue.prototype.$clipboard = clipboard;
   Vue.prototype.$moment = moment;
 
   Object.defineProperty(window.$globalConfig, 'currentLang', {
