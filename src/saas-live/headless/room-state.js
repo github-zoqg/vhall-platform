@@ -33,7 +33,7 @@ export default async function () {
   console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
 
   // 获取媒体许可，设置设备状态
-  mediaCheckServer.getMediaInputPermission();
+  await mediaCheckServer.getMediaInputPermission();
 
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();

@@ -614,10 +614,14 @@
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
-                device_status: context.device_status,
-                device_type: context.device_type,
-                is_banned: Number(context.is_banned),
-                nickname: context.nick_name,
+                device_status: !['', void 0, null].includes(context.device_status)
+                  ? context.device_status
+                  : 1,
+                device_type: !['', void 0, null].includes(context.device_status)
+                  ? context.device_type
+                  : 2,
+                is_banned: isNaN(Number(context.is_banned)) ? 0 : Number(context.is_banned),
+                nickname: context.nick_name || context.nickname,
                 role_name: context.role_name,
                 is_speak: speakIndex >= 0 ? 1 : 0,
                 is_apply: 0
@@ -625,8 +629,7 @@
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
               setTimeout(() => {
-                console.log(_this.$refs.scroll);
-                _this.$refs.scroll.refresh();
+                _this.refresh();
               }, 100);
               if (msg.context.role_name == 4) {
                 if (msg.sender_id == _this.userId) {
@@ -712,12 +715,12 @@
 
           if (isLive) {
             //todo 需要server里取数据替换这个groupUsersNumber
-            // _this.totalNum = _this.isInGroup
-            //   ? msg.uv
-            //   : msg.uv -
-            //     ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-            //       ? _this.$store.getters.getAllState('groupUsersNumber')
-            //       : 0);
+            _this.totalNum = _this.isInGroup
+              ? msg.uv
+              : msg.uv -
+                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
+                  ? _this.groupServer.state.groupedUserList.length
+                  : 0);
           }
 
           if (isWatch) {
@@ -725,9 +728,9 @@
           }
           _this.totalNum < 0 && (_this.totalNum = 0);
           _this._deleteUser(msg.sender_id, _this.onlineUsers, 'leave');
-          _this._deleteUser(msg.sender_id, _this.applyUsers); // 14273
+          _this._deleteUser(msg.sender_id, _this.applyUsers);
           setTimeout(() => {
-            _this.$refs.scroll.refresh();
+            _this.refresh();
           }, 50);
           if (msg.context.role_name == 1 && _this.roleName != 1) {
             _this.$message.warning({ message: _this.$t('message.message_1027') });
@@ -1340,7 +1343,7 @@
               //在线总人数
               this.totalNum = this.memberServer.state.totalNum;
               setTimeout(() => {
-                this.$refs.scroll.refresh();
+                this.refresh();
               }, 50);
             }
             if (![200, '200'].includes(res.code)) {
@@ -1440,12 +1443,11 @@
         } else if (index === 3) {
           this.getLimitUserList();
         }
-        //todo scroll调整
         if (this.$refs.scroll && this.$refs.scroll.$refs && this.$refs.scroll.$refs.scrollBox) {
           this.emptyContainerPaddingTop = this.$refs.scroll.$refs.scrollBox.scrollHeight / 2 - 60;
         }
         setTimeout(() => {
-          this.$refs.scroll.refresh();
+          this.refresh();
         }, 50);
       },
       //清空人员搜索
@@ -1848,6 +1850,12 @@
       loadMore() {
         this.page++;
         this.getOnlineUserList();
+      },
+      //滚动条位置更新
+      refresh() {
+        if (this.$refs && this.$refs.scroll) {
+          this.$refs.scroll.refresh();
+        }
       }
     }
   };

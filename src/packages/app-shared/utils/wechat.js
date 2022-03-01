@@ -64,3 +64,79 @@ export function initHideChatSdk(initData = {}, failedCb = () => {}) {
     });
   });
 }
+
+//微信授权相关
+import { useUserServer } from 'middle-domain';
+import { isWechat } from './tool';
+export function authByWx(isEmbed, path, _next) {
+  const failure = res => {
+    this.$message.error(res.msg);
+  };
+  let params = {
+    source: '',
+    jump_url: ''
+  };
+  if (isWechat() && !isEmbed) {
+    //如果是微信
+    if (window.roomBaseServer.state.configList) {
+      //获取房间权限配置列表
+      //获取地址栏参数、设置请求路径
+      let _search = '';
+      if (location.search && location.search != '') {
+        _search = location.search.split('?')[1];
+      }
+      params.source = params.source != '' ? params.source : 'web'; //默认为web pc的话传pc
+      params.jump_url =
+        window.location.protocol +
+        process.env.VUE_APP_WATCH_URL +
+        process.env.VUE_APP_WEB_KEY +
+        `${path}?purpose=login${_search ? '&' + _search : ''}`;
+      // 请求授权接口
+      return useUserServer()
+        .userApi.authLoginByWx(params)
+        .then(res => {
+          if (res.code !== 200) {
+            failure(res);
+            sessionStorage.setItem('open_id', '');
+            sessionStorage.setItem('isLogin', '');
+            _next();
+          } else if (res && res.code == 200) {
+            //微信授权成功后；设置open_id;跳转到后台返回的url;
+            this.state.open_id = res.data.open_id;
+            sessionStorage.setItem('open_id', res.data.open_id);
+            // 缓存微信授权后的login标记
+            sessionStorage.setItem('isLogin', 1);
+            window.location.replace(res.data.url);
+          }
+        })
+        .catch(err => {
+          failure(err);
+          return err;
+        });
+    }
+  } else {
+    _next();
+  }
+}
+// init微信授权跳转逻辑
+export function authCheck(to, next) {
+  const isEmbed = !!/embed/.test(to.path);
+  let _next = next;
+
+  // 若当前用户已登录过，直接进入界面。
+  if (sessionStorage.getItem('isLogin') == 1) {
+    next();
+    return;
+  }
+  // 若当前地址栏包含user_auth_key 以及 purposer入参，表示当前需要执行第三方信息回调
+  // if (getQueryString('user_auth_key') && getQueryString('purpose')) {
+
+  // }
+  if (to.name != 'watch' && to.name != 'subscribe') {
+    // 不是 预约/观看 或者 嵌入情况， 直接进入
+    next();
+  } else {
+    // 微信登录鉴权
+    authByWx(isEmbed, to.path, _next);
+  }
+}

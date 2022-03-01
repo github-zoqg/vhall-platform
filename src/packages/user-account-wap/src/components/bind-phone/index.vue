@@ -160,7 +160,7 @@
       getCaptha() {
         if (this.checkData()) {
           const data =
-            this.phoneDialog.type === 'edit' && this.phoneDialog.step !== 1
+            this.phoneDialog.type === 'add' || this.phoneDialog.step === 2
               ? this.bindForm.phone
               : this.phoneDialog.phone;
           const validate = this.bindForm.imgCode;

@@ -446,7 +446,7 @@
           });
       },
 
-      // 提现
+      // 提现 测试验证码是8888
       async drawMoney() {
         try {
           if (this.validtorMoney() && this.validtorCode()) {
