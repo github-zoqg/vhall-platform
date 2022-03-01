@@ -47,6 +47,7 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
+          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
           <span v-if="hasDocPermission">暂未分享任何文档</span>
           <span v-else>主讲人正在准备文档，请稍等...</span>
         </div>
@@ -448,6 +449,7 @@
             this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
             await this.$nextTick();
             if (this.docServer.state.switchStatus) {
+              // 回放只在观看端可用
               this.resize();
               // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
               const { width, height } = this.docViewRect;
@@ -460,6 +462,7 @@
                   fileType: item.type.toLowerCase()
                 });
               }
+              this.docServer.loadVodIframe();
             }
           });
         }
@@ -934,7 +937,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: scroll;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      border-radius: 0;
+      background-color: #000 !important;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transpar ent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      height: 60px;
+      border-radius: 10px;
+      border: 1px solid #fff;
+      background: #000 !important;
+    }
 
     li.doc-thumbnailbar__opt {
       height: 63px;
