@@ -201,9 +201,8 @@
       // 文档是否可见
       show() {
         return (
-          (this.roomBaseServer.state.watchInitData.join_info.role_name != 2 &&
-            !this.roomBaseServer.state.isShareScreen) ||
-          (this.roomBaseServer.state.watchInitData.join_info.role_name == 2 &&
+          (!this.isWatch && !this.roomBaseServer.state.isShareScreen) ||
+          (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
               this.hasDocPermission))
