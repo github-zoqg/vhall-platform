@@ -15,14 +15,14 @@
       <div class="pay-fee__select">
         <div class="wx" @click="changePay('wx')">
           <div class="wx-icon">
-            <span class="pay-wx-icon iconfont iconweixinzhifu"></span>
+            <span class="pay-wx-icon vh-iconfont vh-weixinzhifu"></span>
             <span class="des">{{ $t('interact_tools.interact_tools_1049') }}</span>
           </div>
           <span class="circle" :class="{ choose: chooseWx }"></span>
         </div>
         <div class="zf" @click="changePay('zf')">
           <div class="zf-icon">
-            <span class="pay-zf-icon iconfont iconzhifubao"></span>
+            <span class="pay-zf-icon vh-iconfont vh-zhifubao"></span>
             <span class="des">{{ $t('interact_tools.interact_tools_1069') }}</span>
           </div>
           <span class="circle" :class="{ choose: !chooseWx }"></span>
