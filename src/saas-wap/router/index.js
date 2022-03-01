@@ -69,6 +69,12 @@ const routes = [
     path: '/lives/entryform/:id',
     name: 'entryform',
     component: () => import('../views/entryform/index.vue')
+  },
+  {
+    path: '/user/home/:id', // 个人主页
+    name: 'userHome',
+    component: () => import('../views/user/userHome.vue'),
+    meta: { grayType: 'user' }
   }
 ];
 
