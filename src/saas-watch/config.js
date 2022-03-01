@@ -270,9 +270,9 @@ export const serverConfig = {
   // 底部
   comFooter: {
     component: 'VmpFooter',
-    emitClickMediaCheck: {
-      cuid: 'comMediaCheck',
-      method: 'showSetting'
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
     }
   },
   // 底部工具栏（如人数， 热度等）
