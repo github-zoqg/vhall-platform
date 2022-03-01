@@ -6,9 +6,8 @@
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
       <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
-      <div class="vhall-room-id-copy" @click="handleCopy">
-        <i class="iconfont iconfuzhi"></i>
-        <!-- :data-clipboard-text="id" -->
+      <div class="vhall-room-id-copy" :data-clipboard-text="webinarInfo.id" @click="handleCopy">
+        <i class="vh-iconfont vh-line-copy"></i>
       </div>
     </div>
     <!---->
@@ -21,6 +20,7 @@
   </div>
 </template>
 <script>
+  import Clipboard from 'clipboard';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpHeaderLeft',
@@ -43,32 +43,6 @@
       // this.initConfig();
     },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('className')) {
-            this.className = widget.options.className;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('selected')) {
-            this.selected = widget.options.selected;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('disable')) {
-            this.disable = widget.options.disable;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('icon')) {
-            this.icon = widget.options.icon;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('text')) {
-            this.text = widget.options.text;
-          }
-        }
-      },
       // 负责roomId
       handleCopy() {
         // this.$vhall_paas_port({
@@ -84,24 +58,25 @@
         //     req_url: ''
         //   }
         // });
-        const input = document.getElementById('vhall-room-id-copy-val');
-        // input.select();
-        document.execCommand('copy');
-        this.$message({
-          message: '复制成功！',
-          showClose: true,
-          type: 'success',
-          customClass: 'zdy-info-box'
+        const clipboard = new Clipboard('.vhall-room-id-copy');
+        clipboard.on('success', () => {
+          this.$message({
+            message: this.$t('other.other_1008'),
+            showClose: true,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
+          clipboard.destroy();
         });
-        // const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        // clipboard.on('success', () => {
-        //   this.$message.success(this.$t('usual.copySucceeded'));
-        //   clipboard.destroy();
-        // });
-        // clipboard.on('error', () => {
-        //   this.$message.error(this.$t('usual.copyFailed'));
-        //   clipboard.destroy();
-        // });
+        clipboard.on('error', () => {
+          this.$message({
+            message: this.$t('other.other_1009'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          clipboard.destroy();
+        });
       }
     }
   };

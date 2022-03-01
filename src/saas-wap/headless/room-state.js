@@ -76,14 +76,14 @@ export default async function () {
     })
   ];
 
+  await Promise.all(promiseList);
+
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission());
     micServer.init();
   }
-
-  await Promise.all(promiseList);
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });

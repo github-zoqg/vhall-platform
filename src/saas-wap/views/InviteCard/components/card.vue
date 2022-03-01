@@ -288,13 +288,15 @@
         const token = this.$route.query.token || '';
 
         await this.inviteServer.createInvite(
+          // data
           {
             webinar_id: this.$route.params.id,
             join_id
           },
+          // options
           {
             headers: {
-              token: token
+              token
             }
           }
         );

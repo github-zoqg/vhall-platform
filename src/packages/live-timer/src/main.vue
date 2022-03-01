@@ -147,7 +147,7 @@
         ten_sec: 0,
         mon: 0,
         ten_mon: 0,
-        userInfo: JSON.parse(sessionStorage.getItem('user')) || {},
+        userInfo: {},
         doc_permission: ''
       };
     },
@@ -169,6 +169,7 @@
       this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
       // 计时器继续
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
+      this.userInfo = this.roomBaseServer.state.watchInitData.join_info;
       this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
     },
     methods: {
@@ -407,7 +408,7 @@
           // if (window.chatSDK) {
           // TODO: // 主动向房间暂停发送消息
           this.msgServer.sendCustomMsg({
-            role_name: JSON.parse(sessionStorage.getItem('user')).role_name,
+            role_name: this.userInfo.role_name,
             type: 'timer_pause',
             remain_time: this.shijian
           });

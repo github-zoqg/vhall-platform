@@ -12,7 +12,11 @@
           {{ countDownTime }}
         </div>
         <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
-        <div class="subscribe-status" :class="`subscribe-status-${webinarType}`">
+        <div
+          class="subscribe-status"
+          :class="`subscribe-status-${webinarType}`"
+          v-if="!roomBaseServer.state.embedObj.embedVideo"
+        >
           {{
             webinarType == 1
               ? $t('webinar.webinar_1018')
@@ -122,6 +126,9 @@
     },
     mounted() {
       this.listenEvents();
+      if (this.roomBaseServer.state.embedObj.embedVideo) {
+        this.showBottomBtn = false;
+      }
     },
     methods: {
       listenEvents() {
