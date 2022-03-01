@@ -37,7 +37,7 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
   });
 }
 
-export function initHideChatSdk(initData = {}, failedCb = () => { }) {
+export function initHideChatSdk(initData = {}, failedCb = () => {}) {
   let hideConfigSdk = {
     debug: false,
     jsApiList: ['hideMenuItems'],
