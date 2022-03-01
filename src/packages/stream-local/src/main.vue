@@ -307,6 +307,12 @@
             this.interactiveServer.init();
           }
         });
+        // 结束直播
+        this.interactiveServer.$on('live_over', async () => {
+          await this.stopPush();
+
+          this.interactiveServer.destroy();
+        });
       },
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {

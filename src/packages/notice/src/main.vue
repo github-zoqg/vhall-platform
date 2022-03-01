@@ -9,7 +9,7 @@
         <ul>
           <li
             class="vmp-notice-list-container__item"
-            v-for="(item, index) of noticeList"
+            v-for="(item, index) of domainState.noticeList"
             :key="index"
           >
             <i class="vh-iconfont vh-line-voice" />
@@ -50,21 +50,21 @@
       }
     },
     data() {
+      const domainState = this.noticeServer.state;
+
       return {
-        noticeNum: 1,
+        domainState,
         noticeList: [],
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
         },
-        totalPages: 0,
-        total: 0,
         inputVal: '',
         overlayScrollBarsOptions: {
           resize: 'none',
           paddingAbsolute: true,
-          className: 'os-theme-dark os-theme-vhall',
+          className: 'os-theme-light os-theme-vhall',
           scrollbars: {
             autoHide: 'leave',
             autoHideDelay: 200
@@ -100,22 +100,16 @@
        * 初始化notice
        */
       initNotice() {
-        this.noticeServer.$on('room_announcement', msg => this.addNotice(msg));
-      },
-
-      /**
-       *添加一条消息
-       * @param {Object} msg
-       */
-      addNotice(msg) {
-        this.noticeNum++;
-        this.noticeList.unshift({
-          created_at: msg.push_time,
-          content: {
-            content: msg.room_announcement_text
-          }
+        this.noticeServer.$on('room_announcement', msg => {
+          this.domainState.noticeList.unshift({
+            created_at: msg.push_time,
+            content: {
+              content: msg.room_announcement_text
+            }
+          });
         });
       },
+
       /**
        * 获取历史消息列表
        * @param {Boolean} isLoadMore
@@ -128,20 +122,13 @@
           ...this.pageInfo
         };
 
-        const res = await this.noticeServer.getNoticeList({ params, flag: isLoadMore });
-        if (res.code == 200 && res.data) {
-          const state = this.noticeServer.state;
-          this.noticeList = state.noticeList;
-          this.totalPages = state.totalPages;
-          this.total = state.total;
-          this.noticeNum = state.total;
-        }
+        await this.noticeServer.getNoticeList({ params, flag: isLoadMore });
       },
       /**
        * 读取更多data
        */
       moreLoadData() {
-        if (this.pageInfo.pageNum >= this.totalPages) {
+        if (this.pageInfo.pageNum >= this.domainState.totalPages) {
           return false;
         }
         this.pageInfo.pageNum++;

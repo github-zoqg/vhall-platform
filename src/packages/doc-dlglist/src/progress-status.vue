@@ -66,7 +66,7 @@
           if (this.isInDoclib && /pptx?/.test(this.docExt)) {
             return ['静态转码成功', '动态转码成功'];
           }
-          return '转码成功';
+          return this.isInDoclib ? '转码成功' : '转码完成';
         } else if (this.docStatus === 'transfailed') {
           return '转码失败';
         } else return '';

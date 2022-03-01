@@ -183,7 +183,7 @@
       },
 
       addItemByIndex(index, item) {
-        item = getItemEntity(item);
+        item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.splice(index, 0, item);
       },
