@@ -4,12 +4,12 @@
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd" v-show="hasDocPermission">
       <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
-        {{ $t('usual.chooseDocument') }}
+        {{ $t('doc.doc_1012') }}
       </div>
       <!-- 观看端没有观众可见的按钮 -->
       <div class="audience-visible" v-if="!isWatch">
         <span style="margin-right: 5px">
-          {{ $t('usual.audienceVisible') }}
+          {{ $t('doc.doc_1013') }}
         </span>
         <div class="audience-visible__swith">
           <el-switch
@@ -35,7 +35,7 @@
         <!-- 选择 -->
         <div
           class="vmp-icon-item"
-          :title="$t('usual.choose')"
+          :title="$t('doc.doc_1016')"
           :class="{ selected: currentBrush === 'select' }"
           @click="handleBoardTool('select')"
         >
@@ -44,7 +44,7 @@
         <!-- 画笔 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.pen')"
+          :title="$t('doc.doc_1018')"
           :class="{ selected: currentBrush === 'pen' }"
           @click="handleBoardTool('pen')"
         >
@@ -54,7 +54,7 @@
         <!-- 荧光笔 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.highlighter')"
+          :title="$t('doc.doc_1019')"
           :class="{ selected: currentBrush === 'highlighter' }"
           @click="handleBoardTool('highlighter')"
         >
@@ -64,7 +64,7 @@
         <!-- 形状 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.shape')"
+          :title="$t('doc.doc_1020')"
           :class="{ selected: currentBrush === 'shape' }"
           @click="handleBoardTool('shape')"
         >
@@ -74,7 +74,7 @@
         <!-- 文本 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.text')"
+          :title="$t('doc.doc_1021')"
           :class="{ selected: currentBrush === 'text' }"
           @click="handleBoardTool('text')"
         >
@@ -84,21 +84,21 @@
         <!-- 橡皮擦 -->
         <div
           class="vmp-icon-item"
-          :title="$t('usual.eraser')"
+          :title="$t('doc.doc_1017')"
           :class="{ selected: currentBrush === 'eraser' }"
           @click="handleBoardTool('eraser')"
         >
           <i class="vh-iconfont vh-line-eraser"></i>
         </div>
         <!-- 清除 -->
-        <div class="vmp-icon-item" :title="$t('usual.clear')" @click="handleBoardTool('clear')">
+        <div class="vmp-icon-item" :title="$t('doc.doc_1022')" @click="handleBoardTool('clear')">
           <i class="vh-iconfont vh-line-delete"></i>
         </div>
 
         <!-- 退出全屏 -->
         <div
           class="vmp-icon-item vmp-icon-item--exitFullscreen"
-          :title="$t('usual.clear')"
+          :title="$t('doc.doc_1009')"
           @click="fullscreen"
         >
           <i class="vh-iconfont vh-line-narrow"></i>
@@ -108,7 +108,7 @@
         <div
           v-show="currentType !== 'board' && isWatch"
           class="vmp-icon-item"
-          :title="$t('usual.docThumb')"
+          :title="$t('doc.doc_1014')"
           @click="toggleThumbnail"
         >
           <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
@@ -123,7 +123,7 @@
       <div
         v-show="currentType !== 'board'"
         class="vmp-icon-item"
-        :title="$t('usual.docThumb')"
+        :title="$t('doc.doc_1014')"
         @click="toggleThumbnail"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
