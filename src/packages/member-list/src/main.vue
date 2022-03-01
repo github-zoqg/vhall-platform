@@ -297,6 +297,7 @@
       this.initConfig();
       //初始化视图数据
       await this.initViewData();
+      this.memberOptions.platformType === 'live' && this.handleStartGroup();
       //开始初始化流程
       this.init();
       this.listenEvent();
@@ -385,15 +386,36 @@
         this.roleName = join_info.role_name;
         this.userId = join_info.third_party_user_id;
         this.roomId = interact.room_id;
-        this.allowRaiseHand = parseInt(this.roomBaseServer.state.interactToolStatus.is_handsup)
-          ? true
-          : false;
+        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
         //初始化一下视图里初始的上麦列表
         this.changeSpeakerList();
       },
       //统一初始化方法
       init() {
         this.getOnlineUserList();
+      },
+      //开始讨论后的处理（发起端）
+      handleStartGroup() {
+        const _this = this;
+        // 开始讨论后重新初始化页面
+        console.log('开始分组讨论');
+        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
+          let temp = Object.assign({}, rawMsg);
+          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+            temp.data = JSON.parse(temp.data);
+            temp.context = JSON.parse(temp.context);
+          }
+          const { type = '' } = temp.data || {};
+          if (type === 'start_discussion') {
+            _this.init();
+            _this.listenEvent();
+            //初始化主讲人id
+            _this.currentSpeakerId = _this.groupInitData.isInGroup
+              ? _this.groupInitData.doc_permission
+              : _this.interactToolStatus.doc_permission;
+            _this.presentation_screen = _this.groupInitData.presentation_screen;
+          }
+        });
       },
       listenEvent() {
         const _this = this;
@@ -535,6 +557,11 @@
         //直播结束
         function handleLiveOver(msg) {
           console.log(msg);
+          const hostUserId = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
+          // 结束直播时当前主讲人不是主持人， 就设置为主持人
+          if (this.currentSpeakerId != hostUserId) {
+            this.currentSpeakerId = hostUserId;
+          }
           setTimeout(() => {
             _this.refreshList();
           }, 1000);
@@ -1114,8 +1141,8 @@
             }
             // 返回主房间
             if (msg.data.group_ids[1] == 0) {
-              const hostUserId = this.roomBaseServer.state.webinar.userInfo.user_id;
-              if (hostUserId === msg.sender_id) {
+              const hostUserId = _this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
+              if (hostUserId == msg.sender_id) {
                 _this.onlineUsers = [];
                 _this.getOnlineUserList();
               }
