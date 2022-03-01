@@ -278,13 +278,9 @@
 
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
-          console.log('上麦成功', msg);
-
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (
-              this.joinInfo.role_name == 3 ||
-              (this.joinInfo.role_name == 1 && !this.localStream.streamId)
-            ) {
+            if (this.localStream.streamId) return;
+            if (this.joinInfo.role_name == 3 || this.joinInfo.role_name == 1) {
               // 开始推流
               this.startPush();
             } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
