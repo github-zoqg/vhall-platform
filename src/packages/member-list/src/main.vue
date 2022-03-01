@@ -614,9 +614,13 @@
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
-                device_status: context.device_status,
-                device_type: context.device_type,
-                is_banned: Number(context.is_banned),
+                device_status: !['', void 0, null].includes(context.device_status)
+                  ? context.device_status
+                  : 1,
+                device_type: !['', void 0, null].includes(context.device_status)
+                  ? context.device_type
+                  : 2,
+                is_banned: isNaN(Number(context.is_banned)) ? 0 : Number(context.is_banned),
                 nickname: context.nick_name || context.nickname,
                 role_name: context.role_name,
                 is_speak: speakIndex >= 0 ? 1 : 0,

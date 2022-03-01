@@ -451,6 +451,7 @@
       initConfig() {
         const { interact, join_info } = this.roomBaseServer.state.watchInitData;
         console.log(this.roomBaseServer.state, '????====zhangxiao');
+        console.log(this.marquee, this.water, '123244', '??!23221423');
         let params = {
           appId: interact.paas_app_id || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
@@ -478,6 +479,13 @@
             open: this.roomBaseServer.state.configList['ui.browser_peer5'] == '1',
             customerId: 'ds6mupmtq5gnwa4qmtqf',
             fallback: true
+          },
+          marqueeOption: {
+            text: '',
+            enable: false
+          },
+          watermarkOption: {
+            enable: false
           }
         };
         if (this.playerServer.state.type == 'live') {
@@ -492,20 +500,69 @@
         } else {
           throw new Error('参数异常--2');
         }
+        // 获取跑马灯、水印等播放器配置 不等于暖场视频
         if (!this.isWarnPreview) {
-          params = Object.assign({}, params, this.getPlayerInfo());
+          // 跑马灯
+          if (this.marquee && this.marquee.scrolling_open == 1) {
+            let marqueeText = '';
+            if (this.marquee.text_type == 1) {
+              marqueeText = this.marquee.text;
+            } else {
+              let text = '';
+              if (join_info.join_id) {
+                text = `${join_info.join_id}-${join_info.nickname}`;
+              } else {
+                if (localStorage.getItem('userInfo')) {
+                  text = localStorage.getItem('userInfo').nick_name;
+                } else {
+                  text = '';
+                }
+              }
+              marqueeText = `${this.marquee.text}-${text}`;
+            }
+            params.marqueeOption = {
+              enable: true,
+              text: marqueeText, // 跑马灯的文字
+              alpha: this.marquee.alpha, // 透明度,100完全显示,0 隐藏
+              size: this.marquee.size, // 文字大小
+              color: this.marquee.color, // 文字颜色
+              interval: this.marquee.scroll_type == 1 ? this.marquee.interval : 1, // 下次跑马灯开始与本次结束的时间间隔 ， 秒为单位
+              speed: this.marquee.speed || 6000, // 跑马灯移动速度:3000快,6000中,10000慢
+              displayType: this.marquee.scroll_type == 1 ? 0 : 1,
+              position: this.marquee.position // 跑马灯位置 , 1 随机 2上,3中 4下
+            };
+          }
+          // 水印
+          if (this.water && this.water.watermark_open == 1) {
+            const alianMap = new Map([
+              [1, 'tl'],
+              [2, 'tr'],
+              [3, 'br'],
+              [4, 'bl']
+            ]);
+            const align = alianMap.get(parseInt(this.water.img_position));
+
+            params.watermarkOption = {
+              enable: true,
+              url: this.water.img_url, // 水印图片的路径
+              align, // 图片的对其方式， tl | tr | bl | br 分别对应：左上，右上，左下，右下
+              position: ['20px', '20px'], // 对应的横纵位置，支持px,vh,vw,%
+              size: ['8%'], // 水印大小，支持px,vh,vw,%
+              alpha: this.water.img_alpha
+            };
+          }
         }
         return params;
       },
       async initSDK() {
         const defineQuality = this.setDefaultQuality();
-        console.log(defineQuality, '====<<1111111');
         if (this.playerServer.state.type == 'live') {
           this.liveOption.defaultDefinition = defineQuality || '';
         } else if (this.playerServer.state.type == 'vod') {
           this.vodOption.defaultDefinition = defineQuality || '';
         }
-        const params = this.initConfig();
+        const params = await this.initConfig();
+        console.log(params, '====<<1111111');
         return new Promise(resolve => {
           this.playerServer.init(params).then(() => {
             this.eventPointList = this.playerServer.state.markPoints;
@@ -532,69 +589,6 @@
           }
           this.getListenPlayer();
         });
-      },
-      // 获取跑马灯、水印等播放器配置
-      getPlayerInfo() {
-        const { join_info } = this.roomBaseServer.state.watchInitData;
-        let playerParams = {
-          marqueeOption: {
-            text: '',
-            enable: false
-          },
-          watermarkOption: {
-            enable: false
-          }
-        };
-        // 跑马灯
-        if (this.marquee && this.marquee.scrolling_open == 1) {
-          let marqueeText = '';
-          if (this.marquee.text_type == 1) {
-            marqueeText = this.marquee.text;
-          } else {
-            let text = '';
-            if (join_info.join_id) {
-              text = `${join_info.join_id}-${join_info.nickname}`;
-            } else {
-              if (localStorage.getItem('userInfo')) {
-                text = localStorage.getItem('userInfo').nick_name;
-              } else {
-                text = '';
-              }
-            }
-            marqueeText = `${this.marquee.text}-${text}`;
-          }
-          playerParams.marqueeOption = {
-            enable: true,
-            text: marqueeText, // 跑马灯的文字
-            alpha: this.marquee.alpha, // 透明度,100完全显示,0 隐藏
-            size: this.marquee.size, // 文字大小
-            color: this.marquee.color, // 文字颜色
-            interval: this.marquee.scroll_type == 1 ? this.marquee.interval : 1, // 下次跑马灯开始与本次结束的时间间隔 ， 秒为单位
-            speed: this.marquee.speed || 6000, // 跑马灯移动速度:3000快,6000中,10000慢
-            displayType: this.marquee.scroll_type == 1 ? 0 : 1,
-            position: this.marquee.position // 跑马灯位置 , 1 随机 2上,3中 4下
-          };
-        }
-        // 水印
-        if (this.water && this.water.watermark_open == 1) {
-          const alianMap = new Map([
-            [1, 'tl'],
-            [2, 'tr'],
-            [3, 'br'],
-            [4, 'bl']
-          ]);
-          const align = alianMap.get(parseInt(this.water.img_position));
-
-          playerParams.watermarkOption = {
-            enable: true,
-            url: this.water.img_url, // 水印图片的路径
-            align, // 图片的对其方式， tl | tr | bl | br 分别对应：左上，右上，左下，右下
-            position: ['20px', '20px'], // 对应的横纵位置，支持px,vh,vw,%
-            size: ['8%'], // 水印大小，支持px,vh,vw,%
-            alpha: this.water.img_alpha
-          };
-        }
-        return playerParams;
       },
       authTryWatch(type) {
         let params = {
@@ -718,8 +712,10 @@
             if (res.code == 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
               this.marquee = res.data['screen-config'].data;
-              this.waterInfo = res.data['water-mark'].data;
+              this.water = res.data['water-mark'].data;
               this.playerOtherOptions = res.data['basic-config'].data;
+              console.log(this.marquee, this.water, '??!23221423');
+              this.initPlayer();
             }
           });
       },
@@ -762,12 +758,9 @@
           // 暖场视频或者试看
           this.optionTypeInfo('vod', _id);
         }
-        // 暖场视频或者试看
-        if (!this.isWarnPreview) {
-          this.initPlayerOtherInfo();
-        }
       },
       optionTypeInfo(type, id) {
+        // 暖场视频或者试看
         const winVersion = windowVersion();
         // 直播
         this.playerServer.setType(type);
@@ -795,7 +788,7 @@
             this.liveOption.useSWF = true;
           }
         }
-        this.initPlayer();
+        this.initPlayerOtherInfo();
       },
       exchangeVideoDocs() {
         if (this.displayMode == 'mini') {

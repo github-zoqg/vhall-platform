@@ -60,7 +60,7 @@
         :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         @click.stop="setFullScreen"
       >
-        <i class="vh-iconfont vh-a-line-enterfullscreen"></i>
+        <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
     </div>
     <!-- 小组协作中 -->

@@ -34,7 +34,7 @@
       </li>
       <li>
         <!-- 签到 -->
-        <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
@@ -65,14 +65,14 @@
           />
         </div>
       </li>
-      <li>
+      <li v-if="roomBaseState.configList['ui.hide_reward'] === '0'">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
           <reward ref="reward" />
         </div>
       </li>
-      <li>
+      <li v-if="roomBaseState.configList['ui.watch_hide_like'] == '0'">
         <!-- 点赞 -->
         <praise></praise>
       </li>
@@ -194,7 +194,7 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {

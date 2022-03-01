@@ -64,8 +64,6 @@
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
         <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
-      <!-- 被邀请上麦 -->
-      <invite-handup :roomBaseState="roomBaseState" />
     </div>
   </div>
 </template>
@@ -82,11 +80,10 @@
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
   import Handup from './component/handup.vue';
-  import InviteHandup from './component/InviteHandup.vue';
 
   export default {
     name: 'VmpInteractToolsWap',
-    components: { GiftCard, RewardCard, Parise, Handup, InviteHandup },
+    components: { GiftCard, RewardCard, Parise, Handup },
     data() {
       let { configList } = useRoomBaseServer().state;
       let { groupInitData } = useGroupServer().state;
