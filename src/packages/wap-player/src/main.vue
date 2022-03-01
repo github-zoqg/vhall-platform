@@ -397,10 +397,6 @@
           }
           this.optionTypeInfo('vod', _id);
         }
-        // 暖场视频或者试看
-        if (!this.isWarnPreview) {
-          this.initPlayerOtherInfo();
-        }
       },
       optionTypeInfo(type, id) {
         this.playerServer.setType(type);
@@ -415,7 +411,7 @@
           this.vodOption.recordId = id;
           this.liveOption = {};
         }
-        this.initPlayer();
+        this.initPlayerOtherInfo();
       },
       // 初始化播放器配置项
       initConfig() {
@@ -528,8 +524,9 @@
             if (res.code == 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
               this.marquee = res.data['screen-config'].data;
-              this.waterInfo = res.data['water-mark'].data;
+              this.water = res.data['water-mark'].data;
               this.playerOtherOptions = res.data['basic-config'].data;
+              this.initPlayer();
             }
           });
       },

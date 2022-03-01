@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import grayInit from '@/packages/app-shared/gray-init';
 import Subscribe from '../views/subscribe/index.vue';
+import { authCheck } from '../../packages/app-shared/utils/wechat';
 
 Vue.use(VueRouter);
 
@@ -79,6 +80,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   console.log('---grayInit---');
+  // authCheck(to, next);
   await grayInit(to);
   next();
 });

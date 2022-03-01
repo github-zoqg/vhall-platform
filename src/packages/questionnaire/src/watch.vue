@@ -75,16 +75,13 @@
           .then(res => {
             if (res.data) {
               // 未提交
-              this.isShowCircle = true;
               this.chatPreview(id, false);
             } else {
               this.loading = false;
-              this.isShowCircle = false;
               if (flag) {
                 this.$message({
                   message: this.$t('form.form_1037'),
                   showClose: true,
-                  // duration: 0,
                   type: 'success',
                   customClass: 'zdy-info-box'
                 });

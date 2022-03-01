@@ -73,6 +73,9 @@ import VmpRedPacketWap from '@/packages/red-packet-wap/index';
 
 import VmpWapDesktopScreen from '@/packages/stream-desktop-screen-wap';
 
+// 被邀请上麦的弹窗
+import VmpInviteHandup from '@/packages/inviteHandup';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -115,4 +118,5 @@ export function initUse() {
   Vue.use(VmpSubscribeBody);
   Vue.use(VmpWapSignUpForm);
   Vue.use(VmpWapDesktopScreen);
+  Vue.use(VmpInviteHandup);
 }
