@@ -281,8 +281,17 @@
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
-            if (res.code === 200 && confirm) {
-              // this.message();
+            if (confirm) {
+              // 确认同步才需要弹窗提示
+              this.$message({
+                message: res.code == 200 ? '同步成功' : '同步失败',
+                showClose: true,
+                type: res.code == 200 ? 'success' : 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+            if (res.code === 200) {
+              this.queryQuestionnaireList();
             }
           });
       },
