@@ -864,6 +864,15 @@
       width: 100%;
       border-radius: 4px;
     }
+    #vh-watermark-container {
+      width: 90px;
+      height: 30px;
+      img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: scale-down !important;
+      }
+    }
     &-living {
       &-background {
         height: 100%;
