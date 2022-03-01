@@ -61,7 +61,6 @@
       this.initConfig();
       this.roomBaseState = this.roomBaseServer.state;
       this.noticeNum = this.noticeServer.state.latestNotice.total || 0;
-      this.noticeServer.listenMsg();
     },
     mounted() {
       this.initNotice();
@@ -79,7 +78,7 @@
         if (groupInitData.isInGroup) return;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
-          this.noticeNum++;
+          this.noticeNum = this.noticeNum + 1;
           this.noticeList.unshift({
             created_at: msg.push_time,
             content: {
@@ -93,7 +92,6 @@
         this.getNoticeList(false);
       },
       getNoticeList(flag) {
-        const { getNoticeList } = this.noticeServer;
         const { watchInitData } = this.roomBaseState;
         const params = {
           room_id: watchInitData.interact.room_id,
