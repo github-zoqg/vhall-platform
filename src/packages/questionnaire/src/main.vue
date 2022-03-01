@@ -291,7 +291,11 @@
               });
             }
             if (res.code === 200) {
-              this.queryQuestionnaireList();
+              // 数据有延迟
+              const st = setTimeout(() => {
+                this.queryQuestionnaireList();
+                clearInterval(st);
+              }, 1000);
             }
           });
       },

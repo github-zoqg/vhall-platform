@@ -315,6 +315,10 @@
           this.$emit('sendQa', value);
           return;
         }
+        if (this.currentTab == 'private') {
+          this.$emit('sendPrivate', value);
+          return;
+        }
         // 关键词过滤标识
         const filterStatus = this.chatServer.checkHasKeyword(true, value);
         // 发送socket消息  当关键词列表中不包含当前要发的消息时候，进行发送(主意这里仅是把消息保存到了服务器，本地并没有消息)

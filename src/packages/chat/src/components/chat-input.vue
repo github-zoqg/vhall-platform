@@ -468,7 +468,7 @@
       color: @font-dark-normal;
       line-height: 20px;
       padding: 10px 12px;
-      text-align: center;
+      text-align: left;
       border-radius: 20px;
       .textarea-placeholder_no-login {
         color: #666666;
