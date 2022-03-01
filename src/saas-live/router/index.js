@@ -58,6 +58,11 @@ const routes = [
     name: 'notfound',
     component: NotFound,
     meta: { keepAlive: false, grayType: '' }
+  },
+  {
+    path: '/lives/client/:il_id', // 客户端嵌入
+    name: 'Client',
+    component: () => import('@/saas-live/views/clientEmbed/index')
   }
 ];
 
