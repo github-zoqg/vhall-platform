@@ -44,7 +44,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer, useQaServer, useRoomBaseServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useRoomBaseServer, useChatServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -74,20 +74,27 @@
     created() {
       this.initConfig();
       this.initMenu();
+      this.listenEvents();
     },
     async mounted() {
       await this.$nextTick(0);
       this.selectDefault();
-      this.listenEvents();
     },
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        const chatServer = useChatServer();
+        //收到问答开启消息
         qaServer.$on(qaServer.Events.QA_OPEN, () => {
           this.setVisible({ visible: true, type: 'v5' });
         });
+        //收到问答关闭消息
         qaServer.$on(qaServer.Events.QA_CLOSE, () => {
           this.setVisible({ visible: false, type: 'v5' });
+        });
+        //收到私聊消息
+        chatServer.$on('receivePrivateMsg', () => {
+          this.setVisible({ visible: true, type: 'private' });
         });
       },
       /**
@@ -125,7 +132,7 @@
             type: 'private',
             name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '私聊', // 同上
-            status: 1
+            status: 2
           });
           this.addItemByIndex(chatIndex + 2, {
             type: 'v5',
