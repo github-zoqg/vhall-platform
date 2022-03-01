@@ -200,8 +200,7 @@
       },
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
-        console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
-        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
+        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
       },
       switchStatus: {
         get() {
@@ -221,8 +220,9 @@
           );
         } else {
           return (
+            ['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
             this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-            this.watchInitData.join_info.third_party_user_id
+              this.watchInitData.join_info.third_party_user_id
           );
         }
       },
