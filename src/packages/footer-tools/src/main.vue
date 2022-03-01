@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-footer-tools" v-if="!isEmbedVideo">
     <div class="vmp-footer-tools__left">
-      <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
+      <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
         设置
       </div>
