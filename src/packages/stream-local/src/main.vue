@@ -406,6 +406,8 @@
           // 设置旁路主屏布局失败
           console.log('设置主屏失败');
           // TODO: 设置旁路主屏布局失败错误处理
+        } else if (err == 'setBroadCastAdaptiveLayoutModeError') {
+          console.log('设置自适应旁路布局失败');
         } else if (err == 'getCanvasStreamError') {
           console.error('获取图片流track错误');
         } else if (err == 'createLocalPhotoStreamError') {
@@ -427,6 +429,14 @@
 
           // 主持人配置旁路主屏
           if (this.joinInfo.role_name == 1) {
+            /*
+             *  1、初始化互动实例时会默认传旁路自适应布局模式
+             *  2、     若刷新的话，会初始化实例，则旁路展示正确
+             *            不刷新，结束直播后，进行媒体设置更改，再进行开播，则需要手动调用自适应布局方法
+             */
+            if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
+              await this.setBroadCastAdaptiveLayoutMode();
+            }
             await this.setBroadCastScreen();
           }
           // 派发事件
@@ -474,6 +484,17 @@
       async setBroadCastScreen() {
         await this.interactiveServer.setBroadCastScreen().catch(() => 'setBroadCastScreenError');
       },
+
+      // 设置旁路布局
+      async setBroadCastAdaptiveLayoutMode() {
+        const param = {
+          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')]
+        };
+        await this.interactiveServer
+          .setBroadCastAdaptiveLayoutMode(param)
+          .catch(() => 'setBroadCastAdaptiveLayoutModeError');
+      },
+
       // 结束推流
       stopPush() {
         return new Promise(resolve => {
