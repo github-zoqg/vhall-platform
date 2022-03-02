@@ -127,7 +127,12 @@ const serverConfig = {
     emitOpenRedPacket: {
       cuid: ['comRedPacketWap'],
       method: 'openRedPacket'
-    }
+    },
+    // 抽奖弹窗
+    emitClickLotteryIcon: {
+      cuid: ['compLotteryWap'],
+      method: 'open'
+    },
   },
   // notice横幅
   comNoticeWap: {
@@ -327,7 +332,14 @@ const serverConfig = {
   },
   // 抽奖
   compLotteryWap: {
-    component: 'VmpLotteryWap'
+    component: 'VmpLotteryWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
   },
   // 章节
   comChapterWap: {
