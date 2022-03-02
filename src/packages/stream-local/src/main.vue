@@ -181,7 +181,8 @@
     useRoomBaseServer,
     usePlayerServer,
     useMediaSettingServer,
-    useGroupServer
+    useGroupServer,
+    useChatServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -251,6 +252,7 @@
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
+      this.chatServer = useChatServer();
       this.listenEvents();
     },
     async mounted() {
@@ -258,6 +260,12 @@
 
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
+      } else if (
+        this.mode === 6 &&
+        !this.chatServer.state.banned &&
+        !this.chatServer.state.allBanned
+      ) {
+        await this.micServer.userSpeakOn();
       }
     },
     beforeDestroy() {
