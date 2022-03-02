@@ -123,6 +123,10 @@ const serverConfig = {
     emitOpenSign: {
       cuid: ['comSignWap'],
       method: 'openSign'
+    },
+    emitOpenRedPacket: {
+      cuid: ['comRedPacketWap'],
+      method: 'openRedPacket'
     }
   },
   // notice横幅

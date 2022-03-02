@@ -63,6 +63,9 @@
           this.open(uuid);
         });
       },
+      openRedPacket() {
+        this.dialogVisible = true;
+      },
       close() {
         this.dialogVisible = false;
       },
