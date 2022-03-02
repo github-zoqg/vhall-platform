@@ -180,7 +180,8 @@
     useMicServer,
     useRoomBaseServer,
     usePlayerServer,
-    useMediaSettingServer
+    useMediaSettingServer,
+    useGroupServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -208,8 +209,16 @@
         );
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -241,10 +250,11 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
+      this.groupServer = useGroupServer();
       this.listenEvents();
     },
     async mounted() {
-      console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
+      console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
       if (this.micServer.state.isSpeakOn) {
         this.startPush();
@@ -304,7 +314,7 @@
             //  初始化互动实例
             this.interactiveServer.init();
           } else {
-            // 如果成功，销毁播放器
+            // 初始化播放器
             this.playerServer.init();
           }
         });
@@ -313,6 +323,24 @@
           await this.stopPush();
 
           this.interactiveServer.destroy();
+        });
+        // 分组结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', async () => {
+          console.log('分组结束讨论，是否在麦上', this.micServer.state.isSpeakOn);
+          try {
+            await this.stopPush();
+            console.log('11111-1111111');
+            await this.interactiveServer.destroy();
+            //  初始化互动实例
+            console.log('2222222-2222222');
+            this.interactiveServer.init();
+            console.log(
+              '分组结束讨论，重新初始化实例后，是否在麦上',
+              this.micServer.state.isSpeakOn
+            );
+          } catch (error) {
+            console.log('分组结束讨论', error);
+          }
         });
       },
       // 媒体切换后进行无缝切换

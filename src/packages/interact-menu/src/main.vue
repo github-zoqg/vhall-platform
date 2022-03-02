@@ -43,7 +43,7 @@
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openRedPacket"
         >
-          <i class="vh-iconfont vh-a-redpacket"></i>
+          <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
         </div>
         <div

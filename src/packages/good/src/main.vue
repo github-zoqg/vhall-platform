@@ -322,8 +322,8 @@
         overflow: hidden;
         img {
           display: block;
-          width: 100px;
-          height: 100px;
+          width: 100%;
+          height: 100%;
           object-fit: scale-down;
           border-radius: 4px;
         }
