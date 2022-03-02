@@ -14,6 +14,7 @@
         :lotteryId="lotteryId"
         :showWinnerList="showWinnerList"
         :prizeInfo="prizeInfo"
+        :lotteryInfo="lotteryInfo"
         @close="close"
         @navTo="changeView"
       />
@@ -48,7 +49,8 @@
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
-        lotteryId: '' // 抽奖的信息id(接口返回)
+        lotteryId: '', // 抽奖的信息id(接口返回)
+        lotteryInfo: {} // 抽奖信息
       };
     },
     created() {
@@ -79,7 +81,7 @@
               this.lotteryView = 'LotteryMiss';
             }
           }
-          this.dialogVisible = true;
+          this.popupVisible = true;
         });
       },
 
@@ -147,6 +149,7 @@
           title: payload.title,
           img_order: payload.img_order
         };
+        this.lotteryInfo = payload;
       },
       /**
        * @description 判断是否是自己

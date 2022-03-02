@@ -17,7 +17,7 @@
           popper-class="transfer-box"
           style="margin-left: 4px"
         >
-          <i class="iconfont iconicon-help" style="color: #999"></i>
+          <i class="vh-iconfont vh-line-question" style="color: #999"></i>
           <div slot="content">
             1、全体参会者：所有参会的观众拥有参与抽奖的资格
             <br />
@@ -64,7 +64,7 @@
           popper-class="transfer-box"
           style="margin-left: 4px"
         >
-          <i class="iconfont iconicon-help" style="margin-left: 4px; color: #999"></i>
+          <i class="vh-iconfont vh-line-question" style="margin-left: 4px; color: #999"></i>
           <div slot="content">
             1、请在控制台-直播管理-抽奖中进行创建
             <br />
