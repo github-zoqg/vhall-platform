@@ -328,7 +328,14 @@ export const serverConfig = {
   },
   // 互动工具-计时器设置
   liveTimerSet: {
-    component: 'VmpLiveTimerSet'
+    component: 'VmpLiveTimerSet',
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
+      }
+    ]
   },
   // 互动工具-计时器
   liveTimer: {
