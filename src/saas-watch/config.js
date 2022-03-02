@@ -294,6 +294,11 @@ export const serverConfig = {
       cuid: ['compRegLogin'],
       method: 'open'
     },
+    // 抽奖弹窗
+    emitClickLotteryIcon: {
+      cuid: ['comLottery'],
+      method: 'open'
+    },
     children: ['comSignWatch']
   },
   comSignWatch: {
@@ -333,7 +338,12 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
-    ]
+    ],
+    emitClickLotteryChatItem: {
+      cuid: ['comLottery'],
+      method: 'accept',
+      args: ['$0']
+    },
   },
   //成员列表组件
   comMemberList: {
