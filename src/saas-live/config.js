@@ -271,7 +271,7 @@ export const serverConfig = {
     handleClick: [
       {
         cuid: 'comInsertVideoList',
-        method: 'openInserVideoDialog',
+        method: 'openInsertFileDialog',
         args: []
       }
     ]
@@ -531,11 +531,10 @@ export const serverConfig = {
   },
   comInsertVideoList: {
     component: 'VmpInsertVideoList',
-    emitOnchange: [
+    emitInsertFileChange: [
       {
         cuid: 'comInsertStream',
-        method: 'openInsertShow',
-        args: ['$0', '$1']
+        method: 'startInertFile'
       }
     ]
   },
@@ -554,25 +553,18 @@ export const serverConfig = {
   },
   comInsertStream: {
     component: 'VmpInsertStream',
-    emitClose: [
+    emitCloseInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
         method: 'closeInserVideoDialog',
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ],
-    emitOpen: [
+    openInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
-        method: 'openInserVideoDialog',
+        method: 'openInsertFileDialog',
         args: []
-      }
-    ],
-    emitInsertInfo: [
-      {
-        cuid: 'comInsertVideoList',
-        method: 'getInsertingInfo',
-        args: ['$0']
       }
     ]
   },
