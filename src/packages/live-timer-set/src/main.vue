@@ -100,7 +100,7 @@
                   popper-class="transfer-box"
                   style="margin-left: 4px"
                 >
-                  <i class="iconfont iconicon-help pr5" style="color: #666"></i>
+                  <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
                     1.计时器功能在默认情况下，对观众不可见。（仅对主持人、嘉宾、助理三个身份可见）
                     <br />
@@ -127,7 +127,7 @@
                   popper-class="transfer-box"
                   style="margin-left: 4px"
                 >
-                  <i class="iconfont iconicon-help pr5" style="color: #666"></i>
+                  <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
                     1.设置可超时后，倒计时结束，变倒计时为从00:00开始的正向计时，记录超时时间
                     <br />
