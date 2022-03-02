@@ -377,7 +377,7 @@
           //设置禁言/取消禁言
           {
             command: 'setBanned',
-            isShow: ![1, '1'].includes(this.userInfo.role_name),
+            isShow: ![1, '1'].includes(this.userInfo.role_name) && this.userInfo.is_kicked == 0,
             disable: false,
             //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',

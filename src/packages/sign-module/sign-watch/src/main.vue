@@ -58,7 +58,7 @@
       this.signServer = useSignServer();
     },
     created() {
-      this.signServer.listenMsg();
+      // this.signServer.listenMsg();
     },
     mounted() {
       this.signServer.$on('sign_in_push', e => {

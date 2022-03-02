@@ -273,7 +273,7 @@
     },
     beforeDestroy() {
       window.removeEventListener('resize', this.checkIsMobile, false);
-      this.keyLoginServer.setHeader({ 'gray-id': null });
+      // this.keyLoginServer && this.keyLoginServer.setHeader({ 'gray-id': null });
     },
     mounted() {},
     methods: {
@@ -433,8 +433,8 @@
           if ([3, '3'].includes(role)) {
             _this.$router.push({
               name: 'LiveRoom',
-              params: { il_id: _this.$route.params.id },
-              query: { liveT: token }
+              params: { id: _this.$route.params.id },
+              query: { liveToken: token }
             });
             return;
           }
@@ -442,8 +442,8 @@
           if ([1, '1'].includes(role) && _this.webinarInfo.webinar_type == 1) {
             _this.$router.push({
               name: 'LiveRoom',
-              params: { il_id: _this.$route.params.id },
-              query: { liveT: token }
+              params: { id: _this.$route.params.id },
+              query: { liveToken: token }
             });
             return;
           }
@@ -452,7 +452,7 @@
             window.location.protocol +
             `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/chooseWay/${
               _this.$route.params.id
-            }/${role}?type=code&liveT=${token}`;
+            }/${role}?type=code&liveToken=${token}`;
         }, 300);
       },
       //上传图片

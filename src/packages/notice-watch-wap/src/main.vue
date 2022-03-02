@@ -16,7 +16,7 @@
 
 <script>
   //  && !this.zIndexObj.Ques && !videoEnd
-  import { useMsgServer } from 'middle-domain';
+  import { useNoticeServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeWap',
     data() {
@@ -28,37 +28,20 @@
       };
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
+      this.noticeServer = useNoticeServer();
     },
     mounted() {
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        // console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 监听到 公告
-          case 'room_announcement':
-            this.announcement = {
-              content: temp.data.room_announcement_text,
-              isShow: true
-            };
-            setTimeout(() => {
-              this.announcement.isShow = false;
-            }, 30000);
-            break;
-          default:
-            break;
-        }
-      });
       // 监听到 公告
-      // EventBus.$on('room_announcement', msg => {
-      //   this.room_announcement(msg.room_announcement_text);
-      // });
+      this.noticeServer.listenMsg();
+      this.noticeServer.$on('room_announcement', msg => {
+        this.announcement = {
+          content: msg.room_announcement_text,
+          isShow: true
+        };
+        setTimeout(() => {
+          this.announcement.isShow = false;
+        }, 30000);
+      });
     },
     methods: {
       closeAnnouncement() {
