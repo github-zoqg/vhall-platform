@@ -125,11 +125,16 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
+        <span class="info-panel__online-num" v-if="configList['ui.hide_host_nums']">
+          {{ totalNum | numberCompression }}人在线
+        </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
         </span>
-        <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
+        <div
+          class="info-panel__allow-raise-hand"
+          v-if="configList['ui.hide_handsUp'] && mode !== 6"
+        >
           <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
           <el-switch
             v-model="allowRaiseHand"
@@ -158,6 +163,7 @@
                 raiseHandTip ? 'raise-hand' : '',
                 tabIndex === 2 ? 'active' : ''
               ]"
+              v-if="configList['is_interact_and_host']"
             >
               举手
             </li>
@@ -165,6 +171,7 @@
               @click="switchToTab(3)"
               class="button-panel__btn-box__tab-item"
               :class="tabIndex === 3 ? 'active' : ''"
+              v-if="configList['is_membermanage']"
             >
               受限
             </li>
@@ -354,6 +361,9 @@
           show = true;
         }
         return show;
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       },
       //是否在分组里
       isInGroup() {
