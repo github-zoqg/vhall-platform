@@ -132,7 +132,8 @@ export function authCheck(to, next) {
   // if (getQueryString('user_auth_key') && getQueryString('purpose')) {
 
   // }
-  if (to.name != 'watch' && to.name != 'subscribe') {
+  let pathArr = ['watch', 'subscribe'];
+  if (pathArr.includes(to.path)) {
     // 不是 预约/观看 或者 嵌入情况， 直接进入
     next();
   } else {

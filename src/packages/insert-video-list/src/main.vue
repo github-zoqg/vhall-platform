@@ -56,7 +56,11 @@
               >
                 <li v-for="video in tableData" :key="video.id">
                   <p class="insert-header-item0">
-                    <img src="./img/playing.gif" alt="" v-if="playingInsertVideoId == video.id" />
+                    <img
+                      src="./img/playing.gif"
+                      alt=""
+                      v-if="currentRemoteInsertFile.id == video.id"
+                    />
                   </p>
                   <p class="insert-header-item">
                     <i
@@ -138,23 +142,22 @@
         noVideo: 1,
         isFetching: false,
         videoParam: {}, //预览数据
-        webinarId: '876395481' || this.$route.params.id,
-        playingInsertVideoId: '',
         tableData: [],
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
         },
-        insertVideoObj: {
-          isinsterVideoPushing: false,
-          userInfo: {},
-          insertVideoStatus: false // 是否正在插播
-        },
         total: 1,
         totalPages: 0,
         previewDialog: false
       };
+    },
+    computed: {
+      // 当前插播中的云插播文件
+      currentRemoteInsertFile() {
+        return this.$domainStore.state.insertFileServer.currentRemoteInsertFile;
+      }
     },
     components: {
       videoPreview
@@ -162,26 +165,33 @@
     beforeCreate() {
       this.insertFileServer = useInsertFileServer();
       this.msgServer = useMsgServer();
-      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.assistantType = this.$route.query.assistantType;
-      this.roomBaseState = this.roomBaseServer.state;
-      this.roleName = this.roomBaseState.watchInitData.join_info.role_name;
     },
-    mounted() {},
     methods: {
-      openInserVideoDialog() {
-        console.log('??13243544');
+      // 显示插播列表 dialog
+      openInsertFileDialog() {
         // 检查是否可以插播文件
-        // this.checkCaptureStream();
-        this.insertVideoVisible = true;
-        this.getTableList(false, true);
+        const isCanInsert = this.checkInsertFileProcess();
+        if (isCanInsert) {
+          // 显示插播列表
+          this.insertVideoVisible = true;
+          this.getTableList({
+            isNeedResetPage: true,
+            isInvokeInCreated: true
+          });
+        }
       },
-      checkCaptureStream() {
-        //是否是网页端发起的直播  助理其他端不支持插播 、并且是正在直播
-        const { watchInitData } = this.roomBaseState.state;
-        if (!this.isPcStartLive && watchInitData.webinar.type == 1) {
+
+      // 检测当前用户是否可以插播
+      checkInsertFileProcess() {
+        const insertFileServer = useInsertFileServer();
+        const { watchInitData } = useRoomBaseServer().state;
+        const { isInsertFilePushing, insertStreamInfo } = insertFileServer.state;
+
+        // 如果是直播状态需要判断当前主持人是否是用网页发起直播
+        if (watchInitData.switch.start_type != 1 && watchInitData.webinar.type == 1) {
           this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
             title: '提示',
             confirmButtonText: '知道了',
@@ -191,47 +201,35 @@
           });
           return;
         }
-        const thirdId = watchInitData.join_info.third_party_user_id;
-        const user = this.insertVideoObj.userInfo;
+
+        // 如果在插播中，并且不是当前用户插播，alert提示
         if (
-          this.roleName == 3 &&
-          this.insertVideoObj.insertVideoStatus &&
-          user.accountId != thirdId
+          isInsertFilePushing &&
+          insertStreamInfo.accountId != watchInitData.join_info.third_party_user_id
         ) {
-          if (user.role == 4 || user.role_name == 4) {
-            this.$alert(`嘉宾${user.nickname}正在插播文件，请稍后重试`, '', {
+          const roleMap = {
+            1: '主持人',
+            3: '助理',
+            4: '嘉宾'
+          };
+
+          this.$alert(
+            `${roleMap[insertStreamInfo.role]}${
+              insertStreamInfo.role != 1 ? insertStreamInfo.nickname : ''
+            }正在插播文件，请稍后重试`,
+            '',
+            {
               title: '提示',
               confirmButtonText: '确定',
               customClass: 'zdy-message-box',
               cancelButtonClass: 'zdy-confirm-cancel'
-            });
-            return;
-          }
-          this.$alert('主持人正在插播文件，请稍后重试', '', {
-            title: '提示',
-            confirmButtonText: '确定',
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel'
-            // center: true,
-          });
-          return;
-        } else if (
-          this.insertVideoObj.insertVideoStatus &&
-          user.role == 3 &&
-          user.accountId != thirdId
-        ) {
-          this.$alert(`助理${user.nickname}正在插播文件，请稍后重试`, '', {
-            title: '提示',
-            confirmButtonText: '确定',
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            // center: true,
-            callback: action => {}
-          });
+            }
+          );
           return;
         }
-        const v = document.createElement('video');
-        if (typeof v.captureStream !== 'function') {
+
+        // 判断该当前浏览器是否支持插播
+        if (!insertFileServer.isCanUseCaptureStream()) {
           this.$alert(
             '当前浏览器版本不支持插播文件。<br>建议您下载chrome72及以上版本后使用<br>下载<a href="https://www.google.cn/chrome/" target="_blank" style="color: #3562fa">Chrome浏览器</a>',
             '',
@@ -241,31 +239,25 @@
               customClass: 'zdy-message-box',
               cancelButtonClass: 'zdy-confirm-cancel',
               dangerouslyUseHTMLString: true,
-              callback: action => {}
+              callback: () => {}
             }
           );
           return;
         }
-        this.insertVideoVisible = true;
+        return true;
       },
-      closeInserVideoDialog(flag, id) {
-        this.insertVideoObj.insertVideoStatus = flag;
-        this.playingInsertVideoId = id;
+      // 关闭插播列表弹窗
+      closeInserVideoDialog() {
         this.insertVideoVisible = false;
       },
-      // 获取正在插播用户信息
-      getInsertingInfo(obj) {
-        console.log(obj, '====???1zhangxiao-------');
-        this.insertVideoObj.userInfo = obj;
-      },
+      // 选择本地文件插播
       selectlocalVideo() {
-        if (!this.insertFileServer.isCanUseCaptureStream()) {
-          this.$message.error('当前浏览器不支持captureStream()方法! 无法使用此功能');
-          return;
-        }
+        const insertFileServer = useInsertFileServer();
+        const { watchInitData } = useRoomBaseServer().state;
         const _this = this;
-        this.insertFileServer.selectLocalFile(e => {
-          if (_this.layout == 1) {
+        insertFileServer.selectLocalFile(e => {
+          // 如果是音频直播
+          if (watchInitData.webinar.mode == 1) {
             const video_ext_type = e.target.files[0].type; // type: "audio/ogg" // video/mp4
             if (!video_ext_type.includes('ogg')) {
               _this.$message.warning('音频直播只支持插播ogg格式的音频');
@@ -283,23 +275,28 @@
               _this.$message.warning('只支持插播MP4、WEBM、OGG格式的视频');
               return;
             }
-            this.initVideo(e.target.files[0]);
+            console.log('本地插播上传的文件', e, e.target.files[0]);
+            this.initLocalVideo(e.target.files[0]);
           }
         });
       },
-      initVideo(File) {
-        this.playingInsertVideoId = null;
+      // 进入本地文件插播
+      initLocalVideo(File) {
+        console.log('本地插播上传的文件', File);
+        const insertFileServer = useInsertFileServer();
         const isGt5M = File.size / 1024 / 1024 / 1024 > 5;
-        const video_ext_type = File.type; // type: "audio/ogg" // video/mp4
-        console.log(video_ext_type, 'video_ext_type');
-        this.isAudio = video_ext_type.includes('ogg');
+        console.log(File.type, 'File.type');
         if (isGt5M) {
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitOnchange', [File, 'local'])
-        );
+        // 设置插播类型,local 本地插播   remote 云插播
+        console.log('insertFileServer.setInsertFileType', insertFileServer.setInsertFileType);
+        insertFileServer.setInsertFileType('local');
+        // 设置当前插播文件
+        insertFileServer.setLocalInsertFile(File);
+
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitInsertFileChange'));
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -308,10 +305,18 @@
         this.pageInfo.pageNum++;
         this.isFetching = true;
         this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
-        this.getTableList(true);
+        this.getTableList({
+          isNeedResetPage: false
+        });
       },
-      getTableList(flag, isCreated) {
-        if (!flag) {
+      getTableList(
+        options = {
+          isNeedResetPage: false,
+          isInvokeInCreated: false
+        }
+      ) {
+        const { watchInitData } = useRoomBaseServer().state;
+        if (options.isNeedResetPage) {
           this.pageInfo = {
             pos: 0,
             limit: 10,
@@ -322,7 +327,7 @@
         const params = {
           name: this.searchKey,
           get_no_trans: 1,
-          webinar_id: this.webinarId,
+          webinar_id: watchInitData.webinar.id,
           ...this.pageInfo
         };
         this.insertFileServer.getInsertFileList(params).then(res => {
@@ -356,24 +361,34 @@
             this.tableData.push(...res.data.list);
             this.total = res.data.total;
             this.totalPages = Math.ceil(res.data.total / this.pageInfo.limit);
-            if (isCreated) {
+            if (options.isInvokeInCreated) {
               this.noVideo = !res.data.total ? 2 : 1;
             }
           }
         });
       },
+      // 云插播开始播放
       handlePlay(video) {
-        video.isAudio = false;
+        const insertFileServer = useInsertFileServer();
+        const insertFileServerState = insertFileServer.state;
+        const { watchInitData } = useRoomBaseServer().state;
+        let isAudioFile = false;
         const videoType = video.file_type;
         if (
           videoType.toLowerCase() === '.ogg' ||
           videoType.toLowerCase() === '.mp3' ||
           videoType.toLowerCase() === '.mav'
         ) {
-          video.isAudio = true;
+          isAudioFile = true;
         }
+        insertFileServerState.insertStreamInfo.has_video = !isAudioFile;
+
         // 如果当前角色正在进行插播，需要先确认
-        if (this.insertVideoObj.insertVideoStatus) {
+        if (
+          insertFileServerState.isInsertFilePushing &&
+          insertFileServerState.insertStreamInfo.accountId ==
+            watchInitData.join_info.third_party_user_id
+        ) {
           this.$confirm('是否中断播放中视频，并替换播放？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -381,15 +396,19 @@
             cancelButtonClass: 'zdy-confirm-cancel'
           })
             .then(() => {
+              insertFileServer.setRemoteInsertFile(video);
+              insertFileServer.setInsertFileType('remote');
+
               window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitOnchange', [video, 'remote'])
+                boxEventOpitons(this.cuid, 'emitInsertFileChange')
               );
             })
             .catch(() => {});
         } else {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitOnchange', [video, 'remote'])
-          );
+          insertFileServer.setRemoteInsertFile(video);
+          insertFileServer.setInsertFileType('remote');
+
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitInsertFileChange'));
         }
       },
       handleDelete(video) {
@@ -406,7 +425,9 @@
               })
               .then(res => {
                 if (res.code === 200) {
-                  this.getTableList(false);
+                  this.getTableList({
+                    isNeedResetPage: true
+                  });
                   this.$message({
                     message: '删除成功',
                     showClose: true,
