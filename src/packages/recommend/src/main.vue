@@ -205,6 +205,7 @@
 
         img {
           height: 100%;
+          width: 100%;
           object-fit: scale-down;
         }
       }
@@ -212,7 +213,7 @@
         font-size: 14px;
         font-weight: bold;
         color: @font-dark-normal;
-        line-height: 30px;
+        line-height: 22px;
         height: 34px;
       }
 

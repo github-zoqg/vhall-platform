@@ -15,7 +15,7 @@
         <img v-if="isShowPoster" class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
       </div>
       <!-- 播放 按钮 -->
-      <div v-if="!isPlayering" class="vmp-wap-player-pause">
+      <div v-if="!isPlayering && !isVodEnd" class="vmp-wap-player-pause">
         <p @click="startPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
@@ -41,7 +41,7 @@
       </div>
       <!-- 回放结束（正常回放和试看回放结束） -->
       <div
-        v-if="isVodEnd"
+        v-if="isVodEnd && !isPlayering"
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
