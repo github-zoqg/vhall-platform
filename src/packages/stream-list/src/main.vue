@@ -62,7 +62,12 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useRoomBaseServer,
+    useMicServer,
+    useGroupServer
+  } from 'middle-domain';
   export default {
     name: 'VmpStreamList',
 
@@ -77,6 +82,10 @@
     },
 
     computed: {
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -84,7 +93,11 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       remoteStreams() {
         console.log(
@@ -138,6 +151,7 @@
       }
     },
     beforeCreate() {
+      this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();

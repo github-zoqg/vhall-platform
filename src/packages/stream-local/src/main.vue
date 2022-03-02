@@ -209,8 +209,16 @@
         );
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -306,7 +314,7 @@
             //  初始化互动实例
             this.interactiveServer.init();
           } else {
-            // 如果成功，销毁播放器
+            // 初始化播放器
             this.playerServer.init();
           }
         });
