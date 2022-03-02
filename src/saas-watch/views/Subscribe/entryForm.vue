@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { useEntryformServer } from 'middle-domain';
+  import { useEntryformServer, useRoomBaseServer } from 'middle-domain';
   import errorPage from '../ErrorPage/index.vue';
   export default {
     name: 'Entryform',
@@ -23,6 +23,7 @@
     },
     beforeCreate() {
       this.entryformServer = useEntryformServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
       await this.getGrayConfig();
@@ -50,7 +51,7 @@
         this.entryformServer
           .verifyOpenLink({
             webinar_id: this.webinar_id,
-            visit_id: sessionStorage.getItem('visitorId')
+            visit_id: this.roomBaseServer.state.watchInitData.visitor_id
           })
           .then(res => {
             // 如果当前 visitor_id 已经报名，跳转到直播间

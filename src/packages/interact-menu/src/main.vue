@@ -173,7 +173,7 @@
       },
       // 打开计时器设置弹框
       openTimer() {
-        if (this.disTimer) return false;
+        if (this.disTimer || !this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
       },
       //  打开转播
