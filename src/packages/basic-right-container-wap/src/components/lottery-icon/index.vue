@@ -1,7 +1,7 @@
 <template>
-  <div class="vmp-lottery-icon" v-if="showIcon" @click="checkLotteryIcon">
-    <img src="./images/lottery-icon.png" alt="" />
-    <i class="vmp-dot" v-if="showDot" />
+  <div class="icon-wrap" v-if="showIcon" @click="checkLotteryIcon">
+    <img src="./images/icon.png" alt="" />
+    <i class="dot" v-if="showDot" />
   </div>
 </template>
 <script>
@@ -13,8 +13,8 @@
     name: 'LotteryIcon',
     data() {
       return {
-        showIcon: false, //显示图标
-        showDot: false // 显示小红点
+        showIcon: true, //显示图标
+        showDot: true // 显示小红点
       };
     },
     beforeCreate() {
@@ -75,6 +75,27 @@
       width: 32px;
       height: 32px;
       cursor: pointer;
+    }
+  }
+  .icon-wrap {
+    margin-bottom: 10px;
+    width: 84px;
+    height: 84px;
+    position: relative;
+    background-color: transparent;
+    img {
+      width: 84px;
+      height: 84px;
+    }
+    .dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #ff0005;
+      content: '';
     }
   }
 </style>
