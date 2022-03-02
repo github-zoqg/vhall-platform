@@ -67,7 +67,6 @@ export const serverConfig = {
       'comUserAccount',
       'comCash',
       'comLottery',
-      'comWatchTimer',
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
@@ -299,7 +298,7 @@ export const serverConfig = {
       cuid: ['comLottery'],
       method: 'open'
     },
-    children: ['comSignWatch']
+    children: ['comSignWatch', 'comWatchTimer']
   },
   comSignWatch: {
     component: 'VmpSignWatch'

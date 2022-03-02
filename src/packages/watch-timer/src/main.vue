@@ -245,6 +245,7 @@
             }
             if (data == 0) {
               clearInterval(this.timer);
+              this.timerVisible = false;
               // 通知相应组件关闭计时器Icon
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
