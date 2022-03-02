@@ -343,7 +343,7 @@ export const serverConfig = {
       cuid: ['comLottery'],
       method: 'accept',
       args: ['$0']
-    },
+    }
   },
   //成员列表组件
   comMemberList: {
