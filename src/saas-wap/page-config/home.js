@@ -127,7 +127,7 @@ const serverConfig = {
     emitClickLotteryIcon: {
       cuid: ['compLotteryWap'],
       method: 'open'
-    },
+    }
   },
   // notice横幅
   comNoticeWap: {
