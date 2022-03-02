@@ -1,5 +1,5 @@
 <template>
-  <span class="vh-iconfont" :class="[iconStyles]"></span>
+  <span class="vmp-media-check__step-icon vh-iconfont" :class="[iconStyles]"></span>
 </template>
 
 <script>
@@ -31,9 +31,20 @@
 </script>
 
 <style lang="less">
+  .vmp-media-check__step-icon {
+    color: #999;
+    font-size: 24px;
+  }
+
   .is-process {
-    .vh-iconfont {
+    .vmp-media-check__step-icon {
       color: #3562fa;
+    }
+  }
+
+  .is-finish {
+    .vmp-media-check__step-icon {
+      color: #fff;
     }
   }
 </style>
