@@ -388,11 +388,11 @@
         } else if (type === 'questionnaire_push') {
           // 问卷点击查看
           this.questionnaireCheck(content.questionnaire_id);
-        }
+        } 
       },
       //todo 点击查看抽奖信息
       lotteryCheck(content) {
-        this.$emit('lotteryCheck', content.msg, content.userId);
+        this.$emit('lotteryCheck', content.msg);
       },
       //todo 点击查看问卷信息
       questionnaireCheck(questionnaire_id) {

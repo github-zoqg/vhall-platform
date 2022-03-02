@@ -123,6 +123,10 @@ const serverConfig = {
     emitOpenSign: {
       cuid: ['comSignWap'],
       method: 'openSign'
+    },
+    emitClickLotteryIcon: {
+      cuid: ['compLotteryWap'],
+      method: 'open'
     }
   },
   // notice横幅

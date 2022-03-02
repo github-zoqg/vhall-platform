@@ -8,14 +8,21 @@
       <div class="have"></div>
       <img src="./image/icon.png" />
     </div>
+    <div class="icon-wrap">
+      <lottery-icon @clickIcon="checkLotteryIcon" />
+    </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import lotteryIcon from './components/lottery-icon/index.vue';
   export default {
     name: 'VmpContainerRightWap',
+    components: {
+      lotteryIcon
+    },
     data() {
       return {
         showTimer: false,
@@ -36,6 +43,9 @@
       },
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       }
     }
   };
