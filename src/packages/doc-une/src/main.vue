@@ -293,6 +293,15 @@
       }
     },
     watch: {
+      // 回放的时候
+      ['docServer.state.switchStatus'](newval) {
+        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
+          // 如果是回放会点播
+          if (newval) {
+            useRoomBaseServer().setChangeElement('player');
+          }
+        }
+      },
       // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
