@@ -298,13 +298,14 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          this.interactiveServer.destroy();
+          await this.interactiveServer.destroy();
 
-          // 如果成功，销毁播放器
-          this.playerServer.init();
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
             this.interactiveServer.init();
+          } else {
+            // 如果成功，销毁播放器
+            this.playerServer.init();
           }
         });
         // 结束直播

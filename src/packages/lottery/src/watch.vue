@@ -46,11 +46,40 @@
     },
     created() {
       this.initMsgEvent();
+      // this.open();
     },
     destroyed() {
       this.removeMsgEvent();
     },
     methods: {
+      accept(msg) {
+        console.log('🚀 ~ file: watch.vue ~ line 55 ~ accept ~ msg', msg);
+      },
+      /**
+       * @description 点开抽奖(按钮或者聊天)
+       */
+      open(uuid = '') {
+        this.lotteryServer.checkLottery(uuid).then(res => {
+          const data = res.data;
+          if (data.lottery_status === 0) {
+            // 抽奖中
+            // 抽奖进行中
+            this.setFitment(data);
+            this.lotteryView = 'LotteryPending';
+          } else {
+            this.setFitment(data);
+            if (data.win === 1) {
+              // 中奖
+              this.lotteryView = 'LotteryWin';
+            } else {
+              // 未中奖
+              this.lotteryView = 'LotteryMiss';
+            }
+          }
+          this.dialogVisible = true;
+        });
+      },
+
       /**
        * @description 注册事件
        */

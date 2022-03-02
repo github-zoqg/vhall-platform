@@ -51,7 +51,9 @@
       };
     },
     beforeCreate() {
-      this.lotteryServer = useLotteryServer();
+      this.lotteryServer = useLotteryServer({
+        mode: 'live'
+      });
     },
     methods: {
       /**
