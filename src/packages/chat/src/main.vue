@@ -493,7 +493,11 @@
         this.page++;
       },
       //todo domain负责 抽奖情况检查
-      lotteryCheck() {},
+      lotteryCheck(msg) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryChatItem'[msg])
+        );
+      },
       //todo domain负责 问卷情况检查
       questionnaireCheck() {},
       /**

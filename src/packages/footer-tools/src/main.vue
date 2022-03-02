@@ -38,6 +38,7 @@
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
+        <lottery-icon @clickIcon="checkLotteryIcon" />
       </li>
       <li>
         <red-packet-icon />
@@ -100,6 +101,7 @@
   import getInvited from './component/getInvited/index.vue';
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
+  import LotteryIcon from './component/lottery-icon/index.vue';
 
   export default {
     name: 'VmpFooterTools',
@@ -111,7 +113,8 @@
       praise,
       getInvited,
       Pay,
-      RedPacketIcon
+      RedPacketIcon,
+      LotteryIcon
     },
     data() {
       return {
@@ -264,6 +267,10 @@
       },
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+      },
+      checkLotteryIcon() {
+        console.log(111111111);
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       }
     }
   };
