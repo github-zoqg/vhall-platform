@@ -153,6 +153,7 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useTimerServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',
@@ -198,6 +199,9 @@
       },
       onClose() {
         this.$emit('disTimer', true);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
+        );
         this.timerVisible = false;
       },
       // 表单&时间提交
