@@ -164,7 +164,6 @@
         nickError: '',
         avatar: '',
         domain_url: '',
-        useUserServer: {},
         phoneData: {
           dialogShow: false,
           type: 'add',

@@ -44,7 +44,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer, useChatServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -64,8 +64,16 @@
         );
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -100,22 +108,22 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.chatServer = useChatServer();
+      this.groupServer = useGroupServer();
     },
     async mounted() {
       /*
-       * 刷新进入页面 是否自动上麦
+       * 刷新进入页面 是否自动上麦 ( 若在分组+在小组内的麦上  || 在麦上)
        *     1、默认在麦上  ------>   不论什么活动直接上麦
        *     2、默认不在麦上 ----->
        *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
        */
-
-      if (this.micServer.state.isSpeakOn) {
-        this.startPush();
-      } else if (
-        this.mode === 6 &&
-        !this.chatServer.state.banned &&
-        !this.chatServer.state.allBanned
+      if (
+        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+        this.micServer.state.isSpeakOn
       ) {
+        this.startPush();
+      }
+      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
         await this.micServer.userSpeakOn();
       }
 
@@ -147,7 +155,7 @@
       this.micServer.$on('vrtc_disconnect_success', async () => {
         await this.stopPush();
 
-        this.interactiveServer.destroy();
+        await this.interactiveServer.destroy();
         if (this.isNoDelay === 1 || this.mode === 6) {
           //  初始化互动实例
           this.interactiveServer.init();
@@ -160,6 +168,18 @@
           await this.micServer.speakOff();
           await this.stopPush();
           this.interactiveServer.destroy();
+        }
+      });
+
+      // 分组结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', async () => {
+        try {
+          await this.stopPush();
+          await this.interactiveServer.destroy();
+          //  初始化互动实例
+          this.interactiveServer.init();
+        } catch (error) {
+          console.log('分组结束讨论', error);
         }
       });
     },

@@ -68,8 +68,16 @@
       isShowAudioControl() {
         return true;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -116,15 +124,8 @@
         };
         this.interactiveServer
           .subscribe(opt)
-          .then(e => {
+          .then(() => {
             this.getLevel();
-            // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
-            setTimeout(() => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
-            }, 2000);
           })
           .catch(e => {
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }

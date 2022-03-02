@@ -738,7 +738,7 @@
           if (webinar.type === 1) {
             // 直播
             this.optionTypeInfo('live');
-          } else if (webinar.type === 5) {
+          } else if (webinar.type === 5 || webinar.type === 4) {
             // 回放
             this.optionTypeInfo('vod', this.roomBaseServer.state.watchInitData.paas_record_id);
             this.recordHistoryTime = sessionStorage.getItem(

@@ -16,7 +16,7 @@
                 <img src="../assets/imgs/live.gif" alt="" />
               </label>
               <div class="scale8">
-                <span>{{ item | liveTag }}</span>
+                <span>{{ getLiveTag(item) }}</span>
                 <span v-if="hasDelayPermission && item.no_delay_webinar == 1">| 无延迟</span>
               </div>
             </span>
@@ -42,21 +42,6 @@
   import { useCustomMenuServer } from 'middle-domain';
 
   export default {
-    filters: {
-      liveTag(val) {
-        /**
-         * webinar_state  1直播 2预约 3结束 4点播 5回放
-         * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播
-         */
-        const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
-        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播'];
-        let str = liveTypeStr[val.webinar_state];
-        if (val.webinar_state != 4 && val.webinar_type != 5) {
-          str += ` | ${liveStatusStr[val.webinar_type]}`;
-        }
-        return str;
-      }
-    },
     props: ['checkedList', 'pagetype'],
     data() {
       return {
@@ -89,6 +74,38 @@
       this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
     },
     methods: {
+      getLiveTag(val) {
+        /**
+         * webinar_state  1直播 2预约 3结束 4点播 5回放
+         * webinar_type  1音频直播 2视频直播 3互动直播 5定时直播 6分组直播
+         */
+        const liveTypeMap = new Map([
+          [0, ''],
+          [1, this.$t('common.common_1018')],
+          [2, this.$t('common.common_1019')],
+          [3, this.$t('common.common_1020')],
+          [4, this.$t('common.common_1024')],
+          [5, this.$t('common.common_1021')]
+        ]);
+
+        const liveStatusStrMap = new Map([
+          [0, ''],
+          [1, this.$t('common.common_1026')],
+          [2, this.$t('common.common_1027')],
+          [3, this.$t('common.common_1028')],
+          [4, ''],
+          [5, ''],
+          [6, this.$t('common.common_1029')]
+        ]);
+
+        let liveType = liveTypeMap.get(val.webinar_state);
+
+        let liveStatus = '';
+        if (val.webinar_state != 4 && val.webinar_type != 5) {
+          liveStatus = ` | ${liveStatusStrMap.get(val.webinar_type)}`;
+        }
+        return `${liveType}${liveStatus}`;
+      },
       gotoRoom(id) {
         this.$emit('link', id);
       },

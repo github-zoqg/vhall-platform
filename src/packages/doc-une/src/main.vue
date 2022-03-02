@@ -211,8 +211,11 @@
 
       // 是否文档演示权限
       hasDocPermission() {
-        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
-          // 对于应点播和回放，所有人都没有文档演示权限
+        if (
+          !['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
+          (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5)
+        ) {
+          // 对于观看端，点播和回放，所有人都没有文档演示权限
           return false;
         }
         if (this.isInGroup) {
@@ -293,6 +296,17 @@
       }
     },
     watch: {
+      // 回放的时候
+      ['docServer.state.switchStatus'](newval) {
+        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
+          // 如果是回放会点播,文档显示与不显示是切换处理
+          if (newval) {
+            useRoomBaseServer().setChangeElement('player');
+          } else {
+            useRoomBaseServer().setChangeElement('doc');
+          }
+        }
+      },
       // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);

@@ -33,6 +33,8 @@
                   :mode="mode"
                   :member-options="memberOptions"
                   :current-speaker-id="getCurrentSpeakerId"
+                  :main-screen="getCurrentMainScreen"
+                  :presentation-screen="getCurrentPresentationScreen"
                   :leader-id="leader_id"
                   :user-id="userId"
                   :tab-index="tabIndex"
@@ -68,6 +70,8 @@
                   :mode="mode"
                   :member-options="memberOptions"
                   :current-speaker-id="getCurrentSpeakerId"
+                  :main-screen="getCurrentMainScreen"
+                  :presentation-screen="getCurrentPresentationScreen"
                   :leader-id="leader_id"
                   :user-id="userId"
                   :tab-index="tabIndex"
@@ -102,6 +106,8 @@
                   :mode="mode"
                   :member-options="memberOptions"
                   :current-speaker-id="getCurrentSpeakerId"
+                  :main-screen="getCurrentMainScreen"
+                  :presentation-screen="getCurrentPresentationScreen"
                   :leader-id="leader_id"
                   :user-id="userId"
                   :tab-index="tabIndex"
@@ -119,11 +125,16 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
+        <span class="info-panel__online-num" v-if="configList['ui.hide_host_nums']">
+          {{ totalNum | numberCompression }}人在线
+        </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
         </span>
-        <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
+        <div
+          class="info-panel__allow-raise-hand"
+          v-if="configList['ui.hide_handsUp'] && mode !== 6"
+        >
           <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
           <el-switch
             v-model="allowRaiseHand"
@@ -152,6 +163,7 @@
                 raiseHandTip ? 'raise-hand' : '',
                 tabIndex === 2 ? 'active' : ''
               ]"
+              v-if="configList['is_interact_and_host']"
             >
               举手
             </li>
@@ -159,6 +171,7 @@
               @click="switchToTab(3)"
               class="button-panel__btn-box__tab-item"
               :class="tabIndex === 3 ? 'active' : ''"
+              v-if="configList['is_membermanage']"
             >
               受限
             </li>
@@ -349,13 +362,12 @@
         }
         return show;
       },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
       //是否在分组里
       isInGroup() {
         return this.groupServer.state.groupInitData.isInGroup;
-      },
-      //主讲人ID
-      docPermissionId() {
-        return this.groupServer.state.groupInitData.doc_permission;
       },
       //分组信息
       groupInitData() {
@@ -377,11 +389,33 @@
         let currentSpeakerId = '';
         const _this = this;
         if (this.isInGroup) {
-          currentSpeakerId = this.docPermissionId;
+          currentSpeakerId = _this.groupServer.state.groupInitData.doc_permission;
         } else {
-          currentSpeakerId = _this.currentSpeakerId || this.interactToolStatus.doc_permission;
+          currentSpeakerId = _this.interactToolStatus.doc_permission;
         }
         return currentSpeakerId;
+      },
+      //找到当前的主屏
+      getCurrentMainScreen() {
+        let current = '';
+        const _this = this;
+        if (this.isInGroup) {
+          current = _this.groupServer.state.groupInitData.main_screen;
+        } else {
+          current = _this.interactToolStatus.main_screen;
+        }
+        return current;
+      },
+      //找到当前的演示屏幕
+      getCurrentPresentationScreen() {
+        let current = '';
+        const _this = this;
+        if (this.isInGroup) {
+          current = _this.groupServer.state.groupInitData.presentation_screen;
+        } else {
+          current = _this.interactToolStatus.presentation_screen;
+        }
+        return current;
       }
     },
     methods: {
@@ -783,7 +817,9 @@
           }
           if (msg.context.role_name == 4) {
             _this.$message.warning({
-              message: _this.$t('message.message_1029', { n: msg.context.nickname })
+              message: _this.$t('message.message_1029', {
+                n: msg.context.nickname || msg.context.nick_name
+              })
             });
           }
         }
@@ -993,18 +1029,17 @@
           if (msg.data.isJoinMainRoom) {
             const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
             if (flag) return false;
-            //todo 这个事件可能已经没有了
             _this.onlineUsers.push({
-              nickname: msg.context.nickname,
-              is_banned: msg.context.isBanned,
-              account_id: msg.accountId,
-              role_name: msg.context.role_name == 20 ? 2 : msg.context.role_name,
-              device_type: msg.context.device_type,
+              nickname: msg.data.nickname,
+              is_banned: msg.data.isBanned,
+              account_id: msg.data.accountId,
+              role_name: msg.data.role_name == 20 ? 2 : msg.data.role_name,
+              device_type: msg.data.device_type,
               is_apply: 0
             });
           } else {
             _this.onlineUsers.forEach((item, index) => {
-              if (item.account_id === msg.accountId) {
+              if (item.account_id === msg.data.accountId) {
                 _this.onlineUsers.splice(index, 1);
               }
             });
@@ -1032,10 +1067,6 @@
             case 'group_join_info':
               //为上线的分组成员添加身份
               handleSetUserJoinInfo(temp);
-              break;
-            case 'group_join_change':
-              //主持人/助理进入小组
-              handleHostJoin(temp);
               break;
             case 'group_switch_start':
             case 'group_msg_created':
@@ -1086,75 +1117,85 @@
               break;
           }
         });
+        // 主持人进入退出小组 消息监听
+        this.groupServer.$on('dispatch_group_enter', msg => {
+          handleHostJoin(msg);
+        });
         //为上线的分组成员添加身份
         function handleSetUserJoinInfo(msg) {
-          const isLive = _this.isLive;
-          const isWatch = _this.isWatch;
-
-          // 是自己 && 不在分组中
-          if (isLive && msg.sender_id == _this.userId && !_this.isInGroup) {
-            return;
-          }
-          // 是自己 && 在分组中
-          if (isWatch && (msg.sender_id == _this.userId || !_this.isInGroup)) {
-            return;
-          }
-
-          if (isWatch) {
-            _this.speakerList = _this.groupInitData.isInGroup
-              ? msg.data.speaker_list
-              : _this.interactToolStatus.speaker_list || [];
-          }
-
-          // 是否已添加
-          const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
-          const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
-          if (flag) {
+          if (_this.isLive) {
+            // 是自己 && 不在分组中
+            if (msg.sender_id == _this.userId && !_this.isInGroup) {
+              return;
+            }
             _this.onlineUsers.forEach(item => {
               if (item.account_id == msg.sender_id) {
                 Object.assign(item, {
                   account_id: msg.sender_id,
-                  is_banned: msg.context.is_banned,
-                  role_name: msg.context.join_role,
-                  is_speak: speakIndex >= 0 ? 1 : 0,
-                  nickname: msg.context.nickname,
-                  is_apply: 0
+                  is_banned: msg.data.is_banned,
+                  role_name: msg.data.join_role
+                  // is_speak: speakIndex >= 0 ? 1 : 0,
                 });
               }
             });
-            _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
-          } else {
-            const user = {
-              account_id: msg.sender_id,
-              is_banned: msg.context.is_banned,
-              role_name: msg.context.join_role,
-              is_speak: speakIndex >= 0 ? 1 : 0,
-              nickname: msg.context.nickname,
-              is_apply: 0
-            };
-            _this.onlineUsers.push(user);
-            _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+            return;
+          }
+          if (_this.isWatch) {
+            // 是自己 && 在分组中
+            if (msg.sender_id == _this.userId || !_this.isInGroup) {
+              return;
+            }
+            _this.speakerList = _this.groupInitData.isInGroup
+              ? msg.data.speaker_list
+              : _this.interactToolStatus.speaker_list || [];
+            // 是否已添加
+            const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
+            const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
+            if (flag) {
+              _this.onlineUsers.forEach(item => {
+                if (item.account_id == msg.sender_id) {
+                  Object.assign(item, {
+                    account_id: msg.sender_id,
+                    is_banned: msg.data.is_banned,
+                    role_name: msg.data.join_role,
+                    is_speak: speakIndex >= 0 ? 1 : 0,
+                    nickname: msg.data.nickname,
+                    is_apply: 0
+                  });
+                }
+              });
+              _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+            } else {
+              const user = {
+                account_id: msg.sender_id,
+                is_banned: msg.data.is_banned,
+                role_name: msg.data.join_role,
+                is_speak: speakIndex >= 0 ? 1 : 0,
+                nickname: msg.data.nickname,
+                is_apply: 0
+              };
+              _this.onlineUsers.push(user);
+              _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+            }
           }
         }
         //主持人/助理进入小组
         function handleHostJoin(msg) {
-          //msg
-          if (msg.sender_id == _this.userId && [1, 3, '1', '3'].includes(_this.roleName)) {
-            // 进入小组
-            if (msg.data.group_ids[0] == 0) {
+          if (_this.isLive) {
+            if (msg.data.status == 'enter') {
               setTimeout(() => {
                 _this.onlineUsers = [];
                 _this.getOnlineUserList();
               }, 1000);
+            } else if (msg.data.status == 'quit') {
+              _this.onlineUsers = [];
+              _this.getOnlineUserList();
             }
-            // 返回主房间
-            if (msg.data.group_ids[1] == 0) {
-              const hostUserId = _this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
-              if (hostUserId == msg.sender_id) {
-                _this.onlineUsers = [];
-                _this.getOnlineUserList();
-              }
-            }
+            return;
+          }
+          if (_this.isWatch) {
+            // 进入小组重置演示人id
+            _this.presentation_screen = _this.groupServer.state.presentation_screen;
           }
         }
         //分组--开始讨论
@@ -1183,13 +1224,13 @@
           }
           if (isWatch) {
             if (!_this.isInGroup) return;
-            if (_this.userId == msg.target_id) {
+            if (_this.userId == msg.data.target_id) {
               _this.onlineUsers = [];
               _this.getOnlineUserList();
             } else {
               // 不等于时删除该人员
               _this.onlineUsers.forEach((item, index) => {
-                if (item.account_id == msg.target_id) {
+                if (item.account_id == msg.data.target_id) {
                   _this.onlineUsers.splice(index, 1);
                 }
               });
@@ -1236,8 +1277,8 @@
             });
           }
           // 新组长提示
-          if (msg.account_id == _this.userId && _this.isInGroup) {
-            _this.presentation_screen = msg.account_id;
+          if (msg.data.account_id == _this.userId && _this.isInGroup) {
+            _this.presentation_screen = msg.data.account_id;
             _this
               .$alert('您被提升为组长', _this.$t('account.account_1061'), {
                 confirmButtonText: _this.$t('account.account_1062'),
@@ -1248,7 +1289,7 @@
               })
               .then(() => {});
           }
-          _this.leader_id = msg.account_id;
+          _this.leader_id = msg.data.account_id;
           _this.getOnlineUserList();
         }
         //切换频道
@@ -1264,14 +1305,15 @@
         }
         //切换小组
         async function handleGroupChange(msg) {
+          console.log(msg, '切换小组的msg');
           // 进入小组重置演示人id
-          _this.presentation_screen = msg.main_screen;
+          _this.presentation_screen = _this.groupServer.state.main_screen;
           // 初始化互动实例
           await this.interactiveServer.init();
         }
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {
-          if (msg.target_id == _this.presentation_screen) {
+          if (msg.data.target_id == _this.presentation_screen) {
             _this.presentation_screen = _this.leader_id;
           }
         }
@@ -1304,7 +1346,7 @@
       // 演示权限人员掉线异常处理
       handlePermissionLeave(msg) {
         // 如果是当前主讲人掉线，启动异常处理流程
-        if (msg.sender_id == this.currentSpeakerId) {
+        if (msg.sender_id == this.getCurrentSpeakerId) {
           this._permissionLeaveId = msg.sender_id;
           this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
           this._permissionLeaveInterval = window.setTimeout(() => {
@@ -1610,7 +1652,7 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        if (this.isInGroup && accountId !== this.userId) {
+        if (this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
             cancelButtonText: this.$t('account.account_1063'),
@@ -1643,7 +1685,11 @@
       },
       // 我要演示
       myPresentation(accountId) {
-        if (this.currentSpeakerId === accountId) {
+        console.log(this.getCurrentMainScreen, '当前演示主屏幕的id');
+        console.log(this.getCurrentPresentationScreen, '当前演示屏幕的id');
+        console.log(accountId, '当前操作的用户id');
+
+        if (this.getCurrentPresentationScreen == accountId) {
           this.$message.warning('正在演示中');
           return false;
         }
@@ -1752,7 +1798,7 @@
           return;
         }
 
-        if (this.memberOptions.platformType === 'watch' && accountId === this.currentSpeakerId) {
+        if (this.memberOptions.platformType === 'watch' && accountId === this.getCurrentSpeakerId) {
           return;
         }
         const params = {

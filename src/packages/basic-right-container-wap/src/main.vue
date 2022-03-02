@@ -32,7 +32,7 @@
         showTimer: false,
         timerVisible: true,
         showSign: false,
-        showRedPacket: true
+        showRedPacket: false
       };
     },
     methods: {
