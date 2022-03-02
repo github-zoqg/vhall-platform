@@ -326,18 +326,11 @@
         });
         // 分组结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {
-          console.log('分组结束讨论，是否在麦上', this.micServer.state.isSpeakOn);
           try {
             await this.stopPush();
-            console.log('11111-1111111');
             await this.interactiveServer.destroy();
             //  初始化互动实例
-            console.log('2222222-2222222');
             this.interactiveServer.init();
-            console.log(
-              '分组结束讨论，重新初始化实例后，是否在麦上',
-              this.micServer.state.isSpeakOn
-            );
           } catch (error) {
             console.log('分组结束讨论', error);
           }

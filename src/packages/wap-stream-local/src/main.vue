@@ -162,6 +162,18 @@
           this.interactiveServer.destroy();
         }
       });
+
+      // 分组结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', async () => {
+        try {
+          await this.stopPush();
+          await this.interactiveServer.destroy();
+          //  初始化互动实例
+          this.interactiveServer.init();
+        } catch (error) {
+          console.log('分组结束讨论', error);
+        }
+      });
     },
     async beforeDestroy() {
       // 清空计时器
