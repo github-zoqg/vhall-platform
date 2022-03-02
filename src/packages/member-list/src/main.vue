@@ -494,7 +494,7 @@
             case 'vrtc_connect_apply':
               console.log(temp.data, '用户申请上麦');
               //用户申请上麦
-              handleApplyConnect(temp.data);
+              handleApplyConnect(temp);
               break;
             case 'vrtc_connect_apply_cancel':
               //用户取消申请上麦
@@ -572,12 +572,12 @@
         }
         //设备检测
         function handleDeviceCheck(msg) {
-          const { member_info = {} } = msg;
-          if (![2, '2'].includes(msg.device_type)) {
-            _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, member_info);
+          const { member_info = {} } = msg.data;
+          if (![2, '2'].includes(msg.data.device_type)) {
+            _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
           }
-          if (![0, '0'].includes(msg.device_status)) {
-            _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, member_info);
+          if (![0, '0'].includes(msg.data.device_status)) {
+            _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
           }
         }
         //用户加入房间
@@ -778,18 +778,18 @@
             _this.raiseHandTip = true;
           }
           // 如果申请人是自己
-          if (msg.room_join_id == _this.userId) {
+          if (msg.data.room_join_id == _this.userId) {
             return;
           }
           let user = {
-            account_id: msg.room_join_id,
-            avatar: msg.avatar,
-            device_status: msg.device_status,
-            device_type: msg.device_type,
-            nickname: msg.nick_name,
-            role_name: msg.room_role
+            account_id: msg.data.room_join_id,
+            avatar: msg.data.avatar,
+            device_status: msg.data.device_status,
+            device_type: msg.data.device_type,
+            nickname: msg.data.nick_name,
+            role_name: msg.data.room_role
           };
-          const { member_info = { is_apply: 1 } } = msg;
+          const { member_info = { is_apply: 1 } } = msg.data;
           user = Object.assign(user, member_info);
           _this.applyUsers.unshift(user);
 
@@ -816,13 +816,13 @@
         }
         //用户取消上麦申请
         function handleCancelApplyConnect(msg) {
-          const { member_info = { is_apply: 0 } } = msg;
+          const { member_info = { is_apply: 0 } } = msg.data;
           _this.raiseHandTip = false;
-          _this._deleteUser(msg.room_join_id, _this.applyUsers);
-          _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, member_info);
-          _this.handsUpTimerList[msg.room_join_id] &&
-            clearTimeout(_this.handsUpTimerList[msg.room_join_id]); // 取消下麦清除定时器
-          delete _this.handsUpTimerList[msg.room_join_id];
+          _this._deleteUser(msg.data.room_join_id, _this.applyUsers);
+          _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
+          _this.handsUpTimerList[msg.data.room_join_id] &&
+            clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]); // 取消下麦清除定时器
+          delete _this.handsUpTimerList[msg.data.room_join_id];
         }
         //同意用户上麦
         function handleAgreeApplyConnect(msg) {
@@ -839,7 +839,7 @@
         }
         //用户上麦成功
         function handleSuccessConnect(msg) {
-          const { member_info = { is_apply: 0, is_speak: 1 } } = msg;
+          const { member_info = { is_apply: 0, is_speak: 1 } } = msg.data;
           _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
           if (msg.data.room_join_id == _this.userId && msg.data.room_role == 2) {
             return;
@@ -904,8 +904,8 @@
         }
         //互动连麦成功断开链接
         function handleSuccessDisconnect(msg) {
-          const { member_info = { is_speak: 0, is_apply: 0 } } = msg;
-          _this.changeUserStatus(msg.target_id, _this.onlineUsers, member_info);
+          const { member_info = { is_speak: 0, is_apply: 0 } } = msg.data;
+          _this.changeUserStatus(msg.data.target_id, _this.onlineUsers, member_info);
           //如果是观看端，还要维护一下上麦列表
           if (_this.memberOptions.platformType === 'watch') {
             _this.changeSpeakerList();
@@ -1403,6 +1403,7 @@
           Object.assign(item || {}, obj);
           this.$set(list, index, item);
         }
+        console.log(this.onlineUsers, '更改后的人员列表');
       },
       //获取受限人员列表
       async getLimitUserList() {
