@@ -434,15 +434,14 @@
           {
             command: 'inviteMic',
             isShow: 'isShowWatchInvitation',
-            //todo 确认下presentation_screen
-            disable: this.userInfo.account_id === this.leaderId,
+            disable: this.userInfo.account_id == this.presentationScreen,
             text: '邀请演示',
             sequence: 1
           },
           //设置禁言/取消禁言
           {
             command: 'setBanned',
-            isShow: ![2, '2'].includes(this.userInfo.role_name),
+            isShow: [2, '2'].includes(this.userInfo.role_name),
             disable: false,
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
             type: 'toggleButton',
@@ -451,7 +450,7 @@
           //踢出 / 取消踢出
           {
             command: 'setKicked',
-            isShow: this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: [2, '2'].includes(this.userInfo.role_name),
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
