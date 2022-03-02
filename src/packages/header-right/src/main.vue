@@ -1,13 +1,13 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
-      <record-control></record-control>
+      <record-control v-if="configList['cut_record']"></record-control>
       <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
         {{ isRecord ? '开始录制' : '开始直播' }}
       </div>
       <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
       <div
-        v-if="liveStep == 3"
+        v-if="liveStep == 3 && configList['ui.hide_live_end']"
         class="vmp-header-right_btn vmp-header-right_duration"
         @click="handleEndClick"
       >
@@ -106,6 +106,9 @@
       // 是否是录制
       isRecord() {
         return this.$domainStore.state.roomBaseServer.clientType == 'record';
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       }
     },
     components: {

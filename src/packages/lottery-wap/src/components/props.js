@@ -27,6 +27,12 @@ export default {
       default() {
         return {};
       }
+    },
+    lotteryInfo: {
+      type: Object,
+      default() {
+        return {};
+      }
     }
   },
   data() {

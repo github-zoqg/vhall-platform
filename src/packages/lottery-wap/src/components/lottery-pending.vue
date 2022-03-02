@@ -14,12 +14,23 @@
   export default {
     name: 'LotteryPending',
     mixins: [props],
+    computed: {
+      showCodeLottery() {
+        return false;
+      }
+    },
     data() {
       return {
-        showCodeLottery: true
+        loading: false
       };
     },
-    methods: { joinLottery() {} }
+    methods: {
+      //
+      joinLottery() {
+        if (this.loading) return;
+        this.loading = true;
+      }
+    }
   };
 </script>
 <style lang="less" scoped>

@@ -5,6 +5,9 @@
       v-if="prizeShow"
       mode="live"
       :fitment="fitment"
+      :prize-info="prizeInfo"
+      :lottery-id="lotteryInfoId"
+      :lottery-info="lotteryInfo"
       @close="close"
       @end="handleEndLottery"
     />
@@ -42,7 +45,8 @@
         lotteryResultShow: false, // 抽奖结果
         lotteryInfoId: null, // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
-        prizeInfo: {} // 奖品信息
+        prizeInfo: {}, // 奖品信息
+        lotteryInfo: {}
       };
     },
     provide() {
@@ -139,6 +143,7 @@
         this.prizeObj = payload.award_snapshoot;
         this.prizeShow = true;
         this.lotteryContentShow = false;
+        this.lotteryInfo = payload;
       }
     }
   };

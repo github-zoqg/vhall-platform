@@ -57,12 +57,12 @@
     box-sizing: border-box;
     position: absolute;
     right: 0;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     height: 100%;
     flex-direction: column;
     justify-content: flex-start;
+    z-index: 1;
+
     .vmp-basic-right-hd {
       padding-top: 56.25%;
     }

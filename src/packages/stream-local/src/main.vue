@@ -181,7 +181,8 @@
     useRoomBaseServer,
     usePlayerServer,
     useMediaSettingServer,
-    useGroupServer
+    useGroupServer,
+    useChatServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -251,13 +252,20 @@
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
+      this.chatServer = useChatServer();
       this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
-      if (this.micServer.state.isSpeakOn) {
+      if (
+        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+        this.micServer.state.isSpeakOn
+      ) {
         this.startPush();
+      }
+      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
+        await this.micServer.userSpeakOn();
       }
     },
     beforeDestroy() {
@@ -326,18 +334,11 @@
         });
         // 分组结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {
-          console.log('分组结束讨论，是否在麦上', this.micServer.state.isSpeakOn);
           try {
             await this.stopPush();
-            console.log('11111-1111111');
             await this.interactiveServer.destroy();
             //  初始化互动实例
-            console.log('2222222-2222222');
             this.interactiveServer.init();
-            console.log(
-              '分组结束讨论，重新初始化实例后，是否在麦上',
-              this.micServer.state.isSpeakOn
-            );
           } catch (error) {
             console.log('分组结束讨论', error);
           }
