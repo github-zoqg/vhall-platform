@@ -64,7 +64,6 @@
       this.signServer = useSignServer();
     },
     created() {
-      this.signServer.listenMsg();
       this.signinInfo = this.roomBaseData.signInfo;
       let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
       // postcss 换算基数为75 头部+播放器区域高为 522px
@@ -89,7 +88,7 @@
           },
           type: e.data.type
         };
-        console.log(useChatServer(), data, '1323');
+        // console.log(useChatServer(), data, '1323');
         useChatServer().addChatToList(data);
       });
       // 签到结束
@@ -139,6 +138,9 @@
         this.sign_id = sign_id;
         if (sign_id) {
           this.seconds = time;
+          if (this.clock) {
+            window.clearInterval(this.clock);
+          }
           this.clock = window.setInterval(() => {
             if (this.seconds <= 0) {
               window.clearInterval(this.clock);

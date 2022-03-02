@@ -1,3 +1,6 @@
+import { useUserServer, useRoomBaseServer } from 'middle-domain';
+import { isWechat } from './tool';
+
 export function initWeChatSdk(initData = {}, shareData = {}) {
   const configParams = {
     debug: false,
@@ -66,8 +69,6 @@ export function initHideChatSdk(initData = {}, failedCb = () => {}) {
 }
 
 //微信授权相关
-import { useUserServer } from 'middle-domain';
-import { isWechat } from './tool';
 export function authByWx(isEmbed, path, _next) {
   const failure = res => {
     this.$message.error(res.msg);
@@ -78,7 +79,7 @@ export function authByWx(isEmbed, path, _next) {
   };
   if (isWechat() && !isEmbed) {
     //如果是微信
-    if (window.roomBaseServer.state.configList) {
+    if (useRoomBaseServer().state.configList) {
       //获取房间权限配置列表
       //获取地址栏参数、设置请求路径
       let _search = '';
@@ -91,9 +92,10 @@ export function authByWx(isEmbed, path, _next) {
         process.env.VUE_APP_WAP_WATCH +
         process.env.VUE_APP_WEB_KEY +
         `${path}?purpose=login${_search ? '&' + _search : ''}`;
+      console.log(params.jump_url, 'params.jump_url');
       // 请求授权接口
       return useUserServer()
-        .userApi.authLoginByWx(params)
+        .authLoginByWx(params)
         .then(res => {
           if (res.code !== 200) {
             failure(res);
@@ -132,8 +134,7 @@ export function authCheck(to, next) {
   // if (getQueryString('user_auth_key') && getQueryString('purpose')) {
 
   // }
-  let pathArr = ['watch', 'subscribe'];
-  if (pathArr.includes(to.path)) {
+  if (!/watch|subscribe/.test(to.path)) {
     // 不是 预约/观看 或者 嵌入情况， 直接进入
     next();
   } else {

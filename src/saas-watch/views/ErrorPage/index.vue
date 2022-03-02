@@ -27,7 +27,7 @@
         <!-- 浏览器版本低 browser_version -->
         <img v-else-if="propType == 'browser_version'" src="./img/browser_version.png" alt="" />
         <!-- 嵌入页面验证方式 embed_verify -->
-        <img v-else-if="true || propType == 'embed_verify'" src="./img/embed_verify.png" alt="" />
+        <img v-else-if="propType == 'embed_verify'" src="./img/embed_verify.png" alt="" />
         <!-- 视频转码中  transcoding -->
         <img v-else-if="propType == 'transcoding'" src="./img/transcoding.png" alt="" />
         <!-- 页面404 page_404 -->
