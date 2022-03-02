@@ -52,13 +52,15 @@
         />
       </div>
       <!-- 邀请卡 -->
-      <a
-        v-if="showInviteCard && !localRoomInfo.isEmbed"
-        target="_blank"
-        :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
-      >
-        <i class="vh-saas-iconfont iconyaoqingka"></i>
-      </a>
+      <div v-if="showInviteCard && !localRoomInfo.isEmbed">
+        <a
+          target="_blank"
+          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+        >
+          <i class="vh-iconfont vh-line-share"></i>
+        </a>
+      </div>
+
       <!-- 点赞 -->
       <div auth="{ 'ui.watch_hide_like': 0 }" v-if="localRoomInfo.showLike">
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
@@ -116,9 +118,9 @@
         configList,
         groupInitData,
         joinInfoInGift: {},
-        showInviteCard: false,
+        showInviteCard: roomBaseState.inviteCard.status == '1',
         location:
-          window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
+          window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
         handUpStatus: false,
         isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
@@ -139,6 +141,8 @@
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
+
+      window.interactTools = this;
     },
     mounted() {
       console.log(this.configList, useRoomBaseServer().state, 'this.configList');
@@ -183,7 +187,8 @@
         }
       }
     }
-    .vh-saas-iconfont {
+    .vh-saas-iconfont,
+    .vh-iconfont {
       font-size: 47px;
       color: #666666;
     }
