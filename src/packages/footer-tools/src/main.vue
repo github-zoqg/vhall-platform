@@ -50,6 +50,7 @@
           <i v-if="showTimer" class="circle"></i>
           <img src="./img/timer.png" alt="" @click="openTimerHandle" />
         </div>
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="showGiftIcon">
         <!-- 礼物 -->
