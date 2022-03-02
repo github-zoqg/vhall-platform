@@ -28,7 +28,7 @@
           </div>
         </div>
         <template v-else>
-          <div class="vmp-player-living-btn" v-if="!isPlayering">
+          <div class="vmp-player-living-btn" v-if="!isPlayering && !isVodEnd">
             <div
               :class="
                 displayMode == 'mini'
@@ -42,7 +42,7 @@
           </div>
         </template>
 
-        <div class="vmp-player-living-vodend" v-if="isVodEnd">
+        <div class="vmp-player-living-vodend" v-if="isVodEnd && !isPlayering">
           <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
             <h3>{{ $t('appointment.appointment_1013') }}</h3>
             <div>
@@ -57,7 +57,7 @@
               </p>
               <span v-else @click="authTryWatch">{{ authText }}</span>
             </div>
-            <p class="replay-try" @click="startPlay">
+            <p class="replay-try" @click="startRPlay">
               <i class="vh-iconfont vh-line-refresh-left">
                 <b>{{ $t('appointment.appointment_1014') }}</b>
               </i>
@@ -75,7 +75,7 @@
             </div>
             <span
               :class="displayMode == 'mini' ? 'repay--mini' : 'repay--normal'"
-              @click="startPlay"
+              @click="replayPlay"
             >
               {{ $t('player.player_1016') }}
             </span>
@@ -701,6 +701,12 @@
       pause() {
         this.playerServer && this.playerServer.pause();
       },
+      // 重新播放
+      replayPlay() {
+        this.roomBaseServer.setChangeElement('doc');
+        this.displayMode = 'normal';
+        this.startPlay();
+      },
       initPlayerOtherInfo() {
         const { webinar } = this.roomBaseServer.state.watchInitData;
         this.playerServer
@@ -732,7 +738,7 @@
           if (webinar.type === 1) {
             // 直播
             this.optionTypeInfo('live');
-          } else if (webinar.type === 5) {
+          } else if (webinar.type === 5 || webinar.type === 4) {
             // 回放
             this.optionTypeInfo('vod', this.roomBaseServer.state.watchInitData.paas_record_id);
             this.recordHistoryTime = sessionStorage.getItem(
@@ -1015,6 +1021,8 @@
           align-items: center;
           flex-direction: column;
           justify-content: center;
+          height: 100%;
+          width: 100%;
         }
         &-try {
           height: 100%;
@@ -1329,14 +1337,19 @@
     }
     &-controllerMini {
       position: absolute;
-      // bottom: -48px;
-      bottom: 3px;
+      bottom: -48px;
       z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
       background: rgba(0, 0, 0, 0.7);
       transition: all 0.8s;
+      &.active-control {
+        bottom: 0px;
+      }
+      &.previre-control {
+        bottom: 0px;
+      }
       .controller_slider {
         position: absolute;
         top: -4px;

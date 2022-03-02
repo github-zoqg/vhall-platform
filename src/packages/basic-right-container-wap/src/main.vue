@@ -8,6 +8,10 @@
       <div class="have"></div>
       <img src="./image/icon.png" />
     </div>
+    <div class="icon-wrap" @click="handleRedPacket" v-show="showRedPacket">
+      <div class="have"></div>
+      <img src="./image/redPacket.png" />
+    </div>
     <div class="icon-wrap">
       <lottery-icon @clickIcon="checkLotteryIcon" />
     </div>
@@ -27,7 +31,8 @@
       return {
         showTimer: false,
         timerVisible: true,
-        showSign: false
+        showSign: false,
+        showRedPacket: false
       };
     },
     methods: {
@@ -43,6 +48,9 @@
       },
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      handleRedPacket() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       },
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));

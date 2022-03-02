@@ -124,9 +124,9 @@ const serverConfig = {
       cuid: ['comSignWap'],
       method: 'openSign'
     },
-    emitClickLotteryIcon: {
-      cuid: ['compLotteryWap'],
-      method: 'open'
+    emitOpenRedPacket: {
+      cuid: ['comRedPacketWap'],
+      method: 'openRedPacket'
     }
   },
   // notice横幅
