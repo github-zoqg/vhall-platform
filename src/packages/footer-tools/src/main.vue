@@ -269,7 +269,6 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
       checkLotteryIcon() {
-        console.log(111111111);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       }
     }

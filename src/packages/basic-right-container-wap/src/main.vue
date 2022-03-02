@@ -9,7 +9,7 @@
       <img src="./image/icon.png" />
     </div>
     <div class="icon-wrap">
-      <lottery-icon />
+      <lottery-icon @clickIcon="checkLotteryIcon" />
     </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
@@ -43,6 +43,9 @@
       },
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       }
     }
   };
