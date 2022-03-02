@@ -1639,7 +1639,7 @@
         };
         this.signUpFormServer.getWebinarType(params).then(res => {
           if (res.code == 512503 || res.code == 512502) {
-            window.location.href = `${window.location.origin}/${this.webinar_id}`;
+            window.location.href = `${window.location.origin}/${this.webinarId}`;
             return false;
           }
           // 如果是独立链接，判断状态进行跳转
@@ -1649,7 +1649,7 @@
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinar_id}${queryString}`;
+                `/lives/watch/${this.webinarId}${queryString}`;
             } else {
               // 如果预约或结束，跳转到预约页
               if (res.data.webinar.type == 2 && isSubmitForm) {
@@ -1666,7 +1666,7 @@
                       window.location.href =
                         window.location.origin +
                         process.env.VUE_APP_WEB_KEY +
-                        `/lives/subscribe/${this.webinar_id}${queryString}`;
+                        `/lives/subscribe/${this.webinarId}${queryString}`;
                     }
                   }
                 );
@@ -1674,7 +1674,7 @@
                 window.location.href =
                   window.location.origin +
                   process.env.VUE_APP_WEB_KEY +
-                  `/lives/subscribe/${this.webinar_id}${queryString}`;
+                  `/lives/subscribe/${this.webinarId}${queryString}`;
               }
             }
           } else {
