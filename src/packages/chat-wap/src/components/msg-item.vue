@@ -49,7 +49,7 @@
       </div>
     </template>
     <!-- 送礼物 -->
-    <template v-else-if="msg.type == 'gift_send_success' || msg.type == 'free_gift_send'">
+    <template v-else-if="['gift_send_success', 'free_gift_send'].includes(msg.type)">
       <div
         v-if="msg.content.gift_name"
         class="msg-item interact new-gift"
@@ -64,6 +64,12 @@
           </p>
         </div>
         <img class="new-gift-img" :src="msg.content.gift_url" />
+      </div>
+    </template>
+    <!-- 签到 -->
+    <template v-else-if="['sign_in_push'].includes(msg.type)">
+      <div align="center" class="margin-top-bottom">
+        <p class="msg-item sign-msg">{{ msg.content.text_content }}</p>
       </div>
     </template>
     <!-- 聊天消息 -->
@@ -514,6 +520,16 @@
         background: #f7f7f7;
         object-fit: scale-down;
       }
+    }
+    .margin-top-bottom {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .sign-msg {
+      background: #aaa;
+      display: inline-block;
+      padding: 2px 30px;
+      border-radius: 20px;
     }
   }
 </style>
