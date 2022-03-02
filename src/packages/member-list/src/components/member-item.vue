@@ -63,7 +63,7 @@
         <template
           v-if="
             tabIndex === 1 &&
-            currentSpeakerId !== userInfo.account_id &&
+            currentSpeakerId != userInfo.account_id &&
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -325,6 +325,16 @@
       currentSpeakerId: {
         type: [Number, String]
       },
+      //当前演示主屏幕
+      mainScreen: {
+        type: [Number, String],
+        default: () => ''
+      },
+      //当前演示屏幕
+      presentationScreen: {
+        type: [Number, String],
+        default: () => ''
+      },
       //当前的组长的id
       leaderId: {
         type: [Number, String],
@@ -441,7 +451,7 @@
           //踢出 / 取消踢出
           {
             command: 'setKicked',
-            isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
