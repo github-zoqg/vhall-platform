@@ -525,6 +525,7 @@
               handleDeviceCheck(temp);
               break;
             case 'kicked_in_chat':
+            case 'room_kickout':
               handleKicked(temp);
               break;
             case 'vrtc_connect_presentation_refused':
@@ -543,6 +544,9 @@
               break;
             case 'live_over':
               handleLiveOver(temp);
+              break;
+            case 'room_kickout_cancel':
+              handleRoomCancelKickOut(temp);
               break;
             default:
               break;
@@ -1006,6 +1010,10 @@
               }
             });
           }
+        }
+        //房间内取消踢出
+        function handleRoomCancelKickOut(msg) {
+          _this.refreshList();
         }
       },
       //初始化分组消息回调监听
