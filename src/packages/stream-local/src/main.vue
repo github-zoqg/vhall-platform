@@ -258,13 +258,13 @@
     async mounted() {
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
-      if (this.micServer.state.isSpeakOn) {
-        this.startPush();
-      } else if (
-        this.mode === 6 &&
-        !this.chatServer.state.banned &&
-        !this.chatServer.state.allBanned
+      if (
+        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+        this.micServer.state.isSpeakOn
       ) {
+        this.startPush();
+      }
+      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
         await this.micServer.userSpeakOn();
       }
     },

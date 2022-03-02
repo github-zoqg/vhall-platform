@@ -434,7 +434,7 @@
             _this.$router.push({
               name: 'LiveRoom',
               params: { id: _this.$route.params.id },
-              query: { liveToken: token }
+              query: { liveT: token }
             });
             return;
           }
@@ -443,7 +443,7 @@
             _this.$router.push({
               name: 'LiveRoom',
               params: { id: _this.$route.params.id },
-              query: { liveToken: token }
+              query: { liveT: token }
             });
             return;
           }
@@ -452,7 +452,7 @@
             window.location.protocol +
             `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/chooseWay/${
               _this.$route.params.id
-            }/${role}?type=code&liveToken=${token}`;
+            }/${role}?type=code&liveT=${token}`;
         }, 300);
       },
       //上传图片

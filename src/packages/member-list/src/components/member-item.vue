@@ -616,7 +616,7 @@
         if (this.isHost) {
           isShow =
             [1, '1'].includes(this.isInteract) &&
-            !this.userInfo.is_speak &&
+            [0, '0'].includes(this.userInfo.is_speak) &&
             [1, '1'].includes(this.status);
           return isShow;
         }
@@ -625,7 +625,7 @@
           isShow =
             [1, '1'].includes(this.isInteract) &&
             !this.userInfo.is_banned &&
-            !this.userInfo.is_speak &&
+            [0, '0'].includes(this.userInfo.is_speak) &&
             [1, '1'].includes(this.userInfo.device_status);
         }
 
