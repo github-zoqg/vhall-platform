@@ -205,7 +205,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-iconfont vh-line-document',
       text: 'aside_menu.aside_menu_1000',
-      kind: 'document'
+      kind: 'document',
+      isShow: 'hide-document'
     },
     handleClick: [
       {
@@ -225,7 +226,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-line-whiteboard',
       text: 'aside_menu.aside_menu_1001',
-      kind: 'board'
+      kind: 'board',
+      isShow: true
     },
     handleClick: [
       {
@@ -245,7 +247,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
-      kind: 'desktopShare'
+      kind: 'desktopShare',
+      isShow: true
     },
     handleClick: [
       {
@@ -266,7 +269,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-color-Spotfile',
       text: 'aside_menu.aside_menu_1003',
-      kind: 'insertMedia'
+      kind: 'insertMedia',
+      isShow: 'waiting.video.file'
     },
     handleClick: [
       {
@@ -355,6 +359,7 @@ export const serverConfig = {
       icon: 'vh-iconfont vh-line-group',
       text: 'aside_menu.aside_menu_1008',
       kind: 'group',
+      isShow: 'webinar.group',
       disable: true
     },
     handleClick: [
@@ -372,7 +377,8 @@ export const serverConfig = {
       className: 'menu-footer',
       icon: 'vh-iconfont vh-line-share',
       text: '分享',
-      kind: 'share'
+      kind: 'share',
+      isShow: 'ui.hide_share'
     },
     handleClick: [
       {

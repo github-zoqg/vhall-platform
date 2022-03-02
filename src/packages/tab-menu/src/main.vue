@@ -80,6 +80,7 @@
       if (widget && widget.options) {
         this.tabOptions = widget.options;
       }
+      // console.log(this.visibleMenu, '???!231324');
       this.initMenu();
       this.listenEvents();
     },
