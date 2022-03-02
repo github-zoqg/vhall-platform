@@ -370,7 +370,7 @@
             }
             this._isVideoEnd = false;
             if (this._firstInit) {
-              const elVideo = document.getElementById('vh-video');
+              const elVideo = document.querySelector(`#videoDom${this.timestamp} video`);
               this.$emit('remoteInsterSucces', elVideo);
               this._firstInit = false;
             }
