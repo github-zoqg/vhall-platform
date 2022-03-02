@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-list" v-if="noticeNum">
+  <div class="vmp-notice-list" v-if="isShowIcon">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
@@ -23,7 +23,7 @@
         </ul>
       </div>
       <div class="vmp-notice-list-container-close">
-        <i class="vh-iconfont vh-line-close" @click="isShowNotice = false"></i>
+        <i class="vh-iconfont vh-line-close" @click="closeNoticeList"></i>
       </div>
     </div>
   </div>
@@ -41,6 +41,7 @@
       return {
         noticeOptions: {},
         noticeNum: 0,
+        isShowIcon: false,
         isShowNotice: false, //是否显示公告列表
         noticeList: [],
         pageInfo: {
@@ -61,6 +62,9 @@
       this.initConfig();
       this.roomBaseState = this.roomBaseServer.state;
       this.noticeNum = this.noticeServer.state.latestNotice.total || 0;
+      if (this.noticeNum && this.noticeServer.state.latestNotice.created_at) {
+        this.isShowIcon = true;
+      }
     },
     mounted() {
       this.initNotice();
@@ -102,11 +106,19 @@
         this.noticeServer.getNoticeList({ params, flag }).then(result => {
           if (result.code == 200 && result.data) {
             this.noticeList = result.data.list;
-            this.totalPages = ++this.totalPages;
+            this.totalPages = this.noticeServer.state.totalPages;
             this.total = result.data.total;
             this.noticeNum = result.data.total;
           }
         });
+      },
+      closeNoticeList() {
+        this.isShowNotice = false;
+        this.pageInfo = {
+          pos: 0,
+          limit: 10,
+          pageNum: 1
+        };
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {

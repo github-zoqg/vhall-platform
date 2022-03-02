@@ -403,7 +403,8 @@ export const serverConfig = {
       icon: 'vh-iconfont vh-line-exit',
       text: '退出小组',
       kind: 'exitGroup',
-      hidden: true
+      hidden: true,
+      isShow: true
     },
     handleClick: [
       {
