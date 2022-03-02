@@ -32,7 +32,7 @@
             <div class="vmp-video-preview-wrap-controller-icons-left">
               <i
                 class="vh-iconfont"
-                :class="statePaly ? 'vh-a-line-videopause' : 'vh-a-line-videoplay'"
+                :class="statePaly ? 'vh-a-line-videopause' : 'vh-line-video-play'"
                 @click="videoPlayBtn"
               ></i>
               <!-- <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
@@ -78,7 +78,10 @@
                   <i @click="$emit('openInsert')" class="iconfont iconchaboliebiao_icon"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="关闭插播">
-                  <i @click="$emit('closeInsertvideo')" class="vh-iconfont vh-line-close"></i>
+                  <i
+                    @click="$emit('closeInsertvideo', { isShowConfirmDialog: true })"
+                    class="vh-iconfont vh-line-close"
+                  ></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="隐藏">
                   <i
@@ -169,6 +172,7 @@
           if (this.isInsertVideoPreview) {
             this._firstInit = true;
           }
+          console.log('初始化播放器成功');
           this.totalTime = this.playerServer.getDuration(() => {
             console.log('获取总时间失败');
           }); // 获取视频总时长
@@ -228,12 +232,6 @@
         this.setVideoCurrentTime(time);
 
         this.playerServer.play();
-      },
-      closeInsertvideo() {
-        console.log('关闭插播');
-      },
-      hideInsertVideoControl() {
-        console.log('wosh我是隐藏');
       },
       initSlider() {
         this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {
@@ -363,6 +361,7 @@
           }
         });
         this.playerServer.$on(VhallPlayer.PLAY, () => {
+          console.log('播放器播放事件');
           this.statePaly = true;
           // 监听播放状态
           if (this.isInsertVideoPreview) {
@@ -378,6 +377,7 @@
           }
         });
         this.playerServer.$on(VhallPlayer.PAUSE, () => {
+          console.log('视频预览播放器暂停');
           if (this.isInsertVideoPreview) {
             // 监听暂停状态
             this.$emit('handleRemoteInsertVideoPause');
