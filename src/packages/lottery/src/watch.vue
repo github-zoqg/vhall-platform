@@ -46,6 +46,7 @@
     },
     created() {
       this.initMsgEvent();
+      // this.open();
     },
     destroyed() {
       this.removeMsgEvent();

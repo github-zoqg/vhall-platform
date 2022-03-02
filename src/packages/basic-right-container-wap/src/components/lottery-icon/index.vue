@@ -13,8 +13,8 @@
     name: 'LotteryIcon',
     data() {
       return {
-        showIcon: true, //显示图标
-        showDot: true // 显示小红点
+        showIcon: false, //显示图标
+        showDot: false // 显示小红点
       };
     },
     beforeCreate() {
