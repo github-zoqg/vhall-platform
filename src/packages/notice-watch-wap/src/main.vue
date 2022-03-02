@@ -23,7 +23,8 @@
       return {
         announcement: {
           content: '12313',
-          isShow: false
+          isShow: false,
+          timer: null
         }
       };
     },
@@ -35,9 +36,16 @@
       // 刷新展示最新一条公告
       if (this.roomBaseServer.state.noticeInfo.total) {
         console.log(this.roomBaseServer, 'useRoomBaseServer123');
-        this.noticeServer.$emit('room_announcement', {
-          room_announcement_text: this.roomBaseServer.state.noticeInfo.list[0]?.content.content
-        });
+        this.announcement = {
+          content: this.roomBaseServer.state.noticeInfo.list[0]?.content.content,
+          isShow: true
+        };
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(() => {
+          this.announcement.isShow = false;
+        }, 30000);
       }
       // 监听到 公告
       this.noticeServer.listenMsg();
@@ -46,7 +54,10 @@
           content: msg.room_announcement_text,
           isShow: true
         };
-        setTimeout(() => {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(() => {
           this.announcement.isShow = false;
         }, 30000);
       });

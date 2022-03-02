@@ -1346,7 +1346,7 @@
       // 演示权限人员掉线异常处理
       handlePermissionLeave(msg) {
         // 如果是当前主讲人掉线，启动异常处理流程
-        if (msg.sender_id == this.currentSpeakerId) {
+        if (msg.sender_id == this.getCurrentSpeakerId) {
           this._permissionLeaveId = msg.sender_id;
           this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
           this._permissionLeaveInterval = window.setTimeout(() => {
@@ -1685,9 +1685,11 @@
       },
       // 我要演示
       myPresentation(accountId) {
-        console.log(this.getCurrentMainScreen, '当前演示的id');
+        console.log(this.getCurrentMainScreen, '当前演示主屏幕的id');
+        console.log(this.getCurrentPresentationScreen, '当前演示屏幕的id');
         console.log(accountId, '当前操作的用户id');
-        if (this.getCurrentMainScreen == accountId) {
+
+        if (this.getCurrentPresentationScreen == accountId) {
           this.$message.warning('正在演示中');
           return false;
         }
@@ -1796,7 +1798,7 @@
           return;
         }
 
-        if (this.memberOptions.platformType === 'watch' && accountId === this.currentSpeakerId) {
+        if (this.memberOptions.platformType === 'watch' && accountId === this.getCurrentSpeakerId) {
           return;
         }
         const params = {

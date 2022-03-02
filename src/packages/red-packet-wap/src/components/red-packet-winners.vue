@@ -152,7 +152,7 @@
       height: 838px;
       padding-top: 78px;
       .vhsaas-red-packet-close-btn {
-        bottom: 0;
+        bottom: -35px;
       }
     }
   }
@@ -236,9 +236,10 @@
   }
   .vhsaas-other__item {
     width: 552px;
-    height: 520px;
-    background: #ffffff;
+    height: 500px;
+    background: #fde9e9;
     margin: 30px auto 0 auto;
+    padding-top: 10px;
     border-radius: 8px;
     overflow-y: auto;
     li {
@@ -293,7 +294,7 @@
       font-size: 24px;
       font-weight: 400;
       color: #1a1a1a;
-      line-height: 132px;
+      line-height: 22px;
     }
     .vhsaas-red-packet__time {
       font-size: 24px;
