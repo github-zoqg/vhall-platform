@@ -303,11 +303,11 @@
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
             this.interactiveServer.init();
-          }else{
+          } else {
             // 如果成功，销毁播放器
             this.playerServer.init();
           }
-        })
+        });
         // 结束直播
         this.interactiveServer.$on('live_over', async () => {
           await this.stopPush();
