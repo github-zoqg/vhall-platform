@@ -38,7 +38,6 @@
               ? 3
               : 2
             : 1;
-
         // kind: document-文档，board-白板, desktopShare-桌面共享，insertMedia-插播文件，
         // interactTool-互动工具，group-分组讨论, share-分享, exitGroup-退出小组
         for (const vn of this.$children) {
