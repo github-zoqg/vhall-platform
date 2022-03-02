@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-list" v-if="isShowIcon">
+  <div class="vmp-notice-list" v-if="isShowIcon && isLiving">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
@@ -52,6 +52,11 @@
         totalPages: 0,
         total: 0
       };
+    },
+    computed: {
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      }
     },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
