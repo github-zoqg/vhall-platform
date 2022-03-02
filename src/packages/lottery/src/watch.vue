@@ -62,7 +62,9 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       accept(msg) {
-        console.log('🚀 ~ file: watch.vue ~ line 55 ~ accept ~ msg', msg);
+        this.setFitment(msg);
+        this.lotteryView = 'LotteryWin';
+        this.dialogVisible = true;
       },
       /**
        * @description 点开抽奖(按钮或者聊天)

@@ -382,17 +382,24 @@
       },
       //todo 信令唤起其他模块 点击查看消息
       clickToView(type, content) {
+        // TODO: type 为空值, content为整个消息体
+        //console.log('clickToView', type, content);
         // 抽奖点击查看
-        if (type === 'lottery_result_notice') {
-          this.lotteryCheck(content);
-        } else if (type === 'questionnaire_push') {
-          // 问卷点击查看
-          this.questionnaireCheck(content.questionnaire_id);
-        } 
+        const msg = content.msg.data;
+        if (msg.type === 'lottery_result_notice') {
+          this.lotteryCheck(msg);
+        }
+        // FIXME: 下面的代码目前走不通, 先注释
+        // if (type === 'lottery_result_notice') {
+        //   this.lotteryCheck(content);
+        // } else if (type === 'questionnaire_push') {
+        //   // 问卷点击查看
+        //   this.questionnaireCheck(content.questionnaire_id);
+        // }
       },
       //todo 点击查看抽奖信息
-      lotteryCheck(content) {
-        this.$emit('lotteryCheck', content.msg);
+      lotteryCheck(msg) {
+        this.$emit('lotteryCheck', msg);
       },
       //todo 点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
