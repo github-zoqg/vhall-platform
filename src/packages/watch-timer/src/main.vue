@@ -119,10 +119,8 @@
     },
     mounted() {
       this.timerInfo = this.roomBaseServer.state?.timerInfo;
-      console.log(this.$domainStore.state, this.roomBaseServer, '123132');
       // this.init();
       this.timerServer.listenMsg();
-      console.log(this.timerServer.listenMsg, 'this.roomBaseServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束

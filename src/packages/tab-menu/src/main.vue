@@ -46,7 +46,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer, useQaServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useChatServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -119,8 +119,6 @@
           list = [...roomState.customMenu.list];
         }
 
-        console.log('menu list:', list);
-        console.log(useRoomBaseServer().state);
         for (const item of list) {
           this.addItem(item);
         }
@@ -180,7 +178,6 @@
       },
 
       getItemEntity(item) {
-        console.log('menuConfig:', this.tabOptions.menuConfig);
         return getItemEntity(item, this.tabOptions.menuConfig);
       },
 
