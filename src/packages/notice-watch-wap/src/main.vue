@@ -16,7 +16,7 @@
 
 <script>
   //  && !this.zIndexObj.Ques && !videoEnd
-  import { useNoticeServer } from 'middle-domain';
+  import { useNoticeServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeWap',
     data() {
@@ -29,8 +29,16 @@
     },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
+      // 刷新展示最新一条公告
+      if (this.roomBaseServer.state.noticeInfo.total) {
+        console.log(this.roomBaseServer, 'useRoomBaseServer123');
+        this.noticeServer.$emit('room_announcement', {
+          room_announcement_text: this.roomBaseServer.state.noticeInfo.list[0]?.content.content
+        });
+      }
       // 监听到 公告
       this.noticeServer.listenMsg();
       this.noticeServer.$on('room_announcement', msg => {
