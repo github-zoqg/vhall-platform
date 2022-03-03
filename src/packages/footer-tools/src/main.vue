@@ -219,7 +219,7 @@
         );
       },
       isEmbed() {
-        // 是不是音视频嵌入
+        // 是不是嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       isEmbedVideo() {

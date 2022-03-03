@@ -24,20 +24,8 @@
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
-      <!-- <div
-        v-if="isLivingEnd"
-        class="vmp-wap-player-ending"
-        :style="`backgroundImage: url('${webinarsBgImg}')`"
-      >
-        <div class="vmp-wap-player-ending-box">
-          <div class="vmp-wap-player-ending-box-img">
-            <img src="./img/livingEnd@2x.png" alt="" />
-          </div>
-          <h1 class="vmp-wap-player-ending-box-text">直播已结束</h1>
-        </div>
-      </div> -->
       <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
-        <p>语音播放中</p>
+        <p>{{ $t('player.player_1014') }}</p>
       </div>
       <!-- 回放结束（正常回放和试看回放结束） -->
       <div
@@ -47,11 +35,13 @@
       >
         <!-- 试看播放结束 -->
         <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
-          <p class="vmp-wap-player-ending-box-title">试看结束，观看完整视频</p>
+          <p class="vmp-wap-player-ending-box-title">{{ $t('appointment.appointment_1013') }}</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
-              <span class="vmp-wap-player-ending-box-try-pay" @click="handleAuth(3)">付费</span>
-              <span @click="handleAuth(4)">邀请码</span>
+              <span class="vmp-wap-player-ending-box-try-pay" @click="handleAuth(3)">
+                {{ $t('appointment.appointment_1010') }}
+              </span>
+              <span @click="handleAuth(4)">{{ $t('appointment.appointment_1011') }}</span>
             </p>
             <span v-else class="vmp-wap-player-ending-box-try-see" @click="handleAuth">
               {{ authText }}
@@ -59,7 +49,7 @@
           </div>
           <p class="tryKan" @click="replay">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
-            重新试看
+            {{ $t('appointment.appointment_1014') }}
           </p>
         </div>
         <!-- 回放播放结束 -->
@@ -67,7 +57,7 @@
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
-          <p class="vmp-wap-player-ending-box-reset">重新播放</p>
+          <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
         </div>
       </div>
       <!-- 观看次数  -->
@@ -83,9 +73,15 @@
       </div>
       <!-- 倍速、清晰度切换 -->
       <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
-        已为您切换到
+        {{ $t('player.player_1009') }}
         <span v-if="isSetQuality">{{ formatQualityText(currentQualitys.def) }}</span>
-        <span v-if="isSetSpeed">{{ currentSpeed == 1 ? '正常' : currentSpeed }}倍速</span>
+        <span v-if="isSetSpeed">
+          <i18n path="player.player_1015" style="color: #fff">
+            <span place="n">
+              {{ currentSpeed == 1 ? $t('player.player_1025') : currentSpeed }}
+            </span>
+          </i18n>
+        </span>
       </div>
       <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
       <div
@@ -95,7 +91,7 @@
         <!-- 倍速和画质合并 -->
         <div class="vmp-wap-player-speed">
           <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed">
-            {{currentSpeed == 1 ? '倍速': currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+            {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
           </span>
           <span @click="openQuality" v-if="!isWarnPreview">
             {{ formatQualityText(currentQualitys.def) }}
@@ -103,13 +99,17 @@
         </div>
         <div class="vmp-wap-player-control">
           <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
-            试看
-            <span class="vmp-wap-player-control-preview-red">{{ recordTime }}</span>
-            分钟, 观看完整视频请
+            <i18n path="appointment.appointment_1012">
+              <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
+            </i18n>
             <span v-if="authText == 6">
-              <b class="vmp-wap-player-control-preview-red" @click="handleAuth(3)">付费</b>
+              <b class="vmp-wap-player-control-preview-red" @click="handleAuth(3)">
+                {{ $t('appointment.appointment_1010') }}
+              </b>
               或
-              <b class="vmp-wap-player-control-preview-red" @click="handleAuth(4)">邀请码</b>
+              <b class="vmp-wap-player-control-preview-red" @click="handleAuth(4)">
+                {{ $t('appointment.appointment_1011') }}
+              </b>
             </span>
             <span v-else class="vmp-wap-player-control-preview-red" @click="handleAuth">
               {{ authText }}
@@ -117,9 +117,9 @@
             <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
           </div>
           <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
-            上次观看至
-            <span class="red">{{ currentTime | secondToDate }}</span>
-            , 已为您自动续播
+            <i18n path="player.player_1012">
+              <span place="n" class="red">{{ currentTime | secondToDate }}</span>
+            </i18n>
             <i class="vh-iconfont vh-line-close" @click="isShowDuanXuboVideo = false"></i>
           </div>
           <div class="vmp-wap-player-control-slider">
