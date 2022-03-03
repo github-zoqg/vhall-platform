@@ -49,16 +49,24 @@
       this.resetMenus();
     },
     watch: {
-      ['roomBaseServer.state.watchInitData.webinar.type'](newval) {
+      ['roomBaseServer.state.watchInitData.webinar.type']() {
         this.resetMenus();
       },
-      ['groupServer.state.groupInitData.isInGroup'](newval) {
+      ['groupServer.state.groupInitData.isInGroup']() {
         this.resetMenus();
+      },
+      ['roomBaseServer.state.configList']: {
+        deep: true,
+        immediate: true,
+        handler() {
+          this.resetMenus();
+        }
       }
     },
     methods: {
       // 重置菜单，根据场景设置菜单的隐藏和显示
       resetMenus() {
+        const { configList } = this.roomBaseServer.state;
         // kind: document-文档，board-白板, desktopShare-桌面共享，insertMedia-插播文件，
         // interactTool-互动工具，group-分组讨论, share-分享, exitGroup-退出小组
         for (const vn of this.$children) {
@@ -102,7 +110,9 @@
             }
           } else if (vn.kind === 'insertMedia') {
             // 插播文件菜单
-            if (this.role == 4) {
+            if (!configList['waiting.video.file']) {
+              vn.setHiddenState(true);
+            } else if (this.role == 4) {
               // 嘉宾显示但禁用
               vn.setHiddenState(false);
               vn.setDisableState(true);
