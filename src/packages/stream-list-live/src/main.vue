@@ -14,6 +14,7 @@
             miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
         }"
+        v-show="localStream.streamId"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
@@ -144,6 +145,9 @@
         } else {
           return false;
         }
+      },
+      localStream() {
+        return this.$domainStore.state.interactiveServer.localStream;
       }
     },
 

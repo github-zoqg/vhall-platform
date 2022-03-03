@@ -13,11 +13,11 @@
           <button class="btn" @click="handleClickMuteDevice('video')">
             <i
               class="vh-iconfont iconfont-bottom vh-line-turn-off-video-camera"
-              v-show="!localStream.videoMuted"
+              v-show="localStream.videoMuted"
             ></i>
             <i
               class="vh-iconfont iconfont-bottom vh-line-video-camera"
-              v-show="localStream.videoMuted"
+              v-show="!localStream.videoMuted"
             ></i>
             <div class="btn-text">{{ $t('setting.setting_1003') }}</div>
           </button>

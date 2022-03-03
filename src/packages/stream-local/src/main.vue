@@ -31,13 +31,13 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="isStreamPublished">
-      <span
+      <!-- <span
         v-show="[1, 3, 4].includes(joinInfo.role_name)"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
         {{ joinInfo.role_name | roleNameFilter }}
-      </span>
+      </span> -->
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -369,8 +369,9 @@
         // 结束直播
         this.interactiveServer.$on('live_over', async () => {
           await this.stopPush();
-
-          this.interactiveServer.destroy();
+          if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
+            this.interactiveServer.destroy();
+          }
         });
         // 分组结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {

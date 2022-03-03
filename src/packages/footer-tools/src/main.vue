@@ -13,7 +13,7 @@
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__left-language" v-if="isEmbed">
+      <div class="vmp-footer-tools__left-language" v-if="isEmbed && languageList.length > 1">
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
@@ -70,7 +70,7 @@
         </div>
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="showGiftIcon">
+      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] === '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
