@@ -16,7 +16,8 @@
         :extra-props="{
           chatOptions,
           isOnlyShowSponsor,
-          previewImg: previewImg.bind(this)
+          previewImg: previewImg.bind(this),
+          emitLotteryEvent
         }"
       ></virtual-list>
       <div
@@ -415,7 +416,7 @@
         this.page++;
       },
       //todo domain负责 抽奖情况检查
-      lotteryCheck(msg) {
+      emitLotteryEvent(msg) {
         console.log('lotteryCheck', msg);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
