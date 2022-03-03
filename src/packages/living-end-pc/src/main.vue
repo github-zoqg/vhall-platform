@@ -9,7 +9,7 @@
       <div class="vmp-player-living-end-img">
         <img src="../src/img/liveEnd.png" alt="" />
       </div>
-      <h1>直播已结束</h1>
+      <h1>{{ $t('player.player_1017') }}</h1>
       <p v-if="isEmbedVideo">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}

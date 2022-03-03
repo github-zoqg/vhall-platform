@@ -328,22 +328,22 @@ const playerMixins = {
       let text;
       switch (val) {
         case 'same':
-          text = '原画';
+          text = this.$t('player.player_1002');
           break;
         case '720p':
-          text = '超清';
+          text = this.$t('player.player_1005');
           break;
         case '480p':
-          text = '高清';
+          text = this.$t('player.player_1003');
           break;
         case 'a':
-          text = '音频';
+          text = this.$t('player.player_1006');
           break;
         case '360p':
-          text = '标清';
+          text = this.$t('player.player_1004');
           break;
         default:
-          text = '标清';
+          text = this.$t('player.player_1004');
       }
       return text;
     }

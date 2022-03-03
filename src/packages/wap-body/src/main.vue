@@ -10,7 +10,7 @@
         <div class="vmp-wap-body-ending-box-img">
           <img src="./img/livingEnd@2x.png" alt="" />
         </div>
-        <h1 class="vmp-wap-body-ending-box-text">直播已结束</h1>
+        <h1 class="vmp-wap-body-ending-box-text">{{ $t('player.player_1017') }}</h1>
       </div>
     </div>
     <div
@@ -35,10 +35,10 @@
 
       <!-- wap端订阅桌面共享的容器 -->
       <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
-      <!-- 
+      <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
-            此处不能用v-if 
+            此处不能用v-if
        -->
     </div>
   </div>

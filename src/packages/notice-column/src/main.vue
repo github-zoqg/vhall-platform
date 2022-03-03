@@ -30,7 +30,11 @@
     },
     created() {
       const { latestNotice } = this.noticeServer.state;
-      if (latestNotice.total && latestNotice.created_at) {
+      if (
+        latestNotice.total &&
+        latestNotice.created_at &&
+        this.roomBaseServer.state.watchInitData.webinar.type == 1
+      ) {
         this.isNoticeColumn = true;
         this.noticeText = latestNotice.noticeContent;
       }

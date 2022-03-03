@@ -516,6 +516,7 @@
           // console.log('[doc] screenfull.isFullscreen:', screenfull);
           if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
+            this.thumbnailShow = false;
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
@@ -1042,6 +1043,8 @@
   // 文档全屏时
   .vmp-doc-une.vmp-doc-une--fullscreen {
     .vmp-doc-toolbar {
+      position: absolute;
+      bottom: 50px;
       background: transparent;
       border-color: transparent;
     }
@@ -1053,6 +1056,14 @@
       background: #1a1a1a;
       padding: 2px 10px;
       border-radius: 100px;
+
+      .vmp-brush-popup {
+        position: absolute;
+        top: auto;
+        left: 0;
+        bottom: 37px;
+        padding-top: 4px;
+      }
     }
     .vmp-icon-item--exitFullscreen {
       display: block;
