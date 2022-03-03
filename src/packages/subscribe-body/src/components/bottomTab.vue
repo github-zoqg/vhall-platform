@@ -210,7 +210,7 @@
       handleBtnText() {
         let ret = '';
         if (this.type == 3) {
-          this.btnText = '直播已结束';
+          this.btnText = this.$t('player.player_1017');
           this.limitText = '';
           this.btnDisabled = true;
           return;

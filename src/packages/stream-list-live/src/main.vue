@@ -195,7 +195,7 @@
 
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
-            this.$message.warning('直播已结束');
+            this.$message.warning(this.$t('player.player_1017'));
           });
 
           // 接收设为主讲人消息
