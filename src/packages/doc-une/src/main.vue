@@ -315,7 +315,7 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[doc][player]---大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
+        console.log('-[doc]--大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
         const mode = newval === 'doc' ? 'mini' : 'normal';
         this.setDisplayMode(mode);
       },
