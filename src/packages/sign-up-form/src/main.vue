@@ -1790,6 +1790,7 @@
       }
     }
     &__introduction-fold {
+      white-space: nowrap;
       word-break: break-all;
       text-overflow: ellipsis;
       display: -webkit-box;

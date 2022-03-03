@@ -30,7 +30,7 @@
           <label>{{ webinarType | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -66,7 +66,7 @@
       <!-- 关注 -->
       <div
         class="vmp-header-watch-right-attention"
-        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarType != 6"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.mode != 6"
       >
         <div
           :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"

@@ -2,7 +2,7 @@
   <div
     class="vmp-stream-list"
     ref="streamList"
-    :class="{ 'vmp-stream-list-h0': !remoteStreams.length, shrink: isShrink }"
+    :class="{ 'vmp-stream-list-h0': isStreamListH0, shrink: isShrink }"
   >
     <div class="vmp-stream-list__stream-wrapper">
       <div
@@ -14,6 +14,7 @@
             miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
         }"
+        v-show="localStream.streamId"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
@@ -75,7 +76,12 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useSplitScreenServer, useMicServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useSplitScreenServer,
+    useMicServer,
+    useMsgServer
+  } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
 
   export default {
@@ -104,8 +110,9 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        if (this.isInGroup) {
-          return this.groupServer.state.groupInitData.main_screen;
+        console.warn(this.$domainStore.state, 789);
+        if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
@@ -131,10 +138,14 @@
          *    高度不为 0,返回 false
          */
         if (!this.remoteStreams.length) {
-          return !(
+          if (
             this.$domainStore.state.interactiveServer.localStream.streamId &&
             this.joinInfo.third_party_user_id != this.mainScreen
-          );
+          ) {
+            return false;
+          } else {
+            return true;
+          }
         } else if (this.remoteStreams.length == 1) {
           if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
             return this.remoteStreams[0].accountId == this.mainScreen;
@@ -144,6 +155,9 @@
         } else {
           return false;
         }
+      },
+      localStream() {
+        return this.$domainStore.state.interactiveServer.localStream;
       }
     },
 
@@ -151,6 +165,7 @@
       this.interactiveServer = useInteractiveServer();
       this.splitScreenServer = useSplitScreenServer();
       this.micServer = useMicServer();
+      this.msgServer = useMsgServer();
     },
 
     created() {
@@ -195,9 +210,8 @@
 
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
-            this.$message.warning('直播已结束');
+            this.$message.warning(this.$t('player.player_1017'));
           });
-
           // 接收设为主讲人消息
           this.micServer.$on('vrtc_big_screen_set', msg => {
             const str =
@@ -207,6 +221,18 @@
             this.$message.success(`${msg.data.nick_name}设置成为${str}`);
           });
         }
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          if (this.joinInfo.role_name == 1) {
+            const streams = this.interactiveServer.getRoomStreams();
+            const mainScreenStream = streams.find(
+              stream => stream.accountId == msg.data.room_join_id
+            );
+            if (mainScreenStream) {
+              this.interactiveServer.setBroadCastScreen(mainScreenStream.streamId);
+            }
+          }
+        });
       },
       getStreamList() {
         this.interactiveServer.getRoomStreams();
@@ -266,6 +292,7 @@
 
       // 主屏在大窗的样式
       &.vmp-dom__max {
+        width: auto;
         position: absolute;
         top: 80px;
         bottom: 0px;

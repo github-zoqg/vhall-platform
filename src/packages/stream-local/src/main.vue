@@ -31,13 +31,13 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="isStreamPublished">
-      <span
+      <!-- <span
         v-show="[1, 3, 4].includes(joinInfo.role_name)"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
         {{ joinInfo.role_name | roleNameFilter }}
-      </span>
+      </span> -->
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -243,6 +243,12 @@
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 实例化后是否需要调用上麦接口
+      isNeedSpeakOn() {
+        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
+        // isSpeakOffToInit 自动上麦后，如果下麦，会重新初始化互动实例，不加这个变量会又一次走自动上麦
+        return this.mode === 6 && !this.chatServer.state.banned;
       }
     },
     filters: {
@@ -257,31 +263,28 @@
         return roleNameMap[roleName];
       }
     },
-    created() {
+    beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
+    },
+    created() {
       this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
-
-      // 刷新重进时，如果在小组内且上麦，或者不在小组内且上麦
-      if (
+      // 实例化后是否是上麦状态
+      const isSpeakOn =
         (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-        this.micServer.state.isSpeakOn
-      ) {
+        this.micServer.state.isSpeakOn;
+      if (isSpeakOn) {
         this.startPush();
-      } else if (
-        this.mode === 6 &&
-        !this.chatServer.state.banned &&
-        !this.chatServer.state.allBanned &&
-        this.joinInfo.role_name != 3
-      ) {
-        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
-        await this.micServer.userSpeakOn();
+      } else if (this.isNeedSpeakOn) {
+        this.userSpeakOn();
+      } else {
+        this.micServer.setSpeakOffToInit(false);
       }
     },
     beforeDestroy() {
@@ -313,6 +316,18 @@
           },
           true
         );
+
+        // 互动实例成功
+        this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', async () => {
+          // 是否需要自动上麦
+          const micServer = useMicServer();
+
+          if (this.isNeedSpeakOn) {
+            this.userSpeakOn();
+          } else {
+            micServer.setSpeakOffToInit(false);
+          }
+        });
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
@@ -354,8 +369,9 @@
         // 结束直播
         this.interactiveServer.$on('live_over', async () => {
           await this.stopPush();
-
-          this.interactiveServer.destroy();
+          if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
+            this.interactiveServer.destroy();
+          }
         });
         // 分组结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {
@@ -492,7 +508,9 @@
             if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
               await this.setBroadCastAdaptiveLayoutMode();
             }
-            await this.setBroadCastScreen();
+            if (this.mainScreen == this.joinInfo.third_party_user_id) {
+              await this.setBroadCastScreen();
+            }
           }
           // 派发事件
           window.$middleEventSdk?.event?.send(

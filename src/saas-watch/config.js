@@ -332,6 +332,11 @@ export const serverConfig = {
       cuid: ['comLottery'],
       method: 'accept',
       args: ['$0']
+    },
+    emitHideEffect: {
+      cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
     }
   },
   //成员列表组件

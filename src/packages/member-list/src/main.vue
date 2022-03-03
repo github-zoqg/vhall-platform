@@ -1335,7 +1335,7 @@
           this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
           this._permissionLeaveInterval = window.setTimeout(() => {
             // 15秒后自动结束演示
-            this.downMic(this._permissionLeaveId);
+            this.downMic(this._permissionLeaveId, false);
             this.msgServer.$offMsg('JOIN', this.handlePermissionJoin);
           }, 15000);
         }
@@ -1356,7 +1356,7 @@
             this.speakerLeaveIntervalMap[msg.sender_id] &&
               clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
             delete this.speakerLeaveIntervalMap[msg.sender_id];
-            this.downMic(msg.sender_id);
+            this.downMic(msg.sender_id, false);
           }, 15000);
         }
       },
@@ -1388,16 +1388,23 @@
               this.$refs.scroll.finishPullUp();
               this.onlineUsers = this.memberServer.state.onlineUsers || [];
               (this.onlineUsers || []).forEach(item => {
-                if (
-                  _this.memberOptions.platformType === 'watch' &&
-                  item.account_id == _this.userId
-                ) {
+                if (_this.isWatch && item.account_id == _this.userId) {
                   _this.roleName = item.role_name;
                 }
                 if ([20, '20'].includes(item.role_name)) {
                   _this.leader_id = item.account_id;
                 }
               });
+
+              //刷新也维护一下举手状态
+              _this.state.applyUsers.forEach(element => {
+                _this.state.onlineUsers.forEach(item => {
+                  if (element.accountId === item.accountId) {
+                    item.is_apply = 1;
+                  }
+                });
+              });
+
               if (!this.onlineUsers.length) {
                 this.pageConfig.page--;
               }
@@ -1631,12 +1638,12 @@
         }
       },
       //用户下麦
-      downMic(accountId) {
+      downMic(accountId, needConfirm = true) {
         const data = {
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        if (this.isInGroup && this.isLive) {
+        if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
             cancelButtonText: this.$t('account.account_1063'),
