@@ -134,7 +134,8 @@
         });
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
           if (
-            (msg.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+            (msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+            msg.data.answer.is_open != '0' ||
             this.roleName == 1
           ) {
             msg.data.content = this.emojiToText(msg.data.content);
