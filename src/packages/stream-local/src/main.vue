@@ -113,9 +113,6 @@
     <!-- 遮罩层 非主屏-->
     <section v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleNameFilter }}
-        </span>
         <el-tooltip :content="localStream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
             class="vmp-stream-local__shadow-icon"
