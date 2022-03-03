@@ -49,7 +49,6 @@ const serverConfig = {
       'compRegLoginWap',
       'comOfficial',
       'comShare',
-      'comWatchTimer',
       'comSignUpForm',
       'comScreenPostWap',
       'comUserCenterWap',
@@ -115,7 +114,7 @@ const serverConfig = {
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
-    children: ['comSignWap'],
+    children: ['comSignWap', 'comWatchTimer'],
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
