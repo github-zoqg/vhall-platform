@@ -67,7 +67,6 @@ export const serverConfig = {
       'comUserAccount',
       'comCash',
       'comLottery',
-      'comWatchTimer',
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
@@ -294,7 +293,12 @@ export const serverConfig = {
       cuid: ['compRegLogin'],
       method: 'open'
     },
-    children: ['comSignWatch']
+    // 抽奖弹窗
+    emitClickLotteryIcon: {
+      cuid: ['comLottery'],
+      method: 'open'
+    },
+    children: ['comSignWatch', 'comWatchTimer']
   },
   comSignWatch: {
     component: 'VmpSignWatch'
@@ -333,7 +337,12 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
-    ]
+    ],
+    emitClickLotteryChatItem: {
+      cuid: ['comLottery'],
+      method: 'accept',
+      args: ['$0']
+    }
   },
   //成员列表组件
   comMemberList: {
@@ -379,7 +388,14 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    component: 'VmpLotteryWatch'
+    component: 'VmpLotteryWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 开屏页
   comScreenPost: {
@@ -482,9 +498,16 @@ export const serverConfig = {
     }
   },
 
-  // 抽奖
+  // 问卷
   comQuestionnaire: {
-    component: 'VmpQuestionnaireWatch'
+    component: 'VmpQuestionnaireWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
 
   // 红包

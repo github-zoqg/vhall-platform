@@ -142,7 +142,8 @@
           });
       },
       handleJump(url) {
-        location.href = url;
+        // location.href = url;
+        window.open(url, '_blank');
       },
       start(item, e) {
         this.startY = e.targetTouches[0].pageY;
@@ -157,7 +158,8 @@
       },
 
       toHref(item) {
-        location.href = item;
+        window.open(item, '_blank');
+        // location.href = item;
       }
     }
   };
@@ -203,6 +205,7 @@
 
         img {
           height: 100%;
+          width: 100%;
           object-fit: scale-down;
         }
       }
@@ -210,7 +213,7 @@
         font-size: 14px;
         font-weight: bold;
         color: @font-dark-normal;
-        line-height: 30px;
+        line-height: 22px;
         height: 34px;
       }
 

@@ -85,9 +85,9 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log('---grayInit---');
-  // authCheck(to, next);
+  console.log('---grayInit---', to);
   await grayInit(to);
+  authCheck(to, next);
   next();
 });
 

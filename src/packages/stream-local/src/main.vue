@@ -82,7 +82,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && role != 20"
+            v-if="joinInfo.role_name != 1 && groupRole != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -140,7 +140,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && role != 20"
+            v-if="joinInfo.role_name != 1 && groupRole != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -180,7 +180,9 @@
     useMicServer,
     useRoomBaseServer,
     usePlayerServer,
-    useMediaSettingServer
+    useMediaSettingServer,
+    useGroupServer,
+    useChatServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -190,7 +192,6 @@
     data() {
       return {
         isFullScreen: false,
-        role: '',
         isStreamPublished: false,
         networkStatus: 2,
         audioLevel: 1,
@@ -201,6 +202,10 @@
       ImgStream
     },
     computed: {
+      // 小组内角色，20为组长
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
       localStream() {
         console.log(
           '----localStream更新了----',
@@ -208,8 +213,16 @@
         );
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -241,13 +254,21 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
+      this.groupServer = useGroupServer();
+      this.chatServer = useChatServer();
       this.listenEvents();
     },
     async mounted() {
-      console.log('本地流组件mounted钩子函数', this.micServer.state.isSpeakOn);
+      console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
-      if (this.micServer.state.isSpeakOn) {
+      if (
+        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+        this.micServer.state.isSpeakOn
+      ) {
         this.startPush();
+      }
+      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
+        await this.micServer.userSpeakOn();
       }
     },
     beforeDestroy() {
@@ -298,13 +319,14 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          this.interactiveServer.destroy();
+          await this.interactiveServer.destroy();
 
-          // 如果成功，销毁播放器
-          this.playerServer.init();
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
             this.interactiveServer.init();
+          } else {
+            // 初始化播放器
+            this.playerServer.init();
           }
         });
         // 结束直播
@@ -312,6 +334,17 @@
           await this.stopPush();
 
           this.interactiveServer.destroy();
+        });
+        // 分组结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', async () => {
+          try {
+            await this.stopPush();
+            await this.interactiveServer.destroy();
+            //  初始化互动实例
+            this.interactiveServer.init();
+          } catch (error) {
+            console.log('分组结束讨论', error);
+          }
         });
       },
       // 媒体切换后进行无缝切换
@@ -406,6 +439,8 @@
           // 设置旁路主屏布局失败
           console.log('设置主屏失败');
           // TODO: 设置旁路主屏布局失败错误处理
+        } else if (err == 'setBroadCastAdaptiveLayoutModeError') {
+          console.log('设置自适应旁路布局失败');
         } else if (err == 'getCanvasStreamError') {
           console.error('获取图片流track错误');
         } else if (err == 'createLocalPhotoStreamError') {
@@ -427,6 +462,14 @@
 
           // 主持人配置旁路主屏
           if (this.joinInfo.role_name == 1) {
+            /*
+             *  1、初始化互动实例时会默认传旁路自适应布局模式
+             *  2、     若刷新的话，会初始化实例，则旁路展示正确
+             *            不刷新，结束直播后，进行媒体设置更改，再进行开播，则需要手动调用自适应布局方法
+             */
+            if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
+              await this.setBroadCastAdaptiveLayoutMode();
+            }
             await this.setBroadCastScreen();
           }
           // 派发事件
@@ -474,6 +517,17 @@
       async setBroadCastScreen() {
         await this.interactiveServer.setBroadCastScreen().catch(() => 'setBroadCastScreenError');
       },
+
+      // 设置旁路布局
+      async setBroadCastAdaptiveLayoutMode() {
+        const param = {
+          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')]
+        };
+        await this.interactiveServer
+          .setBroadCastAdaptiveLayoutMode(param)
+          .catch(() => 'setBroadCastAdaptiveLayoutModeError');
+      },
+
       // 结束推流
       stopPush() {
         return new Promise(resolve => {

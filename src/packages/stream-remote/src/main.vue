@@ -26,7 +26,10 @@
 
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-first-line"
+      >
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
@@ -87,7 +90,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="joinInfo.role_name == 1 && stream.attributes.roleName != 20"
+            v-if="joinInfo.role_name == 1 || groupRole == 20"
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -95,7 +98,10 @@
     </section>
 
     <section v-else class="vmp-stream-remote__shadow-box">
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-first-line"
+      >
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
             class="vmp-stream-remote__shadow-icon"
@@ -117,17 +123,20 @@
             "
           ></span>
         </el-tooltip>
-
+        <!--
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="joinInfo.role_name != 1 && stream.attributes.roleName != 20"
           ></span>
-        </el-tooltip>
+        </el-tooltip> -->
       </p>
 
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-second-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-second-line"
+      >
         <el-tooltip content="设为主讲人" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
@@ -139,7 +148,7 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2 || stream.attributes.roleName == 20"
+            v-show="stream.attributes.roleName == 2"
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
@@ -149,7 +158,6 @@
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -175,8 +183,20 @@
       }
     },
     computed: {
+      // 小组内角色，20为组长
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -235,15 +255,16 @@
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
-            console.log('订阅成功----', e);
+            console.log('订阅成功--1--', e);
             this.getLevel();
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
-            setTimeout(() => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
-            }, 2000);
+            // setTimeout(() => {
+            //   const list = document.getElementsByTagName('video');
+
+            //   for (const item of list) {
+            //     item.play();
+            //   }
+            // }, 2000);
           })
           .catch(e => {
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }

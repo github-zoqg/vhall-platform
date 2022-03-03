@@ -12,7 +12,8 @@ import {
   useGroupServer,
   useChatAuthServer,
   useMediaSettingServer,
-  useUserServer
+  useUserServer,
+  useInsertFileServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -37,6 +38,7 @@ export default new DomainStore.Store({
     groupServer: useGroupServer().state,
     chatAuthServer: useChatAuthServer().state,
     mediaSettingServer: useMediaSettingServer().state,
-    userServer: useUserServer().state
+    userServer: useUserServer().state,
+    insertFileServer: useInsertFileServer().state
   }
 });

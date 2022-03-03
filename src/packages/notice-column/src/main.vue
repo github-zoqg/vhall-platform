@@ -30,7 +30,7 @@
     },
     created() {
       const { latestNotice } = this.noticeServer.state;
-      if (latestNotice.total) {
+      if (latestNotice.total && latestNotice.created_at) {
         this.isNoticeColumn = true;
         this.noticeText = latestNotice.noticeContent;
       }
@@ -49,6 +49,9 @@
           if (!groupInitData.isInGroup) {
             this.noticeServer.setLatestNoticeInfo(msg.room_announcement_text);
           }
+        });
+        this.noticeServer.$on('live_over', () => {
+          this.isNoticeColumn = false;
         });
       },
       animates() {
@@ -108,7 +111,13 @@
         font-size: 14px;
         overflow: hidden;
         width: 100%;
+        height: 35px;
         flex: 1;
+        &-animated {
+          span {
+            white-space: nowrap;
+          }
+        }
       }
       &-close {
         cursor: pointer;

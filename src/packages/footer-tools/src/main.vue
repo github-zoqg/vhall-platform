@@ -25,7 +25,7 @@
     <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
-      <li>
+      <li v-if="isLiving">
         <!-- 公告 -->
         <notice></notice>
       </li>
@@ -38,6 +38,7 @@
       </li>
       <li v-if="isLiving">
         <!-- 抽奖 -->
+        <lottery-icon @clickIcon="checkLotteryIcon" />
       </li>
       <li>
         <red-packet-icon />
@@ -49,6 +50,7 @@
           <i v-if="showTimer" class="circle"></i>
           <img src="./img/timer.png" alt="" @click="openTimerHandle" />
         </div>
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="showGiftIcon">
         <!-- 礼物 -->
@@ -100,6 +102,7 @@
   import getInvited from './component/getInvited/index.vue';
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
+  import LotteryIcon from './component/lottery-icon/index.vue';
 
   export default {
     name: 'VmpFooterTools',
@@ -111,7 +114,8 @@
       praise,
       getInvited,
       Pay,
-      RedPacketIcon
+      RedPacketIcon,
+      LotteryIcon
     },
     data() {
       return {
@@ -155,10 +159,9 @@
           watchInitData.webinar.type == 1
         );
       },
+      // 是否正在直播
       isLiving() {
-        const { watchInitData } = this.roomBaseState;
-        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
-        return watchInitData.webinar.type == 1;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
       isTrySee() {
         const { watchInitData } = this.roomBaseState;
@@ -264,6 +267,9 @@
       },
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+      },
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       }
     }
   };

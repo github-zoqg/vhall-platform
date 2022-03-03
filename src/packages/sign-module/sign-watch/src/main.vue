@@ -58,13 +58,13 @@
       this.signServer = useSignServer();
     },
     created() {
-      this.signServer.listenMsg();
+      // this.signServer.listenMsg();
     },
     mounted() {
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
         this.showSign = true;
-        this.title = this.$t(e.title);
+        this.title = this.$t(e.data.title);
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
         this.countDownTime();

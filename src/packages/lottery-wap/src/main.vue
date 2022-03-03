@@ -14,6 +14,8 @@
         :lotteryId="lotteryId"
         :showWinnerList="showWinnerList"
         :prizeInfo="prizeInfo"
+        :lotteryInfo="lotteryInfo"
+        @needLogin="handleGoLogin"
         @close="close"
         @navTo="changeView"
       />
@@ -22,6 +24,7 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useLotteryServer, useRoomBaseServer } from 'middle-domain';
   const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
   const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
@@ -48,7 +51,8 @@
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
-        lotteryId: '' // 抽奖的信息id(接口返回)
+        lotteryId: '', // 抽奖的信息id(接口返回)
+        lotteryInfo: {} // 抽奖信息
       };
     },
     created() {
@@ -58,6 +62,31 @@
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
     },
     methods: {
+      /**
+       * @description 点开抽奖(按钮或者聊天)
+       */
+      open(uuid = '') {
+        this.lotteryServer.checkLottery(uuid).then(res => {
+          const data = res.data;
+          if (data.lottery_status === 0) {
+            // 抽奖中
+            // 抽奖进行中
+            this.setFitment(data);
+            this.lotteryView = 'LotteryPending';
+          } else {
+            this.setFitment(data);
+            if (data.win === 1) {
+              // 中奖
+              this.lotteryView = 'LotteryWin';
+            } else {
+              // 未中奖
+              this.lotteryView = 'LotteryMiss';
+            }
+          }
+          this.popupVisible = true;
+        });
+      },
+
       /**
        * @description 注册事件
        */
@@ -122,6 +151,7 @@
           title: payload.title,
           img_order: payload.img_order
         };
+        this.lotteryInfo = payload;
       },
       /**
        * @description 判断是否是自己
@@ -129,11 +159,11 @@
        */
       isSelf(id) {
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
-        console.log();
+        console.log(join_info);
         if (join_info && typeof join_info === 'object') {
           const userId = join_info.user_id || join_info.third_party_user_id;
           console.log(userId, id);
-          return userId === `${id}`;
+          return `${userId}` === `${id}`;
         }
         return false;
       },
@@ -143,6 +173,10 @@
         this.awardInfo.img = '';
         await this.queryLotteryInfo();
         this.latterPrizeInfo();
+      },
+      handleGoLogin() {
+        this.popupVisible = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };

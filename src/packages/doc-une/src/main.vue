@@ -211,6 +211,13 @@
 
       // 是否文档演示权限
       hasDocPermission() {
+        if (
+          !['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
+          (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5)
+        ) {
+          // 对于观看端，点播和回放，所有人都没有文档演示权限
+          return false;
+        }
         if (this.isInGroup) {
           return (
             this.groupServer.state.groupInitData.presentation_screen ==
@@ -218,9 +225,8 @@
           );
         } else {
           return (
-            ['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
             this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-              this.watchInitData.join_info.third_party_user_id
+            this.watchInitData.join_info.third_party_user_id
           );
         }
       },
@@ -290,6 +296,17 @@
       }
     },
     watch: {
+      // 回放的时候
+      ['docServer.state.switchStatus'](newval) {
+        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
+          // 如果是回放会点播,文档显示与不显示是切换处理
+          if (newval) {
+            useRoomBaseServer().setChangeElement('player');
+          } else {
+            useRoomBaseServer().setChangeElement('doc');
+          }
+        }
+      },
       // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
@@ -439,31 +456,34 @@
 
           // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
+            console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
             const data = this.docServer.getVodAllCids();
             this.docServer.state.containerList = data.map(item => {
               return {
                 cid: item.cid
               };
             });
-            //
-            this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
+            console.log(
+              '[doc]this.docServer.state.containerList:',
+              this.docServer.state.containerList
+            );
+
             await this.$nextTick();
-            if (this.docServer.state.switchStatus) {
-              // 回放只在观看端可用
-              this.resize();
-              // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
-              const { width, height } = this.docViewRect;
-              if (!width || !height) return;
-              for (const item of data) {
-                this.docServer.initContainer({
-                  cid: item.cid,
-                  width,
-                  height,
-                  fileType: item.type.toLowerCase()
-                });
-              }
-              this.docServer.loadVodIframe();
+
+            // 回放只在观看端可用
+            this.resize();
+            // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
+            const { width, height } = this.docViewRect;
+            if (!width || !height) return;
+            for (const item of data) {
+              this.docServer.initContainer({
+                cid: item.cid,
+                width,
+                height,
+                fileType: item.type.toLowerCase()
+              });
             }
+            this.docServer.loadVodIframe();
           });
         }
 

@@ -514,6 +514,7 @@
   #homePage {
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-bottom: 100px;
   }
 </style>

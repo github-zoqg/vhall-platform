@@ -205,7 +205,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-iconfont vh-line-document',
       text: 'aside_menu.aside_menu_1000',
-      kind: 'document'
+      kind: 'document',
+      auth: 'hide-document'
     },
     handleClick: [
       {
@@ -225,7 +226,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-line-whiteboard',
       text: 'aside_menu.aside_menu_1001',
-      kind: 'board'
+      kind: 'board',
+      auth: true
     },
     handleClick: [
       {
@@ -245,7 +247,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
-      kind: 'desktopShare'
+      kind: 'desktopShare',
+      auth: true
     },
     handleClick: [
       {
@@ -266,12 +269,13 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-color-Spotfile',
       text: 'aside_menu.aside_menu_1003',
-      kind: 'insertMedia'
+      kind: 'insertMedia',
+      auth: 'waiting.video.file'
     },
     handleClick: [
       {
         cuid: 'comInsertVideoList',
-        method: 'openInserVideoDialog',
+        method: 'openInsertFileDialog',
         args: []
       }
     ]
@@ -328,7 +332,14 @@ export const serverConfig = {
   },
   // 互动工具-计时器设置
   liveTimerSet: {
-    component: 'VmpLiveTimerSet'
+    component: 'VmpLiveTimerSet',
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
+      }
+    ]
   },
   // 互动工具-计时器
   liveTimer: {
@@ -355,6 +366,7 @@ export const serverConfig = {
       icon: 'vh-iconfont vh-line-group',
       text: 'aside_menu.aside_menu_1008',
       kind: 'group',
+      auth: 'webinar.group',
       disable: true
     },
     handleClick: [
@@ -372,7 +384,8 @@ export const serverConfig = {
       className: 'menu-footer',
       icon: 'vh-iconfont vh-line-share',
       text: '分享',
-      kind: 'share'
+      kind: 'share',
+      auth: 'ui.hide_share'
     },
     handleClick: [
       {
@@ -390,7 +403,8 @@ export const serverConfig = {
       icon: 'vh-iconfont vh-line-exit',
       text: '退出小组',
       kind: 'exitGroup',
-      hidden: true
+      hidden: true,
+      auth: true
     },
     handleClick: [
       {
@@ -531,11 +545,10 @@ export const serverConfig = {
   },
   comInsertVideoList: {
     component: 'VmpInsertVideoList',
-    emitOnchange: [
+    emitInsertFileChange: [
       {
         cuid: 'comInsertStream',
-        method: 'openInsertShow',
-        args: ['$0', '$1']
+        method: 'startInertFile'
       }
     ]
   },
@@ -554,25 +567,18 @@ export const serverConfig = {
   },
   comInsertStream: {
     component: 'VmpInsertStream',
-    emitClose: [
+    emitCloseInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
         method: 'closeInserVideoDialog',
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ],
-    emitOpen: [
+    openInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
-        method: 'openInserVideoDialog',
+        method: 'openInsertFileDialog',
         args: []
-      }
-    ],
-    emitInsertInfo: [
-      {
-        cuid: 'comInsertVideoList',
-        method: 'getInsertingInfo',
-        args: ['$0']
       }
     ]
   },
