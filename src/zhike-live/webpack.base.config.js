@@ -9,43 +9,39 @@ const pkg = require('./package.json');
 const htmlConfig = {
   // cdn js
   cdnJs: {
-    vue: '//t-alistatic01.e.vhall.com/3rdlibs/vue/2.6.14/vue.js',
-    VueRouter: '//t-alistatic01.e.vhall.com/3rdlibs/vue-router/3.5.2/vue-router.min.js',
+    lodash: '//cnstatic01.e.vhall.com/common-static/middle/lodash/4.17.21/lodash.min.js',
+    vue: '//cnstatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.min.js',
+    VueRouter:
+      '//cnstatic01.e.vhall.com/common-static/middle/vue-router/3.5.3/dist/vue-router.min.js',
     Moment: '//cnstatic01.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
+
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    // MiddleDomain:
-    //   '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.0.0/dist/lib/middleDomain.js',
     MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
-    ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js'
+    ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+    loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js'
+
     // vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
-    // doc: '//static.vhallyun.com/jssdk/vhall-jssdk-doc/latest/vhall-jssdk-doc-3.2.0.js',
-    // chat: '//static.vhallyun.com/jssdk/vhall-jssdk-chat/latest/vhall-jssdk-chat-2.1.4.js',
-    // player: '//static.vhallyun.com/jssdk/vhall-jssdk-player/latest/vhall-jssdk-player-2.4.0.js',
-    // interaction:
-    //   '//static.vhallyun.com/jssdk/vhall-jssdk-interaction/latest/vhall-jssdk-interaction-2.3.6.js'
   },
   // cdn css
   cdnCss: {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    iconfontCommon:
-      '//t-alistatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.1/iconfont.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-zk-pc/iconfont.css'
+    // 开发时暂时使用阿里链接，后面改成自己的cdn
+    iconfontCommon: '//at.alicdn.com/t/font_3128919_dcbhpaxzl9v.css',
+    iconfont: '//at.alicdn.com/t/font_3128882_y0bppp0pqu.css'
   },
   // dns-prefetch
   dnsPrefetch: {
-    open: false,
+    open: false, //是否开启dns预解析
     dns: {
       't-alistatic01': '//t-alistatic01.e.vhall.com'
     }
   }
 };
 
-let outputDir = path.join(pathConfig.ROOT, 'dist', pkg.name);
-
 module.exports = {
-  outputDir: outputDir,
+  outputDir: path.join(pathConfig.ROOT, 'dist', pkg.name),
   pages: {
     index: {
       entry: path.join(pathConfig.SRC, pkg.name, 'main.js'),
@@ -53,6 +49,7 @@ module.exports = {
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
       version: pkg.version,
+      hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
       ...htmlConfig
     }
   }
