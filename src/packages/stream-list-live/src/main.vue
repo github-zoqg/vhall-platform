@@ -183,11 +183,20 @@
       listenEvents() {
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
-          // live_over 结束直播
-          this.interactiveServer.$on('live_over', () => {
-            this.$message.warning('直播已结束');
+          // 订阅流播放失败    监听到播放失败, 然后展示按钮
+          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+            let videos = document.querySelectorAll('video');
+            videos.length > 0 &&
+              videos.forEach(video => {
+                video.pause();
+              });
+            this.interactiveServer.state.showPlayIcon = true;
           });
 
+          // live_over 结束直播
+          this.interactiveServer.$on('live_over', () => {
+            this.$message.warning(this.$t('player.player_1017'));
+          });
           // 接收设为主讲人消息
           this.micServer.$on('vrtc_big_screen_set', msg => {
             const str =
@@ -197,6 +206,18 @@
             this.$message.success(`${msg.data.nick_name}设置成为${str}`);
           });
         }
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          if (this.joinInfo.role_name == 1) {
+            const streams = this.interactiveServer.getRoomStreams();
+            const mainScreenStream = streams.find(
+              stream => stream.accountId == msg.data.room_join_id
+            );
+            if (mainScreenStream) {
+              this.interactiveServer.setBroadCastScreen(mainScreenStream.streamId);
+            }
+          }
+        });
       },
       getStreamList() {
         this.interactiveServer.getRoomStreams();
@@ -264,6 +285,7 @@
         min-height: auto;
         left: 60px;
         right: 310px;
+        width: auto;
         &.height-lower {
           top: 160px;
         }
