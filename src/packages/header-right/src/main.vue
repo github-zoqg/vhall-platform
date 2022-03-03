@@ -85,7 +85,7 @@
 <script>
   import headerControl from './components/header-control.vue';
   import RecordControl from './components/record-control.vue';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -160,31 +160,44 @@
       }
     },
     methods: {
-      // TODO: 嘉宾点击申请上麦
+      // 嘉宾点击申请上麦
       handleApplyClick() {
-        // TODO: 调申请上麦接口，调用成功之后，执行下面的逻辑，开启倒计时
-        this.isApplying = true;
-        this.applyTime = 30;
-        this._applyInterval = setInterval(() => {
-          this.applyTime = this.applyTime - 1;
-          if (this.applyTime == 0) {
-            this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
-            clearInterval(this._applyInterval);
-            this.isApplying = false;
-            // TODO: 调下麦接口
-          }
-        }, 1000);
+        useMicServer()
+          .userApply()
+          .then(res => {
+            this.isApplying = true;
+            this.applyTime = 30;
+            this._applyInterval = setInterval(async () => {
+              this.applyTime = this.applyTime - 1;
+              if (this.applyTime == 0) {
+                this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
+                clearInterval(this._applyInterval);
+                this.isApplying = false;
+                const { code, msg } = await useMicServer().speakOff();
+                if (code === 513035) {
+                  this.$message.error(msg);
+                }
+              }
+            }, 1000);
+          });
       },
-      // TODO: 嘉宾取消申请
+      // 嘉宾取消申请
       handleApplyCancleClick() {
-        // TODO: 调取消申请上麦接口，成功之后，执行下面的逻辑，关闭倒计时
-        this.isApplying = false;
-        this.applyTime = 30;
-        clearInterval(this._applyInterval);
+        useMicServer()
+          .userCancelApply()
+          .then(res => {
+            this.isApplying = false;
+            this.applyTime = 30;
+            clearInterval(this._applyInterval);
+          });
       },
-      // TODO: 嘉宾下麦
-      handleSpeakOffClick() {
-        // TODO: 下麦接口停止推流，成功之后执行下面的逻辑
+      // 嘉宾下麦
+      async handleSpeakOffClick() {
+        // 下麦接口停止推流，成功之后执行下面的逻辑
+        const { code, msg } = await useMicServer().speakOff();
+        if (code === 513035) {
+          this.$message.error(msg);
+        }
         this.isApplying = false;
         this.applyTimerCount = 30;
       },

@@ -39,7 +39,7 @@
         <!-- 当前直播列表 -->
         <div class="vmp-doc-cur" v-show="mode === 1">
           <!-- 无数据 -->
-          <div class="vmp-doc-cur__empty" v-show="dataList.length === 0">
+          <div class="vmp-doc-cur__empty" v-show="allList.length === 0">
             <img src="./img/no-file.png" />
             <p>您还没有文档，快来上传吧</p>
             <div>
@@ -63,9 +63,9 @@
             </div>
           </div>
           <!-- 有数据 -->
-          <div class="vmp-doc-cur__inner" v-show="dataList.length > 0">
+          <div class="vmp-doc-cur__inner" v-show="allList.length > 0">
             <div class="vmp-doc-cur__hd">
-              <!-- 上传文档 -->
+              <!-- 上传文档按钮 -->
               <el-upload
                 class="doc-uploader"
                 action="#"
@@ -77,10 +77,12 @@
               >
                 <el-button type="primary" round>{{ $t('doc.doc_1027') }}</el-button>
               </el-upload>
+              <!-- 资料库按钮 -->
               <el-button v-if="!isWatch" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
 
+              <!-- 提示信息 -->
               <el-tooltip placement="right">
                 <div slot="content">
                   <div class="help-tips">
@@ -103,18 +105,25 @@
                 ></i>
               </el-tooltip>
 
+              <!-- 搜索框 -->
               <el-input
                 style="width: 220px; float: right"
                 placeholder="请输入文档名称"
                 v-model="docSearchKey"
                 clearable
-                @keydown.enter.stop.native="handleDocSearch()"
+                @keydown.enter.stop.native="handleThrottleDocSearch()"
               >
-                <i slot="prefix" class="el-input__icon el-icon-search" @click="handleDocSearch"></i>
+                <i slot="prefix" class="el-input__icon el-icon-search"></i>
               </el-input>
             </div>
             <div class="vmp-doc-cur__bd">
               <el-table :data="dataList" style="width: 100%" height="370px">
+                <!-- 未搜索到数据展示 -->
+                <template slot="empty">
+                  <img src="../../app-shared/assets/img/no-search.png" />
+                  <p>暂无搜索到您想要的内容</p>
+                </template>
+                <!-- 表格展示 -->
                 <el-table-column prop="file_name" label="文档名称" width="180">
                   <template slot-scope="scope">
                     <p class="text">
@@ -190,13 +199,13 @@
               placeholder="请输入文档名称"
               v-model="doclibSearchKey"
               clearable
-              @clear="handleDoclibSearch()"
-              @keydown.enter.stop.native="handleDoclibSearch()"
+              @clear="handleThrottleDoclibSearch()"
+              @keydown.enter.stop.native="handleThrottleDoclibSearch()"
             >
               <i
                 slot="prefix"
                 class="el-input__icon el-icon-search"
-                @click="handleDoclibSearch"
+                @click="handleThrottleDoclibSearch"
               ></i>
             </el-input>
           </div>
@@ -209,6 +218,11 @@
               @selection-change="handleChangeSelection"
               @select-all="handleChangeSelectall"
             >
+              <!-- 未搜索到数据展示 -->
+              <template slot="empty">
+                <img src="../../app-shared/assets/img/no-search.png" />
+                <p>暂无搜索到您想要的内容</p>
+              </template>
               <el-table-column type="selection" width="55" align="left"></el-table-column>
               <el-table-column prop="file_name" label="文档名称" width="180">
                 <template slot-scope="scope">
@@ -257,6 +271,7 @@
   import { useRoomBaseServer, useMsgServer, useDocServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
+  import _ from 'lodash';
 
   export default {
     name: 'VmpDocDlglist',
@@ -275,7 +290,8 @@
         // 当前活动文档列表相关
         isLoading: false,
         docSearchKey: '',
-        dataList: [],
+        allList: [], //当前活动文档完全数据
+        dataList: [], //过滤展示的数据
 
         // 资料库文档列表相关
         doclibSearchKey: '',
@@ -289,14 +305,14 @@
       };
     },
     beforeCreate() {
-      this.docServer = useDocServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.docServer = useDocServer();
       this.msgServer = useMsgServer();
     },
     computed: {
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.watchInitData.join_info.role_name == 2;
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
     watch: {
@@ -304,13 +320,18 @@
         if (val == '') {
           this.handleDocSearch();
         } else {
-          this.dataList = this.dataList.filter(item => {
+          this.dataList = this.allList.filter(item => {
             return item.file_name.indexOf(val) > -1;
           });
         }
       }
     },
     mounted() {
+      this.handleThrottleDocSearch = _.throttle(this.handleDocSearch, 300, { trailing: false });
+      this.handleThrottleDoclibSearch = _.throttle(this.handleDoclibSearch, 300, {
+        trailing: false
+      });
+
       // 初始化事件
       this.initEvents();
     },
@@ -417,6 +438,11 @@
       show() {
         this.dialogVisible = true;
       },
+      setDataList() {
+        this.dataList = this.allList.filter(item => {
+          return item.file_name.indexOf(this.docSearchKey) > -1;
+        });
+      },
       /**
        * 对话框打开事事件
        */
@@ -504,8 +530,8 @@
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id
           });
           if (result && result.code === 200) {
-            this.dataList = result.data.list;
-            // console.log(this.dataList);
+            this.allList = result.data.list;
+            this.setDataList();
           } else {
             this.$message.error('查询失败');
           }
