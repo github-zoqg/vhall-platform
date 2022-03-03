@@ -342,6 +342,6 @@
     right: 0;
     top: 0;
     width: 360px;
-    z-index: 1;
+    z-index: 10;
   }
 </style>

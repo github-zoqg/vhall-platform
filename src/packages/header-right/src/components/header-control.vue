@@ -35,7 +35,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
-            v-if="isShowSplitScreen && isSupportSplitScreen"
+            v-if="configList['is_interact'] && isShowSplitScreen && isSupportSplitScreen"
             @click="splitScreen"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
@@ -52,6 +52,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             v-if="
+              configList['btn_thirdway'] &&
               isShowThirdParty &&
               webinarInfo.no_delay_webinar == 0 &&
               isThirtPushStream &&
@@ -72,7 +73,7 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="isShowVirtualAudience && webinarInfo.mode != 6"
+            v-if="configList['virtual_user'] && isShowVirtualAudience && webinarInfo.mode != 6"
             @click="openVirtualAudience"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
           >
@@ -128,6 +129,9 @@
       isLiving() {
         //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
         return this.webinarInfo.type == 1;
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       }
     },
     data() {

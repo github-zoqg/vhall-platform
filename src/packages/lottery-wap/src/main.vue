@@ -15,6 +15,7 @@
         :showWinnerList="showWinnerList"
         :prizeInfo="prizeInfo"
         :lotteryInfo="lotteryInfo"
+        @needLogin="handleGoLogin"
         @close="close"
         @navTo="changeView"
       />
@@ -23,6 +24,7 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useLotteryServer, useRoomBaseServer } from 'middle-domain';
   const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
   const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
@@ -157,11 +159,11 @@
        */
       isSelf(id) {
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
-        console.log();
+        console.log(join_info);
         if (join_info && typeof join_info === 'object') {
           const userId = join_info.user_id || join_info.third_party_user_id;
           console.log(userId, id);
-          return userId === `${id}`;
+          return `${userId}` === `${id}`;
         }
         return false;
       },
@@ -171,6 +173,10 @@
         this.awardInfo.img = '';
         await this.queryLotteryInfo();
         this.latterPrizeInfo();
+      },
+      handleGoLogin() {
+        this.popupVisible = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };

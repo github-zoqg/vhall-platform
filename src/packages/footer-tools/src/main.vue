@@ -25,7 +25,7 @@
     <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
-      <li>
+      <li v-if="isLiving">
         <!-- 公告 -->
         <notice></notice>
       </li>
@@ -159,10 +159,9 @@
           watchInitData.webinar.type == 1
         );
       },
+      // 是否正在直播
       isLiving() {
-        const { watchInitData } = this.roomBaseState;
-        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
-        return watchInitData.webinar.type == 1;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
       isTrySee() {
         const { watchInitData } = this.roomBaseState;

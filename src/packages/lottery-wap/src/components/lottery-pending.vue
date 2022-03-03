@@ -1,34 +1,66 @@
 <template>
   <div class="lottery-pending">
     <img :src="fitment.url" alt />
-    <p class="lottery-start-text">
+    <template v-if="needJoin">
+      <i18n path="interact_tools.interact_tools_1065" tag="p">
+        <span style="color: #ff5659" place="n">{{ lotteryInfo.command }}</span>
+      </i18n>
+      <button @click="joinLottery">
+        {{ $t('interact_tools.interact_tools_1008') }}
+      </button>
+    </template>
+    <p v-else class="lottery-start-text">
       {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
     </p>
-    <button v-show="showCodeLottery" @click="joinLottery">
-      {{ $t('interact_tools.interact_tools_1008') }}
-    </button>
   </div>
 </template>
 <script>
   import props from './props';
+  import { useChatServer, useUserServer } from 'middle-domain';
   export default {
     name: 'LotteryPending',
+    inject: ['lotteryServer'],
     mixins: [props],
     computed: {
-      showCodeLottery() {
-        return false;
+      // 显示
+      needJoin() {
+        return (
+          this.lotteryInfo.lottery_type == 8 &&
+          this.lotteryInfo.submit_command !== 1 &&
+          !this.joined
+        );
       }
     },
     data() {
       return {
-        loading: false
+        loading: false,
+        joined: false
       };
     },
     methods: {
       //
       joinLottery() {
-        if (this.loading) return;
+        const state = useUserServer().state;
+        const { userInfo } = state;
+        if (!userInfo) {
+          return this.$emit('needLogin');
+        }
+        if (this.loading || this.joined) return;
         this.loading = true;
+        this.lotteryServer
+          .joinLottery(this.lotteryId || this.lotteryInfo.id || this.lotteryInfo.lottery_id)
+          .then(res => {
+            if (res.code === 200) {
+              const msg = useChatServer().createCurMsg();
+              msg.setText(this.lotteryInfo.command);
+              useChatServer().sendMsg(msg);
+              this.joined = true;
+              this.$toast(this.$t('chat.chat_1010'));
+            }
+          })
+          .finally(() => {
+            this.loading = false;
+          });
       }
     }
   };

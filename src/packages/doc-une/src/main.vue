@@ -211,8 +211,11 @@
 
       // 是否文档演示权限
       hasDocPermission() {
-        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
-          // 对于应点播和回放，所有人都没有文档演示权限
+        if (
+          !['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
+          (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5)
+        ) {
+          // 对于观看端，点播和回放，所有人都没有文档演示权限
           return false;
         }
         if (this.isInGroup) {

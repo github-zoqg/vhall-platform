@@ -140,7 +140,7 @@
         if (this.loading || this.joined) return;
         this.loading = true;
         this.lotteryServer
-          .joinLottery(this.lotteryId || this.lotteryInfo.id)
+          .joinLottery(this.lotteryId || this.lotteryInfo.id || this.lotteryInfo.lottery_id)
           .then(res => {
             if (res.code === 200) {
               const msg = useChatServer().createCurMsg();
