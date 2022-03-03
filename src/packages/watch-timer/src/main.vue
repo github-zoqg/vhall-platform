@@ -147,10 +147,6 @@
         if (this.is_all_show == 1) {
           // 通知相应组件打开计时器Icon
           this.handleTimer();
-          // this.timerVisible = true;
-          // window.$middleEventSdk?.event?.send(
-          //   boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
-          // );
         }
       },
       // 计时器结束
@@ -185,31 +181,26 @@
         this.timerFun(e.data.remain_time);
       },
       init() {
-        setTimeout(() => {
-          const resData = this.timerInfo;
-          console.log(resData, ',,,,,,,,,,,,,,,,,,,');
-          if (resData && JSON.stringify(resData) != '{}') {
-            this.shijian = resData.remain_time;
-            this.beifenshijian = resData.duration;
-            this.is_timeout = resData.is_timeout;
-            this.is_all_show = resData.is_all_show;
-            if (resData.duration == -3599) return false;
-            this.timeFormat(Math.abs(this.shijian));
-            if (resData.status != 4) {
-              this.timerFun(this.shijian);
-            }
-            this.handleTimer();
-            // 打开计时器组件
-            this.status = resData.status == 4 ? 'zanting' : 'kaishi';
-            this.timerVisible = true;
-            if (this.is_all_show == 1) {
-              // 通知相应组件打开计时器Icon
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
-              );
-            }
+        // setTimeout(() => {
+        const resData = this.timerInfo;
+        console.log(resData, ',,,,,,,,,,,,,,,,,,,');
+        if (resData && JSON.stringify(resData) != '{}') {
+          this.shijian = resData.remain_time;
+          this.beifenshijian = resData.duration;
+          this.is_timeout = resData.is_timeout;
+          this.is_all_show = resData.is_all_show;
+          if (resData.duration == -3599) return false;
+          this.timeFormat(Math.abs(this.shijian));
+          if (resData.status != 4) {
+            this.timerFun(this.shijian);
           }
-        }, 100);
+          // 打开计时器组件
+          this.status = resData.status == 4 ? 'zanting' : 'kaishi';
+          if (this.is_all_show == 1) {
+            this.handleTimer();
+          }
+        }
+        // }, 100);
       },
       // open计时器弹框
       handleTimer() {

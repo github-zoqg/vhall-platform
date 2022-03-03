@@ -205,7 +205,7 @@
               <i
                 slot="prefix"
                 class="el-input__icon el-icon-search"
-                @click="handleThrottleDoclibSearch"
+                @click="handleThrottleDoclibSearch()"
               ></i>
             </el-input>
           </div>

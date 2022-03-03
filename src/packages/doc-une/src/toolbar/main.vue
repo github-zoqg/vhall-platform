@@ -129,6 +129,18 @@
         <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
       </div>
     </div>
+    <!-- 清空文档标记的对话框提示,不使用this.$confirm，是因为文档最大化时this.$confirm提示会看不见 -->
+    <saas-alert
+      :visible="isConfirmVisible"
+      :confirm="true"
+      :confirmText="$t('common.common_1010')"
+      :cancelText="$t('account.account_1063')"
+      @onSubmit="confirmSave"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+    >
+      <main slot="content">确定要清空文档标记么？</main>
+    </saas-alert>
   </div>
 </template>
 <script>
@@ -137,13 +149,15 @@
   import VmpShapePopup from './shape-popup.vue';
   import VmpTextPopup from './text-popup.vue';
   import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpDocToolbar',
     components: {
       VmpPenPopup,
       VmpHighlighterPopup,
       VmpShapePopup,
-      VmpTextPopup
+      VmpTextPopup,
+      SaasAlert
     },
     provide() {
       return {
@@ -179,7 +193,8 @@
         text: {
           size: 18, // 字号
           color: '#FD2C0A' //颜色
-        }
+        },
+        isConfirmVisible: false //清空画板显示弹窗提示
       };
     },
     watch: {
@@ -312,26 +327,34 @@
       async handleBoardTool(brush) {
         if (brush === 'clear') {
           // TODO 提示文本进行国际化处理
-          try {
-            await this.$confirm('<p>确定要清空文档标记么？</p>', '提示', {
-              customClass: 'saas-message-box',
-              dangerouslyUseHTMLString: true,
-              closeOnClickModal: false,
-              roundButton: true,
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              confirmButtonClass: 'btn-saas',
-              cancelButtonClass: 'btn-saas btn-saas-cancel'
-            });
-            this.docServer.clear();
-          } catch (err) {
-            console.log(err);
-          }
-          // 还需要重设当前画笔
-          this.changeTool(this.currentBrush);
+          // try {
+          //   await this.$confirm('<p>确定要清空文档标记么？</p>', '提示', {
+          //     customClass: 'saas-message-box',
+          //     dangerouslyUseHTMLString: true,
+          //     closeOnClickModal: false,
+          //     roundButton: true,
+          //     confirmButtonText: '确定',
+          //     cancelButtonText: '取消',
+          //     confirmButtonClass: 'btn-saas',
+          //     cancelButtonClass: 'btn-saas btn-saas-cancel'
+          //   });
+          //   this.docServer.clear();
+          // } catch (err) {
+          //   console.log(err);
+          // }
+          this.isConfirmVisible = true;
           return;
         }
         this.changeTool(brush);
+      },
+      confirmSave() {
+        this.isConfirmVisible = false;
+        this.docServer.clear();
+        // 还需要重设当前画笔
+        this.changeTool(this.currentBrush);
+      },
+      closeConfirm() {
+        this.isConfirmVisible = false;
       },
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();
