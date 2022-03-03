@@ -132,7 +132,6 @@
     methods: {
       listenEvents() {
         this.subscribeServer.$on('live_start', data => {
-          console.log(data, '???zhangxiao');
           this.subOption.type = 1;
           if (this.countDowntimer) clearInterval(this.countDowntimer);
           this.countDownTime = '';
@@ -167,7 +166,11 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        this.filterText(webinar.verify, join_info.is_subscribe);
+        if (webinar.type == 1) {
+          this.subscribeText = this.$t('webinar.webinar_1023');
+        } else {
+          this.filterText(webinar.verify, join_info.is_subscribe);
+        }
         if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
           this.showVideo = true;
         }
