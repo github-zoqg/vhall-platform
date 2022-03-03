@@ -251,6 +251,7 @@
           case 512523:
             // 付费
             if (browserType()) {
+              // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
               const open_id = sessionStorage.getItem('open_id');
               params = {
                 webinar_id: this.$route.params.id,
