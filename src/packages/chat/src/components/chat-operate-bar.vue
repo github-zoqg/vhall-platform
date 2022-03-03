@@ -79,7 +79,7 @@
 
                 <el-switch
                   class="switch"
-                  v-model="allBanned"
+                  :value="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
                   active-color="#fc5659"
@@ -207,8 +207,8 @@
     mounted() {},
     methods: {
       //切换全体禁言开关状态
-      toggleMutedAllStatus() {
-        this.$emit('changeAllBanned', this.allBanned);
+      toggleMutedAllStatus(val) {
+        this.$emit('changeAllBanned', val);
       },
       //进入聊天审核
       joinChatAuth() {

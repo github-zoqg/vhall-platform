@@ -123,12 +123,19 @@
       listenEvents() {
         const qaServer = useQaServer();
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
-          msg.data.content = this.emojiToText(msg.data.content);
-          this.chatList.push(msg.data);
+          if (msg.sender_id == this.userId || this.roleName != 2) {
+            msg.data.content = this.emojiToText(msg.data.content);
+            this.chatList.push(msg.data);
+          }
         });
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          msg.data.content = this.emojiToText(msg.data.content);
-          this.chatList.push(msg.data);
+          if (
+            (msg.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+            this.roleName == 1
+          ) {
+            msg.data.content = this.emojiToText(msg.data.content);
+            this.chatList.push(msg.data);
+          }
         });
       },
       initInputStatus() {
