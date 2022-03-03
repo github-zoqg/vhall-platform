@@ -1,7 +1,7 @@
 <template>
   <a
     href="javascript:;"
-    v-if="!hidden && (configList[isShow] || isShow)"
+    v-if="!hidden && (configList[auth] || auth)"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
@@ -25,7 +25,7 @@
         icon: '', // 小图标
         text: '', // 文本
         kind: '', // 类型
-        isShow: '', // 是否显示
+        auth: '', // 权限控制是否显示
         selected: false, // 是否选中
         disable: false, // 是否禁用
         hidden: false // 是否隐藏
