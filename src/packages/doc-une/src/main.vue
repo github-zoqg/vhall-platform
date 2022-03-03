@@ -336,6 +336,9 @@
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
     },
+    created() {
+      window.addEventListener('keydown', this.listenKeydown);
+    },
     methods: {
       /**
        * 全屏
@@ -513,6 +516,7 @@
           // console.log('[doc] screenfull.isFullscreen:', screenfull);
           if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
+            this.thumbnailShow = false;
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
@@ -544,6 +548,17 @@
             this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
           }
         });
+      },
+
+      listenKeydown(e) {
+        if (!this.hasPager) return;
+        if (e.keyCode === 38) {
+          // 向上翻页
+          this.handlePage('prevStep');
+        } else if (e.keyCode === 40) {
+          // 向下翻页
+          this.handlePage('nextStep');
+        }
       },
       /**
        * 新增文档或白板
@@ -704,12 +719,18 @@
         if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
           return;
         }
-        if (e.target.nodeName === 'UL') return;
-        const type =
-          e.target.dataset.value ||
-          e.target.parentNode.dataset.value ||
-          e.target.parentNode.parentNode.dataset.value ||
-          null;
+        let type;
+        if (e === 'prevStep' || e === 'nextStep') {
+          // 键盘翻页调用
+          type = e;
+        } else {
+          if (e.target.nodeName === 'UL') return;
+          type =
+            e.target.dataset.value ||
+            e.target.parentNode.dataset.value ||
+            e.target.parentNode.parentNode.dataset.value ||
+            null;
+        }
         if (!type) return;
         if (!this.docServer.state.allComplete) {
           return this.$message.warning('请文档加载完成以后再操作');
@@ -821,6 +842,9 @@
         // 恢复上一次的文档数据;
         this.recoverLastDocs();
       }
+    },
+    destroyed() {
+      window.removeEventListener('keydown', this.listenKeydown);
     }
   };
 </script>
@@ -1019,6 +1043,8 @@
   // 文档全屏时
   .vmp-doc-une.vmp-doc-une--fullscreen {
     .vmp-doc-toolbar {
+      position: absolute;
+      bottom: 50px;
       background: transparent;
       border-color: transparent;
     }
@@ -1030,6 +1056,14 @@
       background: #1a1a1a;
       padding: 2px 10px;
       border-radius: 100px;
+
+      .vmp-brush-popup {
+        position: absolute;
+        top: auto;
+        left: 0;
+        bottom: 37px;
+        padding-top: 4px;
+      }
     }
     .vmp-icon-item--exitFullscreen {
       display: block;

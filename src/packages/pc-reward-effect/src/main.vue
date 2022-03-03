@@ -64,6 +64,8 @@
           666: 'bg-666'
           // 'bg-custom': 'bg-custom' //用户自定义礼物
         },
+        //是否屏蔽特效
+        hideEffect: false,
         rewardEffectList: [],
         // rewardEffectInfo: null,
         taskQueue: null // 飘窗列队
@@ -154,8 +156,12 @@
             interactToolsStatus: true
           };
           this.chatServer.addChatToList(data);
-          this.addRewardEffect(msg);
+          !this.hideEffect && this.addRewardEffect(msg);
         });
+      },
+      //设置是否屏蔽特效
+      setHideEffect(status) {
+        this.hideEffect = status;
       },
       /**
        * 根据消息里的sender_id判断, 是否是自己发送的

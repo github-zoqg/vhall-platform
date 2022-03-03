@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { Domain } from 'middle-domain';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
@@ -48,9 +48,29 @@
         if (location.pathname.indexOf('embedclient') != -1) {
           this.clientType = 'embed';
         }
-        await this.initReceiveLive(this.clientType);
+        const domain = await this.initReceiveLive(this.clientType);
+        const roomBaseServer = useRoomBaseServer();
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         await roomState();
+        domain.initVhallReport(
+          {
+            bu: 0,
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            webinar_id: this.$route.params.id,
+            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            os: 10,
+            type: 4,
+            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            pf: 7,
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          },
+          {
+            namespace: 'saas', //业务线
+            env: 'test', // 环境
+            method: 'post' // 上报方式
+          }
+        );
+        window.vhallReport.report('ENTER_WATCH');
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转预约页

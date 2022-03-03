@@ -77,7 +77,11 @@
             this.setFitment(data);
             if (data.win === 1) {
               // 中奖
-              this.lotteryView = 'LotteryWin';
+              if (data.take_award) {
+                this.lotteryView = 'LotterySuccess';
+              } else {
+                this.lotteryView = 'LotteryWin';
+              }
             } else {
               // 未中奖
               this.lotteryView = 'LotteryMiss';

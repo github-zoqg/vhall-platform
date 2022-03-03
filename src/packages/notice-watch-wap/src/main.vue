@@ -33,8 +33,11 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
-      // 刷新展示最新一条公告
-      if (this.roomBaseServer.state.noticeInfo.total) {
+      // 刷新展示最新一条公告&&为直播状态
+      if (
+        this.roomBaseServer.state.noticeInfo.total &&
+        this.roomBaseServer.state.webinar.type == 1
+      ) {
         console.log(this.roomBaseServer, 'useRoomBaseServer123');
         this.announcement = {
           content: this.roomBaseServer.state.noticeInfo.list[0]?.content.content,

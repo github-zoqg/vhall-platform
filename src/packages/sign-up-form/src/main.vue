@@ -93,7 +93,7 @@
                         :maxlength="
                           question.type == 0 && question.default_type == 1
                             ? 50
-                            : question.type == 0
+                            : question.type == 0 && question.default_type !== 3
                             ? ''
                             : 60
                         "
@@ -794,7 +794,7 @@
           phone: {
             type: 'number',
             required: true,
-            message: this.$t('acount.account_1069'),
+            message: this.$t('account.account_1069'),
             trigger: 'blur'
           },
           code: {
@@ -842,7 +842,7 @@
             _this.verifyRules.phone = {
               type: 'number',
               required: true,
-              message: _this.$t('acount.account_1069'),
+              message: _this.$t('account.account_1069'),
               trigger: 'blur'
             };
           }
@@ -904,7 +904,7 @@
                   rules[item.id] = {
                     type: 'number',
                     required: !!item.is_must,
-                    message: this.$t('acount.account_1069'),
+                    message: this.$t('account.account_1069'),
                     trigger: 'blur'
                   };
                 }
@@ -1074,7 +1074,7 @@
           return callback ? callback(new Error(this.$t('account.account_1025'))) : false;
         } else if (!reg.test(value)) {
           this.isValidPhone = false;
-          return callback ? callback(new Error(this.$t('acount.account_1069'))) : false;
+          return callback ? callback(new Error(this.$t('account.account_1069'))) : false;
         } else {
           this.isValidPhone = true;
           if (callback) {
@@ -1790,6 +1790,7 @@
       }
     }
     &__introduction-fold {
+      white-space: nowrap;
       word-break: break-all;
       text-overflow: ellipsis;
       display: -webkit-box;

@@ -387,7 +387,7 @@
           //设置禁言/取消禁言
           {
             command: 'setBanned',
-            isShow: ![1, '1'].includes(this.userInfo.role_name) && this.userInfo.is_kicked == 0,
+            isShow: 'isShowLiveMuted',
             disable: false,
             //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
@@ -397,7 +397,7 @@
           //踢出 / 取消踢出
           {
             command: 'setKicked',
-            isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: 'isShowLiveKicked',
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
             type: 'toggleButton',
@@ -405,7 +405,7 @@
           },
           {
             command: 'setKicked',
-            isShow: this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: 'isShowLiveGroupKicked',
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
@@ -441,7 +441,7 @@
           //设置禁言/取消禁言
           {
             command: 'setBanned',
-            isShow: [2, '2'].includes(this.userInfo.role_name),
+            isShow: 'isShowWatchMuted',
             disable: false,
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
             type: 'toggleButton',
@@ -450,7 +450,7 @@
           //踢出 / 取消踢出
           {
             command: 'setKicked',
-            isShow: [2, '2'].includes(this.userInfo.role_name),
+            isShow: 'isShowWatchKicked',
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
@@ -499,8 +499,37 @@
           (this.roleName == '1' &&
             this.userInfo.account_id != this.userId &&
             this.isInGroup &&
-            this.userInfo.role_name != 20)
+            this.userInfo.role_name != 20) ||
+          ([3, '3', 4, '4'].includes(this.roleName) && [2, '2'].includes(this.userInfo.role_name))
         );
+      },
+      //是否显示禁言、取消禁言
+      isShowLiveMuted() {
+        if (this.tabIndex !== 3) {
+          return ![1, '1'].includes(this.userInfo.role_name);
+        } else {
+          return ![1, '1'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
+      },
+      //是否显示踢出、取消踢出(非分组)
+      isShowLiveKicked() {
+        return !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name);
+      },
+      //是否显示踢出分组、取消踢出
+      isShowLiveGroupKicked() {
+        return this.isInGroup && ![1, '1'].includes(this.userInfo.role_name);
+      },
+      //是否显示禁言、取消禁言（PC观看）
+      isShowWatchMuted() {
+        if (this.tabIndex !== 3) {
+          return [2, '2'].includes(this.userInfo.role_name);
+        } else {
+          return [2, '2'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
+      },
+      //是否显示踢出、取消踢出小组（PC观看）
+      isShowWatchKicked() {
+        return [2, '2'].includes(this.userInfo.role_name);
       },
       //是否展示设为主讲按钮(PC发起)
       isShowSetSpeaker() {
