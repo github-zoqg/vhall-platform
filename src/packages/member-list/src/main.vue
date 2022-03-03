@@ -1335,7 +1335,7 @@
           this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
           this._permissionLeaveInterval = window.setTimeout(() => {
             // 15秒后自动结束演示
-            this.downMic(this._permissionLeaveId);
+            this.downMic(this._permissionLeaveId, false);
             this.msgServer.$offMsg('JOIN', this.handlePermissionJoin);
           }, 15000);
         }
@@ -1356,7 +1356,7 @@
             this.speakerLeaveIntervalMap[msg.sender_id] &&
               clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
             delete this.speakerLeaveIntervalMap[msg.sender_id];
-            this.downMic(msg.sender_id);
+            this.downMic(msg.sender_id, false);
           }, 15000);
         }
       },
@@ -1631,12 +1631,12 @@
         }
       },
       //用户下麦
-      downMic(accountId) {
+      downMic(accountId, needConfirm = true) {
         const data = {
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        if (this.isInGroup && this.isLive) {
+        if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
             cancelButtonText: this.$t('account.account_1063'),
