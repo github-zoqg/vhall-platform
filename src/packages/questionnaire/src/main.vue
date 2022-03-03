@@ -162,7 +162,8 @@
         questionnaireCreateInfo: null, // 已创建弹窗的中转
         saveDialogVisible: false, // 同步问卷弹窗
         shareQuestionnaire: true, // 同步到管理
-        prevQuestionnaireId: false // 显示预览状态的相关UI
+        prevQuestionnaireId: false, // 显示预览状态的相关UI
+        saving: false //保存中的状态
       };
     },
     computed: {
@@ -209,6 +210,7 @@
           this.questionnaireCreateInfo = data;
           this.saveDialogVisible = true;
           this.shareQuestionnaire = true;
+          this.saving = false;
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.UPDATE, res => {
           if (res.code === 200) {
@@ -278,6 +280,7 @@
       saveQuestionnaire(confirm = false) {
         this.saveDialogVisible = false;
         this.showQuestionnaireTable = true;
+        this.saving = true;
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
@@ -297,6 +300,9 @@
                 clearInterval(st);
               }, 1000);
             }
+          })
+          .finally(() => {
+            this.saving = false;
           });
       },
 

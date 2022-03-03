@@ -58,8 +58,8 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { useWatchRewardServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
+  import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'reward',
     props: {
@@ -85,7 +85,7 @@
         money: '',
         btnMoney: '', // 选中按钮上面的金额
         note: '',
-        btnTxt: browserType()
+        btnTxt: isWechat()
           ? this.$t('interact_tools.interact_tools_1049')
           : this.$t('interact_tools.interact_tools_1069')
       };
@@ -153,20 +153,21 @@
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
-        if (browserType()) {
+        if (isWechat()) {
           if (!open_id) {
-            let _search = '';
-            if (location.search && location.search != '') {
-              _search = location.search.split('?')[1];
-            }
-            const address =
-              window.location.protocol +
-              process.env.VUE_APP_WATCH_URL +
-              process.env.VUE_APP_WEB_KEY +
-              `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
-            window.location.href = `${
-              process.env.VUE_APP_BASE_URL
-            }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
+            // let _search = '';
+            // if (location.search && location.search != '') {
+            //   _search = location.search.split('?')[1];
+            // }
+            // const address =
+            //   window.location.protocol +
+            //   process.env.VUE_APP_WATCH_URL +
+            //   process.env.VUE_APP_WEB_KEY +
+            //   `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
+            // window.location.href = `${
+            //   process.env.VUE_APP_BASE_URL
+            // }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
+            authWeixinAjax(this.$route, location.href);
             return;
           }
           params = {
@@ -199,7 +200,7 @@
           .createReward({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType()) {
+              if (isWechat()) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
