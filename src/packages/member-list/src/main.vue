@@ -1388,16 +1388,23 @@
               this.$refs.scroll.finishPullUp();
               this.onlineUsers = this.memberServer.state.onlineUsers || [];
               (this.onlineUsers || []).forEach(item => {
-                if (
-                  _this.memberOptions.platformType === 'watch' &&
-                  item.account_id == _this.userId
-                ) {
+                if (_this.isWatch && item.account_id == _this.userId) {
                   _this.roleName = item.role_name;
                 }
                 if ([20, '20'].includes(item.role_name)) {
                   _this.leader_id = item.account_id;
                 }
               });
+
+              //刷新也维护一下举手状态
+              _this.state.applyUsers.forEach(element => {
+                _this.state.onlineUsers.forEach(item => {
+                  if (element.accountId === item.accountId) {
+                    item.is_apply = 1;
+                  }
+                });
+              });
+
               if (!this.onlineUsers.length) {
                 this.pageConfig.page--;
               }

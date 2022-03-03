@@ -354,8 +354,9 @@
         // 结束直播
         this.interactiveServer.$on('live_over', async () => {
           await this.stopPush();
-
-          this.interactiveServer.destroy();
+          if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
+            this.interactiveServer.destroy();
+          }
         });
         // 分组结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {

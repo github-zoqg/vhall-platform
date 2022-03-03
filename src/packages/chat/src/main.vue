@@ -11,7 +11,7 @@
         style="height: 100%; overflow: auto"
         :keeps="30"
         :data-key="'count'"
-        :data-sources="chatList"
+        :data-sources="renderList"
         :data-component="MsgItem"
         :extra-props="{
           chatOptions,
@@ -214,13 +214,11 @@
           return val;
         };
       },
-      //检查消息项是否显示，实现只看主办方效果
-      checkMessageShow() {
-        return function (msg = {}) {
-          let { roleName = '' } = msg;
-          //如果开启了只看主办方
-          return this.isOnlyShowSponsor ? ![2, '2'].includes(roleName) : true;
-        };
+      //视图中渲染的消息,为了实现主看主办方效果
+      renderList() {
+        return this.isOnlyShowSponsor
+          ? this.chatList.filter(item => ![2, '2'].includes(item.roleName))
+          : this.chatList;
       }
     },
     watch: {
