@@ -2,19 +2,41 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record']"></record-control>
-      <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
-        {{ isRecord ? '开始录制' : '开始直播' }}
-      </div>
-      <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
-      <div
-        v-if="liveStep == 3 && configList['ui.hide_live_end']"
-        class="vmp-header-right_btn vmp-header-right_duration"
-        @click="handleEndClick"
-      >
-        <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
-        <span class="vmp-header-right_duration-end">{{ isRecord ? '结束录制' : '结束直播' }}</span>
-      </div>
-      <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+      <!-- 主持人显示开始结束直播按钮 -->
+      <template v-if="roleName == 1">
+        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+          {{ isRecord ? '开始录制' : '开始直播' }}
+        </div>
+        <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
+        <div
+          v-if="liveStep == 3 && configList['ui.hide_live_end']"
+          class="vmp-header-right_btn vmp-header-right_duration"
+          @click="handleEndClick"
+        >
+          <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
+          <span class="vmp-header-right_duration-end">
+            {{ isRecord ? '结束录制' : '结束直播' }}
+          </span>
+        </div>
+        <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+      </template>
+      <!-- 嘉宾显示申请上麦按钮 -->
+      <template v-if="roleName == 4">
+        <!-- 申请上麦按钮 -->
+        <div
+          v-if="!isApplying && !isSpeakOn"
+          class="vmp-header-right_btn"
+          @click="handleApplyClick"
+        >
+          申请上麦
+        </div>
+        <!-- 等待应答按钮 -->
+        <div v-if="isApplying" class="vmp-header-right_btn" @click="handleApplyCancleClick">
+          等待应答{{ applyTime }}s
+        </div>
+        <!-- 下麦按钮 -->
+        <div v-if="isSpeakOn" class="vmp-header-right_btn" @click="handleSpeakOffClick">下麦</div>
+      </template>
       <div class="vmp-header-right_control">
         <headerControl
           :isShowMediaSetting="isShowMediaSetting"
@@ -72,6 +94,8 @@
       return {
         liveStep: 1, // 1未开始 2启动中 3直播中 4结束中
         liveDuration: '',
+        isApplying: false, // 是否正在等待应答
+        applyTime: 30,
         isFullscreen: false,
         assistantType: this.$route.query.assistantType,
         isShowMediaSetting: false, // 是否显示媒体设置
@@ -109,6 +133,12 @@
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
+      },
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
+      },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     components: {
@@ -130,6 +160,34 @@
       }
     },
     methods: {
+      // TODO: 嘉宾点击申请上麦
+      handleApplyClick() {
+        // TODO: 调申请上麦接口，调用成功之后，执行下面的逻辑，开启倒计时
+        this.isApplying = true;
+        this.applyTime = 30;
+        this._applyInterval = setInterval(() => {
+          this.applyTime = this.applyTime - 1;
+          if (this.applyTime == 0) {
+            this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
+            clearInterval(this._applyInterval);
+            this.isApplying = false;
+            // TODO: 调下麦接口
+          }
+        }, 1000);
+      },
+      // TODO: 嘉宾取消申请
+      handleApplyCancleClick() {
+        // TODO: 调取消申请上麦接口，成功之后，执行下面的逻辑，关闭倒计时
+        this.isApplying = false;
+        this.applyTime = 30;
+        clearInterval(this._applyInterval);
+      },
+      // TODO: 嘉宾下麦
+      handleSpeakOffClick() {
+        // TODO: 下麦接口停止推流，成功之后执行下面的逻辑
+        this.isApplying = false;
+        this.applyTimerCount = 30;
+      },
       listenEvents() {
         // 全屏事件
         const setFullscreen = () => {
