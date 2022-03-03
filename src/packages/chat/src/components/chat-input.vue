@@ -1,6 +1,9 @@
 <template>
   <div class="vmp-chat-input">
-    <div class="vmp-chat-input__textarea-box" v-show="!inputStatus.disable && !chatLoginStatus">
+    <div
+      class="vmp-chat-input__textarea-box"
+      v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
+    >
       <textarea
         id="chat-textarea"
         ref="chatTextarea"
@@ -26,7 +29,7 @@
     </div>
 
     <div
-      v-show="inputStatus.disable || chatLoginStatus"
+      v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
       class="vmp-chat-input__textarea-placeholder"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
@@ -117,6 +120,10 @@
       //在线人数
       onlineUsers() {
         return this.roomBaseState.watchInitData.pv.show;
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {

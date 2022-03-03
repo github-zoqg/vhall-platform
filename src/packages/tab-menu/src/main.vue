@@ -93,12 +93,28 @@
         const qaServer = useQaServer();
         const chatServer = useChatServer();
         //收到问答开启消息
-        qaServer.$on(qaServer.Events.QA_OPEN, () => {
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1026')
+            },
+            roleName: msg.data.role_name,
+            type: msg.type,
+            interactStatus: true
+          });
         });
         //收到问答关闭消息
-        qaServer.$on(qaServer.Events.QA_CLOSE, () => {
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1081')
+            },
+            roleName: msg.data.role_name,
+            type: msg.type,
+            interactStatus: true
+          });
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
@@ -125,13 +141,13 @@
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 1, {
+          this.addItemByIndex(chatIndex + 2, {
             type: 'private',
             name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '私聊', // 同上
             status: 2
           });
-          this.addItemByIndex(chatIndex + 2, {
+          this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
             name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '问答', // 同上

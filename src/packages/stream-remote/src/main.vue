@@ -162,6 +162,14 @@
         </el-tooltip>
       </p>
     </section>
+    <section
+      class="vmp-stream-remote__pause"
+      v-show="mainScreen == stream.accountId && interactiveServer.state.showPlayIcon"
+    >
+      <p @click.stop="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
+      </p>
+    </section>
   </div>
 </template>
 
@@ -245,6 +253,15 @@
       }
     },
     methods: {
+      // 恢复播放
+      replayPlay() {
+        const videos = document.querySelectorAll('video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.play();
+          });
+        this.interactiveServer.state.showPlayIcon = false;
+      },
       subscribeRemoteStream() {
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
@@ -258,13 +275,12 @@
             console.log('订阅成功--1--', e);
             this.getLevel();
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
-            // setTimeout(() => {
-            //   const list = document.getElementsByTagName('video');
-
-            //   for (const item of list) {
-            //     item.play();
-            //   }
-            // }, 2000);
+            setTimeout(() => {
+              const list = document.getElementsByTagName('video');
+              for (const item of list) {
+                item.play();
+              }
+            }, 2000);
           })
           .catch(e => {
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
@@ -522,6 +538,34 @@
         }
         &:last-child {
           margin-right: 0;
+        }
+      }
+    }
+
+    // 暂停按钮
+    &__pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      p {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 46px;
+          color: #f5f5f5;
         }
       }
     }

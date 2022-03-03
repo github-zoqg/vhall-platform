@@ -109,6 +109,10 @@
       },
       webinarId() {
         return this.watchInitData.webinar.id;
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {},
@@ -123,12 +127,20 @@
       listenEvents() {
         const qaServer = useQaServer();
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
-          msg.data.content = this.emojiToText(msg.data.content);
-          this.chatList.push(msg.data);
+          if (msg.sender_id == this.thirdPartyId || this.roleName != 2) {
+            msg.data.content = this.emojiToText(msg.data.content);
+            this.chatList.push(msg.data);
+          }
         });
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          msg.data.content = this.emojiToText(msg.data.content);
-          this.chatList.push(msg.data);
+          if (
+            (msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+            msg.data.answer.is_open != '0' ||
+            this.roleName == 1
+          ) {
+            msg.data.content = this.emojiToText(msg.data.content);
+            this.chatList.push(msg.data);
+          }
         });
       },
       initInputStatus() {
@@ -154,7 +166,10 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        if (![1, '1'].includes(this.roleName) && ['', null, 0].includes(this.userId)) {
+        if (
+          ![1, '1'].includes(this.roleName) &&
+          ['', null, 0].includes(this.userId || this.Embed)
+        ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
         } else {

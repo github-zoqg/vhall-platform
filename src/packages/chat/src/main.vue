@@ -13,7 +13,11 @@
         :data-key="'count'"
         :data-sources="chatList"
         :data-component="MsgItem"
-        :extra-props="{ chatOptions, previewImg: previewImg.bind(this) }"
+        :extra-props="{
+          chatOptions,
+          isOnlyShowSponsor,
+          previewImg: previewImg.bind(this)
+        }"
       ></virtual-list>
       <div
         v-if="![1, '1'].includes(configList['ui.hide_chat_history'])"
@@ -47,7 +51,7 @@
         @changeAllBanned="handleChangeAllBanned"
         @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
-        @ononSwitchShowSponsor="onSwitchShowSponsor"
+        @onSwitchShowSponsor="onSwitchShowSponsor"
         @updateHeight="chatOperateBarHeightChange"
         @needLogin="handleLogin"
         @sendEnd="sendMsgEnd"
@@ -67,64 +71,6 @@
         :atList="atList"
       ></chat-user-control>
     </div>
-    <!--礼物、打赏特效-->
-    <ul
-      v-show="!!this.chatOptions.hasChatFilterBtn && showSpecialEffects"
-      class="chat-special-effect"
-    >
-      <li
-        v-for="(msg, index) in specialEffectsList"
-        v-show="msg.type !== 'reward_pay_ok' || !isEmbed"
-        :key="msg.count"
-        class="chat-special-effect__item"
-        :class="{
-          opacity0: msg.isTimeout,
-          // 打赏动效背景class
-          'bg-red-package': msg.type !== 'gift_send_success',
-          // 默认礼物的背景class
-          [effectsMap[msg.content.gift_name] || 'bg-custom']: msg.type === 'gift_send_success'
-        }"
-        :style="{ top: `${index * 48 + (index + 1) * 18 || 18}px` }"
-      >
-        <div class="special-effect__avatar-box">
-          <img class="special-effect__avatar" :src="msg.avatar || defaultAvatar" alt="" />
-        </div>
-        <div class="special-effect__middle-content">
-          <p class="middle-content__nick-name">
-            {{ textOverflowSlice(msg.nickname, 8) }}
-          </p>
-          <p v-if="msg.type === 'gift_send_success'" class="middle-content__detail">
-            {{ $t('chat.chat_1032') }} {{ $t(msg.content.gift_name) }}
-          </p>
-          <p v-if="msg.type == 'reward_pay_ok'" class="middle-content__detail">
-            {{ msg.content.text_content }}
-          </p>
-        </div>
-        <div
-          v-if="msg.type == 'gift_send_success' && !effectsMap[msg.content.gift_name]"
-          class="special-effect__img-box"
-        >
-          <img
-            class="sepcial-effect__img"
-            :src="msg.content.gift_url || require('./img/red-package-1.png')"
-            alt=""
-          />
-        </div>
-        <img
-          v-if="msg.type == 'gift_send_success' && effectsMap[msg.content.gift_name]"
-          class="sepcial-effect__img"
-          :class="`sepcial-effect__img-${effectsMap[msg.content.gift_name]}`"
-          :src="msg.content.gift_url || require('./img/red-package-1.png')"
-          alt=""
-        />
-        <img
-          v-if="msg.type === 'reward_pay_ok'"
-          class="sepcial-effect__img-reward"
-          :src="msg.content.gift_url || require('./img/red-package-1.png')"
-          alt=""
-        />
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -287,13 +233,9 @@
         immediate: true,
         deep: true
       },
-      chatList: {
-        deep: true,
-        handler() {
-          // 如果滚动条未滚动至最底部
-          // if (this.osInstance.scroll().ratio.y !== 1) {
-          //   this.unReadMessageCount++;
-          // }
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
         }
       }
     },
@@ -351,8 +293,6 @@
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
             this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
-          } else {
-            this.scrollBottom();
           }
         });
         //监听@我的消息
@@ -473,7 +413,6 @@
         };
         await useChatServer().getHistoryMsg(params);
         this.page++;
-        this.scrollBottom();
       },
       //todo domain负责 抽奖情况检查
       lotteryCheck(msg) {
@@ -592,22 +531,20 @@
           this.chatList.find(chatMsg => {
             return chatMsg.count === count;
           }) || {};
-        setTimeout(() => {
-          const params = {
-            channel_id: msgToDelete.channel,
-            msg_id: msgToDelete.msgId,
-            room_id: this.roomId
-          };
-          useChatServer()
-            .deleteMessage(params)
-            .then(res => {
-              this.buriedPointReport(110121, {
-                business_uid: this.userId,
-                webinar_id: this.$route.params.il_id
-              });
-              return res;
+        const params = {
+          channel_id: msgToDelete.channel,
+          msg_id: msgToDelete.msgId,
+          room_id: this.roomId
+        };
+        useChatServer()
+          .deleteMessage(params)
+          .then(res => {
+            this.buriedPointReport(110121, {
+              business_uid: this.userId,
+              webinar_id: this.$route.params.il_id
             });
-        }, 3000); // 优化 17532
+            return res;
+          });
       },
       //todo domain负责 @用户
       //@用户处理
@@ -623,38 +560,10 @@
         this.operatorHeight = operatorHeight;
         this.$refs.chatOperator.updateOverlayScrollbar();
       },
-      //特效
-      addSpecialEffect(item) {
-        // 如果开启聊天高并发的配置项，礼物特效需要限频，丢弃
-        if (this.configList['ui.hide_chat_history'] == '1') {
-          if (this._addSpecialEffectTimer) return;
-          this._addSpecialEffectTimer = setTimeout(() => {
-            clearTimeout(this._addSpecialEffectTimer);
-            this._addSpecialEffectTimer = null;
-          }, 200);
-        }
-        item.isTimeout = false;
-        item.timer = setTimeout(() => {
-          item.isTimeout = true;
-          // this.$forceUpdate()
-          setTimeout(() => {
-            this.specialEffectsList.pop();
-          }, 100);
-        }, 3000);
-        // 如果长度已经大于等于三个了，就需要将最早的关掉
-        if (this.specialEffectsList.length >= 3) {
-          clearTimeout(this.specialEffectsList[this.specialEffectsList.length - 1].timer);
-          this.specialEffectsList[this.specialEffectsList.length - 1].isTimeout = true;
-          // this.$forceUpdate()
-          setTimeout(() => {
-            this.specialEffectsList.pop();
-          }, 100);
-        }
-        this.specialEffectsList.unshift(item);
-      },
       //处理开启/屏蔽特效
       onSwitchShowSpecialEffects(status) {
-        this.showSpecialEffects = status;
+        this.showSpecialEffects = !status;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitHideEffect', status));
       },
       //处理只看主办方
       onSwitchShowSponsor(status) {

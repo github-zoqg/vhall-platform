@@ -19,14 +19,6 @@
         :data-component="msgItem"
         :extra-props="{ previewImg: previewImg.bind(this) }"
       ></virtual-list>
-      <!-- <scroll ref="scroll" @pullingDown="handlePullingDown">
-        <msg-item
-          v-for="msg in chatList"
-          :key="msg.count"
-          :msg="msg"
-          @preview="handlePreview"
-        ></msg-item>
-      </scroll> -->
       <div
         class="vmp-chat-wap__content__new-msg-tips"
         v-show="isHasUnreadAtMeMsg"
@@ -52,7 +44,6 @@
 </template>
 
 <script>
-  // import scroll from './components/scroll';
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
@@ -106,7 +97,13 @@
         allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
-
+    watch: {
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
+        }
+      }
+    },
     computed: {
       //是否开启手动加载聊天历史记录
       hideChatHistory() {

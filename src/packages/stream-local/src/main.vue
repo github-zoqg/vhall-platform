@@ -167,6 +167,16 @@
       </p>
     </section>
 
+    <!-- 播放按钮 -->
+    <section
+      class="vmp-stream-local__pause"
+      v-show="mainScreen == joinInfo.third_party_user_id && interactiveServer.state.showPlayIcon"
+    >
+      <p @click.stop="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
+      </p>
+    </section>
+
     <ImgStream ref="imgPushStream"></ImgStream>
   </div>
 </template>
@@ -284,6 +294,15 @@
       }
     },
     methods: {
+      // 恢复播放
+      replayPlay() {
+        const videos = document.querySelectorAll('video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.play();
+          });
+        this.interactiveServer.state.showPlayIcon = false;
+      },
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
@@ -863,6 +882,33 @@
         }
         &:last-child {
           margin-right: 0;
+        }
+      }
+    }
+    // 播放按钮
+    &__pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      p {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 46px;
+          color: #f5f5f5;
         }
       }
     }

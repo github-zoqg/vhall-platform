@@ -11,7 +11,7 @@
         <template v-if="chatShow">
           <div
             class="content-input__placeholder"
-            v-if="isNeedLogin && !isLogin && !noChatLogin"
+            v-if="isNeedLogin && !isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -148,8 +148,6 @@
         isShowUser: false,
         connectMicShow: false, // 连麦入口按钮
         disabledAll: false, // 全员禁言
-        //是否是嵌入端
-        isEmbed: false,
         //活动信息
         webinar: {},
         //是否已经登录
@@ -173,6 +171,10 @@
           return needLogin;
         }
         return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       //当前登录人信息
       joinInfo() {
@@ -218,10 +220,8 @@
       initViewData() {
         const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        const { embed = false } = embedObj;
         console.log(this.roomBaseServer, 'roomBaseServer');
         this.webinar = webinar;
-        this.isEmbed = embed;
         this.configList = configList;
       },
       // 判断登录
