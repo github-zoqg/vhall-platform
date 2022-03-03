@@ -258,19 +258,19 @@
     async mounted() {
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
+      // 刷新重进时，如果在小组内且上麦，或者不在小组内且上麦
       if (
         (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
         this.micServer.state.isSpeakOn
       ) {
         this.startPush();
-      }
-      // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
-      if (
+      } else if (
         this.mode === 6 &&
         !this.chatServer.state.banned &&
         !this.chatServer.state.allBanned &&
         this.joinInfo.role_name != 3
       ) {
+        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
         await this.micServer.userSpeakOn();
       }
     },
