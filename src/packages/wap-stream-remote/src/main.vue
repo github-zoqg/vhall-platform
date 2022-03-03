@@ -167,6 +167,7 @@
             });
         }, 2000);
       },
+      // 显示退出全屏按钮    5秒后隐藏
       showExitScreen() {
         if (!this.exitScreenStatus) {
           this.interactiveServer.state.fullScreenType = true;
@@ -176,14 +177,14 @@
           this.interactiveServer.state.fullScreenType = false;
         }, 5000);
       },
+      // 退出全屏
       exitFullScreen() {
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.stream.streamId,
             vNode: `vmp-stream-remote__${this.stream.streamId}`
           })
-          .then(res => {
-            console.warn('res----', res);
+          .then(() => {
             this.interactiveServer.state.fullScreenType = false;
           });
       }
