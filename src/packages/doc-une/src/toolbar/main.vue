@@ -200,7 +200,7 @@
       },
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
-        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       },
       switchStatus: {
         get() {
@@ -214,7 +214,7 @@
       // 是否文档演示权限
       hasDocPermission() {
         if (
-          !['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
+          !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType) &&
           (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5)
         ) {
           // 对于观看端，点播和回放，所有人都没有文档演示权限

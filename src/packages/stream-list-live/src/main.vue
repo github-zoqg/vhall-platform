@@ -7,13 +7,13 @@
     <div class="vmp-stream-list__stream-wrapper">
       <div
         class="vmp-stream-list__local-container"
-        :class="[
-          joinInfo.third_party_user_id == mainScreen ? 'vmp-stream-list__main-screen' : '',
-          miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
-            ? 'vmp-dom__mini'
-            : 'vmp-dom__max',
-          isMainScreenHeightLower && !isShrink ? 'height-lower' : ''
-        ]"
+        :class="{
+          'height-lower': isMainScreenHeightLower && !isShrink,
+          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__mini':
+            miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
+        }"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
@@ -22,12 +22,11 @@
           v-for="stream in remoteStreams"
           :key="stream.id"
           class="vmp-stream-list__remote-container"
-          :class="[
-            stream.accountId == mainScreen ? 'vmp-stream-list__main-screen' : '',
-            miniElement == 'stream-list' && stream.accountId == mainScreen
-              ? 'vmp-dom__mini'
-              : 'vmp-dom__max'
-          ]"
+          :class="{
+            'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+            'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen,
+            'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen
+          }"
         >
           <vmp-stream-remote :stream="stream"></vmp-stream-remote>
         </div>
@@ -76,7 +75,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useSplitScreenServer } from 'middle-domain';
+  import { useInteractiveServer, useSplitScreenServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
 
   export default {
@@ -105,7 +104,11 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       remoteStreams() {
         return this.$domainStore.state.interactiveServer.remoteStreams;
@@ -147,6 +150,7 @@
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.micServer = useMicServer();
     },
 
     created() {
@@ -161,6 +165,7 @@
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
         this.PopAlertOffline.visible = true;
       });
+      this.listenEvents();
       // this.getStreamList();
     },
 
@@ -175,6 +180,24 @@
     },
 
     methods: {
+      listenEvents() {
+        // 助理等角色监听
+        if (this.joinInfo.role_name != 1) {
+          // live_over 结束直播
+          this.interactiveServer.$on('live_over', () => {
+            this.$message.warning('直播已结束');
+          });
+
+          // 接收设为主讲人消息
+          this.micServer.$on('vrtc_big_screen_set', msg => {
+            const str =
+              this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+                ? '主画面'
+                : '主讲人';
+            this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+          });
+        }
+      },
       getStreamList() {
         this.interactiveServer.getRoomStreams();
         console.log('------remoteStreams------', this.remoteStreams);
@@ -291,7 +314,8 @@
       height: 80px;
     }
 
-    .vmp-stream-list__remote-container {
+    .vmp-stream-list__remote-container,
+    .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
     }

@@ -331,6 +331,7 @@
           chatServer.sendMsg(curmsg);
           //清除当前消息
           chatServer.clearCurMsg();
+          this.$emit('sendEnd');
         }
       },
       // 打开个人中心
