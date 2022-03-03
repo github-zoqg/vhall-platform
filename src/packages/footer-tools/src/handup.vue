@@ -1,25 +1,36 @@
 <template>
   <div class="vmp-handup">
+    <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
         @click="handleHandClick"
         type="primary"
         size="medium"
         round
-        v-if="isAllowhandup && !isSpeakOn"
+        v-if="
+          isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn
+            : isAllowhandup && !isSpeakOn
+        "
       >
         {{ btnText }}
       </el-button>
     </div>
     <div>
-      <el-button @click="speakOff" type="primary" size="medium" v-if="isSpeakOn" round>
+      <el-button
+        @click="speakOff"
+        type="primary"
+        size="medium"
+        v-if="isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) : isSpeakOn"
+        round
+      >
         下麦
       </el-button>
     </div>
   </div>
 </template>
 <script>
-  import { useMicServer, useRoomBaseServer, useInteractiveServer } from 'middle-domain';
+  import { useMicServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -45,16 +56,19 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      // 组内角色
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
       }
     },
     created() {
       if (this.waitInterval) {
         clearInterval(this.waitInterval);
       }
-      const { join_info } = useRoomBaseServer().state.watchInitData;
       // 申请上麦
       useMicServer().$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', join_info, msg);
+        console.log('---申请上麦消息---', this.joinInfo, msg);
       });
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
@@ -68,7 +82,7 @@
        *
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        console.log('---申请下麦消息---', join_info, msg);
+        console.log('---申请下麦消息---', msg);
       });
       // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {

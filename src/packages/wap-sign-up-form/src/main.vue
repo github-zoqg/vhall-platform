@@ -24,7 +24,11 @@
               <span class="is-ellipsis">...</span>
               {{ $t('form.form_1011') }}
             </span>
-            <span @click="changeFoldStatus(true)" class="text-tail" v-show="!overflowStatus">
+            <span
+              @click="changeFoldStatus(true)"
+              class="text-tail text-tail-2"
+              v-show="!overflowStatus"
+            >
               <span class="is-ellipsis"></span>
               {{ $t('form.form_1012') }}
             </span>
@@ -337,7 +341,7 @@
         //报名表单独立链接是否有效
         formOpenLinkStatus: 0,
         //默认的图片前缀地址
-        defaultImgUrl: process.env.VUE_APP_PUBLIC_PATH,
+        defaultImgUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
         //基础信息
         formInfo: {
           cover: 1
@@ -1426,24 +1430,28 @@
           position: relative;
           line-height: 38px;
           &.title-box__intro-text-ellipsis {
+            white-space: nowrap;
             word-break: break-all;
-            display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
-            -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
-            -webkit-line-clamp: 2; /** 显示的行数 **/
-            overflow: hidden; /** 隐藏超出的内容 **/
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
             text-overflow: -o-ellipsis-lastline;
             text-overflow: ellipsis;
           }
           .text-tail {
             position: absolute;
-            bottom: 0px;
-            right: 4px;
+            bottom: 0;
+            right: 0;
             cursor: pointer;
             background-color: #fff;
             color: #3562fa;
             .is-ellipsis {
               color: #666666;
             }
+          }
+          .text-tail-2 {
+            right: 4px;
           }
         }
       }

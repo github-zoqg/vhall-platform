@@ -163,9 +163,9 @@
           .then(res => {
             this.isQAEnabled = true;
             this.qaVisible = false;
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
+            // );
           });
       }, 500),
       closeQA: debounce(function (flag) {
@@ -174,9 +174,9 @@
           .then(res => {
             this.isQAEnabled = false;
             this.qaVisible = false;
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
+            // );
           });
       }, 500),
       // 设置可用状态
@@ -211,6 +211,7 @@
       },
       // 打开签到弹窗
       openSign() {
+        if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
       // 打开红包弹窗

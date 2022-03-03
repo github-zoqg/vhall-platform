@@ -143,12 +143,12 @@ export const serverConfig = {
         method: 'startPush'
       }
     ],
-    emitClickEndLive: [
-      {
-        cuid: 'comStreamLocal',
-        method: 'stopPush'
-      }
-    ],
+    // emitClickEndLive: [ // 不再派发结束推流事件, 结束推流是监听直播结束消息
+    //   {
+    //     cuid: 'comStreamLocal',
+    //     method: 'stopPush'
+    //   }
+    // ],
     emitMediaSettingClick: [
       {
         cuid: 'comMediaSetting',

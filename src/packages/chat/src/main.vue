@@ -6,36 +6,15 @@
       ref="chatContent"
       :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
-      <overlay-scrollbars
-        ref="chatMessageAreaScroll"
-        :options="overlayScrollBarsOptions"
-        style="height: 100%"
-      >
-        <template v-for="(msg, index) in chatList">
-          <msg-item
-            :key="msg.msgId"
-            :msg="msg"
-            :pre-msg="chatList[index - 1]"
-            v-show="checkMessageShow(msg)"
-            :chat-options="chatOptions"
-            :role-name="roleName"
-            :join-info="joinInfo"
-            @dispatchEvent="msgEventHandleDisPatch"
-            @lotteryCheck="lotteryCheck"
-            @questionnaireCheck="questionnaireCheck"
-            @previewImg="previewImg"
-          ></msg-item>
-        </template>
-        <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
-        <p
-          v-if="[1, '1'].includes(configList['ui.hide_chat_history']) && !chatList.length"
-          class="chat-content__get-list-btn-container"
-        >
-          <span class="chat-content__get-list-btn" @click="getHistoryMsg">
-            {{ $t('chat.chat_1058') }}
-          </span>
-        </p>
-      </overlay-scrollbars>
+      <virtual-list
+        ref="chatlist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'count'"
+        :data-sources="chatList"
+        :data-component="MsgItem"
+        :extra-props="{ chatOptions, previewImg: previewImg.bind(this) }"
+      ></virtual-list>
       <div
         v-if="![1, '1'].includes(configList['ui.hide_chat_history'])"
         class="chat-content__tip-box"
@@ -71,6 +50,7 @@
         @ononSwitchShowSponsor="onSwitchShowSponsor"
         @updateHeight="chatOperateBarHeightChange"
         @needLogin="handleLogin"
+        @sendEnd="sendMsgEnd"
       ></chat-operate-bar>
       <img-preview
         ref="imgPreview"
@@ -154,25 +134,25 @@
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
-
   import eventMixin from './mixin/event-mixin';
-
   import { sessionOrLocal } from './js/utils';
   import { useChatServer, useRoomBaseServer, useGiftsServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import VirtualList from 'vue-virtual-scroll-list';
   export default {
     name: 'VmpChat',
     mixins: [eventMixin, dataReportMixin],
     components: {
-      MsgItem,
       ImgPreview,
       ChatUserControl,
-      ChatOperateBar
+      ChatOperateBar,
+      VirtualList
     },
     data() {
       const { chatList } = useChatServer().state;
       return {
+        MsgItem,
         //滚动插件配置
         overlayScrollBarsOptions: {
           resize: 'none',
@@ -307,13 +287,9 @@
         immediate: true,
         deep: true
       },
-      chatList: {
-        deep: true,
-        handler() {
-          // 如果滚动条未滚动至最底部
-          if (this.osInstance.scroll().ratio.y !== 1) {
-            this.unReadMessageCount++;
-          }
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
         }
       }
     },
@@ -331,7 +307,7 @@
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
       //初始化聊天区域滚动组件
-      this.initScroll();
+      // this.initScroll();
       //拉取聊天历史
       this.getHistoryMsg();
       //监听domain层chatServer通知
@@ -365,26 +341,26 @@
       listenChatServer() {
         const chatServer = useChatServer();
         const giftsServer = useGiftsServer();
+        //监听到新消息过来
+        chatServer.$on('receiveMsg', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.unReadMessageCount++;
+            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
+          }
+        });
         //监听@我的消息
         chatServer.$on('atMe', () => {
-          if (this.osInstance.scroll().ratio.y != 1) {
+          if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = '有人@你';
           }
         });
         //监听回复我的消息
         chatServer.$on('replyMe', () => {
-          if (this.osInstance.scroll().ratio.y != 1) {
+          if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = '有人回复你';
-          }
-        });
-        //监听到新消息过来
-        chatServer.$on('receiveMsg', () => {
-          if (this.osInstance.scroll().ratio.y != 1 && this.osInstance.scroll().max.y > 0) {
-            this.isHasUnreadAtMeMsg = true;
-            this.unReadMessageCount++;
-            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
           }
         });
         //监听禁言通知
@@ -517,83 +493,18 @@
       onClosePreviewImg() {
         this.imgPreviewVisible = false;
       },
-      /**
-       * 聊天图片预览结束
-       * */
-      /** 消息区域滚动处理 */
-      initScroll() {
-        this.osInstance = this.$refs.chatMessageAreaScroll.osInstance();
-        const that = this;
-        this.overlayScrollBarsOptions.callbacks = {
-          onHostSizeChanged: function () {
-            if (that.doScroll) {
-              that.performScroll();
-            }
-          },
-          onContentSizeChanged: function () {
-            if (that.doScroll) {
-              that.performScroll();
-            }
-          },
-          onScroll: that.setDoScroll,
-          onInitialized: that.setDoScroll,
-          onOverflowChanged: function (e) {
-            if (e.y) {
-              that.performScroll();
-            }
-          },
-          onScrollStop: this.handleScrollStop
-        };
-        this.osInstance.options(this.overlayScrollBarsOptions);
-      },
-      setDoScroll() {
-        this.$nextTick(() => {
-          if (!this.animationRunning) {
-            this.doScroll = this.osInstance.scroll().ratio.y === 1;
-          } else {
-            this.doScroll = true;
-          }
-        });
-      },
-      performScroll() {
-        this.$nextTick(() => {
-          this.animationRunning = true;
-          const delayTime = [1, '1'].includes(this.configList['ui.hide_chat_history']) ? 0 : 250;
-          this.osInstance.scrollStop().scroll({ y: '100%' }, delayTime, 'linear', () => {
-            this.animationRunning = false;
-          });
-        });
-      },
       //滚动到底部
-      handleScrollStop() {
-        if (this.osInstance.scroll().ratio.y === 1) {
+      scrollBottom() {
+        this.$nextTick(() => {
+          this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
-          this.isHasUnreadNormalMsg = false;
-          this.isHasUnreadAtMeMsg = false;
-          this.isHasUnreadReplyMsg = false;
-        }
+        });
       },
       //滚动到目标处
       scrollToTarget() {
-        this.animationRunning = true;
-        const delayTime = [1, '1'].includes(this.configList['ui.hide_chat_history']) ? 0 : 250;
-        this.osInstance.scrollStop().scroll(
-          {
-            el: this.osInstance.getElements().content.children[
-              this.chatList.length - this.unReadMessageCount
-            ],
-            block: { y: 'end' }
-          },
-          delayTime,
-          'linear',
-          () => {
-            this.animationRunning = false;
-            this.unReadMessageCount = 0;
-            this.isHasUnreadNormalMsg = false;
-            this.isHasUnreadAtMeMsg = false;
-            this.isHasUnreadReplyMsg = false;
-          }
-        );
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
       },
       /** 消息区域滚动处理结束 */
       //todo domain负责 获取菜单列表
@@ -619,117 +530,6 @@
           //todo 欢迎语功能需要加上
         }
       },
-      //todo domain负责组装 发送消息
-      // sendMsg(callback) {
-      //   window.clearTimeout(this.sendTimeOut);
-
-      //   const { checkHasKeyword } = useChatServer();
-      //   const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
-      //     ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
-      //     : '';
-      //   //子组件里上传的图片
-      //   const imgUrls = this.getUploadImg();
-
-      //   this.sendTimeOut = setTimeout(() => {
-      //     const inputValue = this.trimPlaceHolder('reply');
-      //     if (this.inputStatus.disable) {
-      //       return;
-      //     }
-      //     if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
-      //       return this.$message.warning('内容不能为空');
-      //     }
-      //     const data = {};
-      //     if (inputValue) {
-      //       data.type = 'text';
-      //       data.barrageTxt = inputValue
-      //         .replace(/</g, '&lt;')
-      //         .replace(/>/g, '&gt;')
-      //         .replace(/\n/g, '<br/>');
-      //       data.text_content = inputValue;
-      //     }
-      //     //如果有聊天图片
-      //     if (imgUrls.length) {
-      //       data.image_urls = imgUrls;
-      //       data.type = 'image';
-      //     }
-      //     const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-      //     console.warn('获取当前的本地用户信息', userInfo);
-      //     let name = '';
-      //     if (userInfo) {
-      //       if (userInfo.nickname) {
-      //         name = userInfo.nickname;
-      //       } else {
-      //         name = userInfo.nick_name;
-      //       }
-      //     } else {
-      //       name = joinDefaultName;
-      //     }
-      //     if (this.roleName === 2 && this.join_name) {
-      //       name = this.join_name;
-      //     }
-      //     const context = {
-      //       nickname: name, // 昵称
-      //       avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
-      //       role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
-      //       replyMsg: this.replyMsg, // 回复消息
-      //       atList: this.atList // @用户列表
-      //     };
-      //     let filterStatus = true;
-      //     if (sessionStorage.getItem('watch')) {
-      //       filterStatus = checkHasKeyword(inputValue);
-      //     }
-
-      //     if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-      //       if (this.atList.length && data.text_content) {
-      //         this.atList.forEach(a => {
-      //           data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
-      //         });
-      //       }
-
-      //       useChatServer().sendMsg({ data, context });
-      //     }
-      //     //清空一下子组件里上传的图片
-      //     this.clearUploadImg();
-      //     this.inputValue = '';
-      //     this.replyMsg = {};
-      //     this.$refs.emoji.isShow = false;
-
-      //     this.atList = [];
-      //     callback && callback();
-      //   }, 300);
-      // },
-      // // 发送聊天节流
-      // sendMsgThrottle() {
-      //   if (this.roleName !== 2) {
-      //     this.sendMsg();
-      //     return;
-      //   }
-      //   if (this.chatGap > 0) {
-      //     this.lock = sessionStorage.getItem('chatLock');
-      //     if (this.lock && this.lock == 'true') {
-      //       this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
-      //     }
-      //   } else {
-      //     this.sendMsg(() => {
-      //       window.clearInterval(this.chatGapInterval);
-      //       this.lock = sessionStorage.getItem('chatLock');
-      //       this.chatGap = this.delayTime(this.onlineUsers);
-      //       this.chatGapInterval = window.setInterval(() => {
-      //         if (this.chatGap > 0) {
-      //           if (!this.lock || this.lock == 'false') {
-      //             sessionStorage.setItem('chatLock', true);
-      //           } else {
-      //             this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
-      //           }
-      //           this.chatGap = this.chatGap - 1;
-      //         } else {
-      //           window.clearInterval(this.chatGapInterval);
-      //           sessionStorage.setItem('chatLock', false);
-      //         }
-      //       }, 1000);
-      //     });
-      //   }
-      // },
       backspace() {
         if (!this.inputValue) {
           this.atList = [];
@@ -812,47 +612,6 @@
         });
         this.$refs.chatOperator.handleAtUser(accountId);
       },
-      /**
-       * 事件处理分发
-       * */
-      msgEventHandleDisPatch(params = {}) {
-        let { type = '', el = null, msg = '' } = params;
-        console.log(msg);
-        switch (type) {
-          case 'scrollElement':
-            this.onScrollElementHandle(el);
-            break;
-          case 'closeTip':
-            this.onCloseTipHandle();
-            break;
-          case 'replyMsg':
-            this.onReplyMsg(el, msg);
-            break;
-        }
-      },
-      //滚动到@本用户的msgItem元素
-      onScrollElementHandle(el) {
-        this.showTip = true;
-        this.elements.push(el);
-        this.tipMsg = this.replyElement
-          ? this.$t('chat.chat_1035', this.unReadMessageCount) // TODO:确认是否+1
-          : this.$t('chat.chat_1075');
-      },
-      //关闭提示
-      onCloseTipHandle() {
-        this.showTip = false;
-        this.tipMsg = '';
-      },
-      //有人回复本用户
-      onReplyMsg(el, msg) {
-        if (this.userId !== msg.sendId) return;
-        this.showTip = true;
-        this.tipMsg = this.elements.length
-          ? this.$t('chat.chat_1035', this.unReadMessageCount) // TODO:确认是否+1
-          : this.$t('chat.chat_1076');
-        this.replyElement = el;
-      },
-      //底部输入框输入较多内容，聊天区域也调整高度
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
         this.$refs.chatOperator.updateOverlayScrollbar();
@@ -922,6 +681,19 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
         );
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.chatlist.$el.scrollHeight -
+            this.$refs.chatlist.$el.scrollTop -
+            this.$refs.chatlist.getClientSize() <
+          5
+        );
+      },
+      //自己发送消息后的回调
+      sendMsgEnd() {
+        this.scrollBottom();
       }
     }
   };

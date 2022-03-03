@@ -113,9 +113,6 @@
     <!-- 遮罩层 非主屏-->
     <section v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleNameFilter }}
-        </span>
         <el-tooltip :content="localStream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
             class="vmp-stream-local__shadow-icon"
@@ -167,6 +164,16 @@
             v-if="showDownMic"
           ></span>
         </el-tooltip>
+      </p>
+    </section>
+
+    <!-- 播放按钮 -->
+    <section
+      class="vmp-stream-local__pause"
+      v-show="mainScreen == joinInfo.third_party_user_id && interactiveServer.state.showPlayIcon"
+    >
+      <p @click.stop="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
       </p>
     </section>
 
@@ -261,13 +268,19 @@
     async mounted() {
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
+      // 刷新重进时，如果在小组内且上麦，或者不在小组内且上麦
       if (
         (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
         this.micServer.state.isSpeakOn
       ) {
         this.startPush();
-      }
-      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
+      } else if (
+        this.mode === 6 &&
+        !this.chatServer.state.banned &&
+        !this.chatServer.state.allBanned &&
+        this.joinInfo.role_name != 3
+      ) {
+        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
         await this.micServer.userSpeakOn();
       }
     },
@@ -281,6 +294,15 @@
       }
     },
     methods: {
+      // 恢复播放
+      replayPlay() {
+        const videos = document.querySelectorAll('video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.play();
+          });
+        this.interactiveServer.state.showPlayIcon = false;
+      },
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
@@ -531,7 +553,13 @@
       // 结束推流
       stopPush() {
         return new Promise(resolve => {
+          // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
+          if (!this.isStreamPublished) {
+            resolve();
+            return;
+          }
           this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            console.warn('结束推流成功----');
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 
@@ -854,6 +882,33 @@
         }
         &:last-child {
           margin-right: 0;
+        }
+      }
+    }
+    // 播放按钮
+    &__pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      p {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 46px;
+          color: #f5f5f5;
         }
       }
     }

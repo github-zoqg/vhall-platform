@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-list" v-if="isShowIcon">
+  <div class="vmp-notice-list" v-if="isShowIcon && noticeNum">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
