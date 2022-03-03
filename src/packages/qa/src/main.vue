@@ -109,6 +109,10 @@
       },
       webinarId() {
         return this.watchInitData.webinar.id;
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {},
@@ -123,7 +127,7 @@
       listenEvents() {
         const qaServer = useQaServer();
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
-          if (msg.sender_id == this.userId || this.roleName != 2) {
+          if (msg.sender_id == this.thirdPartyId || this.roleName != 2) {
             msg.data.content = this.emojiToText(msg.data.content);
             this.chatList.push(msg.data);
           }
@@ -161,7 +165,10 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        if (![1, '1'].includes(this.roleName) && ['', null, 0].includes(this.userId)) {
+        if (
+          ![1, '1'].includes(this.roleName) &&
+          ['', null, 0].includes(this.userId || this.Embed)
+        ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
         } else {
