@@ -8,12 +8,18 @@ import {
   useRoomBaseServer,
   useMicServer,
   useMemberServer,
-  useQaServer,
+  useQaAdminServer,
+  useGroupServer,
+  useChatAuthServer,
   useMediaSettingServer,
-  useVirtualAudienceServer
+  useUserServer,
+  useInsertFileServer
 } from 'middle-domain';
 
-setBaseUrl(process.env.VUE_APP_BASE_URL);
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL
+});
 setRequestHeaders({
   platform: 7, // 7:PC网页版
   token: localStorage.getItem('token') || ''
@@ -28,8 +34,11 @@ export default new DomainStore.Store({
     interactiveServer: useInteractiveServer().state,
     micServer: useMicServer().state,
     memberServer: useMemberServer().state,
-    qaServer: useQaServer().state,
+    qaServer: useQaAdminServer().state,
+    groupServer: useGroupServer().state,
+    chatAuthServer: useChatAuthServer().state,
     mediaSettingServer: useMediaSettingServer().state,
-    virtualAudienceServer: useVirtualAudienceServer().state
+    userServer: useUserServer().state,
+    insertFileServer: useInsertFileServer().state
   }
 });
