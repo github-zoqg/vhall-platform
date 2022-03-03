@@ -28,33 +28,35 @@ export default async function () {
     console.log('嵌入', e);
   }
 
-  await roomBaseServer.getConfigList();
-  await roomBaseServer.getLowerConfigList({
-    params: {},
-    environment: process.env.NODE_ENV != 'production' ? 'test' : 'production',
-    systemKey: 2,
-    time: 5
-  });
-  console.log('%c------黄金链路请求配置项完成', 'color:pink');
-  console.log(roomBaseServer.state.configList);
-  // TODO 设置观看端测试权限数据
-  // roomBaseServer.state.configList = {
-  //   hasToolbar: false
-  // };
-  // 调用聚合接口
-  await roomBaseServer.getCommonConfig({
-    tags: [
-      'skin',
-      'screen-poster',
-      'public-account',
-      'webinar-tag',
-      'menu',
-      'adv-default',
-      'invite-card',
-      'goods-default',
-      'timer'
-    ]
-  });
+  const promiseList = [
+    // configList 和 黄金链路串行执行
+    roomBaseServer.getConfigList().then(async () => {
+      //黄金链路
+      await roomBaseServer.startGetDegradationInterval({
+        staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+        environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+        systemKey: 2
+      });
+    }),
+    //多语言接口
+    roomBaseServer.getLangList(),
+    // 调用聚合接口
+    roomBaseServer.getCommonConfig({
+      tags: [
+        'skin',
+        'screen-poster',
+        'public-account',
+        'webinar-tag',
+        'menu',
+        'adv-default',
+        'invite-card',
+        'goods-default',
+        'timer'
+      ]
+    })
+  ];
+
+  await Promise.all(promiseList);
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
