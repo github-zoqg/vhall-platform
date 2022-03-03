@@ -50,7 +50,7 @@ export const serverConfig = {
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
-    children: ['comChat']
+    children: []
   },
   /*** 布局定义end */
 

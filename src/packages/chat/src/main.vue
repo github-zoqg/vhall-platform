@@ -287,13 +287,9 @@
         immediate: true,
         deep: true
       },
-      chatList: {
-        deep: true,
-        handler() {
-          // 如果滚动条未滚动至最底部
-          // if (this.osInstance.scroll().ratio.y !== 1) {
-          //   this.unReadMessageCount++;
-          // }
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
         }
       }
     },
@@ -351,8 +347,6 @@
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
             this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
-          } else {
-            this.scrollBottom();
           }
         });
         //监听@我的消息
@@ -473,7 +467,6 @@
         };
         await useChatServer().getHistoryMsg(params);
         this.page++;
-        this.scrollBottom();
       },
       //todo domain负责 抽奖情况检查
       lotteryCheck(msg) {

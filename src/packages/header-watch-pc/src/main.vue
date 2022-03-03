@@ -49,7 +49,7 @@
     </div>
     <div class="vmp-header-watch-right">
       <!-- 多语言 -->
-      <!-- <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container> -->
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
 
       <!-- 公众号 -->
       <div class="vmp-header-watch-right-officical" v-if="officialImg">

@@ -5,13 +5,31 @@
         <i class="vh-iconfont vh-line-setting"></i>
         设置
       </div>
-      <div class="vmp-footer-tools-left-online" v-if="roomBaseState.watchInitData.online.show">
+      <div class="vmp-footer-tools__left-online" v-if="roomBaseState.watchInitData.online.show">
         <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools-left-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div class="vmp-footer-tools__leftt-hot" v-if="roomBaseState.watchInitData.pv.show">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
+      </div>
+      <div class="vmp-footer-tools__left-language" v-if="isEmbed">
+        <el-dropdown @command="changeLang" trigger="click" placement="bottom">
+          <span class="language__icon">
+            <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
+            {{ lang.label }}
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item
+              :command="item.key"
+              :key="index"
+              :class="{ active: item.key == lang.key }"
+              v-for="(item, index) in languageList"
+            >
+              {{ item.label }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </div>
     <!-- <div class="vmp-footer-tools__right">
@@ -103,7 +121,18 @@
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
-
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -129,7 +158,9 @@
         showPay: false,
         zfQr: '',
         wxQr: '',
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
+        lang: {},
+        languageList: []
       };
     },
     filters: {
@@ -187,6 +218,10 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
       },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       isEmbedVideo() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
@@ -199,6 +234,19 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
+      if (this.isEmbed) {
+        this.languageList = this.roomBaseState.languages.langList.map(item => {
+          return langMap[item.language_type];
+        });
+        console.log(this.languageList, '??!32142435');
+        const curLang = this.roomBaseState.languages.curLang;
+        this.lang =
+          langMap[sessionStorage.getItem('lang')] ||
+          langMap[this.$route.query.lang] ||
+          langMap[curLang.language_type];
+        this.$i18n.locale = this.lang.type;
+        sessionStorage.setItem('lang', this.lang.type);
+      }
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
         if (this.showGift) {
@@ -265,6 +313,10 @@
         this.showPay = true;
         this[data] = url;
       },
+      changeLang(key) {
+        sessionStorage.setItem('lang', key);
+        window.location.reload();
+      },
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
@@ -299,6 +351,12 @@
       }
       &-setting {
         cursor: pointer;
+      }
+      &-language {
+        .language__icon {
+          color: #ccc;
+          cursor: pointer;
+        }
       }
     }
     &__right {

@@ -122,8 +122,11 @@
         this.micServer.state.isSpeakOn
       ) {
         this.startPush();
-      }
-      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
+      } else if (
+        this.mode === 6 &&
+        !this.chatServer.state.banned &&
+        !this.chatServer.state.allBanned
+      ) {
         await this.micServer.userSpeakOn();
       }
 

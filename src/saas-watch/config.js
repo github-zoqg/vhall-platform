@@ -188,7 +188,7 @@ export const serverConfig = {
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice', 'comAttention'],
+    children: ['compLanguageChoice'],
     emitClickLogin: [
       //登录弹窗
       {
@@ -240,16 +240,6 @@ export const serverConfig = {
         }
       ]
     }
-  },
-  comAttention: {
-    component: 'VmpAttention',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLogin',
-        method: 'open'
-      }
-    ]
   },
   comShare: {
     component: 'VmpShare',

@@ -7,13 +7,13 @@
     <div class="vmp-stream-list__stream-wrapper">
       <div
         class="vmp-stream-list__local-container"
-        :class="[
-          joinInfo.third_party_user_id == mainScreen ? 'vmp-stream-list__main-screen' : '',
-          miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
-            ? 'vmp-dom__mini'
-            : 'vmp-dom__max',
-          isMainScreenHeightLower && !isShrink ? 'height-lower' : ''
-        ]"
+        :class="{
+          'height-lower': isMainScreenHeightLower && !isShrink,
+          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__mini':
+            miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
+        }"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
@@ -22,12 +22,11 @@
           v-for="stream in remoteStreams"
           :key="stream.id"
           class="vmp-stream-list__remote-container"
-          :class="[
-            stream.accountId == mainScreen ? 'vmp-stream-list__main-screen' : '',
-            miniElement == 'stream-list' && stream.accountId == mainScreen
-              ? 'vmp-dom__mini'
-              : 'vmp-dom__max'
-          ]"
+          :class="{
+            'vmp-stream-list__main-screen': stream.accountId == mainScreen,
+            'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen,
+            'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen
+          }"
         >
           <vmp-stream-remote :stream="stream"></vmp-stream-remote>
         </div>
@@ -105,7 +104,11 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       remoteStreams() {
         return this.$domainStore.state.interactiveServer.remoteStreams;
@@ -180,6 +183,16 @@
       listenEvents() {
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
+          // 订阅流播放失败    监听到播放失败, 然后展示按钮
+          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+            let videos = document.querySelectorAll('video');
+            videos.length > 0 &&
+              videos.forEach(video => {
+                video.pause();
+              });
+            this.interactiveServer.state.showPlayIcon = true;
+          });
+
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
             this.$message.warning('直播已结束');
@@ -312,7 +325,8 @@
       height: 80px;
     }
 
-    .vmp-stream-list__remote-container {
+    .vmp-stream-list__remote-container,
+    .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
     }
