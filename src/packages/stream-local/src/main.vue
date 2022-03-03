@@ -82,7 +82,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && role != 20"
+            v-if="joinInfo.role_name != 1 && groupRole != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -140,7 +140,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && role != 20"
+            v-if="joinInfo.role_name != 1 && groupRole != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -192,7 +192,6 @@
     data() {
       return {
         isFullScreen: false,
-        role: '',
         isStreamPublished: false,
         networkStatus: 2,
         audioLevel: 1,
@@ -203,6 +202,10 @@
       ImgStream
     },
     computed: {
+      // 小组内角色，20为组长
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
       localStream() {
         console.log(
           '----localStream更新了----',
