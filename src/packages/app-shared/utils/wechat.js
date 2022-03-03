@@ -3,6 +3,25 @@ import { isWechat, getQueryString } from './tool';
 import { Toast } from 'vant';
 
 /**
+ *  路由拦截需要的构建登录地址
+ * @param {*} to
+ * @returns
+ */
+function buildLoginAddress(to) {
+  //获取地址栏参数、设置请求路径
+  let _search = '';
+  if (location.search && location.search != '') {
+    _search = location.search.split('?')[1];
+  }
+  const address =
+    window.location.protocol +
+    process.env.VUE_APP_WAP_WATCH +
+    process.env.VUE_APP_WEB_KEY +
+    `${to.path}?purpose=login${_search ? '&' + _search : ''}`;
+  return address;
+}
+
+/**
  * 过滤地址栏参数
  * @param {*} path
  * @param {*} _next
@@ -181,7 +200,8 @@ export function initHideChatSdk(initData = {}, failedCb = () => { }) {
 }
 
 //微信授权相关
-export async function authWeixinAjax(isEmbed, to, _next) {
+export async function authWeixinAjax(to, address, _next) {
+  const isEmbed = !!/embed/.test(to.path);
   //如果是微信
   if (isWechat() && !isEmbed) {
     let roomBaseServer = useRoomBaseServer();
@@ -197,17 +217,6 @@ export async function authWeixinAjax(isEmbed, to, _next) {
       roomBaseServer.state.configList &&
       roomBaseServer.state.configList['ui.hide_wechat'] == '0'
     ) {
-      //获取地址栏参数、设置请求路径
-      let _search = '';
-      if (location.search && location.search != '') {
-        _search = location.search.split('?')[1];
-      }
-
-      const address =
-        window.location.protocol +
-        process.env.VUE_APP_WAP_WATCH +
-        process.env.VUE_APP_WEB_KEY +
-        `${to.path}?purpose=login${_search ? '&' + _search : ''}`;
       const open_id = sessionStorage.getItem('open_id');
       if (!open_id) {
         // 请求授权接口
@@ -226,7 +235,11 @@ export async function authWeixinAjax(isEmbed, to, _next) {
                 position: 'center',
                 duration: 0
               });
-              _next();
+
+              // 如果是路由执行
+              if (_next) {
+                _next();
+              }
             }
           })
           .catch(res => {
@@ -244,16 +257,20 @@ export async function authWeixinAjax(isEmbed, to, _next) {
 
       sessionStorage.setItem('isLogin', '');
 
-      _next();
+      if (_next) {
+        _next();
+      }
     }
   } else {
-    _next();
+    if (_next) {
+      _next();
+    }
   }
 }
 
 // init微信授权跳转逻辑
 export function authCheck(to, next) {
-  const isEmbed = !!/embed/.test(to.path);
+  // const isEmbed = !!/embed/.test(to.path);
   let _next = next;
 
   // 若当前用户已登录过，直接进入界面。
@@ -272,15 +289,8 @@ export function authCheck(to, next) {
       next();
     } else {
       // 微信登录鉴权
-      authWeixinAjax(isEmbed, to, _next);
+      let address = buildLoginAddress(to);
+      authWeixinAjax(to, address, _next);
     }
   }
-}
-
-// 微信登录跳转
-export function gotoWeixinLogin(address) {
-  console.log('gotoWeixinLogin------->', `${process.env.VUE_APP_BASE_URL}`, address);
-  // window.location.href = `${
-  //   process.env.VUE_APP_BASE_URL
-  // }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
 }
