@@ -1,12 +1,17 @@
 <template>
   <div class="vmp-handup">
+    <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
         @click="handleHandClick"
         type="primary"
         size="medium"
         round
-        v-if="isAllowhandup && !isSpeakOn && showGroupHand()"
+        v-if="
+          isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn
+            : isAllowhandup && !isSpeakOn
+        "
       >
         {{ btnText }}
       </el-button>
@@ -16,7 +21,7 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="isSpeakOn && showGroupHand()"
+        v-if="isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) : isSpeakOn"
         round
       >
         下麦
@@ -90,15 +95,6 @@
       });**/
     },
     methods: {
-      // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' }
-      showGroupHand() {
-        return (
-          this.isInGroup &&
-          parseInt(this.groupRole) !== 3 &&
-          parseInt(this.groupRole) !== 4 &&
-          parseInt(this.groupRole) !== 20
-        );
-      },
       // 下麦
       async speakOff() {
         const { code, msg } = await useMicServer().speakOff();
