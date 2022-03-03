@@ -256,6 +256,7 @@
 
       // 主屏在大窗的样式
       &.vmp-dom__max {
+        width: auto;
         position: absolute;
         top: 80px;
         bottom: 0px;
