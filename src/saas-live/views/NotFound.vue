@@ -1,16 +1,79 @@
 <template>
   <div class="vmp-notfound">
-    <img src="../assets/images/404.png" alt style="width: 50%; height: auto" />
+    <div class="left-section">
+      <div class="inner-content">
+        <h1 class="heading">404</h1>
+        <p class="subheading">页面已失联，攻城狮正在赶来的路上…</p>
+        <p class="headingNotice">
+          无法访问本页的原因：
+          <br />
+          服务器过热导致网站可能出现故障！
+          <br />
+          所访问的页面不存在或者已被管理员删除！
+          <br />
+        </p>
+        <p class="index-btn">
+          <router-link to="/">
+            <button type="button" class="el-button el-button--primary is-round">
+              <span>返回首页</span>
+            </button>
+          </router-link>
+        </p>
+      </div>
+    </div>
+    <div class="right-section">
+      <img src="../../packages/app-shared/assets/img/404.svg" alt="" class="svgImg" />
+    </div>
   </div>
 </template>
 <style lang="less">
   .vmp-notfound {
-    height: 100vh;
-    width: 100%;
+    min-width: 700px;
     position: relative;
-    background: #ffffff;
+    margin: 0 auto;
+    width: 52%;
+    height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: row;
+    justify-content: space-around;
+
+    .left-section {
+      width: 40%;
+      .inner-content {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+
+        .heading {
+          font-size: 80px;
+          font-weight: 600;
+          line-height: 112px;
+        }
+        .subheading {
+          height: 22px;
+          font-size: 16px;
+          color: #1a1a1a;
+        }
+        .headingNotice {
+          margin-top: 16px;
+          width: 266px;
+          font-size: 14px;
+          color: #999;
+        }
+        .index-btn {
+          margin-top: 32px;
+          text-align: left;
+        }
+      }
+    }
+    .right-section {
+      width: 50%;
+      .svgImg {
+        position: absolute;
+        top: 25%;
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
   }
 </style>

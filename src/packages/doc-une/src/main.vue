@@ -174,29 +174,47 @@
       groupInitData() {
         return this.groupServer.state.groupInitData;
       },
+      // 文档是否加载完成
       docLoadComplete() {
         return this.docServer.state.docLoadComplete;
       },
+      // 当前文档或白板容器的Id
       currentCid() {
         return this.docServer.state.currentCid;
       },
+      // 当前页码（从1开始）
       pageNum() {
         return this.docServer.state.pageNum;
       },
+      // 是否在小组中
       isInGroup() {
-        // 在小组中
         return !!this.groupServer.state.groupInitData?.isInGroup;
       },
-      // 显示文档时 && (普通模式，或 观看端全屏模式下);
+      // 是否显示文档翻页相关操作栏
       showPagebar() {
+        // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
         return (
           this.docServer.state.currentCid.split('-')[0] === 'document' &&
           (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
         );
       },
+      // 当前用户Id
+      userId() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      // 当前的演示者Id
+      presenterId() {
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
       // 是否观看端
       isWatch() {
-        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
       // 文档是否可见
       show() {
@@ -208,24 +226,14 @@
               this.hasDocPermission))
         );
       },
-
       // 是否文档演示权限
       hasDocPermission() {
-        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
-          // 对于应点播和回放，所有人都没有文档演示权限
+        if (this.isWatch && [4, 5].includes(this.webinarType)) {
+          // 对于观看端 && 点播和回放，所有人都没有文档演示权限
           return false;
         }
-        if (this.isInGroup) {
-          return (
-            this.groupServer.state.groupInitData.presentation_screen ==
-            this.watchInitData.join_info.third_party_user_id
-          );
-        } else {
-          return (
-            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-            this.watchInitData.join_info.third_party_user_id
-          );
-        }
+        // 当前用户是否演示者
+        return this.presenterId == this.userId;
       },
       /**
        * @description 是否显示结束演示按钮
@@ -239,7 +247,7 @@
        */
       renderEndDemonstrateBtn() {
         // 非开播状态不渲染
-        if (this.watchInitData.webinar.type !== 1) return false;
+        if (this.webinarType !== 1) return false;
         // 非分组活动不渲染
         if (this.watchInitData.webinar.mode != 6) return false;
         // 助理不显示
@@ -249,37 +257,24 @@
           // 如果是主持人或组长，演示人不是自己也不是组长，说明有人观众在演示. 主持人和组长都可以结束演示。
           if (
             (this.groupInitData.join_role == 1 || this.groupInitData.join_role == 20) &&
-            this.groupInitData.presentation_screen !=
-              this.watchInitData.join_info.third_party_user_id &&
-            this.groupInitData.presentation_screen != this.groupInitData.doc_permission
+            this.presenterId != this.userId &&
+            this.presenterId != this.groupInitData.doc_permission
           ) {
             return true;
           }
           // 如果是观众，演示人是自己。
-          if (
-            this.groupInitData.join_role == 2 &&
-            this.groupInitData.presentation_screen ==
-              this.watchInitData.join_info.third_party_user_id
-          ) {
+          if (this.groupInitData.join_role == 2 && this.presenterId == this.userId) {
             return true;
           }
           return false;
         } else {
           // 在主直播间内
           // 如果是主持人，演示人不是自己，说明有人在演示
-          if (
-            this.watchInitData.join_info.role_name == 1 &&
-            this.roomBaseServer.state.interactToolStatus.presentation_screen !=
-              this.watchInitData.join_info.third_party_user_id
-          ) {
+          if (this.watchInitData.join_info.role_name == 1 && this.presenterId != this.userId) {
             return true;
           }
           // 如果不是主持人, 演示者是自己
-          if (
-            this.watchInitData.join_info.role_name != 1 &&
-            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-              this.watchInitData.join_info.third_party_user_id
-          ) {
+          if (this.watchInitData.join_info.role_name != 1 && this.presenterId == this.userId) {
             return true;
           }
           return false;
@@ -293,11 +288,22 @@
       }
     },
     watch: {
+      // 回放的时候
+      ['docServer.state.switchStatus'](newval) {
+        if ([4, 5].includes(this.webinarType)) {
+          // 如果是回放会点播,文档显示与不显示是切换处理
+          if (newval) {
+            useRoomBaseServer().setChangeElement('player');
+          } else {
+            useRoomBaseServer().setChangeElement('doc');
+          }
+        }
+      },
       // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
         if (newval) {
-          if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+          if (this.webinarType == 1) {
             this.docServer.state.isChannelChanged = false;
             // 初始化事件
             this.initEvents();
@@ -329,6 +335,9 @@
       this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
+    },
+    created() {
+      window.addEventListener('keydown', this.listenKeydown);
     },
     methods: {
       /**
@@ -539,6 +548,17 @@
           }
         });
       },
+
+      listenKeydown(e) {
+        if (!this.hasPager) return;
+        if (e.keyCode === 38) {
+          // 向上翻页
+          this.handlePage('prevStep');
+        } else if (e.keyCode === 40) {
+          // 向下翻页
+          this.handlePage('nextStep');
+        }
+      },
       /**
        * 新增文档或白板
        * @param {*} fileType
@@ -698,12 +718,18 @@
         if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
           return;
         }
-        if (e.target.nodeName === 'UL') return;
-        const type =
-          e.target.dataset.value ||
-          e.target.parentNode.dataset.value ||
-          e.target.parentNode.parentNode.dataset.value ||
-          null;
+        let type;
+        if (e === 'prevStep' || e === 'nextStep') {
+          // 键盘翻页调用
+          type = e;
+        } else {
+          if (e.target.nodeName === 'UL') return;
+          type =
+            e.target.dataset.value ||
+            e.target.parentNode.dataset.value ||
+            e.target.parentNode.parentNode.dataset.value ||
+            null;
+        }
         if (!type) return;
         if (!this.docServer.state.allComplete) {
           return this.$message.warning('请文档加载完成以后再操作');
@@ -810,11 +836,14 @@
       this.initEvents();
       // 清空
       // this.docServer.resetContainer();
-      if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+      if (this.webinarType == 1) {
         // 直播中才执行
         // 恢复上一次的文档数据;
         this.recoverLastDocs();
       }
+    },
+    destroyed() {
+      window.removeEventListener('keydown', this.listenKeydown);
     }
   };
 </script>

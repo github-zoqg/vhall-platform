@@ -46,7 +46,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer, useQaServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useChatServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -80,6 +80,7 @@
       if (widget && widget.options) {
         this.tabOptions = widget.options;
       }
+      // console.log(this.visibleMenu, '???!231324');
       this.initMenu();
       this.listenEvents();
     },
@@ -92,12 +93,28 @@
         const qaServer = useQaServer();
         const chatServer = useChatServer();
         //收到问答开启消息
-        qaServer.$on(qaServer.Events.QA_OPEN, () => {
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1026')
+            },
+            roleName: msg.data.role_name,
+            type: msg.type,
+            interactStatus: true
+          });
         });
         //收到问答关闭消息
-        qaServer.$on(qaServer.Events.QA_CLOSE, () => {
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1081')
+            },
+            roleName: msg.data.role_name,
+            type: msg.type,
+            interactStatus: true
+          });
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
@@ -118,8 +135,6 @@
           list = [...roomState.customMenu.list];
         }
 
-        console.log('menu list:', list);
-        console.log(useRoomBaseServer().state);
         for (const item of list) {
           this.addItem(item);
         }
@@ -179,7 +194,6 @@
       },
 
       getItemEntity(item) {
-        console.log('menuConfig:', this.tabOptions.menuConfig);
         return getItemEntity(item, this.tabOptions.menuConfig);
       },
 

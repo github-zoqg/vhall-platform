@@ -57,7 +57,10 @@
           <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
           <!--            {{ $t('common.common_1008') }}-->
           <!--          </i>-->
-          <div class="chat-setting-btn--chat-auth">
+          <div
+            class="chat-setting-btn--chat-auth"
+            v-if="configList['comment_check'] || configList['disable_msg']"
+          >
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
               <!--              <div class="chat-setting-box__item switch-box">-->
@@ -71,19 +74,23 @@
               <!--                  @change="onClickShieldingEffects"-->
               <!--                />-->
               <!--              </div>-->
-              <div class="chat-setting-box__item switch-box">
+              <div class="chat-setting-box__item switch-box" v-if="configList['disable_msg']">
                 <span class="switch-title">全体禁言</span>
 
                 <el-switch
                   class="switch"
-                  v-model="allBanned"
+                  :value="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
                   active-color="#fc5659"
                   @change="toggleMutedAllStatus"
                 />
               </div>
-              <div class="chat-setting-box__item join-chat-btn" @click="joinChatAuth">
+              <div
+                class="chat-setting-box__item join-chat-btn"
+                @click="joinChatAuth"
+                v-if="configList['comment_check']"
+              >
                 进入聊天审核
               </div>
             </div>
@@ -118,6 +125,11 @@
       Emoji,
       ChatImgUpload,
       ChatInput
+    },
+    computed: {
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      }
     },
     props: {
       //聊天配置
@@ -195,8 +207,8 @@
     mounted() {},
     methods: {
       //切换全体禁言开关状态
-      toggleMutedAllStatus() {
-        this.$emit('changeAllBanned', this.allBanned);
+      toggleMutedAllStatus(val) {
+        this.$emit('changeAllBanned', val);
       },
       //进入聊天审核
       joinChatAuth() {

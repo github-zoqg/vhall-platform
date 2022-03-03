@@ -52,17 +52,16 @@
     >
       <i class="vh-iconfont vh-line-arrow-right" />
     </span>
-
-    <div class="vmp-stream-list__pause" v-show="showPlayIcon">
-      <p @click.stop="replayPlay">
-        <i class="vh-iconfont vh-line-video-play"></i>
-      </p>
-    </div>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useRoomBaseServer,
+    useMicServer,
+    useGroupServer
+  } from 'middle-domain';
   export default {
     name: 'VmpStreamList',
 
@@ -70,13 +69,15 @@
       return {
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
-        isShowControlArrow: false, // 是否展示左右按钮
-        showPlayIcon: false,
-        playAbort: [] // 自动播放禁止的stream列表
+        isShowControlArrow: false // 是否展示左右按钮
       };
     },
 
     computed: {
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -84,7 +85,11 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       remoteStreams() {
         console.log(
@@ -138,6 +143,7 @@
       }
     },
     beforeCreate() {
+      this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
@@ -148,8 +154,12 @@
 
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
-        this.playAbort.push(e.data);
-        this.showPlayIcon = true;
+        let videos = document.querySelectorAll('video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.pause();
+          });
+        this.interactiveServer.state.showPlayIcon = true;
       });
     },
 
@@ -176,16 +186,6 @@
           this.$refs.streamWrapper.scrollLeft =
             scrollLeft <= scrollWidth ? scrollLeft + 142 : scrollWidth;
         }
-      },
-
-      // 订阅流自动播放失败，手动播放
-      replayPlay() {
-        this.playAbort.forEach(stream => {
-          this.interactiveServer.setPlay({ streamId: stream.streamId }).then(() => {
-            this.showPlayIcon = false;
-          });
-        });
-        this.playAbort = [];
       }
     }
   };
@@ -201,35 +201,6 @@
     background: #000;
     border-bottom: 1px solid #1f1f1f;
 
-    &__pause {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 56px;
-      width: calc(100% - 380px);
-      height: auto;
-      min-height: auto;
-      z-index: 4;
-      background: transparent;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-
-      p {
-        width: 108px;
-        height: 108px;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        i {
-          font-size: 46px;
-          color: #f5f5f5;
-        }
-      }
-    }
     &__stream-wrapper {
       flex: 1;
       overflow: hidden;
@@ -328,6 +299,6 @@
     right: 0;
     top: 0;
     width: 360px;
-    z-index: 1;
+    z-index: 10;
   }
 </style>

@@ -1,8 +1,8 @@
 <!-- 主题选择组件 -->
 <template>
   <div class="vmp-language-choice">
-    <el-dropdown @command="handleChangeLang" trigger="click" placement="bottom">
-      <div class="vmp-language-choice-lang">
+    <el-dropdown @command="handleChangeLang" placement="bottom">
+      <div :class="'vmp-language-choice-lang ' + themeClass.iconClass">
         <span class="vmp-language-choice-lang-icon">
           <i
             class="vh-saas-iconfont vh-saas-line-multilingual"
@@ -43,7 +43,9 @@
     data() {
       return {
         themeClass: {
-          pageBg: '#3562fa'
+          bgColor: 'light',
+          pageBg: '#cccccc',
+          iconClass: 'icon-default' // icon默认色
         },
         lang: {},
         languageList: []
@@ -54,6 +56,7 @@
     },
     created() {
       const roomBaseServer = useRoomBaseServer();
+      this.setSkinInfo(roomBaseServer.state.skinInfo);
       this.languageList = roomBaseServer.state.languages.langList.map(item => {
         return langMap[item.language_type];
       });
@@ -76,6 +79,21 @@
       handleChangeLang: function (key) {
         sessionStorage.setItem('lang', key);
         window.location.reload();
+      },
+      setSkinInfo(skin) {
+        if (skin && skin.skin_json_pc && skin.status == 1) {
+          this.$nextTick(() => {
+            const { pageStyle } = JSON.parse(skin.skin_json_pc) || '';
+            this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
+            this.themeClass.pageBg = pageStyle;
+          });
+        } else {
+          this.$nextTick(() => {
+            // 默认皮肤
+            this.themeClass.pageBg = '#cccccc';
+            this.themeClass.iconClass = 'icon-default';
+          });
+        }
       }
     }
   };
@@ -99,11 +117,24 @@
         line-height: 14px;
         padding-top: 5px;
       }
-      &:hover {
-        i,
-        p {
+      &.icon-default {
+        &:hover {
           cursor: pointer;
-          color: @font-high-light-normal !important;
+          i,
+          p {
+            cursor: pointer;
+            color: @font-high-light-normal !important;
+          }
+        }
+      }
+      &.icon-revert {
+        &:hover {
+          cursor: pointer;
+          i,
+          p {
+            cursor: pointer;
+            color: @font-dark-second !important;
+          }
         }
       }
     }

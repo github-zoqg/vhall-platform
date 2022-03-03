@@ -9,7 +9,7 @@
         <ul>
           <li
             class="vmp-notice-list-container__item"
-            v-for="(item, index) of domainState.noticeList"
+            v-for="(item, index) of noticeList"
             :key="index"
           >
             <i class="vh-iconfont vh-line-voice" />
@@ -83,9 +83,10 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     created() {
-      this.noticeServer.listenMsg();
       this.roomBaseState = this.roomBaseServer.state;
-      this.getNoticeList(false);
+      // this.getNoticeList(false);
+    },
+    mounted() {
       this.initNotice();
     },
     methods: {
@@ -101,12 +102,15 @@
        */
       initNotice() {
         this.noticeServer.$on('room_announcement', msg => {
-          this.domainState.noticeList.unshift({
+          this.noticeList.unshift({
             created_at: msg.push_time,
             content: {
               content: msg.room_announcement_text
             }
           });
+        });
+        this.noticeServer.$on('live_over', () => {
+          this.noticeList = [];
         });
       },
 

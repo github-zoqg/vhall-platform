@@ -67,7 +67,6 @@ export const serverConfig = {
       'comUserAccount',
       'comCash',
       'comLottery',
-      'comWatchTimer',
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
@@ -189,7 +188,7 @@ export const serverConfig = {
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice', 'comAttention'],
+    children: ['compLanguageChoice'],
     emitClickLogin: [
       //登录弹窗
       {
@@ -242,16 +241,6 @@ export const serverConfig = {
       ]
     }
   },
-  comAttention: {
-    component: 'VmpAttention',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLogin',
-        method: 'open'
-      }
-    ]
-  },
   comShare: {
     component: 'VmpShare',
     options: {
@@ -299,7 +288,7 @@ export const serverConfig = {
       cuid: ['comLottery'],
       method: 'open'
     },
-    children: ['comSignWatch']
+    children: ['comSignWatch', 'comWatchTimer']
   },
   comSignWatch: {
     component: 'VmpSignWatch'
@@ -389,7 +378,14 @@ export const serverConfig = {
   },
   // 抽奖
   comLottery: {
-    component: 'VmpLotteryWatch'
+    component: 'VmpLotteryWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 开屏页
   comScreenPost: {
@@ -492,9 +488,16 @@ export const serverConfig = {
     }
   },
 
-  // 抽奖
+  // 问卷
   comQuestionnaire: {
-    component: 'VmpQuestionnaireWatch'
+    component: 'VmpQuestionnaireWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
 
   // 红包

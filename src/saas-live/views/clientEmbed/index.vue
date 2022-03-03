@@ -5,20 +5,23 @@
     <div v-if="roomStatus.show" class="vh-embed-live">
       <!-- 聊天 -->
       <vmp-chat v-if="componentName == 'Chat'"></vmp-chat>
-      <div v-if="componentName == 'Doc'">
+      <div v-if="componentName == 'Doc'" class="embed-doc-box">
         <!-- 文档 -->
-        <vmp-doc-une></vmp-doc-une>
+        <vmp-doc-une ref="doc"></vmp-doc-une>
         <!-- 文档列表 -->
-        <vmp-doc-dlglist></vmp-doc-dlglist>
+        <vmp-doc-dlglist ref="docList"></vmp-doc-dlglist>
       </div>
       <div v-if="componentName == 'Tools'">
         <!-- 问卷 -->
-        <vmp-questionnaire></vmp-questionnaire>
+        <vmp-questionnaire
+          ref="questionnaire"
+          v-show="tool_component_name == 'questionnaire'"
+        ></vmp-questionnaire>
         <!-- 抽奖 -->
         <!-- 问答 -->
-        <vmp-qa></vmp-qa>
+        <vmp-qa ref="qa" v-show="tool_component_name == 'qa'"></vmp-qa>
         <!-- 签到 -->
-        <vmp-sign-live></vmp-sign-live>
+        <vmp-sign-live ref="signLive" v-show="tool_component_name == 'signLive'"></vmp-sign-live>
       </div>
     </div>
   </div>
@@ -73,7 +76,8 @@
         recordTip: '', // 是否弹出默认回放弹框
         tipMsg: '', // info接口返回的错误信息
         componentName: '',
-        domain: null
+        domain: null,
+        tool_component_name: ''
       };
     },
     beforeCreate() {
@@ -92,6 +96,18 @@
       this.webviewType = getQueryString('view_type');
       if (this.assistantType == 'doc') {
         this.componentName = 'Doc';
+        // TODO: 待优化 dom按时无法获取
+        let dom = document.getElementsByClassName('embed-doc-box')[0];
+        if (!dom) {
+          let timer = setInterval(() => {
+            this.$nextTick(() => {
+              console.log(document.getElementsByClassName('embed-doc-box')[0], 'embed-doc-box');
+            });
+            document.getElementsByClassName('embed-doc-box')[0].style.height =
+              window.innerHeight + 'px';
+            clearInterval(timer);
+          }, 500);
+        }
       } else if (this.assistantType == 'chat') {
         this.componentName = 'Chat';
       } else if (this.assistantType == 'tools') {
@@ -169,12 +185,61 @@
         window.QtCallFunctionPage = _msg => {
           const msg = Number(_msg);
           console.error('展示当前点击的消息转换-------', _msg);
-          this.$refs.vhallClient.handleAssitant(msg);
+          // 获取文档dom
+          let container = '';
+          try {
+            container = document.querySelector('.vhall-document-container');
+          } catch (error) {
+            console.log(error);
+          }
+          // 判断执行对应方法
+          switch (msg) {
+            case 1: // 文档
+              this.$refs.doc.switchTo('document');
+              break;
+            case 2: // 白板
+              this.$refs.doc.switchTo('board');
+              break;
+            case 3: // 问卷
+              this.closeAssistantTools('questionnaire');
+              this.openQuestionarie();
+              break;
+            case 4: // 抽奖
+              this.closeAssistantTools('questionnaire');
+              this.openLettery();
+              break;
+            case 5: // 签到
+              this.closeAssistantTools('signLive');
+              this.openSignIn();
+              break;
+            case 6: // 答题
+              this.closeAssistantTools('qa');
+              this.openQAPopup();
+              break;
+            case 7: // 隐藏文档
+              container && (container.style.opacity = 0);
+              break;
+            case 8: // 显示文档
+              container && (container.style.opacity = 1);
+              break;
+            case 9: // 文档最小化
+              this.exitFullscreen('#vhall-document-container');
+              break;
+            case 11: // 打开红包
+              this.closeAssistantTools('questionnaire');
+              this.openRedPacketPopup();
+              break;
+            case 12: // 打开红包
+              // this.closeAssistantTools()
+              // this.openRedPacketPopup()
+              // EventBus.$emit('live_start');
+              break;
+          }
         };
         // 显示/隐藏文档工具栏
         window.QtCallJsChangeDocTool = _msg => {
           const msg = Number(_msg);
-          this.$refs.vhallClient.handleAssitantDocTool(msg);
+          this.$refs.doc.handleAssitantDocTool(msg);
         };
         // 踢出用户回调
         window.QtCallJsKickOut = (msg, bool) => {
@@ -184,6 +249,10 @@
         window.QtCallDocFocus = msg => {
           this.$refs.vhallClient.handleAssitantDocFocus(msg);
         };
+      },
+      // 关闭其他互动工具
+      closeAssistantTools(name) {
+        this.tool_component_name = name;
       },
       // 初始化房间
       async getUserinfo() {

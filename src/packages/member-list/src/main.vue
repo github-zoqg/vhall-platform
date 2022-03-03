@@ -125,11 +125,16 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num">{{ totalNum | numberCompression }}人在线</span>
+        <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
+          {{ totalNum | numberCompression }}人在线
+        </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
         </span>
-        <div class="info-panel__allow-raise-hand" v-if="mode !== 6">
+        <div
+          class="info-panel__allow-raise-hand"
+          v-if="configList['ui.hide_handsUp'] && mode !== 6"
+        >
           <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
           <el-switch
             v-model="allowRaiseHand"
@@ -158,6 +163,7 @@
                 raiseHandTip ? 'raise-hand' : '',
                 tabIndex === 2 ? 'active' : ''
               ]"
+              v-if="isShowBtn(configList['is_interact_and_host'])"
             >
               举手
             </li>
@@ -165,6 +171,7 @@
               @click="switchToTab(3)"
               class="button-panel__btn-box__tab-item"
               :class="tabIndex === 3 ? 'active' : ''"
+              v-if="isShowBtn(configList['is_membermanage'])"
             >
               受限
             </li>
@@ -354,6 +361,16 @@
           show = true;
         }
         return show;
+      },
+      //底部区域的按钮是否显示,根据配置里是发起端还是观看端
+      isShowBtn() {
+        const _this = this;
+        return function (value = false) {
+          return _this.isWatch ? true : value;
+        };
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       },
       //是否在分组里
       isInGroup() {
@@ -1256,29 +1273,6 @@
         }
         //组长变更
         function handleLeaderChange(msg) {
-          // 原组长提示
-          if (_this.leader_id == _this.userId && _this.isInGroup) {
-            _this.$alert('组长身份已变更', _this.$t('account.account_1061'), {
-              confirmButtonText: _this.$t('account.account_1062'),
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel'
-              // type: 'info',
-              // center: true
-            });
-          }
-          // 新组长提示
-          if (msg.data.account_id == _this.userId && _this.isInGroup) {
-            _this.presentation_screen = msg.data.account_id;
-            _this
-              .$alert('您被提升为组长', _this.$t('account.account_1061'), {
-                confirmButtonText: _this.$t('account.account_1062'),
-                customClass: 'zdy-message-box',
-                cancelButtonClass: 'zdy-confirm-cancel'
-                // type: 'info',
-                // center: true
-              })
-              .then(() => {});
-          }
           _this.leader_id = msg.data.account_id;
           _this.getOnlineUserList();
         }
@@ -1336,7 +1330,7 @@
       // 演示权限人员掉线异常处理
       handlePermissionLeave(msg) {
         // 如果是当前主讲人掉线，启动异常处理流程
-        if (msg.sender_id == this.currentSpeakerId) {
+        if (msg.sender_id == this.getCurrentSpeakerId) {
           this._permissionLeaveId = msg.sender_id;
           this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
           this._permissionLeaveInterval = window.setTimeout(() => {
@@ -1675,9 +1669,11 @@
       },
       // 我要演示
       myPresentation(accountId) {
-        console.log(this.getCurrentMainScreen, '当前演示的id');
+        console.log(this.getCurrentMainScreen, '当前演示主屏幕的id');
+        console.log(this.getCurrentPresentationScreen, '当前演示屏幕的id');
         console.log(accountId, '当前操作的用户id');
-        if (this.getCurrentMainScreen == accountId) {
+
+        if (this.getCurrentPresentationScreen == accountId) {
           this.$message.warning('正在演示中');
           return false;
         }
@@ -1786,7 +1782,7 @@
           return;
         }
 
-        if (this.memberOptions.platformType === 'watch' && accountId === this.currentSpeakerId) {
+        if (this.memberOptions.platformType === 'watch' && accountId === this.getCurrentSpeakerId) {
           return;
         }
         const params = {

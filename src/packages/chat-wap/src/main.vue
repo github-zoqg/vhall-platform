@@ -10,34 +10,21 @@
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
-      <scroll ref="scroll" @pullingDown="handlePullingDown">
-        <msg-item
-          v-for="msg in chatList"
-          :key="msg.count"
-          :msg="msg"
-          @preview="handlePreview"
-        ></msg-item>
-      </scroll>
+      <virtual-list
+        ref="chatlist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'count'"
+        :data-sources="chatList"
+        :data-component="msgItem"
+        :extra-props="{ previewImg: previewImg.bind(this) }"
+      ></virtual-list>
       <div
         class="vmp-chat-wap__content__new-msg-tips"
-        v-show="messageType.atList || messageType.reply || messageType.normal"
-        @click="scrollBottom"
+        v-show="isHasUnreadAtMeMsg"
+        @click="scrollToTarget"
       >
-        <span
-          v-if="
-            (messageType.normal && !messageType.atList && !messageType.reply) ||
-            newMsgNum > 1 ||
-            !((messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal)
-          "
-        >
-          {{ $t('chat.chat_1035', newMsgNum) }}
-        </span>
-        <span
-          v-if="(messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal"
-        >
-          {{ $t('chat.chat_1034') }}{{ messageType.atList ? '@' : ''
-          }}{{ messageType.reply ? $t('chat.chat_1036') : '' }} {{ $t('chat.chat_1059') }}
-        </span>
+        <span>{{ tipMsg }}</span>
         <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
@@ -51,12 +38,13 @@
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
       @login="handleLogin"
+      @sendEnd="sendMsgEnd"
     ></send-box>
   </div>
 </template>
 
 <script>
-  import scroll from './components/scroll';
+  import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
@@ -66,13 +54,14 @@
   export default {
     name: 'VmpChatWap',
     components: {
-      scroll,
-      msgItem,
+      VirtualList,
+      // msgItem,
       sendBox
     },
     data() {
       const { chatList } = this.chatServer.state;
       return {
+        msgItem,
         chatList: chatList,
         //新消息信息集合体
         messageType: {
@@ -82,8 +71,12 @@
           id: '',
           noNormal: false
         },
+        //消息提示
+        tipMsg: '',
+        //是否有未读
+        isHasUnreadAtMeMsg: false,
         //新消息数量
-        newMsgNum: 0,
+        unReadMessageCount: 0,
         //活动信息
         webinar: {},
         //是否隐藏聊天历史加载记录
@@ -104,7 +97,13 @@
         allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
-
+    watch: {
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
+        }
+      }
+    },
     computed: {
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
@@ -175,19 +174,6 @@
         }
       }
     },
-    watch: {
-      async 'chatList.length'(newVal) {
-        console.log(newVal);
-        await this.$nextTick();
-        this.$refs.scroll.refresh();
-        if (this.isPullingDown) {
-          this.$refs.scroll.finishPullDown();
-          this.isPullingDown = false;
-          return;
-        }
-        this.$refs.scroll.scrollBottom();
-      }
-    },
     beforeCreate() {
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -223,6 +209,31 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        // const giftsServer = useGiftsServer();
+        //监听到新消息过来
+        chatServer.$on('receiveMsg', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.unReadMessageCount++;
+            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
+          } else {
+            this.scrollBottom();
+          }
+        });
+        //监听@我的消息
+        chatServer.$on('atMe', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = '有人@你';
+          }
+        });
+        //监听回复我的消息
+        chatServer.$on('replyMe', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = '有人回复你';
+          }
+        });
         //监听禁言通知
         chatServer.$on('banned', res => {
           this.isBanned = res;
@@ -261,12 +272,10 @@
         const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
-        } else {
-          this.$refs.scroll.finishPullDown();
-          this.isPullingDown = false;
         }
+        this.scrollBottom();
       },
-      handlePreview(img) {
+      previewImg(img) {
         const index = this.imgUrls.findIndex(item => item === img);
         ImagePreview({
           images: this.imgUrls,
@@ -280,17 +289,29 @@
         this.isPullingDown = true;
         this.getHistoryMessage();
       },
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
+      },
       //滚动到底部
       scrollBottom() {
-        this.$refs.scroll.scrollBottom();
-        this.messageType = {
-          atList: false,
-          reply: false,
-          normal: false,
-          id: '',
-          noNormal: false
-        };
-        this.newMsgNum = 0;
+        this.$nextTick(() => {
+          this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
+          this.isHasUnreadAtMeMsg = false;
+        });
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.chatlist.$el.scrollHeight -
+            this.$refs.chatlist.$el.scrollTop -
+            this.$refs.chatlist.getClientSize() <
+          5
+        );
       },
       showUserPopup() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
@@ -298,6 +319,10 @@
       //唤起登录弹窗
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      //自己发送消息后的回调
+      sendMsgEnd() {
+        this.scrollBottom();
       }
     }
   };

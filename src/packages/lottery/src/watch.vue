@@ -5,9 +5,11 @@
       :winner-list="winLotteryUserList"
       :fitment="fitment"
       mode="watch"
-      :lotteryId="lotteryId"
       :showWinnerList="showWinnerList"
       :prizeInfo="prizeInfo"
+      :lottery-id="lotteryId"
+      :lottery-info="lotteryInfo"
+      @needLogin="handleGoLogin"
       @close="close"
       @navTo="changeView"
     />
@@ -15,6 +17,7 @@
 </template>
 <script>
   import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpLotteryWatch',
     components: {
@@ -33,7 +36,8 @@
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
-        lotteryId: '' // 抽奖的信息id(接口返回)
+        lotteryId: '', // 抽奖的信息id(接口返回)
+        lotteryInfo: {}
       };
     },
     provide() {
@@ -52,8 +56,15 @@
       this.removeMsgEvent();
     },
     methods: {
+      // 提示需要登录
+      handleGoLogin() {
+        this.dialogVisible = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
       accept(msg) {
-        console.log('🚀 ~ file: watch.vue ~ line 55 ~ accept ~ msg', msg);
+        this.setFitment(msg);
+        this.lotteryView = 'LotteryWin';
+        this.dialogVisible = true;
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
@@ -170,6 +181,7 @@
           title: payload.title,
           img_order: payload.img_order
         };
+        this.lotteryInfo = payload;
       },
       /**
        * @description 判断是否是自己

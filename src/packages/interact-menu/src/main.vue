@@ -14,6 +14,7 @@
           class="vmp-interact-menu-list-item"
           @click="openLottery"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          v-if="configList['ui.hide_lottery']"
         >
           <i class="vh-iconfont vh-a-line-luckydraw"></i>
           <p>抽奖</p>
@@ -22,11 +23,16 @@
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openSign"
+          v-if="configList['ui.hide_sign_in']"
         >
           <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
-        <div class="vmp-interact-menu-list-item" @click="emitOpenQuestionnaire">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="emitOpenQuestionnaire"
+          v-if="configList['ui.hide_survey']"
+        >
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
@@ -34,6 +40,7 @@
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="handleQAPopup"
+          v-if="configList['ui.is_hide_qa_button']"
         >
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
@@ -42,14 +49,16 @@
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openRedPacket"
+          v-if="configList['ui.show_redpacket']"
         >
-          <i class="vh-iconfont vh-a-redpacket"></i>
+          <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
         </div>
         <div
           class="vmp-interact-menu-list-item"
           @click="openTimer"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          v-if="configList['webinar.timer']"
         >
           <i class="vh-iconfont vh-line-time"></i>
           <p>计时器</p>
@@ -58,6 +67,7 @@
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openRebroadcast"
+          v-if="configList['rebroadcast']"
         >
           <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
@@ -117,7 +127,13 @@
     computed: {
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       handleQAPopup() {
@@ -147,9 +163,9 @@
           .then(res => {
             this.isQAEnabled = true;
             this.qaVisible = false;
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
+            // );
           });
       }, 500),
       closeQA: debounce(function (flag) {
@@ -158,9 +174,9 @@
           .then(res => {
             this.isQAEnabled = false;
             this.qaVisible = false;
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
+            // );
           });
       }, 500),
       // 设置可用状态
@@ -173,7 +189,7 @@
       },
       // 打开计时器设置弹框
       openTimer() {
-        if (this.disTimer) return false;
+        if (this.disTimer || !this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
       },
       //  打开转播
@@ -195,6 +211,7 @@
       },
       // 打开签到弹窗
       openSign() {
+        if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
       // 打开红包弹窗

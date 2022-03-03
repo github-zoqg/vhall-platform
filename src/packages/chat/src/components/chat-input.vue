@@ -50,8 +50,10 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatInput',
+    mixins: [emitter],
     props: {
       //输入框状态
       inputStatus: {
@@ -254,7 +256,7 @@
         //将回复消息加入消息体
         curmsg.setReply(this.replyMsg);
         //将@消息加入消息体
-        curmsg.setAt(this.atList);
+        curmsg.setAt([].concat(this.atList));
         //发送消息
         useChatServer().sendMsg(curmsg);
         //清除发送后的消息
@@ -266,6 +268,7 @@
         //todo 建议移入domain  清空一下@列表，但是保持引用
         this.atList.splice(0, this.atList.length);
         callback && callback();
+        this.dispatch('VmpChatOperateBar', 'sendEnd');
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {

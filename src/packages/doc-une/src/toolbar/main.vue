@@ -191,44 +191,50 @@
       }
     },
     computed: {
-      watchInitData() {
-        return this.roomBaseServer.state.watchInitData;
-      },
-      isInGroup() {
-        // 在小组中
-        return !!this.groupServer.state.groupInitData?.isInGroup;
-      },
-      // 是否观看端(send是发起端，其它的都是你观看端)
-      isWatch() {
-        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
-      },
+      // 是否观众可见
       switchStatus: {
         get() {
           return this.docServer.state.switchStatus;
         },
         set() {}
       },
+      // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      watchInitData() {
+        return this.roomBaseServer.state.watchInitData;
+      },
+      // 是否在小组中
+      isInGroup() {
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
+      // 当前用户Id
+      userId() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      // 当前的演示者Id
+      presenterId() {
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
       // 是否文档演示权限
       hasDocPermission() {
-        if (this.watchInitData.webinar.type == 4 || this.watchInitData.webinar.type == 5) {
-          // 对于应点播和回放，所有人都没有文档演示权限
+        if (this.isWatch && [4, 5].includes(this.webinarType)) {
+          // 对于观看端 && 点播和回放，所有人都没有文档演示权限
           return false;
         }
-        if (this.isInGroup) {
-          return (
-            this.groupServer.state.groupInitData.presentation_screen ==
-            this.watchInitData.join_info.third_party_user_id
-          );
-        } else {
-          return (
-            ['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
-            this.roomBaseServer.state.interactToolStatus.presentation_screen ==
-              this.watchInitData.join_info.third_party_user_id
-          );
-        }
+        // 当前用户是否演示者
+        return this.presenterId == this.userId;
       },
       // 是否显示画笔工具栏
       showBrushToolbar() {

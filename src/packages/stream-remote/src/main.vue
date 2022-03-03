@@ -26,7 +26,10 @@
 
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-first-line"
+      >
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
@@ -87,7 +90,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="joinInfo.role_name == 1 && stream.attributes.roleName != 20"
+            v-if="joinInfo.role_name == 1 || groupRole == 20"
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -95,7 +98,10 @@
     </section>
 
     <section v-else class="vmp-stream-remote__shadow-box">
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-first-line"
+      >
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
             class="vmp-stream-remote__shadow-icon"
@@ -117,17 +123,20 @@
             "
           ></span>
         </el-tooltip>
-
+        <!--
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="joinInfo.role_name != 1 && stream.attributes.roleName != 20"
           ></span>
-        </el-tooltip>
+        </el-tooltip> -->
       </p>
 
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-second-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-second-line"
+      >
         <el-tooltip content="设为主讲人" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
@@ -139,7 +148,7 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2 || stream.attributes.roleName == 20"
+            v-show="stream.attributes.roleName == 2"
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
@@ -149,9 +158,16 @@
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
+      </p>
+    </section>
+    <section
+      class="vmp-stream-remote__pause"
+      v-show="mainScreen == stream.accountId && interactiveServer.state.showPlayIcon"
+    >
+      <p @click.stop="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
       </p>
     </section>
   </div>
@@ -175,8 +191,20 @@
       }
     },
     computed: {
+      // 小组内角色，20为组长
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -225,6 +253,15 @@
       }
     },
     methods: {
+      // 恢复播放
+      replayPlay() {
+        const videos = document.querySelectorAll('video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.play();
+          });
+        this.interactiveServer.state.showPlayIcon = false;
+      },
       subscribeRemoteStream() {
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
@@ -235,7 +272,7 @@
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
-            console.log('订阅成功----', e);
+            console.log('订阅成功--1--', e);
             this.getLevel();
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
             setTimeout(() => {
@@ -501,6 +538,34 @@
         }
         &:last-child {
           margin-right: 0;
+        }
+      }
+    }
+
+    // 暂停按钮
+    &__pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      p {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 46px;
+          color: #f5f5f5;
         }
       }
     }

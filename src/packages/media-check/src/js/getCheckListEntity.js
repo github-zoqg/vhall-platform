@@ -1,6 +1,6 @@
 export function getCheckList() {
   return [
-    { use: true, name: 'video', text: '摄像头', icon: 'vh-line-video-camera', status: 'no-check' },
+    { use: true, name: 'video', text: '摄像头', icon: 'vh-line-detection', status: 'no-check' },
     {
       use: true,
       name: 'audioInput',

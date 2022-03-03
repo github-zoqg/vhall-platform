@@ -82,7 +82,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && role != 20"
+            v-if="joinInfo.role_name != 1 && groupRole != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -113,9 +113,6 @@
     <!-- 遮罩层 非主屏-->
     <section v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleNameFilter }}
-        </span>
         <el-tooltip :content="localStream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
             class="vmp-stream-local__shadow-icon"
@@ -140,7 +137,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && role != 20"
+            v-if="joinInfo.role_name != 1 && groupRole != 20"
           ></span>
         </el-tooltip>
       </p>
@@ -170,6 +167,16 @@
       </p>
     </section>
 
+    <!-- 播放按钮 -->
+    <section
+      class="vmp-stream-local__pause"
+      v-show="mainScreen == joinInfo.third_party_user_id && interactiveServer.state.showPlayIcon"
+    >
+      <p @click.stop="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
+      </p>
+    </section>
+
     <ImgStream ref="imgPushStream"></ImgStream>
   </div>
 </template>
@@ -181,7 +188,8 @@
     useRoomBaseServer,
     usePlayerServer,
     useMediaSettingServer,
-    useGroupServer
+    useGroupServer,
+    useChatServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -191,7 +199,6 @@
     data() {
       return {
         isFullScreen: false,
-        role: '',
         isStreamPublished: false,
         networkStatus: 2,
         audioLevel: 1,
@@ -202,6 +209,10 @@
       ImgStream
     },
     computed: {
+      // 小组内角色，20为组长
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
       localStream() {
         console.log(
           '----localStream更新了----',
@@ -209,8 +220,16 @@
         );
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -243,13 +262,26 @@
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
+      this.chatServer = useChatServer();
       this.listenEvents();
     },
     async mounted() {
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
 
-      if (this.micServer.state.isSpeakOn) {
+      // 刷新重进时，如果在小组内且上麦，或者不在小组内且上麦
+      if (
+        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+        this.micServer.state.isSpeakOn
+      ) {
         this.startPush();
+      } else if (
+        this.mode === 6 &&
+        !this.chatServer.state.banned &&
+        !this.chatServer.state.allBanned &&
+        this.joinInfo.role_name != 3
+      ) {
+        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
+        await this.micServer.userSpeakOn();
       }
     },
     beforeDestroy() {
@@ -262,6 +294,15 @@
       }
     },
     methods: {
+      // 恢复播放
+      replayPlay() {
+        const videos = document.querySelectorAll('video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.play();
+          });
+        this.interactiveServer.state.showPlayIcon = false;
+      },
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
@@ -306,7 +347,7 @@
             //  初始化互动实例
             this.interactiveServer.init();
           } else {
-            // 如果成功，销毁播放器
+            // 初始化播放器
             this.playerServer.init();
           }
         });
@@ -318,18 +359,11 @@
         });
         // 分组结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {
-          console.log('分组结束讨论，是否在麦上', this.micServer.state.isSpeakOn);
           try {
             await this.stopPush();
-            console.log('11111-1111111');
             await this.interactiveServer.destroy();
             //  初始化互动实例
-            console.log('2222222-2222222');
             this.interactiveServer.init();
-            console.log(
-              '分组结束讨论，重新初始化实例后，是否在麦上',
-              this.micServer.state.isSpeakOn
-            );
           } catch (error) {
             console.log('分组结束讨论', error);
           }
@@ -519,7 +553,13 @@
       // 结束推流
       stopPush() {
         return new Promise(resolve => {
+          // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
+          if (!this.isStreamPublished) {
+            resolve();
+            return;
+          }
           this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            console.warn('结束推流成功----');
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 
@@ -842,6 +882,33 @@
         }
         &:last-child {
           margin-right: 0;
+        }
+      }
+    }
+    // 播放按钮
+    &__pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      p {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 46px;
+          color: #f5f5f5;
         }
       }
     }

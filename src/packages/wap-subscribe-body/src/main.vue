@@ -121,7 +121,6 @@
     },
     created() {
       this.initPage();
-      this.handlerInitInfo();
       this.subscribeServer.listenMsg();
     },
     mounted() {
@@ -251,6 +250,7 @@
           case 512523:
             // 付费
             if (browserType()) {
+              // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
               const open_id = sessionStorage.getItem('open_id');
               params = {
                 webinar_id: this.$route.params.id,
@@ -390,8 +390,10 @@
         if (this.webinarType != 3) {
           // 不是 活动结束 - 就启动倒计时
           this.sureCountDown();
+          this.handlerInitInfo();
         } else if (this.webinarType == 3) {
-          this.countDownTime = this.$t('player.player_1017');
+          this.subscribeText = this.$t('player.player_1017');
+          this.countDownTime = 0;
         }
       },
       livingStartConfirm() {

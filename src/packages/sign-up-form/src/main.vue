@@ -93,7 +93,7 @@
                         :maxlength="
                           question.type == 0 && question.default_type == 1
                             ? 50
-                            : question.type == 0
+                            : question.type == 0 && question.default_type !== 3
                             ? ''
                             : 60
                         "
@@ -794,7 +794,7 @@
           phone: {
             type: 'number',
             required: true,
-            message: this.$t('acount.account_1069'),
+            message: this.$t('account.account_1069'),
             trigger: 'blur'
           },
           code: {
@@ -842,7 +842,7 @@
             _this.verifyRules.phone = {
               type: 'number',
               required: true,
-              message: _this.$t('acount.account_1069'),
+              message: _this.$t('account.account_1069'),
               trigger: 'blur'
             };
           }
@@ -904,7 +904,7 @@
                   rules[item.id] = {
                     type: 'number',
                     required: !!item.is_must,
-                    message: this.$t('acount.account_1069'),
+                    message: this.$t('account.account_1069'),
                     trigger: 'blur'
                   };
                 }
@@ -1074,7 +1074,7 @@
           return callback ? callback(new Error(this.$t('account.account_1025'))) : false;
         } else if (!reg.test(value)) {
           this.isValidPhone = false;
-          return callback ? callback(new Error(this.$t('acount.account_1069'))) : false;
+          return callback ? callback(new Error(this.$t('account.account_1069'))) : false;
         } else {
           this.isValidPhone = true;
           if (callback) {
@@ -1639,7 +1639,7 @@
         };
         this.signUpFormServer.getWebinarType(params).then(res => {
           if (res.code == 512503 || res.code == 512502) {
-            window.location.href = `${window.location.origin}/${this.webinar_id}`;
+            window.location.href = `${window.location.origin}/${this.webinarId}`;
             return false;
           }
           // 如果是独立链接，判断状态进行跳转
@@ -1649,7 +1649,7 @@
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinar_id}${queryString}`;
+                `/lives/watch/${this.webinarId}${queryString}`;
             } else {
               // 如果预约或结束，跳转到预约页
               if (res.data.webinar.type == 2 && isSubmitForm) {
@@ -1666,7 +1666,7 @@
                       window.location.href =
                         window.location.origin +
                         process.env.VUE_APP_WEB_KEY +
-                        `/lives/subscribe/${this.webinar_id}${queryString}`;
+                        `/lives/subscribe/${this.webinarId}${queryString}`;
                     }
                   }
                 );
@@ -1674,7 +1674,7 @@
                 window.location.href =
                   window.location.origin +
                   process.env.VUE_APP_WEB_KEY +
-                  `/lives/subscribe/${this.webinar_id}${queryString}`;
+                  `/lives/subscribe/${this.webinarId}${queryString}`;
               }
             }
           } else {
