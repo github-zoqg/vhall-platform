@@ -183,6 +183,16 @@
       listenEvents() {
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
+          // 订阅流播放失败    监听到播放失败, 然后展示按钮
+          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+            let videos = document.querySelectorAll('video');
+            videos.length > 0 &&
+              videos.forEach(video => {
+                video.pause();
+              });
+            this.interactiveServer.state.showPlayIcon = true;
+          });
+
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
             this.$message.warning('直播已结束');
@@ -263,6 +273,7 @@
         min-height: auto;
         left: 60px;
         right: 310px;
+        width: auto;
         &.height-lower {
           top: 160px;
         }

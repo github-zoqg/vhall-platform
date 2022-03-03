@@ -2,19 +2,41 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record']"></record-control>
-      <div v-if="liveStep == 1 && role_name" class="vmp-header-right_btn" @click="handleStartClick">
-        {{ isRecord ? '开始录制' : '开始直播' }}
-      </div>
-      <div v-if="liveStep == 2 && role_name" class="vmp-header-right_btn">正在启动...</div>
-      <div
-        v-if="liveStep == 3 && configList['ui.hide_live_end'] && role_name"
-        class="vmp-header-right_btn vmp-header-right_duration"
-        @click="handleEndClick"
-      >
-        <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
-        <span class="vmp-header-right_duration-end">{{ isRecord ? '结束录制' : '结束直播' }}</span>
-      </div>
-      <div v-if="liveStep == 4 && role_name" class="vmp-header-right_btn">正在结束...</div>
+      <!-- 主持人显示开始结束直播按钮 -->
+      <template v-if="roleName == 1">
+        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+          {{ isRecord ? '开始录制' : '开始直播' }}
+        </div>
+        <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
+        <div
+          v-if="liveStep == 3 && configList['ui.hide_live_end']"
+          class="vmp-header-right_btn vmp-header-right_duration"
+          @click="handleEndClick"
+        >
+          <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
+          <span class="vmp-header-right_duration-end">
+            {{ isRecord ? '结束录制' : '结束直播' }}
+          </span>
+        </div>
+        <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+      </template>
+      <!-- 嘉宾显示申请上麦按钮 -->
+      <template v-if="roleName == 4">
+        <!-- 申请上麦按钮 -->
+        <div
+          v-if="!isApplying && !isSpeakOn"
+          class="vmp-header-right_btn"
+          @click="handleApplyClick"
+        >
+          申请上麦
+        </div>
+        <!-- 等待应答按钮 -->
+        <div v-if="isApplying" class="vmp-header-right_btn" @click="handleApplyCancleClick">
+          等待应答{{ applyTime }}s
+        </div>
+        <!-- 下麦按钮 -->
+        <div v-if="isSpeakOn" class="vmp-header-right_btn" @click="handleSpeakOffClick">下麦</div>
+      </template>
       <div class="vmp-header-right_control">
         <headerControl
           :isShowMediaSetting="isShowMediaSetting"
@@ -63,7 +85,7 @@
 <script>
   import headerControl from './components/header-control.vue';
   import RecordControl from './components/record-control.vue';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useMicServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -72,6 +94,8 @@
       return {
         liveStep: 1, // 1未开始 2启动中 3直播中 4结束中
         liveDuration: '',
+        isApplying: false, // 是否正在等待应答
+        applyTime: 30,
         isFullscreen: false,
         assistantType: this.$route.query.assistantType,
         isShowMediaSetting: false, // 是否显示媒体设置
@@ -110,8 +134,11 @@
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
       },
-      role_name() {
-        return this.roomBaseServer.state.watchInitData?.join_info?.role_name == 1;
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
+      },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     components: {
@@ -133,6 +160,47 @@
       }
     },
     methods: {
+      // 嘉宾点击申请上麦
+      handleApplyClick() {
+        useMicServer()
+          .userApply()
+          .then(res => {
+            this.isApplying = true;
+            this.applyTime = 30;
+            this._applyInterval = setInterval(async () => {
+              this.applyTime = this.applyTime - 1;
+              if (this.applyTime == 0) {
+                this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
+                clearInterval(this._applyInterval);
+                this.isApplying = false;
+                const { code, msg } = await useMicServer().speakOff();
+                if (code === 513035) {
+                  this.$message.error(msg);
+                }
+              }
+            }, 1000);
+          });
+      },
+      // 嘉宾取消申请
+      handleApplyCancleClick() {
+        useMicServer()
+          .userCancelApply()
+          .then(res => {
+            this.isApplying = false;
+            this.applyTime = 30;
+            clearInterval(this._applyInterval);
+          });
+      },
+      // 嘉宾下麦
+      async handleSpeakOffClick() {
+        // 下麦接口停止推流，成功之后执行下面的逻辑
+        const { code, msg } = await useMicServer().speakOff();
+        if (code === 513035) {
+          this.$message.error(msg);
+        }
+        this.isApplying = false;
+        this.applyTimerCount = 30;
+      },
       listenEvents() {
         // 全屏事件
         const setFullscreen = () => {
