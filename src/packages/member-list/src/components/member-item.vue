@@ -505,7 +505,11 @@
       },
       //是否显示禁言、取消禁言
       isShowLiveMuted() {
-        return ![1, '1'].includes(this.userInfo.role_name) && this.userInfo.is_kicked == 0;
+        if (this.tabIndex !== 3) {
+          return ![1, '1'].includes(this.userInfo.role_name);
+        } else {
+          return ![1, '1'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
       },
       //是否显示踢出、取消踢出(非分组)
       isShowLiveKicked() {
@@ -517,7 +521,11 @@
       },
       //是否显示禁言、取消禁言（PC观看）
       isShowWatchMuted() {
-        return [2, '2'].includes(this.userInfo.role_name);
+        if (this.tabIndex !== 3) {
+          return [2, '2'].includes(this.userInfo.role_name);
+        } else {
+          return [2, '2'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
       },
       //是否显示踢出、取消踢出小组（PC观看）
       isShowWatchKicked() {
