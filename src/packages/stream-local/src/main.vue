@@ -267,7 +267,13 @@
       ) {
         this.startPush();
       }
-      if (this.mode === 6 && !this.chatServer.state.banned && !this.chatServer.state.allBanned) {
+      // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
+      if (
+        this.mode === 6 &&
+        !this.chatServer.state.banned &&
+        !this.chatServer.state.allBanned &&
+        this.joinInfo.role_name != 3
+      ) {
         await this.micServer.userSpeakOn();
       }
     },
@@ -531,7 +537,13 @@
       // 结束推流
       stopPush() {
         return new Promise(resolve => {
+          // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
+          if (!this.isStreamPublished) {
+            resolve();
+            return;
+          }
           this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+            console.warn('结束推流成功----');
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 

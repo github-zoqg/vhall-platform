@@ -76,7 +76,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useSplitScreenServer } from 'middle-domain';
+  import { useInteractiveServer, useSplitScreenServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
 
   export default {
@@ -147,6 +147,7 @@
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.micServer = useMicServer();
     },
 
     created() {
@@ -161,6 +162,7 @@
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
         this.PopAlertOffline.visible = true;
       });
+      this.listenEvents();
       // this.getStreamList();
     },
 
@@ -175,6 +177,24 @@
     },
 
     methods: {
+      listenEvents() {
+        // 助理等角色监听
+        if (this.joinInfo.role_name != 1) {
+          // live_over 结束直播
+          this.interactiveServer.$on('live_over', () => {
+            this.$message.warning('直播已结束');
+          });
+
+          // 接收设为主讲人消息
+          this.micServer.$on('vrtc_big_screen_set', msg => {
+            const str =
+              this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+                ? '主画面'
+                : '主讲人';
+            this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+          });
+        }
+      },
       getStreamList() {
         this.interactiveServer.getRoomStreams();
         console.log('------remoteStreams------', this.remoteStreams);
