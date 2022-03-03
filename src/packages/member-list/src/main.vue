@@ -1266,29 +1266,6 @@
         }
         //组长变更
         function handleLeaderChange(msg) {
-          // 原组长提示
-          if (_this.leader_id == _this.userId && _this.isInGroup) {
-            _this.$alert('组长身份已变更', _this.$t('account.account_1061'), {
-              confirmButtonText: _this.$t('account.account_1062'),
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel'
-              // type: 'info',
-              // center: true
-            });
-          }
-          // 新组长提示
-          if (msg.data.account_id == _this.userId && _this.isInGroup) {
-            _this.presentation_screen = msg.data.account_id;
-            _this
-              .$alert('您被提升为组长', _this.$t('account.account_1061'), {
-                confirmButtonText: _this.$t('account.account_1062'),
-                customClass: 'zdy-message-box',
-                cancelButtonClass: 'zdy-confirm-cancel'
-                // type: 'info',
-                // center: true
-              })
-              .then(() => {});
-          }
           _this.leader_id = msg.data.account_id;
           _this.getOnlineUserList();
         }

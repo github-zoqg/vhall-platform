@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-column" v-if="isNoticeColumn">
+  <div class="vmp-notice-column" v-if="isLiving && isNoticeColumn">
     <div class="vmp-notice-column-wrap">
       <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
       <p class="vmp-notice-column-wrap-nowrap">
@@ -23,6 +23,11 @@
         isNoticeColumn: false
       };
     },
+    computed: {
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -30,7 +35,7 @@
     },
     created() {
       const { latestNotice } = this.noticeServer.state;
-      if (latestNotice.total) {
+      if (latestNotice.total && latestNotice.created_at) {
         this.isNoticeColumn = true;
         this.noticeText = latestNotice.noticeContent;
       }
