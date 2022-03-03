@@ -93,10 +93,16 @@
                     <p>用office转为pdf后上传</p>
                     <p>4.直播过程中发现PPT自动翻页，请检查源文件</p>
                     <p>是否设置自动放映</p>
-                    <p>5.文档转换较慢，请于直播前从资料管理-文档</p>
-                    <p>管理上传文档</p>
-                    <p>6.动态版文档转码时间较长，请耐心等待，可选</p>
-                    <p>择静态版（无动画效果）快速演示</p>
+                    <template v-if="isWatch && webinarMode == 6">
+                      <p>5.动态版文档转码时间较长，请耐心等待，可选</p>
+                      <p>择静态版（无动画效果）快速演示</p>
+                    </template>
+                    <template v-else>
+                      <p>5.文档转换较慢，请于直播前从资料管理-文档</p>
+                      <p>管理上传文档</p>
+                      <p>6.动态版文档转码时间较长，请耐心等待，可选</p>
+                      <p>择静态版（无动画效果）快速演示</p>
+                    </template>
                   </div>
                 </div>
                 <i
@@ -313,6 +319,10 @@
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 活动直播类型
+      webinarMode() {
+        return this.roomBaseServer.state.watchInitData.webinar.mode;
       }
     },
     watch: {
