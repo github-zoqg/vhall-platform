@@ -93,7 +93,14 @@
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
-            <template v-if="source.replyMsg && source.replyMsg.type && source.atList.length == 0">
+            <template
+              v-if="
+                source.replyMsg &&
+                source.replyMsg.type &&
+                source.atList &&
+                source.atList.length == 0
+              "
+            >
               <p class="reply-msg">
                 <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
                 ：
@@ -116,7 +123,7 @@
               </div>
             </template>
             <!-- @消息 -->
-            <template v-if="source.atList.length !== 0">
+            <template v-if="source.atList && source.atList.length !== 0">
               <div class="msg-content_body">
                 <span v-html="msgContent"></span>
                 <img
@@ -133,7 +140,12 @@
               </div>
             </template>
             <!-- 正常消息 -->
-            <template v-if="!Object.keys(source.replyMsg || {}).length && !source.atList.length">
+            <template
+              v-if="
+                !Object.keys(source.replyMsg || {}).length &&
+                (!source.atList || !source.atList.length)
+              "
+            >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
                 <span v-html="source.content.text_content" style="display: block"></span>

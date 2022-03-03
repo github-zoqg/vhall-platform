@@ -165,13 +165,23 @@
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        //收到提问
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
-          msg.data.content = textToEmojiText(msg.data.content);
-          this.list.push(msg.data);
+          if (msg.sender_id == this.userId || this.roleName != 2) {
+            msg.data.content = this.emojiToText(msg.data.content);
+            this.list.push(msg.data);
+          }
         });
+        //收到问答回复
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          msg.data.content = textToEmojiText(msg.data.content);
-          this.list.push(msg.data);
+          if (
+            (msg.data.answer.is_open == '0' && msg.join_id == this.joinId) ||
+            msg.data.answer.is_open != '0' ||
+            this.roleName == 1
+          ) {
+            msg.data.content = this.emojiToText(msg.data.content);
+            this.list.push(msg.data);
+          }
         });
       },
       roleFilter(value) {
