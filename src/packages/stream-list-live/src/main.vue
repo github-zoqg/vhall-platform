@@ -260,6 +260,7 @@
         min-height: auto;
         left: 60px;
         right: 310px;
+        width: auto;
         &.height-lower {
           top: 160px;
         }
