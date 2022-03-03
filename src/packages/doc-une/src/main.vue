@@ -196,7 +196,7 @@
       },
       // 是否观看端
       isWatch() {
-        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       },
       // 文档是否可见
       show() {

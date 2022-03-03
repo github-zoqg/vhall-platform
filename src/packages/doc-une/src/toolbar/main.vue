@@ -200,7 +200,7 @@
       },
       // 是否观看端(send是发起端，其它的都是你观看端)
       isWatch() {
-        return !['send', 'record'].includes(this.roomBaseServer.state.clientType);
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       },
       switchStatus: {
         get() {
@@ -224,7 +224,7 @@
           );
         } else {
           return (
-            ['send', 'record'].includes(this.roomBaseServer.state.clientType) &&
+            ['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType) &&
             this.roomBaseServer.state.interactToolStatus.presentation_screen ==
               this.watchInitData.join_info.third_party_user_id
           );

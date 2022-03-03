@@ -195,6 +195,7 @@
       },
       // 打开签到弹窗
       openSign() {
+        if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
       // 打开红包弹窗
