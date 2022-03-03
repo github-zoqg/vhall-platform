@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer, useRoomBaseServer, useInteractiveServer } from 'middle-domain';
+  import { useMicServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -45,16 +45,19 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      // 组内角色
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
       }
     },
     created() {
       if (this.waitInterval) {
         clearInterval(this.waitInterval);
       }
-      const { join_info } = useRoomBaseServer().state.watchInitData;
       // 申请上麦
       useMicServer().$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', join_info, msg);
+        console.log('---申请上麦消息---', this.joinInfo, msg);
       });
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
@@ -68,7 +71,7 @@
        *
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        console.log('---申请下麦消息---', join_info, msg);
+        console.log('---申请下麦消息---', msg);
       });
       // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {
@@ -81,6 +84,15 @@
       });**/
     },
     methods: {
+      // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' }
+      showGroupHand() {
+        return (
+          this.isInGroup &&
+          parseInt(this.groupRole) !== 3 &&
+          parseInt(this.groupRole) !== 4 &&
+          parseInt(this.groupRole) !== 20
+        );
+      },
       // 下麦
       async speakOff() {
         const { code, msg } = await useMicServer().speakOff();

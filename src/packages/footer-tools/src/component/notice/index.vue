@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-list" v-if="isShowIcon && isLiving">
+  <div class="vmp-notice-list" v-if="isShowIcon">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
@@ -53,11 +53,6 @@
         total: 0
       };
     },
-    computed: {
-      isLiving() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
-      }
-    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -83,10 +78,14 @@
         }
       },
       initNotice() {
+        this.noticeServer.$on('live_over', () => {
+          this.isShowIcon = false;
+        });
         const { groupInitData } = this.groupServer.state;
         if (groupInitData.isInGroup) return;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
+          this.isShowIcon = true;
           this.noticeNum = this.noticeNum + 1;
           this.noticeList.unshift({
             created_at: msg.push_time,
@@ -110,7 +109,7 @@
 
         this.noticeServer.getNoticeList({ params, flag }).then(result => {
           if (result.code == 200 && result.data) {
-            this.noticeList = result.data.list;
+            this.noticeList = this.noticeServer.state.noticeList;
             this.totalPages = this.noticeServer.state.totalPages;
             this.total = result.data.total;
             this.noticeNum = result.data.total;

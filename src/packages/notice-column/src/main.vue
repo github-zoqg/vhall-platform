@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-column" v-if="isLiving && isNoticeColumn">
+  <div class="vmp-notice-column" v-if="isNoticeColumn">
     <div class="vmp-notice-column-wrap">
       <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
       <p class="vmp-notice-column-wrap-nowrap">
@@ -22,11 +22,6 @@
         noticeText: '',
         isNoticeColumn: false
       };
-    },
-    computed: {
-      isLiving() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
-      }
     },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
@@ -54,6 +49,9 @@
           if (!groupInitData.isInGroup) {
             this.noticeServer.setLatestNoticeInfo(msg.room_announcement_text);
           }
+        });
+        this.noticeServer.$on('live_over', () => {
+          this.isNoticeColumn = false;
         });
       },
       animates() {
@@ -113,7 +111,13 @@
         font-size: 14px;
         overflow: hidden;
         width: 100%;
+        height: 35px;
         flex: 1;
+        &-animated {
+          span {
+            white-space: nowrap;
+          }
+        }
       }
       &-close {
         cursor: pointer;

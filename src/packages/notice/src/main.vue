@@ -83,9 +83,8 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     created() {
-      this.noticeServer.listenMsg();
       this.roomBaseState = this.roomBaseServer.state;
-      this.getNoticeList(false);
+      // this.getNoticeList(false);
       this.initNotice();
     },
     methods: {

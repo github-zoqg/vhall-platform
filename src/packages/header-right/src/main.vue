@@ -2,19 +2,19 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record']"></record-control>
-      <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+      <div v-if="liveStep == 1 && role_name" class="vmp-header-right_btn" @click="handleStartClick">
         {{ isRecord ? '开始录制' : '开始直播' }}
       </div>
-      <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
+      <div v-if="liveStep == 2 && role_name" class="vmp-header-right_btn">正在启动...</div>
       <div
-        v-if="liveStep == 3 && configList['ui.hide_live_end']"
+        v-if="liveStep == 3 && configList['ui.hide_live_end'] && role_name"
         class="vmp-header-right_btn vmp-header-right_duration"
         @click="handleEndClick"
       >
         <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
         <span class="vmp-header-right_duration-end">{{ isRecord ? '结束录制' : '结束直播' }}</span>
       </div>
-      <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+      <div v-if="liveStep == 4 && role_name" class="vmp-header-right_btn">正在结束...</div>
       <div class="vmp-header-right_control">
         <headerControl
           :isShowMediaSetting="isShowMediaSetting"
@@ -109,6 +109,9 @@
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
+      },
+      role_name() {
+        return this.roomBaseServer.state.watchInitData?.join_info?.role_name == 1;
       }
     },
     components: {
