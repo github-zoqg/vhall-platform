@@ -14,7 +14,7 @@
     "serve:saas-wap:331": "node scripts/cli-service.js serve --project=saas-wap --mode=development331",
     "serve:saas-watch:331": "node scripts/cli-service.js serve --project=saas-watch --mode=development331",
     "/-----end/": "-------------331项目启动命令----------------end----",
-    "serve:zhike-live": "node scripts/cli-service.js serve --project=zhike-live",
+    "serve:zhike-live": "node scripts/cli-service.js serve --project=zhike-live --mode=development-zk",
     "build:saas-live": "node scripts/cli-service.js build --project=saas-live",
     "build:saas-live:test": "node scripts/cli-service.js build --project=saas-live --mode=test",
     "build:saas-wap": "node scripts/cli-service.js build --project=saas-wap",
