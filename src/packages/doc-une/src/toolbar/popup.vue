@@ -21,6 +21,7 @@
     position: absolute;
     top: 36px;
     left: 0;
+    bottom: auto;
     padding-top: 4px;
 
     .list-container {
