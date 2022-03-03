@@ -6,19 +6,13 @@
         type="primary"
         size="medium"
         round
-        v-if="isAllowhandup && !isSpeakOn && showGroupHand()"
+        v-if="isAllowhandup && !isSpeakOn"
       >
         {{ btnText }}
       </el-button>
     </div>
     <div>
-      <el-button
-        @click="speakOff"
-        type="primary"
-        size="medium"
-        v-if="isSpeakOn && showGroupHand()"
-        round
-      >
+      <el-button @click="speakOff" type="primary" size="medium" v-if="isSpeakOn" round>
         下麦
       </el-button>
     </div>
