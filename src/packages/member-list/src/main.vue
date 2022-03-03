@@ -125,7 +125,7 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num" v-if="configList['ui.hide_host_nums']">
+        <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
           {{ totalNum | numberCompression }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
@@ -163,7 +163,7 @@
                 raiseHandTip ? 'raise-hand' : '',
                 tabIndex === 2 ? 'active' : ''
               ]"
-              v-if="configList['is_interact_and_host']"
+              v-if="isShowBtn(configList['is_interact_and_host'])"
             >
               举手
             </li>
@@ -171,7 +171,7 @@
               @click="switchToTab(3)"
               class="button-panel__btn-box__tab-item"
               :class="tabIndex === 3 ? 'active' : ''"
-              v-if="configList['is_membermanage']"
+              v-if="isShowBtn(configList['is_membermanage'])"
             >
               受限
             </li>
@@ -361,6 +361,13 @@
           show = true;
         }
         return show;
+      },
+      //底部区域的按钮是否显示,根据配置里是发起端还是观看端
+      isShowBtn() {
+        const _this = this;
+        return function (value = false) {
+          return _this.isWatch ? true : value;
+        };
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
