@@ -22,7 +22,9 @@ setBaseUrl({
 });
 setRequestHeaders({
   platform: 7, // 7:PC网页版
-  token: localStorage.getItem('token') || ''
+  token: localStorage.getItem('token') || '',
+  'biz-id': 4, //业务线标识 知客: 4
+  'biz-application-id': '02391153' //paas应用id
 });
 
 Vue.use(DomainStore);

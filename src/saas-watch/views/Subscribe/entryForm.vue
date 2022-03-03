@@ -31,8 +31,8 @@
     },
     methods: {
       getGrayConfig() {
-        return this.entryformServer
-          .initGrayBefore({
+        return this.roomBaseServer
+          .webinarInitBefore({
             webinar_id: this.webinar_id
           })
           .then(res => {

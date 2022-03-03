@@ -189,7 +189,7 @@
   //todo 后续应替换为全局工具服务里的
   import { uuid } from '@/packages/chat/src/js/utils';
   const defaultAvatar = require('./img/advatar_default@2x.png');
-  import { useKeyLoginServer } from 'middle-domain';
+  import { useRoomBaseServer, useKeyLoginServer } from 'middle-domain';
   export default {
     name: 'VmpPasswordLogin',
     filters: {
@@ -262,6 +262,7 @@
     },
     beforeCreate() {
       this.keyLoginServer = useKeyLoginServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
       this.checkIsMobile();
@@ -283,8 +284,8 @@
         const params = {
           webinar_id: this.$route.params.id
         };
-        return this.keyLoginServer
-          .getGrayConfig(params)
+        return this.roomBaseServer
+          .webinarInitBefore(params)
           .then(res => {
             if ([200, '200'].includes(res.code) && res.data) {
               this.grayId = res.data.user_id;
