@@ -56,8 +56,9 @@ function filterAddressParams(path) {
     search = _newArr.length > 0 ? _newArr.join('&') : '';
   }
 
-  const nextUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${newPath}${search ? '?' + search : ''
-    }`;
+  const nextUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${newPath}${
+    search ? '?' + search : ''
+  }`;
   console.log('wechatjs 看看当前走入到了哪里_next不为空------->', nextUrl);
   // replaceState 添加或替换历史记录后，浏览器地址栏会变成你传的地址，而页面并不会重新载入或跳转
   window.history.replaceState(null, null, nextUrl);
@@ -164,14 +165,14 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
           resolve({ action: 'updateTimelineShareData', isSuccess: true });
         }
       });
-      wx.error(function(res) {
+      wx.error(function (res) {
         console.error('获取微信信息失败1', res);
       });
     });
   });
 }
 
-export function initHideChatSdk(initData = {}, failedCb = () => { }) {
+export function initHideChatSdk(initData = {}, failedCb = () => {}) {
   let hideConfigSdk = {
     debug: false,
     jsApiList: ['hideMenuItems'],
@@ -181,7 +182,7 @@ export function initHideChatSdk(initData = {}, failedCb = () => { }) {
     signature: initData.signature
   };
   wx.config(hideConfigSdk);
-  wx.ready(function() {
+  wx.ready(function () {
     wx.hideMenuItems({
       menuList: [
         'menuItem:share:appMessage',
@@ -193,7 +194,7 @@ export function initHideChatSdk(initData = {}, failedCb = () => { }) {
         'menuItem:copyUrl'
       ]
     });
-    wx.error(function(res) {
+    wx.error(function (res) {
       failedCb(res);
     });
   });
