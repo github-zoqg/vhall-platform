@@ -78,13 +78,14 @@
           this.btnText = '举手上麦';
         }
       });
-      /**
-       *
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        console.log('---申请下麦消息---', msg);
+        this.$message.warning(this.$t('interact.interact_1028'));
       });
-      // 主持人同意上麦申请
+
+      /**
+       *
+       * // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {
         console.log(msg);
       });

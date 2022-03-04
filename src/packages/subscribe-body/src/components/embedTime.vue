@@ -248,7 +248,7 @@
     min-height: 70px;
     transform: translate(-50%, -50%);
     text-align: center;
-    z-index: 35;
+    z-index: 11;
     .end-pic {
       width: 160px;
       height: 162px;

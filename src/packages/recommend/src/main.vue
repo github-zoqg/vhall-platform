@@ -2,7 +2,23 @@
   <section class="vmp-recommend">
     <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
       <div class="vmp-recommend-wrapper">
-        <ul class="a-wrap">
+        <div class="subscribe-wrap" v-if="isSubscribe">
+          <div
+            class="subscribe-wrap-item"
+            v-for="item in advDefault.adv_list"
+            :key="item.adv_id"
+            @click="handleJump(item.url)"
+          >
+            <div class="subscribe-wrap-item_cover">
+              <img :src="item.img_url ? item.img_url : defaultBanner" alt="" />
+            </div>
+            <div class="subscribe-wrap-item_info">
+              <p>{{ item.subject }}</p>
+              <span>{{ $t('menu.menu_1010') }}</span>
+            </div>
+          </div>
+        </div>
+        <ul class="a-wrap" v-else>
           <li
             class="recommend-item"
             v-for="item in advDefault.adv_list"
@@ -15,7 +31,7 @@
               </div>
               <div class="info">
                 <h4 class="title ellipsis">{{ item.subject }}</h4>
-                <button class="check-btn">查看</button>
+                <button class="check-btn">{{ $t('menu.menu_1010') }}</button>
               </div>
             </div>
           </li>
@@ -54,6 +70,9 @@
     computed: {
       advDefault() {
         return this.roomBaseServer.state.advDefault;
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
     },
     beforeCreate() {
@@ -173,79 +192,221 @@
     &-wrapper {
       padding: 0 14px 16px;
     }
+    .subscribe-wrap {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow: hidden;
+      padding: 16px;
+      &-item {
+        width: 358px;
+        height: 306px;
+        margin: 0 0 16px 16px;
+        flex-direction: column;
+        padding: 0;
+        border: none;
+        box-sizing: border-box;
+        transition: all 0.4s;
+        &_cover {
+          width: 358px;
+          height: 202px;
+          margin-right: 0;
+          border-radius: 4px 4px 2px 2px;
+          background: #1a1a1a;
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          overflow: hidden;
+          cursor: pointer;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+            transition: all 0.4s;
+            &:hover {
+              transform: scale(1.2);
+            }
+          }
+        }
+        &_info {
+          height: 104px;
+          width: 100%;
+          background: #fff;
+          box-sizing: border-box;
+          padding: 14px 16px;
+          border-bottom-left-radius: 4px;
+          border-bottom-right-radius: 4px;
+          position: relative;
+          cursor: pointer;
+          &:hover {
+            p {
+              color: #fb3a32;
+            }
+            span {
+              background: #fb3a32;
+              color: #fff;
+            }
+          }
+          p {
+            width: 100%;
+            color: #1a1a1a;
+            font-size: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+            line-height: 20px;
+          }
+          span {
+            display: inline-block;
+            width: 64px;
+            height: 26px;
+            color: #fb3a32;
+            border: 1px solid #fb3a32;
+            text-align: center;
+            line-height: 26px;
+            position: absolute;
+            left: 14px;
+            bottom: 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            &:hover {
+              background: #fb3a32;
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
 
     .a-wrap {
       display: block;
       width: 100%;
       touch-action: pan-y;
-    }
-    .recommend-item {
-      width: 100%;
-      height: 113px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      box-sizing: border-box;
-      border-bottom: 1px solid #444;
-      padding: 16px 5px;
-
-      a {
-        display: inline-block;
-        margin-bottom: 30px;
-      }
-      .banner {
-        width: 40%;
-        height: 100%;
-        text-align: center;
-        background: #1a1a1a;
-        border-radius: 8px;
-        margin-right: 12px;
-        flex: 0 0 auto;
-        max-width: 180px;
-
-        img {
-          height: 100%;
-          width: 100%;
-          object-fit: scale-down;
-        }
-      }
-      .title {
-        font-size: 14px;
-        font-weight: bold;
-        color: @font-dark-normal;
-        line-height: 22px;
-        height: 34px;
-      }
-
-      .info {
-        height: 100%;
-        position: relative;
-        flex: 1 1 auto;
+      .recommend-item {
+        width: 100%;
+        height: 113px;
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+        box-sizing: border-box;
+        border-bottom: 1px solid #444;
+        padding: 16px 5px;
 
-        .check-btn {
-          background: transparent;
-          width: 64px;
-          height: 26px;
-          border-radius: 15px;
-          border: 1px solid #ccc;
-          color: #fff;
+        a {
+          display: inline-block;
+          margin-bottom: 30px;
+        }
+        .banner {
+          width: 40%;
+          height: 100%;
           text-align: center;
-          line-height: 26px;
+          background: #1a1a1a;
+          border-radius: 8px;
+          margin-right: 12px;
+          flex: 0 0 auto;
+          max-width: 180px;
+
+          img {
+            height: 100%;
+            width: 100%;
+            object-fit: scale-down;
+          }
+        }
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+          color: @font-dark-normal;
+          line-height: 22px;
+          height: 34px;
+        }
+
+        .info {
+          height: 100%;
+          position: relative;
+          flex: 1 1 auto;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          .check-btn {
+            background: transparent;
+            width: 64px;
+            height: 26px;
+            border-radius: 15px;
+            border: 1px solid #ccc;
+            color: #fff;
+            text-align: center;
+            line-height: 26px;
+          }
+        }
+
+        &:hover {
+          background: #3c3c3c;
+          border-radius: 4px;
+          cursor: pointer;
+          border-bottom-color: transparent;
+
+          .check-btn {
+            background: #fb3a32;
+            border-color: #fb3a32;
+          }
         }
       }
+    }
+    @media screen and (max-width: 1366px) {
+      .subscribe-wrap-item {
+        width: 249px;
+        height: 244px;
+        margin: 0px 0px 16px 16px;
+        &_cover {
+          width: 100%;
+          height: 140px;
+        }
+        &_info {
+          height: 100px;
+        }
+      }
+    }
 
-      &:hover {
-        background: #3c3c3c;
-        border-radius: 4px;
-        cursor: pointer;
-        border-bottom-color: transparent;
-
-        .check-btn {
-          background: #fb3a32;
-          border-color: #fb3a32;
+    @media screen and (min-width: 1367px) and (max-width: 1600px) {
+      .subscribe-wrap-item {
+        width: 300px;
+        height: 273px;
+        margin: 0px 0px 16px 16px;
+        &_cover {
+          width: 100%;
+          height: 169px;
+        }
+        &_info {
+          height: 104px;
+        }
+      }
+    }
+    @media screen and (min-width: 1601px) and (max-width: 1920px) {
+      .subscribe-wrap-item {
+        width: 358px;
+        height: 306px;
+        margin: 0px 0px 16px 16px;
+        &_cover {
+          width: 100%;
+          height: 202px;
+        }
+        &_info {
+          height: 104px;
+        }
+      }
+    }
+    @media screen and (min-width: 1921px) {
+      .subscribe-wrap-item {
+        width: 358px;
+        height: 306px;
+        margin: 0px 0px 16px 16px;
+        &_cover {
+          width: 100%;
+          height: 202px;
+        }
+        &_info {
+          height: 104px;
         }
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <!-- 弹窗容器 -->
+  <!-- 用户被邀请上麦弹窗 -->
   <aside>
     <saas-alert
       :visible="isConfirmVisible"
@@ -15,10 +15,10 @@
   </aside>
 </template>
 <script>
-  import { useMsgServer, useMicServer } from 'middle-domain';
+  import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
-    name: 'GetInvited',
+    name: 'VmpMicInvited',
     components: {
       SaasAlert
     },
@@ -30,13 +30,10 @@
         roleName: this.$t('chat.chat_1022')
       };
     },
-    props: {
-      roomBaseState: {
-        type: Object,
-        required: true
-      }
-    },
     computed: {
+      roomBaseState() {
+        return useRoomBaseServer().state;
+      },
       join_info() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
@@ -74,6 +71,7 @@
             this.waitTime--;
             this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
+              this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
               this.btnText = this.$t('account.account_1063');
               this.isConfirmVisible = false;

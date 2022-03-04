@@ -98,6 +98,9 @@
           this.handText = this.$t('interact.interact_1007');
         }
       });
+      useMicServer().$on('vrtc_disconnect_success', msg => {
+        this.$toast(this.$t('interact.interact_1028'));
+      });
     },
     methods: {
       // 下麦操作

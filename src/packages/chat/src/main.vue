@@ -384,20 +384,26 @@
         let placeholder = this.$t('chat.chat_1021');
         let disable = false;
 
-        //如果是单人被禁言
-        if (this.isBanned) {
-          placeholder = this.$t('chat.chat_1006');
+        // 控制台配置回放禁言状态
+        if (this.playerType == 5 && this.configList['ui.watch_record_no_chatting'] == 1) {
+          placeholder = this.$t('chat.chat_1079');
           disable = true;
-        }
-        //如果是全体禁言
-        if (this.allBanned) {
-          placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
-          disable = true;
-        }
-        //主持人不受禁言限制
-        if ([1, '1'].includes(this.roleName)) {
-          placeholder = this.$t('chat.chat_1021');
-          disable = false;
+        } else {
+          //如果是单人被禁言
+          if (this.isBanned) {
+            placeholder = this.$t('chat.chat_1006');
+            disable = true;
+          }
+          //如果是全体禁言
+          if (this.allBanned) {
+            placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
+            disable = true;
+          }
+          //主持人不受禁言限制
+          if ([1, '1'].includes(this.roleName)) {
+            placeholder = this.$t('chat.chat_1021');
+            disable = false;
+          }
         }
 
         this.inputStatus.placeholder = placeholder;
