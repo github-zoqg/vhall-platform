@@ -66,6 +66,7 @@
             this.inviteTime--;
             this.refusedText = `${this.$t('interact.interact_1010')}(${this.inviteTime}s)`;
             if (this.inviteTime <= 0) {
+              this.$toast(this.$t('interact.interact_1025'));
               clearInterval(this.inviteFun);
               this.refusedText = `${this.$t('interact.interact_1010')}`;
               this.showInviteConnectMic = false;
