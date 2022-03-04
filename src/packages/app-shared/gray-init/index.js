@@ -1,9 +1,9 @@
-import { gray, room } from 'middle-domain';
+import { gray, roomApi } from 'middle-domain';
 
 export default function grayInit(options) {
   return new Promise(resolve => {
     if (options.meta.grayType == 'webinar') {
-      room.webinar
+      roomApi.webinar
         .webinarInitBefore({
           webinar_id: options.params.id
         })
