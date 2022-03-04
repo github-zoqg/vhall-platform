@@ -135,8 +135,8 @@
     methods: {
       // 灰度
       getGrayConfig() {
-        return this.entryformServer
-          .initGrayBefore({
+        return this.roomBaseServer
+          .webinarInitBefore({
             webinar_id: this.il_id
           })
           .then(res => {
