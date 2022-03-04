@@ -33,8 +33,26 @@
       }
     },
     methods: {
-      open() {
-        this.popupVisible = false;
+      /**
+       * @description 聊天/按钮打开文件
+       */
+      open(questionnaireId) {
+        console.log('open', questionnaireId);
+        this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
+          if (res.data === false) {
+            this.$message({
+              message: this.$t('form.form_1037'),
+              showClose: true,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          } else {
+            this.dialogVisible = true;
+            this.$nextTick(() => {
+              this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
+            }); // 等dom渲染
+          }
+        });
       },
       close() {
         this.popupVisible = false;
