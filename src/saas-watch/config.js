@@ -70,7 +70,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comRedPacket'
+      'comRedPacket',
+      'comMicInvited'
     ]
   },
 
@@ -513,5 +514,9 @@ export const serverConfig = {
   // 红包
   comRedPacket: {
     component: 'VmpRedPacketWatch'
+  },
+  // 邀请上麦弹窗
+  comMicInvited: {
+    component: 'VmpMicInvited'
   }
 };
