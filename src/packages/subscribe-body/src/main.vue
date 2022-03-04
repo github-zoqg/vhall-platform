@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-subscribe-body">
-    <div class="vmp-subscribe-body-intro">
+    <div :class="isEmbed ? 'vmp-subscribe-body-embed' : 'vmp-subscribe-body-intro'">
       <div class="subscribe-img">
         <div class="subscribe-img-box" v-if="!showVideo">
           <!-- 背景图片 未完成验证-->
@@ -10,6 +10,24 @@
           <!-- 完成验证、并且有暖场视频 加载播放器 -->
           <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
         </div>
+      </div>
+      <div class="subscribe-language" v-if="isEmbed && languageList.length > 1 && showBottom">
+        <el-dropdown @command="changeLang" trigger="click" placement="bottom">
+          <span class="language__icon">
+            <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
+            {{ lang.label }}
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item
+              :command="item.key"
+              :key="index"
+              :class="{ active: item.key == lang.key }"
+              v-for="(item, index) in languageList"
+            >
+              {{ item.label }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
       <div class="subscribe-img-box-embed" v-if="isEmbed && showBottom">
         <EmbedTime ref="embedTime" :sub-option="subOption" @authFetch="handleAuthCheck"></EmbedTime>
@@ -26,7 +44,7 @@
       </div>
     </div>
     <div class="vmp-subscribe-body-tab" v-if="!isEmbed">
-      <vmp-air-container cuid="comTabMenu" :oneself="true"></vmp-air-container>
+      <vmp-air-container cuid="comSubscribeTabMenu" :oneself="true"></vmp-air-container>
     </div>
     <div class="vmp-subscribe-body-live" v-if="isLiving">
       <div class="vmp-subscribe-body-live-start">
@@ -42,6 +60,18 @@
   import BottomTab from './components/bottomTab';
   import EmbedTime from './components/embedTime.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -97,6 +127,19 @@
     created() {
       this.handlerInitInfo();
       this.subscribeServer.listenMsg();
+      if (this.isEmbed) {
+        const { languages } = this.roomBaseServer.state;
+        this.languageList = languages.langList.map(item => {
+          return langMap[item.language_type];
+        });
+        const curLang = languages.curLang;
+        this.lang =
+          langMap[sessionStorage.getItem('lang')] ||
+          langMap[this.$route.query.lang] ||
+          langMap[curLang.language_type];
+        this.$i18n.locale = this.lang.type;
+        sessionStorage.setItem('lang', this.lang.type);
+      }
     },
     mounted() {
       this.listenEvents();
@@ -264,6 +307,10 @@
         this.feeAuth({ type: type });
       },
       handlePlay() {},
+      changeLang(key) {
+        sessionStorage.setItem('lang', key);
+        window.location.reload();
+      },
       livingLink() {
         this.handleAuthCheck();
       }
@@ -293,6 +340,54 @@
           border-radius: 4px 4px 0 0;
         }
       }
+      .subscribe-language {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 13;
+        cursor: pointer;
+        .language__icon {
+          color: #fff;
+          &:hover {
+            color: #fb3a32;
+          }
+        }
+      }
+    }
+    &-embed {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      .subscribe-img {
+        padding-top: 56.25%;
+        &-box {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 4px;
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: fill;
+          border-radius: 4px 4px 0 0;
+        }
+      }
+      .subscribe-language {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 13;
+        cursor: pointer;
+        .language__icon {
+          color: #fff;
+          &:hover {
+            color: #fb3a32;
+          }
+        }
+      }
     }
     &-live {
       width: 100%;
@@ -301,7 +396,7 @@
       top: 0px;
       left: 0px;
       background: rgba(0, 0, 0, 0.6);
-      z-index: 45;
+      z-index: 35;
       &-start {
         width: 400px;
         height: 260px;
