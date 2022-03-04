@@ -1571,6 +1571,7 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
+        debugger;
         console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
