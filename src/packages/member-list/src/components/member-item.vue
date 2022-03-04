@@ -46,14 +46,7 @@
           ></i>
         </template>
         <!-- 显示条件：申请上麦 -->
-        <template
-          v-if="
-            [1, 2].includes(this.tabIndex) &&
-            [1, '1'].includes(userInfo.is_apply) &&
-            applyUsers.find(u => u.account_id == userInfo.account_id) &&
-            !userInfo.is_speak
-          "
-        >
+        <template v-if="isShowHandFlag">
           <i
             class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
             style="color: #cccccc; font-size: 15px"
@@ -136,12 +129,7 @@
         ></i>
         <!--申请上麦-->
         <i
-          v-if="
-            [1, 2].includes(tabIndex) &&
-            [1, '1'].includes(userInfo.is_apply) &&
-            applyUsers.find(u => u.account_id === userInfo.account_id) &&
-            !userInfo.is_speak
-          "
+          v-if="isShowHandFlag"
           class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
           style="color: #cccccc; font-size: 15px"
         ></i>
@@ -548,7 +536,7 @@
           this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
-          this.currentSpeakerId !== this.userInfo.account_id
+          this.currentSpeakerId != this.userInfo.account_id
         );
       },
       //PC观看端设为组长
@@ -716,6 +704,15 @@
           }
           return text;
         };
+      },
+      //是否显示举手的标识(PC发起)
+      isShowHandFlag() {
+        return (
+          [1, 2].includes(this.tabIndex) &&
+          [1, '1'].includes(this.userInfo.is_apply) &&
+          this.applyUsers.find(u => u.account_id == this.userInfo.account_id) &&
+          !this.userInfo.is_speak
+        );
       }
     },
     methods: {
