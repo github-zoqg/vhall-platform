@@ -1074,10 +1074,10 @@
               //重新获取最新的groupInitData
               isLive && changeGroupInitData(temp);
               break;
-            // case 'vrtc_connect_presentation_agree':
-            //   //用户被邀请演示-同意演示
-            //   isWatch && agreePresentation(temp);
-            //   break;
+            case 'vrtc_connect_presentation_agree':
+              //用户被邀请演示-同意演示
+              isWatch && agreePresentation(temp);
+              break;
             case 'vrtc_connect_presentation_success':
               //演示权限变更
               isWatch && handlePresentationPermissionChange(temp);
@@ -1146,25 +1146,25 @@
         });
 
         // 邀请演示-同意
-        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
-          if (!isWatch) return;
-
-          if (this.roleName == 20) {
-            this.$message({
-              message: '对方已接受邀请',
-              showClose: true,
-              // duration: 0,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-          }
-          this.presentation_screen = msg.sender_id;
-        });
+        // this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
+        //   if (!isWatch) return;
+        //
+        //   if (this.roleName == 20) {
+        //     this.$message({
+        //       message: '对方已接受邀请',
+        //       showClose: true,
+        //       // duration: 0,
+        //       type: 'success',
+        //       customClass: 'zdy-info-box'
+        //     });
+        //   }
+        //   this.presentation_screen = msg.sender_id;
+        // });
 
         // 同意邀请演示成功消息
-        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', msg => {
-          isWatch && handlePresentationPermissionChange(msg);
-        });
+        // this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', msg => {
+        //   isWatch && handlePresentationPermissionChange(msg);
+        // });
 
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', msg => {
@@ -1425,21 +1425,18 @@
               this.$refs.scroll.finishPullUp();
               this.onlineUsers = this.memberServer.state.onlineUsers || [];
               (this.onlineUsers || []).forEach(item => {
+                //更新一下成员的role
                 if (_this.isWatch && item.account_id == _this.userId) {
                   _this.roleName = item.role_name;
                 }
+                //刷新当前的组长id
                 if ([20, '20'].includes(item.role_name)) {
                   _this.leader_id = item.account_id;
                 }
-              });
-
-              //刷新也维护一下举手状态
-              _this.state.applyUsers.forEach(element => {
-                _this.state.onlineUsers.forEach(item => {
-                  if (element.accountId === item.accountId) {
-                    item.is_apply = 1;
-                  }
-                });
+                //维护举手状态
+                if (_this.applyUsers.map(user => user.account_id).includes(item.account_id)) {
+                  item.is_apply = 1;
+                }
               });
 
               if (!this.onlineUsers.length) {
@@ -1448,7 +1445,7 @@
               //在线总人数
               this.totalNum = this.memberServer.state.totalNum;
               setTimeout(() => {
-                this.refresh();
+                _this.refresh();
               }, 50);
             }
             if (![200, '200'].includes(res.code)) {
