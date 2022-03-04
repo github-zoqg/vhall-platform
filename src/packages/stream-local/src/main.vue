@@ -331,7 +331,6 @@
         this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', async () => {
           // 是否需要自动上麦
           const micServer = useMicServer();
-
           if (this.isNeedSpeakOn) {
             this.userSpeakOn();
           } else {
@@ -383,18 +382,32 @@
             this.interactiveServer.destroy();
           }
         });
-        // 分组结束讨论
-        this.groupServer.$on('GROUP_SWITCH_END', async () => {
-          try {
-            await this.stopPush();
-            await this.interactiveServer.destroy();
-            //  初始化互动实例
-            await this.interactiveServer.init();
-            this.isNeedSpeak();
-          } catch (error) {
-            console.log('分组结束讨论', error);
-          }
-        });
+
+        if (this.joinInfo.role_name == 2) {
+          // 分组 - 结束讨论
+          this.groupServer.$on('GROUP_SWITCH_END', async () => {
+            try {
+              //  初始化互动实例
+              await this.interactiveServer.init();
+              this.isNeedSpeak();
+            } catch (error) {
+              console.log('分组结束讨论', error);
+            }
+          });
+
+          // 分组 - 开始讨论
+          this.groupServer.$on('GROUP_SWITCH_START', async () => {
+            if (this.localStream.streamId) {
+              await this.stopPush();
+              await this.interactiveServer.destroy();
+              //  初始化互动实例
+              await this.interactiveServer.init();
+            }
+            if (this.isNeedSpeakOn) {
+              this.userSpeakOn();
+            }
+          });
+        }
       },
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {

@@ -1780,7 +1780,7 @@
       &__detail {
         position: absolute;
         bottom: 0;
-        right: 4px;
+        right: 0;
         cursor: pointer;
         background-color: #fff;
         color: #3562fa;
@@ -1861,6 +1861,12 @@
         > div {
           padding: 10px 0;
         }
+      }
+      .el-input__inner[maxlength='50'] {
+        padding-right: 60px !important;
+      }
+      .el-input__inner[maxlength='60'] {
+        padding-right: 60px !important;
       }
     }
     &__verify-form {

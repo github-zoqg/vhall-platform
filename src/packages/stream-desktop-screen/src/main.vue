@@ -84,7 +84,7 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       isShareScreen() {
-        return this.$domainStore.state.roomBaseServer.isShareScreen;
+        return this.desktopShareServer.state.isShareScreen;
       },
       isShowWrapper() {
         return this.isShareScreen || this.popAlert.visible || this.isShowAccessDeniedAlert;
@@ -130,7 +130,7 @@
           this.subscribeStream(streamId);
         });
         this.desktopShareServer.$on('screen_stream_remove', () => {
-          useRoomBaseServer().setShareScreenStatus(false);
+          useDesktopShareServer().setShareScreenStatus(false);
           useRoomBaseServer().setChangeElement('');
         });
       },
@@ -143,7 +143,7 @@
         };
 
         this.desktopShareServer.subscribeDesktopShareStream(opt).then(() => {
-          useRoomBaseServer().setShareScreenStatus(true);
+          useDesktopShareServer().setShareScreenStatus(true);
           useRoomBaseServer().setChangeElement('stream-list');
         });
       },
@@ -174,7 +174,7 @@
                 // 重新布局旁路
                 this.interactiveServer.resetLayout();
 
-                useRoomBaseServer().setShareScreenStatus(true);
+                useDesktopShareServer().setShareScreenStatus(true);
                 console.log('[screen] 桌面共享推流成功');
               })
               .catch(error => {

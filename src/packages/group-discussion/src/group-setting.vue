@@ -31,7 +31,7 @@
           <div class="vmp-group-item__hd">分组方式</div>
           <div class="vmp-group-item__bd">
             <el-radio class="group-radio" v-model="way" label="1">
-              自动分组 （系统随机分屏组内成员）
+              自动分组 （系统随机分配组内成员）
             </el-radio>
             <el-radio class="group-radio" v-model="way" label="2">
               手动分组（按照实际情况及个人意愿分配）

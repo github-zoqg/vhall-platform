@@ -68,7 +68,7 @@
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
         this.desktopShareServer.subscribeDesktopShareStream(opt).then(() => {
-          useRoomBaseServer().setShareScreenStatus(true);
+          useDesktopShareServer().setShareScreenStatus(true);
         });
       },
       addEvents() {

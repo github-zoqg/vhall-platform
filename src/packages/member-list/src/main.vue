@@ -615,6 +615,7 @@
           console.log(msg);
           _this.allowRaiseHand = false;
         }
+
         //直播结束
         function handleLiveOver(msg) {
           console.log(msg);
@@ -627,6 +628,7 @@
             _this.refreshList();
           }, 1000);
         }
+
         //设备检测
         function handleDeviceCheck(msg) {
           const { member_info = {} } = msg.data;
@@ -1082,10 +1084,6 @@
               //演示权限变更
               isWatch && handlePresentationPermissionChange(temp);
               break;
-            case 'group_join_change_update':
-              //切换小组
-              isWatch && handleGroupChange(temp);
-              break;
             case 'room_vrtc_disconnect_success':
               //下麦成功
               isWatch && handleRoomDisconnectSuccess(temp);
@@ -1115,17 +1113,20 @@
           handleEndGroupDiscuss(msg);
         });
 
+        // 换组
+        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+          isLive && this.updateOnlineUserList(msg);
+          isWatch && handleGroupChange(msg);
+        });
+
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
           handleGroupKicked(msg);
         });
 
-        // 解散分组
+        // 解散分组(主播&观看均更新)
         this.groupServer.$on('GROUP_DISBAND', () => {
-          if (!isWatch) return;
-
-          this.onlineUsers = [];
-          this.getOnlineUserList();
+          this.updateOnlineUserList();
         });
 
         // 切换组长(组长变更)
@@ -1248,6 +1249,7 @@
             _this.presentation_screen = _this.groupServer.state.presentation_screen;
           }
         }
+
         //分组--开始讨论
         function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
@@ -1403,6 +1405,10 @@
             clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
           delete this.speakerLeaveIntervalMap[msg.sender_id];
         }
+      },
+      updateOnlineUserList() {
+        this.onlineUsers = [];
+        this.getOnlineUserList();
       },
       //获取在线人员列表
       getOnlineUserList(pos) {
@@ -1571,6 +1577,7 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
+        debugger;
         console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
