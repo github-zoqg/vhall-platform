@@ -90,7 +90,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="joinInfo.role_name == 1 || groupRole == 20"
+            v-if="joinInfo.role_name == 1 && stream.attributes.roleName != 20"
             @click="speakOff"
           ></span>
         </el-tooltip>

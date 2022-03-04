@@ -70,7 +70,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comRedPacket'
+      'comRedPacket',
+      'comMicInvited'
     ]
   },
 
@@ -333,6 +334,11 @@ export const serverConfig = {
       method: 'accept',
       args: ['$0']
     },
+    emitClickQuestionnaireChatItem: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
     emitHideEffect: {
       cuid: 'comPcRewardEffect',
       method: 'setHideEffect',
@@ -526,5 +532,9 @@ export const serverConfig = {
   // 红包
   comRedPacket: {
     component: 'VmpRedPacketWatch'
+  },
+  // 邀请上麦弹窗
+  comMicInvited: {
+    component: 'VmpMicInvited'
   }
 };
