@@ -39,8 +39,6 @@
     <div class="vmp-footer-tools__center" v-if="!isBanned && isInteractLive">
       <handup></handup>
     </div>
-    <!-- 用户被邀请dialog -->
-    <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
@@ -117,7 +115,6 @@
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
-  import getInvited from './component/getInvited/index.vue';
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
@@ -141,7 +138,6 @@
       vhGifts,
       notice,
       praise,
-      getInvited,
       Pay,
       RedPacketIcon,
       LotteryIcon

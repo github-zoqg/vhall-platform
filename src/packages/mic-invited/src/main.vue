@@ -1,5 +1,5 @@
 <template>
-  <!-- 弹窗容器 -->
+  <!-- 用户被邀请上麦弹窗 -->
   <aside>
     <saas-alert
       :visible="isConfirmVisible"
@@ -15,10 +15,10 @@
   </aside>
 </template>
 <script>
-  import { useMsgServer, useMicServer } from 'middle-domain';
+  import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
-    name: 'GetInvited',
+    name: 'VmpMicInvited',
     components: {
       SaasAlert
     },
@@ -30,13 +30,10 @@
         roleName: this.$t('chat.chat_1022')
       };
     },
-    props: {
-      roomBaseState: {
-        type: Object,
-        required: true
-      }
-    },
     computed: {
+      roomBaseState() {
+        return useRoomBaseServer().state;
+      },
       join_info() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
@@ -56,6 +53,7 @@
           temp.context = JSON.parse(temp.context);
         }
         const { type = '' } = temp.data || {};
+        console.log('收到邀请组建-----1--11-1-1-1-1-1-');
         if (type === 'vrtc_connect_invite') {
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {

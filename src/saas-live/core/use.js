@@ -46,6 +46,8 @@ import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 import VmpRecordVideoSuccess from '@/packages/record-video-success';
 // 客户端嵌入页
 import VmpEmbedClient from '@/packages/embed-client-live';
+// 邀请上麦
+import VmpMicInvited from '@/packages/mic-invited/index';
 
 // 全局注册组件
 export function initUse() {
@@ -95,4 +97,5 @@ export function initUse() {
   Vue.use(OverlayScrollbarsPlugin);
   Vue.use(VmpStreamDesktopScreen);
   Vue.use(VmpEmbedClient);
+  Vue.use(VmpMicInvited);
 }

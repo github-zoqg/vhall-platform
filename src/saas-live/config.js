@@ -103,7 +103,8 @@ export const serverConfig = {
       'comQuestionnaire',
       'comRebroadcast',
       'comRedPacket',
-      'comRebroadcastList'
+      'comRebroadcastList',
+      'comMicInvited'
     ]
   },
 
@@ -808,5 +809,9 @@ export const serverConfig = {
       method: 'switchTo',
       args: ['$0']
     }
+  },
+  // 邀请上麦弹窗
+  comMicInvited: {
+    component: 'VmpMicInvited'
   }
 };
