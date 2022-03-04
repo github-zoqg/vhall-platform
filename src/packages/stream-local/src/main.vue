@@ -331,7 +331,6 @@
         this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', async () => {
           // 是否需要自动上麦
           const micServer = useMicServer();
-
           if (this.isNeedSpeakOn) {
             this.userSpeakOn();
           } else {
