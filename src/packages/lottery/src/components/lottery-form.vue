@@ -467,6 +467,7 @@
     }
     span {
       cursor: pointer;
+      color: #666;
     }
   }
   .lottery-payment {

@@ -14,6 +14,7 @@
     <lottery-winner
       mode="live"
       v-else-if="lotteryResultShow"
+      :prize-info="prizeInfo"
       :winner-list="winLotteryUserList"
       @reStart="reStart"
       @close="close"

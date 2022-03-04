@@ -8,7 +8,8 @@ import {
   useGroupServer,
   useMediaSettingServer,
   useRebroadcastServer,
-  useInsertFileServer
+  useInsertFileServer,
+  useMemberServer
 } from 'middle-domain';
 
 export default async function () {
@@ -83,4 +84,5 @@ export default async function () {
   window.groupServer = groupServer;
   window.micServer = micServer;
   window.insertFileServer = insertFileServer;
+  window.memberServer = useMemberServer();
 }

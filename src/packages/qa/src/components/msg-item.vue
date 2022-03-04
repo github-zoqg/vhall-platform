@@ -1,26 +1,26 @@
 <template>
   <div class="vhsaas-chat-msg-item__wrapper">
-    <div v-if="msg.answer" class="vhsaas-chat-msg-item clearfix">
+    <div v-if="source.answer" class="vhsaas-chat-msg-item clearfix">
       <!-- 头像 -->
       <div class="vhsaas-chat-msg-item__avatar">
         <img
           class="msg-item__avatar-img"
-          :src="msg.answer.avatar ? msg.answer.avatar : defaultAvatar"
+          :src="source.answer.avatar ? source.answer.avatar : defaultAvatar"
           alt
         />
       </div>
       <div class="vhsaas-chat-msg-item__content">
         <!-- 昵称和角色 -->
         <p class="msg-item__content-name clearfix">
-          <span class="msg-item_content-name-nick">{{ msg.answer.nick_name }}</span>
-          <span class="msg-item_content-name-role" :class="msg.answer.role_name">
-            {{ roleMap[msg.answer.role_name] }}
+          <span class="msg-item_content-name-nick">{{ source.answer.nick_name }}</span>
+          <span class="msg-item_content-name-role" :class="source.answer.role_name">
+            {{ roleMap[source.answer.role_name] }}
           </span>
-          <span class="msg-item__content-time">{{ msg.answer.created_time.slice(-8) }}</span>
+          <span class="msg-item__content-time">{{ source.answer.created_time.slice(-8) }}</span>
         </p>
         <!-- 文本 -->
         <p
-          v-if="msg.answer.content"
+          v-if="source.answer.content"
           class="msg-item__content-body__content"
           v-html="answerContent"
         ></p>
@@ -28,12 +28,12 @@
         <div class="vhsaas-msg-item__qa-content clearfix">
           <!-- 头像 -->
           <div class="vhsaas-chat-msg-item__avatar">
-            <img class="msg-item__avatar-img" :src="msg.avatar || defaultAvatar" alt />
+            <img class="msg-item__avatar-img" :src="source.avatar || defaultAvatar" alt />
           </div>
           <div class="vhsaas-chat-msg-item__content">
             <!-- 昵称和角色 -->
             <p class="msg-item__content-name clearfix">
-              <span class="msg-item_content-name-nick">{{ msg.nick_name }}</span>
+              <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
               <!-- <span
                 class="msg-item_content-name-role"
                 :class="msg.answer.role_name"
@@ -41,7 +41,7 @@
             </p>
             <!-- 文本 -->
             <p
-              v-if="msg.answer.content"
+              v-if="source.answer.content"
               class="msg-item__content-body__content"
               v-html="msgContent"
             ></p>
@@ -52,20 +52,20 @@
     <div v-else class="vhsaas-chat-msg-item clearfix">
       <!-- 头像 -->
       <div class="vhsaas-chat-msg-item__avatar">
-        <img class="msg-item__avatar-img" :src="msg.avatar || defaultAvatar" alt />
+        <img class="msg-item__avatar-img" :src="source.avatar || defaultAvatar" alt />
       </div>
       <div class="vhsaas-chat-msg-item__content">
         <!-- 昵称和角色 -->
         <p class="msg-item__content-name clearfix">
-          <span class="msg-item_content-name-nick">{{ msg.nick_name }}</span>
+          <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
           <!-- <span
             class="msg-item_content-name-role"
             :class="msg.role_name"
           >{{ roleMap[msg.role_name] }}</span> -->
-          <span class="msg-item__content-time">{{ msg.created_time.slice(-8) }}</span>
+          <span class="msg-item__content-time">{{ source.created_time.slice(-8) }}</span>
         </p>
         <!-- 文本 -->
-        <p v-if="msg.content" class="msg-item__content-body__content" v-html="mineContent"></p>
+        <p v-if="source.content" class="msg-item__content-body__content" v-html="mineContent"></p>
       </div>
     </div>
   </div>
@@ -84,7 +84,7 @@
       }
     },
     props: {
-      msg: {
+      source: {
         type: Object,
         required: true,
         default: () => {}
@@ -110,27 +110,27 @@
     },
     methods: {
       handleMsgContent() {
-        if (this.msg.content) {
+        if (this.source.content) {
           this.msgContent = `<span class="msg-item__qa-flag">${this.$t(
             'chat.chat_1040'
-          )}&nbsp;</span> ${this.urlToLink(this.msg.content)}`;
-          this.mineContent = this.urlToLink(this.msg.content);
+          )}&nbsp;</span> ${this.urlToLink(this.source.content)}`;
+          this.mineContent = this.urlToLink(this.source.content);
         }
       },
       handleAnswerContent() {
-        if (this.msg.answer && this.msg.answer.content) {
-          if (this.msg.answer.content == '直播中回复') {
+        if (this.source.answer && this.source.answer.content) {
+          if (this.source.answer.content == '直播中回复') {
             this.answerContent = `<span class="msg-item__qa-flag">${this.$t(
               'chat.chat_1039'
             )}</span>`;
-          } else if (this.msg.answer.is_open == 0) {
+          } else if (this.source.answer.is_open == 0) {
             this.answerContent = `<span class="msg-item__qa-flag">${this.$t(
               'chat.chat_1077'
-            )}&nbsp;</span>${this.urlToLink(this.msg.answer.content)}`;
+            )}&nbsp;</span>${this.urlToLink(this.source.answer.content)}`;
           } else {
             this.answerContent = `<span class="msg-item__qa-flag">${this.$t(
               'chat.chat_1041'
-            )}&nbsp;</span>${this.urlToLink(this.msg.answer.content)}`;
+            )}&nbsp;</span>${this.urlToLink(this.source.answer.content)}`;
           }
         }
       },

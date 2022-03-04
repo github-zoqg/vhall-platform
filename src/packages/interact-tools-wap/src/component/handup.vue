@@ -73,6 +73,9 @@
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     watch: {
@@ -97,6 +100,9 @@
           this.isWaitting = false;
           this.handText = this.$t('interact.interact_1007');
         }
+      });
+      useMicServer().$on('vrtc_disconnect_success', msg => {
+        this.$toast(this.$t('interact.interact_1028'));
       });
     },
     methods: {
@@ -147,19 +153,37 @@
                 this.isWaitting = false;
                 this.handText = this.$t('interact.interact_1001');
                 this.$emit('handupLoading', false);
+                let tip = '';
+                if (this.isInGroup) {
+                  tip = '组长拒绝了您的上麦请求';
+                } else {
+                  tip = '主持人拒绝了您的上麦请求';
+                }
+                this.$toast(tip);
+
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
               }
             }, 1000);
           });
       },
-      handleClickMuteDevice(deviceType) {
+      async handleClickMuteDevice(deviceType) {
         const status = useInteractiveServer().state.localStream[`${deviceType}Muted`] ? 1 : 0;
-        useInteractiveServer().setDeviceStatus({
+        await useInteractiveServer().setDeviceStatus({
           device: deviceType == 'video' ? 2 : 1,
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        if (deviceType === 'video') {
+          status
+            ? this.$toast(this.$t('interact.interact_1024'))
+            : this.$toast(this.$t('interact.interact_1023'));
+        }
+        if (deviceType === 'audio') {
+          status
+            ? this.$toast(this.$t('interact.interact_1015'))
+            : this.$toast(this.$t('interact.interact_1026'));
+        }
       }
     }
   };

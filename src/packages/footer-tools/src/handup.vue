@@ -8,9 +8,10 @@
         size="medium"
         round
         v-if="
-          isInGroup
+          inLine &&
+          (isInGroup
             ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn
-            : isAllowhandup && !isSpeakOn
+            : isAllowhandup && !isSpeakOn)
         "
       >
         {{ btnText }}
@@ -21,7 +22,10 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn : isSpeakOn"
+        v-if="
+          inLine &&
+          (isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn : isSpeakOn)
+        "
         round
       >
         下麦
@@ -44,6 +48,10 @@
     computed: {
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      // 是否是直播中
+      inLine() {
+        return parseInt(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type) === 1;
       },
       // 是否开启举手
       isAllowhandup() {
@@ -78,13 +86,14 @@
           this.btnText = '举手上麦';
         }
       });
-      /**
-       *
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        console.log('---申请下麦消息---', msg);
+        this.$message.warning(this.$t('interact.interact_1028'));
       });
-      // 主持人同意上麦申请
+
+      /**
+       *
+       * // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {
         console.log(msg);
       });

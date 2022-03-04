@@ -116,6 +116,7 @@
     },
     methods: {
       subscribeRemoteStream() {
+        console.warn('开始订阅', this.stream);
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
@@ -124,11 +125,12 @@
         };
         this.interactiveServer
           .subscribe(opt)
-          .then(() => {
+          .then(e => {
+            console.warn('订阅成功---------', e);
             this.getLevel();
           })
           .catch(e => {
-            console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
+            console.warn('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
       speakOff() {

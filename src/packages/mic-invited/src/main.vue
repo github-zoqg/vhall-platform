@@ -53,7 +53,6 @@
           temp.context = JSON.parse(temp.context);
         }
         const { type = '' } = temp.data || {};
-        console.log('收到邀请组建-----1--11-1-1-1-1-1-');
         if (type === 'vrtc_connect_invite') {
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
@@ -72,6 +71,7 @@
             this.waitTime--;
             this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
+              this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
               this.btnText = this.$t('account.account_1063');
               this.isConfirmVisible = false;
