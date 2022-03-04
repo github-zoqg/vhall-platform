@@ -799,6 +799,17 @@ export const serverConfig = {
     children: ['dlgDocList', 'comMediaSetting']
   },
   // *******录制页面****结束
+
+  // 客户端嵌入页组件
+  embedClientRoot: {
+    component: 'VmpEmbedClient',
+    children: ['comDocUne', 'dlgDocList'],
+    emiSwitchTo: {
+      cuid: ['comDocUne'],
+      method: 'switchTo',
+      args: ['$0']
+    }
+  },
   // 邀请上麦弹窗
   comMicInvited: {
     component: 'VmpMicInvited'

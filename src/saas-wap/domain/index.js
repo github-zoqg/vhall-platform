@@ -8,6 +8,7 @@ import {
   useRoomBaseServer,
   useMicServer,
   useGroupServer,
+  useUserServer,
   useVirtualAudienceServer
 } from 'middle-domain';
 
@@ -29,6 +30,7 @@ export default new DomainStore.Store({
     interactiveServer: useInteractiveServer().state,
     micServer: useMicServer().state,
     groupServer: useGroupServer().state,
-    virtualAudienceServer: useVirtualAudienceServer().state
+    virtualAudienceServer: useVirtualAudienceServer().state,
+    userServer: useUserServer().state
   }
 });
