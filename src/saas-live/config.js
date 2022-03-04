@@ -60,6 +60,7 @@ export const serverConfig = {
     children: [
       // 'comMemberList'
       // 'comChat',
+      'comPcRewardEffect',
       'comTabMenu'
     ]
   },
@@ -439,6 +440,10 @@ export const serverConfig = {
         method: 'openModal'
       }
     ]
+  },
+  // 礼物动画组件
+  comPcRewardEffect: {
+    component: 'VmpPcRewardEffect'
   },
   comNotice: {
     component: 'VmpNoticeList'

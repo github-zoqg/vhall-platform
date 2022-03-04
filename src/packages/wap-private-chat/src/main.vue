@@ -2,9 +2,15 @@
   <div class="vmp-wap-private-chat">
     <div class="vmp-wap-private-chat__wrapper">
       <div class="vmp-private-chat__content">
-        <template v-if="privateChatList.length > 0">
-          <msg-item v-for="(item, index) in privateChatList" :key="index" :msg="item"></msg-item>
-        </template>
+        <virtual-list
+          ref="chatlist"
+          style="height: 100%; overflow: auto"
+          :keeps="30"
+          :data-key="'count'"
+          :data-sources="privateChatList"
+          :data-component="msgItem"
+          :extra-props="{}"
+        ></virtual-list>
       </div>
     </div>
     <send-box
@@ -21,14 +27,16 @@
   import { useChatServer, useRoomBaseServer, useUserServer, useMsgServer } from 'middle-domain';
   import sendBox from '@/packages/chat-wap/src/components/send-box';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import VirtualList from 'vue-virtual-scroll-list';
   export default {
     name: 'VmpWapPrivateChat',
     components: {
-      msgItem,
-      sendBox
+      sendBox,
+      VirtualList
     },
     data() {
       return {
+        msgItem,
         //私聊列表
         privateChatList: useChatServer().state.privateChatList,
         //当前@的对象
@@ -107,15 +115,31 @@
         useChatServer().sendMsg(curmsg);
         //清除发送后的消息
         useChatServer().clearCurMsg();
+        this.scrollBottom();
       },
-      //滚动到顶部
-      scrollTop() {
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
+      },
+      //滚动到底部
+      scrollBottom() {
         this.$nextTick(() => {
-          if (document.getElementsByClassName('vmp-wap-private-chat__wrapper').length > 0) {
-            document.getElementsByClassName('vmp-wap-private-chat__wrapper')[0].scrollTop =
-              document.querySelectorAll('.vmp-private-chat__content')[0].scrollHeight;
-          }
+          this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
+          this.isHasUnreadAtMeMsg = false;
         });
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.chatlist.$el.scrollHeight -
+            this.$refs.chatlist.$el.scrollTop -
+            this.$refs.chatlist.getClientSize() <
+          5
+        );
       }
     }
   };
@@ -124,15 +148,6 @@
 <style lang="less">
   .vmp-wap-private-chat {
     height: 100%;
-    .vmp-wap-private-chat__wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: calc(100% - 120px);
-      bottom: 120px;
-      overflow: hidden;
-    }
     .vmp-private-chat__content {
       height: 100%;
       overflow-y: scroll;
