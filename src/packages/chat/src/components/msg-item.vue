@@ -204,6 +204,35 @@
             </span>
           </div>
         </div>
+        <!-- 礼物、打赏 -->
+        <div
+          v-if="source.interactToolsStatus && !(source.type === 'reward_pay_ok' && isEmbed)"
+          class="msg-item-template__interact-tools"
+        >
+          <div class="interact-tools-content">
+            <span v-show="source.nickname" class="interact-tools-content__nick-name">
+              {{ source.nickname }}
+            </span>
+            <span>
+              {{
+                source.type === 'reward_pay_ok' ? '打赏了红包' : `送出${source.content.gift_name}`
+              }}
+            </span>
+            <img
+              class="interact-tools-content__img"
+              :class="{
+                'interact-tools-content__img-scale': source.content.source_status === '0',
+                'interact-tools-content__img-reward': !source.content.gift_url
+              }"
+              :src="source.content.gift_url || require('../img/red-package-1.png')"
+              :alt="$t('interact_tools.interact_tools_1029')"
+            />
+            <br v-if="source.type === 'reward_pay_ok'" />
+            <span v-if="source.type === 'reward_pay_ok'" style="color: #fa9a32">
+              {{ source.content.text_content }}
+            </span>
+          </div>
+        </div>
       </template>
     </div>
   </div>
@@ -224,10 +253,6 @@
       //是否只展示观看端
       isOnlyShowSponsor: {
         default: false
-      },
-      // 是否展示特效
-      showSpecialEffects: {
-        default: true
       },
       // roleName: {
       //   required: true

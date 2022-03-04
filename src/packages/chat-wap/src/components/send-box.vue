@@ -140,7 +140,7 @@
         //是否可以发送消息，发送限频
         canSend: true,
         //限频时间
-        time: 15,
+        time: 0,
         //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
@@ -279,8 +279,10 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(this.$t('chat.chat_1068', this.waitTime));
+            this.$message(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
+        } else if (this.currentTab == 'qa' && this.time != 0) {
+          this.$message(this.$t('chat.chat_1080', { n: this.time }));
         } else {
           this.$refs.chatWapInputModal.openModal();
         }
@@ -313,6 +315,7 @@
         //如果当前是问答tab
         if (this.currentTab == 'qa') {
           this.$emit('sendQa', value);
+          this.timing();
           return;
         }
         if (this.currentTab == 'private') {
@@ -337,6 +340,15 @@
       // 打开个人中心
       showUserPopup() {
         this.$emit('showUserPopup');
+      },
+      timing() {
+        this.time = 15;
+        const timer = setInterval(() => {
+          --this.time;
+          if (this.time == 0) {
+            clearInterval(timer);
+          }
+        }, 1000);
       }
     }
   };

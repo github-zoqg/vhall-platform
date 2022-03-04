@@ -401,7 +401,7 @@
       //处理分组讨论频道变更
       handleChannelChange() {
         this.page = 0;
-        useChatServer().clearHistoryMsg();
+        useChatServer().clearChatMsg();
         this.getHistoryMsg();
       },
       // 获取历史消息
@@ -438,19 +438,6 @@
       //关闭预览图片弹窗之后的处理
       onClosePreviewImg() {
         this.imgPreviewVisible = false;
-      },
-      //滚动到底部
-      scrollBottom() {
-        this.$nextTick(() => {
-          this.$refs.chatlist.scrollToBottom();
-          this.unReadMessageCount = 0;
-        });
-      },
-      //滚动到目标处
-      scrollToTarget() {
-        const index = this.chatList.length - this.unReadMessageCount;
-        this.$refs.chatlist.scrollToIndex(index);
-        this.unReadMessageCount = 0;
       },
       /** 消息区域滚动处理结束 */
       //todo domain负责 获取菜单列表
@@ -563,7 +550,7 @@
       //处理开启/屏蔽特效
       onSwitchShowSpecialEffects(status) {
         this.showSpecialEffects = !status;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitHideEffect', status));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitHideEffect', [status]));
       },
       //处理只看主办方
       onSwitchShowSponsor(status) {
@@ -597,6 +584,19 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
         );
+      },
+      //滚动到底部
+      scrollBottom() {
+        this.$nextTick(() => {
+          this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
+        });
+      },
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部
       isBottom() {
