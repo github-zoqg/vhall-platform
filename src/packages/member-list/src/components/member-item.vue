@@ -415,7 +415,7 @@
           {
             command: 'inviteMic',
             isShow: 'isShowInvitation',
-            disable: this.userInfo.account_id === this.currentSpeakerId,
+            disable: 'isLiveInviteDisable',
             text: '邀请演示',
             sequence: 5
           },
@@ -434,7 +434,7 @@
           {
             command: 'inviteMic',
             isShow: 'isShowWatchInvitation',
-            disable: this.userInfo.account_id == this.presentationScreen,
+            disable: 'isWatchInviteDisable',
             text: '邀请演示',
             sequence: 1
           },
@@ -502,6 +502,14 @@
             this.userInfo.role_name != 20) ||
           ([3, '3', 4, '4'].includes(this.roleName) && [2, '2'].includes(this.userInfo.role_name))
         );
+      },
+      //发起端演示的是否是选中的用户
+      isLiveInviteDisable() {
+        return this.userInfo.account_id == this.currentSpeakerId;
+      },
+      //观看端演示的是否是选中的用户
+      isWatchInviteDisable() {
+        return this.userInfo.account_id == this.presentationScreen;
       },
       //是否显示禁言、取消禁言
       isShowLiveMuted() {
@@ -739,6 +747,10 @@
           case 'inviteMic':
             this.handleInviteMic();
             break;
+          // 升为组长
+          case 'setLeader':
+            this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
+            break;
           default:
             break;
         }
@@ -959,6 +971,14 @@
       &:hover {
         background-color: #fc5659;
         color: #fff;
+      }
+    }
+    .is-disabled {
+      background: #999;
+      color: #fff;
+      &:hover {
+        background: #999;
+        cursor: default;
       }
     }
     .popper__arrow {
