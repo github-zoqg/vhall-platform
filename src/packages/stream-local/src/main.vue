@@ -383,16 +383,27 @@
             this.interactiveServer.destroy();
           }
         });
-        // 分组结束讨论
+        // 分组 - 结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {
           try {
-            await this.stopPush();
-            await this.interactiveServer.destroy();
             //  初始化互动实例
             await this.interactiveServer.init();
             this.isNeedSpeak();
           } catch (error) {
             console.log('分组结束讨论', error);
+          }
+        });
+
+        // 分组 - 开始讨论
+        this.groupServer.$on('GROUP_SWITCH_START', async () => {
+          if (this.localStream.streamId) {
+            await this.stopPush();
+            await this.interactiveServer.destroy();
+            //  初始化互动实例
+            await this.interactiveServer.init();
+          }
+          if (this.isNeedSpeakOn) {
+            this.userSpeakOn();
           }
         });
       },
