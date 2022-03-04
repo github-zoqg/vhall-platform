@@ -30,7 +30,7 @@
           <label>{{ webinarType | webinarFilter }}</label>
         </span>
         <span
-          v-if="webinarType != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -66,7 +66,7 @@
       <!-- 关注 -->
       <div
         class="vmp-header-watch-right-attention"
-        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarType != 6"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.mode != 6"
       >
         <div
           :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"
@@ -143,8 +143,6 @@
     name: 'VmpHeaderWatch',
     data() {
       return {
-        noDelayIconUrl:
-          '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
         defaultLogoUrl: require('./img/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
@@ -158,6 +156,7 @@
           pageBg: '#cccccc',
           iconClass: 'icon-default' // icon默认色
         },
+        lang: 'zh-CN',
         isAttention: false,
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
@@ -182,6 +181,10 @@
       officaialDialog
     },
     computed: {
+      // 无延迟图片地址
+      noDelayIconUrl() {
+        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
+      },
       create_user_url() {
         const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
@@ -220,6 +223,10 @@
         await this.attentionStatus();
       }
       this.getWebinarInfo();
+      // const curLang = this.roomBaseServer.state.languages.curLang;
+      // const langArr = ['zh-CN', 'en'];
+      // const lang = sessionStorage.getItem('lang') || curLang.language_type;
+      // this.lang = langArr[lang];
     },
     methods: {
       getWebinarInfo() {

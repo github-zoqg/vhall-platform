@@ -63,6 +63,10 @@
         this.timer = setTimeout(() => {
           this.announcement.isShow = false;
         }, 30000);
+        // 直播结束自动关闭公告
+        this.noticeServer.$on('live_over', msg => {
+          this.announcement.isShow = false;
+        });
       });
     },
     methods: {

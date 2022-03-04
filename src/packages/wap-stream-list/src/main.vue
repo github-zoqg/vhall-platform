@@ -200,7 +200,6 @@
         return this.interactiveServer.state.defaultStreamBg;
       }
     },
-
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       useMediaCheckServer().checkSystemRequirements();
@@ -250,6 +249,12 @@
           const str =
             this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
           Toast(`${msg.data.nick_name}设置成为${str}`);
+          this.$nextTick(() => {
+            this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+            if (this.mainScreenDom) {
+              this.mainScreenDom.style.left = `${1.02667}rem`;
+            }
+          });
         });
 
         // 房间信令异常断开事件
@@ -376,6 +381,10 @@
 
       // 全屏
       setFullScreen() {
+        /*
+         * 布局原因：wap进入全屏仅全屏主屏流
+         *    进入全屏在list内，退出全屏在remote/local内进行退出
+         */
         let allStream = this.interactiveServer.getRoomStreams();
         let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
         if (mainScreenStream) {

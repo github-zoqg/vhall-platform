@@ -142,7 +142,8 @@
     useGroupServer,
     useInteractiveServer,
     useMemberServer,
-    useRebroadcastServer
+    useRebroadcastServer,
+    useDesktopShareServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -219,7 +220,7 @@
       // 文档是否可见
       show() {
         return (
-          (!this.isWatch && !this.roomBaseServer.state.isShareScreen) ||
+          (!this.isWatch && !this.desktopShareServer.state.isShareScreen) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -315,7 +316,7 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[doc][player]---大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
+        console.log('-[doc]--大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
         const mode = newval === 'doc' ? 'mini' : 'normal';
         this.setDisplayMode(mode);
       },
@@ -329,6 +330,7 @@
       }
     },
     beforeCreate() {
+      this.desktopShareServer = useDesktopShareServer();
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.msgServer = useMsgServer();
@@ -516,6 +518,7 @@
           // console.log('[doc] screenfull.isFullscreen:', screenfull);
           if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
+            this.thumbnailShow = false;
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
@@ -1042,6 +1045,8 @@
   // 文档全屏时
   .vmp-doc-une.vmp-doc-une--fullscreen {
     .vmp-doc-toolbar {
+      position: absolute;
+      bottom: 50px;
       background: transparent;
       border-color: transparent;
     }
@@ -1053,6 +1058,14 @@
       background: #1a1a1a;
       padding: 2px 10px;
       border-radius: 100px;
+
+      .vmp-brush-popup {
+        position: absolute;
+        top: auto;
+        left: 0;
+        bottom: 37px;
+        padding-top: 4px;
+      }
     }
     .vmp-icon-item--exitFullscreen {
       display: block;

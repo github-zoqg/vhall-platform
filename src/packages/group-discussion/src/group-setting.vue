@@ -3,7 +3,7 @@
   <div class="vmp-group-setting">
     <el-dialog
       :visible.sync="dialogVisible"
-      @open="handlOpen"
+      @open="handleOpen"
       :before-close="handleClose"
       :close-on-click-modal="false"
       :append-to-body="false"
@@ -31,7 +31,7 @@
           <div class="vmp-group-item__hd">分组方式</div>
           <div class="vmp-group-item__bd">
             <el-radio class="group-radio" v-model="way" label="1">
-              自动分组 （系统随机分屏组内成员）
+              自动分组 （系统随机分配组内成员）
             </el-radio>
             <el-radio class="group-radio" v-model="way" label="2">
               手动分组（按照实际情况及个人意愿分配）
@@ -83,7 +83,10 @@
       }
     },
     methods: {
-      handlOpen() {},
+      handleOpen() {
+        this.number = '';
+        this.way = '1';
+      },
       // 开始分组
       handleGroup: async function () {
         if (this.number < 2 || this.number > 50) {

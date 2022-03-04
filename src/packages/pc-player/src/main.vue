@@ -11,7 +11,6 @@
     @mousemove="wrapEnter"
     @mouseleave="wrapLeave"
   >
-    <!-- <div> -->
     <div id="vmp-player" class="vmp-player-watch">
       <template class="vmp-player-living">
         <div
@@ -98,6 +97,7 @@
       </template>
       <!-- 控制条 进度条、弹幕、全屏、时间等 -->
       <div
+        v-show="isPlayering"
         :class="[
           { 'active-control': hoveVideo, 'previre-control': isTryPreview },
           displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'
@@ -153,6 +153,19 @@
             </div>
           </div>
           <div class="controller-tools-right">
+            <div class="controller-tools-right-lang" v-if="isEmbedVideo && !isSubscribe">
+              <span>{{ lang.label }}</span>
+              <ul class="controller-tools-right-list controller-lang">
+                <li
+                  v-for="(item, index) in languageList"
+                  :class="{ 'vmp-player-li-active': item.key == lang.key }"
+                  @click="changeLanguage(item.key)"
+                  :key="index"
+                >
+                  {{ item.label }}
+                </li>
+              </ul>
+            </div>
             <div class="controller-tools-right-quality" v-if="!isWarnPreview && !isTryPreview">
               <span>{{ formatQualityText(currentQualitys.def) }}</span>
               <ul class="controller-tools-right-list">
@@ -251,7 +264,6 @@
         </div>
       </div>
     </div>
-    <!-- </div> -->
   </div>
 </template>
 <script>
@@ -260,6 +272,18 @@
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -392,6 +416,19 @@
     created() {
       this.getWebinerStatus();
       this.listenEvents();
+      if (this.isEmbedVideo) {
+        this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
+          return langMap[item.language_type];
+        });
+        console.log(this.languageList, '??!32142435');
+        const curLang = this.roomBaseServer.state.languages.curLang;
+        this.lang =
+          langMap[sessionStorage.getItem('lang')] ||
+          langMap[this.$route.query.lang] ||
+          langMap[curLang.language_type];
+        this.$i18n.locale = this.lang.type;
+        sessionStorage.setItem('lang', this.lang.type);
+      }
     },
     mounted() {
       if (this.isEmbedVideo) {
@@ -730,6 +767,11 @@
         this.setVideoCurrentTime(time);
         this.setTime();
         this.play();
+      },
+      // 切换多语言
+      changeLanguage(key) {
+        sessionStorage.setItem('lang', key);
+        window.location.reload();
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus() {
@@ -1130,11 +1172,10 @@
       &-exchange {
         position: absolute;
         top: 10px;
-        z-index: 7;
+        z-index: 9;
         right: 8px;
         width: 32px;
         height: 32px;
-        // opacity: 100;
         background: transparent;
         display: flex;
         align-items: center;
@@ -1165,7 +1206,7 @@
     &-controller {
       position: absolute;
       bottom: -48px;
-      z-index: 6;
+      z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
@@ -1267,6 +1308,7 @@
               color: @font-error;
             }
           }
+          &-lang,
           &-quality,
           &-speed {
             &:hover {
@@ -1295,6 +1337,9 @@
             }
             .vmp-player-li-active {
               color: @font-error;
+            }
+            &.controller-lang {
+              left: -16%;
             }
           }
           &-volume {

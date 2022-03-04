@@ -116,6 +116,7 @@
     },
     methods: {
       subscribeRemoteStream() {
+        console.warn('开始订阅', this.stream);
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
@@ -124,11 +125,12 @@
         };
         this.interactiveServer
           .subscribe(opt)
-          .then(() => {
+          .then(e => {
+            console.warn('订阅成功---------', e);
             this.getLevel();
           })
           .catch(e => {
-            console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
+            console.warn('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
       speakOff() {
@@ -167,6 +169,7 @@
             });
         }, 2000);
       },
+      // 显示退出全屏按钮    5秒后隐藏
       showExitScreen() {
         if (!this.exitScreenStatus) {
           this.interactiveServer.state.fullScreenType = true;
@@ -176,14 +179,14 @@
           this.interactiveServer.state.fullScreenType = false;
         }, 5000);
       },
+      // 退出全屏
       exitFullScreen() {
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.stream.streamId,
             vNode: `vmp-stream-remote__${this.stream.streamId}`
           })
-          .then(res => {
-            console.warn('res----', res);
+          .then(() => {
             this.interactiveServer.state.fullScreenType = false;
           });
       }

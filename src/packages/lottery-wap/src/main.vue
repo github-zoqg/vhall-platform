@@ -25,7 +25,7 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useLotteryServer, useRoomBaseServer } from 'middle-domain';
+  import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
   const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
   const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
   export default {
@@ -108,6 +108,13 @@
         this.setFitment(msgData);
         this.lotteryView = 'LotteryPending';
         this.popupVisible = true;
+        useChatServer().addChatToList({
+          content: {
+            text_content: this.$t('interact_tools.interact_tools_1021')
+          },
+          type: msg.type,
+          interactStatus: true
+        });
       },
       // 抽奖结果消息推送
       callBackResultNotice(msg) {
@@ -128,6 +135,20 @@
         }
         this.showWinnerList = !!msgData.publish_winner;
         this.popupVisible = true;
+        const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
+        useChatServer().addChatToList({
+          content: {
+            text_content: lotteryResult
+              ? this.$t('interact_tools.interact_tools_1023')
+              : this.$t('interact_tools.interact_tools_1022'),
+            msg: msg,
+            userId: join_info.user_id || join_info.third_party_user_id,
+            Show: msg.data.lottery_status == 1 && msg.data.win == 1
+          },
+          type: msg.type,
+          interactStatus: true,
+          isCheck: lotteryResult
+        });
       },
       close() {
         this.popupVisible = false;

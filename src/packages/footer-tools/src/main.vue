@@ -13,7 +13,7 @@
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__left-language" v-if="isEmbed">
+      <div class="vmp-footer-tools__left-language" v-if="isEmbed && languageList.length > 1">
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
@@ -39,8 +39,6 @@
     <div class="vmp-footer-tools__center" v-if="!isBanned && isInteractLive">
       <handup></handup>
     </div>
-    <!-- 用户被邀请dialog -->
-    <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
@@ -70,7 +68,7 @@
         </div>
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="showGiftIcon">
+      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
@@ -85,7 +83,7 @@
           />
         </div>
       </li>
-      <li v-if="roomBaseState.configList['ui.hide_reward'] === '0'">
+      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0'">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
@@ -117,7 +115,6 @@
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
-  import getInvited from './component/getInvited/index.vue';
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
@@ -141,7 +138,6 @@
       vhGifts,
       notice,
       praise,
-      getInvited,
       Pay,
       RedPacketIcon,
       LotteryIcon
@@ -219,7 +215,7 @@
         );
       },
       isEmbed() {
-        // 是不是音视频嵌入
+        // 是不是嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       isEmbedVideo() {

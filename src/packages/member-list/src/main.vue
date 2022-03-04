@@ -208,6 +208,7 @@
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
   import * as _ from 'lodash';
+  import { sleep } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -332,7 +333,7 @@
       },
       leader_id: {
         handler(newVal, oldVal) {
-          this.leader_id = newVal;
+          // this.leader_id = newVal;
           if (newVal == oldVal) return;
           this.handleLeaderChange(newVal, oldVal);
         },
@@ -405,22 +406,20 @@
       //找到当前的主屏
       getCurrentMainScreen() {
         let current = '';
-        const _this = this;
         if (this.isInGroup) {
-          current = _this.groupServer.state.groupInitData.main_screen;
+          current = this.groupServer.state.groupInitData.main_screen;
         } else {
-          current = _this.interactToolStatus.main_screen;
+          current = this.interactToolStatus.main_screen;
         }
         return current;
       },
       //找到当前的演示屏幕
       getCurrentPresentationScreen() {
         let current = '';
-        const _this = this;
         if (this.isInGroup) {
-          current = _this.groupServer.state.groupInitData.presentation_screen;
+          current = this.groupServer.state.groupInitData.presentation_screen;
         } else {
-          current = _this.interactToolStatus.presentation_screen;
+          current = this.interactToolStatus.presentation_screen;
         }
         return current;
       }
@@ -466,7 +465,7 @@
           const { type = '' } = temp.data || {};
           if (type === 'start_discussion') {
             _this.init();
-            _this.listenEvent();
+            // _this.listenEvent();
             //初始化主讲人id
             _this.currentSpeakerId = _this.groupInitData.isInGroup
               ? _this.groupInitData.doc_permission
@@ -527,7 +526,7 @@
       //初始化房间消息回调监听
       listenRoomMsg() {
         const _this = this;
-        const isLive = this.isLive;
+        const { isLive } = this;
 
         // 加入房间
         this.msgServer.$onMsg('JOIN', msg => {
@@ -616,6 +615,7 @@
           console.log(msg);
           _this.allowRaiseHand = false;
         }
+
         //直播结束
         function handleLiveOver(msg) {
           console.log(msg);
@@ -628,6 +628,7 @@
             _this.refreshList();
           }, 1000);
         }
+
         //设备检测
         function handleDeviceCheck(msg) {
           const { member_info = {} } = msg.data;
@@ -1021,9 +1022,8 @@
         //主房间人员变动
         function handleMainRoomJoinChange(msg) {
           //必须在主房间
-          if (!_this.isInGroup) {
-            return;
-          }
+          if (!_this.isInGroup) return;
+
           if (isLive) {
             _this.totalNum = msg.uv - _this.groupServer.state.groupedUserList.length;
             _this.totalNum = _this.totalNum >= 0 ? _this.totalNum : 0;
@@ -1061,40 +1061,20 @@
       //初始化分组消息回调监听
       listenGroupMsg() {
         const _this = this;
-        const isLive = this.isLive;
-        const isWatch = this.isWatch;
+        const { isLive, isWatch } = this;
+
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
           if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
             temp.data = JSON.parse(temp.data);
             temp.context = JSON.parse(temp.context);
           }
+
           const { type = '' } = temp.data || {};
           switch (type) {
-            case 'group_join_info':
-              //为上线的分组成员添加身份
-              handleSetUserJoinInfo(temp);
-              break;
-            case 'group_switch_start':
-            case 'group_msg_created':
-              //开始讨论
-              isLive && handleStartGroupDiscuss(temp);
-              break;
-            case 'group_switch_end':
-              //结束讨论
-              handleEndGroupDiscuss(temp);
-              break;
             case 'changeGroupInitData':
               //重新获取最新的groupInitData
               isLive && changeGroupInitData(temp);
-              break;
-            case 'room_group_kickout':
-              //踢出小组
-              handleGroupKicked(temp);
-              break;
-            case 'group_disband':
-              //小组被解散
-              isWatch && handleGroupDisband(temp);
               break;
             case 'vrtc_connect_presentation_agree':
               //用户被邀请演示-同意演示
@@ -1104,18 +1084,6 @@
               //演示权限变更
               isWatch && handlePresentationPermissionChange(temp);
               break;
-            case 'group_leader_change':
-              //组长变更
-              isWatch && handleLeaderChange(temp);
-              break;
-            case 'room_channel_change':
-              //频道变更
-              isWatch && handleRoomChannelChange(temp);
-              break;
-            case 'group_join_change_update':
-              //切换小组
-              isWatch && handleGroupChange(temp);
-              break;
             case 'room_vrtc_disconnect_success':
               //下麦成功
               isWatch && handleRoomDisconnectSuccess(temp);
@@ -1124,10 +1092,87 @@
               break;
           }
         });
+
+        //为上线的分组成员添加身份
+        this.groupServer.$on('GROUP_JOIN_INFO', msg => {
+          handleSetUserJoinInfo(msg);
+        });
+
+        // only 发起端（开始分组讨论）
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
+          isLive && handleStartGroupDiscuss(msg);
+        });
+
+        // 切换channel TODO: ???????疑问点
+        this.groupServer.$on('GROUP_MSG_CREATED', msg => {
+          isLive && handleStartGroupDiscuss(msg);
+        });
+
+        //  结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          console.log('GROUP_SWITCH_END', msg);
+          handleEndGroupDiscuss(msg);
+        });
+
+        // 换组
+        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+          isLive && this.updateOnlineUserList(msg);
+          isWatch && handleGroupChange(msg);
+        });
+
+        // 踢出小组
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          handleGroupKicked(msg);
+        });
+
+        // 解散分组(主播&观看均更新)
+        this.groupServer.$on('GROUP_DISBAND', () => {
+          this.updateOnlineUserList();
+        });
+
+        // 切换组长(组长变更)
+        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          if (isLive) return;
+          this.leader_id = msg.data.account_id;
+          this.getOnlineUserList();
+        });
+
         // 主持人进入退出小组 消息监听
-        this.groupServer.$on('dispatch_group_enter', msg => {
+        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
           handleHostJoin(msg);
         });
+
+        // 频道变更-开始讨论(刷新数据)
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
+          isWatch && handleRoomChannelChange(msg);
+        });
+
+        // 邀请演示-同意
+        // this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
+        //   if (!isWatch) return;
+        //
+        //   if (this.roleName == 20) {
+        //     this.$message({
+        //       message: '对方已接受邀请',
+        //       showClose: true,
+        //       // duration: 0,
+        //       type: 'success',
+        //       customClass: 'zdy-info-box'
+        //     });
+        //   }
+        //   this.presentation_screen = msg.sender_id;
+        // });
+
+        // 同意邀请演示成功消息
+        // this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', msg => {
+        //   isWatch && handlePresentationPermissionChange(msg);
+        // });
+
+        // 下麦成功
+        this.micServer.$on('vrtc_disconnect_success', msg => {
+          isWatch && handleRoomDisconnectSuccess(msg);
+        });
+
         //为上线的分组成员添加身份
         function handleSetUserJoinInfo(msg) {
           if (_this.isLive) {
@@ -1205,15 +1250,15 @@
             _this.presentation_screen = _this.groupServer.state.presentation_screen;
           }
         }
+
         //分组--开始讨论
-        function handleStartGroupDiscuss(msg) {
-          console.log(msg);
+        function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
           _this.getOnlineUserList();
         }
-        //分组--结束讨论
+        //
         function handleEndGroupDiscuss(msg) {
-          console.log(msg);
+          console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
           _this.getOnlineUserList();
         }
@@ -1244,12 +1289,7 @@
             }
           }
         }
-        //小组被解散
-        function handleGroupDisband(msg) {
-          console.log(msg);
-          _this.onlineUsers = [];
-          _this.getOnlineUserList();
-        }
+
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
           if (_this.roleName == 20) {
@@ -1276,16 +1316,15 @@
           _this.leader_id = msg.data.account_id;
           _this.getOnlineUserList();
         }
-        //切换频道
-        function handleRoomChannelChange(msg) {
+        //切换频道(开始讨论也会调这里)
+        async function handleRoomChannelChange(msg) {
           console.log(msg);
           //todo 待确认切换频道事件和这里的mainScreen
           _this.mainScreen = _this.groupServer.state.groupInitData.main_screen;
           _this.presentation_screen = _this.groupServer.state.groupInitData.presentation_screen;
-          setTimeout(() => {
-            _this.onlineUsers = [];
-            _this.getOnlineUserList();
-          }, 1000);
+          await sleep(1000);
+          _this.onlineUsers = [];
+          _this.getOnlineUserList();
         }
         //切换小组
         async function handleGroupChange(msg) {
@@ -1368,10 +1407,13 @@
           delete this.speakerLeaveIntervalMap[msg.sender_id];
         }
       },
+      updateOnlineUserList() {
+        this.onlineUsers = [];
+        this.getOnlineUserList();
+      },
       //获取在线人员列表
       getOnlineUserList(pos) {
         const _this = this;
-        const { getOnlineUserList } = this.memberServer;
         const params = {
           room_id: this.roomId,
           pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
@@ -1382,29 +1424,35 @@
         if (this.searchUserInput) {
           Object.assign(params, { nickname: this.searchUserInput });
         }
-        getOnlineUserList(params)
+
+        this.memberServer
+          .getOnlineUserList(params)
           .then(res => {
             if (res.code === 200) {
               this.$refs.scroll.finishPullUp();
               this.onlineUsers = this.memberServer.state.onlineUsers || [];
               (this.onlineUsers || []).forEach(item => {
-                if (
-                  _this.memberOptions.platformType === 'watch' &&
-                  item.account_id == _this.userId
-                ) {
+                //更新一下成员的role
+                if (_this.isWatch && item.account_id == _this.userId) {
                   _this.roleName = item.role_name;
                 }
+                //刷新当前的组长id
                 if ([20, '20'].includes(item.role_name)) {
                   _this.leader_id = item.account_id;
                 }
+                //维护举手状态
+                if (_this.applyUsers.map(user => user.account_id).includes(item.account_id)) {
+                  item.is_apply = 1;
+                }
               });
+
               if (!this.onlineUsers.length) {
                 this.pageConfig.page--;
               }
               //在线总人数
               this.totalNum = this.memberServer.state.totalNum;
               setTimeout(() => {
-                this.refresh();
+                _this.refresh();
               }, 50);
             }
             if (![200, '200'].includes(res.code)) {

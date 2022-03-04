@@ -88,6 +88,7 @@
       interactToolStatus() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus;
       },
+      // 退出全屏
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
@@ -166,7 +167,7 @@
       });
 
       //监听直播结束的通知，下麦并停止推流
-      this.micServer.$on('live_over', async () => {
+      this.interactiveServer.$on('live_over', async () => {
         if (this.micServer.state.isSpeakOn) {
           await this.micServer.speakOff();
           await this.stopPush();
@@ -275,17 +276,9 @@
       // 创建本地流
       async createLocalStream() {
         await this.interactiveServer
-          .createWapLocalStream(
-            {
-              videoNode: `stream-${this.joinInfo.third_party_user_id}`
-            },
-            {
-              mute: {
-                audio: this.mode === 6 && this.interactToolStatus?.auto_speak == 1, // 是否是分组且开启了自动上麦
-                video: false
-              }
-            }
-          )
+          .createWapLocalStream({
+            videoNode: `stream-${this.joinInfo.third_party_user_id}`
+          })
           .catch(() => 'createLocalStreamError');
       },
       // 推流
@@ -344,6 +337,7 @@
         }, 2000);
       },
 
+      // 显示退出全屏按钮    5秒后隐藏
       showExitScreen() {
         if (!this.exitScreenStatus) {
           this.interactiveServer.state.fullScreenType = true;
@@ -353,11 +347,12 @@
           this.interactiveServer.state.fullScreenType = false;
         }, 5000);
       },
+      // 退出全屏
       exitFullScreen() {
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.stream.streamId,
-            vNode: `vmp-stream-remote__${this.stream.streamId}`
+            vNode: `vmp-stream-local__${this.stream.streamId}`
           })
           .then(res => {
             console.warn('res----', res);
