@@ -1132,7 +1132,7 @@
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          if (!isWatch) return;
+          if (isLive) return;
           this.leader_id = msg.data.account_id;
           this.getOnlineUserList();
         });
@@ -1578,7 +1578,6 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
-        debugger;
         console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
