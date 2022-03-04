@@ -255,6 +255,14 @@
       previewImg: {
         type: Function,
         default: function () {}
+      },
+      emitLotteryEvent: {
+        type: Function,
+        default: function () {}
+      },
+      emitQuestionnaireEvent: {
+        type: Function,
+        default: function () {}
       }
     },
     data() {
@@ -374,28 +382,25 @@
       },
       //todo 信令唤起其他模块 点击查看消息
       clickToView(type, content) {
-        // TODO: type 为空值, content为整个消息体
-        //console.log('clickToView', type, content);
+        // TODO: type 目前消息体不统一
+        console.log('clickToView', type, content);
         // 抽奖点击查看
-        const msg = content.msg.data;
-        if (msg.type === 'lottery_result_notice') {
-          this.lotteryCheck(msg);
+        if (content?.msg?.data?.type === 'lottery_result_notice') {
+          this.lotteryCheck(content?.msg?.data);
         }
-        // FIXME: 下面的代码目前走不通, 先注释
-        // if (type === 'lottery_result_notice') {
-        //   this.lotteryCheck(content);
-        // } else if (type === 'questionnaire_push') {
-        //   // 问卷点击查看
-        //   this.questionnaireCheck(content.questionnaire_id);
-        // }
+        // 问卷查看
+        if (type === 'questionnaire_push') {
+          this.questionnaireCheck(content.questionnaire_id);
+        }
       },
       //todo 点击查看抽奖信息
       lotteryCheck(msg) {
-        this.$emit('lotteryCheck', msg);
+        this.emitLotteryEvent(msg);
       },
       //todo 点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
-        this.$emit('questionnaireCheck', questionnaire_id);
+        console.log('questionnaireCheck', questionnaire_id);
+        this.emitQuestionnaireEvent(questionnaire_id);
       },
       //处理@消息
       handleAt() {

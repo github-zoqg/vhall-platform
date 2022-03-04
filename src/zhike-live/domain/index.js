@@ -18,11 +18,14 @@ import {
 
 setBaseUrl({
   v3Url: process.env.VUE_APP_BASE_URL,
-  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
 setRequestHeaders({
   platform: 7, // 7:PC网页版
-  token: localStorage.getItem('token') || ''
+  token: localStorage.getItem('token') || '',
+  'biz-id': 4, //业务线标识 知客: 4
+  'biz-application-id': '02391153' //paas应用id
 });
 
 Vue.use(DomainStore);

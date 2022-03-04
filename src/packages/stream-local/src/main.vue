@@ -243,6 +243,18 @@
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 实例化后是否需要调用上麦接口
+      isNeedSpeakOn() {
+        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
+        // isSpeakOffToInit 自动上麦后，如果下麦，会重新初始化互动实例，不加这个变量会又一次走自动上麦
+        return (
+          this.mode === 6 &&
+          !this.chatServer.state.banned &&
+          !this.chatServer.state.allBanned &&
+          this.joinInfo.role_name != 3 &&
+          !this.micServer.state.isSpeakOffToInit
+        );
       }
     },
     filters: {
@@ -257,32 +269,20 @@
         return roleNameMap[roleName];
       }
     },
-    created() {
+    beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
+    },
+    created() {
       this.listenEvents();
     },
     async mounted() {
+      window.streamLocal = this;
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
-
-      // 刷新重进时，如果在小组内且上麦，或者不在小组内且上麦
-      if (
-        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-        this.micServer.state.isSpeakOn
-      ) {
-        this.startPush();
-      } else if (
-        this.mode === 6 &&
-        !this.chatServer.state.banned &&
-        !this.chatServer.state.allBanned &&
-        this.joinInfo.role_name != 3
-      ) {
-        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
-        await this.micServer.userSpeakOn();
-      }
+      this.isNeedSpeak();
     },
     beforeDestroy() {
       // 清空计时器
@@ -294,6 +294,19 @@
       }
     },
     methods: {
+      isNeedSpeak() {
+        // 实例化后是否是上麦状态
+        const isSpeakOn =
+          (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+          this.micServer.state.isSpeakOn;
+        if (isSpeakOn) {
+          this.startPush();
+        } else if (this.isNeedSpeakOn) {
+          this.userSpeakOn();
+        } else {
+          this.micServer.setSpeakOffToInit(false);
+        }
+      },
       // 恢复播放
       replayPlay() {
         const videos = document.querySelectorAll('video');
@@ -313,6 +326,18 @@
           },
           true
         );
+
+        // 互动实例成功
+        this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', async () => {
+          // 是否需要自动上麦
+          const micServer = useMicServer();
+
+          if (this.isNeedSpeakOn) {
+            this.userSpeakOn();
+          } else {
+            micServer.setSpeakOffToInit(false);
+          }
+        });
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
@@ -358,15 +383,27 @@
             this.interactiveServer.destroy();
           }
         });
-        // 分组结束讨论
+        // 分组 - 结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', async () => {
           try {
+            //  初始化互动实例
+            await this.interactiveServer.init();
+            this.isNeedSpeak();
+          } catch (error) {
+            console.log('分组结束讨论', error);
+          }
+        });
+
+        // 分组 - 开始讨论
+        this.groupServer.$on('GROUP_SWITCH_START', async () => {
+          if (this.localStream.streamId) {
             await this.stopPush();
             await this.interactiveServer.destroy();
             //  初始化互动实例
-            this.interactiveServer.init();
-          } catch (error) {
-            console.log('分组结束讨论', error);
+            await this.interactiveServer.init();
+          }
+          if (this.isNeedSpeakOn) {
+            this.userSpeakOn();
           }
         });
       },
@@ -493,7 +530,9 @@
             if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
               await this.setBroadCastAdaptiveLayoutMode();
             }
-            await this.setBroadCastScreen();
+            if (this.mainScreen == this.joinInfo.third_party_user_id) {
+              await this.setBroadCastScreen();
+            }
           }
           // 派发事件
           window.$middleEventSdk?.event?.send(

@@ -70,7 +70,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comRedPacket'
+      'comRedPacket',
+      'comMicInvited'
     ]
   },
 
@@ -333,6 +334,11 @@ export const serverConfig = {
       method: 'accept',
       args: ['$0']
     },
+    emitClickQuestionnaireChatItem: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
     emitHideEffect: {
       cuid: 'comPcRewardEffect',
       method: 'setHideEffect',
@@ -463,7 +469,7 @@ export const serverConfig = {
 
   comVmpSubscribeBody: {
     component: 'VmpSubscribeBody',
-    children: ['comTabMenu', 'comPcPlayer'],
+    children: ['comSubscribeTabMenu', 'comPcPlayer'],
     emitClickLogin: [
       //登录弹窗
       {
@@ -493,6 +499,24 @@ export const serverConfig = {
     }
   },
 
+  comSubscribeTabMenu: {
+    component: 'VmpTabMenu',
+    options: {
+      // 是否展示左右按钮
+      isToggleBtnVisible: false,
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
+        { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' } // 广告、推荐
+      ]
+    }
+  },
+
   // 问卷
   comQuestionnaire: {
     component: 'VmpQuestionnaireWatch',
@@ -508,5 +532,9 @@ export const serverConfig = {
   // 红包
   comRedPacket: {
     component: 'VmpRedPacketWatch'
+  },
+  // 邀请上麦弹窗
+  comMicInvited: {
+    component: 'VmpMicInvited'
   }
 };

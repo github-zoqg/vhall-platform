@@ -1,5 +1,14 @@
 <template>
   <div class="vmp-chat-container" :class="{ assistant: assistantType }">
+    <transition name="el-fade-in-linear">
+      <div v-if="isWatch && nickName && welcomeText && isShowWelcome" class="vmp-chat-welcome">
+        <!-- 欢迎语显示 -->
+        <div class="vmp-chat-welcome__greeting">
+          <span class="vmp-chat-welcome__nickname">{{ nickName }}</span>
+          &nbsp;{{ welcomeText }}
+        </div>
+      </div>
+    </transition>
     <!-- 消息主体区域 -->
     <div
       class="chat-content"
@@ -16,7 +25,9 @@
         :extra-props="{
           chatOptions,
           isOnlyShowSponsor,
-          previewImg: previewImg.bind(this)
+          previewImg: previewImg.bind(this),
+          emitLotteryEvent,
+          emitQuestionnaireEvent
         }"
       ></virtual-list>
       <div
@@ -161,10 +172,7 @@
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
         // 聊天是否需要登录
         chatLoginStatus: false,
-        //欢迎信息
-        welcomeInfo: {
-          required: false
-        },
+
         //插件
         plugin: {
           image: false,
@@ -198,7 +206,10 @@
           'bg-custom': 'bg-custom'
         },
         //当前登录人信息
-        joinInfo: {}
+        joinInfo: {},
+
+        // 是否展示欢迎语
+        isShowWelcome: false
       };
     },
     computed: {
@@ -219,18 +230,29 @@
         return this.isOnlyShowSponsor
           ? this.chatList.filter(item => ![2, '2'].includes(item.roleName))
           : this.chatList;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 用户昵称
+      nickName() {
+        return this.roomBaseServer.state.watchInitData.join_info.nickname;
+      },
+      // 聊天区欢迎语
+      welcomeText() {
+        if (Array.isArray(this.roomBaseServer.state.customMenu?.list)) {
+          // 获取聊天菜单内容
+          const chatItem = this.roomBaseServer.state.customMenu.list.find(item => {
+            return item.type == 3;
+          });
+          // 返回欢迎语
+          return chatItem?.welcome_content || '';
+        }
+        return '';
       }
     },
     watch: {
-      welcomeInfo: {
-        handler(val) {
-          if (val) {
-            this.getMenuList(val);
-          }
-        },
-        immediate: true,
-        deep: true
-      },
       chatList: function () {
         if (this.isBottom()) {
           this.scrollBottom();
@@ -256,6 +278,9 @@
       this.getHistoryMsg();
       //监听domain层chatServer通知
       this.listenChatServer();
+
+      // 展示欢迎语
+      this.showWelcome();
     },
     destroyed() {},
     methods: {
@@ -413,14 +438,19 @@
         this.page++;
       },
       //todo domain负责 抽奖情况检查
-      lotteryCheck(msg) {
-        console.log('lotteryCheck', msg);
+      emitLotteryEvent(msg) {
+        console.log('emitLotteryEvent', msg);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
         );
       },
       //todo domain负责 问卷情况检查
-      questionnaireCheck() {},
+      emitQuestionnaireEvent(questionnaireId) {
+        console.log('emitQuestionnaireEvent', questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
+        );
+      },
       /**
        * 聊天图片预览
        * */
@@ -469,9 +499,6 @@
           if (rmJoin && rmJoin.nickname) {
             vo.nick_name = rmJoin.nickname;
           }
-          this.welcome_vo = vo;
-          console.log('自定义菜单...', this.welcome_vo);
-          //todo 欢迎语功能需要加上
         }
       },
       backspace() {
@@ -608,6 +635,19 @@
       //自己发送消息后的回调
       sendMsgEnd() {
         this.scrollBottom();
+      },
+      // 展示欢迎语
+      showWelcome() {
+        if (this.isWatch && this.nickName && this.welcomeText) {
+          // 延时显示欢迎语
+          setTimeout(() => {
+            this.isShowWelcome = true;
+            setTimeout(() => {
+              // 3s后隐藏
+              this.isShowWelcome = false;
+            }, 3000);
+          }, 1000);
+        }
       }
     }
   };
@@ -620,6 +660,38 @@
     width: 100%;
     height: 100%;
     position: relative;
+
+    .vmp-chat-welcome {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      position: absolute;
+      top: 5px;
+      z-index: 1;
+
+      &__greeting {
+        max-width: 312px;
+        background: linear-gradient(90deg, #fb3a32 0%, rgba(255, 172, 44, 0.8) 100%);
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        border-radius: 999999px;
+        color: #ffffff;
+        font-size: 14px;
+        line-height: 20px;
+        padding: 6px 16px;
+        text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      &__nickname {
+        display: inline-block;
+        max-width: 126px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        word-break: break-all;
+        vertical-align: top;
+      }
+    }
 
     &.assistant {
       background: #323232;
