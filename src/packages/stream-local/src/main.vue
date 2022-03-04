@@ -282,17 +282,7 @@
     async mounted() {
       window.streamLocal = this;
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
-      // 实例化后是否是上麦状态
-      const isSpeakOn =
-        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-        this.micServer.state.isSpeakOn;
-      if (isSpeakOn) {
-        this.startPush();
-      } else if (this.isNeedSpeakOn) {
-        this.userSpeakOn();
-      } else {
-        this.micServer.setSpeakOffToInit(false);
-      }
+      this.isNeedSpeak();
     },
     beforeDestroy() {
       // 清空计时器
@@ -304,6 +294,19 @@
       }
     },
     methods: {
+      isNeedSpeak() {
+        // 实例化后是否是上麦状态
+        const isSpeakOn =
+          (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+          this.micServer.state.isSpeakOn;
+        if (isSpeakOn) {
+          this.startPush();
+        } else if (this.isNeedSpeakOn) {
+          this.userSpeakOn();
+        } else {
+          this.micServer.setSpeakOffToInit(false);
+        }
+      },
       // 恢复播放
       replayPlay() {
         const videos = document.querySelectorAll('video');
@@ -386,7 +389,8 @@
             await this.stopPush();
             await this.interactiveServer.destroy();
             //  初始化互动实例
-            this.interactiveServer.init();
+            await this.interactiveServer.init();
+            this.isNeedSpeak();
           } catch (error) {
             console.log('分组结束讨论', error);
           }
