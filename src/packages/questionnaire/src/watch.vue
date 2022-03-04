@@ -13,7 +13,7 @@
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaireWatch',
@@ -43,13 +43,48 @@
       this.initEvent();
     },
     methods: {
+      /**
+       * @description 聊天/按钮打开文件
+       */
+      open(questionnaireId) {
+        console.log('open', questionnaireId);
+        this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
+          if (res.data === false) {
+            this.$message({
+              message: this.$t('form.form_1037'),
+              showClose: true,
+              // duration: 0,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          } else {
+            this.dialogVisible = true;
+            this.$nextTick(() => {
+              this.questionnaireServer.renderQuestionnaire4Watch(
+                '#qs-preview-box-content',
+                questionnaireId
+              );
+            }); // 等dom渲染
+          }
+        });
+      },
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async questionnaireId => {
+        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
+          useChatServer().addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1030'),
+              questionnaire_id: msg.questionnaire_id
+            },
+            roleName: msg.room_role,
+            type: msg.type,
+            interactStatus: true,
+            isCheck: true
+          });
           this.dialogVisible = true;
           await this.$nextTick(); // 等dom渲染
           this.questionnaireServer.renderQuestionnaire4Watch(
             '#qs-preview-box-content',
-            questionnaireId
+            msg.questionnaire_id
           );
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
