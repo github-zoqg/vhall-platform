@@ -1110,6 +1110,7 @@
 
         //  结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          console.log('GROUP_SWITCH_END', msg);
           handleEndGroupDiscuss(msg);
         });
 
@@ -1255,9 +1256,9 @@
           _this.onlineUsers = [];
           _this.getOnlineUserList();
         }
-        //分组--结束讨论
+        //
         function handleEndGroupDiscuss(msg) {
-          console.log(msg);
+          console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
           _this.getOnlineUserList();
         }

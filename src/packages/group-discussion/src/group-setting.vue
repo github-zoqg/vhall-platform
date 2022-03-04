@@ -3,7 +3,7 @@
   <div class="vmp-group-setting">
     <el-dialog
       :visible.sync="dialogVisible"
-      @open="handlOpen"
+      @open="handleOpen"
       :before-close="handleClose"
       :close-on-click-modal="false"
       :append-to-body="false"
@@ -83,7 +83,10 @@
       }
     },
     methods: {
-      handlOpen() {},
+      handleOpen() {
+        this.number = '';
+        this.way = '1';
+      },
       // 开始分组
       handleGroup: async function () {
         if (this.number < 2 || this.number > 50) {
