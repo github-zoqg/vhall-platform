@@ -1124,12 +1124,9 @@
           handleGroupKicked(msg);
         });
 
-        // 解散分组
+        // 解散分组(主播&观看均更新)
         this.groupServer.$on('GROUP_DISBAND', () => {
-          if (!isWatch) return;
-
-          this.onlineUsers = [];
-          this.getOnlineUserList();
+          this.updateOnlineUserList();
         });
 
         // 切换组长(组长变更)
