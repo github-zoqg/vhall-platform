@@ -1,6 +1,9 @@
 <template>
   <div class="vmp-subscribe-container">
-    <div class="vmp-basic-container" v-if="state === 1">
+    <div
+      :class="clientType == 'embed' ? 'vmp-container-embed' : 'vmp-basic-container'"
+      v-if="state === 1"
+    >
       <vmp-air-container cuid="layerSubscribeRoot"></vmp-air-container>
     </div>
     <errorPage v-if="state === 2" :prop-type="errorData.errorPageTitle">
@@ -19,6 +22,7 @@
     data() {
       return {
         state: 0,
+        clientType: 'standard',
         errorData: {
           errorPageTitle: '',
           errorPageText: ''
@@ -32,17 +36,16 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        let clientType = 'standard';
         if (location.pathname.indexOf('embedclient') != -1) {
-          clientType = 'embed';
+          this.clientType = 'embed';
         }
-        await this.initReceiveLive(clientType);
+        await this.initReceiveLive(this.clientType);
         await subscribeState();
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转观看页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
-          this.goWatchPage(clientType);
+          this.goWatchPage(this.clientType);
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--', err);
@@ -130,48 +133,59 @@
         margin-top: 20px;
       }
     }
-  }
-  // 媒体查询分辨率下效果
-  @media screen and (min-width: 1920px) {
-    .vmp-basic-bd {
-      max-width: 1658px;
+    .vmp-container-embed {
+      width: 100%;
+      height: 100%;
+      background: #1a1a1a;
+      font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+        '微软雅黑', Arial, sans-serif;
+      .vmp-basic-bd {
+        max-width: unset;
+        height: 100%;
+      }
     }
-  }
-
-  @media screen and (min-width: 1706px) {
-    .vmp-basic-bd {
-      max-width: 1658px;
+    // 媒体查询分辨率下效果
+    @media screen and (min-width: 1920px) {
+      .vmp-basic-bd {
+        max-width: 1658px;
+      }
     }
-  }
 
-  @media screen and (min-width: 1388px) and (max-width: 1705px) {
-    .vmp-basic-bd {
-      max-width: 1339px;
+    @media screen and (min-width: 1706px) {
+      .vmp-basic-bd {
+        max-width: 1658px;
+      }
     }
-  }
 
-  @media screen and (max-width: 1387px) {
-    .vmp-basic-bd {
-      max-width: 1339px;
+    @media screen and (min-width: 1388px) and (max-width: 1705px) {
+      .vmp-basic-bd {
+        max-width: 1339px;
+      }
     }
-  }
 
-  @media screen and (max-width: 1440px) {
-    .vmp-basic-bd {
-      max-width: 1339px;
+    @media screen and (max-width: 1387px) {
+      .vmp-basic-bd {
+        max-width: 1339px;
+      }
     }
-  }
 
-  @media screen and (max-width: 1366px) {
-    .vmp-basic-bd {
-      max-width: 1103px;
+    @media screen and (max-width: 1440px) {
+      .vmp-basic-bd {
+        max-width: 1339px;
+      }
     }
-  }
 
-  @media screen and (max-width: 1151px) {
-    // 浏览器中部最小间距，低于此分辨率1151px滚动条
-    .vmp-basic-bd {
-      max-width: 1103px;
+    @media screen and (max-width: 1366px) {
+      .vmp-basic-bd {
+        max-width: 1103px;
+      }
+    }
+
+    @media screen and (max-width: 1151px) {
+      // 浏览器中部最小间距，低于此分辨率1151px滚动条
+      .vmp-basic-bd {
+        max-width: 1103px;
+      }
     }
   }
 </style>

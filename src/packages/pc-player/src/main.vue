@@ -97,6 +97,7 @@
       </template>
       <!-- 控制条 进度条、弹幕、全屏、时间等 -->
       <div
+        v-show="isPlayering"
         :class="[
           { 'active-control': hoveVideo, 'previre-control': isTryPreview },
           displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'
@@ -1171,11 +1172,10 @@
       &-exchange {
         position: absolute;
         top: 10px;
-        z-index: 7;
+        z-index: 9;
         right: 8px;
         width: 32px;
         height: 32px;
-        // opacity: 100;
         background: transparent;
         display: flex;
         align-items: center;
@@ -1206,7 +1206,7 @@
     &-controller {
       position: absolute;
       bottom: -48px;
-      z-index: 6;
+      z-index: 8;
       width: 100%;
       height: 38px;
       box-sizing: border-box;
