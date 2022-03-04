@@ -56,7 +56,7 @@
               </p>
               <span v-else @click="authTryWatch">{{ authText }}</span>
             </div>
-            <p class="replay-try" @click="startRPlay">
+            <p class="replay-try" @click="replayPlay">
               <i class="vh-iconfont vh-line-refresh-left">
                 <b>{{ $t('appointment.appointment_1014') }}</b>
               </i>
@@ -257,9 +257,6 @@
           <i18n path="player.player_1012">
             <span place="n" class="red">{{ secondToDate(currentTime) }}</span>
           </i18n>
-          <!-- 上次观看至
-            <b>{{ secondToDate(currentTime) }}</b>
-            ，已为您自动续播 -->
           <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
         </div>
       </div>
@@ -740,6 +737,7 @@
       },
       // 重新播放
       replayPlay() {
+        this.isVodEnd = false;
         this.roomBaseServer.setChangeElement('doc');
         this.displayMode = 'normal';
         this.startPlay();
