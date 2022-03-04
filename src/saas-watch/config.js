@@ -333,6 +333,11 @@ export const serverConfig = {
       method: 'accept',
       args: ['$0']
     },
+    emitClickQuestionnaireChatItem: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
     emitHideEffect: {
       cuid: 'comPcRewardEffect',
       method: 'setHideEffect',

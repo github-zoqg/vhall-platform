@@ -6,7 +6,7 @@
   </van-popup>
 </template>
 <script>
-  import { useQuestionnaireServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
@@ -40,10 +40,19 @@
         this.popupVisible = false;
       },
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async questionnaireId => {
+        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
+          console.log('questionnaireServer22222222');
+          console.log(msg);
+          useChatServer().addChatToList({
+            content: {
+              text_content: this.$t('interact_tools.interact_tools_1021')
+            },
+            type: msg.type,
+            interactStatus: true
+          });
           this.popupVisible = true;
           await this.$nextTick();
-          this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
+          this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', msg.questionnaire_id);
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
           if (res.code === 200) {

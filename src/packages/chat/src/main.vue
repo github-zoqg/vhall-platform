@@ -17,7 +17,8 @@
           chatOptions,
           isOnlyShowSponsor,
           previewImg: previewImg.bind(this),
-          emitLotteryEvent
+          emitLotteryEvent,
+          emitQuestionnaireEvent
         }"
       ></virtual-list>
       <div
@@ -415,13 +416,18 @@
       },
       //todo domain负责 抽奖情况检查
       emitLotteryEvent(msg) {
-        console.log('lotteryCheck', msg);
+        console.log('emitLotteryEvent', msg);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
         );
       },
       //todo domain负责 问卷情况检查
-      questionnaireCheck() {},
+      emitQuestionnaireEvent(questionnaireId) {
+        console.log('emitQuestionnaireEvent', questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
+        );
+      },
       /**
        * 聊天图片预览
        * */
