@@ -248,7 +248,13 @@
       isNeedSpeakOn() {
         // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
         // isSpeakOffToInit 自动上麦后，如果下麦，会重新初始化互动实例，不加这个变量会又一次走自动上麦
-        return this.mode === 6 && !this.chatServer.state.banned;
+        return (
+          this.mode === 6 &&
+          !this.chatServer.state.banned &&
+          !this.chatServer.state.allBanned &&
+          this.joinInfo.role_name != 3 &&
+          !this.micServer.state.isSpeakOffToInit
+        );
       }
     },
     filters: {
@@ -274,6 +280,7 @@
       this.listenEvents();
     },
     async mounted() {
+      window.streamLocal = this;
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
       // 实例化后是否是上麦状态
       const isSpeakOn =
