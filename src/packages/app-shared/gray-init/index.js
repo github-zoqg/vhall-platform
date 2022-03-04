@@ -1,4 +1,4 @@
-import { gray, roomApi } from 'middle-domain';
+import { roomSubjectApi, roomApi } from 'middle-domain';
 
 export default function grayInit(options) {
   return new Promise(resolve => {
@@ -17,8 +17,8 @@ export default function grayInit(options) {
         })
         .catch(resolve);
     } else if (options.meta.grayType == 'subject') {
-      gray
-        .initGraySubject({
+      roomSubjectApi.subject
+        .subjectInitBefore({
           subject_id: options.query.id
         })
         .then(res => {
