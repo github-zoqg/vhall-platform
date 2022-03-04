@@ -18,7 +18,8 @@ import {
 
 setBaseUrl({
   v3Url: process.env.VUE_APP_BASE_URL,
-  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
 setRequestHeaders({
   platform: 7, // 7:PC网页版
