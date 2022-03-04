@@ -36,6 +36,11 @@
         // 初始化直播房间
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.startGetDegradationInterval({
+          staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+          environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+          systemKey: 2
+        });
         domain.initVhallReport(
           {
             bu: 0,

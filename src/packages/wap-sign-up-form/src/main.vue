@@ -590,7 +590,7 @@
         }
         const params = {
           webinar_id: this.webinar_id,
-          visit_id: sessionStorage.getItem('visitor_id')
+          visit_id: sessionStorage.getItem('visitorId')
         };
         return this.signUpFormServer.getFormLinkStatus(params).then(res => {
           // 如果独立链接无效，显示无效页
@@ -860,14 +860,14 @@
           params.refer = this.$route.query.refer;
         }
 
-        if (sessionStorage.getItem('visitor_id')) {
-          params.visit_id = sessionStorage.getItem('visitor_id');
+        if (sessionStorage.getItem('visitorId')) {
+          params.visit_id = sessionStorage.getItem('visitorId');
         }
 
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
-            sessionStorage.setItem('visitor_id', res.data.visit_id);
+            sessionStorage.setItem('visitorId', res.data.visit_id);
             // 报名成功
             this.getWebinarStatus();
           })
@@ -1327,8 +1327,8 @@
             params.verify_code = this.verifyForm.code;
           }
 
-          if (sessionStorage.getItem('visitor_id')) {
-            params.visit_id = sessionStorage.getItem('visitor_id');
+          if (sessionStorage.getItem('visitorId')) {
+            params.visit_id = sessionStorage.getItem('visitorId');
           }
 
           console.log(this.signUpFormServer);
@@ -1338,7 +1338,7 @@
             .then(res => {
               // 如果已经报名
               if (res.data.has_registed == 1) {
-                sessionStorage.setItem('visitor_id', res.data.visit_id);
+                sessionStorage.setItem('visitorId', res.data.visit_id);
                 this.$toast(this.$t('form.form_1033'));
                 let queryString = this.$route.query.refer
                   ? `?refer=${this.$route.query.refer}`

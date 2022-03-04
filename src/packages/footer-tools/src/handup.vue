@@ -21,7 +21,7 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) : isSpeakOn"
+        v-if="isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn : isSpeakOn"
         round
       >
         下麦

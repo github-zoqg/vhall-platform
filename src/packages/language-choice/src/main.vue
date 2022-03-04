@@ -1,6 +1,6 @@
 <!-- 主题选择组件 -->
 <template>
-  <div class="vmp-language-choice">
+  <div class="vmp-language-choice" v-if="mode != 6 && languageList.length > 1">
     <el-dropdown @command="handleChangeLang" placement="bottom">
       <div :class="'vmp-language-choice-lang ' + themeClass.iconClass">
         <span class="vmp-language-choice-lang-icon">
@@ -47,6 +47,7 @@
           pageBg: '#cccccc',
           iconClass: 'icon-default' // icon默认色
         },
+        mode: 1,
         lang: {},
         languageList: []
       };
@@ -57,6 +58,7 @@
     created() {
       const roomBaseServer = useRoomBaseServer();
       this.setSkinInfo(roomBaseServer.state.skinInfo);
+      this.mode = roomBaseServer.state.watchInitData.webinar.mode;
       this.languageList = roomBaseServer.state.languages.langList.map(item => {
         return langMap[item.language_type];
       });
