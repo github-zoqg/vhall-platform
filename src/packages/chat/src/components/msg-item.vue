@@ -727,8 +727,8 @@
             color: #fb3a32;
           }
           &.assistant {
-            background-color: rgba(53, 98, 250, 0.2);
-            color: #3562fa;
+            background-color: rgba(166, 166, 166, 0.15);
+            color: #a6a6a6;
           }
           &.guest {
             background-color: rgba(53, 98, 250, 0.2);

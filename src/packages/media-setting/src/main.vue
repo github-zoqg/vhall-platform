@@ -9,7 +9,7 @@
       @onReturn="closeMediaSetting"
       @onClose="closeMediaSetting"
     >
-      <section v-show="isShow" class="vmp-media-setting-dialog-body">
+      <section v-loading="loading" v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
         <aside class="vmp-media-setting-menu">
           <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
@@ -175,10 +175,15 @@
       changeSelectedMenuItem(id) {
         this.selectedMenuItem = id;
       },
-      restart() {
+      async restart() {
         try {
           this.loading = true;
-          this.getVideoDeviceInfo();
+          this.setDefaultSelectType();
+          await this.getDevices();
+          this.setDefaultSelected();
+          this.$refs['videoSetting'].createPreview();
+          this.getStateCapture();
+          this.loading = false;
         } catch (error) {
           console.error('error:', error);
         }
@@ -229,7 +234,6 @@
        */
       sendChangeEvent() {
         const diffOptions = this._diffOptions;
-
         if (Object.keys(diffOptions) === 0) return;
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
@@ -256,14 +260,6 @@
         this.$message.success(this.$t('common.common_1034'));
       },
       /**
-       * 获取视频设备信息
-       */
-      async getVideoDeviceInfo() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(trackInput => trackInput.stop());
-        this.getDevices();
-      },
-      /**
        * 获取所有设备
        */
       async getDevices() {
@@ -280,9 +276,7 @@
         // 获取扬声器
         await this.mediaSettingServer.getSpeakers(item => item.label);
 
-        this.setDefaultSelected(); // 从localstorage和sessionStorage中恢复设置
-        this.getStateCapture();
-        this.loading = false;
+        return true;
       },
       getStateCapture() {
         // 关心的都是浅拷贝数据
@@ -323,6 +317,15 @@
 
         console.log('[media-setting] 记录字段成功');
       },
+      setDefaultSelectType() {
+        // 视频类型
+        // 设置图片推流
+        const param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
+        if (param && param.flag === true && param.streamUrl !== '') {
+          this.mediaState.videoType = 'picture';
+          this.mediaState.canvasImgUrl = param.streamUrl;
+        }
+      },
 
       setDefaultSelected() {
         const {
@@ -334,23 +337,17 @@
         // 视频
         if (videoInputDevices.length > 0) {
           const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
-          this.mediaState.video = sessionVideoId || videoInputDevices[0].deviceId;
+          this.mediaState.video =
+            this.mediaState.video || sessionVideoId || videoInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedVideoDeviceId');
-        }
-
-        // 视频类型
-        // 设置图片推流
-        let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
-        if (param && param.flag === true && param.streamUrl !== '') {
-          this.mediaState.videoType = 'picture';
-          this.mediaState.canvasImgUrl = param.streamUrl;
         }
 
         // 麦克风
         if (audioInputDevices.length > 0) {
           const sessionAudioId = sessionStorage.getItem('selectedAudioDeviceId');
-          this.mediaState.audioInput = sessionAudioId || audioInputDevices[0].deviceId;
+          this.mediaState.audioInput =
+            this.mediaState.audioInput || sessionAudioId || audioInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedAudioDeviceId');
         }
@@ -358,7 +355,8 @@
         // 扬声器
         if (audioOutputDevices.length > 0) {
           const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
-          this.mediaState.audioOutput = sessionAudioOutputId || audioOutputDevices[0].deviceId;
+          this.mediaState.audioOutput =
+            this.mediaState.audioOuput || sessionAudioOutputId || audioOutputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedAudioOutputDeviceId');
         }
