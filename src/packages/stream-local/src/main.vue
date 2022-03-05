@@ -168,10 +168,7 @@
     </section>
 
     <!-- 播放按钮 -->
-    <section
-      class="vmp-stream-local__pause"
-      v-show="mainScreen == joinInfo.third_party_user_id && interactiveServer.state.showPlayIcon"
-    >
+    <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -254,6 +251,13 @@
           !this.chatServer.state.allBanned &&
           this.joinInfo.role_name != 3 &&
           !this.micServer.state.isSpeakOffToInit
+        );
+      },
+      showInterIsPlay() {
+        return (
+          this.mainScreen == this.joinInfo.third_party_user_id &&
+          this.interactiveServer.state.showPlayIcon &&
+          this.joinInfo.role_name == 2
         );
       }
     },
