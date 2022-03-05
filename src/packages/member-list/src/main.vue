@@ -135,14 +135,27 @@
           class="info-panel__allow-raise-hand"
           v-if="configList['ui.hide_handsUp'] && mode !== 6"
         >
-          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
-          <el-switch
-            v-model="allowRaiseHand"
-            :width="32"
-            :disabled="disabledSwitchHand"
-            @change="onSwitchAllowRaiseHand"
-            active-color="#fc5659"
-          ></el-switch>
+          <!--          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>-->
+          <!--          <el-switch-->
+          <!--            v-model="allowRaiseHand"-->
+          <!--            :width="32"-->
+          <!--            :disabled="disabledSwitchHand"-->
+          <!--            @change="onSwitchAllowRaiseHand"-->
+          <!--            active-color="#fc5659"-->
+          <!--          ></el-switch>-->
+          <label class="lb-raisehands" for="lb-raisehands">
+            允许举手
+            <input
+              style="display: none"
+              v-model="allowRaiseHand"
+              @change="onSwitchAllowRaiseHand"
+              type="checkbox"
+              id="lb-raisehands"
+            />
+            <i class="ss">
+              <em></em>
+            </i>
+          </label>
         </div>
       </div>
       <!--按钮面板-->
@@ -1532,7 +1545,7 @@
             console.log('switch-mic-status', res);
             //todo 上报埋点
             this.disabledSwitchHand = false;
-            this.$message.success({ message: this.$t('account.account_1059') });
+            this.$message.success({ message: '设置成功' });
           })
           .catch(err => {
             this.disabledSwitchHand = false;
@@ -2067,6 +2080,43 @@
           display: inline-block;
           vertical-align: middle;
           margin-right: 4px;
+        }
+        .lb-raisehands {
+          cursor: pointer;
+          color: #ccc;
+          font-size: 12px;
+          margin-right: 1px;
+          & > input:checked + i em {
+            border-color: #ff9446;
+            left: 22px;
+            transition: all 0.1s ease-in-out;
+          }
+          & > i {
+            display: inline-block;
+            width: 30px;
+            height: 14px;
+            background-color: #242527;
+            border-radius: 100px;
+            position: relative;
+            margin-left: 5px;
+            position: relative;
+            top: 3px;
+            & > em {
+              box-sizing: border-box;
+              position: absolute;
+              top: 2px;
+              left: 0px;
+              content: '';
+              width: 10px;
+              height: 10px;
+              background-color: #242527;
+              border: 2px solid #aaaaaa;
+              border-radius: 10px;
+              transition: all 0.1s ease-in-out;
+              backface-visibility: hidden;
+              transform-style: preserve-3d;
+            }
+          }
         }
       }
 

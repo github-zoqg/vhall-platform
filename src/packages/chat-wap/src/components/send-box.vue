@@ -322,20 +322,15 @@
           this.$emit('sendPrivate', value);
           return;
         }
-        // 关键词过滤标识
-        const filterStatus = this.chatServer.checkHasKeyword(true, value);
-        // 发送socket消息  当关键词列表中不包含当前要发的消息时候，进行发送(主意这里仅是把消息保存到了服务器，本地并没有消息)
-        if (filterStatus) {
-          const chatServer = useChatServer();
-          const curmsg = chatServer.createCurMsg();
-          //将文本消息加入消息体
-          curmsg.setText(value);
-          //发送消息
-          chatServer.sendMsg(curmsg);
-          //清除当前消息
-          chatServer.clearCurMsg();
-          this.$emit('sendEnd');
-        }
+        const chatServer = useChatServer();
+        const curmsg = chatServer.createCurMsg();
+        //将文本消息加入消息体
+        curmsg.setText(value);
+        //发送消息
+        chatServer.sendMsg(curmsg);
+        //清除当前消息
+        chatServer.clearCurMsg();
+        this.$emit('sendEnd');
       },
       // 打开个人中心
       showUserPopup() {

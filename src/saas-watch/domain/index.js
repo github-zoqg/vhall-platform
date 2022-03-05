@@ -10,7 +10,8 @@ import {
   useMediaSettingServer,
   useVirtualAudienceServer,
   useUserServer,
-  useGroupServer
+  useGroupServer,
+  useDesktopShareServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -33,6 +34,7 @@ export default new DomainStore.Store({
     mediaSettingServer: useMediaSettingServer().state,
     virtualAudienceServer: useVirtualAudienceServer().state,
     userServer: useUserServer().state,
-    groupServer: useGroupServer().state
+    groupServer: useGroupServer().state,
+    desktopShareServer: useDesktopShareServer().state
   }
 });

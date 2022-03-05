@@ -139,6 +139,13 @@ export const serverConfig = {
         method: 'switchTo',
         args: ['$0']
       }
+    ],
+    handleClickDesktopScreen: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'showConfirm',
+        args: ['$0']
+      }
     ]
   },
   comStreamList: {

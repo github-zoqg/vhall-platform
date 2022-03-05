@@ -9,7 +9,8 @@ import {
   useMediaSettingServer,
   useRebroadcastServer,
   useInsertFileServer,
-  useMemberServer
+  useMemberServer,
+  useDesktopShareServer
 } from 'middle-domain';
 
 export default async function () {
@@ -24,6 +25,7 @@ export default async function () {
   const mediaSettingServer = useMediaSettingServer();
   const rebroadcastServer = useRebroadcastServer();
   const insertFileServer = useInsertFileServer();
+  const desktopShareServer = useDesktopShareServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -62,6 +64,8 @@ export default async function () {
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   insertFileServer.init();
+
+  desktopShareServer.init();
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);

@@ -188,7 +188,7 @@
 
       this.imgUrls = [];
       // 给聊天服务保存一份关键词
-      this.chatServer.setKeywordList(this.keywordList);
+      // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
       console.log('useChatServer', useChatServer().state);
