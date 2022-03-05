@@ -27,7 +27,8 @@
         isConfirmVisible: false,
         btnText: this.$t('account.account_1063'),
         waitTime: 30,
-        roleName: this.$t('chat.chat_1022')
+        roleName: this.$t('chat.chat_1022'),
+        senderId: ''
       };
     },
     computed: {
@@ -58,6 +59,7 @@
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
           }
+          this.senderId = temp.sender_id;
           if (this.isInGroup) {
             this.roleName = this.$t('chat.chat_1064');
           } else {
@@ -86,7 +88,8 @@
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
-            type: 0 // 0=邀请上麦|1=邀请演示
+            type: 0, // 0=邀请上麦|1=邀请演示
+            extra_params: this.senderId
           })
           .then(res => {
             useMicServer().userSpeakOn();
@@ -100,7 +103,8 @@
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
-            type: 0 // 0=邀请上麦|1=邀请演示
+            type: 0, // 0=邀请上麦|1=邀请演示
+            extra_params: this.senderId
           })
           .then(res => {
             clearInterval(this.waitInterval);

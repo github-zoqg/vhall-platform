@@ -758,7 +758,9 @@
                     device_type: context.device_type,
                     role_name: context.role_name,
                     is_speak: speakIndex >= 0 ? 1 : 0,
-                    is_apply: 0
+                    is_apply: 0,
+                    is_banned:
+                      context && context.groupInitData ? Number(context.groupInitData.is_banned) : 0
                   };
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
