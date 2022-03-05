@@ -310,6 +310,9 @@
       transition: all 1s;
       z-index: 6;
       -webkit-transition: all 1s;
+      i {
+        color: #fff;
+      }
     }
   }
 </style>
