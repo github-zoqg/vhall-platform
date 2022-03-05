@@ -382,6 +382,23 @@
             this.interactiveServer.destroy();
           }
         });
+        // 小组解散
+        this.groupServer.$on('GROUP_DISBAND', () => {
+          console.log('分组解散了-1-1--11-1-1-1-');
+          this.$message.warning(this.$t('chat.chat_1074'));
+          //  重新初始化互动实例
+          this.interactiveServer.init();
+        });
+
+        // 本人被踢出来
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          console.log('您已被踢出-1-1--11-1-1-1-');
+          if (this.joinInfo.third_party_user_id === msg.data.room_join_id) {
+            this.$message.warning(this.$t('chat.chat_1007'));
+            //  重新初始化互动实例
+            this.interactiveServer.init();
+          }
+        });
 
         // 观众的监听
         if (this.joinInfo.role_name == 2) {

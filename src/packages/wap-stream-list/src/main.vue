@@ -327,13 +327,13 @@
             title = '主持人已将您分配至' + name + '组';
             break;
           case 3:
-            title = '主持人结束了分组讨论，您将返回主直播间';
+            title = this.$t('chat.chat_1073');
             break;
           case 4:
-            title = '主持人解散了分组，您将返回主直播间';
+            title = this.$t('chat.chat_1074');
             break;
           case 5:
-            title = '您已被踢出该小组';
+            title = this.$t('chat.chat_1007');
             break;
           case 6:
             title = '您被提升为组长!';
