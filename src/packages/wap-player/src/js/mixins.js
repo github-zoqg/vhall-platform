@@ -17,6 +17,7 @@ const playerMixins = {
         // 监听播放状态
         this.isPlayering = true;
         this.isShowPoster = false;
+        this.isVodEnd = false;
         console.warn('PLAY');
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
@@ -27,25 +28,25 @@ const playerMixins = {
       // 视频清晰度发生改变----卡顿切换清晰度时触发
       this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, () => {
         console.warn('DEFINITION_CHANGE');
-        this.loading = true;
+        this.isNoBuffer = true;
       });
       this.playerServer.$on(VhallPlayer.LOADEDMETADATA, () => {
         console.warn('LOADEDMETADATA');
       });
       this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
-        this.loading = false;
+        this.isNoBuffer = false;
       });
       this.playerServer.$on(VhallPlayer.LOADED, () => {
-        this.loading = false;
+        this.isNoBuffer = false;
       });
       this.playerServer.$on(VhallPlayer.ERROR, e => {
-        this.loading = false;
+        this.isNoBuffer = true;
         console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
-        console.log('播放完毕');
+        console.log('wap-播放完毕');
         this.isShowPoster = true;
         this.isPlayering = false;
         if (this.isWarnPreview) return;
