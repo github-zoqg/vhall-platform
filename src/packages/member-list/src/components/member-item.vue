@@ -369,6 +369,9 @@
     mounted() {
       console.log(this.currentSpeakerId, '当前主讲人的id');
     },
+    beforeUpdate() {
+      console.log(this.userInfo.nickname, this.isShowSetSpeaker());
+    },
     data() {
       return {
         //默认头像
@@ -554,11 +557,12 @@
       },
       //是否展示设为主讲按钮(PC发起)
       isShowSetSpeaker() {
-        if (!this.isInGroup || this.tabIndex !== 1) {
+        if (this.tabIndex !== 1) {
           return false;
         }
         return (
-          this.isInteract &&
+          !this.isInGroup &&
+          !!this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
           this.mainScreen != this.userInfo.account_id
