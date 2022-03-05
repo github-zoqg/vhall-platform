@@ -224,6 +224,19 @@
         window.addEventListener('mozfullscreenchange', setFullscreen);
         window.addEventListener('msfullscreenchange', setFullscreen);
         window.addEventListener('MSFullscreenChange', setFullscreen);
+
+        // 嘉宾上麦成功相关处理
+        if (this.roleName == 4) {
+          useMicServer().$on('vrtc_connect_success', async msg => {
+            if (
+              msg.data.room_join_id ==
+              this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id
+            ) {
+              this.isApplying = false;
+              clearInterval(this._applyInterval);
+            }
+          });
+        }
       },
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];

@@ -162,14 +162,7 @@
         </el-tooltip>
       </p>
     </section>
-    <section
-      class="vmp-stream-remote__pause"
-      v-show="
-        mainScreen == stream.accountId &&
-        interactiveServer.state.showPlayIcon &&
-        joinInfo.role_name != 3
-      "
-    >
+    <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -215,6 +208,13 @@
       },
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
+      },
+      showInterIsPlay() {
+        return (
+          this.mainScreen == this.stream.accountId &&
+          this.interactiveServer.state.showPlayIcon &&
+          this.joinInfo.role_name == 2
+        );
       }
     },
     filters: {
