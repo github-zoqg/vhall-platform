@@ -417,7 +417,7 @@
           // status: "200" // 动态转换状态 0待转换 100转换中 200完成 500失败
           // status_jpeg: "200" // 静态转换状态 0待转换 100转换中 200完成 500失败
           this.$nextTick(() => {
-            this.dataList.forEach(item => {
+            this.allList.forEach(item => {
               if (msgData.document_id === item.document_id) {
                 const statusJpeg = Number(msgData.status_jpeg);
                 const status = Number(msgData.status);
@@ -442,6 +442,7 @@
                 this.$set(item, 'status', status);
               }
             });
+            this.setDataList();
           });
         }
       },
@@ -563,7 +564,6 @@
           room_id: this.roomBaseServer.state.watchInitData.interact.room_id
         });
         if (result && result.code === 200) {
-          console.log('this.doclibList：', this.doclibList);
           this.doclibList = result.data.list;
         } else {
           this.$message.error('查询失败');
@@ -638,13 +638,14 @@
           transformProcess: 0, // 文档转换进度
           uid: file.uid
         };
-        this.dataList.unshift(fileObj);
+        this.allList.unshift(fileObj);
+        this.setDataList();
         return true;
       },
       // 上传文档
       handleUpload(param) {
         param.onError = (err, file) => {
-          this.dataList.forEach(item => {
+          this.allList.forEach(item => {
             if (file.uid === item.uid) {
               item.docStatus = 'uploadfailed'; //上传失败
             }
@@ -663,7 +664,7 @@
             // page: 1
             // size: 362733
             const fuid = file.uid;
-            this.dataList.forEach(item => {
+            this.allList.forEach(item => {
               if (fuid === item.uid) {
                 this.shareDocumentId = res.data.document_id;
                 item.document_id = res.data.document_id;
@@ -671,22 +672,21 @@
                 item.docStatus = 'transwait'; //上传成功，等待转码
               }
             });
-            this.dataList = [...this.dataList];
+            this.setDataList();
             if (!this.isWatch) {
               this.innerVisible = true;
             }
           }
         };
         param.onProgress = (percent, file) => {
-          // console.log('[doc] 上传进度：', percent);
           const fuid = file.uid;
-          this.dataList.forEach(item => {
+          this.allList.forEach(item => {
             if (fuid === item.uid) {
               item.uploadPropress = parseInt(percent);
             }
           });
           // 触发 watch/computed
-          this.dataList = [...this.dataList];
+          this.setDataList();
         };
         // 开始上传
         this.docServer.uploadFile(param, this.uploadUrl);

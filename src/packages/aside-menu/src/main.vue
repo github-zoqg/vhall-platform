@@ -55,6 +55,9 @@
       ['groupServer.state.groupInitData.isInGroup']() {
         this.resetMenus();
       },
+      ['presenterId']() {
+        this.resetMenus();
+      },
       ['roomBaseServer.state.configList']: {
         deep: true,
         immediate: true,
