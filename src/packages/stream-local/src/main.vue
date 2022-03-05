@@ -382,7 +382,25 @@
             this.interactiveServer.destroy();
           }
         });
+        // 小组解散
+        this.groupServer.$on('GROUP_DISBAND', () => {
+          console.log('分组解散了-1-1--11-1-1-1-');
+          this.$message.warning(this.$t('chat.chat_1074'));
+          //  重新初始化互动实例
+          this.interactiveServer.init();
+        });
 
+        // 本人被踢出来
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          console.log('您已被踢出-1-1--11-1-1-1-');
+          if (this.joinInfo.third_party_user_id === msg.data.room_join_id) {
+            this.$message.warning(this.$t('chat.chat_1007'));
+            //  重新初始化互动实例
+            this.interactiveServer.init();
+          }
+        });
+
+        // 观众的监听
         if (this.joinInfo.role_name == 2) {
           // 分组 - 结束讨论
           this.groupServer.$on('GROUP_SWITCH_END', async () => {
@@ -406,6 +424,23 @@
             if (this.isNeedSpeakOn) {
               this.userSpeakOn();
             }
+          });
+
+          // 开启摄像头
+          this.interactiveServer.$on('vrtc_frames_display', () => {
+            this.$toast(this.$t('interact.interact_1024'));
+          });
+          // 关闭摄像头
+          this.interactiveServer.$on('vrtc_frames_forbid', () => {
+            this.$toast(this.$t('interact.interact_1023'));
+          });
+          // 开启音频
+          this.interactiveServer.$on('vrtc_mute_cancel', () => {
+            this.$toast(this.$t('interact.interact_1015'));
+          });
+          // 关闭音频
+          this.interactiveServer.$on('vrtc_mute', () => {
+            this.$toast(this.$t('interact.interact_1026'));
           });
         }
       },
@@ -620,6 +655,16 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        if (deviceType === 'video') {
+          status
+            ? this.$message.success(this.$t('interact.interact_1024'))
+            : this.$message.success(this.$t('interact.interact_1023'));
+        }
+        if (deviceType === 'audio') {
+          status
+            ? this.$message.success(this.$t('interact.interact_1015'))
+            : this.$message.success(this.$t('interact.interact_1026'));
+        }
       },
       // 进入、退出全屏
       fullScreen() {

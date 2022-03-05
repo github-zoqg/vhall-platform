@@ -102,10 +102,10 @@
             this.number = '';
             this.close();
           } else {
-            this.$message.error(result.msg || '分组失败');
+            this.$message.warning(result.msg || '分组失败');
           }
         } catch (ex) {
-          this.$message.error(ex.messge || '分组出现异常');
+          this.$message.warning(ex.messge || '分组出现异常');
         }
       },
       // 取消

@@ -79,6 +79,7 @@
       width: 100%;
       padding: 30px;
       overflow-y: scroll;
+      margin: 0 20px;
     }
   }
 </style>

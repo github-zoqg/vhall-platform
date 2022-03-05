@@ -121,7 +121,6 @@
     },
     created() {
       this.initPage();
-      this.subscribeServer.listenMsg();
     },
     mounted() {
       this.listenEvents();
@@ -131,7 +130,7 @@
     },
     methods: {
       listenEvents() {
-        this.subscribeServer.$on('live_start', data => {
+        this.subscribeServer.$on('live_start', () => {
           this.subOption.type = 1;
           if (this.countDowntimer) clearInterval(this.countDowntimer);
           this.countDownTime = '';
@@ -141,12 +140,8 @@
 
         this.subscribeServer.$on('pay_success', data => {
           if (data.target_id == this.userInfo.user_id) {
-            this.$message({
-              message: this.$t('common.common_1005'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
+            this.$toast(this.$t('common.common_1005'));
+            this.livingStartConfirm();
           }
         });
 

@@ -131,7 +131,8 @@
       remoteStreams() {
         console.log(
           '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams
+          this.$domainStore.state.interactiveServer.remoteStreams,
+          this.micServer.state.isSpeakOn
         );
         if (this.micServer.state.isSpeakOn) {
           // 远端流个数改变且 在推流 才进行初始化BScroll
@@ -326,13 +327,13 @@
             title = '主持人已将您分配至' + name + '组';
             break;
           case 3:
-            title = '主持人结束了分组讨论，您将返回主直播间';
+            title = this.$t('chat.chat_1073');
             break;
           case 4:
-            title = '主持人解散了分组，您将返回主直播间';
+            title = this.$t('chat.chat_1074');
             break;
           case 5:
-            title = '您已被踢出该小组';
+            title = this.$t('chat.chat_1007');
             break;
           case 6:
             title = '您被提升为组长!';
@@ -400,7 +401,8 @@
               vNode: `vmp-stream-local__${mainScreenStream.streamId}`
             });
           }
-          if (!navigator.userAgent.match(/Version\/([\d.]+).*Safari/)) {
+          // 参考player组件内的brower内的ios判断条件
+          if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
             this.interactiveServer.state.fullScreenType = true;
           }
         }
@@ -545,6 +547,9 @@
         transition: all 1s;
         z-index: 6;
         -webkit-transition: all 1s;
+        i {
+          color: #fff;
+        }
       }
     }
   }

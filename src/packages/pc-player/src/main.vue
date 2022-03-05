@@ -86,7 +86,7 @@
         <div
           class="vmp-player-living-exchange"
           @click="exchangeVideoDocs"
-          v-if="isVisibleMiniElement && hoveVideo"
+          v-if="isVisibleMiniElement && hoveVideo && !isVodEnd"
         >
           <p>
             <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -396,6 +396,11 @@
           this.hoverTime = (val / 100) * this.totalTime;
           this.hoverLeft = (val / 100) * this.ContorlWidth;
         }
+      },
+      voice(newVal) {
+        this.playerServer.setVolume(newVal, () => {
+          console.log('设置音量失败');
+        });
       },
       hoveVideo(newValue) {
         if (newValue) {
@@ -738,8 +743,8 @@
       // 重新播放
       replayPlay() {
         this.isVodEnd = false;
-        this.roomBaseServer.setChangeElement('doc');
-        this.displayMode = 'normal';
+        // this.roomBaseServer.setChangeElement('doc');
+        // this.displayMode = 'normal';
         this.startPlay();
       },
       initPlayerOtherInfo() {
@@ -892,6 +897,13 @@
           }
         }
       },
+      showLabelFun(eventTime) {
+        this.sliderVal = (eventTime / this.totalTime) * 100;
+        this.playerServer.setCurrentTime(eventTime, () => {
+          this.$toast('调整播放时间失败');
+        });
+        this.playerServer.play();
+      },
       secondToDate(val) {
         return secondToDateZH(val);
       }
@@ -914,11 +926,15 @@
     #vh-watermark-container {
       width: 90px;
       height: 30px;
+      z-index: 1;
       img {
         width: 100% !important;
         height: 100% !important;
         object-fit: scale-down !important;
       }
+    }
+    #vhy-danmaku-wrapbox {
+      z-index: 1;
     }
     &-living {
       &-background {
@@ -1053,7 +1069,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: transparent;
+        background-color: rgba(0, 0, 0, 0.6);
         background-size: cover;
         z-index: 9;
         > div {
