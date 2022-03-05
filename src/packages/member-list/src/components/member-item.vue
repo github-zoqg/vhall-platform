@@ -369,9 +369,6 @@
     mounted() {
       console.log(this.currentSpeakerId, '当前主讲人的id');
     },
-    beforeUpdate() {
-      console.log(this.userInfo.nickname, this.isShowSetSpeaker());
-    },
     data() {
       return {
         //默认头像
