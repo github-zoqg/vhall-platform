@@ -401,7 +401,8 @@
               vNode: `vmp-stream-local__${mainScreenStream.streamId}`
             });
           }
-          if (!navigator.userAgent.match(/Version\/([\d.]+).*Safari/)) {
+          // 参考player组件内的brower内的ios判断条件
+          if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
             this.interactiveServer.state.fullScreenType = true;
           }
         }
