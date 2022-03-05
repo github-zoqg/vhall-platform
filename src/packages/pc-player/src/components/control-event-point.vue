@@ -1,6 +1,7 @@
 <template>
   <div
     class="vh-video-tailoring__control-event-point"
+    :class="isMini ? 'event-mini-point' : ''"
     :style="{ left: pointLeft + '%' }"
     @mouseenter.stop="hoverPoint"
     @mouseleave.stop="leavePoint"
@@ -140,10 +141,13 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    top: -9px;
+    top: -5px;
     left: 0px;
     background-color: @font-error;
     z-index: 3;
+    &.event-mini-point {
+      top: -6px;
+    }
     .vh-video-tailoring__event-content {
       width: 220px;
       text-align: left;
