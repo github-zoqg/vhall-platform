@@ -361,6 +361,10 @@
               if (resData.status == 2) {
                 this.status = 'jieshu';
               }
+              // 禁用互动工具-计时器
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
+              );
               this.$emit('disTimer', false);
             }
           })
