@@ -126,7 +126,6 @@
     },
     created() {
       this.handlerInitInfo();
-      this.subscribeServer.listenMsg();
       if (this.isEmbed) {
         const { languages } = this.roomBaseServer.state;
         this.languageList = languages.langList.map(item => {
@@ -146,8 +145,7 @@
     },
     methods: {
       listenEvents() {
-        this.subscribeServer.$on('live_start', data => {
-          console.log(data, '???zhangxiao');
+        this.subscribeServer.$on('live_start', () => {
           this.subOption.type = 1;
           this.isLiving = true;
           this.$refs.bottomTab && this.$refs.bottomTab.changeTime();
