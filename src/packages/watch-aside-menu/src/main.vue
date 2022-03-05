@@ -37,7 +37,7 @@
         ]"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
-        <span>桌面共享</span>
+        <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
       </li>
       <li
         v-if="isInGroup"
@@ -123,6 +123,9 @@
             this.watchInitData.join_info.third_party_user_id
           );
         }
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.isShareScreen;
       }
     },
     created() {
@@ -269,7 +272,9 @@
             });
         } else if (kind === 'desktopShare') {
           // 点击桌面共享
-          // TODO:待实现
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'handleClickDesktopScreen', [this.isShareScreen])
+          );
         }
       }
     }
