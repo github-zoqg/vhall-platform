@@ -18,7 +18,10 @@
             {{ source.roleName | roleFilter(this) }}
           </span>
         </div>
-        <span class="msg-item__content__time">{{ source.sendTime.slice(-8) }}</span>
+
+        <span class="msg-item__content__time">
+          {{ source.sendTime ? source.sendTime.slice(-8) : new Date().toLocaleString().slice(-8) }}
+        </span>
       </div>
       <!-- 文本 -->
       <p

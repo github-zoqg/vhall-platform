@@ -45,6 +45,14 @@
         <!-- 公告 -->
         <notice></notice>
       </li>
+      <li v-if="1">
+        <!-- 计时器 -->
+        <div v-if="openTimer" class="pr">
+          <i v-if="showTimer" class="circle"></i>
+          <img src="./img/timer.png" alt="" @click="openTimerHandle" />
+        </div>
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
+      </li>
       <li>
         <!-- 问卷-->
       </li>
@@ -59,14 +67,6 @@
       <li>
         <red-packet-icon />
         <!-- 红包 -->
-      </li>
-      <li v-if="1">
-        <!-- 计时器 -->
-        <div v-if="openTimer" class="pr">
-          <i v-if="showTimer" class="circle"></i>
-          <img src="./img/timer.png" alt="" @click="openTimerHandle" />
-        </div>
-        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->

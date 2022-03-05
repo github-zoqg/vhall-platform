@@ -169,6 +169,7 @@
 
       //监听直播结束的通知，下麦并停止推流
       this.interactiveServer.$on('live_over', async () => {
+        // console.warn('-----？？？');
         if (this.micServer.state.isSpeakOn) {
           await this.micServer.speakOff();
           await this.stopPush();

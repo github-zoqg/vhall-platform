@@ -153,15 +153,10 @@
 
         this.subscribeServer.$on('pay_success', data => {
           if (data.target_id == this.userInfo.user_id) {
-            this.$message({
-              message: this.$t('common.common_1005'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-            this.fetchAuth({ type: 3 });
+            console.log('111111222234', data, this.userInfo.user_id);
+            this.feeAuth({ type: 3 });
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
+              boxEventOpitons(this.cuid, 'emitClickPay', { flag: false })
             );
           }
         });

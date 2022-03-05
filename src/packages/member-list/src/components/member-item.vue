@@ -46,7 +46,14 @@
           ></i>
         </template>
         <!-- 显示条件：申请上麦 -->
-        <template v-if="isShowHandFlag">
+        <template
+          v-if="
+            [1, 2].includes(tabIndex) &&
+            [1, '1'].includes(userInfo.is_apply) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
+            !userInfo.is_speak
+          "
+        >
           <i
             class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
             style="color: #cccccc; font-size: 15px"
@@ -129,7 +136,12 @@
         ></i>
         <!--申请上麦-->
         <i
-          v-if="isShowHandFlag"
+          v-if="
+            [1, 2].includes(tabIndex) &&
+            [1, '1'].includes(userInfo.is_apply) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
+            !userInfo.is_speak
+          "
           class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
           style="color: #cccccc; font-size: 15px"
         ></i>
@@ -452,8 +464,21 @@
             text: '升为组长',
             sequence: 4
           }
-        ]
+        ],
+        //真实的申请上麦的数组
+        applyUserList: []
       };
+    },
+    watch: {
+      //监听数组的变化，保证举手标识能出现
+      applyUsers: {
+        handler(val) {
+          this.applyUserList = val;
+          this.$forceUpdate();
+        },
+        immediate: true,
+        deep: true
+      }
     },
     computed: {
       //角色转换
@@ -529,11 +554,12 @@
       },
       //是否展示设为主讲按钮(PC发起)
       isShowSetSpeaker() {
-        if (!this.isInGroup || this.tabIndex !== 1) {
+        if (this.tabIndex !== 1) {
           return false;
         }
         return (
-          this.isInteract &&
+          !this.isInGroup &&
+          !!this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
           this.mainScreen != this.userInfo.account_id
@@ -705,12 +731,16 @@
           return text;
         };
       },
+      //是否在申请举手列表里
+      isInApplyUsers() {
+        return this.applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1;
+      },
       //是否显示举手的标识(PC发起)
       isShowHandFlag() {
         return (
           [1, 2].includes(this.tabIndex) &&
           [1, '1'].includes(this.userInfo.is_apply) &&
-          this.applyUsers.find(u => u.account_id == this.userInfo.account_id) &&
+          this.isInApplyUsers &&
           !this.userInfo.is_speak
         );
       }

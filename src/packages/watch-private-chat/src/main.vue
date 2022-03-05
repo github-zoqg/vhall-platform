@@ -224,6 +224,13 @@
       //自己发送消息后的回调
       sendMsgEnd() {
         this.scrollBottom();
+      },
+      //滚动到底部
+      scrollBottom() {
+        this.$nextTick(() => {
+          this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
+        });
       }
     }
   };

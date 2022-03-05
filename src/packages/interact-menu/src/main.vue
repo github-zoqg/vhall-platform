@@ -8,7 +8,7 @@
       <i class="vh-saas-iconfont vh-saas-a-line-Interactivetools"></i>
       <p>互动工具</p>
     </div>
-    <div class="vmp-interact-menu-wrap">
+    <div class="vmp-interact-menu-wrap" v-if="!disable">
       <div class="vmp-interact-menu-list">
         <div
           class="vmp-interact-menu-list-item"
@@ -250,18 +250,30 @@
         color: #fc5659;
       }
     }
-
-    &.disable {
-      i,
-      p {
-        color: #777777;
-      }
-    }
     &:hover {
       .vmp-interact-menu-wrap {
         display: block;
       }
     }
+    &.disable {
+      cursor: default;
+      i,
+      p {
+        color: #777777;
+      }
+      .vmp-interact-menu {
+        &-icon {
+          cursor: default;
+        }
+      }
+
+      &:hover {
+        .vmp-interact-menu-wrap {
+          display: none;
+        }
+      }
+    }
+
     &-wrap {
       display: none;
       position: absolute;

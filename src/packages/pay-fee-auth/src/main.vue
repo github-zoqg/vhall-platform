@@ -56,7 +56,13 @@
       openPayFee(info) {
         console.log(info.flag);
         if (!info.flag) {
-          this.showPay = true;
+          this.showPay = false;
+          this.$message({
+            message: this.$t('common.common_1005'),
+            showClose: true,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
           return;
         }
         this.handleShowPay('wx');

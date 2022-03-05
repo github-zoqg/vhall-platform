@@ -143,7 +143,8 @@
     useInteractiveServer,
     useMemberServer,
     useRebroadcastServer,
-    useDesktopShareServer
+    useDesktopShareServer,
+    usePlayerServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -317,6 +318,7 @@
       },
       ['roomBaseServer.state.miniElement'](newval) {
         console.log('-[doc]--大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
+        console.log('-[doc]--old displayMode：', this.displayMode);
         const mode = newval === 'doc' ? 'mini' : 'normal';
         this.setDisplayMode(mode);
       },
@@ -333,7 +335,6 @@
       this.desktopShareServer = useDesktopShareServer();
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
-      this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
@@ -361,7 +362,7 @@
           return;
         }
         if (this.displayMode === mode) {
-          console.log('当前已经是该模式，无需设置');
+          console.log(`[doc] 当前已经是${mode}模式，无需设置`);
           return;
         }
         //缩略图列表隐藏
@@ -429,10 +430,9 @@
           h = height;
         }
         this.docViewRect = { width: w, height: h };
-        // console.log('[doc] this.docViewRect:', this.docViewRect);
         if (
-          this.docServer.state.currentCid &&
-          document.getElementById(this.docServer.state.currentCid)
+          document.getElementById(this.docServer.state.docCid) ||
+          document.getElementById(this.docServer.state.boardCid)
         ) {
           this.docServer.setSize(w, h);
         }
@@ -460,11 +460,10 @@
                 cid: item.cid
               };
             });
-            console.log(
-              '[doc]this.docServer.state.containerList:',
-              this.docServer.state.containerList
-            );
-
+            // console.log(
+            //   '[doc]this.docServer.state.containerList:',
+            //   this.docServer.state.containerList
+            // );
             await this.$nextTick();
 
             // 回放只在观看端可用
@@ -482,11 +481,19 @@
             }
             this.docServer.loadVodIframe();
           });
+
+          // 点播或回放播放器播放完成
+          usePlayerServer().$on(VhallPlayer.ENDED, () => {
+            console.log('[doc] VhallPlayer.ENDED');
+            if ([4, 5].includes(this.webinarType)) {
+              this.docServer.state.switchStatus = false;
+            }
+          });
         }
 
         // 直播结束
-        this.msgServer.$on('live_over', () => {
-          console.log('[doc]---直播结束---');
+        useMsgServer().$on('live_over', () => {
+          console.log('[doc]---直播结束 live_over---');
           this.docServer.state.switchStatus = false;
           useRoomBaseServer().setChangeElement('doc');
           this.hasStreamList = false;
