@@ -254,7 +254,7 @@
       //处理分组讨论频道变更
       handleChannelChange() {
         this.page = 0;
-        useChatServer().clearHistoryMsg();
+        useChatServer().clearChatMsg();
         this.getHistoryMessage();
       },
       // 获取历史消息

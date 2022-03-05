@@ -16,6 +16,7 @@
 </template>
 
 <script>
+  import { useDesktopShareServer } from 'middle-domain';
   export default {
     name: 'VmpBasicRightContainer',
     data() {
@@ -28,7 +29,7 @@
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
         return (
           this.$domainStore.state.docServer.switchStatus ||
-          this.$domainStore.state.roomBaseServer.isShareScreen
+          this.desktopShareServer.state.isShareScreen
         );
       },
       isTryWatch() {
@@ -41,6 +42,9 @@
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
+    },
+    beforeCreate() {
+      this.desktopShareServer = useDesktopShareServer();
     },
     created() {
       // TODO试看逻辑在这里写判断

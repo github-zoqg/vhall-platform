@@ -2,43 +2,43 @@
   <div
     class="vmp-wap-private-chat-msg-item"
     style="pointer-events: auto"
-    :class="{ 'is-self-msg': msg.self }"
+    :class="{ 'is-self-msg': source.self }"
   >
-    <div v-if="msg.showTime" class="private-chat-msg__showtime">{{ msg.showTime }}</div>
+    <div v-if="source.showTime" class="private-chat-msg__showtime">{{ source.showTime }}</div>
     <div class="private-chat-msg__item-main">
       <div class="private-chat-msg__item-main__avatar-wrap">
         <img
           class="private-chat-msg__item-main__chat-avatar"
           width="35"
           height="35"
-          :src="msg.avatar"
+          :src="source.avatar"
           alt
         />
       </div>
       <div class="private-chat-msg__item-main__msg-content">
         <p class="msg-content_name">
           <span
-            v-if="msg.roleName && msg.roleName != '2'"
+            v-if="source.roleName && source.roleName != '2'"
             class="role"
-            :class="msg.roleName | roleClassFilter"
+            :class="source.roleName | roleClassFilter"
           >
-            {{ roleFilter(msg.roleName) }}
+            {{ roleFilter(source.roleName) }}
           </span>
-          <span class="nickname">{{ msg.nickname }}</span>
+          <span class="nickname">{{ source.nickname }}</span>
         </p>
         <!-- 图文消息 -->
         <p
-          v-if="msg.content.text_content"
+          v-if="source.content.text_content"
           class="msg-content_body"
-          v-html="msg.content.text_content"
+          v-html="source.content.text_content"
         ></p>
-        <p v-if="msg.content.image_urls" class="msg-content_chat-img-wrapper">
+        <p v-if="source.content.image_urls" class="msg-content_chat-img-wrapper">
           <img
             @tap="$emit('preview', img)"
             class="msg-content_chat-img"
             width="50"
             height="50"
-            v-for="(img, index) in msg.content.image_urls"
+            v-for="(img, index) in source.content.image_urls"
             :key="index"
             :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
             :alt="$t('chat.chat_1065')"
@@ -52,12 +52,8 @@
   export default {
     name: 'VmpWapPrivateChatMsgItem',
     props: {
-      msg: {
+      source: {
         required: true,
-        default: () => ({})
-      },
-      userInfo: {
-        type: Object,
         default: () => ({})
       }
     },

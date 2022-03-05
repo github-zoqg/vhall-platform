@@ -249,6 +249,12 @@
           const str =
             this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
           Toast(`${msg.data.nick_name}设置成为${str}`);
+          this.$nextTick(() => {
+            this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+            if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
+              this.mainScreenDom.style.left = `${1.02667}rem`;
+            }
+          });
         });
 
         // 房间信令异常断开事件
@@ -351,6 +357,7 @@
               probeType: 3 // listening scroll event
             });
           }
+
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
@@ -393,7 +400,9 @@
               vNode: `vmp-stream-local__${mainScreenStream.streamId}`
             });
           }
-          this.interactiveServer.state.fullScreenType = true;
+          if (!navigator.userAgent.match(/Version\/([\d.]+).*Safari/)) {
+            this.interactiveServer.state.fullScreenType = true;
+          }
         }
       },
 

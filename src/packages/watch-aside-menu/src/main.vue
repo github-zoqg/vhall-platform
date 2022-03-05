@@ -154,9 +154,16 @@
         });
 
         // 本人被踢出来
-        this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          this.isCollapse = true;
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          if (
+            msg &&
+            msg.data.target_id &&
+            msg.data.target_id ===
+              useRoomBaseServer().state.watchInitData.join_info.third_party_user_id
+          ) {
+            this.isCollapse = true;
+            this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 组长变更

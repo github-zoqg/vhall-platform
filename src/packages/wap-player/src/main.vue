@@ -86,6 +86,7 @@
       <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
       <div
         class="vmp-wap-player-footer"
+        v-show="isPlayering"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
       >
         <!-- 倍速和画质合并 -->
@@ -120,7 +121,7 @@
             <i18n path="player.player_1012">
               <span place="n" class="red">{{ currentTime | secondToDate }}</span>
             </i18n>
-            <i class="vh-iconfont vh-line-close" @click="isShowDuanXuboVideo = false"></i>
+            <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
           <div class="vmp-wap-player-control-slider">
             <div v-if="eventPointList.length" ref="vhTailoringWrap">
@@ -226,7 +227,7 @@
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  // import { create } from 'qrcode';
+
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -252,11 +253,6 @@
       controlEventPoint
     },
     computed: {
-      isNotEmbed() {
-        return this.embedObj
-          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
-          : true;
-      },
       //判断是否是音频直播模式
       isAudio() {
         return this.roomBaseState.watchInitData.webinar.mode == 1;
@@ -351,7 +347,6 @@
     mounted() {
       this.getWebinerStatus();
       this.listenEvents();
-      console.log(this.isNotEmbed, '?????????zhangxiao');
     },
     methods: {
       startPlay() {
@@ -618,7 +613,7 @@
         }
       },
       refresh() {
-        console.log('11woshi我是刷新');
+        window.location.reload();
       },
       handleAuth() {
         console.log('shikan试看权限');
@@ -645,7 +640,8 @@
         }, 5000);
       },
       replay() {
-        console.log('回放');
+        this.isVodEnd = false;
+        this.startPlay();
       }
     }
   };

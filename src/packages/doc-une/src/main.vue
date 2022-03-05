@@ -142,7 +142,8 @@
     useGroupServer,
     useInteractiveServer,
     useMemberServer,
-    useRebroadcastServer
+    useRebroadcastServer,
+    useDesktopShareServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -219,7 +220,7 @@
       // 文档是否可见
       show() {
         return (
-          (!this.isWatch && !this.roomBaseServer.state.isShareScreen) ||
+          (!this.isWatch && !this.desktopShareServer.state.isShareScreen) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -329,6 +330,7 @@
       }
     },
     beforeCreate() {
+      this.desktopShareServer = useDesktopShareServer();
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.msgServer = useMsgServer();
