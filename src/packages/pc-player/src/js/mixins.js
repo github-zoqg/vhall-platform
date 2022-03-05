@@ -60,7 +60,7 @@ const playerMixins = {
       });
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听播放完毕状态
-        console.log('播放完毕');
+        console.log('pc-播放完毕');
         this.isShowPoster = true;
         if (this.isWarnPreview) return;
         this.isVodEnd = true;
