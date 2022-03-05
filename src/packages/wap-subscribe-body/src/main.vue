@@ -141,12 +141,8 @@
 
         this.subscribeServer.$on('pay_success', data => {
           if (data.target_id == this.userInfo.user_id) {
-            this.$message({
-              message: this.$t('common.common_1005'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
+            this.$toast(this.$t('common.common_1005'));
+            this.livingStartConfirm();
           }
         });
 
