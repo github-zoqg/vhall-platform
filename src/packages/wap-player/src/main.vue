@@ -462,7 +462,7 @@
       initPlayer() {
         this.initSDK().then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
-          if (this.playerState.type === 'vod') {
+          if (this.playerState.type == 'vod') {
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
@@ -699,7 +699,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 4;
+      z-index: 12;
       background: transparent;
       p {
         width: 108px;
@@ -907,7 +907,7 @@
       font-size: 28px;
       width: 100%;
       position: absolute;
-      z-index: 3;
+      z-index: 7;
       padding: 0 32px;
       &-preview {
         height: 64px;
