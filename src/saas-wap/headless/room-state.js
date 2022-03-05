@@ -56,25 +56,34 @@ export default async function () {
     //多语言接口
     roomBaseServer.getLangList(),
     // 调用聚合接口
-    roomBaseServer.getCommonConfig({
-      tags: [
-        'skin',
-        'screen-poster',
-        'like',
-        'keywords',
-        'public-account',
-        'webinar-tag',
-        'menu',
-        'adv-default',
-        'invite-card',
-        'red-packet',
-        'room-tool',
-        'goods-default',
-        'announcement',
-        'sign',
-        'timer'
-      ]
-    })
+    roomBaseServer
+      .getCommonConfig({
+        tags: [
+          'skin',
+          'screen-poster',
+          'like',
+          'keywords',
+          'public-account',
+          'webinar-tag',
+          'menu',
+          'adv-default',
+          'invite-card',
+          'red-packet',
+          'room-tool',
+          'goods-default',
+          'announcement',
+          'sign',
+          'timer'
+        ]
+      })
+      .then(async () => {
+        // 如果是回放，调互动工具状态接口，互动状态以这个为准
+        if (roomBaseServer.state.watchInitData.webinar.type == 5) {
+          await roomBaseServer.getInavToolStatus({
+            webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
+          });
+        }
+      })
   ];
 
   // 互动、分组直播进行设备检测

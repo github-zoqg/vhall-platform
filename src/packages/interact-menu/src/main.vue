@@ -274,6 +274,7 @@
       box-sizing: border-box;
       border: 1px solid #2d2d2d;
       padding: 0 10px 20px 10px;
+      z-index: 110;
     }
     &-list {
       display: flex;

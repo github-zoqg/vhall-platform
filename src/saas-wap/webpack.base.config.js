@@ -17,7 +17,7 @@ const htmlConfig = {
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
 
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    MiddleDomain: 'http://172.16.15.140:10001/lib/middle-domain.js',
+    MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
 
     Vant: '//s1.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置

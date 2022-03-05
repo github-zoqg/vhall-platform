@@ -67,8 +67,6 @@
         isVideoSwitching: false,
         isVideoError: false,
         videoTipsText: '设备切换中，请稍后…',
-        roomId: null, // TODO:
-        interactToken: null, // TODO:
         videoError: false
       };
     },
@@ -106,6 +104,7 @@
       },
       // 创建视频流
       async createPreview() {
+        if (this.mediaState.videoType !== 'camera') return;
         await this.destroyStream();
 
         this.$refs['videoPreviewer'].innerHTML = '';
