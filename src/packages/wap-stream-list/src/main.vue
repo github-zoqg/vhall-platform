@@ -131,7 +131,8 @@
       remoteStreams() {
         console.log(
           '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams
+          this.$domainStore.state.interactiveServer.remoteStreams,
+          this.micServer.state.isSpeakOn
         );
         if (this.micServer.state.isSpeakOn) {
           // 远端流个数改变且 在推流 才进行初始化BScroll
@@ -545,6 +546,9 @@
         transition: all 1s;
         z-index: 6;
         -webkit-transition: all 1s;
+        i {
+          color: #fff;
+        }
       }
     }
   }

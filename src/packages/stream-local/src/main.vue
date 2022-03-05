@@ -383,6 +383,7 @@
           }
         });
 
+        // 观众的监听
         if (this.joinInfo.role_name == 2) {
           // 分组 - 结束讨论
           this.groupServer.$on('GROUP_SWITCH_END', async () => {
@@ -406,6 +407,23 @@
             if (this.isNeedSpeakOn) {
               this.userSpeakOn();
             }
+          });
+
+          // 开启摄像头
+          this.interactiveServer.$on('vrtc_frames_display', () => {
+            this.$toast(this.$t('interact.interact_1024'));
+          });
+          // 关闭摄像头
+          this.interactiveServer.$on('vrtc_frames_forbid', () => {
+            this.$toast(this.$t('interact.interact_1023'));
+          });
+          // 开启音频
+          this.interactiveServer.$on('vrtc_mute_cancel', () => {
+            this.$toast(this.$t('interact.interact_1015'));
+          });
+          // 关闭音频
+          this.interactiveServer.$on('vrtc_mute', () => {
+            this.$toast(this.$t('interact.interact_1026'));
           });
         }
       },
