@@ -478,6 +478,9 @@
         padding-right: 24px;
         border-radius: 4px;
         border: none;
+        &:nth-child(2n) {
+          margin-left: 16px;
+        }
         .vh-goods_item-cover {
           width: 200px;
           height: 200px;

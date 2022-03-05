@@ -15,7 +15,7 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-wap-player" @click.stop="videoShowIcon">
+      <div id="vmp-player" @click.stop="videoShowIcon">
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -405,35 +405,8 @@
       },
       // 初始化播放器配置项
       initConfig() {
-        const { interact, join_info } = this.roomBaseState.watchInitData;
         let params = {
-          appId: interact.paas_app_id || '', // 应用ID，必填
-          accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
-          token: interact.paas_access_token || '', // access_token，必填
-          videoNode: 'vmp-wap-player',
-          type: this.playerState.type, // live 直播  vod 点播  必填
-          poster: '',
-          autoplay: false,
-          forceMSE: false,
-          subtitleOption: {
-            enable: true
-          },
-          // 强制卡顿切线
-          thornOption: {
-            enable: true
-          },
-          barrageSetting: {
-            positionRange: [0, 1],
-            speed: 15000,
-            style: {
-              fontSize: 16
-            }
-          },
-          peer5Option: {
-            open: this.roomBaseState.configList['ui.browser_peer5'] == '1',
-            customerId: 'ds6mupmtq5gnwa4qmtqf',
-            fallback: true
-          }
+          videoNode: 'vmp-player'
         };
         if (this.playerState.type == 'live') {
           params = Object.assign(params, {
