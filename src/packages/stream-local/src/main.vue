@@ -655,6 +655,16 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        if (deviceType === 'video') {
+          status
+            ? this.$message.success(this.$t('interact.interact_1024'))
+            : this.$message.success(this.$t('interact.interact_1023'));
+        }
+        if (deviceType === 'audio') {
+          status
+            ? this.$message.success(this.$t('interact.interact_1015'))
+            : this.$message.success(this.$t('interact.interact_1026'));
+        }
       },
       // 进入、退出全屏
       fullScreen() {
