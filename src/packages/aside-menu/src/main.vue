@@ -39,6 +39,14 @@
         return this.isInGroup
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      //互动工具状态
+      doc_permission() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.doc_permission;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.doc_permission;
+        }
       }
     },
     beforeCreate() {
@@ -64,6 +72,14 @@
         handler() {
           this.resetMenus();
         }
+      },
+      // 演示者发生变化
+      presenterId() {
+        this.resetMenus();
+      },
+      // 主讲人发生变化
+      doc_permission() {
+        this.resetMenus();
       }
     },
     methods: {
@@ -76,21 +92,39 @@
           if (!vn.kind || !vn.setDisableState || !vn.setHiddenState) continue;
           if (vn.kind === 'document') {
             // 文档菜单
-            if (this.presenterId == this.userId) {
-              vn.setHiddenState(false);
-              vn.setDisableState(false);
+            if (this.role == 4) {
+              // 嘉宾
+              if (this.doc_permission == this.userId) {
+                vn.setDisableState(false);
+              } else {
+                vn.setDisableState(true);
+              }
             } else {
-              vn.setHiddenState(false);
-              vn.setDisableState(true);
+              if (this.presenterId == this.userId) {
+                vn.setHiddenState(false);
+                vn.setDisableState(false);
+              } else {
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
+              }
             }
           } else if (vn.kind === 'board') {
             // 白板菜单
-            if (this.presenterId == this.userId) {
-              vn.setHiddenState(false);
-              vn.setDisableState(false);
+            if (this.role == 4) {
+              // 嘉宾
+              if (this.doc_permission == this.userId) {
+                vn.setDisableState(false);
+              } else {
+                vn.setDisableState(true);
+              }
             } else {
-              vn.setHiddenState(false);
-              vn.setDisableState(true);
+              if (this.presenterId == this.userId) {
+                vn.setHiddenState(false);
+                vn.setDisableState(false);
+              } else {
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
+              }
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
@@ -105,9 +139,13 @@
                 vn.setDisableState(true);
               }
             } else if (this.role == 4) {
-              // 嘉宾显示但禁用
-              vn.setHiddenState(false);
-              vn.setDisableState(true);
+              if (this.doc_permission == this.userId) {
+                vn.setDisableState(false);
+              } else {
+                // 嘉宾显示但禁用
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
+              }
             } else {
               vn.setHiddenState(true); //隐藏
             }
@@ -116,9 +154,13 @@
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);
             } else if (this.role == 4) {
-              // 嘉宾显示但禁用
-              vn.setHiddenState(false);
-              vn.setDisableState(true);
+              if (this.doc_permission == this.userId) {
+                vn.setDisableState(false);
+              } else {
+                // 嘉宾显示但禁用
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
+              }
             } else {
               if (this.isInGroup) {
                 vn.setHiddenState(true);
@@ -130,9 +172,14 @@
           } else if (vn.kind === 'interactTool') {
             // 互动工具菜单
             if (this.role == 4) {
-              // 嘉宾显示但禁用
-              vn.setHiddenState(false);
-              vn.setDisableState(true);
+              if (this.doc_permission == this.userId) {
+                // 如果嘉宾为主讲人: 设置为可用
+                vn.setDisableState(false);
+              } else {
+                // 嘉宾显示但禁用
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
+              }
             } else {
               if (this.isInGroup) {
                 vn.setHiddenState(true);
