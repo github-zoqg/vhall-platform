@@ -11,7 +11,11 @@
     >
       <el-form class="add-form">
         <el-form-item label="新增" label-width="40px">
-          <el-input :placeholder="placeholder" v-model="count">
+          <el-input
+            :placeholder="placeholder"
+            v-model.trim.number="count"
+            onkeyup="this.value=this.value.replace(/[^\d]/g,'')"
+          >
             <template slot="suffix">组</template>
           </el-input>
         </el-form-item>
@@ -62,23 +66,24 @@
     methods: {
       // 新增分组确定
       handleSubmit: async function () {
-        if (this.count > 50 - this.groupServer.state.groupedUserList.length) {
-          this.$message.warning('请输入正确分组数量');
+        const c = parseInt(this.count);
+        if (isNaN(c) || c < 1) {
+          this.$message.warning('参数错误');
           return false;
         }
         try {
           const result = await this.groupServer.groupCreate({
-            number: this.count,
+            number: c,
             way: 2
           });
           if (result && result.code === 200) {
             this.count = 1;
             this.handleClose();
           } else {
-            this.$message.error(result.msg || '新增分组失败');
+            this.$message.warning(result.msg || '新增分组失败');
           }
         } catch (ex) {
-          this.$message.error(ex.messge || '新增分组出现异常');
+          this.$message.warning(ex.messge || '新增分组出现异常');
         }
       },
       handlOpen() {
