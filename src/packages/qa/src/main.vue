@@ -43,7 +43,7 @@
 <script>
   import ChatOperator from './components/chat-operator';
   import MsgItem from './components/msg-item';
-  import { textToEmojiText } from '@/packages/chat/src/js/emoji';
+  // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
@@ -127,6 +127,7 @@
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        const chatServer = useChatServer();
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
             this.scrollBottom();
@@ -135,11 +136,20 @@
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
           this.scrollBottom();
         });
+        //监听禁言通知
+        chatServer.$on('banned', res => {
+          this.isBanned = res;
+          this.initInputStatus();
+        });
+        //监听全体禁言通知
+        chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+          this.initInputStatus();
+        });
       },
       initInputStatus() {
         this.inputStatus.disable = this.isBanned || this.allBanned;
         if (this.isBanned) {
-          // TODO待翻译
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
         } else if (this.allBanned) {
           this.inputStatus.placeholder = this.$t('chat.chat_1079');

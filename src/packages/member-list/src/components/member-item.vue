@@ -313,7 +313,7 @@
       currentSpeakerId: {
         type: [Number, String]
       },
-      //当前演示主屏幕
+      //当前演示主屏幕（主讲人）
       mainScreen: {
         type: [Number, String],
         default: () => ''
@@ -536,7 +536,7 @@
           this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
-          this.currentSpeakerId != this.userInfo.account_id
+          this.mainScreen != this.userInfo.account_id
         );
       },
       //PC观看端设为组长
@@ -608,7 +608,7 @@
       isShowSpeakerFlag() {
         if (this.tabIndex === 1) {
           const options = [
-            this.mode !== 6 && this.currentSpeakerId === this.userInfo.account_id,
+            this.mode !== 6 && this.mainScreen === this.userInfo.account_id,
             this.mode === 6 && [1, '1'].includes(this.userInfo.role_name)
           ];
           return options.some(value => !!value);

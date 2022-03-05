@@ -220,6 +220,22 @@
                 : '主讲人';
             this.$message.success(`${msg.data.nick_name}设置成为${str}`);
           });
+
+          // 嘉宾：
+          if (this.joinInfo.role_name == 3) {
+            this.$alert('您已进入直播房间，马上开始互动吧', '', {
+              title: '提示',
+              confirmButtonText: '立即开始',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel',
+              callback: () => {
+                const list = document.getElementsByTagName('video');
+                for (const item of list) {
+                  item.play();
+                }
+              }
+            });
+          }
         }
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {

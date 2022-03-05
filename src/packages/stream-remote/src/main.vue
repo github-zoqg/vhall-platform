@@ -164,7 +164,11 @@
     </section>
     <section
       class="vmp-stream-remote__pause"
-      v-show="mainScreen == stream.accountId && interactiveServer.state.showPlayIcon"
+      v-show="
+        mainScreen == stream.accountId &&
+        interactiveServer.state.showPlayIcon &&
+        join_info.role_name != 3
+      "
     >
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>

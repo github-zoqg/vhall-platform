@@ -1,18 +1,13 @@
 <template>
   <div class="vmp-wap-player">
-    <p v-show="isNoBuffer" class="vmp-wap-player-prompt">
+    <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
       <span>{{ prompt }}</span>
-    </p>
+      <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
+    </div>
     <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
       <!-- 播放器背景图片 -->
-      <div class="vmp-wap-player-prompt">
-        <span v-if="!isAudio && promptFlag">{{ prompt }}</span>
-        <img
-          v-if="loadingFlag && !isAudio"
-          class="vmp-wap-player-prompt-load"
-          src="./img/load.gif"
-        />
-        <img v-if="isShowPoster" class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
+      <div class="vmp-wap-player-prompt" v-if="isShowPoster">
+        <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
       </div>
       <!-- 播放 按钮 -->
       <div v-if="!isPlayering && !isVodEnd" class="vmp-wap-player-pause">
@@ -20,7 +15,7 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-player" @click.stop="videoShowIcon">
+      <div id="vmp-wap-player" @click.stop="videoShowIcon">
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -47,13 +42,13 @@
               {{ authText }}
             </span>
           </div>
-          <p class="tryKan" @click="replay">
+          <p class="tryKan" @click="startPlay">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
         </div>
         <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-else @click="replay">
+        <div class="vmp-wap-player-ending-box" v-else @click="startPlay">
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
@@ -286,11 +281,11 @@
     data() {
       return {
         isNoBuffer: false,
-        promptFlag: false,
+        // promptFlag: false,
         isOpenSpeed: false,
         isOpenQuality: false,
         iconShow: false, // 5秒后操作栏icon消失
-        prompt: '内容即将呈现...', // 刚开始点击时展示文案
+        prompt: this.$t('player.player_1010'), // 刚开始点击时展示文案
         loadingFlag: false,
         isShowPoster: true, //是否展示活动图片背景
         isPlayering: false, // 是否是播放状态
@@ -411,12 +406,11 @@
       // 初始化播放器配置项
       initConfig() {
         const { interact, join_info } = this.roomBaseState.watchInitData;
-        console.log(this.roomBaseState, '????====zhangxiao');
         let params = {
           appId: interact.paas_app_id || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
-          videoNode: 'vmp-player',
+          videoNode: 'vmp-wap-player',
           type: this.playerState.type, // live 直播  vod 点播  必填
           poster: '',
           autoplay: false,
@@ -462,7 +456,7 @@
       initPlayer() {
         this.initSDK().then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
-          if (this.playerState.type === 'vod') {
+          if (this.playerState.type == 'vod') {
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
@@ -699,7 +693,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 4;
+      z-index: 12;
       background: transparent;
       p {
         width: 108px;
@@ -907,7 +901,7 @@
       font-size: 28px;
       width: 100%;
       position: absolute;
-      z-index: 3;
+      z-index: 7;
       padding: 0 32px;
       &-preview {
         height: 64px;
