@@ -129,10 +129,7 @@
         this.desktopShareServer.$on('screen_stream_add', streamId => {
           this.subscribeStream(streamId);
         });
-        this.desktopShareServer.$on('screen_stream_remove', () => {
-          useDesktopShareServer().setShareScreenStatus(false);
-          useRoomBaseServer().setChangeElement('');
-        });
+        this.desktopShareServer.$on('screen_stream_remove', () => {});
       },
       // 订阅流
       subscribeStream(streamId) {
@@ -147,8 +144,15 @@
           useRoomBaseServer().setChangeElement('stream-list');
         });
       },
-      showConfirm() {
-        this.popAlert.visible = true;
+      showConfirm(isShareScreen) {
+        if (!isShareScreen) {
+          this.popAlert.visible = true;
+        } else {
+          this.desktopShareServer.stopShareScreen().then(() => {
+            useDesktopShareServer().setShareScreenStatus(false);
+            useRoomBaseServer().setChangeElement('stream-list');
+          });
+        }
       },
 
       // 开始共享

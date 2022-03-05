@@ -168,10 +168,7 @@
     </section>
 
     <!-- 播放按钮 -->
-    <section
-      class="vmp-stream-local__pause"
-      v-show="mainScreen == joinInfo.third_party_user_id && interactiveServer.state.showPlayIcon"
-    >
+    <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -254,6 +251,13 @@
           !this.chatServer.state.allBanned &&
           this.joinInfo.role_name != 3 &&
           !this.micServer.state.isSpeakOffToInit
+        );
+      },
+      showInterIsPlay() {
+        return (
+          this.mainScreen == this.joinInfo.third_party_user_id &&
+          this.interactiveServer.state.showPlayIcon &&
+          this.joinInfo.role_name == 2
         );
       }
     },
@@ -382,19 +386,10 @@
             this.interactiveServer.destroy();
           }
         });
-        // 小组解散
-        this.groupServer.$on('GROUP_DISBAND', () => {
-          console.log('分组解散了-1-1--11-1-1-1-');
-          this.$message.warning(this.$t('chat.chat_1074'));
-          //  重新初始化互动实例
-          this.interactiveServer.init();
-        });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          console.log('您已被踢出-1-1--11-1-1-1-');
-          if (this.joinInfo.third_party_user_id === msg.data.room_join_id) {
-            this.$message.warning(this.$t('chat.chat_1007'));
+          if (this.joinInfo.third_party_user_id === msg.data.target_id) {
             //  重新初始化互动实例
             this.interactiveServer.init();
           }

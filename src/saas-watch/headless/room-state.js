@@ -6,7 +6,8 @@ import {
   useMicServer,
   useMediaCheckServer,
   useGroupServer,
-  useUserServer
+  useUserServer,
+  useDesktopShareServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -20,6 +21,7 @@ export default async function () {
   const groupServer = useGroupServer();
   const micServer = useMicServer();
   const userServer = useUserServer();
+  const desktopShareServer = useDesktopShareServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -121,6 +123,8 @@ export default async function () {
 
   await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+
+  desktopShareServer.init();
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');

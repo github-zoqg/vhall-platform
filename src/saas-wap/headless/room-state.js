@@ -6,7 +6,8 @@ import {
   useMediaCheckServer,
   useMicServer,
   useUserServer,
-  useGroupServer
+  useGroupServer,
+  useDesktopShareServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -21,6 +22,7 @@ export default async function () {
   const micServer = useMicServer();
   const userServer = useUserServer();
   const groupServer = useGroupServer();
+  const desktopShareServer = useDesktopShareServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -111,6 +113,8 @@ export default async function () {
 
   await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+
+  desktopShareServer.init();
 
   await docServer.init({
     token: roomBaseServer.state.watchInitData.interact.paas_access_token
