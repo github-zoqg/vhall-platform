@@ -644,8 +644,8 @@
           try {
             console.log('_this.groupServer:', _this.groupServer);
             console.log('_this.isInGroup:', _this.isInGroup);
-            const isLive = _this.isLive;
-            const isWatch = _this.isWatch;
+            const { isLive, isWatch } = _this;
+            const { context } = msg;
 
             // 上线的人是自己，不做操作
             if (isLive && msg.sender_id == _this.userId) {
@@ -659,6 +659,13 @@
                 ? _this.groupInitData.speaker_list
                 : _this.interactToolStatus.speaker_list || [];
               _this.totalNum = msg.uv;
+            }
+
+            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
+            if (isLive && _this.mode === 6) {
+              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
+                return false;
+              }
             }
 
             if (isLive) {
@@ -690,14 +697,6 @@
 
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
-            const { context } = msg;
-
-            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-            if (isLive && _this.mode === 6) {
-              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
-                return false;
-              }
-            }
 
             if (isLive) {
               const user = {
