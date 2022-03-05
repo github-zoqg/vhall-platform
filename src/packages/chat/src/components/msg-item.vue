@@ -55,10 +55,12 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">{{ source.nickname }}</span>
+              <span class="info-wrap__nick-name">
+                {{ source.nickname }}
+              </span>
               <span
                 v-if="
-                  (source.type === 'text' || source.type === 'image') &&
+                  (source.type === 'text' || source.type === 'image' || source.isHistoryMsg) &&
                   source.roleName &&
                   source.roleName != '2'
                 "
