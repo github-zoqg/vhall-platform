@@ -168,6 +168,7 @@
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        const chatServer = useChatServer();
         //收到提问
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
@@ -177,6 +178,14 @@
         //收到问答回复
         qaServer.$on(qaServer.Events.QA_COMMIT, () => {
           this.scrollBottom();
+        });
+        //监听禁言通知
+        chatServer.$on('banned', res => {
+          this.isBanned = res;
+        });
+        //监听全体禁言通知
+        chatServer.$on('allBanned', res => {
+          this.allBanned = res;
         });
       },
       /**

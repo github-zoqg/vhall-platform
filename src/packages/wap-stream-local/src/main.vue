@@ -138,7 +138,7 @@
 
       // 上麦成功
       this.micServer.$on('vrtc_connect_success', async msg => {
-        console.log('上麦成功', msg);
+        console.log('上麦成功', msg, this.joinInfo.role_name);
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           if (
             this.joinInfo.role_name == 3 ||
@@ -147,6 +147,7 @@
             // 开始推流
             this.startPush();
           } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
+            console.warn('------------cxs----');
             //  初始化互动实例
             await this.interactiveServer.init();
             // 开始推流
@@ -185,6 +186,23 @@
         } catch (error) {
           console.log('分组结束讨论', error);
         }
+      });
+
+      // 开启摄像头
+      this.interactiveServer.$on('vrtc_frames_display', () => {
+        this.$toast(this.$t('interact.interact_1024'));
+      });
+      // 关闭摄像头
+      this.interactiveServer.$on('vrtc_frames_forbid', () => {
+        this.$toast(this.$t('interact.interact_1023'));
+      });
+      // 开启音频
+      this.interactiveServer.$on('vrtc_mute_cancel', () => {
+        this.$toast(this.$t('interact.interact_1015'));
+      });
+      // 关闭音频
+      this.interactiveServer.$on('vrtc_mute', () => {
+        this.$toast(this.$t('interact.interact_1026'));
       });
     },
     async beforeDestroy() {
@@ -462,6 +480,9 @@
       transition: all 1s;
       z-index: 6;
       -webkit-transition: all 1s;
+      i {
+        color: #fff;
+      }
     }
   }
 </style>
