@@ -14,7 +14,9 @@ const serverConfig = {
       'layerBodyCenter',
       'comAllDialog',
       'comWapRewardEffect',
-      'comGoodsDetail'
+      'comGoodsDetail',
+      'comUserAccountWap',
+      'compQuestionnaireWap'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
@@ -52,10 +54,8 @@ const serverConfig = {
       'comSignUpForm',
       'comScreenPostWap',
       'comUserCenterWap',
-      'comUserAccountWap',
       'comCashWap',
       'compLotteryWap',
-      'compQuestionnaireWap',
       'comRedPacketWap',
       'comInviteHandup'
     ]
@@ -378,7 +378,7 @@ const serverConfig = {
   subcribeCenter: {
     component: 'VmpContainer',
     className: 'tab-content',
-    children: ['comTabMenuWap']
+    children: ['comSubcribeTabMenuWap']
   },
   comSubcribeWapBody: {
     component: 'VmpSubscribeBody',
@@ -390,6 +390,21 @@ const serverConfig = {
         method: 'open'
       }
     ]
+  },
+  comSubcribeTabMenuWap: {
+    component: 'VmpTabMenuWap',
+    options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
+        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' } // 广告、推荐
+      ]
+    }
   },
   comRedPacketWap: {
     component: 'VmpRedPacketWap'

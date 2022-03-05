@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="vh-chose-active-item__titleInfo">
-          <div class="vh-chose-active-item__title">
+          <div class="vh-chose-active-item__title ellipsis">
             {{ item.subject }}
           </div>
           <div class="vh-chose-active-item__info">
@@ -41,7 +41,7 @@
   </div>
 </template>
 <script>
-  import { useCustomMenuServer } from 'middle-domain';
+  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
     filters: {},
@@ -49,14 +49,15 @@
     data() {
       return {
         activeList: [],
-        loading: false,
-        hasDelayPermission: false
+        loading: false
       };
     },
     computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList']),
       userId() {
-        return this.watchInitData.join_info.third_party_user_id;
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      hasDelayPermission() {
+        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
       }
     },
     watch: {
@@ -72,9 +73,7 @@
     },
     beforeCreate() {
       this.customMenuServer = useCustomMenuServer();
-    },
-    mounted() {
-      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       getLiveTag(val) {
@@ -146,7 +145,10 @@
     position: relative;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: row;
+    // justify-content: center;
+    justify-content: flex-start;
+    align-items: center;
   }
   .live-check-page {
     justify-content: center;
@@ -185,15 +187,17 @@
         position: absolute;
         left: 10px;
         top: 15px;
-        height: 20px;
-        line-height: 20px;
+        height: 42px;
+        line-height: 42px;
         background: rgba(0, 0, 0, 0.65);
         border-radius: 100px;
-        font-size: 12px;
+        font-size: 20px;
         font-weight: 400;
         color: #ffffff;
         text-align: center;
         img {
+          width: 10px;
+          position: static;
           height: 8px;
         }
       }
@@ -241,18 +245,17 @@
       height: 55px;
     }
     &__title {
-      margin: 10px 0px 4px 0px;
+      width: 100%;
+      height: 36px;
       font-size: 28px;
-      line-height: 38px;
+      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: @font-light-normal;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      text-align: left;
+      color: #1a1a1a;
+      line-height: 36px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      padding: 0px 8px;
+      margin-bottom: 2px;
     }
     &__info {
       font-weight: 400;
@@ -260,13 +263,14 @@
       white-space: nowrap;
       font-size: 12px;
       color: @font-dark-low;
-      line-height: 16px;
+      line-height: 28px;
       text-align: left;
+      padding: 0px 8px;
     }
     .liveTag {
       color: #fff;
-      font-size: 12px;
-      // padding:12px;
+      font-size: 20px;
+      padding: 2px 9px;
       border-radius: 20px;
       position: relative;
       z-index: 2;
@@ -274,16 +278,19 @@
       flex-direction: row;
       align-items: center;
       .live-status {
-        display: inline-block;
-        width: 12px;
-        img {
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          border-radius: 0px;
-          // margin-top: 4px;
-        }
+        padding-right: 6px;
       }
+      // .live-status {
+      //   display: inline-block;
+      //   width: 12px;
+      //   img {
+      //     display: inline-block;
+      //     width: 8px;
+      //     height: 8px;
+      //     border-radius: 0px;
+      //     // margin-top: 4px;
+      //   }
+      // }
     }
     .vh-chose-active-item__cover-status {
       padding: 0px 8px !important;
