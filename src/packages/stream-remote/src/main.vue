@@ -167,7 +167,7 @@
       v-show="
         mainScreen == stream.accountId &&
         interactiveServer.state.showPlayIcon &&
-        join_info.role_name != 3
+        joinInfo.role_name != 3
       "
     >
       <p @click.stop="replayPlay">
