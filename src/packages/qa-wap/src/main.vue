@@ -74,7 +74,6 @@
 </template>
 <script>
   import MsgItem from './components/msg-item.vue';
-  import { textToEmojiText } from '@/packages/chat/src/js/emoji';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -118,47 +117,6 @@
     beforeDestroy() {},
     mounted() {
       this.listenEvents();
-      this.sendMsgFn = (inputValue, type) => {
-        if (type == 'qa') {
-          this.sendQuestion(inputValue);
-        }
-      };
-      // 接收到回答
-      this.commitQAFn = async msg => {
-        // console.log(`当前头像试验查看`, msg.data)
-        if (msg.data.type === 'question_answer_commit') {
-          // 如果是走的消息回复接口
-          msg.content = textToEmojiText(msg.data.content);
-        }
-        msg.data.content = textToEmojiText(msg.data.content);
-        msg.data.answer.content = textToEmojiText(msg.data.answer.content);
-        this.list.push(msg);
-
-        // console.log(`转换后头像实验效果`, msg.data)
-      };
-      // 撤销回答
-      this.backoutQAFn = async msg => {
-        const index = this.list.findIndex(item => {
-          if (item.answer) {
-            if (item.answer.id == msg.data.question_answer_id) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            return false;
-          }
-        });
-        console.log(9, this.list, msg, index);
-
-        if (index > -1) {
-          const qa = this.list[index];
-          qa.answer = null;
-          this.list.splice(index, 1, qa);
-          await this.$nextTick();
-          this.$refs.scroll.refresh();
-        }
-      };
     },
     filters: {
       roleClassFilter(value) {

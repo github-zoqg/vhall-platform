@@ -62,7 +62,7 @@
 </template>
 
 <script>
-  import OverlayScrollbars from 'overlayscrollbars';
+  // import OverlayScrollbars from 'overlayscrollbars';
   import Emoji from '@/packages/chat/src/components/emoji';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
@@ -130,7 +130,7 @@
       inputValue: {
         handler(newValue) {
           // 输入框内容发生变化，更新滚动条
-          this.overlayScrollbar.update();
+          // this.overlayScrollbar.update();
           this.inputHandle();
         }
       }
@@ -139,7 +139,7 @@
       this.chatServer = useChatServer();
     },
     mounted() {
-      this.overlayScrollbarInit();
+      // this.overlayScrollbarInit();
       document.addEventListener('click', () => {
         this.isFilterShow = false;
       });
@@ -147,22 +147,22 @@
       //todo 监听用户头像修改
     },
     methods: {
-      // 滚动条初始化
-      overlayScrollbarInit() {
-        this.$nextTick(() => {
-          this.overlayScrollbar = OverlayScrollbars(
-            document.getElementById('private-chat-textarea'),
-            {
-              paddingAbsolute: true,
-              className: 'os-theme-light os-theme-vhall',
-              scrollbars: {
-                autoHide: 'leave',
-                autoHideDelay: 200
-              }
-            }
-          );
-        });
-      },
+      // // 滚动条初始化
+      // overlayScrollbarInit() {
+      //   this.$nextTick(() => {
+      //     this.overlayScrollbar = OverlayScrollbars(
+      //       document.getElementById('private-chat-textarea'),
+      //       {
+      //         paddingAbsolute: true,
+      //         className: 'os-theme-light os-theme-vhall',
+      //         scrollbars: {
+      //           autoHide: 'leave',
+      //           autoHideDelay: 200
+      //         }
+      //       }
+      //     );
+      //   });
+      // },
       //输入框输入事件,改变高度等
       inputHandle() {
         const chatOldTextareaHeight = this.$refs.privateChatTextarea.style.height;
