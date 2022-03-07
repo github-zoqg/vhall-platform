@@ -33,7 +33,6 @@
           </div>
         </div>
       </template>
-      <!-- 左右滑动Mask 待做 -->
     </div>
     <div class="vmp-wap-stream-wrap-mask">
       <!-- 热度 -->
@@ -268,7 +267,7 @@
         });
 
         // 主持人进入退出小组 消息监听
-        this.groupServer.$on('dispatch_group_enter', msg => {
+        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
           if (msg.data.status == 'enter') {
             this.is_host_in_group = true;
           } else if (msg.data.status == 'quit') {
@@ -447,6 +446,7 @@
       flex-direction: column;
       justify-content: center;
       color: #999;
+      background: #000;
       text-align: center;
       font-size: 28px;
       z-index: 1;

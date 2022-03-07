@@ -143,6 +143,7 @@
     useInsertFileServer,
     useRoomBaseServer,
     useInteractiveServer,
+    useGroupServer,
     useMsgServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -281,6 +282,9 @@
       },
       // 本地插播，video成功创建之后的处理逻辑
       handleLocalInsertVideoCreated(videoElement) {
+        // 隐藏分组设置
+        const groupServer = useGroupServer();
+        groupServer.state.panelShow = false;
         // 保存当前正在播放的videoElement对象，后续播放、暂停、设置事件等需要用到
         this._localFileVideoElement = videoElement;
         // 事件监听 暂停，播放，播放完成
@@ -497,6 +501,10 @@
       },
       remoteInsterSucces(videEl) {
         console.log(videEl, '点播初始化成功');
+        // 隐藏分组设置
+        const groupServer = useGroupServer();
+        groupServer.state.panelShow = false;
+
         const insertFileServer = useInsertFileServer();
         insertFileServer.setInsertVideoElement(videEl);
         this.pushLocalStream();

@@ -27,7 +27,7 @@
           "
         >
           <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
-          <label>{{ webinarType | webinarFilter }}</label>
+          <label>{{ formatType(webinarType) }}</label>
         </span>
         <span
           v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1"
@@ -162,17 +162,6 @@
       };
     },
     filters: {
-      webinarFilter(val) {
-        // const webinarArr = [
-        //   this.$t('common.common_1018'),
-        //   this.$t('common.common_1019'),
-        //   this.$t('common.common_1020'),
-        //   this.$t('common.common_1024'),
-        //   this.$t('common.common_1021')
-        // ];
-        const webinarArr = ['直播', '预告', '结束', '点播', '回放'];
-        return webinarArr[val - 1];
-      },
       splitLenStr(name, len) {
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
@@ -353,6 +342,29 @@
             ? this.webinarTag.skip_url
             : 'https://www.vhall.com/';
         window.open(logoUrl, '_blank');
+      },
+      formatType(val) {
+        let text;
+        switch (parseInt(val)) {
+          case 1:
+            text = this.$t('common.common_1018');
+            break;
+          case 2:
+            text = this.$t('common.common_1019');
+            break;
+          case 3:
+            text = this.$t('common.common_1020');
+            break;
+          case 4:
+            text = this.$t('common.common_1024');
+            break;
+          case 5:
+            text = this.$t('common.common_1021');
+            break;
+          default:
+            text = this.$t('common.common_1018');
+        }
+        return text;
       },
       //登录
       goLogin() {
