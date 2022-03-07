@@ -73,7 +73,6 @@
 <script>
   import {
     useRoomBaseServer,
-    useMsgServer,
     useMicServer,
     useChatServer,
     useGroupServer,
@@ -137,14 +136,6 @@
       // 是否开启举手
       isAllowhandup() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
-        const mode = this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-        if (mode !== 6 && this.device_status === 1) {
-          if (status) {
-            this.$toast(this.$t('interact.interact_1003'));
-          } else {
-            this.$toast(this.$t('interact.interact_1002'));
-          }
-        }
         return status;
       },
       // 是否是上麦状态
@@ -184,6 +175,14 @@
       // 结束直播
       useInteractiveServer().$on('live_over', () => {
         this.live_over = true;
+      });
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        this.$toast(this.$t('interact.interact_1003'));
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        this.$toast(this.$t('interact.interact_1002'));
       });
     },
     methods: {
