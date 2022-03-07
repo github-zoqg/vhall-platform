@@ -55,7 +55,15 @@
       },
       // 是否开启举手
       isAllowhandup() {
-        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        const status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        const mode = this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+        if (mode !== 6) {
+          if (status) {
+            this.$message.success(this.$t('interact.interact_1003'));
+          } else {
+            this.$message.success(this.$t('interact.interact_1002'));
+          }
+        }
         return status;
       },
       // 是否已上麦
