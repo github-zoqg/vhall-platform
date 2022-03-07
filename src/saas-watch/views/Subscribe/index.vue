@@ -57,7 +57,7 @@
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },

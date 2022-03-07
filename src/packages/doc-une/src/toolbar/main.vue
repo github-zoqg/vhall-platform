@@ -270,7 +270,10 @@
        *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
        */
       changeTool(brush, key, value) {
-        if (!this.docServer?.state.currentCid) {
+        if (
+          !this.docServer?.state.currentCid ||
+          !document.getElementById(this.docServer.state.currentCid)
+        ) {
           console.log('容器不存在，不可设置画笔');
           return;
         }

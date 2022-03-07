@@ -10,7 +10,9 @@
         <i class="vh-iconfont vh-line-copy"></i>
       </div>
     </div>
-    <!---->
+    <!-- 定时直播 -->
+    <div v-if="webinarInfo.mode == 5" class="auto-live-start">定时直播</div>
+    <!--无延迟-->
     <div class="nopdelay-icon" v-if="webinarInfo.no_delay_webinar == 1 && webinarInfo.mode != 6">
       <img
         src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
@@ -142,6 +144,18 @@
       line-height: 20px;
       text-align: center;
       cursor: pointer;
+    }
+    .auto-live-start {
+      display: inline-block;
+      margin-left: 8px;
+      background: #fb3a32;
+      border-radius: 10px;
+      height: 16px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 16px;
     }
     .nopdelay-icon {
       line-height: 34px;

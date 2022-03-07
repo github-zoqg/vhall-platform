@@ -153,7 +153,7 @@
 
         this.subscribeServer.$on('pay_success', data => {
           if (data.target_id == this.userInfo.user_id) {
-            console.log('111111222234', data, this.userInfo.user_id);
+            console.log('woshi我是预约页fufei');
             this.feeAuth({ type: 3 });
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickPay', { flag: false })

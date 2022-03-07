@@ -19,7 +19,7 @@
     </div>
     <div class="vmp-header-watch-center">
       <div class="vmp-header-watch-center-title">
-        {{ webinarInfo.subject | splitLenStr(40) }}
+        {{ languagesInfo.subject | splitLenStr(40) }}
         <span
           v-if="webinarType != 6"
           :class="
@@ -209,6 +209,9 @@
       },
       isShowShare() {
         return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
+      },
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
       }
     },
     beforeCreate() {
@@ -223,10 +226,9 @@
         await this.attentionStatus();
       }
       this.getWebinarInfo();
-      // const curLang = this.roomBaseServer.state.languages.curLang;
-      // const langArr = ['zh-CN', 'en'];
-      // const lang = sessionStorage.getItem('lang') || curLang.language_type;
-      // this.lang = langArr[lang];
+      const langArr = ['zh-CN', 'en'];
+      const lang = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+      this.lang = langArr[lang - 1];
     },
     methods: {
       getWebinarInfo() {
