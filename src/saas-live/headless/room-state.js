@@ -10,7 +10,8 @@ import {
   useRebroadcastServer,
   useInsertFileServer,
   useMemberServer,
-  useDesktopShareServer
+  useDesktopShareServer,
+  useSplitScreenServer
 } from 'middle-domain';
 
 export default async function () {
@@ -26,6 +27,7 @@ export default async function () {
   const rebroadcastServer = useRebroadcastServer();
   const insertFileServer = useInsertFileServer();
   const desktopShareServer = useDesktopShareServer();
+  const splitScreenServer = useSplitScreenServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -52,7 +54,7 @@ export default async function () {
   // 如果存在rebroadcast
   if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {
     await rebroadcastServer.init();
-    console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', msgServer);
+    console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', rebroadcastServer);
   }
 
   micServer.init();
@@ -60,8 +62,14 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  await interactiveServer.init();
-  console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  await splitScreenServer.init();
+  console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
+
+  if (!splitScreenServer.state.isOpenSplitScreen) {
+    // 没有开启分屏则初始化互动
+    await interactiveServer.init();
+    console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  }
 
   insertFileServer.init();
 
