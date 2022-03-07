@@ -578,8 +578,11 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
           //   type: 'warning'
-        }).then(() => {
-          this.groupServer.startDiscussion();
+        }).then(async () => {
+          const { code, msg } = await this.groupServer.startDiscussion();
+          if (code !== 200) {
+            this.$message.error(msg);
+          }
         });
       },
       // 结束讨论

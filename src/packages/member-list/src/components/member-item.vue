@@ -48,9 +48,9 @@
         <!-- 显示条件：申请上麦 -->
         <template
           v-if="
-            [1, 2].includes(this.tabIndex) &&
+            [1, 2].includes(tabIndex) &&
             [1, '1'].includes(userInfo.is_apply) &&
-            applyUsers.find(u => u.account_id == userInfo.account_id) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
             !userInfo.is_speak
           "
         >
@@ -139,7 +139,7 @@
           v-if="
             [1, 2].includes(tabIndex) &&
             [1, '1'].includes(userInfo.is_apply) &&
-            applyUsers.find(u => u.account_id === userInfo.account_id) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
             !userInfo.is_speak
           "
           class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
@@ -325,7 +325,7 @@
       currentSpeakerId: {
         type: [Number, String]
       },
-      //当前演示主屏幕
+      //当前演示主屏幕（主讲人）
       mainScreen: {
         type: [Number, String],
         default: () => ''
@@ -368,6 +368,9 @@
     },
     mounted() {
       console.log(this.currentSpeakerId, '当前主讲人的id');
+    },
+    beforeUpdate() {
+      console.log(this.userInfo.nickname, this.isShowSetSpeaker());
     },
     data() {
       return {
@@ -464,8 +467,21 @@
             text: '升为组长',
             sequence: 4
           }
-        ]
+        ],
+        //真实的申请上麦的数组
+        applyUserList: []
       };
+    },
+    watch: {
+      //监听数组的变化，保证举手标识能出现
+      applyUsers: {
+        handler(val) {
+          this.applyUserList = val;
+          this.$forceUpdate();
+        },
+        immediate: true,
+        deep: true
+      }
     },
     computed: {
       //角色转换
@@ -541,14 +557,15 @@
       },
       //是否展示设为主讲按钮(PC发起)
       isShowSetSpeaker() {
-        if (!this.isInGroup || this.tabIndex !== 1) {
+        if (this.tabIndex !== 1) {
           return false;
         }
         return (
-          this.isInteract &&
+          !this.isInGroup &&
+          !!this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
-          this.currentSpeakerId !== this.userInfo.account_id
+          this.mainScreen != this.userInfo.account_id
         );
       },
       //PC观看端设为组长
@@ -620,7 +637,7 @@
       isShowSpeakerFlag() {
         if (this.tabIndex === 1) {
           const options = [
-            this.mode !== 6 && this.currentSpeakerId === this.userInfo.account_id,
+            this.mode !== 6 && this.mainScreen === this.userInfo.account_id,
             this.mode === 6 && [1, '1'].includes(this.userInfo.role_name)
           ];
           return options.some(value => !!value);
@@ -716,6 +733,19 @@
           }
           return text;
         };
+      },
+      //是否在申请举手列表里
+      isInApplyUsers() {
+        return this.applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1;
+      },
+      //是否显示举手的标识(PC发起)
+      isShowHandFlag() {
+        return (
+          [1, 2].includes(this.tabIndex) &&
+          [1, '1'].includes(this.userInfo.is_apply) &&
+          this.isInApplyUsers &&
+          !this.userInfo.is_speak
+        );
       }
     },
     methods: {

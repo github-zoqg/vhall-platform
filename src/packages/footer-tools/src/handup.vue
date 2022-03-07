@@ -123,7 +123,11 @@
       userApply() {
         useMicServer()
           .userApply()
-          .then(() => {
+          .then(res => {
+            if (res.code != 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this.isApplyed = true;
             this.waitTime = 30;
             this.btnText = `等待(${this.waitTime}s)`;

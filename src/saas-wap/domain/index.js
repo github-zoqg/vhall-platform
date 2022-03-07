@@ -9,7 +9,8 @@ import {
   useMicServer,
   useGroupServer,
   useUserServer,
-  useVirtualAudienceServer
+  useVirtualAudienceServer,
+  useDesktopShareServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -31,6 +32,7 @@ export default new DomainStore.Store({
     micServer: useMicServer().state,
     groupServer: useGroupServer().state,
     virtualAudienceServer: useVirtualAudienceServer().state,
-    userServer: useUserServer().state
+    userServer: useUserServer().state,
+    desktopShareServer: useDesktopShareServer().state
   }
 });

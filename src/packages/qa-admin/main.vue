@@ -604,7 +604,8 @@
         .catch(err => {
           this.$message.error(err.msg);
         });
-      await useMsgServer().initMaintMsg(watchInitData);
+
+      await useMsgServer().initMaintMsg({ ...watchInitData, hide: 1 });
       await this.chatPrivateGetRankList();
 
       this.getChat(0); // 待处理

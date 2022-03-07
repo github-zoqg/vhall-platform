@@ -30,7 +30,8 @@
         showInviteConnectMic: false, // 邀请上麦弹框展示
         inviteFun: null,
         isWaitting: false,
-        inviteTime: 30
+        inviteTime: 30,
+        senderId: ''
       };
     },
     computed: {
@@ -58,6 +59,7 @@
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
           }
+          this.senderId = temp.sender_id;
           this.showInviteConnectMic = true;
           this.inviteTime = 30;
           clearInterval(this.inviteFun);
@@ -85,7 +87,8 @@
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
-            type: 0 // 0=邀请上麦|1=邀请演示
+            type: 0, // 0=邀请上麦|1=邀请演示
+            extra_params: this.senderId
           })
           .then(res => {
             useMicServer().userSpeakOn();
@@ -100,7 +103,8 @@
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
-            type: 0 // 0=邀请上麦|1=邀请演示
+            type: 0, // 0=邀请上麦|1=邀请演示
+            extra_params: this.senderId
           })
           .then(res => {
             clearInterval(this.inviteFun);

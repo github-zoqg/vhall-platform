@@ -2,16 +2,16 @@
   <div class="vmp-watch-private-chat">
     <!--消息区域-->
     <div class="private-chat-content" :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }">
-      <overlay-scrollbars
-        ref="chatContent"
-        :options="overlayScrollBarsOptions"
-        style="height: 100%"
-      >
-        <template v-for="msg in chatList">
-          <msg-item :key="msg.count" :msg="msg" :role-name="roleName"></msg-item>
-        </template>
-      </overlay-scrollbars>
       <div class="private-chat-content__tip-box">
+        <virtual-list
+          ref="chatlist"
+          style="height: 100%; overflow: auto"
+          :keeps="30"
+          :data-key="'count'"
+          :data-sources="chatList"
+          :data-component="msgItem"
+          :extra-props="{}"
+        ></virtual-list>
         <div
           v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
           class="private-chat-content__tip-box-content"
@@ -30,8 +30,6 @@
       :input-status="inputStatus"
       :latestMessage="latestMessage"
       :join-info="joinInfo"
-      @chatTextareaHeightChange="handleHeightChange"
-      @performScroll="performScroll"
       @needLogin="handleLogin"
     ></chat-operate>
   </div>
@@ -42,16 +40,17 @@
   import msgItem from './components/msg-item';
   import chatOperate from './components/chat-operate';
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
-  import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import VirtualList from 'vue-virtual-scroll-list';
   export default {
     name: 'VmpWatchPrivateChat',
     components: {
-      msgItem,
-      chatOperate
+      chatOperate,
+      VirtualList
     },
     data() {
       return {
+        msgItem,
         defaultAvatar,
         //私聊的列表 todo 假数据待移除，由domain维护
         chatList: useChatServer().state.privateChatList,
@@ -82,8 +81,6 @@
           disable: false,
           placeholder: this.$t('chat.chat_1021')
         },
-        //是否是初始化私聊tab todo 预留
-        isFirstPrivateChat: false,
         //最新的消息
         latestMessage: {},
         //用户角色
@@ -105,21 +102,14 @@
       };
     },
     watch: {
-      chatList: {
-        deep: true,
-        handler() {
-          // 如果当前自定义菜单显示的是私聊，return
-          if (this.isFirstPrivateChat) {
-            this.isFirstPrivateChat = false;
-            return;
-          }
-          // 如果当前自定义菜单显示的非私聊，显示小红点 todo 信令发送事件给tab
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
         }
       },
       configList: {
         deep: true,
         handler(val, oldVal) {
-          // 如果滚动条未滚动至最底部
           if (val['ui.watch_record_no_chatting'] != oldVal['ui.watch_record_no_chatting']) {
             this.initInputStatus();
           }
@@ -149,7 +139,6 @@
       this.listenEvents();
       this.initInputStatus();
       this.initLoginStatus();
-      this.scrollInit();
       this.getHistoryMsg();
     },
     methods: {
@@ -203,32 +192,6 @@
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
-      //初始化滚动
-      scrollInit() {
-        this.osInstance = this.$refs.chatContent.osInstance();
-        const that = this;
-        this.overlayScrollBarsOptions.callbacks = {
-          onHostSizeChanged: function () {
-            if (that.doScroll) {
-              that.performScroll();
-            }
-          },
-          onContentSizeChanged: function () {
-            if (that.doScroll) {
-              that.performScroll();
-            }
-          },
-          onScroll: that.setDoScroll,
-          onInitialized: that.setDoScroll,
-          onOverflowChanged: function (e) {
-            if (e.y) {
-              that.performScroll();
-            }
-          },
-          onScrollStop: this.handleScrollStop
-        };
-        this.osInstance.options(this.overlayScrollBarsOptions);
-      },
       //事件监听
       listenEvents() {
         this.chatServer.$on('receivePrivateMsg', () => {
@@ -243,63 +206,30 @@
       getHistoryMsg() {
         this.chatServer.getPrivateChatHistoryList();
       },
-      //表情转换
-      emojiToText(value) {
-        return textToEmoji(value)
-          .map(c => {
-            return c.msgType == 'text'
-              ? c.msgCont
-              : `<img width="24" src="${c.msgImage}" border="0" />`;
-          })
-          .join(' ');
-      },
-      setDoScroll() {
-        this.$nextTick(() => {
-          if (!this.animationRunning) {
-            this.doScroll = this.osInstance.scroll().ratio.y === 1;
-          } else {
-            this.doScroll = true;
-          }
-        });
-      },
-      //滚动到指定目标处
+      //滚动到目标处
       scrollToTarget() {
-        const _this = this;
-        this.animationRunning = true;
-        this.osInstance.scrollStop().scroll(
-          {
-            el: this.osInstance.getElements().content.children[
-              _this.chatList.length - _this.unReadMessageCount
-            ],
-            block: { y: 'end' }
-          },
-          250,
-          'linear',
-          () => {
-            _this.animationRunning = false;
-            _this.unReadMessageCount = 0;
-            _this.isHasUnreadNormalMsg = false;
-          }
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.chatlist.$el.scrollHeight -
+            this.$refs.chatlist.$el.scrollTop -
+            this.$refs.chatlist.getClientSize() <
+          5
         );
       },
-      handleScrollStop() {
-        if (this.osInstance.scroll().ratio.y === 1) {
-          this.badgeNumber = 0;
-          this.isHasUnreadNormalMsg = false;
-        }
+      //自己发送消息后的回调
+      sendMsgEnd() {
+        this.scrollBottom();
       },
-      //响应高度变化
-      handleHeightChange(height) {
-        this.operatorHieght = height;
-        this.$refs.privateChatOperator.overlayScrollbar.update();
-      },
-      //执行滚动处理
-      performScroll() {
+      //滚动到底部
+      scrollBottom() {
         this.$nextTick(() => {
-          this.animationRunning = true;
-          this.osInstance.scrollStop().scroll({ y: '100%' }, 250, 'linear', () => {
-            this.animationRunning = false;
-          });
+          this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
         });
       }
     }
@@ -316,13 +246,6 @@
       position: relative;
       &:last-child {
         padding-bottom: 20px;
-      }
-      &__tip-box {
-        position: absolute;
-        z-index: 1;
-        bottom: 5px;
-        left: 50%;
-        transform: translate(-50%, 0);
       }
       &__tip-box-content {
         padding: 0 14px;

@@ -25,11 +25,8 @@
                 }}
               </div>
             </el-col>
-            <span
-              class="close ps"
-              @click="onClose"
-              v-if="userInfo.role_name == 3 || userInfo.third_party_user_id == this.doc_permission"
-            >
+            <!-- 如果角色是助理:3 或者 是主讲人可以关闭 -->
+            <span class="close ps" @click="onClose" v-if="permissionFlag">
               <i class="vh-iconfont vh-line-close"></i>
             </span>
           </el-row>
@@ -54,9 +51,7 @@
             </div>
           </el-row>
 
-          <el-row
-            v-if="userInfo.role_name == 3 || userInfo.third_party_user_id == this.doc_permission"
-          >
+          <el-row v-if="permissionFlag">
             <el-col align="center" class="mt20">
               <el-button
                 round
@@ -146,10 +141,48 @@
         sec: 0,
         ten_sec: 0,
         mon: 0,
-        ten_mon: 0,
-        userInfo: {},
-        doc_permission: ''
+        ten_mon: 0
+        // userInfo: {}
+        // doc_permission: ''
       };
+    },
+    computed: {
+      userInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      //互动工具状态
+      interactToolStatus() {
+        const { interactToolStatus = {} } = this.$domainStore.state.roomBaseServer;
+        return interactToolStatus;
+      },
+      groupInitData() {
+        return this.$domainStore.state.groupServer.groupInitData;
+      },
+      doc_permission() {
+        let currentSpeakerId;
+        if (this.groupInitData.isInGroup) {
+          currentSpeakerId = this.groupInitData.doc_permission;
+        } else {
+          currentSpeakerId = this.interactToolStatus.doc_permission;
+        }
+        return currentSpeakerId;
+      },
+      // 显示权限规则
+      // 如果角色是助理:3 或者 是主讲人可以关闭
+      permissionFlag() {
+        //是否在分组里
+        let flag = false;
+        if (this.userInfo.role_name == 3) {
+          flag = true;
+        } else {
+          if (this.userInfo.third_party_user_id == this.doc_permission) {
+            flag = true;
+          } else {
+            flag = false;
+          }
+        }
+        return flag;
+      }
     },
     beforeCreate() {
       this.timerServer = useTimerServer();
@@ -169,8 +202,8 @@
       this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
       // 计时器继续
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
-      this.userInfo = this.roomBaseServer.state.watchInitData.join_info;
-      this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
+      // this.userInfo = this.roomBaseServer.state.watchInitData.join_info;
+      // this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
     },
     methods: {
       returnName(data) {
@@ -281,9 +314,8 @@
         // 关闭计时器
         // 主讲人助理打开计时设置弹框
         this.$emit('disTimer', true);
-        const arr = [3];
         if (
-          arr.includes(this.userInfo.role_name) ||
+          this.userInfo.role_name == 3 ||
           this.userInfo.third_party_user_id == this.doc_permission
         ) {
           this.$emit('openSetTimer');
@@ -329,6 +361,10 @@
               if (resData.status == 2) {
                 this.status = 'jieshu';
               }
+              // 禁用互动工具-计时器
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
+              );
               this.$emit('disTimer', false);
             }
           })

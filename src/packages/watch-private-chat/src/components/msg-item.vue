@@ -2,27 +2,30 @@
   <div class="vmp-watch-private-chat-msg-template">
     <!--头像-->
     <div class="msg-item__avatar">
-      <img class="msg-item__avatar__img" :src="msg.avatar" alt />
+      <img class="msg-item__avatar__img" :src="source.avatar" alt />
     </div>
     <!--内容-->
     <div class="msg-item__content">
       <!-- 昵称和角色 -->
       <div class="msg-item__content__name">
         <div class="msg-item__content__info-wrap">
-          <span class="msg-item__content__nick-name">{{ msg.nickname }}</span>
+          <span class="msg-item__content__nick-name">{{ source.nickname }}</span>
           <span
             class="msg-item__content__role-name"
-            :class="msg.roleName | roleClassFilter"
-            v-if="showRoleName(msg.roleName)"
+            :class="source.roleName | roleClassFilter"
+            v-if="showRoleName(source.roleName)"
           >
-            {{ msg.roleName | roleFilter(this) }}
+            {{ source.roleName | roleFilter(this) }}
           </span>
         </div>
-        <span class="msg-item__content__time">{{ msg.sendTime.slice(-8) }}</span>
+
+        <span class="msg-item__content__time">
+          {{ source.sendTime ? source.sendTime.slice(-8) : new Date().toLocaleString().slice(-8) }}
+        </span>
       </div>
       <!-- 文本 -->
       <p
-        v-if="msg.content.text_content"
+        v-if="source.content.text_content"
         class="msg-item__content__content-text"
         v-html="messageContent"
       ></p>
@@ -72,7 +75,7 @@
     },
     props: {
       //消息信息
-      msg: {
+      source: {
         type: Object,
         default: () => {
           return {};
@@ -118,8 +121,8 @@
     methods: {
       //处理消息内容
       handleMessageContent() {
-        if (this.msg.content) {
-          this.messageContent = this.urlToLink(this.msg.content.text_content);
+        if (this.source.content) {
+          this.messageContent = this.urlToLink(this.source.content.text_content);
         }
       },
       // 将聊天消息中的链接用 a 标签包裹

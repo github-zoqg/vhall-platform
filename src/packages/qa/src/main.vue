@@ -4,21 +4,17 @@
       class="vhsaas-chat__body-wrapper"
       :style="{ height: 'calc(100% - ' + operatorHieght + 'px)' }"
     >
-      <overlay-scrollbars ref="osComponentRef" :options="osComponentOptions" style="height: 100%">
-        <template v-for="msg in chatList">
-          <msg-item
-            v-show="
-              !isOnlyMine || msg.join_id == joinId || (msg.answer && msg.answer.join_id == joinId)
-            "
-            :key="msg.count"
-            :msg="msg"
-            :role-name="roleName"
-          ></msg-item>
-        </template>
-      </overlay-scrollbars>
+      <virtual-list
+        ref="qalist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'id'"
+        :data-sources="qaList"
+        :data-component="MsgItem"
+      ></virtual-list>
       <div class="vhsaas-chat__body__bottom-tip-box">
         <div
-          v-show="badgeNumber !== 0 && isHasUnreadNormalMsg"
+          v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
           class="vhsaas-chat__body__bottom-tip"
           @click="scrollToTarget"
         >
@@ -33,11 +29,10 @@
     <chat-operator
       v-else
       ref="chatQaOperator"
-      :chat-list="chatList"
+      :chat-list="qaList"
       :chat-login-status="chatLoginStatus"
       :input-status="inputStatus"
       @chatTextareaHeightChange="chatTextareaHeightChange"
-      @performScroll="performScroll"
       @onOnlyMine="onOnlyMine"
       @onInputStatus="onInputStatus"
       @needLogin="handleLogin"
@@ -48,18 +43,20 @@
 <script>
   import ChatOperator from './components/chat-operator';
   import MsgItem from './components/msg-item';
-  import { textToEmoji } from '@/packages/chat/src/js/emoji';
+  // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import VirtualList from 'vue-virtual-scroll-list';
   export default {
     name: 'VmpQa',
     components: {
       ChatOperator,
-      MsgItem
+      VirtualList
     },
     data() {
       return {
-        chatList: [],
+        MsgItem,
+        qaList: useQaServer().state.qaList,
         inputValue: '',
         inputStatus: {
           disable: false,
@@ -80,9 +77,8 @@
         },
         doScroll: false,
         animationRunning: false,
-        osInstance: null,
         // 滚动条状态 end
-        badgeNumber: 0, // 未读消息数量
+        unReadMessageCount: 0, // 未读消息数量
         isOnlyMine: false,
         isHasUnreadNormalMsg: false,
         tipMsg: '',
@@ -115,9 +111,14 @@
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
-    watch: {},
+    watch: {
+      qaList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
+        }
+      }
+    },
     mounted() {
-      this.scrollInit();
       this.listenEvents();
       this.getQaHistoryMsg();
       this.initLoginStatus();
@@ -126,27 +127,29 @@
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        const chatServer = useChatServer();
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
-          if (msg.sender_id == this.thirdPartyId || this.roleName != 2) {
-            msg.data.content = this.emojiToText(msg.data.content);
-            this.chatList.push(msg.data);
+          if (msg.sender_id == this.thirdPartyId) {
+            this.scrollBottom();
           }
         });
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          if (
-            (msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
-            msg.data.answer.is_open != '0' ||
-            this.roleName == 1
-          ) {
-            msg.data.content = this.emojiToText(msg.data.content);
-            this.chatList.push(msg.data);
-          }
+          this.scrollBottom();
+        });
+        //监听禁言通知
+        chatServer.$on('banned', res => {
+          this.isBanned = res;
+          this.initInputStatus();
+        });
+        //监听全体禁言通知
+        chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+          this.initInputStatus();
         });
       },
       initInputStatus() {
         this.inputStatus.disable = this.isBanned || this.allBanned;
         if (this.isBanned) {
-          // TODO待翻译
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
         } else if (this.allBanned) {
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
@@ -179,104 +182,11 @@
       },
       // 获取历史消息
       getQaHistoryMsg() {
-        const params = {
-          room_id: this.roomId
-        };
-        // 如果是回放，需要传回放id
-        if (this.watchInitData.webinar.type == 5 && this.watchInitData.switch.switch_id) {
-          params.webinar_switch_id = this.watchInitData.switch.switch_id;
-        }
-        useQaServer()
-          .getHistoryQaMsg(params)
-          .then(res => {
-            console.warn(res, '历史问答记录');
-            const list = res.data.list.map(h => {
-              return { ...h, content: this.emojiToText(h.content) };
-            });
-            this.chatList = list;
-            setTimeout(() => {
-              this.isInitEnd = true;
-            }, 500);
-          });
-      },
-      emojiToText(content) {
-        return textToEmoji(content)
-          .map(c => {
-            return c.msgType == 'text'
-              ? c.msgCont
-              : `<img width="24" src="${c.msgImage}" border="0" />`;
-          })
-          .join(' ');
+        useQaServer().getQaHistory();
       },
       chatTextareaHeightChange(operatorHieght) {
         this.operatorHieght = operatorHieght;
         this.$refs.chatQaOperator.overlayScrollbar.update();
-      },
-      scrollInit() {
-        this.osInstance = this.$refs.osComponentRef.osInstance();
-        const that = this;
-        this.osComponentOptions.callbacks = {
-          onHostSizeChanged: function () {
-            if (that.doScroll) {
-              that.performScroll();
-            }
-          },
-          onContentSizeChanged: function () {
-            if (that.doScroll) {
-              that.performScroll();
-            }
-          },
-          onScroll: that.setDoScroll,
-          onInitialized: that.setDoScroll,
-          onOverflowChanged: function (e) {
-            if (e.y) {
-              that.performScroll();
-            }
-          },
-          onScrollStop: this.handleScrollStop
-        };
-        this.osInstance.options(this.osComponentOptions);
-      },
-      setDoScroll() {
-        this.$nextTick(() => {
-          if (!this.animationRunning) {
-            this.doScroll = this.osInstance.scroll().ratio.y === 1;
-          } else {
-            this.doScroll = true;
-          }
-        });
-      },
-      performScroll() {
-        this.$nextTick(() => {
-          this.animationRunning = true;
-          this.osInstance.scrollStop().scroll({ y: '100%' }, 250, 'linear', () => {
-            this.animationRunning = false;
-          });
-        });
-      },
-      scrollToTarget() {
-        this.animationRunning = true;
-        this.osInstance.scrollStop().scroll(
-          {
-            el: this.osInstance.getElements().content.children[
-              this.chatList.length - this.badgeNumber
-            ],
-            block: { y: 'end' }
-          },
-          250,
-          'linear',
-          () => {
-            this.animationRunning = false;
-            this.badgeNumber = 0;
-            this.isHasUnreadNormalMsg = false;
-          }
-        );
-      },
-      handleScrollStop() {
-        if (this.osInstance.scroll().ratio.y === 1) {
-          this.badgeNumber = 0;
-          this.isHasUnreadNormalMsg = false;
-        }
       },
       // 只看我的按钮 change 事件
       onOnlyMine(status) {
@@ -289,6 +199,28 @@
         } else {
           window.open(`${base}lives/qa/${this.webinarId}${location.search}`);
         }
+      },
+      //滚动到底部
+      scrollBottom() {
+        this.$nextTick(() => {
+          this.$refs.qalist.scrollToBottom();
+          this.unReadMessageCount = 0;
+        });
+      },
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.qaList.length - this.unReadMessageCount;
+        this.$refs.qalist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.qalist.$el.scrollHeight -
+            this.$refs.qalist.$el.scrollTop -
+            this.$refs.qalist.getClientSize() <
+          5
+        );
       },
       //处理唤起登录
       handleLogin() {

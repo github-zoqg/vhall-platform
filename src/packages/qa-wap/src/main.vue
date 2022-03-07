@@ -2,15 +2,17 @@
   <div class="qa">
     <div class="qa-content-wrapper">
       <div class="qa-content">
-        <scroll :pullDownRefresh="false" ref="scroll">
+        <virtual-list
+          ref="qalist"
+          style="height: 100%; overflow: auto"
+          :keeps="30"
+          :data-key="'id'"
+          :data-sources="qaList"
+          :data-component="MsgItem"
+        ></virtual-list>
+        <!-- <scroll :pullDownRefresh="false" ref="scroll">
           <div class="qa-item-wrapper" v-for="(msg, index) in list" :key="index">
-            <template
-              v-if="
-                msg.join_id == joinId ||
-                (msg.answer && msg.answer.is_open == 1) ||
-                (msg.answer && msg.answer.is_open == 0 && msg.join_id == joinId)
-              "
-            >
+            <template>
               <div class="question">
                 <div class="user">
                   <span class="avatar-box">
@@ -58,7 +60,7 @@
               </template>
             </template>
           </div>
-        </scroll>
+        </scroll> -->
       </div>
     </div>
     <send-box
@@ -71,7 +73,7 @@
   </div>
 </template>
 <script>
-  import Scroll from '@/packages/chat-wap/src/components/scroll';
+  import MsgItem from './components/msg-item.vue';
   import { textToEmojiText } from '@/packages/chat/src/js/emoji';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
@@ -80,7 +82,8 @@
     name: 'VmpQaWap',
     data() {
       return {
-        list: [],
+        MsgItem,
+        qaList: useQaServer().state.qaList,
         listCopy: [],
         isOnlyWatchQaReply: false, // 是否点击了只看我的
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
@@ -108,7 +111,7 @@
         return this.embedObj.embed || this.embedObj.embedVideo;
       }
     },
-    components: { Scroll, SendBox },
+    components: { SendBox },
     created() {
       this.getQAHistroy();
     },
@@ -165,61 +168,31 @@
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
+        const chatServer = useChatServer();
         //收到提问
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
-          if (msg.sender_id == this.userId || this.roleName != 2) {
-            msg.data.content = this.emojiToText(msg.data.content);
-            this.list.push(msg.data);
+          if (msg.sender_id == this.thirdPartyId) {
+            this.scrollBottom();
           }
         });
         //收到问答回复
-        qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          if (
-            (msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
-            msg.data.answer.is_open != '0' ||
-            this.roleName == 1
-          ) {
-            msg.data.content = this.emojiToText(msg.data.content);
-            this.list.push(msg.data);
-          }
+        qaServer.$on(qaServer.Events.QA_COMMIT, () => {
+          this.scrollBottom();
         });
-      },
-      roleFilter(value) {
-        let ret = '';
-        switch (value) {
-          case 'host':
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 'assistant':
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 'guest':
-            ret = this.$t('chat.chat_1023');
-            break;
-          case 'user':
-            ret = this.$t('chat.chat_1063');
-            break;
-          default:
-            ret = this.$t('chat.chat_1062');
-        }
-        return ret;
+        //监听禁言通知
+        chatServer.$on('banned', res => {
+          this.isBanned = res;
+        });
+        //监听全体禁言通知
+        chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+        });
       },
       /**
        * 获取历史问答
        */
-      async getQAHistroy() {
-        const data = { room_id: this.webinarId };
-        await useQaServer()
-          .getHistoryQaMsg(data)
-          .then(res => {
-            if (res.data) {
-              res.data.list.forEach(element => {
-                element.content = textToEmojiText(element.content);
-              });
-              this.list = res.data.list;
-              this.listCopy = this.list && this.list.slice(0);
-            }
-          });
+      getQAHistroy() {
+        useQaServer().getQaHistory();
       },
       /**
        * 观众发送问题
@@ -236,6 +209,28 @@
       //唤起登录弹窗
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      //滚动到底部
+      scrollBottom() {
+        this.$nextTick(() => {
+          this.$refs.qalist.scrollToBottom();
+          this.unReadMessageCount = 0;
+        });
+      },
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.qaList.length - this.unReadMessageCount;
+        this.$refs.qalist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.qalist.$el.scrollHeight -
+            this.$refs.qalist.$el.scrollTop -
+            this.$refs.qalist.getClientSize() <
+          5
+        );
       }
     }
   };

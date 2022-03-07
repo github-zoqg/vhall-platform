@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="vh-chose-active-item__titleInfo">
-          <div class="vh-chose-active-item__title">
+          <div class="vh-chose-active-item__title ellipsis">
             {{ item.title }}
           </div>
           <div class="vh-chose-active-item__info">
@@ -97,12 +97,14 @@
     position: relative;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
   }
   .project-check-page {
     justify-content: center;
     align-items: flex-start;
-    margin: 0px 0px 20px;
+    // margin: 0px 0px 20px;
   }
   .vh-chose-active-item {
     display: flex;
@@ -188,18 +190,17 @@
       height: 55px;
     }
     &__title {
-      margin: 10px 0px 4px 0px;
+      width: 100%;
+      height: 36px;
       font-size: 28px;
+      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: @font-light-normal;
-      line-height: 38px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      text-align: left;
+      color: #1a1a1a;
+      line-height: 36px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      padding: 0px 8px;
+      margin-bottom: 4px;
     }
     &__info {
       font-weight: 400;
@@ -209,6 +210,7 @@
       color: @font-dark-low;
       line-height: 16px;
       text-align: left;
+      padding: 0px 8px;
     }
     .liveTag {
       color: #fff;

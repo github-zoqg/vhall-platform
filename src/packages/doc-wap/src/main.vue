@@ -3,6 +3,7 @@
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[`vmp-doc-wap--${displayMode}`]"
+    :style="{ height: docViewRect.height > 0 ? docViewRect.height + 'px' : '100%' }"
     v-show="switchStatus"
     ref="docWrapper"
   >
@@ -27,6 +28,24 @@
           <img src="./img/doc_null.png" style="width: 100px; margin-bottom: 20px" />
           <span>主讲人未添加文档，请稍等...</span>
         </div>
+      </div>
+
+      <!--上一页按钮 -->
+      <div
+        v-show="hasPager && pageNum > 1"
+        @click="handlePage('prev')"
+        class="btn-pager btn-pager--prev"
+      >
+        <i class="vh-iconfont vh-line-arrow-left"></i>
+      </div>
+
+      <!-- 下一页按钮 -->
+      <div
+        v-show="hasPager && pageNum < pageTotal"
+        @click="handlePage('next')"
+        class="btn-pager btn-pager--next"
+      >
+        <i class="vh-iconfont vh-line-arrow-right"></i>
       </div>
     </div>
 
@@ -53,7 +72,11 @@
       return {
         className: '',
         displayMode: 'normal', // normal: 正常; fullscreen:全屏
-        keepAspectRatio: true
+        keepAspectRatio: true,
+        docViewRect: {
+          width: 0,
+          height: 0
+        }
       };
     },
     computed: {
@@ -65,6 +88,16 @@
       },
       switchStatus() {
         return this.docServer.state.switchStatus;
+      },
+      pageNum() {
+        return this.docServer.state.pageNum;
+      },
+      pageTotal() {
+        return this.docServer.state.pageTotal;
+      },
+      // 是否有翻页按钮
+      hasPager() {
+        return !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc;
       }
     },
     watch: {
@@ -216,27 +249,13 @@
        * 屏幕缩放
        */
       resize() {
-        let rect = screenfull.isFullscreen
-          ? this.$refs.docWrapper?.getBoundingClientRect()
-          : this.$refs.docContent?.getBoundingClientRect();
+        let rect = this.$refs.docWrapper?.getBoundingClientRect();
         if (!rect) return;
         let { width, height } = rect;
 
         if (!width || !height) return;
-        let w = null,
-          h = null;
-        if (this.keepAspectRatio) {
-          if (width / height > 16 / 9) {
-            h = height;
-            w = (h / 9) * 16;
-          } else {
-            w = width;
-            h = (w / 16) * 9;
-          }
-        } else {
-          w = width;
-          h = height;
-        }
+        let w = width;
+        let h = (w / 16) * 9;
         this.docViewRect = { width: w, height: h };
         console.log('[doc] this.docViewRect:', this.docViewRect);
         if (
@@ -311,6 +330,22 @@
             await this.$nextTick();
           }
         });
+      },
+
+      // 翻页
+      handlePage(type) {
+        if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
+          return;
+        }
+        if (type === 'prev') {
+          if (this.docServer.state.pageNum > 1) {
+            this.docServer.prevStep();
+          }
+        } else if (type === 'next') {
+          if (this.docServer.state.pageNum < this.docServer.state.pageTotal) {
+            this.docServer.nextStep();
+          }
+        }
       }
     }
   };
@@ -405,6 +440,26 @@
       align-items: center;
       justify-content: center;
       z-index: 9;
+    }
+
+    .btn-pager {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #000;
+      width: 64px;
+      height: 64px;
+      border-radius: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &--prev {
+        left: 0;
+      }
+      &--next {
+        right: 0;
+      }
     }
 
     // 全屏模式下

@@ -140,7 +140,7 @@
         //是否可以发送消息，发送限频
         canSend: true,
         //限频时间
-        time: 15,
+        time: 0,
         //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
@@ -279,8 +279,10 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(this.$t('chat.chat_1068', this.waitTime));
+            this.$message(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
+        } else if (this.currentTab == 'qa' && this.time != 0) {
+          this.$message(this.$t('chat.chat_1080', { n: this.time }));
         } else {
           this.$refs.chatWapInputModal.openModal();
         }
@@ -313,30 +315,35 @@
         //如果当前是问答tab
         if (this.currentTab == 'qa') {
           this.$emit('sendQa', value);
+          this.timing();
           return;
         }
         if (this.currentTab == 'private') {
           this.$emit('sendPrivate', value);
           return;
         }
-        // 关键词过滤标识
-        const filterStatus = this.chatServer.checkHasKeyword(true, value);
-        // 发送socket消息  当关键词列表中不包含当前要发的消息时候，进行发送(主意这里仅是把消息保存到了服务器，本地并没有消息)
-        if (filterStatus) {
-          const chatServer = useChatServer();
-          const curmsg = chatServer.createCurMsg();
-          //将文本消息加入消息体
-          curmsg.setText(value);
-          //发送消息
-          chatServer.sendMsg(curmsg);
-          //清除当前消息
-          chatServer.clearCurMsg();
-          this.$emit('sendEnd');
-        }
+        const chatServer = useChatServer();
+        const curmsg = chatServer.createCurMsg();
+        //将文本消息加入消息体
+        curmsg.setText(value);
+        //发送消息
+        chatServer.sendMsg(curmsg);
+        //清除当前消息
+        chatServer.clearCurMsg();
+        this.$emit('sendEnd');
       },
       // 打开个人中心
       showUserPopup() {
         this.$emit('showUserPopup');
+      },
+      timing() {
+        this.time = 15;
+        const timer = setInterval(() => {
+          --this.time;
+          if (this.time == 0) {
+            clearInterval(timer);
+          }
+        }, 1000);
       }
     }
   };

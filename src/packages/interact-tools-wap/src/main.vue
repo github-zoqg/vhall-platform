@@ -154,6 +154,9 @@
       //监听禁言通知
       useChatServer().$on('banned', res => {
         this.isBanned = res;
+        if (this.isSpeakOn) {
+          useMicServer().speakOff();
+        }
       });
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {

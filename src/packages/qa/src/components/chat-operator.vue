@@ -317,7 +317,7 @@
         this.inputValue = '  ';
         setTimeout(() => {
           this.inputValue = '';
-          this.$emit('performScroll');
+          // this.$emit('performScroll');
         });
       }
     }

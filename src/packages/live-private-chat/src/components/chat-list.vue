@@ -68,7 +68,7 @@
         </div>
         <div
           class="list-item__chat-txt"
-          v-if="chat.content || chat.content.text_content"
+          v-if="chat.content && chat.content.text_content"
           v-html="chat.content.text_content"
         ></div>
         <div class="list-item__chat-img-list" v-if="chat.type === 'image'">
@@ -122,7 +122,7 @@
         topLoading: false,
         scrollEnd: false,
         //聊天列表
-        chatList: [],
+        chatList: useChatServer().state.privateChatList,
         page_size: 100,
         page: 0,
         count: 0
@@ -185,7 +185,7 @@
         this.initScroll();
       },
       resetData() {
-        this.chatList = [];
+        useChatServer().clearPrivateChatMsg();
         this.finishData = true;
         this.topLoading = false;
         this.scrollEnd = false;
@@ -199,9 +199,7 @@
       },
       //事件监听
       listenEvents() {
-        this.chatServer.$on('receivePrivateMsg', msg => {
-          this.chatList.push(msg);
-        });
+        this.chatServer.$on('receivePrivateMsg', msg => {});
       },
       //todo 待替换
       initScroll() {
@@ -218,46 +216,6 @@
           }
           preTop = top;
         };
-      },
-      //todo 移入domain
-      listenChat(msg, type) {
-        let findResult = false;
-        /* 倒序环更高效 */
-        const msg_id = msg.msgId || msg.msg_id;
-        for (let i = this.chatList.length - 1; i >= 0; i--) {
-          if (this.chatList[i].msg_id === msg_id) {
-            findResult = true;
-            break;
-          }
-        }
-        if (findResult) {
-          // 重复
-          return;
-        }
-        let obj = this.formatChatMsg(msg);
-        let chatList = JSON.parse(JSON.stringify(this.chatList));
-        if (chatList.length >= 100) {
-          chatList = chatList.splice(-100);
-        } else {
-          if (type === 'push') {
-            // 实时消息
-            chatList.push(obj);
-          } else {
-            // 历史聊天
-            if (this.page === 1) {
-              chatList.push(obj);
-            } else {
-              chatList.unshift(obj);
-            }
-          }
-        }
-        this.chatList = chatList;
-        this.scrollBottom();
-      },
-      initChat(group_channel_id) {
-        this.group_channel_id = group_channel_id;
-        this.chatList = [];
-        this.queryChatList();
       },
       nextPageChatList() {
         if (this.topLoading) return;
@@ -279,47 +237,9 @@
           // to_user: '16422715',
           to_user: this.selectUserId
         };
-        return this.chatServer
-          .getPrivateChatList(params)
-          .then(res => {
-            if (res.code == 200) {
-              res.data.list.forEach(ele => {
-                ele.data.text_content = textToEmojiText(ele.data.text_content);
-              });
-              this.chatList = res.data.list;
-              this.scrollBottom();
-            } else {
-              this.$message.warning(res.msg);
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      },
-      //todo 移入domain
-      historyChat(data) {
-        this.scrollEnd = data.list.length != this.page_size;
-        if (this.page > 1) {
-          data.list.forEach(chat => {
-            this.reChatHistory(chat);
-          });
-          this.$nextTick(() => {
-            this.computeScrollPosition(data.list.length);
-          });
-        } else {
-          data.list.reverse().forEach(chat => {
-            this.reChatHistory(chat);
-          });
-          let st = setTimeout(() => {
-            clearTimeout(st);
-            this.scrollBottom();
-          }, 100);
-        }
-        this.topLoading = false;
-      },
-      //todo 移入domain
-      reChatHistory(chat) {
-        this.listenChat(chat);
+        return this.chatServer.getPrivateChatHistoryList(params).then(() => {
+          this.scrollBottom();
+        });
       },
       //todo 移入domain
       formatChatMsg(msg) {
@@ -414,6 +334,7 @@
     width: 100%;
     height: 100%;
     padding: 20px 0;
+    box-sizing: border-box;
     overflow-y: auto;
     .private-chat__top-loading {
       height: 50px;

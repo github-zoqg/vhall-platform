@@ -135,14 +135,27 @@
           class="info-panel__allow-raise-hand"
           v-if="configList['ui.hide_handsUp'] && mode !== 6"
         >
-          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>
-          <el-switch
-            v-model="allowRaiseHand"
-            :width="32"
-            :disabled="disabledSwitchHand"
-            @change="onSwitchAllowRaiseHand"
-            active-color="#fc5659"
-          ></el-switch>
+          <!--          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>-->
+          <!--          <el-switch-->
+          <!--            v-model="allowRaiseHand"-->
+          <!--            :width="32"-->
+          <!--            :disabled="disabledSwitchHand"-->
+          <!--            @change="onSwitchAllowRaiseHand"-->
+          <!--            active-color="#fc5659"-->
+          <!--          ></el-switch>-->
+          <label class="lb-raisehands" for="lb-raisehands">
+            允许举手
+            <input
+              style="display: none"
+              v-model="allowRaiseHand"
+              @change="onSwitchAllowRaiseHand"
+              type="checkbox"
+              id="lb-raisehands"
+            />
+            <i class="ss">
+              <em></em>
+            </i>
+          </label>
         </div>
       </div>
       <!--按钮面板-->
@@ -644,8 +657,8 @@
           try {
             console.log('_this.groupServer:', _this.groupServer);
             console.log('_this.isInGroup:', _this.isInGroup);
-            const isLive = _this.isLive;
-            const isWatch = _this.isWatch;
+            const { isLive, isWatch } = _this;
+            const { context } = msg;
 
             // 上线的人是自己，不做操作
             if (isLive && msg.sender_id == _this.userId) {
@@ -659,6 +672,13 @@
                 ? _this.groupInitData.speaker_list
                 : _this.interactToolStatus.speaker_list || [];
               _this.totalNum = msg.uv;
+            }
+
+            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
+            if (isLive && _this.mode === 6) {
+              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
+                return false;
+              }
             }
 
             if (isLive) {
@@ -690,14 +710,6 @@
 
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
-            const { context } = msg;
-
-            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-            if (isLive && _this.mode === 6) {
-              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
-                return false;
-              }
-            }
 
             if (isLive) {
               const user = {
@@ -759,7 +771,9 @@
                     device_type: context.device_type,
                     role_name: context.role_name,
                     is_speak: speakIndex >= 0 ? 1 : 0,
-                    is_apply: 0
+                    is_apply: 0,
+                    is_banned:
+                      context && context.groupInitData ? Number(context.groupInitData.is_banned) : 0
                   };
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -1110,6 +1124,7 @@
 
         //  结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          console.log('GROUP_SWITCH_END', msg);
           handleEndGroupDiscuss(msg);
         });
 
@@ -1131,7 +1146,7 @@
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          if (!isWatch) return;
+          if (isLive) return;
           this.leader_id = msg.data.account_id;
           this.getOnlineUserList();
         });
@@ -1255,9 +1270,9 @@
           _this.onlineUsers = [];
           _this.getOnlineUserList();
         }
-        //分组--结束讨论
+        //
         function handleEndGroupDiscuss(msg) {
-          console.log(msg);
+          console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
           _this.getOnlineUserList();
         }
@@ -1530,7 +1545,7 @@
             console.log('switch-mic-status', res);
             //todo 上报埋点
             this.disabledSwitchHand = false;
-            this.$message.success({ message: this.$t('account.account_1059') });
+            this.$message.success({ message: '设置成功' });
           })
           .catch(err => {
             this.disabledSwitchHand = false;
@@ -1577,7 +1592,6 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
-        debugger;
         console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
@@ -2066,6 +2080,43 @@
           display: inline-block;
           vertical-align: middle;
           margin-right: 4px;
+        }
+        .lb-raisehands {
+          cursor: pointer;
+          color: #ccc;
+          font-size: 12px;
+          margin-right: 1px;
+          & > input:checked + i em {
+            border-color: #ff9446;
+            left: 22px;
+            transition: all 0.1s ease-in-out;
+          }
+          & > i {
+            display: inline-block;
+            width: 30px;
+            height: 14px;
+            background-color: #242527;
+            border-radius: 100px;
+            position: relative;
+            margin-left: 5px;
+            position: relative;
+            top: 3px;
+            & > em {
+              box-sizing: border-box;
+              position: absolute;
+              top: 2px;
+              left: 0px;
+              content: '';
+              width: 10px;
+              height: 10px;
+              background-color: #242527;
+              border: 2px solid #aaaaaa;
+              border-radius: 10px;
+              transition: all 0.1s ease-in-out;
+              backface-visibility: hidden;
+              transform-style: preserve-3d;
+            }
+          }
         }
       }
 

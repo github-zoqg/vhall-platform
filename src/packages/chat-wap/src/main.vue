@@ -188,7 +188,7 @@
 
       this.imgUrls = [];
       // 给聊天服务保存一份关键词
-      this.chatServer.setKeywordList(this.keywordList);
+      // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
       console.log('useChatServer', useChatServer().state);
@@ -254,7 +254,7 @@
       //处理分组讨论频道变更
       handleChannelChange() {
         this.page = 0;
-        useChatServer().clearHistoryMsg();
+        useChatServer().clearChatMsg();
         this.getHistoryMessage();
       },
       // 获取历史消息
