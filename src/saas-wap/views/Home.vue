@@ -64,8 +64,6 @@
         const isEmbed = clientType === 'embed';
         const hasInviteCode = this.$route.query.invite;
 
-        debugger;
-
         if (
           isWechatBrowser &&
           !isEmbed &&
