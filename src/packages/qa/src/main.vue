@@ -173,7 +173,7 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        const { configList = {} } = this.roomBaseServer.state;
+        const { configList = {} } = useRoomBaseServer().state;
         if (
           ![1, '1'].includes(this.roleName) &&
           ['', null, 0].includes(
