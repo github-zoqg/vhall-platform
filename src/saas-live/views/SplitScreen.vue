@@ -1,36 +1,31 @@
 <template>
-  <div class="vmp-split-screen">
-    <div class="vmp-split-screen__tip">
-      <span class="tip-txt">分屏模式</span>
-      <span
-        class="exit-shadow vh-iconfont vh-line-close"
-        @click="exitShadow"
-        title="退出分屏"
-      ></span>
-      <span
-        class="v-fullScreen vh-iconfont"
-        :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
-        @click="enterFullScreen"
-        title="全屏"
-      ></span>
-    </div>
-
-    <vmp-air-container v-if="dataReady" cuid="comStreamList"></vmp-air-container>
+  <div
+    class="vmp-split-screen-wrap"
+    v-loading="state === 0"
+    element-loading-text="加载中..."
+    element-loading-background="rgba(255, 255, 255, 0.1)"
+  >
+    <vmp-air-container v-if="state === 1" cuid="splitScreenRoot"></vmp-air-container>
+    <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
+    <Chrome v-else-if="state === 3"></Chrome>
   </div>
 </template>
 
 <script>
-  import roomState from '../headless/room-state.js';
+  import splitScreenState from '../headless/split-screen-state';
+  import MsgTip from './MsgTip';
+  import Chrome from './Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
   export default {
-    name: 'SplitScreen',
     data() {
       return {
         state: 0,
-        errMsg: '',
-        isFullscreen: false,
-        dataReady: false
+        errMsg: ''
       };
+    },
+    components: {
+      MsgTip,
+      Chrome
     },
     async created() {
       try {
@@ -39,10 +34,32 @@
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
 
-        const res = await roomState();
-
+        domain.initVhallReport(
+          {
+            bu: 0,
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            webinar_id: this.$route.params.id,
+            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            os: 10,
+            type: 4,
+            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            pf: 7,
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          },
+          {
+            namespace: 'saas', //业务线
+            env: 'test', // 环境
+            method: 'post' // 上报方式
+          }
+        );
+        const res = await splitScreenState();
+        // 如果浏览器不支持
+        if (res === 'isBrowserNotSupport') {
+          this.state = 3;
+          return;
+        }
         console.log('%c---初始化直播房间 完成', 'color:blue');
-        this.dataReady = true;
+        this.state = 1;
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
@@ -52,6 +69,7 @@
             location.search
           }`;
         }
+        this.state = 2;
         this.errMsg = err.msg;
       }
     },
@@ -60,7 +78,7 @@
       initSendLive() {
         const { id } = this.$route.params;
         return new Domain({
-          plugins: ['chat', 'doc', 'interaction'],
+          plugins: ['chat', 'interaction'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
@@ -71,103 +89,14 @@
             check_online: 0 // 不检查主持人是否在房间
           }
         });
-      },
-      enterFullScreen() {},
-      exitShadow() {}
+      }
     }
   };
 </script>
 
 <style lang="less">
-  .vmp-split-screen {
-    &:hover {
-      .vmp-split-screen__tip {
-        display: flex;
-      }
-    }
+  .vmp-split-screen-wrap {
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background: #2d2d2d;
-    flex: 1;
-    height: 100%;
-    background-color: #2d2d2d;
-    display: -webkit-box;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    flex-direction: column;
-    position: relative;
-
-    .vmp-split-screen__tip {
-      display: none;
-      position: fixed;
-      z-index: 12;
-      width: 100%;
-      height: 50px;
-      background-color: #434343;
-      color: white;
-      // display: -webkit-box;
-      // display: flex;
-      -webkit-box-align: center;
-      align-items: center;
-      padding: 0 20px;
-      -webkit-box-pack: justify;
-      justify-content: space-between;
-      .exit-shadow {
-        cursor: pointer;
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        font-size: 18px;
-        color: #fff;
-        position: absolute;
-        top: 8px;
-        right: 44px;
-      }
-      .v-fullScreen {
-        cursor: pointer;
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        font-size: 18px;
-        color: #fff;
-        position: absolute;
-        top: 8px;
-        right: 100px;
-      }
-    }
-    /deep/ & {
-      #vhall-subcribe-screen {
-        position: fixed;
-        top: 0;
-        right: 0;
-        left: 0;
-        bottom: 0;
-        z-index: 10;
-      }
-
-      .vhall-remote-strams-box {
-        -webkit-box-align: center;
-        align-items: center;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        margin: auto;
-        overflow: hidden;
-        overflow: hidden;
-        height: 100%;
-        .vhall-subStream-box--pophover {
-          display: none !important;
-        }
-
-        &:hover {
-          .vhall-subStream-box--pophover {
-            display: none !important;
-          }
-        }
-      }
-    }
   }
 </style>

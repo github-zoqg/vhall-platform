@@ -36,10 +36,10 @@
             class="header-right_control_wrap-container-setting"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
             v-if="configList['is_interact'] && isShowSplitScreen && isSupportSplitScreen"
-            @click="splitScreen"
+            @click="handleSplitScreenChange"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
-            <p>{{ splitStatus == 2 ? '分屏' : '关闭分屏' }}</p>
+            <p>{{ isOpenSplitScreen ? '关闭分屏' : '分屏' }}</p>
           </div>
           <!-- <div
             class="header-right_control_wrap-container-setting"
@@ -89,7 +89,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useSplitScreenServer } from 'middle-domain';
   export default {
     name: 'HeaderControl',
     props: {
@@ -132,6 +132,10 @@
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是否开启分屏
+      isOpenSplitScreen() {
+        return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
       }
     },
     data() {
@@ -141,7 +145,6 @@
         thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
         webinarInfo: {}, //活动下信息
-        splitStatus: 2, //分屏状态
         roleMap: {
           1: '主持人',
           2: '观众',
@@ -152,6 +155,7 @@
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
+      this.splitScreenServer = useSplitScreenServer();
       this.roomBaseState = this.roomBaseServer.state;
       this.userInfo = this.roomBaseState.watchInitData.join_info;
       this.webinarInfo = this.roomBaseState.watchInitData.webinar;
@@ -159,18 +163,33 @@
         this.isThirtPushStream = true;
       }
     },
+    mounted() {
+      this.addEventListener();
+    },
     methods: {
+      addEventListener() {
+        // 分屏关闭事件
+        this.splitScreenServer.$on('SPLIT_SCREEN_CLOSE', () => {});
+      },
+      // 分屏状态更改
+      handleSplitScreenChange() {
+        if (this.isOpenSplitScreen) {
+          this.splitScreenServer.closeSplit();
+        } else {
+          const search = location.search
+            ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
+            : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+          const url =
+            process.env.NODE_ENV === 'development'
+              ? `${window.location.origin}`
+              : `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}`;
+          const retUrl = `${url}/lives/split-screen/${this.$route.params.id}${search}`;
+          this.splitScreenServer.openSplit(retUrl);
+        }
+      },
       openMediaSettings() {
         // TODO 媒体设置弹窗
         this.$emit('openMediaSettings');
-      },
-      splitScreen() {
-        //分屏
-        if (this.splitStatus == 2) {
-          this.$emit('startSplit');
-        } else {
-          this.$emit('endSplit');
-        }
       },
       roleQuit() {
         // 角色退出

@@ -762,13 +762,6 @@ export const serverConfig = {
         cuid: 'comMediaSetting',
         method: 'showMediaSetting'
       }
-    ],
-    emitSplitScreenClick: [
-      {
-        cuid: 'comStreamList',
-        method: 'toggleSplitScreen',
-        args: ['$0'] // 获取动态参数的第一个
-      }
     ]
   },
   // 【录制页面】上麦流列表
@@ -804,6 +797,19 @@ export const serverConfig = {
     children: ['dlgDocList', 'comMediaSetting']
   },
   // *******录制页面****结束
+
+  // *******分屏页面****开始
+  // 【分屏页面】根组件
+  splitScreenRoot: {
+    component: 'VmpAirContainer',
+    children: ['splitScreenContainer']
+  },
+  // 【分屏页面】分屏组件
+  splitScreenContainer: {
+    component: 'VmpSplitScreen',
+    children: ['comStreamLocal']
+  },
+  // *******分屏页面****结束
 
   // 客户端嵌入页组件
   embedClientRoot: {

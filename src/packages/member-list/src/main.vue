@@ -1534,7 +1534,7 @@
         }
         const params = {
           room_id: this.roomId,
-          status: status ? 1 : 0
+          status: this.allowRaiseHand ? 1 : 0
         };
 
         //todo 待micServer这边完善方法

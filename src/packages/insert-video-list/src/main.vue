@@ -189,6 +189,7 @@
         const insertFileServer = useInsertFileServer();
         const { watchInitData } = useRoomBaseServer().state;
         const { isInsertFilePushing, insertStreamInfo } = insertFileServer.state;
+        console.log('---点击插播文件按钮----', insertStreamInfo);
 
         // 如果是直播状态需要判断当前主持人是否是用网页发起直播
         if (watchInitData.switch.start_type != 1 && watchInitData.webinar.type == 1) {
@@ -205,7 +206,7 @@
         // 如果在插播中，并且不是当前用户插播，alert提示
         if (
           isInsertFilePushing &&
-          insertStreamInfo.accountId != watchInitData.join_info.third_party_user_id
+          insertStreamInfo.userInfo.accountId != watchInitData.join_info.third_party_user_id
         ) {
           const roleMap = {
             1: '主持人',
@@ -214,8 +215,8 @@
           };
 
           this.$alert(
-            `${roleMap[insertStreamInfo.role]}${
-              insertStreamInfo.role != 1 ? insertStreamInfo.nickname : ''
+            `${roleMap[insertStreamInfo.userInfo.role]}${
+              insertStreamInfo.userInfo.role != 1 ? insertStreamInfo.userInfo.nickname : ''
             }正在插播文件，请稍后重试`,
             '',
             {
@@ -386,7 +387,7 @@
         // 如果当前角色正在进行插播，需要先确认
         if (
           insertFileServerState.isInsertFilePushing &&
-          insertFileServerState.insertStreamInfo.accountId ==
+          insertFileServerState.insertStreamInfo.userInfo.accountId ==
             watchInitData.join_info.third_party_user_id
         ) {
           this.$confirm('是否中断播放中视频，并替换播放？', '提示', {
