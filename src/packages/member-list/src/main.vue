@@ -983,6 +983,10 @@
             member_info,
             'onlineUsers'
           );
+          //如果已经没有举手的人，清除一下举手一栏的小红点
+          if (!_this.applyUsers.length) {
+            _this.raiseHandTip = false;
+          }
           if (msg.data.room_join_id == _this.userId && msg.data.room_role == 2) {
             return;
           }

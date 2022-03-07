@@ -54,7 +54,7 @@
             class="item-status"
             :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
           >
-            {{ stateArr[item.webinar_state - 1].value }}
+            {{ liveTag(item) }}
             <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
               | {{ $t('common.common_1023') }}
             </span>
@@ -133,6 +133,34 @@
       this.hasDelayPermission = this.$route.query.delay;
     },
     methods: {
+      liveTag(val) {
+        /**
+         * webinar_state  1直播 2预约 3结束 4点播 5回放
+         * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播 6 分组直播
+         */
+        const liveTypeStr = [
+          '',
+          this.$t('common.common_1018'),
+          this.$t('common.common_1019'),
+          this.$t('common.common_1020'),
+          this.$t('common.common_1024'),
+          this.$t('common.common_1021')
+        ];
+        const liveStatusStr = [
+          '',
+          this.$t('common.common_1026'),
+          this.$t('common.common_1027'),
+          this.$t('common.common_1028'),
+          '',
+          '',
+          this.$t('common.common_1029')
+        ];
+        let str = liveTypeStr[val.webinar_state];
+        if (val.webinar_state != 4 && val.webinar_type != 5) {
+          str += ` | ${liveStatusStr[val.webinar_type]}`;
+        }
+        return str;
+      },
       async getDetail() {
         try {
           const res = await this.subjectServer.getSubjectInfo({
