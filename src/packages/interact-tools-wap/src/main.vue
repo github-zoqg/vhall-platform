@@ -3,7 +3,7 @@
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
       <div
-        v-if="!isBanned && (isAllowhandup || isSpeakOn) && !live_over"
+        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && !live_over"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
       >
@@ -77,7 +77,8 @@
     useMicServer,
     useChatServer,
     useGroupServer,
-    useInteractiveServer
+    useInteractiveServer,
+    useMediaCheckServer
   } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
@@ -129,9 +130,21 @@
       };
     },
     computed: {
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
+      },
       // 是否开启举手
       isAllowhandup() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        const mode = this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+        if (mode !== 6 && this.device_status === 1) {
+          if (status) {
+            this.$toast(this.$t('interact.interact_1003'));
+          } else {
+            this.$toast(this.$t('interact.interact_1002'));
+          }
+        }
         return status;
       },
       // 是否是上麦状态
@@ -169,7 +182,7 @@
       });
 
       // 结束直播
-      useInteractiveServer.$on('live_over', () => {
+      useInteractiveServer().$on('live_over', () => {
         this.live_over = true;
       });
     },

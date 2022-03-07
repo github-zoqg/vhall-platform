@@ -36,7 +36,7 @@
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="!isBanned && isInteractLive">
+    <div class="vmp-footer-tools__center" v-if="device_status === 1 && !isBanned && isInteractLive">
       <handup></handup>
     </div>
     <!-- 互动工具 -->
@@ -108,7 +108,8 @@
     useMsgServer,
     useMicServer,
     useChatServer,
-    useGroupServer
+    useGroupServer,
+    useMediaCheckServer
   } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -221,6 +222,10 @@
       isEmbedVideo() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
       }
     },
     beforeCreate() {

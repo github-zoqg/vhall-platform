@@ -153,7 +153,11 @@ export const serverConfig = {
     children: ['comStreamLocal', 'comStreamRemote']
   },
   comStreamLocal: {
-    component: 'VmpStreamLocal'
+    component: 'VmpStreamLocal',
+    initPlayer: {
+      cuid: 'comPcPlayer',
+      method: 'getWebinerStatus'
+    }
   },
   comStreamRemote: {
     component: 'VmpStreamRemote'

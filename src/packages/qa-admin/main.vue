@@ -740,7 +740,7 @@
       replyBut(val) {
         this.reply(val, val.item, val.index);
       },
-      async reply(val, item, index) {
+      reply: debounce(async function (val, item, index) {
         if (typeof val == 'object') {
           if (val.type == 'private') {
             await this.$refs.privateChat.openModal();
@@ -784,7 +784,7 @@
               });
           }
         }
-      },
+      }, 300),
       async messClick() {
         console.warn('qa messClick---------->', this.priteChatList);
         this.privateFlag = true;
@@ -824,7 +824,7 @@
           })
           .join(' ');
       },
-      textReply() {
+      textReply: debounce(function () {
         if (this.sendMessage.text.trim() == '') {
           return this.$message.warning('请输入回复内容!');
         }
@@ -839,13 +839,11 @@
           .then(res => {
             if (res.code == 200) {
               if (this.activeIndex == 2) {
-                debounce(() => {
-                  this.setReply(0);
-                }, 500);
+                this.setReply(0);
               }
             }
           });
-      }
+      }, 300)
     }
   };
 </script>
