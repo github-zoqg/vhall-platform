@@ -77,6 +77,7 @@
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
+        this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
@@ -112,6 +113,16 @@
             email
           }
         });
+      },
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.errMsg = '您已被禁止访问当前活动';
       }
     }
   };
