@@ -56,14 +56,6 @@
       // 是否开启举手
       isAllowhandup() {
         const status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
-        const mode = this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-        if (mode !== 6) {
-          if (status) {
-            this.$message.success(this.$t('interact.interact_1003'));
-          } else {
-            this.$message.success(this.$t('interact.interact_1002'));
-          }
-        }
         return status;
       },
       // 是否已上麦
@@ -97,6 +89,14 @@
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$message.warning(this.$t('interact.interact_1028'));
+      });
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        this.$message.success(this.$t('interact.interact_1003'));
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        this.$message.success(this.$t('interact.interact_1002'));
       });
 
       /**

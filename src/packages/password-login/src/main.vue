@@ -308,7 +308,7 @@
           webinarId: this.$route.params.id,
           is_no_check: 1
         };
-        return this.keyLoginServer
+        return this.roomBaseServer
           .getWebinarInfo(params)
           .then(res => {
             const { code = '', data = {}, msg = '' } = res || {};

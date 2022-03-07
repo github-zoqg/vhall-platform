@@ -57,7 +57,7 @@
       >
         <div class="interact-gift-box">
           <p class="new-gift-name">
-            {{ source.nickName | textOverflowSlice(10) }}
+            {{ source.nickname | textOverflowSlice(10) }}
           </p>
           <p class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | textOverflowSlice(10) }}

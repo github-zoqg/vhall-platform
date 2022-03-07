@@ -62,8 +62,8 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  await splitScreenServer.init();
-  console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
+  // await splitScreenServer.init();
+  // console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
 
   if (!splitScreenServer.state.isOpenSplitScreen) {
     // 没有开启分屏则初始化互动

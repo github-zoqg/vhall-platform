@@ -21,7 +21,7 @@
       <template v-if="remoteStreams.length">
         <div
           v-for="stream in remoteStreams"
-          :key="stream.id"
+          :key="stream.streamId"
           class="vmp-stream-list__remote-container"
           :class="{
             'vmp-stream-list__main-screen': stream.accountId == mainScreen,

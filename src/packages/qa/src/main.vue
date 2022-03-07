@@ -173,9 +173,12 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
+        const { configList = {} } = this.roomBaseServer.state;
         if (
           ![1, '1'].includes(this.roleName) &&
-          ['', null, 0].includes(this.userId || this.Embed)
+          ['', null, 0].includes(
+            this.userId || this.Embed || configList['ui.show_chat_without_login'] == 1
+          )
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';

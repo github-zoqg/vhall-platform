@@ -127,7 +127,11 @@
           console.error('销毁预览失败', error);
         }
       },
-      success() {
+      async success() {
+        // 释放视频设备权限
+        if (this.localStreamId) {
+          await this.stopVideoPreview();
+        }
         this.$emit('next', { result: 'success' });
       },
       fail() {

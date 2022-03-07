@@ -1,5 +1,5 @@
 <template>
-  <div class="subject-detail">
+  <div class="subject-detail" v-if="showSubject">
     <div class="subject-poster">
       <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
     </div>
@@ -54,7 +54,7 @@
             class="item-status"
             :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
           >
-            {{ stateArr[item.webinar_state - 1].value }}
+            {{ liveTag(item) }}
             <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
               | {{ $t('common.common_1023') }}
             </span>
@@ -72,6 +72,11 @@
       </article>
     </section>
   </div>
+  <!-- 没有此专题 -->
+  <div v-else class="error-page">
+    <img src="./img/subject_null.png" alt="" />
+    <p>专题已下线</p>
+  </div>
 </template>
 
 <script>
@@ -82,6 +87,7 @@
     data() {
       return {
         open_hide: false,
+        showSubject: true,
         detailInfo: {
           webinar_subject: {
             cover: '',
@@ -127,12 +133,41 @@
       this.hasDelayPermission = this.$route.query.delay;
     },
     methods: {
+      liveTag(val) {
+        /**
+         * webinar_state  1直播 2预约 3结束 4点播 5回放
+         * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播 6 分组直播
+         */
+        const liveTypeStr = [
+          '',
+          this.$t('common.common_1018'),
+          this.$t('common.common_1019'),
+          this.$t('common.common_1020'),
+          this.$t('common.common_1024'),
+          this.$t('common.common_1021')
+        ];
+        const liveStatusStr = [
+          '',
+          this.$t('common.common_1026'),
+          this.$t('common.common_1027'),
+          this.$t('common.common_1028'),
+          '',
+          '',
+          this.$t('common.common_1029')
+        ];
+        let str = liveTypeStr[val.webinar_state];
+        if (val.webinar_state != 4 && val.webinar_type != 5) {
+          str += ` | ${liveStatusStr[val.webinar_type]}`;
+        }
+        return str;
+      },
       async getDetail() {
         try {
           const res = await this.subjectServer.getSubjectInfo({
             subject_id: this.$route.query.id
           });
           if (res.code !== 200) {
+            this.showSubject = false;
             this.$toast(res.msg);
             return;
           }
@@ -349,7 +384,9 @@
         word-break: break-all;
         text-overflow: ellipsis;
         display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+        /* autoprefixer: off */
         -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+        /* autoprefixer: on */
         -webkit-line-clamp: 2; /** 显示的行数 **/
         overflow: hidden; /** 隐藏超出的内容 **/
       }
@@ -381,6 +418,22 @@
       // width: 116px;
       height: 50px;
       vertical-align: bottom;
+    }
+  }
+
+  .error-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50%;
+    img {
+      width: 460px;
+      height: 200px;
+    }
+    p {
+      padding-top: 30px;
     }
   }
 </style>
