@@ -314,13 +314,14 @@
         isWatch: false
       };
     },
-    beforeCreate() {
+    async beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.msgServer = useMsgServer();
       this.micServer = useMicServer();
       this.memberServer = useMemberServer();
       this.interactiveServer = useInteractiveServer();
       this.groupServer = useGroupServer();
+      await this.interactiveServer.init();
     },
     beforeDestroy() {},
     async mounted() {
