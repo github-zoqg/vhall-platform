@@ -1,5 +1,5 @@
 <template>
-  <div class="subject-detail">
+  <div class="subject-detail" v-if="showSubject">
     <div class="subject-poster">
       <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
     </div>
@@ -72,6 +72,11 @@
       </article>
     </section>
   </div>
+  <!-- 没有此专题 -->
+  <div v-else class="error-page">
+    <img src="./img/subject_null.png" alt="" />
+    <p>专题已下线</p>
+  </div>
 </template>
 
 <script>
@@ -82,6 +87,7 @@
     data() {
       return {
         open_hide: false,
+        showSubject: true,
         detailInfo: {
           webinar_subject: {
             cover: '',
@@ -133,6 +139,7 @@
             subject_id: this.$route.query.id
           });
           if (res.code !== 200) {
+            this.showSubject = false;
             this.$toast(res.msg);
             return;
           }
@@ -349,7 +356,9 @@
         word-break: break-all;
         text-overflow: ellipsis;
         display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+        /* autoprefixer: off */
         -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+        /* autoprefixer: on */
         -webkit-line-clamp: 2; /** 显示的行数 **/
         overflow: hidden; /** 隐藏超出的内容 **/
       }
@@ -381,6 +390,22 @@
       // width: 116px;
       height: 50px;
       vertical-align: bottom;
+    }
+  }
+
+  .error-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50%;
+    img {
+      width: 460px;
+      height: 200px;
+    }
+    p {
+      padding-top: 30px;
     }
   }
 </style>

@@ -38,6 +38,7 @@
         </span>
         <span
           class="gift-img"
+          :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
             backgroundImage: `url(${rewardEffectInfo.data.gift_image_url}?x-oss-process=image/resize,m_lfit,w_100)`
           }"
@@ -266,12 +267,18 @@
       width: 78px;
       height: 56px;
       position: absolute;
-      right: -8px;
-      bottom: 10px;
+      right: 11px;
+      bottom: 11px;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
       z-index: 10;
+    }
+    .zdy-gigt-img {
+      width: 42px;
+      height: 42px;
+      background-color: white;
+      border-radius: 50%;
     }
     .nick-name {
       width: 252px;
