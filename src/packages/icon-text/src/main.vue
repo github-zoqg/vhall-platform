@@ -65,6 +65,7 @@
     font-size: 12px;
     color: #ececec;
     padding: 10px 0px;
+    cursor: pointer;
 
     span.text {
       font-size: 12px;
@@ -80,9 +81,9 @@
       font-size: 22px;
     }
 
-    &:hover {
-      cursor: pointer;
-    }
+    // &:hover {
+    //   cursor: pointer;
+    // }
 
     &.selected {
       span.text,
@@ -92,10 +93,14 @@
     }
 
     &.disable {
+      cursor: default;
       span.text,
       i {
         color: #777777;
       }
+      // &:hover {
+      //   cursor: default;
+      // }
     }
   }
 </style>

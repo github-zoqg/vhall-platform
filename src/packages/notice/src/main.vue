@@ -42,6 +42,7 @@
 </template>
 <script>
   import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
+  import { debounce } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -142,7 +143,7 @@
       /**
        * 发送一条公告
        */
-      async sendNotice() {
+      sendNotice: debounce(function () {
         if (this.inputVal === '' || this.inputVal === undefined) {
           return this.$message.warning('内容不能为空');
         }
@@ -153,14 +154,13 @@
           channel_id: this.watchInitData.interact.channel_id,
           content: this.inputVal
         };
-
         try {
-          await this.noticeServer.sendNotice(params);
+          this.noticeServer.sendNotice(params);
           this.inputVal = '';
         } catch (error) {
           console.warn('发送公告消息错误', error);
         }
-      }
+      })
     }
   };
 </script>

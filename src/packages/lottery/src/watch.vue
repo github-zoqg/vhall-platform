@@ -225,6 +225,6 @@
     right: 0;
     z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: 102;
   }
 </style>

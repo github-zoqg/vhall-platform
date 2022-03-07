@@ -554,11 +554,12 @@
       },
       //是否展示设为主讲按钮(PC发起)
       isShowSetSpeaker() {
-        if (!this.isInGroup || this.tabIndex !== 1) {
+        if (this.tabIndex !== 1) {
           return false;
         }
         return (
-          this.isInteract &&
+          !this.isInGroup &&
+          !!this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
           this.mainScreen != this.userInfo.account_id
@@ -760,6 +761,9 @@
       //处理指令
       handleCommand(command) {
         switch (command) {
+          case 'setSpeaker':
+            this.$emit('operateUser', { type: 'setSpeaker', params: this.userInfo });
+            break;
           case 'setBanned':
             this.handleSetBanned();
             break;

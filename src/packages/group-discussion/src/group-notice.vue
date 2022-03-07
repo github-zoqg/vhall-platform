@@ -11,7 +11,7 @@
       <template slot="title">
         <span class="title">小组公告</span>
         <div class="help-icon">
-          <i class="el-tooltip iconfont iconicon_help_m"></i>
+          <i class="el-tooltip vh-iconfont vh-line-question"></i>
           <div class="help-tooltip">
             <p>1.小组公告仅适用于小组讨论开始后，向各小组成员发送消息</p>
             <p>2.小组公告发送后，仅小组内成员可见</p>
