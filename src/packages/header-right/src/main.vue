@@ -21,7 +21,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && liveStep != 1">
+      <template v-if="roleName == 4 && isLiving">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -47,7 +47,6 @@
           :isShowThirdParty="isShowThirdParty"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
-          @startSplit="startSplit"
           @thirdPushStream="thirdPushStream"
         ></headerControl>
       </div>
@@ -144,6 +143,9 @@
       },
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.type == 1;
       }
     },
     components: {
@@ -259,10 +261,6 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
-      },
-      // 打开分屏
-      startSplit() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSplitScreenClick'));
       },
       // 打开媒体设置弹窗
       openMediaSettings() {

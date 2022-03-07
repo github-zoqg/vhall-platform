@@ -486,7 +486,10 @@
           const el = document.getElementById('vmp-insert-stream-video');
           el.innerHTML = '';
         }
-        // this.$refs.insertStream && this.$refs.insertStream.destroy();
+        if (this.$refs.insertStream) {
+          this.$refs.insertStream && this.$refs.insertStream.destroy();
+          this.$refs.insertStream.initPlayer();
+        }
         // 关闭插播列表弹窗
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')

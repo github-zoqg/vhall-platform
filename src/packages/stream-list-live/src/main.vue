@@ -274,12 +274,6 @@
         });
         observer.observe(this.$refs.streamList, { childList: true, subtree: true });
       },
-      // 开启 / 关闭分屏
-      toggleSplitScreen(command) {
-        if (command === 'open') {
-          this.splitScreenServer.startSplit();
-        }
-      },
       PopAlertOfflineClose() {
         this.PopAlertOffline.visible = false;
       },
