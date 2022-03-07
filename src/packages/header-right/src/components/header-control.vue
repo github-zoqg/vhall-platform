@@ -90,7 +90,6 @@
 </template>
 <script>
   import { useRoomBaseServer, useSplitScreenServer } from 'middle-domain';
-  import qs from 'qs';
   export default {
     name: 'HeaderControl',
     props: {

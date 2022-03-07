@@ -21,7 +21,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4">
+      <template v-if="roleName == 4 && isLiving">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -138,6 +138,9 @@
       },
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.type == 1;
       }
     },
     components: {
