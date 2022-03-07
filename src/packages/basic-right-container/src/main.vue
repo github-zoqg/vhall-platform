@@ -51,7 +51,6 @@
     created() {
       // 结束直播
       useInteractiveServer().$on('live_over', () => {
-        alert(78);
         this.live_over = true;
       });
       // TODO试看逻辑在这里写判断
