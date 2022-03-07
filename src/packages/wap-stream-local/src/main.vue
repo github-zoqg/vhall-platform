@@ -44,7 +44,13 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer,
+    useMsgServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -131,6 +137,17 @@
         await this.micServer.userSpeakOn();
       }
 
+      useMsgServer().$onMsg('ROOM_MSG', async msg => {
+        // live_over 结束直播  停止推流,
+        if (msg.data.type == 'live_over') {
+          if (this.micServer.state.isSpeakOn) {
+            await this.micServer.speakOff();
+            await this.stopPush();
+            this.interactiveServer.destroy();
+          }
+        }
+      });
+
       // 主持人同意上麦申请
       this.micServer.$on('vrtc_connect_agree', async () => {
         this.userSpeakOn();
@@ -147,7 +164,6 @@
             // 开始推流
             this.startPush();
           } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-            console.warn('------------cxs----');
             //  初始化互动实例
             await this.interactiveServer.init();
             // 开始推流
@@ -164,16 +180,6 @@
         if (this.isNoDelay === 1 || this.mode === 6) {
           //  初始化互动实例
           this.interactiveServer.init();
-        }
-      });
-
-      //监听直播结束的通知，下麦并停止推流
-      this.interactiveServer.$on('live_over', async () => {
-        // console.warn('-----？？？');
-        if (this.micServer.state.isSpeakOn) {
-          await this.micServer.speakOff();
-          await this.stopPush();
-          this.interactiveServer.destroy();
         }
       });
 
@@ -238,6 +244,8 @@
           // 麦位已满，上麦失败
           this.$message.error(`上麦席位已满员，您的账号支持${res.data.replace_data}人上麦`);
           // TODO: 麦位已满的处理
+        } else {
+          console.error('上麦接口失败----', res);
         }
         return false;
       },

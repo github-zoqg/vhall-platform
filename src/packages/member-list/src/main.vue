@@ -501,30 +501,60 @@
           const { type = '' } = temp.data || {};
           switch (type) {
             case 'disable':
-              _this.changeUserStatus(temp.data.target_id, _this.onlineUsers, {
-                is_banned: 1
-              });
-              _this.changeUserStatus(temp.data.target_id, _this.limitedUsers, {
-                is_banned: 1
-              });
-              _this.changeUserStatus(temp.data.target_id, _this.applyUsers, {
-                is_banned: 1
-              });
+              _this.changeUserStatus(
+                temp.data.target_id,
+                _this.onlineUsers,
+                {
+                  is_banned: 1
+                },
+                'onlineUsers'
+              );
+              _this.changeUserStatus(
+                temp.data.target_id,
+                _this.limitedUsers,
+                {
+                  is_banned: 1
+                },
+                'limitedUsers'
+              );
+              _this.changeUserStatus(
+                temp.data.target_id,
+                _this.applyUsers,
+                {
+                  is_banned: 1
+                },
+                'applyUsers'
+              );
               // 禁言并且是举手列表
               if (_this.tabIndex === 2) {
-                _this._deleteUser(temp.data.target_id, _this.applyUsers);
+                _this._deleteUser(temp.data.target_id, _this.applyUsers, 'applyUsers');
               }
               break;
             case 'permit':
-              _this.changeUserStatus(temp.data.target_id, _this.onlineUsers, {
-                is_banned: 0
-              });
-              _this.changeUserStatus(temp.data.target_id, _this.limitedUsers, {
-                is_banned: 0
-              });
-              _this.changeUserStatus(temp.data.target_id, _this.applyUsers, {
-                is_banned: 0
-              });
+              _this.changeUserStatus(
+                temp.data.target_id,
+                _this.onlineUsers,
+                {
+                  is_banned: 0
+                },
+                'onlineUsers'
+              );
+              _this.changeUserStatus(
+                temp.data.target_id,
+                _this.limitedUsers,
+                {
+                  is_banned: 0
+                },
+                'limitedUsers'
+              );
+              _this.changeUserStatus(
+                temp.data.target_id,
+                _this.applyUsers,
+                {
+                  is_banned: 0
+                },
+                'applyUsers'
+              );
               _this.limitedUsers.forEach((item, index) => {
                 if (item.account_id == temp.data.target_id) {
                   _this.limitedUsers.splice(index, 1);
@@ -646,10 +676,20 @@
         function handleDeviceCheck(msg) {
           const { member_info = {} } = msg.data;
           if (![2, '2'].includes(msg.data.device_type)) {
-            _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
+            _this.changeUserStatus(
+              msg.data.room_join_id,
+              _this.onlineUsers,
+              member_info,
+              'onlineUsers'
+            );
           }
           if (![0, '0'].includes(msg.data.device_status)) {
-            _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
+            _this.changeUserStatus(
+              msg.data.room_join_id,
+              _this.onlineUsers,
+              member_info,
+              'onlineUsers'
+            );
           }
         }
         //用户加入房间
@@ -672,6 +712,7 @@
                 ? _this.groupInitData.speaker_list
                 : _this.interactToolStatus.speaker_list || [];
               _this.totalNum = msg.uv;
+              _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
             // 如果是分组直播 主持人/助理在主房间,小组内观众上线
@@ -689,6 +730,7 @@
                   ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
                     ? groupUsersNumber
                     : 0);
+              _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
             if (isWatch && !_this.isInGroup && index >= 0) {
@@ -823,14 +865,19 @@
                 ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
                   ? _this.groupServer.state.groupedUserList.length
                   : 0);
+            _this.memberServer.updateState('totalNum', _this.totalNum);
           }
 
           if (isWatch) {
             _this.totalNum = msg.uv;
+            _this.memberServer.updateState('totalNum', _this.totalNum);
           }
-          _this.totalNum < 0 && (_this.totalNum = 0);
-          _this._deleteUser(msg.sender_id, _this.onlineUsers, 'leave');
-          _this._deleteUser(msg.sender_id, _this.applyUsers);
+          if (_this.totalNum < 0) {
+            _this.totalNum = 0;
+            _this.memberServer.updateState('totalNum', _this.totalNum);
+          }
+          _this._deleteUser(msg.sender_id, _this.onlineUsers, 'onlineUsers');
+          _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
           setTimeout(() => {
             _this.refresh();
           }, 50);
@@ -868,7 +915,7 @@
           _this.applyUsers.unshift(user);
 
           _this.applyUsers = _.uniqBy(_this.applyUsers, 'account_id'); // 去重
-          _this.changeUserStatus(user.account_id, _this.onlineUsers, member_info);
+          _this.changeUserStatus(user.account_id, _this.onlineUsers, member_info, 'onlineUsers');
           // 申请30秒后从列表去掉
           _this.handsUpTimerList[user.account_id] &&
             clearTimeout(_this.handsUpTimerList[user.account_id]);
@@ -877,9 +924,14 @@
             _this.handsUpTimerList[user.account_id] &&
               clearTimeout(_this.handsUpTimerList[user.account_id]);
             delete _this.handsUpTimerList[user.account_id];
-            _this.changeUserStatus(user.account_id, _this.onlineUsers, {
-              is_apply: 0
-            });
+            _this.changeUserStatus(
+              user.account_id,
+              _this.onlineUsers,
+              {
+                is_apply: 0
+              },
+              'onlineUsers'
+            );
             _this.applyUsers = _this.applyUsers.filter(u => u.account_id !== user.account_id);
             if (!_this.applyUsers.length) {
               _this.raiseHandTip = false;
@@ -893,8 +945,13 @@
           const { member_info = { is_apply: 0 } } = msg.data;
           //发起端举手提示
           _this.raiseHandTip = false;
-          _this._deleteUser(msg.data.room_join_id, _this.applyUsers);
-          _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
+          _this._deleteUser(msg.data.room_join_id, _this.applyUsers, 'applyUsers');
+          _this.changeUserStatus(
+            msg.data.room_join_id,
+            _this.onlineUsers,
+            member_info,
+            'onlineUsers'
+          );
           _this.handsUpTimerList[msg.data.room_join_id] &&
             clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]); // 取消下麦清除定时器
           delete _this.handsUpTimerList[msg.data.room_join_id];
@@ -906,16 +963,30 @@
             return;
           }
           if (_this.memberOptions.platformType === 'watch') {
-            _this.changeUserStatus(msg.room_join_id, _this.onlineUsers, {
-              is_apply: 0,
-              is_speak: 1
-            });
+            _this.changeUserStatus(
+              msg.room_join_id,
+              _this.onlineUsers,
+              {
+                is_apply: 0,
+                is_speak: 1
+              },
+              'onlineUsers'
+            );
           }
         }
         //用户上麦成功
         function handleSuccessConnect(msg) {
           const { member_info = { is_apply: 0, is_speak: 1 } } = msg.data;
-          _this.changeUserStatus(msg.data.room_join_id, _this.onlineUsers, member_info);
+          _this.changeUserStatus(
+            msg.data.room_join_id,
+            _this.onlineUsers,
+            member_info,
+            'onlineUsers'
+          );
+          //如果已经没有举手的人，清除一下举手一栏的小红点
+          if (!_this.applyUsers.length) {
+            _this.raiseHandTip = false;
+          }
           if (msg.data.room_join_id == _this.userId && msg.data.room_role == 2) {
             return;
           }
@@ -954,10 +1025,15 @@
         //互动连麦成功断开链接
         function handleSuccessDisconnect(msg) {
           // const { member_info = { is_speak: 0, is_apply: 0 } } = msg.data;
-          _this.changeUserStatus(msg.data.target_id, _this.onlineUsers, {
-            is_speak: 0,
-            is_apply: 0
-          });
+          _this.changeUserStatus(
+            msg.data.target_id,
+            _this.onlineUsers,
+            {
+              is_speak: 0,
+              is_apply: 0
+            },
+            'onlineUsers'
+          );
 
           //如果是观看端，还要维护一下上麦列表
           if (_this.isWatch) {
@@ -1002,8 +1078,8 @@
         }
         //处理踢出人员
         function handleKicked(msg) {
-          _this._deleteUser(msg.accountId, _this.onlineUsers);
-          _this._deleteUser(msg.accountId, _this.applyUsers);
+          _this._deleteUser(msg.accountId, _this.onlineUsers, 'onlineUsers');
+          _this._deleteUser(msg.accountId, _this.applyUsers, 'applyUsers');
           //刷新下受限列表
           _this.getLimitUserList();
           _this.refreshList();
@@ -1045,6 +1121,7 @@
             if (msg.sender_id == _this.userId) {
               _this.totalNum++;
             }
+            _this.memberServer.updateState('totalNum', _this.totalNum);
           }
 
           if (msg.data.isJoinMainRoom) {
@@ -1480,7 +1557,7 @@
       /**
        * 改变在线人员列表的状态
        */
-      changeUserStatus(accountId = '', list = [], obj = {}) {
+      changeUserStatus(accountId = '', list = [], obj = {}, key = '') {
         console.log('更改上麦状态', accountId, list, obj);
         const item = list.find(item => item.account_id === accountId);
         if (!item) {
@@ -1491,6 +1568,8 @@
           Object.assign(item || {}, obj);
           this.$set(list, index, item);
         }
+        //因为逻辑暂时还在视图维护，所以也更新一下server里的属性
+        this.memberServer.updateState(key, list);
         console.log(this.onlineUsers, '更改后的人员列表');
       },
       //获取受限人员列表
@@ -1534,7 +1613,7 @@
         }
         const params = {
           room_id: this.roomId,
-          status: status ? 1 : 0
+          status: this.allowRaiseHand ? 1 : 0
         };
 
         //todo 待micServer这边完善方法
@@ -1649,7 +1728,7 @@
           .hostAgreeApply(params)
           .then(res => {
             console.log(res);
-            this._deleteUser(accountId, this.applyUsers);
+            this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
             console.log('allow speak fail ::', err);
@@ -1953,8 +2032,8 @@
               // 踢出只能在在线和举手列表操作
               //todo 上报事件
               if (nextStatus) {
-                this._deleteUser(accountId, this.onlineUsers);
-                this._deleteUser(accountId, this.applyUsers);
+                this._deleteUser(accountId, this.onlineUsers, 'onlineUsers');
+                this._deleteUser(accountId, this.applyUsers, 'applyUsers');
               } else {
                 // 取消踢出只能在受限列表操作
                 this.getLimitUserList();
@@ -1964,11 +2043,15 @@
           .catch(() => {});
       },
       //删除用户
-      _deleteUser(accountId, list = []) {
+      _deleteUser(accountId, list = [], key = '') {
         const index = list.findIndex(
           item => ![null, void 0, ''].includes(accountId) && item.account_id === accountId
         );
-        index !== -1 && list.splice(index, 1);
+
+        if (index !== -1) {
+          list.splice(index, 1);
+          this.memberServer.updateState(key, list);
+        }
       },
       //查找用户在数组的索引号
       _getUserIndex(accountId, list) {

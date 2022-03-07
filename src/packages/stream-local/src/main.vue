@@ -331,17 +331,6 @@
           true
         );
 
-        // 互动实例成功
-        this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', async () => {
-          // 是否需要自动上麦
-          const micServer = useMicServer();
-          if (this.isNeedSpeakOn) {
-            this.userSpeakOn();
-          } else {
-            micServer.setSpeakOffToInit(false);
-          }
-        });
-
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
           this.userSpeakOn();
@@ -351,7 +340,7 @@
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.localStream.streamId) return;
-            if (this.joinInfo.role_name == 3 || this.joinInfo.role_name == 1) {
+            if ([1, 3, 4, '1', '3', '4'].includes(this.joinInfo.role_name)) {
               // 开始推流
               this.startPush();
             } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
@@ -371,12 +360,16 @@
 
           await this.interactiveServer.destroy();
 
-          if (this.isNoDelay === 1 || this.mode === 6) {
+          if (
+            this.isNoDelay === 1 ||
+            this.mode === 6 ||
+            [4, '4'].includes(this.joinInfo.role_name)
+          ) {
             //  初始化互动实例
             this.interactiveServer.init();
           } else {
             // 初始化播放器
-            this.playerServer.init();
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'initPlayer'));
           }
         });
         // 结束直播
@@ -502,6 +495,8 @@
           // 麦位已满，上麦失败
           this.$message.error(`上麦席位已满员，您的账号支持${res.data.replace_data}人上麦`);
           // TODO: 麦位已满的处理
+        } else {
+          console.error('上麦接口失败----', res);
         }
         return false;
       },

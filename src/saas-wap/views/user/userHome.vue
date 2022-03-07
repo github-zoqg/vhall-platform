@@ -774,7 +774,6 @@
       font-family: PingFangSC-Regular, PingFang SC;
       line-height: 38px;
       margin-bottom: 16px;
-      -webkit-box-orient: vertical;
       width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -782,7 +781,9 @@
       display: -moz-inline-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
+      /* autoprefixer: off */
       -webkit-box-orient: vertical;
+      /* autoprefixer: on */
       word-break: break-all;
     }
     .v-info {

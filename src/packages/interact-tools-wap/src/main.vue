@@ -3,7 +3,7 @@
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
       <div
-        v-if="!isBanned && (isAllowhandup || isSpeakOn) && !live_over"
+        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && !live_over"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
       >
@@ -73,11 +73,11 @@
 <script>
   import {
     useRoomBaseServer,
-    useMsgServer,
     useMicServer,
     useChatServer,
     useGroupServer,
-    useInteractiveServer
+    useInteractiveServer,
+    useMediaCheckServer
   } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
@@ -129,6 +129,10 @@
       };
     },
     computed: {
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
+      },
       // 是否开启举手
       isAllowhandup() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
@@ -169,8 +173,16 @@
       });
 
       // 结束直播
-      useInteractiveServer.$on('live_over', () => {
+      useInteractiveServer().$on('live_over', () => {
         this.live_over = true;
+      });
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        this.$toast(this.$t('interact.interact_1003'));
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        this.$toast(this.$t('interact.interact_1002'));
       });
     },
     methods: {

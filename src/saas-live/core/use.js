@@ -45,6 +45,8 @@ import VmpRedPacketLive from '@/packages/red-packet/live';
 import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 import VmpRecordVideoSuccess from '@/packages/record-video-success';
 import VmpPcRewardEffect from '@/packages/pc-reward-effect';
+// 分屏页面
+import VmpSplitScreen from '@/packages/split-screen';
 // 客户端嵌入页
 import VmpEmbedClient from '@/packages/embed-client-live';
 // 邀请上麦
@@ -94,6 +96,8 @@ export function initUse() {
   Vue.use(VmpRecordVideoSuccess);
   Vue.use(VmpRedPacketLive);
   Vue.use(VmpPcRewardEffect);
+  Vue.use(VmpSplitScreen);
+
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);
   Vue.use(VmpStreamDesktopScreen);

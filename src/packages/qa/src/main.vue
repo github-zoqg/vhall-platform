@@ -128,14 +128,18 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        //监听新建问答消息
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
             this.scrollBottom();
           }
         });
+        //监听问答回复消息
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
           this.scrollBottom();
         });
+        //监听撤销问答回复消息
+        qaServer.$on(qaServer.Events.QA_BACKOUT, msg => {});
         //监听禁言通知
         chatServer.$on('banned', res => {
           this.isBanned = res;
@@ -169,9 +173,12 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
+        const { configList = {} } = this.roomBaseServer.state;
         if (
           ![1, '1'].includes(this.roleName) &&
-          ['', null, 0].includes(this.userId || this.Embed)
+          ['', null, 0].includes(
+            this.userId || this.Embed || configList['ui.show_chat_without_login'] == 1
+          )
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
@@ -203,7 +210,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$refs.qalist.scrollToBottom();
+          this.$refs.qalist && this.$refs.qalist.scrollToBottom();
           this.unReadMessageCount = 0;
         });
       },

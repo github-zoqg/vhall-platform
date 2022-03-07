@@ -80,6 +80,7 @@
         ) {
           this.goSubscribePage(this.clientType);
         }
+        this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
@@ -87,6 +88,12 @@
         this.handleErrorCode(err);
         // this.errMsg = err.msg;
       }
+    },
+    mounted() {
+      useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
+        this.state = 2;
+        this.errorData.errorPageTitle = 'it_end';
+      });
     },
     methods: {
       initReceiveLive(clientType) {
@@ -109,6 +116,19 @@
           pageUrl = '/embedclient';
         }
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
+      },
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.handleErrorCode({
+          code: 512514,
+          msg: '您已被禁止访问当前活动'
+        });
       },
       handleErrorCode(err) {
         switch (err.code) {

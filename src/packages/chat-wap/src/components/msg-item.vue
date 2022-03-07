@@ -17,7 +17,7 @@
       <div class="msg-item interact">
         <div class="interact-msg" @tap="checkLotteryDetail($event, source)">
           {{ source.content.text_content }}
-          <template v-if="msg.content.Show">
+          <template v-if="source.content.Show">
             {{ $t('common.common_1030') }}
             <span class="highlight">{{ $t('chat.chat_1031') }}</span>
           </template>
@@ -57,7 +57,7 @@
       >
         <div class="interact-gift-box">
           <p class="new-gift-name">
-            {{ source.nickName | textOverflowSlice(10) }}
+            {{ source.nickname | textOverflowSlice(10) }}
           </p>
           <p class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | textOverflowSlice(10) }}
@@ -273,11 +273,11 @@
       //处理@消息
       handleAt() {
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.source.atList.length) {
+        if (this.source && Array.isArray(this.source.atList) && !this.source.atList.length) {
           this.msgContent = this.source.content.text_content;
-        } else {
+        } else if (this.source.atList && this.source.atList.length) {
           let at = false;
-          this.source.atList.forEach(a => {
+          (this.source.atList || []).forEach(a => {
             console.log('atList', a.nick_name);
             console.log(this.source.atList.length);
             const userName = `@${a.nick_name} `;

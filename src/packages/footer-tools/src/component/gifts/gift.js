@@ -59,10 +59,17 @@ export default {
     this.msgServer = useMsgServer();
   },
   mounted() {
-    console.log(useRoomBaseServer().state, 'this.roomId');
+    console.log(
+      this.$domainStore.state,
+      this.configList['ui.hide_chat_history'] == '1',
+      'this.roomId'
+    );
     // 赠送礼物成功
-    if (this.configList['ui.hide_chat_history'] == '1') {
-      this.$VhallEventBus.$on(this.$VhallEventType.InteractTools.ROOM_GIFT_SEND_SUCCESS, msg => {
+
+    this.giftsServer.$on('gift_send_success', msg => {
+      // 关闭支付弹框
+      this.$emit('changeShowGift', 'showPay', false);
+      if (this.configList['ui.hide_chat_history'] == '1') {
         if (msg.sender_id != this.watchInitData.join_info.third_party_user_id) return;
         this.btnDisabled = true;
         // 开始限频倒计时
@@ -76,8 +83,8 @@ export default {
           }
           this.counter--;
         }, 1000);
-      });
-    }
+      }
+    });
   },
   methods: {
     // ...mapMutations('watchBase', ['setDialogZIndexQueue', 'setToolsCount']),
@@ -179,7 +186,6 @@ export default {
                 this.$emit('acceptPay', 'wxQr', img);
                 // this.wxQr = img;
               }
-              this.showPay = true;
             }
           })
           .catch(e => {

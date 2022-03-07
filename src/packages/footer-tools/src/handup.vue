@@ -55,7 +55,7 @@
       },
       // 是否开启举手
       isAllowhandup() {
-        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        const status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
         return status;
       },
       // 是否已上麦
@@ -89,6 +89,14 @@
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$message.warning(this.$t('interact.interact_1028'));
+      });
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        this.$message.success(this.$t('interact.interact_1003'));
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        this.$message.success(this.$t('interact.interact_1002'));
       });
 
       /**
