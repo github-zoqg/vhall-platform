@@ -1,5 +1,5 @@
 import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-import { useMsgServer, useRoomBaseServer, useWatchRewardServer } from 'middle-domain';
+import { useRoomBaseServer, useWatchRewardServer, useChatServer } from 'middle-domain';
 import QRcode from 'qrcode';
 // import { mapMutations } from 'vuex';
 export default {
@@ -28,9 +28,9 @@ export default {
   },
   beforeCreate() {
     this.watchRewardServer = useWatchRewardServer();
-    this.msgServer = useMsgServer();
   },
   created() {
+    this.chatServer = useChatServer();
     this.listenEvent();
   },
   computed: {
@@ -41,31 +41,36 @@ export default {
   methods: {
     // ...mapMutations('watchBase', ['setDialogZIndexQueue', 'setToolsCount']),
     listenEvent() {
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
+      this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
+        // 添加聊天消息
+        const data = {
+          avatar: rawMsg.data.rewarder_avatar,
+          nickName:
+            rawMsg.data.rewarder_nickname.length > 8
+              ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
+              : rawMsg.data.rewarder_nickname,
+          type: 'reward_pay_ok',
+          content: {
+            text_content: rawMsg.data.reward_describe
+              ? rawMsg.data.reward_describe
+              : '很精彩，赞一个！',
+            num: rawMsg.data.reward_amount
+          },
+          sendId: this.userId,
+          roleName: this.roleName,
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
 
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 支付成功
-          case 'reward_pay_ok':
-            if (this.userId == temp.data.rewarder_id) {
-              this.closeDialog();
-              this.$message({
-                message: this.$t('common.common_1005'),
-                showClose: true,
-                // duration: 0,
-                type: 'success',
-                customClass: 'zdy-info-box'
-              });
-            }
-            break;
-          default:
-            break;
+        if (this.userId == rawMsg.data.rewarder_id) {
+          this.closeDialog();
+          this.$message({
+            message: this.$t('common.common_1005'),
+            showClose: true,
+            // duration: 0,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
         }
       });
     },
