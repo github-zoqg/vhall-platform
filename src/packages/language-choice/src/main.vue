@@ -68,7 +68,7 @@
         langMap[this.$route.query.lang] ||
         langMap[curLang.language_type];
       this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.type);
+      sessionStorage.setItem('lang', this.lang.key);
     },
     watch: {},
     methods: {
@@ -78,7 +78,7 @@
         //   this.lang = window.$layoutConfig.lang;
         // }
       },
-      handleChangeLang: function (key) {
+      handleChangeLang(key) {
         sessionStorage.setItem('lang', key);
         window.location.reload();
       },

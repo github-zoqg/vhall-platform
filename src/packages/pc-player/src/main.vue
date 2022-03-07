@@ -417,7 +417,6 @@
     },
     created() {
       this.getWebinerStatus();
-      this.listenEvents();
       if (this.isEmbedVideo) {
         this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
           return langMap[item.language_type];
@@ -590,6 +589,7 @@
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
           }
+          this.listenEvents();
           this.getListenPlayer();
         });
       },

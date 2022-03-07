@@ -89,6 +89,12 @@
         // this.errMsg = err.msg;
       }
     },
+    mounted() {
+      useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
+        this.state = 2;
+        this.errorData.errorPageTitle = 'it_end';
+      });
+    },
     methods: {
       initReceiveLive(clientType) {
         const { id } = this.$route.params;

@@ -110,7 +110,12 @@
         this.handleErrorCode(err);
       }
     },
-    mounted() {},
+    mounted() {
+      useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
+        this.state = 2;
+        this.liveErrorTip = this.$t('message.message_1003');
+      });
+    },
     methods: {
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
