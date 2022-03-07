@@ -198,7 +198,6 @@
       flex-wrap: wrap;
       justify-content: center;
       overflow: hidden;
-      padding: 16px;
       &-item {
         width: 358px;
         height: 306px;

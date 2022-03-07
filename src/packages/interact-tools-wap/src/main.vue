@@ -3,7 +3,7 @@
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
       <div
-        v-if="!isBanned && (isAllowhandup || isSpeakOn)"
+        v-if="!isBanned && (isAllowhandup || isSpeakOn) && !live_over"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
       >
@@ -76,7 +76,8 @@
     useMsgServer,
     useMicServer,
     useChatServer,
-    useGroupServer
+    useGroupServer,
+    useInteractiveServer
   } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
@@ -123,7 +124,8 @@
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
         handUpStatus: false,
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
+        live_over: false
       };
     },
     computed: {
@@ -164,6 +166,11 @@
         if (this.isSpeakOn) {
           useMicServer().speakOff();
         }
+      });
+
+      // 结束直播
+      useInteractiveServer.$on('live_over', () => {
+        this.live_over = true;
       });
     },
     methods: {

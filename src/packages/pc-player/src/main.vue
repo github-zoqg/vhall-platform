@@ -422,7 +422,6 @@
         this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
           return langMap[item.language_type];
         });
-        console.log(this.languageList, '??!32142435');
         const curLang = this.roomBaseServer.state.languages.curLang;
         this.lang =
           langMap[sessionStorage.getItem('lang')] ||
@@ -488,44 +487,9 @@
       },
       // 初始化播放器配置项
       initConfig() {
-        const { interact, join_info } = this.roomBaseServer.state.watchInitData;
-        console.log(this.roomBaseServer.state, '????====zhangxiao');
-        console.log(this.marquee, this.water, '123244', '??!23221423');
+        const { join_info } = this.roomBaseServer.state.watchInitData;
         let params = {
-          appId: interact.paas_app_id || '', // 应用ID，必填
-          accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
-          token: interact.paas_access_token || '', // access_token，必填
-          videoNode: 'vmp-player',
-          type: this.playerServer.state.type, // live 直播  vod 点播  必填
-          poster: '',
-          autoplay: false,
-          forceMSE: false,
-          subtitleOption: {
-            enable: true
-          },
-          // 强制卡顿切线
-          thornOption: {
-            enable: true
-          },
-          barrageSetting: {
-            positionRange: [0, 1],
-            speed: 15000,
-            style: {
-              fontSize: 16
-            }
-          },
-          peer5Option: {
-            open: this.roomBaseServer.state.configList['ui.browser_peer5'] == '1',
-            customerId: 'ds6mupmtq5gnwa4qmtqf',
-            fallback: true
-          },
-          marqueeOption: {
-            text: '',
-            enable: false
-          },
-          watermarkOption: {
-            enable: false
-          }
+          videoNode: 'vmp-player'
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -743,8 +707,6 @@
       // 重新播放
       replayPlay() {
         this.isVodEnd = false;
-        // this.roomBaseServer.setChangeElement('doc');
-        // this.displayMode = 'normal';
         this.startPlay();
       },
       initPlayerOtherInfo() {
