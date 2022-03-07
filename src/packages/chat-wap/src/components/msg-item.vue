@@ -273,11 +273,11 @@
       //处理@消息
       handleAt() {
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.source.atList.length) {
+        if (this.source && Array.isArray(this.source.atList) && !this.source.atList.length) {
           this.msgContent = this.source.content.text_content;
         } else {
           let at = false;
-          this.source.atList.forEach(a => {
+          (this.source.atList || []).forEach(a => {
             console.log('atList', a.nick_name);
             console.log(this.source.atList.length);
             const userName = `@${a.nick_name} `;
