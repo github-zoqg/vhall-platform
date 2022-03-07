@@ -42,7 +42,7 @@
 </template>
 <script>
   import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
-  import { debounce } from '@/packages/app-shared/utils/tool';
+  import { throttle } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -62,6 +62,7 @@
           pageNum: 1
         },
         inputVal: '',
+
         overlayScrollBarsOptions: {
           resize: 'none',
           paddingAbsolute: true,
@@ -143,11 +144,10 @@
       /**
        * 发送一条公告
        */
-      sendNotice: debounce(function () {
+      sendNotice: throttle(function () {
         if (this.inputVal === '' || this.inputVal === undefined) {
           return this.$message.warning('内容不能为空');
         }
-
         const params = {
           messageType: 1,
           roomId: this.watchInitData.interact.room_id,
