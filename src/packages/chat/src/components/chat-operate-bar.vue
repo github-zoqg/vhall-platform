@@ -36,7 +36,7 @@
               @change="onClickOnlyShowSponsor"
               v-model="filterStatus.onlyShowSponsor"
             >
-              只看主办方
+              {{ $t('chat.chat_1012') }}
             </el-checkbox>
           </li>
           <li class="filter-item">
@@ -45,7 +45,7 @@
               @change="onClickShieldingEffects"
               v-model="filterStatus.isShieldingEffects"
             >
-              屏蔽特效
+              {{ $t('chat.chat_1013') }}
             </el-checkbox>
           </li>
         </ul>
