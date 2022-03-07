@@ -38,7 +38,11 @@
           </p>
           <p class="winner-name">{{ item.lottery_user_nickname }}</p>
           <p class="winner-avatar">
-            <img class="winner-avatar-img" :src="prizeInfo.image_url" alt="" />
+            <img
+              class="winner-avatar-img"
+              :src="prizeInfo.image_url ? prizeInfo.image_url : defaultLotteryImg"
+              alt=""
+            />
           </p>
         </li>
       </ul>
