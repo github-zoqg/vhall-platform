@@ -125,6 +125,8 @@
             type: msg.data.type,
             interactStatus: true
           });
+          // 默认显示菜单中的第一个
+          this.selectDefault();
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
