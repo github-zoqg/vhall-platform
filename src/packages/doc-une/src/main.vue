@@ -546,7 +546,6 @@
           // }
           console.log('[doc] ===========选择容器======', data);
           // this.docInfo.docShowType = data.id.split('-')[0];
-          this.docServer.state.currentCid = data.id;
           // 判断容器是否存在
           const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
           if (currentItem) {
