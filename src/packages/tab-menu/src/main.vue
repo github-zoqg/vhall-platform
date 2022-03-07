@@ -100,7 +100,7 @@
               text_content: this.$t('chat.chat_1026')
             },
             roleName: msg.data.role_name,
-            type: msg.type,
+            type: msg.data.type,
             interactStatus: true
           });
         });
@@ -112,7 +112,7 @@
               text_content: this.$t('chat.chat_1081')
             },
             roleName: msg.data.role_name,
-            type: msg.type,
+            type: msg.data.type,
             interactStatus: true
           });
         });
