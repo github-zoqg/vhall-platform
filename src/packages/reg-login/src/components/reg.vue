@@ -189,6 +189,9 @@
     watch: {
       'ruleForm.phone': function () {
         this.codeBtnDisabledCheck();
+      },
+      captchaReady() {
+        this.codeBtnDisabledCheck();
       }
     },
     methods: {
@@ -205,20 +208,26 @@
         this.regPwdShow = !this.regPwdShow;
       },
       codeBtnDisabledCheck() {
+        if (!this.captchaReady) return (this.btnDisabled = true);
         if (this.ruleForm.phone) {
-          let phoneFlag = false;
-          this.$refs.ruleForm.validateField('phone', function (res) {
-            phoneFlag = !res;
+          this.$refs.ruleForm.validateField('phone', err => {
+            this.btnDisabled = !!err;
           });
-          if (phoneFlag && this.captchaVal) {
-            // 如果当前手机号验证通过，并且图形验证码已选取，获取验证码按钮可点击
-            this.btnDisabled = false;
-          } else {
-            this.btnDisabled = true; // 获取验证码不可点击
-          }
-        } else {
-          this.btnDisabled = true; // 获取验证码不可点击
         }
+        // if (this.ruleForm.phone) {
+        //   let phoneFlag = false;
+        //   this.$refs.ruleForm.validateField('phone', function (res) {
+        //     phoneFlag = !res;
+        //   });
+        //   if (phoneFlag && this.captchaVal) {
+        //     // 如果当前手机号验证通过，并且图形验证码已选取，获取验证码按钮可点击
+        //     this.btnDisabled = false;
+        //   } else {
+        //     this.btnDisabled = true; // 获取验证码不可点击
+        //   }
+        // } else {
+        //   this.btnDisabled = true; // 获取验证码不可点击
+        // }
       },
       handleSendCode() {
         if (!this.captchaReady) {
