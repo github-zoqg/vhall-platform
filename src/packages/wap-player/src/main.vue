@@ -15,7 +15,7 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-player" @click.stop="videoShowIcon">
+      <div id="vmp-wap-player" @click.stop="videoShowIcon">
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -341,7 +341,6 @@
     },
     mounted() {
       this.getWebinerStatus();
-      this.listenEvents();
     },
     methods: {
       startPlay() {
@@ -406,7 +405,7 @@
       // 初始化播放器配置项
       initConfig() {
         let params = {
-          videoNode: 'vmp-player'
+          videoNode: 'vmp-wap-player'
         };
         if (this.playerState.type == 'live') {
           params = Object.assign(params, {
@@ -434,6 +433,7 @@
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
           }
+          this.listenEvents();
           this.getListenPlayer();
         });
       },

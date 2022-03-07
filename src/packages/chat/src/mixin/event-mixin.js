@@ -53,22 +53,23 @@ const eventMixin = {
 
         console.log('********加入房间消息*********');
         console.log(msg);
-        if (window.sessionStorage.getItem('ssoEnabled') == 1) {
-          const kickId = window.sessionStorage.getItem('kickId');
-          const kickMark = `${window.sessionStorage.getItem('kickMark')}${
-            this.$route.params.il_id
-          }`;
-          console.log(
-            kickMark,
-            kickId,
-            msg.context.kick_id,
-            msg.context.kick_mark,
-            '账号相同，需要踢出之前的账号11111111111'
-          );
-          if (kickId == msg.context.kick_id && kickMark != msg.context.kick_mark) {
-            this.$emit('singleLogin');
-          }
-        }
+        // 单点登录不在这里判断 所以注释
+        // if (window.sessionStorage.getItem('ssoEnabled') == 1) {
+        //   const kickId = window.sessionStorage.getItem('kickId');
+        //   const kickMark = `${window.sessionStorage.getItem('kickMark')}${
+        //     this.$route.params.il_id
+        //   }`;
+        //   console.log(
+        //     kickMark,
+        //     kickId,
+        //     msg.context.kick_id,
+        //     msg.context.kick_mark,
+        //     '账号相同，需要踢出之前的账号11111111111'
+        //   );
+        //   if (kickId == msg.context.kick_id && kickMark != msg.context.kick_mark) {
+        //     this.$emit('singleLogin');
+        //   }
+        // }
         EventBus.$emit(msg.data.type, msg);
         const baseOnlineNumber = sessionStorage.getItem('baseOnlineNumber');
         this.onlineUsers = Number(baseOnlineNumber) + Number(msg.uv);

@@ -63,7 +63,7 @@ export default async function () {
   }
 
   await msgServer.init();
-  console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
+  console.log('%------服务初始化 msgServer 预约页初始化完成', 'color:blue');
 
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;
