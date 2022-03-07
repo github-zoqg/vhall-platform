@@ -7,7 +7,7 @@
         {{ $t('doc.doc_1012') }}
       </div>
       <!-- 观看端没有观众可见的按钮 -->
-      <div class="audience-visible" v-if="!isWatch">
+      <div class="audience-visible" v-if="!isWatch && !isInGroup">
         <span style="margin-right: 5px">
           {{ $t('doc.doc_1013') }}
         </span>
@@ -116,7 +116,7 @@
       </div>
     </div>
     <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
-    <div class="vmp-doc-toolbar__ft" v-if="!isWatch">
+    <div class="vmp-doc-toolbar__ft" v-if="!isWatch && !isInGroup">
       <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
         <i class="vh-iconfont vh-line-amplification"></i>
       </div>

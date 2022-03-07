@@ -40,12 +40,14 @@
             此处不能用v-if
        -->
     </div>
+    <masksliding></masksliding>
   </div>
 </template>
 <script>
   import { useMsgServer } from 'middle-domain';
   import move from './js/move';
   import { Dialog } from 'vant';
+  import masksliding from './components/mask.vue';
   export default {
     name: 'VmpWapBody',
     mixins: [move],
@@ -68,6 +70,9 @@
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url || cover;
       }
+    },
+    components: {
+      masksliding
     },
     beforeCreate() {
       this.msgServer = useMsgServer();
