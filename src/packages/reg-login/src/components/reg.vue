@@ -61,12 +61,20 @@
         </span>
       </el-form-item>
       <el-form-item prop="password" class="vmp-register__pwd__box">
-        <el-input
+        <!-- <el-input
           type="password"
           v-model.trim="ruleForm.password"
           clearable
           :placeholder="$t('register.register_1007')"
-        ></el-input>
+        ></el-input> -->
+        <PwdInput
+          v-model.trim="ruleForm.password"
+          clearable
+          :placeholder="$t('login.login_1011')"
+          :maxlength="30"
+          auto-complete="off"
+          onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
+        ></PwdInput>
         <a
           href="javascript:void(0)"
           class="vmp-register__login__link"
@@ -114,9 +122,11 @@
 </template>
 <script>
   import mixin from '../mixins/mixin';
+  import PwdInput from './pwd-input.vue';
   export default {
     name: 'VmpRegister',
     mixins: [mixin],
+    components: { PwdInput },
     data() {
       const validateRegPhone = async (_, value, callback) => {
         if (value === '') {
