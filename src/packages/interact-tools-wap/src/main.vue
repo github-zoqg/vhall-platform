@@ -177,7 +177,7 @@
       });
 
       // 结束直播
-      useInteractiveServer.$on('live_over', () => {
+      useInteractiveServer().$on('live_over', () => {
         this.live_over = true;
       });
     },
