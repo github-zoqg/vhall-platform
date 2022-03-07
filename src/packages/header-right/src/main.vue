@@ -21,7 +21,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4">
+      <template v-if="roleName == 4 && isLiving">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -47,7 +47,6 @@
           :isShowThirdParty="isShowThirdParty"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
-          @startSplit="startSplit"
           @thirdPushStream="thirdPushStream"
         ></headerControl>
       </div>
@@ -85,7 +84,12 @@
 <script>
   import headerControl from './components/header-control.vue';
   import RecordControl from './components/record-control.vue';
-  import { useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMicServer,
+    useInteractiveServer,
+    useSubscribeServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -139,6 +143,9 @@
       },
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.type == 1;
       }
     },
     components: {
@@ -148,6 +155,7 @@
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
+      this.interactiveServer = useInteractiveServer();
       this.initConfig();
       this.listenEvents();
     },
@@ -236,6 +244,16 @@
               clearInterval(this._applyInterval);
             }
           });
+
+          // 开始直播显示申请上麦
+          useSubscribeServer().$on('live_start', () => {
+            this.liveStep = 2;
+          });
+
+          // live_over 结束直播
+          this.interactiveServer.$on('live_over', () => {
+            this.liveStep = 1;
+          });
         }
       },
       initConfig() {
@@ -243,10 +261,6 @@
         if (widget && widget.options) {
           Object.assign(this.$data, widget.options);
         }
-      },
-      // 打开分屏
-      startSplit() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSplitScreenClick'));
       },
       // 打开媒体设置弹窗
       openMediaSettings() {

@@ -73,10 +73,10 @@
           this.resetMenus();
         }
       },
-      // 演示者发生变化
-      presenterId() {
-        this.resetMenus();
-      },
+      // // 演示者发生变化
+      // presenterId() {
+      //   this.resetMenus();
+      // },
       // 主讲人发生变化
       doc_permission() {
         this.resetMenus();
