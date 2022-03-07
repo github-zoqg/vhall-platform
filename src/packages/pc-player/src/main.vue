@@ -416,6 +416,7 @@
       }
     },
     created() {
+      if (this.isShowContainer) return;
       this.getWebinerStatus();
       if (this.isEmbedVideo) {
         this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
@@ -427,7 +428,7 @@
           langMap[this.$route.query.lang] ||
           langMap[curLang.language_type];
         this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.type);
+        sessionStorage.setItem('lang', this.lang.key);
       }
     },
     mounted() {

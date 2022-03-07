@@ -857,13 +857,18 @@
           const isLive = _this.isLive;
           const isWatch = _this.isWatch;
           if (msg.context.isAuthChat) return; // 如果是聊天审核页面不做任何操作
+          //todo 这里可能会改成，请求一下分组的接口，拿到分组的实际人数
+          const groupUserNum =
+            _this.groupServer.state.groupedUserList.length >= 1
+              ? _this.groupServer.state.groupedUserList.length - 1
+              : 0;
 
           if (isLive) {
             _this.totalNum = _this.isInGroup
               ? msg.uv
               : msg.uv -
                 ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                  ? _this.groupServer.state.groupedUserList.length
+                  ? groupUserNum
                   : 0);
             _this.memberServer.updateState('totalNum', _this.totalNum);
           }
