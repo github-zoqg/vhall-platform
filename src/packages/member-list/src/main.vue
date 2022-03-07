@@ -769,6 +769,15 @@
                 is_speak: speakIndex >= 0 ? 1 : 0,
                 is_apply: 0
               };
+              //看一下上线的是不是组长
+              if (
+                _this.isInGroup &&
+                context &&
+                context.groupInitData &&
+                ![null, void 0, ''].includes(context.groupInitData.join_role)
+              ) {
+                user.role_name = context.groupInitData.join_role;
+              }
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
               setTimeout(() => {
@@ -799,7 +808,13 @@
                         device_status: context.device_status,
                         nickname: context.nick_name || context.nickname,
                         device_type: context.device_type,
-                        is_speak: speakIndex >= 0 ? 1 : 0
+                        is_speak: speakIndex >= 0 ? 1 : 0,
+                        role_name:
+                          context &&
+                          context.groupInitData &&
+                          ![null, void 0, ''].includes(context.groupInitData.join_role)
+                            ? context.groupInitData.join_role
+                            : item.role_name
                       });
                     }
                   });
@@ -817,6 +832,14 @@
                     is_banned:
                       context && context.groupInitData ? Number(context.groupInitData.is_banned) : 0
                   };
+                  //看一下上线的是不是组长
+                  if (
+                    context &&
+                    context.groupInitData &&
+                    ![null, void 0, ''].includes(context.groupInitData.join_role)
+                  ) {
+                    user.role_name = context.groupInitData.join_role;
+                  }
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
                 }
