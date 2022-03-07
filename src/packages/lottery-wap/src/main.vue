@@ -112,7 +112,7 @@
           content: {
             text_content: this.$t('interact_tools.interact_tools_1021')
           },
-          type: msg.type,
+          type: msg.data.type,
           interactStatus: true
         });
       },
@@ -142,10 +142,11 @@
               ? this.$t('interact_tools.interact_tools_1023')
               : this.$t('interact_tools.interact_tools_1022'),
             msg: msg,
+            type: msg.data.type,
             userId: join_info.user_id || join_info.third_party_user_id,
             Show: msg.data.lottery_status == 1 && msg.data.win == 1
           },
-          type: msg.type,
+          type: msg.data.type,
           interactStatus: true,
           isCheck: lotteryResult
         });

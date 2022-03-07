@@ -76,7 +76,7 @@
               questionnaire_id: msg.questionnaire_id
             },
             roleName: msg.room_role,
-            type: msg.type,
+            type: msg.data.type,
             interactStatus: true,
             isCheck: true
           });

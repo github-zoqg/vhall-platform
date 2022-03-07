@@ -45,7 +45,7 @@ export default {
         }
       };
       await useUserServer()
-        .callbackUserInfo({
+        .oauthCallback({
           source: 2, // 1 控制塔 2观看端 3admin
           key: userAuthKey,
           scene_id: sceneId

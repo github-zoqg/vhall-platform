@@ -16,12 +16,13 @@
 </template>
 
 <script>
-  import { useDesktopShareServer } from 'middle-domain';
+  import { useDesktopShareServer, useInteractiveServer } from 'middle-domain';
   export default {
     name: 'VmpBasicRightContainer',
     data() {
       return {
-        childrenComp: []
+        childrenComp: [],
+        live_over: false
       };
     },
     computed: {
@@ -29,7 +30,8 @@
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
         return (
           this.$domainStore.state.docServer.switchStatus ||
-          this.desktopShareServer.state.isShareScreen
+          this.desktopShareServer.state.isShareScreen ||
+          !this.live_over
         );
       },
       isTryWatch() {
@@ -47,6 +49,10 @@
       this.desktopShareServer = useDesktopShareServer();
     },
     created() {
+      // 结束直播
+      useInteractiveServer().$on('live_over', () => {
+        this.live_over = true;
+      });
       // TODO试看逻辑在这里写判断
       // this.childrenComp = window.$serverConfig[this.cuid].children;
     },
