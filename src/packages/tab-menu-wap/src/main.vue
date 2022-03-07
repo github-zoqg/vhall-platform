@@ -11,7 +11,7 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span class="item-text">{{ $t(item.text) }}</span>
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
           <i v-show="item.tipsVisible" class="tips"></i>
         </li>
         <li
@@ -32,7 +32,7 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span>{{ $t(item.text) }}</span>
+          <span>{{ $tdefault(item.name) }}</span>
           <i class="tips" v-show="item.tipsVisible"></i>
         </li>
       </ul>
@@ -111,7 +111,7 @@
               text_content: this.$t('chat.chat_1026')
             },
             roleName: msg.data.role_name,
-            type: msg.type,
+            type: msg.data.type,
             interactStatus: true
           });
         });
@@ -122,9 +122,11 @@
               text_content: this.$t('chat.chat_1081')
             },
             roleName: msg.data.role_name,
-            type: msg.type,
+            type: msg.data.type,
             interactStatus: true
           });
+          // 默认显示菜单中的第一个
+          this.selectDefault();
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {

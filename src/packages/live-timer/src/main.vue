@@ -92,7 +92,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useTimerServer, useMsgServer, useChatServer } from 'middle-domain';
+  import { useTimerServer, useMsgServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
@@ -127,9 +127,7 @@
       }
     },
     data() {
-      let roomBaseServer = useRoomBaseServer();
       return {
-        roomBaseServer,
         status: 'kaishi',
         beifenshijian: 60,
         shijian: 0,
@@ -167,8 +165,11 @@
         }
         return currentSpeakerId;
       },
-      // 显示权限规则
-      // 如果角色是助理:3 或者 是主讲人可以关闭
+      /**
+       * 权限控制
+       * 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
+       * 如果角色是助理:3 或者 是主讲人可以关闭
+       */
       permissionFlag() {
         //是否在分组里
         let flag = false;
@@ -191,7 +192,7 @@
     mounted() {
       this.init();
       this.timerServer.listenMsg();
-      console.log(this.timerServer, 'this.roomBaseServer');
+      // console.log(this.timerServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
@@ -202,8 +203,6 @@
       this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
       // 计时器继续
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
-      // this.userInfo = this.roomBaseServer.state.watchInitData.join_info;
-      // this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
     },
     methods: {
       returnName(data) {

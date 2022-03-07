@@ -66,7 +66,7 @@
               // TODO 发起问卷文案提示不对
               text_content: this.$t('interact_tools.interact_tools_1021')
             },
-            type: msg.type,
+            type: msg.data.type,
             interactStatus: true
           });
           this.popupVisible = true;

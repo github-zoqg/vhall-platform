@@ -23,9 +23,9 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useInviteServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
-  import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
+  import { getVhallReportOs, browserType } from '@/packages/app-shared/utils/tool';
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -38,6 +38,9 @@
         state: 0,
         liveErrorTip: ''
       };
+    },
+    beforeCreate() {
+      this.inviteServer = useInviteServer();
     },
     async created() {
       try {
@@ -52,9 +55,27 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
-        document.title = roomBaseServer.state.watchInitData.webinar.subject;
-        // 是否跳转预约页
+        const roomBaseState = roomBaseServer.state;
+        document.title = roomBaseState.watchInitData.webinar.subject;
+
+        // 是否绑定邀请卡信息
+        const open_id = sessionStorage.getItem('open_id');
+        const isWechatBrowser = browserType();
+        const isEmbed = clientType === 'embed';
+        const hasInviteCode = this.$route.query.invite;
+
+        if (
+          isWechatBrowser &&
+          !isEmbed &&
+          hasInviteCode &&
+          open_id &&
+          roomBaseState.watchInitData.join_info
+        ) {
+          this.bindInvite(this.$route.query.invite);
+        }
+
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          // 是否跳转预约页
           this.goSubscribePage(clientType);
           return;
         }
@@ -81,6 +102,7 @@
         );
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
+        this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
@@ -113,6 +135,19 @@
           }
         });
       },
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.handleErrorCode({
+          code: 512514,
+          msg: '您已被禁止访问当前活动'
+        });
+      },
       handleErrorCode(err) {
         if (err.code == 512522) {
           this.liveErrorTip = this.$t('message.message_1009');
@@ -142,6 +177,17 @@
           pageUrl = '/embedclient';
         }
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
+      },
+      /**
+       * 绑定邀请卡关系(上报邀请成功数据)
+       * @param {String} code 邀请码
+       */
+      async bindInvite(code = '') {
+        console.log('bindInvite inner', code, this.$route.params.id);
+        await this.inviteServer.bindInvite({
+          webinar_id: this.$route.params.id,
+          invite: code
+        });
       }
     }
   };

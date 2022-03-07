@@ -43,7 +43,7 @@
           params.channel = 'B';
         }
         this.useUserServer
-          .callbackUserInfo(params)
+          .oauthCallback(params)
           .then(res => {
             if (res && res.code == 200) {
               this.bindingText = this.$t('account.account_1053');
