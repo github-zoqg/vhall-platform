@@ -62,11 +62,18 @@
       </el-form-item>
       <el-form-item prop="password" class="vmp-register__pwd__box">
         <el-input
-          type="password"
+          :type="regPwdShow ? 'text' : 'password'"
           v-model.trim="ruleForm.password"
           clearable
           :placeholder="$t('register.register_1007')"
-        ></el-input>
+        >
+          <i
+            slot="suffix"
+            class="vh-iconfont"
+            :class="[regPwdShow ? 'vh-line-view' : 'vh-line-hidden']"
+            @click="passWordType"
+          ></i>
+        </el-input>
         <a
           href="javascript:void(0)"
           class="vmp-register__login__link"
@@ -173,7 +180,7 @@
           captchas: [{ required: true, validator: validateCaptchas, trigger: 'blur' }],
           password: [{ required: false, validator: validRegPwd, trigger: 'blur' }]
         },
-        regPwdShow: true, // 注册 - 密码框的显示
+        regPwdShow: false, // 注册 - 密码框的显示
         agreementChecked: false, // 是否勾选注册协议
         loginKeyVo: null,
         btnDisabled: true // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
