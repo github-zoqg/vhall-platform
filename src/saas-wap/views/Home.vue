@@ -102,6 +102,7 @@
         );
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
+        this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
@@ -127,6 +128,19 @@
             webinar_id: id, //活动id
             clientType: clientType //客户端类型
           }
+        });
+      },
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.handleErrorCode({
+          code: 512514,
+          msg: '您已被禁止访问当前活动'
         });
       },
       handleErrorCode(err) {
