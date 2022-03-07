@@ -21,7 +21,7 @@
           :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span class="item-text">{{ $t(item.text) }}</span>
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
           <hr class="bottom-line" />
         </li>
       </ul>
@@ -154,6 +154,8 @@
             status: roomState.interactToolStatus.question_status ? 1 : 2
           });
         }
+
+        console.log('this.menu--------->', this.menu);
       },
       /**
        * 选中默认的菜单项（第一项）

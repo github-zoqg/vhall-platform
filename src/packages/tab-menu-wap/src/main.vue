@@ -11,7 +11,7 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span class="item-text">{{ $t(item.text) }}</span>
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
           <i v-show="item.tipsVisible" class="tips"></i>
         </li>
         <li
@@ -32,7 +32,7 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span>{{ $t(item.text) }}</span>
+          <span>{{ $tdefault(item.name) }}</span>
           <i class="tips" v-show="item.tipsVisible"></i>
         </li>
       </ul>
