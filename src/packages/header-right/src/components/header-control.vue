@@ -14,11 +14,7 @@
               {{ userInfo.nickname }}
             </span>
           </div>
-          <div
-            class="header-right_control_wrap-head-right"
-            v-if="isShowQuit"
-            @click="roleQuit || userInfo.role_name != 1"
-          >
+          <div class="header-right_control_wrap-head-right" v-if="isShowQuit" @click="roleQuit">
             退出
           </div>
         </div>
@@ -41,14 +37,14 @@
             <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
             <p>{{ isOpenSplitScreen ? '关闭分屏' : '分屏' }}</p>
           </div>
-          <!-- <div
+          <div
             class="header-right_control_wrap-container-setting"
             v-if="userInfo.role_name != 1"
             @click="roleQuit"
           >
             <i class="iconfont iconjiaosetuichu"></i>
             <p>角色退出</p>
-          </div> -->
+          </div>
           <div
             class="header-right_control_wrap-container-setting"
             v-if="
@@ -89,7 +85,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSplitScreenServer } from 'middle-domain';
+  import { useRoomBaseServer, useSplitScreenServer, useUserServer } from 'middle-domain';
   export default {
     name: 'HeaderControl',
     props: {
@@ -156,6 +152,7 @@
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.useServer = useUserServer();
       this.roomBaseState = this.roomBaseServer.state;
       this.userInfo = this.roomBaseState.watchInitData.join_info;
       this.webinarInfo = this.roomBaseState.watchInitData.webinar;
@@ -193,6 +190,13 @@
       },
       roleQuit() {
         // 角色退出
+        this.useServer.loginRoleOut({ webinar_id: this.webinarInfo.id }).then(res => {
+          if (res.code == 200) {
+            window.location.href = `${window.location.origin}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/lives/keylogin/${this.webinarInfo.id}/${this.userInfo.role_name}`;
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+          }
+        });
         // 调用退出接口 跳转页面
       },
       thirdPartyShow() {

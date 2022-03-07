@@ -14,8 +14,7 @@
       </div>
     </div>
     <div
-      id="wap-player-mini"
-      :class="[mini ? 'vmp-wap-body-mini' : '']"
+      :class="[mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl']"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
     >
@@ -150,6 +149,10 @@
           padding-top: 30px;
         }
       }
+    }
+    &-nomarl {
+      height: 100%;
+      width: 100%;
     }
     &-mini {
       position: fixed;

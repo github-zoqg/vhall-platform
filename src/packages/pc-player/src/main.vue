@@ -557,7 +557,8 @@
         }
         return params;
       },
-      async initSDK() {
+      // 初始化播放器
+      async initPlayer() {
         const defineQuality = this.setDefaultQuality();
         if (this.playerServer.state.type == 'live') {
           this.liveOption.defaultDefinition = defineQuality || '';
@@ -565,33 +566,14 @@
           this.vodOption.defaultDefinition = defineQuality || '';
         }
         const params = await this.initConfig();
-        console.log(params, '====<<1111111');
-        return new Promise(resolve => {
-          this.playerServer.init(params).then(() => {
-            this.eventPointList = this.playerServer.state.markPoints;
-            this.playerServer.openControls(false);
-            this.playerServer.openUI(false);
-            if (this.isLiving) {
-              resolve();
-            } else {
-              this.playerServer.$on(VhallPlayer.LOADED, () => {
-                resolve();
-              });
-            }
-          });
-        });
-      },
-      // 初始化播放器
-      initPlayer() {
-        this.initSDK().then(() => {
+        return this.playerServer.init(params).then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           if (this.playerServer.state.type === 'vod') {
+            this.eventPointList = this.playerServer.state.markPoints;
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
           }
-          this.listenEvents();
-          this.getListenPlayer();
         });
       },
       authTryWatch(type) {
@@ -772,6 +754,8 @@
           // 暖场视频或者试看
           this.optionTypeInfo('vod', _id);
         }
+        this.listenEvents();
+        this.getListenPlayer();
       },
       optionTypeInfo(type, id) {
         // 暖场视频或者试看
