@@ -220,9 +220,11 @@
                 : '主讲人';
             this.$message.success(`${msg.data.nick_name}设置成为${str}`);
           });
-
           // 嘉宾：
-          if (this.joinInfo.role_name == 4) {
+          if (
+            this.joinInfo.role_name == 4 &&
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
+          ) {
             this.$alert('您已进入直播房间，马上开始互动吧', '', {
               title: '提示',
               confirmButtonText: '立即开始',

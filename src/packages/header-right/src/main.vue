@@ -84,7 +84,12 @@
 <script>
   import headerControl from './components/header-control.vue';
   import RecordControl from './components/record-control.vue';
-  import { useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMicServer,
+    useInteractiveServer,
+    useSubscribeServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -150,6 +155,7 @@
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
+      this.interactiveServer = useInteractiveServer();
       this.initConfig();
       this.listenEvents();
     },
@@ -237,6 +243,16 @@
               this.isApplying = false;
               clearInterval(this._applyInterval);
             }
+          });
+
+          // 开始直播显示申请上麦
+          useSubscribeServer().$on('live_start', () => {
+            this.liveStep = 2;
+          });
+
+          // live_over 结束直播
+          this.interactiveServer.$on('live_over', () => {
+            this.liveStep = 1;
           });
         }
       },

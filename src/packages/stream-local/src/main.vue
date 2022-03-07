@@ -351,7 +351,7 @@
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.localStream.streamId) return;
-            if (this.joinInfo.role_name == 3 || this.joinInfo.role_name == 1) {
+            if ([1, 3, 4, '1', '3', '4'].includes(this.joinInfo.role_name)) {
               // 开始推流
               this.startPush();
             } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
@@ -371,7 +371,11 @@
 
           await this.interactiveServer.destroy();
 
-          if (this.isNoDelay === 1 || this.mode === 6) {
+          if (
+            this.isNoDelay === 1 ||
+            this.mode === 6 ||
+            [4, '4'].includes(this.joinInfo.role_name)
+          ) {
             //  初始化互动实例
             this.interactiveServer.init();
           } else {

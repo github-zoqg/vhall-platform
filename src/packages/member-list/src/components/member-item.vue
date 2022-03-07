@@ -761,6 +761,9 @@
       //处理指令
       handleCommand(command) {
         switch (command) {
+          case 'setSpeaker':
+            this.$emit('operateUser', { type: 'setSpeaker', params: this.userInfo });
+            break;
           case 'setBanned':
             this.handleSetBanned();
             break;
