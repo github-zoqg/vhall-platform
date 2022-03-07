@@ -48,7 +48,7 @@
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
           <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
-          <span v-if="hasDocPermission">暂未分享任何文档</span>
+          <span v-if="hasDocPermission || [3, 4].includes(roleName)">暂未分享任何文档</span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
       </div>
@@ -218,6 +218,10 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
+      // 角色
+      roleName() {
+        return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
+      },
       // 文档是否可见
       show() {
         return (
@@ -272,11 +276,11 @@
         } else {
           // 在主直播间内
           // 如果是主持人，演示人不是自己，说明有人在演示
-          if (this.watchInitData.join_info.role_name == 1 && this.presenterId != this.userId) {
+          if (this.roleName == 1 && this.presenterId != this.userId) {
             return true;
           }
           // 如果不是主持人, 演示者是自己
-          if (this.watchInitData.join_info.role_name != 1 && this.presenterId == this.userId) {
+          if (this.roleName != 1 && this.presenterId == this.userId) {
             return true;
           }
           return false;
@@ -285,7 +289,10 @@
       // 是否有翻页操作权限
       hasPager() {
         return (
-          this.hasDocPermission || this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
+          this.hasDocPermission ||
+          ([3, 4].includes(this.roleName) &&
+            this.roomBaseServer.state.configList.close_assistant_flip_doc == 1) ||
+          this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
         );
       }
     },
@@ -316,6 +323,7 @@
           }
         }
       },
+      // 大小屏变化
       ['roomBaseServer.state.miniElement'](newval) {
         console.log('-[doc]--大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
         console.log('-[doc]--old displayMode：', this.displayMode);
@@ -490,6 +498,15 @@
             }
           });
         }
+
+        useMsgServer().$onMsg('ROOM_MSG', msg => {
+          // 直播开始
+          if (msg.data.type === 'live_start') {
+            if ([3, 4].includes(this.roleName)) {
+              this.recoverLastDocs();
+            }
+          }
+        });
 
         // 直播结束
         useMsgServer().$on('live_over', () => {
