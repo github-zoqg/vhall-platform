@@ -90,7 +90,7 @@
       }
     },
     mounted() {
-      this.useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
+      useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
         this.state = 2;
         this.errorData.errorPageTitle = 'it_end';
       });
