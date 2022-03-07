@@ -64,6 +64,7 @@
         <el-input
           :type="regPwdShow ? 'text' : 'password'"
           v-model.trim="ruleForm.password"
+          onkeyup="this.value = this.value.replace(/[\u4E00-\u9FA5]/g, '')"
           clearable
           :placeholder="$t('register.register_1007')"
         >
@@ -74,6 +75,27 @@
             @click="passWordType"
           ></i>
         </el-input>
+        <!-- <el-input
+          type="password"
+          v-model.trim="ruleForm.password"
+          clearable
+          :placeholder="$t('register.register_1007')"
+        ></el-input> -->
+        <!-- <PwdInput
+          v-model.trim="ruleForm.password"
+          clearable
+          :placeholder="$t('login.login_1011')"
+          :maxlength="30"
+          auto-complete="off"
+          onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
+        >
+          <i
+            slot="suffix"
+            class="vh-iconfont"
+            :class="[regPwdShow ? 'vh-line-view' : 'vh-line-hidden']"
+            @click="passWordType"
+          ></i>
+        </PwdInput> -->
         <a
           href="javascript:void(0)"
           class="vmp-register__login__link"
