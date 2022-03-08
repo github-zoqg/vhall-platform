@@ -52,6 +52,9 @@
         opened: false
       };
     },
+    mounted() {
+      console.log(this.redPacketInfo, 'redPacketInfo22222');
+    },
     computed: {
       userId() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
@@ -67,7 +70,6 @@
         // if (this.accepted) return;
         // this.accepted = true;
         if (this.userId == 0) {
-          console.log(this.userId, '7777');
           return this.$emit('needLogin');
         }
         this.redPacketServer.openRedPacket().then(res => {

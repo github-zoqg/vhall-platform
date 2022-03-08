@@ -69,7 +69,6 @@
         this.dialogVisible = true;
       },
       handleGoLogin() {
-        console.log(123);
         this.dialogVisible = false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
