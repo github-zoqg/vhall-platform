@@ -145,7 +145,7 @@
         return this.$domainStore.state.micServer.isSpeakOn;
       },
       isLiving() {
-        return this.$domainStore.state.roomBaseServer.webinar.watchInitData.type == 1;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       }
     },
     components: {
