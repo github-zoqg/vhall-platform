@@ -20,7 +20,9 @@
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
     },
     created() {
       this.initStatus();
@@ -43,6 +45,7 @@
       },
       checkRedPacketIcon() {
         this.$emit('clickIcon', this.lastUUID);
+        this.showDot = false;
       },
       handleNewRedPacket(msg) {
         this.lastUUID = msg.red_packet_uuid;
