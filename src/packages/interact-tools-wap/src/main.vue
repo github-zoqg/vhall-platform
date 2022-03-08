@@ -6,7 +6,6 @@
         v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && webinarType == 1"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
-        :class="`${live_over}`"
       >
         <i
           v-if="!handUpStatus"
