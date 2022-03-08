@@ -15,7 +15,11 @@
     <!-- 抽奖结果 -->
     <template v-else-if="source.type == 'lottery_result_notice'">
       <div class="msg-item interact">
-        <div class="interact-msg" @tap="checkLotteryDetail($event, source)">
+        <div
+          class="interact-msg"
+          @tap="checkLotteryDetail($event, source)"
+          @click="checkLotteryDetail($event, source)"
+        >
           {{ source.content.text_content }}
           <template v-if="source.content.Show">
             {{ $t('common.common_1030') }}
@@ -179,6 +183,21 @@
       previewImg: {
         type: Function,
         default: function () {}
+      },
+      emitLotteryEvent: {
+        type: Function,
+        default: function () {}
+      },
+      emitQuestionnaireEvent: {
+        type: Function,
+        default: function () {}
+      },
+      //当前登录人的信息
+      joinInfo: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {
@@ -260,14 +279,17 @@
     methods: {
       // 点击查看抽奖信息
       //todo 信令替代
-      checkLotteryDetail(e, msg) {
-        console.log(e, msg);
-        // EventBus.$emit('checkLotteryDetail', msg);
+      checkLotteryDetail(e, msgData) {
+        console.log('checkLotteryDetail', e, msgData);
+        console.log(this.emitLotteryEvent);
+        this.emitLotteryEvent(msgData?.content?.msg?.data);
       },
       // 点击查看问卷
       //todo 信令替代
       checkQuestionDetail(questionnaire_id) {
         console.log(questionnaire_id);
+        console.log(this.emitQuestionnaireEvent);
+        this.emitQuestionnaireEvent(questionnaire_id);
         // EventBus.$emit('checkQuestionDetail', questionnaire_id);
       },
       //处理@消息

@@ -65,7 +65,7 @@
     </div>
     <!-- 小组协作中 -->
     <div class="vmp-wap-stream-wrap-group" v-show="showGroupMask">
-      <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+      <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
       小组协作中
     </div>
   </div>

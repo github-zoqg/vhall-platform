@@ -9,58 +9,12 @@
           :data-key="'id'"
           :data-sources="qaList"
           :data-component="MsgItem"
+          @tobottom="tobottom"
         ></virtual-list>
-        <!-- <scroll :pullDownRefresh="false" ref="scroll">
-          <div class="qa-item-wrapper" v-for="(msg, index) in list" :key="index">
-            <template>
-              <div class="question">
-                <div class="user">
-                  <span class="avatar-box">
-                    <img
-                      class="avatar"
-                      :src="
-                        msg.avatar !== '0'
-                          ? msg.avatar || require(`./img/question.png`)
-                          : require(`./img/question.png`)
-                      "
-                    />
-                  </span>
-                  <span class="nick-name">{{ msg.data ? msg.data.nick_name : msg.nick_name }}</span>
-                  <span class="time">{{ msg.created_at }}</span>
-                </div>
-                <div class="content">
-                  <span class="question-label">{{ $t('chat.chat_1040') }}：</span>
-                  <span class="question-reply" v-html="msg.content"></span>
-                </div>
-              </div>
-              <template v-if="msg.answer">
-                <div class="answer">
-                  <div class="user">
-                    <span class="avatar-box">
-                      <img
-                        class="avatar"
-                        :src="
-                          msg.answer.avatar !== '0'
-                            ? msg.answer.avatar || require(`./img/question.png`)
-                            : require(`./img/question.png`)
-                        "
-                      />
-                    </span>
-                    <span :class="['role', msg.answer.role_name]">
-                      {{ roleFilter(msg.answer.role_name) }}
-                    </span>
-                    <span class="nick-name">{{ msg.answer.nick_name }}</span>
-                    <span class="time">{{ msg.answer.created_at }}</span>
-                  </div>
-                  <div class="content">
-                    <span class="question-label">{{ $t('chat.chat_1041') }}：</span>
-                    <span class="question-reply" v-html="msg.answer.content"></span>
-                  </div>
-                </div>
-              </template>
-            </template>
-          </div>
-        </scroll> -->
+      </div>
+      <div class="new-msg-tips" v-show="unReadMessageCount > 0" @click="scrollToTarget">
+        <span>{{ tipMsg }}</span>
+        <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
     <send-box
@@ -77,14 +31,17 @@
   import SendBox from '@/packages/chat-wap/src/components/send-box';
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpQaWap',
+    mixins: [emitter],
     data() {
       return {
         MsgItem,
         qaList: useQaServer().state.qaList,
         listCopy: [],
-        isOnlyWatchQaReply: false, // 是否点击了只看我的
+        tipMsg: '',
+        unReadMessageCount: 0, // 是否点击了只看我的
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
         watchInitData: useRoomBaseServer().state.watchInitData
@@ -134,8 +91,12 @@
           }
         });
         //收到问答回复
-        qaServer.$on(qaServer.Events.QA_COMMIT, () => {
-          this.scrollBottom();
+        qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
+          if (msg.sender_id != this.thirdPartyId) {
+            this.unReadMessageCount++;
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.dispatch('TabContent', 'noticeHint', 'v5');
+          }
         });
         //监听禁言通知
         chatServer.$on('banned', res => {
@@ -179,6 +140,9 @@
       scrollToTarget() {
         const index = this.qaList.length - this.unReadMessageCount;
         this.$refs.qalist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+      },
+      tobottom() {
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部
@@ -281,6 +245,24 @@
               display: inline-block;
             }
           }
+        }
+      }
+      .new-msg-tips {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 60px;
+        background-color: rgba(255, 233, 233, 0.9);
+        border: 1px solid rgba(254, 129, 148, 1);
+        color: #333333;
+        font-size: 26px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .vh-iconfont {
+          font-size: 16px;
+          margin-left: 19px;
         }
       }
     }

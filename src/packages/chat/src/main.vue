@@ -29,6 +29,7 @@
           emitLotteryEvent,
           emitQuestionnaireEvent
         }"
+        @tobottom="tobottom"
       ></virtual-list>
       <div
         v-if="![1, '1'].includes(configList['ui.hide_chat_history'])"
@@ -97,9 +98,10 @@
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChat',
-    mixins: [eventMixin, dataReportMixin],
+    mixins: [eventMixin, dataReportMixin, emitter],
     components: {
       ImgPreview,
       ChatUserControl,
@@ -110,16 +112,6 @@
       const { chatList } = useChatServer().state;
       return {
         MsgItem,
-        //滚动插件配置
-        overlayScrollBarsOptions: {
-          resize: 'none',
-          paddingAbsolute: true,
-          className: 'os-theme-light os-theme-vhall',
-          scrollbars: {
-            autoHide: 'leave',
-            autoHideDelay: 200
-          }
-        },
         chatServerState: useChatServer().state,
         //默认兜底头像
         defaultAvatar,
@@ -315,21 +307,22 @@
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
-            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
+          this.dispatch('VmpTabContainer', 'noticeHint', '3');
         });
         //监听@我的消息
         chatServer.$on('atMe', () => {
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
-            this.tipMsg = '有人@你';
+            this.tipMsg = this.$t('chat.chat_1075');
           }
         });
         //监听回复我的消息
         chatServer.$on('replyMe', () => {
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
-            this.tipMsg = '有人回复你';
+            this.tipMsg = this.$t('chat.chat_1076');
           }
         });
         //监听禁言通知
@@ -349,27 +342,6 @@
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
           this.$message('您已经被踢出房间');
-        });
-        // 发起端 礼物消息接受
-        giftsServer.$on('gift_send_success', msg => {
-          console.log('VmpWapRewardEffect-------->', this.$route);
-          if (this.$route.path.includes('/lives/room')) {
-            const data = {
-              nickname:
-                msg.data.gift_user_nickname.length > 8
-                  ? msg.data.gift_user_nickname.substr(0, 8) + '...'
-                  : msg.data.gift_user_nickname,
-              avatar: msg.data.avatar,
-              content: {
-                gift_name: msg.data.gift_name,
-                gift_url: `${msg.data.gift_image_url}`,
-                source_status: msg.data.source_status
-              },
-              type: msg.data.type,
-              interactToolsStatus: true
-            };
-            chatServer.addChatToList(data);
-          }
         });
       },
       init() {
@@ -627,6 +599,9 @@
       scrollToTarget() {
         const index = this.chatList.length - this.unReadMessageCount;
         this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+      },
+      tobottom() {
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部

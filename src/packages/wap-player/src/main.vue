@@ -83,8 +83,12 @@
           </i18n>
         </span>
       </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条 :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"-->
-      <div class="vmp-wap-player-footer" v-show="isPlayering">
+      <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
+      <div
+        class="vmp-wap-player-footer"
+        v-show="isPlayering"
+        :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
+      >
         <!-- 倍速和画质合并 -->
         <div class="vmp-wap-player-speed">
           <span @click="openLanguage" v-if="languageList.length > 1">
@@ -366,7 +370,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
-      window.playerServer = this.playerServer;
+      // window.playerServer = this.playerServer;
     },
     beforeDestroy() {
       this.playerServer.destroy();
@@ -433,8 +437,6 @@
           }
           this.optionTypeInfo('vod', _id);
         }
-        this.listenEvents();
-        this.getListenPlayer();
       },
       optionTypeInfo(type, id) {
         this.playerServer.setType(type);
@@ -484,12 +486,16 @@
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
+          this.listenEvents(); // 监听断点续播事件
+          this.getListenPlayer(); // 监听播放器播放、暂停等事件
           if (this.playerState.type == 'vod') {
             this.eventPointList = this.playerServer.state.markPoints;
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
           }
+          this.playerServer.openControls(false);
+          this.playerServer.openUI(false);
           this.$nextTick(() => {
             if (this.water && this.water.watermark_open == 1) {
               const watermarkContainer = document.getElementById('vh-watermark-container');
@@ -917,9 +923,9 @@
       z-index: 7;
       padding: 0 32px;
       &-preview {
-        height: 64px;
+        // height: 64px;
         color: #fff;
-        line-height: 64px;
+        line-height: 36px;
         font-size: 24px;
         position: absolute;
         bottom: 100px;

@@ -55,7 +55,7 @@ const serverConfig = {
       'comScreenPostWap',
       'comUserCenterWap',
       'comCashWap',
-      'compLotteryWap',
+      'comLotteryWap',
       'comRedPacketWap',
       'comInviteHandup'
     ]
@@ -125,11 +125,12 @@ const serverConfig = {
     },
     emitOpenRedPacket: {
       cuid: ['comRedPacketWap'],
-      method: 'openRedPacket'
+      method: 'openRedPacket',
+      args: ['$0']
     },
     // 抽奖弹窗
     emitClickLotteryIcon: {
-      cuid: ['compLotteryWap'],
+      cuid: ['comLotteryWap'],
       method: 'open'
     }
   },
@@ -226,6 +227,16 @@ const serverConfig = {
         method: 'open'
       }
     ],
+    emitClickLotteryChatItem: {
+      cuid: ['comLotteryWap'],
+      method: 'accept',
+      args: ['$0']
+    },
+    emitClickQuestionnaireChatItem: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -330,8 +341,19 @@ const serverConfig = {
     ]
   },
   // 抽奖
-  compLotteryWap: {
+  comLotteryWap: {
     component: 'VmpLotteryWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
+  },
+  // 红包
+  compRedPacketWap: {
+    component: 'VmpRedPacketWap',
     emitClickLogin: [
       //登录弹窗
       {

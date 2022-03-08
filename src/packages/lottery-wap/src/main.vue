@@ -62,6 +62,12 @@
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
     },
     methods: {
+      accept(msg) {
+        console.log('accept', msg);
+        this.setFitment(msg);
+        this.lotteryView = 'LotteryWin';
+        this.popupVisible = true;
+      },
       /**
        * @description 点开抽奖(按钮或者聊天)
        */
@@ -144,7 +150,7 @@
             msg: msg,
             type: msg.data.type,
             userId: join_info.user_id || join_info.third_party_user_id,
-            Show: msg.data.lottery_status == 1 && msg.data.win == 1
+            Show: true
           },
           type: msg.data.type,
           interactStatus: true,

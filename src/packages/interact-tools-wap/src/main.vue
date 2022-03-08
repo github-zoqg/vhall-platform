@@ -111,7 +111,7 @@
         webSrc: roomBaseState.watchInitData.urls.web_url,
         webinarId: roomBaseState.watchInitData.webinar.id
       };
-      let webinarData = roomBaseState.watchInitData.webinar;
+      let webinarData = roomBaseState.watchInitData;
       return {
         roomBaseState,
         localRoomInfo,

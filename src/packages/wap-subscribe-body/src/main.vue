@@ -29,6 +29,9 @@
               : $t('common.common_1021')
           }}
         </div>
+        <div class="subscribe-language" v-if="languageList.length > 1" @click="openLanguage">
+          <span>{{ lang.key == 1 ? '中文' : 'EN' }}</span>
+        </div>
       </template>
     </div>
     <template v-if="showBottomBtn">
@@ -55,18 +58,45 @@
       v-model="popupLivingStart"
       :title="$t('webinar.webinar_1019')"
       :confirmButtonText="$t('common.common_1010')"
-      class="vmp-subscribe-body-popup"
+      class="vmp-subscribe-body-dialog"
       @confirm="livingStartConfirm"
       @close="livingCloseConfirm"
     >
       <p>{{ $t('player.player_1018') }}</p>
     </van-dialog>
+    <!-- 弹出语言弹窗 -->
+    <van-popup v-model="isOpenlang" round position="bottom" class="vmp-subscribe-body-popup">
+      <ul>
+        <li
+          v-for="(item, index) in languageList"
+          :key="index"
+          class="language-item"
+          :class="{ 'popup-active': item.key == lang.key }"
+          @click="changeLang(item.key)"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
+      <p class="language-item" @click="isOpenlang = false">{{ $t('account.account_1063') }}</p>
+    </van-popup>
   </div>
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
   import { boxEventOpitons, browserType } from '@/packages/app-shared/utils/tool.js';
   import authBox from './components/confirm.vue';
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -88,7 +118,10 @@
           actual_start_time: '',
           show: 1,
           num: 0
-        }
+        },
+        isOpenlang: false, // 是否打开多语言弹窗
+        lang: {},
+        languageList: []
       };
     },
     components: {
@@ -121,6 +154,17 @@
     },
     created() {
       this.initPage();
+      this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
+        return langMap[item.language_type];
+      });
+      console.log(this.languageList, '??!32142435');
+      const curLang = this.roomBaseServer.state.languages.curLang;
+      this.lang =
+        langMap[sessionStorage.getItem('lang')] ||
+        langMap[this.$route.query.lang] ||
+        langMap[curLang.language_type];
+      this.$i18n.locale = this.lang.type;
+      sessionStorage.setItem('lang', this.lang.key);
     },
     mounted() {
       this.listenEvents();
@@ -350,6 +394,14 @@
       authClose() {
         this.isSubscribeShow = false;
       },
+      openLanguage() {
+        this.isOpenlang = true;
+      },
+      changeLang(key) {
+        this.isOpenlang = false;
+        sessionStorage.setItem('lang', key);
+        window.location.reload();
+      },
       filterText(verify, status) {
         switch (verify) {
           case 0:
@@ -519,6 +571,15 @@
           background: #2ab804;
         }
       }
+      .subscribe-language {
+        position: absolute;
+        bottom: 25px;
+        right: 20px;
+        z-index: 10;
+        color: #fff;
+        font-size: 28px;
+        cursor: pointer;
+      }
     }
     &-auth {
       position: fixed;
@@ -542,7 +603,7 @@
         align-items: center;
       }
     }
-    &-popup {
+    &-dialog {
       min-height: 360px;
       border-radius: 14px;
       .van-dialog__header {
@@ -568,6 +629,25 @@
       .van-dialog__confirm {
         font-size: 36px;
         color: #fc5659;
+      }
+    }
+    &-popup {
+      ul {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 28px;
+      }
+      .language-item {
+        text-align: center;
+        height: 100px;
+        line-height: 100px;
+        width: 100%;
+        background: #fff;
+        color: #333;
+        &.popup-active {
+          color: #fb2626;
+        }
       }
     }
   }

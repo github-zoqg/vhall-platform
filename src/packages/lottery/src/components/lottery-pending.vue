@@ -70,6 +70,12 @@
         default() {
           return 'watch';
         }
+      },
+      disabledTime: {
+        type: Number,
+        default() {
+          return 0;
+        }
       }
     },
     computed: {
@@ -86,38 +92,13 @@
     data() {
       return {
         timer: null,
-        disabledTime: 5, // 5秒禁止点击
+
         loading: false,
         joined: false
       };
     },
 
-    mounted() {
-      if (this.mode === 'live') {
-        this.coutDown();
-      }
-    },
-    destroyed() {
-      this.clearTimer();
-    },
     methods: {
-      // 清除计时
-      clearTimer() {
-        if (this.timer) {
-          clearInterval(this.timer);
-          this.timer = null;
-        }
-      },
-      // 开始计时
-      coutDown() {
-        this.clearTimer();
-        this.timer = setInterval(() => {
-          this.disabledTime--;
-          if (this.disabledTime <= 0) {
-            this.clearTimer();
-          }
-        }, 1000);
-      },
       close() {
         this.$emit('close');
       },

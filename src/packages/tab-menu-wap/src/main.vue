@@ -44,6 +44,7 @@
         ref="tabContent"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
+        @noticeHint="handleHint"
         @closePopup="selectDefault"
       />
     </section>
@@ -262,10 +263,14 @@
       setTipsVisible({ visible, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
-
         tab.tipsVisible = visible;
       },
-
+      handleHint(cuid) {
+        if (this.selectedType == cuid) {
+          return;
+        }
+        this.setTipsVisible({ visible: true, type: cuid });
+      },
       /**
        * 跳转到最近的item
        */

@@ -542,7 +542,14 @@ export const serverConfig = {
 
   // 红包
   comRedPacket: {
-    component: 'VmpRedPacketWatch'
+    component: 'VmpRedPacketWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 邀请上麦弹窗
   comMicInvited: {
