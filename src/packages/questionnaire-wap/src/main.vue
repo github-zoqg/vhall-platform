@@ -62,12 +62,16 @@
           console.log('questionnaireServer22222222');
           console.log(msg);
           useChatServer().addChatToList({
+            nickName: msg.nick_name,
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              // TODO 发起问卷文案提示不对
-              text_content: this.$t('interact_tools.interact_tools_1021')
+              text_content: this.$t('chat.chat_1030'),
+              questionnaire_id: msg.questionnaire_id
             },
-            type: msg.data.type,
-            interactStatus: true
+            roleName: msg.room_role,
+            type: msg.type,
+            interactStatus: true,
+            isCheck: true
           });
           this.popupVisible = true;
           await this.$nextTick();
