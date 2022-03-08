@@ -277,14 +277,9 @@
         searchEmpty: false,
         // 输入的成员名称
         searchUserInput: '',
-        //
         /** 搜索输入框结束 */
         // 容器内边距
         emptyContainerPaddingTop: 10,
-        //当前主讲人的id
-        currentSpeakerId: '',
-        //当前演示者的id
-        presentation_screen: '',
         //组长id
         leader_id: '',
         //当前的激活的tab
@@ -332,21 +327,14 @@
       //开始初始化流程
       this.init();
       this.listenEvent();
-      //初始化主讲人id
-      this.currentSpeakerId = this.groupInitData.isInGroup
-        ? this.groupInitData.doc_permission
-        : this.interactToolStatus.doc_permission;
-      this.presentation_screen = this.groupInitData.presentation_screen;
       this.isWatch && this.changeSpeakerList();
     },
     watch: {
-      roleName(newVal, oldVal) {
+      roleName(newVal) {
         this.roleName = newVal;
-        console.log(oldVal);
       },
       leader_id: {
         handler(newVal, oldVal) {
-          // this.leader_id = newVal;
           if (newVal == oldVal) return;
           this.handleLeaderChange(newVal, oldVal);
         },
@@ -354,7 +342,7 @@
       },
       onlineUsers: {
         handler(newVal) {
-          if (this.memberOptions.platformType === 'watch' && newVal && newVal.length) {
+          if (this.isWatch && newVal && newVal.length) {
             this.onlineSpeakerList = newVal.filter(item => {
               return item.is_speak;
             });
@@ -368,10 +356,10 @@
       //是否显示底部区域
       isShowBottom() {
         let show = true;
-        if (this.memberOptions.platformType === 'watch') {
+        if (this.isWatch) {
           return this.leader_id == this.userId && this.isInGroup;
         }
-        if (this.memberOptions.platformType === 'live') {
+        if (this.isLive) {
           show = true;
         }
         return show;
@@ -468,7 +456,6 @@
       handleStartGroup() {
         const _this = this;
         // 开始讨论后重新初始化页面
-        console.log('开始分组讨论');
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
           if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
@@ -478,12 +465,6 @@
           const { type = '' } = temp.data || {};
           if (type === 'start_discussion') {
             _this.init();
-            // _this.listenEvent();
-            //初始化主讲人id
-            _this.currentSpeakerId = _this.groupInitData.isInGroup
-              ? _this.groupInitData.doc_permission
-              : _this.interactToolStatus.doc_permission;
-            _this.presentation_screen = _this.groupInitData.presentation_screen;
           }
         });
       },
@@ -662,11 +643,6 @@
         //直播结束
         function handleLiveOver(msg) {
           console.log(msg);
-          const hostUserId = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
-          // 结束直播时当前主讲人不是主持人， 就设置为主持人
-          if (this.currentSpeakerId != hostUserId) {
-            this.currentSpeakerId = hostUserId;
-          }
           setTimeout(() => {
             _this.refreshList();
           }, 1000);
@@ -1102,7 +1078,6 @@
           if (_this.isWatch) {
             return;
           }
-          _this.currentSpeakerId = msg.data.room_join_id;
         }
         //处理踢出人员
         function handleKicked(msg) {
@@ -1133,9 +1108,6 @@
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
           console.log(msg);
-          if (_this.isWatch) {
-            _this.presentation_screen = _this.leader_id;
-          }
         }
         //主房间人员变动
         function handleMainRoomJoinChange(msg) {
@@ -1265,28 +1237,6 @@
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
           isWatch && handleRoomChannelChange(msg);
         });
-
-        // 邀请演示-同意
-        // this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
-        //   if (!isWatch) return;
-        //
-        //   if (this.roleName == 20) {
-        //     this.$message({
-        //       message: '对方已接受邀请',
-        //       showClose: true,
-        //       // duration: 0,
-        //       type: 'success',
-        //       customClass: 'zdy-info-box'
-        //     });
-        //   }
-        //   this.presentation_screen = msg.sender_id;
-        // });
-
-        // 同意邀请演示成功消息
-        // this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', msg => {
-        //   isWatch && handlePresentationPermissionChange(msg);
-        // });
-
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', msg => {
           isWatch && handleRoomDisconnectSuccess(msg);
@@ -1362,11 +1312,6 @@
               _this.onlineUsers = [];
               _this.getOnlineUserList();
             }
-            return;
-          }
-          if (_this.isWatch) {
-            // 进入小组重置演示人id
-            _this.presentation_screen = _this.groupServer.state.presentation_screen;
           }
         }
 
@@ -1412,6 +1357,7 @@
 
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
+          console.log(msg);
           if (_this.roleName == 20) {
             _this.$message({
               message: '对方已接受邀请',
@@ -1421,7 +1367,6 @@
               customClass: 'zdy-info-box'
             });
           }
-          _this.presentation_screen = msg.sender_id;
         }
         //演示权限变更
         function handlePresentationPermissionChange(msg) {
@@ -1431,17 +1376,9 @@
             }
           });
         }
-        //组长变更
-        function handleLeaderChange(msg) {
-          _this.leader_id = msg.data.account_id;
-          _this.getOnlineUserList();
-        }
         //切换频道(开始讨论也会调这里)
         async function handleRoomChannelChange(msg) {
           console.log(msg);
-          //todo 待确认切换频道事件和这里的mainScreen
-          _this.mainScreen = _this.groupServer.state.groupInitData.main_screen;
-          _this.presentation_screen = _this.groupServer.state.groupInitData.presentation_screen;
           await sleep(1000);
           _this.onlineUsers = [];
           _this.getOnlineUserList();
@@ -1449,16 +1386,10 @@
         //切换小组
         async function handleGroupChange(msg) {
           console.log(msg, '切换小组的msg');
-          // 进入小组重置演示人id
-          _this.presentation_screen = _this.groupServer.state.main_screen;
-          // 初始化互动实例
-          await this.interactiveServer.init();
         }
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {
-          if (msg.data.target_id == _this.presentation_screen) {
-            _this.presentation_screen = _this.leader_id;
-          }
+          console.log(msg);
         }
       },
       // 更新上麦人员列表
@@ -1634,7 +1565,7 @@
         this.getOnlineUserList();
       },
       //切换允许举手状态
-      onSwitchAllowRaiseHand(status) {
+      onSwitchAllowRaiseHand() {
         if (this.liveStatus !== 1) {
           this.allowRaiseHand = false;
           this.$message.error(this.$t('512521'));
@@ -1645,7 +1576,6 @@
           status: this.allowRaiseHand ? 1 : 0
         };
 
-        //todo 待micServer这边完善方法
         this.disabledSwitchHand = true;
         this.micServer
           .setHandsUp(params)
@@ -1752,15 +1682,10 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
-        //todo 待联调，domain的可能暂时不可用
         this.micServer
           .hostAgreeApply(params)
           .then(res => {
             console.log(res);
-            if (res.code !== 200) {
-              this.$message.error(res.msg);
-              return;
-            }
             this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
@@ -1783,7 +1708,6 @@
             // 主持人自己上麦 todo 可能是信令或者直接移除
             // EventBus.$emit('applyByHost');
           } else {
-            //todo 待domain micServer完善这部分
             this.micServer
               .inviteMic({
                 room_id: this.roomId,
@@ -1843,10 +1767,6 @@
       },
       // 我要演示
       myPresentation(accountId) {
-        console.log(this.getCurrentMainScreen, '当前演示主屏幕的id');
-        console.log(this.getCurrentPresentationScreen, '当前演示屏幕的id');
-        console.log(accountId, '当前操作的用户id');
-
         if (this.getCurrentPresentationScreen == accountId) {
           this.$message.warning('正在演示中');
           return false;
@@ -1907,12 +1827,10 @@
       },
       //邀请上麦
       inviteMic(accountId = '') {
-        console.log('[member] accountId:', accountId);
-        if (this.memberOptions.platformType === 'watch' && accountId === this.leader_id) {
-          return;
-        }
-
-        if (this.memberOptions.platformType === 'watch' && accountId === this.getCurrentSpeakerId) {
+        if (
+          this.isWatch &&
+          (accountId === this.leader_id || accountId === this.getCurrentSpeakerId)
+        ) {
           return;
         }
         const params = {
@@ -1923,7 +1841,6 @@
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {
-            console.log(res, 'v3InviteMic');
             if (res.code == 200) {
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')

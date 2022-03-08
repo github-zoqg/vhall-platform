@@ -3,7 +3,7 @@
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
       <div
-        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && !live_over"
+        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && webinarType == 1"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
         :class="`${live_over}`"
@@ -125,8 +125,7 @@
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
         handUpStatus: false,
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
-        live_over: false
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     computed: {
@@ -142,6 +141,9 @@
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      webinarType() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     created() {
@@ -170,13 +172,6 @@
         this.isBanned = res;
         if (this.isSpeakOn) {
           useMicServer().speakOff();
-        }
-      });
-
-      // 结束直播
-      useMsgServer().$onMsg('ROOM_MSG', msg => {
-        if (msg.data.type === 'live_over') {
-          this.live_over = true;
         }
       });
 
