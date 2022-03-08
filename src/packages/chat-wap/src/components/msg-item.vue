@@ -191,6 +191,13 @@
       emitQuestionnaireEvent: {
         type: Function,
         default: function () {}
+      },
+      //当前登录人的信息
+      joinInfo: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {

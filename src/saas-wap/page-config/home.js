@@ -125,7 +125,8 @@ const serverConfig = {
     },
     emitOpenRedPacket: {
       cuid: ['comRedPacketWap'],
-      method: 'openRedPacket'
+      method: 'openRedPacket',
+      args: ['$0']
     },
     // 抽奖弹窗
     emitClickLotteryIcon: {

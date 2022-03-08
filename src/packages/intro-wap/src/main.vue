@@ -229,6 +229,10 @@
         p {
           word-break: break-all;
         }
+
+        img {
+          width: 100%;
+        }
       }
 
       &__auth {
