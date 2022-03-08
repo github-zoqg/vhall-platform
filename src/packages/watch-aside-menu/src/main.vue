@@ -128,7 +128,17 @@
         return this.$domainStore.state.desktopShareServer.isShareScreen;
       }
     },
-    created() {
+    watch: {
+      // 检测演示人变化
+      ['groupServer.state.groupInitData.presentation_screen'](presenterId) {
+        if (presenterId && presenterId == this.userId) {
+          this.isCollapse = false;
+        } else {
+          this.isCollapse = true;
+        }
+      }
+    },
+    beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.groupServer = useGroupServer();
@@ -141,6 +151,10 @@
         // 开启分组讨论
         this.groupServer.$on('GROUP_SWITCH_START', () => {
           if (this.groupServer.state.groupInitData.isInGroup) {
+            if (this.groupServer.state.groupInitData.join_role == 20) {
+              // 如果是组长，默认展开菜单
+              this.isCollapse = false;
+            }
             this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
@@ -171,8 +185,11 @@
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          this.isCollapse = true;
           if (this.isInGroup) {
+            if (this.groupServer.state.groupInitData.presentation_screen != this.userId) {
+              //  如果演示者不是自己
+              this.isCollapse = true;
+            }
             if (this.groupServer.state.groupInitData.join_role == 20) {
               this.gobackHome(6);
             } else {
@@ -180,6 +197,7 @@
             }
           }
         });
+
         // 观看端监听到邀请演示的消息处理
         // (主直播间主持人邀请其它成员演示，小组内组长邀请其它成员演示)
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION', msg => {

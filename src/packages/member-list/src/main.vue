@@ -1450,9 +1450,7 @@
         async function handleGroupChange(msg) {
           console.log(msg, '切换小组的msg');
           // 进入小组重置演示人id
-          _this.presentation_screen = _this.groupServer.state.main_screen;
-          // 初始化互动实例
-          await this.interactiveServer.init();
+          _this.presentation_screen = _this.groupServer.state.groupInitData.presentation_screen;
         }
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {
