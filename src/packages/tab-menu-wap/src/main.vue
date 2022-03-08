@@ -52,7 +52,13 @@
 </template>
 
 <script>
-  import { useMenuServer, useQaServer, useChatServer } from 'middle-domain';
+  import {
+    useMenuServer,
+    useQaServer,
+    useChatServer,
+    useDocServer,
+    useMsgServer
+  } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
@@ -90,6 +96,7 @@
     },
     beforeCreate() {
       this.menuServer = useMenuServer();
+      this.docServer = useDocServer();
     },
     created() {
       this.initConfig();
@@ -105,6 +112,7 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -118,6 +126,7 @@
         });
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
           chatServer.addChatToList({
             content: {
               text_content: this.$t('chat.chat_1081')
@@ -132,6 +141,20 @@
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
           this.setVisible({ visible: true, type: 'private' });
+        });
+        // 直播结束不展示入口
+        msgServer.$on('live_over', e => {
+          this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
+        });
+        // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_change', val => {
+          console.log('dispatch_doc_switch_change', val);
+          this.setVisible({ visible: val, type: 2 });
+          if (val) {
+            let obj = this.getItem({ type: 2 });
+            this.select({ type: obj.type, id: obj.id });
+          }
         });
       },
       /**
@@ -193,7 +216,7 @@
        * @param {*} index
        */
       removeItemByIndex(index) {
-        this.menu.splice(index);
+        this.menu = this.menu.splice(index);
       },
       /**
        * 添加一个菜单项
@@ -222,7 +245,7 @@
        */
       getItem({ type, id }) {
         return this.menu.find(item => {
-          if (id !== undefined) {
+          if (id !== undefined && !!id) {
             return item.id === id;
           } else {
             return item.type === type;
@@ -282,6 +305,7 @@
         if (index < this.visibleMenu.length && nextItem !== undefined) {
           const { type, id } = nextItem;
           this.select({ type, id });
+          return;
         }
 
         // 向前跳

@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-lottery-icon" v-if="showIcon" @click="checkLotteryIcon">
     <img src="./images/lottery-icon.png" alt="" />
-    <i class="vmp-dot" v-if="showDot" />
+    <i class="vmp-dot" v-if="dotVisible" />
   </div>
 </template>
 <script>
@@ -14,7 +14,7 @@
     data() {
       return {
         showIcon: false, //显示图标
-        showDot: false // 显示小红点
+        dotVisible: false // 显示小红点
       };
     },
     beforeCreate() {
@@ -24,10 +24,16 @@
     },
     created() {
       this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.handleNewLottery);
+      this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_WIN, this.showDot);
+      this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_MISS, this.hideDot);
+      this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_SUBMIT, this.hideDot);
       this.checkLotteryStatus();
     },
     destroyed() {
       this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.handleNewLottery);
+      this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_WIN, this.showDot);
+      this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_MISS, this.hideDot);
+      this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_SUBMIT, this.hideDot);
     },
     methods: {
       checkLotteryIcon() {
@@ -35,7 +41,13 @@
       },
       handleNewLottery() {
         this.showIcon = true;
-        this.showDot = true;
+        this.dotVisible = true;
+      },
+      showDot() {
+        this.dotVisible = true;
+      },
+      hideDot() {
+        this.dotVisible = false;
       },
       /**
        * @description 房间初始化检查当前是否应该显示抽奖按钮
@@ -43,11 +55,10 @@
       checkLotteryStatus() {
         this.lotteryServer.checkLottery().then(res => {
           const data = res.data;
-          if (data.id) {
+          // 初始进入的时候只要发过抽奖,,就显示icon和dot
+          if (data?.id) {
             this.showIcon = true;
-            if (data.win) {
-              this.showDot = true;
-            }
+            this.dotVisible = true;
           }
         });
       }
@@ -55,7 +66,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-red-packet-icon {
+  .vmp-lottery-icon {
     color: #fff;
     margin-left: 16px;
     position: relative;

@@ -65,7 +65,7 @@
         <lottery-icon @clickIcon="checkLotteryIcon" />
       </li>
       <li>
-        <red-packet-icon />
+        <red-packet-icon @clickIcon="checkredPacketIcon" />
         <!-- 红包 -->
       </li>
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
@@ -324,8 +324,17 @@
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
-      checkLotteryIcon() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      checkLotteryIcon(redPacketId) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryIcon', [redPacketId])
+        );
+      },
+      checkredPacketIcon() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [
+            this.$domainStore.state.roomBaseServer.redPacket.red_packet_uuid
+          ])
+        );
       }
     }
   };

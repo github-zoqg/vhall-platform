@@ -50,7 +50,8 @@
     useChatServer,
     useGroupServer,
     useMsgServer,
-    useRoomBaseServer
+    useRoomBaseServer,
+    useMediaCheckServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -126,18 +127,22 @@
        *     2、默认不在麦上 ----->
        *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
        */
-      if (
-        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-        this.micServer.state.isSpeakOn
-      ) {
-        this.startPush();
-      } else if (
-        this.mode === 6 &&
-        !this.chatServer.state.banned &&
-        !this.chatServer.state.allBanned
-      ) {
-        await this.micServer.userSpeakOn();
+      if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
+        // 检测设备状态
+        if (
+          (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+          this.micServer.state.isSpeakOn
+        ) {
+          this.startPush();
+        } else if (
+          this.mode === 6 &&
+          !this.chatServer.state.banned &&
+          !this.chatServer.state.allBanned
+        ) {
+          await this.micServer.userSpeakOn();
+        }
       }
+      console.warn(789999, useMediaCheckServer().state.deviceInfo);
 
       useMsgServer().$onMsg('ROOM_MSG', async msg => {
         // live_over 结束直播  停止推流,
@@ -168,7 +173,7 @@
         }
 
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-          if (this.isNoDelay === 1 || this.mode === 6) {
+          if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例 若是收到结束分组讨论，则无需再次初始化互动实例
             await this.interactiveServer.init();
             // 开始推流

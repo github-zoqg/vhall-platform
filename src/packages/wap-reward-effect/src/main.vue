@@ -245,6 +245,7 @@
         top: 22px;
         background: white;
         border-radius: 50%;
+        overflow: hidden;
       }
     }
     .money-img {

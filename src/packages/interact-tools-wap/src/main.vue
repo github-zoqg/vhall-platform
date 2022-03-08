@@ -3,7 +3,7 @@
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- 上麦 -->
       <div
-        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && !live_over"
+        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && webinarType == 1"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
       >
@@ -76,7 +76,7 @@
     useMicServer,
     useChatServer,
     useGroupServer,
-    useInteractiveServer,
+    useMsgServer,
     useMediaCheckServer
   } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
@@ -124,8 +124,7 @@
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
         handUpStatus: false,
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
-        live_over: false
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
       };
     },
     computed: {
@@ -141,6 +140,9 @@
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      webinarType() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     created() {
@@ -172,17 +174,16 @@
         }
       });
 
-      // 结束直播
-      useInteractiveServer().$on('live_over', () => {
-        this.live_over = true;
-      });
-
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$toast(this.$t('interact.interact_1003'));
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1003'));
+        }
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$toast(this.$t('interact.interact_1002'));
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1002'));
+        }
       });
     },
     methods: {

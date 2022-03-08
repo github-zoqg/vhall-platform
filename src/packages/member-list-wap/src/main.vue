@@ -160,30 +160,37 @@
         });
         //开始讨论
         this.groupServer.$on('GROUP_SWITCH_START', msg => {
+          console.log('开始讨论', msg);
           _this.initList();
         });
         //结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          console.log('结束讨论', msg);
           _this.initList();
         });
         //解散小组
         this.groupServer.$on('GROUP_DISBAND', () => {
+          console.log('解散小组');
           _this.initList();
         });
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          console.log('踢出小组事件');
           handleGroupKicked(msg);
         });
         //切换频道
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
+          console.log('切换频道', msg);
           _this.initList();
         });
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          console.log('切换组长(组长变更)', msg);
           handleGroupLeaderChange(msg);
         });
         //为上线的分组成员添加身份
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
+          console.log('为上线成员添加身份', msg);
           handleGroupJoinInfoChange(msg);
         });
         //切换分组
@@ -193,7 +200,7 @@
         });
         //踢出小组
         function handleGroupKicked(msg) {
-          if (!_this.isInGroup) return;
+          if (!_this.groupInitData.isInGroup) return;
           if (_this.userId == msg.data.target_id) {
             _this.initList();
           } else {
