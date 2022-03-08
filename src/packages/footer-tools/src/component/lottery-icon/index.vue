@@ -24,10 +24,14 @@
     },
     created() {
       this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.handleNewLottery);
+      this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_WIN, this.handleLotteryWin);
+      this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_MISS, this.handleLotteryMiss);
       this.checkLotteryStatus();
     },
     destroyed() {
       this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.handleNewLottery);
+      this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_WIN, this.handleLotteryWin);
+      this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_MISS, this.handleLotteryMiss);
     },
     methods: {
       checkLotteryIcon() {
@@ -37,17 +41,22 @@
         this.showIcon = true;
         this.showDot = true;
       },
+      handleLotteryWin() {
+        this.showDot = true;
+      },
+      handleLotteryMiss() {
+        this.showDot = false;
+      },
       /**
        * @description 房间初始化检查当前是否应该显示抽奖按钮
        */
       checkLotteryStatus() {
         this.lotteryServer.checkLottery().then(res => {
           const data = res.data;
-          if (data.id) {
+          // 初始进入的时候只要发过抽奖,,就显示icon和dot
+          if (data?.id) {
             this.showIcon = true;
-            if (data.win) {
-              this.showDot = true;
-            }
+            this.showDot = true;
           }
         });
       }
@@ -55,7 +64,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-red-packet-icon {
+  .vmp-lottery-icon {
     color: #fff;
     margin-left: 16px;
     position: relative;

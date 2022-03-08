@@ -67,7 +67,6 @@
         // if (this.accepted) return;
         // this.accepted = true;
         if (this.userId == 0) {
-          console.log(this.userId, '7777');
           return this.$emit('needLogin');
         }
         this.redPacketServer.openRedPacket().then(res => {

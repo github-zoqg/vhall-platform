@@ -13,7 +13,7 @@
         height: 100%;
       "
     >
-      加载中...
+      {{ $t('common.common_1001') }}
     </van-loading>
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
@@ -71,7 +71,7 @@
           open_id &&
           roomBaseState.watchInitData.join_info
         ) {
-          this.bindInvite(this.$route.query.invite);
+          await this.bindInvite(this.$route.query.invite);
         }
 
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
@@ -183,8 +183,7 @@
        * @param {String} code 邀请码
        */
       async bindInvite(code = '') {
-        console.log('bindInvite inner', code, this.$route.params.id);
-        await this.inviteServer.bindInvite({
+        return this.inviteServer.bindInvite({
           webinar_id: this.$route.params.id,
           invite: code
         });
