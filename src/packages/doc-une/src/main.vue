@@ -48,7 +48,7 @@
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
           <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
-          <span v-if="hasDocPermission">暂未分享任何文档</span>
+          <span v-if="hasDocPermission || [3, 4].includes(roleName)">暂未分享任何文档</span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
       </div>
@@ -218,6 +218,10 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
+      // 角色
+      roleName() {
+        return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
+      },
       // 文档是否可见
       show() {
         return (
@@ -256,27 +260,29 @@
         if (this.watchInitData.join_info.role_name == 3) return false;
         if (this.isInGroup) {
           // 在小组内
-          // 如果是主持人或组长，演示人不是自己也不是组长，说明有人观众在演示. 主持人和组长都可以结束演示。
           if (
-            (this.groupInitData.join_role == 1 || this.groupInitData.join_role == 20) &&
-            this.presenterId != this.userId &&
+            this.groupInitData.join_role == 1 &&
             this.presenterId != this.groupInitData.doc_permission
           ) {
-            return true;
-          }
-          // 如果是观众，演示人是自己。
-          if (this.groupInitData.join_role == 2 && this.presenterId == this.userId) {
-            return true;
+            return true; // 对于主持人，演示者不是组长的时候显示
+          } else if (
+            this.groupInitData.join_role == 20 &&
+            this.presenterId != this.userId &&
+            this.presenterId != this.watchInitData.webinar.userinfo.user_id
+          ) {
+            return true; // 对于组长，演示者不是自己,也不是主持人的时候显示
+          } else if (this.groupInitData.join_role == 2 && this.presenterId == this.userId) {
+            return true; // 对于观众，演示者是自己的时候显示
           }
           return false;
         } else {
           // 在主直播间内
           // 如果是主持人，演示人不是自己，说明有人在演示
-          if (this.watchInitData.join_info.role_name == 1 && this.presenterId != this.userId) {
+          if (this.roleName == 1 && this.presenterId != this.userId) {
             return true;
           }
-          // 如果不是主持人, 演示者是自己
-          if (this.watchInitData.join_info.role_name != 1 && this.presenterId == this.userId) {
+          // 如果不是主持人, 演示者是自己,显示
+          if (this.roleName != 1 && this.presenterId == this.userId) {
             return true;
           }
           return false;
@@ -285,7 +291,10 @@
       // 是否有翻页操作权限
       hasPager() {
         return (
-          this.hasDocPermission || this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
+          this.hasDocPermission ||
+          ([3, 4].includes(this.roleName) &&
+            this.roomBaseServer.state.configList.close_assistant_flip_doc == 1) ||
+          this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
         );
       }
     },
@@ -316,6 +325,7 @@
           }
         }
       },
+      // 大小屏变化
       ['roomBaseServer.state.miniElement'](newval) {
         console.log('-[doc]--大小屏变更miniElement：', newval); // newval 取值 doc, stream-list
         console.log('-[doc]--old displayMode：', this.displayMode);
@@ -490,6 +500,15 @@
             }
           });
         }
+
+        useMsgServer().$onMsg('ROOM_MSG', msg => {
+          // 直播开始
+          if (msg.data.type === 'live_start') {
+            if ([3, 4].includes(this.roleName)) {
+              this.recoverLastDocs();
+            }
+          }
+        });
 
         // 直播结束
         useMsgServer().$on('live_over', () => {
@@ -879,13 +898,13 @@
       position: relative;
     }
 
-    // 结束演示按钮
+    // 发起端结束演示按钮
     .end-demonstrate {
       position: absolute;
       z-index: 3;
-      top: 27px;
+      top: 10px;
       right: 20px;
-      background: rgba(0, 0, 0, 0.6);
+      background: transparent;
       border-radius: 97px;
       border: 1px solid #666;
       color: #fff;
@@ -1088,6 +1107,24 @@
       width: calc(100% - 380px);
       height: auto;
       min-height: auto;
+    }
+
+    // 观看端结束演示按钮
+    .end-demonstrate {
+      position: absolute;
+      z-index: 3;
+      top: 27px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 97px;
+      border: 1px solid #666;
+      color: #fff;
+      cursor: pointer;
+      &:hover {
+        background: #fc5659;
+        border-color: #fc5659;
+        color: #fff;
+      }
     }
 
     &.vmp-doc-une--normal.has-stream-list {

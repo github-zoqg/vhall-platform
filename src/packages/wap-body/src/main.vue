@@ -14,8 +14,7 @@
       </div>
     </div>
     <div
-      id="wap-player-mini"
-      :class="[mini ? 'vmp-wap-body-mini' : '']"
+      :class="[mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl']"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
     >
@@ -41,12 +40,14 @@
             此处不能用v-if
        -->
     </div>
+    <masksliding></masksliding>
   </div>
 </template>
 <script>
   import { useMsgServer } from 'middle-domain';
   import move from './js/move';
   import { Dialog } from 'vant';
+  import masksliding from './components/mask.vue';
   export default {
     name: 'VmpWapBody',
     mixins: [move],
@@ -69,6 +70,9 @@
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url || cover;
       }
+    },
+    components: {
+      masksliding
     },
     beforeCreate() {
       this.msgServer = useMsgServer();
@@ -150,6 +154,10 @@
           padding-top: 30px;
         }
       }
+    }
+    &-nomarl {
+      height: 100%;
+      width: 100%;
     }
     &-mini {
       position: fixed;

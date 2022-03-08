@@ -1,13 +1,13 @@
 const move = {
   methods: {
     touchstart(e) {
-      // if (this.questionShow && !this.audioMode) {
-      this.videoDom = document.getElementById('wap-player-mini');
-      const style = window.getComputedStyle(this.videoDom);
-      this.DOMS = style;
-      this.touchOffsetX = e.touches[0].pageX - parseFloat(style.left);
-      this.touchOffsetY = e.touches[0].pageY - parseFloat(style.top);
-      // }
+      if (this.mini) {
+        this.videoDom = document.getElementsByClassName('wap-player-mini');
+        const style = window.getComputedStyle(this.videoDom);
+        this.DOMS = style;
+        this.touchOffsetX = e.touches[0].pageX - parseFloat(style.left);
+        this.touchOffsetY = e.touches[0].pageY - parseFloat(style.top);
+      }
     },
     touchmove(e) {
       this.leftX = e.touches[0].pageX - this.touchOffsetX;

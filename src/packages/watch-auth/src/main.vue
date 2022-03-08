@@ -62,12 +62,13 @@
       },
       authSubmit() {
         const { webinar } = this.roomBaseServer.state.watchInitData;
+        console.log(webinar, '???13214');
         let data = {
           webinar_id: webinar.id,
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
-          type: webinar.verify,
+          type: webinar.verify == 6 ? 4 : webinar.verify,
           verify_value: this.authTitle
         };
         this.subscribeServer.watchAuth(data).then(res => {

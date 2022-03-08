@@ -56,6 +56,7 @@ const serverConfig = {
       'comUserCenterWap',
       'comCashWap',
       'compLotteryWap',
+      'compRedPacketWap',
       'comRedPacketWap',
       'comInviteHandup'
     ]
@@ -332,6 +333,17 @@ const serverConfig = {
   // 抽奖
   compLotteryWap: {
     component: 'VmpLotteryWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
+  },
+  // 红包
+  compRedPacketWap: {
+    component: 'VmpRedPacketWap',
     emitClickLogin: [
       //登录弹窗
       {

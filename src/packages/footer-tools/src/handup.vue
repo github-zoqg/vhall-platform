@@ -28,7 +28,7 @@
         "
         round
       >
-        下麦
+        {{ $t('interact.interact_1007') }}
       </el-button>
     </div>
   </div>
@@ -39,7 +39,7 @@
     name: 'VmpHandup',
     data() {
       return {
-        btnText: '举手上麦',
+        btnText: this.$t('interact.interact_1001'),
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
         waitInterval: null
@@ -83,7 +83,7 @@
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           clearInterval(this.waitInterval);
           this.isApplyed = false;
-          this.btnText = '举手上麦';
+          this.btnText = this.$t('interact.interact_1001');
         }
       });
       // 用户成功下麦
@@ -138,7 +138,7 @@
             }
             this.isApplyed = true;
             this.waitTime = 30;
-            this.btnText = `等待(${this.waitTime}s)`;
+            this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
             this.startWaitInterval();
           });
       },
@@ -149,9 +149,9 @@
           .then(() => {
             this.isApplyed = false;
             this.waitInterval && clearInterval(this.waitInterval);
-            this.btnText = '举手上麦';
+            this.btnText = this.$t('interact.interact_1001');
             this.$message({
-              message: '您已取消申请上麦！',
+              message: this.$t('interact.interact_1027'),
               showClose: true,
               type: 'success',
               customClass: 'zdy-info-box'
@@ -162,10 +162,10 @@
       startWaitInterval() {
         this.waitInterval = setInterval(() => {
           this.waitTime--;
-          this.btnText = `等待(${this.waitTime}s)`;
+          this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
           if (this.waitTime <= 0) {
             clearInterval(this.waitInterval);
-            this.btnText = '举手上麦';
+            this.btnText = this.$t('interact.interact_1001');
             this.isApplyed = false;
             useMicServer().userCancelApply();
             // TODO: 分组

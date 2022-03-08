@@ -157,13 +157,12 @@
             @click="setMainScreen(false)"
           ></span>
         </el-tooltip>
-        <el-tooltip content="下麦" placement="bottom">
+        <!-- <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="showDownMic"
           ></span>
-        </el-tooltip>
+        </el-tooltip> -->
       </p>
     </section>
 
@@ -242,17 +241,17 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       // 实例化后是否需要调用上麦接口
-      isNeedSpeakOn() {
-        // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
-        // isSpeakOffToInit 自动上麦后，如果下麦，会重新初始化互动实例，不加这个变量会又一次走自动上麦
-        return (
-          this.mode === 6 &&
-          !this.chatServer.state.banned &&
-          !this.chatServer.state.allBanned &&
-          this.joinInfo.role_name != 3 &&
-          !this.micServer.state.isSpeakOffToInit
-        );
-      },
+      // isNeedSpeakOn() {
+      //   // 分组直播 + 未开启禁言 + 未开启全体禁言 + 非助理[ 角色 1主持人2观众3助理4嘉宾 ]
+      //   // isSpeakOffToInit 自动上麦后，如果下麦，会重新初始化互动实例，不加这个变量会又一次走自动上麦
+      //   return (
+      //     this.mode === 6 &&
+      //     !this.chatServer.state.banned &&
+      //     !this.chatServer.state.allBanned &&
+      //     this.joinInfo.role_name != 3 &&
+      //     !this.micServer.state.isSpeakOffToInit
+      //   );
+      // },
       showInterIsPlay() {
         return (
           this.mainScreen == this.joinInfo.third_party_user_id &&
@@ -279,6 +278,7 @@
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.listenEvents();
@@ -286,7 +286,14 @@
     async mounted() {
       window.streamLocal = this;
       console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
-      this.isNeedSpeak();
+
+      // 实例化后是否是上麦状态
+      const isSpeakOn =
+        (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+        this.micServer.state.isSpeakOn;
+      if (isSpeakOn) {
+        this.startPush();
+      }
     },
     beforeDestroy() {
       // 清空计时器
@@ -298,19 +305,6 @@
       }
     },
     methods: {
-      isNeedSpeak() {
-        // 实例化后是否是上麦状态
-        const isSpeakOn =
-          (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-          this.micServer.state.isSpeakOn;
-        if (isSpeakOn) {
-          this.startPush();
-        } else if (this.isNeedSpeakOn) {
-          this.userSpeakOn();
-        } else {
-          this.micServer.setSpeakOffToInit(false);
-        }
-      },
       // 恢复播放
       replayPlay() {
         const videos = document.querySelectorAll('video');
@@ -340,8 +334,19 @@
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.localStream.streamId) return;
-            if ([1, 3, 4, '1', '3', '4'].includes(this.joinInfo.role_name)) {
+
+            // 更新本地speakerList
+            if (this.groupServer.state.groupInitData.isInGroup) {
+              await this.groupServer.updateGroupInitData();
+            } else {
+              await this.roomBaseServer.getInavToolStatus();
+            }
+
+            console.log('[stream-local] vrtc_connect_success startPush');
+
+            if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 开始推流
+              await this.checkVRTCInstance();
               this.startPush();
             } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
               // 无延迟｜分组直播
@@ -359,6 +364,13 @@
           await this.stopPush();
 
           await this.interactiveServer.destroy();
+
+          // 更新本地speakerList
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            await this.groupServer.updateGroupInitData();
+          } else {
+            await this.roomBaseServer.getInavToolStatus();
+          }
 
           if (
             this.isNoDelay === 1 ||
@@ -381,38 +393,38 @@
         });
 
         // 本人被踢出来
-        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          if (this.joinInfo.third_party_user_id === msg.data.target_id) {
-            //  重新初始化互动实例
-            this.interactiveServer.init();
-          }
-        });
+        // this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+        //   if (this.joinInfo.third_party_user_id === msg.data.target_id) {
+        //     //  重新初始化互动实例
+        //     this.interactiveServer.init();
+        //   }
+        // });
 
         // 观众的监听
         if (this.joinInfo.role_name == 2) {
           // 分组 - 结束讨论
-          this.groupServer.$on('GROUP_SWITCH_END', async () => {
-            try {
-              //  初始化互动实例
-              await this.interactiveServer.init();
-              this.isNeedSpeak();
-            } catch (error) {
-              console.log('分组结束讨论', error);
-            }
-          });
+          // this.groupServer.$on('GROUP_SWITCH_END', async () => {
+          //   try {
+          //     //  初始化互动实例
+          //     await this.interactiveServer.init();
+          //     this.isNeedSpeak();
+          //   } catch (error) {
+          //     console.log('分组结束讨论', error);
+          //   }
+          // });
 
-          // 分组 - 开始讨论
-          this.groupServer.$on('GROUP_SWITCH_START', async () => {
-            if (this.localStream.streamId) {
-              await this.stopPush();
-              await this.interactiveServer.destroy();
-              //  初始化互动实例
-              await this.interactiveServer.init();
-            }
-            if (this.isNeedSpeakOn) {
-              this.userSpeakOn();
-            }
-          });
+          // // 分组 - 开始讨论
+          // this.groupServer.$on('GROUP_SWITCH_START', async () => {
+          //   if (this.localStream.streamId) {
+          //     await this.stopPush();
+          //     await this.interactiveServer.destroy();
+          //     //  初始化互动实例
+          //     await this.interactiveServer.init();
+          //   }
+          //   if (this.isNeedSpeakOn) {
+          //     this.userSpeakOn();
+          //   }
+          // });
 
           // 开启摄像头
           this.interactiveServer.$on('vrtc_frames_display', () => {
@@ -630,9 +642,12 @@
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
+            // 主持人不在小组中，停止推流触发 直播结束 生成回放
+            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+            }
             resolve();
           });
         });
@@ -756,6 +771,25 @@
           .catch(err => {
             console.error('setmainscreen failed ::', err);
           });
+      },
+      checkVRTCInstance() {
+        return new Promise((resolve, reject) => {
+          let count = 0;
+          const timer = setInterval(() => {
+            if (this.interactiveServer.interactiveInstance) {
+              resolve();
+              clearInterval(timer);
+            } else {
+              count++;
+              console.log('checkVRTCInstance count', count);
+              if (count > 20) {
+                clearInterval(timer);
+                console.error('互动实例不存在');
+                reject();
+              }
+            }
+          }, 100);
+        });
       }
     }
   };

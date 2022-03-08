@@ -3,7 +3,7 @@
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
-        设置
+        {{ $t('account.account_1005') }}
       </div>
       <div class="vmp-footer-tools__left-online" v-if="roomBaseState.watchInitData.online.show">
         <i class="vh-iconfont vh-line-user"></i>
@@ -246,7 +246,7 @@
           langMap[this.$route.query.lang] ||
           langMap[curLang.language_type];
         this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.type);
+        sessionStorage.setItem('lang', this.lang.key);
       }
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {

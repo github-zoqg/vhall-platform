@@ -133,7 +133,8 @@
         if (roomState.clientType === 'send') {
           list = [...this.menuServer.state.list];
         } else {
-          list = [...roomState.customMenu.list];
+          let customMenuList = roomState?.customMenu?.list || [];
+          list = [...customMenuList];
         }
 
         for (const item of list) {

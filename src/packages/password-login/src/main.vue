@@ -305,7 +305,7 @@
       //获取活动信息
       getWebinarInfo() {
         const params = {
-          webinarId: this.$route.params.id,
+          webinar_id: this.$route.params.id,
           is_no_check: 1
         };
         return this.roomBaseServer

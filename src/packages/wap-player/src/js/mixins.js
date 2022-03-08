@@ -35,7 +35,7 @@ const playerMixins = {
       });
       this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
-        this.isNoBuffer = false;
+        this.isNoBuffer = true;
       });
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
@@ -49,6 +49,7 @@ const playerMixins = {
         console.log('wap-播放完毕');
         this.isShowPoster = true;
         this.isPlayering = false;
+        // 如果是暖场视频不显示回放结束的标识
         if (this.isWarnPreview) return;
         this.isVodEnd = true;
       });
