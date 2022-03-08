@@ -59,6 +59,12 @@
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
         });
+        this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
+          this.isNoticeColumn = false;
+        });
+        this.groupServer.$on('GROUP_SWITCH_END', () => {
+          this.isNoticeColumn = false;
+        });
       },
       animates() {
         this.$nextTick(() => {
