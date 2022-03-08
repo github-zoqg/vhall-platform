@@ -64,9 +64,10 @@
     methods: {
       accept(msg) {
         console.log('accept', msg);
-        this.setFitment(msg);
-        this.lotteryView = 'LotteryWin';
-        this.popupVisible = true;
+        this.open(msg.lottery_id);
+        // this.setFitment(msg);
+        // this.lotteryView = 'LotteryWin';
+        // this.popupVisible = true;
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
@@ -156,6 +157,12 @@
           interactStatus: true,
           isCheck: lotteryResult
         });
+        // 服务之间传递抽奖结果消息
+        this.lotteryServer.$emit(
+          lotteryResult
+            ? this.lotteryServerthis.Events.LOTTERY_WIN
+            : this.lotteryServerthis.Events.LOTTERY_MISS
+        );
       },
       close() {
         this.popupVisible = false;
