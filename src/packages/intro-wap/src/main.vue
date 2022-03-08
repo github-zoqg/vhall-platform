@@ -2,7 +2,7 @@
   <section class="vmp-intro">
     <section class="vmp-intro-block">
       <header class="vmp-intro-block__headtitle">
-        <i v-if="isNoDelay" class="delay-icon">
+        <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
           <img :src="NoDelayImg" />
         </i>
         {{ title }}
@@ -95,6 +95,9 @@
       };
     },
     computed: {
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       watchInitData() {
         return this?.$domainStore?.state?.roomBaseServer?.watchInitData;
       },

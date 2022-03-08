@@ -185,6 +185,7 @@
     usePlayerServer,
     useMediaSettingServer,
     useGroupServer,
+    useMediaCheckServer,
     useChatServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
@@ -291,8 +292,17 @@
       const isSpeakOn =
         (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
         this.micServer.state.isSpeakOn;
-      if (isSpeakOn) {
-        this.startPush();
+      // console.log(
+      //   '实例化后是否是上麦状态',
+      //   this.groupServer.getGroupSpeakStatus(),
+      //   this.groupServer.state.groupInitData.is_banned,
+      //   this.micServer.state.isSpeakOn
+      // );
+      if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
+        // 检测设备状态
+        if (isSpeakOn) {
+          this.startPush();
+        }
       }
     },
     beforeDestroy() {
