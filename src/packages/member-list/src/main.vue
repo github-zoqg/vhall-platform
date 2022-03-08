@@ -1773,7 +1773,7 @@
         }
         // 设置主讲人
         this.$confirm(
-          '演示后，您可使用小组中的白板、文档、桌面共享功能，是否要演示？',
+          '演示后，组内成员将不能演示白板、文档、桌面共享是否确认演示？',
           this.$t('account.account_1061'),
           {
             confirmButtonText: this.$t('account.account_1062'),
@@ -1895,6 +1895,7 @@
             console.warn('禁言---res', err);
           });
         // “禁言”要关闭当前用户的在麦状态
+        console.log('禁言 -  - 要关闭当前用户的在麦状态 - - - - ', isBanned);
         if (isBanned) {
           return;
         }

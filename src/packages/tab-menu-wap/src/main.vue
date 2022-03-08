@@ -52,7 +52,13 @@
 </template>
 
 <script>
-  import { useMenuServer, useQaServer, useChatServer, useDocServer } from 'middle-domain';
+  import {
+    useMenuServer,
+    useQaServer,
+    useChatServer,
+    useDocServer,
+    useMsgServer
+  } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
@@ -106,6 +112,7 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -119,6 +126,7 @@
         });
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
           chatServer.addChatToList({
             content: {
               text_content: this.$t('chat.chat_1081')
@@ -134,7 +142,11 @@
         chatServer.$on('receivePrivateMsg', () => {
           this.setVisible({ visible: true, type: 'private' });
         });
-
+        // 直播结束不展示入口
+        msgServer.$on('live_over', e => {
+          this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
+        });
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);

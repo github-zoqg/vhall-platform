@@ -47,7 +47,7 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer, useQaServer, useChatServer } from 'middle-domain';
+  import { useMenuServer, useQaServer, useChatServer, useMsgServer } from 'middle-domain';
 
   // TODO: tips
 
@@ -93,6 +93,7 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         //收到问答开启消息
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
@@ -108,6 +109,7 @@
         //收到问答关闭消息
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
           chatServer.addChatToList({
             content: {
               text_content: this.$t('chat.chat_1081')
@@ -120,6 +122,11 @@
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
           this.setVisible({ visible: true, type: 'private' });
+        });
+        // 直播结束不展示入口
+        msgServer.$on('live_over', e => {
+          this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
         });
       },
       /**
