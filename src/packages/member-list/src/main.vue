@@ -1403,6 +1403,7 @@
               _this.onlineUsers.forEach((item, index) => {
                 if (item.account_id == msg.data.target_id) {
                   _this.onlineUsers.splice(index, 1);
+                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 }
               });
             }
