@@ -11,10 +11,11 @@
         :data-key="'id'"
         :data-sources="qaList"
         :data-component="MsgItem"
+        @tobottom="tobottom"
       ></virtual-list>
       <div class="vhsaas-chat__body__bottom-tip-box">
         <div
-          v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
+          v-show="unReadMessageCount !== 0"
           class="vhsaas-chat__body__bottom-tip"
           @click="scrollToTarget"
         >
@@ -47,12 +48,14 @@
   import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpQa',
     components: {
       ChatOperator,
       VirtualList
     },
+    mixins: [emitter],
     data() {
       return {
         MsgItem,
@@ -132,11 +135,18 @@
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
             this.scrollBottom();
+          } else {
+            this.unReadMessageCount++;
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
         });
         //监听问答回复消息
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          this.scrollBottom();
+          if (msg.sender_id != this.thirdPartyId) {
+            this.unReadMessageCount++;
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.dispatch('VmpTabContainer', 'noticeHint', 'v5');
+          }
         });
         //监听撤销问答回复消息
         qaServer.$on(qaServer.Events.QA_BACKOUT, msg => {});
@@ -218,6 +228,9 @@
       scrollToTarget() {
         const index = this.qaList.length - this.unReadMessageCount;
         this.$refs.qalist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+      },
+      tobottom() {
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部

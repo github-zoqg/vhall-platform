@@ -32,6 +32,19 @@
           <vmp-stream-remote :stream="stream"></vmp-stream-remote>
         </div>
       </template>
+
+      <!-- 主持人进入小组后助理占位图 -->
+      <div
+        v-if="mode == 6 && isHostInGroup && joinInfo.role_name == 3 && !isInGroup"
+        class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
+        :class="{
+          'vmp-dom__mini': miniElement == 'stream-list',
+          'vmp-dom__max': miniElement != 'stream-list'
+        }"
+      >
+        <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
+        小组协作中
+      </div>
     </div>
 
     <div
@@ -80,7 +93,8 @@
     useInteractiveServer,
     useSplitScreenServer,
     useMicServer,
-    useMsgServer
+    useMsgServer,
+    useGroupServer
   } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
 
@@ -99,13 +113,22 @@
         speakerList: [],
         PopAlertOffline: {
           visible: false
-        }
+        },
+
+        // 主持人是否在小组内
+        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group
       };
     },
     components: {
       SaasAlert
     },
     computed: {
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
@@ -166,9 +189,11 @@
       this.splitScreenServer = useSplitScreenServer();
       this.micServer = useMicServer();
       this.msgServer = useMsgServer();
+      this.groupServer = useGroupServer();
     },
 
     created() {
+      window.streamListLive = this;
       this.childrenCom = window.$serverConfig[this.cuid].children;
       console.log(
         '-- this.childrenCom:',
@@ -222,7 +247,7 @@
           });
           // 嘉宾：
           if (
-            this.joinInfo.role_name == 4 &&
+            (this.joinInfo.role_name == 4 || this.joinInfo.role_name == 3) &&
             this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
           ) {
             this.$alert('您已进入直播房间，马上开始互动吧', '', {
@@ -249,6 +274,15 @@
             if (mainScreenStream) {
               this.interactiveServer.setBroadCastScreen(mainScreenStream.streamId);
             }
+          }
+        });
+
+        // 主持人进入退出小组 消息监听
+        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
+          if (msg.data.status == 'enter') {
+            this.isHostInGroup = true;
+          } else if (msg.data.status == 'quit') {
+            this.isHostInGroup = false;
           }
         });
       },
@@ -370,6 +404,7 @@
       height: 80px;
     }
 
+    // 展开收起按钮
     &__folder {
       flex: none;
       width: 25px;
@@ -416,6 +451,21 @@
           cursor: auto;
           background-image: url('./img/downarr.png');
         }
+      }
+    }
+
+    &__host-placeholder-in-group {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      background: #2d2d2d;
+      flex-direction: column;
+      color: #999;
+      justify-content: center;
+      text-align: center;
+      i {
+        display: block;
+        font-size: 40px;
       }
     }
   }

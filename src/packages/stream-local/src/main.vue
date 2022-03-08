@@ -157,13 +157,12 @@
             @click="setMainScreen(false)"
           ></span>
         </el-tooltip>
-        <el-tooltip content="下麦" placement="bottom">
+        <!-- <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="showDownMic"
           ></span>
-        </el-tooltip>
+        </el-tooltip> -->
       </p>
     </section>
 
@@ -343,8 +342,11 @@
               await this.roomBaseServer.getInavToolStatus();
             }
 
-            if ([1, 3, 4, '1', '3', '4'].includes(this.joinInfo.role_name)) {
+            console.log('[stream-local] vrtc_connect_success startPush');
+
+            if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 开始推流
+              await this.checkVRTCInstance();
               this.startPush();
             } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
               // 无延迟｜分组直播
@@ -640,9 +642,12 @@
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
+            // 主持人不在小组中，停止推流触发 直播结束 生成回放
+            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+            }
             resolve();
           });
         });
@@ -766,6 +771,25 @@
           .catch(err => {
             console.error('setmainscreen failed ::', err);
           });
+      },
+      checkVRTCInstance() {
+        return new Promise((resolve, reject) => {
+          let count = 0;
+          const timer = setInterval(() => {
+            if (this.interactiveServer.interactiveInstance) {
+              resolve();
+              clearInterval(timer);
+            } else {
+              count++;
+              console.log('checkVRTCInstance count', count);
+              if (count > 20) {
+                clearInterval(timer);
+                console.error('互动实例不存在');
+                reject();
+              }
+            }
+          }, 100);
+        });
       }
     }
   };

@@ -104,22 +104,22 @@
         color: #e6e6e6;
         word-break: break-word;
 
-        ::v-deep p {
+        p {
           margin-bottom: 8px;
         }
-        ::v-deep img {
+        img {
           margin: 4px auto;
           display: block;
           max-width: 100%;
         }
 
-        ::v-deep .empty {
+        .empty {
           display: block;
           width: 160px;
           height: 120px;
           margin: 80px auto 10px auto;
         }
-        ::v-deep .info {
+        .info {
           width: 100%;
           height: 22px;
           font-size: 16px;
