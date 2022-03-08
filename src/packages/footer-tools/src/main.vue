@@ -324,16 +324,12 @@
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
-      checkLotteryIcon(redPacketId) {
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickLotteryIcon', [redPacketId])
-        );
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       },
-      checkredPacketIcon() {
+      checkredPacketIcon(redPacketId) {
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [
-            this.$domainStore.state.roomBaseServer.redPacket.red_packet_uuid
-          ])
+          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [redPacketId])
         );
       }
     }
