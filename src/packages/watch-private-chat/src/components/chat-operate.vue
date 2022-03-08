@@ -3,7 +3,7 @@
     <div class="private-chat-operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
         <!--表情按钮-->
-        <i class="icon iconfont iconbiaoqing" @click.stop="toggleEmoji"></i>
+        <i class="vh-iconfont vh-line-expression" @click.stop="toggleEmoji"></i>
         <!-- 表情选择 -->
         <div class="operate-container__tool-bar__emoji-wrap">
           <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
@@ -40,8 +40,10 @@
         class="input-bar__textarea-box__textarea-placeholder"
       >
         <span v-show="chatLoginStatus" class="input-bar__textarea-box__no-login">
-          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">登录</span>
-          后参与聊天
+          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">
+            {{ $t('nav.nav_1005') }}
+          </span>
+          {{ $t('chat.chat_1001', '') }}
         </span>
         <span
           v-show="inputStatus.disable && !chatLoginStatus"
@@ -52,7 +54,7 @@
       </div>
       <div class="input-bar__textarea-box__send-btn-box">
         <div class="input-bar__textarea-box__send-btn" @click="sendMessage">
-          <i class="icon iconfont iconfasong_icon"></i>
+          <i class="vh-iconfont vh-line-send"></i>
         </div>
       </div>
     </div>
@@ -63,7 +65,8 @@
   import OverlayScrollbars from 'overlayscrollbars';
   import Emoji from '@/packages/chat/src/components/emoji';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'vmpWatchPrivateChatOperate',
     components: {
@@ -95,10 +98,19 @@
           noLogin: false,
           placeholder: '参与聊天'
         })
+      },
+      //当前的登录人信息
+      joinInfo: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //输入框的值
         inputValue: '',
         //是否展示字数限制
@@ -118,10 +130,13 @@
       inputValue: {
         handler(newValue) {
           // 输入框内容发生变化，更新滚动条
-          this.overlayScrollbar.update();
+          // this.overlayScrollbar.update();
           this.inputHandle();
         }
       }
+    },
+    beforeCreate() {
+      this.chatServer = useChatServer();
     },
     mounted() {
       this.overlayScrollbarInit();
@@ -235,6 +250,26 @@
       },
       //todo 发送消息
       async sendMessage() {
+        if (this.inputValue.trim() === '') {
+          return this.$message({
+            message: this.$t('chat.chat_1009'),
+            showClose: true,
+            // duration: 0,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        }
+
+        const msg = this.inputValue.trim();
+        const curmsg = useChatServer().createCurMsg();
+        const target = useRoomBaseServer().state.watchInitData.webinar.userinfo.user_id;
+        curmsg.setTarget(target);
+        //将文本消息加入消息体
+        curmsg.setText(msg);
+        //发送消息
+        useChatServer().sendMsg(curmsg);
+        //清除发送后的消息
+        useChatServer().clearCurMsg();
         this.inputValue = '';
         this.$nextTick(() => {
           // 输入框内容发生变化，更新滚动条
@@ -244,8 +279,10 @@
           this.$emit('performScroll');
         });
       },
-      //todo 信令唤起登录
-      callLogin() {}
+      //信令唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      }
     }
   };
 </script>
@@ -289,7 +326,7 @@
         transform: translateY(-100%);
         left: 0;
       }
-      .iconfont {
+      .vh-iconfont {
         color: #999;
         font-size: 19px;
         cursor: pointer;
@@ -309,7 +346,7 @@
 
         margin-left: 10px;
       }
-      .iconbiaoqing {
+      .vh-line-expression {
         font-size: 19px;
         color: #999;
         margin-left: 0;
@@ -408,7 +445,7 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        .iconfasong_icon {
+        .vh-line-send {
           font-size: 18px;
           color: #e6e6e6;
         }

@@ -17,7 +17,7 @@
   height: 16px;
   .el-dialog__close {
     font-size: 18px;
-    color: @font-light-second;
+    color: @font-light-second !important;
   }
 }
 .el-dialog__footer {
@@ -303,6 +303,7 @@
 .el-textarea__inner {
   border-color: @border-normal-color;
   color: @font-light-normal;
+  padding: 5px 12px;
   &:hover {
     border-color: @border-low-color;
   }
@@ -414,6 +415,9 @@
 .el-radio__inner:hover {
   border-color: @seleted-color-normal;
 }
+.el-radio__input.is-checked + .el-radio__label {
+  color: @font-light-normal;
+}
 /*----------------------------------------- 日期选择效果重置-----------------------------------------*/
 .el-date-table td.today span {
   color: @seleted-color-normal;
@@ -511,6 +515,9 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 26px;
+  &.is-round {
+    padding: 4px 24px;
+  }
 }
 .el-button.el-button--white-medium {
   /* 中等按钮 */
@@ -655,4 +662,8 @@
 // 重置slider
 .el-slider.is-vertical .el-slider__runway {
   margin: 0;
+}
+// 重置表单
+.el-form-item__label {
+  color: @font-light-normal;
 }

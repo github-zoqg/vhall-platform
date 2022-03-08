@@ -40,36 +40,40 @@
     data() {
       return {
         itemArr: Object.freeze([
-          { label: '圆形', value: 'setCircle', icon: 'iconfont iconyuanxing' },
           {
-            label: '四边形',
+            label: this.$t('doc.doc_1023'),
+            value: 'setCircle',
+            icon: 'vh-iconfont vh-line-circle'
+          },
+          {
+            label: this.$t('doc.doc_1024'),
             value: 'setSquare',
-            icon: 'iconfont iconzhengfangxing'
+            icon: 'vh-iconfont vh-line-square'
           },
           {
-            label: '单向箭头',
+            label: this.$t('doc.doc_1025'),
             value: 'setSingleArrow',
-            icon: 'iconfont iconjiantou'
+            icon: 'vh-iconfont vh-a-line-singlearrow'
           },
           {
-            label: '双向箭头',
+            label: this.$t('doc.doc_1026'),
             value: 'setDoubleArrow',
-            icon: 'iconfont iconshuangjiantou'
+            icon: 'vh-iconfont vh-a-line-doublearrow'
           }
         ]),
         colorArr: Object.freeze([
-          { value: '#FFFFFF', title: '白色' },
-          { value: '#9B9B9B', title: '浅灰' },
-          { value: '#2E3038', title: '深灰' },
-          { value: '#000000', title: '黑色' },
-          { value: '#FD2C0A', title: '红色' },
-          { value: '#FF6E00', title: '橙色' },
-          { value: '#FFD400', title: '黄色' },
-          { value: '#98CD47', title: '绿色' },
-          { value: '#01D6D1', title: '青色' },
-          { value: '#0097F0', title: '蓝色' },
-          { value: '#8B6DC2', title: '紫色' },
-          { value: '#FF9B9E', title: '粉色' }
+          { value: '#FFFFFF', title: this.$t('color.color_1001') },
+          { value: '#9B9B9B', title: this.$t('color.color_1002') },
+          { value: '#2E3038', title: this.$t('color.color_1003') },
+          { value: '#000000', title: this.$t('color.color_1004') },
+          { value: '#FD2C0A', title: this.$t('color.color_1005') },
+          { value: '#FF6E00', title: this.$t('color.color_1006') },
+          { value: '#FFD400', title: this.$t('color.color_1007') },
+          { value: '#98CD47', title: this.$t('color.color_1008') },
+          { value: '#01D6D1', title: this.$t('color.color_1009') },
+          { value: '#0097F0', title: this.$t('color.color_1010') },
+          { value: '#8B6DC2', title: this.$t('color.color_1011') },
+          { value: '#FF9B9E', title: this.$t('color.color_1012') }
         ])
       };
     },

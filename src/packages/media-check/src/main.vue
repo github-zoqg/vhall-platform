@@ -30,7 +30,7 @@
         <section v-if="currentStep === STEP_OPTS.VIDEO - firstStep">
           <choose-video
             :defaultSelected="selected.video"
-            :devices="videoDevices"
+            :devices="devices.videoInputDevices"
             :server="mediaCheckServer"
             @next="next"
           />
@@ -40,7 +40,7 @@
         <section v-if="currentStep === STEP_OPTS.AUDIO_INPUT - firstStep">
           <choose-audio-input
             :defaultSelected="selected.audioInput"
-            :devices="audioInputDevices"
+            :devices="devices.audioInputDevices"
             @next="next"
           />
         </section>
@@ -49,7 +49,7 @@
         <section v-if="currentStep === STEP_OPTS.AUDIO_OUTPUT - firstStep">
           <choose-audio-output
             :defaultSelected="selected.audioOutput"
-            :devices="audioOutputDevices"
+            :devices="devices.audioOutputDevices"
             @next="next"
           />
         </section>
@@ -72,7 +72,7 @@
   import ChooseAudioInput from './components/steps/choose-audio-input.vue';
   import ChooseAudioOutput from './components/steps/choose-audio-output.vue';
   import CheckResult from './components/steps/check-result.vue';
-  import { useMediaCheckServer, contextServer } from 'vhall-sass-domain';
+  import { useMediaCheckServer, useRoomBaseServer } from 'middle-domain';
 
   import { STEP_OPTS } from './js/config';
   import { getCheckList } from './js/getCheckListEntity';
@@ -93,6 +93,7 @@
       return {
         liveMode: 0,
         isShow: false,
+        mediaState: this.mediaCheckServer.state,
 
         // enum option 「枚举选项」
         STEP_OPTS: Object.freeze(STEP_OPTS),
@@ -113,11 +114,16 @@
         }
       };
     },
+    computed: {
+      devices() {
+        return this.mediaState.devices;
+      }
+    },
     beforeCreate() {
       this.mediaCheckServer = useMediaCheckServer();
     },
     created() {
-      const { watchInitData } = contextServer.get('roomBaseServer').state;
+      const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.getSessionSelectedDevice();
     },
@@ -147,17 +153,12 @@
           this.firstStep = 1;
         }
         this.currentStep = 0;
-
         this.checkList[0].status = 'process';
 
-        this.videoDevices = [];
-        this.audioInputDevices = [];
-        this.audioOutputDevices = [];
+        this.mediaCheckServer.resetDevices();
         this.selected.video = '';
         this.selected.audioInput = '';
         this.selected.audioOutput = '';
-
-        // TODO:layout===1 (audio type)
 
         try {
           await this.getVideoDeviceInfo();
@@ -193,32 +194,37 @@
         this.getDevices();
       },
       async getDevices() {
-        const devices = await this.mediaCheckServer.getDevices();
-
         // 获取视频列表
-        this.videoDevices = devices.videoInputDevices.filter(
+        await this.mediaCheckServer.getCameras(
           item => item.label && item.deviceId !== 'desktopScreen'
         );
-        if (this.videoDevices.length > 0) {
-          this.selected.video = this.videoDevices[0].deviceId;
+
+        // 获取话筒
+        await this.mediaCheckServer.getMicrophones(
+          d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
+        );
+
+        // 获取扬声器
+        await this.mediaCheckServer.getSpeakers(item => item.label);
+
+        this.setDefaultSelected();
+      },
+      setDefaultSelected() {
+        // 设置默认选项
+        if (this.devices.videoInputDevices.length > 0) {
+          this.selected.video = this.devices.videoInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('media-check.selected.video');
         }
 
-        // 获取音频输入列表(话筒)
-        this.audioInputDevices = devices.audioInputDevices.filter(
-          d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
-        );
-        if (this.audioInputDevices.length > 0) {
-          this.selected.audioInput = this.audioInputDevices[0].deviceId;
+        if (this.devices.audioInputDevices.length > 0) {
+          this.selected.audioInput = this.devices.audioInputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('media-check.selected.audioInput');
         }
 
-        // 获取音频输出设备列表(扬声器)
-        this.audioOutputDevices = devices.audioOutputDevices.filter(item => item.label);
-        if (this.audioOutputDevices.length > 0) {
-          this.selected.audioOutput = this.audioOutputDevices[0].deviceId;
+        if (this.devices.audioOutputDevices.length > 0) {
+          this.selected.audioOutput = this.devices.audioOutputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('media-check.selected.audioOutput');
         }

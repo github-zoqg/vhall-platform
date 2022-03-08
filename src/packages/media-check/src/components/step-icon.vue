@@ -1,5 +1,5 @@
 <template>
-  <span class="iconfont" :class="[iconStyles]"></span>
+  <span class="vmp-media-check__step-icon vh-iconfont" :class="[iconStyles]"></span>
 </template>
 
 <script>
@@ -17,11 +17,11 @@
     computed: {
       iconStyles() {
         if (this.item.status === 'fail') {
-          return 'iconjianceshibai';
+          return 'vh-a-line-exclamationpoint';
         }
 
         if (this.item.status === 'success') {
-          return 'iconjiancechenggong';
+          return 'vh-line-check';
         }
 
         return this.item.icon;
@@ -30,4 +30,21 @@
   };
 </script>
 
-<style></style>
+<style lang="less">
+  .vmp-media-check__step-icon {
+    color: #999;
+    font-size: 24px;
+  }
+
+  .is-process {
+    .vmp-media-check__step-icon {
+      color: #3562fa;
+    }
+  }
+
+  .is-finish {
+    .vmp-media-check__step-icon {
+      color: #fff;
+    }
+  }
+</style>

@@ -17,7 +17,7 @@
       :on-success="uploadSuccess"
       :on-error="uploadError"
     >
-      <i :class="['iconfont', 'icontupianliaotian', uploadActive ? 'active' : '']"></i>
+      <i :class="['vh-iconfont', 'vh-line-picture-outline', uploadActive ? 'active' : '']"></i>
     </el-upload>
     <!-- 上传图片预览 -->
     <div v-show="uploadActive" class="vmp-chat-img-preview-wrap">
@@ -36,7 +36,7 @@
 
 <script>
   import { sessionOrLocal, uuid } from '@/packages/chat/src/js/utils';
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatImgUpload',
     props: {
@@ -63,8 +63,8 @@
         //上传图片请求的token
         headToken: sessionOrLocal.get('token', 'localStorage') || '',
         interact_token: '',
-        //todo 暂时写死，后续替换 上传图片地址
-        action: `https://t-saas-dispatch.vhall.com/v3/commons/upload/index`
+        //上传图片地址
+        action: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`
       };
     },
     computed: {
@@ -88,7 +88,7 @@
       }
     },
     beforeCreate() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
       this.initViewData();
@@ -102,11 +102,11 @@
       //todo 可以升级为知客的上传多张 上传图片前置处理
       beforeUpload() {
         if (this.disable) {
-          this.$message.error('您已被禁言');
+          this.$message.error(this.$t('chat.chat_1006'));
           return false;
         }
         if (this.uploadActive >= 4) {
-          this.$message.error('一次最多上传4张图片');
+          this.$message.error('一次最多上传4张图片'); // TODO: 翻译确实
           return false;
         }
         return true;
@@ -153,7 +153,7 @@
         color: @active-color;
         cursor: pointer;
       }
-      &.icontupianliaotian {
+      &.vh-line-picture-outline {
         font-size: 18px;
       }
     }
@@ -176,7 +176,7 @@
           position: absolute;
           width: 15px;
           height: 15px;
-          background: url('../images/img-del.png') no-repeat;
+          background: url('../img/img-del.png') no-repeat;
           background-size: contain;
           top: 0;
           right: 0;

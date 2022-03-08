@@ -45,33 +45,30 @@
     },
     data() {
       return {
+        roomId: this.$route.params.id,
         options: {}
       };
     },
     methods: {
       setPath(params = {}) {
         this.options = {
-          ...{
-            qqPath: this.qqPath,
-            wxPath: this.wxPath
-          },
+          qqPath: this.qqPath,
+          wxPath: this.wxPath,
           ...params
         };
-        console.log('动态设置的第三方请求地址....');
       },
       // 统一默认入口
       init() {
-        console.log('默认第三方请求地址....');
-        // TODO 后端请求域名 - 待确定如何书写
-        const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
         // 第三方登录后 回调地址 - 待确定如何书写
         // 前端回传地址
-        const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/middle/${this.$route.params.il_id}?purpose=login`;
+        const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.roomId}`;
         // 第三方登录地址
         this.options.wxPath =
-          `${hostPath}/commons/auth/weixin?source=pc&jump_url=` + encodeURIComponent(jumpUrlPath);
+          `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=` +
+          encodeURIComponent(jumpUrlPath);
         this.options.qqPath =
-          `${hostPath}/commons/auth/qq?source=pc&jump_url=` + encodeURIComponent(jumpUrlPath);
+          `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?source=pc&jump_url=` +
+          encodeURIComponent(jumpUrlPath);
       }
     },
     created() {

@@ -1,42 +1,191 @@
 <template>
   <div class="vmp-basic-layout">
-    <div class="vmp-basic-container">
-      <h2>wap观看端</h2>
+    <van-loading
+      v-show="state === 0"
+      size="32px"
+      type="spinner"
+      :vertical="true"
+      style="
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      "
+    >
+      {{ $t('common.common_1001') }}
+    </van-loading>
+    <div class="vmp-basic-container" v-if="state === 1">
+      <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
+    <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
   </div>
 </template>
 
 <script>
-  import { useRoomInitGroupServer, useMsgServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useInviteServer } from 'middle-domain';
+  import roomState from '../headless/room-state.js';
+  import { getVhallReportOs, browserType } from '@/packages/app-shared/utils/tool';
+  import MsgTip from './MsgTip.vue';
+
   export default {
     name: 'Home',
-    data() {},
-    beforeCreate() {
-      this.roomInitGroupServer = useRoomInitGroupServer();
+    components: {
+      MsgTip
     },
-    created() {
-      this.setToken();
-      this.initSendLive();
+    data() {
+      return {
+        state: 0,
+        liveErrorTip: ''
+      };
+    },
+    beforeCreate() {
+      this.inviteServer = useInviteServer();
+    },
+    async created() {
+      try {
+        console.log('%c---初始化直播房间 开始', 'color:blue');
+        // 初始化直播房间
+        let clientType = 'standard';
+        if (location.pathname.indexOf('embedclient') != -1) {
+          clientType = 'embed';
+        }
+        const domain = await this.initReceiveLive(clientType);
+        await roomState();
+        console.log('%c---初始化直播房间 完成', 'color:blue');
+
+        const roomBaseServer = useRoomBaseServer();
+        const roomBaseState = roomBaseServer.state;
+        document.title = roomBaseState.watchInitData.webinar.subject;
+
+        // 是否绑定邀请卡信息
+        const open_id = sessionStorage.getItem('open_id');
+        const isWechatBrowser = browserType();
+        const isEmbed = clientType === 'embed';
+        const hasInviteCode = this.$route.query.invite;
+
+        if (
+          isWechatBrowser &&
+          !isEmbed &&
+          hasInviteCode &&
+          open_id &&
+          roomBaseState.watchInitData.join_info
+        ) {
+          await this.bindInvite(this.$route.query.invite);
+        }
+
+        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          // 是否跳转预约页
+          this.goSubscribePage(clientType);
+          return;
+        }
+        // 初始化数据上报
+        console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
+        // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
+        domain.initVhallReport(
+          {
+            bu: 0,
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            webinar_id: this.$route.params.id,
+            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            os: getVhallReportOs(),
+            type: 2, //播放平台 2: wap
+            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            pf: 3, // wap
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          },
+          {
+            namespace: 'saas', //业务线
+            env: 'test', // 环境
+            method: 'post' // 上报方式
+          }
+        );
+        window.vhallReport.report('ENTER_WATCH');
+        this.state = 1;
+        this.addEventListener();
+      } catch (err) {
+        console.error('---初始化直播房间出现异常--');
+        console.error(err);
+        this.state = 2;
+        this.handleErrorCode(err);
+      }
+    },
+    mounted() {
+      useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
+        this.state = 2;
+        this.liveErrorTip = this.$t('message.message_1003');
+      });
     },
     methods: {
-      setToken() {
-        localStorage.setItem(
-          'token',
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODMyNDgsImV4cCI6MTY0MzI3NTI0OCwidXNlcl9pZCI6IjE2NDIyNzcwIiwicGxhdGZvcm0iOiI3IiwiY2giOiJiIiwiYnVzaW5lc3NfYWNjb3VudF9pZCI6IiJ9.zBKTqqn4EEmLKHduBlUfsmqMMU1I3vPmBfjfGR1cXfo'
-        );
-      },
-      initSendLive() {
-        this.roomInitGroupServer.initSendLive({
-          webinarId: 693742622,
+      initReceiveLive(clientType) {
+        const { id } = this.$route.params;
+        const { token } = this.$route.query;
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+        return new Domain({
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
-            token: localStorage.getItem('token')
+            token: localStorage.getItem('token') || '',
+            'gray-id': sessionStorage.getItem('initGrayId')
+          },
+          initRoom: {
+            webinar_id: id, //活动id
+            clientType: clientType //客户端类型
           }
         });
       },
-      initChatSDK() {
-        this.msgServer = useMsgServer();
-        this.msgServer.init().then(res => {
-          console.log('聊天实例创建', res);
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.handleErrorCode({
+          code: 512514,
+          msg: '您已被禁止访问当前活动'
+        });
+      },
+      handleErrorCode(err) {
+        if (err.code == 512522) {
+          this.liveErrorTip = this.$t('message.message_1009');
+        } else if (err.code == 512541) {
+          this.liveErrorTip = this.$t('message.message_1008');
+        } else if (
+          err.code == 516324 ||
+          err.code == 516324 ||
+          err.code == 512562 ||
+          err.code == 512562 ||
+          err.code == 512571 ||
+          err.code == 512002
+        ) {
+          this.liveErrorTip = this.$t('message.message_1004');
+        } else if (err.code == 512503 || err.code == 512502) {
+          window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+        } else if (err.code == 512534) {
+          // 第三方k值校验失败 跳转指定地址
+          window.location.href = err.data.url;
+        } else {
+          this.liveErrorTip = this.$tes(err.code) || err.msg;
+        }
+      },
+      goSubscribePage(clientType) {
+        let pageUrl = '';
+        if (clientType === 'embed') {
+          pageUrl = '/embedclient';
+        }
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
+      },
+      /**
+       * 绑定邀请卡关系(上报邀请成功数据)
+       * @param {String} code 邀请码
+       */
+      async bindInvite(code = '') {
+        return this.inviteServer.bindInvite({
+          webinar_id: this.$route.params.id,
+          invite: code
         });
       }
     }

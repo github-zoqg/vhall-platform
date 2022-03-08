@@ -12,7 +12,7 @@
         class="vmp-member-item__avatar-wrapper__phone"
         width="9"
         height="12"
-        src="../images/phone.png"
+        src="../img/phone.png"
         alt
       />
     </div>
@@ -22,157 +22,255 @@
       :class="userInfo.role_name | roleClassFilter"
       v-if="![2, '2'].includes(userInfo.role_name)"
     >
-      {{ userInfo.role_name | roleFilter }}
+      {{ roleFilter(userInfo.role_name) }}
     </span>
     <div class="vmp-member-item__control">
-      <!-- 主讲人 -->
-      <i
-        v-if="
-          (mode != 6 && currentSpeakerId === userInfo.account_id) ||
-          (mode == 6 && userInfo.role_name == 1)
-        "
-        class="vmp-member-item__control__user-icon iconfont iconxing"
-      ></i>
-      <!-- 显示条件：被禁言 -->
-      <i
-        v-show="userInfo.is_banned == 1"
-        class="vmp-member-item__control__user-icon iconfont iconjinyan"
-        style="color: #cccccc"
-      ></i>
-      <!-- 显示条件：申请上麦 -->
-      <i
-        v-show="
-          userInfo.isApply &&
-          applyUsers.find(u => u.account_id == userInfo.account_id) &&
-          !userInfo.is_speak
-        "
-        class="vmp-member-item__control__user-icon iconfont iconxiamai"
-        style="color: #cccccc; font-size: 15px"
-      ></i>
-      <!-- 显示条件：上麦中 -->
-      <i
-        v-if="
-          currentSpeakerId != userInfo.account_id &&
-          userInfo.is_speak &&
-          userInfo.device_status != 2
-        "
-        class="vmp-member-item__control__user-icon iconfont iconxiamai1"
-        style="color: #fc5659; font-size: 15px"
-      ></i>
-      <!-- 设备有问题不能上麦 -->
-      <i
-        v-show="isInteract == '1' && userInfo.device_status == 2"
-        style="color: #fc5659; font-size: 15px; vertical-align: middle"
-        class="iconfont iconhebingxingzhuang vmp-member-item__control__device-abnormal"
-      ></i>
-      <!-- 显示条件：列表中该用户不是是主持人 -->
-      <template
-        v-if="
-          roleName == '1' &&
-          userInfo.role_name != 1 &&
-          ((isEnjoy && userInfo.role_name == 3) || userInfo.role_name != 3) &&
-          userInfo.role_name != 20 &&
-          userInfo.device_status != 2
-        "
-      >
-        <!--互动直播 没有被禁言 没有上麦 不是移动端 设备可以上麦-->
+      <template v-if="memberOptions.platformType === 'live'">
+        <!-- 主讲人标识 -->
+        <template v-if="isShowSpeakerFlag">
+          <i class="vmp-member-item__control__user-icon vh-iconfont vh-line-star-off"></i>
+        </template>
+
+        <!--被禁言标识 -->
+        <template v-if="[1, 3].includes(tabIndex) && userInfo.is_banned === 1">
+          <i
+            class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
+            style="color: #cccccc"
+          ></i>
+        </template>
+        <!--被踢出标识 -->
+        <template v-if="tabIndex === 3 && userInfo.is_kicked">
+          <i
+            class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-KickedoutMembers"
+            style="color: #cccccc"
+          ></i>
+        </template>
+        <!-- 显示条件：申请上麦 -->
+        <template
+          v-if="
+            [1, 2].includes(tabIndex) &&
+            [1, '1'].includes(userInfo.is_apply) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
+            !userInfo.is_speak
+          "
+        >
+          <i
+            class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
+            style="color: #cccccc; font-size: 15px"
+          ></i>
+        </template>
+        <!-- 显示条件：上麦中 -->
+        <template
+          v-if="
+            tabIndex === 1 &&
+            currentSpeakerId != userInfo.account_id &&
+            userInfo.is_speak &&
+            ![2, '2'].includes(userInfo.device_status)
+          "
+        >
+          <i
+            class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
+            style="color: #fc5659; font-size: 15px"
+          ></i>
+        </template>
+        <!--同意上麦-->
         <i
-          v-show="
-            isInteract == '1' &&
-            !userInfo.is_banned &&
+          v-if="tabIndex === 2 && [1, '1'].includes(roleName)"
+          class="vmp-member-item__control__up-mic"
+          @click="handleConsent(userInfo.account_id)"
+        >
+          上麦
+        </i>
+
+        <!-- 设备有问题不能上麦 -->
+        <template
+          v-if="
+            tabIndex === 1 &&
+            [1, '1'].includes(isInteract) &&
+            [2, '2'].includes(userInfo.device_status)
+          "
+        >
+          <i
+            style="color: #fc5659; font-size: 15px; vertical-align: middle"
+            class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"
+          ></i>
+        </template>
+        <template v-if="tabIndex === 1">
+          <!--我要演示-->
+          <i
+            v-if="isShowMyPresentation"
+            class="vmp-member-item__control__up-mic widthAuto"
+            @click="myPresentation(userInfo.account_id)"
+          >
+            我要演示
+          </i>
+          <!--上麦-->
+          <i
+            v-if="isShowUpMic"
+            class="vmp-member-item__control__up-mic"
+            @click="upMic(userInfo.is_apply, userInfo.account_id)"
+          >
+            上麦
+          </i>
+          <!--下麦-->
+          <i
+            v-if="isShowDownMic"
+            class="vmp-member-item__control__down-mic"
+            @click="downMic(userInfo.account_id)"
+          >
+            {{ $t('interact.interact_1007') }}
+          </i>
+        </template>
+      </template>
+      <template v-if="memberOptions.platformType === 'watch'">
+        <!-- 主讲人 -->
+        <i
+          v-if="tabIndex === 1 && userInfo.is_kicked !== 1 && [1, '1'].includes(userInfo.role_name)"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-line-star-off"
+        ></i>
+        <!--被禁言-->
+        <i
+          v-if="[1, 3].includes(tabIndex) && [1, '1'].includes(userInfo.is_banned)"
+          class="vmp-member-item__control__user-icon vh-iconfont vh-line-silenced"
+          style="color: #cccccc"
+        ></i>
+        <!--申请上麦-->
+        <i
+          v-if="
+            [1, 2].includes(tabIndex) &&
+            [1, '1'].includes(userInfo.is_apply) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
+            !userInfo.is_speak
+          "
+          class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
+          style="color: #cccccc; font-size: 15px"
+        ></i>
+        <!--上麦中-->
+        <i
+          v-if="
+            tabIndex === 1 &&
+            leaderId !== userInfo.account_id &&
+            userInfo.is_speak &&
+            ![2, '2'].includes(userInfo.device_status)
+          "
+          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-Onthemicrophone1"
+          style="color: #fb3a32; font-size: 15px"
+        ></i>
+        <!--设备有问题-->
+        <i
+          v-if="
+            tabIndex === 1 &&
+            [1, '1'].includes(isInteract) &&
+            [2, '2'].includes(userInfo.device_status)
+          "
+          style="color: #fb3a32; font-size: 15px; vertical-align: middle"
+          class="vh-iconfont vh-full-warning vmp-member-item__control__user-icon"
+        ></i>
+        <!--被踢出-->
+        <i
+          v-if="tabIndex === 3 && userInfo.is_kicked"
+          class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-KickedoutMembers"
+          style="color: #cccccc"
+        ></i>
+        <!-- 显示条件：列表中该用户是是组长 -->
+        <template
+          v-if="
+            tabIndex === 1 &&
+            ['1', '3', '20', 1, 3, 20].includes(roleName) &&
+            [2, '2'].includes(userInfo.role_name) &&
+            [2, '2'].includes(userInfo.device_type) &&
+            [0, '0'].includes(userInfo.is_banned) &&
+            ![2, '2'].includes(userInfo.device_status)
+          "
+        >
+          <i
+            v-if="
+              [1, '1'].includes(isInteract) &&
+              !userInfo.is_speak &&
+              leaderId !== userInfo.account_id
+            "
+            class="vmp-member-item__control__up-mic"
+            @click="upMic(userInfo.is_apply, userInfo.account_id)"
+          >
+            上麦
+          </i>
+          <!-- 显示条件：当前登录者是主持人  正在上麦 -->
+          <i
+            v-if="
+              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId !== userInfo.account_id
+            "
+            class="vmp-member-item__control__down-mic"
+            @click="downMic(userInfo.account_id)"
+          >
+            {{ $t('interact.interact_1007') }}
+          </i>
+        </template>
+        <!--同意上麦 当前登录者是组长-->
+        <i
+          v-if="
+            tabIndex === 2 &&
+            [1, '1'].includes(isInteract) &&
             !userInfo.is_speak &&
-            userInfo.device_status == 1
+            leaderId !== userInfo.account_id
           "
           class="vmp-member-item__control__up-mic"
-          @click="upMic(userInfo.isApply, userInfo.account_id)"
+          @click="handleConsent(userInfo.account_id)"
         >
           上麦
         </i>
-        <!-- 显示条件：当前登录者是主持人  正在上麦 -->
-        <i
-          v-show="isInteract == '1' && userInfo.is_speak"
-          class="vmp-member-item__control__down-mic"
-          @click="downMic(userInfo.account_id)"
-        >
-          下麦
-        </i>
       </template>
-      <!-- 显示条件：列表中该用户是是主持人 -->
-      <template v-if="roleName == '1' && userInfo.role_name == 1 && userInfo.device_status == 1">
-        <i
-          v-show="isInteract == '1'"
-          class="vmp-member-item__control__up-mic widthAuto"
-          @click="myPresentation(userInfo.account_id)"
-        >
-          我要演示
-        </i>
-        <i
-          v-show="isInteract == '1' && !userInfo.is_speak"
-          class="vmp-member-item__control__up-mic"
-          @click="upMic(userInfo.isApply, userInfo.account_id)"
-        >
-          上麦
-        </i>
-        <!-- 显示条件：当前登录者是主持人  正在上麦 -->
-        <i
-          v-show="isInteract == '1' && userInfo.is_speak && currentSpeakerId != userId"
-          class="vmp-member-item__control__down-mic"
-          @click="downMic(userInfo.account_id)"
-        >
-          下麦
-        </i>
-      </template>
-      <!-- class上的hide是为了hover的时候也不显示 -->
+
       <!-- more显示条件：1、当前登录者是主持人-->
       <!-- more显示条件：2、当前登录者是嘉宾助理并且所选用户是观众 -->
-      <el-dropdown @command="handleCommand" v-show="showUserControl">
-        <i
-          @click.stop="getMore(userInfo.account_id, userInfo.role_name)"
-          class="vmp-member-item__control__more"
-        ></i>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="setBanned">聊天禁言</el-dropdown-item>
-          <el-dropdown-item command="setKicked">
-            {{ userInfo.is_kicked ? '取消踢出' : '踢出活动' }}
-          </el-dropdown-item>
-          <el-dropdown-item command="groupSetKicked">
-            {{ userInfo.is_kicked ? '取消踢出' : '踢出小组' }}
-          </el-dropdown-item>
-          <el-dropdown-item command="setSpeaker">设为主讲</el-dropdown-item>
-          <el-dropdown-item command="inviteMic">邀请演示</el-dropdown-item>
-          <el-dropdown-item command="setLeader">升为组长</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+      <template v-if="memberOptions.platformType === 'live'">
+        <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="click">
+          <i class="vmp-member-item__control__more"></i>
+          <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
+            <template v-for="item in operateList">
+              <el-dropdown-item
+                :command="item.command"
+                v-if="getPropertyByKey(item, 'isShow')"
+                :disabled="getPropertyByKey(item, 'disable')"
+                :key="item.command"
+              >
+                {{ item.type && item.type === 'toggleButton' ? computedShowText(item) : item.text }}
+              </el-dropdown-item>
+            </template>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </template>
+      <template v-if="memberOptions.platformType === 'watch'">
+        <el-dropdown
+          @command="handleWatchCommand"
+          v-show="
+            [20, '20', 1, '1', 3, '3'].includes(roleName) && [2, '2'].includes(userInfo.role_name)
+          "
+          trigger="click"
+        >
+          <i class="vmp-member-item__control__more"></i>
+          <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
+            <template v-for="item in watchOperateList">
+              <el-dropdown-item
+                :command="item.command"
+                v-if="getPropertyByKey(item, 'isShow')"
+                :disabled="getPropertyByKey(item, 'disable')"
+                :key="item.command"
+              >
+                {{ item.type && item.type === 'toggleButton' ? computedShowText(item) : item.text }}
+              </el-dropdown-item>
+            </template>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/share/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpMemberItem',
     filters: {
-      //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = '主持人';
-            break;
-          case 3:
-            ret = '助理';
-            break;
-          case 4:
-            ret = '嘉宾';
-            break;
-          case 20:
-            ret = '组长';
-            break;
-          default:
-            ret = '未定义';
-        }
-        return ret;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人
@@ -188,6 +286,17 @@
       }
     },
     props: {
+      //当前的tabIndex
+      tabIndex: {
+        required: true
+      },
+      //成员组件配置
+      memberOptions: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      },
       //成员信息
       userInfo: {
         type: Object,
@@ -216,14 +325,29 @@
       currentSpeakerId: {
         type: [Number, String]
       },
+      //当前演示主屏幕（主讲人）
+      mainScreen: {
+        type: [Number, String],
+        default: () => ''
+      },
+      //当前演示屏幕
+      presentationScreen: {
+        type: [Number, String],
+        default: () => ''
+      },
+      //当前的组长的id
+      leaderId: {
+        type: [Number, String],
+        default: () => ''
+      },
       //当前登录用户的id
       userId: {
         type: [Number, String]
       },
-      //是否是互动直播
+      //是否是互动直播(1是 0否)
       isInteract: {
         type: Number,
-        default: () => false
+        default: 0
       },
       isEnjoy: {
         required: false,
@@ -233,23 +357,391 @@
       applyUsers: {
         type: Array,
         default: () => []
+      },
+      //直播状态，0未开始，1已开始，2已结束
+      status: {
+        type: [Array, String, Number],
+        default: () => {
+          return 0;
+        }
       }
+    },
+    mounted() {
+      console.log(this.currentSpeakerId, '当前主讲人的id');
     },
     data() {
       return {
         //默认头像
-        defaultAvatar
+        defaultAvatar: defaultAvatar,
+        //操作项
+        operateList: [
+          //设为主讲
+          {
+            command: 'setSpeaker',
+            //在对应的计算属性中判断
+            isShow: 'isShowSetSpeaker',
+            disable: false,
+            text: '设为主讲',
+            sequence: 1
+          },
+          //设置禁言/取消禁言
+          {
+            command: 'setBanned',
+            isShow: 'isShowLiveMuted',
+            disable: false,
+            //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
+            text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
+            type: 'toggleButton',
+            sequence: 2
+          },
+          //踢出 / 取消踢出
+          {
+            command: 'setKicked',
+            isShow: 'isShowLiveKicked',
+            disable: false,
+            text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
+            type: 'toggleButton',
+            sequence: 3
+          },
+          {
+            command: 'setKicked',
+            isShow: 'isShowLiveGroupKicked',
+            disable: false,
+            text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
+            type: 'toggleButton',
+            sequence: 4
+          },
+          //邀请演示（全部人员里展示）
+          {
+            command: 'inviteMic',
+            isShow: 'isShowInvitation',
+            disable: 'isLiveInviteDisable',
+            text: '邀请演示',
+            sequence: 5
+          },
+          //升为组长 （全部人员下展示）
+          {
+            command: 'setLeader',
+            isShow: 'isShowSetLeader',
+            disable: false,
+            text: '升为组长',
+            sequence: 6
+          }
+        ],
+        //观看端操作项
+        watchOperateList: [
+          //邀请演示（全部人员里展示）
+          {
+            command: 'inviteMic',
+            isShow: 'isShowWatchInvitation',
+            disable: 'isWatchInviteDisable',
+            text: '邀请演示',
+            sequence: 1
+          },
+          //设置禁言/取消禁言
+          {
+            command: 'setBanned',
+            isShow: 'isShowWatchMuted',
+            disable: false,
+            text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
+            type: 'toggleButton',
+            sequence: 2
+          },
+          //踢出 / 取消踢出
+          {
+            command: 'setKicked',
+            isShow: 'isShowWatchKicked',
+            disable: false,
+            text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
+            type: 'toggleButton',
+            sequence: 3
+          },
+          //升为组长
+          {
+            command: 'setLeader',
+            isShow: 'isShowWatchSetLeader',
+            disable: false,
+            text: '升为组长',
+            sequence: 4
+          }
+        ],
+        //真实的申请上麦的数组
+        applyUserList: []
       };
     },
+    watch: {
+      //监听数组的变化，保证举手标识能出现
+      applyUsers: {
+        handler(val) {
+          this.applyUserList = val;
+          this.$forceUpdate();
+        },
+        immediate: true,
+        deep: true
+      }
+    },
     computed: {
-      //人员操作项是否显示
+      //角色转换
+      roleFilter() {
+        const _this = this;
+        return function (value) {
+          let ret = '';
+          switch (Number(value)) {
+            case 1:
+              ret = _this.$t('chat.chat_1022');
+              break;
+            case 3:
+              ret = _this.$t('chat.chat_1024');
+              break;
+            case 4:
+              ret = _this.$t('chat.chat_1023');
+              break;
+            case 20:
+              ret = _this.$t('chat.chat_1064');
+              break;
+            default:
+              ret = '';
+          }
+          return ret;
+        };
+      },
+      //人员操作项是否显示(PC发起)
       showUserControl() {
         return (
           (this.roleName == '1' && this.userInfo.account_id != this.userId && !this.isInGroup) ||
           (this.roleName == '1' &&
             this.userInfo.account_id != this.userId &&
             this.isInGroup &&
-            this.userInfo.role_name != 20)
+            this.userInfo.role_name != 20) ||
+          ([3, '3', 4, '4'].includes(this.roleName) && [2, '2'].includes(this.userInfo.role_name))
+        );
+      },
+      //发起端演示的是否是选中的用户
+      isLiveInviteDisable() {
+        return this.userInfo.account_id == this.currentSpeakerId;
+      },
+      //观看端演示的是否是选中的用户
+      isWatchInviteDisable() {
+        return this.userInfo.account_id == this.presentationScreen;
+      },
+      //是否显示禁言、取消禁言
+      isShowLiveMuted() {
+        if (this.tabIndex !== 3) {
+          return ![1, '1'].includes(this.userInfo.role_name);
+        } else {
+          return ![1, '1'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
+      },
+      //是否显示踢出、取消踢出(非分组)
+      isShowLiveKicked() {
+        return !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name);
+      },
+      //是否显示踢出分组、取消踢出
+      isShowLiveGroupKicked() {
+        return this.isInGroup && ![1, '1'].includes(this.userInfo.role_name);
+      },
+      //是否显示禁言、取消禁言（PC观看）
+      isShowWatchMuted() {
+        if (this.tabIndex !== 3) {
+          return [2, '2'].includes(this.userInfo.role_name);
+        } else {
+          return [2, '2'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
+      },
+      //是否显示踢出、取消踢出小组（PC观看）
+      isShowWatchKicked() {
+        return [2, '2'].includes(this.userInfo.role_name);
+      },
+      //是否展示设为主讲按钮(PC发起)
+      isShowSetSpeaker() {
+        if (this.tabIndex !== 1) {
+          return false;
+        }
+        return (
+          !this.isInGroup &&
+          !!this.isInteract &&
+          [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
+          this.userInfo.is_speak &&
+          this.mainScreen != this.userInfo.account_id
+        );
+      },
+      //PC观看端设为组长
+      isShowWatchSetLeader() {
+        return (
+          this.tabIndex !== 3 &&
+          [2, '2'].includes(this.userInfo.role_name) &&
+          [2, '2'].includes(this.userInfo.device_type) &&
+          [0, '0'].includes(this.userInfo.is_banned) &&
+          ![2, '2'].includes(this.userInfo.device_status)
+        );
+      },
+      //是否显示邀请演示操作选项(PC发起)
+      isShowInvitation() {
+        let isShow = false;
+        if (this.tabIndex !== 1) {
+          return false;
+        }
+        //如果不是分组讨论
+        if (!this.isInGroup) {
+          let validateRoleName = [this.userInfo.role_name, this.roleName].every(item => {
+            return ![3, '3'].includes(item);
+          });
+          isShow =
+            [6, '6'].includes(this.mode) &&
+            [2, '2'].includes(this.userInfo.device_type) &&
+            ![2, '2'].includes(this.userInfo.device_status) &&
+            validateRoleName &&
+            [0, '0'].includes(this.userInfo.is_banned);
+        }
+
+        //如果是分组讨论
+        if (this.isInGroup) {
+          isShow =
+            [1, '1'].includes(this.roleName) &&
+            [2, '2'].includes(this.userInfo.role_name) &&
+            [2, '2'].includes(this.userInfo.device_type) &&
+            ![2, '2'].includes(this.userInfo.device_status) &&
+            [0, '0'].includes(this.userInfo.is_banned);
+        }
+        return isShow;
+      },
+      //是否显示邀请演示操作选项(PC观看)
+      isShowWatchInvitation() {
+        if ([1, 2].includes(this.tabIndex)) {
+          return (
+            this.isInteract &&
+            [2, '2'].includes(this.userInfo.device_type) &&
+            [0, '0'].includes(this.userInfo.is_banned) &&
+            ![2, '2'].includes(this.userInfo.device_status)
+          );
+        }
+        return false;
+      },
+      //是否显示升为组长选项(PC发起)
+      isShowSetLeader() {
+        if (!this.isInGroup || this.tabIndex !== 1) {
+          return false;
+        }
+        return (
+          [2, '2'].includes(this.userInfo.role_name) &&
+          [2, '2'].includes(this.userInfo.device_type) &&
+          [0, '0'].includes(this.userInfo.is_banned) &&
+          ![2, '2'].includes(this.userInfo.device_status)
+        );
+      },
+      /** 状态标识显示条件 */
+      //是否显示主讲人标识
+      isShowSpeakerFlag() {
+        if (this.tabIndex === 1) {
+          const options = [
+            this.mode !== 6 && this.mainScreen === this.userInfo.account_id,
+            this.mode === 6 && [1, '1'].includes(this.userInfo.role_name)
+          ];
+          return options.some(value => !!value);
+        }
+        return false;
+      },
+      //列表中该用户是否不是主持人身份
+      isNotHost() {
+        const options = [
+          [1, '1'].includes(this.roleName),
+          ![1, '1'].includes(this.userInfo.role_name),
+          (this.isEnjoy && [3, '3'].includes(this.userInfo.role_name)) ||
+            ![3, '3'].includes(this.userInfo.role_name),
+          ![20, '20'].includes(this.userInfo.role_name),
+          ![2, '2'].includes(this.userInfo.device_status)
+        ];
+        return options.every(item => !!item);
+      },
+      //是否是主持人
+      isHost() {
+        return (
+          [1, '1'].includes(this.roleName) &&
+          [1, '1'].includes(this.userInfo.role_name) &&
+          [1, '1'].includes(this.userInfo.device_status)
+        );
+      },
+      //是否显示上麦标识
+      isShowUpMic() {
+        let isShow = false;
+        if (this.isHost) {
+          isShow =
+            [1, '1'].includes(this.isInteract) &&
+            [0, '0'].includes(this.userInfo.is_speak) &&
+            [1, '1'].includes(this.status);
+          return isShow;
+        }
+        //如果不是主持人
+        if (this.isNotHost) {
+          isShow =
+            [1, '1'].includes(this.isInteract) &&
+            !this.userInfo.is_banned &&
+            [0, '0'].includes(this.userInfo.is_speak) &&
+            [1, '1'].includes(this.userInfo.device_status);
+        }
+
+        return isShow;
+      },
+      //是否显示下麦标识
+      isShowDownMic() {
+        let isShow = false;
+        if (this.isHost) {
+          return (
+            [1, '1'].includes(this.isInteract) &&
+            this.userInfo.is_speak &&
+            this.currentSpeakerId !== this.userId
+          );
+        }
+        if (this.isNotHost) {
+          isShow = [1, '1'].includes(this.isInteract) && this.userInfo.is_speak;
+        }
+        return isShow;
+      },
+      //是否显示我要演示
+      isShowMyPresentation() {
+        return this.isHost && [1, '1'].includes(this.isInteract) && this.isInGroup;
+      },
+      /** 状态标识显示条件 */
+      //获取属性值
+      getPropertyByKey() {
+        return function (item = {}, keyName = '') {
+          return typeof item[keyName] === 'boolean' ? item[keyName] : this[item[keyName]];
+        };
+      },
+      //计算应该显示的文字
+      computedShowText() {
+        const _this = this;
+        return function (item = {}) {
+          let text = '';
+          const { command = '' } = item;
+          switch (command) {
+            case 'setBanned':
+              text = ![0, '0'].includes(_this.userInfo.is_banned) ? '取消禁言' : '聊天禁言';
+              break;
+            case 'setKicked':
+              if (_this.isInGroup) {
+                text = _this.userInfo.is_kicked ? '取消踢出' : '踢出小组';
+              } else {
+                text = _this.userInfo.is_kicked ? '取消踢出' : '踢出活动';
+              }
+              break;
+            default:
+              break;
+          }
+          return text;
+        };
+      },
+      //是否在申请举手列表里
+      isInApplyUsers() {
+        return this.applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1;
+      },
+      //是否显示举手的标识(PC发起)
+      isShowHandFlag() {
+        return (
+          [1, 2].includes(this.tabIndex) &&
+          [1, '1'].includes(this.userInfo.is_apply) &&
+          this.isInApplyUsers &&
+          !this.userInfo.is_speak
         );
       }
     },
@@ -262,12 +754,39 @@
       handleSetBanned() {
         this.$emit('operateUser', { type: 'setBanned', params: this.userInfo });
       },
-      //显示更多
-      getMore(accountId, roleName) {
-        console.log(accountId, roleName);
+      // 邀请演示，主直播间和小组内都会调用
+      handleInviteMic() {
+        this.$emit('operateUser', { type: 'inviteMic', params: this.userInfo });
       },
       //处理指令
       handleCommand(command) {
+        switch (command) {
+          case 'setSpeaker':
+            this.$emit('operateUser', { type: 'setSpeaker', params: this.userInfo });
+            break;
+          case 'setBanned':
+            this.handleSetBanned();
+            break;
+          case 'setKicked':
+            this.handleSetKicked();
+            break;
+          case 'setGroupKicked':
+            this.handleSetKicked();
+            break;
+          // 主直播间主持人邀请成员演示
+          case 'inviteMic':
+            this.handleInviteMic();
+            break;
+          // 升为组长
+          case 'setLeader':
+            this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
+            break;
+          default:
+            break;
+        }
+      },
+      //处理观看端指令
+      handleWatchCommand(command) {
         switch (command) {
           case 'setBanned':
             this.handleSetBanned();
@@ -278,16 +797,34 @@
           case 'setGroupKicked':
             this.handleSetKicked();
             break;
+          // 组长邀请成员演示
+          case 'inviteMic':
+            this.handleInviteMic();
+            break;
+          // 升为组长
+          case 'setLeader':
+            this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
+            break;
           default:
             break;
         }
       },
       //上麦
-      upMic() {},
+      upMic() {
+        this.$emit('interactiveOperate', { type: 'upMic', params: this.userInfo });
+      },
       //下麦
-      downMic() {},
+      downMic() {
+        this.$emit('interactiveOperate', { type: 'downMic', params: this.userInfo });
+      },
       //我要演示
-      myPresentation() {}
+      myPresentation() {
+        this.$emit('interactiveOperate', { type: 'myPresentation', params: this.userInfo });
+      },
+      //同意上麦
+      handleConsent() {
+        this.$emit('interactiveOperate', { type: 'agreeUpMic', params: this.userInfo });
+      }
     }
   };
 </script>
@@ -295,12 +832,20 @@
 <style lang="less">
   .vmp-member-item {
     position: relative;
-    box-sizing: content-box;
-    height: 44px;
-    font-size: 12px;
-    padding: 2px 24px;
     color: #999999;
+    height: 44px;
     line-height: 44px;
+    padding: 8px 10px 8px 14px;
+    font-size: 12px;
+    box-sizing: content-box;
+    &:hover {
+      background-color: #2d2d2d;
+      .vmp-member-item__control {
+        &__more {
+          opacity: 1;
+        }
+      }
+    }
     &__avatar-wrapper {
       display: inline-block;
       position: relative;
@@ -317,20 +862,21 @@
     }
     &__name {
       display: inline-block;
-      max-width: 100px;
+      max-width: 55px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       vertical-align: middle;
-      margin: 0 2px 0 9px;
-      font-size: 14px;
+      margin-left: 9px;
     }
     &__role {
+      display: inline-block;
       text-align: center;
-      padding: 0 4px;
-      border-radius: 100px;
+      line-height: 15px;
       vertical-align: middle;
+      padding: 0 4px;
       font-size: 10px;
+      border-radius: 10px;
       &.host {
         background-color: rgba(252, 86, 89, 0.15);
         color: #fb3a32;
@@ -352,34 +898,40 @@
       float: right;
       &__user-icon {
         color: #ff9446;
-        font-size: 16px;
+        font-size: 13px;
         vertical-align: middle;
-        padding: 0 3px;
+        margin-right: 6px;
       }
       &__up-mic,
       &__down-mic {
         display: inline-block;
         width: 30px;
-        height: 20px;
+        height: 16px;
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
         color: #dddddd;
         text-align: center;
         vertical-align: middle;
-        line-height: 20px;
+        line-height: 16px;
         font-style: normal;
         letter-spacing: 1px;
         cursor: pointer;
       }
+      .widthAuto {
+        width: auto;
+        padding: 0 2px;
+        margin-right: 4px;
+      }
       &__more {
         display: inline-block;
-        width: 27px;
-        height: 20px;
+        width: 13px;
+        height: 13px;
         vertical-align: middle;
         margin-left: 3px;
         color: #cccccc;
         font-size: 12px;
-        background: url('../images/more.png') no-repeat center;
+        opacity: 0;
+        background: url('../img/more.png') no-repeat center;
         background-size: 13px 3px;
         border-radius: 4px;
         &:hover {
@@ -421,6 +973,47 @@
             color: #fff;
           }
         }
+      }
+    }
+  }
+  .vmp-member-dropdown-menu.el-dropdown-menu {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    z-index: 2;
+    width: 96px;
+    background-color: #fff !important;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
+    box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    .el-dropdown-menu__item {
+      height: 28px;
+      color: #666;
+      text-align: center;
+      line-height: 28px;
+      padding: 0;
+      margin: 3px 0;
+      &:hover {
+        background-color: #fc5659;
+        color: #fff;
+      }
+    }
+    .is-disabled {
+      background: #999;
+      color: #fff;
+      &:hover {
+        background: #999;
+        cursor: default;
+      }
+    }
+    .popper__arrow {
+      &:after {
+        border-bottom-color: #fff !important;
       }
     }
   }

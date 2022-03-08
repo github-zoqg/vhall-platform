@@ -7,7 +7,7 @@
       </div>
       <div
         :class="
-          this.atList.find(u => u.nickName === this.nickName)
+          this.atList.find(u => u.nickname === this.nickname)
             ? 'vmp-chat-user-control__item disabled'
             : 'vmp-chat-user-control__item'
         "
@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { useChatServer, contextServer } from 'vhall-sass-domain';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
     mixins: [dataReportMixin],
@@ -63,14 +63,14 @@
           is_banned: null,
           is_kicked: null
         },
-        nickName: '',
+        nickname: '',
         godMode: false,
         assistantType: ''
       };
     },
     beforeCreate() {
       this.chatServer = useChatServer();
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.assistantType = this.$route.query.assistantType;
@@ -79,16 +79,25 @@
       //todo 待改为信令
       EventBus.$on(
         'set_person_status_in_chat',
-        async (el, accountId, count, nickName, godMode, roleName) => {
-          if (accountId === this.userId) return; // 不能点击自己
-          this.accountId = accountId;
-          this.count = count;
-          this.userStatus = await this.getUserStatus();
-          this.isShow = true;
-          this.godMode = godMode;
-          this.calculate(el);
-          this.nickName = nickName;
-          this.roleName = roleName;
+        async (el, accountId, count, nickname, msgroleName) => {
+          const roleName = this.roomBaseServer.state.watchInitData.join_info.role_name;
+          if (accountId == this.userId) return; // 不能点击自己
+          if (((roleName == 3 || roleName == 4) && msgroleName == 2) || roleName == 1) {
+            this.accountId = accountId;
+            this.count = count;
+            const boundedList = await this.getUserStatus();
+            this.userStatus.is_banned = boundedList[0].data.list.some(user => {
+              return user.account_id == accountId;
+            });
+            this.userStatus.is_kicked = boundedList[1].data.list.some(user => {
+              return user.account_id == accountId;
+            });
+            this.isShow = true;
+            this.godMode = roleName == 1;
+            this.calculate(el);
+            this.nickname = nickname;
+            this.roleName = roleName;
+          }
         }
       );
       //todo 待改为信令
@@ -130,13 +139,10 @@
        * todo domain提供的服务 得到用户状态是否被禁言/踢出
        */
       getUserStatus() {
-        return this.roomBaseServer
-          .getRoomToolStatus({
-            room_id: this.roomId
-          })
-          .then(res => {
-            return res.data;
-          });
+        return Promise.all([
+          this.chatServer.getBannedList({ room_id: this.roomId }),
+          this.chatServer.getKickedList({ room_id: this.roomId })
+        ]);
       },
       /**
        * 禁言/取消禁言

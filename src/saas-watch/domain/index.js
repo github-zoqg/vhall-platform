@@ -5,28 +5,36 @@ import {
   setRequestHeaders,
   useDocServer,
   useInteractiveServer,
-  useRoomBaseServer
+  useRoomBaseServer,
+  useMicServer,
+  useMediaSettingServer,
+  useVirtualAudienceServer,
+  useUserServer,
+  useGroupServer,
+  useDesktopShareServer
 } from 'middle-domain';
 
-// setBaseUrl('https://t-saas-dispatch.vhall.com');
-setBaseUrl('https://dev-csd-api.vhall.com');
-setRequestHeaders({
-  platform: 10,
-  'biz-id': 2,
-  'biz-application-id': 'fd8d3653',
-  'x-login-user-info':
-    '{"user_id":16422761,"platform":17,"exp_time":123434,"business_account_id":123,"ch":"B"}'
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
-
-const roomBaseServer = useRoomBaseServer();
-roomBaseServer.setPaasAppId('fd8d3653');
+setRequestHeaders({
+  platform: 7
+});
 
 Vue.use(DomainStore);
 
 export default new DomainStore.Store({
   state: {
-    roomBaseServer: roomBaseServer.state,
+    roomBaseServer: useRoomBaseServer().state,
     docServer: useDocServer().state,
-    interactiveServer: useInteractiveServer().state
+    interactiveServer: useInteractiveServer().state,
+    micServer: useMicServer().state,
+    mediaSettingServer: useMediaSettingServer().state,
+    virtualAudienceServer: useVirtualAudienceServer().state,
+    userServer: useUserServer().state,
+    groupServer: useGroupServer().state,
+    desktopShareServer: useDesktopShareServer().state
   }
 });

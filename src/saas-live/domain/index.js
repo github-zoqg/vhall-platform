@@ -5,31 +5,45 @@ import {
   setRequestHeaders,
   useDocServer,
   useInteractiveServer,
-  useRoomBaseServer
+  useRoomBaseServer,
+  useMicServer,
+  useMemberServer,
+  useQaAdminServer,
+  useGroupServer,
+  useChatAuthServer,
+  useMediaSettingServer,
+  useUserServer,
+  useInsertFileServer,
+  useDesktopShareServer,
+  useSplitScreenServer
 } from 'middle-domain';
 
-const paasAppId = 'fd8d3653';
-
-// setBaseUrl('https://t-saas-dispatch.vhall.com');
-setBaseUrl('https://dev-csd-api.vhall.com');
-setRequestHeaders({
-  token: localStorage.getItem('token') || '',
-  platform: 7, // 7:PC网页版
-  'biz-id': 2,
-  'biz-application-id': paasAppId
-  // 'x-login-user-info':
-  //   '{"user_id":16422761,"platform":17,"exp_time":123434,"business_account_id":123,"ch":"B"}'
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
-
-const roomBaseServer = useRoomBaseServer();
-roomBaseServer.setPaasAppId(paasAppId);
+setRequestHeaders({
+  platform: 7, // 7:PC网页版
+  token: localStorage.getItem('token') || ''
+});
 
 Vue.use(DomainStore);
 
 export default new DomainStore.Store({
   state: {
-    roomBaseServer: roomBaseServer.state,
+    roomBaseServer: useRoomBaseServer().state,
     docServer: useDocServer().state,
-    interactiveServer: useInteractiveServer().state
+    interactiveServer: useInteractiveServer().state,
+    micServer: useMicServer().state,
+    memberServer: useMemberServer().state,
+    qaServer: useQaAdminServer().state,
+    groupServer: useGroupServer().state,
+    chatAuthServer: useChatAuthServer().state,
+    mediaSettingServer: useMediaSettingServer().state,
+    userServer: useUserServer().state,
+    insertFileServer: useInsertFileServer().state,
+    desktopShareServer: useDesktopShareServer().state,
+    splitScreenServer: useSplitScreenServer().state
   }
 });

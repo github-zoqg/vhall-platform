@@ -15,7 +15,7 @@
   //是否自动换行
   "editor.wordWrap": "on",
   //关闭迷你图快速预览
-  "editor.minimap.enabled": false,
+  // "editor.minimap.enabled": false,
   //关闭rg.exe进程（吃CPU）
   "search.followSymlinks": false,
   //开启行数提示
@@ -81,9 +81,17 @@
   "path-intellisense.mappings": {
     "@": "${workspaceRoot}/src"
   },
-  "js/ts.implicitProjectConfig.checkJs": true,
   "i18n-ally.localesPaths": [
-    "src/packages/locales"
+    "src/saas-live/languages/modules",
+    "src/saas-watch/languages/modules",
+    "src/saas-wap/languages/modules"
   ],
+  "i18n-ally.enabledParsers": ["json", "js"],
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.displayLanguage": "zh",
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "i18n-ally.keystyle": "nested",
   "vue-i18n.i18nPaths": ""
 }

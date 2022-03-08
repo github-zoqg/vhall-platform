@@ -1,0 +1,1995 @@
+<template>
+  <div class="vmp-sign-up-form" :class="[isEntryForm ? 'vmp-sign-up-form--entry-from' : '']">
+    <template v-if="!isEntryForm">
+      <el-dialog title="" :visible.sync="visible" width="720px" custom-class="vmp-sign-up-form">
+        <div class="vmp-sign-up-form__wrap">
+          <!--顶部banner图-->
+          <div class="vmp-sign-up-form__banner">
+            <img :src="formInfo.cover ? `${baseUrl}${formInfo.cover}` : defaultHeader" alt="" />
+          </div>
+          <div class="vmp-sign-up-form__content">
+            <!--表单名称-->
+            <div class="vmp-sign-up-form__title">{{ formInfo.title }}</div>
+            <!--表单简介-->
+            <div
+              class="vmp-sign-up-form__introduction"
+              v-if="formInfo.intro"
+              ref="intro"
+              :class="[overflowStatus ? 'vmp-sign-up-form__introduction-fold' : '']"
+            >
+              {{ formInfo.intro }}
+              <span
+                v-show="overflowStatus"
+                class="vmp-sign-up-form__introduction__detail"
+                @click="changeFoldStatus(false)"
+              >
+                <span class="is-ellipsis">...</span>
+                {{ $t('form.form_1011') }}
+              </span>
+              <span
+                v-show="!overflowStatus"
+                class="vmp-sign-up-form__introduction__detail"
+                @click="changeFoldStatus(true)"
+              >
+                <span class="is-ellipsis"></span>
+                {{ $t('form.form_1012') }}
+              </span>
+            </div>
+            <!--切换的tab-->
+            <div class="vmp-sign-up-form__tab-bar">
+              <div :class="['vmp-sign-up-form__tab-bar-tabs', formInfo.theme_color + '1']">
+                <template v-for="tab in tabConfig[isSubscribe]">
+                  <div
+                    :class="{ active: activeTab === tab.code }"
+                    :key="tab.code"
+                    @click="switchTab(tab.code)"
+                  >
+                    {{ tab.text }}
+                  </div>
+                </template>
+              </div>
+            </div>
+            <!--报名表单-->
+            <div class="vmp-sign-up-form__main-form" v-show="activeTab === 1">
+              <!-- 报名表单 -->
+              <template>
+                <el-form
+                  ref="form"
+                  :model="form"
+                  class="entryForm"
+                  :rules="rules"
+                  label-position="top"
+                >
+                  <el-form-item
+                    v-for="(question, quesIndex) in list"
+                    v-show="question.type != 6"
+                    :key="question.id"
+                    :prop="question.id + ''"
+                    :label="
+                      question.subject === '隐私声明'
+                        ? ''
+                        : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$t(
+                            question.subject
+                          )}`
+                    "
+                  >
+                    <!-- 输入框 -->
+                    <template
+                      v-if="
+                        (question.type === 0 && question.default_type !== 4) || question.type === 1
+                      "
+                    >
+                      <el-input
+                        v-if="question.type == 0 && question.default_type == 2"
+                        v-model.number="form[question.id]"
+                        :maxlength="question.type == 0 ? '' : 60"
+                        :show-word-limit="question.type != 0"
+                        autocomplete="off"
+                        :placeholder="findPlaceHolder(question.default_type)"
+                      ></el-input>
+                      <el-input
+                        v-else
+                        v-model="form[question.id]"
+                        :maxlength="
+                          question.type == 0 && question.default_type == 1
+                            ? 50
+                            : question.type == 0 && question.default_type !== 3
+                            ? ''
+                            : 60
+                        "
+                        :show-word-limit="question.type != 0"
+                        autocomplete="off"
+                        :placeholder="findPlaceHolder(question.default_type)"
+                      ></el-input>
+                    </template>
+                    <!-- 单选 -->
+                    <template v-if="question.default_type === 4 || question.type === 2">
+                      <el-radio-group v-model="form[question.id]">
+                        <template v-if="question.default_type === 4">
+                          <div>
+                            <el-radio :label="$t('form.form_1015')" name="gender"></el-radio>
+                          </div>
+                          <div>
+                            <el-radio :label="$t('form.form_1016')" name="gender"></el-radio>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <div v-for="radioItem in question.items" :key="radioItem.id">
+                            <el-radio :label="radioItem.id" :name="question.id + ''">
+                              {{ radioItem.subject }}
+                            </el-radio>
+                            <template v-if="radioItem.type === 1">
+                              <el-radio
+                                v-show="form[question.id] == radioItem.id"
+                                v-model="form[`${question.id}${radioItem.id}`]"
+                                maxlength="60"
+                                autocomplete="off"
+                                show-word-limit
+                                :placeholder="$t('form.form_1017')"
+                                style="margin-top: 10px"
+                                class="radio-input"
+                              ></el-radio>
+                            </template>
+                          </div>
+                        </template>
+                      </el-radio-group>
+                    </template>
+                    <!-- 多选 -->
+                    <template v-if="question.type === 3">
+                      <el-checkbox-group v-model="form[question.id]">
+                        <div v-for="checkItem in question.items" :key="checkItem.id">
+                          <el-checkbox :label="checkItem.id" :name="question.id + ''">
+                            {{ checkItem.subject }}
+                          </el-checkbox>
+                          <template v-if="checkItem.type === 1">
+                            <el-input
+                              v-show="form[question.id].some(id => id == checkItem.id)"
+                              v-model="form[`${question.id}${checkItem.id}`]"
+                              :maxlength="60"
+                              autocomplete="off"
+                              show-word-limit
+                              :placeholder="$t('form.form_1017')"
+                              style="margin-top: 10px"
+                              class="radioInput"
+                            ></el-input>
+                          </template>
+                        </div>
+                      </el-checkbox-group>
+                    </template>
+                    <!-- 下拉 -->
+                    <template v-if="question.type === 4">
+                      <el-select
+                        ref="autoCloseRefFlag"
+                        v-model="form[question.id]"
+                        style="width: 100%"
+                        :placeholder="$t('form.form_1018')"
+                      >
+                        <el-option
+                          v-for="option in question.items"
+                          :key="option.id"
+                          :label="option.subject"
+                          :value="option.subject"
+                        ></el-option>
+                      </el-select>
+                    </template>
+                    <!-- 地域选择 -->
+                    <template v-if="question.type === 5">
+                      <el-row :gutter="20">
+                        <el-col :span="question.colNum">
+                          <el-input
+                            v-show="false"
+                            v-model="form[question.id]"
+                            autocomplete="off"
+                          ></el-input>
+                          <el-select
+                            ref="autoCloseRefFlag"
+                            v-model="province"
+                            :placeholder="$t('form.form_1004')"
+                            @change="regionalChange('province')"
+                          >
+                            <el-option
+                              v-for="opt in provinces"
+                              :key="opt.value"
+                              :label="opt.label"
+                              :value="opt.value"
+                            ></el-option>
+                          </el-select>
+                        </el-col>
+                        <el-col v-if="question.options.show_city == 1" :span="question.colNum">
+                          <el-select
+                            ref="autoCloseRefFlag"
+                            v-model="city"
+                            :placeholder="$t('form.form_1005')"
+                            @change="regionalChange('city')"
+                          >
+                            <el-option
+                              v-for="opt in cityList"
+                              :key="opt.value"
+                              :label="opt.label"
+                              :value="opt.value"
+                            ></el-option>
+                          </el-select>
+                        </el-col>
+                        <el-col v-if="question.options.show_district == 1" :span="question.colNum">
+                          <el-select
+                            ref="autoCloseRefFlag"
+                            v-model="county"
+                            :placeholder="$t('form.form_1006')"
+                            @change="regionalChange('county')"
+                          >
+                            <el-option
+                              v-for="opt in countyList"
+                              :key="opt.value"
+                              :label="opt.label"
+                              :value="opt.value"
+                            ></el-option>
+                          </el-select>
+                        </el-col>
+                      </el-row>
+                    </template>
+                  </el-form-item>
+                  <el-form-item
+                    v-if="isPhoneValidate"
+                    class="verify-code-box"
+                    :required="false"
+                    prop="code"
+                  >
+                    <el-row :gutter="20">
+                      <el-col :span="12">
+                        <div id="setCaptcha" class="captcha">
+                          <el-input v-model.trim="form.imgCode" autocomplete="off"></el-input>
+                        </div>
+                      </el-col>
+                      <el-col :span="12">
+                        <el-input
+                          v-model.trim="form.code"
+                          auto-complete="off"
+                          :placeholder="$t('form.form_1020')"
+                        ></el-input>
+                        <el-button
+                          :disabled="time !== 60 || isPreview"
+                          class="send-code-btn"
+                          :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                          size="mini"
+                          @click="time === 60 && getDyCode(true)"
+                        >
+                          {{ time === 60 ? $t('form.form_1021') : `${time}s` }}
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+                  <!-- 隐私声明 -->
+                  <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
+                    <template>
+                      <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
+                        <p v-html="privacyText"></p>
+                      </el-checkbox>
+                    </template>
+                  </el-form-item>
+                  <div class="btn-box">
+                    <el-button
+                      style="margin-top: 11px"
+                      :disabled="isPreview"
+                      :class="[formInfo.theme_color + '1']"
+                      round
+                      type="primary"
+                      @click="submitForm"
+                    >
+                      {{ $t('form.form_1019') }}
+                    </el-button>
+                  </div>
+                </el-form>
+              </template>
+            </div>
+            <!--验证码表单-->
+            <div class="vmp-sign-up-form__verify-form" v-show="activeTab === 2">
+              <!-- 验证 -->
+              <template>
+                <el-form
+                  ref="verifyForm"
+                  class="entryForm"
+                  :model="verifyForm"
+                  :rules="verifyRules"
+                >
+                  <el-form-item :label="$t('form.form_1022')" prop="phone">
+                    <el-input
+                      v-model.number.trim="verifyForm.phone"
+                      type="number"
+                      auto-complete="off"
+                      :placeholder="$t('account.account_1025')"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item v-if="isPhoneValidate" class="verify-code-box" prop="code">
+                    <el-row :gutter="20">
+                      <el-col :span="12">
+                        <div id="setCaptcha1" class="captcha">
+                          <el-input v-model.trim="verifyForm.imgCode" autocomplete="off"></el-input>
+                        </div>
+                      </el-col>
+                      <el-col :span="12">
+                        <el-input
+                          v-model.trim="verifyForm.code"
+                          auto-complete="off"
+                          :placeholder="$t('form.form_1076')"
+                        ></el-input>
+                        <el-button
+                          :disabled="verifyTime !== 60 || isPreview"
+                          :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                          size="mini"
+                          class="send-code-btn"
+                          @click="verifyTime === 60 && getDyCode(false)"
+                        >
+                          {{ verifyTime === 60 ? $t('form.form_1021') : `${verifyTime}s` }}
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+                  <div class="btn-box">
+                    <el-button
+                      :disabled="isPreview"
+                      :class="[formInfo.theme_color + '1']"
+                      round
+                      type="primary"
+                      @click="submitVerify"
+                    >
+                      {{ $t('interact_tools.interact_tools_1019') }}
+                    </el-button>
+                  </div>
+                </el-form>
+              </template>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+    </template>
+    <template v-else>
+      <div class="vmp-sign-up-form__wrap">
+        <!--顶部banner图-->
+        <div class="vmp-sign-up-form__banner">
+          <img :src="formInfo.cover ? `${baseUrl}${formInfo.cover}` : defaultHeader" alt="" />
+        </div>
+        <div class="vmp-sign-up-form__content">
+          <!--表单名称-->
+          <div class="vmp-sign-up-form__title">{{ formInfo.title }}</div>
+          <!--表单简介-->
+          <div
+            class="vmp-sign-up-form__introduction"
+            v-if="formInfo.intro"
+            ref="intro"
+            :class="[overflowStatus ? 'vmp-sign-up-form__introduction-fold' : '']"
+          >
+            {{ formInfo.intro }}
+            <span
+              v-show="overflowStatus"
+              class="vmp-sign-up-form__introduction__detail"
+              @click="changeFoldStatus(false)"
+            >
+              <span class="is-ellipsis">...</span>
+              {{ $t('form.form_1011') }}
+            </span>
+            <span
+              v-show="!overflowStatus"
+              class="vmp-sign-up-form__introduction__detail"
+              @click="changeFoldStatus(true)"
+            >
+              <span class="is-ellipsis"></span>
+              {{ $t('form.form_1012') }}
+            </span>
+          </div>
+          <!--切换的tab-->
+          <div class="vmp-sign-up-form__tab-bar">
+            <div :class="['vmp-sign-up-form__tab-bar-tabs', formInfo.theme_color + '1']">
+              <template v-for="tab in tabConfig[isSubscribe]">
+                <div
+                  :class="{ active: activeTab === tab.code }"
+                  :key="tab.code"
+                  @click="switchTab(tab.code)"
+                >
+                  {{ tab.text }}
+                </div>
+              </template>
+            </div>
+          </div>
+          <!--报名表单-->
+          <div class="vmp-sign-up-form__main-form" v-show="activeTab === 1">
+            <!-- 报名表单 -->
+            <template>
+              <el-form
+                ref="form"
+                :model="form"
+                class="entryForm"
+                :rules="rules"
+                label-position="top"
+              >
+                <el-form-item
+                  v-for="(question, quesIndex) in list"
+                  v-show="question.type != 6"
+                  :key="question.id"
+                  :prop="question.id + ''"
+                  :label="
+                    question.subject === '隐私声明'
+                      ? ''
+                      : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$t(
+                          question.subject
+                        )}`
+                  "
+                >
+                  <!-- 输入框 -->
+                  <template
+                    v-if="
+                      (question.type === 0 && question.default_type !== 4) || question.type === 1
+                    "
+                  >
+                    <el-input
+                      v-if="question.type == 0 && question.default_type == 2"
+                      v-model.number="form[question.id]"
+                      :maxlength="question.type == 0 ? '' : 60"
+                      :show-word-limit="question.type != 0"
+                      autocomplete="off"
+                      :placeholder="findPlaceHolder(question.default_type)"
+                    ></el-input>
+                    <el-input
+                      v-else
+                      v-model="form[question.id]"
+                      :maxlength="
+                        question.type == 0 && question.default_type == 1
+                          ? 50
+                          : question.type == 0
+                          ? ''
+                          : 60
+                      "
+                      :show-word-limit="question.type != 0"
+                      autocomplete="off"
+                      :placeholder="findPlaceHolder(question.default_type)"
+                    ></el-input>
+                  </template>
+                  <!-- 单选 -->
+                  <template v-if="question.default_type === 4 || question.type === 2">
+                    <el-radio-group v-model="form[question.id]">
+                      <template v-if="question.default_type === 4">
+                        <div>
+                          <el-radio :label="$t('form.form_1015')" name="gender"></el-radio>
+                        </div>
+                        <div>
+                          <el-radio :label="$t('form.form_1016')" name="gender"></el-radio>
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div v-for="radioItem in question.items" :key="radioItem.id">
+                          <el-radio :label="radioItem.id" :name="question.id + ''">
+                            {{ radioItem.subject }}
+                          </el-radio>
+                          <template v-if="radioItem.type === 1">
+                            <el-radio
+                              v-show="form[question.id] == radioItem.id"
+                              v-model="form[`${question.id}${radioItem.id}`]"
+                              maxlength="60"
+                              autocomplete="off"
+                              show-word-limit
+                              :placeholder="$t('form.form_1017')"
+                              style="margin-top: 10px"
+                              class="radio-input"
+                            ></el-radio>
+                          </template>
+                        </div>
+                      </template>
+                    </el-radio-group>
+                  </template>
+                  <!-- 多选 -->
+                  <template v-if="question.type === 3">
+                    <el-checkbox-group v-model="form[question.id]">
+                      <div v-for="checkItem in question.items" :key="checkItem.id">
+                        <el-checkbox :label="checkItem.id" :name="question.id + ''">
+                          {{ checkItem.subject }}
+                        </el-checkbox>
+                        <template v-if="checkItem.type === 1">
+                          <el-input
+                            v-show="form[question.id].some(id => id == checkItem.id)"
+                            v-model="form[`${question.id}${checkItem.id}`]"
+                            :maxlength="60"
+                            autocomplete="off"
+                            show-word-limit
+                            :placeholder="$t('form.form_1017')"
+                            style="margin-top: 10px"
+                            class="radioInput"
+                          ></el-input>
+                        </template>
+                      </div>
+                    </el-checkbox-group>
+                  </template>
+                  <!-- 下拉 -->
+                  <template v-if="question.type === 4">
+                    <el-select
+                      ref="autoCloseRefFlag"
+                      v-model="form[question.id]"
+                      style="width: 100%"
+                      :placeholder="$t('form.form_1018')"
+                    >
+                      <el-option
+                        v-for="option in question.items"
+                        :key="option.id"
+                        :label="option.subject"
+                        :value="option.subject"
+                      ></el-option>
+                    </el-select>
+                  </template>
+                  <!-- 地域选择 -->
+                  <template v-if="question.type === 5">
+                    <el-row :gutter="20">
+                      <el-col :span="question.colNum">
+                        <el-input
+                          v-show="false"
+                          v-model="form[question.id]"
+                          autocomplete="off"
+                        ></el-input>
+                        <el-select
+                          ref="autoCloseRefFlag"
+                          v-model="province"
+                          :placeholder="$t('form.form_1004')"
+                          @change="regionalChange('province')"
+                        >
+                          <el-option
+                            v-for="opt in provinces"
+                            :key="opt.value"
+                            :label="opt.label"
+                            :value="opt.value"
+                          ></el-option>
+                        </el-select>
+                      </el-col>
+                      <el-col v-if="question.options.show_city == 1" :span="question.colNum">
+                        <el-select
+                          ref="autoCloseRefFlag"
+                          v-model="city"
+                          :placeholder="$t('form.form_1005')"
+                          @change="regionalChange('city')"
+                        >
+                          <el-option
+                            v-for="opt in cityList"
+                            :key="opt.value"
+                            :label="opt.label"
+                            :value="opt.value"
+                          ></el-option>
+                        </el-select>
+                      </el-col>
+                      <el-col v-if="question.options.show_district == 1" :span="question.colNum">
+                        <el-select
+                          ref="autoCloseRefFlag"
+                          v-model="county"
+                          :placeholder="$t('form.form_1006')"
+                          @change="regionalChange('county')"
+                        >
+                          <el-option
+                            v-for="opt in countyList"
+                            :key="opt.value"
+                            :label="opt.label"
+                            :value="opt.value"
+                          ></el-option>
+                        </el-select>
+                      </el-col>
+                    </el-row>
+                  </template>
+                </el-form-item>
+                <el-form-item
+                  v-if="isPhoneValidate"
+                  class="verify-code-box"
+                  :required="false"
+                  prop="code"
+                >
+                  <el-row :gutter="20">
+                    <el-col :span="12">
+                      <div id="setCaptcha" class="captcha">
+                        <el-input v-model.trim="form.imgCode" autocomplete="off"></el-input>
+                      </div>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-input
+                        v-model.trim="form.code"
+                        auto-complete="off"
+                        :placeholder="$t('form.form_1020')"
+                      ></el-input>
+                      <el-button
+                        :disabled="time !== 60 || isPreview"
+                        class="send-code-btn"
+                        :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                        size="mini"
+                        @click="time === 60 && getDyCode(true)"
+                      >
+                        {{ time === 60 ? $t('form.form_1021') : `${time}s` }}
+                      </el-button>
+                    </el-col>
+                  </el-row>
+                </el-form-item>
+                <!-- 隐私声明 -->
+                <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
+                  <template>
+                    <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
+                      <p v-html="privacyText"></p>
+                    </el-checkbox>
+                  </template>
+                </el-form-item>
+                <div class="btn-box">
+                  <el-button
+                    style="margin-top: 11px"
+                    :disabled="isPreview"
+                    :class="[formInfo.theme_color + '1']"
+                    round
+                    type="primary"
+                    @click="submitForm"
+                  >
+                    {{ $t('form.form_1019') }}
+                  </el-button>
+                </div>
+              </el-form>
+            </template>
+          </div>
+          <!--验证码表单-->
+          <div class="vmp-sign-up-form__verify-form" v-show="activeTab === 2">
+            <!-- 验证 -->
+            <template>
+              <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
+                <el-form-item :label="$t('form.form_1022')" prop="phone">
+                  <el-input
+                    v-model.number.trim="verifyForm.phone"
+                    type="number"
+                    auto-complete="off"
+                    :placeholder="$t('account.account_1025')"
+                  ></el-input>
+                </el-form-item>
+                <el-form-item v-if="isPhoneValidate" class="verify-code-box" prop="code">
+                  <el-row :gutter="20">
+                    <el-col :span="12">
+                      <div id="setCaptcha1" class="captcha">
+                        <el-input v-model.trim="verifyForm.imgCode" autocomplete="off"></el-input>
+                      </div>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-input
+                        v-model.trim="verifyForm.code"
+                        auto-complete="off"
+                        :placeholder="$t('form.form_1076')"
+                      ></el-input>
+                      <el-button
+                        :disabled="verifyTime !== 60 || isPreview"
+                        :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                        size="mini"
+                        class="send-code-btn"
+                        @click="verifyTime === 60 && getDyCode(false)"
+                      >
+                        {{ verifyTime === 60 ? $t('form.form_1021') : `${verifyTime}s` }}
+                      </el-button>
+                    </el-col>
+                  </el-row>
+                </el-form-item>
+                <div class="btn-box">
+                  <el-button
+                    :disabled="isPreview"
+                    :class="[formInfo.theme_color + '1']"
+                    round
+                    type="primary"
+                    @click="submitVerify"
+                  >
+                    {{ $t('interact_tools.interact_tools_1019') }}
+                  </el-button>
+                </div>
+              </el-form>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>
+
+<script>
+  import defaultHeader from './img/formHeader.png';
+  import { useRoomBaseServer, useSignUpFormServer } from 'middle-domain';
+  export default {
+    name: 'VmpSignUpForm',
+    data() {
+      return {
+        //默认的兜底的banner图
+        defaultHeader,
+        //todo 询问下环境变量是否正确
+        baseUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
+        // 是否是独立表单
+        isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
+        //是否是预览
+        isPreview: this.$route.path.indexOf('/live/signup') !== -1,
+        //活动id
+        webinarId: '',
+        //表单信息
+        formInfo: {},
+        //简介内容是否超长
+        overflowStatus: false,
+        //模态窗是否可见
+        visible: false,
+        //当前登陆人的电话号码
+        currentPhone: '',
+        //表单视图模型
+        form: {},
+        //验证表单
+        verifyForm: {
+          phone: '',
+          imgCode: ''
+        },
+        //是否有隐私声明
+        privacy: false,
+        //隐私声明文字
+        privacyText: '',
+        //tab栏的配置
+        tabConfig: {
+          1: [
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            },
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            },
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            }
+          ]
+        },
+        //初始化的活动类型
+        isSubscribe: 1,
+        //当前激活的tab
+        activeTab: 1,
+        //报名表单验证
+        rules: {},
+        //输入文字提示的map
+        placeholderMap: {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1003'),
+            city: this.$t('form.form_1004'),
+            county: this.$t('form.form_1005')
+          },
+          6: this.$t('form.form_1020')
+        },
+        //表单项配置
+        list: [],
+        //省份
+        province: '',
+        //城市
+        city: '',
+        //国家
+        county: '',
+        //省份列表
+        provinces: [],
+        //城市列表
+        cities: {},
+        //国家列表
+        counties: {},
+        //是否手机验证
+        isPhoneValidate: false,
+        // 云盾key
+        captchakey: 'b7982ef659d64141b7120a6af27e19a0',
+        // 云盾值
+        mobileKey: '',
+        // 云盾实例
+        captcha1: null,
+        // 云盾实例
+        captcha2: null,
+        //报名表单的倒计时
+        time: 60,
+        //验证表单的倒计时
+        verifyTime: 60,
+        // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用
+        showCaptcha: false,
+        //是否是校验手机
+        isValidPhone: false,
+        //已报名的表单
+        verifyRules: {
+          phone: {
+            type: 'number',
+            required: true,
+            message: this.$t('account.account_1069'),
+            trigger: 'blur'
+          },
+          code: {
+            required: true,
+            validator: this.validCode,
+            trigger: 'blur'
+          }
+        },
+        //联动选项是第几题
+        colNum: '',
+        //区域选项
+        regionalId: '',
+        //是否是短信验证码错误
+        isVerifyCodeErr: false,
+        //地域验证是否通过
+        isValidRegional: true
+      };
+    },
+    watch: {
+      //省份
+      province(newVal, oldVal) {
+        if (newVal != oldVal) {
+          this.city = '';
+          this.county = '';
+        }
+      },
+      //城市
+      city(newVal, oldVal) {
+        if (newVal != oldVal) {
+          this.county = '';
+        }
+      },
+      isPhoneValidate: {
+        immediate: true,
+        handler(newVal) {
+          const _this = this;
+          // 根据是否开启短信验证，生成相应的手机号验证规则
+          if (newVal) {
+            _this.verifyRules.phone = {
+              required: true,
+              validator: _this.validPhone,
+              trigger: 'blur'
+            };
+          } else {
+            _this.verifyRules.phone = {
+              type: 'number',
+              required: true,
+              message: _this.$t('account.account_1069'),
+              trigger: 'blur'
+            };
+          }
+          // 云盾实例
+          if (newVal) {
+            _this.$nextTick(() => {
+              _this.callCaptcha('#setCaptcha');
+              _this.callCaptcha('#setCaptcha1');
+            });
+          }
+        }
+      },
+      list: {
+        deep: true,
+        handler(newList) {
+          const form = {};
+          const rules = {};
+          newList &&
+            newList.length &&
+            newList.forEach(item => {
+              form[item.id] = '';
+              if (item.type === 3) {
+                form[item.id] = [];
+                item.items.forEach(opt => {
+                  if (opt.type === 1) {
+                    form[`${item.id}${opt.id}`] = '';
+                  }
+                });
+              } else if (item.type === 0 && item.default_type === 2 && this.currentPhone) {
+                // 手机号
+                form[item.id] = this.currentPhone;
+              } else if (item.type === 2) {
+                // 单选/多选
+                item.items.forEach(opt => {
+                  if (opt.type === 1) {
+                    form[`${item.id}${opt.id}`] = '';
+                  }
+                });
+              }
+
+              // 生成验证规则
+              if (item.type === 0 && item.default_type === 1) {
+                // 姓名
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  message: this.$t('form.form_1026'),
+                  trigger: 'blur'
+                };
+              } else if (item.type === 0 && item.default_type === 2) {
+                // 手机号
+                if (this.isPhoneValidate) {
+                  rules[item.id] = {
+                    required: !!item.is_must,
+                    validator: this.validPhone,
+                    trigger: 'blur'
+                  };
+                } else {
+                  // TODO待翻译
+                  rules[item.id] = {
+                    type: 'number',
+                    required: !!item.is_must,
+                    message: this.$t('account.account_1069'),
+                    trigger: 'blur'
+                  };
+                }
+              } else if (item.type === 0 && item.default_type === 4) {
+                // 性别
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  message: this.$t('form.form_1027'),
+                  trigger: 'change'
+                };
+              } else if (item.type === 0 && item.default_type === 3) {
+                // 邮箱
+                rules[item.id] = [
+                  {
+                    required: !!item.is_must,
+                    validator: this.validEmail,
+                    trigger: 'blur'
+                  }
+                ];
+              } else if (item.type === 1) {
+                // 问答
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  message: this.$t('form.form_1028'),
+                  trigger: 'blur'
+                };
+              } else if (item.type === 2 || item.type === 4) {
+                // 单选/下拉
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  message: this.$t('form.form_1029'),
+                  trigger: 'change'
+                };
+              } else if (item.type === 3) {
+                // 多选
+                rules[item.id] = {
+                  type: 'array',
+                  required: !!item.is_must,
+                  message: this.$t('form.form_1029'),
+                  trigger: 'change'
+                };
+              } else if (item.type === 5) {
+                // 地域
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  validator: this.validRegional,
+                  trigger: 'blur'
+                };
+              } else if (item.type === 6 && item.is_must) {
+                // 隐私协议勾选
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  validator: this.validPrivate,
+                  message: this.$t('form.form_1030'),
+                  trigger: 'change'
+                };
+              }
+            });
+          rules.code = {
+            required: true,
+            validator: this.validCode,
+            trigger: 'blur'
+          };
+          this.form = {
+            imgCode: '',
+            code: '',
+            ...form
+          };
+          this.rules = {
+            ...rules
+          };
+        }
+      }
+    },
+    computed: {
+      // 与网易易盾图片插件语言匹配
+      langNECaptcha() {
+        const locale = window.$globalConfig.currentLang;
+        let lang = 'zh-CN';
+        switch (locale) {
+          case 'zh':
+            lang = 'zh-CN';
+            break;
+          case 'spain':
+            lang = 'es';
+            break;
+          default:
+            lang = locale;
+        }
+        return lang;
+      },
+      //输入提示的多语言转换
+      findPlaceHolder() {
+        const _this = this;
+        return function (type) {
+          return _this.placeholderMap[type] || _this.$t('form.form_1014');
+        };
+      },
+      //城市列表
+      cityList() {
+        return this.cities[this.province];
+      },
+      //国家列表
+      countyList() {
+        if (!this.counties[this.city]) {
+          return [];
+        }
+        return this.counties[this.city];
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      this.signUpFormServer = useSignUpFormServer();
+    },
+    mounted() {
+      //因为这个组件也会在独立报名表单页使用，所以增加一下判断
+      if (this.isEntryForm) {
+        this.init();
+      }
+    },
+    methods: {
+      //打开模态窗
+      async openModal() {
+        this.initViewData();
+        this.visible = true;
+        await this.getWebinarType();
+        this.getBaseInfo();
+        this.getQuestionList();
+      },
+      //独立报名表单的初始化逻辑
+      async init() {
+        //因为是独立页面，活动id只能从路由取
+        this.webinarId =
+          this.$route.params.id || this.$route.params.str || this.$route.params.il_id;
+        await this.getWebinarType();
+        this.getBaseInfo();
+        this.getQuestionList();
+      },
+      //获取活动类型
+      getWebinarType() {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        return this.signUpFormServer
+          .getWebinarType(params)
+          .then(res => {
+            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+          })
+          .catch(error => {
+            if (error.code == 512503 || error.code == 512502) {
+              window.location.href = `${window.location.origin}/${this.webinarId}`;
+            }
+          });
+      },
+      initViewData() {
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        const { webinar = {} } = watchInitData;
+        //活动id
+        this.webinarId = webinar.id || '';
+      },
+      // 手机号验证
+      validPhone(rule, value, callback) {
+        const reg = /^1[3|4|5|6|7|8|9]\d{9}$/;
+        if (!value) {
+          this.isValidPhone = false;
+          return callback ? callback(new Error(this.$t('account.account_1025'))) : false;
+        } else if (!reg.test(value)) {
+          this.isValidPhone = false;
+          return callback ? callback(new Error(this.$t('account.account_1069'))) : false;
+        } else {
+          this.isValidPhone = true;
+          if (callback) {
+            callback();
+          } else {
+            return true;
+          }
+        }
+      },
+      //隐私协议勾选验证
+      validPrivate(rule, value, callback) {
+        if (!value) {
+          return callback ? callback(new Error(this.$t('form.form_1030'))) : false;
+        } else {
+          if (callback) {
+            callback();
+          } else {
+            return true;
+          }
+        }
+      },
+      //邮件验证
+      validEmail(rule, value, callback) {
+        const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+        console.log(!reg.test(value));
+        if (!value && rule.required) {
+          return callback ? callback(new Error(this.$t('form.form_1007'))) : false;
+        } else if (value.length > 80) {
+          return callback ? callback(new Error(this.$t('form.form_1009'))) : false;
+        } else if (value && !reg.test(value)) {
+          console.log('请填写正确的邮箱');
+          return callback ? callback(new Error(this.$t('form.form_1010'))) : false;
+        } else {
+          if (callback) {
+            callback();
+          } else {
+            return true;
+          }
+        }
+      },
+      //校验验证码
+      validCode(rule, value, callback) {
+        console.log(rule, value, callback);
+        if (this.isVerifyCodeErr) {
+          return callback ? callback(new Error(this.$t('511057'))) : false;
+        } else {
+          callback();
+        }
+      },
+      //地域验证
+      validRegional(rule, value, callback) {
+        console.log(rule, value, callback);
+        if (!this.isValidRegional) {
+          callback();
+        }
+        if (!this.province) {
+          return callback ? callback(new Error(this.$t('form.form_1004'))) : false;
+        } else if (!this.city && this.colNum <= 12) {
+          return callback ? callback(new Error(this.$t('form.form_1005'))) : false;
+        } else if (!this.county && this.colNum <= 8) {
+          return callback ? callback(new Error(this.$t('form.form_1006'))) : false;
+        } else {
+          callback();
+        }
+      },
+      //初始化活动信息
+      getBaseInfo() {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        this.signUpFormServer.getFormBaseInfo(params).then(res => {
+          const { code = '', data = {} } = res || {};
+          if ([200, '200'].includes(code)) {
+            this.formInfo = data;
+            this.$nextTick(() => {
+              this.calculateText();
+            });
+          } else {
+            this.$message({
+              message: this.$t('form.form_1031'),
+              showClose: true,
+              // duration: 0,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
+      //计算简介是否太长
+      calculateText() {
+        const txtDom = this.$refs.intro;
+        if (!txtDom) {
+          return;
+        }
+        const twoHeight = 40;
+        const curHeight = txtDom.offsetHeight;
+        if (curHeight > twoHeight) {
+          this.overflowStatus = true;
+        }
+      },
+      //初始化表单问题信息
+      getQuestionList() {
+        const _this = this;
+        const params = {
+          webinar_id: this.webinarId
+        };
+        this.signUpFormServer.getQuestionsList(params).then(res => {
+          // 按照 order_num 从小到大排序
+          const list = res.data.ques_list.sort(this.compare('order_num'));
+          !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
+          // 手机号验证开启状态
+          const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
+          console.log(phoneItem, 'phoneItem');
+          this.isPhoneValidate =
+            phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+          // 默认填写手机号
+          !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
+          if (!_this.isPreview) {
+            _this.$refs.verifyForm.validateField('phone', err => {
+              if (!err) {
+                _this.isValidPhone = true;
+              } else {
+                _this.isValidPhone = false;
+              }
+            });
+          }
+          this.list = list;
+          //地域 options 格式化处理
+          this.list.some(item => {
+            if (item.type == 5) {
+              this.isValidRegional = !!item.is_must;
+              item.options = JSON.parse(item.options);
+              item.colNum = 8;
+              item.options.show_district == 0 && (item.colNum = 12);
+              item.options.show_city == 0 && (item.colNum = 24);
+              this.colNum = item.colNum;
+              this.regionalId = item.id;
+              return true;
+            }
+          });
+          // 隐私声明格式处理
+          const lastQuestion = this.list[this.list.length - 1];
+          if (lastQuestion.subject === '隐私声明') {
+            this.privacy = lastQuestion;
+            this.privacy && this.privacyFormatter();
+          }
+          list.some(item => item.type === 5) && this.getAreaList();
+        });
+      },
+      //生成表单提交参数
+      generateFormParams() {
+        const answer = {};
+        (this.list || []).forEach(item => {
+          if (item.type === 0) {
+            // 系统题目
+            !answer.default && (answer.default = []);
+            answer.default.push({
+              id: item.id,
+              content: this.form[item.id] || '',
+              default_type: item.default_type
+            });
+          } else if (item.type === 1) {
+            // 问答
+            const opts = item.options && JSON.parse(item.options);
+            let options = [];
+            opts && opts.type === 7 && (options = { type: 7 });
+            !answer.text && (answer.text = []);
+            answer.text.push({
+              id: item.id,
+              content: this.form[item.id] || '',
+              options: options
+            });
+          } else if (item.type === 2) {
+            // 单选
+            !answer.radio && (answer.radio = []);
+            const element = item.items.find(elem => elem.id === this.form[item.id]);
+            let content = '';
+            if (element) {
+              content =
+                element.type !== 1
+                  ? {
+                      id: element.id,
+                      content: element.subject
+                    }
+                  : {
+                      id: element.id,
+                      content: this.form[`${item.id}${element.id}`]
+                        ? this.form[`${item.id}${element.id}`]
+                        : '其他'
+                    };
+            }
+            answer.radio.push({
+              id: item.id,
+              content: content
+            });
+          } else if (item.type === 3) {
+            // 多选
+            !answer.checkbox && (answer.checkbox = []);
+            const content = [];
+            this.form[item.id].forEach(checkOpt => {
+              const element = item.items.find(elem => elem.id === checkOpt);
+              if (element) {
+                const obj =
+                  element.type !== 1
+                    ? {
+                        id: element.id,
+                        content: element.subject
+                      }
+                    : {
+                        id: element.id,
+                        content: this.form[`${item.id}${element.id}`]
+                          ? this.form[`${item.id}${element.id}`]
+                          : '其他'
+                      };
+                content.push(obj);
+              }
+            });
+            answer.checkbox.push({
+              id: item.id,
+              content: content
+            });
+          } else if (item.type === 4) {
+            // 下拉
+            !answer.select && (answer.select = []);
+            const element = item.items.find(elem => elem.subject === this.form[item.id]);
+            element &&
+              answer.select.push({
+                id: item.id,
+                content: {
+                  id: element.id,
+                  jobTxt: item.subject,
+                  content: element.subject
+                }
+              });
+          } else if (item.type === 5) {
+            // 地域
+            !answer.address && (answer.address = []);
+            const provinec = this.provinces.find(ele => ele.value == this.province) || {
+              label: '',
+              value: ''
+            };
+            const city = this.cityList.find(ele => ele.value == this.city) || {
+              label: '',
+              value: ''
+            };
+            const county = this.countyList.find(ele => ele.value == this.form[item.id]) || {
+              label: '',
+              value: ''
+            };
+            answer.address.push({
+              id: item.id,
+              content: `${provinec.label}${city.label}${county.label}`,
+              contentDe: [
+                {
+                  id: provinec.value,
+                  content: provinec.label
+                },
+                {
+                  id: city.value,
+                  content: city.label
+                },
+                {
+                  id: county.value,
+                  content: county.label
+                }
+              ]
+            });
+          } else if (item.type === 6) {
+            // 隐私协议勾选
+            !answer.statement && (answer.statement = []);
+            answer.statement.push({
+              id: item.id,
+              content: this.form[item.id] ? this.$t('form.form_1035') : this.$t('form.form_1036')
+            });
+          }
+        });
+        return answer;
+      },
+      //获取区域列表
+      getAreaList() {
+        this.signUpFormServer
+          .getAreaList()
+          .then(res => {
+            this.provinces = res.provinces;
+            this.cities = res.cities;
+            this.counties = res.counties;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      //切换tab
+      switchTab(type) {
+        if (type === this.activeTab) {
+          return;
+        }
+        this.activeTab = type;
+        //重置下云盾
+        this.showCaptcha = false;
+        this.mobileKey = '';
+        if (this.isPhoneValidate) {
+          type == 1 ? this.callCaptcha('#setCaptcha') : this.callCaptcha('#setCaptcha1');
+        }
+      },
+      //关闭模态窗
+      handleClose() {
+        this.visible = false;
+      },
+      //切换展开/收起状态
+      changeFoldStatus(status) {
+        this.overflowStatus = status;
+      },
+      //排序
+      compare(property) {
+        return function (a, b) {
+          let value1 = a[property];
+          let value2 = b[property];
+          return value1 - value2;
+        };
+      },
+      //区域变化
+      regionalChange(type) {
+        this.form[this.regionalId] = this[type];
+        this.$refs.form.validateField('' + this.regionalId, res => {
+          console.log(res);
+        });
+      },
+      //获取短信验证码
+      getDyCode(isForm) {
+        let isPhoneValid = true;
+        let phone = '';
+        if (isForm) {
+          const phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
+          phone = this.form[phoneItem.id];
+          // 点击获取短信验证码之前验证手机号
+          this.$refs.form.validateField('' + phoneItem.id, err => {
+            if (!err) {
+              isPhoneValid = true;
+            } else {
+              isPhoneValid = false;
+            }
+          });
+        } else {
+          phone = this.verifyForm.phone;
+          this.$refs.verifyForm.validateField('phone', err => {
+            isPhoneValid = !err;
+          });
+        }
+        if (!isPhoneValid) {
+          return false;
+        }
+
+        //获取短信验证码
+        if (this.mobileKey) {
+          const params = { webinar_id: this.webinarId, phone: phone, captcha: this.mobileKey };
+          this.signUpFormServer.sendVerifyCode(params).then(() => {
+            this.countDown(isForm);
+          });
+        }
+      },
+      // 倒计时函数
+      countDown(isForm) {
+        const key = isForm ? 'time' : 'verifyTime';
+        if (this[key]) {
+          this[key]--;
+          setTimeout(() => {
+            this.countDown(isForm);
+          }, 1000);
+        } else {
+          this[key] = 60;
+          this.showCaptcha = false;
+          this.mobileKey = '';
+          isForm ? this.callCaptcha('#setCaptcha') : this.callCaptcha('#setCaptcha1');
+        }
+      },
+      /**
+       * 初始化网易易盾图片验证码 todo 待改善
+       */
+      callCaptcha(id) {
+        const captcha = id === '#setCaptcha' ? 'captcha1' : 'captcha2';
+        const that = this;
+        // eslint-disable-next-line
+        initNECaptcha({
+          captchaId: that.captchakey,
+          element: id,
+          lang: that.langNECaptcha,
+          mode: 'float',
+          onReady(instance) {
+            console.log('instance', instance);
+          },
+          onVerify(err, data) {
+            if (data) {
+              that.mobileKey = data.validate;
+              that.showCaptcha = true;
+              that.errorMsgShow = '';
+            } else {
+              that[captcha] = '';
+              that.errorMsgShow = true;
+            }
+          },
+          onload(instance) {
+            console.log('onload', instance);
+            that[captcha] = instance;
+          }
+        });
+      },
+      //隐私声明格式化
+      privacyFormatter() {
+        const parseOpts = JSON.parse(this.privacy.options);
+        const parseOptsFir = parseOpts[0] && JSON.parse(parseOpts[0].options);
+        const parseOptsSec = parseOpts[1] && JSON.parse(parseOpts[1].options);
+
+        let text = parseOptsFir.content;
+        const matchPrivacy1 = parseOptsFir.color_text.trim()
+          ? text.match(parseOptsFir.color_text)
+          : null;
+        if (matchPrivacy1) {
+          const reg = new RegExp(`(${matchPrivacy1[0]})`);
+          text = text.replace(
+            reg,
+            `<a href="${parseOptsFir.url || 'javascript:void(0);'}" target="_blank">$1</a>`
+          );
+        }
+        const matchPrivacy2 =
+          parseOptsSec && parseOptsSec.privacy_info.trim()
+            ? text.match(parseOptsSec.privacy_info)
+            : null;
+        if (matchPrivacy2) {
+          const reg = new RegExp(`(${matchPrivacy2[0]})`, 'g');
+          text = text.replace(
+            reg,
+            `<a href="${parseOptsSec.privacy_link || 'javascript:void(0);'}" target="_blank">$1</a>`
+          );
+        }
+
+        this.privacyText = text;
+      },
+      //提交报名表单
+      submitForm() {
+        this.$refs.form.validate((valid, object) => {
+          console.log(object);
+          if (valid) {
+            let form = this.generateFormParams();
+            const params = {
+              webinar_id: this.webinarId,
+              form: JSON.stringify(form)
+            };
+            this.isPhoneValidate && (params.verify_code = this.form.code);
+            const visitorId = sessionStorage.getItem('visitorId');
+            if (visitorId) {
+              params.visit_id = visitorId;
+            }
+            this.$route.query.refer && (params.refer = this.$route.query.refer);
+            this.signUpFormServer.submitSignUpForm(params).then(res => {
+              if (res.code == 200) {
+                res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
+                // 报名成功的操作，跳转到直播间
+                // 判断当前直播状态，进行相应的跳转
+                this.getWebinarStatus(true);
+              } else if (res.code == 512809 || res.code == 512570) {
+                // 短信验证码验证失败，触发表单验证失败
+                // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
+                this.isVerifyCodeErr = true;
+                this.$refs.form.validateField('code', res => {
+                  console.log(res);
+                  // 还原状态
+                  this.isVerifyCodeErr = false;
+                });
+              } else if (res.code == 512814 || res.code == 512815) {
+                // 报名成功的操作，跳转到直播间
+                this.closePreview();
+                // 判断当前直播状态，进行相应的跳转
+                this.$message({
+                  message: this.$t('form.form_1033'),
+                  showClose: true,
+                  // duration: 0,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+                this.getWebinarStatus();
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            });
+          } else {
+            return false;
+          }
+        });
+      },
+      //我已报名--验证
+      submitVerify() {
+        this.$refs.verifyForm.validate(valid => {
+          if (valid) {
+            const params = {
+              webinar_id: this.webinarId,
+              phone: this.verifyForm.phone,
+              verify_code: this.verifyForm.code
+            };
+            const visitorId = sessionStorage.getItem('visitorId');
+            if (visitorId) {
+              params.visit_id = visitorId;
+            }
+            this.signUpFormServer.checkIsRegistered(params).then(res => {
+              if (res.code == 200) {
+                // 如果已经报名
+                if (res.data.has_registed == 1) {
+                  // 已报名，跳转到直播间
+                  this.closePreview();
+                  sessionStorage.setItem('visitor_id', res.data.visit_id);
+                  this.$message({
+                    message: this.$t('form.form_1033'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'success',
+                    customClass: 'zdy-info-box'
+                  });
+                  // 判断当前直播状态，进行相应的跳转
+                  this.getWebinarStatus();
+                } else {
+                  this.$message({
+                    message: this.$t('form.form_1034'),
+                    showClose: true,
+                    // duration: 0,
+                    type: 'warning',
+                    customClass: 'zdy-info-box'
+                  });
+                  this.activeTab = 1;
+                }
+              } else if (res.code == 512809 || res.code == 512570) {
+                // 短信验证码验证失败，触发表单验证失败
+                // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
+                this.isVerifyCodeErr = true;
+                this.$refs.verifyForm.validateField('code', () => {
+                  // 还原状态
+                  this.isVerifyCodeErr = false;
+                });
+              } else {
+                this.$message({
+                  message: this.$tec(res.code) || res.msg,
+                  showClose: true,
+                  // duration: 0,
+                  type: 'error',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            });
+          } else {
+            return false;
+          }
+        });
+      },
+      // 获取当前活动状态，如果直播中，跳转到直播间
+      getWebinarStatus(isSubmitForm) {
+        const params = {
+          webinar_id: this.webinarId
+        };
+        this.signUpFormServer.getWebinarType(params).then(res => {
+          if (res.code == 512503 || res.code == 512502) {
+            window.location.href = `${window.location.origin}/${this.webinarId}`;
+            return false;
+          }
+          // 如果是独立链接，判断状态进行跳转
+          if (this.isEntryForm) {
+            const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+            if (res.data.status == 'live') {
+              window.location.href =
+                window.location.origin +
+                process.env.VUE_APP_WEB_KEY +
+                `/lives/watch/${this.webinarId}${queryString}`;
+            } else {
+              // 如果预约或结束，跳转到预约页
+              if (res.data.webinar.type == 2 && isSubmitForm) {
+                // 如果是预约状态，显示开播时间提醒
+                this.$alert(
+                  this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
+                  this.$t('account.account_1061'),
+                  {
+                    confirmButtonText: this.$t('common.common_1033'),
+                    customClass: 'zdy-alert-box',
+                    callback: action => {
+                      console.log(action);
+                      this.closePreview();
+                      window.location.href =
+                        window.location.origin +
+                        process.env.VUE_APP_WEB_KEY +
+                        `/lives/subscribe/${this.webinarId}${queryString}`;
+                    }
+                  }
+                );
+              } else {
+                window.location.href =
+                  window.location.origin +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/subscribe/${this.webinarId}${queryString}`;
+              }
+            }
+          } else {
+            if (res.data.webinar.type == 2 && isSubmitForm) {
+              // 如果是预约状态，显示开播时间提醒
+              this.$alert(
+                this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
+                this.$t('account.account_1061'),
+                {
+                  confirmButtonText: this.$t('common.common_1033'),
+                  customClass: 'zdy-alert-box',
+                  callback: action => {
+                    console.log(action);
+                    this.closePreview();
+                    //验证成功,刷新页面
+                    location.reload();
+                  }
+                }
+              );
+            } else {
+              this.closePreview();
+              location.reload();
+            }
+          }
+        });
+      },
+      //关闭当前视图
+      closePreview() {
+        this.handleClose();
+        //todo 发送信令，关闭独立预约页
+      }
+    }
+  };
+</script>
+
+<style lang="less">
+  .vmp-sign-up-form {
+    @red: #fb3a32;
+    @redBg: #ffebeb;
+    @blue: #3562fa;
+    @blueBg: #ebefff;
+    @purple: #8d57a4;
+    @purpleBg: #f5bdea;
+    .el-dialog__header {
+      padding: 0;
+    }
+    .el-dialog__headerbtn {
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 28px;
+      color: #fff;
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      font-style: normal;
+      cursor: pointer;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      .el-dialog__close {
+        color: #fff;
+      }
+    }
+
+    .el-dialog__body {
+      padding: 0;
+    }
+    &__wrap {
+      padding-bottom: 87px;
+    }
+    &__banner {
+      width: 100%;
+      height: 120px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      img {
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+    &__content {
+      padding: 0 75px;
+    }
+    &__title {
+      font-size: 22px;
+      color: #1a1a1a;
+      margin: 40px 0 22px;
+      text-align: center;
+      font-weight: 500;
+      font-family: PingFangSC-Medium, PingFang SC;
+      line-height: 33px;
+    }
+    &__introduction {
+      color: #666666;
+      font-size: 14px;
+      line-height: 20px;
+      word-break: break-all;
+      font-weight: 400;
+      position: relative;
+      &__detail {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        cursor: pointer;
+        background-color: #fff;
+        color: #3562fa;
+        .isEllipsis {
+          color: #666666;
+        }
+      }
+    }
+    &__introduction-fold {
+      white-space: nowrap;
+      word-break: break-all;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+    &__tab-bar {
+      width: 100%;
+      margin: 43px auto 20px;
+      display: flex;
+      justify-content: center;
+    }
+    &__tab-bar-tabs {
+      width: 446px;
+      overflow: hidden;
+      border-radius: 4px;
+      > div {
+        width: calc(50% - 1px);
+        float: left;
+        border: 1px solid #e6e6e6;
+        line-height: 40px;
+        height: 40px;
+        text-align: center;
+        transition: all 0.2s linear;
+        cursor: pointer;
+        &:nth-child(1) {
+          border-right: 0px none;
+          border-radius: 4px 0px 0px 4px;
+        }
+        &:nth-child(2) {
+          border-left: 0px none;
+          border-radius: 0px 4px 4px 0px;
+        }
+        &.active {
+          border: 1px solid @red;
+          background: @redBg;
+          color: @red;
+          width: calc(50% - 2px);
+        }
+      }
+      &.red1 {
+        .active {
+          border: 1px solid @red;
+          background: @redBg;
+          color: @red;
+        }
+      }
+      &.blue1 {
+        .active {
+          border: 1px solid @blue;
+          background: @blueBg;
+          color: @blue;
+        }
+      }
+      &.purple1 {
+        .active {
+          border: 1px solid @purple;
+          background: @purpleBg;
+          color: @purple;
+        }
+      }
+    }
+    &__main-form {
+      .el-radio-group {
+        width: 100%;
+        padding-left: 0;
+        > div {
+          padding: 10px 0;
+        }
+      }
+      .el-input__inner[maxlength='50'] {
+        padding-right: 60px !important;
+      }
+      .el-input__inner[maxlength='60'] {
+        padding-right: 60px !important;
+      }
+    }
+    &__verify-form {
+    }
+    .verify-code-box {
+      .no-border {
+        background: #dedede;
+        color: #666666;
+        cursor: not-allowed;
+        &:hover {
+          border: 0;
+        }
+        &:focus {
+          border: 0;
+        }
+      }
+      .isLoginActive {
+        background: #fb3a32;
+        color: #ffffff;
+        cursor: pointer;
+      }
+      // 云盾样式重置
+      .captcha {
+        .yidun_tips {
+          color: #999999;
+          height: 40px;
+          line-height: 38px !important;
+          .yidun_tips__text {
+            vertical-align: initial;
+          }
+        }
+        .yidun_slider {
+          .yidun_slider__icon {
+            background-image: url(img/icon-slide1.png) !important;
+            background-size: 28px 20px;
+            background-position: center;
+            margin-top: -5px;
+          }
+          &:hover {
+            .yidun_slider__icon {
+              background-image: url(img/icon-slide.png) !important;
+            }
+          }
+        }
+        .yidun--success {
+          .yidun_control {
+            .yidun_slider__icon {
+              background-image: url(img/icon-succeed.png) !important;
+            }
+            .yidun_slider {
+              .yidun_slider__icon {
+                background-image: url(img/icon-succeed.png);
+                background-size: 28px 20px;
+                background-position: center;
+              }
+              &:hover {
+                .yidun_slider__icon {
+                  background-image: url(img/icon-succeed.png);
+                  background-size: 28px 20px;
+                  background-position: center;
+                }
+              }
+            }
+          }
+        }
+        .yidun.yidun--light.yidun--success.yidun--jigsaw {
+          .yidun_control .yidun_slider {
+            background-color: #3562fa;
+          }
+          .yidun_slide_indicator {
+            border-color: #3562fa;
+            background-color: #f0f1fe;
+          }
+        }
+        .yidun.yidun--light {
+          .yidun_feedback {
+            background-position: 0px -240px;
+            height: 30px;
+          }
+          .yidun_refresh {
+            background-position: 0px -339px;
+          }
+        }
+      }
+      .send-code-btn {
+        position: absolute;
+        right: 13px;
+        top: 3px;
+        height: 34px;
+        width: 90px;
+        padding: 0;
+        border-radius: 2px;
+        font-size: 13px;
+        border: 0;
+      }
+    }
+    .btn-box {
+      text-align: center;
+    }
+  }
+  .vmp-sign-up-form--entry-from {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 101;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #1a1a1a;
+    .vmp-sign-up-form__wrap {
+      overflow-y: auto;
+      height: 85%;
+      border-radius: 4px;
+      background: #fff;
+      position: relative;
+      z-index: 101;
+      max-width: 720px;
+      margin: 0 auto;
+      padding-bottom: 87px;
+    }
+  }
+</style>

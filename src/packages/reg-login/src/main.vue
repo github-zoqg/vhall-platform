@@ -16,7 +16,7 @@
       <!-- 标题栏插槽 -->
       <template slot="title" v-if="!isMobile && options.loginType == '1-1'">
         <div class="title">
-          <i class="iconfont iconzuofanye" @click.stop.prevent="handleClose"></i>
+          <i class="vh-iconfont vh-line-close" @click.stop.prevent="handleClose"></i>
         </div>
       </template>
       <!-- 可能场景：

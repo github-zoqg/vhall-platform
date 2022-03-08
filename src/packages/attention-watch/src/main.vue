@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-attention">
     <div class="vmp-attention-icon" :style="{ color: themeClass.pageBg }" @click="attentionHandler">
-      <i class="iconfont iconguankanbuju"></i>
+      <i class="vh-iconfont vh-line-collection"></i>
       <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
     </div>
   </div>
@@ -12,7 +12,8 @@
     data() {
       return {
         themeClass: {
-          pageBg: '#3562fa'
+          bgColor: 'light',
+          pageBg: '#cccccc'
         },
         isAttention: false,
         isLogin: false
