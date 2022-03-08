@@ -2,8 +2,16 @@
   <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
-    <!-- videoMuted 的时候显示流占位图 -->
-    <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
+    <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
+    <section
+      v-if="stream.videoMuted || isShowSplitScreenPlaceholder"
+      class="vmp-stream-remote__container__placeholder"
+      :class="{
+        'vmp-stream-remote__container__placeholder-spliting': isShowSplitScreenPlaceholder,
+        'vmp-stream-remote__container__placeholder-mute':
+          stream.videoMuted && !isShowSplitScreenPlaceholder
+      }"
+    ></section>
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom">
       <span
@@ -216,6 +224,12 @@
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2
         );
+      },
+      isShowSplitScreenPlaceholder() {
+        return (
+          this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
+          this.$domainStore.state.splitScreenServer.role == 'host'
+        );
       }
     },
     filters: {
@@ -422,8 +436,7 @@
       width: 100%;
       height: 100%;
     }
-    .vmp-stream-remote__container__mute {
-      background-image: url(./img/no_video_bg.png);
+    .vmp-stream-remote__container__placeholder {
       background-size: cover;
       background-repeat: no-repeat;
       position: absolute;
@@ -431,6 +444,15 @@
       left: 0;
       width: 100%;
       height: 100%;
+      &-mute {
+        background-image: url(./img/no_video_bg.png);
+      }
+      &-spliting {
+        background-color: #2d2d2d;
+        background-image: url(./img/split.png);
+        background-size: 80px 52px;
+        background-position: center;
+      }
     }
     .vmp-stream-local__bootom {
       width: 100%;

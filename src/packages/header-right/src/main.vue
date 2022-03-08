@@ -88,7 +88,8 @@
     useRoomBaseServer,
     useMicServer,
     useInteractiveServer,
-    useSubscribeServer
+    useSubscribeServer,
+    useSplitScreenServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -156,6 +157,7 @@
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
+      this.splitScreenServer = useSplitScreenServer();
       this.initConfig();
       this.listenEvents();
     },
@@ -165,6 +167,10 @@
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
         this.liveStep = 2;
+        // 如果开启了分屏
+        if (this.splitScreenServer.state.isOpenSplitScreen) {
+          this.handlePublishComplate();
+        }
       }
     },
     methods: {
@@ -172,7 +178,7 @@
       handleApplyClick() {
         useMicServer()
           .userApply()
-          .then(res => {
+          .then(() => {
             this.isApplying = true;
             this.applyTime = 30;
             this._applyInterval = setInterval(async () => {
@@ -193,7 +199,7 @@
       handleApplyCancleClick() {
         useMicServer()
           .userCancelApply()
-          .then(res => {
+          .then(() => {
             this.isApplying = false;
             this.applyTime = 30;
             clearInterval(this._applyInterval);
@@ -349,6 +355,11 @@
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type
         });
+
+        // 如果开启了分屏
+        // if (this.splitScreenServer.state.isOpenSplitScreen) {
+        //   this.splitScreenServer.closeSplit();
+        // }
 
         if (res.code == 200 && interactToolStatus.start_type == 4) {
           // 如果是第三方推流直接生成回放

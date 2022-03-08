@@ -173,9 +173,11 @@
         if (this.isOpenSplitScreen) {
           this.splitScreenServer.closeSplit();
         } else {
+          // quertString
           const search = location.search
             ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
             : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+          // location
           const url =
             process.env.NODE_ENV === 'development'
               ? `${window.location.origin}`

@@ -39,7 +39,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import { useSplitScreenServer } from 'middle-domain';
   import screenfull from 'screenfull';
   export default {
     name: 'VmpSplitScreen',
@@ -80,6 +80,9 @@
         }
       }
     },
+    beforeCreate() {
+      this.splitScreenServer = useSplitScreenServer();
+    },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
     },
@@ -89,7 +92,9 @@
       });
     },
     methods: {
-      exitSplitScreen() {},
+      exitSplitScreen() {
+        this.splitScreenServer.closeSplit();
+      },
       enterFullScreen() {
         screenfull.toggle(this.$refs.splitScreen);
       }
