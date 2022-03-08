@@ -9,33 +9,31 @@
    * @description 红包的图标 + 小红点
    */
   import { useRedPacketServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
     name: 'RedPacketIcon',
     data() {
       return {
         showIcon: false, //显示图标
-        showDot: false, // 显示小红点
-        lastRedPacketUUID: '' // 最后一个红包的uuid
+        showDot: false // 显示小红点
       };
     },
     beforeCreate() {
       this.redPacketServer = useRedPacketServer();
     },
     created() {
-      this.redPacketServer.$on(this.redPacketServer, this.handleNewRedPacket);
+      console.log(this.$domainStore.state.roomBaseServer.redPacket, '红包红包1111');
+      // 当红包status==1 时表示有红包
+      this.showIcon = this.$domainStore.state.roomBaseServer.redPacket.status == '1' ? true : false;
+      this.showDot = this.$domainStore.state.roomBaseServer.redPacket.status == '1' ? true : false;
+      this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
     destroyed() {
-      this.redPacketServer.$off(this.redPacketServer, this.handleNewRedPacket);
+      this.redPacketServer.$off(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
     methods: {
       checkRedPacketIcon() {
-        if (!this.lastRedPacketUUID) return;
-        this.showDot = false;
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickRedPacket', [this.lastRedPacketUUID])
-        );
+        this.$emit('clickIcon');
       },
       handleNewRedPacket() {
         this.showIcon = true;

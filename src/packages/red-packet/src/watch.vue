@@ -4,7 +4,7 @@
     <div class="vhsaas-interact-mask">
       <components
         :is="componentsView"
-        :amount="redPacketServerState.amount"
+        :amount="redPacketServerState.amount * 1"
         :red-packet-info="redPacketServerState.info"
         @navTo="navTo"
         @needLogin="handleGoLogin"
@@ -58,6 +58,10 @@
           }
           this.dialogVisible = true;
         });
+      },
+      openRedPacket(uuid) {
+        this.dialogVisible = true;
+        this.open(uuid);
       },
       handleGoLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));

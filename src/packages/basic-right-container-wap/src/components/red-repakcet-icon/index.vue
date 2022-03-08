@@ -22,8 +22,7 @@
       this.redPacketServer = useRedPacketServer({ mode: 'watch' });
     },
     created() {
-      // TODO 消息监听 需要去显示icon
-      console.log(this.$domainStore.state.roomBaseServer.redPacket, '红包红包1111');
+      // 当红包status==1 时表示有红包
       this.showIcon = this.$domainStore.state.roomBaseServer.redPacket.status == '1' ? true : false;
       this.showDot = this.$domainStore.state.roomBaseServer.redPacket.status == '1' ? true : false;
       this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleNewRedPacket);
@@ -33,12 +32,7 @@
     },
     methods: {
       checkRedPacketIcon() {
-        // if (!this.lastRedPacketUUID) return;
-        // this.showDot = false;
         this.$emit('clickIcon');
-        // window.$middleEventSdk?.event?.send(
-        //   boxEventOpitons(this.cuid, 'emitClickRedPacket', [this.lastRedPacketUUID])
-        // );
       },
       handleNewRedPacket() {
         this.showIcon = true;
