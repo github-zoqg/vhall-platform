@@ -12,7 +12,7 @@
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <!-- <i class="saasicon_redu"></i> -->
-            <i class="saasicon_redu iconfont iconredu_icon1"></i>
+            <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
         </div>

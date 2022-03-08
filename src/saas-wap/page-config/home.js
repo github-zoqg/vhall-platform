@@ -350,6 +350,17 @@ const serverConfig = {
       }
     ]
   },
+  // 红包
+  compRedPacketWap: {
+    component: 'VmpRedPacketWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
+  },
   // 章节
   comChapterWap: {
     component: 'VmpChapterWap'

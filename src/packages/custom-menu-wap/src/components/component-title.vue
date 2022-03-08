@@ -21,7 +21,7 @@
 
     &__content {
       margin: 20px 0px;
-      font-size: 14px;
+      font-size: 28px;
       font-weight: 400;
       text-align: left;
       padding: 0px 24px;
