@@ -17,7 +17,12 @@
         :data-key="'count'"
         :data-sources="chatList"
         :data-component="msgItem"
-        :extra-props="{ previewImg: previewImg.bind(this), joinInfo }"
+        :extra-props="{
+          previewImg: previewImg.bind(this),
+          emitLotteryEvent,
+          emitQuestionnaireEvent,
+          joinInfo
+        }"
         @tobottom="tobottom"
       ></virtual-list>
       <div
@@ -330,6 +335,20 @@
       //自己发送消息后的回调
       sendMsgEnd() {
         this.scrollBottom();
+      },
+      //todo domain负责 抽奖情况检查
+      emitLotteryEvent(msg) {
+        console.log('emitLotteryEvent', msg);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
+        );
+      },
+      //todo domain负责 问卷情况检查
+      emitQuestionnaireEvent(questionnaireId) {
+        console.log('emitQuestionnaireEvent', questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
+        );
       }
     }
   };

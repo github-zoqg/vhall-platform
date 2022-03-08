@@ -8,6 +8,7 @@
       :prize-info="prizeInfo"
       :lottery-id="lotteryInfoId"
       :lottery-info="lotteryInfo"
+      :disabled-time="disabledTime"
       @close="close"
       @end="handleEndLottery"
     />
@@ -25,7 +26,7 @@
         <span class="payment-title--text">抽奖</span>
         <span class="payment-title--close vh-iconfont vh-line-close" @click="close"></span>
       </div>
-      <lottery-form @startLottery="handleStartLottery" />
+      <lottery-form @startLottery="startLottery" />
     </div>
   </div>
 </template>
@@ -47,7 +48,8 @@
         lotteryInfoId: null, // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
         prizeInfo: {}, // 奖品信息
-        lotteryInfo: {}
+        lotteryInfo: {},
+        disabledTime: 5 // 5秒禁止点击
       };
     },
     provide() {
@@ -55,12 +57,38 @@
         lotteryServer: this.lotteryServer
       };
     },
+    mounted() {
+      if (this.mode === 'live') {
+        this.coutDown();
+      }
+    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({
         mode: 'live'
       });
     },
+    destroyed() {
+      this.clearTimer();
+    },
     methods: {
+      // 开始计时
+      coutDown() {
+        this.clearTimer();
+        this.disabledTime = 5;
+        this.timer = setInterval(() => {
+          this.disabledTime--;
+          if (this.disabledTime <= 0) {
+            this.clearTimer();
+          }
+        }, 1000);
+      },
+      // 清除计时
+      clearTimer() {
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
+      },
       /**
        * @description 打开整个抽奖组件
        */
@@ -129,6 +157,13 @@
         this.lotteryContentShow = true;
         this.lotteryResultShow = false;
         this.lotteryInfoId = null;
+      },
+      /**
+       * @description 主动发起抽奖(倒计时)
+       */
+      startLottery(payload) {
+        this.coutDown();
+        this.handleStartLottery(payload);
       },
       /**
        * @description 抽奖按钮
