@@ -183,7 +183,6 @@
        * @param {String} code 邀请码
        */
       async bindInvite(code = '') {
-        console.log('bindInvite inner', code, this.$route.params.id);
         return this.inviteServer.bindInvite({
           webinar_id: this.$route.params.id,
           invite: code
