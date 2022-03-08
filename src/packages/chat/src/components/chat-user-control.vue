@@ -7,7 +7,7 @@
       </div>
       <div
         :class="
-          this.atList.find(u => u.nickname === this.nickname)
+          this.atList.find(u => u.nickName === this.nickName)
             ? 'vmp-chat-user-control__item disabled'
             : 'vmp-chat-user-control__item'
         "
@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, contextServer } from 'vhall-sass-domain';
 
   export default {
     mixins: [dataReportMixin],
@@ -63,14 +63,14 @@
           is_banned: null,
           is_kicked: null
         },
-        nickname: '',
+        nickName: '',
         godMode: false,
         assistantType: ''
       };
     },
     beforeCreate() {
       this.chatServer = useChatServer();
-      this.roomBaseServer = useRoomBaseServer();
+      this.roomBaseServer = contextServer.get('roomBaseServer');
     },
     created() {
       this.assistantType = this.$route.query.assistantType;
@@ -79,15 +79,15 @@
       //todo 待改为信令
       EventBus.$on(
         'set_person_status_in_chat',
-        async (el, accountId, count, nickname, godMode, roleName) => {
+        async (el, accountId, count, nickName, godMode, roleName) => {
           if (accountId === this.userId) return; // 不能点击自己
           this.accountId = accountId;
           this.count = count;
-          // this.userStatus = await this.getUserStatus();
+          this.userStatus = await this.getUserStatus();
           this.isShow = true;
           this.godMode = godMode;
           this.calculate(el);
-          this.nickname = nickname;
+          this.nickName = nickName;
           this.roleName = roleName;
         }
       );

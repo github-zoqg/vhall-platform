@@ -9,8 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    // children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
-    children: ['layerHeader', 'layerBody']
+    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
   },
   // 顶部header容器
   layerHeader: {
@@ -21,34 +20,34 @@ export const serverConfig = {
   // 中间主区域容器
   layerBody: {
     component: 'VmpContainer',
-    className: 'vmp-basic-bd',
+    options: {
+      className: 'vmp-basic-bd'
+    },
     children: ['layerBodyCenter', 'layerBodyRight']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerFooter: {
     component: 'VmpFooter',
     className: 'vmp-footer'
   },
-  // layerBodyLeft: {
-  //   component: 'VmpContainer',
-  //   className: 'vmp-basic-left',
-  //   children: []
-  //   // children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-  //   // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
-  // },
+  layerBodyLeft: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-left',
+    children: ['comAsideMenu']
+  },
   layerBodyCenter: {
     component: 'VmpBasicCenterContainer',
     children: ['comStreamList', 'comPcPlayer', 'comFooterTools', 'comNoticeColumn']
-    // children: ['comStreamList', 'comFooterTools', 'comNoticeColumn']
   },
+
   layerBodyRight: {
+    component: 'VmpBasicRightContainer',
+    children: ['layerBodyRightBody']
+  },
+  layerBodyRightBody: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right',
-    children: [
-      'comWatchPrivateChat'
-      // 'comChat'
-    ]
+    className: 'vmp-basic-right__bd',
+    children: ['comMemberList', 'comChat']
   },
   /*** 布局定义end */
 
@@ -149,25 +148,6 @@ export const serverConfig = {
       }
     ]
   },
-  // 文档白板组件
-  comDocUne: {
-    component: 'VmpDocUne',
-    options: {
-      className: 'vmp-area__max',
-      keepAspectRatio: false
-    }
-
-    // emitSwitchTo: {
-    //   cuid: ['comAsideMenu'],
-    //   method: 'switchTo',
-    //   args: ['$0'] // 获取动态参数的第一个
-    // },
-    // // 打开对话框
-    // emitOpenDocList: {
-    //   cuid: 'dlgDocList',
-    //   method: 'show'
-    // }
-  },
   comStreamList: {
     component: 'VmpStreamList',
     children: ['comStreamLocal', 'comStreamRemote']
@@ -224,7 +204,7 @@ export const serverConfig = {
   comShare: {
     component: 'VmpShare',
     options: {
-      isInviteShare: true //分享是否展示邀请卡
+      isInviteShare: false //分享是否展示邀请卡
     }
   },
   // 底部
@@ -237,8 +217,8 @@ export const serverConfig = {
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
-    component: 'VmpFooterTools'
-    // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
+    component: 'VmpFooterTools',
+    children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
   },
   comPraise: {
     component: 'VmpPraise'
@@ -271,11 +251,6 @@ export const serverConfig = {
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
-  },
-  //私聊组件
-  comWatchPrivateChat: {
-    component: 'VmpWatchPrivateChat',
     options: {}
   },
   // 登录注册组件

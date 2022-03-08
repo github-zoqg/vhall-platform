@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'dlgDocList']
   },
   // 顶部header容器
   layerHeader: {
@@ -30,10 +30,9 @@ export const serverConfig = {
     children: ['comAsideMenu']
   },
   layerBodyCenter: {
-    component: 'VmpBasicCenterContainerLive',
-    // children: ['comDocUne']
+    component: 'VmpContainer',
+    className: 'vmp-basic-center',
     children: ['comStreamList', 'comDocUne']
-    // children: ['comThirdStream']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -42,24 +41,18 @@ export const serverConfig = {
   },
   layerBodyRightHeader: {
     component: 'VmpContainer',
-    className: 'vmp-basic-right__hd'
+    className: 'vmp-basic-right__hd',
+    children: ['comStreamLocal']
   },
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
     children: [
-      // 'comMemberList'
-      'comChat'
+      'comMemberList'
+      // 'comChat'
     ]
   },
   /*** 布局定义end */
-
-  /*** 所有弹窗集合 */
-  comAllDialog: {
-    component: 'VmpAirContainer',
-    children: ['dlgDocList', 'comShare', 'comVirtualPeople', 'comLivePrivateChat']
-    // children: ['dlgDocList', 'comShare','comShare', 'comVirtualPeople', 'comLivePrivateChat', 'comInsertVideo']
-  },
 
   /**** 组件定义 */
   // 顶部左侧容器
@@ -76,18 +69,6 @@ export const serverConfig = {
   // // 顶部右侧容器
   pannelHeaderRight: {
     component: 'VmpHeaderRight',
-    options: {
-      isShowQuit: false, //是否显示退出
-      isShowSupport: false, //是否显示技术支持
-      isShowSplitScreen: true //是否显示分屏
-    },
-    emitVirtualClick: [
-      {
-        cuid: 'comVirtualPeople',
-        method: 'openVirtualDialog',
-        args: [{ type: 1 }]
-      }
-    ],
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
@@ -108,19 +89,7 @@ export const serverConfig = {
   // 左侧导航菜单
   comAsideMenu: {
     component: 'VmpAsideMenu',
-    children: [
-      'comDocMenu',
-      'comWbMenu',
-      'comShareDesktopMenu',
-      'comMediaPlayMenu',
-      'comInteractMenu'
-    ],
-    emitShareClick: [
-      {
-        cuid: 'comShare',
-        method: 'openShareDialog'
-      }
-    ]
+    children: ['comDocMenu', 'comWbMenu', 'comShareDesktopMenu', 'comMediaPlayMenu']
   },
   // 语言选择组件
   compLanguageChoice: {
@@ -146,9 +115,9 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1000',
       kind: 'document'
     },
-    handleClick: [
+    emitClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocToolbar', 'comDocUne'],
         method: 'switchTo',
         args: 'document'
       }
@@ -162,9 +131,9 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1001',
       kind: 'board'
     },
-    handleClick: [
+    emitClick: [
       {
-        cuid: ['comAsideMenu', 'comDocUne'],
+        cuid: ['comAsideMenu', 'comDocToolbar', 'comDocUne'],
         method: 'switchTo',
         args: 'board'
       }
@@ -194,10 +163,6 @@ export const serverConfig = {
       }
     ]
   },
-  // 互动工具
-  comInteractMenu: {
-    component: 'VmpInteractMenu'
-  },
   //聊天组件
   comChat: {
     component: 'VmpChat',
@@ -215,19 +180,7 @@ export const serverConfig = {
       userControlOptions: {
         enable: true
       }
-    },
-    //打开私聊弹窗
-    emitOpenLivePrivateChatModal: [
-      {
-        cuid: 'comLivePrivateChat',
-        method: 'openModal'
-      }
-    ]
-  },
-  //发起端--私聊组件
-  comLivePrivateChat: {
-    component: 'VmpLivePrivateChat',
-    options: {}
+    }
   },
   //成员列表组件
   comMemberList: {
@@ -237,11 +190,19 @@ export const serverConfig = {
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
+    children: ['comDocToolbar'],
     emitSwitchTo: {
-      cuid: ['comAsideMenu'],
+      cuid: ['comAsideMenu', 'comDocToolbar'], //同名方法,同样的参数可以合并
       method: 'switchTo',
       args: ['$0'] // 获取动态参数的第一个
     },
+    emitDefault: [
+      {
+        cuid: ['comAsideMenu', 'comDocToolbar'],
+        method: 'switchTo',
+        args: 'document'
+      }
+    ],
     // 打开对话框
     emitOpenDocList: {
       cuid: 'dlgDocList',
@@ -290,14 +251,13 @@ export const serverConfig = {
       {
         cuid: 'comDocUne',
         method: 'demonstrate',
-        args: ['$0', '$1', '$2']
+        args: ['$0', '$1']
       }
     ]
   },
   // 上麦流列表
   comStreamList: {
-    component: 'VmpStreamListLive',
-    children: ['comStreamLocal', 'comStreamRemote']
+    component: 'VmpStreamList'
   },
   // 远端流
   comStreamRemote: {
@@ -335,20 +295,5 @@ export const serverConfig = {
         method: 'handleUnpublishComplate'
       }
     ]
-  },
-  comShare: {
-    component: 'VmpShare',
-    options: {
-      isInviteShare: false //分享是否展示邀请卡图标
-    }
-  },
-  comVirtualPeople: {
-    component: 'VmpVirtualPeople'
-  },
-  comThirdStream: {
-    component: 'VmpThirdStream'
-  },
-  comInsertVideo: {
-    component: 'VmpInsertVideo'
   }
 };

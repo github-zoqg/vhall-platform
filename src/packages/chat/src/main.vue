@@ -16,9 +16,7 @@
             :key="msg.msgId"
             :msg="msg"
             v-show="checkMessageShow(msg)"
-            :chat-options="chatOptions"
-            :role-name="roleName"
-            :join-info="joinInfo"
+            :roleName="roleName"
             @dispatchEvent="msgEventHandleDisPatch"
             @lotteryCheck="lotteryCheck"
             @questionnaireCheck="questionnaireCheck"
@@ -62,7 +60,6 @@
         :chat-list="chatList"
         :at-list="atList"
         :chat-login-status="chatLoginStatus"
-        @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @ononSwitchShowSponsor="onSwitchShowSponsor"
         @updateHeight="chatOperateBarHeightChange"
@@ -106,7 +103,7 @@
         </div>
         <div class="special-effect__middle-content">
           <p class="middle-content__nick-name">
-            {{ textOverflowSlice(msg.nickname, 8) }}
+            {{ textOverflowSlice(msg.nickName, 8) }}
           </p>
           <p v-if="msg.type === 'gift_send_success'" class="middle-content__detail">
             {{ $t('chat.chat_1032') }} {{ $t(msg.content.gift_name) }}
@@ -154,9 +151,8 @@
   import eventMixin from './mixin/event-mixin';
 
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, contextServer } from 'vhall-sass-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpChat',
@@ -170,7 +166,6 @@
     data() {
       this.chatServer = useChatServer();
       const { chatList } = this.chatServer.state;
-      // const roomBaseState = useRoomBaseServer().state;
       return {
         //滚动插件配置
         overlayScrollBarsOptions: {
@@ -272,9 +267,7 @@
           鼓掌: 'bg-applause',
           666: 'bg-666',
           'bg-custom': 'bg-custom'
-        },
-        //当前登录人信息
-        joinInfo: {}
+        }
       };
     },
     computed: {
@@ -320,8 +313,8 @@
       }
     },
     beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
-      console.log('roomBaseState', this.roomBaseServer.state);
+      this.roomBaseServer = contextServer.get('roomBaseServer');
+      console.log(this.roomBaseServer.state, 'roomBaseState');
     },
     created() {
       this.initInputStatus();
@@ -352,7 +345,6 @@
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
-        this.joinInfo = join_info;
         this.configList = configList;
         this.webinarId = webinar.id;
         this.playerType = webinar.type;
@@ -434,14 +426,15 @@
       },
       // 获取历史消息
       getHistoryMsg() {
+        const { getHistoryMsg } = this.chatServer;
+
         const params = {
-          webinar_id: this.$route.params.id,
           room_id: this.roomId,
           pos: Number(this.pageConfig.page) * 50,
           limit: 50
         };
 
-        this.chatServer.getHistoryMsg(params, '发起端').then(result => {
+        getHistoryMsg(params, '发起端').then(result => {
           this.pageConfig.page = Number(this.pageConfig.page) + 1;
           return result;
         });
@@ -568,158 +561,7 @@
           //todo 欢迎语功能需要加上
         }
       },
-      //todo domain负责组装 发送消息
-      sendMsg(callback) {
-        window.clearTimeout(this.sendTimeOut);
-
-        const { checkHasKeyword } = this.chatServer;
-        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
-          ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
-          : '';
-        //子组件里上传的图片
-        const imgUrls = this.getUploadImg();
-
-        this.sendTimeOut = setTimeout(() => {
-          const inputValue = this.trimPlaceHolder('reply');
-          if (this.inputStatus.disable) {
-            return;
-          }
-          if ((!inputValue || (inputValue && !inputValue.trim())) && !imgUrls.length) {
-            return this.$message.warning('内容不能为空');
-          }
-          const data = {};
-          if (inputValue) {
-            data.type = 'text';
-            data.barrageTxt = inputValue
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n/g, '<br/>');
-            data.text_content = inputValue;
-          }
-          //如果有聊天图片
-          if (imgUrls.length) {
-            data.image_urls = imgUrls;
-            data.type = 'image';
-          }
-          const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-          console.warn('获取当前的本地用户信息', userInfo);
-          let name = '';
-          if (userInfo) {
-            if (userInfo.nickname) {
-              name = userInfo.nickname;
-            } else {
-              name = userInfo.nick_name;
-            }
-          } else {
-            name = joinDefaultName;
-          }
-          if (this.roleName === 2 && this.join_name) {
-            name = this.join_name;
-          }
-          const context = {
-            nickname: name, // 昵称
-            avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
-            role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
-            replyMsg: this.replyMsg, // 回复消息
-            atList: this.atList // @用户列表
-          };
-          let filterStatus = true;
-          if (sessionStorage.getItem('watch')) {
-            filterStatus = checkHasKeyword(inputValue);
-          }
-
-          if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-            if (this.atList.length && data.text_content) {
-              this.atList.forEach(a => {
-                data.text_content = data.text_content.replace(`@${a.nickname}`, `***${a.nickname}`);
-              });
-            }
-
-            this.chatServer.sendMsg({ data, context });
-          }
-          //清空一下子组件里上传的图片
-          this.clearUploadImg();
-          this.inputValue = '';
-          this.replyMsg = {};
-          this.$refs.emoji.isShow = false;
-
-          this.atList = [];
-          callback && callback();
-        }, 300);
-      },
-      // 发送聊天节流
-      sendMsgThrottle() {
-        if (this.roleName !== 2) {
-          this.sendMsg();
-          return;
-        }
-        if (this.chatGap > 0) {
-          this.lock = sessionStorage.getItem('chatLock');
-          if (this.lock && this.lock == 'true') {
-            this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
-          }
-        } else {
-          this.sendMsg(() => {
-            window.clearInterval(this.chatGapInterval);
-            this.lock = sessionStorage.getItem('chatLock');
-            this.chatGap = this.delayTime(this.onlineUsers);
-            this.chatGapInterval = window.setInterval(() => {
-              if (this.chatGap > 0) {
-                if (!this.lock || this.lock == 'false') {
-                  sessionStorage.setItem('chatLock', true);
-                } else {
-                  this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
-                }
-                this.chatGap = this.chatGap - 1;
-              } else {
-                window.clearInterval(this.chatGapInterval);
-                sessionStorage.setItem('chatLock', false);
-              }
-            }, 1000);
-          });
-        }
-      },
-      backspace() {
-        if (!this.inputValue) {
-          this.atList = [];
-          return;
-        }
-        const currentIndex = this.$refs.chatInput.selectionStart;
-        const firstPart = this.inputValue.substring(0, currentIndex);
-        const lastIndex = firstPart.lastIndexOf('@');
-        if (lastIndex != -1) {
-          const userName = this.inputValue.substring(lastIndex, currentIndex);
-          const nickname = userName.replace('@', '');
-          // 删除整个@过的用户名逻辑
-          if (this.atList.find(u => u.nickname == nickname)) {
-            this.atList = this.atList.filter(n => n.nickname != nickname);
-            this.inputValue = this.inputValue.replace(userName, '');
-          } else {
-            this.atList = this.atList.filter(a => {
-              const atIndex = this.inputValue.indexOf(`@${a.nickname} `);
-              return atIndex != -1;
-            });
-          }
-        }
-        // 删除要回复的用户名逻辑
-        const lastReplyIndex = firstPart.lastIndexOf('回复');
-        if (lastReplyIndex != -1) {
-          const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          console.log(`回复${this.replyMsg.nickname}:` == replyUserName);
-          if (`回复${this.replyMsg.nickname}:` == replyUserName) {
-            this.inputValue = this.inputValue.replace(replyUserName, '');
-            this.replyMsg = {};
-          } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickname}: `) == -1 &&
-              (this.replyMsg = {});
-          }
-        }
-      },
-      //处理聊天内容
-      trimPlaceHolder() {
-        return this.inputValue.replace(/^[回复].+[:]\s/, '');
-      },
-      //回复消息
+      //回复消息处理
       reply(count) {
         this.buriedPointReport(110119, {
           business_uid: this.userId,
@@ -840,16 +682,6 @@
       //处理只看主办方
       onSwitchShowSponsor(status) {
         this.isOnlyShowSponsor = status;
-      },
-      //打开私聊模态窗
-      openPrivateChatModal() {
-        // window.$middleEventSdk?.event?.send({
-        //   cuid: 'comLivePrivateChat',
-        //   method: 'openModal'
-        // });
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
-        );
       }
     }
   };

@@ -11,8 +11,8 @@
     >
       <!--欢迎语-->
       <template v-if="['welcome_msg'].includes(msg.type)">
-        <div v-if="msg.nickname !== '' && msg.content !== ''" class="msg-item-template--welcome">
-          <span>{{ msg.nickname }}</span>
+        <div v-if="msg.nickName !== '' && msg.content !== ''" class="msg-item-template--welcome">
+          <span>{{ msg.nickName }}</span>
           {{ msg.content }}
         </div>
       </template>
@@ -39,7 +39,7 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">{{ msg.nickname }}</span>
+              <span class="info-wrap__nick-name">{{ msg.nickName }}</span>
               <span
                 v-if="
                   (msg.type === 'text' || msg.type === 'image') &&
@@ -67,8 +67,8 @@
                 class="reply-wrapper__content reply-msg"
                 v-html="
                   `<span class='reply-wrapper__content__nick-name'>${
-                    msg.replyMsg.nickname || msg.replyMsg.nick_name
-                  }</span>&nbsp;${msg.replyMsg.content.text_content}`
+                    msg.replyMsg.nickName || msg.replyMsg.nick_name
+                  }</span>&nbsp;${msgContent}`
                 "
               ></p>
               <!-- 图片 -->
@@ -86,7 +86,7 @@
                   v-if="!msg.replyMsg.content.text_content"
                   class="reply-wrapper__img-wrapper__nick-name"
                 >
-                  {{ msg.replyMsg.nickname }}
+                  {{ msg.replyMsg.nickName }}
                 </span>
                 <p class="msg-item__content-hr"></p>
                 <div
@@ -151,8 +151,8 @@
           class="msg-item-template__interact"
         >
           <div class="msg-item-template__interact-content">
-            <span v-show="msg.nickname && msg.roleName != 1" class="interact-content__nick-name">
-              {{ msg.nickname }}
+            <span v-show="msg.nickName && msg.roleName != 1" class="interact-content__nick-name">
+              {{ msg.nickName }}
             </span>
             <span
               v-show="msg.roleName"
@@ -183,8 +183,8 @@
           class="msg-item-template__interact-tools"
         >
           <div class="interact-tools-content">
-            <span v-show="msg.nickname" class="interact-tools-content__nick-name">
-              {{ msg.nickname }}
+            <span v-show="msg.nickName" class="interact-tools-content__nick-name">
+              {{ msg.nickName }}
             </span>
             <span>
               {{ msg.type === 'reward_pay_ok' ? '打赏了红包' : `送出${msg.content.gift_name}` }}
@@ -225,13 +225,6 @@
       },
       //聊天配置
       chatOptions: {
-        type: Object,
-        default: () => {
-          return {};
-        }
-      },
-      //当前登录人的信息
-      joinInfo: {
         type: Object,
         default: () => {
           return {};
@@ -315,7 +308,7 @@
       } else {
         let at = false;
         this.msg.atList.forEach(a => {
-          const userName = `@${a.nickname} `;
+          const userName = `@${a.nickName} `;
           const match =
             this.msg.content &&
             this.msg.content.text_content &&
@@ -338,10 +331,10 @@
           }
         });
       }
-
+      const userInfo = JSON.parse(sessionStorage.getItem('user'));
       if (
         this.msg.atList &&
-        this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+        this.msg.atList.find(u => userInfo.third_party_user_id == u.accountId) &&
         !this.msg.isHistoryMsg
       ) {
         this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
@@ -375,7 +368,7 @@
             event.target,
             msg.sendId,
             msg.count,
-            msg.nickname,
+            msg.nickName,
             false,
             msg.roleName
           );
@@ -390,7 +383,7 @@
           event.target,
           msg.sendId,
           msg.count,
-          msg.nickname,
+          msg.nickName,
           true,
           msg.roleName
         );

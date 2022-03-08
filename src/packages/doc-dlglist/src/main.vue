@@ -1,11 +1,6 @@
 <template>
   <div class="vmp-doc-list">
-    <el-dialog
-      :visible.sync="dialogVisible"
-      @open="handlOpen"
-      :before-close="handleClose"
-      width="800px"
-    >
+    <el-dialog :visible.sync="dialogVisible" :before-close="handleClose" width="800px">
       <!-- 标题栏 -->
       <template slot="title">
         <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
@@ -101,7 +96,7 @@
               <el-switch
                 class="vmp-doc-cur__switch"
                 v-model="switchStatus"
-                :width="28"
+                width="28"
                 active-color="#fb3a32"
               ></el-switch>
               <span>默认开启，文档演示将自动对观众可见</span>
@@ -155,17 +150,18 @@
   </div>
 </template>
 <script>
-  import { useDocServer, useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpDocDlglist',
     data() {
       return {
         dialogVisible: false,
+        title: '',
+        subject: '', // 直播名称
+        id: '', // 房间id
         mode: 1, //模式，默认1:当前直播列表 ，2：资料库列表
 
-        // 要演示的文档观众是否可见
+        // 观众可见
         switchStatus: true,
         // 当前活动文档列表相关
         isLoading: false,
@@ -180,8 +176,11 @@
       };
     },
     beforeCreate() {
-      this.docServer = useDocServer();
-      this.roomBaseServer = useRoomBaseServer();
+      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.docServer = contextServer.get('docServer');
+    },
+    mounted() {
+      this.handleDocSearch();
     },
     watch: {
       docSearchKey(val) {
@@ -197,12 +196,6 @@
     methods: {
       show() {
         this.dialogVisible = true;
-      },
-      /**
-       * 对话框打开事事件
-       */
-      handlOpen() {
-        this.handleDocSearch();
       },
       handleClose() {
         if (this.mode === 2) {
@@ -224,12 +217,13 @@
       /**
        * 演示文档
        */
-      demonstrate(docId, docType) {
+      demonstrate(documentId, type) {
         this.dialogVisible = false;
-        console.log('演示文档ID：', docId);
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitDemonstrateDoc', [docId, docType, this.switchStatus])
-        );
+        window.$middleEventSdk?.event?.send({
+          cuid: this.cuid,
+          method: 'emitDemonstrateDoc',
+          params: [documentId, type]
+        });
       },
       /***
        * 删除文档
@@ -275,6 +269,7 @@
         if (this.isLoading) {
           return false;
         }
+
         this.isLoading = true;
         try {
           const result = await this.docServer.getWebinarDocList({
@@ -354,8 +349,7 @@
       async handleDoclibCancel() {
         this.cancelCheckHandle();
         this.mode = 1;
-      },
-      handleUpload() {}
+      }
     }
   };
 </script>

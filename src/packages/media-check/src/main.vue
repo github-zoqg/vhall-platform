@@ -72,7 +72,7 @@
   import ChooseAudioInput from './components/steps/choose-audio-input.vue';
   import ChooseAudioOutput from './components/steps/choose-audio-output.vue';
   import CheckResult from './components/steps/check-result.vue';
-  import { useMediaCheckServer, useRoomBaseServer } from 'middle-domain';
+  import { useMediaCheckServer, contextServer } from 'vhall-sass-domain';
 
   import { STEP_OPTS } from './js/config';
   import { getCheckList } from './js/getCheckListEntity';
@@ -117,7 +117,7 @@
       this.mediaCheckServer = useMediaCheckServer();
     },
     created() {
-      const { watchInitData } = useRoomBaseServer().state;
+      const { watchInitData } = contextServer.get('roomBaseServer').state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.getSessionSelectedDevice();
     },

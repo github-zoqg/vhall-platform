@@ -36,7 +36,7 @@
 
 <script>
   import { sessionOrLocal, uuid } from '@/packages/chat/src/js/utils';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpChatImgUpload',
     props: {
@@ -88,7 +88,7 @@
       }
     },
     beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
+      this.roomBaseServer = contextServer.get('roomBaseServer');
     },
     mounted() {
       this.initViewData();

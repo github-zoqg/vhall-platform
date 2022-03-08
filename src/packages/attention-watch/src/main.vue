@@ -12,7 +12,7 @@
     data() {
       return {
         themeClass: {
-          pageBg: '#e6e6e6'
+          pageBg: '#3562fa'
         },
         isAttention: false,
         isLogin: false

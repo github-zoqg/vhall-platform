@@ -14,6 +14,7 @@ import VmpHeaderWatch from '@/packages/header-watch-pc';
 import VmpPcPlayer from '@/packages/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
+import VmpDocToolbar from '@/packages/doc-toolbar';
 import VmpStreamList from '@/packages/stream-list';
 import VmpStreamLocal from '@/packages/stream-local';
 import VmpStreamRemote from '@/packages/stream-remote';
@@ -28,11 +29,8 @@ import VmpBasicCenterContainer from '@/packages/basic-center-container';
 import VmpShare from '@/packages/share'; // 观看端分享
 import VmpAttention from '@/packages/attention-watch'; // 观看端关注
 import VmpOfficial from '@/packages/official-watch-pc'; // 观看端公众号
-import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公众号
-//观看端成员列表
+import VmpWatchLogin from '@/packages/watch-person-login'; // 观看端公众号
 import VmpMemberList from '@/packages/member-list';
-//观看端私聊
-import VmpWatchPrivateChat from '@/packages/watch-private-chat';
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -46,6 +44,7 @@ export function initUse() {
   Vue.use(VmpPcPlayer);
   Vue.use(VmpChat);
   Vue.use(VmpDocUne);
+  Vue.use(VmpDocToolbar);
   Vue.use(VmpStreamList);
   Vue.use(VmpStreamLocal);
   Vue.use(VmpStreamRemote);
@@ -60,7 +59,6 @@ export function initUse() {
   Vue.use(VmpShare);
   Vue.use(VmpAttention);
   Vue.use(VmpOfficial);
-  Vue.use(VmpWatchAuth);
+  Vue.use(VmpWatchLogin);
   Vue.use(VmpMemberList);
-  Vue.use(VmpWatchPrivateChat);
 }

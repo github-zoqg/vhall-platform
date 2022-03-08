@@ -54,7 +54,6 @@
       <div class="operate-container__tool-bar__right">
         <template v-if="chatOptions && chatOptions.enableChatSetting">
           <!--聊天设置-->
-          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">私聊</i>
           <i class="chat-setting-btn" @click.stop="onClickChatSetting">聊天设置</i>
           <chat-filter
             v-if="roleName != 2"
@@ -89,7 +88,7 @@
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
   import ChatFilter from './chat-filter';
-  import { useRoomBaseServer } from 'middle-domain';
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -113,7 +112,7 @@
       },
       //角色名
       roleName: {
-        type: [Number, String],
+        type: String,
         default: () => ''
       },
       //是否被禁言
@@ -155,7 +154,7 @@
       }
     },
     data() {
-      const roomBaseState = useRoomBaseServer().state;
+      const roomBaseState = contextServer.get('roomBaseServer').state;
       return {
         roomBaseState,
         //显示观众的过滤设置
@@ -251,10 +250,6 @@
       //处理@用户
       handleAtUser(accountId) {
         this.$refs.chatInput.atUser(accountId);
-      },
-      //打开私聊模态窗
-      openPrivateChatModal() {
-        this.$emit('openPrivateChatModal');
       }
     }
   };

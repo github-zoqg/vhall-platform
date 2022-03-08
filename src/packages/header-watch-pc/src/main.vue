@@ -65,7 +65,7 @@
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
               <img v-else src="./images/my-dark@2x.png" alt="" />
             </p>
-            <span>{{ userInfo.nickname | splitLenStr(8) }}</span>
+            <span>{{ userInfo.nickName | splitLenStr(8) }}</span>
           </div>
           <div class="vmp-header-watch-right-login-user-list">
             <ul>
@@ -90,7 +90,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { contextServer } from 'vhall-sass-domain';
   export default {
     name: 'VmpHeaderWatch',
     data() {
@@ -101,10 +101,10 @@
         userInfo: {
           avatar:
             'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/9c/e9/9ce963aaaa11f3bf9650f01fc62c3514.jpg',
-          nickname: '测试==测试==测试==测试==测试==测试==测试==测试'
+          nickName: '测试==测试==测试==测试==测试==测试==测试==测试'
         }, // 用户登录之后的信息
         themeClass: {
-          pageBg: '#e6e6e6'
+          pageBg: '#3562fa'
         },
         isLogin: false
       };
@@ -126,7 +126,7 @@
       }
     },
     beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
+      this.roomBaseServer = contextServer.get('roomBaseServer');
     },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;

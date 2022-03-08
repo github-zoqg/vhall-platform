@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { contextServer } from 'vhall-sass-domain';
 
   export default {
     name: 'check-result',
@@ -76,7 +76,7 @@
       }
     },
     created() {
-      const { watchInitData } = useRoomBaseServer().state;
+      const { watchInitData } = contextServer.get('roomBaseServer').state;
       this.roleName = watchInitData?.join_info?.role_name;
     },
     methods: {
