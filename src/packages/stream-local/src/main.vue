@@ -342,7 +342,9 @@
               await this.roomBaseServer.getInavToolStatus();
             }
 
-            if ([1, 3, 4, '1', '3', '4'].includes(this.joinInfo.role_name)) {
+            console.log('[stream-local] vrtc_connect_success startPush');
+
+            if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 开始推流
               this.startPush();
             } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
