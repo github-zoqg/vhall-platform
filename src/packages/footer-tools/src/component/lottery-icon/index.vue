@@ -38,6 +38,7 @@
     methods: {
       checkLotteryIcon() {
         this.$emit('clickIcon');
+        this.dotVisible = false;
       },
       handleNewLottery() {
         this.showIcon = true;
