@@ -3,7 +3,12 @@
     <div class="popup">
       <div class="recordboxHeader">
         <span class="header-title">{{ title || '提示' || $t('message.tipText') }}</span>
-        <a href="javascript:;" @click="onClose" class="iconfont iconguanbi1" v-if="isShowClose"></a>
+        <a
+          href="javascript:;"
+          @click="onClose"
+          class="vh-iconfont vh-line-close"
+          v-if="isShowClose"
+        ></a>
       </div>
       <div class="popbody">
         <p class="f-12 tips">
@@ -100,6 +105,13 @@
       .recordboxHeader {
         position: relative;
         padding: 24px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        a {
+          color: #666;
+        }
         .header-title {
           font-size: 20px;
           font-weight: 500;
