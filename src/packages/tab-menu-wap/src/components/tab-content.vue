@@ -4,9 +4,9 @@
       <!-- 主菜单区域 -->
       <section class="vmp-tab-container-mainarea" ref="mainArea">
         <section
-          v-for="tab of mainMenu"
+          v-for="tab of filterMainMenu"
           :key="tab.cuid"
-          v-show="curItem.cuid === tab.cuid && mainMenu.find(item => item.id === curItem.id)"
+          v-show="curItem.cuid === tab.cuid && filterMainMenu.find(item => item.id === curItem.id)"
         >
           <vmp-air-container :cuid="tab.cuid" :oneself="true" />
         </section>
@@ -63,6 +63,16 @@
       };
     },
     computed: {
+      filterMainMenu() {
+        let set = [];
+        for (const item of this.mainMenu) {
+          if (set.every(i => i.cuid !== item.cuid)) {
+            set.push(item);
+          }
+        }
+
+        return [...set];
+      },
       filterSubMenu() {
         let set = [];
         for (const item of this.subMenu) {
