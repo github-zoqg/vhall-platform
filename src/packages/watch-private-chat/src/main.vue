@@ -42,12 +42,14 @@
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpWatchPrivateChat',
     components: {
       chatOperate,
       VirtualList
     },
+    mixins: [emitter],
     data() {
       return {
         msgItem,
@@ -195,11 +197,8 @@
       //事件监听
       listenEvents() {
         this.chatServer.$on('receivePrivateMsg', () => {
-          if (this.osInstance.scroll().max.y > 0 && this.osInstance.scroll().ratio.y !== 1) {
-            // 如果是除回复、 @之外的普通消息
-            this.isHasUnreadNormalMsg = true;
-            this.tipMsg = `有${++this.unReadMessageCount}条未读消息`;
-          }
+          this.unReadMessageCount++;
+          this.dispatch('VmpTabContainer', 'noticeHint', 'private');
         });
       },
       //获取历史的私聊消息
@@ -224,6 +223,9 @@
       //自己发送消息后的回调
       sendMsgEnd() {
         this.scrollBottom();
+      },
+      tobottom() {
+        this.unReadMessageCount = 0;
       },
       //滚动到底部
       scrollBottom() {

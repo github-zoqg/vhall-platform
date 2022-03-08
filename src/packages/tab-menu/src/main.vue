@@ -22,6 +22,7 @@
           @click="select({ type: item.type, id: item.id })"
         >
           <span class="item-text">{{ $tdefault(item.name) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
           <hr class="bottom-line" />
         </li>
       </ul>
@@ -38,7 +39,7 @@
     </header>
 
     <main class="vmp-tab-menu__main">
-      <tab-content ref="tabContent" :menu="menu" />
+      <tab-content ref="tabContent" :menu="menu" @noticeHint="handleHint" />
     </main>
   </section>
 </template>
@@ -141,13 +142,13 @@
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 2, {
+          this.addItemByIndex(chatIndex + 1, {
             type: 'private',
             name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '私聊', // 同上
             status: 2
           });
-          this.addItemByIndex(chatIndex + 1, {
+          this.addItemByIndex(chatIndex + 2, {
             type: 'v5',
             name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '问答', // 同上
@@ -305,6 +306,12 @@
 
         tab.tipsVisible = visible;
       },
+      handleHint(cuid) {
+        if (this.selectedType == cuid) {
+          return;
+        }
+        this.setTipsVisible({ visible: true, type: cuid });
+      },
       /**
        * 跳转到最近的item
        */
@@ -393,7 +400,15 @@
             display: flex;
             align-items: center;
           }
-
+          .tips {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #fb3a32;
+          }
           .bottom-line {
             display: none;
             position: absolute;
