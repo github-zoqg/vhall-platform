@@ -128,7 +128,15 @@
         return this.$domainStore.state.desktopShareServer.isShareScreen;
       }
     },
-    created() {
+    watch: {
+      // 检测演示人变化
+      ['groupServer.state.groupInitData.presentation_screen'](presenterId) {
+        if (presenterId && presenterId == this.userId) {
+          this.isCollapse = false;
+        }
+      }
+    },
+    beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.groupServer = useGroupServer();
@@ -176,10 +184,7 @@
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
           if (this.isInGroup) {
-            if (
-              this.groupServer.state.groupInitData.presentation_screen ==
-              this.roomBaseServer.state.watchInitData.join_info.third_party_user_id
-            ) {
+            if (this.groupServer.state.groupInitData.presentation_screen != this.userId) {
               //  如果演示者不是自己
               this.isCollapse = true;
             }
