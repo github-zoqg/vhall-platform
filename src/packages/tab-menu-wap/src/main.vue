@@ -139,7 +139,8 @@
           console.log('dispatch_doc_switch_change', val);
           this.setVisible({ visible: val, type: 2 });
           if (val) {
-            this.select({ type: 2 });
+            let obj = this.getItem({ type: 2 });
+            this.select({ type: obj.type, id: obj.id });
           }
         });
       },
@@ -287,6 +288,7 @@
         if (index < this.visibleMenu.length && nextItem !== undefined) {
           const { type, id } = nextItem;
           this.select({ type, id });
+          return;
         }
 
         // 向前跳
