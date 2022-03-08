@@ -77,6 +77,7 @@
       open(uuid = '') {
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
+          this.lotteryId = data.id;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
