@@ -34,7 +34,7 @@
         </el-select>
       </section>
 
-      <section class="vmp-media-setting-item">
+      <section class="vmp-media-setting-item" v-if="liveMode != LIVE_MODE_MAP['VIDEO']">
         <label class="vmp-media-setting-item__label">观看端布局(视频)</label>
         <section class="vmp-media-setting-item__content">
           <div
@@ -43,7 +43,7 @@
               'vmp-media-setting-item-layout__item--selected': mediaState.layout === item.id,
               disabled: liveStatus === 1
             }"
-            v-for="item of layoutConfig"
+            v-for="item of filterLayoutConfig"
             :key="item.id"
             @click="setLayout(item.id)"
           >
@@ -69,7 +69,7 @@
 
 <script>
   import { useMediaSettingServer } from 'middle-domain';
-  import { getDefinitionMap, getScreenOptions } from '../../js/getOptionEntity';
+  import { LIVE_MODE_MAP } from '../../js/liveMap';
 
   import FloatImg from '../../assets/img/float.png';
   import TiledImg from '../../assets/img/tiled.png';
@@ -85,17 +85,39 @@
           'RTC_VIDEO_PROFILE_360P_16x9_M', // 标清
           'RTC_VIDEO_PROFILE_240P_16x9_M' // 流畅
         ]),
-        screenRatesConfig: getScreenOptions(),
+        screenRatesConfig: Object.freeze([
+          { value: 'RTC_SCREEN_PROFILE_1080P_16x9_H', label: '视频动态演示模式' },
+          { value: 'RTC_SCREEN_PROFILE_1080P_16x9_M', label: 'PPT静态演示模式' }
+        ]),
         layoutConfig: Object.freeze([
           { id: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE', img: FloatImg, text: '主次浮窗' },
           { id: 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE', img: TiledImg, text: '主次平铺' },
           { id: 'CANVAS_ADAPTIVE_LAYOUT_GRID_MODE', img: GridImg, text: '均匀排列' }
-        ])
+        ]),
+        LIVE_MODE_MAP
       };
     },
     computed: {
+      webinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
       liveStatus() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+        return this.webinar.type;
+      },
+      liveMode() {
+        return this.webinar.mode;
+      },
+      isNoDelay() {
+        return this.webinar.no_delay_webinar === 1;
+      },
+      filterLayoutConfig() {
+        // 分组、无延迟时，只展示一种布局
+        const isGroupLive = this.liveMode === LIVE_MODE_MAP['GROUP'];
+        if (isGroupLive || this.isNoDelay) {
+          return this.layoutConfig.filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE');
+        }
+
+        return this.layoutConfig;
       }
     },
     beforeCreate() {
@@ -112,10 +134,10 @@
       },
 
       setDefault() {
-        const saveRate = sessionStorage.getItem('selectedRate') || '';
+        const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
         const saveScreenRate =
-          sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[0].value;
-        const savedLayout = sessionStorage.getItem('layout') || this.layoutConfig[0].id;
+          sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
+        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[0].id;
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;
@@ -123,7 +145,16 @@
       },
 
       formatDefinitionLabel(label) {
-        const map = getDefinitionMap();
+        const map = new Map([
+          ['RTC_VIDEO_PROFILE_240P_16x9_M', '流畅'],
+          ['RTC_VIDEO_PROFILE_480P_16x9_M', 'player.player_1003'],
+          ['RTC_VIDEO_PROFILE_360P_16x9_M', 'player.player_1004'],
+          ['RTC_VIDEO_PROFILE_720P_16x9_M', 'player.player_1005'],
+          ['240', 'RTC_VIDEO_PROFILE_240P_16x9_M'],
+          ['480', 'RTC_VIDEO_PROFILE_480P_16x9_M'],
+          ['360', 'RTC_VIDEO_PROFILE_360P_16x9_M'],
+          ['720', 'RTC_VIDEO_PROFILE_720P_16x9_M']
+        ]);
         return this.$t(map.get(label));
       },
       rateChange(selected) {

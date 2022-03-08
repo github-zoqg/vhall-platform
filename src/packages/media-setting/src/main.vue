@@ -88,6 +88,7 @@
   import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
 
   import { getDiffObject } from './js/getDiffObject';
+  import { LIVE_MODE_MAP } from './js/liveMap';
 
   const confirmListener = {
     cb: null,
@@ -120,7 +121,8 @@
         selectedMenuItem: 'basic-setting',
         alertText: '修改设置后会导致重新推流，是否继续保存？',
         isRateChangeToHD: false,
-        liveMode: 0 // 1-音频 2-视频 3-互动
+        liveMode: 0, // 1-音频 2-视频 3-互动 6-分组
+        LIVE_MODE_MAP
       };
     },
     computed: {
