@@ -56,10 +56,19 @@
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
+    computed: {
+      userId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
+      }
+    },
     methods: {
       openRedPacket() {
         // if (this.accepted) return;
         // this.accepted = true;
+        //用户未登录
+        if (this.userId == 0) {
+          return this.$emit('needLogin');
+        }
         this.redPacketServer.openRedPacket().then(res => {
           if (res.code === 200) {
             this.opened = true;

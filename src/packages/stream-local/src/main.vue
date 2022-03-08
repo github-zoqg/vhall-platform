@@ -157,13 +157,12 @@
             @click="setMainScreen(false)"
           ></span>
         </el-tooltip>
-        <el-tooltip content="下麦" placement="bottom">
+        <!-- <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="showDownMic"
           ></span>
-        </el-tooltip>
+        </el-tooltip> -->
       </p>
     </section>
 
@@ -640,9 +639,12 @@
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
+            // 主持人不在小组中，停止推流触发 直播结束 生成回放
+            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+            }
             resolve();
           });
         });

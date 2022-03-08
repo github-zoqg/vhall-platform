@@ -52,6 +52,11 @@
         opened: false
       };
     },
+    computed: {
+      userId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
+      }
+    },
     filters: {
       splitLenStr: function (name, len) {
         return name && name.length > len ? name.substring(0, len) + '...' : name;
@@ -61,6 +66,10 @@
       openRedPacket() {
         // if (this.accepted) return;
         // this.accepted = true;
+        if (this.userId == 0) {
+          console.log(this.userId, '7777');
+          return this.$emit('needLogin');
+        }
         this.redPacketServer.openRedPacket().then(res => {
           if (res.code === 200) {
             this.opened = true;
