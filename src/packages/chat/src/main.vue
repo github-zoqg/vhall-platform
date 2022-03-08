@@ -568,6 +568,7 @@
         useChatServer()
           .setAllBanned(params)
           .then(res => {
+            this.allBanned = flag;
             this.buriedPointReport(flag ? 110116 : 110117, {
               business_uid: this.userId,
               webinar_id: this.webinarId
