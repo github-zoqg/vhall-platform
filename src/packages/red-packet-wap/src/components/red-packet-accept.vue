@@ -52,9 +52,6 @@
         opened: false
       };
     },
-    mounted() {
-      console.log(this.redPacketInfo, 'redPacketInfo22222');
-    },
     computed: {
       userId() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
