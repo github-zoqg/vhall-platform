@@ -64,7 +64,6 @@
         <el-input
           :type="regPwdShow ? 'text' : 'password'"
           v-model.trim="ruleForm.password"
-          onkeyup="this.value = this.value.replace(/[\u4E00-\u9FA5]/g, '')"
           clearable
           :placeholder="$t('register.register_1007')"
         >
@@ -75,27 +74,6 @@
             @click="passWordType"
           ></i>
         </el-input>
-        <!-- <el-input
-          type="password"
-          v-model.trim="ruleForm.password"
-          clearable
-          :placeholder="$t('register.register_1007')"
-        ></el-input> -->
-        <!-- <PwdInput
-          v-model.trim="ruleForm.password"
-          clearable
-          :placeholder="$t('login.login_1011')"
-          :maxlength="30"
-          auto-complete="off"
-          onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
-        >
-          <i
-            slot="suffix"
-            class="vh-iconfont"
-            :class="[regPwdShow ? 'vh-line-view' : 'vh-line-hidden']"
-            @click="passWordType"
-          ></i>
-        </PwdInput> -->
         <a
           href="javascript:void(0)"
           class="vmp-register__login__link"
@@ -209,6 +187,11 @@
       };
     },
     watch: {
+      'ruleForm.password'(val) {
+        console.log(val);
+        this.ruleForm.password = `${val}`.replace(/[\u4E00-\u9FA5]/g, '');
+        console.log(val);
+      },
       'ruleForm.phone': function () {
         this.codeBtnDisabledCheck();
       },
@@ -236,20 +219,6 @@
             this.btnDisabled = !!err;
           });
         }
-        // if (this.ruleForm.phone) {
-        //   let phoneFlag = false;
-        //   this.$refs.ruleForm.validateField('phone', function (res) {
-        //     phoneFlag = !res;
-        //   });
-        //   if (phoneFlag && this.captchaVal) {
-        //     // 如果当前手机号验证通过，并且图形验证码已选取，获取验证码按钮可点击
-        //     this.btnDisabled = false;
-        //   } else {
-        //     this.btnDisabled = true; // 获取验证码不可点击
-        //   }
-        // } else {
-        //   this.btnDisabled = true; // 获取验证码不可点击
-        // }
       },
       handleSendCode() {
         if (!this.captchaReady) {

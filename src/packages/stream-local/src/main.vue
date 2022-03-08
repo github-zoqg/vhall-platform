@@ -279,6 +279,7 @@
       this.playerServer = usePlayerServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.listenEvents();

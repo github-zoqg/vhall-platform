@@ -1869,58 +1869,13 @@
             });
         });
       },
-      //获取插播和桌面共享流信息
-      /**
-       *  获取插播和桌面共享的流信息
-       *  @returns { object } [{streaming: Boolean, streamId: streamId, accountId: accountId, streamType: streamType, remoteUsers: [], localUser: {}  }]
-       */
-      getDesktopAndInStreamInfo() {
-        const info = {
-          streaming: false,
-          streamId: '',
-          streamType: '',
-          accountId: '',
-          remoteUsers: [],
-          localUser: {}
-        };
-        const inavInfo = this.interactiveServer.getRoomInfo();
-        const users = inavInfo.remote.users.concat(inavInfo.local.user || {});
-        users.forEach(u => {
-          // 判断一下有没有人用插播或桌面
-          u.streams.forEach(stream => {
-            const obj = stream.attributes ? JSON.parse(stream.attributes) : {}; // 插播再2个地方存储
-            if (stream.streamType == 3 || stream.streamType == 4 || obj.stream_type == 4) {
-              info.streaming = true;
-              info.streamId = stream.streamId;
-              info.streamType = obj.stream_type || stream.streamType;
-              info.accountId = u.accountId;
-              if (obj.stream_type == 4 || stream.streamType == 4) {
-                info.isInsterStream = true;
-              }
-            }
-          });
-        });
-        info.remoteUsers = inavInfo.remote.users;
-        info.localUser = inavInfo.local.user;
-        return info;
-      },
       /**
        * 设置主讲人
        * @param {Number | String} accountId 用户ID
        * @Function void()
        */
       setSpeaker(accountId, setMainScreen = true) {
-        if (accountId) {
-          const streamInfo = this.getDesktopAndInStreamInfo();
-          const users = streamInfo.remoteUsers.concat(streamInfo.localUser);
-          const mainScreenUser = users.find(u => u.accountId === accountId) || { streams: [] };
-          const mainScreenStream =
-            mainScreenUser.streams.find(s => [2, '2'].includes(s.streamType)) || {};
-          if (!mainScreenStream.streamId) {
-            this.$message.error('设置主讲人失败，请刷新后重试');
-            return;
-          }
-        }
+        //设置主屏幕
         if (setMainScreen) {
           this.interactiveServer
             .setMainScreen({
@@ -1933,6 +1888,7 @@
               console.log('setmainscreen failed ::', err);
             });
         }
+        //设置主讲人
         return this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId

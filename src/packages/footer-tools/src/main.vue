@@ -3,7 +3,7 @@
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
-        设置
+        {{ $t('account.account_1005') }}
       </div>
       <div class="vmp-footer-tools__left-online" v-if="roomBaseState.watchInitData.online.show">
         <i class="vh-iconfont vh-line-user"></i>
