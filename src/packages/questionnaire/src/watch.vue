@@ -71,15 +71,18 @@
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
           useChatServer().addChatToList({
+            nickName: msg.nick_name,
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
               text_content: this.$t('chat.chat_1030'),
               questionnaire_id: msg.questionnaire_id
             },
             roleName: msg.room_role,
-            type: msg.data.type,
+            type: msg.type,
             interactStatus: true,
             isCheck: true
           });
+
           this.dialogVisible = true;
           await this.$nextTick(); // 等dom渲染
           this.questionnaireServer.renderQuestionnaire4Watch(

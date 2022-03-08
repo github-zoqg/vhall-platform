@@ -19,10 +19,7 @@
         <section class="vmp-media-setting-content">
           <main class="vmp-media-setting-content-main">
             <!-- 基础设置 -->
-            <basic-setting
-              v-show="selectedMenuItem === 'basic-setting'"
-              @rateChangeToHD="rateChangeToHD"
-            />
+            <basic-setting v-show="selectedMenuItem === 'basic-setting'" />
             <!-- 摄像头 -->
             <video-setting ref="videoSetting" v-show="selectedMenuItem === 'video-setting'" />
             <!-- 麦克风 -->
@@ -88,16 +85,9 @@
   import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
 
   import { getDiffObject } from './js/getDiffObject';
+  import { LIVE_MODE_MAP } from './js/liveMap';
 
-  const confirmListener = {
-    cb: null,
-    on(cb) {
-      this.cb = cb;
-    },
-    emit(action) {
-      this.cb(action);
-    }
-  };
+  import mediaSettingConfirm from './js/showConfirm';
 
   export default {
     name: 'VmpPcMediaSetting',
@@ -119,8 +109,8 @@
         isConfirmVisible: false, // 确定框可视性
         selectedMenuItem: 'basic-setting',
         alertText: '修改设置后会导致重新推流，是否继续保存？',
-        isRateChangeToHD: false,
-        liveMode: 0 // 1-音频 2-视频 3-互动
+        liveMode: 0, // 1-音频 2-视频 3-互动 6-分组
+        LIVE_MODE_MAP
       };
     },
     computed: {
@@ -139,6 +129,14 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
+
+      mediaSettingConfirm.onShow(text => {
+        this.alertText = text;
+        this.isConfirmVisible = true;
+      });
+    },
+    beforeDestroy() {
+      mediaSettingConfirm.destory();
     },
     methods: {
       showMediaSetting() {
@@ -151,27 +149,16 @@
         this.$refs['videoSetting'].destroyStream();
       },
 
-      showConfirm(text) {
-        this.alertText = text;
-        this.isConfirmVisible = true;
-        return new Promise(resolve => {
-          confirmListener.on(action => resolve(action));
-        });
-      },
-
       confirmSave() {
         this.isConfirmVisible = false;
-        confirmListener.emit('confirm');
+        mediaSettingConfirm.dispatchAction('confirm');
       },
 
       closeConfirm() {
         this.isConfirmVisible = false;
-        confirmListener.emit('close');
+        mediaSettingConfirm.dispatchAction('close');
       },
 
-      rateChangeToHD(value) {
-        this.rateChangeToHD = value;
-      },
       changeSelectedMenuItem(id) {
         this.selectedMenuItem = id;
       },
@@ -204,11 +191,8 @@
 
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
-          let text = '修改设置后导致重新推流，是否继续保存';
-          if (this.isRateChangeToHD) {
-            text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
-          }
-          action = await this.showConfirm(text);
+          const text = '修改设置后导致重新推流，是否继续保存';
+          action = await mediaSettingConfirm.show(text);
         }
 
         if (action === 'not-living' || action === 'confirm') {

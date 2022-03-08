@@ -57,7 +57,7 @@
 
 <script>
   // import EventBus from '@/utils/Events';
-  import { useWatchRewardServer } from 'middle-domain';
+  import { useWatchRewardServer, useChatServer } from 'middle-domain';
   import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
@@ -91,8 +91,11 @@
       };
     },
     mounted() {
+      this.chatServer = useChatServer();
       this.rewardServer = useWatchRewardServer();
-      this.rewardServer.$on('reward_pay_ok', this.rewardFn);
+      this.rewardServer.$on('reward_pay_ok', msg => {
+        this.rewardFn(msg);
+      });
       // EventBus.$on('reward_pay_ok', this.rewardFn);
     },
     beforeDestroy() {

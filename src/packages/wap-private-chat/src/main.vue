@@ -10,6 +10,7 @@
           :data-sources="privateChatList"
           :data-component="msgItem"
           :extra-props="{}"
+          @tobottom="tobottom"
         ></virtual-list>
       </div>
     </div>
@@ -26,14 +27,16 @@
   import msgItem from './components/msg-item';
   import { useChatServer, useRoomBaseServer, useUserServer, useMsgServer } from 'middle-domain';
   import sendBox from '@/packages/chat-wap/src/components/send-box';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  // import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpWapPrivateChat',
     components: {
       sendBox,
       VirtualList
     },
+    mixins: [emitter],
     data() {
       return {
         msgItem,
@@ -100,9 +103,10 @@
       },
       //事件监听
       listenEvents() {
-        // this.chatServer.$on('receivePrivateMsg', msg => {
-        //   this.privateChatList.push(msg);
-        // });
+        this.chatServer.$on('receivePrivateMsg', msg => {
+          this.unReadMessageCount++;
+          this.dispatch('TabContent', 'noticeHint', 'private');
+        });
       },
       //发送消息
       sendMsg(value) {
@@ -131,6 +135,9 @@
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
         });
+      },
+      tobottom() {
+        this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部
       isBottom() {

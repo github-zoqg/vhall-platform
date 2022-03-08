@@ -52,6 +52,11 @@
         opened: false
       };
     },
+    computed: {
+      userId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
+      }
+    },
     filters: {
       splitLenStr: function (name, len) {
         return name && name.length > len ? name.substring(0, len) + '...' : name;
@@ -61,15 +66,29 @@
       openRedPacket() {
         // if (this.accepted) return;
         // this.accepted = true;
-        this.redPacketServer.openRedPacket().then(res => {
-          if (res.code === 200) {
+        if (this.userId == 0) {
+          return this.$emit('needLogin');
+        }
+        const available = this.redPacketServer.state.available;
+        if (available) {
+          this.redPacketServer.openRedPacket().then(res => {
+            if (res.code === 200) {
+              this.opened = true;
+              const st = setTimeout(() => {
+                clearTimeout(st);
+                this.$emit('navTo', 'RedPacketSuccess');
+              }, 1000);
+            }
+          });
+        } else {
+          this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
             this.opened = true;
             const st = setTimeout(() => {
               clearTimeout(st);
               this.$emit('navTo', 'RedPacketSuccess');
             }, 1000);
-          }
-        });
+          });
+        }
       }
     }
   };

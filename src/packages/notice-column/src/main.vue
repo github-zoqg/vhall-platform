@@ -30,10 +30,12 @@
     },
     created() {
       const { latestNotice } = this.noticeServer.state;
+      const { groupInitData } = this.groupServer.state;
       if (
         latestNotice.total &&
         latestNotice.created_at &&
-        this.roomBaseServer.state.watchInitData.webinar.type == 1
+        this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+        !groupInitData.isInGroup
       ) {
         this.isNoticeColumn = true;
         this.noticeText = latestNotice.noticeContent;
@@ -55,6 +57,12 @@
           }
         });
         this.noticeServer.$on('live_over', () => {
+          this.isNoticeColumn = false;
+        });
+        this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
+          this.isNoticeColumn = false;
+        });
+        this.groupServer.$on('GROUP_SWITCH_END', () => {
           this.isNoticeColumn = false;
         });
       },

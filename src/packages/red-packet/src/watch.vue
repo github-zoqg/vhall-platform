@@ -4,9 +4,10 @@
     <div class="vhsaas-interact-mask">
       <components
         :is="componentsView"
-        :amount="redPacketServerState.amount"
+        :amount="redPacketServerState.amount * 1"
         :red-packet-info="redPacketServerState.info"
         @navTo="navTo"
+        @needLogin="handleGoLogin"
       >
         <!-- close按钮 -->
         <i class="vhsaas-red-packet-close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
@@ -16,6 +17,7 @@
 </template>
 <script>
   import { useRedPacketServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
     name: 'VmpRedPacketWatch',
@@ -38,7 +40,9 @@
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
     },
     created() {
       this.initEvent();
@@ -56,6 +60,13 @@
           }
           this.dialogVisible = true;
         });
+      },
+      openRedPacket(uuid) {
+        this.dialogVisible = true;
+        this.open(uuid);
+      },
+      handleGoLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       initEvent() {
         this.redPacketServer.$on(RED_ENVELOPE_OK, data => {

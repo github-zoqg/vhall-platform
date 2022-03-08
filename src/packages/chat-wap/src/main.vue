@@ -17,7 +17,13 @@
         :data-key="'count'"
         :data-sources="chatList"
         :data-component="msgItem"
-        :extra-props="{ previewImg: previewImg.bind(this) }"
+        :extra-props="{
+          previewImg: previewImg.bind(this),
+          emitLotteryEvent,
+          emitQuestionnaireEvent,
+          joinInfo
+        }"
+        @tobottom="tobottom"
       ></virtual-list>
       <div
         class="vmp-chat-wap__content__new-msg-tips"
@@ -51,6 +57,7 @@
   import { ImagePreview } from 'vant';
   import defaultAvatar from './img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatWap',
     components: {
@@ -58,6 +65,7 @@
       // msgItem,
       sendBox
     },
+    mixins: [emitter],
     data() {
       const { chatList } = this.chatServer.state;
       return {
@@ -215,23 +223,22 @@
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
-            this.tipMsg = `有${this.unReadMessageCount}条未读消息`;
-          } else {
-            this.scrollBottom();
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
+          this.dispatch('TabContent', 'noticeHint', 3);
         });
         //监听@我的消息
         chatServer.$on('atMe', () => {
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
-            this.tipMsg = '有人@你';
+            this.tipMsg = this.$t('chat.chat_1075');
           }
         });
         //监听回复我的消息
         chatServer.$on('replyMe', () => {
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
-            this.tipMsg = '有人回复你';
+            this.tipMsg = this.$t('chat.chat_1076');
           }
         });
         //监听禁言通知
@@ -304,6 +311,11 @@
           this.isHasUnreadAtMeMsg = false;
         });
       },
+      //监听滚动条滚动到底部
+      tobottom() {
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
+      },
       //滚动条是否在最底部
       isBottom() {
         return (
@@ -323,6 +335,20 @@
       //自己发送消息后的回调
       sendMsgEnd() {
         this.scrollBottom();
+      },
+      //todo domain负责 抽奖情况检查
+      emitLotteryEvent(msg) {
+        console.log('emitLotteryEvent', msg);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
+        );
+      },
+      //todo domain负责 问卷情况检查
+      emitQuestionnaireEvent(questionnaireId) {
+        console.log('emitQuestionnaireEvent', questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
+        );
       }
     }
   };

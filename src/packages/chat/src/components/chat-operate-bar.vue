@@ -57,9 +57,13 @@
           <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
           <!--            {{ $t('common.common_1008') }}-->
           <!--          </i>-->
+          <!-- 主持人不在小组或组长在小组显示聊天设置 -->
           <div
             class="chat-setting-btn--chat-auth"
-            v-if="configList['comment_check'] || configList['disable_msg']"
+            v-if="
+              ((roleName == 1 && !isInGroup) || (roleName == 20 && isInGroup)) &&
+              (configList['comment_check'] || configList['disable_msg'])
+            "
           >
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
@@ -89,7 +93,7 @@
               <div
                 class="chat-setting-box__item join-chat-btn"
                 @click="joinChatAuth"
-                v-if="configList['comment_check']"
+                v-if="roleName == 1 && configList['comment_check']"
               >
                 进入聊天审核
               </div>
@@ -116,6 +120,7 @@
 </template>
 
 <script>
+  import { useGroupServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
@@ -127,6 +132,10 @@
       ChatInput
     },
     computed: {
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
       }
@@ -203,6 +212,9 @@
         //是否是助理
         assistantType: this.$route.query.assistantType
       };
+    },
+    beforeCreate() {
+      this.groupServer = useGroupServer();
     },
     mounted() {},
     methods: {

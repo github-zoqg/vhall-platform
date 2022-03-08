@@ -35,10 +35,10 @@
     .textlink {
       width: 100%;
       height: 24px;
-      font-size: 14px;
+      font-size: 28px;
       font-weight: 400;
       color: #3562fa !important;
-      line-height: 24px;
+      line-height: 28px;
       // text-align: center;
       & > span:hover {
         cursor: pointer;

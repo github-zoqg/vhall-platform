@@ -164,6 +164,7 @@
 
         <el-tooltip content="下麦" placement="bottom">
           <span
+            v-show="stream.attributes.roleName != 1"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
           ></span>

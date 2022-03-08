@@ -124,12 +124,12 @@
       listenEvents() {
         const _this = this;
         // 加入房间消息
-        this.msgServer.$on('JOIN', msg => {
+        this.msgServer.$onMsg('JOIN', msg => {
           console.log(msg, '加入房间消息');
           this.handleGroupPerson(msg, 'JOIN');
         });
         // 离开房间消息
-        this.msgServer.$on('LEFT', msg => {
+        this.msgServer.$onMsg('LEFT', msg => {
           console.log(msg, '离开房间消息');
           this.handleGroupPerson(msg, 'LEFT');
         });
@@ -143,13 +143,13 @@
           const { type = '' } = temp.data || {};
           switch (type) {
             case 'group_leader_change':
-              handleGroupLeaderChange(temp);
+              // handleGroupLeaderChange(temp);
               break;
             case 'group_join_info':
-              handleGroupJoinInfoChange(temp);
+              // handleGroupJoinInfoChange(temp);
               break;
             case 'room_channel_change':
-              handleChannelChange(temp);
+              // handleChannelChange(temp);
               break;
             case 'main_room_join_change':
               handleMainRoomJoinChange(temp);
@@ -158,6 +158,61 @@
               break;
           }
         });
+        //开始讨论
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
+          console.log('开始讨论', msg);
+          _this.initList();
+        });
+        //结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          console.log('结束讨论', msg);
+          _this.initList();
+        });
+        //解散小组
+        this.groupServer.$on('GROUP_DISBAND', () => {
+          console.log('解散小组');
+          _this.initList();
+        });
+        // 踢出小组
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          console.log('踢出小组事件');
+          handleGroupKicked(msg);
+        });
+        //切换频道
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
+          console.log('切换频道', msg);
+          _this.initList();
+        });
+        // 切换组长(组长变更)
+        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          console.log('切换组长(组长变更)', msg);
+          handleGroupLeaderChange(msg);
+        });
+        //为上线的分组成员添加身份
+        this.groupServer.$on('GROUP_JOIN_INFO', msg => {
+          console.log('为上线成员添加身份', msg);
+          handleGroupJoinInfoChange(msg);
+        });
+        //切换分组
+        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+          console.log('切换分组', msg);
+          _this.initList();
+        });
+        //踢出小组
+        function handleGroupKicked(msg) {
+          if (!_this.groupInitData.isInGroup) return;
+          if (_this.userId == msg.data.target_id) {
+            _this.initList();
+          } else {
+            // 不等于时删除该人员
+            _this.list.forEach((item, index) => {
+              if (item.account_id == msg.data.target_id) {
+                _this.list.splice(index, 1);
+                _this.memberServer.updateState('onlineUsers', _this.list);
+              }
+            });
+          }
+        }
         // 组长改变的消息
         function handleGroupLeaderChange(msg) {
           console.log(msg, '组长改变的消息');
@@ -165,20 +220,11 @@
         // 人员身份更改
         function handleGroupJoinInfoChange(msg) {
           _this.list.forEach(item => {
-            if (item.account_id == msg.accountId) {
-              item.role_name = msg.join_role;
+            if (item.account_id == msg.data.accountId) {
+              item.role_name = msg.data.join_role;
             }
           });
           console.log(msg, '人员身份更改');
-        }
-        //切换channel
-        function handleChannelChange(msg) {
-          console.log('room_channel_change', msg);
-          setTimeout(() => {
-            _this.pageConfig.page = 0;
-            _this.list = [];
-            _this.getList();
-          }, 1000);
         }
         // 主房间人员变动
         function handleMainRoomJoinChange(msg) {
@@ -187,22 +233,27 @@
             // 进入主房间
             if (msg.data.isJoinMainRoom) {
               _this.list.push({
-                nickname: msg.nickname,
-                isBanned: msg.isBanned,
-                account_id: msg.accountId,
-                role_name: msg.role_name == 20 ? 2 : msg.role_name,
-                device_type: msg.device_type
+                nickname: msg.data.nickname,
+                isBanned: msg.data.isBanned,
+                account_id: msg.data.accountId,
+                role_name: msg.data.role_name == 20 ? 2 : msg.data.role_name,
+                device_type: msg.data.device_type
               });
             } else {
               _this.list.forEach((item, index) => {
-                if (item.account_id == msg.accountId) {
+                if (item.account_id == msg.data.accountId) {
                   _this.list.splice(index, 1);
                 }
               });
             }
-            console.log(msg, 'MAIN_ROOM_JOIN_CHANGE');
           }
         }
+      },
+      //初始化列表信息，然后重新请求列表数据
+      initList() {
+        this.pageConfig.page = 0;
+        this.list = [];
+        this.getList();
       },
       // 获取成员列表
       getList() {
@@ -223,7 +274,8 @@
               this.list.push(...list);
             }
             const uniqList = uniqBy(this.list, 'account_id');
-            this.list = this._sortUsers(uniqList);
+            this.list = this.memberServer._sortUsers(uniqList);
+            this.memberServer.updateState('onlineUsers', this.list);
             console.log(this.list);
             this.pageConfig.total = total;
             this.finished = this.list.length >= total;
@@ -231,6 +283,7 @@
               if (!this.pageConfig.page) return;
               this.pageConfig.page--;
             }
+            this.memberServer.updateState('totalNum', this.pageConfig.total);
           })
           .catch(error => {
             console.log(error, '请求在线人员错误');
@@ -257,58 +310,6 @@
         this.getList().finally(() => {
           this.refreshing = false;
         });
-      },
-      /**
-       * 将在线人员列表分为五个部分排序 主持人 / 上麦嘉宾 / 下麦嘉宾 / 助理 / 上麦观众 / 普通观众
-       */
-      _sortUsers(list) {
-        const host = []; // 主持人
-        const onMicGuest = []; // 上麦嘉宾
-        const downMicGuest = []; // 下麦嘉宾
-        const assistant = []; // 助理
-        const onMicAudience = []; // 上麦观众
-        let downMicAudience = []; // 普通观众
-        const leader = []; // 组长
-        list.forEach(item => {
-          switch (Number(item.role_name)) {
-            // 主持人
-            case 1:
-              host.push(item);
-              break;
-            // 观众
-            case 2:
-              item.is_speak ? onMicAudience.push(item) : downMicAudience.push(item);
-              break;
-            // 助理
-            case 3:
-              assistant.push(item);
-              break;
-            // 嘉宾
-            case 4:
-              item.is_speak ? onMicGuest.push(item) : downMicGuest.push(item);
-              break;
-            // 组长
-            case 20:
-              leader.push(item);
-              break;
-            default:
-              console.error('角色未定义');
-              break;
-          }
-        });
-
-        // 加载更多的时候，如果普通观众超过200，只显示后200
-        if (downMicAudience.length > 200) {
-          downMicAudience = downMicAudience.slice(-200);
-        }
-        return host.concat(
-          onMicGuest,
-          downMicGuest,
-          assistant,
-          leader,
-          onMicAudience,
-          downMicAudience
-        );
       },
       // 人员加入或者离开房间
       handleGroupPerson(info, type) {
@@ -342,7 +343,7 @@
 
         if (type === 'JOIN' && index === -1) {
           this.list.push(temp);
-          this.list = this._sortUsers(this.list);
+          this.list = this.memberServer._sortUsers(this.list);
           this.pageConfig.total++;
           console.log(temp, '上线人员信息');
           return;

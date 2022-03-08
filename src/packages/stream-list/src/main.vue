@@ -26,6 +26,7 @@
             <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
           </div>
         </div>
+
         <template v-if="remoteStreams.length">
           <div
             v-for="stream in remoteStreams"
@@ -42,6 +43,19 @@
             </div>
           </div>
         </template>
+
+        <!-- 主持人进入小组后助理占位图 -->
+        <div
+          v-if="mode == 6 && isHostInGroup && !isInGroup"
+          class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
+          :class="{
+            'vmp-dom__mini': miniElement == 'stream-list',
+            'vmp-dom__max': miniElement != 'stream-list'
+          }"
+        >
+          <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
+          小组协作中
+        </div>
       </div>
     </div>
 
@@ -69,7 +83,9 @@
       return {
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
-        isShowControlArrow: false // 是否展示左右按钮
+        isShowControlArrow: false, // 是否展示左右按钮
+        // 主持人是否在小组内
+        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group
       };
     },
 
@@ -161,6 +177,15 @@
           });
         this.interactiveServer.state.showPlayIcon = true;
       });
+
+      // 主持人进入退出小组 消息监听
+      this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
+        if (msg.data.status == 'enter') {
+          this.isHostInGroup = true;
+        } else if (msg.data.status == 'quit') {
+          this.isHostInGroup = false;
+        }
+      });
     },
 
     mounted() {},
@@ -249,6 +274,22 @@
       &.right-btn {
         border-radius: 0 4px 0 0;
         background: linear-gradient(90deg, rgba(84, 84, 84, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
+      }
+    }
+
+    // 主持人在小组内占位图
+    &__host-placeholder-in-group {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      background: #2d2d2d;
+      flex-direction: column;
+      color: #999;
+      justify-content: center;
+      text-align: center;
+      i {
+        display: block;
+        font-size: 40px;
       }
     }
   }

@@ -61,10 +61,15 @@
         this.dialogVisible = false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
+      /**
+       * @description 聊天区域点击,显示中奖信息
+       */
       accept(msg) {
-        this.setFitment(msg);
-        this.lotteryView = 'LotteryWin';
-        this.dialogVisible = true;
+        this.open(msg.lottery_id);
+        // console.log('accept', msg);
+        // this.setFitment(msg);
+        // this.lotteryView = 'LotteryWin';
+        // this.dialogVisible = true;
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
@@ -72,6 +77,7 @@
       open(uuid = '') {
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
+          this.lotteryId = data.id;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中

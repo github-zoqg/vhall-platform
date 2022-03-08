@@ -53,11 +53,11 @@
                 list-type="text"
                 :show-file-list="false"
               >
-                <el-button type="primary">{{ $t('doc.doc_1027') }}</el-button>
+                <el-button type="primary" round>{{ $t('doc.doc_1027') }}</el-button>
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
-              <el-button v-if="!isWatch" @click="handleGotoDoclib">
+              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
@@ -113,7 +113,8 @@
 
               <!-- 搜索框 -->
               <el-input
-                style="width: 220px; float: right"
+                class="input-search"
+                style="float: right"
                 placeholder="请输入文档名称"
                 v-model="docSearchKey"
                 clearable
@@ -201,7 +202,7 @@
         <div v-if="!isWatch" class="vmp-doc-lib" v-show="mode === 2">
           <div class="vmp-doc-lib__hd">
             <el-input
-              style="width: 220px"
+              class="input-search"
               placeholder="请输入文档名称"
               v-model="doclibSearchKey"
               clearable
@@ -264,8 +265,8 @@
               个文档
             </div>
             <div>
-              <el-button type="primary" @click="handleDoclibSubmit">确定</el-button>
-              <el-button @click="handleDoclibCancel">取消</el-button>
+              <el-button type="primary" round @click="handleDoclibSubmit">确定</el-button>
+              <el-button round @click="handleDoclibCancel">取消</el-button>
             </div>
           </div>
         </div>
@@ -731,7 +732,7 @@
       justify-content: center;
       p {
         line-height: 60px;
-        font-size: 14px;
+        font-size: 15px;
         color: #999;
       }
     }
@@ -798,6 +799,13 @@
     .doc-uploader {
       display: inline;
       margin-right: 20px;
+    }
+
+    .input-search {
+      width: 220px;
+      .el-input__inner {
+        border-radius: 100px;
+      }
     }
   }
 

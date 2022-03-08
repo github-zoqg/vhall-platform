@@ -38,6 +38,7 @@
         </span>
         <span
           class="gift-img"
+          :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
             backgroundImage: `url(${rewardEffectInfo.data.gift_image_url}?x-oss-process=image/resize,m_lfit,w_100)`
           }"
@@ -50,7 +51,7 @@
 <script>
   import { useRoomBaseServer, useGiftsServer, useChatServer } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -207,7 +208,7 @@
     // .flex();
     position: absolute;
     left: 16px;
-    top: 24px;
+    top: 620px;
     z-index: 100;
     .reward-effect-box {
       width: 480px;
@@ -242,6 +243,9 @@
         position: absolute;
         left: 8px;
         top: 22px;
+        background: white;
+        border-radius: 50%;
+        overflow: hidden;
       }
     }
     .money-img {
@@ -261,6 +265,15 @@
       background-position: center;
       background-size: contain;
       z-index: 10;
+    }
+
+    .zdy-gigt-img {
+      width: 80px;
+      height: 80px;
+      background-color: white;
+      border-radius: 50%;
+      top: -10px;
+      right: 20px;
     }
     .nick-name {
       width: 252px;
