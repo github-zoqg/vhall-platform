@@ -49,7 +49,7 @@
         winLotteryUserList: [], // 抽奖的结果
         prizeInfo: {}, // 奖品信息
         lotteryInfo: {},
-        disabledTime: 5 // 5秒禁止点击
+        disabledTime: 0 // 5秒禁止点击
       };
     },
     provide() {
