@@ -133,6 +133,8 @@
       ['groupServer.state.groupInitData.presentation_screen'](presenterId) {
         if (presenterId && presenterId == this.userId) {
           this.isCollapse = false;
+        } else {
+          this.isCollapse = true;
         }
       }
     },
