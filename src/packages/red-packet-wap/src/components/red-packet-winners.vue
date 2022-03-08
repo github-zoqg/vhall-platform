@@ -78,12 +78,7 @@
           return {};
         }
       },
-      amount: {
-        type: Number,
-        default() {
-          return 0;
-        }
-      }
+      amount: [String, Number]
     },
     filters: {
       splitLenStr: function (name, len) {

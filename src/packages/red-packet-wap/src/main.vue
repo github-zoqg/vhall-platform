@@ -65,8 +65,9 @@
           this.open(uuid);
         });
       },
-      openRedPacket() {
+      openRedPacket(uuid) {
         this.dialogVisible = true;
+        this.open(uuid);
       },
       handleGoLogin() {
         this.dialogVisible = false;
