@@ -6,6 +6,7 @@
         v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && !live_over"
         style="position: relative"
         auth="{ 'ui.hide_reward': 0 }"
+        :class="`${live_over}`"
       >
         <i
           v-if="!handUpStatus"
@@ -76,7 +77,7 @@
     useMicServer,
     useChatServer,
     useGroupServer,
-    useInteractiveServer,
+    useMsgServer,
     useMediaCheckServer
   } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
@@ -173,16 +174,22 @@
       });
 
       // 结束直播
-      useInteractiveServer().$on('live_over', () => {
-        this.live_over = true;
+      useMsgServer().$onMsg('ROOM_MSG', msg => {
+        if (msg.data.type === 'live_over') {
+          this.live_over = true;
+        }
       });
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$toast(this.$t('interact.interact_1003'));
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1003'));
+        }
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$toast(this.$t('interact.interact_1002'));
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1002'));
+        }
       });
     },
     methods: {

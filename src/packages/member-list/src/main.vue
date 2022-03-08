@@ -1757,6 +1757,10 @@
           .hostAgreeApply(params)
           .then(res => {
             console.log(res);
+            if (res.code !== 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
