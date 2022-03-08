@@ -34,7 +34,7 @@
                 创建问卷
               </el-button>
               <el-input
-                v-model="queryParams.keyword"
+                v-model="keyword"
                 placeholder="请输入问卷名称"
                 style="width: 220px; float: right"
                 @keyup.enter.native="queryQuestionnaireList"
@@ -159,6 +159,7 @@
           pageNum: 1,
           keyword: ''
         },
+        keyword: '', //input的value;
         questionnaireCreateInfo: null, // 已创建弹窗的中转
         saveDialogVisible: false, // 同步问卷弹窗
         shareQuestionnaire: true, // 同步到管理
@@ -223,6 +224,7 @@
        */
       queryQuestionnaireList() {
         this.loading = true;
+        this.queryParams.keyword = this.keyword;
         this.questionnaireServer
           .queryQuestionnaireList({
             keyword: this.queryParams.keyword,
