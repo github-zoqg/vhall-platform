@@ -70,6 +70,7 @@
 <script>
   import { useMediaSettingServer } from 'middle-domain';
   import { LIVE_MODE_MAP } from '../../js/liveMap';
+  import mediaSettingConfirm from '../../js/showConfirm';
 
   import FloatImg from '../../assets/img/float.png';
   import TiledImg from '../../assets/img/tiled.png';
@@ -79,6 +80,7 @@
       return {
         loading: false,
         mediaState: this.mediaSettingServer.state,
+        lastSelectRate: '', // 上一选中的值
         ratesConfig: Object.freeze([
           'RTC_VIDEO_PROFILE_720P_16x9_M', // 超清
           'RTC_VIDEO_PROFILE_480P_16x9_M', // 高清
@@ -120,6 +122,11 @@
         return this.layoutConfig;
       }
     },
+    watch: {
+      'mediaState.rate': function (cur, old) {
+        this.lastSelectRate = old;
+      }
+    },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
     },
@@ -157,13 +164,12 @@
         ]);
         return this.$t(map.get(label));
       },
-      rateChange(selected) {
-        let isRateChangeToHD = false;
-
+      async rateChange(selected) {
         if (selected === 'RTC_VIDEO_PROFILE_720P_16x9_M') {
-          isRateChangeToHD = true;
+          const text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+          const action = await mediaSettingConfirm.show(text);
+          action === 'close' && (this.mediaState.rate = this.lastSelectRate);
         }
-        this.$emit('rateChangeToHD', isRateChangeToHD);
       }
     }
   };
