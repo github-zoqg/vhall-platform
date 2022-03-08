@@ -324,8 +324,10 @@
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
-      checkLotteryIcon() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      checkLotteryIcon(redPacketId) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryIcon', [redPacketId])
+        );
       },
       checkredPacketIcon() {
         window.$middleEventSdk?.event?.send(
