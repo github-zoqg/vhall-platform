@@ -280,7 +280,7 @@ if (['serve', 'build'].includes(cmd)) {
   process.env.VUE_APP_BUILD_HASH = argv.hash;
 
   // 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
-  if(argv.middle) {
+  if (argv.middle) {
     process.env.VUE_APP_ROUTER_BASE_URL = argv.project;
   }
 
