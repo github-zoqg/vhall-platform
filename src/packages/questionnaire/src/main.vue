@@ -129,7 +129,14 @@
         <el-checkbox v-model="shareQuestionnaire">共享到资料管理</el-checkbox>
       </div>
       <div class="async__footer" slot="footer">
-        <el-button type="primary" @click="saveQuestionnaire(true)" round>确 定</el-button>
+        <el-button
+          type="primary"
+          :disabled="!saveDialogVisible"
+          @click="saveQuestionnaire(true)"
+          round
+        >
+          确 定
+        </el-button>
         <el-button @click="saveQuestionnaire(false)" round>取 消</el-button>
       </div>
     </el-dialog>
