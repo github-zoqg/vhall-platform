@@ -1,10 +1,10 @@
 const confirm = {
   showCb: null,
-  confirmCb: null,
+  actionCb: null,
 
   destory() {
     this.showCb = null;
-    this.confirmCb = null;
+    this.actionCb = null;
   },
 
   onShow(cb) {
@@ -18,14 +18,14 @@ const confirm = {
 
     // 等待动作dispatch回调
     return new Promise(resolve => {
-      this.confirmCb = action => resolve(action);
+      this.actionCb = action => resolve(action);
     });
   },
 
   dispatchAction(action) {
     if (this.showCb === null) return;
 
-    this.confirmCb(action);
+    this.actionCb(action);
   }
 };
 

@@ -227,7 +227,7 @@
           const { join_role, isInGroup } = this.groupServer.state.groupInitData;
           // 如果是组长，并且在小组内
           if (join_role == 20 && isInGroup) {
-            this.$message.warning(`观众${msg.nick_name}拒绝了你的演示邀请`);
+            this.$message.warning(`观众${msg.data.nick_name}拒绝了你的演示邀请`);
           }
         });
 
