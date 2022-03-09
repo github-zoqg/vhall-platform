@@ -87,6 +87,15 @@ const playerMixins = {
           window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
         });
       }
+      // 横屏逻辑
+      window.addEventListener('orientationchange', () => {
+        if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
+          this.isOrientation = true;
+          this.setFullScreen();
+        } else {
+          this.isOrientation = false;
+        }
+      });
     },
     initSlider() {
       this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {
@@ -117,42 +126,44 @@ const playerMixins = {
         console.log(e);
       }
     },
+    setFullscreen() {
+      this.isFullscreen = true;
+      const element = document.getElementById('videoWapBox');
+      if (
+        !(
+          element.requestFullscreen ||
+          element.mozRequestFullScreen ||
+          element.webkitRequestFullscreen ||
+          element.msRequestFullscreen
+        )
+      ) {
+        this.playerServer.enterFullScreen();
+      }
+      if (element.requestFullscreen) element.requestFullscreen();
+      else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+      else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+      else if (element.msRequestFullscreen) element.msRequestFullscreen();
+    },
+    exitFullScreen() {
+      this.isFullscreen = false;
+      if (
+        !(
+          document.exitFullscreen ||
+          document.mozCancelFullScreen ||
+          document.webkitExitFullscreen ||
+          document.msExitFullscreen
+        )
+      ) {
+        this.playerServer.exitFullScreen();
+      }
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    },
     // 全屏
     enterFullscreen() {
-      if (this.isFullscreen) {
-        this.isFullscreen = false;
-        if (
-          !(
-            document.exitFullscreen ||
-            document.mozCancelFullScreen ||
-            document.webkitExitFullscreen ||
-            document.msExitFullscreen
-          )
-        ) {
-          this.playerServer.exitFullScreen();
-        }
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
-      } else {
-        this.isFullscreen = true;
-        const element = document.getElementById('videoWapBox');
-        if (
-          !(
-            element.requestFullscreen ||
-            element.mozRequestFullScreen ||
-            element.webkitRequestFullscreen ||
-            element.msRequestFullscreen
-          )
-        ) {
-          this.playerServer.enterFullScreen();
-        }
-        if (element.requestFullscreen) element.requestFullscreen();
-        else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
-        else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
-        else if (element.msRequestFullscreen) element.msRequestFullscreen();
-      }
+      this.isFullscreen ? this.exitFullScreen() : this.setFullscreen();
     },
     // 设置默认视频清晰度
     setDefaultQuality() {

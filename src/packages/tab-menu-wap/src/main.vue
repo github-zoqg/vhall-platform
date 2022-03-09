@@ -167,13 +167,14 @@
           this.setVisible({ visible: false, type: 'private' });
         });
         // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_change', val => {
+          console.log('dispatch_doc_switch_change', val);
+          this.changeDocStatus(val);
+        });
+        // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_status', val => {
           console.log('dispatch_doc_switch_status', val);
-          this.setVisible({ visible: val, type: 2 });
-          if (val) {
-            let obj = this.getItem({ type: 2 });
-            this.select({ type: obj.type, id: obj.id });
-          }
+          this.changeDocStatus(val);
         });
         //监听进出子房间消息
         groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
@@ -189,6 +190,13 @@
             }
           }
         });
+      },
+      changeDocStatus(val) {
+        this.setVisible({ visible: val, type: 2 });
+        if (val) {
+          let obj = this.getItem({ type: 2 });
+          this.select({ type: obj.type, id: obj.id });
+        }
       },
       /**
        * 初始化配置

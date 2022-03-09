@@ -12,7 +12,8 @@ import {
   useUserServer,
   useGroupServer,
   useDesktopShareServer,
-  useSplitScreenServer
+  useSplitScreenServer,
+  useInsertFileServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -37,6 +38,7 @@ export default new DomainStore.Store({
     userServer: useUserServer().state,
     groupServer: useGroupServer().state,
     desktopShareServer: useDesktopShareServer().state,
-    splitScreenServer: useSplitScreenServer().state
+    splitScreenServer: useSplitScreenServer().state,
+    insertFileServer: useInsertFileServer().state
   }
 });

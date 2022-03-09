@@ -5,7 +5,7 @@
         <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
           <img :src="NoDelayImg" />
         </i>
-        {{ title }}
+        {{ languagesInfo.subject }}
       </header>
       <main class="vmp-intro-block__detail">
         <p>
@@ -115,13 +115,16 @@
       isNoDelay() {
         return this.webinar.no_delay_webinar === 1;
       },
-      // 标题 Type:String
-      title() {
-        return this?.webinar?.subject || '';
-      },
+      // 标题 Type:String 多语言不需要用
+      // title() {
+      //   return this?.webinar?.subject || '';
+      // },
       // 开始时间 Type:String
       startTime() {
         return this?.webinar?.start_time?.substr(0, 16) || '';
+      },
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
       },
       // 在线人数或订阅人数 Type:String
       personCount() {
@@ -132,7 +135,7 @@
       },
       // 简介富文本正文 Type:String
       content() {
-        return this?.webinar?.introduction || '<p></p>';
+        return this.languagesInfo.introduction || '<p></p>';
       }
     }
   };

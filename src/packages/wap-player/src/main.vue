@@ -15,7 +15,11 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-wap-player" @click.stop.prevent="videoShowIcon">
+      <div
+        id="vmp-wap-player"
+        style="width: 100%; height: 100%"
+        @click.stop.prevent="videoShowIcon"
+      >
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -81,7 +85,7 @@
       <!-- 底部操作栏  点击 暂停 全屏 播放条 :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']" -->
       <div
         class="vmp-wap-player-footer"
-        v-show="isPlayering"
+        v-show="isPlayering && !isOrientation"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
       >
         <!-- 倍速和画质合并 -->
@@ -289,8 +293,8 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id) {
+        const { warmup, webinar, join_info } = this.roomBaseState.watchInitData;
+        if (warmup && warmup.warmup_paas_record_id && join_info.is_subscribe == 1) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -360,6 +364,7 @@
           speed: 0,
           autoplay: false
         },
+        isOrientation: false,
         lang: {},
         languageList: []
       };
@@ -389,6 +394,12 @@
     },
     mounted() {
       this.getWebinerStatus();
+      if (window.orientation == 90 || window.orientation == -90) {
+        this.isOrientation = true;
+        this.setFullscreen();
+      } else {
+        this.isOrientation = false;
+      }
     },
     methods: {
       startPlay() {

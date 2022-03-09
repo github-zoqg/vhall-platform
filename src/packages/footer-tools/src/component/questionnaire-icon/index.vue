@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-red-packet-icon" v-if="showIcon" @click="checkquestionIcon">
+  <div class="vmp-questionnaire-icon" v-if="showIcon" @click="checkquestionIcon">
     <img src="./images/question.png" alt="" />
     <i class="vmp-dot" v-if="showDot" />
   </div>
@@ -11,7 +11,7 @@
   import { useQuestionnaireServer } from 'middle-domain';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 支付成功消息
   export default {
-    name: 'QuestionIcon',
+    name: 'QuestionnaireIcon',
     data() {
       return {
         showIcon: false, //显示图标
@@ -25,7 +25,7 @@
       });
     },
     created() {
-      // this.initStatus();
+      this.initStatus();
       this.questionServer.$on(QUESTIONNAIRE_PUSH, this.handleNewquestion);
     },
     destroyed() {
@@ -33,8 +33,7 @@
     },
     methods: {
       initStatus() {
-        // const questionInfo = this.$domainStore.state.roomBaseServer;
-        // console.log(questionInfo, 'questionInfo');
+        // this.questionServer.
       },
       checkquestionIcon() {
         this.$emit('clickIcon', this.lastUUID);
@@ -49,7 +48,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-red-packet-icon {
+  .vmp-questionnaire-icon {
     color: #fff;
     margin-left: 16px;
     position: relative;
