@@ -133,7 +133,10 @@
           this.$domainStore.state.interactiveServer.remoteStreams,
           this.micServer.state.isSpeakOn
         );
-        if (this.micServer.state.isSpeakOn) {
+        if (
+          this.micServer.state.isSpeakOn &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2
+        ) {
           // 远端流个数改变且 在推流 才进行初始化BScroll
           this.createBScroll();
         }
@@ -222,7 +225,9 @@
     mounted() {
       // 在麦上 才存在滑动情况
       if (this.micServer.state.isSpeakOn) {
-        this.createBScroll();
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
+          this.createBScroll();
+        }
         if (window.orientation == 90 || window.orientation == -90) {
           this.setFullScreen();
         }
@@ -619,7 +624,7 @@
       }
       .vmp-stream-list__main-screen {
         position: absolute;
-        left: 0;
+        left: 0 !important;
         top: 0;
         width: 100%;
         height: calc(100% - 85px);
