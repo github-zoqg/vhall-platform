@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-questionnaire-icon" v-if="showIcon" @click="checkquestionIcon">
-    <img src="./images/question.png" alt="" />
+    <img src="./images/questionnaire.png" alt="" />
     <i class="vmp-dot" v-if="showDot" />
   </div>
 </template>
@@ -14,7 +14,7 @@
     name: 'QuestionnaireIcon',
     data() {
       return {
-        showIcon: false, //显示图标
+        showIcon: true, //显示图标
         showDot: false, // 显示小红点
         lastUUID: ''
       };
