@@ -41,38 +41,38 @@ export default {
   methods: {
     // ...mapMutations('watchBase', ['setDialogZIndexQueue', 'setToolsCount']),
     listenEvent() {
-      this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
-        // 添加聊天消息
-        const data = {
-          avatar: rawMsg.data.rewarder_avatar,
-          nickName:
-            rawMsg.data.rewarder_nickname.length > 8
-              ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
-              : rawMsg.data.rewarder_nickname,
-          type: 'reward_pay_ok',
-          content: {
-            text_content: rawMsg.data.reward_describe
-              ? rawMsg.data.reward_describe
-              : '很精彩，赞一个！',
-            num: rawMsg.data.reward_amount
-          },
-          sendId: this.userId,
-          roleName: this.roleName,
-          interactToolsStatus: true
-        };
-        this.chatServer.addChatToList(data);
-
-        if (this.userId == rawMsg.data.rewarder_id) {
-          this.closeDialog();
-          this.$message({
-            message: this.$t('common.common_1005'),
-            showClose: true,
-            // duration: 0,
-            type: 'success',
-            customClass: 'zdy-info-box'
-          });
-        }
-      });
+      // 改为飘屏组件监听
+      // this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
+      //   // 添加聊天消息
+      //   const data = {
+      //     avatar: rawMsg.data.rewarder_avatar,
+      //     nickName:
+      //       rawMsg.data.rewarder_nickname.length > 8
+      //         ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
+      //         : rawMsg.data.rewarder_nickname,
+      //     type: 'reward_pay_ok',
+      //     content: {
+      //       text_content: rawMsg.data.reward_describe
+      //         ? rawMsg.data.reward_describe
+      //         : '很精彩，赞一个！',
+      //       num: rawMsg.data.reward_amount
+      //     },
+      //     sendId: this.userId,
+      //     roleName: this.roleName,
+      //     interactToolsStatus: true
+      //   };
+      //   this.chatServer.addChatToList(data);
+      //   if (this.userId == rawMsg.data.rewarder_id) {
+      //     this.closeDialog();
+      //     this.$message({
+      //       message: this.$t('common.common_1005'),
+      //       showClose: true,
+      //       // duration: 0,
+      //       type: 'success',
+      //       customClass: 'zdy-info-box'
+      //     });
+      //   }
+      // });
     },
     /**
      * 价格格式限制

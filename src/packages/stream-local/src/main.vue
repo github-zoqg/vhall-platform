@@ -262,6 +262,14 @@
       //     !this.micServer.state.isSpeakOffToInit
       //   );
       // },
+      autoSpeak() {
+        // 观众自动上麦 - 禁音
+        return (
+          this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
+          this.mode == 6 &&
+          this.joinInfo.role_name == 2
+        );
+      },
       showInterIsPlay() {
         return (
           this.mainScreen == this.joinInfo.third_party_user_id &&
@@ -616,6 +624,13 @@
             if (this.mainScreen == this.joinInfo.third_party_user_id) {
               await this.setBroadCastScreen();
             }
+          }
+          // 分组活动 自动上麦默认禁音
+          if (this.autoSpeak) {
+            this.interactiveServer.muteAudio({
+              streamId: this.localStream.streamId, // 流Id, 必填
+              isMute: true // true为禁用，false为启用。
+            });
           }
           // 派发事件
           window.$middleEventSdk?.event?.send(

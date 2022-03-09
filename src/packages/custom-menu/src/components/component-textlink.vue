@@ -39,6 +39,7 @@
       font-weight: 400;
       color: #3562fa !important;
       line-height: 24px;
+      word-break: break-all;
       text-align: center;
       & > span:hover {
         cursor: pointer;
