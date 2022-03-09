@@ -675,6 +675,10 @@
   .vmp-wap-player {
     height: 100%;
     width: 100%;
+    &-video {
+      height: 100%;
+      width: 100%;
+    }
     // position: relative;
     &-opcity-flase {
       // opacity: 0;

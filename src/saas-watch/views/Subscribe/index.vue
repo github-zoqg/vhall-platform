@@ -14,7 +14,7 @@
   </div>
 </template>
 <script>
-  import { Domain } from 'middle-domain';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import ErrorPage from '../ErrorPage';
   export default {
@@ -41,6 +41,8 @@
         }
         await this.initReceiveLive(this.clientType);
         await subscribeState();
+        const roomBaseServer = useRoomBaseServer();
+        document.title = roomBaseServer.state.languages.curLang.subject;
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转观看页
