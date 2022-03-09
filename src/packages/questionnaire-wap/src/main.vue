@@ -47,7 +47,7 @@
               customClass: 'zdy-info-box'
             });
           } else {
-            this.dialogVisible = true;
+            this.popupVisible = true;
             this.$nextTick(() => {
               this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
             }); // 等dom渲染
