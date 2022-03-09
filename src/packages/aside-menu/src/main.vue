@@ -51,6 +51,10 @@
       // 是否开启了桌面共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.isShareScreen;
+      },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
       }
     },
     beforeCreate() {
@@ -70,7 +74,7 @@
       ['presenterId']() {
         this.resetMenus();
       },
-      ['isShareScreen'](val) {
+      ['isShareScreen']() {
         this.resetMenus();
       },
       ['roomBaseServer.state.configList']: {
@@ -79,6 +83,9 @@
         handler() {
           this.resetMenus();
         }
+      },
+      ['isInsertFilePushing']() {
+        this.resetMenus();
       },
       // // 演示者发生变化
       // presenterId() {
@@ -172,11 +179,12 @@
             } else {
               vn.setHiddenState(true); //隐藏
             }
-          } else if (vn.kind === 'insertMedia') {
-            if (this.isShareScreen) {
+            // 如果在插播就禁用
+            if (this.isInsertFilePushing) {
               vn.setDisableState(true);
               continue;
             }
+          } else if (vn.kind === 'insertMedia') {
             // 插播文件菜单
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);
@@ -195,6 +203,11 @@
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
               }
+            }
+            // 如果在桌面共享就禁用
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
             }
           } else if (vn.kind === 'interactTool') {
             // 互动工具菜单
