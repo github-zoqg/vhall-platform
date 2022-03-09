@@ -84,12 +84,23 @@
         selectedId: '',
         menu: [],
         isSubMenuShow: false,
+        visibleCondition: 'default',
         tabOptions: {}
       };
     },
     computed: {
       visibleMenu() {
-        return this.menu.filter(item => item.visible);
+        return this.menu.filter(item => {
+          if (this.visibleCondition === 'living') {
+            return (item.status == 1 || item.status == 3) && item.visible;
+          }
+
+          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible;
+        });
       },
       mainMenu() {
         return this.visibleMenu.filter((item, index) => index < 3);
@@ -108,6 +119,9 @@
       // 是否是试看
       isTryVideo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
     },
     beforeCreate() {
@@ -161,11 +175,26 @@
         chatServer.$on('receivePrivateMsg', () => {
           this.setVisible({ visible: true, type: 'private' });
         });
-        // 直播结束不展示入口
-        msgServer.$on('live_over', e => {
-          this.setVisible({ visible: false, type: 'v5' });
-          this.setVisible({ visible: false, type: 'private' });
+
+        if (this.isSubscribe) {
+          this.setVisibleCondition('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
+        }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_start') {
+            this.setVisibleCondition('living');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisibleCondition('live_over');
+            this.setVisible({ visible: false, type: 3 }); // chat
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+          }
         });
+
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
@@ -235,6 +264,13 @@
             status: 2
           });
         }
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living|predition]
+       */
+      setVisibleCondition(condition = 'default') {
+        this.visibleCondition = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
