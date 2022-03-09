@@ -1,5 +1,5 @@
 <template>
-  <div class="base-box">
+  <div class="base-box" v-if="!groupInitData.isInGroup">
     <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
@@ -34,6 +34,11 @@
         timerVisible: true,
         showSign: false
       };
+    },
+    computed: {
+      groupInitData() {
+        return this.$domainStore.state.groupServer.groupInitData;
+      }
     },
     methods: {
       changeStatus(data, status) {
@@ -74,8 +79,8 @@
     // width: 20px;
     .icon-wrap {
       margin-bottom: 10px;
-      width: 84px;
-      height: 84px;
+      max-width: 84px;
+      max-height: 84px;
       position: relative;
       background-color: transparent;
       img {
