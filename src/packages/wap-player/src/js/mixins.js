@@ -258,7 +258,7 @@ const playerMixins = {
           return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
         });
       if (sessionStorage.getItem('localSpeedValue')) {
-        this.currentSpeed = sessionStorage.getItem('localSpeedValue');
+        this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
         if (suc) {
