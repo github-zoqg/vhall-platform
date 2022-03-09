@@ -262,15 +262,6 @@
           });
         });
 
-        // 房间信令异常断开事件
-        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
-          Dialog.alert({
-            message: '网络异常导致互动房间连接失败'
-          }).then(() => {
-            window.location.reload();
-          });
-        });
-
         // 主持人进入退出小组 消息监听
         this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
           if (msg.data.status == 'enter') {
