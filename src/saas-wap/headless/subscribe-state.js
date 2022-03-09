@@ -62,7 +62,9 @@ export default async function () {
     await userServer.getUserInfo({ scene_id: 2 });
   }
 
-  await msgServer.init();
+  await msgServer.initMaintMsg({
+    hide: 1
+  });
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
   // TODO 方便查询数据，后面会删除
