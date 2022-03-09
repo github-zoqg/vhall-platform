@@ -3,7 +3,9 @@
     <lottery-header :prizeInfo="prizeInfo"></lottery-header>
     <p class="win-lottery-title">{{ $t('interact_tools.interact_tools_1015') }}</p>
     <p class="win-lottery-desc">
-      {{ $t('interact_tools.interact_tools_1016') }}“{{ prizeInfo.award_name }}”
+      {{ $t('interact_tools.interact_tools_1016') }}“{{
+        prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
+      }}”
     </p>
     <div class="lottery-accept-btn" @click="acceptLottery">
       {{ $t('interact_tools.interact_tools_1017') }}
