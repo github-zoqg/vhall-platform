@@ -143,7 +143,8 @@
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaire',
     provide() {
@@ -224,6 +225,25 @@
           if (res.code === 200) {
             this.initPage();
           }
+        });
+        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
+          let text = '主持人';
+          if (msg.room_role == '3') {
+            text = `助理${msg.nick_name}`;
+          } else if (msg.room_role == '4') {
+            text = `嘉宾${msg.nick_name}`;
+          }
+          const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
+          useChatServer().addChatToList({
+            nickName: '问卷',
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+            content: {
+              text_content: `${text}发起了问卷`,
+              questionnaire_id: msg.questionnaire_id
+            },
+            roleName: join_info.role_name,
+            type: msg.type
+          });
         });
       },
       /**
