@@ -67,7 +67,9 @@
     useQaServer,
     useChatServer,
     useDocServer,
-    useMsgServer
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
   } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
@@ -129,6 +131,7 @@
         const qaServer = useQaServer();
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -173,6 +176,20 @@
           console.log('dispatch_doc_switch_status', val);
           this.changeDocStatus(val);
         });
+        //监听进出子房间消息
+        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
+          }
+        });
       },
       changeDocStatus(val) {
         this.setVisible({ visible: val, type: 2 });
@@ -205,17 +222,17 @@
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 2, {
-            type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
-          });
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
             name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '问答', // 同上
             status: roomState.interactToolStatus.question_status ? 1 : 2
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '私聊', // 同上
+            status: 2
           });
         }
       },
