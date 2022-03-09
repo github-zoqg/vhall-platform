@@ -1,6 +1,6 @@
 <template>
   <div class="tools-box">
-    <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
+    <div class="icon-wrapper">
       <!-- 上麦 -->
       <div
         v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && webinarType == 1"
@@ -9,12 +9,12 @@
       >
         <i
           v-if="!handUpStatus"
-          class="vh-saas-iconfont vh-saas-line-drag"
+          class="vh-saas-iconfont vh-saas-line-shangmai"
           @click="$refs.handup.openConnectPop()"
         ></i>
         <i
           v-else
-          class="vh-saas-iconfont vh-saas-a-line-offthemicrophone"
+          class="vh-saas-iconfont vh-saas-line-shangmaizhong"
           @click="$refs.handup.openConnectPop()"
         ></i>
         <span class="red-dot" v-if="handUpStatus"></span>
@@ -27,45 +27,50 @@
           "
         />
       </div>
-      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
-        <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
-        <GiftCard
-          ref="gifts"
-          :isEmbed="localRoomInfo.isEmbed"
-          :joinInfoInGift="joinInfoInGift"
-          :roomId="localRoomInfo.room_id"
-          :localRoomInfo="localRoomInfo"
-          :cuid="cuid"
-        />
-      </div>
-      <!-- 打赏 -->
-      <div
-        v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward"
-        auth="{ 'ui.hide_reward': 0 }"
-      >
-        <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
-        <RewardCard
-          ref="reward"
-          :webinarData="webinarData"
-          :localRoomInfo="localRoomInfo"
-          :cuid="cuid"
-        />
-      </div>
-      <!-- 邀请卡 -->
-      <div v-if="showInviteCard && !localRoomInfo.isEmbed">
-        <a
-          target="_blank"
-          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+      <template v-if="!groupInitData.isInGroup">
+        <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
+          <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
+          <GiftCard
+            ref="gifts"
+            :isEmbed="localRoomInfo.isEmbed"
+            :joinInfoInGift="joinInfoInGift"
+            :roomId="localRoomInfo.room_id"
+            :localRoomInfo="localRoomInfo"
+            :cuid="cuid"
+          />
+        </div>
+        <!-- 打赏 -->
+        <div
+          v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward"
+          auth="{ 'ui.hide_reward': 0 }"
         >
-          <i class="vh-iconfont vh-line-share"></i>
-        </a>
-      </div>
+          <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
+          <RewardCard
+            ref="reward"
+            :webinarData="webinarData"
+            :localRoomInfo="localRoomInfo"
+            :cuid="cuid"
+          />
+        </div>
+        <!-- 邀请卡 -->
+        <div v-if="showInviteCard && !localRoomInfo.isEmbed">
+          <a
+            target="_blank"
+            :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+          >
+            <i class="vh-iconfont vh-line-share"></i>
+          </a>
+        </div>
 
-      <!-- 点赞 -->
-      <div auth="{ 'ui.watch_hide_like': 0 }" v-if="localRoomInfo.showLike">
-        <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
-        <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
-      </div>
+        <!-- 点赞 -->
+        <div auth="{ 'ui.watch_hide_like': 0 }" v-if="localRoomInfo.showLike">
+          <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
+          <Parise
+            :hideChatHistory="joinInfoInGift.hideChatHistory"
+            :localRoomInfo="localRoomInfo"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>
