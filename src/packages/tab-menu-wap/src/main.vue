@@ -67,7 +67,9 @@
     useQaServer,
     useChatServer,
     useDocServer,
-    useMsgServer
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
   } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
@@ -129,6 +131,7 @@
         const qaServer = useQaServer();
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -170,6 +173,20 @@
           if (val) {
             let obj = this.getItem({ type: 2 });
             this.select({ type: obj.type, id: obj.id });
+          }
+        });
+        //监听进出子房间消息
+        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
           }
         });
       },
