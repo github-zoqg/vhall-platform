@@ -5,12 +5,14 @@
         <vmp-air-container :cuid="cuid"></vmp-air-container>
       </template>
       <template v-else>
-        <div class="subscribe-bg" v-if="!showVideo">
-          <img :src="webinarsBgImg" alt="" />
-        </div>
-        <div v-if="showVideo">
+        <template v-if="!showVideo">
+          <div class="subscribe-bg">
+            <img :src="webinarsBgImg" alt="" />
+          </div>
+        </template>
+        <template v-if="showVideo">
           <vmp-air-container :cuid="cuid"></vmp-air-container>
-        </div>
+        </template>
         <template v-if="!showVideo">
           <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
             {{ countDownTime }}
