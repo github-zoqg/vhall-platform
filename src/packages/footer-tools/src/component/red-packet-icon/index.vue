@@ -39,7 +39,7 @@
         } else {
           this.redPacketServer.setAvailable(true);
         }
-        console.log(this.redPacketServer.state.available, 'available');
+        console.log(this.$domainStore.state.roomBaseServer, 'available');
         if (redPacketInfo.red_packet_uuid) {
           this.redPacketServer.setUUid(redPacketInfo.red_packet_uuid);
           this.lastUUID = redPacketInfo.red_packet_uuid;
