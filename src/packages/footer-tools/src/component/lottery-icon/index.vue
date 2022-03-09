@@ -75,7 +75,6 @@
 <style lang="less" scoped>
   .vmp-lottery-icon {
     color: #fff;
-    margin-left: 16px;
     position: relative;
     .vmp-dot {
       position: absolute;
