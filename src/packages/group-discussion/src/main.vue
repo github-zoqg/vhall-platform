@@ -352,6 +352,7 @@
             role = '嘉宾';
           }
           if (msg.data.extra_params == this.userId) {
+            console.log('拒绝邀请', msg);
             this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
             });
