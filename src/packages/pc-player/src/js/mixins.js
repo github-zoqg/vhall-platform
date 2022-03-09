@@ -63,7 +63,7 @@ const playerMixins = {
         // 监听播放状态
         this.isPlayering = true;
         this.isShowPoster = false;
-        console.warn('PLAY');
+        console.warn('PLAY', this.isPlayering, this.isVodEnd);
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态

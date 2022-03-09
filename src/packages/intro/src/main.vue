@@ -62,6 +62,9 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
       },
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
+      },
       // 简介富文本正文 Type:String
       content() {
         const defaultText = this.$t('appointment.appointment_1019');
@@ -72,7 +75,7 @@
         </section>
         `;
 
-        const introduction = this?.webinar?.introduction;
+        const introduction = this.languagesInfo.introduction;
         if (introduction && introduction !== '<p></p>') {
           return introduction;
         }
