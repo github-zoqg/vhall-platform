@@ -42,7 +42,7 @@
             v-if="userInfo.role_name != 1"
             @click="roleQuit"
           >
-            <i class="vh-saas-iconfont vh-saas-a-line-KickedoutMembers"></i>
+            <i class="vh-iconfont vh-line-exit"></i>
             <p>角色退出</p>
           </div>
           <div
