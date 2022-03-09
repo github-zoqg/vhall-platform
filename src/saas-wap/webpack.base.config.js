@@ -33,7 +33,7 @@ const htmlConfig = {
     Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
     iconfontCommon: '//at.alicdn.com/t/font_3128919_dcbhpaxzl9v.css',
-    iconfont: '//at.alicdn.com/t/font_3120276_xa4utodgrg8.css'
+    iconfont: '//at.alicdn.com/t/font_3120276_vywbqplu6p.css'
   },
   // dns-prefetch
   dnsPrefetch: {
