@@ -47,6 +47,10 @@
         } else {
           return this.roomBaseServer.state.interactToolStatus.doc_permission;
         }
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.isShareScreen;
       }
     },
     beforeCreate() {
@@ -64,6 +68,9 @@
         this.resetMenus();
       },
       ['presenterId']() {
+        this.resetMenus();
+      },
+      ['isShareScreen'](val) {
         this.resetMenus();
       },
       ['roomBaseServer.state.configList']: {
@@ -91,6 +98,10 @@
         for (const vn of this.$children) {
           if (!vn.kind || !vn.setDisableState || !vn.setHiddenState) continue;
           if (vn.kind === 'document') {
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 文档菜单
             if (this.role == 4) {
               // 嘉宾
@@ -110,6 +121,10 @@
             }
           } else if (vn.kind === 'board') {
             // 白板菜单
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             if (this.role == 4) {
               // 嘉宾
               if (this.doc_permission == this.userId) {
@@ -128,6 +143,14 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
+            if (this.isShareScreen) {
+              vn.setDisableState(false);
+              vn.setText('关闭共享');
+              vn.setSelectedState(true);
+              continue;
+            }
+            vn.setText('桌面共享');
+            vn.setSelectedState(false);
             if (this.role === 1) {
               // 主持人
               if (this.webinarType === 1) {
@@ -150,6 +173,10 @@
               vn.setHiddenState(true); //隐藏
             }
           } else if (vn.kind === 'insertMedia') {
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 插播文件菜单
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);

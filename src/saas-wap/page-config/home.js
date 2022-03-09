@@ -16,7 +16,7 @@ const serverConfig = {
       'comWapRewardEffect',
       'comGoodsDetail',
       'comUserAccountWap',
-      'compQuestionnaireWap'
+      'comQuestionnaireWap'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
@@ -55,8 +55,7 @@ const serverConfig = {
       'comScreenPostWap',
       'comUserCenterWap',
       'comCashWap',
-      'compLotteryWap',
-      'compRedPacketWap',
+      'comLotteryWap',
       'comRedPacketWap',
       'comInviteHandup'
     ]
@@ -86,7 +85,15 @@ const serverConfig = {
     children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
   },
   comWapPlayer: {
-    component: 'VmpWapPlayer'
+    component: 'VmpWapPlayer',
+    emitCheckAuth: [
+      //权限验证
+      {
+        cuid: 'comSubcribeWapBody',
+        method: 'playerAuthCheck',
+        args: ['$0'] // 获取动态参数的第一个
+      }
+    ]
   },
   comWapStreamList: {
     component: 'VmpWapStreamList',
@@ -126,11 +133,12 @@ const serverConfig = {
     },
     emitOpenRedPacket: {
       cuid: ['comRedPacketWap'],
-      method: 'openRedPacket'
+      method: 'openRedPacket',
+      args: ['$0']
     },
     // 抽奖弹窗
     emitClickLotteryIcon: {
-      cuid: ['compLotteryWap'],
+      cuid: ['comLotteryWap'],
       method: 'open'
     }
   },
@@ -227,6 +235,16 @@ const serverConfig = {
         method: 'open'
       }
     ],
+    emitClickLotteryChatItem: {
+      cuid: ['comLotteryWap'],
+      method: 'accept',
+      args: ['$0']
+    },
+    emitClickQuestionnaireChatItem: {
+      cuid: ['comQuestionnaireWap'],
+      method: 'open',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap'],
     options: {}
   },
@@ -331,7 +349,7 @@ const serverConfig = {
     ]
   },
   // 抽奖
-  compLotteryWap: {
+  comLotteryWap: {
     component: 'VmpLotteryWap',
     emitClickLogin: [
       //登录弹窗
@@ -357,7 +375,7 @@ const serverConfig = {
     component: 'VmpChapterWap'
   },
   // 问卷
-  compQuestionnaireWap: {
+  comQuestionnaireWap: {
     component: 'VmpQuestionnaireWap',
     emitQuestionnaireVisible: [
       // 问卷弹窗的显示和隐藏(全屏)

@@ -133,7 +133,10 @@
           this.$domainStore.state.interactiveServer.remoteStreams,
           this.micServer.state.isSpeakOn
         );
-        if (this.micServer.state.isSpeakOn) {
+        if (
+          this.micServer.state.isSpeakOn &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2
+        ) {
           // 远端流个数改变且 在推流 才进行初始化BScroll
           this.createBScroll();
         }
@@ -222,7 +225,9 @@
     mounted() {
       // 在麦上 才存在滑动情况
       if (this.micServer.state.isSpeakOn) {
-        this.createBScroll();
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
+          this.createBScroll();
+        }
         if (window.orientation == 90 || window.orientation == -90) {
           this.setFullScreen();
         }
@@ -257,15 +262,6 @@
           });
         });
 
-        // 房间信令异常断开事件
-        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
-          Dialog.alert({
-            message: '网络异常导致互动房间连接失败'
-          }).then(() => {
-            window.location.reload();
-          });
-        });
-
         // 主持人进入退出小组 消息监听
         this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
           if (msg.data.status == 'enter') {
@@ -284,27 +280,29 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
-          this.gobackHome(4);
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(4);
+          }
         });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
           if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
-            if (this.groupServer.state.groupInitData.join_role == 20) {
-              this.gobackHome(6);
-            } else {
-              this.gobackHome(7);
-            }
+            this.gobackHome(7);
           }
         });
 
@@ -333,9 +331,6 @@
             break;
           case 5:
             title = this.$t('chat.chat_1007');
-            break;
-          case 6:
-            title = '您被提升为组长!';
             break;
           case 7:
             title = '组长身份已变更';
@@ -619,7 +614,7 @@
       }
       .vmp-stream-list__main-screen {
         position: absolute;
-        left: 0;
+        left: 0 !important;
         top: 0;
         width: 100%;
         height: calc(100% - 85px);

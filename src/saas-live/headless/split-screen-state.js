@@ -4,7 +4,8 @@ import {
   useInteractiveServer,
   useMicServer,
   useMediaCheckServer,
-  useMediaSettingServer
+  useMediaSettingServer,
+  useSplitScreenServer
 } from 'middle-domain';
 
 export default async function () {
@@ -15,6 +16,7 @@ export default async function () {
   const mediaCheckServer = useMediaCheckServer();
   const micServer = useMicServer();
   const mediaSettingServer = useMediaSettingServer();
+  const splitScreenServer = useSplitScreenServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -37,6 +39,13 @@ export default async function () {
   await msgServer.initMaintMsg({
     hide: 1
   });
+
+  const splitRes = await splitScreenServer.init({
+    role: 'split'
+  });
+  if (splitRes == 'SPLIT_OPEN_ERROR') {
+    return 'splitOpenError';
+  }
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
   await interactiveServer.init();
@@ -44,11 +53,10 @@ export default async function () {
 
   mediaSettingServer.init();
 
-  useMicServer();
-
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.interactiveServer = interactiveServer;
   window.micServer = micServer;
+  window.splitScreenServer = splitScreenServer;
 }

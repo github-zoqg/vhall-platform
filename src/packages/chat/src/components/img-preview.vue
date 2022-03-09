@@ -103,7 +103,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 11;
+    z-index: 200;
   }
   .preview-img__container {
     width: 800px;

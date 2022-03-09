@@ -57,6 +57,10 @@
         if (res === 'isBrowserNotSupport') {
           this.state = 3;
           return;
+        } else if (res === 'splitOpenError') {
+          this.state = 2;
+          this.errMsg = '页面无法打开，请检查分屏页面是否已打开或分屏模式未开启';
+          return;
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
@@ -90,6 +94,10 @@
           }
         });
       }
+      // 直播结束停止推流事件
+      // handleUnpublishComplate() {
+
+      // }
     }
   };
 </script>

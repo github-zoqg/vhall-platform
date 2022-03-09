@@ -34,7 +34,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer } from 'middle-domain';
+  import { useMicServer, useMediaCheckServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -48,6 +48,10 @@
     computed: {
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
       },
       // 是否是直播中
       inLine() {
@@ -92,11 +96,15 @@
       });
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$message.success(this.$t('interact.interact_1003'));
+        if (parseInt(this.device_status) === 1) {
+          this.$message.success(this.$t('interact.interact_1003'));
+        }
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$message.success(this.$t('interact.interact_1002'));
+        if (parseInt(this.device_status) === 1) {
+          this.$message.success(this.$t('interact.interact_1002'));
+        }
       });
 
       /**

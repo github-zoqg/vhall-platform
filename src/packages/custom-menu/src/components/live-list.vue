@@ -22,7 +22,7 @@
             </span>
           </div>
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <i class="saasicon_redu iconfont iconredu_icon1"></i>
+            <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
         </div>
@@ -231,22 +231,21 @@
         margin: 4px 10px 0px 0px;
       }
     }
-    &__titleInfo {
-      height: 55px;
-    }
     &__title {
-      margin: 10px 0px 4px 0px;
+      margin: 10px 0 4px 0;
       font-size: 14px;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: #e6e6e6;
       line-height: 20px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
-      -webkit-box-orient: vertical;
       text-align: left;
+      /**autoprefixer: ignore next */
+      -webkit-box-orient: vertical;
+      max-height: 200px;
     }
     &__info {
       font-weight: 400;
@@ -337,6 +336,10 @@
       color: @font-light-normal;
       line-height: 24px;
       margin: 12px 16px 7px 16px;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
     }
     &__info {
       font-size: 14px;

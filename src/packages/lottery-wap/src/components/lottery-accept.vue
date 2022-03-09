@@ -130,6 +130,7 @@
             lottery_id: this.lotteryId
           })
           .then(() => {
+            this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
             this.$toast(this.$t('interact_tools.interact_tools_1067'));
             this.$nextTick(() => {
               this.$emit('navTo', 'LotterySuccess');

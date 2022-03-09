@@ -2,7 +2,7 @@
   <section class="vmp-intro">
     <section class="vmp-intro-block">
       <header class="vmp-intro-block__headtitle">
-        <i v-if="isNoDelay" class="delay-icon">
+        <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
           <img :src="NoDelayImg" />
         </i>
         {{ title }}
@@ -28,7 +28,7 @@
       </main>
       <div
         class="vmp-intro-block__auth"
-        v-if="watchInitData.status == 'subscribe' && webinar.type != 1"
+        v-if="watchInitData.status == 'subscribe' && watchInitData.join_info.is_subscribe != 1"
       >
         <span>
           {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}
@@ -95,6 +95,9 @@
       };
     },
     computed: {
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       watchInitData() {
         return this?.$domainStore?.state?.roomBaseServer?.watchInitData;
       },
@@ -228,6 +231,10 @@
         line-height: 1.2;
         p {
           word-break: break-all;
+        }
+
+        img {
+          width: 100%;
         }
       }
 

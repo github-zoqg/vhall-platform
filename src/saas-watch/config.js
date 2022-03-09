@@ -300,6 +300,12 @@ export const serverConfig = {
       cuid: ['comLottery'],
       method: 'open'
     },
+    //红包弹窗
+    emitClickRedPacketIcon: {
+      cuid: ['comRedPacket'],
+      method: 'openRedPacket',
+      args: ['$0']
+    },
     children: ['comSignWatch', 'comWatchTimer']
   },
   comSignWatch: {

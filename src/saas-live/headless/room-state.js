@@ -62,8 +62,11 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  // await splitScreenServer.init();
-  // console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
+  await splitScreenServer.init({
+    splitScreenPageUrl: getSplitScreenPageUrl(roomBaseServer.state.watchInitData.webinar.id),
+    role: 'host'
+  });
+  console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
 
   if (!splitScreenServer.state.isOpenSplitScreen) {
     // 没有开启分屏则初始化互动
@@ -97,4 +100,20 @@ export default async function () {
   window.micServer = micServer;
   window.insertFileServer = insertFileServer;
   window.memberServer = useMemberServer();
+  window.splitScreenServer = splitScreenServer;
+}
+
+// 获取分屏页面url
+function getSplitScreenPageUrl(webinarId) {
+  // quertString
+  const search = location.search
+    ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
+    : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+  // location
+  const url =
+    process.env.NODE_ENV === 'development'
+      ? `${window.location.origin}`
+      : `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}`;
+  const retUrl = `${url}/lives/split-screen/${webinarId}${search}`;
+  return retUrl;
 }

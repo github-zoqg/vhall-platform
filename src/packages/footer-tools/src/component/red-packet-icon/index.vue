@@ -9,7 +9,6 @@
    * @description 红包的图标 + 小红点
    */
   import { useRedPacketServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
     name: 'RedPacketIcon',
@@ -17,27 +16,45 @@
       return {
         showIcon: false, //显示图标
         showDot: false, // 显示小红点
-        lastRedPacketUUID: '' // 最后一个红包的uuid
+        lastUUID: ''
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
     },
     created() {
-      this.redPacketServer.$on(this.redPacketServer, this.handleNewRedPacket);
+      this.initStatus();
+      this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
     destroyed() {
-      this.redPacketServer.$off(this.redPacketServer, this.handleNewRedPacket);
+      this.redPacketServer.$off(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
     methods: {
-      checkRedPacketIcon() {
-        if (!this.lastRedPacketUUID) return;
-        this.showDot = false;
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickRedPacket', [this.lastRedPacketUUID])
-        );
+      initStatus() {
+        const redPacketInfo = this.$domainStore.state.roomBaseServer.redPacket;
+        if (redPacketInfo.number * 1 == redPacketInfo.get_user_count * 1) {
+          this.redPacketServer.setAvailable(false);
+        } else {
+          this.redPacketServer.setAvailable(true);
+        }
+        console.log(this.redPacketServer.state.available, 'available');
+        if (redPacketInfo.red_packet_uuid) {
+          this.redPacketServer.setUUid(redPacketInfo.red_packet_uuid);
+          this.lastUUID = redPacketInfo.red_packet_uuid;
+        }
+        if (redPacketInfo.status === '1') {
+          this.showIcon = true;
+          this.showDot = true;
+        }
       },
-      handleNewRedPacket() {
+      checkRedPacketIcon() {
+        this.$emit('clickIcon', this.lastUUID);
+        this.showDot = false;
+      },
+      handleNewRedPacket(msg) {
+        this.lastUUID = msg.red_packet_uuid;
         this.showIcon = true;
         this.showDot = true;
       }

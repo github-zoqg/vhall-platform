@@ -31,10 +31,7 @@
       <li
         @click="handleClickItem('desktopShare')"
         class="menu-item"
-        :class="[
-          selectedMenu === 'desktopShare' ? 'selected' : '',
-          disableMenus.includes('desktopShare') ? 'disable' : ''
-        ]"
+        :class="[disableMenus.includes('desktopShare') ? 'disable' : '']"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
         <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
@@ -84,8 +81,14 @@
       };
     },
     computed: {
+      currentCid() {
+        return this.docServer.state.currentCid;
+      },
       disableMenus() {
         if (this.hasDocPermission) {
+          if (this.isShareScreen) {
+            return ['document', 'board'];
+          }
           return [];
         }
         return ['document', 'board', 'desktopShare'];
@@ -124,11 +127,30 @@
           );
         }
       },
+      // 是否在桌面共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.isShareScreen;
       }
     },
-    created() {
+    watch: {
+      // 检测演示人变化
+      ['groupServer.state.groupInitData.presentation_screen'](presenterId) {
+        if (presenterId && presenterId == this.userId) {
+          this.isCollapse = false;
+        } else {
+          this.isCollapse = true;
+        }
+      },
+      ['docServer.state.currentCid'](newval) {
+        if (newval) {
+          const t = newval.split('-')[0];
+          if (t) {
+            this.selectedMenu = t;
+          }
+        }
+      }
+    },
+    beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.groupServer = useGroupServer();
@@ -141,6 +163,10 @@
         // 开启分组讨论
         this.groupServer.$on('GROUP_SWITCH_START', () => {
           if (this.groupServer.state.groupInitData.isInGroup) {
+            if (this.groupServer.state.groupInitData.join_role == 20) {
+              // 如果是组长，默认展开菜单
+              this.isCollapse = false;
+            }
             this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
@@ -171,8 +197,11 @@
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          this.isCollapse = true;
           if (this.isInGroup) {
+            if (this.groupServer.state.groupInitData.presentation_screen != this.userId) {
+              //  如果演示者不是自己
+              this.isCollapse = true;
+            }
             if (this.groupServer.state.groupInitData.join_role == 20) {
               this.gobackHome(6);
             } else {
@@ -180,6 +209,7 @@
             }
           }
         });
+
         // 观看端监听到邀请演示的消息处理
         // (主直播间主持人邀请其它成员演示，小组内组长邀请其它成员演示)
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION', msg => {
@@ -197,7 +227,7 @@
           const { join_role, isInGroup } = this.groupServer.state.groupInitData;
           // 如果是组长，并且在小组内
           if (join_role == 20 && isInGroup) {
-            this.$message.warning(`观众${msg.nick_name}拒绝了你的演示邀请`);
+            this.$message.warning(`观众${msg.data.nick_name}拒绝了你的演示邀请`);
           }
         });
 
@@ -253,9 +283,8 @@
       },
       handleClickItem(kind) {
         if (this.disableMenus.includes(kind)) return false;
-        this.selectedMenu = kind;
-
         if (kind === 'document' || kind === 'board') {
+          this.selectedMenu = kind;
           // 点击文档或白板
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClickDoc', [kind]));
         } else if (kind === 'assistance') {
@@ -323,6 +352,11 @@
         padding: 10px 0;
         span {
           user-select: none;
+        }
+
+        &:not(.disable):hover {
+          color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {
