@@ -96,6 +96,9 @@
       interactToolStatus() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus;
       },
+      autoSpeak() {
+        return this.interactToolStatus.auto_speak == 1 && this.mode == 6;
+      },
       // 退出全屏
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
@@ -309,6 +312,13 @@
           await this.createLocalStream();
           // 推流
           await this.publishLocalStream();
+          // 分组活动 自动上麦默认禁音
+          if (this.autoSpeak) {
+            this.interactiveServer.muteAudio({
+              streamId: this.localStream.streamId, // 流Id, 必填
+              isMute: true // true为禁用，false为启用。
+            });
+          }
           // 实时获取网络状况
           this.getLevel();
           this.interactiveServer.state.defaultStreamBg = false;
