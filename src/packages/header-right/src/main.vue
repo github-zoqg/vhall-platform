@@ -340,6 +340,9 @@
       },
       // 结束直播/录制
       handleEndClick() {
+        if (this.splitScreenServer.state.isHostWaitingSplit) {
+          return this.$message.warning('请分屏关闭完成以后结束直播');
+        }
         if (this.isRecord) {
           this.handleEndClickInRecord();
         } else {
@@ -357,9 +360,10 @@
         });
 
         // 如果开启了分屏
-        // if (this.splitScreenServer.state.isOpenSplitScreen) {
-        //   this.splitScreenServer.closeSplit();
-        // }
+        if (this.splitScreenServer.state.isOpenSplitScreen) {
+          this.splitScreenServer.staet.isOpenSplitScreen = false;
+          return;
+        }
 
         if (res.code == 200 && interactToolStatus.start_type == 4) {
           // 如果是第三方推流直接生成回放
