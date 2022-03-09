@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
@@ -70,7 +70,7 @@
       ['presenterId']() {
         this.resetMenus();
       },
-      ['isShareScreen'](val) {
+      ['isShareScreen']() {
         this.resetMenus();
       },
       ['roomBaseServer.state.configList']: {

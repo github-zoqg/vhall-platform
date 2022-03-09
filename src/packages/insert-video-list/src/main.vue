@@ -20,21 +20,33 @@
                 <br />
                 4.发起端插播文件仅支持本地插播，不会上传到活动下哦！
               </div>
-              <i class="iconfont iconicon_help_m"></i>
+              <i class="vh-iconfont vh-line-question"></i>
             </el-tooltip>
             <el-input
               v-model="searchKey"
               placeholder="请输入音视频文件名称"
               style="width: 220px; float: right"
-              @keyup.enter.native="getTableList(false)"
-              @clear="getTableList(false)"
+              @keyup.enter.native="
+                getTableList({
+                  isNeedResetPage: true
+                })
+              "
+              @clear="
+                getTableList({
+                  isNeedResetPage: true
+                })
+              "
               clearable
             >
               <i
                 slot="prefix"
                 class="el-icon-search el-input__icon"
                 style="cursor: pointer; line-height: 36px"
-                @click="getTableList(false)"
+                @click="
+                  getTableList({
+                    isNeedResetPage: true
+                  })
+                "
               ></i>
             </el-input>
           </div>
@@ -64,10 +76,10 @@
                   </p>
                   <p class="insert-header-item">
                     <i
-                      class="iconfont iconyinpinwenjian"
+                      class="vh-iconfont vh-fill-audio"
                       v-if="video.file_type == '.mp3' || video.file_type == '.mav'"
                     ></i>
-                    <i class="iconfont iconshipinwenjian" v-else></i>
+                    <i class="vh-iconfont vh-fill-video" v-else></i>
                     <span>{{ video.name }}</span>
                   </p>
                   <p class="insert-header-item">{{ video.created_at }}</p>
@@ -486,7 +498,7 @@
   .vmp-insert-video {
     &-wrap {
       &-search {
-        .iconicon_help_m {
+        .vh-line-question {
           margin-left: 10px;
           color: #999;
         }
@@ -533,13 +545,14 @@
             li {
               border-bottom: 1px solid #e6e6e6;
               .insert-header-item {
-                .iconfont {
-                  margin-right: 12px;
+                .vh-iconfont {
+                  margin-right: 14px;
+                  font-size: 18px;
                 }
-                .iconshipinwenjian {
+                .vh-fill-video {
                   color: #ff733c;
                 }
-                .iconyinpinwenjian {
+                .vh-fill-audio {
                   color: #10d3a8;
                 }
                 .insert-process-icon {

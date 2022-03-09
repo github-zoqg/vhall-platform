@@ -129,7 +129,10 @@
 
         return findComp(cuid, arr);
       },
-      switchTo(item) {
+      switchTo: async function (item) {
+        // 确保动态加载的dom渲染完成
+        await this.$nextTick();
+
         let child = null;
 
         child = this.getComp(item.cuid, this.$children);
