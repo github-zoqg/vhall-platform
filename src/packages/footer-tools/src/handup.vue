@@ -10,7 +10,7 @@
         v-if="
           inLine &&
           (isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn && isBanned
             : isAllowhandup && !isSpeakOn)
         "
       >
@@ -24,7 +24,9 @@
         size="medium"
         v-if="
           inLine &&
-          (isInGroup ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn : isSpeakOn)
+          (isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn && isBanned
+            : isSpeakOn)
         "
         round
       >
@@ -72,6 +74,10 @@
       // 组内角色
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
+      // 分组 组内 禁言 状态
+      isBanned() {
+        return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },
     created() {
