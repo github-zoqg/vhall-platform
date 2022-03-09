@@ -113,7 +113,7 @@ function getPlugins() {
           rules: [
             {
               search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
+              replace: `${argv.project}`
             },
             {
               search: /@projectName/g,
@@ -127,7 +127,7 @@ function getPlugins() {
           rules: [
             {
               search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
+              replace: `${argv.project}/${argv.version}`
             },
             {
               search: /@projectName/g,
@@ -308,7 +308,7 @@ if (['serve', 'build'].includes(cmd)) {
 
   // 导出
   module.exports = vueConfig;
-  return;
+  // return;
 }
 
 module.exports = sharedConfig;
