@@ -56,7 +56,11 @@
       ></span>
     </section>
     <!-- 遮罩层 主屏-->
-    <section v-if="mainScreen == joinInfo.third_party_user_id" class="vmp-stream-local__shadow-box">
+    <section
+      v-if="mainScreen == joinInfo.third_party_user_id"
+      class="vmp-stream-local__shadow-box"
+      v-show="isShowShadowBtn"
+    >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           {{ joinInfo.role_name | roleNameFilter }}
@@ -116,7 +120,7 @@
     </section>
 
     <!-- 遮罩层 非主屏-->
-    <section v-else class="vmp-stream-local__shadow-box">
+    <section v-show="isShowShadowBtn" v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
         <el-tooltip :content="localStream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
           <span
@@ -211,6 +215,14 @@
       ImgStream
     },
     computed: {
+      // 当前人插播的时候，不显示本地流的操作按钮
+      isShowShadowBtn() {
+        return (
+          !this.$domainStore.state.insertFileServer.isInsertFilePushing ||
+          this.$domainStore.state.insertFileServer.insertStreamInfo.userInfo.accountId !=
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
+      },
       // 是否推流
       isStreamPublished() {
         return this.$domainStore.state.interactiveServer.localStream.streamId;
