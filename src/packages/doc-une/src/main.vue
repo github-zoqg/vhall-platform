@@ -292,8 +292,7 @@
       hasPager() {
         return (
           this.hasDocPermission ||
-          ([3, 4].includes(this.roleName) &&
-            this.roomBaseServer.state.configList.close_assistant_flip_doc == 1) ||
+          (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
           this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
         );
       }
