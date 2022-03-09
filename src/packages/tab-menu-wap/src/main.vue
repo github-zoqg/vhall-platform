@@ -148,8 +148,8 @@
           this.setVisible({ visible: false, type: 'private' });
         });
         // 设置观看端文档是否可见
-        this.docServer.$on('dispatch_doc_switch_change', val => {
-          console.log('dispatch_doc_switch_change', val);
+        this.docServer.$on('dispatch_doc_switch_status', val => {
+          console.log('dispatch_doc_switch_status', val);
           this.setVisible({ visible: val, type: 2 });
           if (val) {
             let obj = this.getItem({ type: 2 });

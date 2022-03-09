@@ -455,7 +455,7 @@
           // 文档是否可见状态变化事件
           this.docServer.$on('dispatch_doc_switch_change', val => {
             console.log('===[doc]=======dispatch_doc_switch_change=============', val);
-            if (val && this.show) {
+            if (val && this.show && this.docLoadComplete) {
               this.recoverLastDocs();
             }
           });
@@ -550,30 +550,11 @@
           }
         });
 
-        // 文档不存在或已删除
-        this.docServer.on('dispatch_doc_not_exit', () => {
-          this.$message({
-            type: 'error',
-            message: '文档不存在或已删除'
-          });
-        });
+        // 文档容器选择事件
+        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
 
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
-          //   return;
-          // }
-          console.log('[doc] ===========选择容器======', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          // 判断容器是否存在
-          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-          if (currentItem) {
-            this.docServer.activeContainer(data.id);
-          } else {
-            const { id: cid, docId } = data;
-            console.log('[doc] cid:', cid);
-            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-          }
-        });
+        // 文档不存在或已删除
+        this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
       },
 
       listenKeydown(e) {
@@ -856,6 +837,34 @@
         } catch (ex) {
           return;
         }
+      },
+      // 选中文档容器事件
+      dispatchDocSelectContainer: async function (data) {
+        // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
+        //   return;
+        // }
+        console.log('[doc] ===========选择容器======', data);
+        // 判断容器是否存在
+        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
+        if (currentItem) {
+          this.docServer.activeContainer(data.id);
+        } else {
+          const { id: cid, docId } = data;
+          const fileType = cid.split('-')[0];
+          if (fileType === 'document' && !docId) {
+            // 文档id没有
+            console.log('[doc] 文档id没有 cid:', cid);
+            return;
+          }
+          this.addNewFile({ fileType, docId, cid });
+        }
+      },
+      // 文档不存在或已删除
+      dispatchDocNotExit() {
+        this.$message({
+          type: 'error',
+          message: '文档不存在或已删除'
+        });
       }
     },
     mounted() {
@@ -869,7 +878,9 @@
         this.recoverLastDocs();
       }
     },
-    destroyed() {
+    beforeDestroy() {
+      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
+      this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
