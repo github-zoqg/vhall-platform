@@ -209,8 +209,10 @@
       async handleSpeakOffClick() {
         // 下麦接口停止推流，成功之后执行下面的逻辑
         const { code, msg } = await useMicServer().speakOff();
-        if (code === 513035) {
-          this.$message.error(msg);
+        if (parseInt(this.roleName) !== 4) {
+          if (code !== 200) {
+            this.$message.error(msg);
+          }
         }
         this.isApplying = false;
         this.applyTimerCount = 30;
