@@ -144,8 +144,8 @@
           useRoomBaseServer().setChangeElement('stream-list');
         });
       },
-      showConfirm(isShareScreen) {
-        if (!isShareScreen) {
+      showConfirm() {
+        if (!this.isShareScreen) {
           this.popAlert.visible = true;
         } else {
           this.desktopShareServer.stopShareScreen().then(() => {

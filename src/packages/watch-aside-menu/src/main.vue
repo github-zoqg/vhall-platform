@@ -31,10 +31,7 @@
       <li
         @click="handleClickItem('desktopShare')"
         class="menu-item"
-        :class="[
-          selectedMenu === 'desktopShare' ? 'selected' : '',
-          disableMenus.includes('desktopShare') ? 'disable' : ''
-        ]"
+        :class="[disableMenus.includes('desktopShare') ? 'disable' : '']"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
         <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
@@ -84,8 +81,14 @@
       };
     },
     computed: {
+      currentCid() {
+        return this.docServer.state.currentCid;
+      },
       disableMenus() {
         if (this.hasDocPermission) {
+          if (this.isShareScreen) {
+            return ['document', 'board'];
+          }
           return [];
         }
         return ['document', 'board', 'desktopShare'];
@@ -124,6 +127,7 @@
           );
         }
       },
+      // 是否在桌面共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.isShareScreen;
       }
@@ -135,6 +139,14 @@
           this.isCollapse = false;
         } else {
           this.isCollapse = true;
+        }
+      },
+      ['docServer.state.currentCid'](newval) {
+        if (newval) {
+          const t = newval.split('-')[0];
+          if (t) {
+            this.selectedMenu = t;
+          }
         }
       }
     },
@@ -271,9 +283,8 @@
       },
       handleClickItem(kind) {
         if (this.disableMenus.includes(kind)) return false;
-        this.selectedMenu = kind;
-
         if (kind === 'document' || kind === 'board') {
+          this.selectedMenu = kind;
           // 点击文档或白板
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClickDoc', [kind]));
         } else if (kind === 'assistance') {
@@ -341,6 +352,11 @@
         padding: 10px 0;
         span {
           user-select: none;
+        }
+
+        &:not(.disable):hover {
+          color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {
