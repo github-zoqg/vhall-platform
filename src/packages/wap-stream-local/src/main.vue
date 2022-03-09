@@ -185,6 +185,7 @@
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例 若是收到结束分组讨论，则无需再次初始化互动实例
+            await this.checkVRTCInstance();
             await this.interactiveServer.init();
             // 开始推流
             this.startPush();
@@ -203,16 +204,6 @@
           //  初始化互动实例
           await this.interactiveServer.init();
         }
-      });
-
-      // 分组结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', async () => {
-        this.isStreamPublished = false;
-      });
-
-      // 分组结束讨论
-      this.groupServer.$on('GROUP_SWITCH_START', async () => {
-        this.isStreamPublished = false;
       });
 
       // 开启摄像头
@@ -303,6 +294,26 @@
           console.error(err);
           throw new Error('代码错误');
         }
+      },
+      // 检测互动实例 由于上麦接口调用成功比互动实例化快，故进行等待
+      checkVRTCInstance() {
+        return new Promise((resolve, reject) => {
+          let count = 0;
+          const timer = setInterval(() => {
+            if (this.interactiveServer.interactiveInstance) {
+              resolve();
+              clearInterval(timer);
+            } else {
+              count++;
+              console.log('checkVRTCInstance count', count);
+              if (count > 20) {
+                clearInterval(timer);
+                console.error('互动实例不存在');
+                reject();
+              }
+            }
+          }, 100);
+        });
       },
       // 开始推流
       async startPush() {
