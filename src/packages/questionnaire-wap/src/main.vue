@@ -40,12 +40,7 @@
         console.log('open', questionnaireId);
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
-            this.$message({
-              message: this.$t('form.form_1037'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
+            this.$toast(this.$t('form.form_1037'));
           } else {
             this.popupVisible = true;
             this.$nextTick(() => {
@@ -59,8 +54,6 @@
       },
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
-          console.log('questionnaireServer22222222');
-          console.log(msg);
           useChatServer().addChatToList({
             nickName: msg.nick_name,
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
