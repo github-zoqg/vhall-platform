@@ -140,6 +140,12 @@ const serverConfig = {
     emitClickLotteryIcon: {
       cuid: ['comLotteryWap'],
       method: 'open'
+    },
+    // 问卷弹窗
+    emitClickQuestionnaireIcon: {
+      cuid: ['comQuestionnaireWap'],
+      method: 'open',
+      args: ['$0']
     }
   },
   // notice横幅
