@@ -1,7 +1,7 @@
 <template>
-  <div class="vmp-questionnaire-icon" v-if="showIcon" @click="checkquestionIcon">
-    <img src="./images/questionnaire.png" alt="" />
-    <i class="vmp-dot" v-if="showDot" />
+  <div class="vmp-questionnaire-icon" v-if="questionnaireServerState.iconVisible">
+    <img src="./images/questionnaire.png" alt="" @click="checkQuestionnaireIcon" />
+    <i class="vmp-dot" v-if="questionnaireServerState.dotVisible" />
   </div>
 </template>
 <script>
@@ -13,36 +13,20 @@
   export default {
     name: 'QuestionnaireIcon',
     data() {
+      const questionnaireServerState = this.questionnaireServer.state;
       return {
-        showIcon: true, //显示图标
-        showDot: false, // 显示小红点
-        lastUUID: ''
+        questionnaireServerState
       };
     },
     beforeCreate() {
-      this.questionServer = useQuestionnaireServer({
+      this.questionnaireServer = useQuestionnaireServer({
         mode: 'watch'
       });
     },
-    created() {
-      this.initStatus();
-      this.questionServer.$on(QUESTIONNAIRE_PUSH, this.handleNewquestion);
-    },
-    destroyed() {
-      this.questionServer.$off(QUESTIONNAIRE_PUSH, this.handleNewquestion);
-    },
     methods: {
-      initStatus() {
-        // this.questionServer.
-      },
-      checkquestionIcon() {
-        this.$emit('clickIcon', this.lastUUID);
-        this.showDot = false;
-      },
-      handleNewquestion(msg) {
-        this.lastUUID = msg.questionnaire_id;
-        this.showIcon = true;
-        this.showDot = true;
+      checkQuestionnaireIcon() {
+        this.questionnaireServer.setDotVisible(false);
+        this.$emit('clickIcon', this.questionnaireServerState.lastQuestionnaireId);
       }
     }
   };
@@ -50,7 +34,6 @@
 <style lang="less" scoped>
   .vmp-questionnaire-icon {
     color: #fff;
-    margin-left: 16px;
     position: relative;
     .vmp-dot {
       position: absolute;
