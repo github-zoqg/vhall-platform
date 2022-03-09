@@ -423,6 +423,13 @@
         });
         // 结束直播
         this.interactiveServer.$on('live_over', async () => {
+          // 如果开启分屏并且是主页面，不需要停止推流
+          if (
+            this.splitScreenServer.state.isOpenSplitScreen &&
+            this.splitScreenServer.state.role == 'host'
+          ) {
+            return;
+          }
           await this.stopPush();
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
