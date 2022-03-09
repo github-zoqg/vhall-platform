@@ -141,14 +141,21 @@
         ) {
           await this.micServer.userSpeakOn();
         }
+      } else {
+        if (
+          (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
+          this.micServer.state.isSpeakOn
+        ) {
+          this.speakOff();
+        }
       }
-      console.warn(789999, useMediaCheckServer().state.deviceInfo);
+      console.warn('查看设备是否被禁用', useMediaCheckServer().state.deviceInfo.device_status);
 
       useMsgServer().$onMsg('ROOM_MSG', async msg => {
         // live_over 结束直播  停止推流,
         if (msg.data.type == 'live_over') {
           if (this.micServer.state.isSpeakOn) {
-            await this.micServer.speakOff();
+            await this.speakOff();
             await this.stopPush();
             this.interactiveServer.destroy();
           }
@@ -184,6 +191,8 @@
 
       // 下麦成功
       this.micServer.$on('vrtc_disconnect_success', async () => {
+        console.warn('下麦成功----', useMediaCheckServer().state.deviceInfo.device_status);
+        if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
         await this.stopPush();
 
         await this.interactiveServer.destroy();
@@ -229,7 +238,7 @@
         clearInterval(this._netWorkStatusInterval);
       }
       if (this.micServer.state.isSpeakOn) {
-        await this.micServer.speakOff();
+        await this.speakOff();
         await this.stopPush();
         this.interactiveServer.destroy();
       }

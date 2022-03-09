@@ -335,6 +335,10 @@
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();
+        } else {
+          if (isSpeakOn) {
+            this.speakOff();
+          }
         }
       },
       // 恢复播放
@@ -393,6 +397,7 @@
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
           await this.stopPush();
 
           await this.interactiveServer.destroy();
