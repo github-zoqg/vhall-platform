@@ -1,12 +1,17 @@
 <template>
   <div class="win-lottery">
     <img class="win-lottery-icon" :src="submitImg" alt="" />
-    <p class="win-lottery-text" v-if="showWinnerList">
+    <template v-if="showWinnerList">
+      <p class="win-lottery-text">
+        {{ $t('interact_tools.interact_tools_1013') }}
+      </p>
+      <button @click="navToWinnerList">
+        {{ $t('interact_tools.interact_tools_1012') }}
+      </button>
+    </template>
+    <span v-else style="display: inline-block; height: 30px; margin-top: 30px">
       {{ $t('interact_tools.interact_tools_1013') }}
-    </p>
-    <button v-if="showWinnerList" @click="navToWinnerList">
-      {{ $t('interact_tools.interact_tools_1012') }}
-    </button>
+    </span>
   </div>
 </template>
 <script>
