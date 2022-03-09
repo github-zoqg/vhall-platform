@@ -1021,6 +1021,7 @@
             role = _this.$t('chat.chat_1023');
           }
           if (msg.data.extra_params == _this.userId) {
+            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
@@ -1100,6 +1101,7 @@
             role = '嘉宾';
           }
           if (msg.data.extra_params == _this.userId) {
+            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
             });

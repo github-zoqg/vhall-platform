@@ -34,6 +34,12 @@
     methods: {
       initStatus() {
         const redPacketInfo = this.$domainStore.state.roomBaseServer.redPacket;
+        if (redPacketInfo.number * 1 == redPacketInfo.get_user_count * 1) {
+          this.redPacketServer.setAvailable(false);
+        } else {
+          this.redPacketServer.setAvailable(true);
+        }
+        console.log(this.$domainStore.state.roomBaseServer, 'available');
         if (redPacketInfo.red_packet_uuid) {
           this.redPacketServer.setUUid(redPacketInfo.red_packet_uuid);
           this.lastUUID = redPacketInfo.red_packet_uuid;

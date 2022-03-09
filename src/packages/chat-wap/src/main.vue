@@ -89,8 +89,6 @@
         webinar: {},
         //是否隐藏聊天历史加载记录
         configList: {},
-        //在线的上麦状态 todo 待确认从哪里取全局的speakerList
-        onlineMicStatus: false,
         //当前页数
         page: 1,
         //是否已经下拉刷新
@@ -180,6 +178,27 @@
             video: false
           };
         }
+      },
+      //是否已上麦
+      onlineMicStatus() {
+        const { interactToolStatus = {} } = this.roomBaseServer.state;
+        const { groupInitData = {} } = this.groupServer.state;
+        let isOnMic = false;
+        if (groupInitData && groupInitData.isInGroup) {
+          isOnMic =
+            Array.isArray(groupInitData.speaker_list) &&
+            !groupInitData.speaker_list.some(
+              ele => ele.account_id === this.joinInfo.third_party_user_id
+            );
+        } else {
+          isOnMic =
+            interactToolStatus &&
+            Array.isArray(interactToolStatus.speaker_list) &&
+            !interactToolStatus.speaker_list.some(
+              ele => ele.account_id === this.joinInfo.third_party_user_id
+            );
+        }
+        return isOnMic;
       }
     },
     beforeCreate() {

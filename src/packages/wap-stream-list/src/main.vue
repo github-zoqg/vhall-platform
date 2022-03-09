@@ -280,27 +280,29 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
-          this.gobackHome(4);
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(4);
+          }
         });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
           if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
-            if (this.groupServer.state.groupInitData.join_role == 20) {
-              this.gobackHome(6);
-            } else {
-              this.gobackHome(7);
-            }
+            this.gobackHome(7);
           }
         });
 
@@ -329,9 +331,6 @@
             break;
           case 5:
             title = this.$t('chat.chat_1007');
-            break;
-          case 6:
-            title = '您被提升为组长!';
             break;
           case 7:
             title = '组长身份已变更';
