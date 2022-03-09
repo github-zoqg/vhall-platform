@@ -61,7 +61,8 @@
           <div
             class="chat-setting-btn--chat-auth"
             v-if="
-              ((roleName == 1 && !isInGroup) || (roleName == 20 && isInGroup)) &&
+              (roleName == 1 || roleName == 2) &&
+              !isInGroup &&
               (configList['comment_check'] || configList['disable_msg'])
             "
           >
@@ -135,6 +136,9 @@
       isInGroup() {
         // 在小组中
         return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
+      joinRole() {
+        return !!this.groupServer.state.groupInitData?.join_role;
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;

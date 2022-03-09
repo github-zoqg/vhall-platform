@@ -63,7 +63,7 @@ const playerMixins = {
         // 监听播放状态
         this.isPlayering = true;
         this.isShowPoster = false;
-        console.warn('PLAY');
+        console.warn('PLAY', this.isPlayering, this.isVodEnd);
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态
@@ -204,14 +204,15 @@ const playerMixins = {
       const UsableSpeed = this.playerServer.getUsableSpeed(() => {
         console.log('获取倍速失败');
       });
-      console.log('获取倍速', UsableSpeed);
       this.UsableSpeed =
         UsableSpeed &&
         UsableSpeed.filter(value => {
           return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
         });
+      console.log('获取倍速', this.UsableSpeed);
       if (sessionStorage.getItem('localSpeedValue')) {
-        this.currentSpeed = sessionStorage.getItem('localSpeedValue');
+        this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
+        // console.log(this.currentSpeed.toString().length, this.currentSpeed.toFixed(1), '??!2334');
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
         if (suc) {

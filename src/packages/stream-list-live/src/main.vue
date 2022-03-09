@@ -35,7 +35,7 @@
 
       <!-- 主持人进入小组后助理占位图 -->
       <div
-        v-if="mode == 6 && isHostInGroup && joinInfo.role_name == 3 && !isInGroup"
+        v-if="showGroupMask"
         class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
         :class="{
           'vmp-dom__mini': miniElement == 'stream-list',
@@ -113,10 +113,7 @@
         speakerList: [],
         PopAlertOffline: {
           visible: false
-        },
-
-        // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group
+        }
       };
     },
     components: {
@@ -181,6 +178,16 @@
       },
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
+      },
+      showGroupMask() {
+        // 主持人是否在组内 + 直播中 + 分组 + 助理 + 自身不在小组中
+        return (
+          this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1 &&
+          this.mode == 6 &&
+          this.joinInfo.role_name == 3 &&
+          !this.isInGroup
+        );
       }
     },
 
@@ -274,15 +281,6 @@
             if (mainScreenStream) {
               this.interactiveServer.setBroadCastScreen(mainScreenStream.streamId);
             }
-          }
-        });
-
-        // 主持人进入退出小组 消息监听
-        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-          if (msg.data.status == 'enter') {
-            this.isHostInGroup = true;
-          } else if (msg.data.status == 'quit') {
-            this.isHostInGroup = false;
           }
         });
       },
