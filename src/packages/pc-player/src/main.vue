@@ -34,7 +34,7 @@
           </div>
         </div>
         <template v-else>
-          <div class="vmp-player-living-btn" v-if="!isPlayering && !isVodEnd">
+          <div class="vmp-player-living-btn" v-if="!isPlayering">
             <div
               :class="
                 displayMode == 'mini'
@@ -48,7 +48,7 @@
           </div>
         </template>
 
-        <div class="vmp-player-living-vodend" v-if="isVodEnd && !isPlayering">
+        <div class="vmp-player-living-vodend" v-if="isVodEnd">
           <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
             <h3>{{ $t('appointment.appointment_1013') }}</h3>
             <div>
