@@ -181,17 +181,17 @@
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 2, {
-            type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
-          });
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
             name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '问答', // 同上
             status: roomState.interactToolStatus.question_status ? 1 : 2
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '私聊', // 同上
+            status: 2
           });
         }
       },
