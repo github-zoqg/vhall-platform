@@ -4,7 +4,8 @@ import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
-import grayInit from '@/packages/app-shared/gray-init';
+// import grayInit from '@/packages/app-shared/gray-init';
+import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
 
@@ -74,7 +75,14 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   console.log('---grayInit---');
-  await grayInit(to);
+  await grayInitByMiddle(to, data => {
+    // 如果是中台用户, 跳转到中台
+    console.log('grayInitByMiddle------------>', data);
+    // data.is_csd_user = 1;
+    if (data.is_csd_user == 1) {
+      window.location.href = `${process.env.VUE_APP_WEB_BASE_MIDDLE}/${process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
+    }
+  });
   next();
 });
 
