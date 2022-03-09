@@ -64,7 +64,6 @@
 <style lang="less" scoped>
   .vmp-red-packet-icon {
     color: #fff;
-    margin-left: 16px;
     position: relative;
     .vmp-dot {
       position: absolute;

@@ -111,6 +111,7 @@
             // 清空
             // this.docServer.resetContainer();
             // 恢复上一次的文档数据;
+            console.log('----- recoverLastDocs 频道变更');
             this.recoverLastDocs();
           }
         }
@@ -122,16 +123,16 @@
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
     },
-    created() {
-      // 初始化事件
-      this.initEvents();
-    },
     mounted() {
+      this.initEvents();
       // 清空
       // this.docServer.resetContainer();
       if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
         // 恢复上一次的文档数据;
-        this.recoverLastDocs();
+        console.log('----- recoverLastDocs type == 1');
+        this.$nextTick(() => {
+          this.recoverLastDocs();
+        });
       }
     },
     methods: {
@@ -168,55 +169,14 @@
         this.docServer.zoomReset();
       },
       initEvents() {
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', val => {
-          if (val) {
-            this.recoverLastDocs();
-          }
-        });
+        // 文档容器选择事件
+        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
 
         // 回放文档加载事件
-        this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-          if (this.docServer.state.containerList.length === 0) {
-            const data = this.docServer.getVodAllCids();
-            this.docServer.state.containerList = data.map(item => {
-              return {
-                cid: item.cid
-              };
-            });
-            console.log('[doc] containerList:', this.docServer.state.containerList);
-            this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
-            await this.$nextTick();
-            if (this.docServer.state.switchStatus) {
-              // emitShowMenuTab
-              this.resize();
-              // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
-              const { width, height } = this.docViewRect;
-              if (!width || !height) return;
-              for (const item of data) {
-                this.docServer.initContainer({
-                  cid: item.cid,
-                  width,
-                  height,
-                  fileType: item.type.toLowerCase()
-                });
-              }
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitShowMenuTab', {
-                  visible: true,
-                  type: 2
-                })
-              );
-            } else {
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitShowMenuTab', {
-                  visible: false,
-                  type: 2
-                })
-              );
-            }
-          }
-        });
+        this.docServer.$on(
+          'dispatch_doc_vod_cuepoint_load_complate',
+          this.dispatchDocVodCuepointLoadComplate
+        );
 
         // 全屏/退出全屏事件
         screenfull.onchange(ev => {
@@ -228,51 +188,36 @@
             this.displayMode = screenfull.targetMode || 'normal';
           }
         });
-
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          console.log('[doc] ===========选择容器======', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          this.docServer.state.currentCid = data.id;
-          // 判断容器是否存在
-          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-          if (currentItem) {
-            this.docServer.activeContainer(data.id);
-          } else {
-            const { id: cid, docId } = data;
-            console.log('[doc] cid:', cid);
-            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-          }
-        });
       },
 
       /**
-       * 屏幕缩放
+       * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
        */
       resize() {
-        let rect = this.$refs.docWrapper?.getBoundingClientRect();
-        if (rect.width === 0) {
-          const parentNode = this.$refs.docWrapper.parentNode;
-          const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
-          rect = {
-            width: cWidth,
-            height: (cWidth / 16) * 9
-          };
-        }
-        if (!rect) return;
-        let { width, height } = rect;
-
-        if (!width || !height) return;
-        let w = width;
-        let h = (w / 16) * 9;
-        this.docViewRect = { width: w, height: h };
-        console.log('[doc] this.docViewRect:', this.docViewRect);
+        const { width, height } = this.setDocViewRect();
         if (
-          this.docServer.state.currentCid &&
-          document.getElementById(this.docServer.state.currentCid)
+          document.getElementById(this.docServer.state.docCid) ||
+          document.getElementById(this.docServer.state.boardCid)
         ) {
-          this.docServer.setSize(w, h);
+          this.docServer.setSize(width, height);
         }
       },
+      setDocViewRect() {
+        let rect = this.$refs.docWrapper?.getBoundingClientRect();
+        let w = 0;
+        let h = 0;
+        if (!rect || rect.width <= 0 || rect.height <= 0) {
+          // 竖屏
+          w =
+            window.screen.height < window.screen.width ? window.screen.height : window.screen.width;
+        } else {
+          w = rect.width;
+        }
+        h = (w / 16) * 9;
+        this.docViewRect = { width: w, height: h };
+        return this.docViewRect;
+      },
+
       /**
        * 新增文档或白板
        * @param {*} fileType
@@ -324,20 +269,20 @@
           this.docServer.setDocLoadComplete();
           return;
         }
-        // 确定文档最外层节点显示，并且文档dom绑定ID成功
-        await this.$nextTick();
 
-        // 初始化文档最外层节点大小
-        this.resize();
-
-        const { width, height } = this.docViewRect;
-        await this.docServer.recover({
-          width,
-          height,
-          bindCidFun: async cid => {
-            await this.$nextTick();
-          }
-        });
+        if (this.docServer.state.switchStatus) {
+          // 确定文档最外层节点显示，并且文档dom绑定ID成功
+          await this.$nextTick();
+          // 初始化文档最外层节点大小
+          const { width, height } = this.setDocViewRect();
+          await this.docServer.recover({
+            width,
+            height,
+            bindCidFun: async cid => {
+              await this.$nextTick();
+            }
+          });
+        }
       },
 
       // 翻页
@@ -354,7 +299,73 @@
             this.docServer.nextStep();
           }
         }
+      },
+      // 选中文档容器事件
+      dispatchDocSelectContainer: async function (data) {
+        console.log('[doc] ===========选择容器======', data);
+        // this.docInfo.docShowType = data.id.split('-')[0];
+        this.docServer.state.currentCid = data.id;
+        // 判断容器是否存在
+        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
+        if (currentItem) {
+          this.docServer.activeContainer(data.id);
+        } else {
+          const { id: cid, docId } = data;
+          const fileType = cid.split('-')[0];
+          if (fileType === 'document' && !docId) {
+            // 文档id没有
+            console.log('[doc] 文档id没有 cid:', cid);
+            return;
+          }
+          this.addNewFile({ fileType, docId, cid });
+        }
+      },
+      // 回放文档加载事件
+      dispatchDocVodCuepointLoadComplate: async function (data) {
+        if (this.docServer.state.containerList.length === 0) {
+          const data = this.docServer.getVodAllCids();
+          this.docServer.state.containerList = data.map(item => {
+            return {
+              cid: item.cid
+            };
+          });
+          // console.log('[doc] containerList:', this.docServer.state.containerList);
+          this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
+          await this.$nextTick();
+          if (this.docServer.state.switchStatus) {
+            const { width, height } = this.setDocViewRect();
+            if (!width || !height) return;
+            for (const item of data) {
+              this.docServer.initContainer({
+                cid: item.cid,
+                width,
+                height,
+                fileType: item.type.toLowerCase()
+              });
+            }
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                visible: true,
+                type: 2
+              })
+            );
+          } else {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                visible: false,
+                type: 2
+              })
+            );
+          }
+        }
       }
+    },
+    beforeDestroy() {
+      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
+      this.docServer.$off(
+        'dispatch_doc_vod_cuepoint_load_complate',
+        this.dispatchDocVodCuepointLoadComplate
+      );
     }
   };
 </script>
