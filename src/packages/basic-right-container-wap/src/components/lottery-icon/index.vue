@@ -38,6 +38,7 @@
     methods: {
       checkLotteryIcon() {
         this.$emit('clickIcon');
+        this.dotVisible = false;
       },
       handleNewLottery() {
         this.showIcon = true;
@@ -55,9 +56,15 @@
       checkLotteryStatus() {
         this.lotteryServer.checkLottery().then(res => {
           const data = res.data;
-          if (data.id) {
+          if (data?.id) {
             this.showIcon = true;
-            this.dotVisible = true;
+            if (data.lottery_status === 0) {
+              // 抽奖中
+              this.dotVisible = true;
+            } else if (data.win === 1 && data.take_award === 0) {
+              // 中奖未领奖
+              this.dotVisible = true;
+            }
           }
         });
       }

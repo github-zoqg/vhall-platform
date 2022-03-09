@@ -16,7 +16,7 @@ const serverConfig = {
       'comWapRewardEffect',
       'comGoodsDetail',
       'comUserAccountWap',
-      'compQuestionnaireWap'
+      'comQuestionnaireWap'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
@@ -85,7 +85,15 @@ const serverConfig = {
     children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
   },
   comWapPlayer: {
-    component: 'VmpWapPlayer'
+    component: 'VmpWapPlayer',
+    emitCheckAuth: [
+      //权限验证
+      {
+        cuid: 'comSubcribeWapBody',
+        method: 'playerAuthCheck',
+        args: ['$0'] // 获取动态参数的第一个
+      }
+    ]
   },
   comWapStreamList: {
     component: 'VmpWapStreamList',
@@ -233,7 +241,7 @@ const serverConfig = {
       args: ['$0']
     },
     emitClickQuestionnaireChatItem: {
-      cuid: ['comQuestionnaire'],
+      cuid: ['comQuestionnaireWap'],
       method: 'open',
       args: ['$0']
     },
@@ -367,7 +375,7 @@ const serverConfig = {
     component: 'VmpChapterWap'
   },
   // 问卷
-  compQuestionnaireWap: {
+  comQuestionnaireWap: {
     component: 'VmpQuestionnaireWap',
     emitQuestionnaireVisible: [
       // 问卷弹窗的显示和隐藏(全屏)

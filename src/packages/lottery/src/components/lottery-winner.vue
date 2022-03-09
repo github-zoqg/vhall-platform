@@ -4,14 +4,14 @@
       class="custom-lottery-box"
       :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
     >
-      <img
+      <!-- <img
         v-if="prizeInfo && !prizeInfo.image_url"
         src="../img/default-lottery.png"
         alt=""
         class="default-lottery"
-      />
-      <div v-else class="custom-lottery">
-        <img :src="prizeInfo && prizeInfo.image_url" alt="" />
+      /> -->
+      <div class="custom-lottery">
+        <img :src="prizeInfo ? prizeInfo.image_url : defaultLotteryImg" alt="" />
       </div>
       <p
         class="custom-lottery__name"

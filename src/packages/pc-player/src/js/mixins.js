@@ -1,3 +1,4 @@
+import screenfull from 'screenfull';
 const playerMixins = {
   data() {
     return {
@@ -26,6 +27,36 @@ const playerMixins = {
         this.authText = 6;
       }
     },
+    listenEvents() {
+      // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
+      if (this.playerServer.state.type === 'vod' && !this.isTryPreview) {
+        window.addEventListener('beforeunload', () => {
+          this.endTime = this.playerServer.getCurrentTime(() => {
+            console.log('获取当前视频播放时间失败----------');
+          });
+
+          this.totalTime = this.playerServer.getDuration(() => {
+            console.log('获取视频总时长失败');
+          });
+          const curLocalHistoryTime = window.sessionStorage.getItem(
+            this.roomBaseServer.state.watchInitData.paas_record_id
+          );
+          if (!curLocalHistoryTime && this.recordHistoryTime) {
+            return;
+          }
+          window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
+        });
+      }
+      screenfull.onchange(ev => {
+        console.log(screenfull.isFullscreen, ev, '???123143254');
+        if (ev.target.id !== 'vmp-player') return;
+        this.isFullscreen = !this.isFullscreen;
+      });
+      clearTimeout(this.hoverVideoTimer);
+      this.hoverVideoTimer = setTimeout(() => {
+        this.hoveVideo = false;
+      }, 3000);
+    },
     getListenPlayer() {
       //  直播开始
       this.playerServer.$on(VhallPlayer.PLAY, () => {
@@ -49,13 +80,13 @@ const playerMixins = {
       });
       this.playerServer.$on(VhallPlayer.LAG_REPORT, e => {
         console.warn('LAG_REPORT');
-        this.loading = false;
+        this.loading = true;
       });
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
       });
       this.playerServer.$on(VhallPlayer.ERROR, e => {
-        this.loading = false;
+        this.loading = true;
         console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
       this.playerServer.$on(VhallPlayer.ENDED, () => {
@@ -268,21 +299,8 @@ const playerMixins = {
         ? this.playerServer && this.playerServer.openBarrage()
         : this.playerServer && this.playerServer.closeBarrage();
     },
-    // 全屏
     enterFullscreen() {
-      this.isFullscreen = !this.isFullscreen;
-      if (this.isFullscreen) {
-        const element = document.querySelector('.vmp-player-watch');
-        if (element.requestFullscreen) element.requestFullscreen();
-        else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
-        else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
-        else if (element.msRequestFullscreen) element.msRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
-      }
+      screenfull.toggle(this.$refs.playerWatch);
     },
     setChange() {
       if (this.changeTime) {

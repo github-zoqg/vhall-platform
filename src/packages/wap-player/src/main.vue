@@ -4,12 +4,7 @@
       <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
       <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
     </div>
-    <div
-      v-show="!isNoBuffer"
-      id="videoWapBox"
-      class="vmp-wap-player-video"
-      @click.stop="videoShowIcon"
-    >
+    <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
       <!-- 播放器背景图片 -->
       <div class="vmp-wap-player-prompt" v-if="isShowPoster">
         <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
@@ -20,7 +15,7 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-wap-player">
+      <div id="vmp-wap-player" @click.stop.prevent="videoShowIcon">
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -47,7 +42,7 @@
               {{ authText }}
             </span>
           </div>
-          <p class="tryKan" @click="startPlay">
+          <p class="vmp-wap-player-ending-box-title" @click="startPlay">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
@@ -83,7 +78,7 @@
           </i18n>
         </span>
       </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
+      <!-- 底部操作栏  点击 暂停 全屏 播放条 :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']" -->
       <div
         class="vmp-wap-player-footer"
         v-show="isPlayering"
@@ -102,6 +97,7 @@
           </span>
         </div>
         <div class="vmp-wap-player-control">
+          <!--  -->
           <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
               <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
@@ -248,6 +244,7 @@
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const langMap = {
     1: {
       label: '简体中文',
@@ -619,8 +616,11 @@
       refresh() {
         window.location.reload();
       },
-      handleAuth() {
-        console.log('shikan试看权限');
+      handleAuth(type) {
+        let params = {
+          type: this.authText == 6 ? type : this.roomBaseServer.state.watchInitData.webinar.verify
+        };
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCheckAuth', params));
       },
       openSpeed() {
         this.iconShow = true;
@@ -792,13 +792,13 @@
           font-size: 28px;
         }
         &-try {
-          padding-top: 24px;
+          padding: 24px 0;
           span {
             display: inline-block;
             background: #fb3a32;
             color: #fff;
-            height: 64px;
-            line-height: 64px;
+            height: 56px;
+            line-height: 56px;
             font-size: 24px;
             border-radius: 32px;
             text-align: center;
@@ -816,8 +816,9 @@
           }
           &-see {
             font-size: 24px;
+            padding: 0 24px;
             color: #fff;
-            padding-top: 40px;
+            margin: 20px 0;
           }
         }
       }
@@ -934,7 +935,7 @@
         background: rgba(0, 0, 0, 0.7);
         box-shadow: 0px 4px 8px 0px rgba(118, 118, 118, 0.2);
         border-radius: 32px 32px 32px 0px;
-        padding: 0 24px;
+        padding: 5px 24px;
         &-red {
           color: #fb2626;
           margin: 0px 4px;

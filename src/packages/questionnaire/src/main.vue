@@ -34,7 +34,7 @@
                 创建问卷
               </el-button>
               <el-input
-                v-model="queryParams.keyword"
+                v-model="keyword"
                 placeholder="请输入问卷名称"
                 style="width: 220px; float: right"
                 @keyup.enter.native="queryQuestionnaireList"
@@ -129,7 +129,14 @@
         <el-checkbox v-model="shareQuestionnaire">共享到资料管理</el-checkbox>
       </div>
       <div class="async__footer" slot="footer">
-        <el-button type="primary" @click="saveQuestionnaire(true)" round>确 定</el-button>
+        <el-button
+          type="primary"
+          :disabled="!saveDialogVisible"
+          @click="saveQuestionnaire(true)"
+          round
+        >
+          确 定
+        </el-button>
         <el-button @click="saveQuestionnaire(false)" round>取 消</el-button>
       </div>
     </el-dialog>
@@ -159,6 +166,7 @@
           pageNum: 1,
           keyword: ''
         },
+        keyword: '', //input的value;
         questionnaireCreateInfo: null, // 已创建弹窗的中转
         saveDialogVisible: false, // 同步问卷弹窗
         shareQuestionnaire: true, // 同步到管理
@@ -223,6 +231,7 @@
        */
       queryQuestionnaireList() {
         this.loading = true;
+        this.queryParams.keyword = this.keyword;
         this.questionnaireServer
           .queryQuestionnaireList({
             keyword: this.queryParams.keyword,
@@ -284,6 +293,7 @@
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
+            console.log('saveQuestionnaire', res);
             if (confirm) {
               // 确认同步才需要弹窗提示
               this.$message({

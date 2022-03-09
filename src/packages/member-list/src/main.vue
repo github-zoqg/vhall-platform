@@ -1021,6 +1021,7 @@
             role = _this.$t('chat.chat_1023');
           }
           if (msg.data.extra_params == _this.userId) {
+            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
@@ -1100,6 +1101,7 @@
             role = '嘉宾';
           }
           if (msg.data.extra_params == _this.userId) {
+            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
             });
@@ -1188,13 +1190,13 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-
+        //todo 这里需要仔细确认一下
         // only 发起端（开始分组讨论）
         this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          isLive && handleStartGroupDiscuss(msg);
+          handleStartGroupDiscuss(msg);
         });
 
-        // 切换channel TODO: ???????疑问点
+        // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
           isLive && handleStartGroupDiscuss(msg);
         });
@@ -1318,12 +1320,14 @@
         //分组--开始讨论
         function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
+          _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.getOnlineUserList();
         }
         //
         function handleEndGroupDiscuss(msg) {
           console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
+          _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.getOnlineUserList();
         }
         //重新获取最新的groupInitData
@@ -1773,7 +1777,7 @@
         }
         // 设置主讲人
         this.$confirm(
-          '演示后，您可使用小组中的白板、文档、桌面共享功能，是否要演示？',
+          '演示后，组内成员将不能演示白板、文档、桌面共享是否确认演示？',
           this.$t('account.account_1061'),
           {
             confirmButtonText: this.$t('account.account_1062'),
@@ -1895,6 +1899,7 @@
             console.warn('禁言---res', err);
           });
         // “禁言”要关闭当前用户的在麦状态
+        console.log('禁言 -  - 要关闭当前用户的在麦状态 - - - - ', isBanned);
         if (isBanned) {
           return;
         }

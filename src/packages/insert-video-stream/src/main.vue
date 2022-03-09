@@ -1,5 +1,12 @@
 <template>
-  <div class="vmp-insert-stream" v-show="insertFileStreamVisible" ref="insterWarpRef">
+  <div
+    class="vmp-insert-stream"
+    @mouseenter="wrapHover"
+    @mouseleave="wrapLeave"
+    v-show="insertFileStreamVisible"
+    ref="insterWarpRef"
+    :class="miniElement == 'stream-list' ? 'vmp-insert-stream__mini' : ''"
+  >
     <div class="vmp-insert-stream-mask">
       <p>
         <span>视图</span>
@@ -45,7 +52,12 @@
     ></div>
 
     <!-- 音频插播封面图 -->
-    <img v-if="isAudio" class="vmp-insert-stream-audio-poster" src="./img/video.gif" alt="" />
+    <img
+      v-if="isAudio && (!isLiving || mode == 1)"
+      class="vmp-insert-stream-audio-poster"
+      src="./img/video.gif"
+      alt=""
+    />
 
     <!-- 远端视频插播的播放器容器 -->
     <div id="vmp-insert-remote-stream" class="vmp-insert-remote-stream">
@@ -53,6 +65,7 @@
         ref="insertStream"
         :videoParam="remoteVideoParam"
         :isInsertVideoPreview="true"
+        :isShowController="miniElement != 'stream-list'"
         @remoteInsterSucces="remoteInsterSucces"
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
@@ -64,7 +77,7 @@
 
     <!-- 播放器控制条 -->
     <div
-      v-show="insertFileType == 'local' && isCurrentRoleInsert"
+      v-show="insertFileType == 'local' && isCurrentRoleInsert && miniElement != 'stream-list'"
       class="vmp-insert-stream-controller"
       :class="{ 'insert-active-top': constrolUp }"
     >
@@ -117,7 +130,7 @@
             </div>
           </div>
           <el-tooltip effect="dark" content="插播列表">
-            <i @click="handleOpenInsertFileDialog" class="iconfont iconchaboliebiao_icon"></i>
+            <i @click="handleOpenInsertFileDialog" class="vh-iconfont vh-line-menu"></i>
           </el-tooltip>
           <el-tooltip effect="dark" content="关闭插播">
             <i
@@ -159,6 +172,7 @@
           autoplay: true
         },
         constrolUp: false, // 控制栏显示、隐藏
+        // 控制栏信息
         conctorObj: {
           TimesShow: false,
           hoverTime: 0,
@@ -190,6 +204,15 @@
           this.$domainStore.state.insertFileServer.insertStreamInfo.userInfo.accountId ==
             this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
         );
+      },
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      miniElement() {
+        return this.$domainStore.state.roomBaseServer.miniElement;
       }
     },
     watch: {
@@ -203,7 +226,7 @@
         handler(value) {
           if (value) {
             this.remoteVideoParam.paas_record_id = value.paas_record_id;
-            this.remoteVideoParam.file_type = value.paas_record_id;
+            this.remoteVideoParam.file_type = value.file_type;
           }
         }
       }
@@ -227,6 +250,7 @@
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
       this.initEventListener();
@@ -282,6 +306,8 @@
       },
       // 本地插播，video成功创建之后的处理逻辑
       handleLocalInsertVideoCreated(videoElement) {
+        // TODO: 设置插播画面在大窗
+        this.roomBaseServer.setChangeElement('doc');
         // 隐藏分组设置
         const groupServer = useGroupServer();
         groupServer.state.panelShow = false;
@@ -450,9 +476,12 @@
         // 设置插播状态为 false
         insertFileServer.setInsertFilePushing(false);
         return this.stopPushStream().then(() => {
+          console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
           // 还原插播状态
           insertFileServer.clearInsertFileInfo();
+          // 设置流为小屏
+          this.roomBaseServer.setChangeElement('stream-list');
           document.getElementById('vmp-insert-stream-video').innerHTML = '';
           // 云插播播放器销毁
           this.$refs.insertStream && this.$refs.insertStream.destroy();
@@ -507,6 +536,8 @@
 
         const insertFileServer = useInsertFileServer();
         insertFileServer.setInsertVideoElement(videEl);
+        // TODO: 设置插播画面在大窗
+        this.roomBaseServer.setChangeElement('doc');
         this.pushLocalStream();
       },
       initEventListener() {
@@ -515,10 +546,10 @@
           this.subscribeInster();
           this.addSDKEvents();
         }
-        this.msgServer.$on('live_start', () => {
+        interactiveServer.$on('live_start', () => {
           this.closeInsertvideoHandler(true);
         });
-        this.msgServer.$on('live_over', () => {
+        interactiveServer.$on('live_over', () => {
           this.insertFileStreamVisible && this.closeInsertvideoHandler();
         });
         /**
@@ -646,6 +677,21 @@
           }
         });
       },
+      wrapLeave() {
+        console.log('----wrapLeave-=----');
+        this._timers = setTimeout(() => {
+          console.log('----wrapLeave-setTimeout=----');
+          this.constrolUp = false;
+          clearTimeout(this._timers);
+          this.$refs.insertStream && this.$refs.insertStream.wrapLeave();
+        }, 3000);
+      },
+      wrapHover() {
+        console.log('----wrapHover-=----');
+        clearTimeout(this._timers);
+        this.constrolUp = true;
+        this.$refs.insertStream && this.$refs.insertStream.wrapEnter();
+      },
       // 隐藏控制栏
       hideInsertVideoControl() {
         this.constrolUp = false;
@@ -729,7 +775,11 @@
       },
       // 大小窗切换
       exchange() {
-        // 切换小屏幕
+        if (this.miniElement == 'doc') {
+          this.roomBaseServer.setChangeElement('stream-list');
+        } else {
+          this.roomBaseServer.setChangeElement('doc');
+        }
       },
       // video静音
       jingYin() {
@@ -798,6 +848,14 @@
     width: 100%;
     height: 100%;
     position: relative;
+    &__mini {
+      width: 309px;
+      height: 240px;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      position: absolute;
+    }
     .vmp-insert-local-stream {
       position: absolute;
       height: 100px;
@@ -873,8 +931,7 @@
     }
     &-controller {
       position: absolute;
-      // bottom: -31px;
-      bottom: 0px;
+      bottom: -31px;
       z-index: 20;
       width: 100%;
       padding: 0px 0 0 23px;
@@ -1005,12 +1062,15 @@
               }
             }
           }
-          .iconchaboliebiao_icon,
-          .iconguanbichabo_icon {
+          .vh-line-menu,
+          .vh-line-close {
             margin-left: 12px;
           }
           .vh-iconfont {
             cursor: pointer;
+            &:hover {
+              color: #fb3a32;
+            }
           }
         }
       }

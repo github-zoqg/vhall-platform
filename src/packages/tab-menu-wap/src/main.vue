@@ -1,53 +1,63 @@
 <template>
   <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
-    <section class="vmp-tab-menu__header">
-      <!-- 菜单区域 -->
-      <ul class="vmp-tab-menu-scroll-container" ref="menu">
-        <li
-          v-for="item of mainMenu"
-          :ref="item.id"
-          class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span class="item-text">{{ $tdefault(item.name) }}</span>
-          <i v-show="item.tipsVisible" class="tips"></i>
-        </li>
-        <li
-          v-if="visibleMenu.length > 3"
-          class="vmp-tab-menu-more"
-          :class="{ selected: isSubMenuShow }"
-          @click="toggleSubMenuVisible"
-        >
-          <i class="vh-iconfont vh-full-more"></i>
-        </li>
-      </ul>
+    <template v-if="isTryVideo">
+      <div class="vmp-tab-menu__try">
+        <div class="try-img">
+          <img src="./img/trySee.png" alt="" />
+        </div>
+        <p>{{ $t('appointment.appointment_1030') }}</p>
+      </div>
+    </template>
+    <template v-else>
+      <section class="vmp-tab-menu__header">
+        <!-- 菜单区域 -->
+        <ul class="vmp-tab-menu-scroll-container" ref="menu">
+          <li
+            v-for="item of mainMenu"
+            :ref="item.id"
+            class="vmp-tab-menu-item"
+            :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+            :key="item.id"
+            @click="select({ type: item.type, id: item.id })"
+          >
+            <span class="item-text">{{ $tdefault(item.name) }}</span>
+            <i v-show="item.tipsVisible" class="tips"></i>
+          </li>
+          <li
+            v-if="visibleMenu.length > 3"
+            class="vmp-tab-menu-more"
+            :class="{ selected: isSubMenuShow }"
+            @click="toggleSubMenuVisible"
+          >
+            <i class="vh-iconfont vh-full-more"></i>
+          </li>
+        </ul>
 
-      <!-- 次级菜单 -->
-      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-        <li
-          class="vmp-tab-menu-sub__item"
-          v-for="item of subMenu"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span>{{ $tdefault(item.name) }}</span>
-          <i class="tips" v-show="item.tipsVisible"></i>
-        </li>
-      </ul>
-    </section>
+        <!-- 次级菜单 -->
+        <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+          <li
+            class="vmp-tab-menu-sub__item"
+            v-for="item of subMenu"
+            :key="item.id"
+            @click="select({ type: item.type, id: item.id })"
+          >
+            <span>{{ $tdefault(item.name) }}</span>
+            <i class="tips" v-show="item.tipsVisible"></i>
+          </li>
+        </ul>
+      </section>
 
-    <!-- 正文区域 -->
-    <section class="vmp-tab-menu__main">
-      <tab-content
-        ref="tabContent"
-        :mainMenu="mainMenu"
-        :subMenu="subMenu"
-        @noticeHint="handleHint"
-        @closePopup="selectDefault"
-      />
-    </section>
+      <!-- 正文区域 -->
+      <section class="vmp-tab-menu__main">
+        <tab-content
+          ref="tabContent"
+          :mainMenu="mainMenu"
+          :subMenu="subMenu"
+          @noticeHint="handleHint"
+          @closePopup="selectDefault"
+        />
+      </section>
+    </template>
   </section>
 </template>
 
@@ -92,6 +102,10 @@
       // 是否为嵌入页
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 是否是试看
+      isTryVideo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
       }
     },
     beforeCreate() {
@@ -99,11 +113,13 @@
       this.docServer = useDocServer();
     },
     created() {
+      if (this.isTryVideo) return;
       this.initConfig();
       this.initMenu();
       this.listenEvents();
     },
     async mounted() {
+      if (this.isTryVideo) return;
       await this.$nextTick(0);
       this.selectDefault();
     },
@@ -148,8 +164,8 @@
           this.setVisible({ visible: false, type: 'private' });
         });
         // 设置观看端文档是否可见
-        this.docServer.$on('dispatch_doc_switch_change', val => {
-          console.log('dispatch_doc_switch_change', val);
+        this.docServer.$on('dispatch_doc_switch_status', val => {
+          console.log('dispatch_doc_switch_status', val);
           this.setVisible({ visible: val, type: 2 });
           if (val) {
             let obj = this.getItem({ type: 2 });
@@ -350,6 +366,29 @@
     font-size: 32px;
     display: flex;
     flex-direction: column;
+    &__try {
+      height: 100%;
+      width: 100%;
+      background: #f7f7f7;
+      .try-img {
+        width: 221px;
+        height: 136px;
+        margin: 0 auto;
+        margin-top: 40%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      p {
+        text-align: center;
+        font-size: 28px;
+        color: #8c8c8c;
+        padding-top: 24px;
+        text-indent: -20px;
+      }
+    }
 
     &__header {
       position: relative;

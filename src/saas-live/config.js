@@ -8,7 +8,13 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'comAllDialog'],
+    checkStartPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'checkStartPush'
+      }
+    ]
   },
   // 顶部header容器
   layerHeader: {
@@ -751,12 +757,12 @@ export const serverConfig = {
         method: 'startPush'
       }
     ],
-    emitClickEndLive: [
-      {
-        cuid: 'recordComStreamLocal',
-        method: 'stopPush'
-      }
-    ],
+    // emitClickEndLive: [
+    //   {
+    //     cuid: 'recordComStreamLocal',
+    //     method: 'stopPush'
+    //   }
+    // ],
     emitMediaSettingClick: [
       {
         cuid: 'comMediaSetting',
@@ -807,7 +813,18 @@ export const serverConfig = {
   // 【分屏页面】分屏组件
   splitScreenContainer: {
     component: 'VmpSplitScreen',
-    children: ['comStreamLocal']
+    children: ['splitScreenStreamLocal']
+  },
+  // 【分屏页面】本地流
+  splitScreenStreamLocal: {
+    component: 'VmpStreamLocal',
+    // 停止推流完成事件
+    emitClickUnpublishComplate: [
+      {
+        cuid: 'splitScreenContainer',
+        method: 'handleUnpublishComplate'
+      }
+    ]
   },
   // *******分屏页面****结束
 

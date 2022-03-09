@@ -55,6 +55,7 @@
       </li>
       <li>
         <!-- 问卷-->
+        <question-icon @clickIcon="checkQuestionIcon" />
       </li>
       <li>
         <!-- 签到 -->
@@ -118,6 +119,7 @@
   import praise from './component/praise/index.vue';
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
+  import QuestionIcon from './component/question-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
   const langMap = {
     1: {
@@ -141,6 +143,7 @@
       praise,
       Pay,
       RedPacketIcon,
+      QuestionIcon,
       LotteryIcon
     },
     data() {
@@ -324,16 +327,17 @@
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
-      checkLotteryIcon(redPacketId) {
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      checkredPacketIcon(redPacketId) {
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickLotteryIcon', [redPacketId])
+          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [redPacketId])
         );
       },
-      checkredPacketIcon() {
+      checkQuestionIcon(questionnaireId) {
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [
-            this.$domainStore.state.roomBaseServer.redPacket.red_packet_uuid
-          ])
+          boxEventOpitons(this.cuid, 'emitClickQuestionIcon', [questionnaireId])
         );
       }
     }

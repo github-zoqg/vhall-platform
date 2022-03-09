@@ -20,11 +20,11 @@
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
     },
     created() {
-      console.log(this.$domainStore.state.roomBaseServer.redPacket, '红包红包1111');
-      // 当红包status==1 时表示有红包
       this.initStatus();
       this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
@@ -34,8 +34,12 @@
     methods: {
       initStatus() {
         const redPacketInfo = this.$domainStore.state.roomBaseServer.redPacket;
-        console.log('initStatus');
-        console.log(redPacketInfo);
+        if (redPacketInfo.number * 1 == redPacketInfo.get_user_count * 1) {
+          this.redPacketServer.setAvailable(false);
+        } else {
+          this.redPacketServer.setAvailable(true);
+        }
+        console.log(this.$domainStore.state.roomBaseServer, 'available');
         if (redPacketInfo.red_packet_uuid) {
           this.redPacketServer.setUUid(redPacketInfo.red_packet_uuid);
           this.lastUUID = redPacketInfo.red_packet_uuid;
@@ -47,9 +51,10 @@
       },
       checkRedPacketIcon() {
         this.$emit('clickIcon', this.lastUUID);
+        this.showDot = false;
       },
       handleNewRedPacket(msg) {
-        this.lastUUID = msg;
+        this.lastUUID = msg.red_packet_uuid;
         this.showIcon = true;
         this.showDot = true;
       }
@@ -59,7 +64,6 @@
 <style lang="less" scoped>
   .vmp-red-packet-icon {
     color: #fff;
-    margin-left: 16px;
     position: relative;
     .vmp-dot {
       position: absolute;
