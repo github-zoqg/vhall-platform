@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
