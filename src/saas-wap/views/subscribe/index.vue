@@ -34,7 +34,7 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
-        document.title = roomBaseServer.state.watchInitData.webinar.subject;
+        document.title = roomBaseServer.state.languages.curLang.subject;
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
           this.goWatchPage(clientType);
