@@ -1190,13 +1190,13 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-
+        //todo 这里需要仔细确认一下
         // only 发起端（开始分组讨论）
         this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          isLive && handleStartGroupDiscuss(msg);
+          handleStartGroupDiscuss(msg);
         });
 
-        // 切换channel TODO: ???????疑问点
+        // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
           isLive && handleStartGroupDiscuss(msg);
         });
@@ -1320,12 +1320,14 @@
         //分组--开始讨论
         function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
+          _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.getOnlineUserList();
         }
         //
         function handleEndGroupDiscuss(msg) {
           console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
+          _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.getOnlineUserList();
         }
         //重新获取最新的groupInitData
