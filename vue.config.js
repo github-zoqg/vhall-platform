@@ -256,8 +256,13 @@ const sharedConfig = {
   // 不使用thread-loader, 否则有很大概率编译不通过
   parallel: false,
   devServer: {
-    port: 8080,
+    port: 443,
     host: '0.0.0.0',
+    https: true,
+    // disableHostCheck: true,
+    // allowedHosts: [
+    //   'dev-csd-saas-web.vhall.com'
+    // ],
     contentBase: resolve('public'),
     proxy: {
       '/mock': {
