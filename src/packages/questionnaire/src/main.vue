@@ -293,6 +293,7 @@
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
+            console.log('saveQuestionnaire', res);
             if (confirm) {
               // 确认同步才需要弹窗提示
               this.$message({
