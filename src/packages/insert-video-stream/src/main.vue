@@ -251,6 +251,7 @@
       this.interactiveServer = useInteractiveServer();
       this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.insertFileServer = useInsertFileServer();
     },
     mounted() {
       this.initEventListener();
@@ -259,12 +260,11 @@
       // 开始插播的入口
       async startInertFile() {
         const { watchInitData } = useRoomBaseServer().state;
-        const insertFileServer = useInsertFileServer();
         // 展示插播流组件
         this.insertFileStreamVisible = true;
         // 设置插播状态为 true
-        insertFileServer.setInsertFilePushing(true);
-        insertFileServer.state.insertStreamInfo.userInfo = {
+        this.insertFileServer.setInsertFilePushing(true);
+        this.insertFileServer.state.insertStreamInfo.userInfo = {
           // 推插播流的人的信息
           accountId: watchInitData.join_info.third_party_user_id,
           role: watchInitData.join_info.role_name,
@@ -282,13 +282,12 @@
       async initLocalInsertFile() {
         this._videoEnded = false; // 本地插播文件是否播放结束
         this._isFirstInsertSucces = true; // 记录开始本地插播的状态，video play事件会用到
-        const insertFileServer = useInsertFileServer();
-        if (insertFileServer.state.insertStreamInfo.streamId) {
+        if (this.insertFileServer.state.insertStreamInfo.streamId) {
           await this.stopPushStream();
         }
         // 创建video标签播放本地音视频文件
-        insertFileServer
-          .createLocalVideoElement(insertFileServer.currentLocalInsertFile, {
+        this.insertFileServer
+          .createLocalVideoElement(this.insertFileServer.currentLocalInsertFile, {
             el: 'vmp-insert-stream-video'
           })
           .then(videoElement => {
@@ -325,9 +324,8 @@
       },
       // 创建本地插播流
       creatLoaclStream() {
-        const insertFileServer = useInsertFileServer();
         return new Promise((resolve, reject) => {
-          insertFileServer
+          this.insertFileServer
             .createLocalInsertStream({
               videoNode: 'vmp-insert-local-stream'
             })
@@ -353,11 +351,9 @@
         // 如果未开播，不推流
         if (watchInitData.webinar.type != 1) return;
 
-        const insertFileServer = useInsertFileServer();
-
         this.creatLoaclStream()
           .then(res => {
-            insertFileServer
+            this.insertFileServer
               .publishInsertStream({ streamId: res.streamId })
               .then(() => {
                 interactiveServer.resetLayout();
@@ -372,7 +368,6 @@
       },
       // 云插播播放器开始播放
       handleRemoteInsertVideoPlay(isVideoEnd) {
-        const insertFileServer = useInsertFileServer();
         if (isVideoEnd) {
           // 如果是结束播放，重新开始播放，需要重新推流
           this.stopPushStream().then(() => {
@@ -380,17 +375,15 @@
           });
         }
         // 发送自定义消息，通知开始插播，互动角色关闭麦克风
-        insertFileServer.sendStateChangeMessage(1);
+        this.insertFileServer.sendStateChangeMessage(1);
       },
       // 云插播播放器暂停播放
       handleRemoteInsertVideoPause() {
-        const insertFileServer = useInsertFileServer();
         // 发送自定义消息，通知插播暂停，互动角色开启麦克风
-        insertFileServer.sendStateChangeMessage(0);
+        this.insertFileServer.sendStateChangeMessage(0);
       },
       // 添加播放器video事件
       InitVideoEvent() {
-        const insertFileServer = useInsertFileServer();
         // 本地插播
         this._localFileVideoElement.addEventListener('ended', () => {
           this._videoEnded = true;
@@ -412,7 +405,7 @@
             this._isFirstInsertSucces = false;
             return;
           }
-          insertFileServer.sendStateChangeMessage(1);
+          this.insertFileServer.sendStateChangeMessage(1);
         });
         // 本地插播播放器暂停事件
         this._localFileVideoElement.addEventListener('pause', () => {
@@ -420,7 +413,7 @@
           this.conctorObj.statePlay = false;
           // 如果不是关闭触发的暂停，发送自定义消息，通知插播暂停，互动角色开启麦克风
           if (!this._isCloseInsertvideoHandler) {
-            insertFileServer.sendStateChangeMessage(0);
+            this.insertFileServer.sendStateChangeMessage(0);
             return;
           }
           this._isCloseInsertvideoHandler = false;
@@ -472,14 +465,13 @@
           // 如果不是暂停状态，关闭插播时会触发暂停事件，记录这个状态，暂停事件不需要发自定义消息
           this._isCloseInsertvideoHandler = true;
         }
-        const insertFileServer = useInsertFileServer();
         // 设置插播状态为 false
-        insertFileServer.setInsertFilePushing(false);
+        this.insertFileServer.setInsertFilePushing(false);
         return this.stopPushStream().then(() => {
           console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
           // 还原插播状态
-          insertFileServer.clearInsertFileInfo();
+          this.insertFileServer.clearInsertFileInfo();
           // 设置流为小屏
           this.roomBaseServer.setChangeElement('stream-list');
           document.getElementById('vmp-insert-stream-video').innerHTML = '';
@@ -488,7 +480,7 @@
           // 本地插播播放器销毁
           this.$refs.localStreamRef.innerHTML = '';
           // 云插播播放器容器销毁
-          insertFileServer.setInsertFileType('');
+          this.insertFileServer.setInsertFileType('');
           // 插播隐藏
           this.insertFileStreamVisible = false;
           if (isliveStart) return;
@@ -499,13 +491,12 @@
       },
       // 销毁插播流
       stopPushStream() {
-        const insertFileServer = useInsertFileServer();
-        if (!insertFileServer.state.insertStreamInfo.streamId) {
+        if (!this.insertFileServer.state.insertStreamInfo.streamId) {
           return Promise.resolve();
         }
         // 停止推流
-        return insertFileServer
-          .stopPublishInsertStream(insertFileServer.state.insertStreamInfo.streamId)
+        return this.insertFileServer
+          .stopPublishInsertStream(this.insertFileServer.state.insertStreamInfo.streamId)
           .catch(e => {
             console.log('销毁本地插播流失败', e);
             return e;
@@ -513,8 +504,7 @@
       },
       // 初始化云插播
       async initRemoteInsertFile() {
-        const insertFileServer = useInsertFileServer();
-        if (insertFileServer.state.insertStreamInfo.streamId) {
+        if (this.insertFileServer.state.insertStreamInfo.streamId) {
           await this.stopPushStream();
           const el = document.getElementById('vmp-insert-stream-video');
           el.innerHTML = '';
@@ -534,14 +524,14 @@
         const groupServer = useGroupServer();
         groupServer.state.panelShow = false;
 
-        const insertFileServer = useInsertFileServer();
-        insertFileServer.setInsertVideoElement(videEl);
+        this.insertFileServer.setInsertVideoElement(videEl);
         // TODO: 设置插播画面在大窗
         this.roomBaseServer.setChangeElement('doc');
         this.pushLocalStream();
       },
       initEventListener() {
         const interactiveServer = useInteractiveServer();
+        const groupServer = useGroupServer();
         if (interactiveServer.state.remoteStreams[0]) {
           this.subscribeInster();
           this.addSDKEvents();
@@ -552,6 +542,19 @@
         interactiveServer.$on('live_over', () => {
           this.insertFileStreamVisible && this.closeInsertvideoHandler();
         });
+        // 有人开始演示，需要关闭插播
+        groupServer.$on(groupServer.EVENT_TYPE.VRTC_CONNECT_PRESENTATION_SUCCESS, () => {
+          if (this.isCurrentRoleInsert) {
+            this.closeInsertvideoHandler();
+          }
+        });
+        // 进入小组，需要关闭插播
+        groupServer.$on(groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
+          if (this.isCurrentRoleInsert) {
+            this.closeInsertvideoHandler();
+          }
+        });
+
         /**
          *  监听退出全屏事件
          */
@@ -585,8 +588,7 @@
           videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
-        const insertFileServer = useInsertFileServer();
-        insertFileServer
+        this.insertFileServer
           .subscribeInsertStream(opt)
           .then(() => {
             const obj = JSON.parse(owner.attributes);
@@ -598,11 +600,10 @@
           });
       },
       addSDKEvents() {
-        const insertFileServer = useInsertFileServer();
         const interactiveServer = useInteractiveServer();
         const roomBaseServer = useRoomBaseServer();
         // 流加入
-        insertFileServer.$on('INSERT_FILE_STREAM_ADD', e => {
+        this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', e => {
           console.log('监听流加入55555555', e);
           // { e.type， 流类行 }
           // 0: 纯音频, 1: 只是视频, 2: 音视频  3: 屏幕共享, 4: 插播
@@ -616,7 +617,7 @@
           // 如果是主持人并且是视频插播，设置旁路
           if (
             roomBaseServer.watchInitData.join_info.role_name == 1 &&
-            insertFileServer.state.insertStreamInfo.has_video
+            this.insertFileServer.state.insertStreamInfo.has_video
           ) {
             interactiveServer.resetLayout();
           }
@@ -634,7 +635,7 @@
         });
 
         // 插播流删除 流结束
-        insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', e => {
+        this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', e => {
           console.log('EVENT_REMOTESTREAM_REMOVED插播流删除了', e);
           // 自己和其他人都能收到
           console.log('插播流删除，流id', e.data.streamId, this.streamId);
@@ -647,14 +648,14 @@
             // 如果是主持人并且是视频插播，设置旁路
             if (
               roomBaseServer.watchInitData.join_info.role_name == 1 &&
-              insertFileServer.state.insertStreamInfo.has_video
+              this.insertFileServer.state.insertStreamInfo.has_video
             ) {
               interactiveServer.resetLayout();
             }
             clearInterval(this.resubscribeTimer);
           }
         });
-        insertFileServer.$on('INSERT_FILE_STREAM_FAILED', e => {
+        this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', e => {
           if (e.data.stream.getID() == this.streamId) {
             clearInterval(this.resubscribeTimer);
             this.resubscribeTimer = setInterval(() => {
@@ -663,7 +664,7 @@
                 videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
                 mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
               };
-              insertFileServer
+              this.insertFileServer
                 .subscribeInsertStream(opt)
                 .then(() => {
                   clearInterval(this.resubscribeTimer);

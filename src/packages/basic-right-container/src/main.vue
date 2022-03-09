@@ -26,14 +26,14 @@
     },
     computed: {
       webinarType() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
       },
       isVisibleMiniElement() {
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
         return (
           (this.$domainStore.state.docServer.switchStatus ||
             this.desktopShareServer.state.isShareScreen) &&
-          this.webinarType == 1
+          [1, 4, 5].includes(this.webinarType)
         );
       },
       isTryWatch() {

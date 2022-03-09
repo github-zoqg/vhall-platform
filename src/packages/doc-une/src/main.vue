@@ -390,6 +390,7 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
+        console.log('----resize-----');
         this.resize();
       },
       /**
@@ -398,7 +399,9 @@
       resize() {
         let rect;
         if (this.isWatch) {
+          console.log('----this.isWatch-----');
           if (this.displayMode === 'mini') {
+            console.log('----is mini-----');
             rect = {
               width: 360,
               height: 204
