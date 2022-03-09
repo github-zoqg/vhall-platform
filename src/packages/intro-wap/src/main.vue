@@ -28,7 +28,7 @@
       </main>
       <div
         class="vmp-intro-block__auth"
-        v-if="watchInitData.status == 'subscribe' && webinar.type != 1"
+        v-if="watchInitData.status == 'subscribe' && watchInitData.join_info.is_subscribe != 1"
       >
         <span>
           {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}

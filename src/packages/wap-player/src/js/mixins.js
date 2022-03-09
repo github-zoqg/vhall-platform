@@ -52,6 +52,8 @@ const playerMixins = {
         // 如果是暖场视频不显示回放结束的标识
         if (this.isWarnPreview) return;
         this.isVodEnd = true;
+        // 为了将打开的弹窗关闭
+        this.videoShowIcon();
       });
       // 打开弹幕
       this.playerServer.$on('push_barrage', data => {

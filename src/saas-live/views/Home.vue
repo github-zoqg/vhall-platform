@@ -151,6 +151,14 @@
         splitScreenServer.$on('SPLIT_CLOSE_TO_HOST', async () => {
           this.$message('关闭分屏模式');
         });
+        splitScreenServer.$on('SPLIT_CUSTOM_MESSAGE', msg => {
+          // 分屏停止推流完成的消息
+          if (msg.data.body.type == 'split_unpublish_complete') {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons('comStreamLocal', 'emitClickUnpublishComplate')
+            );
+          }
+        });
       },
       handleKickout() {
         this.state = 2;

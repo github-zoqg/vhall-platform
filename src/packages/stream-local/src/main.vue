@@ -262,6 +262,14 @@
       //     !this.micServer.state.isSpeakOffToInit
       //   );
       // },
+      autoSpeak() {
+        // 观众自动上麦 - 禁音
+        return (
+          this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
+          this.mode == 6 &&
+          this.joinInfo.role_name == 2
+        );
+      },
       showInterIsPlay() {
         return (
           this.mainScreen == this.joinInfo.third_party_user_id &&
@@ -335,6 +343,10 @@
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();
+        } else {
+          if (isSpeakOn) {
+            this.speakOff();
+          }
         }
       },
       // 恢复播放
@@ -393,6 +405,7 @@
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
           await this.stopPush();
 
           await this.interactiveServer.destroy();
@@ -418,6 +431,13 @@
         });
         // 结束直播
         this.interactiveServer.$on('live_over', async () => {
+          // 如果开启分屏并且是主页面，不需要停止推流
+          if (
+            this.splitScreenServer.state.isOpenSplitScreen &&
+            this.splitScreenServer.state.role == 'host'
+          ) {
+            return;
+          }
           await this.stopPush();
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
@@ -604,6 +624,13 @@
             if (this.mainScreen == this.joinInfo.third_party_user_id) {
               await this.setBroadCastScreen();
             }
+          }
+          // 分组活动 自动上麦默认禁音
+          if (this.autoSpeak) {
+            this.interactiveServer.muteAudio({
+              streamId: this.localStream.streamId, // 流Id, 必填
+              isMute: true // true为禁用，false为启用。
+            });
           }
           // 派发事件
           window.$middleEventSdk?.event?.send(
