@@ -91,16 +91,10 @@
         qwe: 1
       };
     },
-    computed: {
-      webinarType() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
-      }
-    },
     created() {
       window.interactTools = this;
     },
     mounted() {
-      console.log(this.configList, useRoomBaseServer().state, 'this.configList');
       this.joinInfoInGift = {
         avatar: this.roomBaseState.watchInitData.join_info.avatar,
         nickname: this.roomBaseState.watchInitData.join_info.nickname,
