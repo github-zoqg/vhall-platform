@@ -11,7 +11,8 @@ import {
   useVirtualAudienceServer,
   useUserServer,
   useGroupServer,
-  useDesktopShareServer
+  useDesktopShareServer,
+  useSplitScreenServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -35,6 +36,7 @@ export default new DomainStore.Store({
     virtualAudienceServer: useVirtualAudienceServer().state,
     userServer: useUserServer().state,
     groupServer: useGroupServer().state,
-    desktopShareServer: useDesktopShareServer().state
+    desktopShareServer: useDesktopShareServer().state,
+    splitScreenServer: useSplitScreenServer().state
   }
 });

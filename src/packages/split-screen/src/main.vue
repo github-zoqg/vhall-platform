@@ -97,6 +97,16 @@
       },
       enterFullScreen() {
         screenfull.toggle(this.$refs.splitScreen);
+      },
+      // 停止推流之后，通知主页面结束直播停止计时
+      handleUnpublishComplate() {
+        console.log('----停止推流之后，通知主页面结束直播停止计时----');
+        // 分屏推流结束，poostMessage消息通知主页面
+        this.splitScreenServer.splitSendPostMessage({
+          type: 'split_unpublish_complete'
+        });
+        // 关闭分屏
+        this.splitScreenServer.splitCloseSplitProcess(false);
       }
     }
   };

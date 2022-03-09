@@ -165,6 +165,12 @@
           interactStatus: true,
           isCheck: lotteryResult
         });
+        // 服务之间传递抽奖结果消息
+        this.lotteryServer.$emit(
+          lotteryResult
+            ? this.lotteryServerthis.Events.LOTTERY_WIN
+            : this.lotteryServerthis.Events.LOTTERY_MISS
+        );
       },
       close() {
         this.dialogVisible = false;

@@ -49,6 +49,10 @@
       setHiddenState(val) {
         this.hidden = val;
       },
+      // 设置文本
+      setText(val) {
+        this.text = val;
+      },
       // click事件
       handleClick: function () {
         if (this.disable) return false;

@@ -59,7 +59,13 @@
           // 初始进入的时候只要发过抽奖,,就显示icon和dot
           if (data?.id) {
             this.showIcon = true;
-            this.dotVisible = true;
+            if (data.lottery_status === 0) {
+              // 抽奖中
+              this.dotVisible = true;
+            } else if (data.win === 1 && data.take_award === 0) {
+              // 中奖未领奖
+              this.dotVisible = true;
+            }
           }
         });
       }
