@@ -41,14 +41,11 @@
         <div
           class="icon-wrapper"
           v-show="
-            (webinar.type == 1 &&
-              deviceStatus != 2 &&
-              connectMicShow &&
-              !disabledAll &&
-              !isBanned &&
-              !groupInitData.isInGroup) ||
-            (onlineMicStatus && !groupInitData.isInGroup) ||
-            (!groupInitData.isBanned && groupInitData.isInGroup)
+            webinar.type == 1 &&
+            deviceStatus != 2 &&
+            ((connectMicShow && !isAllBanned && !isBanned && !groupInitData.isInGroup) ||
+              (onlineMicStatus && !groupInitData.isInGroup) ||
+              (groupInitData.isInGroup && !groupInitData.isBanned))
           "
         ></div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">

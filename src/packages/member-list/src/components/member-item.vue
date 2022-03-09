@@ -517,7 +517,7 @@
       },
       //发起端演示的是否是选中的用户
       isLiveInviteDisable() {
-        return this.userInfo.account_id == this.currentSpeakerId;
+        return this.userInfo.account_id == this.presentationScreen;
       },
       //观看端演示的是否是选中的用户
       isWatchInviteDisable() {
