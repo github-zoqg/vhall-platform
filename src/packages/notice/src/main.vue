@@ -1,35 +1,48 @@
 <template>
-  <div class="vmp-notice-list" v-if="noticeNum">
-    <div class="vmp-notice-list-icon">
-      <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
-      <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
-        <img src="./images/notice-icon.png" alt="" />
-      </div>
-    </div>
-    <div class="vmp-notice-list-container" v-if="isShowNotice">
-      <div class="vmp-notice-list-container-data">
-        <ul v-if="noticeList.length" v-infinite-scroll="moreLoadData">
-          <li v-for="(item, index) in noticeList" :key="index">
-            <div class="vmp-notice-list-container-data-time">
-              {{ item.created_at | formatTime }}
-            </div>
-            <div class="vmp-notice-list-container-data-text">
-              <span class="vmp-notice-list-container-data-text-circle">
-                <i v-if="index == 0"></i>
-              </span>
-              <p class="vmp-notice-list-container-data-text-title">{{ item.content.content }}</p>
-            </div>
+  <div class="vmp-notice-list">
+    <main class="vmp-notice-list-container">
+      <overlay-scrollbars
+        ref="noticeScroll"
+        :options="overlayScrollBarsOptions"
+        style="height: 100%"
+      >
+        <ul>
+          <li
+            class="vmp-notice-list-container__item"
+            v-for="(item, index) of noticeList"
+            :key="index"
+          >
+            <i class="vh-iconfont vh-line-voice" />
+            <p>
+              <span class="v-type">[公告]</span>
+              <span>{{ item.content.content }}</span>
+            </p>
+            <p class="vmp-notice-item__time">{{ item.created_at }}</p>
           </li>
         </ul>
+      </overlay-scrollbars>
+    </main>
+
+    <footer class="vmp-notice-list-textarea">
+      <div class="toSay">
+        <div class="clearfix text-box">
+          <textarea
+            class="mywords fl"
+            placeholder="请输入公告内容"
+            v-on:keyup.enter="sendNotice"
+            v-model.trim="inputVal"
+            name="xword"
+            maxlength="300"
+          ></textarea>
+          <input type="button" class="sendMsg fr" value="发送" @click="sendNotice" />
+        </div>
       </div>
-      <div class="vmp-notice-list-container-close">
-        <i class="iconfont iconguanbi_icon" @click="isShowNotice = false"></i>
-      </div>
-    </div>
+    </footer>
   </div>
 </template>
 <script>
-  import { contextServer, useNoticeServer } from 'vhall-sass-domain';
+  import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
+  import { throttle } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -38,51 +51,76 @@
       }
     },
     data() {
+      const domainState = this.noticeServer.state;
+
       return {
-        noticeNum: 1,
-        isShowNotice: false, //是否显示公告列表
+        domainState,
         noticeList: [],
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
         },
-        totalPages: 0,
-        total: 0
+        inputVal: '',
+
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
+    computed: {
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
+      }
+    },
     beforeCreate() {
-      this.msgServer = contextServer.get('msgServer');
+      this.msgServer = useMsgServer();
       this.noticeServer = useNoticeServer();
-      this.roomBaseServer = contextServer.get('roomBaseServer');
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
-      console.log(this.roomBaseState, '===zhangxiao===???');
+      // this.getNoticeList(false);
+    },
+    mounted() {
       this.initNotice();
     },
     methods: {
+      /**
+       * 初始化scroll区域
+       */
+      initScroll() {
+        this.osInstance = this.$refs.noticeScroll.osInstance();
+        this.osInstance.options(this.overlayScrollBarsOptions);
+      },
+      /**
+       * 初始化notice
+       */
       initNotice() {
-        // 公告消息
-        this.msgServer.$on('ROOM_MSG', msg => {
-          let msgs = JSON.parse(msg.data);
-          if (msgs.type == 'room_announcement') {
-            this.noticeNum++;
-            this.noticeList.unshift({
-              created_at: msgs.push_time,
-              content: {
-                content: msgs.room_announcement_text
-              }
-            });
-          }
+        this.noticeServer.$on('room_announcement', msg => {
+          this.noticeList.unshift({
+            created_at: msg.push_time,
+            content: {
+              content: msg.room_announcement_text
+            }
+          });
+        });
+        this.noticeServer.$on('live_over', () => {
+          this.noticeList = [];
         });
       },
-      getNoticeHistoryList() {
-        this.isShowNotice = true;
-        this.getNoticeList(false);
-      },
-      getNoticeList(flag) {
-        const { getNoticeList } = this.noticeServer;
+
+      /**
+       * 获取历史消息列表
+       * @param {Boolean} isLoadMore
+       */
+      async getNoticeList(isLoadMore = true) {
         const { watchInitData } = this.roomBaseState;
         const params = {
           room_id: watchInitData.interact.room_id,
@@ -90,70 +128,89 @@
           ...this.pageInfo
         };
 
-        getNoticeList({ params, flag }).then(result => {
-          const { backData: res, state } = result;
-          if (res.code == 200 && res.data) {
-            this.noticeList = state.noticeList;
-            this.totalPages = state.totalPages;
-            this.total = state.total;
-            this.noticeNum = state.total;
-          }
-        });
+        await this.noticeServer.getNoticeList({ params, flag: isLoadMore });
       },
+      /**
+       * 读取更多data
+       */
       moreLoadData() {
-        if (this.pageInfo.pageNum >= this.totalPages) {
+        if (this.pageInfo.pageNum >= this.domainState.totalPages) {
           return false;
         }
         this.pageInfo.pageNum++;
         this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
         this.getNoticeList(true);
-      }
+      },
+      /**
+       * 发送一条公告
+       */
+      sendNotice: throttle(function () {
+        if (this.inputVal === '' || this.inputVal === undefined) {
+          return this.$message.warning('内容不能为空');
+        }
+        const params = {
+          messageType: 1,
+          roomId: this.watchInitData.interact.room_id,
+          channel_id: this.watchInitData.interact.channel_id,
+          content: this.inputVal
+        };
+        try {
+          this.noticeServer.sendNotice(params);
+          this.inputVal = '';
+        } catch (error) {
+          console.warn('发送公告消息错误', error);
+        }
+      })
     }
   };
 </script>
+
 <style lang="less">
   .vmp-notice-list {
     height: 100%;
     position: relative;
-    &-icon {
-      &-img {
-        height: 32px;
-        width: 32px;
-        line-height: 32px;
-        border-radius: 50%;
+    &-container {
+      height: calc(100% - 52px);
+      width: 100%;
+      background: transparent;
+      background-size: 100% 100%;
+
+      &__item {
         position: relative;
-        cursor: pointer;
-        img {
-          height: 32px;
-          width: 32px;
+        background-color: #2d2d2d;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 20px 14px 43px;
+
+        &:not(:first-child) {
+          margin-top: 1px;
+        }
+
+        i.vh-iconfont {
+          display: inline-block;
+          position: absolute;
+          top: 17px;
+          font-size: 14px;
+          color: #fba511;
+          left: 15px;
+        }
+
+        p {
+          width: 100%;
+          word-break: break-all;
+          font-size: 12px;
+          color: #ececec;
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+          padding-right: 20px;
+        }
+
+        .vmp-notice-item__time {
+          color: #999;
+          margin-top: 4px;
         }
       }
-      &-num {
-        position: absolute;
-        top: -10px;
-        right: -8px;
-        border-radius: 9px;
-        background: @bg-error-light;
-        color: @font-error-low;
-        font-size: 12px;
-        padding: 0 5px;
-        text-align: center;
-        line-height: 17px;
-        height: 17px;
-        z-index: 1;
-        border: solid 1px @border-tools-color;
-      }
-    }
-    &-container {
-      position: absolute;
-      right: -100px;
-      bottom: 50px;
-      z-index: 12;
-      width: 492px;
-      height: 382px;
-      background: transparent;
-      background-image: url('./images/notice.png');
-      background-size: 100% 100%;
+
       &-data {
         position: absolute;
         top: 108px;
@@ -222,6 +279,60 @@
         i {
           font-size: 12px;
           color: @font-error;
+        }
+      }
+    }
+
+    &-textarea {
+      width: 100%;
+      height: 52px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      background-color: #34363a;
+      .toSay {
+        position: relative;
+        background-color: transparent;
+        padding: 9px 9px 0;
+        height: 100%;
+      }
+      .text-box {
+        .mywords {
+          border: none;
+          background: #545454;
+          height: 32px;
+          width: 250px;
+          resize: none;
+          outline: none;
+          padding: 0 9px;
+          line-height: 32px;
+          color: #fff;
+          overflow: auto;
+          border-radius: 4px 0 0 4px;
+          box-sizing: border-box;
+          font-size: 12px;
+          float: left;
+          display: inline-block;
+        }
+        .sendMsg {
+          box-sizing: border-box;
+          width: 40px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          background: #999;
+          cursor: pointer;
+          border: none;
+          color: #fff;
+          float: left;
+          border-radius: 0 4px 4px 0;
+          font-size: 12px;
+          display: inline-block;
+          outline: none;
+          &:hover {
+            background: #fc5659;
+          }
         }
       }
     }

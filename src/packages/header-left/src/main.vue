@@ -1,15 +1,19 @@
 <template>
   <div class="vmp-header-left">
-    <div :title="subject" class="vhall-room-name">{{ subject }}</div>
+    <div :title="webinarInfo.subject" class="vhall-room-name">
+      {{ webinarInfo.subject || '房间名称' }}
+    </div>
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
-      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ id }}</div>
-      <div :data-clipboard-text="id" class="vhall-room-id-copy" @click="handleCopy">
-        <i class="iconfont iconfuzhi"></i>
+      <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
+      <div class="vhall-room-id-copy" :data-clipboard-text="webinarInfo.id" @click="handleCopy">
+        <i class="vh-iconfont vh-line-copy"></i>
       </div>
     </div>
-    <!---->
-    <div class="nopdelay-icon">
+    <!-- 定时直播 -->
+    <div v-if="webinarInfo.mode == 5" class="auto-live-start">定时直播</div>
+    <!--无延迟-->
+    <div class="nopdelay-icon" v-if="webinarInfo.no_delay_webinar == 1 && webinarInfo.mode != 6">
       <img
         src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
         alt=""
@@ -18,7 +22,8 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import Clipboard from 'clipboard';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpHeaderLeft',
     data() {
@@ -29,45 +34,17 @@
         kind: '',
         icon: '',
         text: '',
-        subject: '', // 直播名称
-        id: '' // 房间id
+        webinarInfo: {}
       };
     },
     created() {
-      const { watchInitData } = contextServer.get('roomBaseServer').state;
-      this.subject = watchInitData?.webinar?.subject || '';
-      this.id = watchInitData?.webinar?.id || '';
+      const { watchInitData } = useRoomBaseServer().state;
+      this.webinarInfo = watchInitData.webinar;
     },
     mounted() {
-      this.initConfig();
+      // this.initConfig();
     },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('className')) {
-            this.className = widget.options.className;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('selected')) {
-            this.selected = widget.options.selected;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('disable')) {
-            this.disable = widget.options.disable;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('icon')) {
-            this.icon = widget.options.icon;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('text')) {
-            this.text = widget.options.text;
-          }
-        }
-      },
       // 负责roomId
       handleCopy() {
         // this.$vhall_paas_port({
@@ -83,13 +60,23 @@
         //     req_url: ''
         //   }
         // });
-        const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        clipboard.on('success', e => {
-          this.$message.success(this.$t('usual.copySucceeded'));
+        const clipboard = new Clipboard('.vhall-room-id-copy');
+        clipboard.on('success', () => {
+          this.$message({
+            message: this.$t('other.other_1008'),
+            showClose: true,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
           clipboard.destroy();
         });
-        clipboard.on('error', e => {
-          this.$message.error(this.$t('usual.copyFailed'));
+        clipboard.on('error', () => {
+          this.$message({
+            message: this.$t('other.other_1009'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
           clipboard.destroy();
         });
       }
@@ -157,6 +144,18 @@
       line-height: 20px;
       text-align: center;
       cursor: pointer;
+    }
+    .auto-live-start {
+      display: inline-block;
+      margin-left: 8px;
+      background: #fb3a32;
+      border-radius: 10px;
+      height: 16px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 16px;
     }
     .nopdelay-icon {
       line-height: 34px;

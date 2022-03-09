@@ -1,0 +1,251 @@
+<template>
+  <div class="vmp-sign-watch">
+    <div v-if="isShowCircle" class="vmp-sign-watch-icon" @click="reShowSignBox">
+      <i class="sign-circle"></i>
+      <img src="./img/icon@2x.png" alt="" />
+    </div>
+    <div v-if="showSign" class="vmp-sign-watch-sign">
+      <div class="vmp-sign-watch-sign-container">
+        <div class="vmp-sign-watch-sign-content">
+          <p class="sign-title">{{ title }}</p>
+          <CountDown
+            :duration="duration"
+            :consume="sign_time"
+            class="vmp-sign-watch-sign-counter"
+          ></CountDown>
+          <el-button type="danger" class="sign-btn" @click="signLogin">
+            {{ $t('interact_tools.interact_tools_1026') }}
+          </el-button>
+        </div>
+        <div class="vmp-sign-watch-sign-close" @click="closeSign">
+          <i class="vh-iconfont vh-line-circle-close"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  import CountDown from './components/countDown';
+  import { useSignServer, useChatServer } from 'middle-domain';
+  export default {
+    name: 'VmpSignWatch',
+    components: {
+      CountDown
+    },
+    watch: {
+      signInfo: {
+        handler(val) {
+          if (val && !val.is_signed && val.id) {
+            this.getHistorySignInfo();
+          }
+        },
+        immediate: true,
+        deep: true
+      }
+    },
+    data() {
+      return {
+        showSign: false,
+        sign_id: '',
+        sign_time: 0,
+        duration: 30,
+        isShowCircle: false,
+        title: this.$t('interact_tools.interact_tools_1025'),
+        secFlag: true
+      };
+    },
+    beforeCreate() {
+      this.signServer = useSignServer();
+    },
+    created() {
+      // this.signServer.listenMsg();
+    },
+    mounted() {
+      this.signServer.$on('sign_in_push', e => {
+        this.sign_id = e.data.sign_id;
+        this.showSign = true;
+        this.title = this.$t(e.data.title);
+        this.sign_time = Number(e.data.sign_show_time);
+        this.duration = Number(e.data.sign_show_time);
+        this.countDownTime();
+
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: this.$t('chat.chat_1027')
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
+      });
+      this.signServer.$on('sign_end', () => {
+        this.showSign = false;
+        this.isShowCircle = false;
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+      });
+    },
+    computed: {
+      roomId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.interact.room_id;
+      },
+      signInfo() {
+        return this.$domainStore.state.roomBaseServer.signInfo;
+      }
+    },
+    methods: {
+      signLogin() {
+        this.signServer
+          .sign({
+            room_id: this.roomId,
+            sign_id: this.sign_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              clearInterval(this.timer);
+              this.showSign = false;
+              this.isShowCircle = false;
+              this.sign_time = 0;
+              this.$message({
+                type: 'success',
+                message: this.$t('interact_tools.interact_tools_1027')
+              });
+            } else {
+              this.showSign = false;
+              this.$message({
+                type: 'error',
+                message:
+                  res.code == 505
+                    ? this.$t('webinar.webinar_1012')
+                    : this.$t('interact_tools.interact_tools_1028')
+              });
+            }
+          })
+          .catch(error => {
+            this.$message({
+              message: error.msg,
+              showClose: true,
+              // duration: 0,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          });
+      },
+      closeSign() {
+        this.showSign = false;
+        this.isShowCircle = true;
+      },
+      reShowSignBox() {
+        this.showSign = true;
+      },
+      getHistorySignInfo() {
+        this.sign_id = this.signInfo.id;
+        this.isShowCircle = true;
+        this.title = this.signInfo.sign_tips;
+        const sign_time =
+          this.signInfo.is_auto_sign == 1
+            ? this.signInfo.auto_sign_time_ttl
+            : this.signInfo.sign_time_ttl;
+        this.sign_time = Number(sign_time);
+        this.duration = Number(this.signInfo.show_time);
+        this.countDownTime();
+      },
+      countDownTime() {
+        this.timer = setInterval(() => {
+          if (this.sign_time <= 1) {
+            clearInterval(this.timer);
+            this.showSign = false;
+            this.isShowCircle = false;
+            return;
+          }
+          this.sign_time--;
+        }, 1000);
+      }
+    }
+  };
+</script>
+<style lang="less">
+  .vmp-sign-watch {
+    &-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      margin-left: 16px;
+      line-height: 32px;
+      .sign-circle {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        background: #fb3a32;
+        border-radius: 50%;
+        border: 1px solid #2a2a2a;
+      }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: scale-down;
+      }
+    }
+    &-sign {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.6);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 28;
+      &-container {
+        width: 399px;
+        height: 464px;
+        margin-top: 10vh;
+        background-image: url('./img/sign@2x.png');
+        background-size: 100% 100%;
+        position: relative;
+      }
+      &-counter {
+        margin: 0 auto;
+      }
+      &-content {
+        text-align: center;
+        padding-top: 180px;
+        margin: 0 auto;
+        .sign-title {
+          font-size: 14px;
+          color: @font-light-normal;
+          line-height: 20px;
+          margin-bottom: 20px;
+        }
+        .sign-btn {
+          width: 160px;
+          font-size: 14px;
+          color: #fff;
+          background-color: #fb3a32;
+          border-color: #fb3a32;
+          margin-top: 20px;
+          border-radius: 20px;
+        }
+      }
+      &-close {
+        position: absolute;
+        left: 47%;
+        bottom: -35px;
+        cursor: pointer;
+        i {
+          font-size: 24px;
+          color: #fff;
+        }
+      }
+    }
+  }
+</style>

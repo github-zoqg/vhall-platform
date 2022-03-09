@@ -12,7 +12,7 @@
   min-height: 124px;
 }
 .el-dialog__headerbtn {
-  top: 32px;
+  top: 30px;
   right: 32px;
   height: 16px;
   .el-dialog__close {
@@ -73,8 +73,8 @@
     padding: 24px 32px;
     .el-button {
       border-radius: 20px;
-      min-width: 76px !important;
-      min-height: 36px !important;
+      min-width: 76px;
+      min-height: 36px;
     }
   }
 }
@@ -300,6 +300,7 @@
 }
 .el-input__inner,
 .el-textarea__inner {
+  padding: 0 12px;
   border-color: @border-normal-color;
   color: @font-light-normal;
   &:hover {
@@ -363,6 +364,17 @@
   resize: none;
 }
 
+/*-----------------------------------------表单-----------------------------------------*/
+.el-form-item {
+  margin-bottom: 24px;
+}
+.el-form-item.is-success .el-input__inner,
+.el-form-item.is-success .el-input__inner:focus,
+.el-form-item.is-success .el-textarea__inner,
+.el-form-item.is-success .el-textarea__inner:focus {
+  border-color: @font-light-normal;
+}
+
 /*-----------------------------------------下拉框重置-----------------------------------------*/
 .el-select-dropdown__item {
   &.selected {
@@ -422,7 +434,7 @@
 }
 .el-date-table td.current:not(.disabled) span {
   color: @font-error-low;
-  background-color: @seleted-color-normal !important;
+  background-color: @seleted-color-normal;
 }
 /* -----------------------------------------加载中效果 -----------------------------------------*/
 .el-loading-spinner i {
@@ -439,19 +451,19 @@
 /* -----------------------------------------下拉框 _ 选择框样式重置----------------------------------------- */
 .el-select-dropdown {
   &.el-popper {
-    margin-top: 3px !important;
+    margin-top: 3px;
   }
   .popper__arrow {
-    display: none !important;
+    display: none;
   }
   .el-select-dropdown__list {
     padding: 4px 0;
   }
   .el-select-dropdown__wrap {
-    max-height: 208px !important;
+    max-height: 208px;
   }
   .el-select-dropdown__item {
-    line-height: 40px !important;
+    line-height: 40px;
     &.hover,
     &:hover {
       background-color: @hover-color-normal;
@@ -471,6 +483,10 @@
   border: 1px solid @border-normal-color;
   padding: 9px 48px;
   color: @font-light-second;
+  &.is-round {
+    border-radius: 20px;
+    padding: 7px 30px;
+  }
   &:hover {
     color: @font-error-low;
     background: @font-high-light-normal;
@@ -530,7 +546,6 @@
 
 .el-button.is-round {
   border-radius: 20px;
-  padding: 9px 51px;
 }
 
 .el-button.el-button--small {
@@ -631,18 +646,18 @@
   padding: 0 0;
 }
 .el-dropdown-menu {
-  background-color: @bg-dark-section !important;
-  color: @font-light-low !important;
-  border: none !important;
+  background-color: @bg-dark-section;
+  color: @font-light-low;
+  border: none;
   top: 48px;
-  padding: 5px 0 !important;
+  padding: 5px 0;
   .el-dropdown-menu__item {
     height: 28px;
     line-height: 28px;
   }
   .el-dropdown-menu__item:hover {
     background-color: @border-bormal;
-    color: @font-dark-normal !important;
+    color: @font-dark-normal;
   }
 }
 .el-popper[x-placement^='bottom'] .popper__arrow {

@@ -9,7 +9,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'comCheckDevice']
+    children: ['layerHeader', 'layerBody', 'comCheckDevice', 'comVirtualPeople']
   },
   // 顶部header容器
   layerHeader: {
@@ -28,7 +28,7 @@ export const serverConfig = {
   layerBodyLeft: {
     component: 'VmpContainer',
     className: 'vmp-basic-left',
-    children: ['comAsideMenu']
+    children: ['comChatMenu', 'comMemberMenu', 'comBigDataMenu']
   },
   layerBodyCenter: {
     component: 'VmpContainer',
@@ -50,7 +50,7 @@ export const serverConfig = {
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
-    children: ['comChat']
+    children: []
   },
   /*** 布局定义end */
 
@@ -62,9 +62,21 @@ export const serverConfig = {
   },
   // 顶部右侧容器
   pannelHeaderRight: {
-    component: 'VmpContainer',
+    component: 'VmpHeaderRight',
     className: 'vmp-header-right vmp-header-func',
-    children: ['comSettingIcon', 'comFullIcon', 'comUserSettingBox']
+    options: {
+      isShowQuit: true, //是否显示退出
+      isShowSupport: true, //是否显示技术支持
+      isShowSplitScreen: false //是否显示分屏
+    },
+    emitVirtualClick: [
+      {
+        cuid: 'comVirtualPeople',
+        method: 'openVirtualDialog',
+        args: [{ type: 2 }]
+      }
+    ]
+    // children: ['comSettingIcon', 'comFullIcon']
   },
   // 顶部左侧组件
   compHeaderLeft: {
@@ -73,7 +85,7 @@ export const serverConfig = {
   // 左侧导航菜单
   comAsideMenu: {
     component: 'VmpAsideMenu',
-    children: ['comChatMenu', 'comMemberMenu', 'comBigDataMenu', 'comShareMenu']
+    children: ['comChatMenu', 'comMemberMenu', 'comBigDataMenu']
   },
   // 语言选择组件
   compLanguageChoice: {
@@ -181,12 +193,12 @@ export const serverConfig = {
     component: 'VmpStreamLocal'
   },
   //设备检测
-  comCheckDevice: {
-    component: 'VmpCheckDevice',
-    options: {
-      title: 'check_device.check_device_1000'
-    }
-  },
+  // comCheckDevice: {
+  //   component: 'VmpCheckDevice',
+  //   options: {
+  //     title: 'check_device.check_device_1000'
+  //   }
+  // },
   // 聊天菜单
   comChatMenu: {
     component: 'VmpIconText',
@@ -212,14 +224,14 @@ export const serverConfig = {
       text: 'aside_menu.aside_menu_1005'
     }
   },
-  // 分享菜单
-  comShareMenu: {
-    component: 'VmpIconText',
-    options: {
-      icon: 'iconfont icon-fenxiangxiaoguo-',
-      text: 'aside_menu.aside_menu_1006'
-    }
-  },
+  // // 分享菜单
+  // comShareMenu: {
+  //   component: 'VmpIconText',
+  //   options: {
+  //     icon: 'iconfont icon-fenxiangxiaoguo-',
+  //     text: 'aside_menu.aside_menu_1006'
+  //   }
+  // },
   //设置按钮
   comSettingIcon: {
     component: 'VmpSettingIcon',
@@ -241,5 +253,8 @@ export const serverConfig = {
       icon: 'iconfont icon-faqiduanshezhi',
       title: '设备检测'
     }
+  },
+  comVirtualPeople: {
+    component: 'VmpVirtualPeople'
   }
 };

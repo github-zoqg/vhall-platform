@@ -1,54 +1,100 @@
 import {
-  contextServer,
   useMsgServer,
   useRoomBaseServer,
   useDocServer,
-  useInteractiveServer
-} from 'vhall-sass-domain';
+  useInteractiveServer,
+  useMicServer,
+  useMediaCheckServer,
+  useGroupServer,
+  useMediaSettingServer,
+  useRebroadcastServer,
+  useInsertFileServer,
+  useMemberServer,
+  useDesktopShareServer,
+  useSplitScreenServer
+} from 'middle-domain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
-  let msgServer = contextServer.get('msgServer');
-  if (!msgServer) {
-    msgServer = useMsgServer();
-  }
-  if (!msgServer) {
-    throw Error('get msgServer exception');
-  }
-  console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
+  const msgServer = useMsgServer();
+  const docServer = useDocServer();
+  const interactiveServer = useInteractiveServer();
+  const roomBaseServer = useRoomBaseServer();
+  const mediaCheckServer = useMediaCheckServer();
+  const groupServer = useGroupServer();
+  const micServer = useMicServer();
+  const mediaSettingServer = useMediaSettingServer();
+  const rebroadcastServer = useRebroadcastServer();
+  const insertFileServer = useInsertFileServer();
+  const desktopShareServer = useDesktopShareServer();
+  const splitScreenServer = useSplitScreenServer();
 
-  let docServer = contextServer.get('docServer');
-  if (!docServer) {
-    docServer = useDocServer();
+  const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
+  if (!checkSystemResult.result) {
+    return 'isBrowserNotSupport';
   }
-  if (!docServer) {
-    throw Error('get docServer exception');
-  }
-  contextServer.set('docServer', docServer);
-  console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
 
-  let interactiveServer = contextServer.get('interactiveServer');
-  if (!interactiveServer) {
-    interactiveServer = useInteractiveServer();
-  }
-  if (!interactiveServer) {
-    throw Error('get interactiveServer exception');
-  }
-  console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
-
-  let roomBaseServer = contextServer.get('roomBaseServer');
-  if (!roomBaseServer) {
-    roomBaseServer = useRoomBaseServer();
-  }
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
-  console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue');
+  console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
+
+  // 获取媒体许可，设置设备状态
+  await mediaCheckServer.getMediaInputPermission();
+
+  // 获取房间互动工具状态
+  await roomBaseServer.getInavToolStatus();
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
+  // 如果存在rebroadcast
+  if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {
+    await rebroadcastServer.init();
+    console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', rebroadcastServer);
+  }
+
+  micServer.init();
 
   await msgServer.init();
-  await interactiveServer.init();
+  console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  await docServer.init({
-    token: roomBaseServer.state.watchInitData.interact.paas_access_token
-  });
+  // await splitScreenServer.init();
+  // console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
+
+  if (!splitScreenServer.state.isOpenSplitScreen) {
+    // 没有开启分屏则初始化互动
+    await interactiveServer.init();
+    console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  }
+
+  insertFileServer.init();
+
+  desktopShareServer.init();
+
+  await docServer.init();
+  console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
+
+  mediaSettingServer.init();
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
+  useMicServer();
+
+  // TODO 方便查询数据，后面会删除
+  window.msgServer = msgServer;
+  window.roomBaseServer = roomBaseServer;
+  window.interactiveServer = interactiveServer;
+  window.docServer = docServer;
+  window.groupServer = groupServer;
+  window.micServer = micServer;
+  window.insertFileServer = insertFileServer;
+  window.memberServer = useMemberServer();
 }

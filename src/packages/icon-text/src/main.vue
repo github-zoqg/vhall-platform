@@ -1,6 +1,7 @@
 <template>
   <a
     href="javascript:;"
+    v-if="!hidden && (configList[auth] || auth)"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
@@ -15,52 +16,27 @@
   </a>
 </template>
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpIconText',
     data() {
       return {
-        className: '',
-        kind: '',
-        selected: false,
-        disable: false,
-        icon: '',
-        text: ''
+        className: '', // 自定义样式
+        icon: '', // 小图标
+        text: '', // 文本
+        kind: '', // 类型
+        auth: '', // 权限控制是否显示
+        selected: false, // 是否选中
+        disable: false, // 是否禁用
+        hidden: false // 是否隐藏
       };
     },
-    mounted() {
-      this.initConfig();
+    computed: {
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      }
     },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('className')) {
-            this.className = widget.options.className;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('kind')) {
-            this.kind = widget.options.kind;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('selected')) {
-            this.selected = widget.options.selected;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('disable')) {
-            this.disable = widget.options.disable;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('icon')) {
-            this.icon = widget.options.icon;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('text')) {
-            this.text = widget.options.text;
-          }
-        }
-      },
       // 设置选中转态
       setSelectedState(val) {
         this.selected = val;
@@ -69,13 +45,14 @@
       setDisableState(val) {
         this.disable = val;
       },
+      // 设置显示隐藏状态
+      setHiddenState(val) {
+        this.hidden = val;
+      },
       // click事件
       handleClick: function () {
         if (this.disable) return false;
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClick'
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClick'));
       }
     }
   };
@@ -88,6 +65,7 @@
     font-size: 12px;
     color: #ececec;
     padding: 10px 0px;
+    cursor: pointer;
 
     span.text {
       font-size: 12px;
@@ -103,9 +81,9 @@
       font-size: 22px;
     }
 
-    &:hover {
-      cursor: pointer;
-    }
+    // &:hover {
+    //   cursor: pointer;
+    // }
 
     &.selected {
       span.text,
@@ -115,10 +93,14 @@
     }
 
     &.disable {
+      cursor: default;
       span.text,
       i {
         color: #777777;
       }
+      // &:hover {
+      //   cursor: default;
+      // }
     }
   }
 </style>

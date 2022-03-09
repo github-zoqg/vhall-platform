@@ -21,7 +21,11 @@
             <span></span>
             <p>{{ $t('nav.nav_1017') }}</p>
           </div>
-          <div class="vmp-share-wrap-imgs-invite" @click="shareOtherDialog(4)" v-if="isInviteShare">
+          <div
+            class="vmp-share-wrap-imgs-invite"
+            @click="shareOtherDialog(4)"
+            v-if="isInviteShare && isWatchInvite"
+          >
             <span></span>
             <p>{{ $t('nav.nav_1015') }}</p>
           </div>
@@ -55,37 +59,35 @@
   </div>
 </template>
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpShare',
     data() {
       return {
         shareVisible: false,
         shareOtherVisible: false,
-        watchWebUrl: `https://t-webinar.e.vhall.com/v3/lives/watch/${this.$route.params.id}`,
+        watchWebUrl: `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
-        isInviteShare: false
+        isInviteShare: false,
+        isWatchInvite: false
       };
     },
     beforeCreate() {
-      this.roomBaseServer = contextServer.get('roomBaseServer');
-    },
-    mounted() {
-      this.initConfig();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
     },
     methods: {
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          Object.assign(this.$data, widget.options);
-        }
-      },
       openShareDialog() {
         this.shareVisible = true;
+        if (!this.isInviteShare) return; //发起端不用判断是否开启邀请卡
+        if (this.roomBaseState.inviteCard.status == '1') {
+          this.isWatchInvite = true;
+        } else {
+          this.isWatchInvite = false;
+        }
       },
       shareOtherDialog(index) {
         this.shareUrl = '';
@@ -156,9 +158,9 @@
         const { join_info } = this.roomBaseState.watchInitData;
         if (join_info) {
           const url = encodeURIComponent(
-            `https://t-webinar.e.vhall.com/v3/lives/invite/${this.$route.params.id}?invite_id=${
-              join_info.join_id || ''
-            }`
+            `https:${process.env.VUE_APP_WAP_WATCH}${
+              process.env.VUE_APP_ROUTER_BASE_URL
+            }/lives/invite/${this.$route.params.id}?invite_id=${join_info.join_id || ''}`
           );
           this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         }
@@ -205,7 +207,7 @@
         }
         &-chat {
           span {
-            background: url('./images/wechat@2x.png') 50% no-repeat;
+            background: url('./img/wechat@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -214,7 +216,7 @@
         }
         &-qq {
           span {
-            background: url('./images/qq@2x.png') 50% no-repeat;
+            background: url('./img/qq@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -223,7 +225,7 @@
         }
         &-weibo {
           span {
-            background: url('./images/weibo@2x.png') 50% no-repeat;
+            background: url('./img/weibo@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -232,7 +234,7 @@
         }
         &-invite {
           span {
-            background: url('./images/inv-card@2x.png') 50% no-repeat;
+            background: url('./img/inv-card@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {

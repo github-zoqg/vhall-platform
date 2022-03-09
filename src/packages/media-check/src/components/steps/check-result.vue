@@ -2,11 +2,11 @@
   <section class="check-end">
     <div>
       <div class="check-end-icon success" v-if="isCheckSuccess">
-        <span class="iconfont iconchenggong"></span>
+        <i class="vh-iconfont vh-line-circle-check" />
         <div class="check-end-text">设备检测正常</div>
       </div>
       <div class="check-end-icon fail" v-else>
-        <span class="iconfont iconyichang"></span>
+        <i class="vh-iconfont vh-line-warning-outline" />
         <div class="check-end-text">设备检测异常</div>
       </div>
     </div>
@@ -17,33 +17,37 @@
         <span>检测结果</span>
       </header>
 
-      <main v-for="item of checkList" :key="item.name" class="vh-check-result__item">
-        <span>{{ item.text }}</span>
-        <span :class="item.status">
-          <span>{{ item.status === 'success' ? '正常' : '异常' }}</span>
-        </span>
+      <main>
+        <div v-for="item of checkList" :key="item.name" class="vh-check-result__item">
+          <span>{{ item.text }}</span>
+          <span :class="item.status">
+            <span>{{ item.status === 'success' ? '正常' : '异常' }}</span>
+          </span>
+        </div>
       </main>
+    </div>
 
-      <footer class="vh-footer__result-btn">
+    <footer class="vh-footer">
+      <section v-if="!isCheckSuccess" class="vh-footer_result-help">
+        <a target="_blank" href="https://e.vhall.com/v3/lives/room/624923410?type=ctrl">
+          {{ $t('setting.setting_1029') }}
+        </a>
+      </section>
+
+      <section class="vh-fotter_result-btn">
         <el-button round v-if="!isCheckSuccess" @click="restart" class="confirm">
           重新检测
         </el-button>
-        <el-button
-          round
-          type="primary"
-          v-if="isCheckSuccess"
-          :class="audioOutputStatus != 'success' ? 'cancel' : 'confirm'"
-          @click="finish"
-        >
+        <el-button round type="primary" v-if="isCheckSuccess" @click="finish">
           {{ roleName == 1 ? '去直播' : '马上互动' }}
         </el-button>
-      </footer>
-    </div>
+      </section>
+    </footer>
   </section>
 </template>
 
 <script>
-  import { contextServer } from 'vhall-sass-domain';
+  import { useRoomBaseServer } from 'middle-domain';
 
   export default {
     name: 'check-result',
@@ -76,7 +80,7 @@
       }
     },
     created() {
-      const { watchInitData } = contextServer.get('roomBaseServer').state;
+      const { watchInitData } = useRoomBaseServer().state;
       this.roleName = watchInitData?.join_info?.role_name;
     },
     methods: {
@@ -92,11 +96,13 @@
 
 <style lang="less">
   .check-end {
+    width: 330px;
+
     .check-end-icon {
       display: flex;
       flex-direction: column;
       align-items: center;
-      & > .iconfont {
+      & > .vh-iconfont {
         font-size: 48px;
       }
       & > .check-end-text {
@@ -155,12 +161,31 @@
           }
         }
       }
+    }
+    .vh-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: absolute;
+      bottom: 16px;
+      width: 330px;
+
       .vh-check-help {
         position: absolute;
         left: 55px;
         bottom: 32px;
         &:hover {
           text-decoration: underline;
+        }
+      }
+
+      .vh-footer_result-help {
+        a {
+          font-size: 14px;
+          color: #666;
+          &:hover {
+            color: #3562fa;
+          }
         }
       }
 

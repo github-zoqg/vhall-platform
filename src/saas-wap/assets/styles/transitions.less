@@ -1,0 +1,145 @@
+/* 渐隐渐现 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 向左滑入，向左划出 */
+.left-enter {
+  transform: translateX(100%);
+}
+.left-enter-to,
+.left-leave {
+  transform: translateX(0);
+}
+.left-enter-active,
+.left-leave-active {
+  transition: 0.3s;
+}
+.left-leave-to {
+  transform: translateX(-100%);
+}
+/* 向右滑入，从右划出 */
+.right-enter {
+  transform: translateX(-100%);
+}
+.right-enter-to,
+.right-leave {
+  transform: translateX(0);
+}
+.right-enter-active,
+.right-leave-active {
+  transition: 0.3s;
+}
+.right-leave-to {
+  transform: translateX(100%);
+}
+
+/* 向左滑入，从右划出 */
+.left-right-enter,
+.left-right-leave-to {
+  transform: translateX(100%);
+}
+.left-right-enter-to,
+.left-right-leave {
+  transform: translateX(0);
+}
+.left-right-enter-active,
+.left-right-leave-active {
+  transition: 0.3s;
+}
+
+/* 向左滑入，从右划出 */
+.right-left-enter,
+.right-left-leave-to {
+  transform: translateX(-100%);
+}
+
+.right-left-leave,
+.right-left-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+.right-left-enter-active,
+.right-left-leave-active {
+  transition: 0.3s;
+}
+
+/* 向上滑入，从下划出 */
+.top-bottom-enter,
+.top-bottom-leave-to {
+  transform: translateY(100%);
+}
+.top-bottom-enter-to,
+.top-bottom-leave {
+  transform: translateY(0);
+}
+.top-bottom-enter-active,
+.top-bottom-leave-active {
+  transition: 0.3s;
+}
+
+/* 向左滑入，从右划出 */
+.bottom-top-enter,
+.bottom-top-leave-to {
+  transform: translateY(-100%);
+}
+.bottom-top-enter-to,
+.bottom-top-leave {
+  transform: translateY(0);
+}
+.bottom-top-enter-active,
+.bottom-top-leave-active {
+  transition: 0.3s;
+}
+/* 列表进入划出动画 */
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+  transition: all 0.5s;
+}
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s;
+}
+.list-enter,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-leave-active {
+  position: absolute;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rotate-r {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-90deg);
+  }
+  50% {
+    transform: rotate(-180deg);
+  }
+  75% {
+    transform: rotate(-270deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+.refreshing {
+  animation: rotate-r 1s linear infinite;
+}

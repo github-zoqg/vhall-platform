@@ -1,18 +1,7 @@
 <template>
-  <div class="vmp-basic-center">
+  <div class="vmp-basic-center" :class="isEmbed ? 'vmp-basic-center-embed' : ''">
     <!-- 流列表 -->
-    <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
-    <!-- 主区域占位 -->
-    <div class="vmp-basic-center__mainscreen-pos"></div>
-    <!-- 播放器 -->
-    <vmp-air-container v-if="false" :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
-    <!-- 文档 -->
-    <!-- 桌面共享 -->
-    <!-- 插播 -->
-    <!-- 底部控制栏 -->
-    <vmp-air-container :cuid="childrenComp[2]" :oneself="true"></vmp-air-container>
-    <!-- 滚动的公告 -->
-    <vmp-air-container :cuid="childrenComp[3]" :oneself="true"></vmp-air-container>
+    <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
 
@@ -20,15 +9,13 @@
   export default {
     name: 'VmpBasicCenterContainer',
     data() {
-      return {
-        childrenComp: []
-      };
+      return {};
     },
-    created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
-    },
-    mounted() {},
-    methods: {}
+    computed: {
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
+    }
   };
 </script>
 
@@ -39,9 +26,16 @@
     flex-direction: column;
     background-color: #2d2d2d;
     width: calc(100% - 380px);
-    margin-right: 20px;
     border-radius: 4px;
+    &-embed {
+      height: 100%;
+      width: calc(100% - 360px) !important;
+    }
+    &__mainscreen-pos {
+      height: 100%;
+    }
   }
+  // .vmp-basic-center
   .vmp-basic-center__mainscreen-pos {
     width: 100%;
     padding-top: 56.25%;

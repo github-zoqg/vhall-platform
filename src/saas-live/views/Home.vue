@@ -7,62 +7,122 @@
   >
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
-
-      <aside class="vmp-basic-dialog-container">
-        <VmpPcMediaCheck></VmpPcMediaCheck>
-      </aside>
     </div>
     <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
+    <Chrome v-else-if="state === 3"></Chrome>
   </div>
 </template>
 
 <script>
   import roomState from '../headless/room-state.js';
-  import MsgTip from './MsgTip.vue';
-  import { useRoomInitGroupServer } from 'vhall-sass-domain';
+  import MsgTip from './MsgTip';
+  import Chrome from './Chrome';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
-      MsgTip
+      MsgTip,
+      Chrome
     },
     data() {
       return {
-        state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败
+        state: 0, // 当前状态： 0:loading; 1：直播房间初始化成功； 2：初始化失败；3：浏览器不支持
         errMsg: ''
       };
-    },
-    beforeCreate() {
-      this.roomInitGroupServer = useRoomInitGroupServer();
     },
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        await this.initSendLive();
-        await roomState();
+        const domain = await this.initSendLive();
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.startGetDegradationInterval({
+          staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+          environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+          systemKey: 2
+        });
+        domain.initVhallReport(
+          {
+            bu: 0,
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            webinar_id: this.$route.params.id,
+            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            os: 10,
+            type: 4,
+            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            pf: 7,
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          },
+          {
+            namespace: 'saas', //业务线
+            env: 'test', // 环境
+            method: 'post' // 上报方式
+          }
+        );
+        window.vhallReport.report('ENTER_WATCH');
+        window.vhallLog({
+          tag: 'doc', // 日志所属功能模块
+          data: {
+            user_id: 20001,
+            user_name: 'hello world',
+            url: 'https://t.e.vhall.com'
+          },
+          type: 'log' // log 日志埋点，event 业务数据埋点
+        });
+        const res = await roomState();
+        // 如果浏览器不支持
+        if (res === 'isBrowserNotSupport') {
+          this.state = 3;
+          return;
+        }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
-      } catch (ex) {
+        this.addEventListener();
+      } catch (err) {
         console.error('---初始化直播房间出现异常--');
-        console.error(ex);
+        console.error(err);
+        if (err.code == 510008) {
+          // 未登录
+          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
+            location.search
+          }`;
+        }
         this.state = 2;
-        this.errMsg = ex.msg;
+        this.errMsg = err.msg;
       }
     },
     methods: {
       // 初始化直播房间
-      async initSendLive() {
+      initSendLive() {
         const { id } = this.$route.params;
-        const { token } = this.$route.query;
+        const { token, nickname = '', email = '', liveT = '' } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
-        await this.roomInitGroupServer.initSendLive({
-          webinarId: id,
+        return new Domain({
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
-            token: localStorage.getItem('token')
+            token: localStorage.getItem('token') || '',
+            liveToken: liveT,
+            'gray-id': sessionStorage.getItem('initGrayId')
+          },
+          initRoom: {
+            webinar_id: id, //活动id
+            clientType: 'send', //客户端类型
+            nickname,
+            email
           }
         });
+      },
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.errMsg = '您已被禁止访问当前活动';
       }
     }
   };

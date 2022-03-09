@@ -1,7 +1,51 @@
-import { setBaseUrl, setRequestHeaders } from 'vhall-sass-domain';
-// setBaseUrl(process.env.VUE_APP_MOCK_BASE_URL);
-setBaseUrl('https://t-saas-dispatch.vhall.com');
+import Vue from 'vue';
+import DomainStore from './store';
+import {
+  setBaseUrl,
+  setRequestHeaders,
+  useDocServer,
+  useInteractiveServer,
+  useRoomBaseServer,
+  useMicServer,
+  useMemberServer,
+  useQaAdminServer,
+  useGroupServer,
+  useChatAuthServer,
+  useMediaSettingServer,
+  useUserServer,
+  useInsertFileServer,
+  useDesktopShareServer,
+  useSplitScreenServer
+} from 'middle-domain';
 
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
+});
 setRequestHeaders({
-  platform: 10
+  platform: 7, // 7:PC网页版
+  token: localStorage.getItem('token') || '',
+  'biz-id': 2, //业务线标识 saas: 2 知客: 4
+  'biz-application-id': 'fd8d3653' //paas应用id saas: fd8d3653 知客: 02391153
+});
+
+Vue.use(DomainStore);
+
+export default new DomainStore.Store({
+  state: {
+    roomBaseServer: useRoomBaseServer().state,
+    docServer: useDocServer().state,
+    interactiveServer: useInteractiveServer().state,
+    micServer: useMicServer().state,
+    memberServer: useMemberServer().state,
+    qaServer: useQaAdminServer().state,
+    groupServer: useGroupServer().state,
+    chatAuthServer: useChatAuthServer().state,
+    mediaSettingServer: useMediaSettingServer().state,
+    userServer: useUserServer().state,
+    insertFileServer: useInsertFileServer().state,
+    desktopShareServer: useDesktopShareServer().state,
+    splitScreenServer: useSplitScreenServer().state
+  }
 });

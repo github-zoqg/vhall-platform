@@ -1,6 +1,9 @@
 <template>
   <div class="vmp-chat-input">
-    <div class="vmp-chat-input__textarea-box" v-show="!inputStatus.disable && !chatLoginStatus">
+    <div
+      class="vmp-chat-input__textarea-box"
+      v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
+    >
       <textarea
         id="chat-textarea"
         ref="chatTextarea"
@@ -26,12 +29,13 @@
     </div>
 
     <div
-      v-show="inputStatus.disable || chatLoginStatus"
+      v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
       class="vmp-chat-input__textarea-placeholder"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
-        <span class="chat-login-btn" @click="callLogin">登录</span>
-        后参与聊天
+        <i18n path="chat.chat_1001">
+          <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
+        </i18n>
       </span>
       <span v-show="inputStatus.disable && !chatLoginStatus" class="textarea-placeholder_no-login">
         {{ inputStatus.placeholder }}
@@ -40,7 +44,7 @@
 
     <div class="vmp-chat-input__send-btn-box">
       <div class="vmp-chat-input__send-btn" @click="sendMsgThrottle">
-        <i class="icon iconfont iconfasong_icon"></i>
+        <i class="vh-iconfont vh-line-send"></i>
       </div>
     </div>
   </div>
@@ -48,9 +52,11 @@
 
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
-  import { useChatServer, contextServer } from 'vhall-sass-domain';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatInput',
+    mixins: [emitter],
     props: {
       //输入框状态
       inputStatus: {
@@ -85,13 +91,13 @@
       }
     },
     data() {
-      const roomBaseState = contextServer.get('roomBaseServer').state;
+      const roomBaseState = useRoomBaseServer().state;
       return {
         roomBaseState,
         //聊天输入框的值
         inputValue: '',
         //聊天框提示文字
-        placeholder: '参与聊天',
+        placeholder: this.$t('chat.chat_1021'),
         //字数限制
         inputMaxLength: 140,
         //显示字数限制提示
@@ -114,6 +120,10 @@
       //在线人数
       onlineUsers() {
         return this.roomBaseState.watchInitData.pv.show;
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {
@@ -121,9 +131,10 @@
         if (Object.keys(this.replyMsg || {}).length == 0) {
           this.inputValue = this.trimPlaceHolder('reply');
         } else {
+          const replyText = this.$t('chat.chat_1036');
           this.inputValue = this.inputValue
-            ? `回复${this.replyMsg.nickName}: ${this.trimPlaceHolder('reply')}`
-            : `回复${this.replyMsg.nickName}: `;
+            ? `${replyText}${this.replyMsg.nickname}: ${this.trimPlaceHolder('reply')}`
+            : `${replyText}${this.replyMsg.nickname}: `;
         }
       },
       inputValue(newValue) {
@@ -132,9 +143,7 @@
         }
       }
     },
-    beforeCreate() {
-      this.chatServer = useChatServer();
-    },
+    beforeCreate() {},
     mounted() {
       this.overlayScrollbarInit();
     },
@@ -205,37 +214,36 @@
         const lastIndex = firstPart.lastIndexOf('@');
         if (lastIndex !== -1) {
           const userName = this.inputValue.substring(lastIndex, currentIndex);
-          const nickName = userName.replace('@', '');
+          const nickname = userName.replace('@', '');
           // 删除整个@过的用户名逻辑
-          if (this.atList.find(u => u.nickName === nickName)) {
-            let tempList = this.atList.filter(n => n.nickName !== nickName);
+          if (this.atList.find(u => u.nickname === nickname)) {
+            let tempList = this.atList.filter(n => n.nickname !== nickname);
             this.atList.splice(0, this.atList.length, ...tempList);
             this.inputValue = this.inputValue.replace(userName, '');
           } else {
             let tempList = this.atList.filter(a => {
-              const atIndex = this.inputValue.indexOf(`@${a.nickName} `);
+              const atIndex = this.inputValue.indexOf(`@${a.nickname} `);
               return atIndex !== -1;
             });
             this.atList.splice(0, this.atList.length, ...tempList);
           }
         }
         // 删除要回复的用户名逻辑
-        const lastReplyIndex = firstPart.lastIndexOf('回复');
+        const replyText = this.$t('chat.chat_1036');
+        const lastReplyIndex = firstPart.lastIndexOf(replyText);
         if (lastReplyIndex !== -1) {
           const replyUserName = this.inputValue.substring(lastReplyIndex, currentIndex);
-          if (`回复${this.replyMsg.nickName}:` === replyUserName) {
+          if (`${replyText}${this.replyMsg.nickname}:` === replyUserName) {
             this.inputValue = this.inputValue.replace(replyUserName, '');
             this.replyMsg = {};
           } else {
-            this.inputValue.indexOf(`回复${this.replyMsg.nickName}: `) === -1 &&
+            this.inputValue.indexOf(`${replyText}${this.replyMsg.nickname}: `) === -1 &&
               (this.replyMsg = {});
           }
         }
       },
       /** 发送聊天消息 */
       sendMsg(callback) {
-        this.sendTimeOut && window.clearTimeout(this.sendTimeOut);
-
         //是否是聊天禁言状态
         if (this.inputStatus.disable) {
           return;
@@ -245,83 +253,29 @@
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
-          return this.$message.warning('内容不能为空');
+          return this.$message.warning(this.$t('chat.chat_1009'));
         }
-
-        const { checkHasKeyword, sendMsg } = this.chatServer;
-        const joinDefaultName = JSON.parse(sessionStorage.getItem('moduleShow'))
-          ? JSON.parse(sessionStorage.getItem('moduleShow')).auth.nick_name
-          : '';
-
-        this.sendTimeOut = setTimeout(() => {
-          const data = {};
-          if (inputValue) {
-            data.type = 'text';
-            data.barrageTxt = inputValue
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n/g, '<br/>');
-            data.text_content = inputValue;
-          }
-          //如果有聊天图片
-          if (this.imgUrls.length) {
-            data.image_urls = this.imgUrls;
-            data.type = 'image';
-          }
-          //todo 考虑从domain里取用
-          const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-          console.warn('获取当前的本地用户信息', userInfo);
-          let name = '';
-          if (userInfo) {
-            if (userInfo.nickname) {
-              name = userInfo.nickname;
-            } else {
-              name = userInfo.nick_name;
-            }
-          } else {
-            name = joinDefaultName;
-          }
-          //获取发消息的用户的用户昵称
-          if (this.roleName === 2 && this.join_name) {
-            name = this.join_name;
-          }
-          //消息内容
-          const context = {
-            nickname: name, // 昵称
-            avatar: userInfo && userInfo.avatar ? userInfo.avatar : '', // 头像
-            role_name: this.roleName, // 角色 1主持人2观众3助理4嘉宾
-            replyMsg: this.replyMsg, // 回复消息
-            atList: this.atList // @用户列表
-          };
-
-          //判断一下是否是分组讨论的组长
-          const { groupInitData = {} } = this.roomBaseState;
-          if (groupInitData.isInGroup && groupInitData.join_role == 20) {
-            context.role_name = 20;
-          }
-
-          let filterStatus = true;
-          if (sessionStorage.getItem('watch')) {
-            filterStatus = checkHasKeyword(inputValue);
-          }
-
-          if (this.roleName !== 2 || (this.roleName === 2 && filterStatus)) {
-            if (this.atList.length && data.text_content) {
-              this.atList.forEach(a => {
-                data.text_content = data.text_content.replace(`@${a.nickName}`, `***${a.nickName}`);
-              });
-            }
-
-            sendMsg({ data, context });
-          }
-          //清空一下子组件里上传的图片
-          this.clearImgUrls();
-          this.inputValue = '';
-          this.replyMsg = {};
-          //todo 建议移入domain  清空一下@列表，但是保持引用
-          this.atList.splice(0, this.atList.length);
-          callback && callback();
-        }, 300);
+        const curmsg = useChatServer().createCurMsg();
+        //将文本消息加入消息体
+        curmsg.setText(inputValue);
+        //将图片消息加入消息体
+        curmsg.setImge(this.imgUrls);
+        //将回复消息加入消息体
+        curmsg.setReply(this.replyMsg);
+        //将@消息加入消息体
+        curmsg.setAt([].concat(this.atList));
+        //发送消息
+        useChatServer().sendMsg(curmsg);
+        //清除发送后的消息
+        useChatServer().clearCurMsg();
+        //清空一下子组件里上传的图片
+        this.clearImgUrls();
+        this.inputValue = '';
+        this.replyMsg = {};
+        //todo 建议移入domain  清空一下@列表，但是保持引用
+        this.atList.splice(0, this.atList.length);
+        callback && callback();
+        this.dispatch('VmpChatOperateBar', 'sendEnd');
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
@@ -336,7 +290,7 @@
         if (this.chatGap > 0) {
           this.lock = sessionStorage.getItem('chatLock');
           if (this.lock && this.lock == 'true') {
-            this.$message.warning(`当前活动火爆，请您在${this.chatGap}秒后再次发言`);
+            this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
           }
         } else {
           this.sendMsg(() => {
@@ -348,7 +302,7 @@
                 if (!this.lock || this.lock == 'false') {
                   sessionStorage.setItem('chatLock', true);
                 } else {
-                  this.$message.warning(`太频繁啦，还有${this.chatGap}秒后才能发送`);
+                  this.$message.warning(this.$t('chat.chat_1080', this.chatGap));
                 }
                 this.chatGap = this.chatGap - 1;
               } else {
@@ -363,8 +317,10 @@
       trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
-      //todo 利用信令 唤起登录
-      callLogin() {},
+      //利用信令 唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      },
       //选择了表情,这个方法是通过ref暴露给父组件使用
       emojiInput(val = '') {
         if (this.inputStatus.disable) {
@@ -403,7 +359,7 @@
             return chatMsg.sendId == accountId;
           }) || {};
         if (!this.atList.find(u => u.accountId == msgToAt.sendId)) {
-          this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickName} `;
+          this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickname} `;
           this.$refs.chatTextarea.focus();
           let currentIndex = 0;
           try {
@@ -412,11 +368,35 @@
             console.log(e);
           }
           this.atList.push({
-            nickName: msgToAt.nickName,
+            nickName: msgToAt.nickname,
             accountId: msgToAt.sendId,
             index: currentIndex
           });
         }
+      },
+      /**
+       * 获取根据人数和系数获取延迟时间
+       * @param n 人数
+       * @param o 非必传，系数，不传递默认为1
+       * @returns {number}
+       */
+      delayTime(n, o) {
+        n = n || 0;
+        o = o || 1;
+        let result = 0;
+        if (n <= 1000) {
+          result = 0;
+        } else if (n <= 10000) {
+          // 大于1千，小于1万
+          result = n / 1000;
+        } else if (n <= 50000) {
+          // 大于1万，小于5万
+          result = 20 + (10 * (n - 10000)) / 10000;
+        } else if (n > 50000) {
+          // 大于5万
+          result = 60;
+        }
+        return Math.floor(o * result);
       }
     }
   };
@@ -498,7 +478,7 @@
       color: @font-dark-normal;
       line-height: 20px;
       padding: 10px 12px;
-      text-align: center;
+      text-align: left;
       border-radius: 20px;
       .textarea-placeholder_no-login {
         color: #666666;
@@ -519,7 +499,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      .iconfasong_icon {
+      .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;
       }
