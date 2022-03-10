@@ -74,7 +74,6 @@
 </template>
 
 <script>
-  // import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
   export default {
     name: 'VmpIntroWap',
     filters: {
@@ -90,15 +89,10 @@
     },
     data() {
       return {
-        // NoDelayImg,
         type: 'default' // default、subscribe
       };
     },
     computed: {
-      // 无延迟图片地址
-      // NoDelayImg() {
-      //   return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
-      // },
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -119,10 +113,6 @@
       isNoDelay() {
         return this.webinar.no_delay_webinar === 1;
       },
-      // 标题 Type:String 多语言不需要用
-      // title() {
-      //   return this?.webinar?.subject || '';
-      // },
       // 开始时间 Type:String
       startTime() {
         return this?.webinar?.start_time?.substr(0, 16) || '';

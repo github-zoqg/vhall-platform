@@ -29,7 +29,7 @@
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
-            <vmp-wap-stream-remote :stream="speaker"></vmp-wap-stream-remote>
+            <vmp-wap-stream-remote :stream="streamInfo(speaker)"></vmp-wap-stream-remote>
           </div>
         </div>
       </template>
@@ -107,6 +107,7 @@
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import { Toast } from 'vant';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
   const langMap = {
     1: {
       label: '简体中文',
@@ -134,7 +135,8 @@
         iconShow: false, // 5 秒的展示
         isOpenlang: false,
         lang: {},
-        languageList: []
+        languageList: [],
+        streamInfo
       };
     },
     filters: {
