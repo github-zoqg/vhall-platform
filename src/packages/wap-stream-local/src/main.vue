@@ -219,16 +219,15 @@
           // 更新本地speakerList
           if (this.groupServer.state.groupInitData.isInGroup) {
             await this.groupServer.updateGroupInitData();
-            const instance = await this.checkVRTCInstance();
-            if (!instance) {
-              await this.interactiveServer.init();
-            }
           } else {
             await this.roomBaseServer.getInavToolStatus();
           }
 
+          console.log('[stream-local] vrtc_connect_success startPush');
+
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
+              this.playerServer.destroy();
               await this.interactiveServer.init();
               // 开始推流
               this.startPush();
@@ -242,6 +241,13 @@
           await this.stopPush();
 
           await this.interactiveServer.destroy();
+          // 更新本地speakerList
+          if (this.groupServer.state.groupInitData.isInGroup) {
+            await this.groupServer.updateGroupInitData();
+          } else {
+            await this.roomBaseServer.getInavToolStatus();
+          }
+
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
             await this.interactiveServer.init({});
