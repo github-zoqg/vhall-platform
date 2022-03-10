@@ -31,10 +31,7 @@
       <li
         @click="handleClickItem('desktopShare')"
         class="menu-item"
-        :class="[
-          selectedMenu === 'desktopShare' ? 'selected' : '',
-          disableMenus.includes('desktopShare') ? 'disable' : ''
-        ]"
+        :class="[disableMenus.includes('desktopShare') ? 'disable' : '']"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
         <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
@@ -84,8 +81,14 @@
       };
     },
     computed: {
+      currentCid() {
+        return this.docServer.state.currentCid;
+      },
       disableMenus() {
         if (this.hasDocPermission) {
+          if (this.isShareScreen) {
+            return ['document', 'board'];
+          }
           return [];
         }
         return ['document', 'board', 'desktopShare'];
@@ -124,8 +127,9 @@
           );
         }
       },
+      // 是否在桌面共享
       isShareScreen() {
-        return this.$domainStore.state.desktopShareServer.isShareScreen;
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     watch: {
@@ -135,6 +139,14 @@
           this.isCollapse = false;
         } else {
           this.isCollapse = true;
+        }
+      },
+      ['docServer.state.currentCid'](newval) {
+        if (newval) {
+          const t = newval.split('-')[0];
+          if (t) {
+            this.selectedMenu = t;
+          }
         }
       }
     },
@@ -161,13 +173,17 @@
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
           this.isCollapse = true;
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          if (this.isInGroup) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
           this.isCollapse = true;
-          this.gobackHome(4);
+          if (this.isInGroup) {
+            this.gobackHome(4);
+          }
         });
 
         // 本人被踢出来
@@ -179,7 +195,9 @@
               useRoomBaseServer().state.watchInitData.join_info.third_party_user_id
           ) {
             this.isCollapse = true;
-            this.gobackHome(5, this.groupServer.state.groupInitData.name);
+            if (this.isInGroup) {
+              this.gobackHome(5, this.groupServer.state.groupInitData.name);
+            }
           }
         });
 
@@ -215,7 +233,7 @@
           const { join_role, isInGroup } = this.groupServer.state.groupInitData;
           // 如果是组长，并且在小组内
           if (join_role == 20 && isInGroup) {
-            this.$message.warning(`观众${msg.nick_name}拒绝了你的演示邀请`);
+            this.$message.warning(`观众${msg.data.nick_name}拒绝了你的演示邀请`);
           }
         });
 
@@ -271,9 +289,8 @@
       },
       handleClickItem(kind) {
         if (this.disableMenus.includes(kind)) return false;
-        this.selectedMenu = kind;
-
         if (kind === 'document' || kind === 'board') {
+          this.selectedMenu = kind;
           // 点击文档或白板
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClickDoc', [kind]));
         } else if (kind === 'assistance') {
@@ -341,6 +358,11 @@
         padding: 10px 0;
         span {
           user-select: none;
+        }
+
+        &:not(.disable):hover {
+          color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {

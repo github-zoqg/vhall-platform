@@ -64,7 +64,8 @@
           this.second--;
           if (this.second <= 0) {
             clearInterval(this.timer);
-            this.close();
+            // this.close();
+            this.handleClose();
           }
         }, 1000);
       },

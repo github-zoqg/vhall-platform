@@ -21,13 +21,13 @@
       <div class="vmp-header-watch-center-title">
         {{ languagesInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarType != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
+            webinarInfo.type
           "
         >
-          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
-          <label>{{ formatType(webinarType) }}</label>
+          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ formatType(webinarInfo.type) }}</label>
         </span>
         <span
           v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1"
@@ -156,7 +156,6 @@
           pageBg: '#cccccc',
           iconClass: 'icon-default' // icon默认色
         },
-        lang: 'zh-CN',
         isAttention: false,
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
@@ -170,10 +169,6 @@
       officaialDialog
     },
     computed: {
-      // 无延迟图片地址
-      noDelayIconUrl() {
-        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
-      },
       create_user_url() {
         const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
@@ -193,14 +188,18 @@
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
       },
-      webinarType() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
-      },
       isShowShare() {
         return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
       },
       languagesInfo() {
         return this.$domainStore.state.roomBaseServer.languages.curLang;
+      },
+      // 无延迟图片地址
+      noDelayIconUrl() {
+        const langArr = ['zh-CN', 'en'];
+        const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+        const lang = langArr[langer - 1] || 'zh-CN';
+        return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       }
     },
     beforeCreate() {
@@ -209,15 +208,11 @@
       this.userServer = useUserServer();
     },
     async created() {
-      // this.childrenComp = window.$serverConfig[this.cuid].children;
       if (this.isLogin && !this.embedObj.embed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
       }
       this.getWebinarInfo();
-      const langArr = ['zh-CN', 'en'];
-      const lang = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
-      this.lang = langArr[lang - 1];
     },
     methods: {
       getWebinarInfo() {

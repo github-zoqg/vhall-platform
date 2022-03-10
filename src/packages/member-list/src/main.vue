@@ -562,6 +562,11 @@
           handleUserLeaveRoom(msg);
         });
 
+        //直播结束
+        this.msgServer.$on('live_over', () => {
+          handleLiveOver();
+        });
+
         //房间消息
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
@@ -623,9 +628,9 @@
             case 'endLive':
               handleEndLive(temp);
               break;
-            case 'live_over':
-              handleLiveOver(temp);
-              break;
+            // case 'live_over':
+            //   handleLiveOver(temp);
+            //   break;
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
@@ -641,11 +646,12 @@
         }
 
         //直播结束
-        function handleLiveOver(msg) {
-          console.log(msg);
+        function handleLiveOver() {
           setTimeout(() => {
             _this.refreshList();
           }, 1000);
+          //重置一下视图里各个状态
+          _this.resetViewData();
         }
 
         //设备检测
@@ -730,6 +736,7 @@
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
 
             if (isLive) {
+              console.log('context:::::', msg, context);
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
@@ -1021,6 +1028,7 @@
             role = _this.$t('chat.chat_1023');
           }
           if (msg.data.extra_params == _this.userId) {
+            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
@@ -1100,6 +1108,7 @@
             role = '嘉宾';
           }
           if (msg.data.extra_params == _this.userId) {
+            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
             });
@@ -1188,13 +1197,13 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-
+        //todo 这里需要仔细确认一下
         // only 发起端（开始分组讨论）
         this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          isLive && handleStartGroupDiscuss(msg);
+          handleStartGroupDiscuss(msg);
         });
 
-        // 切换channel TODO: ???????疑问点
+        // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
           isLive && handleStartGroupDiscuss(msg);
         });
@@ -1318,12 +1327,14 @@
         //分组--开始讨论
         function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
+          _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.getOnlineUserList();
         }
         //
         function handleEndGroupDiscuss(msg) {
           console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
+          _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.getOnlineUserList();
         }
         //重新获取最新的groupInitData
@@ -1564,9 +1575,14 @@
         this.searchUserInput = '';
         this.getOnlineUserList();
       },
+      //直播结束重置视图里的一些状态
+      resetViewData() {
+        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+      },
       //切换允许举手状态
-      onSwitchAllowRaiseHand() {
+      onSwitchAllowRaiseHand(element) {
         if (this.liveStatus !== 1) {
+          element.target.checked = false;
           this.allowRaiseHand = false;
           this.$message.error(this.$t('512521'));
           return;
@@ -1773,7 +1789,7 @@
         }
         // 设置主讲人
         this.$confirm(
-          '演示后，您可使用小组中的白板、文档、桌面共享功能，是否要演示？',
+          '演示后，组内成员将不能演示白板、文档、桌面共享是否确认演示？',
           this.$t('account.account_1061'),
           {
             confirmButtonText: this.$t('account.account_1062'),
@@ -1895,6 +1911,7 @@
             console.warn('禁言---res', err);
           });
         // “禁言”要关闭当前用户的在麦状态
+        console.log('禁言 -  - 要关闭当前用户的在麦状态 - - - - ', isBanned);
         if (isBanned) {
           return;
         }

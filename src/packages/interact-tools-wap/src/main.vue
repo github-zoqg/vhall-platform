@@ -1,33 +1,6 @@
 <template>
   <div class="tools-box">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
-      <!-- 上麦 -->
-      <div
-        v-if="device_status === 1 && !isBanned && (isAllowhandup || isSpeakOn) && webinarType == 1"
-        style="position: relative"
-        auth="{ 'ui.hide_reward': 0 }"
-        :class="`${live_over}`"
-      >
-        <i
-          v-if="!handUpStatus"
-          class="vh-saas-iconfont vh-saas-line-drag"
-          @click="$refs.handup.openConnectPop()"
-        ></i>
-        <i
-          v-else
-          class="vh-saas-iconfont vh-saas-a-line-offthemicrophone"
-          @click="$refs.handup.openConnectPop()"
-        ></i>
-        <span class="red-dot" v-if="handUpStatus"></span>
-        <Handup
-          ref="handup"
-          @handupLoading="
-            s => {
-              handUpStatus = s;
-            }
-          "
-        />
-      </div>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
         <GiftCard
@@ -72,22 +45,14 @@
 </template>
 
 <script>
-  import {
-    useRoomBaseServer,
-    useMicServer,
-    useChatServer,
-    useGroupServer,
-    useMsgServer,
-    useMediaCheckServer
-  } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
-  import Handup from './component/handup.vue';
 
   export default {
     name: 'VmpInteractToolsWap',
-    components: { GiftCard, RewardCard, Parise, Handup },
+    components: { GiftCard, RewardCard, Parise },
     data() {
       let { configList } = useRoomBaseServer().state;
       let { groupInitData } = useGroupServer().state;
@@ -123,69 +88,18 @@
         showInviteCard: roomBaseState.inviteCard.status == '1',
         location:
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
-        qwe: 1,
-        handUpStatus: false,
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned //true禁言，false未禁言
+        qwe: 1
       };
     },
-    computed: {
-      device_status() {
-        // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return useMediaCheckServer().state.deviceInfo.device_status;
-      },
-      // 是否开启举手
-      isAllowhandup() {
-        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
-        return status;
-      },
-      // 是否是上麦状态
-      isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
-      },
-      webinarType() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
-      }
-    },
     created() {
-      if (this.isSpeakOn && useChatServer().state.allBanned) {
-        useMicServer().speakOff();
-      }
-
       window.interactTools = this;
     },
     mounted() {
-      console.log(this.configList, useRoomBaseServer().state, 'this.configList');
       this.joinInfoInGift = {
         avatar: this.roomBaseState.watchInitData.join_info.avatar,
         nickname: this.roomBaseState.watchInitData.join_info.nickname,
         hideChatHistory: this.configList['ui.hide_chat_history'] == 1
       };
-      //监听禁言通知
-      useChatServer().$on('banned', res => {
-        this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-      //监听全体禁言通知
-      useChatServer().$on('allBanned', res => {
-        this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-
-      useMicServer().$on('vrtc_connect_open', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$toast(this.$t('interact.interact_1003'));
-        }
-      });
-
-      useMicServer().$on('vrtc_connect_close', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$toast(this.$t('interact.interact_1002'));
-        }
-      });
     },
     methods: {
       opneGifts() {
@@ -215,16 +129,6 @@
     .vh-iconfont {
       font-size: 47px;
       color: #666666;
-    }
-
-    .red-dot {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 10px;
-      height: 10px;
-      background-color: #ff3030;
-      border-radius: 10px;
     }
   }
 </style>

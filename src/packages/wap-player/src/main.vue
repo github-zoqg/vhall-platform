@@ -4,12 +4,7 @@
       <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
       <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
     </div>
-    <div
-      v-show="!isNoBuffer"
-      id="videoWapBox"
-      class="vmp-wap-player-video"
-      @click.stop="videoShowIcon"
-    >
+    <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
       <!-- 播放器背景图片 -->
       <div class="vmp-wap-player-prompt" v-if="isShowPoster">
         <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
@@ -20,7 +15,11 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-wap-player">
+      <div
+        id="vmp-wap-player"
+        style="width: 100%; height: 100%"
+        @click.stop.prevent="videoShowIcon"
+      >
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -47,7 +46,7 @@
               {{ authText }}
             </span>
           </div>
-          <p class="tryKan" @click="startPlay">
+          <p class="vmp-wap-player-ending-box-title" @click="startPlay">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
@@ -83,10 +82,10 @@
           </i18n>
         </span>
       </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
+      <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
       <div
         class="vmp-wap-player-footer"
-        v-show="isPlayering"
+        v-show="isPlayering && !isOrientation"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
       >
         <!-- 倍速和画质合并 -->
@@ -102,6 +101,7 @@
           </span>
         </div>
         <div class="vmp-wap-player-control">
+          <!--  -->
           <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
               <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
@@ -248,6 +248,7 @@
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const langMap = {
     1: {
       label: '简体中文',
@@ -292,8 +293,8 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id) {
+        const { warmup, webinar, join_info } = this.roomBaseState.watchInitData;
+        if (warmup && warmup.warmup_paas_record_id && join_info.is_subscribe == 1) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -363,6 +364,7 @@
           speed: 0,
           autoplay: false
         },
+        isOrientation: false,
         lang: {},
         languageList: []
       };
@@ -392,6 +394,12 @@
     },
     mounted() {
       this.getWebinerStatus();
+      if (window.orientation == 90 || window.orientation == -90) {
+        this.isOrientation = true;
+        this.setFullscreen();
+      } else {
+        this.isOrientation = false;
+      }
     },
     methods: {
       startPlay() {
@@ -619,8 +627,11 @@
       refresh() {
         window.location.reload();
       },
-      handleAuth() {
-        console.log('shikan试看权限');
+      handleAuth(type) {
+        let params = {
+          type: this.authText == 6 ? type : this.roomBaseServer.state.watchInitData.webinar.verify
+        };
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCheckAuth', params));
       },
       openSpeed() {
         this.iconShow = true;
@@ -653,6 +664,13 @@
         this.iconShow = true;
         this.isOpenlang = true;
       },
+      showLabelFun(eventTime) {
+        this.sliderVal = (eventTime / this.totalTime) * 100;
+        this.playerServer.setCurrentTime(eventTime, () => {
+          this.$toast('调整播放时间失败');
+        });
+        this.playerServer.play();
+      },
       replay() {
         this.isVodEnd = false;
         this.startPlay();
@@ -664,6 +682,10 @@
   .vmp-wap-player {
     height: 100%;
     width: 100%;
+    &-video {
+      height: 100%;
+      width: 100%;
+    }
     // position: relative;
     &-opcity-flase {
       // opacity: 0;
@@ -792,13 +814,13 @@
           font-size: 28px;
         }
         &-try {
-          padding-top: 24px;
+          padding: 24px 0;
           span {
             display: inline-block;
             background: #fb3a32;
             color: #fff;
-            height: 64px;
-            line-height: 64px;
+            height: 56px;
+            line-height: 56px;
             font-size: 24px;
             border-radius: 32px;
             text-align: center;
@@ -816,8 +838,9 @@
           }
           &-see {
             font-size: 24px;
+            padding: 0 24px;
             color: #fff;
-            padding-top: 40px;
+            margin: 20px 0;
           }
         }
       }
@@ -934,7 +957,7 @@
         background: rgba(0, 0, 0, 0.7);
         box-shadow: 0px 4px 8px 0px rgba(118, 118, 118, 0.2);
         border-radius: 32px 32px 32px 0px;
-        padding: 0 24px;
+        padding: 5px 24px;
         &-red {
           color: #fb2626;
           margin: 0px 4px;

@@ -11,7 +11,14 @@
     @mousemove="wrapEnter"
     @mouseleave="wrapLeave"
   >
-    <div id="vmp-player" class="vmp-player-watch">
+    <div
+      id="vmp-player"
+      class="vmp-player-watch"
+      ref="playerWatch"
+      v-loading="loading"
+      element-loading-background="#1a1a1a"
+      :element-loading-text="$t('common.common_1001')"
+    >
       <template class="vmp-player-living">
         <div
           v-if="isShowPoster"
@@ -41,7 +48,7 @@
           </div>
         </template>
 
-        <div class="vmp-player-living-vodend" v-if="isVodEnd && !isPlayering">
+        <div class="vmp-player-living-vodend" v-if="isVodEnd">
           <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
             <h3>{{ $t('appointment.appointment_1013') }}</h3>
             <div>
@@ -238,7 +245,7 @@
         </div>
       </div>
       <!-- 试看和断点续播提示 -->
-      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini'">
+      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini' && isPlayering">
         <!-- 试看 -->
         <div v-if="vodType === 'shikan' && isTryPreview">
           <i18n path="appointment.appointment_1012">
@@ -249,7 +256,7 @@
             <i style="color: #fff">{{ $t('interact.interact_1020') }}</i>
             <b @click="authTryWatch(4)">{{ $t('appointment.appointment_1011') }}</b>
           </span>
-          <span v-else @click="authTryWatch()">{{ authText }}</span>
+          <span v-else class="red" @click="authTryWatch()">{{ authText }}</span>
           <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
         </div>
         <!-- 断点续播 -->
@@ -289,6 +296,7 @@
     },
     data() {
       return {
+        loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
@@ -438,53 +446,6 @@
       }
     },
     methods: {
-      listenEvents() {
-        // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-        if (this.playerServer.state.type === 'vod' && !this.isTryPreview) {
-          window.addEventListener('beforeunload', () => {
-            this.endTime = this.playerServer.getCurrentTime(() => {
-              console.log('获取当前视频播放时间失败----------');
-            });
-
-            this.totalTime = this.playerServer.getDuration(() => {
-              console.log('获取视频总时长失败');
-            });
-            const curLocalHistoryTime = window.sessionStorage.getItem(
-              this.roomBaseServer.state.watchInitData.paas_record_id
-            );
-            if (!curLocalHistoryTime && this.recordHistoryTime) {
-              return;
-            }
-            window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
-          });
-        }
-        // 全屏事件
-        const setFullscreen = () => {
-          const fullscreenElement =
-            document.fullscreenElement ||
-            document.webkitFullscreenElement ||
-            document.mozFullscreenElement ||
-            document.msFullscreenElement;
-          if (
-            fullscreenElement &&
-            fullscreenElement.className &&
-            fullscreenElement.className.indexOf('vmp-player-watch') != -1
-          ) {
-            this.isFullscreen = true;
-          } else {
-            this.isFullscreen = false;
-          }
-        };
-        clearTimeout(this.hoverVideoTimer);
-        this.hoverVideoTimer = setTimeout(() => {
-          this.hoveVideo = false;
-        }, 3000);
-        window.addEventListener('fullscreenchange', setFullscreen);
-        window.addEventListener('webkitfullscreenchange', setFullscreen);
-        window.addEventListener('mozfullscreenchange', setFullscreen);
-        window.addEventListener('msfullscreenchange', setFullscreen);
-        window.addEventListener('MSFullscreenChange', setFullscreen);
-      },
       // 初始化播放器配置项
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
@@ -568,6 +529,8 @@
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
+          this.listenEvents();
+          this.getListenPlayer();
           if (this.playerServer.state.type === 'vod') {
             this.eventPointList = this.playerServer.state.markPoints;
             this.getRecordTotalTime(); // 获取视频总时长
@@ -754,8 +717,6 @@
           // 暖场视频或者试看
           this.optionTypeInfo('vod', _id);
         }
-        this.listenEvents();
-        this.getListenPlayer();
       },
       optionTypeInfo(type, id) {
         // 暖场视频或者试看
@@ -882,6 +843,15 @@
     }
     #vhy-danmaku-wrapbox {
       z-index: 1;
+    }
+    .el-loading-spinner .el-loading-text {
+      color: #fff;
+    }
+    .el-loading-spinner .path {
+      stroke: #fb3a32;
+    }
+    .el-loading-mask {
+      z-index: 7;
     }
     &-living {
       &-background {

@@ -43,6 +43,11 @@ function getPlugins() {
     // 项目资源路径
     let projectResourceDir = path.join(pathConfig.ROOT, `dist/${argv.project}/static/js/`);
 
+    // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
+    // if (argv.middle) {
+    process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
+    // }
+
     plugins.push(
       new SentryCliPlugin({
         release: `${argv.version}`, // 版本号
@@ -279,11 +284,6 @@ if (['serve', 'build'].includes(cmd)) {
   process.env.VUE_APP_BUILD_VERSION = argv.version;
   process.env.VUE_APP_BUILD_HASH = argv.hash;
 
-  // 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
-  if (argv.middle) {
-    process.env.VUE_APP_ROUTER_BASE_URL = argv.project;
-  }
-
   // 根据参数获取专用配置信息
   const specialConfig = btool.createSpecialConfig(argv.project);
 
@@ -313,7 +313,7 @@ if (['serve', 'build'].includes(cmd)) {
 
   // 导出
   module.exports = vueConfig;
-  // return;
+} else {
+  // 默认配置
+  module.exports = sharedConfig;
 }
-
-module.exports = sharedConfig;

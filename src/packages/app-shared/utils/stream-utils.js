@@ -28,3 +28,36 @@ export function calculateNetworkStatus(status) {
   }
   return netWorkStatus;
 }
+
+/**
+ *兼容处理 role | nickname
+ * 这么做的原因：嵌入页、app等字段不统一，存在大小写、下划线等情况。无法完成统一迭代升级
+ * @param {*} stream 流信息
+ */
+export function streamInfo(stream) {
+  Object.prototype.hasOwnProperty.call(stream, 'attributes');
+  if (
+    stream &&
+    Object.keys(stream).length !== 0 &&
+    Object.prototype.hasOwnProperty.call(stream, 'attributes')
+  ) {
+    let arr = Object.keys(stream.attributes);
+    if (!Object.prototype.hasOwnProperty.call(stream.attributes, 'roleName')) {
+      let role = arr.filter(el => {
+        if (el.toLowerCase().indexOf('role') != -1) {
+          return el;
+        }
+      })[0];
+      stream.attributes.roleName = stream.attributes[role];
+    }
+    if (!Object.prototype.hasOwnProperty.call(stream.attributes, 'nickname')) {
+      let name = arr.filter(el => {
+        if (el.toLowerCase().indexOf('nick') != -1) {
+          return el;
+        }
+      })[0];
+      stream.attributes.nickname = stream.attributes[name];
+    }
+  }
+  return stream;
+}

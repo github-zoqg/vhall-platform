@@ -7,7 +7,8 @@ import {
   useMicServer,
   useUserServer,
   useGroupServer,
-  useDesktopShareServer
+  useDesktopShareServer,
+  usePlayerServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -23,6 +24,7 @@ export default async function () {
   const userServer = useUserServer();
   const groupServer = useGroupServer();
   const desktopShareServer = useDesktopShareServer();
+  const playerServer = usePlayerServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -128,4 +130,5 @@ export default async function () {
   window.docServer = docServer;
   window.groupServer = groupServer;
   window.micServer = micServer;
+  window.playerServer = playerServer;
 }

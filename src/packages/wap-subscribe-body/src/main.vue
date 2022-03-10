@@ -1,37 +1,44 @@
 <template>
   <div class="vmp-subscribe-body">
     <div class="vmp-subscribe-body-container">
-      <div class="subscribe-bg" v-if="!showVideo">
-        <img :src="webinarsBgImg" alt="" />
-      </div>
-      <div v-if="showVideo">
+      <template v-if="isTryVideo">
         <vmp-air-container :cuid="cuid"></vmp-air-container>
-      </div>
-      <template v-if="!showVideo">
-        <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
-          {{ countDownTime }}
-        </div>
-        <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
-        <div
-          class="subscribe-status"
-          :class="`subscribe-status-${webinarType}`"
-          v-if="!roomBaseServer.state.embedObj.embedVideo"
-        >
-          {{
-            webinarType == 1
-              ? $t('webinar.webinar_1018')
-              : webinarType == 2
-              ? $t('common.common_1019')
-              : webinarType == 3
-              ? $t('common.common_1020')
-              : webinarType == 4
-              ? $t('common.common_1024')
-              : $t('common.common_1021')
-          }}
-        </div>
-        <div class="subscribe-language" v-if="languageList.length > 1" @click="openLanguage">
-          <span>{{ lang.key == 1 ? '中文' : 'EN' }}</span>
-        </div>
+      </template>
+      <template v-else>
+        <template v-if="!showVideo">
+          <div class="subscribe-bg">
+            <img :src="webinarsBgImg" alt="" />
+          </div>
+        </template>
+        <template v-if="showVideo">
+          <vmp-air-container :cuid="cuid"></vmp-air-container>
+        </template>
+        <template v-if="!showVideo">
+          <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
+            {{ countDownTime }}
+          </div>
+          <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
+          <div
+            class="subscribe-status"
+            :class="`subscribe-status-${webinarType}`"
+            v-if="!roomBaseServer.state.embedObj.embedVideo"
+          >
+            {{
+              webinarType == 1
+                ? $t('webinar.webinar_1018')
+                : webinarType == 2
+                ? $t('common.common_1019')
+                : webinarType == 3
+                ? $t('common.common_1020')
+                : webinarType == 4
+                ? $t('common.common_1024')
+                : $t('common.common_1021')
+            }}
+          </div>
+          <div class="subscribe-language" v-if="languageList.length > 1" @click="openLanguage">
+            <span>{{ lang.key == 1 ? '中文' : 'EN' }}</span>
+          </div>
+        </template>
       </template>
     </div>
     <template v-if="showBottomBtn">
@@ -145,6 +152,12 @@
       },
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
+      },
+      isTryVideo() {
+        return (
+          this.roomBaseServer.state.watchInitData.record.preview_paas_record_id &&
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe'
+        );
       }
     },
     beforeCreate() {
@@ -157,7 +170,6 @@
       this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
         return langMap[item.language_type];
       });
-      console.log(this.languageList, '??!32142435');
       const curLang = this.roomBaseServer.state.languages.curLang;
       this.lang =
         langMap[sessionStorage.getItem('lang')] ||
@@ -205,7 +217,7 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        if (webinar.type == 1) {
+        if (webinar.type == 1 && join_info.is_subscribe == 1) {
           this.subscribeText = this.$t('webinar.webinar_1023');
         } else {
           this.filterText(webinar.verify, join_info.is_subscribe);
@@ -213,6 +225,9 @@
         if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
           this.showVideo = true;
         }
+      },
+      playerAuthCheck(info) {
+        this.authCheck(info.type);
       },
       authCheck(type) {
         if (this.webinarType == 2 && this.subOption.is_subscribe == 1) {

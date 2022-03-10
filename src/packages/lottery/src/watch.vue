@@ -77,6 +77,7 @@
       open(uuid = '') {
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
+          this.lotteryId = data.id;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
@@ -164,6 +165,12 @@
           interactStatus: true,
           isCheck: lotteryResult
         });
+        // 服务之间传递抽奖结果消息
+        this.lotteryServer.$emit(
+          lotteryResult
+            ? this.lotteryServerthis.Events.LOTTERY_WIN
+            : this.lotteryServerthis.Events.LOTTERY_MISS
+        );
       },
       close() {
         this.dialogVisible = false;

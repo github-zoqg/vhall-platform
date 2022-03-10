@@ -306,6 +306,12 @@ export const serverConfig = {
       method: 'openRedPacket',
       args: ['$0']
     },
+    //问卷弹窗
+    emitClickQuestionIcon: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
     children: ['comSignWatch', 'comWatchTimer']
   },
   comSignWatch: {
