@@ -313,7 +313,6 @@ if (['serve', 'build'].includes(cmd)) {
 
   // 导出
   module.exports = vueConfig;
-
 } else {
   // 默认配置
   module.exports = sharedConfig;
