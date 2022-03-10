@@ -154,7 +154,10 @@
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
       isTryVideo() {
-        return this.roomBaseServer.state.watchInitData.record.preview_paas_record_id;
+        return (
+          this.roomBaseServer.state.watchInitData.record.preview_paas_record_id &&
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe'
+        );
       }
     },
     beforeCreate() {

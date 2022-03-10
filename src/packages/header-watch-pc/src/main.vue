@@ -21,13 +21,13 @@
       <div class="vmp-header-watch-center-title">
         {{ languagesInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarType != 6"
           :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' + webinarType
+            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
+            webinarInfo.type
           "
         >
-          <img v-if="webinarType == 1" src="./img/live-white.gif" alt="" />
-          <label>{{ formatType(webinarType) }}</label>
+          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ formatType(webinarInfo.type) }}</label>
         </span>
         <span
           v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1"
@@ -188,9 +188,6 @@
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
       },
-      webinarType() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
-      },
       isShowShare() {
         return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
       },
@@ -211,7 +208,6 @@
       this.userServer = useUserServer();
     },
     async created() {
-      // this.childrenComp = window.$serverConfig[this.cuid].children;
       if (this.isLogin && !this.embedObj.embed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();

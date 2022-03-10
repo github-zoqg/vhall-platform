@@ -1,6 +1,6 @@
 <template>
   <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
-    <template v-if="isTryVideo">
+    <template v-if="isTryVideo && isSubscribe">
       <div class="vmp-tab-menu__try">
         <div class="try-img">
           <img src="./img/trySee.png" alt="" />
@@ -129,13 +129,13 @@
       this.docServer = useDocServer();
     },
     created() {
-      if (this.isTryVideo) return;
+      if (this.isTryVideo && this.isSubscribe) return;
       this.initConfig();
       this.initMenu();
       this.listenEvents();
     },
     async mounted() {
-      if (this.isTryVideo) return;
+      if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.selectDefault();
     },

@@ -3,7 +3,7 @@
     <template v-if="isTryWatch">
       <div class="vmp-try-watch">
         <img src="./img/try@2x.png" alt="" />
-        <p>活动主办方设置了试看</p>
+        <p>{{ $t('appointment.appointment_1030') }}</p>
       </div>
     </template>
     <template v-else>

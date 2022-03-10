@@ -48,7 +48,6 @@ const playerMixins = {
         });
       }
       screenfull.onchange(ev => {
-        console.log(screenfull.isFullscreen, ev, '???123143254');
         if (ev.target.id !== 'vmp-player') return;
         this.isFullscreen = !this.isFullscreen;
       });
@@ -56,6 +55,31 @@ const playerMixins = {
       this.hoverVideoTimer = setTimeout(() => {
         this.hoveVideo = false;
       }, 3000);
+      window.onkeydown = event => {
+        let e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e.keyCode === 32) {
+          this.startPlay();
+          if (e.preventDefault) {
+            e.preventDefault();
+          } else {
+            window.event.returnValue = false;
+          }
+        } else if (e.keyCode === 38) {
+          if (this.voice >= 100) {
+            this.voice = 100;
+            return;
+          }
+          this.voice = this.voice + 2;
+        } else if (e.keyCode === 40) {
+          if (this.voice <= 0) {
+            this.voice = 0;
+            return;
+          }
+          this.voice = this.voice - 2;
+        } else if (e.keyCode === 173) {
+          console.log('11111静音');
+        }
+      };
     },
     getListenPlayer() {
       //  直播开始
