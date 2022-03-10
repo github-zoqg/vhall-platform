@@ -83,16 +83,18 @@
                 <video-preview ref="videoPreview" :videoParam="videoParam" />
               </section>
             </main>
-            <footer class="vmp-rebroadcast-preview-panel__footer">
+            <footer class="vmp-rebroadcast-preview-panel__footer" v-if="currentRoomId">
               <section>
                 <p v-if="pushStreamSeperately" class="start-local-stream" @click="pushLocalStream">
                   开始本地推流
                 </p>
-                <!-- <el-checkbox v-model="localStream">同时开始本地推流</el-checkbox> -->
+                <p v-if="rebroadcastingRoomId">
+                  <el-checkbox v-model="isPushLocalStream">同时开始本地推流</el-checkbox>
+                </p>
               </section>
               <section>
-                <el-button round @click="start">开始转播</el-button>
-                <el-button round @click="stop">结束转播</el-button>
+                <el-button v-if="rebroadcastingRoomId" round @click="stop">结束转播</el-button>
+                <el-button v-if="!rebroadcastingRoomId" round @click="start">开始转播</el-button>
               </section>
             </footer>
           </section>
@@ -105,7 +107,7 @@
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import SaasDialog from '@/packages/pc-alert/src/dialog.vue';
-  import { useRoomBaseServer, useRebroadcastServer } from 'middle-domain';
+  import { useRoomBaseServer, useRebroadcastServer, useInteractiveServer } from 'middle-domain';
   import { sleep } from '@/packages/app-shared/utils/tool';
   import VideoPreview from '@/packages/app-shared/components/video-preview';
 
@@ -121,12 +123,13 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.rebroadcastServer = useRebroadcastServer();
-      window.rebroadcast = this;
+      this.interactiveServer = useInteractiveServer();
     },
     data() {
       return {
         isShow: false,
         currentRoomId: '',
+        rebroadcastingRoomId: '',
         inputVal: '',
         loading: false,
         previewLoading: false,
@@ -137,6 +140,7 @@
           '//t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/upload/common/static-imgs/c0/e7/c0e7569408de296971eb4b98945c240b.png',
 
         pushStreamSeperately: false,
+        isPushLocalStream: false,
         isPreviewVisible: false,
         videoParam: {},
         overlayScrollBarsOptions: {
@@ -167,6 +171,13 @@
       },
       close() {
         this.isShow = false;
+        this.reset();
+      },
+      reset() {
+        this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        this.currentRoomId = '';
+        this.rebroadcastingRoomId = '';
+        this.pushStreamSeperately = false;
       },
       /**
        * 获取(更新)转播列表
@@ -193,6 +204,11 @@
         this.currentRoomId = id;
         this.previewLoading = true;
         this.domainState.sourceWebinarId = sourceWebinarId;
+
+        const rebroadcastingItem = this.domainState.list.find(item => item.room_id === id);
+        if (rebroadcastingItem && rebroadcastingItem.is_stream == 1) {
+          this.rebroadcastingRoomId = id;
+        }
 
         const { watchInitData } = this.roomBaseServer.state;
 
@@ -241,7 +257,7 @@
           });
           if (res.code !== 200) return this.$message.error(`转播失败!`);
 
-          // this.rebroadcastRoomId = this.current; // 记录
+          this.rebroadcastRoomId = this.currentRoomId; // 记录
           this.report();
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
           this.$message.success(`转播成功！`);
@@ -265,6 +281,12 @@
           if (res.code === 200) {
             this.$message.success('停止转播成功!');
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'stopRebroadcast'));
+
+            if (this.isPushLocalStream) {
+              this.interactiveServer.publishStream();
+            }
+
+            this.close();
           } else {
             this.$message.error('停止转播失败!');
           }
