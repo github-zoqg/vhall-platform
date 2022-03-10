@@ -407,15 +407,14 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            console.error('this.localStream.streamId', this.localStream.streamId);
             if (this.localStream.streamId) return;
 
-            // 更新本地speakerList
-            if (this.groupServer.state.groupInitData.isInGroup) {
-              await this.groupServer.updateGroupInitData();
-            } else {
-              await this.roomBaseServer.getInavToolStatus();
-            }
+            // // 更新本地speakerList
+            // if (this.groupServer.state.groupInitData.isInGroup) {
+            //   await this.groupServer.updateGroupInitData();
+            // } else {
+            //   await this.roomBaseServer.getInavToolStatus();
+            // }
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
@@ -442,11 +441,11 @@
           await this.interactiveServer.destroy();
 
           // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
-          }
+          // if (this.groupServer.state.groupInitData.isInGroup) {
+          //   await this.groupServer.updateGroupInitData();
+          // } else {
+          //   await this.roomBaseServer.getInavToolStatus();
+          // }
 
           if (
             this.isNoDelay === 1 ||
