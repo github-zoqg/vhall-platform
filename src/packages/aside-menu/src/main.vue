@@ -160,7 +160,7 @@
             vn.setSelectedState(false);
             if (this.role === 1) {
               // 主持人
-              if (this.webinarType === 1) {
+              if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
               } else {
