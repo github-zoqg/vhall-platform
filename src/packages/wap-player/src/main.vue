@@ -82,7 +82,7 @@
           </i18n>
         </span>
       </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条 :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']" -->
+      <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
       <div
         class="vmp-wap-player-footer"
         v-show="isPlayering && !isOrientation"
@@ -663,6 +663,13 @@
       openLanguage() {
         this.iconShow = true;
         this.isOpenlang = true;
+      },
+      showLabelFun(eventTime) {
+        this.sliderVal = (eventTime / this.totalTime) * 100;
+        this.playerServer.setCurrentTime(eventTime, () => {
+          this.$toast('调整播放时间失败');
+        });
+        this.playerServer.play();
       },
       replay() {
         this.isVodEnd = false;
