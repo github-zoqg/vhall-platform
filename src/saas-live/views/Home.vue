@@ -22,7 +22,6 @@
     Domain,
     useRoomBaseServer,
     useSplitScreenServer,
-    useMicServer,
     useInteractiveServer
   } from 'middle-domain';
   export default {
