@@ -227,7 +227,6 @@
 
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-              this.playerServer.destroy();
               await this.interactiveServer.init();
               // 开始推流
               this.startPush();
