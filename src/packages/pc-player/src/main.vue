@@ -644,7 +644,12 @@
       },
       // 播放
       play() {
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {
