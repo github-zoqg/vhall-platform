@@ -82,8 +82,15 @@
             interactStatus: true,
             isCheck: true
           });
-
+          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+            msg.questionnaire_id
+          );
+          if (canAnswer !== true) {
+            this.questionnaireServer.setDotVisible(false);
+            return false;
+          }
           this.dialogVisible = true;
+          this.questionnaireServer.setDotVisible(true);
           await this.$nextTick(); // 等dom渲染
           this.questionnaireServer.renderQuestionnaire4Watch(
             '#qs-preview-box-content',

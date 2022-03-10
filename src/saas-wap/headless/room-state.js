@@ -90,6 +90,12 @@ export default async function () {
       })
   ];
 
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
   // 判断是否是微信分享来的
   try {
     if (getQueryString('shareId') || getQueryString('share_id')) {
@@ -116,11 +122,7 @@ export default async function () {
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
   }
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 

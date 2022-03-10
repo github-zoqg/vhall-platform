@@ -208,7 +208,7 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: #000;
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {
