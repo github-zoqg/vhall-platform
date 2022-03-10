@@ -22,12 +22,7 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span
-              v-if="
-                (isBanned && !groupInitData.isInGroup) ||
-                (groupInitData.isBanned && groupInitData.isInGroup)
-              "
-            >
+            <span v-if="isBanned">
               {{ $t('chat.chat_1006') }}
             </span>
             <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>

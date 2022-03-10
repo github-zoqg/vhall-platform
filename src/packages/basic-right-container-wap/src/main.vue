@@ -1,5 +1,5 @@
 <template>
-  <div class="base-box">
+  <div class="base-box" v-if="!groupInitData.isInGroup">
     <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
@@ -14,6 +14,9 @@
     <div class="icon-wrap">
       <lottery-icon @clickIcon="checkLotteryIcon" />
     </div>
+    <div class="icon-wrap">
+      <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
+    </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
@@ -22,11 +25,13 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import lotteryIcon from './components/lottery-icon/index.vue';
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
+  import questionnaireIcon from './components/questionnaire-icon/index.vue';
   export default {
     name: 'VmpContainerRightWap',
     components: {
       lotteryIcon,
-      redPacketIcon
+      redPacketIcon,
+      questionnaireIcon
     },
     data() {
       return {
@@ -34,6 +39,11 @@
         timerVisible: true,
         showSign: false
       };
+    },
+    computed: {
+      groupInitData() {
+        return this.$domainStore.state.groupServer.groupInitData;
+      }
     },
     methods: {
       changeStatus(data, status) {
@@ -58,6 +68,12 @@
       },
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      checkQuestionnaireIcon(questionnaireId) {
+        console.log(questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireIcon', [questionnaireId])
+        );
       }
     }
   };
@@ -74,8 +90,8 @@
     // width: 20px;
     .icon-wrap {
       margin-bottom: 10px;
-      width: 84px;
-      height: 84px;
+      max-width: 84px;
+      max-height: 84px;
       position: relative;
       background-color: transparent;
       img {

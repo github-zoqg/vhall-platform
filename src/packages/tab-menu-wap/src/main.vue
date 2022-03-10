@@ -67,7 +67,9 @@
     useQaServer,
     useChatServer,
     useDocServer,
-    useMsgServer
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
   } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
@@ -82,12 +84,23 @@
         selectedId: '',
         menu: [],
         isSubMenuShow: false,
+        visibleCondition: 'default',
         tabOptions: {}
       };
     },
     computed: {
       visibleMenu() {
-        return this.menu.filter(item => item.visible);
+        return this.menu.filter(item => {
+          if (this.visibleCondition === 'living') {
+            return (item.status == 1 || item.status == 3) && item.visible;
+          }
+
+          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible;
+        });
       },
       mainMenu() {
         return this.visibleMenu.filter((item, index) => index < 3);
@@ -106,6 +119,9 @@
       // 是否是试看
       isTryVideo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
     },
     beforeCreate() {
@@ -129,6 +145,7 @@
         const qaServer = useQaServer();
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -158,11 +175,26 @@
         chatServer.$on('receivePrivateMsg', () => {
           this.setVisible({ visible: true, type: 'private' });
         });
-        // 直播结束不展示入口
-        msgServer.$on('live_over', e => {
-          this.setVisible({ visible: false, type: 'v5' });
-          this.setVisible({ visible: false, type: 'private' });
+
+        if (this.isSubscribe) {
+          this.setVisibleCondition('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
+        }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_start') {
+            this.setVisibleCondition('living');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisibleCondition('live_over');
+            this.setVisible({ visible: false, type: 3 }); // chat
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+          }
         });
+
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
@@ -172,6 +204,20 @@
         this.docServer.$on('dispatch_doc_switch_status', val => {
           console.log('dispatch_doc_switch_status', val);
           this.changeDocStatus(val);
+        });
+        //监听进出子房间消息
+        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
+          }
         });
       },
       changeDocStatus(val) {
@@ -205,19 +251,26 @@
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 2, {
-            type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
-          });
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
             name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '问答', // 同上
             status: roomState.interactToolStatus.question_status ? 1 : 2
           });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '私聊', // 同上
+            status: 2
+          });
         }
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living|predition]
+       */
+      setVisibleCondition(condition = 'default') {
+        this.visibleCondition = condition;
       },
       /**
        * 选中默认的菜单项（第一项）

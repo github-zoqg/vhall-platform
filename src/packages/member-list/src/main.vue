@@ -730,6 +730,7 @@
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
 
             if (isLive) {
+              console.log('context:::::', msg, context);
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
