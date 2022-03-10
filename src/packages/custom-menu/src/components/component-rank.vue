@@ -117,6 +117,8 @@
   </div>
 </template>
 <script>
+  import { useCustomMenuServer } from 'middle-domain';
+
   export default {
     name: 'component-rank',
     filters: {
@@ -187,6 +189,14 @@
         scrollLock: false
       };
     },
+    computed: {
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.join_info;
+      }
+    },
     watch: {
       info: function (newVal) {
         if (newVal.inSwitch == 0 && this.activeIndex == 1) {
@@ -210,6 +220,9 @@
         immediate: true
       }
     },
+    beforeCreate() {
+      this.customMenuServer = useCustomMenuServer();
+    },
     mounted() {
       if (this.info.inSwitch == 1) {
         this.activeIndex = 1;
@@ -220,20 +233,8 @@
       }
       this.bindEventListener();
     },
-    beforeDestroy() {
-      this.inviteRankList = [];
-      this.awardRankList = [];
-      this.ipos = 0;
-      this.ilimit = 10;
-      this.itotal = 0;
-      this.awardpos = 0;
-      this.awardlimit = 10;
-      this.awardtotal = 0;
-      this.scrollLock = false;
-    },
     methods: {
-      bindEventListener() {
-        // if (this.pagetype == 'watch') {
+      async bindEventListener() {
         this.$nextTick(() => {
           const wrap = document.querySelector('.rank-band');
           if (!wrap) return;
@@ -272,17 +273,47 @@
       /**
        * 获取邀请信息
        */
-      queryInviteInfo(id) {
-        this.$vhallapi.interactTool
-          .queryInviteInfo({
-            webinar_id: this.$route.params.il_id || '',
-            join_id: id
-          })
-          .then(res => {
-            if (res.data && res.code == 200) {
-              this.inviteInfo = res.data;
+      async queryInviteInfo() {
+        const res = await this.customMenuServer.getInviteInfo({
+          webinar_id: this.watchInitData.webinar.id,
+          join_id: this.joinInfo.join_id
+        });
+
+        this.inviteInfo = res.data;
+      },
+      /**
+       * 获取邀请列表
+       */
+      async getInviteList() {
+        if (this.pageLock) return;
+        this.pageLock = true;
+        this.showBottom = true;
+        this.bottomText = '加载中...';
+
+        const res = await this.customMenuServer.getInviteTopList({
+          webinar_id: this.watchInitData.webinar.id,
+          join_id: this.watchInitData.join_info.join_id,
+          pos: parseInt(this.ipos),
+          limit: 10
+        });
+
+        if (res.code == 200 && res.data && res.data.list.length > 0) {
+          const list = res.data.list.map(item => {
+            if (!item.img_url) {
+              item.img_url = this.avatar;
             }
+            return item;
           });
+
+          const data = this.inviteRankList;
+          this.inviteRankList = data.concat(list);
+          this.ipos = res.data.pos + 10;
+          this.ilimit = 10;
+          this.itotal = res.data.total;
+        }
+        this.scrollLock = false;
+
+        this.clearBottomInfo();
       },
       showInviteFriends() {
         this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_OPEN_INVITE_FRIENDS_QR);
@@ -312,39 +343,7 @@
       changeTab(index) {
         this.activeIndex = index;
       },
-      getInviteList() {
-        if (this.pageLock) return;
-        this.pageLock = true;
-        this.showBottom = true;
-        this.bottomText = '加载中...';
-        this.$vhallapi.interactTool
-          .queryInviteTopList({
-            webinar_id: this.$route.params.il_id,
-            join_id: this.joinId,
-            pos: parseInt(this.ipos),
-            limit: 10
-          })
-          .then(res => {
-            if (res.code == 200 && res.data && res.data.list.length > 0) {
-              const list = res.data.list.map(item => {
-                if (!item.img_url) {
-                  item.img_url = this.avatar;
-                }
-                return item;
-              });
-              const data = this.inviteRankList;
-              this.inviteRankList = data.concat(list);
-              this.ipos = res.data.pos + 10;
-              this.ilimit = 10;
-              this.itotal = res.data.total;
-            }
-            this.scrollLock = false;
-          })
-          .catch(e => {
-            this.scrollLock = false;
-          });
-        this.clearBottomInfo();
-      },
+
       clearBottomInfo() {
         this.pageLock = false;
         if (
@@ -358,36 +357,33 @@
           this.showBottom = false;
         }
       },
-      getAwardRank() {
+      async getAwardRank() {
         if (this.pageLock) return;
         this.pageLock = true;
         this.showBottom = true;
         this.bottomText = '加载中...';
-        this.$vhallapi.interactTool
-          .queryAwardList({
-            room_id: this.roomId,
-            offset: parseInt(this.awardpos),
-            limit: 10
-          })
-          .then(res => {
-            if (res.code == 200 && res.data) {
-              const list = res.data.list.map(item => {
-                if (!item.avatar) {
-                  item.avatar = this.avatar;
-                }
-                return item;
-              });
-              const data = this.awardRankList;
-              this.awardlimit = 10;
-              this.awardpos = res.data.offset + 10;
-              this.awardtotal = res.data.total;
-              this.awardRankList = data.concat(list);
+
+        const res = await this.customMenuServer.getAwardList({
+          room_id: this.watchInitData.interact.room_id,
+          offset: parseInt(this.awardpos),
+          limit: 10
+        });
+
+        if (res.code == 200 && res.data) {
+          const list = res.data.list.map(item => {
+            if (!item.avatar) {
+              item.avatar = this.avatar;
             }
-            this.scrollLock = false;
-          })
-          .catch(e => {
-            this.scrollLock = false;
+            return item;
           });
+          const data = this.awardRankList;
+          this.awardlimit = 10;
+          this.awardpos = res.data.offset + 10;
+          this.awardtotal = res.data.total;
+          this.awardRankList = data.concat(list);
+        }
+        this.scrollLock = false;
+
         this.clearBottomInfo();
       }
     }
@@ -472,7 +468,6 @@
       // min-height: 320px;
       height: 570px;
       // height: 440px;
-      overflow-y: scroll;
       .loading-bottom {
         width: 100%;
         height: 20px;
@@ -655,8 +650,6 @@
       .rank-con {
         color: #e6e6e6;
         width: 100%;
-        // height: 100%;
-        overflow-y: scroll;
       }
       .center {
         text-align: center;
@@ -664,7 +657,6 @@
       }
     }
     .watch-area {
-      // left: -24px;
       width: 360px;
     }
   }
