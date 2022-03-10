@@ -114,7 +114,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    top: -1px;
+    top: 8px;
     background-color: #fb3a32;
     z-index: 3;
     .vh-video-tailoring__event-content {

@@ -36,11 +36,14 @@
         <div
           class="icon-wrapper"
           v-show="
-            webinar.type == 1 &&
-            deviceStatus != 2 &&
-            ((connectMicShow && !isAllBanned && !isBanned && !groupInitData.isInGroup) ||
-              (onlineMicStatus && !groupInitData.isInGroup) ||
-              (groupInitData.isInGroup && !groupInitData.isBanned))
+            (webinar.type == 1 &&
+              device_status != 2 &&
+              connectMicShow &&
+              !isAllBanned &&
+              !isBanned &&
+              !groupInitData.isInGroup) ||
+            (!isBanned && !isAllBanned && onlineMicStatus && !groupInitData.isInGroup) ||
+            (groupInitData.isInGroup && !groupInitData.isBanned)
           "
         >
           <!-- 上麦 -->
@@ -270,20 +273,21 @@
         if (parseInt(this.device_status) === 1) {
           this.$toast(this.$t('interact.interact_1003'));
         }
+        this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
         if (parseInt(this.device_status) === 1) {
           this.$toast(this.$t('interact.interact_1002'));
         }
+        this.connectMicShow = false;
       });
     },
     methods: {
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        console.log(this.roomBaseServer, 'roomBaseServer');
         this.webinar = webinar;
         this.configList = configList;
       },
@@ -306,17 +310,6 @@
         // 直播结束不展示入口
         this.msgServer.$on('live_over', e => {
           console.log(e);
-          this.connectMicShow = false;
-        });
-        // 接收开启连麦消息事件
-        this.msgServer.$on('vrtc_connect_open', msg => {
-          console.log(msg);
-          this.connectMicShow = true;
-        });
-
-        // 接收关闭连麦消息事件
-        this.msgServer.$on('vrtc_connect_close', msg => {
-          console.log(msg);
           this.connectMicShow = false;
         });
 

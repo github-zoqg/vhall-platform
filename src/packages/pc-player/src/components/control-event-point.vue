@@ -144,7 +144,8 @@
     top: -5px;
     left: 0px;
     background-color: @font-error;
-    z-index: 3;
+    z-index: 9;
+    cursor: pointer;
     &.event-mini-point {
       top: -6px;
     }
@@ -153,7 +154,7 @@
       text-align: left;
       word-break: break-all;
       position: absolute;
-      z-index: 9;
+      z-index: 10;
       top: 0;
       left: 0;
       color: @font-error-low;

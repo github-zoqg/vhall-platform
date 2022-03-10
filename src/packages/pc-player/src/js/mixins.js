@@ -48,7 +48,6 @@ const playerMixins = {
         });
       }
       screenfull.onchange(ev => {
-        console.log(screenfull.isFullscreen, ev, '???123143254');
         if (ev.target.id !== 'vmp-player') return;
         this.isFullscreen = !this.isFullscreen;
       });
@@ -56,6 +55,31 @@ const playerMixins = {
       this.hoverVideoTimer = setTimeout(() => {
         this.hoveVideo = false;
       }, 3000);
+      window.onkeydown = event => {
+        let e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e.keyCode === 32) {
+          this.startPlay();
+          if (e.preventDefault) {
+            e.preventDefault();
+          } else {
+            window.event.returnValue = false;
+          }
+        } else if (e.keyCode === 38) {
+          if (this.voice >= 100) {
+            this.voice = 100;
+            return;
+          }
+          this.voice = this.voice + 2;
+        } else if (e.keyCode === 40) {
+          if (this.voice <= 0) {
+            this.voice = 0;
+            return;
+          }
+          this.voice = this.voice - 2;
+        } else if (e.keyCode === 173) {
+          console.log('11111静音');
+        }
+      };
     },
     getListenPlayer() {
       //  直播开始
@@ -71,24 +95,31 @@ const playerMixins = {
         console.warn('PAUSE');
       });
       // 视频清晰度发生改变----卡顿切换清晰度时触发
-      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, e => {
+      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, () => {
         console.warn('DEFINITION_CHANGE');
         this.loading = true;
       });
-      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, e => {
-        console.warn('LOADEDMETADATA');
-      });
-      this.playerServer.$on(VhallPlayer.LAG_REPORT, e => {
+      // 卡顿
+      this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
         this.loading = true;
       });
+
+      // 卡顿恢复
+      this.playerServer.$on(VhallPlayer.LAG_RECOVER, () => {
+        console.warn('LAG_RECOVER');
+        this.loading = false;
+      });
+
+      // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
       });
-      this.playerServer.$on(VhallPlayer.ERROR, e => {
+      // 视频错误
+      this.playerServer.$on(VhallPlayer.ERROR, () => {
         this.loading = true;
-        console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
+      // 视频播放完毕
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听播放完毕状态
         console.log('pc-播放完毕');
@@ -97,11 +128,6 @@ const playerMixins = {
         this.isVodEnd = true;
         this.roomBaseServer.setChangeElement('doc');
         this.displayMode = 'normal';
-      });
-      // 打开弹幕
-      this.playerServer.$on('push_barrage', data => {
-        if (!this.danmuIsOpen) return;
-        this.addBarrage(data);
       });
 
       // 结束直播
@@ -212,7 +238,6 @@ const playerMixins = {
       console.log('获取倍速', this.UsableSpeed);
       if (sessionStorage.getItem('localSpeedValue')) {
         this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
-        // console.log(this.currentSpeed.toString().length, this.currentSpeed.toFixed(1), '??!2334');
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
         if (suc) {

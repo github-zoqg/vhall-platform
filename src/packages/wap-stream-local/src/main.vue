@@ -10,7 +10,7 @@
       :id="`stream-${joinInfo.third_party_user_id}`"
     ></section>
     <!-- videoMuted 的时候显示流占位图 -->
-    <section v-if="localStream.videoMuted" class="vmp-stream-local__stream-box__mute"></section>
+    <section v-if="localSpeaker.videoMuted" class="vmp-stream-local__stream-box__mute"></section>
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="isStreamPublished">
       <span
@@ -28,7 +28,7 @@
       <span
         class="vmp-stream-local__bootom-mic vh-iconfont"
         :class="
-          localStream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
+          localSpeaker.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
       ></span>
     </section>
@@ -65,6 +65,23 @@
       };
     },
     computed: {
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
+        );
+      },
+      remoteSpeakers() {
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
+      },
       localStream() {
         console.log(
           '----localStream更新了----',
@@ -178,13 +195,17 @@
         // 更新本地speakerList
         if (this.groupServer.state.groupInitData.isInGroup) {
           await this.groupServer.updateGroupInitData();
+          try {
+            await this.checkVRTCInstance();
+          } catch (e) {
+            console.log('检测错误信息----', e);
+          }
         } else {
           await this.roomBaseServer.getInavToolStatus();
         }
 
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-            // await this.checkVRTCInstance();
             await this.interactiveServer.init();
             // 开始推流
             this.startPush();
@@ -306,7 +327,7 @@
             } else {
               count++;
               console.log('checkVRTCInstance count', count);
-              if (count > 20) {
+              if (count > 30) {
                 clearInterval(timer);
                 console.error('互动实例不存在');
                 reject();
@@ -416,7 +437,7 @@
       exitFullScreen() {
         this.interactiveServer
           .exitStreamFullscreen({
-            streamId: this.stream.streamId,
+            streamId: this.localStream.streamId,
             vNode: `vmp-stream-local__${this.stream.streamId}`
           })
           .then(res => {

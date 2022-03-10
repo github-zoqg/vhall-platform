@@ -25,25 +25,37 @@ const playerMixins = {
         this.isPlayering = false;
         console.warn('PAUSE');
       });
+
       // 视频清晰度发生改变----卡顿切换清晰度时触发
       this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, () => {
         console.warn('DEFINITION_CHANGE');
         this.isNoBuffer = true;
       });
-      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, () => {
-        console.warn('LOADEDMETADATA');
-      });
+
+      // 卡顿
       this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
         this.isNoBuffer = true;
       });
+
+      // 卡顿恢复
+      this.playerServer.$on(VhallPlayer.LAG_RECOVER, () => {
+        console.warn('LAG_RECOVER');
+        this.isNoBuffer = false;
+      });
+
+      // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
       });
+
+      // 视频出错
       this.playerServer.$on(VhallPlayer.ERROR, e => {
         this.isNoBuffer = true;
         console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
+
+      // 视频播放完毕
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('wap-播放完毕');
@@ -55,17 +67,6 @@ const playerMixins = {
         // 为了将打开的弹窗关闭
         this.videoShowIcon();
       });
-      // 打开弹幕
-      this.playerServer.$on('push_barrage', data => {
-        if (!this.danmuIsOpen) return;
-        this.addBarrage(data);
-      });
-
-      // // 结束直播
-      // this.playerServer.$on('live_over', data => {
-      //   console.log(data);
-      //   this.isLivingEnd = true;
-      // });
     },
     listenEvents() {
       // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
@@ -103,8 +104,6 @@ const playerMixins = {
           console.log('获取当前视频播放时间失败----------');
         });
         this.sliderVal = (this.currentTime / this.totalTime) * 100;
-        // 派发播放器时间更新事件，通知章节当前播放的时间节点
-        // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, this.currentTime);
       });
     },
     changeSlider(value) {
