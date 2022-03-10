@@ -184,9 +184,9 @@
 
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-            // await this.checkVRTCInstance();
             await this.interactiveServer.init();
             // 开始推流
+            await this.checkVRTCInstance();
             this.startPush();
           }
         }
@@ -306,7 +306,7 @@
             } else {
               count++;
               console.log('checkVRTCInstance count', count);
-              if (count > 20) {
+              if (count > 30) {
                 clearInterval(timer);
                 console.error('互动实例不存在');
                 reject();
