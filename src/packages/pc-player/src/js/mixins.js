@@ -71,24 +71,31 @@ const playerMixins = {
         console.warn('PAUSE');
       });
       // 视频清晰度发生改变----卡顿切换清晰度时触发
-      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, e => {
+      this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, () => {
         console.warn('DEFINITION_CHANGE');
         this.loading = true;
       });
-      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, e => {
-        console.warn('LOADEDMETADATA');
-      });
-      this.playerServer.$on(VhallPlayer.LAG_REPORT, e => {
+      // 卡顿
+      this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
         this.loading = true;
       });
+
+      // 卡顿恢复
+      this.playerServer.$on(VhallPlayer.LAG_RECOVER, () => {
+        console.warn('LAG_RECOVER');
+        this.loading = false;
+      });
+
+      // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
       });
-      this.playerServer.$on(VhallPlayer.ERROR, e => {
+      // 视频错误
+      this.playerServer.$on(VhallPlayer.ERROR, () => {
         this.loading = true;
-        console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
+      // 视频播放完毕
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听播放完毕状态
         console.log('pc-播放完毕');
@@ -97,11 +104,6 @@ const playerMixins = {
         this.isVodEnd = true;
         this.roomBaseServer.setChangeElement('doc');
         this.displayMode = 'normal';
-      });
-      // 打开弹幕
-      this.playerServer.$on('push_barrage', data => {
-        if (!this.danmuIsOpen) return;
-        this.addBarrage(data);
       });
 
       // 结束直播
@@ -212,7 +214,6 @@ const playerMixins = {
       console.log('获取倍速', this.UsableSpeed);
       if (sessionStorage.getItem('localSpeedValue')) {
         this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
-        // console.log(this.currentSpeed.toString().length, this.currentSpeed.toFixed(1), '??!2334');
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
         if (suc) {
