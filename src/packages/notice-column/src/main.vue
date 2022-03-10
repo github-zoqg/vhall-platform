@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-column" v-if="isNoticeColumn">
+  <div class="vmp-notice-column" v-show="isNoticeColumn">
     <div class="vmp-notice-column-wrap">
       <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
       <p class="vmp-notice-column-wrap-nowrap">
@@ -58,6 +58,14 @@
         });
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
+        });
+        // 结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          const { latestNotice } = this.noticeServer.state;
+          if (latestNotice.total && latestNotice.created_at) {
+            this.isNoticeColumn = true;
+            this.noticeText = latestNotice.noticeContent;
+          }
         });
         this.groupServer.$on('GROUP_SWITCH_START', () => {
           this.isNoticeColumn = false;

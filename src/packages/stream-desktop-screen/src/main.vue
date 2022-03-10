@@ -126,6 +126,14 @@
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
+      },
+      ['roomBaseServer.state.watchInitData.webinar.type'](newval) {
+        if (newval == 3) {
+          // 直播结束,如果桌面共享还开着,结束
+          if (this.isShareScreen) {
+            this.showConfirm();
+          }
+        }
       }
     },
     methods: {

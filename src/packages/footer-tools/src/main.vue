@@ -40,7 +40,7 @@
       <handup></handup>
     </div>
     <!-- 互动工具 -->
-    <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
+    <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
         <!-- 公告 -->
         <notice></notice>
@@ -242,7 +242,6 @@
         this.languageList = this.roomBaseState.languages.langList.map(item => {
           return langMap[item.language_type];
         });
-        console.log(this.languageList, '??!32142435');
         const curLang = this.roomBaseState.languages.curLang;
         this.lang =
           langMap[sessionStorage.getItem('lang')] ||
@@ -265,22 +264,10 @@
       //监听禁言通知
       useChatServer().$on('banned', res => {
         this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
       });
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
         this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-      //监听直播结束的通知，下麦并停止推流
-      useMsgServer().$on('live_over', e => {
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
       });
     },
     methods: {

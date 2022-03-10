@@ -45,7 +45,7 @@
         }
       },
       checkRedPacketIcon() {
-        this.$emit('clickIcon');
+        this.$emit('clickIcon', this.lastUUID);
         this.showDot = false;
       },
       handleNewRedPacket(msg) {

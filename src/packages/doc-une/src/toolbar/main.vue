@@ -173,7 +173,7 @@
       return {
         showAudienceTip: true,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
-        currentBrush: 'pen',
+        currentBrush: '',
         // 画笔状态
         pen: {
           size: 7, // 粗细
@@ -328,23 +328,14 @@
        * 切换画板工具
        */
       async handleBoardTool(brush) {
+        if (
+          !this.docServer?.state.currentCid ||
+          !document.getElementById(this.docServer.state.currentCid)
+        ) {
+          console.log('容器不存在，不执行操作');
+          return;
+        }
         if (brush === 'clear') {
-          // TODO 提示文本进行国际化处理
-          // try {
-          //   await this.$confirm('<p>确定要清空文档标记么？</p>', '提示', {
-          //     customClass: 'saas-message-box',
-          //     dangerouslyUseHTMLString: true,
-          //     closeOnClickModal: false,
-          //     roundButton: true,
-          //     confirmButtonText: '确定',
-          //     cancelButtonText: '取消',
-          //     confirmButtonClass: 'btn-saas',
-          //     cancelButtonClass: 'btn-saas btn-saas-cancel'
-          //   });
-          //   this.docServer.clear();
-          // } catch (err) {
-          //   console.log(err);
-          // }
           this.isConfirmVisible = true;
           return;
         }
