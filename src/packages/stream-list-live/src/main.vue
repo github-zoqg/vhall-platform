@@ -29,7 +29,7 @@
             'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen
           }"
         >
-          <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
+          <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
         </div>
       </template>
 
@@ -97,6 +97,7 @@
     useGroupServer
   } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
   export default {
     name: 'VmpStreamListLive',
@@ -112,7 +113,8 @@
         remoteMaxLength: 0, //一行最大数
         PopAlertOffline: {
           visible: false
-        }
+        },
+        streamInfo
       };
     },
     components: {
