@@ -34,6 +34,7 @@
         </div>
       </template>
     </div>
+    <!-- wap 蒙层显示信息 -->
     <div class="vmp-wap-stream-wrap-mask">
       <!-- 热度 -->
       <div
