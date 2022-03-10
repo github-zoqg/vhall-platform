@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-list" v-if="isShowIcon && noticeNum">
+  <div class="vmp-notice-list" v-show="isShowIcon && noticeNum">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
@@ -39,7 +39,6 @@
     },
     data() {
       return {
-        noticeOptions: {},
         noticeNum: 0,
         isShowIcon: false,
         isShowNotice: false, //是否显示公告列表
@@ -59,7 +58,6 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.initConfig();
       this.roomBaseState = this.roomBaseServer.state;
       this.noticeNum = this.noticeServer.state.latestNotice.total || 0;
       if (this.noticeNum && this.noticeServer.state.latestNotice.created_at) {
@@ -70,13 +68,6 @@
       this.initNotice();
     },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          this.noticeOptions = widget.options;
-        }
-      },
       initNotice() {
         this.noticeServer.$on('live_over', () => {
           this.isShowIcon = false;
