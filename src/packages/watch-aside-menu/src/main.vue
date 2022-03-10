@@ -173,17 +173,13 @@
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
           this.isCollapse = true;
-          if (this.isInGroup) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
           this.isCollapse = true;
-          if (this.isInGroup) {
-            this.gobackHome(4);
-          }
+          this.gobackHome(4);
         });
 
         // 本人被踢出来
@@ -195,9 +191,7 @@
               useRoomBaseServer().state.watchInitData.join_info.third_party_user_id
           ) {
             this.isCollapse = true;
-            if (this.isInGroup) {
-              this.gobackHome(5, this.groupServer.state.groupInitData.name);
-            }
+            this.gobackHome(5, this.groupServer.state.groupInitData.name);
           }
         });
 
