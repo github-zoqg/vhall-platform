@@ -31,6 +31,7 @@ export function calculateNetworkStatus(status) {
 
 /**
  *兼容处理 role | nickname
+ * 这么做的原因：嵌入页、app等字段不统一，存在大小写、下划线等情况。无法完成统一迭代升级
  * @param {*} stream 流信息
  */
 export function streamInfo(stream) {
