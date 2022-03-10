@@ -1,5 +1,9 @@
 <template>
-  <div class="vhall-question" v-if="dialogVisible">
+  <div
+    class="vhall-question"
+    v-if="dialogVisible"
+    :style="{ zIndex: zIndexServerState.zIndexMap.questionnaire }"
+  >
     <div class="vhall-question-box">
       <div class="question-box">
         <div class="question-close" @click="dialogVisible = false">
@@ -13,7 +17,7 @@
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer, useZIndexServer } from 'middle-domain';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaireWatch',
@@ -30,7 +34,9 @@
       }
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         dialogVisible: false,
         questionLastId: '', // 最后一个问卷id
         questionnaireId: '' // 问卷Id
@@ -38,6 +44,7 @@
     },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initEvent();
@@ -59,6 +66,7 @@
             });
           } else {
             this.dialogVisible = true;
+            this.zIndexServer.setDialogZIndex('questionnaire');
             this.$nextTick(() => {
               this.questionnaireServer.renderQuestionnaire4Watch(
                 '#qs-preview-box-content',
@@ -90,6 +98,7 @@
             return false;
           }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('questionnaire');
           this.questionnaireServer.setDotVisible(true);
           await this.$nextTick(); // 等dom渲染
           this.questionnaireServer.renderQuestionnaire4Watch(
