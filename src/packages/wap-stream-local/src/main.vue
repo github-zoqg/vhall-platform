@@ -171,12 +171,13 @@
          *     2、默认不在麦上 ----->
          *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
          */
+        console.log();
         if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
           // 检测设备状态
-          if (
+          const isSpeakOn =
             (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-            this.micServer.state.isSpeakOn
-          ) {
+            this.micServer.state.isSpeakOn;
+          if (isSpeakOn) {
             this.startPush();
           } else if (
             this.mode === 6 &&
