@@ -70,6 +70,18 @@
       },
       visibleMenu() {
         return this.menu.filter(item => item.visible);
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
+    watch: {
+      isInGroup(val) {
+        if (val) {
+          this.setVisible({ visible: false, type: 'notice' });
+        } else {
+          this.setVisible({ visible: true, type: 'notice' });
+        }
       }
     },
     beforeCreate() {
