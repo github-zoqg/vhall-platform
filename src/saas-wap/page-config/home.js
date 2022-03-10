@@ -82,7 +82,7 @@ const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer',
@@ -101,6 +101,9 @@ const serverConfig = {
   },
   comWapDesktopScreen: {
     component: 'VmpWapDesktopScreen'
+  },
+  comWapInsertFIle: {
+    component: 'VmpWapInsertFIle'
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'

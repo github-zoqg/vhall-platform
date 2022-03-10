@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-sign-watch">
-    <div v-if="isShowCircle" class="vmp-sign-watch-icon" @click="reShowSignBox">
+    <div v-show="isShowCircle" class="vmp-sign-watch-icon" @click="reShowSignBox">
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
@@ -26,7 +26,7 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer, useChatServer } from 'middle-domain';
+  import { useSignServer, useChatServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
@@ -56,9 +56,7 @@
     },
     beforeCreate() {
       this.signServer = useSignServer();
-    },
-    created() {
-      // this.signServer.listenMsg();
+      this.groupServer = useGroupServer();
     },
     mounted() {
       this.signServer.$on('sign_in_push', e => {
@@ -87,6 +85,11 @@
         if (this.timer) {
           clearInterval(this.timer);
         }
+      });
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        let signInfo = this.$domainStore.state.roomBaseServer.signInfo;
+        console.log(signInfo, msg, '??!2314235');
       });
     },
     computed: {
