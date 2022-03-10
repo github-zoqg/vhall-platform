@@ -106,7 +106,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast, Dialog } from 'vant';
+  import { Toast } from 'vant';
   const langMap = {
     1: {
       label: '简体中文',

@@ -171,14 +171,23 @@
       .vmp-wap-player-footer {
         display: none;
       }
+      // 小屏后互动样式
       .vmp-wap-stream-wrap {
         height: 100%;
+        .vmp-stream-list {
+          height: 100%;
+          width: 100%;
+        }
         .vmp-stream-list__main-screen {
           position: absolute;
           top: 0;
-          left: 0;
+          left: 0 !important; // 由于小屏后，和产品沟通，只展示主画面
           width: 100%;
           height: 100%;
+          z-index: 7;
+          .vmp-stream-remote-exitscreen {
+            display: none;
+          }
         }
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
