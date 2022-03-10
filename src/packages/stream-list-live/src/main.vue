@@ -11,8 +11,11 @@
           'height-lower': isMainScreenHeightLower && !isShrink,
           'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__mini':
-            miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
-          'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
+            ['stream-list', 'insert-video'].includes(miniElement) &&
+            joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__max':
+            !['stream-list', 'insert-video'].includes(miniElement) &&
+            joinInfo.third_party_user_id == mainScreen
         }"
         v-show="localSpeaker.accountId"
       >
@@ -25,8 +28,12 @@
           class="vmp-stream-list__remote-container"
           :class="{
             'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
-            'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen,
-            'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen
+            'vmp-dom__mini':
+              ['stream-list', 'insert-video'].includes(miniElement) &&
+              speaker.accountId == mainScreen,
+            'vmp-dom__max':
+              !['stream-list', 'insert-video'].includes(miniElement) &&
+              speaker.accountId == mainScreen
           }"
         >
           <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
@@ -38,8 +45,8 @@
         v-if="showGroupMask"
         class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
         :class="{
-          'vmp-dom__mini': miniElement == 'stream-list',
-          'vmp-dom__max': miniElement != 'stream-list'
+          'vmp-dom__mini': ['stream-list', 'insert-video'].includes(miniElement),
+          'vmp-dom__max': !['stream-list', 'insert-video'].includes(miniElement)
         }"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>

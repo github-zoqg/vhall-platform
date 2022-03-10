@@ -43,6 +43,7 @@ export const serverConfig = {
       'comWatchAsideMenu',
       'comDocUne',
       'comDesktopScreen',
+      'comInsertStream',
       'comFooterTools',
       'comNoticeColumn',
       'comLivingEnd'
@@ -165,6 +166,10 @@ export const serverConfig = {
   // 桌面共享组件
   comDesktopScreen: {
     component: 'VmpStreamDesktopScreen'
+  },
+  // 插播文件
+  comInsertStream: {
+    component: 'VmpInsertStream'
   },
   // 播放器
   comPcPlayer: {
