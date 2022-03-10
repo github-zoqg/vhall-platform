@@ -178,7 +178,6 @@
             tabIndex === 1 &&
             ['1', '3', '20', 1, 3, 20].includes(roleName) &&
             [2, '2'].includes(userInfo.role_name) &&
-            [2, '2'].includes(userInfo.device_type) &&
             [0, '0'].includes(userInfo.is_banned) &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -197,7 +196,7 @@
           <!-- 显示条件：当前登录者是主持人  正在上麦 -->
           <i
             v-if="
-              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId !== userInfo.account_id
+              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId != userInfo.account_id
             "
             class="vmp-member-item__control__down-mic"
             @click="downMic(userInfo.account_id)"
@@ -518,7 +517,7 @@
       },
       //发起端演示的是否是选中的用户
       isLiveInviteDisable() {
-        return this.userInfo.account_id == this.currentSpeakerId;
+        return this.userInfo.account_id == this.presentationScreen;
       },
       //观看端演示的是否是选中的用户
       isWatchInviteDisable() {

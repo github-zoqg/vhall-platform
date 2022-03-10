@@ -1,5 +1,13 @@
 let localId = 0;
 
+const STATUS_MAP = {
+  VISIBLE: 1, //  显示
+  HIDDEN: 2, // 隐藏
+  LIVING: 3, // 直播或回放显示
+  RECORD: 3, // 直播或回放显示
+  PREDITION_FINISH_VISIBLE: 4 // 预告结束显示
+};
+
 export function getItemEntity(
   {
     type = 2,
@@ -14,7 +22,8 @@ export function getItemEntity(
 
   const text = type === 1 ? name : item.text;
   let { visible = true, tipsVisible = false, iconVisible = false } = item;
-  if (status == '2' || status == '4') visible = false;
+
+  if (status == STATUS_MAP['hidden']) visible = false;
 
   return {
     // 原始字段

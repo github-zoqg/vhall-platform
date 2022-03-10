@@ -25,7 +25,7 @@
     data() {
       return {
         isConfirmVisible: false,
-        btnText: this.$t('account.account_1063'),
+        btnText: this.$t('interact.interact_1010'),
         waitTime: 30,
         roleName: this.$t('chat.chat_1022'),
         senderId: ''
@@ -68,14 +68,14 @@
           this.isConfirmVisible = true;
           this.waitTime = 30;
           clearInterval(this.waitInterval);
-          this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
+          this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
           this.waitInterval = setInterval(() => {
             this.waitTime--;
-            this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
+            this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
               this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
-              this.btnText = this.$t('account.account_1063');
+              this.btnText = this.$t('interact.interact_1010');
               this.isConfirmVisible = false;
             }
           }, 1000);
@@ -94,7 +94,7 @@
           .then(res => {
             useMicServer().userSpeakOn();
             clearInterval(this.waitInterval);
-            this.btnText = this.$t('account.account_1063');
+            this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
           });
       },
@@ -108,7 +108,7 @@
           })
           .then(res => {
             clearInterval(this.waitInterval);
-            this.btnText = this.$t('account.account_1063');
+            this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
           });
       }

@@ -31,8 +31,12 @@
     <!-- 收到问卷 -->
     <template v-else-if="source.type == 'questionnaire_push'">
       <div class="msg-item interact">
-        <div class="interact-msg" @tap="checkQuestionDetail(source.content.questionnaire_id)">
-          1{{ source.content.text_content }},{{ $t('common.common_1030') }}
+        <div
+          class="interact-msg"
+          @tap="checkQuestionDetail(source.content.questionnaire_id)"
+          @click="checkQuestionDetail(source.content.questionnaire_id)"
+        >
+          {{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>

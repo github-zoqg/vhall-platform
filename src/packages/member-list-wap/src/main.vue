@@ -26,7 +26,7 @@
           </div>
 
           <div class="self" v-if="item.role_name == 1">
-            <i class="vh-iconfont vh-saas-line-speaker"></i>
+            <i class="vh-saas-iconfont vh-saas-line-speaker"></i>
           </div>
         </div>
       </van-list>
@@ -447,7 +447,7 @@
     .self {
       position: absolute;
       right: 32px;
-      .vh-iconfont {
+      .vh-saas-iconfont {
         color: #ff9446;
         font-size: 30px;
       }

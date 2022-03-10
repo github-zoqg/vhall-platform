@@ -1,6 +1,6 @@
 /* eslint-disable promise/param-names */
 <template>
-  <van-popup v-model="popupVisible" position="bottom" :overlay="false" style="height: 80vh">
+  <van-popup v-model="popupVisible" position="bottom" :overlay="false" class="lottery-popup">
     <!-- 抽奖标题 -->
     <header class="title-bar">
       {{ $t('interact_tools.interact_tools_1003') }}
@@ -75,6 +75,7 @@
       open(uuid = '') {
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
+          this.lotteryId = data.id;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
@@ -222,6 +223,9 @@
 </script>
 
 <style lang="less" scoped>
+  .lottery-popup {
+    height: calc(100% - 522px);
+  }
   .title-bar {
     position: relative;
     font-size: 32px;

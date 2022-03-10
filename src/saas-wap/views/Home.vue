@@ -56,7 +56,7 @@
 
         const roomBaseServer = useRoomBaseServer();
         const roomBaseState = roomBaseServer.state;
-        document.title = roomBaseState.watchInitData.webinar.subject;
+        document.title = roomBaseState.languages.curLang.subject;
 
         // 是否绑定邀请卡信息
         const open_id = sessionStorage.getItem('open_id');

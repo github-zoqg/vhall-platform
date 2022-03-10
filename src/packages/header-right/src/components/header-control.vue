@@ -42,7 +42,7 @@
             v-if="userInfo.role_name != 1"
             @click="roleQuit"
           >
-            <i class="iconfont iconjiaosetuichu"></i>
+            <i class="vh-iconfont vh-line-exit"></i>
             <p>角色退出</p>
           </div>
           <div
@@ -173,13 +173,15 @@
         if (this.isOpenSplitScreen) {
           this.splitScreenServer.closeSplit();
         } else {
+          // quertString
           const search = location.search
             ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
             : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+          // location
           const url =
             process.env.NODE_ENV === 'development'
               ? `${window.location.origin}`
-              : `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}`;
+              : `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}`;
           const retUrl = `${url}/lives/split-screen/${this.$route.params.id}${search}`;
           this.splitScreenServer.openSplit(retUrl);
         }
@@ -192,7 +194,7 @@
         // 角色退出
         this.useServer.loginRoleOut({ webinar_id: this.webinarInfo.id }).then(res => {
           if (res.code == 200) {
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/lives/keylogin/${this.webinarInfo.id}/${this.userInfo.role_name}`;
+            window.location.href = `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/lives/keylogin/${this.webinarInfo.id}/${this.userInfo.role_name}`;
             window.localStorage.clear();
             window.sessionStorage.clear();
           }

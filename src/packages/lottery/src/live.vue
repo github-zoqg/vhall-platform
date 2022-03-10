@@ -176,7 +176,7 @@
           title: payload.title,
           img_order: payload.img_order
         };
-        this.prizeObj = payload.award_snapshoot;
+        this.prizeInfo = payload.award_snapshoot;
         this.prizeShow = true;
         this.lotteryContentShow = false;
         this.lotteryInfo = payload;

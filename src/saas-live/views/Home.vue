@@ -17,7 +17,14 @@
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import {
+    Domain,
+    useRoomBaseServer,
+    useSplitScreenServer,
+    useMicServer,
+    useInteractiveServer
+  } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
@@ -116,8 +123,41 @@
       },
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
+        const splitScreenServer = useSplitScreenServer();
+        const micServer = useMicServer();
+        const interactiveServer = useInteractiveServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
+        });
+        // 关闭分屏模式
+        splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
+          // 还原流信息
+          interactiveServer.state.localStream = {
+            streamId: null, // 本地流id
+            videoMuted: false,
+            audioMuted: false,
+            attributes: {}
+          };
+          interactiveServer.state.remoteStreams = [];
+          micServer.init();
+          await interactiveServer.init();
+          window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
+        });
+        // 分屏页面关闭
+        splitScreenServer.$on('SPLIT_SHADOW_CLOSE', async () => {
+          this.$message('正在与分屏页面建立连接，请稍等...');
+        });
+        // 分屏页面关闭10s未重新连接
+        splitScreenServer.$on('SPLIT_CLOSE_TO_HOST', async () => {
+          this.$message('关闭分屏模式');
+        });
+        splitScreenServer.$on('SPLIT_CUSTOM_MESSAGE', msg => {
+          // 分屏停止推流完成的消息
+          if (msg.data.body.type == 'split_unpublish_complete') {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons('comStreamLocal', 'emitClickUnpublishComplate')
+            );
+          }
         });
       },
       handleKickout() {

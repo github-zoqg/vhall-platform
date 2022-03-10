@@ -93,10 +93,9 @@
     mounted() {
       this.chatServer = useChatServer();
       this.rewardServer = useWatchRewardServer();
-      this.rewardServer.$on('reward_pay_ok', msg => {
-        this.rewardFn(msg);
-      });
-      // EventBus.$on('reward_pay_ok', this.rewardFn);
+      // this.rewardServer.$on('reward_pay_ok', msg => {
+      //   this.rewardFn(msg);
+      // });
     },
     beforeDestroy() {
       // EventBus.$off('reward_pay_ok', this.rewardFn);
@@ -117,7 +116,7 @@
             text_content: msg.data.reward_describe ? msg.data.reward_describe : '很精彩，赞一个！',
             num: msg.data.reward_amount
           },
-          sendId: this.userId,
+          sendId: this.webinarData.join_info.third_party_user_id,
           roleName: this.roleName,
           interactToolsStatus: true
         };

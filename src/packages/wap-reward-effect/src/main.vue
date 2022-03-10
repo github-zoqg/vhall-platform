@@ -16,10 +16,18 @@
         <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
         <img
           class="gift-user-avatar"
-          :src="rewardEffectInfo.data.gift_user_avatar || default_user_avatar"
+          :src="
+            rewardEffectInfo.data.type == 'gift_send_success'
+              ? rewardEffectInfo.data.gift_user_avatar
+              : rewardEffectInfo.data.rewarder_avatar || default_user_avatar
+          "
         />
         <span class="nick-name">
-          {{ rewardEffectInfo.data.gift_user_nickname | overHidden(7) }}
+          {{
+            rewardEffectInfo.data.type == 'gift_send_success'
+              ? rewardEffectInfo.data.gift_user_nickname
+              : rewardEffectInfo.data.rewarder_nickname | overHidden(7)
+          }}
         </span>
         <!-- <span v-if="rewardEffectInfo.type == 'reward'">
             打赏
@@ -37,21 +45,33 @@
           {{ rewardEffectInfo.data.text_content }}
         </span>
         <span
+          v-if="rewardEffectInfo.data.type == 'gift_send_success'"
           class="gift-img"
           :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
             backgroundImage: `url(${rewardEffectInfo.data.gift_image_url}?x-oss-process=image/resize,m_lfit,w_100)`
           }"
         ></span>
+        <img
+          src="./images/red-package-1.png"
+          alt=""
+          class="gift-img red-package"
+          v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
+        />
       </div>
     </transition-group>
   </div>
 </template>
 
 <script>
-  import { useRoomBaseServer, useGiftsServer, useChatServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useGiftsServer,
+    useChatServer,
+    useWatchRewardServer
+  } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -81,6 +101,7 @@
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
+      this.watchRewardServer = useWatchRewardServer();
       this.giftsServer = useGiftsServer();
       this.chatServer = useChatServer();
       console.log('wap this.roomBaseServer------->', this.roomBaseServer);
@@ -151,6 +172,43 @@
           };
           this.chatServer.addChatToList(data);
           this.addRewardEffect(msg);
+        });
+        // 打赏消息
+        this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
+          // 添加聊天消息
+          const data = {
+            avatar: rawMsg.data.rewarder_avatar,
+            nickname:
+              rawMsg.data.rewarder_nickname.length > 8
+                ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
+                : rawMsg.data.rewarder_nickname,
+            type: 'reward_pay_ok',
+            content: {
+              text_content: rawMsg.data.reward_describe
+                ? rawMsg.data.reward_describe
+                : '很精彩，赞一个！',
+              num: rawMsg.data.reward_amount
+            },
+            sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
+            roleName: this.roleName,
+            interactToolsStatus: true
+          };
+          this.chatServer.addChatToList(data);
+          this.addRewardEffect(rawMsg);
+
+          if (
+            this.roomBaseServer.state.watchInitData.join_info.third_party_user_id ==
+            rawMsg.data.rewarder_id
+          ) {
+            this.closeDialog();
+            this.$message({
+              message: this.$t('common.common_1005'),
+              showClose: true,
+              // duration: 0,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          }
         });
       },
       /**
@@ -304,6 +362,12 @@
     }
     .multiple {
       font-size: 12px;
+    }
+    .red-package {
+      width: 64px;
+      height: auto;
+      top: -2px;
+      right: 32px;
     }
   }
 </style>

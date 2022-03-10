@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
@@ -47,6 +47,14 @@
         } else {
           return this.roomBaseServer.state.interactToolStatus.doc_permission;
         }
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
       }
     },
     beforeCreate() {
@@ -66,12 +74,18 @@
       ['presenterId']() {
         this.resetMenus();
       },
+      ['isShareScreen']() {
+        this.resetMenus();
+      },
       ['roomBaseServer.state.configList']: {
         deep: true,
         immediate: true,
         handler() {
           this.resetMenus();
         }
+      },
+      ['isInsertFilePushing']() {
+        this.resetMenus();
       },
       // // 演示者发生变化
       // presenterId() {
@@ -91,6 +105,10 @@
         for (const vn of this.$children) {
           if (!vn.kind || !vn.setDisableState || !vn.setHiddenState) continue;
           if (vn.kind === 'document') {
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 文档菜单
             if (this.role == 4) {
               // 嘉宾
@@ -110,6 +128,10 @@
             }
           } else if (vn.kind === 'board') {
             // 白板菜单
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             if (this.role == 4) {
               // 嘉宾
               if (this.doc_permission == this.userId) {
@@ -128,9 +150,17 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
+            if (this.isShareScreen) {
+              vn.setDisableState(false);
+              vn.setText('关闭共享');
+              vn.setSelectedState(true);
+              continue;
+            }
+            vn.setText('桌面共享');
+            vn.setSelectedState(false);
             if (this.role === 1) {
               // 主持人
-              if (this.webinarType === 1) {
+              if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
               } else {
@@ -148,6 +178,11 @@
               }
             } else {
               vn.setHiddenState(true); //隐藏
+            }
+            // 如果在插播就禁用
+            if (this.isInsertFilePushing) {
+              vn.setDisableState(true);
+              continue;
             }
           } else if (vn.kind === 'insertMedia') {
             // 插播文件菜单
@@ -168,6 +203,11 @@
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
               }
+            }
+            // 如果在桌面共享就禁用
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
             }
           } else if (vn.kind === 'interactTool') {
             // 互动工具菜单

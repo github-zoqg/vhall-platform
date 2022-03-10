@@ -173,6 +173,7 @@
             })
             .then(res => {
               if (res.code === 200) {
+                this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
                 this.$nextTick(() => {
                   this.$emit('navTo', 'LotterySuccess');
                 });

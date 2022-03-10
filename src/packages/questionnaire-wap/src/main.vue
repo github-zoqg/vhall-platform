@@ -40,14 +40,9 @@
         console.log('open', questionnaireId);
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
-            this.$message({
-              message: this.$t('form.form_1037'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
+            this.$toast(this.$t('form.form_1037'));
           } else {
-            this.dialogVisible = true;
+            this.popupVisible = true;
             this.$nextTick(() => {
               this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
             }); // 等dom渲染
@@ -59,15 +54,23 @@
       },
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
-          console.log('questionnaireServer22222222');
-          console.log(msg);
+          let text = '主持人';
+          if (msg.room_role == '3') {
+            text = `助理${msg.nick_name}`;
+          } else if (msg.room_role == '4') {
+            text = `嘉宾${msg.nick_name}`;
+          }
           useChatServer().addChatToList({
+            nickName: msg.nick_name,
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              // TODO 发起问卷文案提示不对
-              text_content: this.$t('interact_tools.interact_tools_1021')
+              text_content: text + this.$t('chat.chat_1030'),
+              questionnaire_id: msg.questionnaire_id
             },
-            type: msg.data.type,
-            interactStatus: true
+            roleName: msg.room_role,
+            type: msg.type,
+            interactStatus: true,
+            isCheck: true
           });
           this.popupVisible = true;
           await this.$nextTick();

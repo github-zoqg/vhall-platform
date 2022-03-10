@@ -1,58 +1,76 @@
 <template>
   <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
-    <section class="vmp-tab-menu__header">
-      <!-- 菜单区域 -->
-      <ul class="vmp-tab-menu-scroll-container" ref="menu">
-        <li
-          v-for="item of mainMenu"
-          :ref="item.id"
-          class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span class="item-text">{{ $tdefault(item.name) }}</span>
-          <i v-show="item.tipsVisible" class="tips"></i>
-        </li>
-        <li
-          v-if="visibleMenu.length > 3"
-          class="vmp-tab-menu-more"
-          :class="{ selected: isSubMenuShow }"
-          @click="toggleSubMenuVisible"
-        >
-          <i class="vh-iconfont vh-full-more"></i>
-        </li>
-      </ul>
+    <template v-if="isTryVideo && isSubscribe">
+      <div class="vmp-tab-menu__try">
+        <div class="try-img">
+          <img src="./img/trySee.png" alt="" />
+        </div>
+        <p>{{ $t('appointment.appointment_1030') }}</p>
+      </div>
+    </template>
+    <template v-else>
+      <section class="vmp-tab-menu__header">
+        <!-- 菜单区域 -->
+        <ul class="vmp-tab-menu-scroll-container" ref="menu">
+          <li
+            v-for="item of mainMenu"
+            :ref="item.id"
+            class="vmp-tab-menu-item"
+            :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+            :key="item.id"
+            @click="select({ type: item.type, id: item.id })"
+          >
+            <span class="item-text">{{ $tdefault(item.name) }}</span>
+            <i v-show="item.tipsVisible" class="tips"></i>
+          </li>
+          <li
+            v-if="visibleMenu.length > 3"
+            class="vmp-tab-menu-more"
+            :class="{ selected: isSubMenuShow }"
+            @click="toggleSubMenuVisible"
+          >
+            <i class="vh-iconfont vh-full-more"></i>
+          </li>
+        </ul>
 
-      <!-- 次级菜单 -->
-      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-        <li
-          class="vmp-tab-menu-sub__item"
-          v-for="item of subMenu"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span>{{ $tdefault(item.name) }}</span>
-          <i class="tips" v-show="item.tipsVisible"></i>
-        </li>
-      </ul>
-    </section>
+        <!-- 次级菜单 -->
+        <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+          <li
+            class="vmp-tab-menu-sub__item"
+            v-for="item of subMenu"
+            :key="item.id"
+            @click="select({ type: item.type, id: item.id })"
+          >
+            <span>{{ $tdefault(item.name) }}</span>
+            <i class="tips" v-show="item.tipsVisible"></i>
+          </li>
+        </ul>
+      </section>
 
-    <!-- 正文区域 -->
-    <section class="vmp-tab-menu__main">
-      <tab-content
-        ref="tabContent"
-        :mainMenu="mainMenu"
-        :subMenu="subMenu"
-        @noticeHint="handleHint"
-        @closePopup="selectDefault"
-      />
-    </section>
+      <!-- 正文区域 -->
+      <section class="vmp-tab-menu__main">
+        <tab-content
+          ref="tabContent"
+          :mainMenu="mainMenu"
+          :subMenu="subMenu"
+          @noticeHint="handleHint"
+          @closePopup="selectDefault"
+        />
+      </section>
+    </template>
   </section>
 </template>
 
 <script>
-  import { useMenuServer, useQaServer, useChatServer, useDocServer } from 'middle-domain';
+  import {
+    useMenuServer,
+    useQaServer,
+    useChatServer,
+    useDocServer,
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
@@ -66,12 +84,23 @@
         selectedId: '',
         menu: [],
         isSubMenuShow: false,
+        visibleCondition: 'default',
         tabOptions: {}
       };
     },
     computed: {
       visibleMenu() {
-        return this.menu.filter(item => item.visible);
+        return this.menu.filter(item => {
+          if (this.visibleCondition === 'living') {
+            return (item.status == 1 || item.status == 3) && item.visible;
+          }
+
+          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible;
+        });
       },
       mainMenu() {
         return this.visibleMenu.filter((item, index) => index < 3);
@@ -86,6 +115,13 @@
       // 是否为嵌入页
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 是否是试看
+      isTryVideo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
     },
     beforeCreate() {
@@ -93,11 +129,13 @@
       this.docServer = useDocServer();
     },
     created() {
+      if (this.isTryVideo && this.isSubscribe) return;
       this.initConfig();
       this.initMenu();
       this.listenEvents();
     },
     async mounted() {
+      if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.selectDefault();
     },
@@ -106,6 +144,8 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -119,6 +159,7 @@
         });
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
           chatServer.addChatToList({
             content: {
               text_content: this.$t('chat.chat_1081')
@@ -135,15 +176,56 @@
           this.setVisible({ visible: true, type: 'private' });
         });
 
+        if (this.isSubscribe) {
+          this.setVisibleCondition('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
+        }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_start') {
+            this.setVisibleCondition('living');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisibleCondition('live_over');
+            this.setVisible({ visible: false, type: 3 }); // chat
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+          }
+        });
+
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
-          this.setVisible({ visible: val, type: 2 });
-          if (val) {
-            let obj = this.getItem({ type: 2 });
-            this.select({ type: obj.type, id: obj.id });
+          this.changeDocStatus(val);
+        });
+        // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_status', val => {
+          console.log('dispatch_doc_switch_status', val);
+          this.changeDocStatus(val);
+        });
+        //监听进出子房间消息
+        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
           }
         });
+      },
+      changeDocStatus(val) {
+        this.setVisible({ visible: val, type: 2 });
+        if (val) {
+          let obj = this.getItem({ type: 2 });
+          this.select({ type: obj.type, id: obj.id });
+        }
       },
       /**
        * 初始化配置
@@ -169,19 +251,26 @@
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 2, {
-            type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
-          });
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
             name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
             text: '问答', // 同上
             status: roomState.interactToolStatus.question_status ? 1 : 2
           });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: '私聊', // 同上
+            status: 2
+          });
         }
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living|predition]
+       */
+      setVisibleCondition(condition = 'default') {
+        this.visibleCondition = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
@@ -338,6 +427,29 @@
     font-size: 32px;
     display: flex;
     flex-direction: column;
+    &__try {
+      height: 100%;
+      width: 100%;
+      background: #f7f7f7;
+      .try-img {
+        width: 221px;
+        height: 136px;
+        margin: 0 auto;
+        margin-top: 40%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      p {
+        text-align: center;
+        font-size: 28px;
+        color: #8c8c8c;
+        padding-top: 24px;
+        text-indent: -20px;
+      }
+    }
 
     &__header {
       position: relative;

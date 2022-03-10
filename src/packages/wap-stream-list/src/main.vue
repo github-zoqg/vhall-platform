@@ -19,17 +19,17 @@
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-      <template v-if="remoteStreams.length">
+      <template v-if="remoteSpeakers.length">
         <div
-          v-for="stream in remoteStreams"
-          :key="stream.streamId"
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': stream.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
-            <vmp-wap-stream-remote :stream="stream"></vmp-wap-stream-remote>
+            <vmp-wap-stream-remote :stream="streamInfo(speaker)"></vmp-wap-stream-remote>
           </div>
         </div>
       </template>
@@ -42,7 +42,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          热度 &nbsp;{{ hotNum | formatHotNum }}
+          &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -50,6 +50,12 @@
         <p @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
+      </div>
+      <!-- 多语言入口 -->
+      <div class="vmp-wap-stream-wrap-mask-lang">
+        <span @click="openLanguage" v-if="languageList.length > 1">
+          {{ lang.key == 1 ? '中文' : 'EN' }}
+        </span>
       </div>
       <!-- 进入全屏 -->
       <div
@@ -68,6 +74,24 @@
       <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
       小组协作中
     </div>
+    <van-popup
+      v-model="isOpenlang"
+      :overlay="false"
+      position="right"
+      style="z-index: 12"
+      class="vmp-wap-stream-popup"
+    >
+      <ul>
+        <li
+          v-for="(item, index) in languageList"
+          :key="index"
+          :class="{ 'popup-active': item.key == lang.key }"
+          @click="changeLang(item.key)"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
+    </van-popup>
   </div>
 </template>
 
@@ -82,8 +106,20 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast, Dialog } from 'vant';
-
+  import { Toast } from 'vant';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpWapStreamList',
 
@@ -97,7 +133,10 @@
         scroll: null, // BScroll 插件
         mainScreenDom: null, // 主屏Dom
         iconShow: false, // 5 秒的展示
-        is_host_in_group: this.roomBaseServer.state.interactToolStatus?.is_host_in_group // 主持人是否在小组中
+        isOpenlang: false,
+        lang: {},
+        languageList: [],
+        streamInfo
       };
     },
     filters: {
@@ -127,22 +166,33 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
-      remoteStreams() {
-        console.log(
-          '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams,
-          this.micServer.state.isSpeakOn
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
         );
-        if (this.micServer.state.isSpeakOn) {
+      },
+      remoteSpeakers() {
+        if (
+          this.micServer.state.isSpeakOn &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2
+        ) {
           // 远端流个数改变且 在推流 才进行初始化BScroll
           this.createBScroll();
         }
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      // 流列表高度是否为 0 的属性(这个属性依赖的场景比较多,后续有人更改,请更新说明注释)
       isStreamListH0() {
         /**
          * 计算方式:
@@ -156,14 +206,15 @@
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
          */
-        if (!this.remoteStreams.length) {
-          return !(
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          );
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
+            return false;
+          } else {
+            return true;
+          }
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
@@ -174,19 +225,22 @@
       isStreamListHAll() {
         // 只存在订阅一路流的情况下进行铺满
         return (
-          this.remoteStreams.length == 1 &&
-          this.remoteStreams[0].accountId == this.mainScreen &&
+          this.remoteSpeakers.length == 1 &&
+          this.remoteSpeakers[0].accountId == this.mainScreen &&
           !this.$domainStore.state.interactiveServer.localStream.streamId
         );
+      },
+      is_host_in_group() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
-        let _flag =
-          !this.$domainStore.state.groupServer.groupInitData.isInGroup &&
+        return (
+          !this.isInGroup &&
           this.is_host_in_group &&
-          this.roomBaseServer.state.watchInitData.webinar.mode == 6;
-        return _flag;
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6
+        );
       },
       hotNum() {
         return (
@@ -211,6 +265,16 @@
 
     async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
+      this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
+        return langMap[item.language_type];
+      });
+      const curLang = this.roomBaseServer.state.languages.curLang;
+      this.lang =
+        langMap[sessionStorage.getItem('lang')] ||
+        langMap[this.$route.query.lang] ||
+        langMap[curLang.language_type];
+      this.$i18n.locale = this.lang.type;
+      sessionStorage.setItem('lang', this.lang.key);
       this.addSDKEvents();
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
@@ -222,7 +286,9 @@
     mounted() {
       // 在麦上 才存在滑动情况
       if (this.micServer.state.isSpeakOn) {
-        this.createBScroll();
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
+          this.createBScroll();
+        }
         if (window.orientation == 90 || window.orientation == -90) {
           this.setFullScreen();
         }
@@ -257,54 +323,38 @@
           });
         });
 
-        // 房间信令异常断开事件
-        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
-          Dialog.alert({
-            message: '网络异常导致互动房间连接失败'
-          }).then(() => {
-            window.location.reload();
-          });
-        });
-
-        // 主持人进入退出小组 消息监听
-        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-          if (msg.data.status == 'enter') {
-            this.is_host_in_group = true;
-          } else if (msg.data.status == 'quit') {
-            this.is_host_in_group = false;
-          }
-        });
-
         // 开启分组讨论
         this.groupServer.$on('GROUP_SWITCH_START', () => {
-          if (this.groupServer.state.groupInitData.isInGroup) {
+          if (this.isInGroup) {
             this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          if (this.isInGroup) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
-          this.gobackHome(4);
+          if (this.isInGroup) {
+            this.gobackHome(4);
+          }
         });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          if (this.isInGroup) {
+            this.gobackHome(5, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
-            if (this.groupServer.state.groupInitData.join_role == 20) {
-              this.gobackHome(6);
-            } else {
-              this.gobackHome(7);
-            }
+          if (this.isInGroup) {
+            this.gobackHome(7);
           }
         });
 
@@ -333,9 +383,6 @@
             break;
           case 5:
             title = this.$t('chat.chat_1007');
-            break;
-          case 6:
-            title = '您被提升为组长!';
             break;
           case 7:
             title = '组长身份已变更';
@@ -418,6 +465,15 @@
       videoShowIcon() {
         this.iconShow = true;
         this.fiveDown();
+      },
+      changeLang(key) {
+        this.isOpenlang = false;
+        sessionStorage.setItem('lang', key);
+        window.location.reload();
+      },
+      openLanguage() {
+        this.iconShow = true;
+        this.isOpenlang = true;
       },
       // 5秒后消失
       fiveDown() {
@@ -508,6 +564,26 @@
           }
         }
       }
+      &-lang {
+        top: 150px;
+        right: 32px;
+        padding: 0 24px;
+        color: #fff;
+        position: absolute;
+        z-index: 5;
+        span {
+          display: block;
+          height: 48px;
+          width: 88px;
+          border-radius: 24px;
+          background: rgba(0, 0, 0, 0.5);
+          text-align: center;
+          line-height: 48px;
+          font-size: 24px;
+          font-family: PingFangSC-Medium, PingFang SC;
+          color: #fff;
+        }
+      }
       &-screen {
         width: 64px;
         height: 64px;
@@ -549,6 +625,34 @@
         -webkit-transition: all 1s;
         i {
           color: #fff;
+        }
+      }
+    }
+    .vmp-wap-stream-popup {
+      width: 200px;
+      position: absolute;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      ul {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 30px 0;
+        li {
+          width: 100%;
+          height: 60px;
+          line-height: 60px;
+          font-size: 28px;
+          font-family: PingFangSC-Regular, PingFang SC;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 1);
+          text-align: center;
+          &.popup-active {
+            color: #fb2626;
+          }
         }
       }
     }
@@ -619,7 +723,7 @@
       }
       .vmp-stream-list__main-screen {
         position: absolute;
-        left: 0;
+        left: 0 !important;
         top: 0;
         width: 100%;
         height: calc(100% - 85px);

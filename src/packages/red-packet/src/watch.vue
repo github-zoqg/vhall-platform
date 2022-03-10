@@ -40,7 +40,9 @@
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
     },
     created() {
       this.initEvent();
