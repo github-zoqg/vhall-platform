@@ -178,6 +178,11 @@
         // 更新本地speakerList
         if (this.groupServer.state.groupInitData.isInGroup) {
           await this.groupServer.updateGroupInitData();
+          try {
+            await this.checkVRTCInstance();
+          } catch (e) {
+            console.log('检测错误信息----', e);
+          }
         } else {
           await this.roomBaseServer.getInavToolStatus();
         }
@@ -186,7 +191,6 @@
           if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
             await this.interactiveServer.init();
             // 开始推流
-            await this.checkVRTCInstance();
             this.startPush();
           }
         }

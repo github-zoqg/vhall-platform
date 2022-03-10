@@ -74,7 +74,6 @@
 </template>
 
 <script>
-  import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
   export default {
     name: 'VmpIntroWap',
     filters: {
@@ -90,11 +89,15 @@
     },
     data() {
       return {
-        NoDelayImg,
+        lang: 'zh-CN',
         type: 'default' // default、subscribe
       };
     },
     computed: {
+      // 无延迟图片地址
+      NoDelayImg() {
+        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
+      },
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
