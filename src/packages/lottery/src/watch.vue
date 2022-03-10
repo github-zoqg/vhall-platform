@@ -1,5 +1,9 @@
 <template>
-  <div class="vhall-lottery-wap" v-if="dialogVisible">
+  <div
+    class="vhall-lottery-wap"
+    v-if="dialogVisible"
+    :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
+  >
     <component
       :is="lotteryView"
       :winner-list="winLotteryUserList"
@@ -16,7 +20,12 @@
   </div>
 </template>
 <script>
-  import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import {
+    useLotteryServer,
+    useRoomBaseServer,
+    useChatServer,
+    useZIndexServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpLotteryWatch',
@@ -28,8 +37,15 @@
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
       LotterySuccess: () => import('./components/lottery-success.vue') // 领取结果页面
     },
-    data() {
+    provide() {
       return {
+        lotteryServer: this.lotteryServer
+      };
+    },
+    data() {
+      const zIndexServerState = this.zIndexServer.state;
+      return {
+        zIndexServerState,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
         lotteryView: '', // 抽奖组件视图名称
@@ -40,13 +56,13 @@
         lotteryInfo: {}
       };
     },
-    provide() {
-      return {
-        lotteryServer: this.lotteryServer
-      };
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
+      try {
+        this.zIndexServer = useZIndexServer();
+      } catch (e) {
+        console.log(e);
+      }
     },
     created() {
       this.initMsgEvent();
@@ -98,6 +114,7 @@
             }
           }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('lottery');
         });
       },
 
@@ -125,6 +142,7 @@
         this.setFitment(msg.data);
         this.lotteryView = 'LotteryPending';
         this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('lottery');
         useChatServer().addChatToList({
           content: {
             text_content: this.$t('interact_tools.interact_tools_1021')
@@ -150,6 +168,7 @@
         }
         this.showWinnerList = !!msg.data.publish_winner;
         this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('lottery');
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
         useChatServer().addChatToList({
           content: {
