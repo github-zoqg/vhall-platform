@@ -181,7 +181,7 @@
           const url =
             process.env.NODE_ENV === 'development'
               ? `${window.location.origin}`
-              : `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}`;
+              : `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}`;
           const retUrl = `${url}/lives/split-screen/${this.$route.params.id}${search}`;
           this.splitScreenServer.openSplit(retUrl);
         }
