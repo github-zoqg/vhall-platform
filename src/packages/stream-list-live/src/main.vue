@@ -14,22 +14,22 @@
             miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
         }"
-        v-show="localStream.streamId"
+        v-show="localSpeaker.accountId"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
-      <template v-if="remoteStreams.length">
+      <template v-if="remoteSpeakers.length">
         <div
-          v-for="stream in remoteStreams"
-          :key="stream.streamId"
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-            'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen,
-            'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen,
+            'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen
           }"
         >
-          <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+          <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
         </div>
       </template>
 
@@ -49,7 +49,7 @@
 
     <div
       class="vmp-stream-list__folder"
-      v-show="remoteStreams.length > 0 || (splited && speakerList.length > 0)"
+      v-show="remoteSpeakers.length > 0 || (splited && speakerList.length > 0)"
       v-if="!isSplited"
     >
       <span
@@ -57,7 +57,7 @@
         :class="{
           disable:
             isShrink ||
-            (!splited && remoteStreams.length <= remoteMaxLength) ||
+            (!splited && remoteSpeakers.length <= remoteMaxLength) ||
             (splited && speakerList.length - 1 <= remoteMaxLength)
         }"
         @click="toggleShrink(true)"
@@ -67,7 +67,7 @@
         :class="{
           disable:
             !isShrink ||
-            (!splited && remoteStreams.length <= remoteMaxLength) ||
+            (!splited && remoteSpeakers.length <= remoteMaxLength) ||
             (splited && speakerList.length - 1 <= remoteMaxLength)
         }"
         @click="toggleShrink(false)"
@@ -110,7 +110,6 @@
         isShrink: false, // 是否收起
         isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
         remoteMaxLength: 0, //一行最大数
-        speakerList: [],
         PopAlertOffline: {
           visible: false
         },
@@ -140,8 +139,22 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
-      remoteStreams() {
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
+        );
+      },
+      remoteSpeakers() {
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -160,27 +173,21 @@
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
          */
-        if (!this.remoteStreams.length) {
-          if (
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          ) {
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;
           } else {
             return true;
           }
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
         } else {
           return false;
         }
-      },
-      localStream() {
-        return this.$domainStore.state.interactiveServer.localStream;
       }
     },
 
@@ -195,23 +202,15 @@
     created() {
       window.streamListLive = this;
       this.childrenCom = window.$serverConfig[this.cuid].children;
-      console.log(
-        '-- this.childrenCom:',
-        this.childrenCom,
-        this.$domainStore.state.interactiveServer.remoteStreams
-      );
 
       // 房间信令异常断开事件
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
         this.PopAlertOffline.visible = true;
       });
       this.listenEvents();
-      // this.getStreamList();
     },
 
     mounted() {
-      console.log(this.joinInfo, '----stream-list----joinInfo');
-
       // 计算一行最多放几个
       this.remoteMaxLength = parseInt(this.$refs.streamList.offsetWidth / 142);
 
@@ -267,12 +266,13 @@
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
           if (this.joinInfo.role_name == 1) {
-            const streams = this.interactiveServer.getRoomStreams();
-            const mainScreenStream = streams.find(
-              stream => stream.accountId == msg.data.room_join_id
+            const mainScreenSpeaker = this.speakerList.find(
+              speaker => speaker.accountId == msg.data.room_join_id
             );
-            if (mainScreenStream) {
-              this.interactiveServer.setBroadCastScreen(mainScreenStream.streamId);
+            if (mainScreenSpeaker.streamId) {
+              this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
+            } else {
+              this.$message.warning('当前用户正在推流，请稍等');
             }
           }
         });
@@ -286,10 +286,7 @@
           }
         });
       },
-      getStreamList() {
-        this.interactiveServer.getRoomStreams();
-        console.log('------remoteStreams------', this.remoteStreams);
-      },
+
       toggleShrink(flag) {
         this.isShrink = flag;
       },

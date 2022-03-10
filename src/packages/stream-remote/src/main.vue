@@ -193,7 +193,19 @@
     },
     props: {
       stream: {
-        require: true
+        require: true,
+        default: () => {}
+      }
+    },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          console.error('----speaker--- 有流Id了------', newval);
+          if (newval) {
+            this.subscribeRemoteStream();
+          }
+        },
+        immediate: true
       }
     },
     computed: {
@@ -249,7 +261,7 @@
       this.micServer = useMicServer();
     },
     mounted() {
-      this.subscribeRemoteStream();
+      // this.subscribeRemoteStream();
 
       window.addEventListener(
         'fullscreenchange',
@@ -288,6 +300,8 @@
           videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
+
+        console.log('订阅参数', opt);
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
@@ -425,7 +439,7 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: rgba(0, 0, 0, 0.85);
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {

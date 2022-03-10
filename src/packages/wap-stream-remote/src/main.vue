@@ -55,6 +55,17 @@
         require: true
       }
     },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          console.error('----speaker--- 有流Id了------', newval);
+          if (newval) {
+            this.subscribeRemoteStream();
+          }
+        },
+        immediate: true
+      }
+    },
     computed: {
       // 是否显示摄像头开关按钮
       isShowVideoControl() {
@@ -103,7 +114,7 @@
       this.micServer = useMicServer();
     },
     mounted() {
-      this.subscribeRemoteStream();
+      // this.subscribeRemoteStream();
     },
     beforeDestroy() {
       // 清空计时器

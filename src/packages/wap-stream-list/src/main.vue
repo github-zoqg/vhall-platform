@@ -19,17 +19,17 @@
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-      <template v-if="remoteStreams.length">
+      <template v-if="remoteSpeakers.length">
         <div
-          v-for="stream in remoteStreams"
-          :key="stream.streamId"
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': stream.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
-            <vmp-wap-stream-remote :stream="stream"></vmp-wap-stream-remote>
+            <vmp-wap-stream-remote :stream="speaker"></vmp-wap-stream-remote>
           </div>
         </div>
       </template>
@@ -127,22 +127,30 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
-      remoteStreams() {
-        console.log(
-          '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams,
-          this.micServer.state.isSpeakOn
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
         );
+      },
+      remoteSpeakers() {
         if (this.micServer.state.isSpeakOn) {
           // 远端流个数改变且 在推流 才进行初始化BScroll
           this.createBScroll();
         }
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      // 流列表高度是否为 0 的属性(这个属性依赖的场景比较多,后续有人更改,请更新说明注释)
       isStreamListH0() {
         /**
          * 计算方式:
@@ -156,14 +164,15 @@
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
          */
-        if (!this.remoteStreams.length) {
-          return !(
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          );
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
+            return false;
+          } else {
+            return true;
+          }
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
@@ -174,8 +183,8 @@
       isStreamListHAll() {
         // 只存在订阅一路流的情况下进行铺满
         return (
-          this.remoteStreams.length == 1 &&
-          this.remoteStreams[0].accountId == this.mainScreen &&
+          this.remoteSpeakers.length == 1 &&
+          this.remoteSpeakers[0].accountId == this.mainScreen &&
           !this.$domainStore.state.interactiveServer.localStream.streamId
         );
       },
