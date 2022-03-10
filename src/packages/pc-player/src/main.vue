@@ -48,7 +48,7 @@
           </div>
         </template>
 
-        <div class="vmp-player-living-vodend" v-if="isVodEnd && !isPlayering">
+        <div class="vmp-player-living-vodend" v-if="isVodEnd">
           <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
             <h3>{{ $t('appointment.appointment_1013') }}</h3>
             <div>
@@ -245,7 +245,7 @@
         </div>
       </div>
       <!-- 试看和断点续播提示 -->
-      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini'">
+      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini' && isPlayering">
         <!-- 试看 -->
         <div v-if="vodType === 'shikan' && isTryPreview">
           <i18n path="appointment.appointment_1012">
@@ -256,7 +256,7 @@
             <i style="color: #fff">{{ $t('interact.interact_1020') }}</i>
             <b @click="authTryWatch(4)">{{ $t('appointment.appointment_1011') }}</b>
           </span>
-          <span v-else @click="authTryWatch()">{{ authText }}</span>
+          <span v-else class="red" @click="authTryWatch()">{{ authText }}</span>
           <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
         </div>
         <!-- 断点续播 -->
@@ -644,7 +644,12 @@
       },
       // 播放
       play() {
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {

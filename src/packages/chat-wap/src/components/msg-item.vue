@@ -36,7 +36,7 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          1{{ source.content.text_content }},{{ $t('common.common_1030') }}
+          {{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>

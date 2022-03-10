@@ -5,12 +5,14 @@
         <vmp-air-container :cuid="cuid"></vmp-air-container>
       </template>
       <template v-else>
-        <div class="subscribe-bg" v-if="!showVideo">
-          <img :src="webinarsBgImg" alt="" />
-        </div>
-        <div v-if="showVideo">
+        <template v-if="!showVideo">
+          <div class="subscribe-bg">
+            <img :src="webinarsBgImg" alt="" />
+          </div>
+        </template>
+        <template v-if="showVideo">
           <vmp-air-container :cuid="cuid"></vmp-air-container>
-        </div>
+        </template>
         <template v-if="!showVideo">
           <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
             {{ countDownTime }}
@@ -152,7 +154,10 @@
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
       isTryVideo() {
-        return this.roomBaseServer.state.watchInitData.record.preview_paas_record_id;
+        return (
+          this.roomBaseServer.state.watchInitData.record.preview_paas_record_id &&
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe'
+        );
       }
     },
     beforeCreate() {

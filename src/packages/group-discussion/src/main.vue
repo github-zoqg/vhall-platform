@@ -566,8 +566,9 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         })
-          .then(() => {
-            this.groupServer.groupDisband(id);
+          .then(async () => {
+            await this.groupServer.groupDisband(id);
+            await this.roomBaseServer.getInavToolStatus();
           })
           .catch(() => {});
       },

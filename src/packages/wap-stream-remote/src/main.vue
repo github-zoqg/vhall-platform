@@ -55,6 +55,16 @@
         require: true
       }
     },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          if (newval) {
+            this.subscribeRemoteStream();
+          }
+        },
+        immediate: true
+      }
+    },
     computed: {
       // 是否显示摄像头开关按钮
       isShowVideoControl() {
@@ -103,7 +113,7 @@
       this.micServer = useMicServer();
     },
     mounted() {
-      this.subscribeRemoteStream();
+      // this.subscribeRemoteStream();
     },
     beforeDestroy() {
       // 清空计时器
@@ -198,7 +208,7 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: #000;
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {

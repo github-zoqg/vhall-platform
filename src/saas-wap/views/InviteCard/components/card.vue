@@ -285,7 +285,11 @@
       },
       // 记录生成邀请卡, /create-invite-self-relation 传递了join_id
       async submitCreateHistory(join_id) {
-        const token = this.$route.query.token || '';
+        const token =
+          this.$route.query.token ||
+          localStorage.getItem('token') ||
+          sessionStorage.getItem('token') ||
+          '';
 
         await this.inviteServer.createInvite(
           // data

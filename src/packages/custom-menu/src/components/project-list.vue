@@ -199,6 +199,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       text-align: left;
+      /**autoprefixer: ignore next */
       -webkit-box-orient: vertical;
     }
     &__info {

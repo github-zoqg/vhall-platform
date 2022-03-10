@@ -3,26 +3,26 @@
     <section class="vmp-intro-block">
       <header class="vmp-intro-block__headtitle">
         <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
-          <img :src="NoDelayImg" />
+          <img :src="noDelayIconUrl" />
         </i>
-        {{ title }}
+        {{ languagesInfo.subject }}
       </header>
       <main class="vmp-intro-block__detail">
         <p>
           <i class="vh-iconfont vh-line-time" />
-          开始时间:{{ startTime }}
+          {{ $t('common.common_1012') }}:{{ startTime }}
         </p>
         <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
           <p v-if="watchInitData.subscribe.show">
             <i class="vh-iconfont vh-line-user"></i>
-            预约人数:{{ watchInitData.subscribe.num }} 人
+            {{ $t('common.common_1031') }}:{{ watchInitData.subscribe.num }} 人
           </p>
         </template>
         <template v-if="watchInitData.status != 'subscribe'">
           <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
           <p v-if="watchInitData.online.show">
             <i class="vh-iconfont vh-line-user"></i>
-            在线人数:{{ personCount }} 人
+            {{ $t('common.common_1013') }}:{{ personCount }} 人
           </p>
         </template>
       </main>
@@ -54,7 +54,7 @@
       </div>
     </section>
     <section class="vmp-intro-block vmp-intro-block-content">
-      <header class="vmp-intro-block__title">活动简介</header>
+      <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header>
       <main class="vmp-intro-block__content-main" v-html="content"></main>
     </section>
 
@@ -65,7 +65,7 @@
         href="https://www.vhall.com/saas"
         target="_blank"
       >
-        微吼提供技术支持
+        {{ $t('footer.footer_1021') }}
       </a>
       <!-- 暂时借用dom -->
       <vmp-air-container :cuid="cuid"></vmp-air-container>
@@ -74,7 +74,6 @@
 </template>
 
 <script>
-  import NoDelayImg from '@/packages/app-shared/assets/img/delay-icon.png';
   export default {
     name: 'VmpIntroWap',
     filters: {
@@ -90,7 +89,6 @@
     },
     data() {
       return {
-        NoDelayImg,
         type: 'default' // default、subscribe
       };
     },
@@ -115,13 +113,12 @@
       isNoDelay() {
         return this.webinar.no_delay_webinar === 1;
       },
-      // 标题 Type:String
-      title() {
-        return this?.webinar?.subject || '';
-      },
       // 开始时间 Type:String
       startTime() {
         return this?.webinar?.start_time?.substr(0, 16) || '';
+      },
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
       },
       // 在线人数或订阅人数 Type:String
       personCount() {
@@ -130,9 +127,16 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
       },
+      // 无延迟图片地址
+      noDelayIconUrl() {
+        const langArr = ['zh-CN', 'en'];
+        const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+        const lang = langArr[langer - 1] || 'zh-CN';
+        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
+      },
       // 简介富文本正文 Type:String
       content() {
-        return this?.webinar?.introduction || '<p></p>';
+        return this.languagesInfo.introduction || '<p></p>';
       }
     }
   };

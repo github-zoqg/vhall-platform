@@ -15,7 +15,11 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-wap-player" @click.stop.prevent="videoShowIcon">
+      <div
+        id="vmp-wap-player"
+        style="width: 100%; height: 100%"
+        @click.stop.prevent="videoShowIcon"
+      >
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -78,10 +82,10 @@
           </i18n>
         </span>
       </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条 :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']" -->
+      <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
       <div
         class="vmp-wap-player-footer"
-        v-show="isPlayering"
+        v-show="isPlayering && !isOrientation"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
       >
         <!-- 倍速和画质合并 -->
@@ -123,7 +127,7 @@
             <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
           <div class="vmp-wap-player-control-slider">
-            <div v-if="eventPointList.length" ref="vhTailoringWrap">
+            <div v-if="eventPointList.length && totalTime && !isWarnPreview" ref="vhTailoringWrap">
               <controlEventPoint
                 v-for="(item, index) in eventPointList"
                 :key="'controlEventPoint' + index"
@@ -289,8 +293,8 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id) {
+        const { warmup, webinar, join_info } = this.roomBaseState.watchInitData;
+        if (warmup && warmup.warmup_paas_record_id && join_info.is_subscribe == 1) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -360,6 +364,7 @@
           speed: 0,
           autoplay: false
         },
+        isOrientation: false,
         lang: {},
         languageList: []
       };
@@ -389,6 +394,12 @@
     },
     mounted() {
       this.getWebinerStatus();
+      if (window.orientation == 90 || window.orientation == -90) {
+        this.isOrientation = true;
+        this.setFullscreen();
+      } else {
+        this.isOrientation = false;
+      }
     },
     methods: {
       startPlay() {
@@ -398,7 +409,12 @@
       play() {
         this.iconShow = false;
         this.fiveDown();
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {
@@ -653,6 +669,13 @@
         this.iconShow = true;
         this.isOpenlang = true;
       },
+      showLabelFun(eventTime) {
+        this.sliderVal = (eventTime / this.totalTime) * 100;
+        this.playerServer.setCurrentTime(eventTime, () => {
+          this.$toast('调整播放时间失败');
+        });
+        this.playerServer.play();
+      },
       replay() {
         this.isVodEnd = false;
         this.startPlay();
@@ -664,6 +687,10 @@
   .vmp-wap-player {
     height: 100%;
     width: 100%;
+    &-video {
+      height: 100%;
+      width: 100%;
+    }
     // position: relative;
     &-opcity-flase {
       // opacity: 0;

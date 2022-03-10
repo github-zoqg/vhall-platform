@@ -14,6 +14,9 @@
     <div class="icon-wrap">
       <lottery-icon @clickIcon="checkLotteryIcon" />
     </div>
+    <div class="icon-wrap">
+      <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
+    </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
@@ -22,11 +25,13 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import lotteryIcon from './components/lottery-icon/index.vue';
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
+  import questionnaireIcon from './components/questionnaire-icon/index.vue';
   export default {
     name: 'VmpContainerRightWap',
     components: {
       lotteryIcon,
-      redPacketIcon
+      redPacketIcon,
+      questionnaireIcon
     },
     data() {
       return {
@@ -54,15 +59,19 @@
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
-      handleRedPacket() {
+      handleRedPacket(red_packet_uuid) {
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitOpenRedPacket', [
-            this.$domainStore.state.roomBaseServer.redPacket.red_packet_uuid
-          ])
+          boxEventOpitons(this.cuid, 'emitOpenRedPacket', [red_packet_uuid])
         );
       },
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      checkQuestionnaireIcon(questionnaireId) {
+        console.log(questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireIcon', [questionnaireId])
+        );
       }
     }
   };

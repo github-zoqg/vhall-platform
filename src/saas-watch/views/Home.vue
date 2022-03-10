@@ -49,9 +49,10 @@
           this.clientType = 'embed';
         }
         const domain = await this.initReceiveLive(this.clientType);
+        await roomState();
         const roomBaseServer = useRoomBaseServer();
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
-        await roomState();
+        document.title = roomBaseServer.state.languages.curLang.subject;
         domain.initVhallReport(
           {
             bu: 0,

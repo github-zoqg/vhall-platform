@@ -562,6 +562,11 @@
           handleUserLeaveRoom(msg);
         });
 
+        //直播结束
+        this.msgServer.$on('live_over', () => {
+          handleLiveOver();
+        });
+
         //房间消息
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
@@ -623,9 +628,9 @@
             case 'endLive':
               handleEndLive(temp);
               break;
-            case 'live_over':
-              handleLiveOver(temp);
-              break;
+            // case 'live_over':
+            //   handleLiveOver(temp);
+            //   break;
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
@@ -641,11 +646,12 @@
         }
 
         //直播结束
-        function handleLiveOver(msg) {
-          console.log(msg);
+        function handleLiveOver() {
           setTimeout(() => {
             _this.refreshList();
           }, 1000);
+          //重置一下视图里各个状态
+          _this.resetViewData();
         }
 
         //设备检测
@@ -730,6 +736,7 @@
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
 
             if (isLive) {
+              console.log('context:::::', msg, context);
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
@@ -1181,6 +1188,10 @@
               //下麦成功
               isWatch && handleRoomDisconnectSuccess(temp);
               break;
+            case 'group_switch_start':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              handleStartGroupDiscuss();
+              break;
             default:
               break;
           }
@@ -1190,11 +1201,11 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-        //todo 这里需要仔细确认一下
-        // only 发起端（开始分组讨论）
-        this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          handleStartGroupDiscuss(msg);
-        });
+
+        //开始分组讨论
+        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
+        //   handleStartGroupDiscuss(msg);
+        // });
 
         // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
@@ -1568,9 +1579,14 @@
         this.searchUserInput = '';
         this.getOnlineUserList();
       },
+      //直播结束重置视图里的一些状态
+      resetViewData() {
+        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+      },
       //切换允许举手状态
-      onSwitchAllowRaiseHand() {
+      onSwitchAllowRaiseHand(element) {
         if (this.liveStatus !== 1) {
+          element.target.checked = false;
           this.allowRaiseHand = false;
           this.$message.error(this.$t('512521'));
           return;
@@ -1709,8 +1725,8 @@
           this.agreeUpMic(accountId);
         } else {
           if (this.userId === accountId) {
-            // 主持人自己上麦 todo 可能是信令或者直接移除
-            // EventBus.$emit('applyByHost');
+            // 主持人自己上麦
+            this.micServer.userSpeakOn();
           } else {
             this.micServer
               .inviteMic({
@@ -1851,10 +1867,12 @@
               } else {
                 this.$message.success(this.$t('message.message_1033'));
               }
+            } else {
+              this.$message.error(res.msg);
             }
           })
           .catch(err => {
-            this.$message.warning(err.msg);
+            this.$message.error(err.msg);
           });
       },
       //设为组长
