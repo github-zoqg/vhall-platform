@@ -1867,10 +1867,12 @@
               } else {
                 this.$message.success(this.$t('message.message_1033'));
               }
+            } else {
+              this.$message.error(res.msg);
             }
           })
           .catch(err => {
-            this.$message.warning(err.msg);
+            this.$message.error(err.msg);
           });
       },
       //设为组长
