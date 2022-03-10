@@ -90,6 +90,17 @@ export default async function () {
       })
   ];
 
+  // 判断是否是微信分享来的
+  try {
+    if (getQueryString('shareId') || getQueryString('share_id')) {
+      roomBaseServer.bindShare({
+        share: getQueryString('shareId') || getQueryString('share_id')
+      });
+    }
+  } catch (e) {
+    console.log('微信分享', e);
+  }
+
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态

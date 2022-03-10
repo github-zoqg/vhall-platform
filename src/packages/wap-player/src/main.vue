@@ -127,7 +127,7 @@
             <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
           <div class="vmp-wap-player-control-slider">
-            <div v-if="eventPointList.length" ref="vhTailoringWrap">
+            <div v-if="eventPointList.length && totalTime && !isWarnPreview" ref="vhTailoringWrap">
               <controlEventPoint
                 v-for="(item, index) in eventPointList"
                 :key="'controlEventPoint' + index"
@@ -409,7 +409,12 @@
       play() {
         this.iconShow = false;
         this.fiveDown();
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {
