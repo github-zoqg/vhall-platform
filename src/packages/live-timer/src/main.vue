@@ -534,7 +534,7 @@
     .bgimg {
       width: 292px;
       position: fixed;
-      z-index: 12;
+      z-index: 102;
       padding: 24px 20px;
       top: 15vh;
       left: 50vw;

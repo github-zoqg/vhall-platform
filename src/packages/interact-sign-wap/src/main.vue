@@ -27,7 +27,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSignServer, useChatServer } from 'middle-domain';
+  import { useSignServer, useChatServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   // import EventBus from '../../utils/Events';
   import CountDown from './countDown.vue';
@@ -35,9 +35,7 @@
     name: 'VmpSignWap',
     components: { CountDown },
     data() {
-      let roomBaseData = useRoomBaseServer().state;
       return {
-        roomBaseData,
         signInVisible: false,
         seconds: 60,
         sign_id: '',
@@ -58,12 +56,26 @@
       },
       signInVisible(newValue) {
         // EventBus.$emit('signShow', newValue);
+      },
+      roomBaseData: {
+        immediate: true,
+        deep: true,
+        handler: function (val) {
+          this.signinInfo = val.signInfo;
+        }
+      }
+    },
+    computed: {
+      roomBaseData() {
+        return this.$domainStore.state.roomBaseServer;
       }
     },
     beforeCreate() {
       this.signServer = useSignServer();
+      this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
-    created() {
+    async created() {
       this.signinInfo = this.roomBaseData.signInfo;
       let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
       // postcss 换算基数为75 头部+播放器区域高为 522px
@@ -97,6 +109,19 @@
           boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
         );
         // this.iconShow = false;
+
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+          },
+          type: e.data.type
+        };
+        // console.log(useChatServer(), data, '1323');
+        useChatServer().addChatToList(data);
+
         this.duration = 30;
         this.signInVisible = false;
         if (this.seconds) {
