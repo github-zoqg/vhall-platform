@@ -172,7 +172,7 @@
     computed: {
       // 无延迟图片地址
       noDelayIconUrl() {
-        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
+        return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
       },
       create_user_url() {
         const { watchInitData } = this.roomBaseServer.state;
