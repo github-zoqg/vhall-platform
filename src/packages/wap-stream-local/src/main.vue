@@ -486,7 +486,7 @@
       height: 24px;
       font-size: 12px;
       line-height: 24px;
-      color: #000;
+      color: #fff;
       box-sizing: border-box;
       padding: 0 6px;
       position: absolute;
