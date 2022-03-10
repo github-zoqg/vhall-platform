@@ -25,7 +25,6 @@
     },
     methods: {
       checkQuestionnaireIcon() {
-        this.questionnaireServer.setDotVisible(false);
         this.$emit('clickIcon', this.questionnaireServerState.lastQuestionnaireId);
       }
     }

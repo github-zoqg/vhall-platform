@@ -72,6 +72,9 @@
             interactStatus: true,
             isCheck: true
           });
+          const canAnswer = await this.questionnaireServer.checkAnswerStatus(msg.questionnaire_id);
+          if (canAnswer !== true) return false;
+          this.questionnaireServer.setDotVisible(true);
           this.popupVisible = true;
           await this.$nextTick();
           this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', msg.questionnaire_id);
