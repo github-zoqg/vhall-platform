@@ -129,7 +129,7 @@
       },
       // 是否在桌面共享
       isShareScreen() {
-        return this.$domainStore.state.desktopShareServer.isShareScreen;
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     watch: {
