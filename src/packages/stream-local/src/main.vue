@@ -369,7 +369,8 @@
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
           useMediaCheckServer().state.deviceInfo.device_status === 1 &&
-          ((isSpeakOn && !this.isOpenSplitScreen) ||
+          isSpeakOn &&
+          (!this.isOpenSplitScreen ||
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();
@@ -407,15 +408,14 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            console.error('this.localStream.streamId', this.localStream.streamId);
             if (this.localStream.streamId) return;
 
-            // 更新本地speakerList
-            if (this.groupServer.state.groupInitData.isInGroup) {
-              await this.groupServer.updateGroupInitData();
-            } else {
-              await this.roomBaseServer.getInavToolStatus();
-            }
+            // // 更新本地speakerList
+            // if (this.groupServer.state.groupInitData.isInGroup) {
+            //   await this.groupServer.updateGroupInitData();
+            // } else {
+            //   await this.roomBaseServer.getInavToolStatus();
+            // }
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
@@ -442,11 +442,11 @@
           await this.interactiveServer.destroy();
 
           // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
-          }
+          // if (this.groupServer.state.groupInitData.isInGroup) {
+          //   await this.groupServer.updateGroupInitData();
+          // } else {
+          //   await this.roomBaseServer.getInavToolStatus();
+          // }
 
           if (
             this.isNoDelay === 1 ||
@@ -470,6 +470,8 @@
             return;
           }
           await this.stopPush();
+          this.roomBaseServer.setChangeElement('stream-list');
+
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
           }

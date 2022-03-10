@@ -74,12 +74,6 @@
         <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
     </template>
-    <!-- 签到 -->
-    <template v-else-if="['sign_in_push'].includes(source.type)">
-      <div align="center" class="margin-top-bottom">
-        <p class="msg-item sign-msg">{{ source.content.text_content }}</p>
-      </div>
-    </template>
     <!-- 聊天消息 -->
     <template v-else>
       <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
