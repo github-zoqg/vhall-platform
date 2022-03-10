@@ -257,18 +257,6 @@
       // eventBus监听
       this.eventListener();
 
-      //监听禁言通知
-      useChatServer().$on('banned', res => {
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-      //监听全体禁言通知
-      useChatServer().$on('allBanned', res => {
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
       useMicServer().$on('vrtc_connect_open', msg => {
         if (parseInt(this.device_status) === 1) {
           this.$toast(this.$t('interact.interact_1003'));

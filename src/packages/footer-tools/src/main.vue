@@ -265,22 +265,10 @@
       //监听禁言通知
       useChatServer().$on('banned', res => {
         this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
       });
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
         this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-      //监听直播结束的通知，下麦并停止推流
-      useMsgServer().$on('live_over', e => {
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
       });
     },
     methods: {

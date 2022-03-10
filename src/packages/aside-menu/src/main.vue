@@ -50,7 +50,7 @@
       },
       // 是否开启了桌面共享
       isShareScreen() {
-        return this.$domainStore.state.desktopShareServer.isShareScreen;
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
       // 是否开启了插播
       isInsertFilePushing() {

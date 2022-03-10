@@ -15,7 +15,10 @@
     <div id="vmp-desktop-screen-subscribe"></div>
 
     <!-- 推桌面共享时占位图 -->
-    <div class="vmp-desktop-screen__tip" v-show="isShareScreen && streamId">
+    <div
+      class="vmp-desktop-screen__tip"
+      v-show="isShareScreen && desktopShareInfo.accountId == accountId"
+    >
       <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
       <br />
       <p>桌面共享中...</p>
@@ -84,10 +87,16 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       isShareScreen() {
-        return this.desktopShareServer.state.isShareScreen;
+        return this.desktopShareServer.state.localDesktopStreamId;
       },
       isShowWrapper() {
         return this.isShareScreen || this.popAlert.visible || this.isShowAccessDeniedAlert;
+      },
+      desktopShareInfo() {
+        return this.desktopShareServer.state.desktopShareInfo;
+      },
+      accountId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id;
       }
     },
     components: {
@@ -101,17 +110,12 @@
       this.desktopShareServer = useDesktopShareServer();
     },
     created() {
-      this.streamId = '';
       this.addEvents();
     },
     mounted() {
       // 刷新或者上麦 重新订阅
-      if (this.interactiveServer.interactiveInstance) {
-        let stream = this.interactiveServer.getDesktopAndIntercutInfo();
-
-        if (stream?.streamType === 3 || stream?.streamType === 4) {
-          this.subscribeStream(stream.streamId);
-        }
+      if (this.isShareScreen && this.accountId != this.desktopShareInfo.accountId) {
+        this.subscribeStream();
       }
     },
     watch: {
@@ -126,21 +130,21 @@
     },
     methods: {
       addEvents() {
-        this.desktopShareServer.$on('screen_stream_add', streamId => {
-          this.subscribeStream(streamId);
+        this.desktopShareServer.$on('screen_stream_add', () => {
+          this.subscribeStream();
         });
-        this.desktopShareServer.$on('screen_stream_remove', () => {});
+        this.desktopShareServer.$on('screen_stream_remove', () => {
+          this.desktopShareServer.unSubscribeDesktopShareStream();
+        });
       },
       // 订阅流
-      subscribeStream(streamId) {
+      subscribeStream() {
         const opt = {
-          streamId: streamId,
           videoNode: 'vmp-desktop-screen-subscribe', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
 
         this.desktopShareServer.subscribeDesktopShareStream(opt).then(() => {
-          useDesktopShareServer().setShareScreenStatus(true);
           useRoomBaseServer().setChangeElement('stream-list');
         });
       },
@@ -149,7 +153,6 @@
           this.popAlert.visible = true;
         } else {
           this.desktopShareServer.stopShareScreen().then(() => {
-            useDesktopShareServer().setShareScreenStatus(false);
             useRoomBaseServer().setChangeElement('stream-list');
           });
         }
@@ -170,15 +173,13 @@
 
         this.desktopShareServer
           .startShareScreen(options)
-          .then(data => {
-            this.streamId = data.streamId;
+          .then(() => {
             this.desktopShareServer
-              .publishDesktopShareStream(data.streamId)
+              .publishDesktopShareStream()
               .then(() => {
                 // 重新布局旁路
                 this.interactiveServer.resetLayout();
 
-                useDesktopShareServer().setShareScreenStatus(true);
                 console.log('[screen] 桌面共享推流成功');
               })
               .catch(error => {
