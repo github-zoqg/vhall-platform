@@ -23,7 +23,7 @@ export function getItemEntity(
   const text = type === 1 ? name : item.text;
   let { visible = true, tipsVisible = false, iconVisible = false } = item;
 
-  if (status == STATUS_MAP['hidden']) visible = false;
+  if (status == STATUS_MAP.HIDDEN) visible = false;
 
   return {
     // 原始字段
