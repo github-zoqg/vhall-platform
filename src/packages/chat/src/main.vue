@@ -372,7 +372,7 @@
             disable = true;
           }
           //主持人不受禁言限制
-          if ([1, '1'].includes(this.roleName)) {
+          if ([1, '1', 3, '3'].includes(this.roleName)) {
             placeholder = this.$t('chat.chat_1021');
             disable = false;
           }
