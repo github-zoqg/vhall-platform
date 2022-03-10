@@ -184,8 +184,7 @@
 
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-            //  初始化互动实例 若是收到结束分组讨论，则无需再次初始化互动实例
-            await this.checkVRTCInstance();
+            // await this.checkVRTCInstance();
             await this.interactiveServer.init();
             // 开始推流
             this.startPush();
@@ -248,6 +247,7 @@
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
+        console.warn('res----', res);
         if (res.code == 200) {
           // 成功上麦，返回true
           return true;
