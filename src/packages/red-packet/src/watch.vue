@@ -1,6 +1,10 @@
 <!-- 观看页-红包组件（颤动 + 弹出层） -->
 <template>
-  <div class="vhsaas-red-packet" v-if="dialogVisible">
+  <div
+    class="vhsaas-red-packet"
+    v-if="dialogVisible"
+    :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
+  >
     <div class="vhsaas-interact-mask">
       <components
         :is="componentsView"
@@ -16,7 +20,7 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer } from 'middle-domain';
+  import { useRedPacketServer, useZIndexServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
@@ -33,7 +37,9 @@
     },
     data() {
       const redPacketServerState = this.redPacketServer.state;
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         redPacketServerState,
         dialogVisible: false, // 组件显示
         componentsView: 'RedPacketAccept'
@@ -43,6 +49,7 @@
       this.redPacketServer = useRedPacketServer({
         mode: 'watch'
       });
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initEvent();
@@ -59,10 +66,12 @@
             this.componentsView = 'RedPacketAccept';
           }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('redPacket');
         });
       },
       openRedPacket(uuid) {
         this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('redPacket');
         this.open(uuid);
       },
       handleGoLogin() {
