@@ -1188,6 +1188,10 @@
               //下麦成功
               isWatch && handleRoomDisconnectSuccess(temp);
               break;
+            case 'group_switch_start':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              handleStartGroupDiscuss();
+              break;
             default:
               break;
           }
@@ -1197,11 +1201,11 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-        //todo 这里需要仔细确认一下
-        // only 发起端（开始分组讨论）
-        this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          handleStartGroupDiscuss(msg);
-        });
+
+        //开始分组讨论
+        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
+        //   handleStartGroupDiscuss(msg);
+        // });
 
         // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {

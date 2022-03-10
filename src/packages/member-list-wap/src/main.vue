@@ -154,15 +154,19 @@
             case 'main_room_join_change':
               handleMainRoomJoinChange(temp);
               break;
+            case 'group_switch_start':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              _this.initList();
+              break;
             default:
               break;
           }
         });
         //开始讨论
-        this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          console.log('开始讨论', msg);
-          _this.initList();
-        });
+        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
+        //   console.log('开始讨论', msg);
+        //   _this.initList();
+        // });
         //结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           console.log('结束讨论', msg);
