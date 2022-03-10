@@ -28,28 +28,27 @@
         }
       };
     },
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
+    watch: {
+      isInGroup(val) {
+        if (val) {
+          this.announcement.isShow = false;
+        } else {
+          this.openAnnouncement();
+        }
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
-      // 刷新展示最新一条公告&&为直播状态
-      if (
-        this.roomBaseServer.state.noticeInfo.total &&
-        this.roomBaseServer.state.webinar.type == 1
-      ) {
-        console.log(this.roomBaseServer, 'useRoomBaseServer123');
-        this.announcement = {
-          content: this.roomBaseServer.state.noticeInfo.list[0]?.content.content,
-          isShow: true
-        };
-        if (this.timer) {
-          clearTimeout(this.timer);
-        }
-        this.timer = setTimeout(() => {
-          this.announcement.isShow = false;
-        }, 30000);
-      }
+      this.openAnnouncement();
+      console.log(this.roomBaseServer, 'useRoomBaseServer123');
       // 监听到 公告
       this.noticeServer.listenMsg();
       this.noticeServer.$on('room_announcement', msg => {
@@ -72,6 +71,25 @@
     methods: {
       closeAnnouncement() {
         this.announcement.isShow = false;
+      },
+      openAnnouncement() {
+        // 刷新展示最新一条公告&&为直播状态
+        if (
+          this.roomBaseServer.state.noticeInfo.total &&
+          this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+          !this.isInGroup
+        ) {
+          this.announcement = {
+            content: this.roomBaseServer.state.noticeInfo.list[0]?.content.content,
+            isShow: true
+          };
+          if (this.timer) {
+            clearTimeout(this.timer);
+          }
+          this.timer = setTimeout(() => {
+            this.announcement.isShow = false;
+          }, 30000);
+        }
       }
     }
   };
