@@ -369,7 +369,8 @@
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
           useMediaCheckServer().state.deviceInfo.device_status === 1 &&
-          ((isSpeakOn && !this.isOpenSplitScreen) ||
+          isSpeakOn &&
+          (!this.isOpenSplitScreen ||
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();

@@ -126,7 +126,6 @@
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
         const splitScreenServer = useSplitScreenServer();
-        const micServer = useMicServer();
         const interactiveServer = useInteractiveServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
@@ -141,7 +140,6 @@
             attributes: {}
           };
           interactiveServer.state.remoteStreams = [];
-          micServer.init();
           await interactiveServer.init();
           window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
         });
