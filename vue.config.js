@@ -281,7 +281,7 @@ if (['serve', 'build'].includes(cmd)) {
 
   // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
   // if (argv.middle) {
-    process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
+  process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
   // }
 
   // 根据参数获取专用配置信息
