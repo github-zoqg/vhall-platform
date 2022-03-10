@@ -178,14 +178,17 @@
         // 更新本地speakerList
         if (this.groupServer.state.groupInitData.isInGroup) {
           await this.groupServer.updateGroupInitData();
+          try {
+            await this.checkVRTCInstance();
+          } catch (e) {
+            console.log('检测错误信息----', e);
+          }
         } else {
           await this.roomBaseServer.getInavToolStatus();
         }
 
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-            //  初始化互动实例 若是收到结束分组讨论，则无需再次初始化互动实例
-            await this.checkVRTCInstance();
             await this.interactiveServer.init();
             // 开始推流
             this.startPush();
@@ -248,6 +251,7 @@
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
+        console.warn('res----', res);
         if (res.code == 200) {
           // 成功上麦，返回true
           return true;
@@ -306,7 +310,7 @@
             } else {
               count++;
               console.log('checkVRTCInstance count', count);
-              if (count > 20) {
+              if (count > 30) {
                 clearInterval(timer);
                 console.error('互动实例不存在');
                 reject();
