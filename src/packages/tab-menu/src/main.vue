@@ -68,6 +68,7 @@
         isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
         direciton: 'row', // row(横)，column(纵)
         selectedId: '',
+        visibleCondition: 'living',
         menu: []
       };
     },
@@ -76,7 +77,20 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        return this.menu.filter(item => item.visible);
+        return this.menu.filter(item => {
+          if (this.visibleCondition === 'living') {
+            return (item.status == 1 || item.status == 3) && item.visible;
+          }
+
+          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible;
+        });
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
     },
     beforeCreate() {
@@ -131,10 +145,24 @@
         chatServer.$on('receivePrivateMsg', () => {
           this.setVisible({ visible: true, type: 'private' });
         });
-        // 直播结束不展示入口
-        msgServer.$on('live_over', e => {
-          this.setVisible({ visible: false, type: 'v5' });
-          this.setVisible({ visible: false, type: 'private' });
+
+        if (this.isSubscribe) {
+          this.setVisibleCondition('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
+        }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_start') {
+            this.setVisibleCondition('living');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisibleCondition('live_over');
+            this.setVisible({ visible: false, type: 3 }); // chat
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+          }
         });
         //监听进出子房间消息
         groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
@@ -169,7 +197,7 @@
         for (const item of list) {
           this.addItem(item);
         }
-        // TODO: temp，增加私聊
+
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
           this.addItemByIndex(chatIndex + 1, {
@@ -187,6 +215,13 @@
         }
 
         console.log('this.menu--------->', this.menu);
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living|predition]
+       */
+      setVisibleCondition(condition = 'default') {
+        this.visibleCondition = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
@@ -283,7 +318,7 @@
 
       /**
        * 选中一个菜单项，并显示对应内容
-       * @param {String} cuid cuid
+       * @param {String} type 后端传过来的menu type
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
@@ -301,7 +336,7 @@
       /**
        * 设置菜单项显隐
        * @param {Boolean} visible [true|false] 显隐值
-       * @param {String} cuid cuid
+       * @param {String} type 后端传过来的 menu type
        * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
       setVisible({ visible = true, type, id }) {
@@ -309,11 +344,11 @@
         if (!tab) return;
 
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(id);
+        visible === false && this.jumpToNearestItemById(tab.id);
       },
       /**
        * 切换某个菜单tab的可视性
-       * @param {*} cuid
+       * @param {*} type
        * @param {*} menuId [非必传]
        * @example toggleVisible('comChatWap','')
        */
@@ -326,7 +361,7 @@
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
-       * @param {String} cuid cuid
+       * @param {String} type 后端传过来的 menu type
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        * @example setTipsVisible(true,'comChatWap','10186')
        */
