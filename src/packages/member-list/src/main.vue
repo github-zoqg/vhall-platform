@@ -1725,8 +1725,8 @@
           this.agreeUpMic(accountId);
         } else {
           if (this.userId === accountId) {
-            // 主持人自己上麦 todo 可能是信令或者直接移除
-            // EventBus.$emit('applyByHost');
+            // 主持人自己上麦
+            this.micServer.userSpeakOn();
           } else {
             this.micServer
               .inviteMic({
