@@ -2,7 +2,7 @@ const move = {
   methods: {
     touchstart(e) {
       if (this.mini) {
-        this.videoDom = document.getElementsByClassName('wap-player-mini');
+        this.videoDom = document.querySelector('.vmp-wap-body-mini');
         const style = window.getComputedStyle(this.videoDom);
         this.DOMS = style;
         this.touchOffsetX = e.touches[0].pageX - parseFloat(style.left);
