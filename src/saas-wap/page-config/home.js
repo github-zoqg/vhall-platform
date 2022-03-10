@@ -141,6 +141,11 @@ const serverConfig = {
       cuid: ['comLotteryWap'],
       method: 'open'
     },
+    // 红包弹窗
+    emitClickRedPacketIcon: {
+      cuid: ['comRedPacketWap'],
+      method: 'open'
+    },
     // 问卷弹窗
     emitClickQuestionnaireIcon: {
       cuid: ['comQuestionnaireWap'],
@@ -365,17 +370,6 @@ const serverConfig = {
       }
     ]
   },
-  // 红包
-  compRedPacketWap: {
-    component: 'VmpRedPacketWap',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLoginWap',
-        method: 'open'
-      }
-    ]
-  },
   // 章节
   comChapterWap: {
     component: 'VmpChapterWap'
@@ -442,8 +436,16 @@ const serverConfig = {
       ]
     }
   },
+  // 红包
   comRedPacketWap: {
-    component: 'VmpRedPacketWap'
+    component: 'VmpRedPacketWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
   },
   comInviteHandup: {
     component: 'VmpInviteHandup'
