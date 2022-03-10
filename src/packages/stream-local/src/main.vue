@@ -470,6 +470,8 @@
             return;
           }
           await this.stopPush();
+          this.roomBaseServer.setChangeElement('stream-list');
+
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
           }

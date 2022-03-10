@@ -14,7 +14,11 @@
     <div class="vmp-insert-stream-mask">
       <p>
         <span>视图</span>
-        <el-tooltip content="切换" placement="top" v-if="!isFullScreen && docSwitchStatus">
+        <el-tooltip
+          content="切换"
+          placement="top"
+          v-if="!isFullScreen && (!isWatch || (isWatch && docSwitchStatus))"
+        >
           <a
             href="javascript:void(0);"
             class="vh-iconfont vh-line-copy-document"
@@ -45,6 +49,7 @@
       id="vmp-insert-subscribe-stream"
       ref="remoteStreamRef"
       class="vmp-insert-subscribe-stream"
+      v-show="!isCurrentRoleInsert"
     ></div>
 
     <!-- 本地视频插播的video容器 -->
@@ -612,10 +617,22 @@
       },
       // 取消订阅插播流
       unsubscribeInsert() {
-        this.insertFileServer.unsubscribeInsertStream().then(() => {
-          // 隐藏插播流组件
-          this.insertFileStreamVisible = false;
-        });
+        // 隐藏插播流组件
+        this.insertFileStreamVisible = false;
+        // 如果不是观众(主持人\助理\嘉宾)
+        if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+          // 设置 miniElement 为 stream-list
+          this.roomBaseServer.setChangeElement('stream-list');
+        } else {
+          // 如果是观众
+          // 设置 miniElement 为主屏流
+          if (this.docServer.state.switchStatus) {
+            this.roomBaseServer.setChangeElement('stream-list');
+          } else {
+            this.roomBaseServer.setChangeElement('doc');
+          }
+        }
+        this.insertFileServer.clearInsertFileInfo();
       },
       // 添加互动sdk事件
       addSDKEvents() {
@@ -872,6 +889,10 @@
       left: 0;
       top: 0;
       z-index: 1;
+    }
+    .vmp-insert-subscribe-stream {
+      width: 100%;
+      height: 100%;
     }
     &-mask {
       opacity: 0;
