@@ -81,16 +81,25 @@
       // 初始化直播房间
       initSendLive() {
         const { id } = this.$route.params;
+        const { token, nickname = '', email = '', liveT = '' } = this.$route.query;
+        if (token) {
+          localStorage.setItem('token', token);
+        }
         return new Domain({
           plugins: ['chat', 'interaction'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
             'gray-id': sessionStorage.getItem('initGrayId')
           },
+          requestBody: {
+            live_token: liveT
+          },
           initRoom: {
             webinar_id: id, //活动id
             clientType: 'send',
-            check_online: 0 // 不检查主持人是否在房间
+            check_online: 0, // 不检查主持人是否在房间
+            nickname,
+            email
           }
         });
       }

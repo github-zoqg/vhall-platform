@@ -8,6 +8,7 @@ import {
   useGroupServer,
   useUserServer,
   useDesktopShareServer,
+  useInsertFileServer,
   useMediaSettingServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
@@ -23,6 +24,7 @@ export default async function () {
   const micServer = useMicServer();
   const userServer = useUserServer();
   const desktopShareServer = useDesktopShareServer();
+  const insertFileServer = useInsertFileServer();
   const mediaSettingServer = useMediaSettingServer();
 
   if (!roomBaseServer) {
@@ -128,6 +130,8 @@ export default async function () {
 
   mediaSettingServer.init();
 
+  insertFileServer.init();
+
   desktopShareServer.init();
 
   await docServer.init();
@@ -140,4 +144,5 @@ export default async function () {
   window.docServer = docServer;
   window.groupServer = groupServer;
   window.micServer = micServer;
+  window.insertFileServer = insertFileServer;
 }
