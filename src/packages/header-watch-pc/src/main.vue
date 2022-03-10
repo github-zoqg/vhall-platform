@@ -156,7 +156,6 @@
           pageBg: '#cccccc',
           iconClass: 'icon-default' // icon默认色
         },
-        lang: 'zh-CN',
         isAttention: false,
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
@@ -170,10 +169,6 @@
       officaialDialog
     },
     computed: {
-      // 无延迟图片地址
-      noDelayIconUrl() {
-        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${this.lang}.png`;
-      },
       create_user_url() {
         const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
@@ -201,6 +196,13 @@
       },
       languagesInfo() {
         return this.$domainStore.state.roomBaseServer.languages.curLang;
+      },
+      // 无延迟图片地址
+      noDelayIconUrl() {
+        const langArr = ['zh-CN', 'en'];
+        const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+        const lang = langArr[langer - 1] || 'zh-CN';
+        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       }
     },
     beforeCreate() {
@@ -215,9 +217,6 @@
         await this.attentionStatus();
       }
       this.getWebinarInfo();
-      const langArr = ['zh-CN', 'en'];
-      const lang = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
-      this.lang = langArr[lang - 1];
     },
     methods: {
       getWebinarInfo() {
