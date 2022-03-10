@@ -39,7 +39,7 @@
             }"
           >
             <div class="vmp-stream-list__remote-container-h">
-              <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
+              <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
             </div>
           </div>
         </template>
@@ -76,6 +76,8 @@
     useMicServer,
     useGroupServer
   } from 'middle-domain';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
+
   export default {
     name: 'VmpStreamList',
 
@@ -85,7 +87,8 @@
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
         // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group
+        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group,
+        streamInfo
       };
     },
 
