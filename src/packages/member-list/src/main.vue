@@ -562,6 +562,11 @@
           handleUserLeaveRoom(msg);
         });
 
+        //直播结束
+        this.msgServer.$on('live_over', () => {
+          handleLiveOver();
+        });
+
         //房间消息
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
@@ -623,9 +628,9 @@
             case 'endLive':
               handleEndLive(temp);
               break;
-            case 'live_over':
-              handleLiveOver(temp);
-              break;
+            // case 'live_over':
+            //   handleLiveOver(temp);
+            //   break;
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
@@ -641,11 +646,12 @@
         }
 
         //直播结束
-        function handleLiveOver(msg) {
-          console.log(msg);
+        function handleLiveOver() {
           setTimeout(() => {
             _this.refreshList();
           }, 1000);
+          //重置一下视图里各个状态
+          _this.resetViewData();
         }
 
         //设备检测
@@ -1569,9 +1575,14 @@
         this.searchUserInput = '';
         this.getOnlineUserList();
       },
+      //直播结束重置视图里的一些状态
+      resetViewData() {
+        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+      },
       //切换允许举手状态
-      onSwitchAllowRaiseHand() {
+      onSwitchAllowRaiseHand(element) {
         if (this.liveStatus !== 1) {
+          element.target.checked = false;
           this.allowRaiseHand = false;
           this.$message.error(this.$t('512521'));
           return;
