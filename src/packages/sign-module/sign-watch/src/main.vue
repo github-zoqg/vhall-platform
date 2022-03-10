@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-sign-watch">
-    <div v-if="isShowCircle" class="vmp-sign-watch-icon" @click="reShowSignBox">
+    <div v-show="isShowCircle" class="vmp-sign-watch-icon" @click="reShowSignBox">
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
@@ -26,7 +26,7 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer, useChatServer } from 'middle-domain';
+  import { useSignServer, useChatServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
@@ -56,9 +56,7 @@
     },
     beforeCreate() {
       this.signServer = useSignServer();
-    },
-    created() {
-      // this.signServer.listenMsg();
+      this.groupServer = useGroupServer();
     },
     mounted() {
       this.signServer.$on('sign_in_push', e => {
@@ -74,19 +72,36 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: this.$t('chat.chat_1027')
+            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1027')}`
           },
           type: e.data.type,
           interactStatus: true
         };
         useChatServer().addChatToList(data);
       });
-      this.signServer.$on('sign_end', () => {
+      this.signServer.$on('sign_end', e => {
         this.showSign = false;
         this.isShowCircle = false;
+
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
         if (this.timer) {
           clearInterval(this.timer);
         }
+      });
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        let signInfo = this.$domainStore.state.roomBaseServer.signInfo;
+        console.log(signInfo, msg, '??!2314235');
       });
     },
     computed: {

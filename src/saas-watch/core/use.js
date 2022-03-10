@@ -53,6 +53,7 @@ import VmpWatchPayFee from '@/packages/pay-fee-auth/';
 import VmpQuestionnaireWatch from '@/packages/questionnaire/watch';
 import VmpRedPacketWatch from '@/packages/red-packet/watch';
 import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
+import VmpInsertStream from '@/packages/insert-video-stream';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
@@ -122,5 +123,6 @@ export function initUse() {
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);
   Vue.use(VmpStreamDesktopScreen);
+  Vue.use(VmpInsertStream);
   Vue.use(VmpMicInvited);
 }

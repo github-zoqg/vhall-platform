@@ -5,12 +5,16 @@
     @mouseleave="wrapLeave"
     v-show="insertFileStreamVisible"
     ref="insterWarpRef"
-    :class="miniElement == 'stream-list' ? 'vmp-insert-stream__mini' : ''"
+    :class="{
+      'vmp-insert-stream__mini': miniElement == 'insert-video',
+      'vmp-insert-stream__is-watch': isWatch,
+      'vmp-insert-stream__has-stream-list': hasStreamList
+    }"
   >
     <div class="vmp-insert-stream-mask">
       <p>
         <span>视图</span>
-        <el-tooltip content="切换" placement="top" v-if="!isFullScreen">
+        <el-tooltip content="切换" placement="top" v-if="!isFullScreen && docSwitchStatus">
           <a
             href="javascript:void(0);"
             class="vh-iconfont vh-line-copy-document"
@@ -65,7 +69,7 @@
         ref="insertStream"
         :videoParam="remoteVideoParam"
         :isInsertVideoPreview="true"
-        :isShowController="miniElement != 'stream-list'"
+        :isShowController="miniElement != 'insert-video'"
         @remoteInsterSucces="remoteInsterSucces"
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
@@ -77,7 +81,7 @@
 
     <!-- 播放器控制条 -->
     <div
-      v-show="insertFileType == 'local' && isCurrentRoleInsert && miniElement != 'stream-list'"
+      v-show="insertFileType == 'local' && isCurrentRoleInsert && miniElement != 'insert-video'"
       class="vmp-insert-stream-controller"
       :class="{ 'insert-active-top': constrolUp }"
     >
@@ -188,6 +192,15 @@
       };
     },
     computed: {
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
+      },
+      docSwitchStatus() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
       // 云插播 remote 本地插播 local
       insertFileType() {
         return this.$domainStore.state.insertFileServer.insertFileType;
@@ -213,6 +226,9 @@
       },
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
+      },
+      hasStreamList() {
+        return this.$domainStore.state.interactiveServer.streamListHeightInWatch >= 1;
       }
     },
     watch: {
@@ -305,7 +321,7 @@
       },
       // 本地插播，video成功创建之后的处理逻辑
       handleLocalInsertVideoCreated(videoElement) {
-        // TODO: 设置插播画面在大窗
+        // TODO: 设置插播画面在大窗,文档在小窗
         this.roomBaseServer.setChangeElement('doc');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -525,35 +541,38 @@
         groupServer.state.panelShow = false;
 
         this.insertFileServer.setInsertVideoElement(videEl);
-        // TODO: 设置插播画面在大窗
+        // 设置插播画面在大窗,文档在小窗
         this.roomBaseServer.setChangeElement('doc');
         this.pushLocalStream();
       },
+      // 注册事件监听
       initEventListener() {
-        const interactiveServer = useInteractiveServer();
         const groupServer = useGroupServer();
-        if (interactiveServer.state.remoteStreams[0]) {
-          this.subscribeInster();
-          this.addSDKEvents();
+        if (this.insertFileServer.state.insertStreamInfo.streamId) {
+          this.subscribeInsert();
         }
-        interactiveServer.$on('live_start', () => {
-          this.closeInsertvideoHandler(true);
-        });
-        interactiveServer.$on('live_over', () => {
-          this.insertFileStreamVisible && this.closeInsertvideoHandler();
-        });
-        // 有人开始演示，需要关闭插播
-        groupServer.$on(groupServer.EVENT_TYPE.VRTC_CONNECT_PRESENTATION_SUCCESS, () => {
-          if (this.isCurrentRoleInsert) {
-            this.closeInsertvideoHandler();
-          }
-        });
-        // 进入小组，需要关闭插播
-        groupServer.$on(groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
-          if (this.isCurrentRoleInsert) {
-            this.closeInsertvideoHandler();
-          }
-        });
+        this.addSDKEvents();
+        // 注册发起端独有的事件
+        if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+          this.interactiveServer.$on('live_start', () => {
+            this.closeInsertvideoHandler(true);
+          });
+          this.interactiveServer.$on('live_over', () => {
+            this.insertFileStreamVisible && this.closeInsertvideoHandler();
+          });
+          // 有人开始演示，需要关闭插播
+          groupServer.$on(groupServer.EVENT_TYPE.VRTC_CONNECT_PRESENTATION_SUCCESS, () => {
+            if (this.isCurrentRoleInsert) {
+              this.closeInsertvideoHandler();
+            }
+          });
+          // 进入小组，需要关闭插播
+          groupServer.$on(groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
+            if (this.isCurrentRoleInsert) {
+              this.closeInsertvideoHandler();
+            }
+          });
+        }
 
         /**
          *  监听退出全屏事件
@@ -571,113 +590,58 @@
           true
         );
       },
-      subscribeInster(currentStreams) {
-        if (!currentStreams) return;
-        let owner = null;
-        currentStreams.forEach(stream => {
-          const obj = JSON.parse(stream.attributes);
-          if (obj.stream_type == 4 || stream.streamType == 4) {
-            owner = stream;
-          }
-        });
-        if (!owner) return;
-        console.log('刷新重新订阅- 插播流', owner);
-        this.streamId = owner.streamId;
+      // 订阅插播流
+      subscribeInsert() {
         const opt = {
-          streamId: this.streamId,
           videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
-        this.insertFileServer
-          .subscribeInsertStream(opt)
-          .then(() => {
-            const obj = JSON.parse(owner.attributes);
-            obj.accountId = owner.accountId;
-            this.subscribInsterStreamSucess = true;
-          })
-          .catch(e => {
-            console.log('订阅失败', e);
-          });
-      },
-      addSDKEvents() {
-        const interactiveServer = useInteractiveServer();
-        const roomBaseServer = useRoomBaseServer();
-        // 流加入
-        this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', e => {
-          console.log('监听流加入55555555', e);
-          // { e.type， 流类行 }
-          // 0: 纯音频, 1: 只是视频, 2: 音视频  3: 屏幕共享, 4: 插播
-          console.log('流加入-插播流,自己收不到自己的流', e);
-          this.streamId = e.data.streamId;
-          const opt = {
-            streamId: e.data.streamId,
-            videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
-            mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
-          };
-          // 如果是主持人并且是视频插播，设置旁路
-          if (
-            roomBaseServer.watchInitData.join_info.role_name == 1 &&
-            this.insertFileServer.state.insertStreamInfo.has_video
-          ) {
-            interactiveServer.resetLayout();
+        this.insertFileServer.subscribeInsertStream(opt).then(() => {
+          // 展示插播流组件
+          this.insertFileStreamVisible = true;
+          // 如果不是观众(主持人\助理\嘉宾)
+          if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+            // 设置 miniElement 为 doc
+            this.roomBaseServer.setChangeElement('doc');
+          } else {
+            // 如果是观众
+            // 设置 miniElement 为主屏流
+            this.roomBaseServer.setChangeElement('doc');
           }
-          // this.$emit('addRemoteInterVideo', obj); // 其余订阅的人
-          this.interactiveServer
-            .subscribeStream(opt)
-            .then(() => {
-              console.log('插播流订阅成功');
-              this.subscribInsterStreamSucess = true;
-              // EventBus.$emit('inster_mic_close');
-            })
-            .catch(e => {
-              console.log('订阅失败', e);
-            });
+        });
+      },
+      // 取消订阅插播流
+      unsubscribeInsert() {
+        this.insertFileServer.unsubscribeInsertStream().then(() => {
+          // 隐藏插播流组件
+          this.insertFileStreamVisible = false;
+        });
+      },
+      // 添加互动sdk事件
+      addSDKEvents() {
+        // 流加入
+        this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
+          this.reSetBroadcast();
+          this.subscribeInsert();
         });
 
-        // 插播流删除 流结束
-        this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', e => {
-          console.log('EVENT_REMOTESTREAM_REMOVED插播流删除了', e);
-          // 自己和其他人都能收到
-          console.log('插播流删除，流id', e.data.streamId, this.streamId);
-          if (e.data.streamId == this.streamId) {
-            this.streamId = '';
-            this.$refs.localStreamRef.innerHTML = '';
-            this.subscribInsterStreamSucess = false;
-            // EventBus.$emit('inster_mic_open');
-            // this.$emit('pushStreamInsterRemove');
-            // 如果是主持人并且是视频插播，设置旁路
-            if (
-              roomBaseServer.watchInitData.join_info.role_name == 1 &&
-              this.insertFileServer.state.insertStreamInfo.has_video
-            ) {
-              interactiveServer.resetLayout();
-            }
-            clearInterval(this.resubscribeTimer);
-          }
-        });
-        this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.streamId) {
-            clearInterval(this.resubscribeTimer);
-            this.resubscribeTimer = setInterval(() => {
-              const opt = {
-                streamId: this.streamId,
-                videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
-                mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
-              };
-              this.insertFileServer
-                .subscribeInsertStream(opt)
-                .then(() => {
-                  clearInterval(this.resubscribeTimer);
-                  console.log('重新插播流订阅成功', e.data.stream);
-                  this.subscribInsterStreamSucess = true;
-                })
-                .catch(e => {
-                  console.log('订阅失败', e);
-                });
-            }, 3000);
-          }
+        // 插播流删除
+        this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
+          this.unsubscribeInsert();
+          this.reSetBroadcast();
         });
       },
+      // 设置旁路
+      reSetBroadcast() {
+        // 如果是主持人并且是视频插播，设置旁路
+        if (
+          this.roomBaseServer.state.watchInitData.join_info.role_name == 1 &&
+          this.insertFileServer.state.insertStreamInfo.has_video
+        ) {
+          this.interactiveServer.resetLayout();
+        }
+      },
+      // 鼠标移出隐藏播放器控制栏
       wrapLeave() {
         console.log('----wrapLeave-=----');
         this._timers = setTimeout(() => {
@@ -687,6 +651,7 @@
           this.$refs.insertStream && this.$refs.insertStream.wrapLeave();
         }, 3000);
       },
+      // 鼠标移入显示播放器控制栏
       wrapHover() {
         console.log('----wrapHover-=----');
         clearTimeout(this._timers);
@@ -776,10 +741,12 @@
       },
       // 大小窗切换
       exchange() {
-        if (this.miniElement == 'doc') {
-          this.roomBaseServer.setChangeElement('stream-list');
+        if (this.isWatch) {
+          const miniElement = this.miniElement == 'insert-video' ? 'doc' : 'insert-video';
+          this.roomBaseServer.setChangeElement(miniElement);
         } else {
-          this.roomBaseServer.setChangeElement('doc');
+          const miniElement = this.miniElement == 'insert-video' ? 'doc' : 'insert-video';
+          this.roomBaseServer.setChangeElement(miniElement);
         }
       },
       // video静音
@@ -856,6 +823,27 @@
       right: 0;
       z-index: 10;
       position: absolute;
+      overflow: hidden;
+    }
+    &__is-watch {
+      position: absolute;
+      top: 0;
+      bottom: 56px;
+      width: calc(100% - 380px);
+      height: auto;
+      min-height: auto;
+      &.vmp-insert-stream__mini {
+        width: 360px;
+        height: 204px;
+        min-height: 204px;
+        top: 0 !important;
+        right: 0;
+        z-index: 11;
+        overflow: hidden;
+      }
+    }
+    &__has-stream-list {
+      top: 80px;
     }
     .vmp-insert-local-stream {
       position: absolute;

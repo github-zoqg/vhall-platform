@@ -145,7 +145,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.listenEvents();
     },
-    async mounted() {
+    mounted() {
       this.checkStartPush();
     },
     async beforeDestroy() {
