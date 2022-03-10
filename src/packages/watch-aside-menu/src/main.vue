@@ -258,9 +258,15 @@
         });
 
         // 演示者变更
-        this.groupServer.$on('VRTC_PRESENTATION_SCREEN_SET', msg => {
-          console.log('VRTC_PRESENTATION_SCREEN_SET:', msg);
-        });
+        this.groupServer.$on(
+          'VRTC_PRESENTATION_SCREEN_SET',
+          (msg, { isOldPresenter, isOldLeader }) => {
+            console.log('VRTC_PRESENTATION_SCREEN_SET:', msg);
+            if (isOldPresenter || isOldLeader) {
+              this.$message.success('演示权限已变更');
+            }
+          }
+        );
 
         // 观看端收到同意演示成功消息
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', msg => {
@@ -269,9 +275,7 @@
 
         // 观看端收到结束演示成功消息
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
-          if (msg.sender_id != this.userId) {
-            this.$message.warning('演示权限已变更');
-          } else {
+          if (msg.sender_id == this.userId) {
             this.$message.success('结束演示');
           }
         });
