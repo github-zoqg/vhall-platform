@@ -111,7 +111,7 @@
     flex-direction: column;
     overflow: hidden;
     width: 300px;
-    height: 250px;
+    height: 266px;
     margin: 20px 14px;
     border-radius: 6px;
     background: #f7f7f7;
