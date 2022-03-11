@@ -187,7 +187,7 @@
             if (this.isInGroup) {
               tip = '组长拒绝了您的上麦请求';
             } else {
-              tip = '主持人拒绝了您的上麦请求';
+              tip = this.$t('other.other_1006');
             }
             this.$message.warning(tip);
           }

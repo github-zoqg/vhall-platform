@@ -4,6 +4,7 @@
     <saas-alert
       :visible="isConfirmVisible"
       :confirm="true"
+      :title="$t('account.account_1061')"
       :confirmText="$t('common.common_1010')"
       :cancelText="btnText"
       @onSubmit="confirmSave"

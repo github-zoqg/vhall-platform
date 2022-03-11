@@ -138,7 +138,9 @@
               class="normal-msg__content-wrapper"
               v-html="
                 source.replyMsg && source.replyMsg.content
-                  ? `<span class='normal-msg__content-wrapper__label'>回复&nbsp;</span> ${msgContent}`
+                  ? `<span class='normal-msg__content-wrapper__label'>${$t(
+                      'chat.chat_1036'
+                    )}&nbsp;</span> ${msgContent}`
                   : msgContent
               "
             ></p>
@@ -149,7 +151,7 @@
                 v-if="source.replyMsg && source.replyMsg.content && !source.content.text_content"
                 class="normal-msg__img-wrapper__label"
               >
-                回复
+                {{ $t('chat.chat_1036') }}
               </span>
               <p class="msg-item__content-hr"></p>
               <div
@@ -163,7 +165,7 @@
                   width="34"
                   height="34"
                   :src="img"
-                  alt="聊天图片加载失败"
+                  alt="$t('chat.chat_1065')"
                   @click="previewImg(index, source.content.image_urls)"
                 />
               </div>
@@ -217,7 +219,9 @@
             </span>
             <span>
               {{
-                source.type === 'reward_pay_ok' ? '打赏了红包' : `送出${source.content.gift_name}`
+                source.type === 'reward_pay_ok'
+                  ? $t('chat.chat_1029')
+                  : `$t('chat.chat_1032')${source.content.gift_name}`
               }}
             </span>
             <img
