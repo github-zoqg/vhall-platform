@@ -88,7 +88,7 @@ router.beforeEach(async (to, from, next) => {
       //   window.location.href = `${protocol}${VUE_APP_WEB_BASE_MIDDLE}/${VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
       // }
       if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_SAAS}`) {
-        window.location.href = `${protocol}${VUE_APP_WEB_BASE_SAAS}/v3${window.location.pathname}`;
+        // window.location.href = `${protocol}${VUE_APP_WEB_BASE_SAAS}/v3${window.location.pathname}`;
       }
     }
   });
