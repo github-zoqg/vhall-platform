@@ -341,7 +341,7 @@
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$message(this.$t('chat.chat_1007'));
         });
       },
       init() {

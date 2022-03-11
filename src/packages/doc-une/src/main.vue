@@ -225,7 +225,7 @@
       // 文档是否可见
       show() {
         return (
-          (!this.isWatch && !this.desktopShareServer.state.isShareScreen) ||
+          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||

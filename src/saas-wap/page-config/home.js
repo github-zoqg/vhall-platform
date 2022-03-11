@@ -451,7 +451,13 @@ const serverConfig = {
     ]
   },
   comInviteHandup: {
-    component: 'VmpInviteHandup'
+    component: 'VmpInviteHandup',
+    emitAgreeInvite: [
+      {
+        cuid: 'comWapStreamLocal',
+        method: 'updateAutoSpeak'
+      }
+    ]
   }
 };
 

@@ -330,6 +330,7 @@
         hoveVideo: true, //显示控制条
         isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
+        isAutoPlay: false,
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -690,7 +691,9 @@
         window.location.reload();
       },
       // 判断是直播还是回放 活动状态
-      getWebinerStatus() {
+      getWebinerStatus(info) {
+        console.log(info);
+        // this.isAutoPlay = info;
         const { webinar, warmup, record } = this.roomBaseServer.state.watchInitData;
         if (this.roomBaseServer.state.watchInitData.status === 'live') {
           if (webinar.type === 1) {

@@ -157,7 +157,8 @@ export const serverConfig = {
     component: 'VmpStreamLocal',
     initPlayer: {
       cuid: 'comPcPlayer',
-      method: 'getWebinerStatus'
+      method: 'getWebinerStatus',
+      args: ['$0']
     }
   },
   comStreamRemote: {
@@ -570,6 +571,12 @@ export const serverConfig = {
   },
   // 邀请上麦弹窗
   comMicInvited: {
-    component: 'VmpMicInvited'
+    component: 'VmpMicInvited',
+    emitAgreeInvite: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'updateAutoSpeak'
+      }
+    ]
   }
 };

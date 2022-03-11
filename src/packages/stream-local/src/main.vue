@@ -220,7 +220,8 @@
         isFullScreen: false,
         networkStatus: 2,
         audioLevel: 1,
-        showDownMic: false
+        showDownMic: false,
+        isNotAutoSpeak: false // 分组模式下的是否为自动静音上麦自动
       };
     },
     components: {
@@ -289,11 +290,12 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
-        // 观众自动上麦 - 禁音
+        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 非同意主持人的邀请上麦 + 非自己申请上麦
         return (
           this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
           this.mode == 6 &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          !this.isNotAutoSpeak
         );
       },
       showInterIsPlay() {
@@ -356,15 +358,13 @@
     methods: {
       // 检查推流
       checkStartPush() {
-        console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.state.isSpeakOn);
+        console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.getSpeakerStatus());
         if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
           return;
         }
 
         // 实例化后是否是上麦状态
-        const isSpeakOn =
-          (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-          this.micServer.state.isSpeakOn;
+        const isSpeakOn = this.micServer.getSpeakerStatus();
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
@@ -389,6 +389,10 @@
           });
         this.interactiveServer.state.showPlayIcon = false;
       },
+      // 自动上麦禁音条件更新
+      updateAutoSpeak() {
+        this.isNotAutoSpeak = true;
+      },
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
@@ -402,6 +406,7 @@
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
+          this.isNotAutoSpeak = true;
           this.userSpeakOn();
         });
 
@@ -420,16 +425,23 @@
             console.log('[stream-local] vrtc_connect_success startPush');
 
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
-              // 开始推流
+              // 轮询判断是否有互动实例
               await this.checkVRTCInstance();
+              // 开始推流
               this.startPush();
-            } else if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
+            } else if (this.joinInfo.role_name == 2) {
               // 无延迟｜分组直播
               // 如果成功，销毁播放器
               this.playerServer.destroy();
-              //  初始化互动实例
-              await this.interactiveServer.init();
-              // 开始推流
+
+              if (!this.interactiveServer.state.autoSpeak) {
+                //  初始化互动实例
+                await this.interactiveServer.init();
+                // 开始推流
+              }
+
+              // 轮询判断是否有互动实例
+              await this.checkVRTCInstance();
               this.startPush();
             }
           }
@@ -457,7 +469,9 @@
             this.interactiveServer.init();
           } else {
             // 初始化播放器
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'initPlayer'));
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true })
+            );
           }
         });
         // 结束直播
@@ -481,19 +495,19 @@
         if (this.joinInfo.role_name == 2) {
           // 开启摄像头
           this.interactiveServer.$on('vrtc_frames_display', () => {
-            this.$toast(this.$t('interact.interact_1024'));
+            this.$message.success(this.$t('interact.interact_1024'));
           });
           // 关闭摄像头
           this.interactiveServer.$on('vrtc_frames_forbid', () => {
-            this.$toast(this.$t('interact.interact_1023'));
+            this.$message.warning(this.$t('interact.interact_1023'));
           });
           // 开启音频
           this.interactiveServer.$on('vrtc_mute_cancel', () => {
-            this.$toast(this.$t('interact.interact_1015'));
+            this.$message.success(this.$t('interact.interact_1015'));
           });
           // 关闭音频
           this.interactiveServer.$on('vrtc_mute', () => {
-            this.$toast(this.$t('interact.interact_1026'));
+            this.$message.warning(this.$t('interact.interact_1026'));
           });
         }
       },
@@ -714,16 +728,6 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
-        if (deviceType === 'video') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1024'))
-            : this.$message.success(this.$t('interact.interact_1023'));
-        }
-        if (deviceType === 'audio') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1015'))
-            : this.$message.success(this.$t('interact.interact_1026'));
-        }
       },
       // 进入、退出全屏
       fullScreen() {

@@ -117,6 +117,8 @@
   </div>
 </template>
 <script>
+  import { useCustomMenuServer } from 'middle-domain';
+
   export default {
     name: 'component-rank',
     filters: {
@@ -187,6 +189,14 @@
         scrollLock: false
       };
     },
+    computed: {
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.join_info;
+      }
+    },
     watch: {
       info: function (newVal) {
         if (newVal.inSwitch == 0 && this.activeIndex == 1) {
@@ -209,6 +219,9 @@
         },
         immediate: true
       }
+    },
+    beforeCreate() {
+      this.customMenuServer = useCustomMenuServer();
     },
     mounted() {
       if (this.info.inSwitch == 1) {
@@ -272,17 +285,47 @@
       /**
        * 获取邀请信息
        */
-      queryInviteInfo(id) {
-        this.$vhallapi.interactTool
-          .queryInviteInfo({
-            webinar_id: this.$route.params.il_id || '',
-            join_id: id
-          })
-          .then(res => {
-            if (res.data && res.code == 200) {
-              this.inviteInfo = res.data;
+      async queryInviteInfo() {
+        const res = await this.customMenuServer.getInviteInfo({
+          webinar_id: this.watchInitData.webinar.id,
+          join_id: this.joinInfo.join_id
+        });
+
+        this.inviteInfo = res.data;
+      },
+      /**
+       * 获取邀请列表
+       */
+      async getInviteList() {
+        if (this.pageLock) return;
+        this.pageLock = true;
+        this.showBottom = true;
+        this.bottomText = '加载中...';
+
+        const res = await this.customMenuServer.getInviteTopList({
+          webinar_id: this.watchInitData.webinar.id,
+          join_id: this.watchInitData.join_info.join_id,
+          pos: parseInt(this.ipos),
+          limit: 10
+        });
+
+        if (res.code == 200 && res.data && res.data.list.length > 0) {
+          const list = res.data.list.map(item => {
+            if (!item.img_url) {
+              item.img_url = this.avatar;
             }
+            return item;
           });
+
+          const data = this.inviteRankList;
+          this.inviteRankList = data.concat(list);
+          this.ipos = res.data.pos + 10;
+          this.ilimit = 10;
+          this.itotal = res.data.total;
+        }
+        this.scrollLock = false;
+
+        this.clearBottomInfo();
       },
       showInviteFriends() {
         this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_OPEN_INVITE_FRIENDS_QR);
@@ -312,39 +355,7 @@
       changeTab(index) {
         this.activeIndex = index;
       },
-      getInviteList() {
-        if (this.pageLock) return;
-        this.pageLock = true;
-        this.showBottom = true;
-        this.bottomText = '加载中...';
-        this.$vhallapi.interactTool
-          .queryInviteTopList({
-            webinar_id: this.$route.params.il_id,
-            join_id: this.joinId,
-            pos: parseInt(this.ipos),
-            limit: 10
-          })
-          .then(res => {
-            if (res.code == 200 && res.data && res.data.list.length > 0) {
-              const list = res.data.list.map(item => {
-                if (!item.img_url) {
-                  item.img_url = this.avatar;
-                }
-                return item;
-              });
-              const data = this.inviteRankList;
-              this.inviteRankList = data.concat(list);
-              this.ipos = res.data.pos + 10;
-              this.ilimit = 10;
-              this.itotal = res.data.total;
-            }
-            this.scrollLock = false;
-          })
-          .catch(e => {
-            this.scrollLock = false;
-          });
-        this.clearBottomInfo();
-      },
+
       clearBottomInfo() {
         this.pageLock = false;
         if (
@@ -358,36 +369,36 @@
           this.showBottom = false;
         }
       },
-      getAwardRank() {
+      /**
+       * 获取打赏列表
+       */
+      async getAwardRank() {
         if (this.pageLock) return;
         this.pageLock = true;
         this.showBottom = true;
         this.bottomText = '加载中...';
-        this.$vhallapi.interactTool
-          .queryAwardList({
-            room_id: this.roomId,
-            offset: parseInt(this.awardpos),
-            limit: 10
-          })
-          .then(res => {
-            if (res.code == 200 && res.data) {
-              const list = res.data.list.map(item => {
-                if (!item.avatar) {
-                  item.avatar = this.avatar;
-                }
-                return item;
-              });
-              const data = this.awardRankList;
-              this.awardlimit = 10;
-              this.awardpos = res.data.offset + 10;
-              this.awardtotal = res.data.total;
-              this.awardRankList = data.concat(list);
+
+        const res = await this.customMenuServer.getAwardList({
+          room_id: this.watchInitData.interact.room_id,
+          offset: parseInt(this.awardpos),
+          limit: 10
+        });
+
+        if (res.code == 200 && res.data) {
+          const list = res.data.list.map(item => {
+            if (!item.avatar) {
+              item.avatar = this.avatar;
             }
-            this.scrollLock = false;
-          })
-          .catch(e => {
-            this.scrollLock = false;
+            return item;
           });
+          const data = this.awardRankList;
+          this.awardlimit = 10;
+          this.awardpos = res.data.offset + 10;
+          this.awardtotal = res.data.total;
+          this.awardRankList = data.concat(list);
+        }
+        this.scrollLock = false;
+
         this.clearBottomInfo();
       }
     }
@@ -412,16 +423,12 @@
     }
   }
   .rank-previewbox {
-    // background: url(../assets/imgs/rank-bg.png) repeat;
-    // padding-bottom: 10px;
     .ranking-title {
       font-size: 14px;
       color: #fff;
       line-height: 20px;
       height: 20px;
-      // margin: 0 10px;
       position: relative;
-      // margin-bottom: 10px;
       .rank-menu {
         text-align: left;
         span {
@@ -432,21 +439,15 @@
       }
       span {
         margin-right: 10px;
-        // opacity: 0.8;
         color: @font-dark-low;
         &:hover {
-          // opacity: 1;
           cursor: pointer;
         }
         &.active {
-          // width: 42px;
-          // height: 16px;
           font-size: 14px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
           color: #fb3a32;
-          // line-height: 16px;
-          // opacity: 1;
         }
       }
       .bang-rule {
@@ -472,7 +473,6 @@
       // min-height: 320px;
       height: 570px;
       // height: 440px;
-      overflow-y: scroll;
       .loading-bottom {
         width: 100%;
         height: 20px;
@@ -517,11 +517,7 @@
           vertical-align: top;
           position: relative;
         }
-        // .top-three{
-        //   width: 34px;
-        //   height: 36px;
-        //   position: relative;
-        // }
+
         .avatar {
           display: inline-block;
           width: 28px;
@@ -637,7 +633,6 @@
       background: rgba(51, 51, 51, 0.95);
       padding: 12px 24px;
       box-sizing: border-box;
-      overflow-y: scroll;
       word-break: break-all;
       font-size: 12px;
       font-family: PingFangSC-Regular, PingFang SC;

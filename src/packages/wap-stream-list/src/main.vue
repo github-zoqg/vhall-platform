@@ -287,7 +287,7 @@
 
     mounted() {
       // 在麦上 才存在滑动情况
-      if (this.micServer.state.isSpeakOn) {
+      if (this.micServer.getSpeakerStatus()) {
         if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           this.createBScroll();
         }

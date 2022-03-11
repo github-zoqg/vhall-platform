@@ -4,7 +4,11 @@
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
-    <div v-if="showSign" class="vmp-sign-watch-sign">
+    <div
+      v-if="showSign"
+      class="vmp-sign-watch-sign"
+      :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
+    >
       <div class="vmp-sign-watch-sign-container">
         <div class="vmp-sign-watch-sign-content">
           <p class="sign-title">{{ title }}</p>
@@ -26,7 +30,13 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useSignServer,
+    useChatServer,
+    useGroupServer,
+    useZIndexServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
@@ -44,7 +54,9 @@
       }
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         showSign: false,
         sign_id: '',
         sign_time: 0,
@@ -55,13 +67,15 @@
       };
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.signServer = useSignServer();
       this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
-        this.showSign = true;
+        this.reShowSignBox();
         this.title = this.$t(e.data.title);
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
@@ -100,16 +114,15 @@
       });
       // 结束讨论
       this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        let signInfo = this.$domainStore.state.roomBaseServer.signInfo;
-        console.log(signInfo, msg, '??!2314235');
+        console.log(this.signInfo, msg, '??!2314235');
       });
     },
     computed: {
       roomId() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.interact.room_id;
+        return this.roomBaseServer.state.watchInitData.interact.room_id;
       },
       signInfo() {
-        return this.$domainStore.state.roomBaseServer.signInfo;
+        return this.roomBaseServer.state.signInfo;
       }
     },
     methods: {
@@ -155,6 +168,7 @@
         this.isShowCircle = true;
       },
       reShowSignBox() {
+        this.zIndexServer.setDialogZIndex('signIn');
         this.showSign = true;
       },
       getHistorySignInfo() {

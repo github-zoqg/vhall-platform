@@ -152,7 +152,7 @@
       this.timerServer = useTimerServer();
     },
     async mounted() {
-      await this.getCommonConfig();
+      // await this.getCommonConfig();
       console.log(this.roomBaseServer.state?.timerInfo, 'this.roomBaseServer.state?.timerInfo');
       this.timerInfo = this.roomBaseServer.state?.timerInfo;
       this.timerServer.listenMsg();
@@ -288,30 +288,30 @@
           this.timeFormat(Math.abs(--data));
           this.shijian = data;
         }, 1000);
-      },
+      }
       // TODO: 不应在此处调getCommonConfig用接口 须退出小组相关逻辑调用
       // 初始化房间互动工具
-      getCommonConfig() {
-        return this.roomBaseServer.getCommonConfig({
-          tags: [
-            'skin',
-            'screen-poster',
-            'like',
-            'keywords',
-            'public-account',
-            'webinar-tag',
-            'menu',
-            'adv-default',
-            'invite-card',
-            'red-packet',
-            'room-tool',
-            'goods-default',
-            'announcement',
-            'sign',
-            'timer'
-          ]
-        });
-      }
+      // getCommonConfig() {
+      //   return this.roomBaseServer.getCommonConfig({
+      //     tags: [
+      //       'skin',
+      //       'screen-poster',
+      //       'like',
+      //       'keywords',
+      //       'public-account',
+      //       'webinar-tag',
+      //       'menu',
+      //       'adv-default',
+      //       'invite-card',
+      //       'red-packet',
+      //       'room-tool',
+      //       'goods-default',
+      //       'announcement',
+      //       'sign',
+      //       'timer'
+      //     ]
+      //   });
+      // }
     }
   };
 </script>

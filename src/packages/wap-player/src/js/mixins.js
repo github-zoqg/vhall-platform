@@ -61,8 +61,8 @@ const playerMixins = {
         console.log('wap-播放完毕');
         this.isShowPoster = true;
         this.isPlayering = false;
-        // 如果是暖场视频不显示回放结束的标识
-        if (this.isWarnPreview) return;
+        // 如果是暖场视频和试看不显示回放结束的标识
+        if (this.isWarnPreview || this.isTryPreview) return;
         this.isVodEnd = true;
         // 为了将打开的弹窗关闭
         this.videoShowIcon();
