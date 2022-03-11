@@ -4,7 +4,11 @@
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
-    <div v-show="showSign" class="vmp-sign-watch-sign">
+    <div
+      v-show="showSign"
+      class="vmp-sign-watch-sign"
+      :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
+    >
       <div class="vmp-sign-watch-sign-container">
         <div class="vmp-sign-watch-sign-content">
           <p class="sign-title">{{ title }}</p>
@@ -26,7 +30,13 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer, useRoomBaseServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useSignServer,
+    useChatServer,
+    useGroupServer,
+    useZIndexServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
@@ -44,7 +54,9 @@
     //   }
     // },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         showSign: false,
         sign_id: '',
         sign_time: 0,
@@ -55,6 +67,7 @@
       };
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.signServer = useSignServer();
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -71,7 +84,7 @@
       });
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
-        this.showSign = true;
+        this.reShowSignBox();
         this.title = this.$t(e.data.title);
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
@@ -160,6 +173,7 @@
         this.isShowCircle = true;
       },
       reShowSignBox() {
+        this.zIndexServer.setDialogZIndex('signIn');
         this.showSign = true;
       },
       getHistorySignInfo() {

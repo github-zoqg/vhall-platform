@@ -225,7 +225,7 @@
       // 文档是否可见
       show() {
         return (
-          (!this.isWatch && !this.desktopShareServer.state.isShareScreen) ||
+          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -406,7 +406,11 @@
           document.getElementById(this.docServer.state.docCid) ||
           document.getElementById(this.docServer.state.boardCid)
         ) {
-          this.docServer.setSize(width, height);
+          try {
+            this.docServer.setSize(width, height);
+          } catch (ex) {
+            console.error('[doc] setSize:', ex);
+          }
         }
       },
       getDocViewRect() {
@@ -460,14 +464,6 @@
       initEvents() {
         if (this.isWatch) {
           // 观看端事件
-          // 文档是否可见状态变化事件
-          this.docServer.$on('dispatch_doc_switch_change', val => {
-            console.log('===[doc]=======dispatch_doc_switch_change=============', val);
-            if (val && this.show && this.docLoadComplete) {
-              this.recoverLastDocs();
-            }
-          });
-
           // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
             console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
@@ -574,6 +570,9 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        // 文档是否可见状态变化事件
+        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       },
 
       listenKeydown(e) {
@@ -620,6 +619,8 @@
        */
       recoverLastDocs: async function () {
         console.log('[doc] 刷新或者退出重进恢复上次的文档');
+        if (!this.docLoadComplete) return;
+        this.docServer.setDocLoadComplete(false);
         try {
           // 获取容器列表
           await this.docServer.getContainerList();
@@ -870,6 +871,13 @@
           this.addNewFile({ fileType, docId, cid });
         }
       },
+      // 文档是否可见状态变化事件
+      dispatchDocSwitchChange: async function (val) {
+        console.log('===[doc]====dispatch_doc_switch_change=============', val);
+        if (val && this.show && this.docLoadComplete) {
+          this.recoverLastDocs();
+        }
+      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({
@@ -899,6 +907,7 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };

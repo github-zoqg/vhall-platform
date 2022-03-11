@@ -35,11 +35,8 @@
     },
     watch: {
       isInGroup(val) {
-        if (val) {
-          this.announcement.isShow = false;
-        } else {
-          this.openAnnouncement();
-        }
+        this.announcement.isShow = false;
+        this.openAnnouncement();
       }
     },
     beforeCreate() {

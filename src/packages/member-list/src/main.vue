@@ -1724,6 +1724,9 @@
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             })
             .then(res => {
+              if (res.code !== 200) {
+                this.$message.error(res.msg);
+              }
               console.log(res, 'presentation');
             })
             .catch(err => {

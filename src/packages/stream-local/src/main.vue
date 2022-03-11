@@ -162,7 +162,10 @@
           ></span>
         </el-tooltip>
       </p>
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-local__shadow-second-line">
+      <p
+        v-if="joinInfo.role_name == 1 || localSpeaker.roleName === 20"
+        class="vmp-stream-local__shadow-second-line"
+      >
         <!-- 设为主讲人 -->
         <el-tooltip content="设为主讲人" v-if="mode != 6" placement="bottom">
           <span
