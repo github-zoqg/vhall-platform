@@ -269,22 +269,62 @@
         this.groupServer.$on(
           'VRTC_PRESENTATION_SCREEN_SET',
           (msg, { isOldPresenter, isOldLeader }) => {
-            console.log('VRTC_PRESENTATION_SCREEN_SET:', msg);
-            if (isOldPresenter || isOldLeader) {
-              this.$message.success('演示权限已变更');
-            }
+            // console.log('VRTC_PRESENTATION_SCREEN_SET:', msg);
+            // if (isOldPresenter || isOldLeader) {
+            //   this.$message.success('演示权限已变更');
+            // }
           }
         );
 
-        // 观看端收到同意演示成功消息
+        // 观看端-同意演示成功
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', msg => {
           console.log('VRTC_CONNECT_PRESENTATION_SUCCESS:', msg);
         });
 
-        // 观看端收到结束演示成功消息
+        // 观看端-结束演示成功
+        // 前置说明: 该组件只在观看端使用，角色只有观众和组长
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
-          if (msg.sender_id == this.userId) {
-            this.$message.success('结束演示');
+          if (msg.data.room_role == 1 && msg.sender_id == msg.data.room_join_id) {
+            // 主持人结束了主持人自己的演示
+            this.$message({
+              message: '主持人结束了演示',
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          } else if (
+            msg.data.room_role == 2 &&
+            msg.sender_id == this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id
+          ) {
+            // 主持人结束了观众的演示
+            if (msg.data.room_join_id == this.userId) {
+              this.$message({
+                message: '演示权限已变更',
+                showClose: true,
+                type: 'warning',
+                customClass: 'zdy-info-box'
+              });
+            }
+          } else if (msg.data.room_role == 2 && msg.sender_id == msg.data.room_join_id) {
+            // 观众结束了观众自己的演示
+            if (msg.data.room_join_id != this.userId) {
+              this.$message({
+                message: `观众${msg.data.nick_name}结束了演示`,
+                showClose: true,
+                type: 'warning',
+                customClass: 'zdy-info-box'
+              });
+            }
+          } else if (msg.data.room_role == 2) {
+            // 组长结束了观众的演示
+            if (msg.data.room_join_id == this.userId) {
+              this.$message({
+                message: '演示权限已变更',
+                showClose: true,
+                type: 'warning',
+                customClass: 'zdy-info-box'
+              });
+            }
           }
         });
       },
