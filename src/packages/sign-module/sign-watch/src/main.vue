@@ -26,7 +26,7 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer, useChatServer, useGroupServer } from 'middle-domain';
+  import { useSignServer, useRoomBaseServer, useChatServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
@@ -57,6 +57,7 @@
     beforeCreate() {
       this.signServer = useSignServer();
       this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
       this.signServer.$on('sign_in_push', e => {
@@ -100,16 +101,15 @@
       });
       // 结束讨论
       this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        let signInfo = this.$domainStore.state.roomBaseServer.signInfo;
-        console.log(signInfo, msg, '??!2314235');
+        console.log(this.signInfo, msg, '??!2314235');
       });
     },
     computed: {
       roomId() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.interact.room_id;
+        return this.roomBaseServer.state.watchInitData.interact.room_id;
       },
       signInfo() {
-        return this.$domainStore.state.roomBaseServer.signInfo;
+        return this.roomBaseServer.state.signInfo;
       }
     },
     methods: {
