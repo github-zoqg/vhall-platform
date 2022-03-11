@@ -46,7 +46,7 @@
        * 重新加载直播间
        */
       reloadLiveRoom() {
-        window.location.href = `${window.origin}/lives/room/${this.webinar_id}`;
+        window.location.href = `${window.origin}/lives/watch/${this.webinar_id}`;
       }
     },
     mounted() {
