@@ -244,13 +244,12 @@
         return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       localSpeaker() {
-        let speaker =
+        console.log('-------localSpeaker更新--------');
+        return (
           this.$domainStore.state.micServer.speakerList.find(
             item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {};
-
-        console.log('-------localSpeaker更新--------', speaker);
-        return speaker;
+          ) || {}
+        );
       },
       remoteSpeakers() {
         return (

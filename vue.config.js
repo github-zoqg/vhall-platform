@@ -56,6 +56,11 @@ function getPlugins() {
     // 项目资源路径
     let projectResourceDir = path.join(pathConfig.ROOT, `dist/${argv.project}/static/js/`);
 
+    // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
+    if (argv.middle) {
+      process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
+    }
+
     plugins.push(
       new SentryCliPlugin({
         release: `${argv.version}`, // 版本号

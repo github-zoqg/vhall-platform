@@ -15,7 +15,7 @@
     <!--无延迟-->
     <div class="nopdelay-icon" v-if="webinarInfo.no_delay_webinar == 1 && webinarInfo.mode != 6">
       <img
-        src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
+        src="//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
         alt=""
       />
     </div>

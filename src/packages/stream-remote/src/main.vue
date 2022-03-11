@@ -202,7 +202,9 @@
         handler(newval) {
           console.log('----speaker--- 有流Id了------', newval);
           if (newval) {
-            this.subscribeRemoteStream();
+            this.$nextTick(() => {
+              this.subscribeRemoteStream();
+            });
           }
         },
         immediate: true
@@ -261,8 +263,6 @@
       this.micServer = useMicServer();
     },
     mounted() {
-      // this.subscribeRemoteStream();
-
       window.addEventListener(
         'fullscreenchange',
         () => {
