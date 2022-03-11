@@ -23,7 +23,7 @@ export function getItemEntity(
   let { visible = true, tipsVisible = false, iconVisible = false } = item;
 
   // status:1 显示 status:2 隐藏 status:3 直播回放显示 status4:预告结束显示
-  if (status == STATUS_MAP['hidden']) visible = false;
+  if (status == STATUS_MAP.HIDDEN) visible = false;
 
   return {
     // 原始字段

@@ -1,7 +1,7 @@
 <template>
   <a
     href="javascript:;"
-    v-if="!hidden && (configList[auth] || auth)"
+    v-if="!hidden && (configList[auth] == 1 || auth == true)"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"

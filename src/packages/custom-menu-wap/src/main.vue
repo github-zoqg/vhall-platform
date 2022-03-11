@@ -1,6 +1,6 @@
 <template>
   <section class="vmp-custom-menu">
-    <div class="vmp-custom-menu-wrapper">
+    <div v-show="!loading" class="vmp-custom-menu-wrapper">
       <component
         v-for="(block, index) in customTabs"
         :is="block.componentName"
@@ -43,7 +43,8 @@
     data() {
       return {
         customTabs: [],
-        roomId: ''
+        roomId: '',
+        loading: false
       };
     },
     beforeCreate() {
@@ -54,15 +55,25 @@
         if (id === undefined || id === null) {
           return;
         }
-        const res = await this.customMenuServer.getCustomMenuDetail({
-          menu_id: id
-        });
 
-        if (res.code === 200 && res.data) {
-          this.customTabs = res.data.components.map(menu => {
-            menu.componentName = `component-${componentMap[menu.component_id]}`;
-            return menu;
+        this.loading = true;
+        await this.$nextTick();
+
+        try {
+          const res = await this.customMenuServer.getCustomMenuDetail({
+            menu_id: id
           });
+
+          this.loading = false;
+
+          if (res.code === 200 && res.data) {
+            this.customTabs = res.data.components.map(menu => {
+              menu.componentName = `component-${componentMap[menu.component_id]}`;
+              return menu;
+            });
+          }
+        } catch (error) {
+          this.loading = false;
         }
       }
     }

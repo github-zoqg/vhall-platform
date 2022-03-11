@@ -59,11 +59,9 @@
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
-      handleRedPacket() {
+      handleRedPacket(red_packet_uuid) {
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitOpenRedPacket', [
-            this.$domainStore.state.roomBaseServer.redPacket.red_packet_uuid
-          ])
+          boxEventOpitons(this.cuid, 'emitOpenRedPacket', [red_packet_uuid])
         );
       },
       checkLotteryIcon() {

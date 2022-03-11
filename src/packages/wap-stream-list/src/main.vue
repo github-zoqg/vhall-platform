@@ -34,6 +34,7 @@
         </div>
       </template>
     </div>
+    <!-- wap 蒙层显示信息 -->
     <div class="vmp-wap-stream-wrap-mask">
       <!-- 热度 -->
       <div
@@ -275,7 +276,6 @@
         langMap[curLang.language_type];
       this.$i18n.locale = this.lang.type;
       sessionStorage.setItem('lang', this.lang.key);
-      this.addSDKEvents();
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
         return Toast(`浏览器不支持互动`);
@@ -285,7 +285,7 @@
 
     mounted() {
       // 在麦上 才存在滑动情况
-      if (this.micServer.state.isSpeakOn) {
+      if (this.micServer.getSpeakerStatus()) {
         if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           this.createBScroll();
         }
@@ -293,6 +293,8 @@
           this.setFullScreen();
         }
       }
+
+      this.addSDKEvents();
       this.fiveDown();
     },
     beforeDestroy() {
@@ -302,6 +304,17 @@
     },
 
     methods: {
+      // 设置主画面
+      setBigScreen(msg) {
+        const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+        Toast(`${msg.data.nick_name}设置成为${str}`);
+        this.$nextTick(() => {
+          this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+          if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
+            this.mainScreenDom.style.left = `${1.02667}rem`;
+          }
+        });
+      },
       // 事件监听
       addSDKEvents() {
         // 监听到自动播放
@@ -312,15 +325,12 @@
 
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
-          const str =
-            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-          Toast(`${msg.data.nick_name}设置成为${str}`);
-          this.$nextTick(() => {
-            this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
-            if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
-              this.mainScreenDom.style.left = `${1.02667}rem`;
-            }
-          });
+          this.setBigScreen(msg);
+        });
+
+        // 接收设为主讲人消息
+        this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
+          this.setBigScreen(msg);
         });
 
         // 开启分组讨论
@@ -332,30 +342,22 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
-          if (this.isInGroup) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
-          if (this.isInGroup) {
-            this.gobackHome(4);
-          }
+          this.gobackHome(4);
         });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          if (this.isInGroup) {
-            this.gobackHome(5, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(5, this.groupServer.state.groupInitData.name);
         });
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          if (this.isInGroup) {
-            this.gobackHome(7);
-          }
+          this.gobackHome(7);
         });
 
         // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流

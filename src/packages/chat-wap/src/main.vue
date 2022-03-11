@@ -274,7 +274,7 @@
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$message(this.$t('chat.chat_1007'));
         });
       },
       //处理分组讨论频道变更
@@ -325,7 +325,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$refs.chatlist.scrollToBottom();
+          this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
         });

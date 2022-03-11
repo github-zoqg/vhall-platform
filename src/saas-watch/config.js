@@ -43,6 +43,7 @@ export const serverConfig = {
       'comWatchAsideMenu',
       'comDocUne',
       'comDesktopScreen',
+      'comInsertStream',
       'comFooterTools',
       'comNoticeColumn',
       'comLivingEnd'
@@ -156,7 +157,8 @@ export const serverConfig = {
     component: 'VmpStreamLocal',
     initPlayer: {
       cuid: 'comPcPlayer',
-      method: 'getWebinerStatus'
+      method: 'getWebinerStatus',
+      args: ['$0']
     }
   },
   comStreamRemote: {
@@ -165,6 +167,10 @@ export const serverConfig = {
   // 桌面共享组件
   comDesktopScreen: {
     component: 'VmpStreamDesktopScreen'
+  },
+  // 插播文件
+  comInsertStream: {
+    component: 'VmpInsertStream'
   },
   // 播放器
   comPcPlayer: {
@@ -565,6 +571,12 @@ export const serverConfig = {
   },
   // 邀请上麦弹窗
   comMicInvited: {
-    component: 'VmpMicInvited'
+    component: 'VmpMicInvited',
+    emitAgreeInvite: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'updateAutoSpeak'
+      }
+    ]
   }
 };

@@ -32,8 +32,8 @@
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
-        <!-- 试看播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
+        <!-- 试看播放结束 和线上保持一致 -->
+        <!-- <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
           <p class="vmp-wap-player-ending-box-title">{{ $t('appointment.appointment_1013') }}</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
@@ -50,9 +50,9 @@
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
-        </div>
+        </div> -->
         <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-else @click="startPlay">
+        <div class="vmp-wap-player-ending-box" @click="startPlay">
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
@@ -101,8 +101,8 @@
           </span>
         </div>
         <div class="vmp-wap-player-control">
-          <!--  -->
-          <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
+          <!-- 试看逻辑不加 按照线上 -->
+          <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
               <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
             </i18n>
@@ -119,7 +119,7 @@
               {{ authText }}
             </span>
             <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
-          </div>
+          </div> -->
           <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
             <i18n path="player.player_1012">
               <span place="n" class="red">{{ currentTime | secondToDate }}</span>
@@ -127,7 +127,7 @@
             <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
           <div class="vmp-wap-player-control-slider">
-            <div v-if="eventPointList.length" ref="vhTailoringWrap">
+            <div v-if="eventPointList.length && totalTime && !isWarnPreview" ref="vhTailoringWrap">
               <controlEventPoint
                 v-for="(item, index) in eventPointList"
                 :key="'controlEventPoint' + index"
@@ -409,7 +409,12 @@
       play() {
         this.iconShow = false;
         this.fiveDown();
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {

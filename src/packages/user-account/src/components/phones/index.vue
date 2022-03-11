@@ -203,10 +203,9 @@
           validateList.push(valid);
         });
         if (validateList.every(item => item === '')) {
-          const data =
-            this.phoneData.type === 'edit' && this.phoneData.step !== 1
-              ? this.setPhoneForm.phone
-              : this.phoneData.phone;
+          const data = !(this.phoneData.type == 'edit' && this.phoneData.step === 1)
+            ? this.setPhoneForm.phone
+            : this.phoneData.phone;
           const validate = this.setPhoneForm.imgCode;
           const scene_id = this.setPhoneForm.scene_id;
           // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码

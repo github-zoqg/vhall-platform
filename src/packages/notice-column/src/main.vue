@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-notice-column" v-if="isNoticeColumn">
+  <div class="vmp-notice-column" v-show="isNoticeColumn">
     <div class="vmp-notice-column-wrap">
       <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
       <p class="vmp-notice-column-wrap-nowrap">
@@ -23,28 +23,44 @@
         isNoticeColumn: false
       };
     },
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
+    watch: {
+      isInGroup(val) {
+        this.isNoticeColumn = false;
+        this.openNotice();
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
-      const { latestNotice } = this.noticeServer.state;
-      const { groupInitData } = this.groupServer.state;
-      if (
-        latestNotice.total &&
-        latestNotice.created_at &&
-        this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
-        !groupInitData.isInGroup
-      ) {
-        this.isNoticeColumn = true;
-        this.noticeText = latestNotice.noticeContent;
-      }
+      this.openNotice();
     },
     mounted() {
       this.initNotice();
     },
     methods: {
+      openNotice() {
+        const { latestNotice } = this.noticeServer.state;
+        console.log(latestNotice.noticeContent, 'latestNotice.noticeContent');
+        const { groupInitData } = this.groupServer.state;
+        if (
+          latestNotice.total &&
+          latestNotice.created_at &&
+          this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+          !groupInitData.isInGroup
+        ) {
+          this.isNoticeColumn = true;
+          this.noticeText = this.roomBaseServer.state.noticeInfo.list[0]?.content.content;
+          // this.noticeText = latestNotice.noticeContent;
+        }
+      },
       initNotice() {
         const { groupInitData } = this.groupServer.state;
         // 公告消息
@@ -58,6 +74,14 @@
         });
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
+        });
+        // 结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          const { latestNotice } = this.noticeServer.state;
+          if (latestNotice.total && latestNotice.created_at) {
+            this.isNoticeColumn = true;
+            this.noticeText = latestNotice.noticeContent;
+          }
         });
         this.groupServer.$on('GROUP_SWITCH_START', () => {
           this.isNoticeColumn = false;

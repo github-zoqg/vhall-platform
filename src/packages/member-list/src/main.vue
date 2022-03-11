@@ -262,8 +262,6 @@
         applyUsers: [],
         //受限人数
         limitedUsers: [],
-        //上麦人员列表
-        speakerList: [],
         //房间号
         roomId: '',
         //mod 6代表分组活动
@@ -327,29 +325,10 @@
       //开始初始化流程
       this.init();
       this.listenEvent();
-      this.isWatch && this.changeSpeakerList();
     },
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
-      },
-      leader_id: {
-        handler(newVal, oldVal) {
-          if (newVal == oldVal) return;
-          this.handleLeaderChange(newVal, oldVal);
-        },
-        immediate: true
-      },
-      onlineUsers: {
-        handler(newVal) {
-          if (this.isWatch && newVal && newVal.length) {
-            this.onlineSpeakerList = newVal.filter(item => {
-              return item.is_speak;
-            });
-          }
-        },
-        deep: true,
-        immediate: true
       }
     },
     computed: {
@@ -423,6 +402,12 @@
           current = this.interactToolStatus.presentation_screen;
         }
         return current;
+      },
+      //获取当前的上麦的人员列表
+      getCurrentSpeakerList() {
+        return this.isInGroup
+          ? this.groupInitData['speaker_list'] || []
+          : this.interactToolStatus['speaker_list'] || [];
       }
     },
     methods: {
@@ -445,8 +430,6 @@
         this.userId = join_info.third_party_user_id;
         this.roomId = interact.room_id;
         this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
-        //初始化一下视图里初始的上麦列表
-        this.changeSpeakerList();
       },
       //统一初始化方法
       init() {
@@ -690,9 +673,6 @@
             let index = _this._getUserIndex(msg.sender_id, _this.onlineUsers);
 
             if (isWatch) {
-              _this.speakerList = _this.isInGroup
-                ? _this.groupInitData.speaker_list
-                : _this.interactToolStatus.speaker_list || [];
               _this.totalNum = msg.uv;
               _this.memberServer.updateState('totalNum', _this.totalNum);
             }
@@ -733,7 +713,7 @@
             }
 
             // 从上麦人员列表中获取加入房间着是否上麦
-            const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
+            const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
             if (isLive) {
               console.log('context:::::', msg, context);
@@ -1048,10 +1028,9 @@
           );
 
           //如果是观看端，还要维护一下上麦列表
-          if (_this.isWatch) {
-            _this.changeSpeakerList();
-            _this.speakerList = _this.speakerList.filter(item => item.account_id != msg.sender_id);
-          }
+          // if (_this.isWatch) {
+          //   _this.speakerList = _this.speakerList.filter(item => item.account_id != msg.sender_id);
+          // }
 
           //提示语
           if (msg.data.target_id == _this.userId) {
@@ -1188,6 +1167,10 @@
               //下麦成功
               isWatch && handleRoomDisconnectSuccess(temp);
               break;
+            case 'group_switch_start':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              handleStartGroupDiscuss();
+              break;
             default:
               break;
           }
@@ -1197,11 +1180,11 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-        //todo 这里需要仔细确认一下
-        // only 发起端（开始分组讨论）
-        this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          handleStartGroupDiscuss(msg);
-        });
+
+        //开始分组讨论
+        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
+        //   handleStartGroupDiscuss(msg);
+        // });
 
         // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
@@ -1275,12 +1258,9 @@
             if (msg.sender_id == _this.userId || !_this.isInGroup) {
               return;
             }
-            _this.speakerList = _this.groupInitData.isInGroup
-              ? msg.data.speaker_list
-              : _this.interactToolStatus.speaker_list || [];
             // 是否已添加
             const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
-            const speakIndex = _this._getUserIndex(msg.sender_id, _this.speakerList);
+            const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
             if (flag) {
               _this.onlineUsers.forEach(item => {
                 if (item.account_id == msg.sender_id) {
@@ -1401,72 +1381,6 @@
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {
           console.log(msg);
-        }
-      },
-      // 更新上麦人员列表
-      changeSpeakerList() {
-        this.speakerList = this.groupServer.state.groupInitData.isInGroup
-          ? this.groupInitData.speaker_list || []
-          : this.interactToolStatus.speaker_list || [];
-      },
-      handleLeaderChange(newVal, oldVal) {
-        // 如果被设为了组长，接管权限拥有者掉线的异常处理
-        if (newVal == this.userId) {
-          this.msgServer.$onMsg('LEFT', this.handleRoomLeaveForLeader);
-          this.msgServer.$onMsg('JOIN', this.handleRoomJoinForLeader);
-        }
-        // 如果自己不是组长了，注销事件
-        if (oldVal == this.userId) {
-          this.msgServer.$offMsg('LEFT', this.handleRoomLeaveForLeader);
-          this.msgServer.$offMsg('JOIN', this.handleRoomJoinForLeader);
-        }
-      },
-      handleRoomLeaveForLeader(msg) {
-        this.handlePermissionLeave(msg);
-        this.handleSpeakerLeave(msg);
-      },
-      handleRoomJoinForLeader(msg) {
-        this.handleSpeakerBack(msg);
-      },
-      // 演示权限人员掉线异常处理
-      handlePermissionLeave(msg) {
-        // 如果是当前主讲人掉线，启动异常处理流程
-        if (msg.sender_id == this.getCurrentSpeakerId) {
-          this._permissionLeaveId = msg.sender_id;
-          this.msgServer.$onMsg('JOIN', this.handlePermissionJoin);
-          this._permissionLeaveInterval = window.setTimeout(() => {
-            // 15秒后自动结束演示
-            this.downMic(this._permissionLeaveId, false);
-            this.msgServer.$offMsg('JOIN', this.handlePermissionJoin);
-          }, 15000);
-        }
-      },
-      // 演示权限人员掉线又重新上线
-      handlePermissionJoin(msg) {
-        if (this._permissionLeaveId == msg.sender_id) {
-          this._permissionLeaveInterval && window.clearTimeout(this._permissionLeaveInterval);
-          this.msgServer.$offMsg('JOIN', this.handlePermissionJoin);
-        }
-      },
-      // 上麦人员掉线异常处理
-      handleSpeakerLeave(msg) {
-        const isInArray =
-          (this.onlineSpeakerList || []).findIndex(item => msg.sender_id == item.account_id) > -1;
-        if (isInArray) {
-          this.speakerLeaveIntervalMap[msg.sender_id] = setTimeout(() => {
-            this.speakerLeaveIntervalMap[msg.sender_id] &&
-              clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
-            delete this.speakerLeaveIntervalMap[msg.sender_id];
-            this.downMic(msg.sender_id, false);
-          }, 15000);
-        }
-      },
-      // 上麦人员掉线又重新上线
-      handleSpeakerBack(msg) {
-        if (this.speakerLeaveIntervalMap[msg.sender_id]) {
-          this.speakerLeaveIntervalMap[msg.sender_id] &&
-            clearTimeout(this.speakerLeaveIntervalMap[msg.sender_id]);
-          delete this.speakerLeaveIntervalMap[msg.sender_id];
         }
       },
       updateOnlineUserList() {
@@ -1701,7 +1615,10 @@
         this.micServer
           .hostAgreeApply(params)
           .then(res => {
-            console.log(res);
+            if (res.code !== 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
@@ -1721,8 +1638,12 @@
           this.agreeUpMic(accountId);
         } else {
           if (this.userId === accountId) {
-            // 主持人自己上麦 todo 可能是信令或者直接移除
-            // EventBus.$emit('applyByHost');
+            // 主持人自己上麦
+            this.micServer.userSpeakOn().then(res => {
+              if (res.code !== 200) {
+                this.$message.error(res.msg);
+              }
+            });
           } else {
             this.micServer
               .inviteMic({
@@ -1863,10 +1784,12 @@
               } else {
                 this.$message.success(this.$t('message.message_1033'));
               }
+            } else {
+              this.$message.error(res.msg);
             }
           })
           .catch(err => {
-            this.$message.warning(err.msg);
+            this.$message.error(err.msg);
           });
       },
       //设为组长

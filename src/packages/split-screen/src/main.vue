@@ -28,10 +28,10 @@
         <!-- 远端流 -->
         <div
           class="vmp-split-screen__stream-container"
-          v-for="stream in remoteStreams"
-          :key="stream.id"
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.id"
         >
-          <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+          <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
         </div>
       </div>
     </div>
@@ -52,20 +52,22 @@
     },
     computed: {
       // 远端流列表showPlayIcon
-      remoteStreams() {
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
-      // 流列表长度（远端流加本地流）
-      streamListLength() {
+      remoteSpeakers() {
         return (
-          this.remoteStreams.length +
-          (this.$domainStore.state.interactiveServer.localStream.streamId ? 1 : 0)
+          this.speakerList.filter(
+            item =>
+              item.accountId !=
+              this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+          ) || []
         );
       }
     },
     watch: {
       // 流数量变更，更新视图的布局
-      streamListLength: {
+      'speakerList.length': {
         immediate: true,
         handler(newVal) {
           if (newVal == 1) {
@@ -183,7 +185,9 @@
       }
       &__2 {
         .vmp-split-screen__stream-container {
-          width: 50%;
+          width: calc(50vh * 16 / 9);
+          max-width: 50%;
+          height: 50vh;
         }
       }
       &__3 {

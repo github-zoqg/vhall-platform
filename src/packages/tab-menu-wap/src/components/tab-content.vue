@@ -6,7 +6,7 @@
         <section
           v-for="tab of filterMainMenu"
           :key="tab.cuid"
-          v-show="curItem.cuid === tab.cuid && filterMainMenu.find(item => item.id === curItem.id)"
+          v-show="curItem.cuid === tab.cuid && mainMenu.find(item => item.id === curItem.id)"
         >
           <vmp-air-container :cuid="tab.cuid" :oneself="true" />
         </section>
@@ -129,12 +129,11 @@
 
         return findComp(cuid, arr);
       },
-      switchTo: async function (item) {
+      async switchTo(item) {
         // 确保动态加载的dom渲染完成
         await this.$nextTick();
 
         let child = null;
-
         child = this.getComp(item.cuid, this.$children);
 
         // hack(TODO: 临时，后面需要改)
@@ -145,6 +144,7 @@
         }
 
         if (!child) return;
+        console.log('item:', item);
 
         // pre-show
         if (item.type === 1) {

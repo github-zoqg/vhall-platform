@@ -34,6 +34,7 @@
       display: block;
       max-width: 100%;
       margin: 0px auto;
+      pointer-events: none;
     }
 
     p {

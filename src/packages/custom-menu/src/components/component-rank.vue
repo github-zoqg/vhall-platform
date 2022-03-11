@@ -1,47 +1,49 @@
 <template>
   <div class="rank-wrapbox" :class="{ 'rank-preview-box': pagetype == 'subscribe' }">
     <div v-if="info.inSwitch == 1 || info.rewardSwitch == 1" class="rank-previewbox">
-      <div class="ranking-title">
+      <header class="ranking-title">
         <div class="rank-menu">
           <span
             v-if="info.inSwitch == 1"
-            :class="{ active: activeIndex == 1 }"
-            @click="changeActiveIndex(1)"
+            :class="{ active: activeTab == 'invite' }"
+            @click="changeTab('invite')"
           >
             邀请榜
           </span>
           <span
             v-if="info.rewardSwitch == 1"
-            :class="{ active: activeIndex == 2 }"
-            @click="changeActiveIndex(2)"
+            :class="{ active: activeTab == 'award' }"
+            @click="changeTab('award')"
           >
             打赏榜
           </span>
         </div>
-        <div class="bang-rule" @click="changeRulesShow">
-          {{ activeIndex == 1 ? '邀请榜' : '打赏榜' }}规则
+        <div class="rank-rule" @click="changeRulesShow">
+          {{ activeTab == 'invite' ? '邀请榜' : '打赏榜' }}规则
           <span
             class="iconfont rank-icon"
             :class="{ iconjiantou_shouqi: !showRules, iconjiantou_zhankai: showRules }"
           ></span>
         </div>
-      </div>
+      </header>
+
       <div v-show="showRules" class="ranking-box watch-area">
-        <div v-show="activeIndex == 1" class="rank-con" v-html="info.inContent"></div>
-        <div v-show="activeIndex == 1 && !info.inContent" class="rank-con center">
+        <div v-show="activeTab === 'invite'" class="rank-con" v-html="info.inContent"></div>
+        <div v-show="activeTab === 'invite' && !info.inContent" class="rank-con center">
           什么规则都没有
         </div>
         <div
-          v-show="activeIndex == 2 && info.rewardContent"
+          v-show="activeTab === 'award' && info.rewardContent"
           class="rank-con"
           v-html="info.rewardContent"
         ></div>
-        <div v-show="activeIndex == 2 && !info.rewardContent" class="rank-con center">
+        <div v-show="activeTab === 'award' && !info.rewardContent" class="rank-con center">
           什么规则都没有
         </div>
       </div>
+
       <div class="rank-band">
-        <div v-show="activeIndex == 1" class="band-list">
+        <div v-show="activeTab === 'invite'" class="band-list">
           <template v-if="inviteRankList.length > 0">
             <div v-for="(item, index) in inviteRankList" :key="index" class="rank-item">
               <img
@@ -66,7 +68,10 @@
                 人
               </span>
             </div>
-            <div v-if="showBottom && inviteRankList.length >= itotal" class="loading-bottom">
+            <div
+              v-if="showBottom && inviteRankList.length >= invitePage.total"
+              class="loading-bottom"
+            >
               <span class="load-icon"></span>
               {{ bottomText }}
             </div>
@@ -76,7 +81,7 @@
             <span class="default-tip">您还未邀请,快去抢沙发吧~</span>
           </template>
         </div>
-        <div v-show="activeIndex == 2" class="band-list">
+        <div v-show="activeTab == 'award'" class="band-list">
           <template v-if="awardRankList.length > 0">
             <div v-for="(item, index) in awardRankList" :key="index" class="rank-item">
               <img
@@ -99,7 +104,10 @@
                 元
               </span>
             </div>
-            <div v-if="showBottom && awardRankList.length >= awardtotal" class="loading-bottom">
+            <div
+              v-if="showBottom && awardRankList.length >= awardPage.total"
+              class="loading-bottom"
+            >
               <span class="load-icon"></span>
               {{ bottomText }}
             </div>
@@ -110,6 +118,7 @@
           </template>
         </div>
       </div>
+
       <div v-if="open == 1" class="invite-friends">
         <span @click="showInviteFriends">邀请好友观看</span>
       </div>
@@ -117,6 +126,8 @@
   </div>
 </template>
 <script>
+  import { useCustomMenuServer } from 'middle-domain';
+
   export default {
     name: 'component-rank',
     filters: {
@@ -166,229 +177,207 @@
     },
     data() {
       return {
-        pageLock: false,
-        showBottom: false,
-        bottomText: '',
-        inviteInfo: {},
-        activeIndex: '1',
-        showRules: false,
         bangdan1: require('../assets/imgs/bangdan-1.png'),
         bangdan2: require('../assets/imgs/bangdan-2.png'),
         bangdan3: require('../assets/imgs/bangdan-3.png'),
         avatar: require('../assets/imgs/avatar.png'),
+
+        pageLock: false,
+        scrollLock: false,
+        showBottom: false,
+        showRules: false,
+        bottomText: '',
+        activeTab: 'invite',
         inviteRankList: [],
         awardRankList: [],
-        ipos: 0,
-        ilimit: 10,
-        itotal: 0,
-        awardpos: 0,
-        awardlimit: 10,
-        awardtotal: 0,
-        scrollLock: false
+        invitePage: {
+          pos: 0,
+          limit: 10,
+          total: 0
+        },
+        awardPage: {
+          pos: 0,
+          limit: 10,
+          total: 0
+        }
       };
+    },
+    computed: {
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.join_info;
+      }
     },
     watch: {
       info: function (newVal) {
-        if (newVal.inSwitch == 0 && this.activeIndex == 1) {
-          this.activeIndex = 2;
-        } else if (newVal.rewardSwitch == 1 && this.activeIndex == 2) {
-          this.activeIndex = 1;
+        if (newVal.inSwitch == 0 && this.activeTab === 'invite') {
+          this.activeTab = 'award';
+        } else if (newVal.rewardSwitch == 1 && this.activeTab === 'award') {
+          this.activeTab = 'invite';
         }
-      },
-      joinId: {
-        handler(val) {
-          if (val) {
-            this.queryInviteInfo(val);
-          }
-        },
-        immediate: true
-      },
-      open: {
-        handler(val) {
-          console.log('>>>>>>>3,', val);
-        },
-        immediate: true
       }
+    },
+    beforeCreate() {
+      this.customMenuServer = useCustomMenuServer();
     },
     mounted() {
       if (this.info.inSwitch == 1) {
-        this.activeIndex = 1;
-        this.getInviteList();
+        this.activeTab = 'invite';
+        this.getInviteRankList();
       } else if (this.info.rewardSwitch == 1) {
-        this.activeIndex = 2;
-        this.getAwardRank();
+        this.activeTab = 'award';
+        this.getAwardRankList();
       }
-      this.bindEventListener();
-    },
-    beforeDestroy() {
-      this.inviteRankList = [];
-      this.awardRankList = [];
-      this.ipos = 0;
-      this.ilimit = 10;
-      this.itotal = 0;
-      this.awardpos = 0;
-      this.awardlimit = 10;
-      this.awardtotal = 0;
-      this.scrollLock = false;
+      this.listenEvents();
     },
     methods: {
-      bindEventListener() {
-        // if (this.pagetype == 'watch') {
-        this.$nextTick(() => {
-          const wrap = document.querySelector('.rank-band');
-          if (!wrap) return;
-          wrap.addEventListener('scroll', e => {
-            if (this.scrollLock) return;
-            const clientHeight = e.target.clientHeight;
-            const scrollHeight = e.target.scrollHeight;
-            const scrollTop = e.target.scrollTop;
-            if (clientHeight + scrollTop >= scrollHeight) {
-              if (this.pageTimer) {
-                clearTimeout(this.pageTimer);
-                this.pageTimer = null;
-              }
-              this.scrollLock = true;
-              this.pageTimer = setTimeout(() => {
-                if (this.activeIndex == 1) {
-                  // 邀请排行
-                  if (this.ipos + this.ilimit >= this.itotal + this.ilimit) return;
-                  this.getInviteList();
-                } else {
-                  console.log(
-                    '3.3>>>>>>',
-                    this.awardpos,
-                    this.awardlimit,
-                    this.awardtotal,
-                    this.awardpos + this.awardlimit >= this.awardtotal + this.awardlimit
-                  );
-                  if (this.awardpos + this.awardlimit >= this.awardtotal + this.awardlimit) return;
-                  this.getAwardRank();
-                }
-              }, 300);
+      async listenEvents() {
+        await this.$nextTick();
+        const wrap = document.querySelector('.rank-band');
+        if (!wrap) return;
+        wrap.addEventListener('scroll', e => {
+          if (this.scrollLock) return;
+          const clientHeight = e.target.clientHeight;
+          const scrollHeight = e.target.scrollHeight;
+          const scrollTop = e.target.scrollTop;
+          if (clientHeight + scrollTop >= scrollHeight) {
+            if (this.pageTimer) {
+              clearTimeout(this.pageTimer);
+              this.pageTimer = null;
             }
-          });
+            this.scrollLock = true;
+            this.pageTimer = setTimeout(() => {
+              if (this.activeTab === 'invite') {
+                // 邀请排行
+                if (this.invitePage.pos >= this.invitePage.total) return;
+                this.getInviteRankList();
+              } else {
+                if (this.awardPage.pos >= this.awardPage.total) return;
+                this.getAwardRankList();
+              }
+            }, 300);
+          }
         });
       },
-      /**
-       * 获取邀请信息
-       */
-      queryInviteInfo(id) {
-        this.$vhallapi.interactTool
-          .queryInviteInfo({
-            webinar_id: this.$route.params.il_id || '',
-            join_id: id
-          })
-          .then(res => {
-            if (res.data && res.code == 200) {
-              this.inviteInfo = res.data;
-            }
-          });
-      },
-      showInviteFriends() {
-        this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_OPEN_INVITE_FRIENDS_QR);
-      },
-      changeActiveIndex(index) {
-        this.activeIndex = index;
+      changeTab(tab = 'invite') {
+        this.activeTab = tab;
+
         this.pageLock = false;
         this.showBottom = false;
         this.scrollLock = false;
-        if (index == 1) {
-          this.ipos = 0;
-          this.ilimit = 10;
-          this.itotal = 0;
+
+        if (tab === 'invite') {
+          this.invitePage = {
+            pos: 0,
+            limit: 10,
+            total: 0
+          };
           this.inviteRankList = [];
-          this.getInviteList();
-        } else {
-          this.awardpos = 0;
-          this.awardlimit = 10;
-          this.awardtotal = 0;
+          this.getInviteRankList();
+        }
+
+        if (tab === 'award') {
+          this.awardPage = {
+            pos: 0,
+            limit: 10,
+            total: 0
+          };
           this.awardRankList = [];
-          this.getAwardRank();
+          this.getAwardRankList();
         }
       },
-      changeRulesShow() {
-        this.showRules = !this.showRules;
+      /**
+       * 获取邀请列表
+       */
+      async getInviteRankList() {
+        if (this.pageLock) return;
+        this.pageLock = true;
+        this.showBottom = true;
+        this.bottomText = this.$t('common.common_1001');
+
+        const res = await this.customMenuServer.getInviteTopList({
+          webinar_id: this.watchInitData.webinar.id,
+          join_id: this.watchInitData.join_info.join_id,
+          pos: parseInt(this.invitePage.pos),
+          limit: 10
+        });
+
+        if (res.code == 200 && res.data && res.data.list.length > 0) {
+          const list = res.data.list.map(item => {
+            if (!item.img_url) {
+              item.img_url = this.avatar;
+            }
+            return item;
+          });
+
+          const data = this.inviteRankList;
+          this.inviteRankList = data.concat(list);
+          this.invitePage = {
+            pos: res.data.pos + 10,
+            limit: 10,
+            total: res.data.total
+          };
+        }
+        this.scrollLock = false;
+
+        this.clearBottomInfo();
       },
-      changeTab(index) {
-        this.activeIndex = index;
-      },
-      getInviteList() {
+      /**
+       * 获取打赏列表
+       */
+      async getAwardRankList() {
         if (this.pageLock) return;
         this.pageLock = true;
         this.showBottom = true;
         this.bottomText = '加载中...';
-        this.$vhallapi.interactTool
-          .queryInviteTopList({
-            webinar_id: this.$route.params.il_id,
-            join_id: this.joinId,
-            pos: parseInt(this.ipos),
-            limit: 10
-          })
-          .then(res => {
-            if (res.code == 200 && res.data && res.data.list.length > 0) {
-              const list = res.data.list.map(item => {
-                if (!item.img_url) {
-                  item.img_url = this.avatar;
-                }
-                return item;
-              });
-              const data = this.inviteRankList;
-              this.inviteRankList = data.concat(list);
-              this.ipos = res.data.pos + 10;
-              this.ilimit = 10;
-              this.itotal = res.data.total;
+
+        const res = await this.customMenuServer.getAwardList({
+          room_id: this.watchInitData.interact.room_id,
+          offset: parseInt(this.awardPage.pos),
+          limit: 10
+        });
+
+        if (res.code == 200 && res.data) {
+          const list = res.data.list.map(item => {
+            if (!item.avatar) {
+              item.avatar = this.avatar;
             }
-            this.scrollLock = false;
-          })
-          .catch(e => {
-            this.scrollLock = false;
+            return item;
           });
+          const data = this.awardRankList;
+          this.awardPage = {
+            pos: res.data.offset + 10,
+            limit: 10,
+            total: res.data.total
+          };
+          this.awardRankList = data.concat(list);
+        }
+        this.scrollLock = false;
+
         this.clearBottomInfo();
       },
+      showInviteFriends() {
+        this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_OPEN_INVITE_FRIENDS_QR);
+      },
+
+      changeRulesShow() {
+        this.showRules = !this.showRules;
+      },
+
       clearBottomInfo() {
         this.pageLock = false;
-        if (
-          this.ipos + this.ilimit >= this.itotal ||
-          this.awardpos + this.awardlimit >= this.awardtotal
-        ) {
+        const inviteOver = this.invitePage.pos + this.invitePage.limit >= this.invitePage.total;
+        const awardOver = this.awardPage.pos + this.awardPage.limit >= this.awardPage.total;
+
+        if (inviteOver || awardOver) {
           this.bottomText = '已经到底啦~';
           this.showBottom = true;
         } else {
           this.bottomText = '';
           this.showBottom = false;
         }
-      },
-      getAwardRank() {
-        if (this.pageLock) return;
-        this.pageLock = true;
-        this.showBottom = true;
-        this.bottomText = '加载中...';
-        this.$vhallapi.interactTool
-          .queryAwardList({
-            room_id: this.roomId,
-            offset: parseInt(this.awardpos),
-            limit: 10
-          })
-          .then(res => {
-            if (res.code == 200 && res.data) {
-              const list = res.data.list.map(item => {
-                if (!item.avatar) {
-                  item.avatar = this.avatar;
-                }
-                return item;
-              });
-              const data = this.awardRankList;
-              this.awardlimit = 10;
-              this.awardpos = res.data.offset + 10;
-              this.awardtotal = res.data.total;
-              this.awardRankList = data.concat(list);
-            }
-            this.scrollLock = false;
-          })
-          .catch(e => {
-            this.scrollLock = false;
-          });
-        this.clearBottomInfo();
       }
     }
   };
@@ -412,8 +401,6 @@
     }
   }
   .rank-previewbox {
-    // background: url(../assets/imgs/rank-bg.png) repeat;
-    // padding-bottom: 10px;
     .ranking-title {
       font-size: 14px;
       color: #fff;
@@ -449,7 +436,7 @@
           // opacity: 1;
         }
       }
-      .bang-rule {
+      .rank-rule {
         position: absolute;
         right: -10px;
         top: 0;
@@ -469,16 +456,12 @@
 
     .rank-band {
       text-align: center;
-      // min-height: 320px;
       height: 570px;
-      // height: 440px;
-      overflow-y: scroll;
       .loading-bottom {
         width: 100%;
         height: 20px;
         text-align: center;
         font-size: 14px;
-        font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
         color: #999999;
         line-height: 20px;
@@ -496,7 +479,6 @@
         width: 100%;
         height: 54px;
         box-sizing: border-box;
-        // padding: 0px 10px;
         line-height: 54px;
         font-size: 14px;
         color: #e6e6e6;
@@ -517,11 +499,7 @@
           vertical-align: top;
           position: relative;
         }
-        // .top-three{
-        //   width: 34px;
-        //   height: 36px;
-        //   position: relative;
-        // }
+
         .avatar {
           display: inline-block;
           width: 28px;
@@ -619,7 +597,6 @@
         width: 60%;
         height: 100%;
         font-size: 14px;
-        font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
         color: #e6e6e6;
         line-height: 20px;
@@ -640,7 +617,6 @@
       overflow-y: scroll;
       word-break: break-all;
       font-size: 12px;
-      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: @font-dark-normal;
       line-height: 20px;
@@ -655,8 +631,6 @@
       .rank-con {
         color: #e6e6e6;
         width: 100%;
-        // height: 100%;
-        overflow-y: scroll;
       }
       .center {
         text-align: center;
@@ -664,7 +638,6 @@
       }
     }
     .watch-area {
-      // left: -24px;
       width: 360px;
     }
   }

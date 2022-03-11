@@ -34,6 +34,9 @@
 
       <!-- wap端订阅桌面共享的容器 -->
       <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+
+      <!-- wap端订阅桌面共享的容器 -->
+      <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
       <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
@@ -44,7 +47,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer } from 'middle-domain';
+  import { useMsgServer, useInteractiveServer } from 'middle-domain';
   import move from './js/move';
   import { Dialog } from 'vant';
   import masksliding from './components/mask.vue';
@@ -78,6 +81,10 @@
       this.msgServer = useMsgServer();
     },
     async created() {
+      // 监听自动上麦的异常code
+      useInteractiveServer().$on('speakOnFailed', e => {
+        this.$toast(e.msg);
+      });
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1

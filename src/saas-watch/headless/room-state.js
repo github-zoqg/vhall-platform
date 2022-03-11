@@ -8,6 +8,7 @@ import {
   useGroupServer,
   useUserServer,
   useDesktopShareServer,
+  useInsertFileServer,
   useMediaSettingServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
@@ -23,6 +24,7 @@ export default async function () {
   const micServer = useMicServer();
   const userServer = useUserServer();
   const desktopShareServer = useDesktopShareServer();
+  const insertFileServer = useInsertFileServer();
   const mediaSettingServer = useMediaSettingServer();
 
   if (!roomBaseServer) {
@@ -123,10 +125,14 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-  await interactiveServer.init();
-  console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  if (roomBaseServer.state.watchInitData.webinar.type == 1) {
+    await interactiveServer.init();
+    console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  }
 
   mediaSettingServer.init();
+
+  insertFileServer.init();
 
   desktopShareServer.init();
 
@@ -140,4 +146,5 @@ export default async function () {
   window.docServer = docServer;
   window.groupServer = groupServer;
   window.micServer = micServer;
+  window.insertFileServer = insertFileServer;
 }

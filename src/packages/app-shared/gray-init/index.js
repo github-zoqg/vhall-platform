@@ -18,9 +18,11 @@ export default function grayInit(options) {
           } else {
             window.sessionStorage.setItem('initGrayId', null);
           }
-          resolve();
+          resolve(res);
         })
-        .catch(resolve);
+        .catch(res => {
+          resolve(res);
+        });
     } else if (options.meta.grayType == 'subject') {
       roomSubjectApi.subject
         .subjectInitBefore({
@@ -32,9 +34,11 @@ export default function grayInit(options) {
           } else {
             window.sessionStorage.setItem('initGrayId', null);
           }
-          resolve();
+          resolve(res);
         })
-        .catch(resolve);
+        .catch(res => {
+          resolve(res);
+        });
     } else if (options.meta.grayType == 'user') {
       if (options.params.id) {
         window.sessionStorage.setItem('initGrayId', options.params.id);
@@ -52,7 +56,7 @@ export default function grayInit(options) {
 /**
  * 通过中台接口来走灰度
  */
-export function grayInitByMiddle(options, callback) {
+export function grayInitByMiddle(options) {
   return new Promise(resolve => {
     if (options.meta.grayType == 'webinar') {
       roomApi.webinar
@@ -61,16 +65,15 @@ export function grayInitByMiddle(options, callback) {
         })
         .then(res => {
           if (res.code == 200 && res.data) {
-            if (callback) {
-              callback(res.data);
-            }
             window.sessionStorage.setItem('initGrayId', res.data.user_id);
           } else {
             window.sessionStorage.setItem('initGrayId', null);
           }
-          resolve();
+          resolve(res);
         })
-        .catch(resolve);
+        .catch(res => {
+          resolve(res);
+        });
     } else if (options.meta.grayType == 'subject') {
       roomSubjectApi.subject
         .subjectInitBefore({
@@ -82,9 +85,11 @@ export function grayInitByMiddle(options, callback) {
           } else {
             window.sessionStorage.setItem('initGrayId', null);
           }
-          resolve();
+          resolve(res);
         })
-        .catch(resolve);
+        .catch(res => {
+          resolve(res);
+        });
     } else if (options.meta.grayType == 'user') {
       if (options.params.id) {
         window.sessionStorage.setItem('initGrayId', options.params.id);

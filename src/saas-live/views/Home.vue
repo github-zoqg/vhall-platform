@@ -22,7 +22,6 @@
     Domain,
     useRoomBaseServer,
     useSplitScreenServer,
-    useMicServer,
     useInteractiveServer
   } from 'middle-domain';
   export default {
@@ -110,8 +109,10 @@
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
-            liveToken: liveT,
             'gray-id': sessionStorage.getItem('initGrayId')
+          },
+          requestBody: {
+            live_token: liveT
           },
           initRoom: {
             webinar_id: id, //活动id
@@ -124,7 +125,6 @@
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
         const splitScreenServer = useSplitScreenServer();
-        const micServer = useMicServer();
         const interactiveServer = useInteractiveServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
@@ -139,7 +139,6 @@
             attributes: {}
           };
           interactiveServer.state.remoteStreams = [];
-          micServer.init();
           await interactiveServer.init();
           window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
         });

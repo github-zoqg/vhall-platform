@@ -82,7 +82,7 @@ const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
   },
   comWapPlayer: {
     component: 'VmpWapPlayer',
@@ -101,6 +101,9 @@ const serverConfig = {
   },
   comWapDesktopScreen: {
     component: 'VmpWapDesktopScreen'
+  },
+  comWapInsertFIle: {
+    component: 'VmpWapInsertFIle'
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
@@ -139,6 +142,11 @@ const serverConfig = {
     // 抽奖弹窗
     emitClickLotteryIcon: {
       cuid: ['comLotteryWap'],
+      method: 'open'
+    },
+    // 红包弹窗
+    emitClickRedPacketIcon: {
+      cuid: ['comRedPacketWap'],
       method: 'open'
     },
     // 问卷弹窗
@@ -365,17 +373,6 @@ const serverConfig = {
       }
     ]
   },
-  // 红包
-  compRedPacketWap: {
-    component: 'VmpRedPacketWap',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLoginWap',
-        method: 'open'
-      }
-    ]
-  },
   // 章节
   comChapterWap: {
     component: 'VmpChapterWap'
@@ -442,11 +439,25 @@ const serverConfig = {
       ]
     }
   },
+  // 红包
   comRedPacketWap: {
-    component: 'VmpRedPacketWap'
+    component: 'VmpRedPacketWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
   },
   comInviteHandup: {
-    component: 'VmpInviteHandup'
+    component: 'VmpInviteHandup',
+    emitAgreeInvite: [
+      {
+        cuid: 'comWapStreamLocal',
+        method: 'updateAutoSpeak'
+      }
+    ]
   }
 };
 
