@@ -8,7 +8,8 @@ import {
   useUserServer,
   useGroupServer,
   useDesktopShareServer,
-  usePlayerServer
+  usePlayerServer,
+  useInsertFileServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -24,6 +25,7 @@ export default async function () {
   const userServer = useUserServer();
   const groupServer = useGroupServer();
   const desktopShareServer = useDesktopShareServer();
+  const insertFileServer = useInsertFileServer();
   const playerServer = usePlayerServer();
 
   if (!roomBaseServer) {
@@ -129,6 +131,8 @@ export default async function () {
   await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
+  insertFileServer.init();
+
   desktopShareServer.init();
 
   await docServer.init({
@@ -144,4 +148,5 @@ export default async function () {
   window.groupServer = groupServer;
   window.micServer = micServer;
   window.playerServer = playerServer;
+  window.insertFileServer = insertFileServer;
 }

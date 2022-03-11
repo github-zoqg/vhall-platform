@@ -276,6 +276,7 @@
         langMap[curLang.language_type];
       this.$i18n.locale = this.lang.type;
       sessionStorage.setItem('lang', this.lang.key);
+
       this.addSDKEvents();
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
@@ -333,30 +334,22 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
-          if (this.isInGroup) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
-          if (this.isInGroup) {
-            this.gobackHome(4);
-          }
+          this.gobackHome(4);
         });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          if (this.isInGroup) {
-            this.gobackHome(5, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(5, this.groupServer.state.groupInitData.name);
         });
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          if (this.isInGroup) {
-            this.gobackHome(7);
-          }
+          this.gobackHome(7);
         });
 
         // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流

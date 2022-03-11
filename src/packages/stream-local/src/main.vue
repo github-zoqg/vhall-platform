@@ -220,7 +220,8 @@
         isFullScreen: false,
         networkStatus: 2,
         audioLevel: 1,
-        showDownMic: false
+        showDownMic: false,
+        isNotAutoSpeak: false // 分组模式下的是否为自动静音上麦自动
       };
     },
     components: {
@@ -289,11 +290,12 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
-        // 观众自动上麦 - 禁音
+        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 非同意主持人的邀请上麦 + 非自己申请上麦
         return (
           this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
           this.mode == 6 &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          !this.isNotAutoSpeak
         );
       },
       showInterIsPlay() {
@@ -369,7 +371,8 @@
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
           useMediaCheckServer().state.deviceInfo.device_status === 1 &&
-          ((isSpeakOn && !this.isOpenSplitScreen) ||
+          isSpeakOn &&
+          (!this.isOpenSplitScreen ||
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();
@@ -388,6 +391,10 @@
           });
         this.interactiveServer.state.showPlayIcon = false;
       },
+      // 自动上麦禁音条件更新
+      updateAutoSpeak() {
+        this.isNotAutoSpeak = true;
+      },
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
@@ -401,21 +408,21 @@
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
+          this.isNotAutoSpeak = true;
           this.userSpeakOn();
         });
 
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            console.error('this.localStream.streamId', this.localStream.streamId);
             if (this.localStream.streamId) return;
 
-            // 更新本地speakerList
-            if (this.groupServer.state.groupInitData.isInGroup) {
-              await this.groupServer.updateGroupInitData();
-            } else {
-              await this.roomBaseServer.getInavToolStatus();
-            }
+            // // 更新本地speakerList
+            // if (this.groupServer.state.groupInitData.isInGroup) {
+            //   await this.groupServer.updateGroupInitData();
+            // } else {
+            //   await this.roomBaseServer.getInavToolStatus();
+            // }
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
@@ -442,11 +449,11 @@
           await this.interactiveServer.destroy();
 
           // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
-          }
+          // if (this.groupServer.state.groupInitData.isInGroup) {
+          //   await this.groupServer.updateGroupInitData();
+          // } else {
+          //   await this.roomBaseServer.getInavToolStatus();
+          // }
 
           if (
             this.isNoDelay === 1 ||
@@ -470,6 +477,8 @@
             return;
           }
           await this.stopPush();
+          this.roomBaseServer.setChangeElement('stream-list');
+
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
           }

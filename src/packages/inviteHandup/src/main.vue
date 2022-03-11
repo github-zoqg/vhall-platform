@@ -22,6 +22,7 @@
 </template>
 <script>
   import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpInviteHandup',
     data() {
@@ -91,6 +92,7 @@
             extra_params: this.senderId
           })
           .then(res => {
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             useMicServer().userSpeakOn();
             clearInterval(this.inviteFun);
             this.inviteTime = 30;

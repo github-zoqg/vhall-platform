@@ -1,5 +1,5 @@
 <template>
-  <section class="vmp-custom-menu">
+  <section class="vmp-custom-menu" v-show="!loading">
     <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
       <div class="vmp-custom-menu-wrapper">
         <component
@@ -44,6 +44,7 @@
     },
     data() {
       return {
+        loading: false,
         customTabs: [],
         roomId: '',
         overlayScrollBarsOptions: {
@@ -66,15 +67,23 @@
           return;
         }
 
-        const res = await this.customMenuServer.getCustomMenuDetail({
-          menu_id: id
-        });
+        this.loading = true;
+        await this.$nextTick();
 
-        if (res.code === 200 && res.data) {
-          this.customTabs = res.data.components.map(menu => {
-            menu.componentName = `component-${componentMap[menu.component_id]}`;
-            return menu;
+        try {
+          const res = await this.customMenuServer.getCustomMenuDetail({
+            menu_id: id
           });
+          this.loading = false;
+
+          if (res.code === 200 && res.data) {
+            this.customTabs = res.data.components.map(menu => {
+              menu.componentName = `component-${componentMap[menu.component_id]}`;
+              return menu;
+            });
+          }
+        } catch (error) {
+          this.loading = false;
         }
       }
     }

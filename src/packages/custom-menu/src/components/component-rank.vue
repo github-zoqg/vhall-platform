@@ -204,20 +204,6 @@
         } else if (newVal.rewardSwitch == 1 && this.activeIndex == 2) {
           this.activeIndex = 1;
         }
-      },
-      joinId: {
-        handler(val) {
-          if (val) {
-            this.queryInviteInfo(val);
-          }
-        },
-        immediate: true
-      },
-      open: {
-        handler(val) {
-          console.log('>>>>>>>3,', val);
-        },
-        immediate: true
       }
     },
     beforeCreate() {
