@@ -157,7 +157,8 @@ export const serverConfig = {
     component: 'VmpStreamLocal',
     initPlayer: {
       cuid: 'comPcPlayer',
-      method: 'getWebinerStatus'
+      method: 'getWebinerStatus',
+      args: ['$0']
     }
   },
   comStreamRemote: {
