@@ -1,7 +1,7 @@
 <template>
   <div class="win-lottery">
     <div class="award-img">
-      <img v-if="prizeInfo.image_url" :src="prizeInfo.image_url" alt="" />
+      <img :src="prizeInfo.image_url || defaultLotteryImg" alt srcset />
     </div>
     <div>{{ $t('interact_tools.interact_tools_1015') }}</div>
     <div>
