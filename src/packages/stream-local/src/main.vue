@@ -469,7 +469,9 @@
             this.interactiveServer.init();
           } else {
             // 初始化播放器
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'initPlayer'));
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true })
+            );
           }
         });
         // 结束直播
