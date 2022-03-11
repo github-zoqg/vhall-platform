@@ -147,16 +147,18 @@
       },
       localSpeaker() {
         return (
-          this.$domainStore.state.micServer.speakerList.find(
-            item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {}
+          // this.$domainStore.state.micServer.speakerList.find(
+          //   item => item.accountId == this.joinInfo.third_party_user_id
+          // ) || {}
+          {}
         );
       },
       remoteSpeakers() {
         return (
-          this.$domainStore.state.micServer.speakerList.filter(
-            item => item.accountId != this.joinInfo.third_party_user_id
-          ) || []
+          // this.$domainStore.state.micServer.speakerList.filter(
+          //   item => item.accountId != this.joinInfo.third_party_user_id
+          // ) || []
+          []
         );
       },
       speakerList() {
