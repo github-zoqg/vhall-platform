@@ -76,11 +76,20 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   console.log('---grayInit---');
   await grayInitByMiddle(to, data => {
+    const VUE_MIDDLE_SAAS_LIVE_PC_PROJECT = process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT;
+    // const VUE_APP_WEB_BASE_MIDDLE = process.env.VUE_APP_WEB_BASE_MIDDLE;
+    const VUE_APP_WEB_BASE_SAAS = process.env.VUE_APP_WEB_BASE_SAAS;
+    let protocol = window.location.protocol;
     // 如果是中台用户, 跳转到中台
-    console.log('grayInitByMiddle------------>', data);
+    console.log('grayInitByMiddle------------>', VUE_MIDDLE_SAAS_LIVE_PC_PROJECT);
     // data.is_csd_user = 1;
-    if (data.is_csd_user == 1) {
-      window.location.href = `${process.env.VUE_APP_WEB_BASE_MIDDLE}/${process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
+    if (data.is_csd_user == 0) {
+      // if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_MIDDLE}`) {
+      //   window.location.href = `${protocol}${VUE_APP_WEB_BASE_MIDDLE}/${VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
+      // }
+      if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_SAAS}`) {
+        window.location.href = `${protocol}${VUE_APP_WEB_BASE_SAAS}/v3${window.location.pathname}`;
+      }
     }
   });
   next();

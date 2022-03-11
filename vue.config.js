@@ -34,7 +34,14 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl')
+        ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl'),
+        VUE_APP_WAP_WATCH_MIDDLE: JSON.stringify(process.env.VUE_APP_WAP_WATCH_MIDDLE),
+        VUE_APP_WEB_BASE_MIDDLE: JSON.stringify(process.env.VUE_APP_WEB_BASE_MIDDLE),
+        VUE_MIDDLE_SAAS_WATCH_PC_PROJECT: JSON.stringify(process.env.VUE_MIDDLE_SAAS_WATCH_PC_PROJECT),
+        VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT: JSON.stringify(process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT),
+        VUE_MIDDLE_SAAS_LIVE_PC_PROJECT: JSON.stringify(process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT),
+        VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS), //化蝶观看端域名
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS), //化蝶发起端域名
       }
     })
   ];
