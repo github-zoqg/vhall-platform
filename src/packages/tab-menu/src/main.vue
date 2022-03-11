@@ -165,9 +165,9 @@
           }
         });
         //监听进出子房间消息
-        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+        groupServer.$on('GROUP_IS_IN_GROUP_CHANGE', groupInfo => {
           const { interactToolStatus } = useRoomBaseServer().state;
-          if (isInGroup) {
+          if (groupInfo.isInGroup) {
             this.setVisible({ visible: false, type: 'v5' });
             this.setVisible({ visible: false, type: 'private' });
           } else {
