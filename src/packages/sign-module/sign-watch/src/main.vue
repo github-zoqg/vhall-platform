@@ -85,7 +85,8 @@
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
         this.reShowSignBox();
-        this.title = this.$t(e.data.title);
+        console.log(e.data.title, e, '??!23245364758');
+        this.title = e.data.title == '主持人发起了签到' ? this.title : e.data.title;
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
         this.countDownTime();
@@ -179,7 +180,9 @@
       getHistorySignInfo() {
         this.sign_id = this.signInfo.id;
         this.isShowCircle = true;
-        this.title = this.signInfo.sign_tips;
+        this.title =
+          this.signInfo.sign_tips == '主持人发起了签到' ? this.title : this.signInfo.sign_tips;
+        // this.title = this.signInfo.sign_tips;
         const sign_time =
           this.signInfo.is_auto_sign == 1
             ? this.signInfo.auto_sign_time_ttl
