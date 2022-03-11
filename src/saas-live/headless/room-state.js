@@ -45,6 +45,9 @@ export default async function () {
   // 获取房间互动工具状态
   await roomBaseServer.getInavToolStatus();
 
+  micServer.init();
+  console.log('%c------服务初始化 micServer 初始化完成', 'color:blue', micServer);
+
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
     await groupServer.init();
@@ -75,8 +78,6 @@ export default async function () {
   insertFileServer.init();
 
   desktopShareServer.init();
-
-  micServer.init();
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
