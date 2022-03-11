@@ -194,6 +194,12 @@
           this.gobackHome(4);
         });
 
+        // 接收设为主讲人消息
+        this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
+          const str =
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+          this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+        });
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
           if (

@@ -47,7 +47,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer } from 'middle-domain';
+  import { useMsgServer, useInteractiveServer } from 'middle-domain';
   import move from './js/move';
   import { Dialog } from 'vant';
   import masksliding from './components/mask.vue';
@@ -81,6 +81,10 @@
       this.msgServer = useMsgServer();
     },
     async created() {
+      // 监听自动上麦的异常code
+      useInteractiveServer().$on('speakOnFailed', e => {
+        this.$toast(e.msg);
+      });
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1

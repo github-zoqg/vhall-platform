@@ -277,8 +277,6 @@
       this.$i18n.locale = this.lang.type;
       sessionStorage.setItem('lang', this.lang.key);
 
-      this.addSDKEvents();
-
       if (useMediaCheckServer().state.isBrowserNotSupport) {
         return Toast(`浏览器不支持互动`);
       }
@@ -295,6 +293,8 @@
           this.setFullScreen();
         }
       }
+
+      this.addSDKEvents();
       this.fiveDown();
     },
     beforeDestroy() {
@@ -304,6 +304,17 @@
     },
 
     methods: {
+      // 设置主画面
+      setBigScreen(msg) {
+        const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+        Toast(`${msg.data.nick_name}设置成为${str}`);
+        this.$nextTick(() => {
+          this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+          if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
+            this.mainScreenDom.style.left = `${1.02667}rem`;
+          }
+        });
+      },
       // 事件监听
       addSDKEvents() {
         // 监听到自动播放
@@ -314,15 +325,12 @@
 
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
-          const str =
-            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-          Toast(`${msg.data.nick_name}设置成为${str}`);
-          this.$nextTick(() => {
-            this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
-            if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
-              this.mainScreenDom.style.left = `${1.02667}rem`;
-            }
-          });
+          this.setBigScreen(msg);
+        });
+
+        // 接收设为主讲人消息
+        this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
+          this.setBigScreen(msg);
         });
 
         // 开启分组讨论
