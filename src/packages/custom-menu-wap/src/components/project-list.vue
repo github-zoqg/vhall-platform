@@ -193,7 +193,6 @@
       width: 100%;
       height: 36px;
       font-size: 28px;
-      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: #1a1a1a;
       line-height: 36px;
