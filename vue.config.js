@@ -37,11 +37,17 @@ function getPlugins() {
         ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl'),
         VUE_APP_WAP_WATCH_MIDDLE: JSON.stringify(process.env.VUE_APP_WAP_WATCH_MIDDLE),
         VUE_APP_WEB_BASE_MIDDLE: JSON.stringify(process.env.VUE_APP_WEB_BASE_MIDDLE),
-        VUE_MIDDLE_SAAS_WATCH_PC_PROJECT: JSON.stringify(process.env.VUE_MIDDLE_SAAS_WATCH_PC_PROJECT),
-        VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT: JSON.stringify(process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT),
-        VUE_MIDDLE_SAAS_LIVE_PC_PROJECT: JSON.stringify(process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT),
+        VUE_MIDDLE_SAAS_WATCH_PC_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_WATCH_PC_PROJECT
+        ),
+        VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT
+        ),
+        VUE_MIDDLE_SAAS_LIVE_PC_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT
+        ),
         VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS), //化蝶观看端域名
-        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS), //化蝶发起端域名
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS) //化蝶发起端域名
       }
     })
   ];
