@@ -4,8 +4,8 @@ import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
-// import grayInit from '@/packages/app-shared/gray-init';
-import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
+import grayInit from '@/packages/app-shared/gray-init';
+// import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
 
@@ -80,7 +80,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const res = await grayInitByMiddle(to);
+  const res = await grayInit(to);
   if (res) {
     console.log('---grayInit---', res);
     //处理限流逻辑
