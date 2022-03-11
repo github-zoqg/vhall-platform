@@ -326,6 +326,15 @@
       this.init();
       this.listenEvent();
     },
+    updated() {
+      const _this = this;
+      //hack处理BsScroll不能滚动的问题
+      this.$nextTick(() => {
+        if (_this.$refs && _this.$refs.scroll) {
+          _this.$refs.scroll.refresh();
+        }
+      });
+    },
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
@@ -1944,8 +1953,10 @@
       }
     }
     &__container {
-      flex: 1;
+      flex: 1 0 auto;
+      max-height: calc(100% - 80px);
       position: relative;
+      overflow: hidden;
       &__scroll {
         display: flex;
         flex-direction: column;
@@ -1954,7 +1965,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        overflow: hidden;
+        //overflow: hidden;
       }
       .empty-container {
         width: 100%;
