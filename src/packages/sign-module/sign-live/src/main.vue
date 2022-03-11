@@ -9,7 +9,7 @@
           @close-sign="closeAutoSignin"
           :autoSign="signInfo.autoSign"
           :title="signInfo.signTip"
-          :total="total"
+          :total="totalTime"
           :remaining="remaining"
           v-if="starting"
           ref="counter"
@@ -64,6 +64,7 @@
         signInfo: null,
         remaining: 0, // 总时长
         timer: null,
+        totalTime: 0,
         signId: '', // 签到ID
         nowSignObj: '' // 当前自动签到信息
       };
@@ -91,7 +92,7 @@
                 this.totalTime = res.data.auto_sign_time;
               } else {
                 this.remaining = res.data.sign_time_ttl;
-                this.totalTime = 0;
+                this.totalTime = res.data.show_time;
               }
               this.setIntervalAction();
             } else {
@@ -108,7 +109,7 @@
         this.timer = setInterval(() => {
           if (--this.remaining <= 0) {
             if (sessionStorage.getItem('isAutoSign')) {
-              this.remaining = this.totalTime;
+              // this.remaining = this.totalTime;
               this.signVisible = false;
               this.signinDown = true;
             } else {
