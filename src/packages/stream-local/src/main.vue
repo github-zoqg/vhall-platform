@@ -495,19 +495,19 @@
         if (this.joinInfo.role_name == 2) {
           // 开启摄像头
           this.interactiveServer.$on('vrtc_frames_display', () => {
-            this.$toast(this.$t('interact.interact_1024'));
+            this.$message.success(this.$t('interact.interact_1024'));
           });
           // 关闭摄像头
           this.interactiveServer.$on('vrtc_frames_forbid', () => {
-            this.$toast(this.$t('interact.interact_1023'));
+            this.$message.warning(this.$t('interact.interact_1023'));
           });
           // 开启音频
           this.interactiveServer.$on('vrtc_mute_cancel', () => {
-            this.$toast(this.$t('interact.interact_1015'));
+            this.$message.success(this.$t('interact.interact_1015'));
           });
           // 关闭音频
           this.interactiveServer.$on('vrtc_mute', () => {
-            this.$toast(this.$t('interact.interact_1026'));
+            this.$message.warning(this.$t('interact.interact_1026'));
           });
         }
       },
@@ -728,16 +728,6 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
-        if (deviceType === 'video') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1024'))
-            : this.$message.success(this.$t('interact.interact_1023'));
-        }
-        if (deviceType === 'audio') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1015'))
-            : this.$message.success(this.$t('interact.interact_1026'));
-        }
       },
       // 进入、退出全屏
       fullScreen() {

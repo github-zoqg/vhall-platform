@@ -1639,7 +1639,11 @@
         } else {
           if (this.userId === accountId) {
             // 主持人自己上麦
-            this.micServer.userSpeakOn();
+            this.micServer.userSpeakOn().then(res => {
+              if (res.code !== 200) {
+                this.$message.error(res.msg);
+              }
+            });
           } else {
             this.micServer
               .inviteMic({
