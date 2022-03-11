@@ -27,7 +27,9 @@
           </div>
         </div>
 
-        <template v-if="remoteSpeakers.length">
+        <template
+          v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
+        >
           <div
             v-for="speaker in remoteSpeakers"
             :key="speaker.accountId"
