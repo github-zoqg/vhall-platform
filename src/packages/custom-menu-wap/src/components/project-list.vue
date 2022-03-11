@@ -206,9 +206,9 @@
       font-weight: 400;
       word-break: keep-all;
       white-space: nowrap;
-      font-size: 12px;
+      font-size: 24px;
       color: @font-dark-low;
-      line-height: 16px;
+      line-height: 42px;
       text-align: left;
       padding: 0px 8px;
     }

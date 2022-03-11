@@ -117,9 +117,14 @@
       interactToolStatus() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus;
       },
-      // 是否为自动上麦
+      // 是否为自动上麦  只有不在麦上才会去设置默认禁音上麦
       autoSpeak() {
-        return this.interactToolStatus.auto_speak == 1 && this.mode == 6 && !this.isNotAutoSpeak;
+        return (
+          this.interactToolStatus.auto_speak == 1 &&
+          this.mode == 6 &&
+          !this.isNotAutoSpeak &&
+          !this.localSpeaker.accountId
+        );
       },
       // 退出全屏
       exitScreenStatus() {
@@ -172,7 +177,6 @@
          *     2、默认不在麦上 ----->
          *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
          */
-        console.log();
         if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
           // 检测设备状态
           const isSpeakOn = this.micServer.getSpeakerStatus();
