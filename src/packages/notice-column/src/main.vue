@@ -62,7 +62,7 @@
         // 结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           const { latestNotice } = this.noticeServer.state;
-          if (latestNotice.total && latestNotice.created_at) {
+          if (!msg.data.over_live && latestNotice.total && latestNotice.created_at) {
             this.isNoticeColumn = true;
             this.noticeText = latestNotice.noticeContent;
           }

@@ -4,7 +4,7 @@
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
-    <div v-if="showSign" class="vmp-sign-watch-sign">
+    <div v-show="showSign" class="vmp-sign-watch-sign">
       <div class="vmp-sign-watch-sign-container">
         <div class="vmp-sign-watch-sign-content">
           <p class="sign-title">{{ title }}</p>
@@ -32,17 +32,17 @@
     components: {
       CountDown
     },
-    watch: {
-      signInfo: {
-        handler(val) {
-          if (val && !val.is_signed && val.id) {
-            this.getHistorySignInfo();
-          }
-        },
-        immediate: true,
-        deep: true
-      }
-    },
+    // watch: {
+    //   signInfo: {
+    //     handler(val) {
+    //       if (val && !val.is_signed && val.id) {
+    //         this.getHistorySignInfo();
+    //       }
+    //     },
+    //     immediate: true,
+    //     deep: true
+    //   }
+    // },
     data() {
       return {
         showSign: false,
@@ -60,6 +60,15 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
+      if (this.signInfo && !this.signInfo.is_signed && this.signInfo.id) {
+        this.getHistorySignInfo();
+      }
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        if (!msg.data.over_live && !this.signInfo.is_signed && this.signInfo.id) {
+          this.getHistorySignInfo();
+        }
+      });
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
         this.showSign = true;
@@ -98,10 +107,6 @@
         if (this.timer) {
           clearInterval(this.timer);
         }
-      });
-      // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        console.log(this.signInfo, msg, '??!2314235');
       });
     },
     computed: {
