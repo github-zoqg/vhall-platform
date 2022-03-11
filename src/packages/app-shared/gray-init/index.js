@@ -18,9 +18,11 @@ export default function grayInit(options) {
           } else {
             window.sessionStorage.setItem('initGrayId', null);
           }
-          resolve();
+          resolve(res);
         })
-        .catch(resolve);
+        .catch(res => {
+          resolve(res);
+        });
     } else if (options.meta.grayType == 'subject') {
       roomSubjectApi.subject
         .subjectInitBefore({
@@ -32,9 +34,11 @@ export default function grayInit(options) {
           } else {
             window.sessionStorage.setItem('initGrayId', null);
           }
-          resolve();
+          resolve(res);
         })
-        .catch(resolve);
+        .catch(res => {
+          resolve(res);
+        });
     } else if (options.meta.grayType == 'user') {
       if (options.params.id) {
         window.sessionStorage.setItem('initGrayId', options.params.id);
@@ -61,9 +65,6 @@ export function grayInitByMiddle(options) {
         })
         .then(res => {
           if (res.code == 200 && res.data) {
-            // if (callback) {
-            //   callback(res.data);
-            // }
             window.sessionStorage.setItem('initGrayId', res.data.user_id);
           } else {
             window.sessionStorage.setItem('initGrayId', null);
@@ -80,9 +81,6 @@ export function grayInitByMiddle(options) {
         })
         .then(res => {
           if (res.code == 200 && res.data) {
-            // if (callback) {
-            //   callback(res.data);
-            // }
             window.sessionStorage.setItem('initGrayId', res.data.user_id);
           } else {
             window.sessionStorage.setItem('initGrayId', null);

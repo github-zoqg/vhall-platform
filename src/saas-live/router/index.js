@@ -4,8 +4,8 @@ import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
-// import grayInit from '@/packages/app-shared/gray-init';
-import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
+import grayInit from '@/packages/app-shared/gray-init';
+// import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
 
@@ -74,9 +74,8 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log('---grayInit---');
-  const res = await grayInitByMiddle(to);
-  console.log('grayInitByMiddle------------>', res);
+  const res = await grayInit(to);
+  console.log('---grayInit---', res);
   //处理限流逻辑
   if (res.code == 589) {
     // TODO:需要弹框提示
@@ -92,7 +91,7 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-    // console.log('grayInitByMiddle------------>', res);
+    // console.log('grayInit------------>', res);
   }
   next();
 });
