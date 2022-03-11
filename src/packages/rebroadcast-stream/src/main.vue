@@ -42,8 +42,6 @@
       this.rebroadcastServer = useRebroadcastServer();
     },
     mounted() {
-      debugger;
-
       if (this.roomBaseServer.state.watchInitData.rebroadcast.id) {
         this.open();
       }
