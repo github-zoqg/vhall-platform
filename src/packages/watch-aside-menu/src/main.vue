@@ -260,8 +260,13 @@
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
           const { join_role, isInGroup } = this.groupServer.state.groupInitData;
           // 如果是组长，并且在小组内
-          if (join_role == 20 && isInGroup) {
-            this.$message.warning(`观众${msg.data.nick_name}拒绝了你的演示邀请`);
+          if (join_role == 20 && isInGroup && msg.data.extra_params == this.userId) {
+            this.$message({
+              message: `观众${msg.data.nick_name}拒绝了你的演示邀请`,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
           }
         });
 
