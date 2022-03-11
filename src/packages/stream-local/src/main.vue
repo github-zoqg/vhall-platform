@@ -220,7 +220,8 @@
         isFullScreen: false,
         networkStatus: 2,
         audioLevel: 1,
-        showDownMic: false
+        showDownMic: false,
+        isNotAutoSpeak: false // 分组模式下的是否为自动静音上麦自动
       };
     },
     components: {
@@ -289,11 +290,12 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
-        // 观众自动上麦 - 禁音
+        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 非同意主持人的邀请上麦 + 非自己申请上麦
         return (
           this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
           this.mode == 6 &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          !this.isNotAutoSpeak
         );
       },
       showInterIsPlay() {
@@ -389,6 +391,10 @@
           });
         this.interactiveServer.state.showPlayIcon = false;
       },
+      // 自动上麦禁音条件更新
+      updateAutoSpeak() {
+        this.isNotAutoSpeak = true;
+      },
       listenEvents() {
         window.addEventListener(
           'fullscreenchange',
@@ -402,6 +408,7 @@
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
+          this.isNotAutoSpeak = true;
           this.userSpeakOn();
         });
 

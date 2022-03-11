@@ -61,7 +61,8 @@
       return {
         isStreamPublished: false,
         networkStatus: 2, // 网络状况
-        audioLevel: 1 // 音量状况
+        audioLevel: 1, // 音量状况
+        isNotAutoSpeak: false // 是否自动上麦   此值只用于 申请上麦及同意上麦消息处使用
       };
     },
     computed: {
@@ -118,7 +119,7 @@
       },
       // 是否为自动上麦
       autoSpeak() {
-        return this.interactToolStatus.auto_speak == 1 && this.mode == 6;
+        return this.interactToolStatus.auto_speak == 1 && this.mode == 6 && !this.isNotAutoSpeak;
       },
       // 退出全屏
       exitScreenStatus() {
@@ -209,6 +210,7 @@
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {
+          this.isNotAutoSpeak = true;
           this.userSpeakOn();
         });
 
@@ -270,12 +272,9 @@
           this.$toast(this.$t('interact.interact_1026'));
         });
       },
-      sleep(time = 1000) {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(true);
-          }, time);
-        });
+      // 自动上麦禁音条件更新
+      updateAutoSpeak() {
+        this.isNotAutoSpeak = true;
       },
       // 上麦接口
       async userSpeakOn() {
@@ -357,6 +356,7 @@
           // 推流
           await this.publishLocalStream();
           // 分组活动 自动上麦默认禁音
+          console.warn('自动上麦条件：', this.autoSpeak);
           if (this.autoSpeak) {
             this.interactiveServer.muteAudio({
               streamId: this.localStream.streamId, // 流Id, 必填

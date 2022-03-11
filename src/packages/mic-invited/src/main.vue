@@ -17,6 +17,7 @@
 <script>
   import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpMicInvited',
     components: {
@@ -93,6 +94,7 @@
           })
           .then(res => {
             useMicServer().userSpeakOn();
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
