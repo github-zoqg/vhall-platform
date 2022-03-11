@@ -244,10 +244,10 @@
         return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       localSpeaker() {
-        let speaker =
-          this.$domainStore.state.micServer.speakerList.find(
-            item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {};
+        let speaker = {};
+        // this.$domainStore.state.micServer.speakerList.find(
+        //   item => item.accountId == this.joinInfo.third_party_user_id
+        // ) || {};
 
         console.log('-------localSpeaker更新--------', speaker);
         return speaker;
