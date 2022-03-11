@@ -97,7 +97,12 @@
       </li>
       <!-- 支付弹框 -->
       <li v-if="showPay">
-        <Pay :wxQr="wxQr" :zfQr="zfQr" @changeShow="changeStatus"></Pay>
+        <Pay
+          :wxQr="wxQr"
+          :zfQr="zfQr"
+          @changeShow="changeStatus"
+          :style="{ zIndex: zIndexServerState.zIndexMap.giftPay }"
+        ></Pay>
       </li>
     </ul>
   </div>
@@ -106,7 +111,7 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import {
     useRoomBaseServer,
-    useMsgServer,
+    useZIndexServer,
     useMicServer,
     useChatServer,
     useGroupServer,
@@ -147,7 +152,9 @@
       LotteryIcon
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         roomBaseState: null,
         showGiftIcon: true,
         showGift: false,
@@ -232,6 +239,7 @@
       }
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
@@ -304,6 +312,8 @@
       },
       // 接收支付码
       acceptPay(data, url) {
+        // 修改付费礼物支付弹窗层级
+        this.zIndexServer.setDialogZIndex('giftPay');
         this.showPay = true;
         this[data] = url;
       },
@@ -340,7 +350,7 @@
     align-items: center;
     padding: 0 24px;
     position: relative;
-    z-index: 10;
+    // z-index: 10;
 
     &__left {
       display: flex;
