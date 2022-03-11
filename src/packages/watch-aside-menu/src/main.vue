@@ -65,6 +65,7 @@
   import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import GroupInvitaion from './group-invitation.vue';
+  import { consoleSandbox } from '@sentry/utils';
 
   export default {
     name: 'VmpWatchAsideMenu',
@@ -113,9 +114,6 @@
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
-      },
-      watchInitData() {
-        return this.roomBaseServer.state.watchInitData;
       },
       // 是否在小组中，请求协助菜单在小组中才显示
       isInGroup() {
@@ -182,6 +180,7 @@
             this.gobackHome(1, this.groupServer.state.groupInitData.name);
           }
         });
+
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
           this.isCollapse = true;
@@ -194,6 +193,21 @@
           this.gobackHome(4);
         });
 
+        // 接收设为主讲人消息
+        this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
+          const str =
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+          this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+        });
+        // 切换小组,小组人员变动
+        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+          if (this.isInGroup) {
+            const { watchInitData } = useRoomBaseServer().state;
+            const who = msg.sender_id == watchInitData.webinar.userinfo.user_id ? '主持人' : '助理';
+            this.grouAlert(`${who}已将您分配至${this.groupServer.state.groupInitData.name}`);
+          }
+        });
+
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
           if (
@@ -203,7 +217,7 @@
               useRoomBaseServer().state.watchInitData.join_info.third_party_user_id
           ) {
             this.isCollapse = true;
-            this.gobackHome(5, this.groupServer.state.groupInitData.name);
+            this.grouAlert('您已被踢出该小组');
           }
         });
 
@@ -273,6 +287,16 @@
             this.$message.success('结束演示');
           }
         });
+      },
+      grouAlert(message) {
+        this.$alert(message, '提示', {
+          confirmButtonText: '我知道了',
+          customClass: 'know-message-box',
+          lockScroll: false,
+          cancelButtonClass: 'zdy-confirm-cancel'
+        })
+          .then(() => {})
+          .catch(() => {});
       },
       // 返回主房间提示
       gobackHome(index, name) {

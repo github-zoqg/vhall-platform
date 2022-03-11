@@ -330,6 +330,7 @@
         hoveVideo: true, //显示控制条
         isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
+        isAutoPlay: false,
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -536,6 +537,10 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+          } else {
+            if (this.isAutoPlay && !this.isPlayering) {
+              this.play();
+            }
           }
         });
       },
@@ -690,7 +695,10 @@
         window.location.reload();
       },
       // 判断是直播还是回放 活动状态
-      getWebinerStatus() {
+      getWebinerStatus(info) {
+        if (info && info.autoPlay) {
+          this.isAutoPlay = info.autoPlay;
+        }
         const { webinar, warmup, record } = this.roomBaseServer.state.watchInitData;
         if (this.roomBaseServer.state.watchInitData.status === 'live') {
           if (webinar.type === 1) {

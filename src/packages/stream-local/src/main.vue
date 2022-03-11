@@ -162,7 +162,10 @@
           ></span>
         </el-tooltip>
       </p>
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-local__shadow-second-line">
+      <p
+        v-if="joinInfo.role_name == 1 || localSpeaker.roleName === 20"
+        class="vmp-stream-local__shadow-second-line"
+      >
         <!-- 设为主讲人 -->
         <el-tooltip content="设为主讲人" v-if="mode != 6" placement="bottom">
           <span
@@ -241,10 +244,10 @@
         return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       localSpeaker() {
-        let speaker =
-          this.$domainStore.state.micServer.speakerList.find(
-            item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {};
+        let speaker = {};
+        // this.$domainStore.state.micServer.speakerList.find(
+        //   item => item.accountId == this.joinInfo.third_party_user_id
+        // ) || {};
 
         console.log('-------localSpeaker更新--------', speaker);
         return speaker;
@@ -424,10 +427,9 @@
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
-            // 轮询判断是否有互动实例
-            await this.checkVRTCInstance();
-
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
+              // 轮询判断是否有互动实例
+              await this.checkVRTCInstance();
               // 开始推流
               this.startPush();
             } else if (this.joinInfo.role_name == 2) {
@@ -440,6 +442,9 @@
                 await this.interactiveServer.init();
                 // 开始推流
               }
+
+              // 轮询判断是否有互动实例
+              await this.checkVRTCInstance();
               this.startPush();
             }
           }
@@ -467,7 +472,9 @@
             this.interactiveServer.init();
           } else {
             // 初始化播放器
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'initPlayer'));
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true })
+            );
           }
         });
         // 结束直播
@@ -491,19 +498,19 @@
         if (this.joinInfo.role_name == 2) {
           // 开启摄像头
           this.interactiveServer.$on('vrtc_frames_display', () => {
-            this.$toast(this.$t('interact.interact_1024'));
+            this.$message.success(this.$t('interact.interact_1024'));
           });
           // 关闭摄像头
           this.interactiveServer.$on('vrtc_frames_forbid', () => {
-            this.$toast(this.$t('interact.interact_1023'));
+            this.$message.warning(this.$t('interact.interact_1023'));
           });
           // 开启音频
           this.interactiveServer.$on('vrtc_mute_cancel', () => {
-            this.$toast(this.$t('interact.interact_1015'));
+            this.$message.success(this.$t('interact.interact_1015'));
           });
           // 关闭音频
           this.interactiveServer.$on('vrtc_mute', () => {
-            this.$toast(this.$t('interact.interact_1026'));
+            this.$message.warning(this.$t('interact.interact_1026'));
           });
         }
       },
@@ -724,16 +731,6 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
-        if (deviceType === 'video') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1024'))
-            : this.$message.success(this.$t('interact.interact_1023'));
-        }
-        if (deviceType === 'audio') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1015'))
-            : this.$message.success(this.$t('interact.interact_1026'));
-        }
       },
       // 进入、退出全屏
       fullScreen() {

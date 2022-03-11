@@ -257,7 +257,7 @@
       },
       //无延迟图标的地址(注意这是生产环境地址，测试环境地址是阿里的)
       noDelayIconUrl() {
-        return `${process.env.VUE_APP_PUBLIC_PATH}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`;
+        return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`;
       }
     },
     beforeCreate() {

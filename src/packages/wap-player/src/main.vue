@@ -32,8 +32,8 @@
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
-        <!-- 试看播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
+        <!-- 试看播放结束 和线上保持一致 -->
+        <!-- <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
           <p class="vmp-wap-player-ending-box-title">{{ $t('appointment.appointment_1013') }}</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
@@ -50,9 +50,9 @@
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
-        </div>
+        </div> -->
         <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-else @click="startPlay">
+        <div class="vmp-wap-player-ending-box" @click="startPlay">
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
@@ -85,7 +85,7 @@
       <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
       <div
         class="vmp-wap-player-footer"
-        v-show="isPlayering && !isOrientation"
+        v-show="isPlayering"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
       >
         <!-- 倍速和画质合并 -->
@@ -101,8 +101,8 @@
           </span>
         </div>
         <div class="vmp-wap-player-control">
-          <!--  -->
-          <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
+          <!-- 试看逻辑不加 按照线上 -->
+          <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
               <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
             </i18n>
@@ -119,7 +119,7 @@
               {{ authText }}
             </span>
             <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
-          </div>
+          </div> -->
           <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
             <i18n path="player.player_1012">
               <span place="n" class="red">{{ currentTime | secondToDate }}</span>
@@ -356,6 +356,7 @@
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
         isVodEnd: false, // 回放结束
+        isAutoPlay: false, // 记录下麦后自动播放
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -421,7 +422,10 @@
         this.playerServer && this.playerServer.pause();
       },
       // 判断是直播还是回放 活动状态
-      getWebinerStatus() {
+      getWebinerStatus(info) {
+        if (info && info.autoPlay) {
+          this.isAutoPlay = info.autoPlay;
+        }
         const { webinar, warmup, record } = this.roomBaseState.watchInitData;
         if (this.roomBaseState.watchInitData.status === 'live') {
           if (webinar.type === 1) {
@@ -506,6 +510,10 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+          } else {
+            if (this.isAutoPlay && !this.isPlayering) {
+              this.play();
+            }
           }
           this.playerServer.openControls(false);
           this.playerServer.openUI(false);

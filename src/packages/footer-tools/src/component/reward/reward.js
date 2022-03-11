@@ -1,13 +1,20 @@
 import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-import { useRoomBaseServer, useWatchRewardServer, useChatServer } from 'middle-domain';
+import {
+  useRoomBaseServer,
+  useWatchRewardServer,
+  useChatServer,
+  useZIndexServer
+} from 'middle-domain';
 import QRcode from 'qrcode';
 // import { mapMutations } from 'vuex';
 export default {
   name: 'reward',
   data() {
     let { watchInitData } = useRoomBaseServer().state;
+    const zIndexServerState = this.zIndexServer.state;
     return {
       watchInitData,
+      zIndexServerState,
       showRewardDialog: false,
       showGiveMoneyQr: false,
       giveMoneyUrl: '',
@@ -27,6 +34,7 @@ export default {
     // }
   },
   beforeCreate() {
+    this.zIndexServer = useZIndexServer();
     this.watchRewardServer = useWatchRewardServer();
   },
   created() {
@@ -124,8 +132,8 @@ export default {
     },
     // open支付金额设置弹框
     onClickReward() {
+      this.zIndexServer.setDialogZIndex('reward');
       this.showRewardDialog = true;
-      // this.setDialogZIndexQueue('reward');
     },
     // 选择支付金额
     onClickRewardItem(index) {

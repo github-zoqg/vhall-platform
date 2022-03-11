@@ -64,6 +64,7 @@
         signInfo: null,
         remaining: 0, // 总时长
         timer: null,
+        totalTime: 0,
         signId: '', // 签到ID
         nowSignObj: '' // 当前自动签到信息
       };
@@ -88,8 +89,10 @@
               this.signInfo.autoSign = res.data.is_auto_sign == 1;
               if (res.data.is_auto_sign == 1) {
                 this.remaining = res.data.auto_sign_time_ttl;
+                this.signInfo.interval = res.data.auto_sign_time;
                 this.totalTime = res.data.auto_sign_time;
               } else {
+                this.signInfo.duration = res.data.show_time;
                 this.remaining = res.data.sign_time_ttl;
                 this.totalTime = 0;
               }

@@ -5,6 +5,7 @@ import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/packages/app-shared/gray-init';
+// import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
 
@@ -63,6 +64,12 @@ const routes = [
     path: '/lives/client/:il_id', // 客户端嵌入
     name: 'Client',
     component: () => import('@/saas-live/views/clientEmbed/index')
+  },
+  {
+    path: '/lives/error/:id/:code', // 统一错误页
+    name: 'PageError',
+    meta: { title: '系统异常' },
+    component: () => import('@/saas-live/views/MsgTip.vue')
   }
 ];
 
@@ -73,9 +80,34 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log('---grayInit---');
-  await grayInit(to);
-  next();
+  const res = await grayInit(to);
+  if (res) {
+    console.log('---grayInit---', res);
+    //处理限流逻辑
+    if (res.code == 200) {
+      //处理灰度
+      const VUE_MIDDLE_SAAS_LIVE_PC_PROJECT = process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT;
+      const VUE_APP_WEB_BASE_MIDDLE = process.env.VUE_APP_WEB_BASE_MIDDLE;
+      let protocol = window.location.protocol;
+      // 如果是中台用户, 跳转到中台
+      if (res.data.is_csd_user == 1) {
+        if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_MIDDLE}`) {
+          window.location.href = `${protocol}${VUE_APP_WEB_BASE_MIDDLE}/${VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
+        }
+      }
+      next();
+    } else {
+      next({
+        name: 'PageError',
+        params: {
+          id: to.params.id,
+          code: res.code
+        }
+      });
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;
