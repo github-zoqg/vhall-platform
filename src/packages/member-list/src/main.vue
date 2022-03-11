@@ -678,7 +678,7 @@
             }
 
             // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-            if (isLive && _this.mode === 6) {
+            if (_this.mode === 6) {
               if (!_this.isInGroup && context.groupInitData?.isInGroup) {
                 return false;
               }
@@ -1171,6 +1171,9 @@
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
               handleStartGroupDiscuss();
               break;
+            case 'group_join_change':
+              _this.getOnlineUserList();
+              break;
             default:
               break;
           }
@@ -1198,10 +1201,10 @@
         });
 
         // 换组
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          isLive && this.updateOnlineUserList(msg);
-          isWatch && handleGroupChange(msg);
-        });
+        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+        //   isLive && this.updateOnlineUserList(msg);
+        //   isWatch && handleGroupChange(msg);
+        // });
 
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
