@@ -35,29 +35,30 @@ export function calculateNetworkStatus(status) {
  * @param {*} stream 流信息
  */
 export function streamInfo(stream) {
-  Object.prototype.hasOwnProperty.call(stream, 'attributes');
   if (
     stream &&
     Object.keys(stream).length !== 0 &&
     Object.prototype.hasOwnProperty.call(stream, 'attributes')
   ) {
     let arr = Object.keys(stream.attributes);
+    let role = 'roleName',
+      name = 'nickname';
     if (!Object.prototype.hasOwnProperty.call(stream.attributes, 'roleName')) {
-      let role = arr.filter(el => {
+      role = arr.filter(el => {
         if (el.toLowerCase().indexOf('role') != -1) {
           return el;
         }
       })[0];
-      stream.attributes.roleName = stream.attributes[role];
     }
     if (!Object.prototype.hasOwnProperty.call(stream.attributes, 'nickname')) {
-      let name = arr.filter(el => {
+      name = arr.filter(el => {
         if (el.toLowerCase().indexOf('nick') != -1) {
           return el;
         }
       })[0];
-      stream.attributes.nickname = stream.attributes[name];
     }
+    stream.attributes.roleName = stream.attributes[role] || stream.roleName || stream[role];
+    stream.attributes.nickname = stream.attributes[name] || stream.nickname || stream[name];
   }
   return stream;
 }
