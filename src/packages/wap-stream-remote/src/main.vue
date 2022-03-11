@@ -55,6 +55,16 @@
         require: true
       }
     },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          if (newval) {
+            this.subscribeRemoteStream();
+          }
+        },
+        immediate: true
+      }
+    },
     computed: {
       // 是否显示摄像头开关按钮
       isShowVideoControl() {
@@ -102,9 +112,6 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
     },
-    mounted() {
-      this.subscribeRemoteStream();
-    },
     beforeDestroy() {
       // 清空计时器
       if (this._audioLeveInterval) {
@@ -116,7 +123,7 @@
     },
     methods: {
       subscribeRemoteStream() {
-        console.warn('开始订阅', this.stream);
+        console.warn('开始订阅', JSON.stringify(this.stream));
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
@@ -130,7 +137,7 @@
             this.getLevel();
           })
           .catch(e => {
-            console.warn('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
+            console.error('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
       speakOff() {
@@ -198,7 +205,7 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: #000;
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {

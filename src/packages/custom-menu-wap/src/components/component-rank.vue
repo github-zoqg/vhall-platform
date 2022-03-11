@@ -187,6 +187,14 @@
         scrollLock: false
       };
     },
+    computed: {
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.join_info;
+      }
+    },
     watch: {
       info: function (newVal) {
         if (newVal.inSwitch == 0 && this.activeIndex == 1) {

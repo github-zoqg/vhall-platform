@@ -45,7 +45,6 @@
         return autoSign ? interval : duration;
       },
       starting() {
-        console.warn(this.signInfo, this.remaining, '测试时间');
         return this.signInfo !== null && !!this.remaining;
       },
       showSet() {
@@ -154,7 +153,6 @@
             sign_id: this.nowSignObj.id
           })
           .then(res => {
-            console.log('结束当前房间的签到成功-----', res);
             this.$message.success('关闭签到成功');
             window.sessionStorage.removeItem('isAutoSign');
             this.signVisible = false;

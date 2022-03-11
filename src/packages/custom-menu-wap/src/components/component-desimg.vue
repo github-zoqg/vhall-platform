@@ -28,6 +28,7 @@
     overflow-x: hidden;
     img {
       width: 100%;
+      pointer-events: none;
     }
   }
 </style>

@@ -54,11 +54,17 @@
       },
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
+          let text = '主持人';
+          if (msg.room_role == '3') {
+            text = `助理${msg.nick_name}`;
+          } else if (msg.room_role == '4') {
+            text = `嘉宾${msg.nick_name}`;
+          }
           useChatServer().addChatToList({
             nickName: msg.nick_name,
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              text_content: this.$t('chat.chat_1030'),
+              text_content: text + this.$t('chat.chat_1030'),
               questionnaire_id: msg.questionnaire_id
             },
             roleName: msg.room_role,
@@ -66,6 +72,14 @@
             interactStatus: true,
             isCheck: true
           });
+          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+            msg.questionnaire_id
+          );
+          if (canAnswer !== true) {
+            this.questionnaireServer.setDotVisible(false);
+            return false;
+          }
+          this.questionnaireServer.setDotVisible(true);
           this.popupVisible = true;
           await this.$nextTick();
           this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', msg.questionnaire_id);

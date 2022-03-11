@@ -194,7 +194,8 @@
        * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
        */
       resize() {
-        const { width, height } = this.setDocViewRect();
+        const { width, height } = this.getDocViewRect();
+        if (!width || !height) return;
         if (
           document.getElementById(this.docServer.state.docCid) ||
           document.getElementById(this.docServer.state.boardCid)
@@ -202,7 +203,7 @@
           this.docServer.setSize(width, height);
         }
       },
-      setDocViewRect() {
+      getDocViewRect() {
         let rect = this.$refs.docWrapper?.getBoundingClientRect();
         let w = 0;
         let h = 0;
@@ -214,8 +215,7 @@
           w = rect.width;
         }
         h = (w / 16) * 9;
-        this.docViewRect = { width: w, height: h };
-        return this.docViewRect;
+        return { width: w, height: h };
       },
 
       /**
@@ -225,7 +225,7 @@
        * @param {*} docType
        */
       async addNewFile({ fileType, docId, docType, cid }) {
-        const { width, height } = this.docViewRect;
+        const { width, height } = this.getDocViewRect();
         console.log(
           '[doc] addNewFile:',
           JSON.stringify({
@@ -243,11 +243,7 @@
           fileType,
           cid,
           docId,
-          docType,
-          bindCidFun: async cid => {
-            console.log('[doc] bindCidFun:', cid);
-            await this.$nextTick();
-          }
+          docType
         });
         this.resize();
       },
@@ -274,13 +270,10 @@
           // 确定文档最外层节点显示，并且文档dom绑定ID成功
           await this.$nextTick();
           // 初始化文档最外层节点大小
-          const { width, height } = this.setDocViewRect();
+          const { width, height } = this.getDocViewRect();
           await this.docServer.recover({
             width,
-            height,
-            bindCidFun: async cid => {
-              await this.$nextTick();
-            }
+            height
           });
         }
       },
@@ -303,7 +296,9 @@
       // 选中文档容器事件
       dispatchDocSelectContainer: async function (data) {
         console.log('[doc] ===========选择容器======', data);
-        // this.docInfo.docShowType = data.id.split('-')[0];
+        if (this.currentCid == data.id) {
+          return;
+        }
         this.docServer.state.currentCid = data.id;
         // 判断容器是否存在
         const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
@@ -333,7 +328,7 @@
           this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
           await this.$nextTick();
           if (this.docServer.state.switchStatus) {
-            const { width, height } = this.setDocViewRect();
+            const { width, height } = this.getDocViewRect();
             if (!width || !height) return;
             for (const item of data) {
               this.docServer.initContainer({

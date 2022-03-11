@@ -34,6 +34,9 @@
 
       <!-- wap端订阅桌面共享的容器 -->
       <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+
+      <!-- wap端订阅桌面共享的容器 -->
+      <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
       <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
@@ -171,14 +174,23 @@
       .vmp-wap-player-footer {
         display: none;
       }
+      // 小屏后互动样式
       .vmp-wap-stream-wrap {
         height: 100%;
+        .vmp-stream-list {
+          height: 100%;
+          width: 100%;
+        }
         .vmp-stream-list__main-screen {
           position: absolute;
           top: 0;
-          left: 0;
+          left: 0 !important; // 由于小屏后，和产品沟通，只展示主画面
           width: 100%;
           height: 100%;
+          z-index: 7;
+          .vmp-stream-remote-exitscreen {
+            display: none;
+          }
         }
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,

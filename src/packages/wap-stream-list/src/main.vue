@@ -19,21 +19,22 @@
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-      <template v-if="remoteStreams.length">
+      <template v-if="remoteSpeakers.length">
         <div
-          v-for="stream in remoteStreams"
-          :key="stream.streamId"
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': stream.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
-            <vmp-wap-stream-remote :stream="stream"></vmp-wap-stream-remote>
+            <vmp-wap-stream-remote :stream="streamInfo(speaker)"></vmp-wap-stream-remote>
           </div>
         </div>
       </template>
     </div>
+    <!-- wap 蒙层显示信息 -->
     <div class="vmp-wap-stream-wrap-mask">
       <!-- 热度 -->
       <div
@@ -106,7 +107,8 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast, Dialog } from 'vant';
+  import { Toast } from 'vant';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
   const langMap = {
     1: {
       label: '简体中文',
@@ -134,7 +136,8 @@
         iconShow: false, // 5 秒的展示
         isOpenlang: false,
         lang: {},
-        languageList: []
+        languageList: [],
+        streamInfo
       };
     },
     filters: {
@@ -164,12 +167,14 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
-      remoteStreams() {
-        console.log(
-          '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams,
-          this.micServer.state.isSpeakOn
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
         );
+      },
+      remoteSpeakers() {
         if (
           this.micServer.state.isSpeakOn &&
           useMediaCheckServer().state.deviceInfo.device_status != 2
@@ -177,12 +182,18 @@
           // 远端流个数改变且 在推流 才进行初始化BScroll
           this.createBScroll();
         }
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      // 流列表高度是否为 0 的属性(这个属性依赖的场景比较多,后续有人更改,请更新说明注释)
       isStreamListH0() {
         /**
          * 计算方式:
@@ -196,14 +207,15 @@
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
          */
-        if (!this.remoteStreams.length) {
-          return !(
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          );
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
+            return false;
+          } else {
+            return true;
+          }
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
@@ -214,8 +226,8 @@
       isStreamListHAll() {
         // 只存在订阅一路流的情况下进行铺满
         return (
-          this.remoteStreams.length == 1 &&
-          this.remoteStreams[0].accountId == this.mainScreen &&
+          this.remoteSpeakers.length == 1 &&
+          this.remoteSpeakers[0].accountId == this.mainScreen &&
           !this.$domainStore.state.interactiveServer.localStream.streamId
         );
       },
@@ -264,6 +276,7 @@
         langMap[curLang.language_type];
       this.$i18n.locale = this.lang.type;
       sessionStorage.setItem('lang', this.lang.key);
+
       this.addSDKEvents();
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
@@ -274,7 +287,7 @@
 
     mounted() {
       // 在麦上 才存在滑动情况
-      if (this.micServer.state.isSpeakOn) {
+      if (this.micServer.getSpeakerStatus()) {
         if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           this.createBScroll();
         }
@@ -321,30 +334,22 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', () => {
-          if (this.isInGroup) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(3, this.groupServer.state.groupInitData.name);
         });
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
-          if (this.isInGroup) {
-            this.gobackHome(4);
-          }
+          this.gobackHome(4);
         });
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          if (this.isInGroup) {
-            this.gobackHome(5, this.groupServer.state.groupInitData.name);
-          }
+          this.gobackHome(5, this.groupServer.state.groupInitData.name);
         });
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          if (this.isInGroup) {
-            this.gobackHome(7);
-          }
+          this.gobackHome(7);
         });
 
         // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
