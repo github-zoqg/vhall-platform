@@ -199,7 +199,7 @@
         const langArr = ['zh-CN', 'en'];
         const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
         const lang = langArr[langer - 1] || 'zh-CN';
-        return `${process.env.VUE_APP_STATIC_BASE}/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
+        return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       }
     },
     beforeCreate() {

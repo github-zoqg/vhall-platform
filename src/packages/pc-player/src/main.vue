@@ -537,6 +537,10 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+          } else {
+            if (this.isAutoPlay && !this.isPlayering) {
+              this.play();
+            }
           }
         });
       },
@@ -692,8 +696,9 @@
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus(info) {
-        console.log(info);
-        // this.isAutoPlay = info;
+        if (info && info.autoPlay) {
+          this.isAutoPlay = info.autoPlay;
+        }
         const { webinar, warmup, record } = this.roomBaseServer.state.watchInitData;
         if (this.roomBaseServer.state.watchInitData.status === 'live') {
           if (webinar.type === 1) {

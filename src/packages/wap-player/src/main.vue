@@ -85,7 +85,7 @@
       <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
       <div
         class="vmp-wap-player-footer"
-        v-show="isPlayering && !isOrientation"
+        v-show="isPlayering"
         :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
       >
         <!-- 倍速和画质合并 -->
@@ -356,6 +356,7 @@
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
         isVodEnd: false, // 回放结束
+        isAutoPlay: false, // 记录下麦后自动播放
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -421,7 +422,10 @@
         this.playerServer && this.playerServer.pause();
       },
       // 判断是直播还是回放 活动状态
-      getWebinerStatus() {
+      getWebinerStatus(info) {
+        if (info && info.autoPlay) {
+          this.isAutoPlay = info.autoPlay;
+        }
         const { webinar, warmup, record } = this.roomBaseState.watchInitData;
         if (this.roomBaseState.watchInitData.status === 'live') {
           if (webinar.type === 1) {
@@ -506,6 +510,10 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+          } else {
+            if (this.isAutoPlay && !this.isPlayering) {
+              this.play();
+            }
           }
           this.playerServer.openControls(false);
           this.playerServer.openUI(false);

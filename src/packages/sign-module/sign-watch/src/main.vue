@@ -5,7 +5,7 @@
       <img src="./img/icon@2x.png" alt="" />
     </div>
     <div
-      v-if="showSign"
+      v-show="showSign"
       class="vmp-sign-watch-sign"
       :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
     >
@@ -42,17 +42,17 @@
     components: {
       CountDown
     },
-    watch: {
-      signInfo: {
-        handler(val) {
-          if (val && !val.is_signed && val.id) {
-            this.getHistorySignInfo();
-          }
-        },
-        immediate: true,
-        deep: true
-      }
-    },
+    // watch: {
+    //   signInfo: {
+    //     handler(val) {
+    //       if (val && !val.is_signed && val.id) {
+    //         this.getHistorySignInfo();
+    //       }
+    //     },
+    //     immediate: true,
+    //     deep: true
+    //   }
+    // },
     data() {
       const zIndexServerState = this.zIndexServer.state;
       return {
@@ -73,6 +73,15 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
+      if (this.signInfo && !this.signInfo.is_signed && this.signInfo.id) {
+        this.getHistorySignInfo();
+      }
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        if (!msg.data.over_live && !this.signInfo.is_signed && this.signInfo.id) {
+          this.getHistorySignInfo();
+        }
+      });
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
         this.reShowSignBox();
@@ -111,10 +120,6 @@
         if (this.timer) {
           clearInterval(this.timer);
         }
-      });
-      // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        console.log(this.signInfo, msg, '??!2314235');
       });
     },
     computed: {
