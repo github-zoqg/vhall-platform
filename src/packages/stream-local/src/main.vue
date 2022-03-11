@@ -211,7 +211,8 @@
     useGroupServer,
     useSplitScreenServer,
     useMediaCheckServer,
-    useChatServer
+    useChatServer,
+    useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -477,7 +478,7 @@
           }
         });
         // 结束直播
-        this.interactiveServer.$on('live_over', async () => {
+        useMsgServer().$on('live_over', async () => {
           // 如果开启分屏并且是主页面，不需要停止推流
           if (
             this.splitScreenServer.state.isOpenSplitScreen &&
