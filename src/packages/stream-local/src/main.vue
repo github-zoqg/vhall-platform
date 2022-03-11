@@ -424,10 +424,9 @@
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
-            // 轮询判断是否有互动实例
-            await this.checkVRTCInstance();
-
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
+              // 轮询判断是否有互动实例
+              await this.checkVRTCInstance();
               // 开始推流
               this.startPush();
             } else if (this.joinInfo.role_name == 2) {
@@ -440,6 +439,9 @@
                 await this.interactiveServer.init();
                 // 开始推流
               }
+
+              // 轮询判断是否有互动实例
+              await this.checkVRTCInstance();
               this.startPush();
             }
           }
