@@ -58,6 +58,7 @@
         ) {
           this.isNoticeColumn = true;
           this.noticeText = this.roomBaseServer.state.noticeInfo.list[0]?.content.content;
+          this.animates();
           // this.noticeText = latestNotice.noticeContent;
         }
       },
