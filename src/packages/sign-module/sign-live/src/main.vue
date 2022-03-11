@@ -9,7 +9,7 @@
           @close-sign="closeAutoSignin"
           :autoSign="signInfo.autoSign"
           :title="signInfo.signTip"
-          :total="totalTime"
+          :total="total"
           :remaining="remaining"
           v-if="starting"
           ref="counter"
@@ -89,10 +89,12 @@
               this.signInfo.autoSign = res.data.is_auto_sign == 1;
               if (res.data.is_auto_sign == 1) {
                 this.remaining = res.data.auto_sign_time_ttl;
+                this.signInfo.interval = res.data.auto_sign_time;
                 this.totalTime = res.data.auto_sign_time;
               } else {
+                this.signInfo.duration = res.data.show_time;
                 this.remaining = res.data.sign_time_ttl;
-                this.totalTime = res.data.show_time;
+                this.totalTime = 0;
               }
               this.setIntervalAction();
             } else {
@@ -109,7 +111,7 @@
         this.timer = setInterval(() => {
           if (--this.remaining <= 0) {
             if (sessionStorage.getItem('isAutoSign')) {
-              // this.remaining = this.totalTime;
+              this.remaining = this.totalTime;
               this.signVisible = false;
               this.signinDown = true;
             } else {
