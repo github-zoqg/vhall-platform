@@ -157,7 +157,7 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
-      if (this.micServer.state.isSpeakOn) {
+      if (this.micServer.getSpeakerStatus()) {
         await this.speakOff();
         await this.stopPush();
         this.interactiveServer.destroy();
@@ -175,9 +175,7 @@
         console.log();
         if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
           // 检测设备状态
-          const isSpeakOn =
-            (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-            this.micServer.state.isSpeakOn;
+          const isSpeakOn = this.micServer.getSpeakerStatus();
           if (isSpeakOn) {
             this.startPush();
           } else if (
@@ -188,10 +186,7 @@
             await this.micServer.userSpeakOn();
           }
         } else {
-          if (
-            (this.isInGroup && this.groupServer.getGroupSpeakStatus()) ||
-            this.micServer.state.isSpeakOn
-          ) {
+          if (this.micServer.getSpeakerStatus()) {
             this.speakOff();
           }
         }
@@ -200,7 +195,7 @@
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
           // live_over 结束直播  停止推流,
           if (msg.data.type == 'live_over') {
-            if (this.micServer.state.isSpeakOn) {
+            if (this.micServer.getSpeakerStatus()) {
               await this.speakOff();
               await this.stopPush();
               this.interactiveServer.destroy();
