@@ -1348,7 +1348,7 @@
 
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
-          console.log(msg);
+          // console.log(msg);
           if (_this.roleName == 20) {
             _this.$message({
               message: '对方已接受邀请',
