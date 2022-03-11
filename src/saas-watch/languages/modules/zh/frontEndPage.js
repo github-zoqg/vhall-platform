@@ -42,7 +42,8 @@ export default {
     common_1031: '预约人数',
     common_1032: '观看人数',
     common_1033: '我知道了',
-    common_1034: '保存成功'
+    common_1034: '保存成功',
+    common_1035: '重新加载'
   },
   player: {
     player_1001: '热度',
