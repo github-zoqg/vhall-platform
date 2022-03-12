@@ -212,7 +212,8 @@
     useSplitScreenServer,
     useMediaCheckServer,
     useChatServer,
-    useMsgServer
+    useMsgServer,
+    useDocServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -427,6 +428,11 @@
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
+            // 上麦成功后，如果开启文档可见，把主画面置为小屏
+            if (useDocServer().state.switchStatus) {
+              useRoomBaseServer().setChangeElement('stream-list');
+            }
+
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 轮询判断是否有互动实例
               await this.checkVRTCInstance();
@@ -456,12 +462,10 @@
 
           await this.interactiveServer.destroy();
 
-          // 更新本地speakerList
-          // if (this.groupServer.state.groupInitData.isInGroup) {
-          //   await this.groupServer.updateGroupInitData();
-          // } else {
-          //   await this.roomBaseServer.getInavToolStatus();
-          // }
+          // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
+          if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
+            useRoomBaseServer().setChangeElement('player');
+          }
 
           if (
             this.isNoDelay === 1 ||
