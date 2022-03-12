@@ -82,7 +82,7 @@
     },
     async created() {
       // 监听自动上麦的异常code
-      useInteractiveServer().$on('speakOnFailed', e => {
+      useInteractiveServer().$on('SPEAKON_FAILED', e => {
         this.$toast(e.msg);
       });
       if (
