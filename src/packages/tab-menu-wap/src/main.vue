@@ -122,6 +122,9 @@
       },
       isSubscribe() {
         return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     beforeCreate() {
@@ -206,9 +209,9 @@
           this.changeDocStatus(val);
         });
         //监听进出子房间消息
-        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+        groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           const { interactToolStatus } = useRoomBaseServer().state;
-          if (isInGroup) {
+          if (this.isInGroup) {
             this.setVisible({ visible: false, type: 'v5' });
             this.setVisible({ visible: false, type: 'private' });
           } else {
@@ -247,21 +250,21 @@
         for (const item of list) {
           this.addItem(item);
         }
-
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
-            name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '问答', // 同上
-            status: roomState.interactToolStatus.question_status ? 1 : 2
+            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1004'), // 同上
+            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
           });
           this.addItemByIndex(chatIndex + 2, {
             type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
+            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1008'), // 同上
+            status: 3
           });
         }
       },

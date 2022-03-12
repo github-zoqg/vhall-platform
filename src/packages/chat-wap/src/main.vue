@@ -286,10 +286,10 @@
       // 获取历史消息
       async getHistoryMessage() {
         const data = {
-          // room_id: this.roomId,
-          webinar_id: this.webinar_id,
+          room_id: this.roomId,
+          // webinar_id: this.webinar_id,
           pos: this.page * 10,
-          limit: 10 // 所有端统一显示50条
+          limit: 50 // 所有端统一显示50条
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {

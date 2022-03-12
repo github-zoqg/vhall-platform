@@ -31,6 +31,9 @@
           </div>
         </template>
       </div>
+      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+        {{ $t('chat.chat_1018') }}
+      </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
         <div class="icon-wrapper" v-show="isShowMicBtn">
@@ -165,7 +168,9 @@
         configList: {},
         //用户头像
         avatar: require('../img/default_avatar.png'),
-        handUpStatus: false
+        handUpStatus: false,
+        //只看我的问答
+        isShowMyQA: false
       };
     },
     computed: {
@@ -207,9 +212,10 @@
       },
       //是否展示互动上麦按钮
       isShowMicBtn() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
         return (
           this.webinar.type == 1 &&
-          this.device_status != 2 &&
+          device_status != 2 &&
           [
             this.connectMicShow &&
               !this.isAllBanned &&
@@ -266,6 +272,10 @@
       });
     },
     methods: {
+      showMyQA() {
+        this.isShowMyQA = !this.isShowMyQA;
+        this.$emit('showMyQA', this.isShowMyQA);
+      },
       //初始化视图数据
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
@@ -483,6 +493,9 @@
             border-radius: 10px;
           }
         }
+      }
+      .only-my {
+        color: #fc5659;
       }
     }
   }

@@ -13,14 +13,16 @@ export function getItemEntity(
     type = 2,
     id = `local_${localId++}`, //menu id
     name,
-    status = '1'
+    status = '1',
+    visible = true
   },
   typeMap
 ) {
   const item = typeMap.find(config => config.type === type);
   if (!item) return false;
+  item.visible = visible;
   const text = type === 1 ? name : item.text;
-  let { visible = true, tipsVisible = false, iconVisible = false } = item;
+  let { tipsVisible = false, iconVisible = false } = item;
 
   // status:1 显示 status:2 隐藏 status:3 直播回放显示 status4:预告结束显示
   if (status == STATUS_MAP.HIDDEN) visible = false;

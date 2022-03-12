@@ -101,6 +101,9 @@
             extra_params: this.senderId
           })
           .then(res => {
+            if (res.code !== 200) {
+              this.$message.error(res.msg);
+            }
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             useMicServer().userSpeakOn();
             clearInterval(this.inviteFun);
