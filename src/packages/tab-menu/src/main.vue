@@ -345,7 +345,9 @@
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(tab.id);
+        if (tab.id == this.selectedId) {
+          visible === false && this.jumpToNearestItemById(tab.id);
+        }
       },
       /**
        * 切换某个菜单tab的可视性

@@ -55,7 +55,7 @@
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
           useChatServer().addChatToList({
-            nickName: msg.nick_name,
+            nickname: msg.nick_name,
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
               text_content: this.$t('chat.chat_1030'),
