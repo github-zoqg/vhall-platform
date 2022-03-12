@@ -406,8 +406,10 @@
           return;
         }
         if (
-          document.getElementById(this.docServer.state.docCid) ||
-          document.getElementById(this.docServer.state.boardCid)
+          (document.getElementById(this.docServer.state.docCid) &&
+            document.getElementById(this.docServer.state.docCid).childNodes.length) ||
+          (document.getElementById(this.docServer.state.boardCid) &&
+            document.getElementById(this.docServer.state.boardCid).childNodes.length)
         ) {
           try {
             this.docServer.setSize(width, height);
