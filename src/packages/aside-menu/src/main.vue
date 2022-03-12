@@ -166,7 +166,7 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
-            if (this.isShareScreen) {
+            if (this.isShareScreen && this.role != 1) {
               vn.setDisableState(false);
               vn.setText('关闭共享');
               vn.setSelectedState(true);
