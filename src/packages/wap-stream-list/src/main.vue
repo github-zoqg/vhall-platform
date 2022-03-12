@@ -341,8 +341,10 @@
         });
 
         // 结束分组讨论
-        this.groupServer.$on('GROUP_SWITCH_END', () => {
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          if (!msg.data.groupToast) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 小组解散

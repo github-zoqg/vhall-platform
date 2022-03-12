@@ -418,7 +418,11 @@
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.localStream.streamId) return;
-
+            // 若上麦成功后发现设备不允许上麦，则进行下麦操作
+            if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
+              this.speakOff();
+              return;
+            }
             // // 更新本地speakerList
             // if (this.groupServer.state.groupInitData.isInGroup) {
             //   await this.groupServer.updateGroupInitData();
@@ -457,7 +461,6 @@
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
-          if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
           await this.stopPush();
 
           await this.interactiveServer.destroy();

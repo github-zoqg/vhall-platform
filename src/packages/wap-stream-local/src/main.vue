@@ -217,7 +217,11 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.localStream.streamId) return;
-
+          // 若上麦成功后发现设备不允许上麦，则进行下麦操作
+          if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
+            this.speakOff();
+            return;
+          }
           console.log('[stream-local] vrtc_connect_success startPush');
 
           // 无延迟｜分组直播
@@ -239,14 +243,13 @@
 
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
-          if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
           await this.stopPush();
 
           await this.interactiveServer.destroy();
 
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
-            await this.interactiveServer.init({});
+            await this.interactiveServer.init();
           }
         });
 
