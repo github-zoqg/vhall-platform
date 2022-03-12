@@ -166,7 +166,8 @@
     useRoomBaseServer,
     useInteractiveServer,
     useGroupServer,
-    useMsgServer
+    useMsgServer,
+    useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import moment from 'moment';
@@ -250,6 +251,12 @@
             this.remoteVideoParam.file_type = value.file_type;
           }
         }
+      },
+      '$domainStore.state.insertFileServer.isInsertFilePushing': {
+        handler() {
+          this.insertFileStreamVisible =
+            this.$domainStore.state.insertFileServer.isInsertFilePushing;
+        }
       }
     },
     filters: {
@@ -273,6 +280,7 @@
       this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
+      this.docServer = useDocServer();
     },
     mounted() {
       this.initEventListener();
@@ -377,6 +385,8 @@
             this.insertFileServer
               .publishInsertStream({ streamId: res.streamId })
               .then(() => {
+                // 更改麦克风状态
+                this.insertFileServer.updateMicMuteStatusByInsert({ isStart: true });
                 interactiveServer.resetLayout();
               })
               .catch(() => {
@@ -505,9 +515,8 @@
           // 插播隐藏
           this.insertFileStreamVisible = false;
           if (isliveStart) return;
-          // 通知更改麦克风状态
-          // EventBus.$emit('inster_mic_open');
-          // EventBus.$emit('insertVideoStop');
+          // 更改麦克风状态
+          this.insertFileServer.updateMicMuteStatusByInsert({ isStart: false });
         });
       },
       // 销毁插播流
@@ -558,6 +567,15 @@
         if (this.insertFileServer.state.insertStreamInfo.streamId) {
           this.subscribeInsert();
         }
+
+        this.insertFileServer.$on('insert_mic_mute_change', status => {
+          if (status == 'play') {
+            this.$message.warning(this.$t('interact.interact_1026'));
+          } else {
+            this.$message.warning('麦克风开启，对方将听到您的声音');
+          }
+        });
+
         this.addSDKEvents();
         // 注册发起端独有的事件
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
@@ -648,6 +666,12 @@
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
           this.unsubscribeInsert();
           this.reSetBroadcast();
+        });
+
+        // 流加入
+        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+          this.reSetBroadcast();
+          this.subscribeInsert();
         });
       },
       // 设置旁路

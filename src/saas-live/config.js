@@ -225,6 +225,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
@@ -246,6 +251,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },

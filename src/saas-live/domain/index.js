@@ -30,6 +30,9 @@ setRequestHeaders({
   'biz-application-id': 'fd8d3653' //paas应用id saas: fd8d3653 知客: 02391153
 });
 
+// 平台标识
+window.platform = 7;
+
 Vue.use(DomainStore);
 
 export default new DomainStore.Store({

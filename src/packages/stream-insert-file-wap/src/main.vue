@@ -37,13 +37,23 @@
         this.insertFileServer.subscribeInsertStream(opt);
       },
       addEvents() {
-        // 监听桌面共享或者插播流加入
+        // 监听插播流加入
         this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
           this.subscribeInsert();
         });
-        // 监听桌面共享或者插播流离开
+        // 监听插播流离开
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
           this.insertFileServer.unsubscribeInsertStream();
+        });
+        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+          this.subscribeInsert();
+        });
+        this.insertFileServer.$on('insert_mic_mute_change', status => {
+          if (status == 'play') {
+            this.$toast(this.$t('interact.interact_1026'));
+          } else {
+            this.$toast('麦克风开启，对方将听到您的声音');
+          }
         });
       }
     }

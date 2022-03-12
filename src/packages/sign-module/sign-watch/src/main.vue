@@ -76,16 +76,15 @@
       if (this.signInfo && !this.signInfo.is_signed && this.signInfo.id) {
         this.getHistorySignInfo();
       }
-      // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        if (!msg.data.over_live && !this.signInfo.is_signed && this.signInfo.id) {
+      // // 结束讨论
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        if (!this.isInGroup && !this.signInfo.is_signed && this.signInfo.id) {
           this.getHistorySignInfo();
         }
       });
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
         this.reShowSignBox();
-        console.log(e.data.title, e, '??!23245364758');
         this.title = e.data.title == '主持人发起了签到' ? this.title : e.data.title;
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
@@ -129,6 +128,9 @@
       },
       signInfo() {
         return this.roomBaseServer.state.signInfo;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     methods: {
