@@ -38,9 +38,8 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.roleName | roleFilter(this) }}{{ source.content.text_content }},{{
-            $t('common.common_1030')
-          }}
+          {{ source.roleName | roleFilter(this) }}{{ source.roleName != 1 ? source.nickname : ''
+          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>

@@ -94,7 +94,7 @@
               <div
                 class="chat-setting-box__item join-chat-btn"
                 @click="joinChatAuth"
-                v-if="roleName == 1 && configList['comment_check']"
+                v-if="configList['comment_check']"
               >
                 进入聊天审核
               </div>

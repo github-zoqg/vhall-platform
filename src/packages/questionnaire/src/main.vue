@@ -229,7 +229,7 @@
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
           const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
           useChatServer().addChatToList({
-            nickName: '问卷',
+            nickname: '问卷',
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
               text_content: `发起了问卷`,
