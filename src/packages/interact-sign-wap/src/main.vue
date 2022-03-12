@@ -84,8 +84,9 @@
       // postcss 换算基数为75 头部+播放器区域高为 522px
       this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
       // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        if (!msg.data.over_live && !this.signinInfo.is_signed && this.signinInfo.id) {
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup && !this.signinInfo.is_signed && this.signinInfo.id) {
           this.init();
         }
       });
