@@ -166,7 +166,8 @@
     useRoomBaseServer,
     useInteractiveServer,
     useGroupServer,
-    useMsgServer
+    useMsgServer,
+    useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import moment from 'moment';
@@ -250,6 +251,12 @@
             this.remoteVideoParam.file_type = value.file_type;
           }
         }
+      },
+      '$domainStore.state.insertFileServer.isInsertFilePushing': {
+        handler() {
+          this.insertFileStreamVisible =
+            this.$domainStore.state.insertFileServer.isInsertFilePushing;
+        }
       }
     },
     filters: {
@@ -273,6 +280,7 @@
       this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
+      this.docServer = useDocServer();
     },
     mounted() {
       this.initEventListener();
@@ -658,6 +666,12 @@
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
           this.unsubscribeInsert();
           this.reSetBroadcast();
+        });
+
+        // 流加入
+        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+          this.reSetBroadcast();
+          this.subscribeInsert();
         });
       },
       // 设置旁路
