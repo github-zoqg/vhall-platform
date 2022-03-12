@@ -98,6 +98,7 @@
     methods: {
       showThirdStream(info) {
         this.isShowThirdStream = info.status;
+        this.roomBaseServer.setThirdPushStream(info.status);
         info.status && this.getThirdPushStream();
       },
       getThirdPushStream() {
@@ -107,6 +108,9 @@
             this.thirdWatchWebUrl = res.data.stream_address;
           }
         });
+      },
+      closeThirdStream() {
+        this.isShowThirdStream = false;
       },
       doCopy(type) {
         let btn = '';

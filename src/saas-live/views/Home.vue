@@ -129,6 +129,13 @@
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
         });
+        // 第三方推流改变背景图片
+        roomBaseServer.$on('LIVE_START', () => {
+          const thirdBackground = document.querySelector('.vmp-basic-right__hd');
+          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/saas-v3-lives/static/img/thirdDefault.293fe294.png) no-repeat`;
+          thirdBackground.style.backgroundSize = '100% 100%';
+          thirdBackground.style.backgroundPosition = 'center';
+        });
         // 关闭分屏模式
         splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
           // 还原流信息
