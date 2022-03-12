@@ -117,7 +117,12 @@
     </div>
     <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
     <div class="vmp-doc-toolbar__ft" v-if="!isWatch && !isInGroup">
-      <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
+      <div
+        class="vmp-icon-item"
+        :title="$t('doc.doc_1010')"
+        v-if="roleName != 3"
+        @click="fullscreen"
+      >
         <i class="vh-iconfont vh-line-amplification"></i>
       </div>
       <div
@@ -241,6 +246,10 @@
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      // 角色
+      roleName() {
+        return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
       // 是否文档演示权限
       hasDocPermission() {
