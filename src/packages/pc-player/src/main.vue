@@ -538,7 +538,7 @@
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
           } else {
-            if (this.isAutoPlay && !this.isPlayering) {
+            if (this.isAutoPlay) {
               this.play();
             }
           }
