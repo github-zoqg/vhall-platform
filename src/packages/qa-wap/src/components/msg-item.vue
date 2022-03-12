@@ -1,5 +1,10 @@
 <template>
-  <div class="qa-item-wrapper">
+  <div
+    class="qa-item-wrapper"
+    v-if="
+      source.join_id == joinId || (source.answer && source.answer.join_id == joinId) || !isOnlyMine
+    "
+  >
     <template>
       <div class="question">
         <div class="user">
@@ -58,7 +63,11 @@
         type: Object,
         required: true,
         default: () => {}
-      }
+      },
+      isOnlyMine: {
+        default: false
+      },
+      joinId: {}
     },
     methods: {
       roleFilter(value) {

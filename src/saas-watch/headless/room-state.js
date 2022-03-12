@@ -88,7 +88,8 @@ export default async function () {
             webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
           });
         }
-      })
+      }),
+    roomBaseServer.getCustomRoleName()
   ];
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {

@@ -61,7 +61,7 @@
           <div
             class="chat-setting-btn--chat-auth"
             v-if="
-              (roleName == 1 || roleName == 2) &&
+              (roleName == 1 || roleName == 3) &&
               !isInGroup &&
               (configList['comment_check'] || configList['disable_msg'])
             "
@@ -404,7 +404,7 @@
         .chat-setting-box {
           display: none;
           position: absolute;
-          top: -105px;
+          bottom: 30px;
           right: 0;
           width: 180px;
           padding: 4px 0;
