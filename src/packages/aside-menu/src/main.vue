@@ -180,7 +180,11 @@
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
                 // 如果主持人把别人设为了主讲人，或者有人正在演示，桌面共享禁用
-                if (this.doc_permission != this.userId || this.presenterId != this.userId) {
+                if (
+                  this.doc_permission != this.userId ||
+                  this.presenterId != this.userId ||
+                  this.isThirdStream
+                ) {
                   vn.setHiddenState(false);
                   vn.setDisableState(true);
                 }

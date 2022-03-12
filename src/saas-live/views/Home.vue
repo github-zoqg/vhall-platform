@@ -76,6 +76,7 @@
           type: 'log' // log 日志埋点，event 业务数据埋点
         });
         const res = await roomState();
+
         // 如果浏览器不支持
         if (res === 'isBrowserNotSupport') {
           this.state = 3;
@@ -131,10 +132,7 @@
         });
         // 第三方推流改变背景图片
         roomBaseServer.$on('LIVE_START', () => {
-          const thirdBackground = document.querySelector('.vmp-basic-right__hd');
-          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/saas-v3-lives/static/img/thirdDefault.293fe294.png) no-repeat`;
-          thirdBackground.style.backgroundSize = '100% 100%';
-          thirdBackground.style.backgroundPosition = 'center';
+          this.changePushImage();
         });
         // 关闭分屏模式
         splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
@@ -169,6 +167,12 @@
       handleKickout() {
         this.state = 2;
         this.errMsg = this.$t('message.message_1007');
+      },
+      changePushImage() {
+        const thirdBackground = document.querySelector('.vmp-basic-right__hd');
+        thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/saas-v3-lives/static/img/thirdDefault.293fe294.png) no-repeat`;
+        thirdBackground.style.backgroundSize = '100% 100%';
+        thirdBackground.style.backgroundPosition = 'center';
       }
     }
   };

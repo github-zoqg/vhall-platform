@@ -88,9 +88,18 @@
       this.roomBaseServer = useRoomBaseServer();
       this.msgServer = useMsgServer();
     },
+    computed: {
+      isThirdStream() {
+        return this.roomBaseServer.state.isThirdStream;
+      }
+    },
     mounted() {
+      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+        this.isShowThirdStream = true;
+        this.changePushImage();
+      }
       this.msgServer.$onMsg('ROOM_MSG', msg => {
-        if (msg.data.type == 'live_start') {
+        if (msg.data.type == 'live_over') {
           this.isShowThirdStream = false;
         }
       });
@@ -108,6 +117,12 @@
             this.thirdWatchWebUrl = res.data.stream_address;
           }
         });
+      },
+      changePushImage() {
+        const thirdBackground = document.querySelector('.vmp-basic-right__hd');
+        thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/saas-v3-lives/static/img/thirdDefault.293fe294.png) no-repeat`;
+        thirdBackground.style.backgroundSize = '100% 100%';
+        thirdBackground.style.backgroundPosition = 'center';
       },
       closeThirdStream() {
         this.isShowThirdStream = false;

@@ -138,13 +138,20 @@
       // 是否开启了插播
       isInsertFilePushing() {
         return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
+      // 是否正在第三方推流
+      thirtPushStreamimg() {
+        return (
+          this.roomBaseServer.state.isThirdStream &&
+          this.roomBaseServer.state.watchInitData.webinar.type == 1
+        );
       }
     },
     data() {
       return {
         roomBaseState: null,
         isThirtPushStream: false, // 是否支持第三方推流
-        thirtPushStreamimg: false, // 是否正在第三方推流
+        // thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
         webinarInfo: {}, //活动下信息
         roleMap: {
@@ -214,7 +221,7 @@
           return;
         }
         this.$emit('thirdPushStream', true);
-        this.thirtPushStreamimg = true;
+        // this.thirtPushStreamimg = true;
         this.roomBaseServer.setInavToolStatus('start_type', 4);
       },
       thirdPartyClose() {
@@ -224,7 +231,7 @@
           return;
         }
         this.$emit('thirdPushStream', false);
-        this.thirtPushStreamimg = false;
+        // this.thirtPushStreamimg = false;
         this.roomBaseServer.setInavToolStatus('start_type', 1);
       },
       openVirtualAudience() {
