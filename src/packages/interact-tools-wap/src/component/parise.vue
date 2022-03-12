@@ -47,8 +47,9 @@
         }
       });
       // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        if (!msg.data.over_live) {
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup) {
           this.like = this.roomBaseServer.state.priseLike.total || 0;
         }
       });

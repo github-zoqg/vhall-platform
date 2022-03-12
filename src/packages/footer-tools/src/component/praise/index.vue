@@ -53,8 +53,9 @@
         }
       });
       // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        if (!msg.data.over_live) {
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup) {
           this.totalPraiseNum = this.roomBaseServer.state.priseLike.total || 0;
           this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
         }

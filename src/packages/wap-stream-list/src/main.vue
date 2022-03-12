@@ -253,6 +253,10 @@
       // 开始推流到成功期间展示默认图
       defaultBg() {
         return this.interactiveServer.state.defaultStreamBg;
+      },
+      // 主持人ID 分组期间使用
+      userinfoId() {
+        return this.roomBaseServer.state.watchInitData?.webinar.userinfo.user_id;
       }
     },
     beforeCreate() {
@@ -334,32 +338,39 @@
         });
 
         // 开启分组讨论
-        this.groupServer.$on('GROUP_SWITCH_START', () => {
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
           if (this.isInGroup) {
-            this.gobackHome(1, this.groupServer.state.groupInitData.name);
+            this.gobackHome(1, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 切换小组,小组人员变动
+        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+          if (this.isInGroup) {
+            this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
           }
         });
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           if (!msg.data.groupToast) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+            this.gobackHome(3, this.groupServer.state.groupInitData.name, msg);
           }
         });
 
         // 小组解散
-        this.groupServer.$on('GROUP_DISBAND', () => {
-          this.gobackHome(4);
+        this.groupServer.$on('GROUP_DISBAND', msg => {
+          this.gobackHome(4, '', msg);
         });
 
         // 本人被踢出来
-        this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          this.gobackHome(5, this.groupServer.state.groupInitData.name, msg);
         });
 
         // 组长变更
-        this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          this.gobackHome(7);
+        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          this.gobackHome(7, '', msg);
         });
 
         // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
@@ -370,20 +381,21 @@
         });
       },
       // 返回主房间提示
-      async gobackHome(index, name) {
+      async gobackHome(index, name, msg) {
+        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
         let title = '';
         switch (index) {
           case 1:
-            title = '主持人开启了分组讨论，您将进入' + name + '组参与讨论';
+            title = who + '开启了分组讨论，您将进入' + name + '组参与讨论';
             break;
           case 2:
-            title = '主持人已将您分配至' + name + '组';
+            title = who + '已将您分配至' + name + '组';
             break;
           case 3:
-            title = this.$t('chat.chat_1073');
+            title = who + '结束了分组讨论，您将返回主直播间';
             break;
           case 4:
-            title = this.$t('chat.chat_1074');
+            title = who + '解散了分组，您将返回主直播间';
             break;
           case 5:
             title = this.$t('chat.chat_1007');
