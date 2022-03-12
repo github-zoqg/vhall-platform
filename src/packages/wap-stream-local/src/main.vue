@@ -295,7 +295,7 @@
         return this.micServer.speakOff();
       },
       // 处理上麦失败
-      handleSpeakOnError(err) {
+      async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
@@ -308,6 +308,10 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'noPermission') {
+          await this.interactiveServer.destroy();
+          await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          this.publishLocalStream();
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
           console.log('开启主屏失败');
@@ -384,7 +388,14 @@
           .then(() => {
             this.isStreamPublished = true;
           })
-          .catch(() => 'publishStreamError');
+          .catch(e => {
+            if (e.code === '611007') {
+              this.handleSpeakOnError('noPermission');
+            } else {
+              this.handleSpeakOnError('publishStreamError');
+            }
+          });
+        // .catch(() => 'publishStreamError');
       },
       // 结束推流
       stopPush() {
