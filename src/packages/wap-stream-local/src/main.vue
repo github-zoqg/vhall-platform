@@ -51,7 +51,8 @@
     useGroupServer,
     useMsgServer,
     useRoomBaseServer,
-    useMediaCheckServer
+    useMediaCheckServer,
+    usePlayerServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -217,22 +218,23 @@
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.localStream.streamId) return;
 
-          // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
-          }
-
           console.log('[stream-local] vrtc_connect_success startPush');
 
-          if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-              await this.interactiveServer.init();
-              // 开始推流
-              this.startPush();
-            }
+          // 无延迟｜分组直播
+          // 如果成功，销毁播放器
+          if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar == 0) {
+            usePlayerServer().destroy();
           }
+
+          if (!this.interactiveServer.state.autoSpeak) {
+            //  初始化互动实例
+            await this.interactiveServer.init();
+            // 开始推流
+          }
+
+          // 轮询判断是否有互动实例
+          await this.checkVRTCInstance();
+          this.startPush();
         });
 
         // 下麦成功
@@ -241,12 +243,6 @@
           await this.stopPush();
 
           await this.interactiveServer.destroy();
-          // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
-          }
 
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
