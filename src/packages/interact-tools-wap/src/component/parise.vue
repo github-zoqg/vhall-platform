@@ -10,7 +10,7 @@
   </div>
 </template>
 <script>
-  import { usePraiseServer, useRoomBaseServer } from 'middle-domain';
+  import { usePraiseServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
 
   const timeId = null;
   export default {
@@ -29,28 +29,27 @@
         require: false
       }
     },
-    // watch: {
-    //   priseLike: {
-    //     handler(val) {
-    //       if (val) {
-    //         this.like = val;
-    //       }
-    //     },
-    //     immediate: true
-    //   }
-    // },
     beforeCreate() {
       this.praiseServer = usePraiseServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
+    },
+    created() {
+      this.like = this.roomBaseServer.state.priseLike.total || 0;
     },
     mounted() {
-      this.like = this.roomBaseServer.state.priseLike.total || 0;
       this.praiseServer.$on('customPraise', msg => {
         if (msg.visitorId != this.roomBaseServer.state.watchInitData.visitor_id) {
           if (msg.num > this.like) {
             // 消息返回的点赞数、是点赞总数
             this.like = msg.num;
           }
+        }
+      });
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        if (!msg.data.over_live) {
+          this.like = this.roomBaseServer.state.priseLike.total || 0;
         }
       });
 

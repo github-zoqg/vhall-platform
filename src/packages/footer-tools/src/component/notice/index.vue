@@ -52,17 +52,19 @@
         total: 0
       };
     },
+    computed: {
+      noticeLatestInfo() {
+        // 最新公告信息
+        return this.roomBaseServer.state.noticeInfo;
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
-      this.roomBaseState = this.roomBaseServer.state;
-      this.noticeNum = this.noticeServer.state.latestNotice.total || 0;
-      if (this.noticeNum && this.noticeServer.state.latestNotice.created_at) {
-        this.isShowIcon = true;
-      }
+      this.getNoticeInfo();
     },
     mounted() {
       this.initNotice();
@@ -71,6 +73,12 @@
       initNotice() {
         this.noticeServer.$on('live_over', () => {
           this.isShowIcon = false;
+        });
+        // 结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          if (!msg.data.over_live) {
+            this.getNoticeInfo();
+          }
         });
         const { groupInitData } = this.groupServer.state;
         if (groupInitData.isInGroup) return;
@@ -86,12 +94,23 @@
           });
         });
       },
+      getNoticeInfo() {
+        this.noticeNum = this.noticeLatestInfo.total || 0;
+        if (this.noticeNum && this.noticeLatestInfo.list[0].created_at) {
+          this.isShowIcon = true;
+          this.pageInfo = {
+            pos: 0,
+            limit: 10,
+            pageNum: 1
+          };
+        }
+      },
       getNoticeHistoryList() {
         this.isShowNotice = true;
         this.getNoticeList(false);
       },
       getNoticeList(flag) {
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseServer.state;
         const params = {
           room_id: watchInitData.interact.room_id,
           is_cache: 1,
