@@ -96,7 +96,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1027')}`
+            text_content: `${this.$t('chat.chat_1027')}`
           },
           type: e.data.type,
           interactStatus: true

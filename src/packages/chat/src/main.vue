@@ -408,8 +408,8 @@
       // 获取历史消息
       async getHistoryMsg() {
         const params = {
-          webinar_id: this.webinarId,
-          // room_id: this.roomId,
+          // webinar_id: this.webinarId,
+          room_id: this.roomId,
           pos: Number(this.page) * 50,
           limit: 50
         };
