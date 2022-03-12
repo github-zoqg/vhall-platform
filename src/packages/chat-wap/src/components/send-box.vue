@@ -212,9 +212,10 @@
       },
       //是否展示互动上麦按钮
       isShowMicBtn() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
         return (
           this.webinar.type == 1 &&
-          this.device_status != 2 &&
+          device_status != 2 &&
           [
             this.connectMicShow &&
               !this.isAllBanned &&
