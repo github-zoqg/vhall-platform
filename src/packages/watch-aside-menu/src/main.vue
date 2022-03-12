@@ -182,9 +182,11 @@
         });
 
         // 结束分组讨论
-        this.groupServer.$on('GROUP_SWITCH_END', () => {
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
           this.isCollapse = true;
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          if (!msg.data.groupToast) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          }
         });
 
         // 小组解散
