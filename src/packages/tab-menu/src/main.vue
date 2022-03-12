@@ -4,6 +4,7 @@
       <!-- prev-btn -->
       <span
         class="vmp-tab-menu-page-btn prev-btn"
+        v-if="isToggleBtnVisible"
         :class="{ disabledClick: selectedIndex === 0 }"
         @click="prev"
       >
@@ -20,13 +21,15 @@
           :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span class="item-text">{{ $t(item.text) }}</span>
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
           <hr class="bottom-line" />
         </li>
       </ul>
 
       <!-- next btn -->
       <span
+        v-if="isToggleBtnVisible"
         class="vmp-tab-menu-page-btn next-btn"
         :class="{ disabledClick: selectedIndex === menu.length - 1 }"
         @click="next"
@@ -36,7 +39,7 @@
     </header>
 
     <main class="vmp-tab-menu__main">
-      <tab-content ref="tabContent" :menu="menu" />
+      <tab-content ref="tabContent" :menu="menu" @noticeHint="handleHint" />
     </main>
   </section>
 </template>
@@ -44,7 +47,14 @@
 <script>
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
-  import { useMenuServer } from 'middle-domain';
+  import {
+    useMenuServer,
+    useQaServer,
+    useChatServer,
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
+  } from 'middle-domain';
 
   // TODO: tips
 
@@ -55,8 +65,10 @@
     },
     data() {
       return {
+        isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
         direciton: 'row', // row(横)，column(纵)
         selectedId: '',
+        visibleCondition: 'living',
         menu: []
       };
     },
@@ -65,29 +77,112 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        return this.menu.filter(item => item.visible);
+        return this.menu.filter(item => {
+          if (this.visibleCondition === 'living') {
+            return (item.status == 1 || item.status == 3) && item.visible;
+          }
+
+          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible;
+        });
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
+    watch: {},
     beforeCreate() {
       this.menuServer = useMenuServer();
     },
     created() {
-      this.initConfig();
+      // initConfig
+      const widget = window.$serverConfig?.[this.cuid];
+      if (widget && widget.options) {
+        this.tabOptions = widget.options;
+      }
+      // console.log(this.visibleMenu, '???!231324');
       this.initMenu();
+      this.listenEvents();
     },
     async mounted() {
       await this.$nextTick(0);
       this.selectDefault();
     },
     methods: {
-      /**
-       * 初始化配置
-       */
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          this.tabOptions = widget.options;
+      listenEvents() {
+        const qaServer = useQaServer();
+        const chatServer = useChatServer();
+        const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
+        //收到问答开启消息
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
+          this.setVisible({ visible: true, type: 'v5' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1026')
+            },
+            roleName: msg.data.role_name,
+            type: msg.data.type,
+            interactStatus: true
+          });
+        });
+        //收到问答关闭消息
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
+          this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1081')
+            },
+            roleName: msg.data.role_name,
+            type: msg.data.type,
+            interactStatus: true
+          });
+        });
+        //收到私聊消息
+        chatServer.$on('receivePrivateMsg', () => {
+          this.setVisible({ visible: true, type: 'private' });
+        });
+
+        if (this.isSubscribe) {
+          this.setVisibleCondition('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
         }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_start') {
+            this.setVisibleCondition('living');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisibleCondition('live_over');
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+          }
+        });
+        //监听进出子房间消息
+        groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (this.isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+            this.setVisible({ visible: false, type: 'notice' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
+            this.setVisible({ visible: true, type: 'notice' });
+          }
+        });
       },
       /**
        * 拉取接口，初始化菜单项
@@ -100,24 +195,45 @@
         if (roomState.clientType === 'send') {
           list = [...this.menuServer.state.list];
         } else {
-          list = [...roomState.customMenu.list];
+          let customMenuList = roomState?.customMenu?.list || [];
+          list = [...customMenuList];
         }
-
-        console.log('menu list:', list);
         for (const item of list) {
           this.addItem(item);
         }
 
-        window.tabMenu = this;
+        const chatIndex = this.menu.findIndex(el => el.type === 3);
+        if (chatIndex >= -1) {
+          this.addItemByIndex(chatIndex + 1, {
+            type: 'v5',
+            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1004'), // 同上
+            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1008'), // 同上
+            visible: false,
+            status: 3
+          });
+        }
+
+        console.log('this.menu--------->', this.menu);
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living|predition]
+       */
+      setVisibleCondition(condition = 'default') {
+        this.visibleCondition = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
        */
       selectDefault() {
-        if (this.visibleMenu.length > 0) {
-          const { type, id } = this.visibleMenu[0];
-          this.select({ type, id });
-        }
+        this.select({ type: 3 });
       },
       /**
        * 选中当前项左边一项
@@ -148,14 +264,18 @@
         this.menu.splice(index);
       },
 
+      getItemEntity(item) {
+        return getItemEntity(item, this.tabOptions.menuConfig);
+      },
+
       addItem(item) {
-        item = getItemEntity(item, this.tabOptions.menuConfig);
+        item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.push(item);
       },
 
       addItemByIndex(index, item) {
-        item = getItemEntity(item, this.tabOptions.menuConfig);
+        item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.splice(index, 0, item);
       },
@@ -201,17 +321,15 @@
 
       /**
        * 选中一个菜单项，并显示对应内容
-       * @param {String} cuid cuid
+       * @param {String} type 后端传过来的menu type
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
       select({ type, id }) {
         this.selectedType = type;
-        this.selectedId = id;
-
-        this.scrollToItem({ id });
-
         const item = this.getItem({ type, id });
+        this.scrollToItem({ id: item.id });
+        this.selectedId = item.id;
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
         this.menuServer.$emit('tab-switched', item);
@@ -219,19 +337,18 @@
       /**
        * 设置菜单项显隐
        * @param {Boolean} visible [true|false] 显隐值
-       * @param {String} cuid cuid
+       * @param {String} type 后端传过来的 menu type
        * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
       setVisible({ visible = true, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
-
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(id);
+        visible === false && this.jumpToNearestItemById(tab.id);
       },
       /**
        * 切换某个菜单tab的可视性
-       * @param {*} cuid
+       * @param {*} type
        * @param {*} menuId [非必传]
        * @example toggleVisible('comChatWap','')
        */
@@ -244,7 +361,7 @@
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
-       * @param {String} cuid cuid
+       * @param {String} type 后端传过来的 menu type
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        * @example setTipsVisible(true,'comChatWap','10186')
        */
@@ -253,6 +370,12 @@
         if (!tab) return;
 
         tab.tipsVisible = visible;
+      },
+      handleHint(cuid) {
+        if (this.selectedType == cuid) {
+          return;
+        }
+        this.setTipsVisible({ visible: true, type: cuid });
       },
       /**
        * 跳转到最近的item
@@ -286,8 +409,6 @@
   .vmp-tab-menu {
     height: 100%;
     font-size: 14px;
-    display: flex;
-    flex-direction: column;
 
     &__header {
       flex: 0 0 auto;
@@ -344,7 +465,15 @@
             display: flex;
             align-items: center;
           }
-
+          .tips {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #fb3a32;
+          }
           .bottom-line {
             display: none;
             position: absolute;
@@ -380,7 +509,8 @@
     }
 
     &__main {
-      flex: 1 1 auto;
+      height: calc(100% - 46px);
+      overflow: hidden;
     }
   }
 </style>

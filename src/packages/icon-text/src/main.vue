@@ -1,7 +1,7 @@
 <template>
   <a
     href="javascript:;"
-    v-if="!hidden"
+    v-if="!hidden && (configList[auth] == 1 || auth == true)"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
@@ -25,10 +25,16 @@
         icon: '', // 小图标
         text: '', // 文本
         kind: '', // 类型
+        auth: '', // 权限控制是否显示
         selected: false, // 是否选中
         disable: false, // 是否禁用
         hidden: false // 是否隐藏
       };
+    },
+    computed: {
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      }
     },
     methods: {
       // 设置选中转态
@@ -42,6 +48,10 @@
       // 设置显示隐藏状态
       setHiddenState(val) {
         this.hidden = val;
+      },
+      // 设置文本
+      setText(val) {
+        this.text = val;
       },
       // click事件
       handleClick: function () {
@@ -59,6 +69,7 @@
     font-size: 12px;
     color: #ececec;
     padding: 10px 0px;
+    cursor: pointer;
 
     span.text {
       font-size: 12px;
@@ -74,9 +85,9 @@
       font-size: 22px;
     }
 
-    &:hover {
-      cursor: pointer;
-    }
+    // &:hover {
+    //   cursor: pointer;
+    // }
 
     &.selected {
       span.text,
@@ -86,10 +97,14 @@
     }
 
     &.disable {
+      cursor: default;
       span.text,
       i {
         color: #777777;
       }
+      // &:hover {
+      //   cursor: default;
+      // }
     }
   }
 </style>

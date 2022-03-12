@@ -107,7 +107,7 @@
           <div>
             <el-button type="text" @click="editQQHandler">
               {{
-                useUserServer.state.thirdInfo.QQbind
+                useUserServer.state.thirdInfo.QQBind
                   ? $t('account.account_1021')
                   : $t('account.account_1022')
               }}
@@ -164,7 +164,6 @@
         nickError: '',
         avatar: '',
         domain_url: '',
-        useUserServer: {},
         phoneData: {
           dialogShow: false,
           type: 'add',
@@ -371,17 +370,12 @@
             })
             .catch(() => {});
         } else {
-          console.log(this.$route);
-          // 绑定
-          // this.$VhallStorage.set('tag', 'bindQQ', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindQQ');
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
-          console.log(jumpUrlPath);
+          localStorage.setItem('vmp_auth_tag', 'bindQQ');
+
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL;
+          const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
-              jumpUrlPath
-            )}`,
-            '_blank'
+            `${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
           );
         }
       },
@@ -435,15 +429,14 @@
             .catch(() => {});
         } else {
           // 绑定
-          // this.$VhallStorage.set('tag', 'bindWx', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindWx');
-          const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
-          // 前端回传地址
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
+          localStorage.setItem('vmp_auth_tag', 'bindWx');
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL;
+          const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+            `${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
+              jumpUrlPath
+            )}`
           );
-          // window.open(`${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(this.$VhallStorage.get('goHref', 'local'))}`, '_blank');
         }
       },
       // 打开个人资料弹出框

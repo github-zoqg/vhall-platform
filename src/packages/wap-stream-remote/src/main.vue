@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+    @click.stop="showExitScreen"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图 -->
@@ -23,6 +27,14 @@
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
+    <!-- 退出全屏 -->
+    <div
+      class="vmp-stream-remote-exitscreen"
+      :class="[exitScreenStatus ? 'opcity-true' : 'opcity-flase']"
+      @click.stop="exitFullScreen"
+    >
+      <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+    </div>
   </div>
 </template>
 
@@ -43,6 +55,18 @@
         require: true
       }
     },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          if (newval) {
+            this.$nextTick(() => {
+              this.subscribeRemoteStream();
+            });
+          }
+        },
+        immediate: true
+      }
+    },
     computed: {
       // 是否显示摄像头开关按钮
       isShowVideoControl() {
@@ -56,11 +80,22 @@
       isShowAudioControl() {
         return true;
       },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      exitScreenStatus() {
+        return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
     filters: {
@@ -79,9 +114,6 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
     },
-    mounted() {
-      this.subscribeRemoteStream();
-    },
     beforeDestroy() {
       // 清空计时器
       if (this._audioLeveInterval) {
@@ -93,6 +125,7 @@
     },
     methods: {
       subscribeRemoteStream() {
+        console.warn('开始订阅', JSON.stringify(this.stream));
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
@@ -102,18 +135,11 @@
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
-            console.log('订阅成功----', e);
+            console.warn('订阅成功---------', e);
             this.getLevel();
-            // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
-            setTimeout(() => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
-            }, 2000);
           })
           .catch(e => {
-            console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
+            console.error('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
       speakOff() {
@@ -151,6 +177,27 @@
               this.networkStatus = 0;
             });
         }, 2000);
+      },
+      // 显示退出全屏按钮    5秒后隐藏
+      showExitScreen() {
+        if (!this.exitScreenStatus) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.interactiveServer.state.fullScreenType = false;
+        }, 5000);
+      },
+      // 退出全屏
+      exitFullScreen() {
+        this.interactiveServer
+          .exitStreamFullscreen({
+            streamId: this.stream.streamId,
+            vNode: `vmp-stream-remote__${this.stream.streamId}`
+          })
+          .then(() => {
+            this.interactiveServer.state.fullScreenType = false;
+          });
       }
     }
   };
@@ -160,7 +207,7 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: #000;
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {
@@ -172,7 +219,7 @@
       height: 100%;
     }
     .vmp-stream-remote__container__mute {
-      background-image: url(./images/no_video_bg.png);
+      background-image: url(./img/no_video_bg.png);
       background-size: cover;
       background-repeat: no-repeat;
       position: absolute;
@@ -237,16 +284,43 @@
         background-size: contain;
         height: 16px;
         width: 16px;
-        background-image: url(./images/network0.png);
+        background-image: url(./img/network0.png);
         &__0 {
-          background-image: url(./images/network0.png);
+          background-image: url(./img/network0.png);
         }
         &__1 {
-          background-image: url(./images/network1.png);
+          background-image: url(./img/network1.png);
         }
         &__2 {
-          background-image: url(./images/network2.png);
+          background-image: url(./img/network2.png);
         }
+      }
+    }
+    &-exitscreen {
+      width: 64px;
+      height: 64px;
+      line-height: 64px;
+      z-index: 4;
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      text-align: center;
+      transform: translate(-32px, -32px);
+      border-radius: 50%;
+    }
+    .opcity-flase {
+      display: none;
+      transition: all 1s;
+      -webkit-transition: all 1s;
+    }
+    .opcity-true {
+      opacity: 1;
+      transition: all 1s;
+      z-index: 6;
+      -webkit-transition: all 1s;
+      i {
+        color: #fff;
       }
     }
   }

@@ -25,11 +25,8 @@
                 }}
               </div>
             </el-col>
-            <span
-              class="close ps"
-              @click="onClose"
-              v-if="userInfo.role_name == 3 || userInfo.third_party_user_id == this.doc_permission"
-            >
+            <!-- 如果角色是助理:3 或者 是主讲人可以关闭 -->
+            <span class="close ps" @click="onClose" v-if="permissionFlag">
               <i class="vh-iconfont vh-line-close"></i>
             </span>
           </el-row>
@@ -54,9 +51,7 @@
             </div>
           </el-row>
 
-          <el-row
-            v-if="userInfo.role_name == 3 || userInfo.third_party_user_id == this.doc_permission"
-          >
+          <el-row v-if="permissionFlag">
             <el-col align="center" class="mt20">
               <el-button
                 round
@@ -97,7 +92,7 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useTimerServer, useMsgServer } from 'middle-domain';
+  import { useTimerServer, useMsgServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
@@ -132,9 +127,7 @@
       }
     },
     data() {
-      let roomBaseServer = useRoomBaseServer();
       return {
-        roomBaseServer,
         status: 'kaishi',
         beifenshijian: 60,
         shijian: 0,
@@ -146,10 +139,54 @@
         sec: 0,
         ten_sec: 0,
         mon: 0,
-        ten_mon: 0,
-        userInfo: JSON.parse(sessionStorage.getItem('user')) || {},
-        doc_permission: ''
+        ten_mon: 0
+        // userInfo: {}
+        // doc_permission: ''
       };
+    },
+    computed: {
+      userInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      //互动工具状态
+      interactToolStatus() {
+        const { interactToolStatus = {} } = this.$domainStore.state.roomBaseServer;
+        return interactToolStatus;
+      },
+      groupInitData() {
+        return this.$domainStore.state.groupServer.groupInitData;
+      },
+      doc_permission() {
+        let currentSpeakerId;
+        if (this.groupInitData.isInGroup) {
+          currentSpeakerId = this.groupInitData.doc_permission;
+        } else {
+          currentSpeakerId = this.interactToolStatus.doc_permission;
+        }
+        return currentSpeakerId;
+      },
+      /**
+       * 权限控制
+       * 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
+       * 如果角色是助理:3 或者 是主讲人可以关闭
+       */
+      permissionFlag() {
+        //是否在分组里
+        let flag = false;
+        if (this.userInfo.role_name == 3) {
+          flag = true;
+        } else {
+          if (this.userInfo.third_party_user_id == this.doc_permission) {
+            flag = true;
+          } else {
+            flag = false;
+          }
+        }
+        return flag;
+      },
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
+      }
     },
     beforeCreate() {
       this.timerServer = useTimerServer();
@@ -158,7 +195,7 @@
     mounted() {
       this.init();
       this.timerServer.listenMsg();
-      console.log(this.timerServer, 'this.roomBaseServer');
+      // console.log(this.timerServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
@@ -169,9 +206,30 @@
       this.timerServer.$on('timer_reset', temp => this.timer_reset(temp));
       // 计时器继续
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
-      this.doc_permission = this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id;
     },
     methods: {
+      returnName(data) {
+        const identity = [
+          {
+            name: this.$tdefault(this.customRoleName[1]),
+            code: 1
+          },
+          {
+            name: this.$t('chat.chat_1063'),
+            code: 2
+          },
+          {
+            name: this.$tdefault(this.customRoleName[3]),
+            code: 3
+          },
+          {
+            name: this.$tdefault(this.customRoleName[4]),
+            code: 4
+          }
+        ];
+        const obj = identity.find(item => item.code == data);
+        return obj.name ? obj.name : data;
+      },
       // 计时器开始
       timer_start(e) {
         console.warn('监听到了计时器开始-------', e);
@@ -188,6 +246,17 @@
           boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
         );
         this.$emit('disTimer', true);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}发起了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       // 计时器结束
       timer_end(e) {
@@ -198,6 +267,17 @@
         );
         this.$emit('disTimer', true);
         clearInterval(this.timer);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}关闭了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       // 计时器暂停
       timer_pause(e) {
@@ -205,18 +285,39 @@
         this.status = 'zanting';
         this.timeFormat(Math.abs(e.data.remain_time));
         clearInterval(this.timer);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}暂停了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       // 计时器重置
       timer_reset(e) {
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}重置了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
         console.warn('监听到了计时器重置-------', e);
         clearInterval(this.timer);
         this.timerVisible = false;
         // 关闭计时器
         // 主讲人助理打开计时设置弹框
         this.$emit('disTimer', true);
-        const arr = [3];
         if (
-          arr.includes(this.userInfo.role_name) ||
+          this.userInfo.role_name == 3 ||
           this.userInfo.third_party_user_id == this.doc_permission
         ) {
           this.$emit('openSetTimer');
@@ -228,6 +329,17 @@
         console.warn('监听到了计时器继续-------', e);
         this.status = 'kaishi';
         this.timerFun(this.shijian);
+        // 添加聊天记录
+        const text = this.returnName(e.data.role_name);
+        const data = {
+          nickname: '计时器', // TODO: 缺翻译
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}继续了计时器` // TODO: 缺翻译
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
       },
       init() {
         this.timerServer
@@ -251,6 +363,10 @@
               if (resData.status == 2) {
                 this.status = 'jieshu';
               }
+              // 禁用互动工具-计时器
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
+              );
               this.$emit('disTimer', false);
             }
           })
@@ -330,7 +446,7 @@
           // if (window.chatSDK) {
           // TODO: // 主动向房间暂停发送消息
           this.msgServer.sendCustomMsg({
-            role_name: JSON.parse(sessionStorage.getItem('user')).role_name,
+            role_name: this.userInfo.role_name,
             type: 'timer_pause',
             remain_time: this.shijian
           });
@@ -421,7 +537,7 @@
     .bgimg {
       width: 292px;
       position: fixed;
-      z-index: 12;
+      z-index: 102;
       padding: 24px 20px;
       top: 15vh;
       left: 50vw;

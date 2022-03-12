@@ -22,7 +22,7 @@ import VmpInteractMenu from '@/packages/interact-menu';
 import VmpShare from '@/packages/share'; // 发起端分享观看端地址
 import VmpVirtualPeople from '@/packages/virtual-people'; // 虚拟人数弹窗
 import VmpThirdStream from '@/packages/third-push-stream';
-import VmpInsertVideo from '@/packages/insert-video-list';
+import VmpInsertVideoList from '@/packages/insert-video-list';
 import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
 import VmpPcMediaSetting from '@/packages/media-setting';
@@ -34,9 +34,23 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpNoticeList from '@/packages/notice'; // 公告列表
 import VmpLiveTimerSet from '@/packages/live-timer-set';
 import VmpLiveTimer from '@/packages/live-timer';
-import VmpRebroadcast from '@/packages/rebroadcast';
+import VmpRebroadcastList from '@/packages/rebroadcast-list';
+import VmpRebroadCastStream from '@/packages/rebroadcast-stream';
 import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
+import VmpQuestionnaire from '@/packages/questionnaire';
+import VmpSignLive from '@/packages/sign-module/sign-live';
+import VmpQa from '@/packages/qa';
+import VmpRedPacketLive from '@/packages/red-packet/live';
+import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
+import VmpRecordVideoSuccess from '@/packages/record-video-success';
+import VmpPcRewardEffect from '@/packages/pc-reward-effect';
+// 分屏页面
+import VmpSplitScreen from '@/packages/split-screen';
+// 客户端嵌入页
+import VmpEmbedClient from '@/packages/embed-client-live';
+// 邀请上麦
+import VmpMicInvited from '@/packages/mic-invited/index';
 
 // 全局注册组件
 export function initUse() {
@@ -61,7 +75,7 @@ export function initUse() {
   Vue.use(VmpShare);
   Vue.use(VmpVirtualPeople);
   Vue.use(VmpThirdStream);
-  Vue.use(VmpInsertVideo);
+  Vue.use(VmpInsertVideoList);
   Vue.use(VmpInsertStream);
   Vue.use(VmpBasicCenterContainerLive);
   // Vue.use(VmpGroupSetting);
@@ -72,10 +86,21 @@ export function initUse() {
   Vue.use(VmpNoticeList);
   Vue.use(VmpLiveTimerSet);
   Vue.use(VmpLiveTimer);
-  Vue.use(VmpRebroadcast);
+  Vue.use(VmpRebroadcastList);
+  Vue.use(VmpRebroadCastStream);
   Vue.use(VmpRecommend);
   Vue.use(VmpLotteryLive);
+  Vue.use(VmpQuestionnaire);
+  Vue.use(VmpSignLive);
+  Vue.use(VmpQa);
+  Vue.use(VmpRecordVideoSuccess);
+  Vue.use(VmpRedPacketLive);
+  Vue.use(VmpPcRewardEffect);
+  Vue.use(VmpSplitScreen);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);
+  Vue.use(VmpStreamDesktopScreen);
+  Vue.use(VmpEmbedClient);
+  Vue.use(VmpMicInvited);
 }

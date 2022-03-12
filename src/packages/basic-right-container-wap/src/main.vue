@@ -1,5 +1,5 @@
 <template>
-  <div class="base-box">
+  <div class="base-box" v-if="!groupInitData.isInGroup">
     <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
@@ -8,20 +8,42 @@
       <div class="have"></div>
       <img src="./image/icon.png" />
     </div>
+    <div class="icon-wrap">
+      <red-packet-icon @clickIcon="handleRedPacket" />
+    </div>
+    <div class="icon-wrap">
+      <lottery-icon @clickIcon="checkLotteryIcon" />
+    </div>
+    <div class="icon-wrap">
+      <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
+    </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
 </template>
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import lotteryIcon from './components/lottery-icon/index.vue';
+  import redPacketIcon from './components/red-repakcet-icon/index.vue';
+  import questionnaireIcon from './components/questionnaire-icon/index.vue';
   export default {
     name: 'VmpContainerRightWap',
+    components: {
+      lotteryIcon,
+      redPacketIcon,
+      questionnaireIcon
+    },
     data() {
       return {
         showTimer: false,
         timerVisible: true,
         showSign: false
       };
+    },
+    computed: {
+      groupInitData() {
+        return this.$domainStore.state.groupServer.groupInitData;
+      }
     },
     methods: {
       changeStatus(data, status) {
@@ -36,6 +58,20 @@
       },
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      handleRedPacket(red_packet_uuid) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitOpenRedPacket', [red_packet_uuid])
+        );
+      },
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      checkQuestionnaireIcon(questionnaireId) {
+        console.log(questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireIcon', [questionnaireId])
+        );
       }
     }
   };
@@ -45,7 +81,6 @@
   .base-box {
     display: flex;
     flex-direction: column;
-    background: #ddd;
     position: absolute;
     display: inline-block;
     right: 26px;
@@ -53,8 +88,8 @@
     // width: 20px;
     .icon-wrap {
       margin-bottom: 10px;
-      width: 84px;
-      height: 84px;
+      max-width: 84px;
+      max-height: 84px;
       position: relative;
       background-color: transparent;
       img {

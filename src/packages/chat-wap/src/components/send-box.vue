@@ -11,7 +11,7 @@
         <template v-if="chatShow">
           <div
             class="content-input__placeholder"
-            v-if="isNeedLogin && !isLogin && !noChatLogin"
+            v-if="isNeedLogin && !isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -22,12 +22,7 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span
-              v-if="
-                (isBanned && !groupInitData.isInGroup) ||
-                (groupInitData.isBanned && groupInitData.isInGroup)
-              "
-            >
+            <span v-if="isBanned">
               {{ $t('chat.chat_1006') }}
             </span>
             <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
@@ -36,21 +31,39 @@
           </div>
         </template>
       </div>
-      <div class="interact-wrapper">
+      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+        {{ $t('chat.chat_1018') }}
+      </span>
+      <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
-        <div
-          class="icon-wrapper"
-          v-show="
-            (webinar.type == 1 &&
-              deviceStatus != 2 &&
-              connectMicShow &&
-              !disabledAll &&
-              !isBanned &&
-              !groupInitData.isInGroup) ||
-            (onlineMicStatus && !groupInitData.isInGroup) ||
-            (!groupInitData.isBanned && groupInitData.isInGroup)
-          "
-        ></div>
+        <div class="icon-wrapper" v-show="isShowMicBtn">
+          <!-- 上麦 -->
+          <div
+            v-if="isAllowhandup || isSpeakOn"
+            style="position: relative"
+            auth="{ 'ui.hide_reward': 0 }"
+          >
+            <i
+              v-if="!handUpStatus"
+              class="vh-saas-iconfont vh-saas-line-shangmai"
+              @click="$refs.handup.openConnectPop()"
+            ></i>
+            <i
+              v-else
+              class="vh-saas-iconfont vh-saas-line-shangmaizhong"
+              @click="$refs.handup.openConnectPop()"
+            ></i>
+            <span class="red-dot" v-if="handUpStatus"></span>
+            <Handup
+              ref="handup"
+              @handupLoading="
+                s => {
+                  handUpStatus = s;
+                }
+              "
+            />
+          </div>
+        </div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
           <!-- 底部互动工具组件 comChatWap-->
           <vmp-air-container cuid="comChatWap"></vmp-air-container>
@@ -71,8 +84,10 @@
     useChatServer,
     useMediaCheckServer,
     useMsgServer,
-    useUserServer
+    useUserServer,
+    useMicServer
   } from 'middle-domain';
+  import Handup from './handup.vue';
 
   export default {
     props: {
@@ -108,10 +123,6 @@
         type: Boolean,
         default: false
       },
-      onlineMicStatus: {
-        type: Boolean,
-        default: false
-      },
       deviceType: {
         require: true,
         default: () => {
@@ -129,7 +140,8 @@
       }
     },
     components: {
-      chatWapInputModal
+      chatWapInputModal,
+      Handup
     },
     data() {
       const { state: roomBaseState } = this.roomBaseServer;
@@ -140,7 +152,7 @@
         //是否可以发送消息，发送限频
         canSend: true,
         //限频时间
-        time: 15,
+        time: 0,
         //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
@@ -148,8 +160,6 @@
         isShowUser: false,
         connectMicShow: false, // 连麦入口按钮
         disabledAll: false, // 全员禁言
-        //是否是嵌入端
-        isEmbed: false,
         //活动信息
         webinar: {},
         //是否已经登录
@@ -157,10 +167,26 @@
         //配置列表
         configList: {},
         //用户头像
-        avatar: require('../images/default_avatar.png')
+        avatar: require('../img/default_avatar.png'),
+        handUpStatus: false,
+        //只看我的问答
+        isShowMyQA: false
       };
     },
     computed: {
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
+      },
+      // 是否开启举手
+      isAllowhandup() {
+        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        return status;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       //分组讨论的信息
       groupInitData() {
         const { groupInitData = {} } = this.groupServer.state;
@@ -174,15 +200,30 @@
         }
         return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
       },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       //当前登录人信息
       joinInfo() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {} } = watchInitData;
         return join_info;
       },
-      //设备状态
-      deviceStatus() {
-        return this.mediaCheckServer.state.isBrowserNotSupport;
+      //是否展示互动上麦按钮
+      isShowMicBtn() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        return (
+          this.webinar.type == 1 &&
+          device_status != 2 &&
+          [
+            this.connectMicShow &&
+              !this.isAllBanned &&
+              !this.isBanned &&
+              !this.groupInitData.isInGroup,
+            this.groupInitData.isInGroup && !this.groupInitData.isBanned
+          ].some(val => !!val)
+        );
       }
     },
     watch: {
@@ -201,6 +242,9 @@
       this.userServer = useUserServer();
     },
     created() {
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
       this.initViewData();
     },
     mounted() {
@@ -212,16 +256,31 @@
       this.checkIsLogin();
       // eventBus监听
       this.eventListener();
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1003'));
+        }
+        this.connectMicShow = true;
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1002'));
+        }
+        this.connectMicShow = false;
+      });
     },
     methods: {
+      showMyQA() {
+        this.isShowMyQA = !this.isShowMyQA;
+        this.$emit('showMyQA', this.isShowMyQA);
+      },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        const { embed = false } = embedObj;
-        console.log(this.roomBaseServer, 'roomBaseServer');
         this.webinar = webinar;
-        this.isEmbed = embed;
         this.configList = configList;
       },
       // 判断登录
@@ -232,7 +291,7 @@
           this.isLogin = true;
           // 若用户已经登录过，获取userInfo
           this.isShowUser = true;
-          this.avatar = userInfo.avatar || require('../images/default_avatar.png');
+          this.avatar = userInfo.avatar || require('../img/default_avatar.png');
         } else {
           this.isLogin = false;
           this.isShowUser = false;
@@ -240,20 +299,9 @@
       },
       // eventBus监听
       eventListener() {
-        // 直播结束不展示入口
+        // 直播结束不展示连麦入口
         this.msgServer.$on('live_over', e => {
           console.log(e);
-          this.connectMicShow = false;
-        });
-        // 接收开启连麦消息事件
-        this.msgServer.$on('vrtc_connect_open', msg => {
-          console.log(msg);
-          this.connectMicShow = true;
-        });
-
-        // 接收关闭连麦消息事件
-        this.msgServer.$on('vrtc_connect_close', msg => {
-          console.log(msg);
           this.connectMicShow = false;
         });
 
@@ -279,8 +327,10 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(this.$t('chat.chat_1068', this.waitTime));
+            this.$message(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
+        } else if (this.currentTab == 'qa' && this.time != 0) {
+          this.$message(this.$t('chat.chat_1080', { n: this.time }));
         } else {
           this.$refs.chatWapInputModal.openModal();
         }
@@ -310,23 +360,38 @@
       },
       //发送消息
       sendMessage(value = '') {
-        // 关键词过滤标识
-        const filterStatus = this.chatServer.checkHasKeyword(true, value);
-        // 发送socket消息  当关键词列表中不包含当前要发的消息时候，进行发送(主意这里仅是把消息保存到了服务器，本地并没有消息)
-        if (filterStatus) {
-          const chatServer = useChatServer();
-          const curmsg = chatServer.createCurMsg();
-          //将文本消息加入消息体
-          curmsg.setText(value);
-          //发送消息
-          chatServer.sendMsg(curmsg);
-          //清除当前消息
-          chatServer.clearCurMsg();
+        //如果当前是问答tab
+        if (this.currentTab == 'qa') {
+          this.$emit('sendQa', value);
+          this.timing();
+          return;
         }
+        if (this.currentTab == 'private') {
+          this.$emit('sendPrivate', value);
+          return;
+        }
+        const chatServer = useChatServer();
+        const curmsg = chatServer.createCurMsg();
+        //将文本消息加入消息体
+        curmsg.setText(value);
+        //发送消息
+        chatServer.sendMsg(curmsg);
+        //清除当前消息
+        chatServer.clearCurMsg();
+        this.$emit('sendEnd');
       },
       // 打开个人中心
       showUserPopup() {
         this.$emit('showUserPopup');
+      },
+      timing() {
+        this.time = 15;
+        const timer = setInterval(() => {
+          --this.time;
+          if (this.time == 0) {
+            clearInterval(timer);
+          }
+        }, 1000);
       }
     }
   };
@@ -412,7 +477,25 @@
           .iconyaoqingka {
             font-size: 44px;
           }
+          .vh-saas-iconfont,
+          .vh-iconfont {
+            font-size: 47px;
+            color: #666666;
+          }
+
+          .red-dot {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background-color: #ff3030;
+            border-radius: 10px;
+          }
         }
+      }
+      .only-my {
+        color: #fc5659;
       }
     }
   }

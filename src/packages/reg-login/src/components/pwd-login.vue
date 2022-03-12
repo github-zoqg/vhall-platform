@@ -25,13 +25,21 @@
       </el-form-item>
       <!-- 请输入登录密码 -->
       <el-form-item prop="password">
-        <el-input
+        <!-- <el-input
           type="password"
           v-model.trim="ruleForm.password"
           clearable
           :placeholder="$t('login.login_1011')"
           @blur="autoLoginSetMargin"
-        ></el-input>
+        ></el-input> -->
+        <PwdInput
+          v-model.trim="ruleForm.password"
+          clearable
+          :placeholder="$t('login.login_1011')"
+          :maxlength="30"
+          auto-complete="off"
+          onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
+        ></PwdInput>
       </el-form-item>
       <!-- 其它 -->
       <el-form-item>
@@ -78,12 +86,14 @@
 </template>
 <script>
   import ThirdLoginLink from './third-login-link.vue';
+  import PwdInput from './pwd-input.vue';
   import mixin from '../mixins/mixin';
   export default {
     name: 'VmpPwdLogin',
     mixins: [mixin],
     components: {
-      ThirdLoginLink
+      ThirdLoginLink,
+      PwdInput
     },
     data() {
       const validAccount = (rule, value, callback) => {

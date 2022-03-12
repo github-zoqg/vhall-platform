@@ -4,7 +4,7 @@
       <!-- 主菜单区域 -->
       <section class="vmp-tab-container-mainarea" ref="mainArea">
         <section
-          v-for="tab of mainMenu"
+          v-for="tab of filterMainMenu"
           :key="tab.cuid"
           v-show="curItem.cuid === tab.cuid && mainMenu.find(item => item.id === curItem.id)"
         >
@@ -63,6 +63,16 @@
       };
     },
     computed: {
+      filterMainMenu() {
+        let set = [];
+        for (const item of this.mainMenu) {
+          if (set.every(i => i.cuid !== item.cuid)) {
+            set.push(item);
+          }
+        }
+
+        return [...set];
+      },
       filterSubMenu() {
         let set = [];
         for (const item of this.subMenu) {
@@ -119,9 +129,11 @@
 
         return findComp(cuid, arr);
       },
-      switchTo(item) {
-        let child = null;
+      async switchTo(item) {
+        // 确保动态加载的dom渲染完成
+        await this.$nextTick();
 
+        let child = null;
         child = this.getComp(item.cuid, this.$children);
 
         // hack(TODO: 临时，后面需要改)
@@ -132,6 +144,7 @@
         }
 
         if (!child) return;
+        console.log('item:', item);
 
         // pre-show
         if (item.type === 1) {

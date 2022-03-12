@@ -1,16 +1,16 @@
 <template>
-  <div class="vmp-chat-msg-item">
+  <div class="vmp-chat-msg-item" v-if="!(isOnlyShowSponsor && source.roleName != 1)">
     <!--消息发送时间-->
     <div v-if="showTime" class="vmp-chat-msg-item__showtime">{{ showTime }}</div>
     <!--常规消息-->
     <div
       :class="[
         'msg-item-template',
-        ['welcome_msg'].includes(msg.type) ? 'msg-item-template--welcome' : ''
+        ['welcome_msg'].includes(source.type) ? 'msg-item-template--welcome' : ''
       ]"
     >
       <!--欢迎语-->
-      <template v-if="['welcome_msg'].includes(msg.type)">
+      <template v-if="['welcome_msg'].includes(source.type)">
         <div v-if="msg.nickname !== '' && msg.content !== ''" class="msg-item-template--welcome">
           <span>{{ msg.nickname }}</span>
           {{ msg.content }}
@@ -19,7 +19,7 @@
       <template v-else>
         <!--常规消息-->
         <div
-          v-if="!msg.interactStatus && !msg.interactToolsStatus"
+          v-if="!source.interactStatus && !source.interactToolsStatus"
           class="msg-item-template__normal-msg clearfix"
         >
           <template
@@ -27,27 +27,27 @@
               chatOptions && chatOptions.userControlOptions && chatOptions.userControlOptions.enable
             "
           >
-            <div class="normal-msg__avatar" @click="setPersonStatus($event, msg)">
-              <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+            <div class="normal-msg__avatar" @click="setPersonStatus($event, source)">
+              <img class="normal-msg__avatar-img" :src="source.avatar" alt />
               <img
-                v-if="msg.client === 'h5_browser'"
+                v-if="source.client === 'h5_browser'"
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../images/phone.png"
+                src="../img/phone.png"
                 alt
               />
             </div>
           </template>
           <template v-else>
             <div class="normal-msg__avatar">
-              <img class="normal-msg__avatar-img" :src="msg.avatar" alt />
+              <img class="normal-msg__avatar-img" :src="source.avatar" alt />
               <img
-                v-if="msg.client === 'h5_browser'"
+                v-if="source.client === 'h5_browser'"
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../images/phone.png"
+                src="../img/phone.png"
                 alt
               />
             </div>
@@ -55,58 +55,68 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">{{ msg.nickname }}</span>
+              <span class="info-wrap__nick-name">
+                {{ source.nickname }}
+              </span>
               <span
                 v-if="
-                  (msg.type === 'text' || msg.type === 'image') &&
-                  msg.roleName &&
-                  msg.roleName != '2'
+                  (source.type === 'text' || source.type === 'image' || source.isHistoryMsg) &&
+                  source.roleName &&
+                  source.roleName != '2'
                 "
                 class="info-wrap__role-name"
-                :class="msg.roleName | roleClassFilter"
+                :class="source.roleName | roleClassFilter"
               >
-                {{ msg.roleName | roleFilter(this) }}
+                {{ source.roleName | roleFilter(this) }}
               </span>
             </p>
             <!-- 被回复的消息 -->
             <div
               v-if="
-                msg.replyMsg &&
-                msg.replyMsg.content &&
-                (msg.replyMsg.content.text_content || msg.replyMsg.content.image_urls)
+                source.replyMsg &&
+                source.replyMsg.content &&
+                (source.replyMsg.content.text_content || source.replyMsg.content.image_urls)
               "
               class="normal-msg__content__reply-wrapper"
             >
               <!-- 文本 -->
               <p
-                v-if="msg.replyMsg && msg.replyMsg.content && msg.replyMsg.content.text_content"
+                v-if="
+                  source.replyMsg && source.replyMsg.content && source.replyMsg.content.text_content
+                "
                 class="reply-wrapper__content reply-msg"
                 v-html="
                   `<span class='reply-wrapper__content__nick-name'>${
-                    msg.replyMsg.nickname || msg.replyMsg.nick_name
-                  }</span>&nbsp;${msg.replyMsg.content.text_content}`
+                    source.replyMsg.nickname || source.replyMsg.nick_name
+                  }</span>&nbsp;${source.replyMsg.content.text_content}`
                 "
               ></p>
               <!-- 图片 -->
               <div
-                v-if="msg.replyMsg && msg.replyMsg.content && msg.replyMsg.content.image_urls"
+                v-if="
+                  source.replyMsg && source.replyMsg.content && source.replyMsg.content.image_urls
+                "
                 class="reply-wrapper__img-wrapper reply-msg"
-                :style="msg.replyMsg.content.text_content && 'margin-top:-3px;'"
+                :style="source.replyMsg.content.text_content && 'margin-top:-3px;'"
               >
                 <p
-                  v-if="msg.replyMsg && msg.replyMsg.content && msg.replyMsg.content.text_content"
+                  v-if="
+                    source.replyMsg &&
+                    source.replyMsg.content &&
+                    source.replyMsg.content.text_content
+                  "
                   class="msg-item__content-hr"
                 ></p>
                 <!-- 回复 -->
                 <span
-                  v-if="!msg.replyMsg.content.text_content"
+                  v-if="!source.replyMsg.content.text_content"
                   class="reply-wrapper__img-wrapper__nick-name"
                 >
-                  {{ msg.replyMsg.nickname }}
+                  {{ source.replyMsg.nickname }}
                 </span>
                 <p class="msg-item__content-hr"></p>
                 <div
-                  v-for="(img, index) in msg.replyMsg.content.image_urls"
+                  v-for="(img, index) in source.replyMsg.content.image_urls"
                   :key="index"
                   class="reply-wrapper__img-wrapper__img-box reply-msg"
                   :class="index === 0 ? 'first-child' : ''"
@@ -117,33 +127,35 @@
                     height="34"
                     :src="img"
                     :alt="$t('chat.chat_1065')"
-                    @click="previewImg($event, index, msg.replyMsg.content.image_urls)"
+                    @click="previewImg(index, source.replyMsg.content.image_urls)"
                   />
                 </div>
               </div>
             </div>
             <!-- 文本 -->
             <p
-              v-if="msg.content.text_content"
+              v-if="source.content.text_content"
               class="normal-msg__content-wrapper"
               v-html="
-                msg.replyMsg && msg.replyMsg.content
-                  ? `<span class='normal-msg__content-wrapper__label'>回复&nbsp;</span> ${msgContent}`
+                source.replyMsg && source.replyMsg.content
+                  ? `<span class='normal-msg__content-wrapper__label'>${$t(
+                      'chat.chat_1036'
+                    )}&nbsp;</span> ${msgContent}`
                   : msgContent
               "
             ></p>
             <!-- 图片 -->
-            <div v-if="msg.content.image_urls" class="normal-msg__img-wrapper">
+            <div v-if="source.content.image_urls" class="normal-msg__img-wrapper">
               <!-- 回复 -->
               <span
-                v-if="msg.replyMsg && msg.replyMsg.content && !msg.content.text_content"
+                v-if="source.replyMsg && source.replyMsg.content && !source.content.text_content"
                 class="normal-msg__img-wrapper__label"
               >
-                回复
+                {{ $t('chat.chat_1036') }}
               </span>
               <p class="msg-item__content-hr"></p>
               <div
-                v-for="(img, index) in msg.content.image_urls"
+                v-for="(img, index) in source.content.image_urls"
                 :key="index"
                 class="normal-msg__img-wrapper__img-box"
                 :class="index === 0 ? 'first-child' : ''"
@@ -153,8 +165,8 @@
                   width="34"
                   height="34"
                   :src="img"
-                  alt="聊天图片加载失败"
-                  @click="previewImg($event, index, msg.content.image_urls)"
+                  alt="$t('chat.chat_1065')"
+                  @click="previewImg(index, source.content.image_urls)"
                 />
               </div>
             </div>
@@ -163,31 +175,34 @@
 
         <!-- 抽奖、问答、签到、问卷、红包 -->
         <div
-          v-if="msg.interactStatus && !(msg.type == 'red_envelope_ok' && isEmbed)"
+          v-if="source.interactStatus && !(source.type == 'red_envelope_ok' && isEmbed)"
           class="msg-item-template__interact"
         >
           <div class="msg-item-template__interact-content">
-            <span v-show="msg.nickname && msg.roleName != 1" class="interact-content__nick-name">
-              {{ msg.nickname }}
+            <span
+              v-show="source.nickname && source.roleName != 1"
+              class="interact-content__nick-name"
+            >
+              {{ source.nickname }}
             </span>
             <span
-              v-show="msg.roleName"
+              v-show="source.roleName"
               class="interact-content__role-name"
-              :class="msg.roleName | roleClassFilterForMsg"
+              :class="source.roleName | roleClassFilterForMsg"
             >
-              {{ msg.roleName | roleFilter(this) }}
+              {{ source.roleName | roleFilter(this) }}
             </span>
             <img
-              v-if="msg.type == 'red_envelope_ok'"
+              v-if="source.type == 'red_envelope_ok'"
               class="interact-content__redpackage-img"
-              src="../images/red-package-1.png"
+              src="../img/red-package-1.png"
               alt=""
             />
-            <span>{{ msg.content.text_content }}</span>
+            <span>{{ source.content.text_content }}</span>
             <span
-              v-if="msg.isCheck"
+              v-if="source.isCheck"
               class="interact-content__click-detail"
-              @click="clickToView(msg.type, msg.content)"
+              @click="clickToView(source.type, source.content)"
             >
               {{ $t('nav.nav_1027') }}
             </span>
@@ -195,28 +210,32 @@
         </div>
         <!-- 礼物、打赏 -->
         <div
-          v-if="msg.interactToolsStatus && !(msg.type === 'reward_pay_ok' && isEmbed)"
+          v-if="source.interactToolsStatus && !(source.type === 'reward_pay_ok' && isEmbed)"
           class="msg-item-template__interact-tools"
         >
           <div class="interact-tools-content">
-            <span v-show="msg.nickname" class="interact-tools-content__nick-name">
-              {{ msg.nickname }}
+            <span v-show="source.nickname" class="interact-tools-content__nick-name">
+              {{ source.nickname }}
             </span>
             <span>
-              {{ msg.type === 'reward_pay_ok' ? '打赏了红包' : `送出${msg.content.gift_name}` }}
+              {{
+                source.type === 'reward_pay_ok'
+                  ? $t('chat.chat_1029')
+                  : `$t('chat.chat_1032')${source.content.gift_name}`
+              }}
             </span>
             <img
               class="interact-tools-content__img"
               :class="{
-                'interact-tools-content__img-scale': msg.content.source_status === '0',
-                'interact-tools-content__img-reward': !msg.content.gift_url
+                'interact-tools-content__img-scale': source.content.source_status === '0',
+                'interact-tools-content__img-reward': !source.content.gift_url
               }"
-              :src="msg.content.gift_url || require('../images/red-package-1.png')"
+              :src="source.content.gift_url || require('../img/red-package-1.png')"
               :alt="$t('interact_tools.interact_tools_1029')"
             />
-            <br v-if="msg.type === 'reward_pay_ok'" />
-            <span v-if="msg.type === 'reward_pay_ok'" style="color: #fa9a32">
-              {{ msg.content.text_content }}
+            <br v-if="source.type === 'reward_pay_ok'" />
+            <span v-if="source.type === 'reward_pay_ok'" style="color: #fa9a32">
+              {{ source.content.text_content }}
             </span>
           </div>
         </div>
@@ -230,16 +249,20 @@
   export default {
     name: 'msgItem',
     props: {
-      msg: {
+      source: {
         type: Object,
         required: true,
         default() {
           return {};
         }
       },
-      roleName: {
-        required: true
+      //是否只展示观看端
+      isOnlyShowSponsor: {
+        default: false
       },
+      // roleName: {
+      //   required: true
+      // },
       //聊天配置
       chatOptions: {
         type: Object,
@@ -258,6 +281,19 @@
       preMsg: {
         type: Object,
         default: null
+      },
+      // 预览图片
+      previewImg: {
+        type: Function,
+        default: function () {}
+      },
+      emitLotteryEvent: {
+        type: Function,
+        default: function () {}
+      },
+      emitQuestionnaireEvent: {
+        type: Function,
+        default: function () {}
       }
     },
     data() {
@@ -269,10 +305,16 @@
     },
     computed: {
       showTime() {
-        if (!this.preMsg) {
-          return handleChatShowTime('', this.msg.sendTime);
+        if (!this.source.sendTime) {
+          return '';
         }
-        return handleChatShowTime(this.preMsg.sendTime, this.msg.sendTime);
+        if (!this.source.prevTime) {
+          return handleChatShowTime('', this.source.sendTime);
+        }
+        return handleChatShowTime(this.source.prevTime, this.source.sendTime);
+      },
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
     filters: {
@@ -291,13 +333,13 @@
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = vm.$t('chat.chat_1022');
+            ret = vm.$tdefault(vm.customRoleName[1]);
             break;
           case 3:
-            ret = vm.$t('chat.chat_1024');
+            ret = vm.$tdefault(vm.customRoleName[3]);
             break;
           case 4:
-            ret = vm.$t('chat.chat_1023');
+            ret = vm.$tdefault(vm.customRoleName[4]);
             break;
           case 20:
             ret = vm.$t('chat.chat_1064');
@@ -341,96 +383,101 @@
       this.handleAt();
     },
     methods: {
-      // 预览图片
-      previewImg(e, index, images) {
-        this.$emit('previewImg', index, images);
-      },
       //todo domain负责
       setPersonStatus(event, msg) {
         if (!msg.sendId) {
           return;
         }
         // 嘉宾和助理只能操作观众
-        if ((this.roleName == 3 || this.roleName == 4) && msg.roleName != 2) {
-          EventBus.$emit(
-            'set_person_status_in_chat',
-            event.target,
-            msg.sendId,
-            msg.count,
-            msg.nickname,
-            false,
-            msg.roleName
-          );
-          return;
-        }
-        // 观众不能操作
-        if (this.roleName == 2) {
-          return;
-        }
+        // if ((this.roleName == 3 || this.roleName == 4) && msg.roleName != 2) {
+        //   EventBus.$emit(
+        //     'set_person_status_in_chat',
+        //     event.target,
+        //     msg.sendId,
+        //     msg.count,
+        //     msg.nickname,
+        //     false,
+        //     msg.roleName
+        //   );
+        //   return;
+        // }
+        // // 观众不能操作
+        // if (this.roleName == 2) {
+        //   return;
+        // }
         EventBus.$emit(
           'set_person_status_in_chat',
           event.target,
           msg.sendId,
           msg.count,
           msg.nickname,
-          true,
           msg.roleName
         );
       },
       //todo 信令唤起其他模块 点击查看消息
       clickToView(type, content) {
+        // TODO: type 目前消息体不统一
+        console.log('clickToView', type, content);
         // 抽奖点击查看
-        if (type === 'lottery_result_notice') {
-          this.lotteryCheck(content);
-        } else if (type === 'questionnaire_push') {
-          // 问卷点击查看
+        if (content?.msg?.data?.type === 'lottery_result_notice') {
+          this.lotteryCheck(content?.msg?.data);
+        }
+        // 问卷查看
+        if (type === 'questionnaire_push') {
           this.questionnaireCheck(content.questionnaire_id);
         }
       },
       //todo 点击查看抽奖信息
-      lotteryCheck(content) {
-        this.$emit('lotteryCheck', content.msg, content.userId);
+      lotteryCheck(msg) {
+        this.emitLotteryEvent(msg);
       },
       //todo 点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
-        this.$emit('questionnaireCheck', questionnaire_id);
+        console.log('questionnaireCheck', questionnaire_id);
+        this.emitQuestionnaireEvent(questionnaire_id);
       },
       //处理@消息
       handleAt() {
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.msg.atList.length) {
-          this.msgContent = this.msg.content.text_content;
+        if (!this.source.atList || !this.source.atList.length) {
+          this.msgContent = this.urlToLink(this.source.content.text_content);
         } else {
           let at = false;
-          this.msg.atList.forEach(a => {
+          this.source.atList.forEach(a => {
             // TODO历史列表aList与直播中格式不一致作
             const userName = `@${a.nick_name || a.nickName} `;
             const match =
-              this.msg.content &&
-              this.msg.content.text_content &&
-              this.msg.content.text_content.indexOf(userName) != -1;
+              this.source.content &&
+              this.source.content.text_content &&
+              this.source.content.text_content.indexOf(userName) != -1;
             if (match) {
               if (at) {
-                this.msgContent = this.msgContent.replace(
-                  userName,
-                  `<span style='color:#4DA1FF'>${userName}</span>`
+                this.msgContent = this.urlToLink(
+                  this.msgContent.replace(
+                    userName,
+                    `<span style='color:#4DA1FF'>${userName}</span>`
+                  )
                 );
               } else {
-                this.msgContent = this.msg.content.text_content.replace(
-                  userName,
-                  `<span style='color:#4DA1FF'>${userName}</span>`
+                this.msgContent = this.urlToLink(
+                  this.source.content.text_content.replace(
+                    userName,
+                    `<span style='color:#4DA1FF'>${userName}</span>`
+                  )
                 );
               }
               at = true;
             } else {
-              this.msgContent = at ? this.msgContent : this.msg.content.text_content;
+              this.msgContent = at
+                ? this.urlToLink(this.msgContent)
+                : this.urlToLink(this.source.content.text_content);
             }
           });
         }
         if (
-          this.msg.atList &&
-          this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
-          !this.msg.isHistoryMsg
+          this.source.atList &&
+          this.source.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+          !this.source.isHistoryMsg
         ) {
           this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
           clearTimeout(this.tipTimer);
@@ -438,13 +485,50 @@
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
         }
-        if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
-          this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
+        if (this.source.replyMsg && this.source.replyMsg.content && !this.source.isHistoryMsg) {
+          this.$emit('dispatchEvent', {
+            type: 'replyMsg',
+            el: this.$el,
+            msg: this.source.replyMsg
+          });
           clearTimeout(this.tipTimer);
           this.tipTimer = setTimeout(() => {
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
         }
+      },
+      // 将聊天消息中的链接用 a 标签包裹
+      urlToLink(str) {
+        if (!str) return '';
+
+        // 提取聊天内容中的 img 标签
+        const regImg = /<img.*?(?:>|\/>)/g;
+        const imgArr = str.match(regImg);
+
+        // 提取聊天内容中除去 img 标签以外的部分
+        const strArr = str.split(regImg);
+        // eslint-disable-next-line no-useless-escape
+        const regUrl =
+          /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/g;
+
+        // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹
+        strArr.forEach((item, index) => {
+          const tempStr = item.replace(regUrl, function (match) {
+            return `<a class='msg-item__content-body__content-link' href='${match}' target='_blank'>${match}</a>`;
+          });
+          strArr[index] = tempStr;
+        });
+
+        // 遍历 img 标签数组，将聊天内容中的 img 标签插回原来的位置
+        if (imgArr) {
+          const imgArrLength = imgArr.length;
+          let imgIndex = 0;
+          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+            imgIndex++;
+          }
+        }
+        return strArr.join('');
       }
     }
   };
@@ -691,8 +775,8 @@
             color: #fb3a32;
           }
           &.assistant {
-            background-color: rgba(53, 98, 250, 0.2);
-            color: #3562fa;
+            background-color: rgba(166, 166, 166, 0.15);
+            color: #a6a6a6;
           }
           &.guest {
             background-color: rgba(53, 98, 250, 0.2);
@@ -748,6 +832,10 @@
           }
         }
       }
+    }
+    .msg-item__content-body__content-link {
+      color: #3562fa;
+      text-decoration: underline #3562fa !important;
     }
   }
 </style>

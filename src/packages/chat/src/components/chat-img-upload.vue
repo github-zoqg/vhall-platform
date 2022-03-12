@@ -63,8 +63,8 @@
         //上传图片请求的token
         headToken: sessionOrLocal.get('token', 'localStorage') || '',
         interact_token: '',
-        //todo 暂时写死，后续替换 上传图片地址
-        action: `https://t-saas-dispatch.vhall.com/v3/commons/upload/index`
+        //上传图片地址
+        action: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`
       };
     },
     computed: {
@@ -176,7 +176,7 @@
           position: absolute;
           width: 15px;
           height: 15px;
-          background: url('../images/img-del.png') no-repeat;
+          background: url('../img/img-del.png') no-repeat;
           background-size: contain;
           top: 0;
           right: 0;

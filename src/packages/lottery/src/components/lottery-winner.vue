@@ -2,22 +2,22 @@
   <div class="winner-list">
     <div
       class="custom-lottery-box"
-      :class="prizeObj && !prizeObj.award_name ? 'custom-lottery-box-default' : ''"
+      :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
     >
-      <img
-        v-if="prizeObj && !prizeObj.image_url"
+      <!-- <img
+        v-if="prizeInfo && !prizeInfo.image_url"
         src="../img/default-lottery.png"
         alt=""
         class="default-lottery"
-      />
-      <div v-else class="custom-lottery">
-        <img :src="prizeObj && prizeObj.image_url" alt="" />
+      /> -->
+      <div class="custom-lottery">
+        <img :src="prizeInfo ? prizeInfo.image_url : defaultLotteryImg" alt="" />
       </div>
       <p
         class="custom-lottery__name"
-        :class="prizeObj && !prizeObj.award_name ? 'custom-lottery__name-default' : ''"
+        :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery__name-default' : ''"
       >
-        {{ (prizeObj && prizeObj.award_name) || '奖品' }}
+        {{ (prizeInfo && prizeInfo.award_name) || '奖品' }}
       </p>
     </div>
     <!-- 列表 -->
@@ -37,6 +37,13 @@
             />
           </p>
           <p class="winner-name">{{ item.lottery_user_nickname }}</p>
+          <!-- <p class="winner-avatar">
+            <img
+              class="winner-avatar-img"
+              :src="prizeInfo.image_url ? prizeInfo.image_url : defaultLotteryImg"
+              alt=""
+            />
+          </p> -->
         </li>
       </ul>
     </div>
@@ -64,16 +71,24 @@
         default() {
           return [];
         }
+      },
+      // 奖品信息
+      prizeInfo: {
+        type: Object
       }
     },
     data() {
       return {
-        prizeObj: {}, // 奖品信息
+        // prizeInfo: {}, // 奖品信息
         isScroll: false,
-        defaultAvatarImg: require('../img/avatar.png')
+        defaultAvatarImg: require('../img/avatar.png'),
+        defaultLotteryImg: require('../img/default-lottery.png')
       };
     },
-    created() {},
+    mounted() {},
+    created() {
+      console.log(this.winnerList, 'winnerList');
+    },
     methods: {
       handleScroll(e) {
         // 滚动的像素+容器的高度>可滚动的总高度-100像素

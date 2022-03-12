@@ -5,14 +5,24 @@
       v-loading="loading"
       element-loading-text="加载中"
       element-loading-background="rgba(0,0,0,.9)"
+      @mousemove="wrapEnter"
+      @mouseleave="wrapLeave(true)"
     >
-      <div :id="'videoDom' + timestamp" class="vmp-video-preview-wrap-container">
-        <div class="vmp-video-preview-wrap-tips" v-if="isAudio">
+      <div
+        :id="'videoDom' + timestamp"
+        class="vmp-video-preview-wrap-container"
+        :class="isAudio && isInsertVideoPreview ? 'vmp-video-preview-wrap-container__hide' : ''"
+      >
+        <div class="vmp-video-preview-wrap-tips" v-if="isAudio && !isInsertVideoPreview">
           <div class="vmp-video-img">
             <img class="audio-img" :src="audioImg" alt="" />
           </div>
         </div>
-        <div class="vmp-video-preview-wrap-controller">
+        <div
+          class="vmp-video-preview-wrap-controller"
+          :class="hoveVideo ? 'vmp-video-preview-wrap-controller__active' : ''"
+          v-show="isShowController"
+        >
           <div class="vmp-video-preview-wrap-controller-slider">
             <!-- 进度条 -->
             <el-slider
@@ -32,7 +42,7 @@
             <div class="vmp-video-preview-wrap-controller-icons-left">
               <i
                 class="vh-iconfont"
-                :class="statePaly ? 'vh-a-line-videopause' : 'vh-a-line-videoplay'"
+                :class="statePaly ? 'vh-a-line-videopause' : 'vh-line-video-play'"
                 @click="videoPlayBtn"
               ></i>
               <!-- <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
@@ -75,16 +85,16 @@
               <!-- 插播视频播放器显示的按钮 -->
               <template v-if="isInsertVideoPreview">
                 <el-tooltip effect="dark" content="插播列表">
-                  <i @click="$emit('openInsert')" class="iconfont iconchaboliebiao_icon"></i>
+                  <i @click="$emit('openInsert')" class="vh-iconfont vh-line-menu"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="关闭插播">
-                  <i @click="$emit('closeInsertvideo')" class="vh-iconfont vh-line-close"></i>
+                  <i
+                    @click="$emit('closeInsertvideo', { isShowConfirmDialog: true })"
+                    class="vh-iconfont vh-line-close"
+                  ></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="隐藏">
-                  <i
-                    @click="$emit('hideInsertVideoControl')"
-                    class="vh-iconfont vh-line-arrow-down"
-                  ></i>
+                  <i @click="hideInsertVideoControl" class="vh-iconfont vh-line-arrow-down"></i>
                 </el-tooltip>
               </template>
             </div>
@@ -103,6 +113,12 @@
       videoParam: {
         type: Object,
         required: true
+      },
+      // 是否显示控制栏
+      isShowController: {
+        type: Boolean,
+        require: false,
+        default: false
       },
       isInsertVideoPreview: {
         type: Boolean,
@@ -148,6 +164,7 @@
     computed: {
       isAudio() {
         const videoType = this.videoParam.msg_url || this.videoParam.file_type;
+        if (!videoType) return false;
         return videoType.toLowerCase() == '.mp3' || videoType.toLowerCase() == '.mav';
       }
     },
@@ -168,6 +185,7 @@
           if (this.isInsertVideoPreview) {
             this._firstInit = true;
           }
+          console.log('初始化播放器成功');
           this.totalTime = this.playerServer.getDuration(() => {
             console.log('获取总时间失败');
           }); // 获取视频总时长
@@ -177,20 +195,37 @@
       },
       async initSDK() {
         const { interact, join_info } = this.roomBaseState.watchInitData;
-        const params = {
+        const { videoParam } = this;
+        let params = {
           appId: interact.paas_app_id || '', // 应用ID，必填
           accountId: join_info.third_party_user_id || '', // 第三方用户ID，必填
           token: interact.paas_access_token || '', // access_token，必填
-          type: 'vod', // live 直播  vod 点播  必填
+          type: videoParam.type || 'vod', // live 直播  vod 点播  必填
           videoNode: 'videoDom' + this.timestamp, // 播放器的容器， div的id 必填
           poster: '', // 封面地址  仅支持.jpg
-          autoplay: false,
+          autoplay: videoParam.autoplay || false,
           forceMSE: false,
-          vodOption: { recordId: this.videoParam.paas_record_id, forceMSE: false },
+
           subtitleOption: {
             enable: true
           }
         };
+
+        // params = Object.assign(videoParam, params);
+
+        if (params.type === 'live') {
+          Object.assign(params, {
+            liveOption: videoParam.liveOption
+          });
+        }
+
+        if (params.type === 'vod') {
+          Object.assign(params, {
+            vodOption: { recordId: videoParam.paas_record_id, forceMSE: false }
+          });
+        }
+
+        console.log('video init params', params);
         return new Promise(resolve => {
           this.playerServer.init(params).then(() => {
             this.playerServer.openControls(false);
@@ -210,12 +245,6 @@
         this.setVideoCurrentTime(time);
 
         this.playerServer.play();
-      },
-      closeInsertvideo() {
-        console.log('关闭插播');
-      },
-      hideInsertVideoControl() {
-        console.log('wosh我是隐藏');
       },
       initSlider() {
         this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {
@@ -345,6 +374,7 @@
           }
         });
         this.playerServer.$on(VhallPlayer.PLAY, () => {
+          console.log('播放器播放事件');
           this.statePaly = true;
           // 监听播放状态
           if (this.isInsertVideoPreview) {
@@ -353,13 +383,14 @@
             }
             this._isVideoEnd = false;
             if (this._firstInit) {
-              const elVideo = document.getElementById('vh-video');
+              const elVideo = document.querySelector(`#videoDom${this.timestamp} video`);
               this.$emit('remoteInsterSucces', elVideo);
               this._firstInit = false;
             }
           }
         });
         this.playerServer.$on(VhallPlayer.PAUSE, () => {
+          console.log('视频预览播放器暂停');
           if (this.isInsertVideoPreview) {
             // 监听暂停状态
             this.$emit('handleRemoteInsertVideoPause');
@@ -381,6 +412,20 @@
           },
           true
         );
+      },
+      // 隐藏播放器控制栏
+      hideInsertVideoControl() {
+        this.hoveVideo = false;
+      },
+      wrapEnter() {
+        this.hoveVideo = true;
+      },
+      wrapLeave(isSelfInvok) {
+        // 如果是插播播放器，禁止组件自身触发leave方法，只能通过 parent.refs 调用
+        if (isSelfInvok && this.isInsertVideoPreview) {
+          return;
+        }
+        this.hoveVideo = false;
       }
     },
     beforeDestroy() {
@@ -402,7 +447,7 @@
         height: 100%;
         width: 100%;
         background: black;
-        &.hide {
+        &__hide {
           background: rgba(0, 0, 0, 0);
           /deep/ video {
             visibility: hidden;
@@ -433,10 +478,13 @@
         z-index: 20;
         width: 100%;
         height: 40px;
-        bottom: 0px;
+        bottom: -31px;
         background: rgba(0, 0, 0, 0.7);
         transition: all 0.8s;
         color: white;
+        &__active {
+          bottom: 0;
+        }
         &-slider {
           width: 100%;
           position: absolute;
@@ -548,12 +596,15 @@
                 }
               }
             }
-            .iconchaboliebiao_icon,
-            .iconguanbichabo_icon {
+            .vh-line-menu,
+            .vh-line-close {
               margin-left: 12px;
             }
-            .iconfont {
+            .vh-iconfont {
               cursor: pointer;
+              &:hover {
+                color: #fb3a32;
+              }
             }
           }
         }

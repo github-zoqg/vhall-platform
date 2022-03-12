@@ -1,33 +1,7 @@
 <template>
   <div class="tools-box">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
-      <!-- 上麦 -->
-      <div
-        v-if="isAllowhandup || isSpeakOn"
-        style="position: relative"
-        auth="{ 'ui.hide_reward': 0 }"
-      >
-        <i
-          v-if="!handUpStatus"
-          class="vh-saas-iconfont vh-saas-line-drag"
-          @click="$refs.handup.openConnectPop()"
-        ></i>
-        <i
-          v-else
-          class="vh-saas-iconfont vh-saas-a-line-offthemicrophone"
-          @click="$refs.handup.openConnectPop()"
-        ></i>
-        <span class="red-dot" v-if="handUpStatus"></span>
-        <Handup
-          ref="handup"
-          @handupLoading="
-            s => {
-              handUpStatus = s;
-            }
-          "
-        />
-      </div>
-      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }">
+      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
         <GiftCard
           ref="gifts"
@@ -39,7 +13,10 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-if="!localRoomInfo.isEmbed" auth="{ 'ui.hide_reward': 0 }">
+      <div
+        v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward"
+        auth="{ 'ui.hide_reward': 0 }"
+      >
         <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
         <RewardCard
           ref="reward"
@@ -49,20 +26,20 @@
         />
       </div>
       <!-- 邀请卡 -->
-      <a
-        v-if="showInviteCard && !localRoomInfo.isEmbed"
-        target="_blank"
-        :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
-      >
-        <i class="vh-saas-iconfont iconyaoqingka"></i>
-      </a>
+      <div v-if="showInviteCard && !localRoomInfo.isEmbed">
+        <a
+          target="_blank"
+          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+        >
+          <i class="vh-iconfont vh-line-share"></i>
+        </a>
+      </div>
+
       <!-- 点赞 -->
-      <div auth="{ 'ui.watch_hide_like': 0 }">
+      <div auth="{ 'ui.watch_hide_like': 0 }" v-if="localRoomInfo.showLike">
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
         <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
-      <!-- 被邀请上麦 -->
-      <invite-handup :roomBaseState="roomBaseState" />
     </div>
   </div>
 </template>
@@ -72,12 +49,10 @@
   import GiftCard from './component/GiftCard.vue';
   import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
-  import Handup from './component/handup.vue';
-  import InviteHandup from './component/InviteHandup.vue';
 
   export default {
     name: 'VmpInteractToolsWap',
-    components: { GiftCard, RewardCard, Parise, Handup, InviteHandup },
+    components: { GiftCard, RewardCard, Parise },
     data() {
       let { configList } = useRoomBaseServer().state;
       let { groupInitData } = useGroupServer().state;
@@ -88,21 +63,21 @@
           ? roomBaseState.watchInitData.webinar.rebroadcast.channel_id
           : '',
         isEmbed: /embed/.test(this.$route.path),
-        isLogin: sessionStorage.getItem('isLogin'),
-        isNeedLogin: !sessionStorage.getItem('isLogin'),
-        isShowGift: true,
-        isShowOnselfMdess: false,
-        showLike: true,
-        showShare: true,
+        isLogin: !!roomBaseState.watchInitData.join_info.user_id,
+        isNeedLogin: !roomBaseState.watchInitData.join_info.user_id,
+        isShowGift: configList['ui.hide_gifts'] != 1,
+        showLike: configList['ui.watch_hide_like'] != 1,
+        showShare: configList['ui.watch_hide_share'] != 1,
+        isShowReward: configList['ui.hide_reward'] != 1,
         roomId: roomBaseState.watchInitData.interact.room_id,
         saasJoinId: roomBaseState.watchInitData.join_info.join_id,
         staticSrc: roomBaseState.watchInitData.urls.static_url,
         type: roomBaseState.watchInitData.webinar.type,
         uploadSrc: roomBaseState.watchInitData.urls.upload_url,
         webSrc: roomBaseState.watchInitData.urls.web_url,
-        webinarId: '723145973'
+        webinarId: roomBaseState.watchInitData.webinar.id
       };
-      let webinarData = roomBaseState.watchInitData.webinar;
+      let webinarData = roomBaseState.watchInitData;
       return {
         roomBaseState,
         localRoomInfo,
@@ -110,23 +85,14 @@
         configList,
         groupInitData,
         joinInfoInGift: {},
-        showInviteCard: false,
+        showInviteCard: roomBaseState.inviteCard.status == '1',
         location:
-          window.location.protocol + process.env.VUE_APP_WATCH_URL + process.env.VUE_APP_WEB_KEY,
-        qwe: 1,
-        handUpStatus: false
+          window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
+        qwe: 1
       };
     },
-    computed: {
-      // 是否开启举手
-      isAllowhandup() {
-        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
-        return status;
-      },
-      // 是否是上麦状态
-      isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
-      }
+    created() {
+      window.interactTools = this;
     },
     mounted() {
       this.joinInfoInGift = {
@@ -134,7 +100,6 @@
         nickname: this.roomBaseState.watchInitData.join_info.nickname,
         hideChatHistory: this.configList['ui.hide_chat_history'] == 1
       };
-      console.log(this.roomBaseState, 'roomBaseState');
     },
     methods: {
       opneGifts() {
@@ -160,19 +125,10 @@
         }
       }
     }
-    .vh-saas-iconfont {
+    .vh-saas-iconfont,
+    .vh-iconfont {
       font-size: 47px;
       color: #666666;
-    }
-
-    .red-dot {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 10px;
-      height: 10px;
-      background-color: #ff3030;
-      border-radius: 10px;
     }
   }
 </style>

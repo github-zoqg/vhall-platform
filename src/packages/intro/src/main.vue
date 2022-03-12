@@ -1,10 +1,12 @@
 <template>
   <section class="vmp-intro">
-    <section class="vmp-intro-block vmp-intro-block-content">
-      <main v-if="content" class="vmp-intro-block__content-main">
-        <section v-html="content"></section>
-      </main>
-    </section>
+    <overlay-scrollbars ref="introScroll" :options="overlayScrollBarsOptions" style="height: 100%">
+      <section class="vmp-intro-block vmp-intro-block-content">
+        <main v-if="content" class="vmp-intro-block__content-main">
+          <section v-html="content"></section>
+        </main>
+      </section>
+    </overlay-scrollbars>
   </section>
 </template>
 
@@ -15,7 +17,16 @@
     data() {
       return {
         IntroEmptyImg,
-        type: 'default' // default、subscribe
+        type: 'default', // default、subscribe
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     computed: {
@@ -51,6 +62,9 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
       },
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
+      },
       // 简介富文本正文 Type:String
       content() {
         const defaultText = this.$t('appointment.appointment_1019');
@@ -61,7 +75,7 @@
         </section>
         `;
 
-        const introduction = this?.webinar?.introduction;
+        const introduction = this.languagesInfo.introduction;
         if (introduction && introduction !== '<p></p>') {
           return introduction;
         }
@@ -78,7 +92,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
 
     .vmp-intro-block {
       padding: 0.4rem;
@@ -88,29 +101,28 @@
         padding: 16px 24px 12px 24px;
         width: 100%;
         height: 100%;
-        overflow-y: scroll;
         background: transparent;
         font-size: 14px;
         font-weight: 400;
         color: #e6e6e6;
         word-break: break-word;
 
-        ::v-deep p {
+        p {
           margin-bottom: 8px;
         }
-        ::v-deep img {
+        img {
           margin: 4px auto;
           display: block;
           max-width: 100%;
         }
 
-        ::v-deep .empty {
+        .empty {
           display: block;
           width: 160px;
           height: 120px;
           margin: 80px auto 10px auto;
         }
-        ::v-deep .info {
+        .info {
           width: 100%;
           height: 22px;
           font-size: 16px;

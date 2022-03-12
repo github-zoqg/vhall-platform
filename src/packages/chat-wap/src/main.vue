@@ -10,34 +10,27 @@
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
-      <scroll ref="scroll" @pullingDown="handlePullingDown">
-        <msg-item
-          v-for="msg in chatList"
-          :key="msg.count"
-          :msg="msg"
-          @preview="handlePreview"
-        ></msg-item>
-      </scroll>
+      <virtual-list
+        ref="chatlist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'count'"
+        :data-sources="chatList"
+        :data-component="msgItem"
+        :extra-props="{
+          previewImg: previewImg.bind(this),
+          emitLotteryEvent,
+          emitQuestionnaireEvent,
+          joinInfo
+        }"
+        @tobottom="tobottom"
+      ></virtual-list>
       <div
         class="vmp-chat-wap__content__new-msg-tips"
-        v-show="messageType.atList || messageType.reply || messageType.normal"
-        @click="scrollBottom"
+        v-show="isHasUnreadAtMeMsg"
+        @click="scrollToTarget"
       >
-        <span
-          v-if="
-            (messageType.normal && !messageType.atList && !messageType.reply) ||
-            newMsgNum > 1 ||
-            !((messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal)
-          "
-        >
-          {{ $t('chat.chat_1035', newMsgNum) }}
-        </span>
-        <span
-          v-if="(messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal"
-        >
-          {{ $t('chat.chat_1034') }}{{ messageType.atList ? '@' : ''
-          }}{{ messageType.reply ? $t('chat.chat_1036') : '' }} {{ $t('chat.chat_1059') }}
-        </span>
+        <span>{{ tipMsg }}</span>
         <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
@@ -51,28 +44,32 @@
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
       @login="handleLogin"
+      @sendEnd="sendMsgEnd"
     ></send-box>
   </div>
 </template>
 
 <script>
-  import scroll from './components/scroll';
+  import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
-  import defaultAvatar from './images/default_avatar.png';
+  import defaultAvatar from './img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatWap',
     components: {
-      scroll,
-      msgItem,
+      VirtualList,
+      // msgItem,
       sendBox
     },
+    mixins: [emitter],
     data() {
       const { chatList } = this.chatServer.state;
       return {
+        msgItem,
         chatList: chatList,
         //新消息信息集合体
         messageType: {
@@ -82,14 +79,16 @@
           id: '',
           noNormal: false
         },
+        //消息提示
+        tipMsg: '',
+        //是否有未读
+        isHasUnreadAtMeMsg: false,
         //新消息数量
-        newMsgNum: 0,
+        unReadMessageCount: 0,
         //活动信息
         webinar: {},
         //是否隐藏聊天历史加载记录
         configList: {},
-        //在线的上麦状态 todo 待确认从哪里取全局的speakerList
-        onlineMicStatus: false,
         //当前页数
         page: 1,
         //是否已经下拉刷新
@@ -104,7 +103,13 @@
         allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
-
+    watch: {
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
+        }
+      }
+    },
     computed: {
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
@@ -173,19 +178,27 @@
             video: false
           };
         }
-      }
-    },
-    watch: {
-      async 'chatList.length'(newVal) {
-        console.log(newVal);
-        await this.$nextTick();
-        this.$refs.scroll.refresh();
-        if (this.isPullingDown) {
-          this.$refs.scroll.finishPullDown();
-          this.isPullingDown = false;
-          return;
+      },
+      //是否已上麦
+      onlineMicStatus() {
+        const { interactToolStatus = {} } = this.roomBaseServer.state;
+        const { groupInitData = {} } = this.groupServer.state;
+        let isOnMic = false;
+        if (groupInitData && groupInitData.isInGroup) {
+          isOnMic =
+            Array.isArray(groupInitData.speaker_list) &&
+            !groupInitData.speaker_list.some(
+              ele => ele.account_id === this.joinInfo.third_party_user_id
+            );
+        } else {
+          isOnMic =
+            interactToolStatus &&
+            Array.isArray(interactToolStatus.speaker_list) &&
+            !interactToolStatus.speaker_list.some(
+              ele => ele.account_id === this.joinInfo.third_party_user_id
+            );
         }
-        this.$refs.scroll.scrollBottom();
+        return isOnMic;
       }
     },
     beforeCreate() {
@@ -202,7 +215,7 @@
 
       this.imgUrls = [];
       // 给聊天服务保存一份关键词
-      this.chatServer.setKeywordList(this.keywordList);
+      // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
       console.log('useChatServer', useChatServer().state);
@@ -223,6 +236,30 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        // const giftsServer = useGiftsServer();
+        //监听到新消息过来
+        chatServer.$on('receiveMsg', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.unReadMessageCount++;
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+          }
+          this.dispatch('TabContent', 'noticeHint', 3);
+        });
+        //监听@我的消息
+        chatServer.$on('atMe', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = this.$t('chat.chat_1075');
+          }
+        });
+        //监听回复我的消息
+        chatServer.$on('replyMe', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = this.$t('chat.chat_1076');
+          }
+        });
         //监听禁言通知
         chatServer.$on('banned', res => {
           this.isBanned = res;
@@ -237,15 +274,22 @@
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$message(this.$t('chat.chat_1007'));
         });
+      },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        useChatServer().clearChatMsg();
+        this.getHistoryMessage();
       },
       // 获取历史消息
       async getHistoryMessage() {
         const data = {
           room_id: this.roomId,
+          // webinar_id: this.webinar_id,
           pos: this.page * 10,
-          limit: 10 // 所有端统一显示50条
+          limit: 50 // 所有端统一显示50条
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
@@ -255,12 +299,10 @@
         const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
-        } else {
-          this.$refs.scroll.finishPullDown();
-          this.isPullingDown = false;
         }
+        this.scrollBottom();
       },
-      handlePreview(img) {
+      previewImg(img) {
         const index = this.imgUrls.findIndex(item => item === img);
         ImagePreview({
           images: this.imgUrls,
@@ -274,17 +316,34 @@
         this.isPullingDown = true;
         this.getHistoryMessage();
       },
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
+      },
       //滚动到底部
       scrollBottom() {
-        this.$refs.scroll.scrollBottom();
-        this.messageType = {
-          atList: false,
-          reply: false,
-          normal: false,
-          id: '',
-          noNormal: false
-        };
-        this.newMsgNum = 0;
+        this.$nextTick(() => {
+          this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
+          this.isHasUnreadAtMeMsg = false;
+        });
+      },
+      //监听滚动条滚动到底部
+      tobottom() {
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.chatlist.$el.scrollHeight -
+            this.$refs.chatlist.$el.scrollTop -
+            this.$refs.chatlist.getClientSize() <
+          5
+        );
       },
       showUserPopup() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
@@ -292,6 +351,24 @@
       //唤起登录弹窗
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      //自己发送消息后的回调
+      sendMsgEnd() {
+        this.scrollBottom();
+      },
+      //todo domain负责 抽奖情况检查
+      emitLotteryEvent(msg) {
+        console.log('emitLotteryEvent', msg);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
+        );
+      },
+      //todo domain负责 问卷情况检查
+      emitQuestionnaireEvent(questionnaireId) {
+        console.log('emitQuestionnaireEvent', questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
+        );
       }
     }
   };

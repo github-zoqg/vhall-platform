@@ -1,9 +1,10 @@
 <template>
-  <div class="vh-goods" :class="{ subscribe_goods: pagetype == 'subscribe' }">
+  <div class="vh-goods" :class="{ subscribe_goods: isSubscribe }">
     <div
       v-for="good in goodsList"
       :key="good.goods_id"
-      class="vh-goods_item watch-page"
+      class="vh-goods_item"
+      :class="isSubscribe ? 'subscribe_item' : 'watch-page'"
       @click="showDetailDialog(good)"
     >
       <div class="vh-goods_item-cover">
@@ -116,14 +117,10 @@
         bottomText: ''
       };
     },
-    props: {
-      pagetype: {
-        default: 'watch'
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
-      // goodsInfo: {
-      //   type: Object,
-      //   default: () => {}
-      // }
     },
     // watch: {
     //   goodsInfo: {
@@ -301,9 +298,9 @@
 </script>
 
 <style lang="less">
-  c {
+  .vh-goods {
     width: 100%;
-    height: 500px;
+    height: 100%;
     overflow-y: scroll;
 
     .vh-goods_item {
@@ -322,14 +319,14 @@
         overflow: hidden;
         img {
           display: block;
-          width: 100px;
-          height: 100px;
+          width: 100%;
+          height: 100%;
           object-fit: scale-down;
           border-radius: 4px;
         }
       }
       &-info {
-        width: 100%;
+        // width: 100%;
         height: 100px;
         font-size: 12px;
         position: relative;
@@ -441,8 +438,11 @@
     }
 
     &.subscribe_goods {
-      padding: 16px 24px;
-      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 16px 24px 24px;
       .vh-goods_item {
         margin: 24px 0;
         background: #fff;
@@ -470,107 +470,119 @@
           background: #f1f1f1;
         }
       }
+      .subscribe_item {
+        width: 458px;
+        height: 200px;
+        background: #fff;
+        padding: 0px;
+        padding-right: 24px;
+        border-radius: 4px;
+        border: none;
+        &:nth-child(2n) {
+          margin-left: 16px;
+        }
+        .vh-goods_item-cover {
+          width: 200px;
+          height: 200px;
+          background: #f7f7f7;
+          border-top-right-radius: 0px;
+          border-bottom-right-radius: 0px;
+          overflow: hidden;
+          display: inline-block;
+          img {
+            display: block;
+            width: 200px;
+            height: 200px;
+            object-fit: scale-down;
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+            transition: all 0.4s;
+            &:hover {
+              transform: scale(1.2);
+            }
+          }
+        }
+        .vh-goods_item-info {
+          display: inline-block;
+          height: 100%;
+          color: @font-light-normal;
+          box-sizing: border-box;
+          padding-top: 24px;
+          position: relative;
+          .name {
+            color: @font-light-normal;
+          }
+          .describe {
+            width: 100%;
+            height: 36px;
+            line-height: 18px;
+            word-break: break-word;
+            font-size: 12px;
+            font-family: PingFangSC-Regular, PingFang SC;
+            font-weight: 400;
+            color: #666666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            white-space: normal;
+            margin-top: 4px;
+          }
+          .discount_price {
+            bottom: 48px;
+          }
+          .other-info {
+            bottom: 24px;
+            .price,
+            i {
+              color: #fb3a32;
+            }
+            .price {
+              ::v-deep > .remainder {
+                font-size: 10px;
+              }
+            }
+            .buy {
+              border: 1px solid #fb3a32;
+              color: #fb3a32;
+            }
+            .discount_price {
+              color: @font-light-low;
+            }
+          }
+          &:hover {
+            .name {
+              color: #fb3a32;
+            }
+            .other-info div .buy {
+              background: #fb3a32;
+              color: #fff;
+            }
+          }
+        }
+        &:hover {
+          background: #fff;
+          border-radius: 4px;
+          cursor: pointer;
+          border: none;
+          // .vh-goods_item-cover{
+          //   img {
+          //     transition: all .4s;
+          //     transform: scale(1.2);
+          //   }
+          // }
+          // .vh-goods_item-info .name{
+          //   color: #FB3A32;
+          // }
+          .vh-goods_item-info .other-info .buy {
+            border: 1px solid #fb3a32;
+            background: #fff;
+          }
+        }
+      }
     }
-    // .subscribe_item {
-    //   width: 458px;
-    //   height: 200px;
-    //   background: #fff;
-    //   padding: 0px;
-    //   padding-right: 24px;
-    //   border-radius: 4px;
-    //   border: none;
-    //   .vh-goods_item-cover {
-    //     width: 200px;
-    //     height: 200px;
-    //     background: #f7f7f7;
-    //     border-top-right-radius: 0px;
-    //     border-bottom-right-radius: 0px;
-    //     overflow: hidden;
-    //     display: inline-block;
-    //     img {
-    //       display: block;
-    //       width: 200px;
-    //       height: 200px;
-    //       object-fit: scale-down;
-    //       border-top-right-radius: 0px;
-    //       border-bottom-right-radius: 0px;
-    //       transition: all 0.4s;
-    //       &:hover {
-    //         transform: scale(1.2);
-    //       }
-    //     }
-    //   }
-    //   .vh-goods_item-info {
-    //     display: inline-block;
-    //     height: 100%;
-    //     color: @font-light-normal;
-    //     box-sizing: border-box;
-    //     padding-top: 24px;
-    //     position: relative;
-    //     .name {
-    //       color: @font-light-normal;
-    //     }
-    //     .describe {
-    //       width: 100%;
-    //       height: 36px;
-    //       line-height: 18px;
-    //       word-break: break-word;
-    //       font-size: 12px;
-    //       font-family: PingFangSC-Regular, PingFang SC;
-    //       font-weight: 400;
-    //       color: #666666;
-    //       overflow: hidden;
-    //       text-overflow: ellipsis;
-    //       display: -webkit-box;
-    //       -webkit-line-clamp: 2;
-    //       line-clamp: 2;
-    //       -webkit-box-orient: vertical;
-    //       white-space: normal;
-    //       margin-top: 4px;
-    //     }
-    //     .discount_price {
-    //       bottom: 48px;
-    //     }
-    //     .other-info {
-    //       bottom: 24px;
-    //       .price,
-    //       i {
-    //         color: #fb3a32;
-    //       }
-    //       .price {
-    //         .remainder {
-    //           font-size: 10px;
-    //         }
-    //       }
-    //       .buy {
-    //         border: 1px solid #fb3a32;
-    //         color: #fb3a32;
-    //       }
-    //       .discount_price {
-    //         color: @font-light-low;
-    //       }
-    //     }
-    //     &:hover {
-    //       .name {
-    //         color: #fb3a32;
-    //       }
-    //       .other-info div .buy {
-    //         background: #fb3a32;
-    //         color: #fff;
-    //       }
-    //     }
-    //   }
-    //   &:hover {
-    //     background: #fff;
-    //     border-radius: 4px;
-    //     cursor: pointer;
-    //     border: none;
-    //     .vh-goods_item-info .other-info .buy {
-    //       border: 1px solid #fb3a32;
-    //       background: #fff;
-    //     }
-    //   }
-    // }
     .good-pop-wrap {
       position: fixed;
       top: 0px;
@@ -806,70 +818,69 @@
     }
   }
 
-  // @media screen and (max-width: 1366px) {
-  //   .subscribe_goods {
-  //     width: 780px;
-  //   }
-  //   .subscribe_item {
-  //     // width: 433px;
-  //     width: 409px;
-  //     height: 200px;
-  //     margin-bottom: 16px;
-  //     .vh-goods_item-info {
-  //       width: 201px;
-  //     }
-  //   }
-  // }
+  @media screen and (max-width: 1366px) {
+    .subscribe_goods {
+      width: 780px;
+    }
+    .subscribe_item {
+      width: 409px;
+      height: 200px;
+      margin-bottom: 16px;
+      .vh-goods_item-info {
+        width: 201px;
+      }
+    }
+  }
 
-  // @media screen and (min-width: 1367px) and (max-width: 1600px) {
-  //   .subscribe_goods {
-  //     width: 932px;
-  //   }
-  //   .subscribe_item {
-  //     width: 433px;
-  //     // width: 409px;
-  //     height: 200px;
-  //     margin-bottom: 16px;
-  //     .vh-goods_item-info {
-  //       width: 225px;
-  //     }
-  //     &:nth-child(2n) {
-  //       margin-left: 16px;
-  //     }
-  //   }
-  // }
-  // @media screen and (min-width: 1601px) and (max-width: 1920px) {
-  //   .subscribe_goods {
-  //     width: 1480px;
-  //   }
-  //   .subscribe_item {
-  //     // width: 482px;
-  //     width: 458px;
-  //     height: 200px;
-  //     margin-bottom: 16px;
-  //     .vh-goods_item-info {
-  //       width: 250px;
-  //     }
-  //     &:nth-child(3n + 2) {
-  //       margin: 0px 16px;
-  //     }
-  //   }
-  // }
-  // @media screen and (min-width: 1921px) {
-  //   .subscribe_goods {
-  //     width: 1480px;
-  //   }
-  //   .subscribe_item {
-  //     // width: 482px;
-  //     width: 458px;
-  //     height: 200px;
-  //     margin-bottom: 16px;
-  //     .vh-goods_item-info {
-  //       width: 250px;
-  //     }
-  //     &:nth-child(3n + 2) {
-  //       margin: 0px 16px;
-  //     }
-  //   }
-  // }
+  @media screen and (min-width: 1367px) and (max-width: 1600px) {
+    .subscribe_goods {
+      width: 932px;
+    }
+    .subscribe_item {
+      width: 433px;
+      // width: 409px;
+      height: 200px;
+      margin-bottom: 16px;
+      .vh-goods_item-info {
+        width: 225px;
+      }
+      &:nth-child(2n) {
+        margin-left: 16px;
+      }
+    }
+  }
+  @media screen and (min-width: 1601px) and (max-width: 1920px) {
+    .subscribe_goods {
+      width: 1480px;
+    }
+    .subscribe_item {
+      // width: 482px;
+      width: 458px;
+      height: 200px;
+      margin-bottom: 16px;
+      .vh-goods_item-info {
+        width: 250px;
+      }
+      &:nth-child(3n + 2) {
+        margin: 0px 16px;
+      }
+    }
+  }
+  @media screen and (min-width: 1921px) {
+    .subscribe_goods {
+      width: 1480px;
+    }
+    .subscribe_item {
+      // width: 482px;
+      width: 458px;
+      height: 200px;
+      margin-bottom: 16px;
+      .vh-goods_item-info {
+        width: 250px;
+      }
+      &:nth-child(3n + 2) {
+        margin: 0px 16px;
+      }
+    }
+  }
 </style>

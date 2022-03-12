@@ -788,7 +788,18 @@ export default {
     other_1001: 'Preview image',
     other_1002: 'Enter the password!',
     other_1003: 'Enter the invitation code',
-    other_1004: 'Upload image cannot exceed 2M'
+    other_1004: 'Upload image cannot exceed 2M',
+    other_1006: 'The host rejected you to open the microphone',
+    other_1007: 'Try sliding left and right',
+    other_1008: 'waiting',
+    other_1009:
+      'This live supports video connection， recommend allowing system opens corresponding device to use function.',
+    other_1010: 'The current device does not support connection',
+    other_1011: 'Allow “webinar.e.vhall.com” use your camera and Mic',
+    other_1012: 'Refuse',
+    other_1013: 'Allow',
+    other_1014: 'Equipment inspection',
+    other_1015: 'I got it'
   },
   undefined: {}
 };

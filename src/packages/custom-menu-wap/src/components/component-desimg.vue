@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="vmp-custom-menu-desimg">
     <div v-html="info.content"></div>
   </section>
 </template>
@@ -19,4 +19,16 @@
   };
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+  .vmp-custom-menu-desimg {
+    font-size: 14px;
+    font-weight: 400;
+    color: #1a1a1a;
+    line-height: 22px;
+    overflow-x: hidden;
+    img {
+      width: 100%;
+      pointer-events: none;
+    }
+  }
+</style>

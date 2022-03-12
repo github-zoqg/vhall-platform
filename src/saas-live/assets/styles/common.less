@@ -75,7 +75,6 @@ textarea {
     flex-direction: row;
     width: 100%;
     height: 50px;
-    line-height: 50px;
     background-color: #434343;
     z-index: 12;
     justify-content: space-between;
@@ -86,6 +85,7 @@ textarea {
     display: flex;
     position: relative;
     flex: 1;
+    height: calc(100% - 50px);
   }
   .vmp-basic-left {
     width: 60px;
@@ -104,6 +104,9 @@ textarea {
     background-color: #2d2d2d;
     display: flex;
     flex-direction: column;
+    flex: 1;
+  }
+  .vmp-basic-center-bottom {
     flex: 1;
   }
   .vmp-basic-right {
@@ -129,6 +132,7 @@ textarea {
       position: relative;
       display: flex;
       flex-direction: column;
+      height: calc(100% - 240px);
     }
   }
 }
@@ -140,7 +144,6 @@ textarea {
 }
 .vmp-header-right {
   flex: 1;
-  text-align: right;
 }
 
 .el-table::before {

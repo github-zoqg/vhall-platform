@@ -8,16 +8,24 @@ import {
   useRoomBaseServer,
   useMicServer,
   useMemberServer,
-  useQaServer,
+  useQaAdminServer,
+  useGroupServer,
+  useChatAuthServer,
   useMediaSettingServer,
-  useVirtualAudienceServer
+  useUserServer,
+  useInsertFileServer
 } from 'middle-domain';
 
-setBaseUrl('https://t-saas-dispatch.vhall.com');
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
+});
 setRequestHeaders({
   platform: 7, // 7:PC网页版
   token: localStorage.getItem('token') || '',
-  'interact-token': sessionStorage.getItem('interact_token') || ''
+  'biz-id': 4, //业务线标识 知客: 4
+  'biz-application-id': '02391153' //paas应用id
 });
 
 Vue.use(DomainStore);
@@ -29,8 +37,11 @@ export default new DomainStore.Store({
     interactiveServer: useInteractiveServer().state,
     micServer: useMicServer().state,
     memberServer: useMemberServer().state,
-    qaServer: useQaServer().state,
+    qaServer: useQaAdminServer().state,
+    groupServer: useGroupServer().state,
+    chatAuthServer: useChatAuthServer().state,
     mediaSettingServer: useMediaSettingServer().state,
-    virtualAudienceServer: useVirtualAudienceServer().state
+    userServer: useUserServer().state,
+    insertFileServer: useInsertFileServer().state
   }
 });

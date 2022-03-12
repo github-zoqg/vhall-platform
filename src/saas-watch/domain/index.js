@@ -9,10 +9,18 @@ import {
   useMicServer,
   useMediaSettingServer,
   useVirtualAudienceServer,
-  useUserServer
+  useUserServer,
+  useGroupServer,
+  useDesktopShareServer,
+  useSplitScreenServer,
+  useInsertFileServer
 } from 'middle-domain';
 
-setBaseUrl('https://t-saas-dispatch.vhall.com');
+setBaseUrl({
+  v3Url: process.env.VUE_APP_BASE_URL,
+  middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
+  wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
+});
 setRequestHeaders({
   platform: 7
 });
@@ -27,6 +35,10 @@ export default new DomainStore.Store({
     micServer: useMicServer().state,
     mediaSettingServer: useMediaSettingServer().state,
     virtualAudienceServer: useVirtualAudienceServer().state,
-    userServer: useUserServer().state
+    userServer: useUserServer().state,
+    groupServer: useGroupServer().state,
+    desktopShareServer: useDesktopShareServer().state,
+    splitScreenServer: useSplitScreenServer().state,
+    insertFileServer: useInsertFileServer().state
   }
 });

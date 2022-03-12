@@ -294,7 +294,6 @@
       this.init();
     },
     methods: {
-      //todo 初始化方法
       async init() {
         //提取Url参数
         this.urlParams = this.extractionUrlParams();
@@ -386,6 +385,17 @@
           webinar_id: this.webinarId,
           vc
         });
+
+        const paramKeyList = Object.keys(params);
+
+        //这里兼容一下以前的参数，保证口令登录的情况下，聊天审核也能正常,以前参数附加live_token这一步是在axios封装的方法里实现的
+        if (
+          paramKeyList.includes('liveT') &&
+          (!paramKeyList.includes('live_token') ||
+            ['', null, void 0].includes(params['live_token']))
+        ) {
+          params.live_token = params.liveT;
+        }
 
         return this.chatAuthServer
           .initRoomInfo(params)

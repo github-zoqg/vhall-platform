@@ -96,28 +96,22 @@
       <van-cell></van-cell>
     </van-popup>
 
-    <!-- 设置密码 -->
-    <!-- <van-popup
-      v-model="pwdDialog.visible"
-      class="user-info-dialog"
-      v-if="pwdDialog.visible"
-      :close-on-click-overlay="false"
-      get-container="body"
-    ></van-popup> -->
-
     <!-- 设置手机号 -->
     <bind-phone v-model="phoneDialog" />
+
+    <!-- 设置密码 -->
+    <bind-password v-model="pwdData" />
   </div>
 </template>
 
 <script>
   import { useUserServer } from 'middle-domain';
-  import NECaptchaLanguages from './js/setNECLanguages';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import BindPhone from './components/bind-phone';
+  import BindPassword from './components/bind-password';
   export default {
     name: 'VmpUserAccountWap',
-    components: { BindPhone },
-    mixins: [NECaptchaLanguages],
+    components: { BindPhone, BindPassword },
     data() {
       return {
         useUserServer: {},
@@ -129,6 +123,10 @@
           step: 1,
           type: 'add',
           phone: ''
+        },
+        pwdData: {
+          type: 'add',
+          visible: false
         }
       };
     },
@@ -145,6 +143,7 @@
       // 关闭弹窗
       closePopup() {
         this.visible = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCloseUserCenterWap'));
       },
 
       // 打开手机号弹窗
@@ -248,7 +247,10 @@
       },
 
       // 修改密码
-      openPwdHandler() {}
+      openPwdHandler() {
+        this.pwdData.visible = true;
+        this.pwdData.type = this.useUserServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
+      }
     }
   };
 </script>

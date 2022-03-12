@@ -302,6 +302,10 @@
       isOpenSwitch() {
         return this.roomBaseServer.state.interactToolStatus.is_open_switch;
       },
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
       // 待分配人员列表
       waitingUserList() {
         return this.groupServer.state.waitingUserList;
@@ -326,14 +330,54 @@
       }
     },
     mounted() {
+      this.initEvent();
       this.initData();
     },
     methods: {
+      // 初始化事件
+      initEvent() {
+        // 发起端收到拒绝邀请演示
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
+          // 如果申请人是自己, 或者自己不是主持人
+          if (
+            msg.data.room_join_id == this.userId ||
+            this.roomBaseServer.state.watchInitData.join_info.role_name != 1
+          ) {
+            return;
+          }
+          let role = '';
+          if (msg.data.room_role == 2) {
+            role = '观众';
+          } else if (msg.data.room_role == 4) {
+            role = '嘉宾';
+          }
+          if (msg.data.extra_params == this.userId) {
+            console.log('拒绝邀请', msg);
+            this.$message({
+              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+
+        // 发起端收到结束演示成功消息
+        this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
+          if (msg.sender_id != this.userId) {
+            this.$message({
+              message: '观众结束了演示',
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
       // 正在演示的人，切换channel需要自己结束演示
       handleEndDemonstrateInChannelChange() {
-        if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
-          this.groupServer.endSelft;
-        }
+        // if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
+        // }
       },
       hiddenAll() {
         this.settingDialogVisible = false;
@@ -523,8 +567,9 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         })
-          .then(() => {
-            this.groupServer.groupDisband(id);
+          .then(async () => {
+            await this.groupServer.groupDisband(id);
+            await this.roomBaseServer.getInavToolStatus();
           })
           .catch(() => {});
       },
@@ -536,8 +581,11 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
           //   type: 'warning'
-        }).then(() => {
-          this.groupServer.startDiscussion();
+        }).then(async () => {
+          const { code, msg } = await this.groupServer.startDiscussion();
+          if (code !== 200) {
+            this.$message.error(msg);
+          }
         });
       },
       // 结束讨论
@@ -674,6 +722,13 @@
             font-weight: 400;
             color: #f4f4f4;
             line-height: 22px;
+
+            .colFA9A32 {
+              font-size: 14px;
+              font-weight: 400;
+              color: #fa9a32;
+              line-height: 22px;
+            }
           }
           .split-card__menus {
             flex: 1;

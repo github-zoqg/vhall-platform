@@ -1,7 +1,7 @@
 <template>
-  <div class="vmp-notice-column" v-if="isNoticeColumn">
+  <div class="vmp-notice-column" v-show="isNoticeColumn">
     <div class="vmp-notice-column-wrap">
-      <span class="vmp-notice-column-wrap-icons"><img src="./images/icon.png" alt="" /></span>
+      <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
       <p class="vmp-notice-column-wrap-nowrap">
         <span class="vmp-notice-column-wrap-animated">
           <span id="vmp-notice-column-text">{{ noticeText }}</span>
@@ -23,33 +23,70 @@
         isNoticeColumn: false
       };
     },
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      noticeLatestInfo() {
+        return this.roomBaseServer.state.noticeInfo;
+      }
+    },
+    watch: {
+      isInGroup(val) {
+        this.isNoticeColumn = false;
+        this.openNotice();
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
-      this.noticeServer.listenMsg();
-      const { latestNotice } = this.noticeServer.state;
-      if (latestNotice.total) {
-        this.isNoticeColumn = true;
-        this.noticeText = latestNotice.noticeContent;
-      }
+      this.openNotice();
     },
     mounted() {
       this.initNotice();
     },
     methods: {
+      openNotice() {
+        if (
+          this.noticeLatestInfo.total &&
+          this.noticeLatestInfo.list[0].created_at &&
+          this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+          !this.isInGroup
+        ) {
+          this.isNoticeColumn = true;
+          this.noticeText = this.noticeLatestInfo.list[0].content['content'];
+          this.animates();
+        }
+      },
       initNotice() {
-        const { groupInitData } = this.groupServer.state;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
           this.isNoticeColumn = true;
           this.noticeText = msg.room_announcement_text;
           this.animates();
-          if (!groupInitData.isInGroup) {
-            this.noticeServer.setLatestNoticeInfo(msg.room_announcement_text);
+        });
+        this.noticeServer.$on('live_over', () => {
+          this.isNoticeColumn = false;
+        });
+        // 结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          if (
+            !msg.data.over_live &&
+            this.noticeLatestInfo.total &&
+            this.noticeLatestInfo.list[0].created_at
+          ) {
+            this.isNoticeColumn = true;
+            this.noticeText = this.noticeLatestInfo.list[0].content['content'];
           }
+        });
+        this.groupServer.$on('GROUP_SWITCH_START', () => {
+          this.isNoticeColumn = false;
+        });
+        this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
+          this.isNoticeColumn = false;
         });
       },
       animates() {
@@ -109,7 +146,13 @@
         font-size: 14px;
         overflow: hidden;
         width: 100%;
+        height: 35px;
         flex: 1;
+        &-animated {
+          span {
+            white-space: nowrap;
+          }
+        }
       }
       &-close {
         cursor: pointer;

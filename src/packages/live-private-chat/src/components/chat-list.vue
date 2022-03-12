@@ -6,23 +6,15 @@
         class="private-chat__list-item"
         :class="{
           'self-item':
-            loginInfo.user_id == chat.user_id || loginInfo.third_party_user_id == chat.user_id
+            loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId
         }"
         v-for="(chat, idx) in chatList"
         :key="idx"
       >
         <div class="list-item__user-info">
           <template
-            v-if="
-              loginInfo.user_id == chat.user_id || loginInfo.third_party_user_id == chat.user_id
-            "
+            v-if="loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId"
           >
-            <span class="list-item__user-info__user-name">{{ chat.name }}</span>
-            <span class="user-status user-host" v-if="chat.role === 'host'">主持人</span>
-            <span class="user-status user-assistant" v-else-if="chat.role === 'assistant'">
-              助理
-            </span>
-            <span class="user-status user-admin" v-else-if="chat.role === 'admin'">管理员</span>
             <template v-if="chat.avatar">
               <span
                 class="list-item__user-info__avatar"
@@ -31,9 +23,20 @@
                 }"
               ></span>
             </template>
+            <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
+            <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
+              {{ $t('chat.chat_1022') }}
+            </span>
+            <span class="user-status user-assistant" v-else-if="[3, '3'].includes(chat.roleName)">
+              {{ $t('chat.chat_1024') }}
+            </span>
+            <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
+              {{ $t('chat.chat_1023') }}
+            </span>
+
             <template v-else>
               <span class="list-item__user-info__avatar">
-                {{ chat.name ? chat.name.substr(0, 1) : '' }}
+                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
               </span>
             </template>
           </template>
@@ -48,32 +51,42 @@
             </template>
             <template v-else>
               <span class="list-item__user-info__avatar">
-                {{ chat.name ? chat.name.substr(0, 1) : '' }}
+                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
               </span>
             </template>
-            <span class="user-status user-host" v-if="chat.role === 'host'">主持人</span>
-            <span class="user-status user-assistant" v-else-if="chat.role === 'assistant'">
-              助理
+            <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
+              {{ $t('chat.chat_1022') }}
             </span>
-            <span class="user-status user-admin" v-else-if="chat.role === 'admin'">管理员</span>
-            <span class="list-item__user-info__user-name">{{ chat.name }}</span>
+            <span class="user-status user-assistant" v-else-if="[3, '3'].includes(chat.roleName)">
+              {{ $t('chat.chat_1024') }}
+            </span>
+            <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
+              {{ $t('chat.chat_1023') }}
+            </span>
+            <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
           </template>
         </div>
-        <div class="list-item__chat-txt" v-if="chat.txt" v-html="chat.txt"></div>
-        <div class="list-item__chat-img-list" v-if="chat.msgType === 'imgChat'">
+        <div
+          class="list-item__chat-txt"
+          v-if="chat.content && chat.content.text_content"
+          v-html="chat.content.text_content"
+        ></div>
+        <div class="list-item__chat-img-list" v-if="chat.type === 'image'">
           <div
             class="chat-img-item"
-            v-for="(imgUrl, imgIdx) in chat.img_list"
+            v-for="(imgUrl, imgIdx) in chat.content.img_list"
             :key="imgIdx"
             :style="{
               backgroundImage: `url(${imgUrl}?x-oss-process=image/resize,m_lfit,w_100${
                 isWebp ? '/format,webp' : ''
               })`
             }"
-            @click="showImgBrowser(imgIdx, chat.img_list)"
+            @click="showImgBrowser(imgIdx, chat.content.img_list)"
           ></div>
         </div>
-        <span class="list-item__chat-time">{{ chat.time | chatTime }}</span>
+        <span class="list-item__chat-time">
+          {{ chat.sendTime | chatTime }}
+        </span>
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
@@ -84,8 +97,9 @@
 </template>
 
 <script>
-  import { faceArr as emojiFace } from '@/packages/chat/src/js/emoji';
+  import { faceArr as emojiFace, textToEmojiText } from '@/packages/chat/src/js/emoji';
   import { uniqueId } from 'lodash';
+  import { useChatServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'livePrivateChatList',
     filters: {
@@ -108,15 +122,15 @@
         topLoading: false,
         scrollEnd: false,
         //聊天列表
-        chatList: [],
-        page_size: 50,
-        page: 1,
+        chatList: useChatServer().state.privateChatList,
+        page_size: 100,
+        page: 0,
         count: 0
       };
     },
     props: {
       //活动id
-      activityId: {
+      webinarId: {
         type: [Number, String],
         default: ''
       },
@@ -131,21 +145,61 @@
       role: {
         type: [Number, String],
         default: ''
+      },
+      //房间号
+      roomId: {
+        type: [Number, String],
+        default: ''
+      },
+      //聊天的人的id
+      selectUserId: {
+        type: [Number, String],
+        default: ''
       }
     },
+    watch: {
+      selectUserId: {
+        handler(newVal, oldVal) {
+          const _this = this;
+          console.log(oldVal);
+          if (newVal) {
+            _this.init();
+          }
+        },
+        immediate: true
+      }
+    },
+    beforeCreate() {
+      this.chatServer = useChatServer();
+      this.msgServer = useMsgServer();
+    },
     mounted() {
-      this.initEvent();
-      this.initScroll();
+      // this.initEvent();
+      // this.initScroll();
+      this.listenEvents();
     },
     methods: {
+      init() {
+        this.resetData();
+        this.initEvent();
+        this.initScroll();
+      },
+      resetData() {
+        useChatServer().clearPrivateChatMsg();
+        this.finishData = true;
+        this.topLoading = false;
+        this.scrollEnd = false;
+        this.page_size = 100;
+        this.page = 0;
+        this.count = 0;
+      },
       initEvent() {
-        //todo domain代替EventBus完成监听新的私聊消息
-        // EventBus.$on('new_chat', msg => {
-        //   this.finishData = true;
-        //   this.listenChat(msg, 'push');
-        // });
         this.queryChatList();
         this.finishData = true;
+      },
+      //事件监听
+      listenEvents() {
+        this.chatServer.$on('receivePrivateMsg', msg => {});
       },
       //todo 待替换
       initScroll() {
@@ -163,140 +217,29 @@
           preTop = top;
         };
       },
-      //todo 移入domain
-      listenChat(msg, type) {
-        let findResult = false;
-        /* 倒序环更高效 */
-        const msg_id = msg.msgId || msg.msg_id;
-        for (let i = this.chatList.length - 1; i >= 0; i--) {
-          if (this.chatList[i].msg_id === msg_id) {
-            findResult = true;
-            break;
-          }
-        }
-        if (findResult) {
-          // 重复
-          return;
-        }
-        let obj = this.formatChatMsg(msg);
-        let chatList = JSON.parse(JSON.stringify(this.chatList));
-        if (chatList.length >= 100) {
-          chatList = chatList.splice(-100);
-        } else {
-          if (type === 'push') {
-            // 实时消息
-            chatList.push(obj);
-          } else {
-            // 历史聊天
-            if (this.page === 1) {
-              chatList.push(obj);
-            } else {
-              chatList.unshift(obj);
-            }
-          }
-        }
-        this.chatList = chatList;
-        this.scrollBottom();
-      },
-      initChat(group_channel_id) {
-        this.group_channel_id = group_channel_id;
-        this.chatList = [];
-        this.queryChatList();
-      },
       nextPageChatList() {
         if (this.topLoading) return;
         this.topLoading = true;
         this.page++;
         this.queryChatList();
       },
-      //todo 移入domain
+      //获取当前用户聊天列表
       queryChatList() {
         if (this.page === 1) {
           this.finishData = false;
         }
-        //todo domain负责拉去历史消息
         const params = {
-          activity_id: this.activityId,
-          group_channel_id: this.group_channel_id,
-          page: this.page,
-          page_size: this.page_size
+          room_id: this.roomId,
+          webinar_id: this.webinarId,
+          start_time: '',
+          pos: this.page,
+          limit: this.page_size,
+          // to_user: '16422715',
+          to_user: this.selectUserId
         };
-        return Promise.resolve({
-          code: 200,
-          msg: null,
-          data: {
-            total: 2,
-            page_num: 1,
-            list: [
-              {
-                filter_desp: null,
-                terminal: 'pc_browser',
-                audit_status: 1,
-                limit_status: 0,
-                filter_status: 0,
-                view_status: 1,
-                msg_data:
-                  '{"type":"imgChat","text_content":"","img_list":["https://test-zhike.oss-cn-beijing.aliyuncs.com/mp-test/64/4e/644e34cbfbaeda386a9f3e67a6d4364c.jpeg"]}',
-                send_id: 'v1478672653019328512',
-                send_time: '2022-01-17 15:37:14',
-                deleted: 0,
-                child_channel: 'child_tziQLU34',
-                context:
-                  '{"role":"host","consumer_user_id":"v1478672653019328512","nick_name":"主持人","avatar":"","UUID":"MC45NzAyMzMyMTgyMDcwODQ3"}',
-                msg_id: '08a0ce566a084e54ab3e11390c4065ea',
-                channel_id: 'ch_2tf76kFf',
-                target_id: 'ch_2tf76kFf'
-              },
-              {
-                filter_desp: null,
-                terminal: 'pc_browser',
-                audit_status: 1,
-                limit_status: 0,
-                filter_status: 0,
-                view_status: 1,
-                msg_data: '{"type":"text","text_content":"111"}',
-                send_id: 'v1478672653019328512',
-                send_time: '2022-01-17 14:22:48',
-                deleted: 0,
-                child_channel: 'child_tziQLU34',
-                context:
-                  '{"role":"host","consumer_user_id":"v1478672653019328512","nick_name":"主持人","avatar":"","UUID":"MC40MDE0MjAwNDkxNDMzMQ=="}',
-                msg_id: '1e44f1bc4f874e7a8993d51f6df19d12',
-                channel_id: 'ch_2tf76kFf',
-                target_id: 'ch_2tf76kFf'
-              }
-            ],
-            page_all: 1
-          }
-        }).then(res => {
-          this.historyChat(res.data);
-          this.finishData = true;
+        return this.chatServer.getPrivateChatHistoryList(params).then(() => {
+          this.scrollBottom();
         });
-      },
-      //todo 移入domain
-      historyChat(data) {
-        this.scrollEnd = data.list.length != this.page_size;
-        if (this.page > 1) {
-          data.list.forEach(chat => {
-            this.reChatHistory(chat);
-          });
-          this.$nextTick(() => {
-            this.computeScrollPosition(data.list.length);
-          });
-        } else {
-          data.list.reverse().forEach(chat => {
-            this.reChatHistory(chat);
-          });
-          let st = setTimeout(() => {
-            clearTimeout(st);
-            this.scrollBottom();
-          }, 100);
-        }
-        this.topLoading = false;
-      },
-      //todo 移入domain
-      reChatHistory(chat) {
-        this.listenChat(chat);
       },
       //todo 移入domain
       formatChatMsg(msg) {
@@ -391,6 +334,7 @@
     width: 100%;
     height: 100%;
     padding: 20px 0;
+    box-sizing: border-box;
     overflow-y: auto;
     .private-chat__top-loading {
       height: 50px;

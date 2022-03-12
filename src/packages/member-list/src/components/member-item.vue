@@ -12,7 +12,7 @@
         class="vmp-member-item__avatar-wrapper__phone"
         width="9"
         height="12"
-        src="../images/phone.png"
+        src="../img/phone.png"
         alt
       />
     </div>
@@ -48,9 +48,9 @@
         <!-- 显示条件：申请上麦 -->
         <template
           v-if="
-            [1, 2].includes(this.tabIndex) &&
+            [1, 2].includes(tabIndex) &&
             [1, '1'].includes(userInfo.is_apply) &&
-            applyUsers.find(u => u.account_id == userInfo.account_id) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
             !userInfo.is_speak
           "
         >
@@ -63,7 +63,7 @@
         <template
           v-if="
             tabIndex === 1 &&
-            currentSpeakerId !== userInfo.account_id &&
+            currentSpeakerId != userInfo.account_id &&
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -96,6 +96,14 @@
           ></i>
         </template>
         <template v-if="tabIndex === 1">
+          <!--我要演示-->
+          <i
+            v-if="isShowMyPresentation"
+            class="vmp-member-item__control__up-mic widthAuto"
+            @click="myPresentation(userInfo.account_id)"
+          >
+            我要演示
+          </i>
           <!--上麦-->
           <i
             v-if="isShowUpMic"
@@ -111,14 +119,6 @@
             @click="downMic(userInfo.account_id)"
           >
             {{ $t('interact.interact_1007') }}
-          </i>
-          <!--我要演示-->
-          <i
-            v-if="isShowMyPresentation"
-            class="vmp-member-item__control__up-mic widthAuto"
-            @click="myPresentation(userInfo.account_id)"
-          >
-            我要演示
           </i>
         </template>
       </template>
@@ -139,7 +139,7 @@
           v-if="
             [1, 2].includes(tabIndex) &&
             [1, '1'].includes(userInfo.is_apply) &&
-            applyUsers.find(u => u.account_id === userInfo.account_id) &&
+            applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1 &&
             !userInfo.is_speak
           "
           class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
@@ -149,7 +149,7 @@
         <i
           v-if="
             tabIndex === 1 &&
-            currentSpeakerId !== userInfo.account_id &&
+            leaderId !== userInfo.account_id &&
             userInfo.is_speak &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -178,7 +178,6 @@
             tabIndex === 1 &&
             ['1', '3', '20', 1, 3, 20].includes(roleName) &&
             [2, '2'].includes(userInfo.role_name) &&
-            [2, '2'].includes(userInfo.device_type) &&
             [0, '0'].includes(userInfo.is_banned) &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -187,7 +186,7 @@
             v-if="
               [1, '1'].includes(isInteract) &&
               !userInfo.is_speak &&
-              currentSpeakerId !== userInfo.account_id
+              leaderId !== userInfo.account_id
             "
             class="vmp-member-item__control__up-mic"
             @click="upMic(userInfo.is_apply, userInfo.account_id)"
@@ -197,9 +196,7 @@
           <!-- 显示条件：当前登录者是主持人  正在上麦 -->
           <i
             v-if="
-              [1, '1'].includes(isInteract) &&
-              userInfo.is_speak &&
-              currentSpeakerId !== userInfo.account_id
+              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId != userInfo.account_id
             "
             class="vmp-member-item__control__down-mic"
             @click="downMic(userInfo.account_id)"
@@ -213,7 +210,7 @@
             tabIndex === 2 &&
             [1, '1'].includes(isInteract) &&
             !userInfo.is_speak &&
-            currentSpeakerId !== userInfo.account_id
+            leaderId !== userInfo.account_id
           "
           class="vmp-member-item__control__up-mic"
           @click="handleConsent(userInfo.account_id)"
@@ -225,7 +222,7 @@
       <!-- more显示条件：1、当前登录者是主持人-->
       <!-- more显示条件：2、当前登录者是嘉宾助理并且所选用户是观众 -->
       <template v-if="memberOptions.platformType === 'live'">
-        <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="hover">
+        <el-dropdown @command="handleCommand" v-show="showUserControl" trigger="click">
           <i class="vmp-member-item__control__more"></i>
           <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
             <template v-for="item in operateList">
@@ -242,7 +239,13 @@
         </el-dropdown>
       </template>
       <template v-if="memberOptions.platformType === 'watch'">
-        <el-dropdown @command="handleWatchCommand" v-show="isInGroup" trigger="hover">
+        <el-dropdown
+          @command="handleWatchCommand"
+          v-show="
+            [20, '20', 1, '1', 3, '3'].includes(roleName) && [2, '2'].includes(userInfo.role_name)
+          "
+          trigger="click"
+        >
           <i class="vmp-member-item__control__more"></i>
           <el-dropdown-menu slot="dropdown" class="vmp-member-dropdown-menu">
             <template v-for="item in watchOperateList">
@@ -263,7 +266,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/share/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpMemberItem',
     filters: {
@@ -321,6 +324,21 @@
       currentSpeakerId: {
         type: [Number, String]
       },
+      //当前演示主屏幕（主讲人）
+      mainScreen: {
+        type: [Number, String],
+        default: () => ''
+      },
+      //当前演示屏幕
+      presentationScreen: {
+        type: [Number, String],
+        default: () => ''
+      },
+      //当前的组长的id
+      leaderId: {
+        type: [Number, String],
+        default: () => ''
+      },
       //当前登录用户的id
       userId: {
         type: [Number, String]
@@ -353,7 +371,7 @@
     data() {
       return {
         //默认头像
-        defaultAvatar,
+        defaultAvatar: defaultAvatar,
         //操作项
         operateList: [
           //设为主讲
@@ -368,7 +386,7 @@
           //设置禁言/取消禁言
           {
             command: 'setBanned',
-            isShow: ![1, '1'].includes(this.userInfo.role_name),
+            isShow: 'isShowLiveMuted',
             disable: false,
             //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
@@ -378,7 +396,7 @@
           //踢出 / 取消踢出
           {
             command: 'setKicked',
-            isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: 'isShowLiveKicked',
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
             type: 'toggleButton',
@@ -386,7 +404,7 @@
           },
           {
             command: 'setKicked',
-            isShow: this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: 'isShowLiveGroupKicked',
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
@@ -396,7 +414,7 @@
           {
             command: 'inviteMic',
             isShow: 'isShowInvitation',
-            disable: this.userInfo.account_id === this.currentSpeakerId,
+            disable: 'isLiveInviteDisable',
             text: '邀请演示',
             sequence: 5
           },
@@ -415,15 +433,14 @@
           {
             command: 'inviteMic',
             isShow: 'isShowWatchInvitation',
-            //todo 确认下presentation_screen
-            disable: this.userInfo.account_id === this.currentSpeakerId,
+            disable: 'isWatchInviteDisable',
             text: '邀请演示',
             sequence: 1
           },
           //设置禁言/取消禁言
           {
             command: 'setBanned',
-            isShow: ![2, '2'].includes(this.userInfo.role_name),
+            isShow: 'isShowWatchMuted',
             disable: false,
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
             type: 'toggleButton',
@@ -432,7 +449,7 @@
           //踢出 / 取消踢出
           {
             command: 'setKicked',
-            isShow: !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name),
+            isShow: 'isShowWatchKicked',
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
@@ -446,8 +463,21 @@
             text: '升为组长',
             sequence: 4
           }
-        ]
+        ],
+        //真实的申请上麦的数组
+        applyUserList: []
       };
+    },
+    watch: {
+      //监听数组的变化，保证举手标识能出现
+      applyUsers: {
+        handler(val) {
+          this.applyUserList = val;
+          this.$forceUpdate();
+        },
+        immediate: true,
+        deep: true
+      }
     },
     computed: {
       //角色转换
@@ -481,19 +511,57 @@
           (this.roleName == '1' &&
             this.userInfo.account_id != this.userId &&
             this.isInGroup &&
-            this.userInfo.role_name != 20)
+            this.userInfo.role_name != 20) ||
+          ([3, '3', 4, '4'].includes(this.roleName) && [2, '2'].includes(this.userInfo.role_name))
         );
+      },
+      //发起端演示的是否是选中的用户
+      isLiveInviteDisable() {
+        return this.userInfo.account_id == this.presentationScreen;
+      },
+      //观看端演示的是否是选中的用户
+      isWatchInviteDisable() {
+        return this.userInfo.account_id == this.presentationScreen;
+      },
+      //是否显示禁言、取消禁言
+      isShowLiveMuted() {
+        if (this.tabIndex !== 3) {
+          return ![1, '1'].includes(this.userInfo.role_name);
+        } else {
+          return ![1, '1'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
+      },
+      //是否显示踢出、取消踢出(非分组)
+      isShowLiveKicked() {
+        return !this.isInGroup && ![1, '1'].includes(this.userInfo.role_name);
+      },
+      //是否显示踢出分组、取消踢出
+      isShowLiveGroupKicked() {
+        return this.isInGroup && ![1, '1'].includes(this.userInfo.role_name);
+      },
+      //是否显示禁言、取消禁言（PC观看）
+      isShowWatchMuted() {
+        if (this.tabIndex !== 3) {
+          return [2, '2'].includes(this.userInfo.role_name);
+        } else {
+          return [2, '2'].includes(this.userInfo.role_name) && !this.userInfo.is_kicked;
+        }
+      },
+      //是否显示踢出、取消踢出小组（PC观看）
+      isShowWatchKicked() {
+        return [2, '2'].includes(this.userInfo.role_name);
       },
       //是否展示设为主讲按钮(PC发起)
       isShowSetSpeaker() {
-        if (!this.isInGroup || this.tabIndex !== 1) {
+        if (this.tabIndex !== 1) {
           return false;
         }
         return (
-          this.isInteract &&
+          !this.isInGroup &&
+          !!this.isInteract &&
           [1, 4, '1', '4'].includes(this.userInfo.role_name) &&
           this.userInfo.is_speak &&
-          this.currentSpeakerId !== this.userInfo.account_id
+          this.mainScreen != this.userInfo.account_id
         );
       },
       //PC观看端设为组长
@@ -565,7 +633,7 @@
       isShowSpeakerFlag() {
         if (this.tabIndex === 1) {
           const options = [
-            this.mode !== 6 && this.currentSpeakerId === this.userInfo.account_id,
+            this.mode !== 6 && this.mainScreen === this.userInfo.account_id,
             this.mode === 6 && [1, '1'].includes(this.userInfo.role_name)
           ];
           return options.some(value => !!value);
@@ -598,7 +666,7 @@
         if (this.isHost) {
           isShow =
             [1, '1'].includes(this.isInteract) &&
-            !this.userInfo.is_speak &&
+            [0, '0'].includes(this.userInfo.is_speak) &&
             [1, '1'].includes(this.status);
           return isShow;
         }
@@ -607,7 +675,7 @@
           isShow =
             [1, '1'].includes(this.isInteract) &&
             !this.userInfo.is_banned &&
-            !this.userInfo.is_speak &&
+            [0, '0'].includes(this.userInfo.is_speak) &&
             [1, '1'].includes(this.userInfo.device_status);
         }
 
@@ -661,6 +729,19 @@
           }
           return text;
         };
+      },
+      //是否在申请举手列表里
+      isInApplyUsers() {
+        return this.applyUserList.findIndex(u => u.account_id == this.userInfo.account_id) !== -1;
+      },
+      //是否显示举手的标识(PC发起)
+      isShowHandFlag() {
+        return (
+          [1, 2].includes(this.tabIndex) &&
+          [1, '1'].includes(this.userInfo.is_apply) &&
+          this.isInApplyUsers &&
+          !this.userInfo.is_speak
+        );
       }
     },
     methods: {
@@ -672,13 +753,16 @@
       handleSetBanned() {
         this.$emit('operateUser', { type: 'setBanned', params: this.userInfo });
       },
-      //邀请演示
+      // 邀请演示，主直播间和小组内都会调用
       handleInviteMic() {
         this.$emit('operateUser', { type: 'inviteMic', params: this.userInfo });
       },
       //处理指令
       handleCommand(command) {
         switch (command) {
+          case 'setSpeaker':
+            this.$emit('operateUser', { type: 'setSpeaker', params: this.userInfo });
+            break;
           case 'setBanned':
             this.handleSetBanned();
             break;
@@ -688,8 +772,13 @@
           case 'setGroupKicked':
             this.handleSetKicked();
             break;
+          // 主直播间主持人邀请成员演示
           case 'inviteMic':
             this.handleInviteMic();
+            break;
+          // 升为组长
+          case 'setLeader':
+            this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
             break;
           default:
             break;
@@ -707,7 +796,13 @@
           case 'setGroupKicked':
             this.handleSetKicked();
             break;
+          // 组长邀请成员演示
           case 'inviteMic':
+            this.handleInviteMic();
+            break;
+          // 升为组长
+          case 'setLeader':
+            this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
             break;
           default:
             break;
@@ -736,14 +831,19 @@
 <style lang="less">
   .vmp-member-item {
     position: relative;
-    box-sizing: content-box;
-    height: 44px;
-    font-size: 12px;
-    padding: 2px 24px;
     color: #999999;
+    height: 44px;
     line-height: 44px;
+    padding: 8px 10px 8px 14px;
+    font-size: 12px;
+    box-sizing: content-box;
     &:hover {
       background-color: #2d2d2d;
+      .vmp-member-item__control {
+        &__more {
+          opacity: 1;
+        }
+      }
     }
     &__avatar-wrapper {
       display: inline-block;
@@ -761,20 +861,21 @@
     }
     &__name {
       display: inline-block;
-      max-width: 100px;
+      max-width: 55px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       vertical-align: middle;
-      margin: 0 2px 0 9px;
-      font-size: 14px;
+      margin-left: 9px;
     }
     &__role {
+      display: inline-block;
       text-align: center;
-      padding: 0 4px;
-      border-radius: 100px;
+      line-height: 15px;
       vertical-align: middle;
+      padding: 0 4px;
       font-size: 10px;
+      border-radius: 10px;
       &.host {
         background-color: rgba(252, 86, 89, 0.15);
         color: #fb3a32;
@@ -796,34 +897,40 @@
       float: right;
       &__user-icon {
         color: #ff9446;
-        font-size: 16px;
+        font-size: 13px;
         vertical-align: middle;
-        padding: 0 3px;
+        margin-right: 6px;
       }
       &__up-mic,
       &__down-mic {
         display: inline-block;
         width: 30px;
-        height: 20px;
+        height: 16px;
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
         color: #dddddd;
         text-align: center;
         vertical-align: middle;
-        line-height: 20px;
+        line-height: 16px;
         font-style: normal;
         letter-spacing: 1px;
         cursor: pointer;
       }
+      .widthAuto {
+        width: auto;
+        padding: 0 2px;
+        margin-right: 4px;
+      }
       &__more {
         display: inline-block;
-        width: 27px;
-        height: 20px;
+        width: 13px;
+        height: 13px;
         vertical-align: middle;
         margin-left: 3px;
         color: #cccccc;
         font-size: 12px;
-        background: url('../images/more.png') no-repeat center;
+        opacity: 0;
+        background: url('../img/more.png') no-repeat center;
         background-size: 13px 3px;
         border-radius: 4px;
         &:hover {
@@ -893,6 +1000,14 @@
       &:hover {
         background-color: #fc5659;
         color: #fff;
+      }
+    }
+    .is-disabled {
+      background: #999;
+      color: #fff;
+      &:hover {
+        background: #999;
+        cursor: default;
       }
     }
     .popper__arrow {

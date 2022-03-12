@@ -4,9 +4,17 @@
     <template v-if="docStatus === 'uploading'">
       <el-progress :percentage="uploadPropress"></el-progress>
     </template>
-    <div v-else class="transform-status" :class="docStatus">
-      {{ docStatusStr }}
-    </div>
+    <template v-if="Array.isArray(docStatusStr)">
+      <div
+        v-for="(item, index) in docStatusStr"
+        v-bind:key="'status' + index"
+        class="transform-status"
+        :class="docStatus"
+      >
+        {{ item }}
+      </div>
+    </template>
+    <div v-else class="transform-status" :class="docStatus">{{ docStatusStr }}</div>
   </div>
 </template>
 <script>
@@ -18,7 +26,7 @@
       // uploadfailed: '上传失败'
       // transwait: 等待转码 （上传成功后会转到此状态）
       // transdoing: 转码中
-      // transcompleted: 转码完成
+      // transcompleted: 转码成功
       // transfailed: 转码失败
       docStatus: {
         type: String,
@@ -33,6 +41,15 @@
       transformProcess: {
         type: Number,
         default: 0
+      },
+      docExt: {
+        type: String,
+        default: ''
+      },
+      // 是否在资料库列表中使用
+      isInDoclib: {
+        type: Boolean,
+        default: false
       }
     },
     computed: {
@@ -46,7 +63,10 @@
         } else if (this.docStatus === 'transdoing') {
           return '转码中';
         } else if (this.docStatus === 'transcompleted') {
-          return '转码完成';
+          if (this.isInDoclib && /pptx?/.test(this.docExt)) {
+            return ['静态转码成功', '动态转码成功'];
+          }
+          return this.isInDoclib ? '转码成功' : '转码完成';
         } else if (this.docStatus === 'transfailed') {
           return '转码失败';
         } else return '';
@@ -57,20 +77,18 @@
 <style lang="less">
   .doc-progress-status {
     .transform-status {
-      &::after {
+      &::before {
         content: '';
-        position: absolute;
-        left: -6px;
-        top: 50%;
         width: 8px;
         height: 8px;
-        transform: translateY(-50%);
-        border-radius: 100%;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
       }
-      &.transcompleted:after {
+      &.transcompleted:before {
         background-color: #14ba6a;
       }
-      &.transfailed:after {
+      &.transfailed:before {
         background-color: red;
       }
 

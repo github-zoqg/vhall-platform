@@ -100,7 +100,7 @@
                   popper-class="transfer-box"
                   style="margin-left: 4px"
                 >
-                  <i class="iconfont iconicon-help pr5" style="color: #666"></i>
+                  <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
                     1.计时器功能在默认情况下，对观众不可见。（仅对主持人、嘉宾、助理三个身份可见）
                     <br />
@@ -127,7 +127,7 @@
                   popper-class="transfer-box"
                   style="margin-left: 4px"
                 >
-                  <i class="iconfont iconicon-help pr5" style="color: #666"></i>
+                  <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
                     1.设置可超时后，倒计时结束，变倒计时为从00:00开始的正向计时，记录超时时间
                     <br />
@@ -153,7 +153,8 @@
 </template>
 
 <script>
-  import { useTimerServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { useTimerServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',
     data() {
@@ -198,6 +199,9 @@
       },
       onClose() {
         this.$emit('disTimer', true);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
+        );
         this.timerVisible = false;
       },
       // 表单&时间提交
@@ -248,7 +252,7 @@
         this[data] = '';
       },
       changeAllShow() {
-        if (sessionStorage.getItem('delay_status') != 1) {
+        if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar != 1) {
           this.$message({
             type: 'warning',
             message: '当前活动非无延迟模式，不支持此功能'

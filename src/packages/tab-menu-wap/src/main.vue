@@ -1,5 +1,14 @@
 <template>
-  <section class="vmp-tab-menu">
+  <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
+    <!-- <template v-if="isTryVideo && isSubscribe">
+      <div class="vmp-tab-menu__try">
+        <div class="try-img">
+          <img src="./img/trySee.png" alt="" />
+        </div>
+        <p>{{ $t('appointment.appointment_1030') }}</p>
+      </div>
+    </template> -->
+    <!-- <template v-else> -->
     <section class="vmp-tab-menu__header">
       <!-- 菜单区域 -->
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
@@ -11,7 +20,8 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          <span class="item-text">{{ $t(item.text) }}</span>
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
         </li>
         <li
           v-if="visibleMenu.length > 3"
@@ -31,7 +41,8 @@
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
-          {{ $t(item.text) }}
+          <span>{{ $tdefault(item.name) }}</span>
+          <i class="tips" v-show="item.tipsVisible"></i>
         </li>
       </ul>
     </section>
@@ -42,14 +53,24 @@
         ref="tabContent"
         :mainMenu="mainMenu"
         :subMenu="subMenu"
+        @noticeHint="handleHint"
         @closePopup="selectDefault"
       />
     </section>
+    <!-- </template> -->
   </section>
 </template>
 
 <script>
-  import { useMenuServer } from 'middle-domain';
+  import {
+    useMenuServer,
+    useQaServer,
+    useChatServer,
+    useDocServer,
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
@@ -63,12 +84,23 @@
         selectedId: '',
         menu: [],
         isSubMenuShow: false,
+        visibleCondition: 'default',
         tabOptions: {}
       };
     },
     computed: {
       visibleMenu() {
-        return this.menu.filter(item => item.visible);
+        return this.menu.filter(item => {
+          if (this.visibleCondition === 'living') {
+            return (item.status == 1 || item.status == 3) && item.visible;
+          }
+
+          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible;
+        });
       },
       mainMenu() {
         return this.visibleMenu.filter((item, index) => index < 3);
@@ -79,21 +111,125 @@
       },
       selectedIndex() {
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 是否是试看
+      isTryVideo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     beforeCreate() {
       this.menuServer = useMenuServer();
+      this.docServer = useDocServer();
     },
     created() {
+      // if (this.isTryVideo && this.isSubscribe) return;
       this.initConfig();
       this.initMenu();
+      this.listenEvents();
     },
     async mounted() {
+      // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.selectDefault();
     },
 
     methods: {
+      listenEvents() {
+        const qaServer = useQaServer();
+        const chatServer = useChatServer();
+        const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
+          this.setVisible({ visible: true, type: 'v5' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1026')
+            },
+            roleName: msg.data.role_name,
+            type: msg.data.type,
+            interactStatus: true
+          });
+        });
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
+          this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
+          chatServer.addChatToList({
+            content: {
+              text_content: this.$t('chat.chat_1081')
+            },
+            roleName: msg.data.role_name,
+            type: msg.data.type,
+            interactStatus: true
+          });
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+        });
+        //收到私聊消息
+        chatServer.$on('receivePrivateMsg', () => {
+          this.setVisible({ visible: true, type: 'private' });
+        });
+
+        if (this.isSubscribe) {
+          this.setVisibleCondition('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
+        }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_start') {
+            this.setVisibleCondition('living');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisibleCondition('live_over');
+            this.setVisible({ visible: false, type: 3 }); // chat
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+          }
+        });
+
+        // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_change', val => {
+          console.log('dispatch_doc_switch_change', val);
+          this.changeDocStatus(val);
+        });
+        // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_status', val => {
+          console.log('dispatch_doc_switch_status', val);
+          this.changeDocStatus(val);
+        });
+        //监听进出子房间消息
+        groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (this.isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
+          }
+        });
+      },
+      changeDocStatus(val) {
+        this.setVisible({ visible: val, type: 2 });
+        if (val) {
+          let obj = this.getItem({ type: 2 });
+          this.select({ type: obj.type, id: obj.id });
+        }
+      },
       /**
        * 初始化配置
        */
@@ -107,12 +243,37 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
+        const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
         }
+        // TODO: temp，增加私聊
+        const chatIndex = this.menu.findIndex(el => el.type === 3);
+        if (chatIndex >= -1) {
+          this.addItemByIndex(chatIndex + 1, {
+            type: 'v5',
+            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1004'), // 同上
+            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1008'), // 同上
+            status: 3
+          });
+        }
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living|predition]
+       */
+      setVisibleCondition(condition = 'default') {
+        this.visibleCondition = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
@@ -135,7 +296,7 @@
        * @param {*} index
        */
       removeItemByIndex(index) {
-        this.menu.splice(index);
+        this.menu = this.menu.splice(index);
       },
       /**
        * 添加一个菜单项
@@ -164,7 +325,7 @@
        */
       getItem({ type, id }) {
         return this.menu.find(item => {
-          if (id !== undefined) {
+          if (id !== undefined && !!id) {
             return item.id === id;
           } else {
             return item.type === type;
@@ -180,7 +341,6 @@
       setVisible({ visible = true, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
-
         tab.visible = visible;
         visible === false && this.jumpToNearestItemById(id);
       },
@@ -206,10 +366,14 @@
       setTipsVisible({ visible, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
-
         tab.tipsVisible = visible;
       },
-
+      handleHint(cuid) {
+        if (this.selectedType == cuid) {
+          return;
+        }
+        this.setTipsVisible({ visible: true, type: cuid });
+      },
       /**
        * 跳转到最近的item
        */
@@ -221,6 +385,7 @@
         if (index < this.visibleMenu.length && nextItem !== undefined) {
           const { type, id } = nextItem;
           this.select({ type, id });
+          return;
         }
 
         // 向前跳
@@ -265,6 +430,29 @@
     font-size: 32px;
     display: flex;
     flex-direction: column;
+    &__try {
+      height: 100%;
+      width: 100%;
+      background: #f7f7f7;
+      .try-img {
+        width: 221px;
+        height: 136px;
+        margin: 0 auto;
+        margin-top: 40%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      p {
+        text-align: center;
+        font-size: 28px;
+        color: #8c8c8c;
+        padding-top: 24px;
+        text-indent: -20px;
+      }
+    }
 
     &__header {
       position: relative;
@@ -302,7 +490,6 @@
         width: calc((100% - 100px) / 4);
         position: relative;
         display: inline-flex;
-        flex-direction: column;
         height: 100%;
         justify-content: center;
         align-items: center;
@@ -314,6 +501,17 @@
         .item-text {
           display: flex;
           align-items: center;
+          line-height: 1.2;
+        }
+
+        .tips {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ff0005;
+          border: 9px solid #ff0005;
+          transform: translate(30%, -100%);
         }
 
         .bottom-line {
@@ -381,12 +579,22 @@
       &__item {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         width: 100%;
         height: 88px;
         padding: 0 40px;
 
         &:not(:last-child) {
           border-bottom: 1px solid #d4d4d4;
+        }
+
+        .tips {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ff0005;
+          border: 9px solid #ff0005;
         }
       }
     }

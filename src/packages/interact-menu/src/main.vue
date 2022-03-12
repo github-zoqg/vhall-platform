@@ -8,33 +8,67 @@
       <i class="vh-saas-iconfont vh-saas-a-line-Interactivetools"></i>
       <p>互动工具</p>
     </div>
-    <div class="vmp-interact-menu-wrap">
+    <div class="vmp-interact-menu-wrap" v-if="!disable">
       <div class="vmp-interact-menu-list">
-        <div class="vmp-interact-menu-list-item" @click="openLottery">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="openLottery"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          v-if="configList['ui.hide_lottery']"
+        >
           <i class="vh-iconfont vh-a-line-luckydraw"></i>
           <p>抽奖</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openSign"
+          v-if="configList['ui.hide_sign_in']"
+        >
           <i class="vh-iconfont vh-line-order"></i>
           <p>签到</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="emitOpenQuestionnaire"
+          v-if="configList['ui.hide_survey']"
+        >
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
-        <div class="vmp-interact-menu-list-item vmp-interact-menu-list-disable">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="handleQAPopup"
+          v-if="configList['ui.is_hide_qa_button']"
+        >
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openRedPacket"
+          v-if="configList['ui.show_redpacket']"
+        >
           <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
         </div>
-        <div class="vmp-interact-menu-list-item" @click="openTimer">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="openTimer"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          v-if="configList['webinar.timer']"
+        >
           <i class="vh-iconfont vh-line-time"></i>
           <p>计时器</p>
         </div>
-        <div class="vmp-interact-menu-list-item">
+        <div
+          class="vmp-interact-menu-list-item"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          @click="openRebroadcast"
+          v-if="configList['rebroadcast']"
+        >
           <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
         </div>
@@ -69,9 +103,8 @@
 <script>
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { debounce } from 'lodash';
-  import { useQaServer } from 'middle-domain';
+  import { useQaServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const qaServer = useQaServer();
   export default {
     name: 'VmpInteractMenu',
     components: {
@@ -80,7 +113,7 @@
     data() {
       return {
         living: false,
-        isQAEnabled: false,
+        isQAEnabled: useRoomBaseServer().state.interactToolStatus.question_status,
         qaVisible: false,
         qaCount: 0,
         className: '', // 自定义样式
@@ -91,16 +124,39 @@
         assistantType: false // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
       };
     },
+    computed: {
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    mounted() {
+      this.listenEvents();
+    },
     methods: {
+      listenEvents() {
+        const msgServer = useMsgServer();
+        msgServer.$on('live_over', () => {
+          this.isQAEnabled = false;
+          this.qaVisible = false;
+        });
+      },
       handleQAPopup() {
         if (!this.qaVisible && this.isQAEnabled) {
-          qaServer.getCurrentPlayQuestionNum().then(res => {
-            if (res.code == 200) {
-              this.qaCount = res.data.num;
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
+          useQaServer()
+            .getCurrentPlayQuestionNum()
+            .then(res => {
+              if (res.code == 200) {
+                this.qaCount = res.data.num;
+              } else {
+                this.$message.error(res.msg);
+              }
+            });
         }
         this.qaVisible = !this.qaVisible;
       },
@@ -111,11 +167,49 @@
           this.enableQA();
         }
       },
-      enableQA: debounce(flag => {
-        console.log(qaServer);
-        qaServer.qaEnable().then(res => {
-          console.log('开启问答', res);
-        });
+      enableQA: debounce(function (flag) {
+        useQaServer()
+          .qaEnable()
+          .then(res => {
+            if (res.code == 200) {
+              this.isQAEnabled = true;
+              this.qaVisible = false;
+              this.$message({
+                message: '开启问答成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '开启问答失败',
+                type: 'error'
+              });
+            }
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
+            // );
+          });
+      }, 500),
+      closeQA: debounce(function (flag) {
+        useQaServer()
+          .qaDisable()
+          .then(res => {
+            if (res.code == 200) {
+              this.isQAEnabled = false;
+              this.qaVisible = false;
+              this.$message({
+                message: '关闭问答成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '关闭问答失败',
+                type: 'error'
+              });
+            }
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
+            // );
+          });
       }, 500),
       // 设置可用状态
       setDisableState(val) {
@@ -127,8 +221,12 @@
       },
       // 打开计时器设置弹框
       openTimer() {
-        if (this.disTimer) return false;
+        if (this.disTimer || !this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+      },
+      //  打开转播
+      openRebroadcast() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRebroadcast'));
       },
       // 更改禁用状态
       changeStatus(data, status) {
@@ -138,6 +236,19 @@
       // 打开抽奖弹窗
       openLottery() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
+      },
+      // 打开问卷弹窗
+      emitOpenQuestionnaire() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenQuestionnaire'));
+      },
+      // 打开签到弹窗
+      openSign() {
+        if (!this.isLiving) return false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
+      },
+      // 打开红包弹窗
+      openRedPacket() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       }
     }
   };
@@ -171,18 +282,30 @@
         color: #fc5659;
       }
     }
-
-    &.disable {
-      i,
-      p {
-        color: #777777;
-      }
-    }
     &:hover {
       .vmp-interact-menu-wrap {
         display: block;
       }
     }
+    &.disable {
+      cursor: default;
+      i,
+      p {
+        color: #777777;
+      }
+      .vmp-interact-menu {
+        &-icon {
+          cursor: default;
+        }
+      }
+
+      &:hover {
+        .vmp-interact-menu-wrap {
+          display: none;
+        }
+      }
+    }
+
     &-wrap {
       display: none;
       position: absolute;
@@ -195,6 +318,7 @@
       box-sizing: border-box;
       border: 1px solid #2d2d2d;
       padding: 0 10px 20px 10px;
+      z-index: 110;
     }
     &-list {
       display: flex;

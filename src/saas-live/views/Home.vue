@@ -17,7 +17,13 @@
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import {
+    Domain,
+    useRoomBaseServer,
+    useSplitScreenServer,
+    useInteractiveServer
+  } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
@@ -36,6 +42,11 @@
         // 初始化直播房间
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
+        roomBaseServer.startGetDegradationInterval({
+          staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+          environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+          systemKey: 2
+        });
         domain.initVhallReport(
           {
             bu: 0,
@@ -72,31 +83,85 @@
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
-      } catch (ex) {
+        this.addEventListener();
+      } catch (err) {
         console.error('---初始化直播房间出现异常--');
-        console.error(ex);
+        console.error(err);
+        if (err.code == 510008) {
+          // 未登录
+          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
+            location.search
+          }`;
+        }
         this.state = 2;
-        this.errMsg = ex.msg;
+        this.errMsg = err.msg;
       }
     },
     methods: {
       // 初始化直播房间
       initSendLive() {
         const { id } = this.$route.params;
-        const { token } = this.$route.query;
+        const { token, nickname = '', email = '', liveT = '' } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
-            token: token || localStorage.getItem('token')
+            token: localStorage.getItem('token') || '',
+            'gray-id': sessionStorage.getItem('initGrayId')
+          },
+          requestBody: {
+            live_token: liveT
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'send' //客户端类型
+            clientType: 'send', //客户端类型
+            nickname,
+            email
           }
         });
+      },
+      addEventListener() {
+        const roomBaseServer = useRoomBaseServer();
+        const splitScreenServer = useSplitScreenServer();
+        const interactiveServer = useInteractiveServer();
+        roomBaseServer.$on('ROOM_KICKOUT', () => {
+          this.handleKickout();
+        });
+        // 关闭分屏模式
+        splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
+          // 还原流信息
+          interactiveServer.state.localStream = {
+            streamId: null, // 本地流id
+            videoMuted: false,
+            audioMuted: false,
+            attributes: {}
+          };
+          interactiveServer.state.remoteStreams = [];
+          await interactiveServer.init();
+          window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
+        });
+        // 分屏页面关闭
+        splitScreenServer.$on('SPLIT_SHADOW_CLOSE', async () => {
+          this.$message('正在与分屏页面建立连接，请稍等...');
+        });
+        // 分屏页面关闭10s未重新连接
+        splitScreenServer.$on('SPLIT_CLOSE_TO_HOST', async () => {
+          this.$message('关闭分屏模式');
+        });
+        splitScreenServer.$on('SPLIT_CUSTOM_MESSAGE', msg => {
+          // 分屏停止推流完成的消息
+          if (msg.data.body.type == 'split_unpublish_complete') {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons('comStreamLocal', 'emitClickUnpublishComplate')
+            );
+          }
+        });
+      },
+      handleKickout() {
+        this.state = 2;
+        this.errMsg = this.$t('message.message_1007');
       }
     }
   };

@@ -1,9 +1,9 @@
 <template>
-  <div class="vmp-notice-list" v-if="noticeNum">
+  <div class="vmp-notice-list" v-show="isShowIcon && noticeNum">
     <div class="vmp-notice-list-icon">
       <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
       <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
-        <img src="./images/notice-icon.png" alt="" />
+        <img src="./img/notice-icon.png" alt="" />
       </div>
     </div>
     <div class="vmp-notice-list-container" v-if="isShowNotice">
@@ -23,7 +23,7 @@
         </ul>
       </div>
       <div class="vmp-notice-list-container-close">
-        <i class="vh-iconfont vh-line-close" @click="isShowNotice = false"></i>
+        <i class="vh-iconfont vh-line-close" @click="closeNoticeList"></i>
       </div>
     </div>
   </div>
@@ -39,8 +39,8 @@
     },
     data() {
       return {
-        noticeOptions: {},
         noticeNum: 0,
+        isShowIcon: false,
         isShowNotice: false, //是否显示公告列表
         noticeList: [],
         pageInfo: {
@@ -52,34 +52,40 @@
         total: 0
       };
     },
+    computed: {
+      noticeLatestInfo() {
+        // 最新公告信息
+        return this.roomBaseServer.state.noticeInfo;
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
-      this.initConfig();
-      this.roomBaseState = this.roomBaseServer.state;
-      this.noticeNum = this.noticeServer.state.latestNotice.total || 0;
-      this.noticeServer.listenMsg();
+      this.getNoticeInfo();
     },
     mounted() {
       this.initNotice();
     },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          this.noticeOptions = widget.options;
-        }
-      },
       initNotice() {
+        this.noticeServer.$on('live_over', () => {
+          this.isShowIcon = false;
+        });
+        // 结束讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          if (!msg.data.over_live) {
+            this.getNoticeInfo();
+          }
+        });
         const { groupInitData } = this.groupServer.state;
         if (groupInitData.isInGroup) return;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
-          this.noticeNum++;
+          this.isShowIcon = true;
+          this.noticeNum = this.noticeNum + 1;
           this.noticeList.unshift({
             created_at: msg.push_time,
             content: {
@@ -88,28 +94,45 @@
           });
         });
       },
+      getNoticeInfo() {
+        this.noticeNum = this.noticeLatestInfo.total || 0;
+        if (this.noticeNum && this.noticeLatestInfo.list[0].created_at) {
+          this.isShowIcon = true;
+          this.pageInfo = {
+            pos: 0,
+            limit: 10,
+            pageNum: 1
+          };
+        }
+      },
       getNoticeHistoryList() {
         this.isShowNotice = true;
         this.getNoticeList(false);
       },
       getNoticeList(flag) {
-        const { getNoticeList } = this.noticeServer;
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseServer.state;
         const params = {
           room_id: watchInitData.interact.room_id,
           is_cache: 1,
           ...this.pageInfo
         };
 
-        getNoticeList({ params, flag }).then(result => {
-          const { backData: res, state } = result;
-          if (res.code == 200 && res.data) {
-            this.noticeList = state.noticeList;
-            this.totalPages = state.totalPages;
-            this.total = state.total;
-            this.noticeNum = state.total;
+        this.noticeServer.getNoticeList({ params, flag }).then(result => {
+          if (result.code == 200 && result.data) {
+            this.noticeList = this.noticeServer.state.noticeList;
+            this.totalPages = this.noticeServer.state.totalPages;
+            this.total = result.data.total;
+            this.noticeNum = result.data.total;
           }
         });
+      },
+      closeNoticeList() {
+        this.isShowNotice = false;
+        this.pageInfo = {
+          pos: 0,
+          limit: 10,
+          pageNum: 1
+        };
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -163,7 +186,7 @@
       width: 492px;
       height: 382px;
       background: transparent;
-      background-image: url('./images/notice.png');
+      background-image: url('./img/notice.png');
       background-size: 100% 100%;
       &-data {
         position: absolute;

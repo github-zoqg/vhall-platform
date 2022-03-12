@@ -3,7 +3,7 @@
   <div class="vmp-group-setting">
     <el-dialog
       :visible.sync="dialogVisible"
-      @open="handlOpen"
+      @open="handleOpen"
       :before-close="handleClose"
       :close-on-click-modal="false"
       :append-to-body="false"
@@ -20,8 +20,9 @@
               clearable
               maxlength="2"
               placeholder="2-50"
-              v-model.trim.number="number"
-              onkeyup="this.value=this.value.replace(/[^\d]/g,'')"
+              type="number"
+              v-model.number.trim="count"
+              @input="validCount"
               class="group-number__input"
             ></el-input>
             小组
@@ -31,7 +32,7 @@
           <div class="vmp-group-item__hd">分组方式</div>
           <div class="vmp-group-item__bd">
             <el-radio class="group-radio" v-model="way" label="1">
-              自动分组 （系统随机分屏组内成员）
+              自动分组 （系统随机分配组内成员）
             </el-radio>
             <el-radio class="group-radio" v-model="way" label="2">
               手动分组（按照实际情况及个人意愿分配）
@@ -61,7 +62,7 @@
     data() {
       return {
         dialogVisible: this.show,
-        number: '', // 分组数量，2~50 之间
+        count: '', // 分组数量，2~50 之间
         way: '1' // 分组方式，1=随机分配|2=手动分配
       };
     },
@@ -83,26 +84,35 @@
       }
     },
     methods: {
-      handlOpen() {},
+      validCount(v) {
+        if (v.length > 2) {
+          this.count = v.slice(0, 2);
+        }
+      },
+      handleOpen() {
+        this.count = '';
+        this.way = '1';
+      },
       // 开始分组
       handleGroup: async function () {
-        if (this.number < 2 || this.number > 50) {
+        console.log('this.count:', this.count);
+        if (isNaN(this.count) || this.count < 2 || this.count > 50) {
           this.$message.warning('请输入正确分组数量');
           return false;
         }
         try {
           const result = await this.groupServer.groupCreate({
-            number: this.number,
+            number: this.count,
             way: this.way
           });
           if (result && result.code === 200) {
-            this.number = '';
+            this.count = '';
             this.close();
           } else {
-            this.$message.error(result.msg || '分组失败');
+            this.$message.warning(result.msg || '分组失败');
           }
         } catch (ex) {
-          this.$message.error(ex.messge || '分组出现异常');
+          this.$message.warning(ex.messge || '分组出现异常');
         }
       },
       // 取消

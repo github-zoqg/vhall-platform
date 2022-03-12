@@ -1,20 +1,26 @@
 <template>
   <div class="vmp-notice-list">
     <main class="vmp-notice-list-container">
-      <ul>
-        <li
-          class="vmp-notice-list-container__item"
-          v-for="(item, index) of noticeList"
-          :key="index"
-        >
-          <i class="iconfont icongonggao" />
-          <p>
-            <span class="v-type">[公告]</span>
-            <span>{{ item.content.content }}</span>
-          </p>
-          <p class="vmp-notice-item__time">{{ item.created_at }}</p>
-        </li>
-      </ul>
+      <overlay-scrollbars
+        ref="noticeScroll"
+        :options="overlayScrollBarsOptions"
+        style="height: 100%"
+      >
+        <ul>
+          <li
+            class="vmp-notice-list-container__item"
+            v-for="(item, index) of noticeList"
+            :key="index"
+          >
+            <i class="vh-iconfont vh-line-voice" />
+            <p>
+              <span class="v-type">[公告]</span>
+              <span>{{ item.content.content }}</span>
+            </p>
+            <p class="vmp-notice-item__time">{{ item.created_at }}</p>
+          </li>
+        </ul>
+      </overlay-scrollbars>
     </main>
 
     <footer class="vmp-notice-list-textarea">
@@ -36,6 +42,7 @@
 </template>
 <script>
   import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
+  import { throttle } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
     filters: {
@@ -44,17 +51,27 @@
       }
     },
     data() {
+      const domainState = this.noticeServer.state;
+
       return {
-        noticeNum: 1,
+        domainState,
         noticeList: [],
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
         },
-        totalPages: 0,
-        total: 0,
-        inputVal: ''
+        inputVal: '',
+
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     computed: {
@@ -69,30 +86,41 @@
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
-      this.getNoticeHistoryList();
+      // this.getNoticeList(false);
+    },
+    mounted() {
       this.initNotice();
     },
     methods: {
+      /**
+       * 初始化scroll区域
+       */
+      initScroll() {
+        this.osInstance = this.$refs.noticeScroll.osInstance();
+        this.osInstance.options(this.overlayScrollBarsOptions);
+      },
+      /**
+       * 初始化notice
+       */
       initNotice() {
-        // 公告消息
-        this.msgServer.$onMsg('ROOM_MSG', msg => {
-          let msgs = msg.data;
-          if (msgs.type == 'room_announcement') {
-            this.noticeNum++;
-            this.noticeList.unshift({
-              created_at: msgs.push_time,
-              content: {
-                content: msgs.room_announcement_text
-              }
-            });
-          }
+        this.noticeServer.$on('room_announcement', msg => {
+          this.noticeList.unshift({
+            created_at: msg.push_time,
+            content: {
+              content: msg.room_announcement_text
+            }
+          });
+        });
+        this.noticeServer.$on('live_over', () => {
+          this.noticeList = [];
         });
       },
-      getNoticeHistoryList() {
-        this.isShowNotice = true;
-        this.getNoticeList(false);
-      },
-      async getNoticeList(flag) {
+
+      /**
+       * 获取历史消息列表
+       * @param {Boolean} isLoadMore
+       */
+      async getNoticeList(isLoadMore = true) {
         const { watchInitData } = this.roomBaseState;
         const params = {
           room_id: watchInitData.interact.room_id,
@@ -100,42 +128,39 @@
           ...this.pageInfo
         };
 
-        const res = await this.noticeServer.getNoticeList({ params, flag });
-        if (res.code == 200 && res.data) {
-          const state = this.noticeServer.state;
-          this.noticeList = state.noticeList;
-          this.totalPages = state.totalPages;
-          this.total = state.total;
-          this.noticeNum = state.total;
-        }
+        await this.noticeServer.getNoticeList({ params, flag: isLoadMore });
       },
+      /**
+       * 读取更多data
+       */
       moreLoadData() {
-        if (this.pageInfo.pageNum >= this.totalPages) {
+        if (this.pageInfo.pageNum >= this.domainState.totalPages) {
           return false;
         }
         this.pageInfo.pageNum++;
         this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
         this.getNoticeList(true);
       },
-      async sendNotice() {
+      /**
+       * 发送一条公告
+       */
+      sendNotice: throttle(function () {
         if (this.inputVal === '' || this.inputVal === undefined) {
           return this.$message.warning('内容不能为空');
         }
-
         const params = {
           messageType: 1,
           roomId: this.watchInitData.interact.room_id,
           channel_id: this.watchInitData.interact.channel_id,
           content: this.inputVal
         };
-
         try {
-          await this.noticeServer.sendNotice(params);
+          this.noticeServer.sendNotice(params);
           this.inputVal = '';
         } catch (error) {
           console.warn('发送公告消息错误', error);
         }
-      }
+      })
     }
   };
 </script>
@@ -146,7 +171,6 @@
     position: relative;
     &-container {
       height: calc(100% - 52px);
-      overflow-y: scroll;
       width: 100%;
       background: transparent;
       background-size: 100% 100%;
@@ -162,10 +186,10 @@
           margin-top: 1px;
         }
 
-        i.iconfont {
+        i.vh-iconfont {
           display: inline-block;
           position: absolute;
-          top: 15px;
+          top: 17px;
           font-size: 14px;
           color: #fba511;
           left: 15px;

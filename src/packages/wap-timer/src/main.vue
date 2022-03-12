@@ -1,5 +1,5 @@
 <template>
-  <div class="timer">
+  <div class="timer" v-if="!embedObj.embedVideo">
     <!-- 时间显示区 -->
     <div v-show="timerVisible" class="bgimg" id="timer" v-drag>
       <div>
@@ -138,16 +138,25 @@
           statusStr = this.$t('interact_tools.interact_tools_1057');
         }
         return `${timeStr} ${this.$t('interact_tools.interact_tools_1054')} ${statusStr}`;
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 是否为直播
+      isLive() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       }
     },
     beforeCreate() {
       this.timerServer = useTimerServer();
     },
-    mounted() {
-      console.log(this.roomBaseServer.state);
+    async mounted() {
+      // await this.getCommonConfig();
+      console.log(this.roomBaseServer.state?.timerInfo, 'this.roomBaseServer.state?.timerInfo');
       this.timerInfo = this.roomBaseServer.state?.timerInfo;
       this.timerServer.listenMsg();
-      console.log(this.timerServer, 'this.timerServer');
+      console.log(this.$domainStore.state.roomBaseServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
@@ -171,12 +180,9 @@
           this.timerFun(this.shijian);
         }
         // 打开计时器组件
-        if (this.is_all_show == 1) {
+        if (this.is_all_show == 1 && this.isLive) {
           this.status = 'kaishi';
           this.handleTimer();
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
-          );
         }
       },
       // 计时器结束
@@ -220,14 +226,10 @@
           if (resData.status != 4) {
             this.timerFun(this.shijian);
           }
-          this.handleTimer();
           // 打开计时器组件
           this.status = resData.status == 4 ? 'zanting' : 'kaishi';
-          this.timerVisible = true;
-          if (this.is_all_show == 1) {
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
-            );
+          if (this.is_all_show == 1 && this.isLive) {
+            this.handleTimer();
             console.log(this.cuid, 'emitChangeTimer');
           }
         } else {
@@ -241,6 +243,9 @@
       },
       handleTimer() {
         this.timerVisible = true;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
+        );
       },
       onClose() {
         this.timerVisible = false;
@@ -268,6 +273,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
               );
+              this.timerVisible = false;
               return false;
             }
           }
@@ -283,6 +289,29 @@
           this.shijian = data;
         }, 1000);
       }
+      // TODO: 不应在此处调getCommonConfig用接口 须退出小组相关逻辑调用
+      // 初始化房间互动工具
+      // getCommonConfig() {
+      //   return this.roomBaseServer.getCommonConfig({
+      //     tags: [
+      //       'skin',
+      //       'screen-poster',
+      //       'like',
+      //       'keywords',
+      //       'public-account',
+      //       'webinar-tag',
+      //       'menu',
+      //       'adv-default',
+      //       'invite-card',
+      //       'red-packet',
+      //       'room-tool',
+      //       'goods-default',
+      //       'announcement',
+      //       'sign',
+      //       'timer'
+      //     ]
+      //   });
+      // }
     }
   };
 </script>

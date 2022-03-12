@@ -1,54 +1,75 @@
 <template>
-  <div class="vmp-footer-tools">
+  <div class="vmp-footer-tools" v-if="!isEmbedVideo">
     <div class="vmp-footer-tools__left">
-      <div class="vmp-footer-tools-left-setting" v-if="isInteractLive" @click="settingShow">
+      <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
-        设置
+        {{ $t('account.account_1005') }}
       </div>
-      <div class="vmp-footer-tools-left-online" v-if="roomBaseState.watchInitData.online.show">
+      <div class="vmp-footer-tools__left-online" v-if="roomBaseState.watchInitData.online.show">
         <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools-left-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div class="vmp-footer-tools__leftt-hot" v-if="roomBaseState.watchInitData.pv.show">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
+      </div>
+      <div class="vmp-footer-tools__left-language" v-if="isEmbed && languageList.length > 1">
+        <el-dropdown @command="changeLang" trigger="click" placement="bottom">
+          <span class="language__icon">
+            <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
+            {{ lang.label }}
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item
+              :command="item.key"
+              :key="index"
+              :class="{ active: item.key == lang.key }"
+              v-for="(item, index) in languageList"
+            >
+              {{ item.label }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </div>
     <!-- <div class="vmp-footer-tools__right">
       <vmp-air-container :cuid="cuid"></vmp-air-container>
     </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="isInteractLive">
+    <div class="vmp-footer-tools__center" v-if="device_status === 1 && !isBanned && isInteractLive">
       <handup></handup>
     </div>
-    <!-- 用户被邀请dialog -->
-    <get-invited :roomBaseState="roomBaseState"></get-invited>
     <!-- 互动工具 -->
-    <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
-      <li>
+    <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
+      <li v-if="isLiving">
         <!-- 公告 -->
         <notice></notice>
       </li>
-      <li>
-        <!-- 问卷-->
-      </li>
-      <li>
-        <!-- 签到 -->
-      </li>
-      <li v-if="isLiving">
-        <!-- 抽奖 -->
-      </li>
-      <li>
-        <!-- 红包 -->
-      </li>
-      <li v-if="isLiving">
+      <li v-if="1">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
           <img src="./img/timer.png" alt="" @click="openTimerHandle" />
         </div>
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="showGiftIcon">
+      <li>
+        <!-- 问卷-->
+        <questionnaire-icon @clickIcon="checkQuestionIcon" />
+      </li>
+      <li>
+        <!-- 签到 -->
+        <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
+      </li>
+      <li v-if="isLiving">
+        <!-- 抽奖 -->
+        <lottery-icon @clickIcon="checkLotteryIcon" />
+      </li>
+      <li>
+        <red-packet-icon @clickIcon="checkredPacketIcon" />
+        <!-- 红包 -->
+      </li>
+      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
@@ -58,54 +79,96 @@
             :roomId="roomBaseState.watchInitData.interact.room_id"
             :show-gift-count="showGiftCount"
             @changeShowGift="changeStatus"
-            :cuid="cuid"
+            @acceptPay="acceptPay"
+            @needLogin="needLogin"
           />
         </div>
       </li>
-      <li>
+      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0'">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
           <reward ref="reward" />
         </div>
       </li>
-      <li>
+      <li v-if="roomBaseState.configList['ui.watch_hide_like'] == '0'">
         <!-- 点赞 -->
         <praise></praise>
+      </li>
+      <!-- 支付弹框 -->
+      <li v-if="showPay">
+        <Pay
+          :wxQr="wxQr"
+          :zfQr="zfQr"
+          @changeShow="changeStatus"
+          :style="{ zIndex: zIndexServerState.zIndexMap.giftPay }"
+        ></Pay>
       </li>
     </ul>
   </div>
 </template>
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useZIndexServer,
+    useMicServer,
+    useChatServer,
+    useGroupServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
-  import getInvited from './component/getInvited/index.vue';
-
+  import Pay from './component/pay/index.vue';
+  import RedPacketIcon from './component/red-packet-icon/index.vue';
+  import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
+  import LotteryIcon from './component/lottery-icon/index.vue';
+  const langMap = {
+    1: {
+      label: '简体中文',
+      type: 'zh',
+      key: 1
+    },
+    2: {
+      label: 'English',
+      type: 'en',
+      key: 2
+    }
+  };
   export default {
     name: 'VmpFooterTools',
-    data() {
-      return {
-        roomBaseState: null,
-        showGiftIcon: true,
-        showGift: false,
-        showGiftCount: 0,
-        openTimer: false,
-        showTimer: false,
-        groupInitData: {}
-      };
-    },
     components: {
       handup,
       reward,
       vhGifts,
       notice,
       praise,
-      getInvited
+      Pay,
+      RedPacketIcon,
+      QuestionnaireIcon,
+      LotteryIcon
+    },
+    data() {
+      const zIndexServerState = this.zIndexServer.state;
+      return {
+        zIndexServerState,
+        roomBaseState: null,
+        showGiftIcon: true,
+        showGift: false,
+        showGiftCount: 0,
+        openTimer: false,
+        showTimer: false,
+        groupInitData: {},
+        showPay: false,
+        zfQr: '',
+        wxQr: '',
+        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
+        lang: {},
+        languageList: []
+      };
     },
     filters: {
       formatHotNum(value) {
@@ -123,6 +186,10 @@
       }
     },
     computed: {
+      // 是否已上麦
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       isInteractLive() {
         const { watchInitData } = this.roomBaseState;
         return (
@@ -130,10 +197,9 @@
           watchInitData.webinar.type == 1
         );
       },
+      // 是否正在直播
       isLiving() {
-        const { watchInitData } = this.roomBaseState;
-        //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
-        return watchInitData.webinar.type == 1;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
       isTrySee() {
         const { watchInitData } = this.roomBaseState;
@@ -158,27 +224,63 @@
           Number(this.$domainStore.state.virtualAudienceServer.uvOnline) +
           Number(this.$domainStore.state.virtualAudienceServer.virtualOnline)
         );
+      },
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      isEmbedVideo() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
       }
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
+      if (this.isEmbed) {
+        this.languageList = this.roomBaseState.languages.langList.map(item => {
+          return langMap[item.language_type];
+        });
+        const curLang = this.roomBaseState.languages.curLang;
+        this.lang =
+          langMap[sessionStorage.getItem('lang')] ||
+          langMap[this.$route.query.lang] ||
+          langMap[curLang.language_type];
+        this.$i18n.locale = this.lang.type;
+        sessionStorage.setItem('lang', this.lang.key);
+      }
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
         if (this.showGift) {
           this.showGift = false;
         }
       });
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
+    },
+    mounted() {
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isBanned = res;
+      });
     },
     methods: {
       settingShow() {
-        window.$middleEventSdk?.event?.send({
-          cuid: this.cuid,
-          method: 'emitClickMediaCheck' // TODO 设置媒体的弹窗方法
-        });
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
       },
       changeStatus(data, status) {
         console.log(data, status, 'data, status');
@@ -202,10 +304,38 @@
       onClickReward() {
         // 需校验是否登陆
         if (this.roomBaseState.watchInitData.join_info.user_id == 0) {
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          this.needLogin();
+          // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           return false;
         }
         this.$refs.reward.onClickReward();
+      },
+      // 接收支付码
+      acceptPay(data, url) {
+        // 修改付费礼物支付弹窗层级
+        this.zIndexServer.setDialogZIndex('giftPay');
+        this.showPay = true;
+        this[data] = url;
+      },
+      changeLang(key) {
+        sessionStorage.setItem('lang', key);
+        window.location.reload();
+      },
+      needLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+      },
+      checkLotteryIcon() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      checkredPacketIcon(redPacketId) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [redPacketId])
+        );
+      },
+      checkQuestionIcon(questionnaireId) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionIcon', [questionnaireId])
+        );
       }
     }
   };
@@ -220,7 +350,7 @@
     align-items: center;
     padding: 0 24px;
     position: relative;
-    z-index: 10;
+    // z-index: 10;
 
     &__left {
       display: flex;
@@ -235,6 +365,12 @@
       }
       &-setting {
         cursor: pointer;
+      }
+      &-language {
+        .language__icon {
+          color: #ccc;
+          cursor: pointer;
+        }
       }
     }
     &__right {

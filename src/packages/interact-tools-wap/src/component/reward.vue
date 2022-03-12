@@ -57,8 +57,9 @@
 
 <script>
   // import EventBus from '@/utils/Events';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
+  import { useWatchRewardServer, useChatServer } from 'middle-domain';
+  import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'reward',
     props: {
@@ -84,13 +85,17 @@
         money: '',
         btnMoney: '', // 选中按钮上面的金额
         note: '',
-        btnTxt: browserType()
+        btnTxt: isWechat()
           ? this.$t('interact_tools.interact_tools_1049')
           : this.$t('interact_tools.interact_tools_1069')
       };
     },
     mounted() {
-      // EventBus.$on('reward_pay_ok', this.rewardFn);
+      this.chatServer = useChatServer();
+      this.rewardServer = useWatchRewardServer();
+      // this.rewardServer.$on('reward_pay_ok', msg => {
+      //   this.rewardFn(msg);
+      // });
     },
     beforeDestroy() {
       // EventBus.$off('reward_pay_ok', this.rewardFn);
@@ -99,6 +104,24 @@
       // 打赏成功消息
       rewardFn(msg) {
         console.log('收到打赏成功消息', msg, this.webinarData.join_info.third_party_user_id);
+        // 添加聊天消息
+        const data = {
+          avatar: msg.data.rewarder_avatar,
+          nickName:
+            msg.data.rewarder_nickname.length > 8
+              ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+              : msg.data.rewarder_nickname,
+          type: 'reward_pay_ok',
+          content: {
+            text_content: msg.data.reward_describe ? msg.data.reward_describe : '很精彩，赞一个！',
+            num: msg.data.reward_amount
+          },
+          sendId: this.webinarData.join_info.third_party_user_id,
+          roleName: this.roleName,
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
+
         if (msg.rewarder_id == this.webinarData.join_info.third_party_user_id) {
           console.log('收到打上成功消息，关闭弹窗');
           this.close();
@@ -151,20 +174,21 @@
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
-        if (browserType()) {
+        if (isWechat()) {
           if (!open_id) {
-            let _search = '';
-            if (location.search && location.search != '') {
-              _search = location.search.split('?')[1];
-            }
-            const address =
-              window.location.protocol +
-              process.env.VUE_APP_WATCH_URL +
-              process.env.VUE_APP_WEB_KEY +
-              `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
-            window.location.href = `${
-              process.env.VUE_APP_BASE_URL
-            }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
+            // let _search = '';
+            // if (location.search && location.search != '') {
+            //   _search = location.search.split('?')[1];
+            // }
+            // const address =
+            //   window.location.protocol +
+            //   process.env.VUE_APP_WATCH_URL +
+            //   process.env.VUE_APP_WEB_KEY +
+            //   `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
+            // window.location.href = `${
+            //   process.env.VUE_APP_BASE_URL
+            // }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
+            authWeixinAjax(this.$route, location.href);
             return;
           }
           params = {
@@ -193,11 +217,11 @@
       // 确认支付
       payProcess(params) {
         const that = this;
-        this.watchRewardServer
+        this.rewardServer
           .createReward({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType()) {
+              if (isWechat()) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {

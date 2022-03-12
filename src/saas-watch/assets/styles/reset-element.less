@@ -17,7 +17,7 @@
   height: 16px;
   .el-dialog__close {
     font-size: 18px;
-    color: @font-light-second;
+    color: @font-light-second !important;
   }
 }
 .el-dialog__footer {
@@ -515,6 +515,9 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 26px;
+  &.is-round {
+    padding: 4px 24px;
+  }
 }
 .el-button.el-button--white-medium {
   /* 中等按钮 */

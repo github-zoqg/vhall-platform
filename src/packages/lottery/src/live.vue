@@ -1,10 +1,21 @@
 <template>
   <div class="vhall-lottery" v-if="dialogVisible">
     <!-- 抽奖中 -->
-    <lottery-pending v-if="prizeShow" :fitment="fitment" @close="close" @end="handleEndLottery" />
+    <lottery-pending
+      v-if="prizeShow"
+      mode="live"
+      :fitment="fitment"
+      :prize-info="prizeInfo"
+      :lottery-id="lotteryInfoId"
+      :lottery-info="lotteryInfo"
+      :disabled-time="disabledTime"
+      @close="close"
+      @end="handleEndLottery"
+    />
     <lottery-winner
       mode="live"
       v-else-if="lotteryResultShow"
+      :prize-info="prizeInfo"
       :winner-list="winLotteryUserList"
       @reStart="reStart"
       @close="close"
@@ -15,7 +26,7 @@
         <span class="payment-title--text">抽奖</span>
         <span class="payment-title--close vh-iconfont vh-line-close" @click="close"></span>
       </div>
-      <lottery-form @startLottery="handleStartLottery" />
+      <lottery-form @startLottery="startLottery" />
     </div>
   </div>
 </template>
@@ -36,7 +47,9 @@
         lotteryResultShow: false, // 抽奖结果
         lotteryInfoId: null, // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
-        prizeInfo: {} // 奖品信息
+        prizeInfo: {}, // 奖品信息
+        lotteryInfo: {},
+        disabledTime: 0 // 5秒禁止点击
       };
     },
     provide() {
@@ -44,10 +57,38 @@
         lotteryServer: this.lotteryServer
       };
     },
+    mounted() {
+      if (this.mode === 'live') {
+        this.coutDown();
+      }
+    },
     beforeCreate() {
-      this.lotteryServer = useLotteryServer();
+      this.lotteryServer = useLotteryServer({
+        mode: 'live'
+      });
+    },
+    destroyed() {
+      this.clearTimer();
     },
     methods: {
+      // 开始计时
+      coutDown() {
+        this.clearTimer();
+        this.disabledTime = 5;
+        this.timer = setInterval(() => {
+          this.disabledTime--;
+          if (this.disabledTime <= 0) {
+            this.clearTimer();
+          }
+        }, 1000);
+      },
+      // 清除计时
+      clearTimer() {
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
+      },
       /**
        * @description 打开整个抽奖组件
        */
@@ -69,7 +110,7 @@
             if (data.lottery_status === 0) {
               // 抽奖进行中
               this.handleStartLottery(data);
-            } else if (data.lottery_status === 1) {
+            } else {
               // 上一轮抽奖已结束
               this.lotteryContentShow = true;
               this.lotteryInfoId = null;
@@ -118,6 +159,13 @@
         this.lotteryInfoId = null;
       },
       /**
+       * @description 主动发起抽奖(倒计时)
+       */
+      startLottery(payload) {
+        this.coutDown();
+        this.handleStartLottery(payload);
+      },
+      /**
        * @description 抽奖按钮
        */
       handleStartLottery(payload) {
@@ -128,9 +176,10 @@
           title: payload.title,
           img_order: payload.img_order
         };
-        this.prizeObj = payload.award_snapshoot;
+        this.prizeInfo = payload.award_snapshoot;
         this.prizeShow = true;
         this.lotteryContentShow = false;
+        this.lotteryInfo = payload;
       }
     }
   };
@@ -146,7 +195,7 @@
     right: 0;
     z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: 102;
     .el-form-item__label {
       color: #1a1a1a;
     }

@@ -21,7 +21,9 @@ const htmlConfig = {
 
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
-    jsencrypt: '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js'
+    jsencrypt:
+      '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
+    loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js'
 
     // vhallReport: '//cnstatic01.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
   },
@@ -30,8 +32,8 @@ const htmlConfig = {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
-    iconfontCommon: '//at.alicdn.com/t/font_3128919_wa3mcobacyp.css',
-    iconfont: '//at.alicdn.com/t/font_3120276_to9ja89x0p.css'
+    iconfontCommon: '//at.alicdn.com/t/font_3128919_8a91sagp8mc.css',
+    iconfont: '//at.alicdn.com/t/font_3120276_vywbqplu6p.css'
   },
   // dns-prefetch
   dnsPrefetch: {
@@ -51,6 +53,7 @@ module.exports = {
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
       version: pkg.version,
+      hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
       ...htmlConfig
     }
   }

@@ -34,7 +34,20 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: JSON.stringify(process.env.VUE_APP_ROUTER_BASE_URL)
+        ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl'),
+        VUE_APP_WAP_WATCH_MIDDLE: JSON.stringify(process.env.VUE_APP_WAP_WATCH_MIDDLE),
+        VUE_APP_WEB_BASE_MIDDLE: JSON.stringify(process.env.VUE_APP_WEB_BASE_MIDDLE),
+        VUE_MIDDLE_SAAS_WATCH_PC_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_WATCH_PC_PROJECT
+        ),
+        VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT
+        ),
+        VUE_MIDDLE_SAAS_LIVE_PC_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT
+        ),
+        VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS), //化蝶观看端域名
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS) //化蝶发起端域名
       }
     })
   ];
@@ -42,6 +55,11 @@ function getPlugins() {
   if (!isDev) {
     // 项目资源路径
     let projectResourceDir = path.join(pathConfig.ROOT, `dist/${argv.project}/static/js/`);
+
+    // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
+    if (argv.middle) {
+      process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
+    }
 
     plugins.push(
       new SentryCliPlugin({
@@ -54,8 +72,28 @@ function getPlugins() {
       new FileManagerPlugin({
         events: {
           onEnd: {
-            mkdir: [`dist/${argv.project}/sourcemap`],
+            mkdir: [
+              `dist/${argv.project}/docker`,
+              `dist/${argv.project}/cloud`,
+              `dist/${argv.project}/sourcemap`
+            ],
             copy: [
+              {
+                source: `dist/${argv.project}/index.html`,
+                destination: `dist/${argv.project}/docker/index.html`
+              },
+              {
+                source: `dist/${argv.project}/index.html`,
+                destination: `dist/${argv.project}/docker/${argv.version}/index.html`
+              },
+              {
+                source: `dist/${argv.project}/static`,
+                destination: `dist/${argv.project}/cloud/static`
+              },
+              {
+                source: `dist/${argv.project}/static`,
+                destination: `dist/${argv.project}/cloud/${argv.version}/static`
+              },
               {
                 source: `dist/${argv.project}/static/**/*.map`,
                 destination: `dist/${argv.project}/sourcemap`
@@ -67,21 +105,54 @@ function getPlugins() {
       }),
       // 修改文件内容替换路由标记
       new ReplaceInFileWebpackPlugin([
-        // {
-        //   dir: `dist/${argv.project}/cloud/static`,
-        //   test: /\.js$/,
-        //   rules: [{
-        //     search: '@routerBase',
-        //     replace: `${process.env.VUE_APP_ROUTER_BASE}`
-        //   }]
-        // }, {
-        //   dir: `dist/${argv.project}/cloud/${argv.version}/static`,
-        //   test: /\.js$/,
-        //   rules: [{
-        //     search: '@routerBase',
-        //     replace: `${process.env.VUE_APP_ROUTER_BASE}/${argv.version}`
-        //   }]
-        // },
+        {
+          dir: `dist/${argv.project}/docker`,
+          files: ['index.html'],
+          rules: [
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}`
+            }
+          ]
+        },
+        {
+          dir: `dist/${argv.project}/docker/${argv.version}`,
+          files: ['index.html'],
+          rules: [
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}/${argv.version}`
+            }
+          ]
+        },
+        {
+          dir: `dist/${argv.project}/cloud/static`,
+          test: /\.js$/,
+          rules: [
+            {
+              search: /@routerBaseUrl/g,
+              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
+            },
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}`
+            }
+          ]
+        },
+        {
+          dir: `dist/${argv.project}/cloud/${argv.version}/static`,
+          test: /\.js$/,
+          rules: [
+            {
+              search: /@routerBaseUrl/g,
+              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
+            },
+            {
+              search: /@projectName/g,
+              replace: `${argv.project}/${argv.version}`
+            }
+          ]
+        },
         {
           dir: `dist/${argv.project}`,
           test: /\.js$/,
@@ -102,11 +173,11 @@ function getPlugins() {
  * 共享配置
  */
 const sharedConfig = {
-  publicPath: '/',
+  publicPath: isDev ? '/' : `${process.env.VUE_APP_PUBLIC_PATH}/common-static/@projectName/`,
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool: isDev ? '#cheap-module-eval-source-map' : 'source-map',
+    devtool: isDev ? '#eval-source-map' : '#cheap-module-source-map',
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
       hints: isDev ? false : 'warning',
@@ -138,16 +209,28 @@ const sharedConfig = {
     }
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
       // 编译结束后重新组织编译结果
-      config.plugin('reorganize').use(
-        new ReorganizePlugin({
-          resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
-          dist: path.resolve('dist'),
-          project: argv.project,
-          version: argv.version,
-          routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-        })
-      );
+      // config.plugin('reorganize').use(
+      //   new ReorganizePlugin({
+      //     resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
+      //     dist: path.resolve('dist'),
+      //     project: argv.project,
+      //     version: argv.version,
+      //     routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
+      //   })
+      // );
     }
+    // config.module
+    //   .rule('images')
+    //   .test(/\.(jpg|png|gif)$/)
+    //   .use('url-loader')
+    //   .loader('url-loader')
+    //   .options({
+    //     limit: 10,
+    //     publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
+    //     outputPath: 'img',
+    //     name: '[name].[ext]'
+    //   })
+    //   .end();
   },
   // 向 CSS 相关的 loader 传递选项
   // 可支持 css\postcss\sass\less\stylus-loader
@@ -191,8 +274,13 @@ const sharedConfig = {
   // 不使用thread-loader, 否则有很大概率编译不通过
   parallel: false,
   devServer: {
-    port: 8080,
+    // port: 443,
     host: '0.0.0.0',
+    // https: true,
+    // disableHostCheck: true,
+    // allowedHosts: [
+    //   'dev-csd-saas-web.vhall.com'
+    // ],
     contentBase: resolve('public'),
     proxy: {
       '/mock': {
@@ -207,6 +295,7 @@ const sharedConfig = {
 if (['serve', 'build'].includes(cmd)) {
   // 动态修改运行环境的版本号
   process.env.VUE_APP_BUILD_VERSION = argv.version;
+  process.env.VUE_APP_BUILD_HASH = argv.hash;
 
   // 根据参数获取专用配置信息
   const specialConfig = btool.createSpecialConfig(argv.project);
@@ -237,7 +326,6 @@ if (['serve', 'build'].includes(cmd)) {
 
   // 导出
   module.exports = vueConfig;
-  return;
+} else {
+  module.exports = sharedConfig;
 }
-
-module.exports = sharedConfig;

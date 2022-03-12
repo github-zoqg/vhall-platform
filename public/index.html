@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="version" content="<%= htmlWebpackPlugin.options.version %>" />
+    <meta name="gitlab-hash" content="<%= htmlWebpackPlugin.options.hash %>" />
     <% if( htmlWebpackPlugin.options && htmlWebpackPlugin.options.isWap){ %>
     <meta
       name="viewport"
@@ -24,6 +25,7 @@
     <% } %>
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 
+    <script src="https://cdn.bootcss.com/vConsole/3.3.0/vconsole.min.js"></script>
     <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico" /> -->
     <title><%= htmlWebpackPlugin.options.title %></title>
     <!-- CDN预解析 -->
@@ -55,5 +57,6 @@
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <script src="<%= js %>"></script>
     <% } }%>
+    <script></script>
   </body>
 </html>

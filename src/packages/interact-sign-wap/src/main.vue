@@ -27,7 +27,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSignServer } from 'middle-domain';
+  import { useSignServer, useChatServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   // import EventBus from '../../utils/Events';
   import CountDown from './countDown.vue';
@@ -35,40 +35,60 @@
     name: 'VmpSignWap',
     components: { CountDown },
     data() {
-      let roomBaseData = useRoomBaseServer().state;
       return {
-        roomBaseData,
         signInVisible: false,
         seconds: 60,
         sign_id: '',
         clock: null,
         duration: 30,
         title: '',
-        signinInfo: {},
+        // signinInfo: {},
         popHeight: ''
       };
     },
-    watch: {
-      signinInfo: {
-        immediate: true,
-        deep: true,
-        handler: function () {
-          this.init();
-        }
-      },
-      signInVisible(newValue) {
-        // EventBus.$emit('signShow', newValue);
+    // watch: {
+    //   signinInfo: {
+    //     immediate: true,
+    //     deep: true,
+    //     handler: function () {
+    //       this.init();
+    //     }
+    //   },
+    //   signInVisible(newValue) {
+    //     // EventBus.$emit('signShow', newValue);
+    //   },
+    //   roomBaseData: {
+    //     immediate: true,
+    //     deep: true,
+    //     handler: function (val) {
+    //       this.signinInfo = val.signInfo;
+    //     }
+    //   }
+    // },
+    computed: {
+      // roomBaseData() {
+      //   return this.$domainStore.state.roomBaseServer;
+      // },
+      signinInfo() {
+        return this.roomBaseServer.state.signInfo;
       }
     },
     beforeCreate() {
       this.signServer = useSignServer();
+      this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
-    created() {
-      this.signServer.listenMsg();
-      this.signinInfo = this.roomBaseData.signInfo;
+    async created() {
+      this.init();
       let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
       // postcss 换算基数为75 头部+播放器区域高为 522px
       this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        if (!msg.data.over_live && !this.signinInfo.is_signed && this.signinInfo.id) {
+          this.init();
+        }
+      });
       // 发起签到
       this.signServer.$on('sign_in_push', e => {
         window.$middleEventSdk?.event?.send(
@@ -79,6 +99,17 @@
         this.duration = Number(e.data.sign_show_time);
         this.openSignIn(e.data.sign_id, e.data.sign_show_time);
         this.title = e.data.title;
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${this.$t('chat.chat_1027')}`
+          },
+          type: e.data.type
+        };
+        // console.log(useChatServer(), data, '1323');
+        useChatServer().addChatToList(data);
       });
       // 签到结束
       this.signServer.$on('sign_end', e => {
@@ -86,6 +117,19 @@
           boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
         );
         // this.iconShow = false;
+
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: this.$t('chat.chat_1028')
+          },
+          type: e.data.type
+        };
+        // console.log(useChatServer(), data, '1323');
+        useChatServer().addChatToList(data);
+
         this.duration = 30;
         this.signInVisible = false;
         if (this.seconds) {
@@ -127,6 +171,9 @@
         this.sign_id = sign_id;
         if (sign_id) {
           this.seconds = time;
+          if (this.clock) {
+            window.clearInterval(this.clock);
+          }
           this.clock = window.setInterval(() => {
             if (this.seconds <= 0) {
               window.clearInterval(this.clock);
@@ -134,7 +181,6 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
               );
-              // this.iconShow = false;
             }
             this.seconds--;
           }, 1000);
@@ -150,7 +196,7 @@
       signin() {
         this.signServer
           .sign({
-            room_id: this.roomBaseData.watchInitData.interact.room_id,
+            room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
             sign_id: this.sign_id
           })
           .then(res => {

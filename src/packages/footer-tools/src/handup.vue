@@ -1,30 +1,47 @@
 <template>
   <div class="vmp-handup">
+    <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
         @click="handleHandClick"
         type="primary"
         size="medium"
         round
-        v-if="isAllowhandup && !isSpeakOn"
+        v-if="
+          inLine &&
+          (isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn && isBanned
+            : isAllowhandup && !isSpeakOn)
+        "
       >
         {{ btnText }}
       </el-button>
     </div>
     <div>
-      <el-button @click="speakOff" type="primary" size="medium" v-if="isSpeakOn" round>
-        下麦
+      <el-button
+        @click="speakOff"
+        type="primary"
+        size="medium"
+        v-if="
+          inLine &&
+          (isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn && isBanned
+            : isSpeakOn)
+        "
+        round
+      >
+        {{ $t('interact.interact_1007') }}
       </el-button>
     </div>
   </div>
 </template>
 <script>
-  import { useMicServer, useRoomBaseServer } from 'middle-domain';
+  import { useMicServer, useMediaCheckServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
       return {
-        btnText: '举手上麦',
+        btnText: this.$t('interact.interact_1001'),
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
         waitInterval: null
@@ -34,9 +51,17 @@
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return useMediaCheckServer().state.deviceInfo.device_status;
+      },
+      // 是否是直播中
+      inLine() {
+        return parseInt(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type) === 1;
+      },
       // 是否开启举手
       isAllowhandup() {
-        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        const status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
         return status;
       },
       // 是否已上麦
@@ -45,30 +70,52 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      // 组内角色
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
+      // 分组 组内 禁言 状态
+      isBanned() {
+        return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },
     created() {
       if (this.waitInterval) {
         clearInterval(this.waitInterval);
       }
-      const { join_info } = useRoomBaseServer().state.watchInitData;
       // 申请上麦
       useMicServer().$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', join_info, msg);
+        console.log('---申请上麦消息---', this.joinInfo, msg);
       });
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           clearInterval(this.waitInterval);
           this.isApplyed = false;
-          this.btnText = '举手上麦';
+          this.btnText = this.$t('interact.interact_1001');
         }
       });
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        console.log('---申请下麦消息---', join_info, msg);
+        this.$message.warning(this.$t('interact.interact_1028'));
       });
-      // 主持人同意上麦申请
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        if (parseInt(this.device_status) === 1) {
+          this.$message.success(this.$t('interact.interact_1003'));
+        }
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        if (parseInt(this.device_status) === 1) {
+          this.$message.success(this.$t('interact.interact_1002'));
+        }
+      });
+
+      /**
+       *
+       * // 主持人同意上麦申请
       useMicServer().$on('user_apply_host_agree', msg => {
         console.log(msg);
       });
@@ -76,12 +123,15 @@
       useMicServer().$on('user_apply_host_reject', msg => {
         // TODO:被拒绝的处理
         console.log(msg);
-      });
+      });**/
     },
     methods: {
       // 下麦
-      speakOff() {
-        useMicServer().speakOff();
+      async speakOff() {
+        const { code, msg } = await useMicServer().speakOff();
+        if (code === 513035) {
+          this.$message.error(msg);
+        }
       },
       // 举手按钮点击事件
       handleHandClick() {
@@ -95,10 +145,14 @@
       userApply() {
         useMicServer()
           .userApply()
-          .then(() => {
+          .then(res => {
+            if (res.code != 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this.isApplyed = true;
             this.waitTime = 30;
-            this.btnText = `等待(${this.waitTime}s)`;
+            this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
             this.startWaitInterval();
           });
       },
@@ -109,9 +163,9 @@
           .then(() => {
             this.isApplyed = false;
             this.waitInterval && clearInterval(this.waitInterval);
-            this.btnText = '举手上麦';
+            this.btnText = this.$t('interact.interact_1001');
             this.$message({
-              message: '您已取消申请上麦！',
+              message: this.$t('interact.interact_1027'),
               showClose: true,
               type: 'success',
               customClass: 'zdy-info-box'
@@ -122,10 +176,10 @@
       startWaitInterval() {
         this.waitInterval = setInterval(() => {
           this.waitTime--;
-          this.btnText = `等待(${this.waitTime}s)`;
+          this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
           if (this.waitTime <= 0) {
             clearInterval(this.waitInterval);
-            this.btnText = '举手上麦';
+            this.btnText = this.$t('interact.interact_1001');
             this.isApplyed = false;
             useMicServer().userCancelApply();
             // TODO: 分组
@@ -133,7 +187,7 @@
             if (this.isInGroup) {
               tip = '组长拒绝了您的上麦请求';
             } else {
-              tip = '主持人拒绝了您的上麦请求';
+              tip = this.$t('other.other_1006');
             }
             this.$message.warning(tip);
           }

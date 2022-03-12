@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-header-watch">
+  <div
+    class="vmp-header-watch"
+    :class="embedObj.embed ? 'vmp-basic-hd' : ''"
+    v-if="!embedObj.embed"
+  >
     <div class="vmp-header-watch-left">
       <!-- 品牌设置-标识图片 -->
       <div
@@ -15,19 +19,18 @@
     </div>
     <div class="vmp-header-watch-center">
       <div class="vmp-header-watch-center-title">
-        {{ webinarInfo.subject | splitLenStr(40) }}
+        {{ languagesInfo.subject | splitLenStr(40) }}
         <span
-          v-if="webinarInfo.type != 6"
           :class="
             'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
             webinarInfo.type
           "
         >
-          <img v-if="webinarInfo.type == 1" src="./images/live-white.gif" alt="" />
-          <label>{{ webinarInfo.type | webinarFilter }}</label>
+          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ formatType(webinarInfo.type) }}</label>
         </span>
         <span
-          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
+          v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1"
           class="vmp-header-watch-center-title-delay"
         >
           <img :src="noDelayIconUrl" alt="" />
@@ -46,7 +49,7 @@
     </div>
     <div class="vmp-header-watch-right">
       <!-- 多语言 -->
-      <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
 
       <!-- 公众号 -->
       <div class="vmp-header-watch-right-officical" v-if="officialImg">
@@ -63,7 +66,7 @@
       <!-- 关注 -->
       <div
         class="vmp-header-watch-right-attention"
-        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.type != 6"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.mode != 6"
       >
         <div
           :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"
@@ -75,14 +78,12 @@
               isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
             }`"
           ></i>
-          <!-- <i class="vh-iconfont vh-line-collection vh-a-line-collectionsuccess"></i> -->
           <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
         </div>
       </div>
-      <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
 
       <!-- 分享 -->
-      <div class="vmp-header-watch-right-share">
+      <div class="vmp-header-watch-right-share" v-if="isShowShare">
         <div
           :class="'vmp-header-watch-right-share-icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
@@ -102,14 +103,14 @@
       <!-- 登录、基础信息 -->
       <div class="vmp-header-watch-right-login">
         <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
-          <p><img src="./images/my-dark@2x.png" alt="" /></p>
+          <p><img src="./img/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
         <div class="vmp-header-watch-right-login-user" v-else>
           <div class="vmp-header-watch-right-login-user-dropdown">
             <p>
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
-              <img v-else src="./images/my-dark@2x.png" alt="" />
+              <img v-else src="./img/my-dark@2x.png" alt="" />
             </p>
             <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
             <div class="vmp-header-watch-right-login-user-list">
@@ -142,9 +143,7 @@
     name: 'VmpHeaderWatch',
     data() {
       return {
-        noDelayIconUrl:
-          '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
-        defaultLogoUrl: require('./images/logo-red@2x.png'),
+        defaultLogoUrl: require('./img/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识
@@ -162,17 +161,6 @@
       };
     },
     filters: {
-      webinarFilter(val) {
-        // const webinarArr = [
-        //   this.$t('common.common_1018'),
-        //   this.$t('common.common_1019'),
-        //   this.$t('common.common_1020'),
-        //   this.$t('common.common_1024'),
-        //   this.$t('common.common_1021')
-        // ];
-        const webinarArr = ['直播', '预告', '结束', '点播', '回放'];
-        return webinarArr[val - 1];
-      },
       splitLenStr(name, len) {
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
@@ -182,7 +170,7 @@
     },
     computed: {
       create_user_url() {
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
           const url = watchInitData.urls.web_url || '';
           if (url.split('')[url.length - 1] == '/') {
@@ -194,13 +182,24 @@
           return 'javascript:void(0);';
         }
       },
-      isNotEmbed() {
-        return this.embedObj
-          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
-          : true;
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       },
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
+      },
+      isShowShare() {
+        return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
+      },
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
+      },
+      // 无延迟图片地址
+      noDelayIconUrl() {
+        const langArr = ['zh-CN', 'en'];
+        const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+        const lang = langArr[langer - 1] || 'zh-CN';
+        return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       }
     },
     beforeCreate() {
@@ -209,10 +208,7 @@
       this.userServer = useUserServer();
     },
     async created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
-      this.roomBaseState = this.roomBaseServer.state;
-      this.embedObj = this.roomBaseState.embedObj;
-      if (this.isLogin && this.isNotEmbed) {
+      if (this.isLogin && !this.embedObj.embed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
       }
@@ -220,12 +216,12 @@
     },
     methods: {
       getWebinarInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
+        const { webinar } = this.roomBaseServer.state.watchInitData;
         this.webinarInfo = webinar || {};
-        this.skinInfo = this.roomBaseState.skinInfo || {};
-        this.webinarTag = this.roomBaseState.webinarTag || {};
-        this.officicalInfo = this.roomBaseState.officicalInfo || {};
-        this.screenPosterInfo = this.roomBaseState.screenPosterInfo || {};
+        this.skinInfo = this.roomBaseServer.state.skinInfo || {};
+        this.webinarTag = this.roomBaseServer.state.webinarTag || {};
+        this.officicalInfo = this.roomBaseServer.state.officicalInfo || {};
+        this.screenPosterInfo = this.roomBaseServer.state.screenPosterInfo || {};
         this.setOfficicalInfo(this.officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },
@@ -342,6 +338,29 @@
             : 'https://www.vhall.com/';
         window.open(logoUrl, '_blank');
       },
+      formatType(val) {
+        let text;
+        switch (parseInt(val)) {
+          case 1:
+            text = this.$t('common.common_1018');
+            break;
+          case 2:
+            text = this.$t('common.common_1019');
+            break;
+          case 3:
+            text = this.$t('common.common_1020');
+            break;
+          case 4:
+            text = this.$t('common.common_1024');
+            break;
+          case 5:
+            text = this.$t('common.common_1021');
+            break;
+          default:
+            text = this.$t('common.common_1018');
+        }
+        return text;
+      },
       //登录
       goLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -388,9 +407,14 @@
     justify-content: space-between;
     height: 72px;
     width: 100%;
-    margin: 0 32px 0 8px;
+    margin-bottom: 20px;
+    background: #2a2a2a;
+    &.vmp-basic-hd {
+      display: none;
+    }
     &-left {
       margin-right: 7px;
+      padding-left: 8px;
       &-logo {
         width: 120px;
         height: 44px;

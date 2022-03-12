@@ -10,9 +10,9 @@
         >
           <el-option
             v-for="rate in ratesConfig"
-            :key="rate.label"
-            :value="rate.label"
-            :label="formatDefinitionLabel(rate.label)"
+            :key="rate"
+            :value="rate"
+            :label="formatDefinitionLabel(rate)"
           ></el-option>
         </el-select>
       </section>
@@ -21,6 +21,7 @@
         <label class="vmp-media-setting-item__label">桌面共享</label>
         <el-select
           class="vmp-media-setting-item__content"
+          :disabled="liveStatus === 1"
           v-model="mediaState.screenRate"
           placeholder="请选择桌面共享模式"
         >
@@ -33,15 +34,16 @@
         </el-select>
       </section>
 
-      <section class="vmp-media-setting-item">
+      <section class="vmp-media-setting-item" v-if="liveMode != LIVE_MODE_MAP['VIDEO']">
         <label class="vmp-media-setting-item__label">观看端布局(视频)</label>
         <section class="vmp-media-setting-item__content">
           <div
             class="vmp-media-setting-item-layout__item"
             :class="{
-              'vmp-media-setting-item-layout__item--selected': mediaState.layout === item.id
+              'vmp-media-setting-item-layout__item--selected': mediaState.layout === item.id,
+              disabled: liveStatus === 1
             }"
-            v-for="item of layoutConfig"
+            v-for="item of filterLayoutConfig"
             :key="item.id"
             @click="setLayout(item.id)"
           >
@@ -67,7 +69,8 @@
 
 <script>
   import { useMediaSettingServer } from 'middle-domain';
-  import { getDefinitionMap, getScreenOptions } from '../../js/getOptionEntity';
+  import { LIVE_MODE_MAP } from '../../js/liveMap';
+  import mediaSettingConfirm from '../../js/showConfirm';
 
   import FloatImg from '../../assets/img/float.png';
   import TiledImg from '../../assets/img/tiled.png';
@@ -75,72 +78,98 @@
   export default {
     data() {
       return {
+        loading: false,
         mediaState: this.mediaSettingServer.state,
-
-        // v-for config
-        ratesConfig: [],
-        screenRatesConfig: getScreenOptions(),
+        lastSelectRate: '', // 上一选中的值
+        ratesConfig: Object.freeze([
+          'RTC_VIDEO_PROFILE_720P_16x9_M', // 超清
+          'RTC_VIDEO_PROFILE_480P_16x9_M', // 高清
+          'RTC_VIDEO_PROFILE_360P_16x9_M', // 标清
+          'RTC_VIDEO_PROFILE_240P_16x9_M' // 流畅
+        ]),
+        screenRatesConfig: Object.freeze([
+          { value: 'RTC_SCREEN_PROFILE_1080P_16x9_H', label: '视频动态演示模式' },
+          { value: 'RTC_SCREEN_PROFILE_1080P_16x9_M', label: 'PPT静态演示模式' }
+        ]),
         layoutConfig: Object.freeze([
           { id: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE', img: FloatImg, text: '主次浮窗' },
           { id: 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE', img: TiledImg, text: '主次平铺' },
           { id: 'CANVAS_ADAPTIVE_LAYOUT_GRID_MODE', img: GridImg, text: '均匀排列' }
-        ])
+        ]),
+        LIVE_MODE_MAP
       };
+    },
+    computed: {
+      webinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
+      liveStatus() {
+        return this.webinar.type;
+      },
+      liveMode() {
+        return this.webinar.mode;
+      },
+      isNoDelay() {
+        return this.webinar.no_delay_webinar === 1;
+      },
+      filterLayoutConfig() {
+        // 分组、无延迟时，只展示一种布局
+        const isGroupLive = this.liveMode === LIVE_MODE_MAP['GROUP'];
+        if (isGroupLive || this.isNoDelay) {
+          return this.layoutConfig.filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE');
+        }
+
+        return this.layoutConfig;
+      }
+    },
+    watch: {
+      'mediaState.rate': function (cur, old) {
+        this.lastSelectRate = old;
+      }
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
     },
-    watch: {
-      'mediaState.video'(cur, old) {
-        if (cur === old) return;
-        this.getVideoConstraints(cur);
-      }
+    created() {
+      window.basicSetting = this;
+      this.setDefault();
     },
     methods: {
-      async getVideoConstraints(deviceId) {
-        console.log('getVideoConstraints', deviceId);
-        if (!deviceId) return;
-
-        const constraints = await VhallRTC.vhallrtc.getVideoConstraints({ deviceId });
-        console.log('媒体设置获取设备分辨率列表和对应设备ID', constraints, deviceId);
-        const availableRates = [
-          'RTC_VIDEO_PROFILE_720P_16x9_M',
-          'RTC_VIDEO_PROFILE_480P_16x9_M',
-          'RTC_VIDEO_PROFILE_360P_16x9_M',
-          'RTC_VIDEO_PROFILE_720P_16x9_M',
-          'RTC_VIDEO_PROFILE_240P_16x9_M'
-        ];
-        this.ratesConfig = constraints.filter(item => {
-          return availableRates.includes(item.label);
-        });
-      },
-
       setLayout(id) {
+        if (this.liveStatus === 1) return;
         this.mediaState.layout = id;
       },
 
       setDefault() {
-        const saveRate = sessionStorage.getItem('selectedRate');
-        const savedLayout = sessionStorage.getItem('layout');
+        const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
+        const saveScreenRate =
+          sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
+        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[0].id;
 
-        this.saveRate = this.saveRate || saveRate;
-
-        this.selectedLayout =
-          this.selectedLayout ||
-          (savedLayout != 'null' && savedLayout != 'undefined' ? savedLayout : '') ||
-          'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE';
+        this.mediaState.rate = saveRate;
+        this.mediaState.screenRate = saveScreenRate;
+        this.mediaState.layout = savedLayout;
       },
+
       formatDefinitionLabel(label) {
-        const map = getDefinitionMap();
+        const map = new Map([
+          ['RTC_VIDEO_PROFILE_240P_16x9_M', '流畅'],
+          ['RTC_VIDEO_PROFILE_480P_16x9_M', 'player.player_1003'],
+          ['RTC_VIDEO_PROFILE_360P_16x9_M', 'player.player_1004'],
+          ['RTC_VIDEO_PROFILE_720P_16x9_M', 'player.player_1005'],
+          ['240', 'RTC_VIDEO_PROFILE_240P_16x9_M'],
+          ['480', 'RTC_VIDEO_PROFILE_480P_16x9_M'],
+          ['360', 'RTC_VIDEO_PROFILE_360P_16x9_M'],
+          ['720', 'RTC_VIDEO_PROFILE_720P_16x9_M']
+        ]);
         return this.$t(map.get(label));
       },
-      rateChange(selected) {
-        let isRateChangeToHD = false;
-
+      async rateChange(selected) {
         if (selected === 'RTC_VIDEO_PROFILE_720P_16x9_M') {
-          isRateChangeToHD = true;
+          const text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
+          const action = await mediaSettingConfirm.show(text);
+          action === 'close' && (this.mediaState.rate = this.lastSelectRate);
         }
-        this.$emit('rateChangeToHD', isRateChangeToHD);
       }
     }
   };
@@ -162,6 +191,10 @@
 
       &--selected {
         border: 1px solid #fc5659;
+      }
+
+      &.disabled {
+        cursor: not-allowed;
       }
 
       img {

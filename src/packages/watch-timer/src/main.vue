@@ -117,12 +117,11 @@
     beforeCreate() {
       this.timerServer = useTimerServer();
     },
-    mounted() {
+    async mounted() {
+      // await this.getCommonConfig();
       this.timerInfo = this.roomBaseServer.state?.timerInfo;
-      console.log(this.$domainStore.state, this.roomBaseServer, '123132');
       // this.init();
       this.timerServer.listenMsg();
-      console.log(this.timerServer.listenMsg, 'this.roomBaseServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
@@ -144,15 +143,11 @@
         this.is_all_show = e.data.is_all_show;
         this.timeFormat(this.shijian);
         this.timerFun(e.data.duration);
-        this.handleTimer();
         // 打开计时器组件
         this.status = 'kaishi';
-        this.timerVisible = true;
         if (this.is_all_show == 1) {
           // 通知相应组件打开计时器Icon
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
-          );
+          this.handleTimer();
         }
       },
       // 计时器结束
@@ -174,6 +169,7 @@
       // 计时器重置
       timer_reset() {
         clearInterval(this.timer);
+        this.timerVisible = false;
         this.status = 'kaishi';
         // 通知相应组件关闭计时器Icon
         window.$middleEventSdk?.event?.send(
@@ -186,31 +182,26 @@
         this.timerFun(e.data.remain_time);
       },
       init() {
-        setTimeout(() => {
-          const resData = this.timerInfo;
-          console.log(resData, ',,,,,,,,,,,,,,,,,,,');
-          if (resData && JSON.stringify(resData) != '{}') {
-            this.shijian = resData.remain_time;
-            this.beifenshijian = resData.duration;
-            this.is_timeout = resData.is_timeout;
-            this.is_all_show = resData.is_all_show;
-            if (resData.duration == -3599) return false;
-            this.timeFormat(Math.abs(this.shijian));
-            if (resData.status != 4) {
-              this.timerFun(this.shijian);
-            }
-            this.handleTimer();
-            // 打开计时器组件
-            this.status = resData.status == 4 ? 'zanting' : 'kaishi';
-            this.timerVisible = true;
-            if (this.is_all_show == 1) {
-              // 通知相应组件打开计时器Icon
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', true])
-              );
-            }
+        // setTimeout(() => {
+        const resData = this.timerInfo;
+        console.log(resData, ',,,,,,,,,,,,,,,,,,,');
+        if (resData && JSON.stringify(resData) != '{}') {
+          this.shijian = resData.remain_time;
+          this.beifenshijian = resData.duration;
+          this.is_timeout = resData.is_timeout;
+          this.is_all_show = resData.is_all_show;
+          if (resData.duration == -3599) return false;
+          this.timeFormat(Math.abs(this.shijian));
+          if (resData.status != 4) {
+            this.timerFun(this.shijian);
           }
-        }, 100);
+          // 打开计时器组件
+          this.status = resData.status == 4 ? 'zanting' : 'kaishi';
+          if (this.is_all_show == 1) {
+            this.handleTimer();
+          }
+        }
+        // }, 100);
       },
       // open计时器弹框
       handleTimer() {
@@ -244,6 +235,7 @@
             }
             if (data == 0) {
               clearInterval(this.timer);
+              this.timerVisible = false;
               // 通知相应组件关闭计时器Icon
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
@@ -262,6 +254,29 @@
           this.shijian = data;
         }, 1000);
       }
+      // TODO: 不应在此处调getCommonConfig用接口 须退出小组相关逻辑调用
+      // 初始化房间互动工具
+      // getCommonConfig() {
+      //   return this.roomBaseServer.getCommonConfig({
+      //     tags: [
+      //       'skin',
+      //       'screen-poster',
+      //       'like',
+      //       'keywords',
+      //       'public-account',
+      //       'webinar-tag',
+      //       'menu',
+      //       'adv-default',
+      //       'invite-card',
+      //       'red-packet',
+      //       'room-tool',
+      //       'goods-default',
+      //       'announcement',
+      //       'sign',
+      //       'timer'
+      //     ]
+      //   });
+      // }
     }
   };
 </script>

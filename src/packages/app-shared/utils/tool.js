@@ -6,6 +6,17 @@ export const hasOwnProperty = function (obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 };
 
+/**
+ * 延迟执行(setTimeout的promify写法)
+ * @param {*} ms 毫秒数
+ * @returns {Promise}
+ */
+export const sleep = function (ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+};
+
 //防抖
 export function debounce(fn, t = 300) {
   let lastTime;
@@ -326,3 +337,32 @@ export function getVhallReportOs() {
   }
   return os;
 }
+
+/**
+ * 手机号验证
+ * */
+export const validPhone = (rule, value, vueThis) => {
+  const reg = /^1[3|4|5|6|7|8|9]\d{9}$/;
+  if (!value) {
+    return vueThis ? vueThis.$t('account.account_1025') : '请填写手机号码';
+  } else if (!reg.test(value)) {
+    return vueThis ? vueThis.$t('account.account_1069') : '请填写正确的手机号码';
+  } else {
+    return true;
+  }
+};
+/**
+ * 邮箱验证
+ * */
+export const validEmail = (required, value, vueThis) => {
+  const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+  if (!value && required) {
+    return vueThis ? vueThis.$t('form.form_1007') : '请填写邮箱';
+  } else if (value.length > 80) {
+    return vueThis ? vueThis.$t('form.form_1009') : '邮箱长度不能大于80';
+  } else if (value && !reg.test(value)) {
+    return vueThis ? vueThis.$t('form.form_1010') : '请填写正确的邮箱';
+  } else {
+    return true;
+  }
+};

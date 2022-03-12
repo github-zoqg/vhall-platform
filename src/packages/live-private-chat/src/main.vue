@@ -13,12 +13,11 @@
             v-for="(group, index) in chatGroupList"
             :class="{ active: activeGroupIndex === index }"
             @click="selectGroup(index)"
-            :key="group.id"
+            :key="group.user_id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
-            <span class="wrap__left-item__group-name">{{ group.chat_name }}</span>
+            <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
             <i
-              v-if="group.type == 1"
               class="el-icon-circle-close wrap__left-item__close-icon"
               @click.stop="delChatItem(index)"
             ></i>
@@ -27,7 +26,10 @@
         <div
           class="wrap__right"
           :class="{
-            'hide-tip': activeGroupIndex !== -1 && chatGroupList[activeGroupIndex].type == 2
+            'hide-tip':
+              activeGroupIndex !== -1 &&
+              chatGroupList[activeGroupIndex] &&
+              chatGroupList[activeGroupIndex].type == 2
           }"
         >
           <span class="wrap__right__header">提示：如想结束当前聊天，关闭左侧用户窗口即可</span>
@@ -35,7 +37,10 @@
             <chat-list
               @showImg="openImgPreview"
               :role="roleName"
-              :activity-id="webinarId"
+              :webinar-id="webinarId"
+              :login-info="loginInfo"
+              :select-user-id="currentSelectUser"
+              :room-id="roomId"
               ref="chatRef"
             ></chat-list>
           </div>
@@ -72,14 +77,14 @@
             <div class="wrap__right__send-tool">
               <i
                 title="表情"
-                class="iconfont iconbiaoqing icon-emoji"
+                class="vh-iconfont vh-line-expression icon-emoji"
                 @click.stop="openEmojiModal"
               ></i>
-              <i
-                title="上传图片（上限5张）"
-                class="iconfont icontupianliaotian"
-                @click="handleUploadImg"
-              ></i>
+              <!--              <i-->
+              <!--                title="上传图片（上限5张）"-->
+              <!--                class="vh-iconfont vh-line-illustrations"-->
+              <!--                @click="handleUploadImg"-->
+              <!--              ></i>-->
             </div>
             <!--聊天内容输入-->
             <textarea
@@ -142,15 +147,15 @@
         isWebp: window.webp,
         //已经上传的图片
         imgList: [],
-        //图片上传地址 todo 暂时写死，后续替换
-        actionUrl: 'https://t-saas-dispatch.vhall.com/v3/commons/upload/index',
+        //图片上传地址
+        actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`,
         //私聊群组列表 todo 假数据替换
         chatGroupList: [
-          {
-            id: 0,
-            type: 2,
-            chat_name: '主办方群聊'
-          }
+          // {
+          //   id: 0,
+          //   type: 2,
+          //   chat_name: '主办方群聊'
+          // }
         ],
         //当前选中的私聊群组的index
         activeGroupIndex: -1,
@@ -171,20 +176,58 @@
         //当前的活动id
         webinarId: '',
         //当前的登录信息
-        loginInfo: {}
+        loginInfo: {},
+        //房间号
+        roomId: ''
       };
+    },
+    computed: {
+      //当前选中的人的id
+      currentSelectUser() {
+        let userId = '';
+        if (this.chatGroupList.length && this.activeGroupIndex >= 0) {
+          let temp = this.chatGroupList[this.activeGroupIndex];
+          userId = temp.account_id || temp.user_id;
+        }
+        return userId;
+      }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.chatServer = useChatServer();
     },
     mounted() {
       this.initViewData();
     },
     methods: {
       //打开模态窗
-      openModal() {
+      async openModal() {
         console.log('收到打开窗口的信令');
+        await this.getPrivateContactList();
         this.visible = true;
+      },
+      //获取私聊联系人列表
+      getPrivateContactList() {
+        const roomId = this.roomBaseServer.state.watchInitData.interact.room_id;
+        const webinarId = this.roomBaseServer.state.watchInitData.webinar.id;
+        const params = {
+          room_id: roomId,
+          webinar_id: webinarId
+        };
+        return this.chatServer
+          .getPrivateContactList(params)
+          .then(res => {
+            const { code = '', msg = '', data = {} } = res || {};
+            if ([200, '200'].includes(code)) {
+              this.chatGroupList = Array.isArray(data.list) ? data.list : [];
+            } else {
+              this.$message.error(msg);
+            }
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
+          });
       },
       //关闭模态窗
       handleClose() {
@@ -204,6 +247,7 @@
         this.webinarId = webinar.id;
         this.roleName = join_info.role_name;
         this.loginInfo = join_info;
+        console.log(this.loginInfo, '当前的登录信息');
         this.extraParams = {
           path: `${roomId}/img`,
           type: 'image',
@@ -215,11 +259,12 @@
       //选中某个群组
       selectGroup(index) {
         this.activeGroupIndex = index;
+        this.$refs.chatRef.resetData();
       },
-      //新建对话
+      //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
         const isExit = this.chatGroupList.some((chatItem, index) => {
-          if (chatItemInfo.id == chatItem.id) {
+          if (chatItemInfo.id == chatItem.user_id) {
             this.selectGroup(index);
             return true;
           } else {
@@ -227,11 +272,12 @@
           }
         });
         if (!isExit) {
-          this.chatGroupList.push(chatItemInfo);
+          const { id, chat_name } = chatItemInfo;
+          this.chatGroupList.push({ user_id: id, nickname: chat_name });
           this.selectGroup(this.chatGroupList.length - 1);
         }
       },
-      //删除某个对话 todo
+      //删除某个对话
       delChatItem(index) {
         this.chatGroupList.splice(index, 1);
         this.selectGroup(this.activeGroupIndex - 1);
@@ -283,7 +329,12 @@
       },
       //选中表情
       emojiInput(value) {
-        this.inputText += value;
+        const _this = this;
+        console.log(value, '选中了表情------------------');
+        this.$nextTick(() => {
+          _this.inputText += value;
+        });
+        console.log(this.inputText);
       },
       //发送消息
       sendMessage() {
@@ -295,6 +346,8 @@
           this.$message.warning('内容不能为空');
         }
         const curmsg = useChatServer().createCurMsg();
+        const target = this.chatGroupList[this.activeGroupIndex].user_id;
+        curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
         //将图片消息加入消息体
@@ -363,7 +416,7 @@
         padding: 0 10px 0 20px;
         border-bottom: solid 1px @color-bd;
         transition: all 0.2s;
-        .iconfont {
+        .vh-iconfont {
           display: none;
           vertical-align: middle;
           font-size: 18px;
@@ -457,7 +510,7 @@
           height: 34px;
           line-height: 34px;
           padding-left: 10px;
-          .iconfont {
+          .vh-iconfont {
             margin-right: 6px;
             font-size: 18px;
             &:hover {

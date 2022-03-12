@@ -1,14 +1,16 @@
 <template>
-  <section class="vmp-custom-menu">
-    <div class="vmp-custom-menu-wrapper">
-      <component
-        v-for="(block, index) in customTabs"
-        :is="block.componentName"
-        :key="index"
-        :info="block"
-        :room-id="roomId"
-      />
-    </div>
+  <section class="vmp-custom-menu" v-show="!loading">
+    <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
+      <div class="vmp-custom-menu-wrapper">
+        <component
+          v-for="(block, index) in customTabs"
+          :is="block.componentName"
+          :key="index"
+          :info="block"
+          :room-id="roomId"
+        />
+      </div>
+    </overlay-scrollbars>
   </section>
 </template>
 
@@ -42,8 +44,18 @@
     },
     data() {
       return {
+        loading: false,
         customTabs: [],
-        roomId: ''
+        roomId: '',
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     beforeCreate() {
@@ -55,15 +67,23 @@
           return;
         }
 
-        const res = await this.customMenuServer.getCustomMenuDetail({
-          menu_id: id
-        });
+        this.loading = true;
+        await this.$nextTick();
 
-        if (res.code === 200 && res.data) {
-          this.customTabs = res.data.components.map(menu => {
-            menu.componentName = `component-${componentMap[menu.component_id]}`;
-            return menu;
+        try {
+          const res = await this.customMenuServer.getCustomMenuDetail({
+            menu_id: id
           });
+          this.loading = false;
+
+          if (res.code === 200 && res.data) {
+            this.customTabs = res.data.components.map(menu => {
+              menu.componentName = `component-${componentMap[menu.component_id]}`;
+              return menu;
+            });
+          }
+        } catch (error) {
+          this.loading = false;
         }
       }
     }
@@ -76,9 +96,9 @@
     width: 100%;
 
     &-wrapper {
-      height: 100%;
+      padding-top: 16px;
+      height: calc(100% - 16px);
       width: 100%;
-      overflow-y: scroll;
     }
   }
 </style>

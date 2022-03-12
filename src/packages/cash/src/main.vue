@@ -209,7 +209,7 @@
             <div
               class="vmp-qr-reload"
               v-if="countPoll === 12"
-              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1)"
+              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1 ? 2 : 1)"
             >
               <i class="vh-iconfont vh-a-line-clockwiserotation"></i>
             </div>
@@ -290,7 +290,6 @@
         useUserServer: {}, // 用户相关的接口
         useCashServer: {}, // 提现相关的接口
         step: 0, // 当前步骤
-        cashCaptVo: {}, // 待删除
         bindForm: {
           money: '',
           phone: '',
@@ -532,7 +531,8 @@
           .getBindKey()
           .then(res => {
             if (res.code == 200) {
-              const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
+              console.log(res.data);
+              const jump_url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/bind/${res.data.mark}`;
               this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
               console.log(`二维码请求地址: ${this.qrcode}`);
               // 轮询微信扫码绑定情况
@@ -559,9 +559,10 @@
       // 轮询微信扫码绑定情况
       async startPolling(type) {
         this.initPollTimer();
+        await this.withdrawIsBind(true);
         const pollingFn = async () => {
           // 微信扫码绑定情况
-          const bindData = await this.withdrawIsBind(type);
+          const bindData = await this.withdrawIsBind();
           if (type == 1 && bindData.data.is_bind == 1) {
             console.log('第一次绑定, 当前已经授权过...');
             this.initPollTimer();
@@ -586,9 +587,9 @@
       },
 
       // 获取当前的微信绑定状态 1初次绑定 2更换绑定
-      withdrawIsBind(type) {
+      withdrawIsBind(isInit = false) {
         const params = {};
-        type === 2 && (params.is_change = 1); // 更换绑定增加参数
+        isInit && (params.is_change = 1); // 告知后端初始化更换状态的查询
         return this.useCashServer.withdrawIsBind(params);
       },
 
@@ -716,21 +717,25 @@
         border-radius: 20px;
         text-align: center;
         position: relative;
+        height: 38px;
+        font-weight: 500;
         .vmp-cash_btn_hover {
           display: none;
+          height: 38px;
         }
         &.is-disabled:hover {
+          opacity: 1;
           .vmp-cash_btn_hover {
             display: block;
             position: absolute;
             top: -1px;
             border-radius: 4px;
             word-break: break-all;
-            line-height: 20px;
+            line-height: 38px;
             background: rgba(26, 26, 26, 0.8);
             font-size: 12px;
             color: #fff;
-            padding: 8px 12px;
+            padding: 0 12px;
             text-align: left;
             right: 0;
           }
@@ -842,12 +847,12 @@
           background: rgba(0, 0, 0, 0.9);
           border-radius: 4px;
           padding: 23px 27px;
-          text-align: left;
           overflow-y: auto;
           p {
             font-size: 12px;
             font-weight: 400;
             color: #ffffff;
+            text-align: justify;
             line-height: 17px;
             span {
               font-size: 20px;

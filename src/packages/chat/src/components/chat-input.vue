@@ -1,6 +1,9 @@
 <template>
   <div class="vmp-chat-input">
-    <div class="vmp-chat-input__textarea-box" v-show="!inputStatus.disable && !chatLoginStatus">
+    <div
+      class="vmp-chat-input__textarea-box"
+      v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
+    >
       <textarea
         id="chat-textarea"
         ref="chatTextarea"
@@ -26,12 +29,13 @@
     </div>
 
     <div
-      v-show="inputStatus.disable || chatLoginStatus"
+      v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
       class="vmp-chat-input__textarea-placeholder"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
-        <span class="chat-login-btn" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
-        {{ $t('chat.chat_1001') }}
+        <i18n path="chat.chat_1001">
+          <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
+        </i18n>
       </span>
       <span v-show="inputStatus.disable && !chatLoginStatus" class="textarea-placeholder_no-login">
         {{ inputStatus.placeholder }}
@@ -49,8 +53,10 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatInput',
+    mixins: [emitter],
     props: {
       //输入框状态
       inputStatus: {
@@ -114,6 +120,10 @@
       //在线人数
       onlineUsers() {
         return this.roomBaseState.watchInitData.pv.show;
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {
@@ -253,7 +263,7 @@
         //将回复消息加入消息体
         curmsg.setReply(this.replyMsg);
         //将@消息加入消息体
-        curmsg.setAt(this.atList);
+        curmsg.setAt([].concat(this.atList));
         //发送消息
         useChatServer().sendMsg(curmsg);
         //清除发送后的消息
@@ -265,6 +275,7 @@
         //todo 建议移入domain  清空一下@列表，但是保持引用
         this.atList.splice(0, this.atList.length);
         callback && callback();
+        this.dispatch('VmpChatOperateBar', 'sendEnd');
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
@@ -306,8 +317,10 @@
       trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
-      //todo 利用信令 唤起登录
-      callLogin() {},
+      //利用信令 唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      },
       //选择了表情,这个方法是通过ref暴露给父组件使用
       emojiInput(val = '') {
         if (this.inputStatus.disable) {
@@ -465,7 +478,7 @@
       color: @font-dark-normal;
       line-height: 20px;
       padding: 10px 12px;
-      text-align: center;
+      text-align: left;
       border-radius: 20px;
       .textarea-placeholder_no-login {
         color: #666666;

@@ -1,5 +1,12 @@
 <template>
-  <div class="vmp-doc-wap" :class="[`vmp-doc-wap--${displayMode}`]" ref="docWrapper">
+  <div
+    id="docWrapper"
+    class="vmp-doc-wap"
+    :class="[`vmp-doc-wap--${displayMode}`]"
+    :style="{ height: docViewRect.height > 0 ? docViewRect.height + 'px' : '100%' }"
+    v-show="switchStatus"
+    ref="docWrapper"
+  >
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
@@ -18,9 +25,27 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <i class="vh-iconfont vh-a-line-registrationform"></i>
+          <img src="./img/doc_null.png" style="width: 100px; margin-bottom: 20px" />
           <span>主讲人未添加文档，请稍等...</span>
         </div>
+      </div>
+
+      <!--上一页按钮 -->
+      <div
+        v-show="hasPager && pageNum > 1"
+        @click="handlePage('prev')"
+        class="btn-pager btn-pager--prev"
+      >
+        <i class="vh-iconfont vh-line-arrow-left"></i>
+      </div>
+
+      <!-- 下一页按钮 -->
+      <div
+        v-show="hasPager && pageNum < pageTotal"
+        @click="handlePage('next')"
+        class="btn-pager btn-pager--next"
+      >
+        <i class="vh-iconfont vh-line-arrow-right"></i>
       </div>
     </div>
 
@@ -31,13 +56,15 @@
     </div>
     <!-- 文档拖动后还原 -->
     <div @click="restore" class="btn-doc-restore">
-      <i class="vh-saas-iconfont vh-saas-a-line-11"></i>
+      <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
     </div>
   </div>
 </template>
 <script>
   import screenfull from 'screenfull';
   import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpDocWap',
 
@@ -45,7 +72,11 @@
       return {
         className: '',
         displayMode: 'normal', // normal: 正常; fullscreen:全屏
-        keepAspectRatio: true
+        keepAspectRatio: true,
+        docViewRect: {
+          width: 0,
+          height: 0
+        }
       };
     },
     computed: {
@@ -54,19 +85,35 @@
       },
       currentCid() {
         return this.docServer.state.currentCid;
+      },
+      switchStatus() {
+        return this.docServer.state.switchStatus;
+      },
+      pageNum() {
+        return this.docServer.state.pageNum;
+      },
+      pageTotal() {
+        return this.docServer.state.pageTotal;
+      },
+      // 是否有翻页按钮
+      hasPager() {
+        return !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc;
       }
     },
     watch: {
       ['docServer.state.isChannelChanged'](newval) {
         console.log('-[doc]---watch频道变更', newval);
         if (newval) {
-          this.docServer.state.isChannelChanged = false;
-          // 初始化事件
-          this.initEvents();
-          // 清空
-          // this.docServer.resetContainer();
-          // 恢复上一次的文档数据;
-          this.recoverLastDocs();
+          if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+            this.docServer.state.isChannelChanged = false;
+            // 初始化事件
+            this.initEvents();
+            // 清空
+            // this.docServer.resetContainer();
+            // 恢复上一次的文档数据;
+            console.log('----- recoverLastDocs 频道变更');
+            this.recoverLastDocs();
+          }
         }
       }
     },
@@ -77,12 +124,16 @@
       this.groupServer = useGroupServer();
     },
     mounted() {
-      // 初始化事件
       this.initEvents();
       // 清空
       // this.docServer.resetContainer();
-      // 恢复上一次的文档数据;
-      this.recoverLastDocs();
+      if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+        // 恢复上一次的文档数据;
+        console.log('----- recoverLastDocs type == 1');
+        this.$nextTick(() => {
+          this.recoverLastDocs();
+        });
+      }
     },
     methods: {
       /**
@@ -118,74 +169,55 @@
         this.docServer.zoomReset();
       },
       initEvents() {
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', val => {
-          if (val) {
-            this.recoverLastDocs();
-          }
-        });
-        //
+        // 文档容器选择事件
+        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
+
+        // 回放文档加载事件
+        this.docServer.$on(
+          'dispatch_doc_vod_cuepoint_load_complate',
+          this.dispatchDocVodCuepointLoadComplate
+        );
 
         // 全屏/退出全屏事件
-        screenfull.onchange(() => {
+        screenfull.onchange(ev => {
           // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+          if (ev.target.id !== 'docWrapper') return;
           if (screenfull.isFullscreen) {
             this.displayMode = 'fullscreen';
           } else {
             this.displayMode = screenfull.targetMode || 'normal';
           }
         });
-
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          console.log('[doc] ===========选择容器======', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          this.docServer.state.currentCid = data.id;
-          // 判断容器是否存在
-          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-          if (currentItem) {
-            this.docServer.activeContainer(data.id);
-          } else {
-            const { id: cid, docId } = data;
-            console.log('[doc] cid:', cid);
-            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-          }
-        });
       },
 
       /**
-       * 屏幕缩放
+       * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
        */
       resize() {
-        let rect = screenfull.isFullscreen
-          ? this.$refs.docWrapper?.getBoundingClientRect()
-          : this.$refs.docContent?.getBoundingClientRect();
-        if (!rect) return;
-        let { width, height } = rect;
-
+        const { width, height } = this.getDocViewRect();
         if (!width || !height) return;
-        let w = null,
-          h = null;
-        if (this.keepAspectRatio) {
-          if (width / height > 16 / 9) {
-            h = height;
-            w = (h / 9) * 16;
-          } else {
-            w = width;
-            h = (w / 16) * 9;
-          }
-        } else {
-          w = width;
-          h = height;
-        }
-        this.docViewRect = { width: w, height: h };
-        console.log('[doc] this.docViewRect:', this.docViewRect);
         if (
-          this.docServer.state.currentCid &&
-          document.getElementById(this.docServer.state.currentCid)
+          document.getElementById(this.docServer.state.docCid) ||
+          document.getElementById(this.docServer.state.boardCid)
         ) {
-          this.docServer.setSize(w, h);
+          this.docServer.setSize(width, height);
         }
       },
+      getDocViewRect() {
+        let rect = this.$refs.docWrapper?.getBoundingClientRect();
+        let w = 0;
+        let h = 0;
+        if (!rect || rect.width <= 0 || rect.height <= 0) {
+          // 竖屏
+          w =
+            window.screen.height < window.screen.width ? window.screen.height : window.screen.width;
+        } else {
+          w = rect.width;
+        }
+        h = (w / 16) * 9;
+        return { width: w, height: h };
+      },
+
       /**
        * 新增文档或白板
        * @param {*} fileType
@@ -193,7 +225,7 @@
        * @param {*} docType
        */
       async addNewFile({ fileType, docId, docType, cid }) {
-        const { width, height } = this.docViewRect;
+        const { width, height } = this.getDocViewRect();
         console.log(
           '[doc] addNewFile:',
           JSON.stringify({
@@ -211,11 +243,7 @@
           fileType,
           cid,
           docId,
-          docType,
-          bindCidFun: async cid => {
-            console.log('[doc] bindCidFun:', cid);
-            await this.$nextTick();
-          }
+          docType
         });
         this.resize();
       },
@@ -237,21 +265,102 @@
           this.docServer.setDocLoadComplete();
           return;
         }
-        // 确定文档最外层节点显示，并且文档dom绑定ID成功
-        await this.$nextTick();
 
-        // 初始化文档最外层节点大小
-        this.resize();
+        if (this.docServer.state.switchStatus) {
+          // 确定文档最外层节点显示，并且文档dom绑定ID成功
+          await this.$nextTick();
+          // 初始化文档最外层节点大小
+          const { width, height } = this.getDocViewRect();
+          await this.docServer.recover({
+            width,
+            height
+          });
+        }
+      },
 
-        const { width, height } = this.docViewRect;
-        await this.docServer.recover({
-          width,
-          height,
-          bindCidFun: async cid => {
-            await this.$nextTick();
+      // 翻页
+      handlePage(type) {
+        if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
+          return;
+        }
+        if (type === 'prev') {
+          if (this.docServer.state.pageNum > 1) {
+            this.docServer.prevStep();
           }
-        });
+        } else if (type === 'next') {
+          if (this.docServer.state.pageNum < this.docServer.state.pageTotal) {
+            this.docServer.nextStep();
+          }
+        }
+      },
+      // 选中文档容器事件
+      dispatchDocSelectContainer: async function (data) {
+        console.log('[doc] ===========选择容器======', data);
+        if (this.currentCid == data.id) {
+          return;
+        }
+        this.docServer.state.currentCid = data.id;
+        // 判断容器是否存在
+        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
+        if (currentItem) {
+          this.docServer.activeContainer(data.id);
+        } else {
+          const { id: cid, docId } = data;
+          const fileType = cid.split('-')[0];
+          if (fileType === 'document' && !docId) {
+            // 文档id没有
+            console.log('[doc] 文档id没有 cid:', cid);
+            return;
+          }
+          this.addNewFile({ fileType, docId, cid });
+        }
+      },
+      // 回放文档加载事件
+      dispatchDocVodCuepointLoadComplate: async function (data) {
+        if (this.docServer.state.containerList.length === 0) {
+          const data = this.docServer.getVodAllCids();
+          this.docServer.state.containerList = data.map(item => {
+            return {
+              cid: item.cid
+            };
+          });
+          // console.log('[doc] containerList:', this.docServer.state.containerList);
+          this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
+          await this.$nextTick();
+          if (this.docServer.state.switchStatus) {
+            const { width, height } = this.getDocViewRect();
+            if (!width || !height) return;
+            for (const item of data) {
+              this.docServer.initContainer({
+                cid: item.cid,
+                width,
+                height,
+                fileType: item.type.toLowerCase()
+              });
+            }
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                visible: true,
+                type: 2
+              })
+            );
+          } else {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowMenuTab', {
+                visible: false,
+                type: 2
+              })
+            );
+          }
+        }
       }
+    },
+    beforeDestroy() {
+      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
+      this.docServer.$off(
+        'dispatch_doc_vod_cuepoint_load_complate',
+        this.dispatchDocVodCuepointLoadComplate
+      );
     }
   };
 </script>
@@ -345,6 +454,26 @@
       align-items: center;
       justify-content: center;
       z-index: 9;
+    }
+
+    .btn-pager {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #000;
+      width: 64px;
+      height: 64px;
+      border-radius: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &--prev {
+        left: 0;
+      }
+      &--next {
+        right: 0;
+      }
     }
 
     // 全屏模式下
