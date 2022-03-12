@@ -14,7 +14,10 @@
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
       ref="docToolbar"
-      v-show="hasDocPermission && (displayMode === 'normal' || displayMode === 'fullscreen')"
+      v-show="
+        (hasDocPermission || [3].includes(roleName)) &&
+        (displayMode === 'normal' || displayMode === 'fullscreen')
+      "
     ></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
