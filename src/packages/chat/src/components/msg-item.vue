@@ -308,6 +308,9 @@
           return handleChatShowTime('', this.source.sendTime);
         }
         return handleChatShowTime(this.source.prevTime, this.source.sendTime);
+      },
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
     filters: {
@@ -326,13 +329,13 @@
         let ret = '';
         switch (Number(value)) {
           case 1:
-            ret = vm.$t('chat.chat_1022');
+            ret = vm.$tdefault(vm.customRoleName[1]);
             break;
           case 3:
-            ret = vm.$t('chat.chat_1024');
+            ret = vm.$tdefault(vm.customRoleName[3]);
             break;
           case 4:
-            ret = vm.$t('chat.chat_1023');
+            ret = vm.$tdefault(vm.customRoleName[4]);
             break;
           case 20:
             ret = vm.$t('chat.chat_1064');

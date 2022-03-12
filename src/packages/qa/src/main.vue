@@ -11,6 +11,10 @@
         :data-key="'id'"
         :data-sources="qaList"
         :data-component="MsgItem"
+        :extra-props="{
+          isOnlyMine,
+          joinId
+        }"
         @tobottom="tobottom"
       ></virtual-list>
       <div class="vhsaas-chat__body__bottom-tip-box">

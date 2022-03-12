@@ -309,7 +309,7 @@
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
-          this.dispatch('VmpTabContainer', 'noticeHint', '3');
+          this.dispatch('VmpTabContainer', 'noticeHint', 3);
         });
         //监听@我的消息
         chatServer.$on('atMe', () => {
