@@ -59,6 +59,7 @@ export default async function () {
   }
   await Promise.all(promiseList);
 
+  // 依赖于roombase返回
   micServer.init();
   console.log('%c------服务初始化 micServer 初始化完成', 'color:blue', micServer);
 
