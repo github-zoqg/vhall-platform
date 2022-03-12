@@ -341,7 +341,7 @@
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$message(this.$t('chat.chat_1007'));
         });
       },
       init() {
@@ -408,7 +408,8 @@
       // 获取历史消息
       async getHistoryMsg() {
         const params = {
-          room_id: this.roomId,
+          webinar_id: this.webinarId,
+          // room_id: this.roomId,
           pos: Number(this.page) * 50,
           limit: 50
         };

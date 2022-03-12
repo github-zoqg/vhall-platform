@@ -161,7 +161,7 @@
     overflow: hidden;
     box-sizing: border-box;
     width: 300px;
-    height: 250px;
+    height: 266px;
     margin: 20px 14px;
     border-radius: 6px;
     overflow: hidden;

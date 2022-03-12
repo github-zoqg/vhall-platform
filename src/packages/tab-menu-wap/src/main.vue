@@ -1,63 +1,63 @@
 <template>
   <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
-    <template v-if="isTryVideo && isSubscribe">
+    <!-- <template v-if="isTryVideo && isSubscribe">
       <div class="vmp-tab-menu__try">
         <div class="try-img">
           <img src="./img/trySee.png" alt="" />
         </div>
         <p>{{ $t('appointment.appointment_1030') }}</p>
       </div>
-    </template>
-    <template v-else>
-      <section class="vmp-tab-menu__header">
-        <!-- 菜单区域 -->
-        <ul class="vmp-tab-menu-scroll-container" ref="menu">
-          <li
-            v-for="item of mainMenu"
-            :ref="item.id"
-            class="vmp-tab-menu-item"
-            :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
-            :key="item.id"
-            @click="select({ type: item.type, id: item.id })"
-          >
-            <span class="item-text">{{ $tdefault(item.name) }}</span>
-            <i v-show="item.tipsVisible" class="tips"></i>
-          </li>
-          <li
-            v-if="visibleMenu.length > 3"
-            class="vmp-tab-menu-more"
-            :class="{ selected: isSubMenuShow }"
-            @click="toggleSubMenuVisible"
-          >
-            <i class="vh-iconfont vh-full-more"></i>
-          </li>
-        </ul>
+    </template> -->
+    <!-- <template v-else> -->
+    <section class="vmp-tab-menu__header">
+      <!-- 菜单区域 -->
+      <ul class="vmp-tab-menu-scroll-container" ref="menu">
+        <li
+          v-for="item of mainMenu"
+          :ref="item.id"
+          class="vmp-tab-menu-item"
+          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
+        >
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
+        </li>
+        <li
+          v-if="visibleMenu.length > 3"
+          class="vmp-tab-menu-more"
+          :class="{ selected: isSubMenuShow }"
+          @click="toggleSubMenuVisible"
+        >
+          <i class="vh-iconfont vh-full-more"></i>
+        </li>
+      </ul>
 
-        <!-- 次级菜单 -->
-        <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-          <li
-            class="vmp-tab-menu-sub__item"
-            v-for="item of subMenu"
-            :key="item.id"
-            @click="select({ type: item.type, id: item.id })"
-          >
-            <span>{{ $tdefault(item.name) }}</span>
-            <i class="tips" v-show="item.tipsVisible"></i>
-          </li>
-        </ul>
-      </section>
+      <!-- 次级菜单 -->
+      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+        <li
+          class="vmp-tab-menu-sub__item"
+          v-for="item of subMenu"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
+        >
+          <span>{{ $tdefault(item.name) }}</span>
+          <i class="tips" v-show="item.tipsVisible"></i>
+        </li>
+      </ul>
+    </section>
 
-      <!-- 正文区域 -->
-      <section class="vmp-tab-menu__main">
-        <tab-content
-          ref="tabContent"
-          :mainMenu="mainMenu"
-          :subMenu="subMenu"
-          @noticeHint="handleHint"
-          @closePopup="selectDefault"
-        />
-      </section>
-    </template>
+    <!-- 正文区域 -->
+    <section class="vmp-tab-menu__main">
+      <tab-content
+        ref="tabContent"
+        :mainMenu="mainMenu"
+        :subMenu="subMenu"
+        @noticeHint="handleHint"
+        @closePopup="selectDefault"
+      />
+    </section>
+    <!-- </template> -->
   </section>
 </template>
 
@@ -132,13 +132,13 @@
       this.docServer = useDocServer();
     },
     created() {
-      if (this.isTryVideo && this.isSubscribe) return;
+      // if (this.isTryVideo && this.isSubscribe) return;
       this.initConfig();
       this.initMenu();
       this.listenEvents();
     },
     async mounted() {
-      if (this.isTryVideo && this.isSubscribe) return;
+      // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.selectDefault();
     },

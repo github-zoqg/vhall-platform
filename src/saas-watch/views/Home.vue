@@ -175,6 +175,9 @@
       height: 100%;
     }
   }
+  .vmp-basic-container {
+    overflow: hidden;
+  }
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {
     .vmp-basic-bd {

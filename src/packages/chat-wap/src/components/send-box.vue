@@ -36,19 +36,7 @@
       </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
-        <div
-          class="icon-wrapper"
-          v-show="
-            (webinar.type == 1 &&
-              device_status != 2 &&
-              connectMicShow &&
-              !isAllBanned &&
-              !isBanned &&
-              !groupInitData.isInGroup) ||
-            (!isBanned && !isAllBanned && onlineMicStatus && !groupInitData.isInGroup) ||
-            (groupInitData.isInGroup && !groupInitData.isBanned)
-          "
-        >
+        <div class="icon-wrapper" v-show="isShowMicBtn">
           <!-- 上麦 -->
           <div
             v-if="isAllowhandup || isSpeakOn"
@@ -132,10 +120,6 @@
         default: false
       },
       isHandsUp: {
-        type: Boolean,
-        default: false
-      },
-      onlineMicStatus: {
         type: Boolean,
         default: false
       },
@@ -226,9 +210,19 @@
         const { join_info = {} } = watchInitData;
         return join_info;
       },
-      //设备状态
-      deviceStatus() {
-        return this.mediaCheckServer.state.isBrowserNotSupport;
+      //是否展示互动上麦按钮
+      isShowMicBtn() {
+        return (
+          this.webinar.type == 1 &&
+          this.device_status != 2 &&
+          [
+            this.connectMicShow &&
+              !this.isAllBanned &&
+              !this.isBanned &&
+              !this.groupInitData.isInGroup,
+            this.groupInitData.isInGroup && !this.groupInitData.isBanned
+          ].some(val => !!val)
+        );
       }
     },
     watch: {
@@ -304,7 +298,7 @@
       },
       // eventBus监听
       eventListener() {
-        // 直播结束不展示入口
+        // 直播结束不展示连麦入口
         this.msgServer.$on('live_over', e => {
           console.log(e);
           this.connectMicShow = false;

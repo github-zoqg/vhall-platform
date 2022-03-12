@@ -122,8 +122,8 @@ npm run lint
 ## 检查代码是否符合规则并自动修复
 npm run lint:fix
 
-##统一执行命令
-node scripts/cli-service.js build --project=${项目} --mode=${环境}
+##统一执行命令, hash非必需、middle非必需: true | false
+node scripts/cli-service.js build --project=${项目} --mode=${环境} --hash=${gitlab-commit-hash} --middle=${是否为中台}
 ```
 
 &emsp; 更多命令参考 package.json 中的 scripts 配置

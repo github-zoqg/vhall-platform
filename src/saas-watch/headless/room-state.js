@@ -126,8 +126,10 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-  await interactiveServer.init();
-  console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  if (roomBaseServer.state.watchInitData.webinar.type == 1) {
+    await interactiveServer.init();
+    console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  }
 
   mediaSettingServer.init();
 

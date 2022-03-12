@@ -161,7 +161,7 @@
       },
       handleKickout() {
         this.state = 2;
-        this.errMsg = '您已被禁止访问当前活动';
+        this.errMsg = this.$t('message.message_1007');
       }
     }
   };

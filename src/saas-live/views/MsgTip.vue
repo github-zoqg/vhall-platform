@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-msgtip">
     <div class="vmp-msgtip__inner">
-      <div class="vmp-msgtip__image-box" />
+      <div class="vmp-msgtip__image-box"></div>
       <p v-html="text"></p>
     </div>
   </div>
@@ -27,9 +27,9 @@
       top: 50%;
       left: 50%;
       margin-left: -370px;
-      margin-top: -78px;
+      margin-top: -200px;
       width: 740px;
-      height: 156px;
+      height: 400px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -38,10 +38,6 @@
         height: 130px;
         width: 148px;
         background: url('../assets/images/invalid_url.png') no-repeat;
-      }
-      p {
-        font-family: '\5FAE\8F6F\96C5\9ED1';
-        user-select: none;
       }
     }
   }

@@ -788,7 +788,8 @@ export default {
     other_1001: 'Preview image',
     other_1002: 'Enter the password!',
     other_1003: 'Enter the invitation code',
-    other_1004: 'Upload image cannot exceed 2M'
+    other_1004: 'Upload image cannot exceed 2M',
+    other_1006: 'The host rejected you to open the microphone'
   },
   undefined: {}
 };

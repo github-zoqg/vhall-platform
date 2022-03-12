@@ -27,7 +27,9 @@
           </div>
         </div>
 
-        <template v-if="remoteSpeakers.length">
+        <template
+          v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
+        >
           <div
             v-for="speaker in remoteSpeakers"
             :key="speaker.accountId"
@@ -185,6 +187,10 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
+      // 监听自动上麦的异常code
+      useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        this.$message(e.msg);
+      });
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
         let videos = document.querySelectorAll('video');

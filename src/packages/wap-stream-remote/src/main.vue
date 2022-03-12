@@ -59,7 +59,9 @@
       'stream.streamId': {
         handler(newval) {
           if (newval) {
-            this.subscribeRemoteStream();
+            this.$nextTick(() => {
+              this.subscribeRemoteStream();
+            });
           }
         },
         immediate: true

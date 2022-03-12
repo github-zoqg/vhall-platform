@@ -74,7 +74,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpThirdStream',
     data() {
@@ -86,6 +86,14 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.msgServer = useMsgServer();
+    },
+    mounted() {
+      this.msgServer.$onMsg('ROOM_MSG', msg => {
+        if (msg.data.type == 'live_start') {
+          this.isShowThirdStream = false;
+        }
+      });
     },
     methods: {
       showThirdStream(info) {

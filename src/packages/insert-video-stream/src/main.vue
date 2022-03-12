@@ -391,7 +391,7 @@
       handleRemoteInsertVideoPlay(isVideoEnd) {
         if (isVideoEnd) {
           // 如果是结束播放，重新开始播放，需要重新推流
-          this.stopPushStream().then(() => {
+          this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
             this.pushLocalStream();
           });
         }
@@ -416,7 +416,7 @@
           // 如果是结束播放，重新开始播放，需要重新推流
           if (this._videoEnded) {
             this._videoEnded = false;
-            this.stopPushStream().then(() => {
+            this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
               this.pushLocalStream();
             });
           }
@@ -487,7 +487,7 @@
           this._isCloseInsertvideoHandler = true;
         }
         // 设置插播状态为 false
-        this.insertFileServer.setInsertFilePushing(false);
+        // this.insertFileServer.setInsertFilePushing(false);
         return this.stopPushStream().then(() => {
           console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
@@ -511,13 +511,15 @@
         });
       },
       // 销毁插播流
-      stopPushStream() {
+      stopPushStream(options = { isNotClearInsertFileInfo: false }) {
         if (!this.insertFileServer.state.insertStreamInfo.streamId) {
           return Promise.resolve();
         }
         // 停止推流
         return this.insertFileServer
-          .stopPublishInsertStream(this.insertFileServer.state.insertStreamInfo.streamId)
+          .stopPublishInsertStream(this.insertFileServer.state.insertStreamInfo.streamId, {
+            isNotClearInsertFileInfo: options.isNotClearInsertFileInfo
+          })
           .catch(e => {
             console.log('销毁本地插播流失败', e);
             return e;

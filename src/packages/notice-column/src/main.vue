@@ -23,28 +23,45 @@
         isNoticeColumn: false
       };
     },
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
+    watch: {
+      isInGroup(val) {
+        this.isNoticeColumn = false;
+        this.openNotice();
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
-      const { latestNotice } = this.noticeServer.state;
-      const { groupInitData } = this.groupServer.state;
-      if (
-        latestNotice.total &&
-        latestNotice.created_at &&
-        this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
-        !groupInitData.isInGroup
-      ) {
-        this.isNoticeColumn = true;
-        this.noticeText = latestNotice.noticeContent;
-      }
+      this.openNotice();
     },
     mounted() {
       this.initNotice();
     },
     methods: {
+      openNotice() {
+        const { latestNotice } = this.noticeServer.state;
+        console.log(latestNotice.noticeContent, 'latestNotice.noticeContent');
+        const { groupInitData } = this.groupServer.state;
+        if (
+          latestNotice.total &&
+          latestNotice.created_at &&
+          this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+          !groupInitData.isInGroup
+        ) {
+          this.isNoticeColumn = true;
+          this.noticeText = this.roomBaseServer.state.noticeInfo.list[0]?.content.content;
+          this.animates();
+          // this.noticeText = latestNotice.noticeContent;
+        }
+      },
       initNotice() {
         const { groupInitData } = this.groupServer.state;
         // 公告消息
@@ -62,7 +79,7 @@
         // 结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           const { latestNotice } = this.noticeServer.state;
-          if (latestNotice.total && latestNotice.created_at) {
+          if (!msg.data.over_live && latestNotice.total && latestNotice.created_at) {
             this.isNoticeColumn = true;
             this.noticeText = latestNotice.noticeContent;
           }
