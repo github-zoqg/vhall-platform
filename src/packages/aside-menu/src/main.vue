@@ -40,7 +40,7 @@
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
       },
-      //互动工具状态
+      // 主讲人权限
       doc_permission() {
         if (this.isInGroup) {
           return this.groupServer.state.groupInitData.doc_permission;
@@ -55,6 +55,10 @@
       // 是否开启了插播
       isInsertFilePushing() {
         return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
+      // 是否开启分屏
+      isOpenSplitScreen() {
+        return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
       }
     },
     beforeCreate() {
@@ -93,6 +97,10 @@
       // },
       // 主讲人发生变化
       doc_permission() {
+        this.resetMenus();
+      },
+      // 是否开启分屏
+      isOpenSplitScreen() {
         this.resetMenus();
       }
     },
@@ -163,6 +171,11 @@
               if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
+                // 如果主持人把别人设为了主讲人，或者有人正在演示，桌面共享禁用
+                if (this.doc_permission != this.userId || this.presenterId != this.userId) {
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                }
               } else {
                 // 显示但禁用
                 vn.setHiddenState(false);
@@ -189,12 +202,31 @@
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);
             } else if (this.role == 4) {
-              if (this.doc_permission == this.userId) {
+              // 是主讲人并且没有开启分屏的时候，插播可用
+              if (this.doc_permission == this.userId && !this.isOpenSplitScreen) {
                 vn.setDisableState(false);
               } else {
                 // 嘉宾显示但禁用
                 vn.setHiddenState(false);
                 vn.setDisableState(true);
+              }
+            } else if (this.role == 1) {
+              if (this.isInGroup) {
+                vn.setHiddenState(true);
+              } else {
+                // 如果不在小组中
+                // 如果主持人把别人设为了主讲人，或者有人正在演示，或者开启分屏，插播文件禁用
+                if (
+                  this.doc_permission != this.userId ||
+                  this.presenterId != this.userId ||
+                  this.isOpenSplitScreen
+                ) {
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                } else {
+                  vn.setHiddenState(false);
+                  vn.setDisableState(false);
+                }
               }
             } else {
               if (this.isInGroup) {

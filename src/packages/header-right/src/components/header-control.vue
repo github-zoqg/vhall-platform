@@ -30,7 +30,9 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
+            :class="{
+              'header-right_control_wrap-container-disabled': !isLiving || isInsertFilePushing
+            }"
             v-if="configList['is_interact'] && isShowSplitScreen && isSupportSplitScreen"
             @click="handleSplitScreenChange"
           >
@@ -132,6 +134,10 @@
       // 是否开启分屏
       isOpenSplitScreen() {
         return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
+      },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
       }
     },
     data() {
