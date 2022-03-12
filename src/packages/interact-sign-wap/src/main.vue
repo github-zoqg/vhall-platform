@@ -99,13 +99,12 @@
         this.duration = Number(e.data.sign_show_time);
         this.openSignIn(e.data.sign_id, e.data.sign_show_time);
         this.title = e.data.title;
-
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1027')}`
+            text_content: `${this.$t('chat.chat_1027')}`
           },
           type: e.data.type
         };
@@ -124,7 +123,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+            text_content: this.$t('chat.chat_1028')
           },
           type: e.data.type
         };

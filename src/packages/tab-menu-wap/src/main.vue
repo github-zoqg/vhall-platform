@@ -250,7 +250,6 @@
         for (const item of list) {
           this.addItem(item);
         }
-
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {

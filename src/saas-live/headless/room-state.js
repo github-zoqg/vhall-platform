@@ -46,9 +46,6 @@ export default async function () {
     roomBaseServer.getCustomRoleName()
   ];
 
-  micServer.init();
-  console.log('%c------服务初始化 micServer 初始化完成', 'color:blue', micServer);
-
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
     promiseList.push(groupServer.init());
@@ -61,6 +58,11 @@ export default async function () {
     console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', rebroadcastServer);
   }
   await Promise.all(promiseList);
+
+  // 依赖于roombase返回
+  micServer.init();
+  console.log('%c------服务初始化 micServer 初始化完成', 'color:blue', micServer);
+
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
