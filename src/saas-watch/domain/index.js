@@ -25,6 +25,9 @@ setRequestHeaders({
   platform: 7
 });
 
+// 平台标识
+window.platform = 7;
+
 Vue.use(DomainStore);
 
 export default new DomainStore.Store({

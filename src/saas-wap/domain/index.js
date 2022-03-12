@@ -20,8 +20,11 @@ setBaseUrl({
   wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
 setRequestHeaders({
-  platform: 7
+  platform: 10
 });
+
+// 平台标识
+window.platform = 10;
 
 Vue.use(DomainStore);
 
