@@ -309,7 +309,7 @@
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
-          this.dispatch('VmpTabContainer', 'noticeHint', '3');
+          this.dispatch('VmpTabContainer', 'noticeHint', 3);
         });
         //监听@我的消息
         chatServer.$on('atMe', () => {
@@ -372,7 +372,7 @@
             disable = true;
           }
           //主持人不受禁言限制
-          if ([1, '1'].includes(this.roleName)) {
+          if ([1, '1', 3, '3'].includes(this.roleName)) {
             placeholder = this.$t('chat.chat_1021');
             disable = false;
           }

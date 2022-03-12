@@ -38,27 +38,29 @@ export default async function () {
     throw Error('get roomBaseServer exception');
   }
   console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
-
-  // 获取媒体许可，设置设备状态
-  await mediaCheckServer.getMediaInputPermission();
-
-  // 获取房间互动工具状态
-  await roomBaseServer.getInavToolStatus();
-
-  micServer.init();
-  console.log('%c------服务初始化 micServer 初始化完成', 'color:blue', micServer);
+  const promiseList = [
+    // 获取媒体许可，设置设备状态
+    mediaCheckServer.getMediaInputPermission(),
+    // 获取房间互动工具状态
+    roomBaseServer.getInavToolStatus(),
+    roomBaseServer.getCustomRoleName()
+  ];
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
-    await groupServer.init();
+    promiseList.push(groupServer.init());
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
   // 如果存在rebroadcast
   if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {
-    await rebroadcastServer.init();
+    promiseList.push(rebroadcastServer.init());
     console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', rebroadcastServer);
   }
+  await Promise.all(promiseList);
+
+  micServer.init();
+  console.log('%c------服务初始化 micServer 初始化完成', 'color:blue', micServer);
 
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);

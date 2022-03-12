@@ -96,16 +96,15 @@ router.beforeEach(async (to, from, next) => {
     console.log('---grayInit---', res);
     //处理限流逻辑
     if (res.code == 200) {
-      //处理灰度
-      // const VUE_MIDDLE_SAAS_LIVE_PC_PROJECT = process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT;
-      // const VUE_APP_WEB_BASE_MIDDLE = process.env.VUE_APP_WEB_BASE_MIDDLE;
-      // let protocol = window.location.protocol;
-      // // 如果是中台用户, 跳转到中台
-      // if (res.data.is_csd_user == 1) {
-      //   if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_MIDDLE}`) {
-      //     window.location.href = `${protocol}${VUE_APP_WEB_BASE_MIDDLE}/${VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
-      //   }
-      // }
+      //处理灰度、如果是中台用户, 跳转到中台
+      const VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT = process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT;
+      const VUE_APP_WAP_WATCH_MIDDLE = process.env.VUE_APP_WAP_WATCH_MIDDLE;
+      let protocol = window.location.protocol;
+      if (res.data.is_csd_user == 1) {
+        if (window.location.origin != `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}`) {
+          window.location.href = `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}/${VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT}${window.location.pathname}`;
+        }
+      }
       authCheck(to, next);
       next();
     } else {
