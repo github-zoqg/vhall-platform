@@ -183,6 +183,9 @@
           }
         }
         return flag;
+      },
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
     beforeCreate() {
@@ -208,19 +211,19 @@
       returnName(data) {
         const identity = [
           {
-            name: '主持人',
+            name: this.$tdefault(this.customRoleName[1]),
             code: 1
           },
           {
-            name: '观众',
+            name: this.$t('chat.chat_1063'),
             code: 2
           },
           {
-            name: '助理',
+            name: this.$tdefault(this.customRoleName[3]),
             code: 3
           },
           {
-            name: '嘉宾',
+            name: this.$tdefault(this.customRoleName[4]),
             code: 4
           }
         ];

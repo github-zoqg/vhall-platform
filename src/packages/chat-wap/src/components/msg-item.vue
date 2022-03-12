@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
-    <!-- 发起抽奖 -->
+    <!-- 发起抽奖/问答 -->
     <template
       v-if="
         source.type == 'lottery_push' ||
@@ -9,7 +9,9 @@
       "
     >
       <div class="msg-item interact">
-        <div class="interact-msg">{{ source.content.text_content }}</div>
+        <div class="interact-msg">
+          {{ source.roleName | roleFilter(this) }}{{ source.content.text_content }}
+        </div>
       </div>
     </template>
     <!-- 抽奖结果 -->
@@ -36,7 +38,9 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.content.text_content }},{{ $t('common.common_1030') }}
+          {{ source.roleName | roleFilter(this) }}{{ source.content.text_content }},{{
+            $t('common.common_1030')
+          }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
