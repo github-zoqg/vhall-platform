@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, usePraiseServer } from 'middle-domain';
+  import { useRoomBaseServer, usePraiseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpPraise',
     data() {
@@ -36,9 +36,10 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.praiseServer = usePraiseServer();
+      this.groupServer = useGroupServer();
     },
     created() {
-      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum || 0;
+      this.totalPraiseNum = this.roomBaseServer.state.priseLike.total || 0;
       this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
     },
     mounted() {
@@ -49,6 +50,13 @@
             // 消息返回的点赞数、是点赞总数
             this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
           }
+        }
+      });
+      // 结束讨论
+      this.groupServer.$on('GROUP_SWITCH_END', msg => {
+        if (!msg.data.over_live) {
+          this.totalPraiseNum = this.roomBaseServer.state.priseLike.total || 0;
+          this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
         }
       });
     },

@@ -26,6 +26,9 @@
     computed: {
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      noticeLatestInfo() {
+        return this.roomBaseServer.state.noticeInfo;
       }
     },
     watch: {
@@ -47,41 +50,36 @@
     },
     methods: {
       openNotice() {
-        const { latestNotice } = this.noticeServer.state;
-        console.log(latestNotice.noticeContent, 'latestNotice.noticeContent');
-        const { groupInitData } = this.groupServer.state;
         if (
-          latestNotice.total &&
-          latestNotice.created_at &&
+          this.noticeLatestInfo.total &&
+          this.noticeLatestInfo.list[0].created_at &&
           this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
-          !groupInitData.isInGroup
+          !this.isInGroup
         ) {
           this.isNoticeColumn = true;
-          this.noticeText = this.roomBaseServer.state.noticeInfo.list[0]?.content.content;
+          this.noticeText = this.noticeLatestInfo.list[0].content['content'];
           this.animates();
-          // this.noticeText = latestNotice.noticeContent;
         }
       },
       initNotice() {
-        const { groupInitData } = this.groupServer.state;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
           this.isNoticeColumn = true;
           this.noticeText = msg.room_announcement_text;
           this.animates();
-          if (!groupInitData.isInGroup) {
-            this.noticeServer.setLatestNoticeInfo(msg.room_announcement_text);
-          }
         });
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
         });
         // 结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          const { latestNotice } = this.noticeServer.state;
-          if (!msg.data.over_live && latestNotice.total && latestNotice.created_at) {
+          if (
+            !msg.data.over_live &&
+            this.noticeLatestInfo.total &&
+            this.noticeLatestInfo.list[0].created_at
+          ) {
             this.isNoticeColumn = true;
-            this.noticeText = latestNotice.noticeContent;
+            this.noticeText = this.noticeLatestInfo.list[0].content['content'];
           }
         });
         this.groupServer.$on('GROUP_SWITCH_START', () => {
