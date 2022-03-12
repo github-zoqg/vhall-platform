@@ -326,6 +326,15 @@
       this.init();
       this.listenEvent();
     },
+    updated() {
+      const _this = this;
+      //hack处理BsScroll不能滚动的问题
+      this.$nextTick(() => {
+        if (_this.$refs && _this.$refs.scroll) {
+          _this.$refs.scroll.refresh();
+        }
+      });
+    },
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
@@ -1077,21 +1086,21 @@
         //用户拒绝邀请演示
         function handleUserRejectPresentation(msg) {
           // 如果申请人是自己
-          if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
-            return;
-          }
-          let role = '';
-          if (msg.data.room_role == 2) {
-            role = '观众';
-          } else if (msg.data.room_role == 4) {
-            role = '嘉宾';
-          }
-          if (msg.data.extra_params == _this.userId) {
-            console.log('拒绝邀请', msg);
-            _this.$message.warning({
-              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
-            });
-          }
+          // if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
+          //   return;
+          // }
+          // let role = '';
+          // if (msg.data.room_role == 2) {
+          //   role = '观众';
+          // } else if (msg.data.room_role == 4) {
+          //   role = '嘉宾';
+          // }
+          // if (msg.data.extra_params == _this.userId) {
+          //   console.log('拒绝邀请', msg);
+          //   _this.$message.warning({
+          //     message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
+          //   });
+          // }
         }
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
@@ -1351,7 +1360,7 @@
 
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
-          console.log(msg);
+          console.log('agreePresentation:', msg);
           if (_this.roleName == 20) {
             _this.$message({
               message: '对方已接受邀请',
@@ -1944,8 +1953,10 @@
       }
     }
     &__container {
-      flex: 1;
+      flex: 1 0 auto;
+      max-height: calc(100% - 80px);
       position: relative;
+      overflow: hidden;
       &__scroll {
         display: flex;
         flex-direction: column;
@@ -1954,7 +1965,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        overflow: hidden;
+        //overflow: hidden;
       }
       .empty-container {
         width: 100%;

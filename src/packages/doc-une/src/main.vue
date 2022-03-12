@@ -811,17 +811,18 @@
 
       /**
        * 结束演示
-       * 1.主持人在小组中,且主持人正在演示中,则结束 - 自己演示
-       * 2.主持人在主直播间或小组内，别人演示中, 则结束 - 他人演示
+       * 1.观众演示时，组长和主持人都可以结束演示
+       * 2.主持人在小组中自己演示时，只有自己可以结束演示
        */
       async handleEndDemonstrate() {
         // 在主直播间
-        let confirmTip = '结束演示';
-        if (
-          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 2) ||
-          (!this.isInGroup && this.roomBaseServer.state.watchInitData.join_info.role_name == 2)
-        ) {
-          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
+        let confirmTip = '结束演示?';
+        if (this.presenterId == this.userId) {
+          // 如果演示者是自己，自己结束自己的演示
+          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示？';
+        } else if (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) {
+          // 如果是组长结束观众的演示
+          confirmTip = '是否结束演示?';
         }
         try {
           await this.$confirm(confirmTip, '提示', {
@@ -833,18 +834,40 @@
           if (this.hasDocPermission) {
             console.log('结束自己的演示');
             // 结束自己的演示
-            await this.memberServer.userEndPresentation({
+            const result = await this.memberServer.userEndPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             });
+            if (result && result.code == 200) {
+              if (this.groupServer.state.groupInitData.join_role == 2) {
+                // 如果是观众结束了自己的演示
+                this.$message({
+                  message: '结束演示',
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
           } else {
             // 结束他人的演示
             console.log('结束他人的演示');
-            await this.memberServer.endUserPresentation({
+            const result = await this.memberServer.endUserPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
               receive_account_id: this.isInGroup
                 ? this.groupServer.state.groupInitData.presentation_screen
                 : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
+            if (result && result.code == 200) {
+              if (this.groupServer.state.groupInitData.join_role == 20) {
+                // 如果是组长结束了观众的演示
+                this.$message({
+                  message: '结束演示',
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
           }
         } catch (ex) {
           return;

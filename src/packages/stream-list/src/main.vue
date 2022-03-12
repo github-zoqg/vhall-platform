@@ -188,7 +188,7 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
       // 监听自动上麦的异常code
-      useInteractiveServer().$on('speakOnFailed', e => {
+      useInteractiveServer().$on('SPEAKON_FAILED', e => {
         this.$message(e.msg);
       });
       // 订阅流播放失败

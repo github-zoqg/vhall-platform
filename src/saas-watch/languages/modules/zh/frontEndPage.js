@@ -42,7 +42,8 @@ export default {
     common_1031: '预约人数',
     common_1032: '观看人数',
     common_1033: '我知道了',
-    common_1034: '保存成功'
+    common_1034: '保存成功',
+    common_1035: '重新加载'
   },
   player: {
     player_1001: '热度',
@@ -825,6 +826,7 @@ export default {
     other_1002: '输入密码',
     other_1003: '输入邀请码',
     other_1004: '上传图片大小不能超过 2MB',
+    other_1006: '主持人拒绝了您的上麦请求',
     other_1008: '复制成功',
     other_1009: '复制失败'
   },

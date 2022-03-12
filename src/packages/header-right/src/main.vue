@@ -360,7 +360,6 @@
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type
         });
-
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
           this.splitScreenServer.staet.isOpenSplitScreen = false;
