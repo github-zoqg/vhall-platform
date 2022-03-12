@@ -84,10 +84,10 @@ export const serverConfig = {
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
+       * watch观看端tab不展示文档
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
         { type: 'private', cuid: 'comWatchPrivateChat', text: 'common.common_1008' }, // 私聊
         { type: 'notice', cuid: 'comNotice', text: '公告' },
