@@ -107,7 +107,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast } from 'vant';
+  import { Toast, Dialog } from 'vant';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
   const langMap = {
     1: {
@@ -370,7 +370,7 @@
         });
       },
       // 返回主房间提示
-      gobackHome(index, name) {
+      async gobackHome(index, name) {
         let title = '';
         switch (index) {
           case 1:
@@ -392,7 +392,14 @@
             title = '组长身份已变更';
             break;
         }
-        Toast(title);
+        if (index == 1) {
+          await Dialog.alert({
+            title: this.$t('account.account_1061'),
+            message: title
+          });
+        } else {
+          Toast(title);
+        }
       },
 
       // 创建betterScroll
