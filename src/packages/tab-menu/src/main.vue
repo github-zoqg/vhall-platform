@@ -77,16 +77,17 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
+        // PC端要排除文档菜单
         return this.menu.filter(item => {
           if (this.visibleCondition === 'living') {
-            return (item.status == 1 || item.status == 3) && item.visible;
+            return (item.status == 1 || item.status == 3) && item.visible && item.type != 2;
           }
 
           if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
-            return (item.status == 1 || item.status == 4) && item.visible;
+            return (item.status == 1 || item.status == 4) && item.visible && item.type != 2;
           }
 
-          return item.visible;
+          return item.visible && item.type != 2;
         });
       },
       isSubscribe() {
@@ -344,7 +345,9 @@
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(tab.id);
+        if (tab.id == this.selectedId) {
+          visible === false && this.jumpToNearestItemById(tab.id);
+        }
       },
       /**
        * 切换某个菜单tab的可视性

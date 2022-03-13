@@ -194,7 +194,7 @@
     },
     mounted() {
       this.init();
-      this.timerServer.listenMsg();
+      // this.timerServer.listenMsg();
       // console.log(this.timerServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));

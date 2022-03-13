@@ -121,7 +121,7 @@
       // await this.getCommonConfig();
       this.timerInfo = this.roomBaseServer.state?.timerInfo;
       // this.init();
-      this.timerServer.listenMsg();
+      // this.timerServer.listenMsg();
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
       // 计时器结束
