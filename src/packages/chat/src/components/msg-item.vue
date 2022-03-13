@@ -67,7 +67,7 @@
                 class="info-wrap__role-name"
                 :class="source.roleName | roleClassFilter"
               >
-                {{ source.roleName | roleFilter(this) }}
+                {{ source.roleName | roleFilter }}
               </span>
             </p>
             <!-- 被回复的消息 -->
@@ -190,7 +190,7 @@
               class="interact-content__role-name"
               :class="source.roleName | roleClassFilterForMsg"
             >
-              {{ source.roleName | roleFilter(this) }}
+              {{ source.roleName | roleFilter }}
             </span>
             <img
               v-if="source.type == 'red_envelope_ok'"
@@ -312,9 +312,6 @@
           return handleChatShowTime('', this.source.sendTime);
         }
         return handleChatShowTime(this.source.prevTime, this.source.sendTime);
-      },
-      customRoleName() {
-        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
     filters: {
@@ -327,27 +324,6 @@
           return val.substring(0, len) + '...';
         }
         return val;
-      },
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = vm.$tdefault(vm.customRoleName[1]);
-            break;
-          case 3:
-            ret = vm.$tdefault(vm.customRoleName[3]);
-            break;
-          case 4:
-            ret = vm.$tdefault(vm.customRoleName[4]);
-            break;
-          case 20:
-            ret = vm.$t('chat.chat_1064');
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
       },
       //角色标签样式
       roleClassFilter(value) {
