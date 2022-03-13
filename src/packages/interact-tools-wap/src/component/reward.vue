@@ -107,7 +107,7 @@
         // 添加聊天消息
         const data = {
           avatar: msg.data.rewarder_avatar,
-          nickName:
+          nickname:
             msg.data.rewarder_nickname.length > 8
               ? msg.data.rewarder_nickname.substr(0, 8) + '...'
               : msg.data.rewarder_nickname,

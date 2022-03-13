@@ -17,7 +17,7 @@
     <!-- 推桌面共享时占位图 -->
     <div
       class="vmp-desktop-screen__tip"
-      v-show="isShareScreen && desktopShareInfo.accountId == accountId"
+      v-show="isShareScreen && desktopShareInfo.accountId == accountId && role == 1"
     >
       <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
       <br />
@@ -75,6 +75,16 @@
       };
     },
     computed: {
+      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾？）
+      role() {
+        return this.roomBaseServer.state.watchInitData.join_info.role_name;
+      },
+      third_party_user_id() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      presentation_screen() {
+        return this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
       // 是否观看端
       isWatch() {
         return this.roomBaseServer.state.clientType !== 'send';
@@ -90,7 +100,12 @@
         return this.desktopShareServer.state.localDesktopStreamId;
       },
       isShowWrapper() {
-        return this.isShareScreen || this.popAlert.visible || this.isShowAccessDeniedAlert;
+        return (
+          (this.isShareScreen &&
+            (this.presentation_screen != this.third_party_user_id || this.role == 1)) ||
+          this.popAlert.visible ||
+          this.isShowAccessDeniedAlert
+        );
       },
       desktopShareInfo() {
         return this.desktopShareServer.state.desktopShareInfo;
