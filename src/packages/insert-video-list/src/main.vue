@@ -220,14 +220,8 @@
           isInsertFilePushing &&
           insertStreamInfo.userInfo.accountId != watchInitData.join_info.third_party_user_id
         ) {
-          const roleMap = {
-            1: '主持人',
-            3: '助理',
-            4: '嘉宾'
-          };
-
           this.$alert(
-            `${roleMap[insertStreamInfo.userInfo.role]}${
+            `${this.$getRoleName(insertStreamInfo.userInfo.role)}${
               insertStreamInfo.userInfo.role != 1 ? insertStreamInfo.userInfo.nickname : ''
             }正在插播文件，请稍后重试`,
             '',
