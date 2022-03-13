@@ -31,7 +31,7 @@
   import signinSet from './components/signinSet.vue';
   import Counter from './components/counter.vue';
   import signinResult from './components/signinResult.vue';
-  import { useSignServer } from 'middle-domain';
+  import { useSignServer, useChatServer } from 'middle-domain';
   export default {
     name: 'VmpSignLive',
     components: {
@@ -71,6 +71,34 @@
     },
     beforeCreate() {
       this.signServer = useSignServer();
+    },
+    mounted() {
+      this.signServer.$on('sign_in_push', e => {
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${this.$t('chat.chat_1027')}`
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
+      });
+      this.signServer.$on('sign_end', e => {
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
+      });
     },
     methods: {
       openSign() {
