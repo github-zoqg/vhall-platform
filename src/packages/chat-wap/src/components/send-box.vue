@@ -212,6 +212,7 @@
       },
       //是否展示互动上麦按钮
       isShowMicBtn() {
+        //todo 注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         const device_status = useMediaCheckServer().state.deviceInfo.device_status;
         return (
           this.webinar.type == 1 &&
@@ -221,7 +222,7 @@
               !this.isAllBanned &&
               !this.isBanned &&
               !this.groupInitData.isInGroup,
-            this.groupInitData.isInGroup && !this.groupInitData.isBanned
+            this.groupInitData.isInGroup && !this.isBanned
           ].some(val => !!val)
         );
       }
