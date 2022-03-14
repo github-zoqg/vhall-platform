@@ -234,12 +234,12 @@
         });
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
           const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
-          const text = this.$getRoleName(msg.room_role);
+          // const text = this.$getRoleName(msg.room_role);
           useChatServer().addChatToList({
             nickname: '问卷',
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              text_content: `${text}发起了问卷`,
+              text_content: `发起了问卷`,
               questionnaire_id: msg.questionnaire_id
             },
             roleName: join_info.role_name,
