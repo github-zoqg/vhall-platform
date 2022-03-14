@@ -96,11 +96,11 @@
     mounted() {
       if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
         this.isShowThirdStream = true;
-        this.changePushImage();
+        this.changePushImage(true);
       }
       this.msgServer.$onMsg('ROOM_MSG', msg => {
         if (msg.data.type == 'live_over') {
-          this.isShowThirdStream = false;
+          this.changePushImage(false);
         }
       });
     },
@@ -118,9 +118,14 @@
           }
         });
       },
-      changePushImage() {
+      changePushImage(flag) {
         const thirdBackground = document.querySelector('.vmp-basic-right__hd');
-        thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/saas-v3-lives/static/img/thirdDefault.293fe294.png) no-repeat`;
+        if (flag) {
+          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
+        } else {
+          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/base-right.png) no-repeat`;
+        }
+        this.isShowThirdStream = false;
         thirdBackground.style.backgroundSize = '100% 100%';
         thirdBackground.style.backgroundPosition = 'center';
       },

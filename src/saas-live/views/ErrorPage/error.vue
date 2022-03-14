@@ -94,13 +94,16 @@
       .vmp-msgtip__image-loading {
         text-align: center;
         img {
-          height: 200px;
+          height: 60px;
           width: 200px;
         }
       }
       .vmp-msgtip__text {
-        margin: 40px 0 20px 0;
+        font-size: 14px;
+        line-height: 20px;
+        margin: 30px 0 60px 0;
         user-select: none;
+        color: #666666;
       }
     }
   }

@@ -63,7 +63,7 @@
     >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleNameFilter }}
+          {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
           :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
@@ -192,6 +192,7 @@
 
     <!-- 播放按钮 -->
     <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -302,12 +303,17 @@
           !this.isNotAutoSpeak
         );
       },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
         return (
           this.mainScreen == this.joinInfo.third_party_user_id &&
           this.interactiveServer.state.showPlayIcon &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          this.$domainStore.state.docServer.switchStatus
         );
+      },
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
       // 是否显示分屏占位图
       isShowSplitScreenPlaceholder() {
@@ -320,20 +326,12 @@
 
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -665,9 +663,10 @@
           }
           // 分组活动 自动上麦默认禁音
           if (this.autoSpeak) {
-            this.interactiveServer.muteAudio({
-              streamId: this.localStream.streamId, // 流Id, 必填
-              isMute: true // true为禁用，false为启用。
+            this.interactiveServer.setDeviceStatus({
+              device: 1, // 1:audio    2:video
+              status: 0, // 0:禁音    1:打开麦克风
+              receive_account_id: this.joinInfo.third_party_user_id
             });
           }
           // 派发事件
@@ -784,7 +783,13 @@
       // 切换大小窗
       exchange() {
         const roomBaseServer = useRoomBaseServer();
-        roomBaseServer.requestChangeMiniElement('stream-list');
+        let miniElement = '';
+        if (this.isShareScreen) {
+          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+        } else {
+          miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        }
+        roomBaseServer.setChangeElement(miniElement);
       },
       // 实时获取网路状况和麦克风能量
       getLevel() {
@@ -1105,6 +1110,12 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
       p {
         width: 108px;
         height: 108px;

@@ -186,7 +186,7 @@
                             item.operator.role_name == 'guest'
                         }"
                       >
-                        <!-- {{ item.operator.role_name | roleFilter }} -->
+                        {{ item.operator.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ item.operator.operate_time }}</span>
                     </p>
@@ -370,7 +370,7 @@
                           item.operator.role_name == 'assistant'
                       }"
                     >
-                      <!-- {{ item.operator.role_name | roleFilter }} -->
+                      {{ item.operator.role_name | roleFilter }}
                     </span>
                   </div>
                   <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
@@ -455,17 +455,6 @@
       PrivateChat
     },
     filters: {
-      filterRoleName(val) {
-        if (val == 'host' || val == 1) {
-          return '主持人';
-        } else if (val == 'assistant' || val == 3) {
-          return '助理';
-        } else if (val == 'guest' || val == 4) {
-          return '嘉宾';
-        } else {
-          return '';
-        }
-      },
       filterNickName(val) {
         if (val.length > 8) {
           return val.substring(0, 8) + '...';

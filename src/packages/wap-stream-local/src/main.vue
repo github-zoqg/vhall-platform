@@ -18,7 +18,7 @@
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleNameFilter }}
+        {{ joinInfo.role_name | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
@@ -132,18 +132,7 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -360,9 +349,10 @@
           // 分组活动 自动上麦默认禁音
           console.warn('自动上麦条件：', this.autoSpeak);
           if (this.autoSpeak) {
-            this.interactiveServer.muteAudio({
-              streamId: this.localStream.streamId, // 流Id, 必填
-              isMute: true // true为禁用，false为启用。
+            this.interactiveServer.setDeviceStatus({
+              device: 1, // 1:audio    2:video
+              status: 0, // 0:禁音    1:打开麦克风
+              receive_account_id: this.joinInfo.third_party_user_id
             });
           }
           // 实时获取网络状况
