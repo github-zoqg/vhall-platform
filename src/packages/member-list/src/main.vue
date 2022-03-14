@@ -221,7 +221,7 @@
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
   import * as _ from 'lodash';
-  import { sleep } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -903,6 +903,10 @@
           if (msg.data.room_join_id == _this.userId) {
             return;
           }
+          //tab提示小红点
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(_this.cuid, 'emitTabTips', { visible: true, type: 8 })
+          );
           let user = {
             account_id: msg.data.room_join_id,
             avatar: msg.data.avatar,
@@ -936,6 +940,9 @@
             _this.applyUsers = _this.applyUsers.filter(u => u.account_id !== user.account_id);
             if (!_this.applyUsers.length) {
               _this.raiseHandTip = false;
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(_this.cuid, 'emitTabTips', { visible: false, type: 8 })
+              );
             }
           }, 30000);
           //todo 信令通知其他组件(比如自定义菜单组件，有红点)
