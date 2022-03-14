@@ -43,7 +43,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          热度 &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -206,7 +206,11 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
+         * 4. 没有互动实例的时候高度为0
          */
+        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+          return true;
+        }
         if (!this.remoteSpeakers.length) {
           if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;
@@ -293,9 +297,6 @@
         if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           this.createBScroll();
         }
-        if (window.orientation == 90 || window.orientation == -90) {
-          this.setFullScreen();
-        }
       }
 
       this.addSDKEvents();
@@ -345,8 +346,8 @@
         });
 
         // 切换小组,小组人员变动
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          if (this.isInGroup) {
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, changeInfo) => {
+          if (changeInfo.isNeedCare && this.isInGroup) {
             this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
           }
         });
@@ -371,13 +372,6 @@
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
           this.gobackHome(7, '', msg);
-        });
-
-        // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
-        window.addEventListener('orientationchange', () => {
-          if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
-            this.setFullScreen();
-          }
         });
       },
       // 返回主房间提示
@@ -404,13 +398,13 @@
             title = '组长身份已变更';
             break;
         }
-        if (index == 1) {
+        if (index == 5 || index == 7) {
+          Toast(title);
+        } else {
           await Dialog.alert({
             title: this.$t('account.account_1061'),
             message: title
           });
-        } else {
-          Toast(title);
         }
       },
 
