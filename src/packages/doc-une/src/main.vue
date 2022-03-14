@@ -18,6 +18,7 @@
         (hasDocPermission || [3].includes(roleName)) &&
         (displayMode === 'normal' || displayMode === 'fullscreen')
       "
+      @changeBrush="changeBrush"
     ></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
@@ -94,6 +95,7 @@
           data-value="move"
           title="移动"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag"
+          :class="{ selected: canMove }"
         ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
@@ -110,7 +112,11 @@
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul class="vmp-doc-thumbnailbar" @click="handleThumbnail" v-show="thumbnailShow">
+      <ul
+        class="vmp-doc-thumbnailbar"
+        @click="handleThumbnail"
+        v-show="currentType !== 'board' && thumbnailShow"
+      >
         <li
           class="doc-thumbnailbar__opt"
           v-for="(item, index) in docServer.state.thumbnailList"
@@ -169,7 +175,8 @@
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
         keepAspectRatio: true,
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false
+        hasStreamList: false,
+        canMove: false
       };
     },
     computed: {
@@ -786,14 +793,16 @@
             break;
           // 移动
           case 'move':
-            this.docServer.move();
-            this.$refs.docToolbar.changeTool('');
+            this.$refs.docToolbar.changeTool('move');
             break;
           // 全屏
           case 'fullscreen':
             this.fullscreen();
             break;
         }
+      },
+      changeBrush(brush) {
+        this.canMove = brush === 'move';
       },
 
       /**
