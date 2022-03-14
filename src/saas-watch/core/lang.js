@@ -11,7 +11,11 @@ Vue.prototype.$tec = function (path) {
 };
 
 Vue.prototype.$tdefault = function (key) {
-  return defaultLanguageConf[key] ? this.$t(defaultLanguageConf[key]) : key;
+  if (this.$t) {
+    return defaultLanguageConf[key] ? this.$t(defaultLanguageConf[key]) : key;
+  } else {
+    return defaultLanguageConf[key] ? this.t(defaultLanguageConf[key]) : key;
+  }
 };
 
 /**
