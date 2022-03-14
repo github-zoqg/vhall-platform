@@ -31,7 +31,10 @@
       <li
         @click="handleClickItem('desktopShare')"
         class="menu-item"
-        :class="[disableMenus.includes('desktopShare') ? 'disable' : '']"
+        :class="[
+          disableMenus.includes('desktopShare') ? 'disable' : '',
+          { highlight: isShareScreen }
+        ]"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
         <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
@@ -447,6 +450,11 @@
         }
 
         &:not(.disable):hover {
+          color: #fb3a32;
+          cursor: pointer;
+        }
+
+        &.highlight {
           color: #fb3a32;
           cursor: pointer;
         }
