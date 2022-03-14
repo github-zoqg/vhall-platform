@@ -37,7 +37,7 @@
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
-
+    <!-- {{ joinInfo.role_name }} -- {{ groupRole }} -->
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
       <p
@@ -113,7 +113,7 @@
 
     <section v-else class="vmp-stream-remote__shadow-box">
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="(joinInfo.role_name == 1 && !is_host_in_group) || groupRole == 20"
         class="vmp-stream-remote__shadow-first-line"
       >
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -162,7 +162,7 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2"
+            v-show="stream.attributes.roleName == 2 || joinInfo.role_name == 1"
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
@@ -170,7 +170,7 @@
 
         <el-tooltip content="下麦" placement="bottom">
           <span
-            v-show="stream.attributes.roleName != 1"
+            v-show="(stream.attributes.roleName != 1 && !is_host_in_group) || groupRole == 20"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
           ></span>
@@ -220,6 +220,9 @@
     computed: {
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      is_host_in_group() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
       //默认的主持人id
       hostId() {

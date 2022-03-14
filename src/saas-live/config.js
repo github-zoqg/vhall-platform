@@ -575,7 +575,8 @@ export const serverConfig = {
     emitInsertFileChange: [
       {
         cuid: 'comInsertStream',
-        method: 'startInertFile'
+        method: 'inertFileChange',
+        args: ['$0', '$1']
       }
     ]
   },
