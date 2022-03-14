@@ -192,6 +192,7 @@
 
     <!-- 播放按钮 -->
     <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -302,12 +303,17 @@
           !this.isNotAutoSpeak
         );
       },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
         return (
           this.mainScreen == this.joinInfo.third_party_user_id &&
           this.interactiveServer.state.showPlayIcon &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          this.$domainStore.state.docServer.switchStatus
         );
+      },
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
       // 是否显示分屏占位图
       isShowSplitScreenPlaceholder() {
@@ -1095,6 +1101,12 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
       p {
         width: 108px;
         height: 108px;

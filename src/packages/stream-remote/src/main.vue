@@ -25,7 +25,7 @@
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleNameFilter }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
@@ -178,6 +178,7 @@
       </p>
     </section>
     <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -262,11 +263,17 @@
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
+      // 封面图
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
         return (
           this.mainScreen == this.stream.accountId &&
           this.interactiveServer.state.showPlayIcon &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          this.$domainStore.state.docServer.switchStatus
         );
       },
       isShowSplitScreenPlaceholder() {
@@ -637,6 +644,12 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
       p {
         width: 108px;
         height: 108px;
