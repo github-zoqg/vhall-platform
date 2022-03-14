@@ -293,8 +293,10 @@
         if (key) {
           this[brush][key] = value;
         }
-        // 取消缩放、移动模式
-        this.docServer.cancelZoom();
+        if (brush !== 'move') {
+          // 取消缩放、移动模式
+          this.docServer.cancelZoom();
+        }
         switch (brush) {
           // 选择
           case 'select': {
@@ -331,7 +333,12 @@
             this.docServer.setEraser();
             break;
           }
+          case 'move': {
+            this.docServer.move();
+            break;
+          }
         }
+        this.$emit('changeBrush', brush);
       },
       /**
        * 切换画板工具
