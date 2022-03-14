@@ -221,7 +221,7 @@
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
   import * as _ from 'lodash';
-  import { sleep } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -416,7 +416,7 @@
       getCurrentSpeakerList() {
         return this.isInGroup
           ? this.groupInitData['speaker_list'] || []
-          : this.interactToolStatus['speaker_list'] || [];
+          : this.micServer.state.speakerList || [];
       }
     },
     methods: {
@@ -721,6 +721,7 @@
               return;
             }
 
+            console.log(_this.getCurrentSpeakerList, '当前正在上麦的人员.........');
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
@@ -902,6 +903,10 @@
           if (msg.data.room_join_id == _this.userId) {
             return;
           }
+          //tab提示小红点
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(_this.cuid, 'emitTabTips', { visible: true, type: 8 })
+          );
           let user = {
             account_id: msg.data.room_join_id,
             avatar: msg.data.avatar,
@@ -935,6 +940,9 @@
             _this.applyUsers = _this.applyUsers.filter(u => u.account_id !== user.account_id);
             if (!_this.applyUsers.length) {
               _this.raiseHandTip = false;
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(_this.cuid, 'emitTabTips', { visible: false, type: 8 })
+              );
             }
           }, 30000);
           //todo 信令通知其他组件(比如自定义菜单组件，有红点)
@@ -1916,7 +1924,9 @@
       },
       //查找用户在数组的索引号
       _getUserIndex(accountId, list) {
-        return list.findIndex(item => item.account_id === accountId);
+        return list.findIndex(
+          item => item.account_id === accountId || item.accountId === accountId
+        );
       },
       //加载更多
       loadMore() {
