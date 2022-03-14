@@ -407,8 +407,8 @@
         }
 
         // 前后都没有清空任何选择(基本不会发生的极端情况)
-        this.selectedId = '';
-        this.selectedType = '';
+        // this.selectedId = '';
+        // this.selectedType = '';
       },
 
       /**
