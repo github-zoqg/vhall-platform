@@ -633,6 +633,14 @@
       },
       // 开始推流
       async startPush() {
+        // 第三方推流直接开始直播
+        if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
+          // 派发事件
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
+          );
+          return;
+        }
         try {
           // 创建本地流
           await this.createLocalStream();

@@ -718,7 +718,7 @@
         display: flex;
         justify-content: center;
         &-content {
-          margin: 20px 46px 0;
+          // margin: 20px 46px 0;
           line-height: 20px;
           padding: 5px 16px;
           background-color: #222222;
