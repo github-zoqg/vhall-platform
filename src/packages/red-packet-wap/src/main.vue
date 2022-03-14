@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer } from 'middle-domain';
+  import { useRedPacketServer, useChatServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
@@ -63,6 +63,15 @@
       },
       initEvent() {
         this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
+          useChatServer().addChatToList({
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+            content: {
+              text_content: this.$t('chat.chat_1038')
+            },
+            type: data.type,
+            interactStatus: true,
+            Show: true
+          });
           const uuid = data.red_packet_uuid;
           this.open(uuid);
         });
