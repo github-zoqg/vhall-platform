@@ -8,7 +8,7 @@
         <div class="header-right_control_wrap-head">
           <div class="header-right_control_wrap-head-left">
             <span class="header-right_control_wrap-head-left-role">
-              {{ roleMap[userInfo.role_name] }}
+              {{ userInfo.role_name | roleFilter }}
             </span>
             <span class="header-right_control_wrap-head-left-name">
               {{ userInfo.nickname }}
@@ -153,13 +153,7 @@
         isThirtPushStream: false, // 是否支持第三方推流
         // thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
-        webinarInfo: {}, //活动下信息
-        roleMap: {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾'
-        }
+        webinarInfo: {} //活动下信息
       };
     },
     created() {

@@ -18,7 +18,7 @@
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleNameFilter }}
+        {{ joinInfo.role_name | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
@@ -132,18 +132,7 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
