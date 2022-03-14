@@ -77,7 +77,7 @@
         selectedType: '',
         selectedId: '',
         menu: [],
-        visibleCondition: 'default',
+        pageEnv: 'default',
         tabOptions: {}
       };
     },
@@ -87,11 +87,11 @@
       },
       visibleMenu() {
         return this.menu.filter(item => {
-          if (this.visibleCondition === 'living') {
+          if (this.pageEnv === 'living') {
             return (item.status == 1 || item.status == 3) && item.visible;
           }
 
-          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+          if (this.pageEnv === 'live_over' || this.pageEnv === 'subscribe') {
             return (item.status == 1 || item.status == 4) && item.visible;
           }
 
@@ -172,8 +172,10 @@
         });
 
         if (this.isSubscribe) {
-          this.setVisibleCondition('subscribe');
+          this.setPageEnv('subscribe');
           this.setVisible({ visible: false, type: 3 }); // chat
+        } else {
+          this.setPageEnv('live-room');
         }
 
         // 直播中、结束直播更改状态
@@ -181,11 +183,10 @@
           const { clientType } = useRoomBaseServer().state;
 
           if (msg.data.type === 'live_start') {
-            this.setVisibleCondition('living');
+            this.setPageEnv('live-room');
           }
 
           if (msg.data.type === 'live_over') {
-            this.setVisibleCondition('live_over');
             this.setVisible({ visible: false, type: 'private' }); // private-chat
             this.setVisible({ visible: false, type: 'v5' }); // qa
             clientType === 'send' && this.selectDefault();
@@ -285,8 +286,8 @@
        * 设置显示条件
        * @param {String} condition [default|living|predition]
        */
-      setVisibleCondition(condition = 'default') {
-        this.visibleCondition = condition;
+      setPageEnv(condition = 'default') {
+        this.pageEnv = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
