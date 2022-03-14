@@ -172,7 +172,7 @@
             // 桌面共享菜单
 
             // 如果自己是推送桌面共享
-            if (this.isShareScreen && this.desktopShareInfo.accounId == this.userId) {
+            if (this.isShareScreen && this.desktopShareInfo.accountId == this.userId) {
               vn.setDisableState(false);
               vn.setText('关闭共享');
               vn.setSelectedState(true);

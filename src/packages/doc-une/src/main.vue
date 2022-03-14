@@ -655,12 +655,14 @@
         const { width, height } = this.getDocViewRect();
         if (!width || !height) {
           console.error(`[doc] recoverLastDocs 获取容器宽高异常width=${width},height=${height}`);
+          this.docServer.setDocLoadComplete();
           return;
         }
         await this.docServer.recover({
           width,
           height
         });
+
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
           const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
           window.$middleEventSdk?.event?.send(

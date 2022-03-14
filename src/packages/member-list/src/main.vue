@@ -414,9 +414,7 @@
       },
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
-        return this.isInGroup
-          ? this.groupInitData['speaker_list'] || []
-          : this.micServer.state.speakerList || [];
+        return this.micServer.state.speakerList;
       }
     },
     methods: {
@@ -606,10 +604,6 @@
             case 'room_kickout':
               handleKicked(temp);
               break;
-            case 'vrtc_connect_presentation_refused':
-              //用户拒绝了演示邀请
-              isLive && handleUserRejectPresentation(temp);
-              break;
             case 'vrtc_disconnect_presentation_success':
               //用户主动结束演示
               handleUserEndPresentation(temp);
@@ -721,7 +715,6 @@
               return;
             }
 
-            console.log(_this.getCurrentSpeakerList, '当前正在上麦的人员.........');
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
@@ -750,6 +743,9 @@
                 ![null, void 0, ''].includes(context.groupInitData.join_role)
               ) {
                 user.role_name = context.groupInitData.join_role;
+                user.is_banned = isNaN(Number(context.groupInitData.is_banned))
+                  ? 0
+                  : Number(context.groupInitData.is_banned);
               }
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -1091,25 +1087,6 @@
           _this.getLimitUserList();
           _this.refreshList();
         }
-        //用户拒绝邀请演示
-        function handleUserRejectPresentation(msg) {
-          // 如果申请人是自己
-          // if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
-          //   return;
-          // }
-          // let role = '';
-          // if (msg.data.room_role == 2) {
-          //   role = '观众';
-          // } else if (msg.data.room_role == 4) {
-          //   role = '嘉宾';
-          // }
-          // if (msg.data.extra_params == _this.userId) {
-          //   console.log('拒绝邀请', msg);
-          //   _this.$message.warning({
-          //     message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
-          //   });
-          // }
-        }
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
           console.log(msg);
@@ -1368,8 +1345,10 @@
 
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
-          console.log('agreePresentation:', msg);
-          if (_this.roleName == 20) {
+          if (
+            msg.data.extra_params ==
+            useRoomBaseServer().state.watchInitData?.join_info?.third_party_user_id
+          ) {
             _this.$message({
               message: '对方已接受邀请',
               showClose: true,
