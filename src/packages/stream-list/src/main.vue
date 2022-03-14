@@ -1,4 +1,14 @@
 <template>
+  <!-- <div
+    class="vmp-stream-list-wrapper"
+    ref="noDelayStreamContainer"
+    :class="{
+      'no-delay-layout': isUseNoDelayLayout,
+      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
+      'stream-length': remoteSpeakers.length > 1
+    }"
+  >
+  </div> -->
   <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
     <!-- 左翻页 -->
     <span
@@ -168,6 +178,10 @@
         } else {
           return false;
         }
+      },
+      // 互动无延迟 未上麦观众是否使用类似旁路布局
+      isUseNoDelayLayout() {
+        return !this.localSpeaker.accountId && this.mode == 3;
       }
     },
     watch: {
@@ -235,6 +249,22 @@
           this.$refs.streamWrapper.scrollLeft =
             scrollLeft <= scrollWidth ? scrollLeft + 142 : scrollWidth;
         }
+      },
+      /**
+       * 监听无延迟未上麦时，观众采用类似旁路布局的容器高度变化
+       */
+      computeTop() {
+        const MutationObserver =
+          window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+        const _this = this;
+        const observer = new MutationObserver(function () {
+          console.log(
+            '监听到noDelayStreamContainer变动了',
+            _this.$refs.noDelayStreamContainer.clientHeight
+          );
+        });
+        observer.observe(this.$refs.noDelayStreamContainer, { childList: true, subtree: true });
       }
     }
   };
@@ -366,4 +396,62 @@
     width: 360px;
     z-index: 10;
   }
+
+  // .vmp-stream-list-wrapper {
+  //   &.no-delay-layout {
+  //     width: calc(100% - 380px);
+  //     position: absolute;
+  //     top: 0;
+  //     left: 0;
+  //     bottom: 56px;
+
+  //     &.vmp-dom__mini {
+  //       right: 0;
+  //       top: 0;
+  //       width: 360px;
+  //       z-index: 10;
+  //       left: auto;
+  //       height: 204px;
+  //       .vmp-stream-list {
+  //         height: 40px;
+  //       }
+  //       .vmp-stream-list__remote-container {
+  //         width: 72px;
+  //       }
+  //       .vmp-stream-list__main-screen {
+  //         width: 100%;
+  //         height: 164px;
+  //       }
+  //     }
+  //     .vmp-stream-list {
+  //       position: absolute;
+  //       left: 0;
+  //       bottom: 0;
+  //     }
+  //     .vmp-stream-list__main-screen {
+  //       bottom: 100%;
+  //       left: 0;
+  //       top: auto;
+  //       position: absolute;
+  //       width: 100%;
+  //       height: 100%;
+  //     }
+  //     &.stream-length {
+  //       .vmp-stream-list__main-screen {
+  //         bottom: 100%;
+  //         left: 0;
+  //         top: auto;
+  //         position: absolute;
+  //         width: 100%;
+  //         height: 484px;
+  //         @media screen and (max-width: 1366px) {
+  //           height: 350px;
+  //         }
+  //       }
+  //     }
+  //     .vmp-stream-list__stream-wrapper-scroll {
+  //       justify-content: flex-start;
+  //     }
+  //   }
+  // }
 </style>

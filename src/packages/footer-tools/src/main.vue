@@ -153,7 +153,6 @@
         showPay: false,
         zfQr: '',
         wxQr: '',
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
         lang: {},
         languageList: []
       };
@@ -224,6 +223,9 @@
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
         return useMediaCheckServer().state.deviceInfo.device_status;
+      },
+      isBanned() {
+        return !this.isInGroup && (useChatServer().state.banned || useChatServer().state.allBanned); //true禁言，false未禁言
       }
     },
     beforeCreate() {
@@ -247,16 +249,6 @@
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
-    },
-    mounted() {
-      //监听禁言通知
-      useChatServer().$on('banned', res => {
-        this.isBanned = res;
-      });
-      //监听全体禁言通知
-      useChatServer().$on('allBanned', res => {
-        this.isBanned = res;
-      });
     },
     methods: {
       settingShow() {
