@@ -139,7 +139,7 @@
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
             this.scrollBottom();
-          } else {
+          } else if (this.roleName != 2) {
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
