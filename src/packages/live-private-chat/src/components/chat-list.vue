@@ -194,7 +194,7 @@
         this.count = 0;
       },
       initEvent() {
-        this.queryChatList();
+        // this.queryChatList();
         this.finishData = true;
       },
       //事件监听
@@ -212,7 +212,7 @@
           let top = e.target.scrollTop;
           if (top < preTop && top < 100) {
             // 向上滚动到50px处
-            this.nextPageChatList();
+            // this.nextPageChatList();
           }
           preTop = top;
         };
