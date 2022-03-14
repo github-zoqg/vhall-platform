@@ -336,6 +336,18 @@
     methods: {
       // 初始化事件
       initEvent() {
+        // 发起端收到同意邀约演示
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
+          if (msg.data.extra_params == this.userId) {
+            this.$message({
+              message: '对方已接受邀请',
+              showClose: true,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+
         // 发起端收到拒绝邀请演示
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
           // 如果申请人是自己, 或者自己不是主持人
