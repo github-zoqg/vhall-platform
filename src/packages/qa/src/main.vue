@@ -129,6 +129,7 @@
       this.listenEvents();
       this.getQaHistoryMsg();
       this.initLoginStatus();
+      this.initInputStatus();
     },
     filters: {},
     methods: {
