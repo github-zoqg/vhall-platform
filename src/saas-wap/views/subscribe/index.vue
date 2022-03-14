@@ -35,6 +35,8 @@
 
         const roomBaseServer = useRoomBaseServer();
         document.title = roomBaseServer.state.languages.curLang.subject;
+        let lang = roomBaseServer.state.languages.lang;
+        this.$i18n.locale = lang.type;
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
           this.goWatchPage(clientType);

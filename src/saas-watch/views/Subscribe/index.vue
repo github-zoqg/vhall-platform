@@ -43,6 +43,8 @@
         await subscribeState();
         const roomBaseServer = useRoomBaseServer();
         document.title = roomBaseServer.state.languages.curLang.subject;
+        let lang = roomBaseServer.state.languages.lang;
+        this.$i18n.locale = lang.type;
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转观看页

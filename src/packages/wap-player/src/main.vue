@@ -249,18 +249,6 @@
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -382,16 +370,8 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
-      this.languageList = this.roomBaseState.languages.langList.map(item => {
-        return langMap[item.language_type];
-      });
-      const curLang = this.roomBaseState.languages.curLang;
-      this.lang =
-        langMap[sessionStorage.getItem('lang')] ||
-        langMap[this.$route.query.lang] ||
-        langMap[curLang.language_type];
-      this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.key);
+      this.languageList = this.roomBaseServer.state.languages.langList;
+      this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
       this.getWebinerStatus();
@@ -670,7 +650,7 @@
       },
       changeLang(key) {
         this.isOpenlang = false;
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       openLanguage() {
