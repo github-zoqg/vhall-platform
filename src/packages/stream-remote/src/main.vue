@@ -15,7 +15,7 @@
 
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
-      <div v-show="false" class="vmp-stream-local__top-presentation">演示中</div>
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
     </section>
 
     <!-- 底部流信息 -->
@@ -25,7 +25,7 @@
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleNameFilter }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
@@ -178,6 +178,7 @@
       </p>
     </section>
     <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -220,6 +221,16 @@
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -238,15 +249,14 @@
       presentationScreen() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
       },
+      //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.stream;
         const sameId = this.presentationScreen === accountId;
         const groupMode = this.liveMode == 6;
-        // const inMainRoomUser = !this.isInGroup && accountId != hostId;
-        // const inGroupRoomUser = this.isInGroup && accountId != groupLeaderId;
-        // const allowedUser = inMainRoomUser || inGroupRoomUser;
-        const allowedUser = true;
-
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
         return sameId && groupMode && allowedUser;
       },
       joinInfo() {
@@ -255,11 +265,17 @@
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
+      // 封面图
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
         return (
           this.mainScreen == this.stream.accountId &&
           this.interactiveServer.state.showPlayIcon &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          this.$domainStore.state.docServer.switchStatus
         );
       },
       isShowSplitScreenPlaceholder() {
@@ -267,6 +283,9 @@
           this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
           this.$domainStore.state.splitScreenServer.role == 'host'
         );
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     filters: {},
@@ -366,9 +385,16 @@
             });
         }
       },
+      // 切换大小窗
       exchange() {
         const roomBaseServer = useRoomBaseServer();
-        roomBaseServer.requestChangeMiniElement('stream-list');
+        let miniElement = '';
+        if (this.isShareScreen) {
+          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+        } else {
+          miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        }
+        roomBaseServer.setChangeElement(miniElement);
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -630,6 +656,12 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
       p {
         width: 108px;
         height: 108px;

@@ -170,7 +170,7 @@
       },
       changePushImage() {
         const thirdBackground = document.querySelector('.vmp-basic-right__hd');
-        thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/saas-v3-lives/static/img/thirdDefault.293fe294.png) no-repeat`;
+        thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
         thirdBackground.style.backgroundSize = '100% 100%';
         thirdBackground.style.backgroundPosition = 'center';
       }
