@@ -190,6 +190,13 @@
               this.desktopShareServer.stopShareScreen();
             }
           }
+          // 演示着变更
+          if (msg.data.type === 'group_manager_enter') {
+            // 自己正在发起桌面共享
+            if (this.isShareScreen && this.third_party_user_id == this.desktopShareInfo.accountId) {
+              this.desktopShareServer.stopShareScreen();
+            }
+          }
         });
       },
       // 订阅流
