@@ -1458,20 +1458,22 @@
       },
       //获取受限人员列表
       async getLimitUserList() {
-        const { getMutedUserList, getKickedUserList } = this.memberServer;
+        const _this = this;
         const data = {
           room_id: this.roomId,
           pos: 0,
           limit: 100
         };
         try {
-          const bannedList = await getMutedUserList(data);
-          const kickedList = this.isInGroup
+          let bannedList = await _this.memberServer.getMutedUserList(data);
+          let kickedList = this.isInGroup
             ? { data: { list: [] } }
-            : await getKickedUserList(data);
-          const list = bannedList.data.list.concat(kickedList.data.list);
+            : await _this.memberServer.getKickedUserList(data);
+          bannedList = bannedList?.data?.list || [];
+          kickedList = kickedList?.data?.list || [];
+          const list = bannedList.concat(kickedList);
           const hash = {};
-          this.limitedUsers = list.reduce((preVal, curVal) => {
+          this.limitedUsers = (list || []).reduce((preVal, curVal) => {
             !hash[curVal.account_id] && (hash[curVal.account_id] = true && preVal.push(curVal));
             return preVal;
           }, []);
