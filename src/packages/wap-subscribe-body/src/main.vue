@@ -166,7 +166,6 @@
       this.playerServer = usePlayerServer();
     },
     created() {
-      this.initPage();
       this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
         return langMap[item.language_type];
       });
@@ -179,6 +178,7 @@
       sessionStorage.setItem('lang', this.lang.key);
     },
     mounted() {
+      this.initPage();
       this.listenEvents();
       if (this.roomBaseServer.state.embedObj.embedVideo) {
         this.showBottomBtn = false;

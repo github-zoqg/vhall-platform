@@ -17,5 +17,5 @@ export function initGlobalAPI() {
   initMixin();
 }
 export const i18n = initI18n();
-
+console.log('i18n', i18n);
 initRoleFilter(i18n);

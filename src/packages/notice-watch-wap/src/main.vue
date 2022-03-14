@@ -16,7 +16,7 @@
 
 <script>
   //  && !this.zIndexObj.Ques && !videoEnd
-  import { useNoticeServer, useRoomBaseServer } from 'middle-domain';
+  import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeWap',
     data() {
@@ -42,12 +42,12 @@
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
     },
     mounted() {
       this.openAnnouncement();
       console.log(this.roomBaseServer, 'useRoomBaseServer123');
       // 监听到 公告
-      this.noticeServer.listenMsg();
       this.noticeServer.$on('room_announcement', msg => {
         this.announcement = {
           content: msg.room_announcement_text,
@@ -59,10 +59,22 @@
         this.timer = setTimeout(() => {
           this.announcement.isShow = false;
         }, 30000);
-        // 直播结束自动关闭公告
-        this.noticeServer.$on('live_over', msg => {
-          this.announcement.isShow = false;
-        });
+      });
+      // 直播结束自动关闭公告
+      this.noticeServer.$on('live_over', () => {
+        this.announcement.isShow = false;
+      });
+      // 结束讨论
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        if (!this.isInGroup) {
+          this.openAnnouncement();
+        }
+      });
+      this.groupServer.$on('GROUP_SWITCH_START', () => {
+        this.announcement.isShow = false;
+      });
+      this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
+        this.announcement.isShow = false;
       });
     },
     methods: {

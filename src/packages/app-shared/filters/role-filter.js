@@ -13,27 +13,28 @@ let i18n;
 function getRoleName(value) {
   const customRoleName = useRoomBaseServer().state.customRoleName;
   let ret = '';
-  switch (Number(value)) {
+  /^\d+$/.test(value) && (value = Number(value));
+  switch (value) {
     case 1:
     case 'host':
-      ret = Vue.prototype.$tdefault(customRoleName[1]);
+      ret = Vue.prototype.$tdefault.call(i18n, customRoleName[1]);
       break;
     case 2:
-      ret = i18n.$t('chat.chat_1063');
+      ret = i18n.t('chat.chat_1063');
       break;
     case 3:
     case 'assistant':
-      ret = Vue.prototype.$tdefault(customRoleName[3]);
+      ret = Vue.prototype.$tdefault.call(i18n, customRoleName[3]);
       break;
     case 4:
-      ret = Vue.prototype.$tdefault(customRoleName[4]);
+      ret = Vue.prototype.$tdefault.call(i18n, customRoleName[4]);
       break;
     case 20:
-      ret = i18n.$t('chat.chat_1064');
+      ret = i18n.t('chat.chat_1064');
       break;
     default:
-      ret = i18n.$t('chat.chat_1062');
-      break;
+      ret = i18n.t('chat.chat_1062');
+      return ret;
   }
   return ret;
 }
