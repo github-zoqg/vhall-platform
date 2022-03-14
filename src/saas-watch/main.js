@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== 'development') {
   // Sentry监控探针
   Sentry.init({
     Vue,
-    dsn: 'https://840242dc84b6435fbe79ebd7850f2a9a@sentry.vhall.com/20',
+    dsn: 'https://840242dc84b6435fbe79ebd7850f2a9a@sentry.vhall.com/19',
     release: `${process.env.VUE_APP_BUILD_VERSION}`,
     // environment 上报的环境 建议 按照 测试、生产区分
     environment: process.env.NODE_ENV,
