@@ -130,7 +130,7 @@
       // 无延迟图片地址
       noDelayIconUrl() {
         const langArr = ['zh-CN', 'en'];
-        const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+        const langer = localStorage.getItem('lang') || this.languagesInfo.language_type;
         const lang = langArr[langer - 1] || 'zh-CN';
         return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       },
