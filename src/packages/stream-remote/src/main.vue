@@ -223,7 +223,9 @@
       },
       //默认的主持人id
       hostId() {
-        return this.$$domainStore.state.roomBaseServer.watchInitData.webinar.userInfo.user_id;
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
       },
       //当前的组长id
       groupLeaderId() {
