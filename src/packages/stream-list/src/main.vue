@@ -1,83 +1,83 @@
 <template>
-  <div
+  <!-- <div
     class="vmp-stream-list-wrapper"
     ref="noDelayStreamContainer"
     :class="{
       'no-delay-layout': isUseNoDelayLayout,
-      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list'
+      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
+      'stream-length': remoteSpeakers.length > 1
     }"
   >
-    <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
-      <!-- 左翻页 -->
-      <span
-        v-show="isShowControlArrow"
-        class="vmp-stream-list__scroll-btn left-btn"
-        @click="scrollStream('left')"
-      >
-        <i class="vh-iconfont vh-line-arrow-left" />
-      </span>
+  </div> -->
+  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
+    <!-- 左翻页 -->
+    <span
+      v-show="isShowControlArrow"
+      class="vmp-stream-list__scroll-btn left-btn"
+      @click="scrollStream('left')"
+    >
+      <i class="vh-iconfont vh-line-arrow-left" />
+    </span>
 
-      <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
-      <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
-        <div class="vmp-stream-list__stream-wrapper-scroll">
+    <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
+    <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
+      <div class="vmp-stream-list__stream-wrapper-scroll">
+        <div
+          class="vmp-stream-list__local-container"
+          :class="{
+            'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
+            'vmp-dom__max':
+              miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen,
+            'vmp-dom__mini':
+              miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
+          }"
+        >
+          <div class="vmp-stream-list__remote-container-h">
+            <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+          </div>
+        </div>
+
+        <template
+          v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
+        >
           <div
-            v-show="localSpeaker.accountId"
-            class="vmp-stream-list__local-container"
+            v-for="speaker in remoteSpeakers"
+            :key="speaker.accountId"
+            class="vmp-stream-list__remote-container"
             :class="{
-              'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
-              'vmp-dom__max':
-                miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen,
-              'vmp-dom__mini':
-                miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen
+              'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+              'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen,
+              'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen
             }"
           >
             <div class="vmp-stream-list__remote-container-h">
-              <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+              <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
             </div>
           </div>
+        </template>
 
-          <template
-            v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
-          >
-            <div
-              v-for="speaker in remoteSpeakers"
-              :key="speaker.accountId"
-              class="vmp-stream-list__remote-container"
-              :class="{
-                'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
-                'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen,
-                'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen
-              }"
-            >
-              <div class="vmp-stream-list__remote-container-h">
-                <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
-              </div>
-            </div>
-          </template>
-
-          <!-- 主持人进入小组后助理占位图 -->
-          <div
-            v-if="mode == 6 && isHostInGroup && !isInGroup"
-            class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
-            :class="{
-              'vmp-dom__mini': miniElement == 'stream-list',
-              'vmp-dom__max': miniElement != 'stream-list'
-            }"
-          >
-            <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
-            小组协作中
-          </div>
+        <!-- 主持人进入小组后助理占位图 -->
+        <div
+          v-if="mode == 6 && isHostInGroup && !isInGroup"
+          class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
+          :class="{
+            'vmp-dom__mini': miniElement == 'stream-list',
+            'vmp-dom__max': miniElement != 'stream-list'
+          }"
+        >
+          <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
+          小组协作中
         </div>
       </div>
-
-      <span
-        v-show="isShowControlArrow"
-        class="vmp-stream-list__scroll-btn right-btn"
-        @click="scrollStream('right')"
-      >
-        <i class="vh-iconfont vh-line-arrow-right" />
-      </span>
     </div>
+
+    <span
+      v-show="isShowControlArrow"
+      class="vmp-stream-list__scroll-btn right-btn"
+      @click="scrollStream('right')"
+    >
+      <i class="vh-iconfont vh-line-arrow-right" />
+    </span>
   </div>
 </template>
 
@@ -397,51 +397,61 @@
     z-index: 10;
   }
 
-  .vmp-stream-list-wrapper {
-    &.no-delay-layout {
-      width: calc(100% - 380px);
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 56px;
+  // .vmp-stream-list-wrapper {
+  //   &.no-delay-layout {
+  //     width: calc(100% - 380px);
+  //     position: absolute;
+  //     top: 0;
+  //     left: 0;
+  //     bottom: 56px;
 
-      &.vmp-dom__mini {
-        right: 0;
-        top: 0;
-        width: 360px;
-        z-index: 10;
-        left: auto;
-        height: 204px;
-        .vmp-stream-list {
-          height: 40px;
-        }
-        .vmp-stream-list__remote-container {
-          width: 72px;
-        }
-        .vmp-stream-list__main-screen {
-          width: 100%;
-          height: 164px;
-        }
-      }
-      .vmp-stream-list {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-      }
-      .vmp-stream-list__main-screen {
-        bottom: 100%;
-        left: 0;
-        top: auto;
-        position: absolute;
-        width: 100%;
-        height: 484px;
-        @media screen and (max-width: 1366px) {
-          height: 350px;
-        }
-      }
-      .vmp-stream-list__stream-wrapper-scroll {
-        justify-content: flex-start;
-      }
-    }
-  }
+  //     &.vmp-dom__mini {
+  //       right: 0;
+  //       top: 0;
+  //       width: 360px;
+  //       z-index: 10;
+  //       left: auto;
+  //       height: 204px;
+  //       .vmp-stream-list {
+  //         height: 40px;
+  //       }
+  //       .vmp-stream-list__remote-container {
+  //         width: 72px;
+  //       }
+  //       .vmp-stream-list__main-screen {
+  //         width: 100%;
+  //         height: 164px;
+  //       }
+  //     }
+  //     .vmp-stream-list {
+  //       position: absolute;
+  //       left: 0;
+  //       bottom: 0;
+  //     }
+  //     .vmp-stream-list__main-screen {
+  //       bottom: 100%;
+  //       left: 0;
+  //       top: auto;
+  //       position: absolute;
+  //       width: 100%;
+  //       height: 100%;
+  //     }
+  //     &.stream-length {
+  //       .vmp-stream-list__main-screen {
+  //         bottom: 100%;
+  //         left: 0;
+  //         top: auto;
+  //         position: absolute;
+  //         width: 100%;
+  //         height: 484px;
+  //         @media screen and (max-width: 1366px) {
+  //           height: 350px;
+  //         }
+  //       }
+  //     }
+  //     .vmp-stream-list__stream-wrapper-scroll {
+  //       justify-content: flex-start;
+  //     }
+  //   }
+  // }
 </style>

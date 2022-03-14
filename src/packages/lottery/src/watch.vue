@@ -66,7 +66,6 @@
     },
     created() {
       this.initMsgEvent();
-      // this.open();
     },
     destroyed() {
       this.removeMsgEvent();
@@ -82,10 +81,6 @@
        */
       accept(msg) {
         this.open(msg.lottery_id);
-        // console.log('accept', msg);
-        // this.setFitment(msg);
-        // this.lotteryView = 'LotteryWin';
-        // this.dialogVisible = true;
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
