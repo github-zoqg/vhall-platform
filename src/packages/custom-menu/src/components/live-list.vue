@@ -73,7 +73,7 @@
       this.customMenuServer = useCustomMenuServer();
     },
     mounted() {
-      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+      // this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
     },
     methods: {
       getLiveTag(val) {

@@ -10,10 +10,20 @@
     </template> -->
     <!-- <template v-else> -->
     <section class="vmp-tab-menu__header">
+      <!-- prev-btn -->
+      <span
+        class="vmp-tab-menu-page-btn prev-btn"
+        v-if="isToggleBtnVisible"
+        :class="{ disabledClick: selectedIndex === 0 }"
+        @click="prev"
+      >
+        <i class="vh-iconfont vh-line-arrow-left" />
+      </span>
+
       <!-- 菜单区域 -->
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
         <li
-          v-for="item of mainMenu"
+          v-for="item of visibleMenu"
           :ref="item.id"
           class="vmp-tab-menu-item"
           :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
@@ -23,39 +33,22 @@
           <span class="item-text">{{ $tdefault(item.name) }}</span>
           <i v-show="item.tipsVisible" class="tips"></i>
         </li>
-        <li
-          v-if="visibleMenu.length > 3"
-          class="vmp-tab-menu-more"
-          :class="{ selected: isSubMenuShow }"
-          @click="toggleSubMenuVisible"
-        >
-          <i class="vh-iconfont vh-full-more"></i>
-        </li>
       </ul>
 
-      <!-- 次级菜单 -->
-      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-        <li
-          class="vmp-tab-menu-sub__item"
-          v-for="item of subMenu"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span>{{ $tdefault(item.name) }}</span>
-          <i class="tips" v-show="item.tipsVisible"></i>
-        </li>
-      </ul>
+      <!-- next btn -->
+      <span
+        v-if="isToggleBtnVisible"
+        class="vmp-tab-menu-page-btn next-btn"
+        :class="{ disabledClick: selectedIndex === menu.length - 1 }"
+        @click="next"
+      >
+        <i class="vh-iconfont vh-line-arrow-right" />
+      </span>
     </section>
 
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
-      <tab-content
-        ref="tabContent"
-        :mainMenu="mainMenu"
-        :subMenu="subMenu"
-        @noticeHint="handleHint"
-        @closePopup="selectDefault"
-      />
+      <tab-content ref="tabContent" :menu="menu" @noticeHint="handleHint" />
     </section>
     <!-- </template> -->
   </section>
@@ -79,16 +72,19 @@
     components: { tabContent },
     data() {
       return {
+        isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
         direciton: 'row', // row(横)，column(纵)
         selectedType: '',
         selectedId: '',
         menu: [],
-        isSubMenuShow: false,
         visibleCondition: 'default',
         tabOptions: {}
       };
     },
     computed: {
+      selectedIndex() {
+        return this.visibleMenu.findIndex(item => item.id === this.selectedId);
+      },
       visibleMenu() {
         return this.menu.filter(item => {
           if (this.visibleCondition === 'living') {
@@ -101,16 +97,6 @@
 
           return item.visible;
         });
-      },
-      mainMenu() {
-        return this.visibleMenu.filter((item, index) => index < 3);
-      },
-      subMenu() {
-        if (this.visibleMenu.length <= 3) return [];
-        return this.visibleMenu.filter((item, index) => index >= 3);
-      },
-      selectedIndex() {
-        return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       // 是否为嵌入页
       embedObj() {
@@ -125,6 +111,12 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
+    watch: {
+      async 'visibleMenu.length'() {
+        await this.$nextTick();
+        this.scrollToItem({ id: this.selectedId });
       }
     },
     beforeCreate() {
@@ -186,15 +178,17 @@
 
         // 直播中、结束直播更改状态
         msgServer.$onMsg('ROOM_MSG', msg => {
+          const { clientType } = useRoomBaseServer().state;
+
           if (msg.data.type === 'live_start') {
             this.setVisibleCondition('living');
           }
 
           if (msg.data.type === 'live_over') {
             this.setVisibleCondition('live_over');
-            this.setVisible({ visible: false, type: 3 }); // chat
             this.setVisible({ visible: false, type: 'private' }); // private-chat
             this.setVisible({ visible: false, type: 'v5' }); // qa
+            clientType === 'send' && this.selectDefault();
           }
         });
 
@@ -246,11 +240,10 @@
         const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
-        console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
         }
-        // TODO: temp，增加私聊
+
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
           this.addItemByIndex(chatIndex + 1, {
@@ -269,6 +262,26 @@
         }
       },
       /**
+       * 选中当前项左边一项
+       */
+      prev() {
+        if (this.selectedIndex === 0) return;
+        const index = this.selectedIndex - 1;
+        const item = this.visibleMenu[index];
+        const { type, id } = item;
+        this.select({ type, id });
+      },
+      /**
+       * 选中当前想右边一项
+       */
+      next() {
+        if (this.selectedIndex >= this.visibleMenu.length - 1) return;
+        const index = this.selectedIndex + 1;
+        const item = this.visibleMenu[index];
+        const { type, id } = item;
+        this.select({ type, id });
+      },
+      /**
        * 设置显示条件
        * @param {String} condition [default|living|predition]
        */
@@ -277,19 +290,14 @@
       },
       /**
        * 选中默认的菜单项（第一项）
+       *
        */
       selectDefault() {
-        // 选择默认项
-        if (this.visibleMenu.length > 0) {
-          const { type, id } = this.visibleMenu[0];
-          this.select({ type, id });
-        }
-      },
-      /**
-       * 切换次级菜单的显隐
-       */
-      toggleSubMenuVisible() {
-        this.isSubMenuShow = !this.isSubMenuShow;
+        if (this.visibleMenu.length === 0) return;
+
+        const item = this.visibleMenu[0];
+        const { type, id } = item;
+        this.select({ type, id });
       },
       /**
        * 删除某个位置的菜单项
@@ -338,10 +346,11 @@
        * @param {String} cuid cuid
        * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
-      setVisible({ visible = true, type, id }) {
+      async setVisible({ visible = true, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
+
         if (tab.id == this.selectedId) {
           visible === false && this.jumpToNearestItemById(tab.id);
         }
@@ -367,7 +376,7 @@
        */
       setTipsVisible({ visible, type, id }) {
         const tab = this.getItem({ type, id });
-        if (!tab) return;
+        if (!tab || this.selectedId === tab.id) return;
         tab.tipsVisible = visible;
       },
       handleHint(cuid) {
@@ -403,18 +412,39 @@
       },
 
       /**
+       *
+       * @param {String} cuid
+       * @param {String|Number} menuId
+       */
+      async scrollToItem({ id }) {
+        const rectArr = this.visibleMenu.map(item => {
+          const id = item.id;
+          const ref = this.$refs[id][0];
+          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
+          const left = ref.offsetLeft - paddingLeft;
+          return { id, ref, left };
+        });
+
+        const positionItem = rectArr.find(item => item.id === id);
+
+        this.$refs['menu'].scrollTo({
+          left: positionItem.left,
+          behavior: 'smooth'
+        });
+      },
+
+      /**
        * 选中一个菜单项，并显示对应内容
        * @param {String} type tab类型
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
       select({ type, id = '' }) {
-        this.selectedType = type;
-        this.selectedId = id;
-
-        this.isSubMenuShow = false;
-
         const item = this.getItem({ type, id });
+
+        this.selectedType = item.type;
+        this.selectedId = item.id;
+        this.scrollToItem({ id: item.id });
         item.tipsVisible = false;
 
         this.$refs['tabContent'].switchTo(item); // tab-content视图切换
@@ -458,6 +488,7 @@
 
     &__header {
       position: relative;
+      padding: 0 24px;
       width: 100%;
       height: 90px;
       flex: 0 0 auto;
@@ -472,6 +503,31 @@
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
       }
+
+      .vmp-tab-menu-page-btn {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 24px;
+        height: 100%;
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        height: 100%;
+        cursor: pointer;
+
+        &.disabledClick:hover {
+          cursor: auto;
+          i {
+            color: @font-light-low;
+          }
+        }
+
+        &:hover {
+          color: #666;
+        }
+      }
     }
 
     &__main {
@@ -483,13 +539,13 @@
     .vmp-tab-menu-scroll-container {
       height: 100%;
       flex: 1 1 auto;
-      overflow-y: scroll;
+      overflow-x: auto;
       display: flex;
       flex-wrap: nowrap;
-      overflow: hidden;
+      overflow-x: auto;
       .vmp-tab-menu-item {
-        flex: 1 1 auto;
-        width: calc((100% - 100px) / 4);
+        flex: 0 0 auto;
+        min-width: 33%;
         position: relative;
         display: inline-flex;
         height: 100%;
@@ -547,56 +603,6 @@
           .bottom-line {
             display: block;
           }
-        }
-      }
-
-      .vmp-tab-menu-more {
-        height: 100%;
-        width: 100px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-
-        &.selected {
-          background-color: #f3f3f3;
-        }
-      }
-    }
-
-    .vmp-tab-menu-sub {
-      position: relative;
-      font-size: 32px;
-      position: absolute;
-      top: 90px;
-      left: 0;
-      right: 0;
-      z-index: 22; // 危险值
-      background-color: #f3f3f3;
-      color: #444;
-      width: 100%;
-      max-height: 352px;
-      overflow-y: scroll;
-
-      &__item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 88px;
-        padding: 0 40px;
-
-        &:not(:last-child) {
-          border-bottom: 1px solid #d4d4d4;
-        }
-
-        .tips {
-          display: inline-block;
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
-          background: #ff0005;
-          border: 9px solid #ff0005;
         }
       }
     }

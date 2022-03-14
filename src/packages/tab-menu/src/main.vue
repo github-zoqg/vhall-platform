@@ -80,14 +80,14 @@
         // PC端要排除文档菜单
         return this.menu.filter(item => {
           if (this.visibleCondition === 'living') {
-            return (item.status == 1 || item.status == 3) && item.visible && item.type != 2;
+            return (item.status == 1 || item.status == 3) && item.visible;
           }
 
           if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
-            return (item.status == 1 || item.status == 4) && item.visible && item.type != 2;
+            return (item.status == 1 || item.status == 4) && item.visible;
           }
 
-          return item.visible && item.type != 2;
+          return item.visible;
         });
       },
       isSubscribe() {
@@ -158,6 +158,8 @@
 
         // 直播中、结束直播更改状态
         msgServer.$onMsg('ROOM_MSG', msg => {
+          const { clientType } = useRoomBaseServer().state;
+
           if (msg.data.type === 'live_start') {
             this.setVisibleCondition('living');
           }
@@ -166,6 +168,7 @@
             this.setVisibleCondition('live_over');
             this.setVisible({ visible: false, type: 'private' }); // private-chat
             this.setVisible({ visible: false, type: 'v5' }); // qa
+            clientType === 'send' && this.selectDefault();
           }
         });
         //监听进出子房间消息
@@ -234,7 +237,11 @@
        * 选中默认的菜单项（第一项）
        */
       selectDefault() {
-        this.select({ type: 3 });
+        if (this.visibleMenu.length === 0) return;
+
+        const item = this.visibleMenu[0];
+        const { type, id } = item;
+        this.select({ type, id });
       },
       /**
        * 选中当前项左边一项
@@ -370,7 +377,7 @@
        */
       setTipsVisible({ visible, type, id }) {
         const tab = this.getItem({ type, id });
-        if (!tab) return;
+        if (!tab || this.selectedId === tab.id) return;
 
         tab.tipsVisible = visible;
       },
@@ -401,8 +408,8 @@
         }
 
         // 前后都没有清空任何选择(基本不会发生的极端情况)
-        this.selectedId = '';
-        this.selectedType = '';
+        // this.selectedId = '';
+        // this.selectedType = '';
       }
     }
   };
