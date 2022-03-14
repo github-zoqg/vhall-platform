@@ -94,7 +94,7 @@
         <li
           data-value="move"
           title="移动"
-          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
           :class="{ selected: canMove }"
         ></li>
         <li
@@ -1061,6 +1061,11 @@
         padding: 7px 10px;
 
         &.selected {
+          color: #fc5659;
+        }
+      }
+      .doc-pagebar__opt--move {
+        &:hover {
           color: #fc5659;
         }
       }
