@@ -67,6 +67,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      z-index: 1;
       img {
         position: absolute;
         top: 0;

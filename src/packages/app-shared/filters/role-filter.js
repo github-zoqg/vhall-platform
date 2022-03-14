@@ -33,8 +33,9 @@ function getRoleName(value) {
       break;
     default:
       ret = i18n.$t('chat.chat_1062');
-      return ret;
+      break;
   }
+  return ret;
 }
 
 Vue.prototype.$getRoleName = getRoleName;
