@@ -317,7 +317,7 @@
     methods: {
       // 恢复播放
       replayPlay() {
-        const videos = document.querySelectorAll('video');
+        const videos = document.querySelectorAll('.vmp-stream-remote video');
         videos.length > 0 &&
           videos.forEach(video => {
             video.play();
@@ -340,7 +340,7 @@
             this.getLevel();
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
             setTimeout(() => {
-              const list = document.getElementsByTagName('video');
+              const list = document.querySelectorAll('.vmp-stream-remote video');
               for (const item of list) {
                 item.play();
               }
