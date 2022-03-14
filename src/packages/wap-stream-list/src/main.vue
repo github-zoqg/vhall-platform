@@ -206,7 +206,11 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
+         * 4. 没有互动实例的时候高度为0
          */
+        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+          return true;
+        }
         if (!this.remoteSpeakers.length) {
           if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;
