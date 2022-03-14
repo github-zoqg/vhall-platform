@@ -309,9 +309,8 @@
     position: relative;
     .winner-info-form {
       width: 260px;
-      height: 150px;
+      // height: 150px;
       margin-top: 24px;
-
       .required-flag {
         position: absolute;
         color: #666666;
