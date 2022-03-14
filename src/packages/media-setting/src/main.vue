@@ -82,7 +82,7 @@
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
-  import { useMediaSettingServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
 
   import { getDiffObject } from './js/getDiffObject';
   import { LIVE_MODE_MAP } from './js/liveMap';
@@ -120,7 +120,6 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
-      this.msgServer = useMsgServer();
     },
     created() {
       this._originCaptureState = {};
@@ -135,21 +134,12 @@
         this.alertText = text;
         this.isConfirmVisible = true;
       });
-
-      this.listenEvents();
     },
     beforeDestroy() {
       mediaSettingConfirm.destory();
-      this.msgServer.removeEvents();
+      this.removeEvents();
     },
     methods: {
-      listenEvents() {
-        this._onLiveOver = () => sessionStorage.setItem('selectedRate', '');
-        this.msgServer.$on('live_over', this._onLiveOver);
-      },
-      removeEvents() {
-        this.msgServer.$off('live_over', this._onLiveOver);
-      },
       showMediaSetting() {
         this.isShow = true;
         this.restart();

@@ -63,6 +63,10 @@
       // 是否开启第三方推流
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
+      },
+      // 桌面共享推流用户信息
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
       }
     },
     beforeCreate() {
@@ -166,7 +170,9 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
-            if (this.isShareScreen && this.role != 1) {
+
+            // 如果自己是推送桌面共享
+            if (this.isShareScreen && this.desktopShareInfo.accounId == this.userId) {
               vn.setDisableState(false);
               vn.setText('关闭共享');
               vn.setSelectedState(true);

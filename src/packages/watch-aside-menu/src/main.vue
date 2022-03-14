@@ -202,9 +202,10 @@
           this.$message.success(`${msg.data.nick_name}设置成为${str}`);
         });
         // 切换小组,小组人员变动
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, groupJoinChangeInfo) => {
           if (this.isInGroup) {
             const { watchInitData } = useRoomBaseServer().state;
+            if (groupJoinChangeInfo && groupJoinChangeInfo.isNeedCare === false) return;
             const who = msg.sender_id == watchInitData.webinar.userinfo.user_id ? '主持人' : '助理';
             this.grouAlert(`${who}已将您分配至${this.groupServer.state.groupInitData.name}`);
           }
