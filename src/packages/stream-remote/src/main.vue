@@ -15,7 +15,7 @@
 
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
-      <div v-show="false" class="vmp-stream-local__top-presentation">演示中</div>
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
     </section>
 
     <!-- 底部流信息 -->
@@ -220,6 +220,14 @@
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
+      //默认的主持人id
+      hostId() {
+        return this.$$domainStore.state.roomBaseServer.watchInitData.webinar.userInfo.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -238,15 +246,14 @@
       presentationScreen() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
       },
+      //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.stream;
         const sameId = this.presentationScreen === accountId;
         const groupMode = this.liveMode == 6;
-        // const inMainRoomUser = !this.isInGroup && accountId != hostId;
-        // const inGroupRoomUser = this.isInGroup && accountId != groupLeaderId;
-        // const allowedUser = inMainRoomUser || inGroupRoomUser;
-        const allowedUser = true;
-
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
         return sameId && groupMode && allowedUser;
       },
       joinInfo() {
