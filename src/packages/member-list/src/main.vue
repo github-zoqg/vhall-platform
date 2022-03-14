@@ -416,7 +416,7 @@
       getCurrentSpeakerList() {
         return this.isInGroup
           ? this.groupInitData['speaker_list'] || []
-          : this.interactToolStatus['speaker_list'] || [];
+          : this.micServer.state.speakerList || [];
       }
     },
     methods: {
@@ -721,6 +721,7 @@
               return;
             }
 
+            console.log(_this.getCurrentSpeakerList, '当前正在上麦的人员.........');
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
@@ -1916,7 +1917,9 @@
       },
       //查找用户在数组的索引号
       _getUserIndex(accountId, list) {
-        return list.findIndex(item => item.account_id === accountId);
+        return list.findIndex(
+          item => item.account_id === accountId || item.accountId === accountId
+        );
       },
       //加载更多
       loadMore() {
