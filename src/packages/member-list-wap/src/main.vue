@@ -71,17 +71,17 @@
         const mapList = [
           {
             code: 1,
-            name: this.$t('chat.chat_1022'),
+            name: this.$getRoleName(1),
             className: 'info-role--host'
           },
           {
             code: 3,
-            name: this.$t('chat.chat_1024'),
+            name: this.$getRoleName(3),
             className: 'info-role--assistant'
           },
           {
             code: 4,
-            name: this.$t('chat.chat_1023'),
+            name: this.$getRoleName(4),
             className: 'info-role--guest'
           }
         ];
