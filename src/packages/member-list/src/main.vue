@@ -414,9 +414,7 @@
       },
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
-        return this.isInGroup
-          ? this.groupInitData['speaker_list'] || []
-          : this.micServer.state.speakerList || [];
+        return this.micServer.state.speakerList;
       }
     },
     methods: {
@@ -721,7 +719,6 @@
               return;
             }
 
-            console.log(_this.getCurrentSpeakerList, '当前正在上麦的人员.........');
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
@@ -750,6 +747,9 @@
                 ![null, void 0, ''].includes(context.groupInitData.join_role)
               ) {
                 user.role_name = context.groupInitData.join_role;
+                user.is_banned = isNaN(Number(context.groupInitData.is_banned))
+                  ? 0
+                  : Number(context.groupInitData.is_banned);
               }
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
