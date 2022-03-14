@@ -307,6 +307,21 @@
           this.initRemoteInsertFile();
         }
       },
+      // 插播文件更改
+      async inertFileChange(video, type) {
+        // 如果当前正在插播中，需要先结束现有插播
+        if (this.insertFileServer.state.isInsertFilePushing) {
+          await this.closeInsertvideoHandler();
+        }
+        // 更新选择插播的文件
+        this.insertFileServer.setInsertFileType(type);
+        if (type == 'local') {
+          this.insertFileServer.setLocalInsertFile(video);
+        } else {
+          this.insertFileServer.setRemoteInsertFile(video);
+        }
+        this.startInertFile();
+      },
       // 初始化本地插播,创建video标签播放本地文件
       async initLocalInsertFile() {
         this._videoEnded = false; // 本地插播文件是否播放结束
