@@ -141,10 +141,7 @@
       },
       // 是否正在第三方推流
       thirtPushStreamimg() {
-        return (
-          this.roomBaseServer.state.isThirdStream &&
-          this.roomBaseServer.state.watchInitData.webinar.type == 1
-        );
+        return this.roomBaseServer.state.isThirdStream;
       }
     },
     data() {
