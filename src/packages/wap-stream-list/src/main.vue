@@ -109,18 +109,6 @@
   import BScroll from '@better-scroll/core';
   import { Toast, Dialog } from 'vant';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpWapStreamList',
 
@@ -274,16 +262,8 @@
 
     async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
-      this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
-        return langMap[item.language_type];
-      });
-      const curLang = this.roomBaseServer.state.languages.curLang;
-      this.lang =
-        langMap[sessionStorage.getItem('lang')] ||
-        langMap[this.$route.query.lang] ||
-        langMap[curLang.language_type];
-      this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.key);
+      this.languageList = this.roomBaseServer.state.languages.langList;
+      this.lang = this.roomBaseServer.state.languages.lang;
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
         return Toast(`浏览器不支持互动`);
@@ -485,7 +465,7 @@
       },
       changeLang(key) {
         this.isOpenlang = false;
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       openLanguage() {

@@ -126,18 +126,6 @@
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -247,16 +235,8 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       if (this.isEmbed) {
-        this.languageList = this.roomBaseState.languages.langList.map(item => {
-          return langMap[item.language_type];
-        });
-        const curLang = this.roomBaseState.languages.curLang;
-        this.lang =
-          langMap[sessionStorage.getItem('lang')] ||
-          langMap[this.$route.query.lang] ||
-          langMap[curLang.language_type];
-        this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.key);
+        this.languageList = this.roomBaseState.languages.langList;
+        this.lang = this.roomBaseServer.state.languages.lang;
       }
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
@@ -318,7 +298,7 @@
         this[data] = url;
       },
       changeLang(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       needLogin() {
