@@ -19,7 +19,7 @@
         <p class="msg-item__content-name clearfix">
           <span class="msg-item_content-name-nick">{{ source.answer.nick_name }}</span>
           <span class="msg-item_content-name-role" :class="source.answer.role_name">
-            {{ source.answer.role_name | roleFilter(this) }}
+            {{ source.answer.role_name | roleFilter }}
           </span>
           <span class="msg-item__content-time">{{ source.answer.created_time.slice(-8) }}</span>
         </p>
@@ -104,22 +104,22 @@
         } else {
           return val;
         }
-      },
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (value) {
-          case 'host':
-            ret = vm.$tdefault(vm.customRoleName[1]);
-            break;
-          case 'assistant':
-            ret = vm.$tdefault(vm.customRoleName[3]);
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
       }
+      // //角色转换
+      // roleFilter: (value, vm) => {
+      //   let ret = '';
+      //   switch (value) {
+      //     case 'host':
+      //       ret = vm.$tdefault(vm.customRoleName[1]);
+      //       break;
+      //     case 'assistant':
+      //       ret = vm.$tdefault(vm.customRoleName[3]);
+      //       break;
+      //     default:
+      //       ret = vm.$t('chat.chat_1062');
+      //   }
+      //   return ret;
+      // }
     },
     computed: {
       customRoleName() {
