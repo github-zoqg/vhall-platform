@@ -345,8 +345,8 @@
         });
 
         // 切换小组,小组人员变动
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          if (this.isInGroup) {
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, changeInfo) => {
+          if (changeInfo.isNeedCare && this.isInGroup) {
             this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
           }
         });
