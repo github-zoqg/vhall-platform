@@ -48,7 +48,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleNameFilter }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -269,18 +269,7 @@
         );
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
