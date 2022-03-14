@@ -8,18 +8,18 @@
             :class="{ active: activeTab === 'invite' }"
             @click="changeTab('invite')"
           >
-            邀请榜
+            {{ $t('nav.nav_1032') }}
           </span>
           <span
             v-if="info.rewardSwitch == 1"
             :class="{ active: activeTab === 'award' }"
             @click="changeTab('award')"
           >
-            打赏榜
+            {{ $t('nav.nav_1033') }}
           </span>
         </div>
         <div class="rank-rule" @click="changeRulesShow">
-          {{ activeTab == 'invite' ? '邀请榜' : '打赏榜' }}规则
+          {{ activeTab == 'invite' ? $t('nav.nav_1034') : $t('nav.nav_1035') }}
           <span
             class="iconfont rank-icon"
             :class="{ iconjiantou_shouqi: !showRules, iconjiantou_zhankai: showRules }"
@@ -30,7 +30,7 @@
       <div v-show="showRules" class="ranking-box watch-area">
         <div v-show="activeTab === 'invite'" class="rank-con" v-html="info.inContent"></div>
         <div v-show="activeTab === 'invite' && !info.inContent" class="rank-con center">
-          什么规则都没有
+          {{ $t('nav.nav_1036') }}
         </div>
         <div
           v-show="activeTab === 'award' && info.rewardContent"
@@ -38,7 +38,7 @@
           v-html="info.rewardContent"
         ></div>
         <div v-show="activeTab === 'award' && !info.rewardContent" class="rank-con center">
-          什么规则都没有
+          {{ $t('nav.nav_1036') }}
         </div>
       </div>
 
@@ -61,11 +61,16 @@
               <img v-else class="avatar" :src="item.img_url" alt="" />
               <span class="nickname">{{ item.nick_name | filterNickname }}</span>
               <span class="num">
-                邀请
+                <i18n path="nav.nav_1037">
+                  <span style="color: #fb3a32" place="n">
+                    &nbsp;{{ item.invites | filterInvitePeople }}&nbsp;
+                  </span>
+                </i18n>
+                <!-- 邀请
                 <span style="color: #fb3a32">
                   &nbsp;{{ item.invites | filterInvitePeople }}&nbsp;
                 </span>
-                人
+                人 -->
               </span>
             </div>
             <div
@@ -78,7 +83,7 @@
           </template>
           <template v-else>
             <img class="default-icon" src="../assets/imgs/empty-pay.png" alt="" />
-            <span class="default-tip">您还未邀请,快去抢沙发吧~</span>
+            <span class="default-tip">{{ $t('nav.nav_1038') }}</span>
           </template>
         </div>
         <div v-show="activeTab == 'award'" class="band-list">
@@ -99,9 +104,14 @@
               <img v-else class="avatar" :src="item.avatar" alt="" />
               <span class="nickname">{{ item.nickname | filterNickname }}</span>
               <span class="num">
-                打赏
+                <i18n path="interact_tools.interact_tools_1073">
+                  <span style="color: #fc5659" place="n">
+                    ¥{{item.reward_amount | filterAmount)}}
+                  </span>
+                </i18n>
+                <!-- 打赏
                 <span style="color: #fc5659">{{ item.reward_amount | filterAmount }}</span>
-                元
+                元 -->
               </span>
             </div>
             <div
@@ -114,13 +124,13 @@
           </template>
           <template v-else>
             <img class="default-icon" src="../assets/imgs/empty-reward.png" alt />
-            <span class="default-tip">土豪,求打赏!</span>
+            <span class="default-tip">{{ $t('nav.nav_1041') }}</span>
           </template>
         </div>
       </div>
 
       <div v-if="open == 1" class="invite-friends">
-        <span @click="showInviteFriends">邀请好友观看</span>
+        <span @click="showInviteFriends">{{ $t('nav.nav_1042') }}</span>
       </div>
     </div>
   </div>
@@ -142,14 +152,14 @@
       filterInvitePeople(val) {
         const num = Number(val);
         if (num > 10000) {
-          return (num / 10000).toFixed(2) + '万';
+          return (num / 10000).toFixed(2) + this.$t('common.common_1014');
         }
         return parseInt(num);
       },
       filterAmount(val) {
         const num = Number(val);
         if (num > 10000) {
-          return (num / 10000).toFixed(2) + '万';
+          return (num / 10000).toFixed(2) + this.$t('common.common_1014');
         }
         return num.toFixed(2);
       }
@@ -365,7 +375,7 @@
         const awardOver = this.awardPage.pos + this.awardPage.limit >= this.awardPage.total;
 
         if (inviteOver || awardOver) {
-          this.bottomText = '已经到底啦~';
+          this.bottomText = this.$t('nav.nav_1043');
           this.showBottom = true;
         } else {
           this.bottomText = '';

@@ -63,7 +63,7 @@
     >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleNameFilter }}
+          {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
           :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
@@ -322,18 +322,7 @@
         return this.$domainStore.state.interactiveServer.localStream;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -633,6 +622,14 @@
       },
       // 开始推流
       async startPush() {
+        // 第三方推流直接开始直播
+        if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
+          // 派发事件
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
+          );
+          return;
+        }
         try {
           // 创建本地流
           await this.createLocalStream();
@@ -657,9 +654,10 @@
           }
           // 分组活动 自动上麦默认禁音
           if (this.autoSpeak) {
-            this.interactiveServer.muteAudio({
-              streamId: this.localStream.streamId, // 流Id, 必填
-              isMute: true // true为禁用，false为启用。
+            this.interactiveServer.setDeviceStatus({
+              device: 1, // 1:audio    2:video
+              status: 0, // 0:禁音    1:打开麦克风
+              receive_account_id: this.joinInfo.third_party_user_id
             });
           }
           // 派发事件

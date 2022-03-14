@@ -43,7 +43,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          热度 &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -293,9 +293,6 @@
         if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           this.createBScroll();
         }
-        if (window.orientation == 90 || window.orientation == -90) {
-          this.setFullScreen();
-        }
       }
 
       this.addSDKEvents();
@@ -372,13 +369,6 @@
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
           this.gobackHome(7, '', msg);
         });
-
-        // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
-        window.addEventListener('orientationchange', () => {
-          if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
-            this.setFullScreen();
-          }
-        });
       },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
@@ -404,13 +394,13 @@
             title = '组长身份已变更';
             break;
         }
-        if (index == 1) {
+        if (index == 5 || index == 7) {
+          Toast(title);
+        } else {
           await Dialog.alert({
             title: this.$t('account.account_1061'),
             message: title
           });
-        } else {
-          Toast(title);
         }
       },
 

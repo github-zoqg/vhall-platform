@@ -22,7 +22,7 @@
             class="role"
             :class="source.roleName | roleClassFilter"
           >
-            {{ source.roleName | roleFilter(this) }}
+            {{ source.roleName | roleFilter }}
           </span>
           <span class="nickname">{{ source.nickname }}</span>
         </p>
@@ -63,27 +63,6 @@
       }
     },
     filters: {
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = vm.$tdefault(vm.customRoleName[1]);
-            break;
-          case 3:
-            ret = vm.$tdefault(vm.customRoleName[3]);
-            break;
-          case 4:
-            ret = vm.$tdefault(vm.customRoleName[4]);
-            break;
-          case 20:
-            ret = vm.$t('chat.chat_1064');
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人

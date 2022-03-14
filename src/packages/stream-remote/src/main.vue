@@ -12,6 +12,12 @@
           stream.videoMuted && !isShowSplitScreenPlaceholder
       }"
     ></section>
+
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="false" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom">
       <span
@@ -42,7 +48,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleNameFilter }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -211,6 +217,9 @@
       }
     },
     computed: {
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -225,6 +234,20 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      presentationScreen() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+      },
+      isShowPresentationScreen() {
+        const { accountId } = this.stream;
+        const sameId = this.presentationScreen === accountId;
+        const groupMode = this.liveMode == 6;
+        // const inMainRoomUser = !this.isInGroup && accountId != hostId;
+        // const inGroupRoomUser = this.isInGroup && accountId != groupLeaderId;
+        // const allowedUser = inMainRoomUser || inGroupRoomUser;
+        const allowedUser = true;
+
+        return sameId && groupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -246,18 +269,7 @@
         );
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -536,6 +548,28 @@
         }
       }
     }
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     // 遮罩层样式
     .vmp-stream-remote__shadow-box {
       width: 100%;

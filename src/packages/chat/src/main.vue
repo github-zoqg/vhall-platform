@@ -18,7 +18,7 @@
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
+        :keeps="20"
         :data-key="'count'"
         :data-sources="renderList"
         :data-component="MsgItem"

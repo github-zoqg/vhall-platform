@@ -17,7 +17,7 @@
     <!-- 推桌面共享时占位图 -->
     <div
       class="vmp-desktop-screen__tip"
-      v-show="isShareScreen && desktopShareInfo.accountId == accountId && role == 1"
+      v-show="isShareScreen && desktopShareInfo.accountId == accountId && role != 2"
     >
       <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
       <br />
@@ -57,7 +57,8 @@
     useMediaSettingServer,
     useInteractiveServer,
     useGroupServer,
-    useDesktopShareServer
+    useDesktopShareServer,
+    useMsgServer
   } from 'middle-domain';
   // import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -82,9 +83,6 @@
       third_party_user_id() {
         return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
       },
-      presentation_screen() {
-        return this.roomBaseServer.state.interactToolStatus.presentation_screen;
-      },
       // 是否观看端
       isWatch() {
         return this.roomBaseServer.state.clientType !== 'send';
@@ -99,10 +97,19 @@
       isShareScreen() {
         return this.desktopShareServer.state.localDesktopStreamId;
       },
+      presentation_screen() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.presentation_screen;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.presentation_screen;
+        }
+      },
       isShowWrapper() {
         return (
           (this.isShareScreen &&
-            (this.presentation_screen != this.third_party_user_id || this.role == 1)) ||
+            (this.presentation_screen != this.third_party_user_id ||
+              this.role == 1 ||
+              this.role == 4)) ||
           this.popAlert.visible ||
           this.isShowAccessDeniedAlert
         );
@@ -158,6 +165,31 @@
         });
         this.desktopShareServer.$on('screen_stream_remove', () => {
           this.desktopShareServer.unSubscribeDesktopShareStream();
+        });
+
+        useMsgServer().$onMsg('ROOM_MSG', msg => {
+          // 主讲人变更
+          if (msg.data.type === 'vrtc_speaker_switch') {
+            // 自己正在发起桌面共享
+            if (
+              this.isShareScreen &&
+              this.third_party_user_id == this.desktopShareInfo.accountId &&
+              msg.data.target_id != this.third_party_user_id
+            ) {
+              this.desktopShareServer.stopShareScreen();
+            }
+          }
+          // 演示着变更
+          if (msg.data.type === 'vrtc_presentation_screen_set') {
+            // 自己正在发起桌面共享
+            if (
+              this.isShareScreen &&
+              this.third_party_user_id == this.desktopShareInfo.accountId &&
+              msg.data.target_id != this.third_party_user_id
+            ) {
+              this.desktopShareServer.stopShareScreen();
+            }
+          }
         });
       },
       // 订阅流
@@ -260,7 +292,7 @@
     height: 100%;
     background: #2d2d2d;
     position: relative;
-
+    display: flex;
     &__tip {
       text-align: center;
       position: absolute;

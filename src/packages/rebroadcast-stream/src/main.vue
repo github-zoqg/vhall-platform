@@ -80,6 +80,7 @@
       },
       async close() {
         this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
         this.isShow = false;
       },
       exchangeScreen() {
