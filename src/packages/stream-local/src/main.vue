@@ -654,9 +654,10 @@
           }
           // 分组活动 自动上麦默认禁音
           if (this.autoSpeak) {
-            this.interactiveServer.muteAudio({
-              streamId: this.localStream.streamId, // 流Id, 必填
-              isMute: true // true为禁用，false为启用。
+            this.interactiveServer.setDeviceStatus({
+              device: 1, // 1:audio    2:video
+              status: 0, // 0:禁音    1:打开麦克风
+              receive_account_id: this.joinInfo.third_party_user_id
             });
           }
           // 派发事件

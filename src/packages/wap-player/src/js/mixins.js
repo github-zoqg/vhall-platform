@@ -88,15 +88,15 @@ const playerMixins = {
           window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
         });
       }
-      // 横屏逻辑
-      window.addEventListener('orientationchange', () => {
-        if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
-          this.isOrientation = true;
-          this.setFullScreen();
-        } else {
-          this.isOrientation = false;
-        }
-      });
+      // 横屏逻辑 和佳佳沟通暂时不加
+      // window.addEventListener('orientationchange', () => {
+      //   if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
+      //     this.isOrientation = true;
+      //     this.setFullScreen();
+      //   } else {
+      //     this.isOrientation = false;
+      //   }
+      // });
     },
     initSlider() {
       this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {

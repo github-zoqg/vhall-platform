@@ -11,7 +11,7 @@
         <img v-if="!giftInfo.hoverImg" class="gift-info-pic" :src="giftInfo.image_url" />
         <img v-else class="gift-info-pic" :src="giftInfo.hoverImg" />
         <div class="gift-info-cont">
-          <span class="name">{{ $t(giftInfo.name) }}</span>
+          <span class="name">{{ $tdefault(giftInfo.name) }}</span>
           <div class="price">
             <span>
               ￥{{
