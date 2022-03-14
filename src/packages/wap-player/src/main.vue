@@ -395,12 +395,12 @@
     },
     mounted() {
       this.getWebinerStatus();
-      if (window.orientation == 90 || window.orientation == -90) {
-        this.isOrientation = true;
-        this.setFullscreen();
-      } else {
-        this.isOrientation = false;
-      }
+      // if (window.orientation == 90 || window.orientation == -90) {
+      //   this.isOrientation = true;
+      //   this.setFullscreen();
+      // } else {
+      //   this.isOrientation = false;
+      // }
     },
     methods: {
       startPlay() {
