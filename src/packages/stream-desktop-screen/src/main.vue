@@ -82,9 +82,6 @@
       third_party_user_id() {
         return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
       },
-      presentation_screen() {
-        return this.roomBaseServer.state.interactToolStatus.presentation_screen;
-      },
       // 是否观看端
       isWatch() {
         return this.roomBaseServer.state.clientType !== 'send';
@@ -98,6 +95,13 @@
       },
       isShareScreen() {
         return this.desktopShareServer.state.localDesktopStreamId;
+      },
+      presentation_screen() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.presentation_screen;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.presentation_screen;
+        }
       },
       isShowWrapper() {
         return (
@@ -260,7 +264,7 @@
     height: 100%;
     background: #2d2d2d;
     position: relative;
-
+    display: flex;
     &__tip {
       text-align: center;
       position: absolute;
