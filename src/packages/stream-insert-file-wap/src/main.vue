@@ -64,7 +64,6 @@
   #vmp-wap-insert-file {
     width: 100%;
     height: 100%;
-    background: #2d2d2d;
     position: absolute;
     top: 0;
     left: 0;
