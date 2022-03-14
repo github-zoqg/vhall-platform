@@ -234,7 +234,10 @@
         });
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
           const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
-          // const text = this.$getRoleName(msg.room_role);
+          let text = this.$getRoleName(msg.room_role);
+          if (msg.room_role !== 1) {
+            text = `${text}${join_info.nickname}`;
+          }
           useChatServer().addChatToList({
             nickname: '问卷',
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
