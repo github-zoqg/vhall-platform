@@ -267,6 +267,9 @@
           this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
           this.$domainStore.state.splitScreenServer.role == 'host'
         );
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     filters: {
@@ -377,9 +380,16 @@
             });
         }
       },
+      // 切换大小窗
       exchange() {
         const roomBaseServer = useRoomBaseServer();
-        roomBaseServer.requestChangeMiniElement('stream-list');
+        let miniElement = '';
+        if (this.isShareScreen) {
+          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+        } else {
+          miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        }
+        roomBaseServer.setChangeElement(miniElement);
       },
       getLevel() {
         // 麦克风音量查询计时器
