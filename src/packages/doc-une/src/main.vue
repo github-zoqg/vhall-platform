@@ -305,6 +305,10 @@
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
           this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
         );
+      },
+      // 当前资料类型是文档还是白板
+      currentType() {
+        return this.docServer.state.currentCid.split('-')[0];
       }
     },
     watch: {
@@ -373,6 +377,14 @@
        */
       toggleThumbnail() {
         this.thumbnailShow = !this.thumbnailShow;
+        if (
+          this.thumbnailShow &&
+          this.currentCid == this.docServer.state.docCid &&
+          this.docServer.state.docCid &&
+          this.docServer.state.thumbnailList.length === 0
+        ) {
+          this.docServer.getCurrentThumbnailList();
+        }
       },
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
