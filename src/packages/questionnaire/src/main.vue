@@ -63,7 +63,12 @@
                   </span>
                   <p class="no-msg">暂未搜索到您想要的内容！</p>
                 </div>
-                <el-table-column prop="title" width="220" label="问卷名称"></el-table-column>
+                <el-table-column
+                  prop="title"
+                  width="220"
+                  label="问卷名称"
+                  show-overflow-tooltip
+                ></el-table-column>
                 <el-table-column
                   prop="topic_num"
                   width="60"
