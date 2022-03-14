@@ -10,7 +10,8 @@ import {
   useGroupServer,
   useUserServer,
   useVirtualAudienceServer,
-  useDesktopShareServer
+  useDesktopShareServer,
+  useInsertFileServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -19,8 +20,11 @@ setBaseUrl({
   wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
 setRequestHeaders({
-  platform: 7
+  platform: 10
 });
+
+// 平台标识
+window.platform = 10;
 
 Vue.use(DomainStore);
 
@@ -33,6 +37,7 @@ export default new DomainStore.Store({
     groupServer: useGroupServer().state,
     virtualAudienceServer: useVirtualAudienceServer().state,
     userServer: useUserServer().state,
-    desktopShareServer: useDesktopShareServer().state
+    desktopShareServer: useDesktopShareServer().state,
+    insertFileServer: useInsertFileServer().state
   }
 });

@@ -148,7 +148,7 @@
   import Upload from './components/upload/upload.vue';
   import Phones from './components/phones/index.vue';
   import Password from './components/password/password.vue';
-  import { useUserServer } from 'middle-domain';
+  import { useUserServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpUserAccount',
     components: {
@@ -178,6 +178,7 @@
     },
     created() {
       this.useUserServer = useUserServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       // 上传、替换头像
@@ -198,6 +199,7 @@
                   type: 'success',
                   customClass: 'zdy-info-box'
                 });
+                this.roomBaseServer.setChangeUserInfo(1, { avatar: file_url });
                 this.useUserServer.getUserInfo({ scene_id: 2 });
               } else {
                 this.$message({
@@ -273,6 +275,7 @@
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
+              this.roomBaseServer.setChangeUserInfo(1, { avatar: '' });
               this.useUserServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
@@ -326,6 +329,7 @@
                   });
                   // 触发保存接口
                   this.isNickNameEdit = false;
+                  this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
                   // 用户信息接口更新
                   this.useUserServer.getUserInfo({ scene_id: 2 });
                 } else {

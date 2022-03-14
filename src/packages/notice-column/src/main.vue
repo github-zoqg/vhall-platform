@@ -23,48 +23,52 @@
         isNoticeColumn: false
       };
     },
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      noticeLatestInfo() {
+        return this.roomBaseServer.state.noticeInfo;
+      }
+    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
     created() {
-      const { latestNotice } = this.noticeServer.state;
-      const { groupInitData } = this.groupServer.state;
-      if (
-        latestNotice.total &&
-        latestNotice.created_at &&
-        this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
-        !groupInitData.isInGroup
-      ) {
-        this.isNoticeColumn = true;
-        this.noticeText = latestNotice.noticeContent;
-      }
+      this.openNotice();
     },
     mounted() {
       this.initNotice();
     },
     methods: {
+      openNotice() {
+        if (
+          this.noticeLatestInfo.total &&
+          this.noticeLatestInfo.list[0].created_at &&
+          this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+          !this.isInGroup
+        ) {
+          this.isNoticeColumn = true;
+          this.noticeText = this.noticeLatestInfo.list[0].content['content'];
+          this.animates();
+        }
+      },
       initNotice() {
-        const { groupInitData } = this.groupServer.state;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
           this.isNoticeColumn = true;
           this.noticeText = msg.room_announcement_text;
           this.animates();
-          if (!groupInitData.isInGroup) {
-            this.noticeServer.setLatestNoticeInfo(msg.room_announcement_text);
-          }
         });
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
         });
         // 结束讨论
-        this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          const { latestNotice } = this.noticeServer.state;
-          if (latestNotice.total && latestNotice.created_at) {
-            this.isNoticeColumn = true;
-            this.noticeText = latestNotice.noticeContent;
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          if (!this.isInGroup) {
+            this.openNotice();
           }
         });
         this.groupServer.$on('GROUP_SWITCH_START', () => {

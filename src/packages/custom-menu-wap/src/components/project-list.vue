@@ -111,7 +111,7 @@
     flex-direction: column;
     overflow: hidden;
     width: 300px;
-    height: 250px;
+    height: 266px;
     margin: 20px 14px;
     border-radius: 6px;
     background: #f7f7f7;
@@ -193,7 +193,6 @@
       width: 100%;
       height: 36px;
       font-size: 28px;
-      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: #1a1a1a;
       line-height: 36px;

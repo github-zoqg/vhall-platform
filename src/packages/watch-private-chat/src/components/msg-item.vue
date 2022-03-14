@@ -13,9 +13,9 @@
           <span
             class="msg-item__content__role-name"
             :class="source.roleName | roleClassFilter"
-            v-if="showRoleName(source.roleName)"
+            v-if="source.roleName && source.roleName != 2"
           >
-            {{ source.roleName | roleFilter(this) }}
+            {{ source.roleName | roleFilter }}
           </span>
         </div>
 
@@ -50,27 +50,6 @@
         }
         //游客
         return 'guest';
-      },
-      //角色转换
-      roleFilter(value, vm) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = vm.$t('chat.chat_1022');
-            break;
-          case 3:
-            ret = vm.$t('chat.chat_1024');
-            break;
-          case 4:
-            ret = vm.$t('chat.chat_1023');
-            break;
-          case 20:
-            ret = vm.$t('chat.chat_1064');
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
       }
     },
     props: {
@@ -80,31 +59,6 @@
         default: () => {
           return {};
         }
-      }
-    },
-    computed: {
-      //是否展示用户角色角标
-      showRoleName() {
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = '主持人';
-              break;
-            case 3:
-              ret = '助理';
-              break;
-            case 4:
-              ret = '嘉宾';
-              break;
-            case 20:
-              ret = '组长';
-              break;
-            default:
-              ret = '';
-          }
-          return ret !== '';
-        };
       }
     },
     data() {

@@ -353,23 +353,24 @@
           }
           if (msg.data.extra_params == this.userId) {
             console.log('拒绝邀请', msg);
-            this.$message.warning({
-              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
+            this.$message({
+              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
             });
           }
-        });
-
-        // 发起端收到同意演示成功消息
-        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', () => {
-          // if (msg.sender_id != this.userId) {
-          //    // 如果是主持人演示
-          // }
         });
 
         // 发起端收到结束演示成功消息
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
           if (msg.sender_id != this.userId) {
-            this.$message.warning('观众结束了演示');
+            this.$message({
+              message: '观众结束了演示',
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
           }
         });
       },

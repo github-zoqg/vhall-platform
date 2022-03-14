@@ -40,7 +40,7 @@
         </div>
         <button class="btn btn-handsup" v-if="!isSpeakOn" @click="handsUpToConnect">
           <i
-            v-if="handText.search('等待...') != -1"
+            v-if="handText.search(`${$t('interact.interact_1004')}...`) != -1"
             class="vh-iconfont iconfont-bottom vh-a-line-handsup"
           ></i>
           <div class="btn-text">{{ handText }}</div>
@@ -164,7 +164,7 @@
                 if (this.isInGroup) {
                   tip = '组长拒绝了您的上麦请求';
                 } else {
-                  tip = '主持人拒绝了您的上麦请求';
+                  tip = this.$t('other.other_1006');
                 }
                 this.$toast(tip);
 

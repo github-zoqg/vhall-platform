@@ -13,7 +13,8 @@ export function getItemEntity(
     type = 2,
     id = `local_${localId++}`, //menu id
     name,
-    status = '1'
+    status = '1',
+    visible = true
   },
   typeMap
 ) {
@@ -21,7 +22,7 @@ export function getItemEntity(
   if (!item) return false;
 
   const text = type === 1 ? name : item.text;
-  let { visible = true, tipsVisible = false, iconVisible = false } = item;
+  let { tipsVisible = false, iconVisible = false } = item;
 
   if (status == STATUS_MAP.HIDDEN) visible = false;
 

@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
-    <!-- 发起抽奖 -->
+    <!-- 发起抽奖/问答 -->
     <template
       v-if="
         source.type == 'lottery_push' ||
@@ -9,7 +9,9 @@
       "
     >
       <div class="msg-item interact">
-        <div class="interact-msg">{{ source.content.text_content }}</div>
+        <div class="interact-msg">
+          {{ source.roleName | roleFilter }}{{ source.content.text_content }}
+        </div>
       </div>
     </template>
     <!-- 抽奖结果 -->
@@ -36,7 +38,8 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.content.text_content }},{{ $t('common.common_1030') }}
+          {{ source.roleName | roleFilter }}{{ source.roleName != 1 ? source.nickname : ''
+          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
@@ -88,7 +91,7 @@
               class="role"
               :class="source.roleName | roleClassFilter"
             >
-              {{ roleFilter(source.roleName) }}
+              {{ source.roleName | roleFilter }}
             </span>
             <span class="nickname">{{ source.nickname }}</span>
           </p>
@@ -203,32 +206,6 @@
         msgContent: '',
         jiantou: require('../img/jiantou.png')
       };
-    },
-    computed: {
-      //角色转换
-      roleFilter() {
-        const _this = this;
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = _this.$t('chat.chat_1022');
-              break;
-            case 3:
-              ret = _this.$t('chat.chat_1024');
-              break;
-            case 4:
-              ret = _this.$t('chat.chat_1023');
-              break;
-            case 20:
-              ret = _this.$t('chat.chat_1064');
-              break;
-            default:
-              ret = _this.$t('chat.chat_1062');
-          }
-          return ret;
-        };
-      }
     },
     filters: {
       //角色标签样式

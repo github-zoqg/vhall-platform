@@ -162,7 +162,10 @@
           ></span>
         </el-tooltip>
       </p>
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-local__shadow-second-line">
+      <p
+        v-if="joinInfo.role_name == 1 || localSpeaker.roleName === 20"
+        class="vmp-stream-local__shadow-second-line"
+      >
         <!-- 设为主讲人 -->
         <el-tooltip content="设为主讲人" v-if="mode != 6" placement="bottom">
           <span
@@ -208,7 +211,9 @@
     useGroupServer,
     useSplitScreenServer,
     useMediaCheckServer,
-    useChatServer
+    useChatServer,
+    useMsgServer,
+    useDocServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -241,13 +246,12 @@
         return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       localSpeaker() {
-        let speaker =
+        console.log('-------localSpeaker更新--------');
+        return (
           this.$domainStore.state.micServer.speakerList.find(
             item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {};
-
-        console.log('-------localSpeaker更新--------', speaker);
-        return speaker;
+          ) || {}
+        );
       },
       remoteSpeakers() {
         return (
@@ -414,7 +418,11 @@
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.localStream.streamId) return;
-
+            // 若上麦成功后发现设备不允许上麦，则进行下麦操作
+            if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
+              this.speakOff();
+              return;
+            }
             // // 更新本地speakerList
             // if (this.groupServer.state.groupInitData.isInGroup) {
             //   await this.groupServer.updateGroupInitData();
@@ -423,6 +431,11 @@
             // }
 
             console.log('[stream-local] vrtc_connect_success startPush');
+
+            // 上麦成功后，如果开启文档可见，把主画面置为小屏
+            if (useDocServer().state.switchStatus) {
+              useRoomBaseServer().setChangeElement('stream-list');
+            }
 
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 轮询判断是否有互动实例
@@ -448,17 +461,14 @@
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
-          if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
           await this.stopPush();
 
           await this.interactiveServer.destroy();
 
-          // 更新本地speakerList
-          // if (this.groupServer.state.groupInitData.isInGroup) {
-          //   await this.groupServer.updateGroupInitData();
-          // } else {
-          //   await this.roomBaseServer.getInavToolStatus();
-          // }
+          // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
+          if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
+            useRoomBaseServer().setChangeElement('player');
+          }
 
           if (
             this.isNoDelay === 1 ||
@@ -475,7 +485,7 @@
           }
         });
         // 结束直播
-        this.interactiveServer.$on('live_over', async () => {
+        useMsgServer().$on('live_over', async () => {
           // 如果开启分屏并且是主页面，不需要停止推流
           if (
             this.splitScreenServer.state.isOpenSplitScreen &&
@@ -495,19 +505,19 @@
         if (this.joinInfo.role_name == 2) {
           // 开启摄像头
           this.interactiveServer.$on('vrtc_frames_display', () => {
-            this.$toast(this.$t('interact.interact_1024'));
+            this.$message.success(this.$t('interact.interact_1024'));
           });
           // 关闭摄像头
           this.interactiveServer.$on('vrtc_frames_forbid', () => {
-            this.$toast(this.$t('interact.interact_1023'));
+            this.$message.warning(this.$t('interact.interact_1023'));
           });
           // 开启音频
           this.interactiveServer.$on('vrtc_mute_cancel', () => {
-            this.$toast(this.$t('interact.interact_1015'));
+            this.$message.success(this.$t('interact.interact_1015'));
           });
           // 关闭音频
           this.interactiveServer.$on('vrtc_mute', () => {
-            this.$toast(this.$t('interact.interact_1026'));
+            this.$message.warning(this.$t('interact.interact_1026'));
           });
         }
       },
@@ -584,7 +594,7 @@
         return this.micServer.speakOff();
       },
       // 处理上麦失败
-      handleSpeakOnError(err) {
+      async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
@@ -597,6 +607,11 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'noPermission') {
+          // 无推流权限
+          await this.interactiveServer.destroy();
+          await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          await this.publishLocalStream();
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
           console.log('开启主屏失败');
@@ -680,7 +695,14 @@
       },
       // 推流
       async publishLocalStream() {
-        await this.interactiveServer.publishStream().catch(() => 'publishStreamError');
+        await this.interactiveServer.publishStream().catch(e => {
+          console.warn('----推流失败', e);
+          if (e.code === '611007') {
+            this.handleSpeakOnError('noPermission');
+          } else {
+            this.handleSpeakOnError('publishStreamError');
+          }
+        });
       },
 
       // 设置主屏
@@ -728,16 +750,6 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
-        if (deviceType === 'video') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1024'))
-            : this.$message.success(this.$t('interact.interact_1023'));
-        }
-        if (deviceType === 'audio') {
-          status
-            ? this.$message.success(this.$t('interact.interact_1015'))
-            : this.$message.success(this.$t('interact.interact_1026'));
-        }
       },
       // 进入、退出全屏
       fullScreen() {

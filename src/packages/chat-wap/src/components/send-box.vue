@@ -31,21 +31,12 @@
           </div>
         </template>
       </div>
+      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+        {{ $t('chat.chat_1018') }}
+      </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
-        <div
-          class="icon-wrapper"
-          v-show="
-            (webinar.type == 1 &&
-              device_status != 2 &&
-              connectMicShow &&
-              !isAllBanned &&
-              !isBanned &&
-              !groupInitData.isInGroup) ||
-            (!isBanned && !isAllBanned && onlineMicStatus && !groupInitData.isInGroup) ||
-            (groupInitData.isInGroup && !groupInitData.isBanned)
-          "
-        >
+        <div class="icon-wrapper" v-show="isShowMicBtn">
           <!-- 上麦 -->
           <div
             v-if="isAllowhandup || isSpeakOn"
@@ -132,10 +123,6 @@
         type: Boolean,
         default: false
       },
-      onlineMicStatus: {
-        type: Boolean,
-        default: false
-      },
       deviceType: {
         require: true,
         default: () => {
@@ -181,7 +168,9 @@
         configList: {},
         //用户头像
         avatar: require('../img/default_avatar.png'),
-        handUpStatus: false
+        handUpStatus: false,
+        //只看我的问答
+        isShowMyQA: false
       };
     },
     computed: {
@@ -221,9 +210,21 @@
         const { join_info = {} } = watchInitData;
         return join_info;
       },
-      //设备状态
-      deviceStatus() {
-        return this.mediaCheckServer.state.isBrowserNotSupport;
+      //是否展示互动上麦按钮
+      isShowMicBtn() {
+        //todo 注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        return (
+          this.webinar.type == 1 &&
+          device_status != 2 &&
+          [
+            this.connectMicShow &&
+              !this.isAllBanned &&
+              !this.isBanned &&
+              !this.groupInitData.isInGroup,
+            this.groupInitData.isInGroup && !this.isBanned
+          ].some(val => !!val)
+        );
       }
     },
     watch: {
@@ -272,6 +273,10 @@
       });
     },
     methods: {
+      showMyQA() {
+        this.isShowMyQA = !this.isShowMyQA;
+        this.$emit('showMyQA', this.isShowMyQA);
+      },
       //初始化视图数据
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
@@ -295,7 +300,7 @@
       },
       // eventBus监听
       eventListener() {
-        // 直播结束不展示入口
+        // 直播结束不展示连麦入口
         this.msgServer.$on('live_over', e => {
           console.log(e);
           this.connectMicShow = false;
@@ -489,6 +494,9 @@
             border-radius: 10px;
           }
         }
+      }
+      .only-my {
+        color: #fc5659;
       }
     }
   }

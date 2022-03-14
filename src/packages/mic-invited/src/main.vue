@@ -4,6 +4,7 @@
     <saas-alert
       :visible="isConfirmVisible"
       :confirm="true"
+      :title="$t('account.account_1061')"
       :confirmText="$t('common.common_1010')"
       :cancelText="btnText"
       @onSubmit="confirmSave"
@@ -93,6 +94,9 @@
             extra_params: this.senderId
           })
           .then(res => {
+            if (res.code !== 200) {
+              this.$message.error(res.msg);
+            }
             useMicServer().userSpeakOn();
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             clearInterval(this.waitInterval);

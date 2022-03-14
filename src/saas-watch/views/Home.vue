@@ -7,7 +7,7 @@
   >
     <div
       class="vmp-basic-container"
-      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : ''"
+      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : 'vmp-basic-container-normarl'"
       v-if="state === 1"
     >
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
@@ -175,6 +175,10 @@
       height: 100%;
     }
   }
+  .vmp-basic-container-normarl {
+    overflow: auto;
+  }
+
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {
     .vmp-basic-bd {

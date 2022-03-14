@@ -166,7 +166,8 @@
     useRoomBaseServer,
     useInteractiveServer,
     useGroupServer,
-    useMsgServer
+    useMsgServer,
+    useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import moment from 'moment';
@@ -250,6 +251,12 @@
             this.remoteVideoParam.file_type = value.file_type;
           }
         }
+      },
+      '$domainStore.state.insertFileServer.isInsertFilePushing': {
+        handler() {
+          this.insertFileStreamVisible =
+            this.$domainStore.state.insertFileServer.isInsertFilePushing;
+        }
       }
     },
     filters: {
@@ -273,6 +280,7 @@
       this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
+      this.docServer = useDocServer();
     },
     mounted() {
       this.initEventListener();
@@ -377,6 +385,8 @@
             this.insertFileServer
               .publishInsertStream({ streamId: res.streamId })
               .then(() => {
+                // 更改麦克风状态
+                this.insertFileServer.updateMicMuteStatusByInsert({ isStart: true });
                 interactiveServer.resetLayout();
               })
               .catch(() => {
@@ -391,7 +401,7 @@
       handleRemoteInsertVideoPlay(isVideoEnd) {
         if (isVideoEnd) {
           // 如果是结束播放，重新开始播放，需要重新推流
-          this.stopPushStream().then(() => {
+          this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
             this.pushLocalStream();
           });
         }
@@ -416,7 +426,7 @@
           // 如果是结束播放，重新开始播放，需要重新推流
           if (this._videoEnded) {
             this._videoEnded = false;
-            this.stopPushStream().then(() => {
+            this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
               this.pushLocalStream();
             });
           }
@@ -487,7 +497,7 @@
           this._isCloseInsertvideoHandler = true;
         }
         // 设置插播状态为 false
-        this.insertFileServer.setInsertFilePushing(false);
+        // this.insertFileServer.setInsertFilePushing(false);
         return this.stopPushStream().then(() => {
           console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
@@ -505,19 +515,20 @@
           // 插播隐藏
           this.insertFileStreamVisible = false;
           if (isliveStart) return;
-          // 通知更改麦克风状态
-          // EventBus.$emit('inster_mic_open');
-          // EventBus.$emit('insertVideoStop');
+          // 更改麦克风状态
+          this.insertFileServer.updateMicMuteStatusByInsert({ isStart: false });
         });
       },
       // 销毁插播流
-      stopPushStream() {
+      stopPushStream(options = { isNotClearInsertFileInfo: false }) {
         if (!this.insertFileServer.state.insertStreamInfo.streamId) {
           return Promise.resolve();
         }
         // 停止推流
         return this.insertFileServer
-          .stopPublishInsertStream(this.insertFileServer.state.insertStreamInfo.streamId)
+          .stopPublishInsertStream(this.insertFileServer.state.insertStreamInfo.streamId, {
+            isNotClearInsertFileInfo: options.isNotClearInsertFileInfo
+          })
           .catch(e => {
             console.log('销毁本地插播流失败', e);
             return e;
@@ -556,6 +567,15 @@
         if (this.insertFileServer.state.insertStreamInfo.streamId) {
           this.subscribeInsert();
         }
+
+        this.insertFileServer.$on('insert_mic_mute_change', status => {
+          if (status == 'play') {
+            this.$message.warning(this.$t('interact.interact_1026'));
+          } else {
+            this.$message.warning('麦克风开启，对方将听到您的声音');
+          }
+        });
+
         this.addSDKEvents();
         // 注册发起端独有的事件
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
@@ -646,6 +666,12 @@
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
           this.unsubscribeInsert();
           this.reSetBroadcast();
+        });
+
+        // 流加入
+        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+          this.reSetBroadcast();
+          this.subscribeInsert();
         });
       },
       // 设置旁路

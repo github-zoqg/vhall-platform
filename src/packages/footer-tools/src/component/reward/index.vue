@@ -1,8 +1,10 @@
 <template>
   <div class="vhsaas-reward-wrapper">
-    <!-- <img class="vhsaas-reward-icon" src="./img/reward-icon.png" alt="" @click="onClickReward" /> -->
-    <div v-show="showRewardDialog" class="reward-dialog-wrapper" :style="{ zIndex: 1 }">
-      <!-- TODO: 原dialogZIndexMap.reward -->
+    <div
+      v-show="showRewardDialog"
+      class="reward-dialog-wrapper"
+      :style="{ zIndex: zIndexServerState.zIndexMap.reward }"
+    >
       <!-- 支付金额设置弹框 -->
       <div v-if="!showGiveMoneyQr" class="reward-dialog">
         <div class="reward-content-container">

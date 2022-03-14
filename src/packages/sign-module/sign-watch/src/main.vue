@@ -4,7 +4,11 @@
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
-    <div v-if="showSign" class="vmp-sign-watch-sign">
+    <div
+      v-show="showSign"
+      class="vmp-sign-watch-sign"
+      :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
+    >
       <div class="vmp-sign-watch-sign-container">
         <div class="vmp-sign-watch-sign-content">
           <p class="sign-title">{{ title }}</p>
@@ -26,25 +30,33 @@
 </template>
 <script>
   import CountDown from './components/countDown';
-  import { useSignServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useSignServer,
+    useChatServer,
+    useGroupServer,
+    useZIndexServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   export default {
     name: 'VmpSignWatch',
     components: {
       CountDown
     },
-    watch: {
-      signInfo: {
-        handler(val) {
-          if (val && !val.is_signed && val.id) {
-            this.getHistorySignInfo();
-          }
-        },
-        immediate: true,
-        deep: true
-      }
-    },
+    // watch: {
+    //   signInfo: {
+    //     handler(val) {
+    //       if (val && !val.is_signed && val.id) {
+    //         this.getHistorySignInfo();
+    //       }
+    //     },
+    //     immediate: true,
+    //     deep: true
+    //   }
+    // },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         showSign: false,
         sign_id: '',
         sign_time: 0,
@@ -55,14 +67,25 @@
       };
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.signServer = useSignServer();
       this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
+      if (this.signInfo && !this.signInfo.is_signed && this.signInfo.id) {
+        this.getHistorySignInfo();
+      }
+      // // 结束讨论
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        if (!this.isInGroup && !this.signInfo.is_signed && this.signInfo.id) {
+          this.getHistorySignInfo();
+        }
+      });
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
-        this.showSign = true;
-        this.title = this.$t(e.data.title);
+        this.reShowSignBox();
+        this.title = e.data.title == '主持人发起了签到' ? this.title : e.data.title;
         this.sign_time = Number(e.data.sign_show_time);
         this.duration = Number(e.data.sign_show_time);
         this.countDownTime();
@@ -72,7 +95,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1027')}`
+            text_content: `${this.$t('chat.chat_1027')}`
           },
           type: e.data.type,
           interactStatus: true
@@ -98,18 +121,16 @@
           clearInterval(this.timer);
         }
       });
-      // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        let signInfo = this.$domainStore.state.roomBaseServer.signInfo;
-        console.log(signInfo, msg, '??!2314235');
-      });
     },
     computed: {
       roomId() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.interact.room_id;
+        return this.roomBaseServer.state.watchInitData.interact.room_id;
       },
       signInfo() {
-        return this.$domainStore.state.roomBaseServer.signInfo;
+        return this.roomBaseServer.state.signInfo;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     methods: {
@@ -155,12 +176,15 @@
         this.isShowCircle = true;
       },
       reShowSignBox() {
+        this.zIndexServer.setDialogZIndex('signIn');
         this.showSign = true;
       },
       getHistorySignInfo() {
         this.sign_id = this.signInfo.id;
         this.isShowCircle = true;
-        this.title = this.signInfo.sign_tips;
+        this.title =
+          this.signInfo.sign_tips == '主持人发起了签到' ? this.title : this.signInfo.sign_tips;
+        // this.title = this.signInfo.sign_tips;
         const sign_time =
           this.signInfo.is_auto_sign == 1
             ? this.signInfo.auto_sign_time_ttl

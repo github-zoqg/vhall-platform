@@ -1,63 +1,63 @@
 <template>
   <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
-    <template v-if="isTryVideo && isSubscribe">
+    <!-- <template v-if="isTryVideo && isSubscribe">
       <div class="vmp-tab-menu__try">
         <div class="try-img">
           <img src="./img/trySee.png" alt="" />
         </div>
         <p>{{ $t('appointment.appointment_1030') }}</p>
       </div>
-    </template>
-    <template v-else>
-      <section class="vmp-tab-menu__header">
-        <!-- 菜单区域 -->
-        <ul class="vmp-tab-menu-scroll-container" ref="menu">
-          <li
-            v-for="item of mainMenu"
-            :ref="item.id"
-            class="vmp-tab-menu-item"
-            :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
-            :key="item.id"
-            @click="select({ type: item.type, id: item.id })"
-          >
-            <span class="item-text">{{ $tdefault(item.name) }}</span>
-            <i v-show="item.tipsVisible" class="tips"></i>
-          </li>
-          <li
-            v-if="visibleMenu.length > 3"
-            class="vmp-tab-menu-more"
-            :class="{ selected: isSubMenuShow }"
-            @click="toggleSubMenuVisible"
-          >
-            <i class="vh-iconfont vh-full-more"></i>
-          </li>
-        </ul>
+    </template> -->
+    <!-- <template v-else> -->
+    <section class="vmp-tab-menu__header">
+      <!-- 菜单区域 -->
+      <ul class="vmp-tab-menu-scroll-container" ref="menu">
+        <li
+          v-for="item of mainMenu"
+          :ref="item.id"
+          class="vmp-tab-menu-item"
+          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
+        >
+          <span class="item-text">{{ $tdefault(item.name) }}</span>
+          <i v-show="item.tipsVisible" class="tips"></i>
+        </li>
+        <li
+          v-if="visibleMenu.length > 3"
+          class="vmp-tab-menu-more"
+          :class="{ selected: isSubMenuShow }"
+          @click="toggleSubMenuVisible"
+        >
+          <i class="vh-iconfont vh-full-more"></i>
+        </li>
+      </ul>
 
-        <!-- 次级菜单 -->
-        <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-          <li
-            class="vmp-tab-menu-sub__item"
-            v-for="item of subMenu"
-            :key="item.id"
-            @click="select({ type: item.type, id: item.id })"
-          >
-            <span>{{ $tdefault(item.name) }}</span>
-            <i class="tips" v-show="item.tipsVisible"></i>
-          </li>
-        </ul>
-      </section>
+      <!-- 次级菜单 -->
+      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
+        <li
+          class="vmp-tab-menu-sub__item"
+          v-for="item of subMenu"
+          :key="item.id"
+          @click="select({ type: item.type, id: item.id })"
+        >
+          <span>{{ $tdefault(item.name) }}</span>
+          <i class="tips" v-show="item.tipsVisible"></i>
+        </li>
+      </ul>
+    </section>
 
-      <!-- 正文区域 -->
-      <section class="vmp-tab-menu__main">
-        <tab-content
-          ref="tabContent"
-          :mainMenu="mainMenu"
-          :subMenu="subMenu"
-          @noticeHint="handleHint"
-          @closePopup="selectDefault"
-        />
-      </section>
-    </template>
+    <!-- 正文区域 -->
+    <section class="vmp-tab-menu__main">
+      <tab-content
+        ref="tabContent"
+        :mainMenu="mainMenu"
+        :subMenu="subMenu"
+        @noticeHint="handleHint"
+        @closePopup="selectDefault"
+      />
+    </section>
+    <!-- </template> -->
   </section>
 </template>
 
@@ -122,6 +122,9 @@
       },
       isSubscribe() {
         return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     beforeCreate() {
@@ -129,13 +132,13 @@
       this.docServer = useDocServer();
     },
     created() {
-      if (this.isTryVideo && this.isSubscribe) return;
+      // if (this.isTryVideo && this.isSubscribe) return;
       this.initConfig();
       this.initMenu();
       this.listenEvents();
     },
     async mounted() {
-      if (this.isTryVideo && this.isSubscribe) return;
+      // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.selectDefault();
     },
@@ -206,9 +209,9 @@
           this.changeDocStatus(val);
         });
         //监听进出子房间消息
-        groupServer.$on('GROUP_ENTER_OUT', isInGroup => {
+        groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           const { interactToolStatus } = useRoomBaseServer().state;
-          if (isInGroup) {
+          if (this.isInGroup) {
             this.setVisible({ visible: false, type: 'v5' });
             this.setVisible({ visible: false, type: 'private' });
           } else {
@@ -247,21 +250,21 @@
         for (const item of list) {
           this.addItem(item);
         }
-
         // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
-            name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '问答', // 同上
-            status: roomState.interactToolStatus.question_status ? 1 : 2
+            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1004'), // 同上
+            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
           });
           this.addItemByIndex(chatIndex + 2, {
             type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
+            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1008'), // 同上
+            status: 3
           });
         }
       },
@@ -339,7 +342,9 @@
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(id);
+        if (tab.id == this.selectedId) {
+          visible === false && this.jumpToNearestItemById(tab.id);
+        }
       },
       /**
        * 切换某个菜单tab的可视性

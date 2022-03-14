@@ -221,7 +221,7 @@
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
   import * as _ from 'lodash';
-  import { sleep } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -326,6 +326,15 @@
       this.init();
       this.listenEvent();
     },
+    updated() {
+      const _this = this;
+      //hack处理BsScroll不能滚动的问题
+      this.$nextTick(() => {
+        if (_this.$refs && _this.$refs.scroll) {
+          _this.$refs.scroll.refresh();
+        }
+      });
+    },
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
@@ -407,7 +416,7 @@
       getCurrentSpeakerList() {
         return this.isInGroup
           ? this.groupInitData['speaker_list'] || []
-          : this.interactToolStatus['speaker_list'] || [];
+          : this.micServer.state.speakerList || [];
       }
     },
     methods: {
@@ -678,7 +687,7 @@
             }
 
             // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-            if (isLive && _this.mode === 6) {
+            if (_this.mode === 6) {
               if (!_this.isInGroup && context.groupInitData?.isInGroup) {
                 return false;
               }
@@ -712,6 +721,7 @@
               return;
             }
 
+            console.log(_this.getCurrentSpeakerList, '当前正在上麦的人员.........');
             // 从上麦人员列表中获取加入房间着是否上麦
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
@@ -893,6 +903,10 @@
           if (msg.data.room_join_id == _this.userId) {
             return;
           }
+          //tab提示小红点
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(_this.cuid, 'emitTabTips', { visible: true, type: 8 })
+          );
           let user = {
             account_id: msg.data.room_join_id,
             avatar: msg.data.avatar,
@@ -926,6 +940,9 @@
             _this.applyUsers = _this.applyUsers.filter(u => u.account_id !== user.account_id);
             if (!_this.applyUsers.length) {
               _this.raiseHandTip = false;
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(_this.cuid, 'emitTabTips', { visible: false, type: 8 })
+              );
             }
           }, 30000);
           //todo 信令通知其他组件(比如自定义菜单组件，有红点)
@@ -1077,21 +1094,21 @@
         //用户拒绝邀请演示
         function handleUserRejectPresentation(msg) {
           // 如果申请人是自己
-          if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
-            return;
-          }
-          let role = '';
-          if (msg.data.room_role == 2) {
-            role = '观众';
-          } else if (msg.data.room_role == 4) {
-            role = '嘉宾';
-          }
-          if (msg.data.extra_params == _this.userId) {
-            console.log('拒绝邀请', msg);
-            _this.$message.warning({
-              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
-            });
-          }
+          // if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
+          //   return;
+          // }
+          // let role = '';
+          // if (msg.data.room_role == 2) {
+          //   role = '观众';
+          // } else if (msg.data.room_role == 4) {
+          //   role = '嘉宾';
+          // }
+          // if (msg.data.extra_params == _this.userId) {
+          //   console.log('拒绝邀请', msg);
+          //   _this.$message.warning({
+          //     message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
+          //   });
+          // }
         }
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
@@ -1171,6 +1188,9 @@
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
               handleStartGroupDiscuss();
               break;
+            case 'group_join_change':
+              _this.getOnlineUserList();
+              break;
             default:
               break;
           }
@@ -1198,10 +1218,10 @@
         });
 
         // 换组
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          isLive && this.updateOnlineUserList(msg);
-          isWatch && handleGroupChange(msg);
-        });
+        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+        //   isLive && this.updateOnlineUserList(msg);
+        //   isWatch && handleGroupChange(msg);
+        // });
 
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
@@ -1348,7 +1368,7 @@
 
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
-          console.log(msg);
+          console.log('agreePresentation:', msg);
           if (_this.roleName == 20) {
             _this.$message({
               message: '对方已接受邀请',
@@ -1639,7 +1659,11 @@
         } else {
           if (this.userId === accountId) {
             // 主持人自己上麦
-            this.micServer.userSpeakOn();
+            this.micServer.userSpeakOn().then(res => {
+              if (res.code !== 200) {
+                this.$message.error(res.msg);
+              }
+            });
           } else {
             this.micServer
               .inviteMic({
@@ -1720,6 +1744,9 @@
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             })
             .then(res => {
+              if (res.code !== 200) {
+                this.$message.error(res.msg);
+              }
               console.log(res, 'presentation');
             })
             .catch(err => {
@@ -1897,7 +1924,9 @@
       },
       //查找用户在数组的索引号
       _getUserIndex(accountId, list) {
-        return list.findIndex(item => item.account_id === accountId);
+        return list.findIndex(
+          item => item.account_id === accountId || item.accountId === accountId
+        );
       },
       //加载更多
       loadMore() {
@@ -1934,8 +1963,10 @@
       }
     }
     &__container {
-      flex: 1;
+      flex: 1 0 auto;
+      max-height: calc(100% - 80px);
       position: relative;
+      overflow: hidden;
       &__scroll {
         display: flex;
         flex-direction: column;
@@ -1944,7 +1975,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        overflow: hidden;
+        //overflow: hidden;
       }
       .empty-container {
         width: 100%;

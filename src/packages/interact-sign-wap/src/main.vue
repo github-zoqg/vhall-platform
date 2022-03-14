@@ -42,32 +42,35 @@
         clock: null,
         duration: 30,
         title: '',
-        signinInfo: {},
+        // signinInfo: {},
         popHeight: ''
       };
     },
-    watch: {
-      signinInfo: {
-        immediate: true,
-        deep: true,
-        handler: function () {
-          this.init();
-        }
-      },
-      signInVisible(newValue) {
-        // EventBus.$emit('signShow', newValue);
-      },
-      roomBaseData: {
-        immediate: true,
-        deep: true,
-        handler: function (val) {
-          this.signinInfo = val.signInfo;
-        }
-      }
-    },
+    // watch: {
+    //   signinInfo: {
+    //     immediate: true,
+    //     deep: true,
+    //     handler: function () {
+    //       this.init();
+    //     }
+    //   },
+    //   signInVisible(newValue) {
+    //     // EventBus.$emit('signShow', newValue);
+    //   },
+    //   roomBaseData: {
+    //     immediate: true,
+    //     deep: true,
+    //     handler: function (val) {
+    //       this.signinInfo = val.signInfo;
+    //     }
+    //   }
+    // },
     computed: {
-      roomBaseData() {
-        return this.$domainStore.state.roomBaseServer;
+      // roomBaseData() {
+      //   return this.$domainStore.state.roomBaseServer;
+      // },
+      signinInfo() {
+        return this.roomBaseServer.state.signInfo;
       }
     },
     beforeCreate() {
@@ -76,10 +79,17 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
-      this.signinInfo = this.roomBaseData.signInfo;
+      this.init();
       let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
       // postcss 换算基数为75 头部+播放器区域高为 522px
       this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
+      // 结束讨论
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup && !this.signinInfo.is_signed && this.signinInfo.id) {
+          this.init();
+        }
+      });
       // 发起签到
       this.signServer.$on('sign_in_push', e => {
         window.$middleEventSdk?.event?.send(
@@ -90,13 +100,12 @@
         this.duration = Number(e.data.sign_show_time);
         this.openSignIn(e.data.sign_id, e.data.sign_show_time);
         this.title = e.data.title;
-
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1027')}`
+            text_content: `${this.$t('chat.chat_1027')}`
           },
           type: e.data.type
         };
@@ -115,7 +124,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+            text_content: this.$t('chat.chat_1028')
           },
           type: e.data.type
         };
@@ -173,7 +182,6 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
               );
-              // this.iconShow = false;
             }
             this.seconds--;
           }, 1000);
@@ -189,7 +197,7 @@
       signin() {
         this.signServer
           .sign({
-            room_id: this.roomBaseData.watchInitData.interact.room_id,
+            room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
             sign_id: this.sign_id
           })
           .then(res => {

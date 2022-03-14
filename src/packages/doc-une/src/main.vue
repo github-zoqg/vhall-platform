@@ -14,7 +14,10 @@
     <!-- 这里配置的是文档工具栏 -->
     <VmpDocToolbar
       ref="docToolbar"
-      v-show="hasDocPermission && (displayMode === 'normal' || displayMode === 'fullscreen')"
+      v-show="
+        (hasDocPermission || [3].includes(roleName)) &&
+        (displayMode === 'normal' || displayMode === 'fullscreen')
+      "
     ></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
@@ -225,7 +228,7 @@
       // 文档是否可见
       show() {
         return (
-          (!this.isWatch && !this.desktopShareServer.state.isShareScreen) ||
+          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -403,10 +406,16 @@
           return;
         }
         if (
-          document.getElementById(this.docServer.state.docCid) ||
-          document.getElementById(this.docServer.state.boardCid)
+          (document.getElementById(this.docServer.state.docCid) &&
+            document.getElementById(this.docServer.state.docCid).childNodes.length) ||
+          (document.getElementById(this.docServer.state.boardCid) &&
+            document.getElementById(this.docServer.state.boardCid).childNodes.length)
         ) {
-          this.docServer.setSize(width, height);
+          try {
+            this.docServer.setSize(width, height);
+          } catch (ex) {
+            console.error('[doc] setSize:', ex);
+          }
         }
       },
       getDocViewRect() {
@@ -460,14 +469,6 @@
       initEvents() {
         if (this.isWatch) {
           // 观看端事件
-          // 文档是否可见状态变化事件
-          this.docServer.$on('dispatch_doc_switch_change', val => {
-            console.log('===[doc]=======dispatch_doc_switch_change=============', val);
-            if (val && this.show && this.docLoadComplete) {
-              this.recoverLastDocs();
-            }
-          });
-
           // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
             console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
@@ -574,6 +575,9 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        // 文档是否可见状态变化事件
+        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       },
 
       listenKeydown(e) {
@@ -620,6 +624,8 @@
        */
       recoverLastDocs: async function () {
         console.log('[doc] 刷新或者退出重进恢复上次的文档');
+        if (!this.docLoadComplete) return;
+        this.docServer.setDocLoadComplete(false);
         try {
           // 获取容器列表
           await this.docServer.getContainerList();
@@ -810,17 +816,18 @@
 
       /**
        * 结束演示
-       * 1.主持人在小组中,且主持人正在演示中,则结束 - 自己演示
-       * 2.主持人在主直播间或小组内，别人演示中, 则结束 - 他人演示
+       * 1.观众演示时，组长和主持人都可以结束演示
+       * 2.主持人在小组中自己演示时，只有自己可以结束演示
        */
       async handleEndDemonstrate() {
         // 在主直播间
-        let confirmTip = '结束演示';
-        if (
-          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 2) ||
-          (!this.isInGroup && this.roomBaseServer.state.watchInitData.join_info.role_name == 2)
-        ) {
-          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
+        let confirmTip = '结束演示?';
+        if (this.presenterId == this.userId) {
+          // 如果演示者是自己，自己结束自己的演示
+          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示？';
+        } else if (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) {
+          // 如果是组长结束观众的演示
+          confirmTip = '是否结束演示?';
         }
         try {
           await this.$confirm(confirmTip, '提示', {
@@ -832,18 +839,40 @@
           if (this.hasDocPermission) {
             console.log('结束自己的演示');
             // 结束自己的演示
-            await this.memberServer.userEndPresentation({
+            const result = await this.memberServer.userEndPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             });
+            if (result && result.code == 200) {
+              if (this.groupServer.state.groupInitData.join_role == 2) {
+                // 如果是观众结束了自己的演示
+                this.$message({
+                  message: '结束演示',
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
           } else {
             // 结束他人的演示
             console.log('结束他人的演示');
-            await this.memberServer.endUserPresentation({
+            const result = await this.memberServer.endUserPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
               receive_account_id: this.isInGroup
                 ? this.groupServer.state.groupInitData.presentation_screen
                 : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
+            if (result && result.code == 200) {
+              if (this.groupServer.state.groupInitData.join_role == 20) {
+                // 如果是组长结束了观众的演示
+                this.$message({
+                  message: '结束演示',
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
           }
         } catch (ex) {
           return;
@@ -868,6 +897,13 @@
             return;
           }
           this.addNewFile({ fileType, docId, cid });
+        }
+      },
+      // 文档是否可见状态变化事件
+      dispatchDocSwitchChange: async function (val) {
+        console.log('===[doc]====dispatch_doc_switch_change=============', val);
+        if (val && this.show && this.docLoadComplete) {
+          this.recoverLastDocs();
         }
       },
       // 文档不存在或已删除
@@ -899,6 +935,7 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };

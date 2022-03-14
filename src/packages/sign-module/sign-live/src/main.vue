@@ -31,7 +31,7 @@
   import signinSet from './components/signinSet.vue';
   import Counter from './components/counter.vue';
   import signinResult from './components/signinResult.vue';
-  import { useSignServer } from 'middle-domain';
+  import { useSignServer, useChatServer } from 'middle-domain';
   export default {
     name: 'VmpSignLive',
     components: {
@@ -64,12 +64,41 @@
         signInfo: null,
         remaining: 0, // 总时长
         timer: null,
+        totalTime: 0,
         signId: '', // 签到ID
         nowSignObj: '' // 当前自动签到信息
       };
     },
     beforeCreate() {
       this.signServer = useSignServer();
+    },
+    mounted() {
+      this.signServer.$on('sign_in_push', e => {
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${this.$t('chat.chat_1027')}`
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
+      });
+      this.signServer.$on('sign_end', e => {
+        const data = {
+          roleName: e.data.role_name,
+          nickname: e.data.sign_creator_nickname,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+          },
+          type: e.data.type,
+          interactStatus: true
+        };
+        useChatServer().addChatToList(data);
+      });
     },
     methods: {
       openSign() {
@@ -88,8 +117,10 @@
               this.signInfo.autoSign = res.data.is_auto_sign == 1;
               if (res.data.is_auto_sign == 1) {
                 this.remaining = res.data.auto_sign_time_ttl;
+                this.signInfo.interval = res.data.auto_sign_time;
                 this.totalTime = res.data.auto_sign_time;
               } else {
+                this.signInfo.duration = res.data.show_time;
                 this.remaining = res.data.sign_time_ttl;
                 this.totalTime = 0;
               }

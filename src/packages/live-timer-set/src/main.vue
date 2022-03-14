@@ -174,7 +174,7 @@
       this.timerServer = useTimerServer();
     },
     mounted() {
-      this.timerServer.listenMsg();
+      // this.timerServer.listenMsg();
       // 计时器开始
       this.timerServer.$on('timer_start', temp => {
         console.log(temp, '原始消息');

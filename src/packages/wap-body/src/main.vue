@@ -47,7 +47,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer } from 'middle-domain';
+  import { useMsgServer, useInteractiveServer } from 'middle-domain';
   import move from './js/move';
   import { Dialog } from 'vant';
   import masksliding from './components/mask.vue';
@@ -81,13 +81,17 @@
       this.msgServer = useMsgServer();
     },
     async created() {
+      // 监听自动上麦的异常code
+      useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        this.$toast(e.msg);
+      });
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
       ) {
         await Dialog.alert({
-          title: '提示',
-          message: '本场直播支持视频连线，建议您允许系统启用相应设备以使用该功能。'
+          title: this.$t('account.account_1061'),
+          message: this.$t('other.other_1009')
         });
       }
       this.childrenComp = window.$serverConfig[this.cuid].children;

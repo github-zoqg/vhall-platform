@@ -207,6 +207,7 @@
               if (avatar === '') {
                 this.fileList = [];
               }
+              this.roomBaseServer.setChangeUserInfo(1, { avatar: avatar });
               // 用户信息接口更新
               this.useUserServer.getUserInfo({ scene_id: 2 });
             } else {
@@ -235,6 +236,7 @@
             .then(res => {
               if (res && res.code == 200) {
                 this.$toast(this.$t('account.account_1057'));
+                this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
                 this.useUserServer.getUserInfo({ scene_id: 2 });
               } else {
                 this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1058'));

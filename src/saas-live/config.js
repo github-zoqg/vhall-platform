@@ -225,6 +225,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
@@ -246,6 +251,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
@@ -468,6 +478,11 @@ export const serverConfig = {
     options: {
       //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
       platformType: 'live'
+    },
+    emitTabTips: {
+      cuid: ['comTabMenu'],
+      method: 'setTipsVisible',
+      args: ['$0']
     }
   },
   comQa: {

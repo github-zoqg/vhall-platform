@@ -10,8 +10,7 @@
   </div>
 </template>
 <script>
-  // import EventBus from '../../utils/Events';
-  import { usePraiseServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import { usePraiseServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
 
   const timeId = null;
   export default {
@@ -30,37 +29,30 @@
         require: false
       }
     },
-    watch: {
-      priseLike: {
-        handler(val) {
-          if (val) {
-            this.like = val;
-          }
-        },
-        immediate: true
-      }
-    },
     beforeCreate() {
       this.praiseServer = usePraiseServer();
       this.roomBaseServer = useRoomBaseServer();
-      this.chatServer = useChatServer();
+      this.groupServer = useGroupServer();
+    },
+    created() {
+      this.like = this.roomBaseServer.state.priseLike.total || 0;
     },
     mounted() {
-      this.priseLike = this.roomBaseServer.state.priseLike.total;
-      this.praiseServer.listenMsg();
       this.praiseServer.$on('customPraise', msg => {
-        // console.log(msg.visitorId, this.roomBaseServer.state.watchInitData.visitor_id);
         if (msg.visitorId != this.roomBaseServer.state.watchInitData.visitor_id) {
-          this.like += msg.num;
+          if (msg.num > this.like) {
+            // 消息返回的点赞数、是点赞总数
+            this.like = msg.num;
+          }
         }
       });
-      // EventBus.$on('tabChange', payload => {
-      //   this.$forceUpdate();
-      // });
-
-      // EventBus.$on('currentUserPraise', num => {
-      //   this.like += num;
-      // });
+      // 结束讨论
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup) {
+          this.like = this.roomBaseServer.state.priseLike.total || 0;
+        }
+      });
 
       if (this.localRoomInfo.type != 1) {
         if (timeId) {
@@ -100,8 +92,6 @@
           this.outerHTML = '';
         });
         this.timess++;
-        // 通过 eventbus 修改 like 是为了同步两个点赞实例的点赞数量
-        // EventBus.$emit('currentUserPraise', 1);
         this.like = Number(this.like) + 1;
         this.$forceUpdate();
         if (this.clearSet) {

@@ -191,7 +191,7 @@
     },
     mounted() {
       this.init();
-      this.timerServer.listenMsg();
+      // this.timerServer.listenMsg();
       // console.log(this.timerServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
@@ -205,28 +205,6 @@
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
     },
     methods: {
-      returnName(data) {
-        const identity = [
-          {
-            name: '主持人',
-            code: 1
-          },
-          {
-            name: '观众',
-            code: 2
-          },
-          {
-            name: '助理',
-            code: 3
-          },
-          {
-            name: '嘉宾',
-            code: 4
-          }
-        ];
-        const obj = identity.find(item => item.code == data);
-        return obj.name ? obj.name : data;
-      },
       // 计时器开始
       timer_start(e) {
         console.warn('监听到了计时器开始-------', e);
@@ -244,7 +222,7 @@
         );
         this.$emit('disTimer', true);
         // 添加聊天记录
-        const text = this.returnName(e.data.role_name);
+        const text = this.$getRoleName(e.data.role_name);
         const data = {
           nickname: '计时器', // TODO: 缺翻译
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -265,7 +243,7 @@
         this.$emit('disTimer', true);
         clearInterval(this.timer);
         // 添加聊天记录
-        const text = this.returnName(e.data.role_name);
+        const text = this.$getRoleName(e.data.role_name);
         const data = {
           nickname: '计时器', // TODO: 缺翻译
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -283,7 +261,7 @@
         this.timeFormat(Math.abs(e.data.remain_time));
         clearInterval(this.timer);
         // 添加聊天记录
-        const text = this.returnName(e.data.role_name);
+        const text = this.$getRoleName(e.data.role_name);
         const data = {
           nickname: '计时器', // TODO: 缺翻译
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -297,7 +275,7 @@
       // 计时器重置
       timer_reset(e) {
         // 添加聊天记录
-        const text = this.returnName(e.data.role_name);
+        const text = this.$getRoleName(e.data.role_name);
         const data = {
           nickname: '计时器', // TODO: 缺翻译
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -327,7 +305,7 @@
         this.status = 'kaishi';
         this.timerFun(this.shijian);
         // 添加聊天记录
-        const text = this.returnName(e.data.role_name);
+        const text = this.$getRoleName(e.data.role_name);
         const data = {
           nickname: '计时器', // TODO: 缺翻译
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',

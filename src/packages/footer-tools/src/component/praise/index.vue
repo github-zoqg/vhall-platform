@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useRoomBaseServer, usePraiseServer } from 'middle-domain';
+  import { useRoomBaseServer, usePraiseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpPraise',
     data() {
@@ -34,19 +34,29 @@
       };
     },
     beforeCreate() {
-      this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
       this.praiseServer = usePraiseServer();
+      this.groupServer = useGroupServer();
     },
     created() {
-      this.totalPraiseNum = this.praiseServer.state.praiseTotalNum || 0;
+      this.totalPraiseNum = this.roomBaseServer.state.priseLike.total || 0;
       this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
-      this.praiseServer.listenMsg();
     },
     mounted() {
       this.praiseServer.$on('customPraise', msg => {
         if (msg.visitorId != this.roomBaseServer.state.watchInitData.visitor_id) {
-          this.totalPraiseNum = this.totalPraiseNum + msg.num;
+          if (msg.num > this.totalPraiseNum) {
+            this.totalPraiseNum = msg.num;
+            // 消息返回的点赞数、是点赞总数
+            this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
+          }
+        }
+      });
+      // 结束讨论
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup) {
+          this.totalPraiseNum = this.roomBaseServer.state.priseLike.total || 0;
           this.praiseNum = this.transformWatchNum(this.totalPraiseNum);
         }
       });
@@ -72,6 +82,7 @@
       praise() {
         const num = this.increment;
         const { watchInitData } = this.roomBaseServer.state;
+        window.vhallReport && window.vhallReport.report('PRAISE');
         this.praiseServer.postPraiseIncrement({
           room_id: watchInitData.interact.room_id,
           num

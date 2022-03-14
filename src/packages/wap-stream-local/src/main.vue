@@ -51,7 +51,8 @@
     useGroupServer,
     useMsgServer,
     useRoomBaseServer,
-    useMediaCheckServer
+    useMediaCheckServer,
+    usePlayerServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -216,41 +217,39 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.localStream.streamId) return;
-
-          // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
+          // 若上麦成功后发现设备不允许上麦，则进行下麦操作
+          if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
+            this.speakOff();
+            return;
           }
-
           console.log('[stream-local] vrtc_connect_success startPush');
 
-          if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.joinInfo.role_name == 2 || this.isNoDelay === 1 || this.mode === 6) {
-              await this.interactiveServer.init();
-              // 开始推流
-              this.startPush();
-            }
+          // 无延迟｜分组直播
+          // 如果成功，销毁播放器
+          if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar == 0) {
+            usePlayerServer().destroy();
           }
+
+          if (!this.interactiveServer.state.autoSpeak) {
+            //  初始化互动实例
+            await this.interactiveServer.init();
+            // 开始推流
+          }
+
+          // 轮询判断是否有互动实例
+          await this.checkVRTCInstance();
+          this.startPush();
         });
 
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
-          if (useMediaCheckServer().state.deviceInfo.device_status == 2) return;
           await this.stopPush();
 
           await this.interactiveServer.destroy();
-          // 更新本地speakerList
-          if (this.groupServer.state.groupInitData.isInGroup) {
-            await this.groupServer.updateGroupInitData();
-          } else {
-            await this.roomBaseServer.getInavToolStatus();
-          }
 
           if (this.isNoDelay === 1 || this.mode === 6) {
             //  初始化互动实例
-            await this.interactiveServer.init({});
+            await this.interactiveServer.init();
           }
         });
 
@@ -296,7 +295,7 @@
         return this.micServer.speakOff();
       },
       // 处理上麦失败
-      handleSpeakOnError(err) {
+      async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
@@ -309,6 +308,10 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'noPermission') {
+          await this.interactiveServer.destroy();
+          await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          this.publishLocalStream();
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
           console.log('开启主屏失败');
@@ -385,7 +388,14 @@
           .then(() => {
             this.isStreamPublished = true;
           })
-          .catch(() => 'publishStreamError');
+          .catch(e => {
+            if (e.code === '611007') {
+              this.handleSpeakOnError('noPermission');
+            } else {
+              this.handleSpeakOnError('publishStreamError');
+            }
+          });
+        // .catch(() => 'publishStreamError');
       },
       // 结束推流
       stopPush() {

@@ -1,6 +1,6 @@
 <template>
   <div class="noLottery">
-    <img class="no-lottery-img" :src="prizeInfo.img_url || noLotteryImg" alt srcset />
+    <img class="no-lottery-img" :src="prizeInfo.image_url || noLotteryImg" alt srcset />
     <p class="gongxi">{{ $t('interact_tools.interact_tools_1022') }}</p>
     <p class="gongxi" style="margin-top: 8px">
       {{
