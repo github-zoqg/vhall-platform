@@ -25,13 +25,13 @@
             </template>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
-              {{ $t('chat.chat_1022') }}
+              {{ chat.roleName | roleFilter }}
             </span>
             <span class="user-status user-assistant" v-else-if="[3, '3'].includes(chat.roleName)">
-              {{ $t('chat.chat_1024') }}
+              {{ chat.roleName | roleFilter }}
             </span>
             <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
-              {{ $t('chat.chat_1023') }}
+              {{ chat.roleName | roleFilter }}
             </span>
 
             <template v-else>

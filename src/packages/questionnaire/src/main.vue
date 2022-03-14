@@ -50,11 +50,7 @@
               </el-input>
             </div>
             <div class="popbody">
-              <ul
-                v-loading="loading"
-                class="vhall-question__content-list"
-                v-infinite-scroll="moreLoadData"
-              >
+              <ul class="vhall-question__content-list">
                 <!-- 标题头 -->
                 <li class="vhall-question__content-list__title">
                   <span class="vhall-question__content-list__colmun-title fontColor">问卷名称</span>
@@ -64,8 +60,11 @@
                   </span>
                   <span class="vhall-question__content-list__colmun-action fontColor">操作</span>
                 </li>
-
-                <div v-if="questionnaireList.length" class="data-list">
+                <div
+                  v-if="questionnaireList.length"
+                  class="data-list"
+                  v-infinite-scroll="moreLoadData"
+                >
                   <li v-for="(item, idx) in questionnaireList" :key="idx">
                     <span class="vhall-question__content-list__colmun-title">{{ item.title }}</span>
                     <span class="vhall-question__content-list__colmun-time">
@@ -103,8 +102,8 @@
                     </span>
                   </li>
                 </div>
-                <div v-else class="show-no-msg">
-                  <span v-if="!loading" class="no-img">
+                <div v-else-if="!loading" class="show-no-msg">
+                  <span class="no-img">
                     <img src="./images/no-search@2x.png" alt="" />
                   </span>
                   <p class="no-msg">暂未搜索到您想要的内容！</p>
@@ -235,12 +234,12 @@
         });
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
           const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
-          const text = this.$getRoleName(msg.room_role);
+          // const text = this.$getRoleName(msg.room_role);
           useChatServer().addChatToList({
             nickname: '问卷',
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              text_content: `${text}发起了问卷`,
+              text_content: `发起了问卷`,
               questionnaire_id: msg.questionnaire_id
             },
             roleName: join_info.role_name,
@@ -739,7 +738,7 @@
           color: #1a1a1a;
         }
         .data-list {
-          max-height: 360px;
+          height: 360px;
           overflow: auto;
         }
       }

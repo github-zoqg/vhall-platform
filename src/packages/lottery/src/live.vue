@@ -10,7 +10,7 @@
       :lottery-info="lotteryInfo"
       :disabled-time="disabledTime"
       @close="close"
-      @end="handleEndLottery"
+      @end="endLottery"
     />
     <lottery-winner
       mode="live"
@@ -57,20 +57,46 @@
         lotteryServer: this.lotteryServer
       };
     },
-    mounted() {
-      if (this.mode === 'live') {
-        this.coutDown();
-      }
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({
         mode: 'live'
       });
     },
+    created() {
+      this.initMsgEvent();
+    },
+    mounted() {
+      if (this.mode === 'live') {
+        this.coutDown();
+      }
+    },
     destroyed() {
+      this.removeMsgEvent();
       this.clearTimer();
     },
     methods: {
+      initMsgEvent() {
+        //监听结束抽奖
+        this.lotteryServer.$on(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
+      },
+      removeMsgEvent() {
+        this.lotteryServer.$off(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
+      },
+      // 抽奖结束(需要同步助理/嘉宾)
+      callBackResultNotice(msg) {
+        const lotteryId = msg.data.lottery_id;
+        this.lotteryServer.getWinnerList(lotteryId).then(res => {
+          this.winLotteryUserList = res.data.list;
+          this.prizeShow = false;
+          this.lotteryResultShow = true;
+        });
+      },
       // 开始计时
       coutDown() {
         this.clearTimer();
@@ -127,28 +153,10 @@
         this.prizeShow = false; // 抽奖中
         this.dialogVisible = false;
       },
-      // 结束抽奖
-      handleEndLottery() {
+      // 结束抽奖()
+      endLottery() {
         if (!this.lotteryInfoId) return;
-        return this.lotteryServer.endLottery(this.lotteryInfoId).then(res => {
-          if (res.code === 200) {
-            this.winLotteryUserList = res.data.lottery_users;
-            // console.warn('抽奖完成', res.data, res.data.award_snapshoot);
-            // this.closeShow = true;
-            // this.lotteryResultShow = true;
-            // this.lotteryEndResult = res.data.lottery_users; // 中奖用户人信息列表
-            // this.lotteryResultObj.url =
-            //   res.data.award_snapshoot && res.data.award_snapshoot.image_url
-            //     ? res.data.award_snapshoot.image_url
-            //     : '';
-            // this.lotteryResultObj.text =
-            //   res.data.award_snapshoot && res.data.award_snapshoot.award_name
-            //     ? res.data.award_snapshoot.award_name
-            //     : '';
-            this.prizeShow = false;
-            this.lotteryResultShow = true;
-          }
-        });
+        return this.lotteryServer.endLottery(this.lotteryInfoId);
       },
       /**
        * @description 重新开始一轮抽奖

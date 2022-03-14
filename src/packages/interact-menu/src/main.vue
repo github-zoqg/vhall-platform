@@ -141,9 +141,16 @@
     methods: {
       listenEvents() {
         const msgServer = useMsgServer();
+        const qaServer = useQaServer();
         msgServer.$on('live_over', () => {
           this.isQAEnabled = false;
           this.qaVisible = false;
+        });
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
+          this.isQAEnabled = true;
+        });
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
+          this.isQAEnabled = false;
         });
       },
       handleQAPopup() {
