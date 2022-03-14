@@ -17,17 +17,17 @@ function getRoleName(value) {
   switch (value) {
     case 1:
     case 'host':
-      ret = Vue.prototype.$tdefault(customRoleName[1]);
+      ret = Vue.prototype.$tdefault.call(i18n, customRoleName[1]);
       break;
     case 2:
       ret = i18n.t('chat.chat_1063');
       break;
     case 3:
     case 'assistant':
-      ret = Vue.prototype.$tdefault(customRoleName[3]);
+      ret = Vue.prototype.$tdefault.call(i18n, customRoleName[3]);
       break;
     case 4:
-      ret = Vue.prototype.$tdefault(customRoleName[4]);
+      ret = Vue.prototype.$tdefault.call(i18n, customRoleName[4]);
       break;
     case 20:
       ret = i18n.t('chat.chat_1064');

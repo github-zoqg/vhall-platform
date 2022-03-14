@@ -41,21 +41,22 @@
   </div>
 </template>
 <script>
-  import { useCustomMenuServer } from 'middle-domain';
+  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
     props: ['checkedList', 'pagetype'],
     data() {
       return {
         activeList: [],
-        loading: false,
-        hasDelayPermission: false
+        loading: false
       };
     },
     computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList']),
       userId() {
         return this.watchInitData.join_info.third_party_user_id;
+      },
+      hasDelayPermission() {
+        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
       }
     },
     watch: {
@@ -71,9 +72,7 @@
     },
     beforeCreate() {
       this.customMenuServer = useCustomMenuServer();
-    },
-    mounted() {
-      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       getLiveTag(val) {

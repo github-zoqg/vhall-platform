@@ -186,7 +186,7 @@
                             item.operator.role_name == 'guest'
                         }"
                       >
-                        <!-- {{ item.operator.role_name | roleFilter }} -->
+                        {{ item.operator.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ item.operator.operate_time }}</span>
                     </p>
@@ -370,7 +370,7 @@
                           item.operator.role_name == 'assistant'
                       }"
                     >
-                      <!-- {{ item.operator.role_name | roleFilter }} -->
+                      {{ item.operator.role_name | roleFilter }}
                     </span>
                   </div>
                   <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>

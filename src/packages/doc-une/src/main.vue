@@ -1166,6 +1166,7 @@
 
   // 作为观看端时的样式
   .vmp-doc-une.is-watch {
+    background-color: #2d2d2d;
     // 普通模式
     &.vmp-doc-une--normal {
       position: absolute;
