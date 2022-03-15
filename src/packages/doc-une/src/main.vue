@@ -380,8 +380,7 @@
         if (
           this.thumbnailShow &&
           this.currentCid == this.docServer.state.docCid &&
-          this.docServer.state.docCid &&
-          this.docServer.state.thumbnailList.length === 0
+          this.docServer.state.docCid
         ) {
           this.docServer.getCurrentThumbnailList();
         }
