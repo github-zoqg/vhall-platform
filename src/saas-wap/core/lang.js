@@ -20,10 +20,10 @@ Vue.prototype.$tdefault = function (key) {
  */
 export function initI18n() {
   window.i18n = new VueI18n({
-    locale: 'zh-CN' || window.$globalConfig.currentLang,
+    locale: window.$globalConfig.currentLang || 'zh',
     messages: {
-      zh: languages.zh,
-      en: languages.en
+      en: languages.en,
+      zh: languages.zh
     }
   });
   return window.i18n;
