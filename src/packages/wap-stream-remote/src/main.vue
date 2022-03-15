@@ -9,7 +9,7 @@
     <!-- videoMuted 的时候显示流占位图 -->
     <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom">
+    <section class="vmp-stream-local__bootom" v-show="stream.streamId">
       <span
         v-show="[1, 3, 4].includes(stream.attributes.roleName)"
         class="vmp-stream-local__bootom-role"
@@ -68,18 +68,6 @@
       }
     },
     computed: {
-      // 是否显示摄像头开关按钮
-      isShowVideoControl() {
-        // 如果当前人是主持人,并且是主屏,显示
-        // if (this.joinInfo.role_name == 1 && this.mainScreen == this.joinInfo.third_party_user_id) {
-        //   return true
-        // } else
-        return true;
-      },
-      // 是否显示麦克风开关按钮
-      isShowAudioControl() {
-        return true;
-      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -114,7 +102,7 @@
     },
     methods: {
       subscribeRemoteStream() {
-        console.warn('开始订阅', JSON.stringify(this.stream));
+        console.log('开始订阅', JSON.stringify(this.stream));
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
