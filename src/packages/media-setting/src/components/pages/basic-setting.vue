@@ -163,10 +163,7 @@
         const saveScreenRate =
           sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
 
-        const defaultLayout = this.filterLayoutConfig.find(
-          el => el.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE'
-        );
-        const savedLayout = sessionStorage.getItem('layout') || defaultLayout.id; // 默认主次平铺
+        const savedLayout = sessionStorage.getItem('layout') || 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE'; // 默认主次平铺
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;
