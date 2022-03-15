@@ -10,7 +10,7 @@
     >
       <div class="msg-item interact">
         <div class="interact-msg">
-          {{ source.roleName | roleFilter(this) }}{{ source.content.text_content }}
+          {{ source.roleName | roleFilter }}{{ source.content.text_content }}
         </div>
       </div>
     </template>
@@ -38,9 +38,8 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.roleName | roleFilter(this) }}{{ source.content.text_content }},{{
-            $t('common.common_1030')
-          }}
+          {{ source.roleName | roleFilter }}{{ source.roleName != 1 ? source.nickname : ''
+          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
@@ -92,7 +91,7 @@
               class="role"
               :class="source.roleName | roleClassFilter"
             >
-              {{ source.roleName | roleFilter(this) }}
+              {{ source.roleName | roleFilter }}
             </span>
             <span class="nickname">{{ source.nickname }}</span>
           </p>
@@ -208,33 +207,7 @@
         jiantou: require('../img/jiantou.png')
       };
     },
-    computed: {
-      customRoleName() {
-        return this.$domainStore.state.roomBaseServer.customRoleName;
-      }
-    },
     filters: {
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = vm.$tdefault(vm.customRoleName[1]);
-            break;
-          case 3:
-            ret = vm.$tdefault(vm.customRoleName[3]);
-            break;
-          case 4:
-            ret = vm.$tdefault(vm.customRoleName[4]);
-            break;
-          case 20:
-            ret = vm.$t('chat.chat_1064');
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人

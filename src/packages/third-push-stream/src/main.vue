@@ -88,16 +88,26 @@
       this.roomBaseServer = useRoomBaseServer();
       this.msgServer = useMsgServer();
     },
+    computed: {
+      isThirdStream() {
+        return this.roomBaseServer.state.isThirdStream;
+      }
+    },
     mounted() {
+      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+        this.isShowThirdStream = true;
+        this.changePushImage(true);
+      }
       this.msgServer.$onMsg('ROOM_MSG', msg => {
-        if (msg.data.type == 'live_start') {
-          this.isShowThirdStream = false;
+        if (msg.data.type == 'live_over') {
+          this.changePushImage(false);
         }
       });
     },
     methods: {
       showThirdStream(info) {
         this.isShowThirdStream = info.status;
+        this.roomBaseServer.setThirdPushStream(info.status);
         info.status && this.getThirdPushStream();
       },
       getThirdPushStream() {
@@ -107,6 +117,20 @@
             this.thirdWatchWebUrl = res.data.stream_address;
           }
         });
+      },
+      changePushImage(flag) {
+        const thirdBackground = document.querySelector('.vmp-basic-right__hd');
+        if (flag) {
+          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
+        } else {
+          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/base-right.png) no-repeat`;
+        }
+        this.isShowThirdStream = false;
+        thirdBackground.style.backgroundSize = '100% 100%';
+        thirdBackground.style.backgroundPosition = 'center';
+      },
+      closeThirdStream() {
+        this.isShowThirdStream = false;
       },
       doCopy(type) {
         let btn = '';

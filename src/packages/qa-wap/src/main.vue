@@ -99,8 +99,9 @@
         //收到问答回复
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
           if (msg.sender_id != this.thirdPartyId) {
-            this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.scrollBottom();
+            // this.unReadMessageCount++;
+            // this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
             this.dispatch('TabContent', 'noticeHint', 'v5');
           }
         });

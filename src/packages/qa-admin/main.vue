@@ -186,7 +186,7 @@
                             item.operator.role_name == 'guest'
                         }"
                       >
-                        {{ item.operator.role_name | filterRoleName }}
+                        {{ item.operator.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ item.operator.operate_time }}</span>
                     </p>
@@ -272,7 +272,7 @@
                           'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
                         }"
                       >
-                        {{ ite.role_name | filterRoleName }}
+                        {{ ite.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
                       <template v-if="ite.is_open == 1">
@@ -370,7 +370,7 @@
                           item.operator.role_name == 'assistant'
                       }"
                     >
-                      {{ item.operator.role_name | filterRoleName }}
+                      {{ item.operator.role_name | roleFilter }}
                     </span>
                   </div>
                   <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
@@ -455,17 +455,6 @@
       PrivateChat
     },
     filters: {
-      filterRoleName(val) {
-        if (val == 'host' || val == 1) {
-          return '主持人';
-        } else if (val == 'assistant' || val == 3) {
-          return '助理';
-        } else if (val == 'guest' || val == 4) {
-          return '嘉宾';
-        } else {
-          return '';
-        }
-      },
       filterNickName(val) {
         if (val.length > 8) {
           return val.substring(0, 8) + '...';
@@ -606,7 +595,7 @@
         });
 
       await useMsgServer().initMaintMsg({ ...watchInitData, hide: 1 });
-      await this.chatPrivateGetRankList();
+      await Promise.all([this.roomBaseServer.getCustomRoleName(), this.chatPrivateGetRankList()]);
 
       this.getChat(0); // 待处理
       this.getChat(1); // 不处理

@@ -68,7 +68,7 @@
         isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
         direciton: 'row', // row(横)，column(纵)
         selectedId: '',
-        visibleCondition: 'living',
+        pageEnv: 'live-room',
         menu: []
       };
     },
@@ -78,11 +78,11 @@
       },
       visibleMenu() {
         return this.menu.filter(item => {
-          if (this.visibleCondition === 'living') {
+          if (this.pageEnv === 'live-room') {
             return (item.status == 1 || item.status == 3) && item.visible;
           }
 
-          if (this.visibleCondition === 'live_over' || this.visibleCondition === 'subscribe') {
+          if (this.pageEnv === 'subscribe') {
             return (item.status == 1 || item.status == 4) && item.visible;
           }
 
@@ -106,7 +106,6 @@
       if (widget && widget.options) {
         this.tabOptions = widget.options;
       }
-      // console.log(this.visibleMenu, '???!231324');
       this.initMenu();
       this.listenEvents();
     },
@@ -151,20 +150,24 @@
         });
 
         if (this.isSubscribe) {
-          this.setVisibleCondition('subscribe');
+          this.setPageEnv('subscribe');
           this.setVisible({ visible: false, type: 3 }); // chat
+        } else {
+          this.setPageEnv('live-room');
         }
 
         // 直播中、结束直播更改状态
         msgServer.$onMsg('ROOM_MSG', msg => {
+          const { clientType } = useRoomBaseServer().state;
+
           if (msg.data.type === 'live_start') {
-            this.setVisibleCondition('living');
+            this.setPageEnv('live-room');
           }
 
           if (msg.data.type === 'live_over') {
-            this.setVisibleCondition('live_over');
             this.setVisible({ visible: false, type: 'private' }); // private-chat
             this.setVisible({ visible: false, type: 'v5' }); // qa
+            clientType === 'send' && this.selectDefault();
           }
         });
         //监听进出子房间消息
@@ -226,14 +229,18 @@
        * 设置显示条件
        * @param {String} condition [default|living|predition]
        */
-      setVisibleCondition(condition = 'default') {
-        this.visibleCondition = condition;
+      setPageEnv(condition = 'default') {
+        this.pageEnv = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
        */
       selectDefault() {
-        this.select({ type: 3 });
+        if (this.visibleMenu.length === 0) return;
+
+        const item = this.visibleMenu[0];
+        const { type, id } = item;
+        this.select({ type, id });
       },
       /**
        * 选中当前项左边一项
@@ -325,13 +332,14 @@
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
-      select({ type, id }) {
+      async select({ type, id }) {
         this.selectedType = type;
         const item = this.getItem({ type, id });
         this.scrollToItem({ id: item.id });
         this.selectedId = item.id;
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
+        await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       },
       /**
@@ -344,7 +352,9 @@
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(tab.id);
+        if (tab.id == this.selectedId) {
+          visible === false && this.jumpToNearestItemById(tab.id);
+        }
       },
       /**
        * 切换某个菜单tab的可视性
@@ -367,7 +377,7 @@
        */
       setTipsVisible({ visible, type, id }) {
         const tab = this.getItem({ type, id });
-        if (!tab) return;
+        if (!tab || this.selectedId === tab.id) return;
 
         tab.tipsVisible = visible;
       },
@@ -398,8 +408,8 @@
         }
 
         // 前后都没有清空任何选择(基本不会发生的极端情况)
-        this.selectedId = '';
-        this.selectedType = '';
+        // this.selectedId = '';
+        // this.selectedType = '';
       }
     }
   };

@@ -221,7 +221,7 @@
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
   import * as _ from 'lodash';
-  import { sleep } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -414,9 +414,7 @@
       },
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
-        return this.isInGroup
-          ? this.groupInitData['speaker_list'] || []
-          : this.interactToolStatus['speaker_list'] || [];
+        return this.micServer.state.speakerList;
       }
     },
     methods: {
@@ -606,10 +604,6 @@
             case 'room_kickout':
               handleKicked(temp);
               break;
-            case 'vrtc_connect_presentation_refused':
-              //用户拒绝了演示邀请
-              isLive && handleUserRejectPresentation(temp);
-              break;
             case 'vrtc_disconnect_presentation_success':
               //用户主动结束演示
               handleUserEndPresentation(temp);
@@ -749,6 +743,9 @@
                 ![null, void 0, ''].includes(context.groupInitData.join_role)
               ) {
                 user.role_name = context.groupInitData.join_role;
+                user.is_banned = isNaN(Number(context.groupInitData.is_banned))
+                  ? 0
+                  : Number(context.groupInitData.is_banned);
               }
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
@@ -902,6 +899,10 @@
           if (msg.data.room_join_id == _this.userId) {
             return;
           }
+          //tab提示小红点
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(_this.cuid, 'emitTabTips', { visible: true, type: 8 })
+          );
           let user = {
             account_id: msg.data.room_join_id,
             avatar: msg.data.avatar,
@@ -935,6 +936,9 @@
             _this.applyUsers = _this.applyUsers.filter(u => u.account_id !== user.account_id);
             if (!_this.applyUsers.length) {
               _this.raiseHandTip = false;
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(_this.cuid, 'emitTabTips', { visible: false, type: 8 })
+              );
             }
           }, 30000);
           //todo 信令通知其他组件(比如自定义菜单组件，有红点)
@@ -1082,25 +1086,6 @@
           //刷新下受限列表
           _this.getLimitUserList();
           _this.refreshList();
-        }
-        //用户拒绝邀请演示
-        function handleUserRejectPresentation(msg) {
-          // 如果申请人是自己
-          // if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
-          //   return;
-          // }
-          // let role = '';
-          // if (msg.data.room_role == 2) {
-          //   role = '观众';
-          // } else if (msg.data.room_role == 4) {
-          //   role = '嘉宾';
-          // }
-          // if (msg.data.extra_params == _this.userId) {
-          //   console.log('拒绝邀请', msg);
-          //   _this.$message.warning({
-          //     message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
-          //   });
-          // }
         }
         //用户主动结束演示
         function handleUserEndPresentation(msg) {
@@ -1360,8 +1345,10 @@
 
         //用户被邀请演示-同意演示
         function agreePresentation(msg) {
-          console.log('agreePresentation:', msg);
-          if (_this.roleName == 20) {
+          if (
+            msg.data.extra_params ==
+            useRoomBaseServer().state.watchInitData?.join_info?.third_party_user_id
+          ) {
             _this.$message({
               message: '对方已接受邀请',
               showClose: true,
@@ -1471,20 +1458,22 @@
       },
       //获取受限人员列表
       async getLimitUserList() {
-        const { getMutedUserList, getKickedUserList } = this.memberServer;
+        const _this = this;
         const data = {
           room_id: this.roomId,
           pos: 0,
           limit: 100
         };
         try {
-          const bannedList = await getMutedUserList(data);
-          const kickedList = this.isInGroup
+          let bannedList = await _this.memberServer.getMutedUserList(data);
+          let kickedList = this.isInGroup
             ? { data: { list: [] } }
-            : await getKickedUserList(data);
-          const list = bannedList.data.list.concat(kickedList.data.list);
+            : await _this.memberServer.getKickedUserList(data);
+          bannedList = bannedList?.data?.list || [];
+          kickedList = kickedList?.data?.list || [];
+          const list = bannedList.concat(kickedList);
           const hash = {};
-          this.limitedUsers = list.reduce((preVal, curVal) => {
+          this.limitedUsers = (list || []).reduce((preVal, curVal) => {
             !hash[curVal.account_id] && (hash[curVal.account_id] = true && preVal.push(curVal));
             return preVal;
           }, []);
@@ -1916,7 +1905,9 @@
       },
       //查找用户在数组的索引号
       _getUserIndex(accountId, list) {
-        return list.findIndex(item => item.account_id === accountId);
+        return list.findIndex(
+          item => item.account_id === accountId || item.accountId === accountId
+        );
       },
       //加载更多
       loadMore() {

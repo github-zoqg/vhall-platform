@@ -84,8 +84,9 @@
       // postcss 换算基数为75 头部+播放器区域高为 522px
       this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
       // 结束讨论
-      this.groupServer.$on('GROUP_SWITCH_END', msg => {
-        if (!msg.data.over_live && !this.signinInfo.is_signed && this.signinInfo.id) {
+      this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+        const { groupInitData } = this.groupServer.state;
+        if (!groupInitData.isInGroup && !this.signinInfo.is_signed && this.signinInfo.id) {
           this.init();
         }
       });
@@ -98,7 +99,7 @@
         this.signInVisible = true;
         this.duration = Number(e.data.sign_show_time);
         this.openSignIn(e.data.sign_id, e.data.sign_show_time);
-        this.title = e.data.title;
+        this.title = this.$tdefault(e.data.title);
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,
@@ -226,7 +227,7 @@
         // this.$toast('签到成功！')
       },
       getHistorySignInfo() {
-        this.title = this.signinInfo.sign_tips;
+        this.title = this.$tdefault(this.signinInfo.sign_tips);
         this.duration = Number(this.signinInfo.show_time);
         const sign_time =
           this.signinInfo.is_auto_sign == 1

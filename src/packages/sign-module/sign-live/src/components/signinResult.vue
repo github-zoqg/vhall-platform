@@ -16,7 +16,7 @@
           <span class="sign-avatar">
             <img :src="user.signer_avatar ? user.signer_avatar : defaultAvater" alt="" />
           </span>
-          <span class="sign-name ellsips">{{ user.signer_nickname }}</span>
+          <span class="sign-name text-overflow">{{ user.signer_nickname }}</span>
           <span class="sign-time">{{ signTime(user.created_at) }}</span>
         </div>
       </div>

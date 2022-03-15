@@ -133,7 +133,7 @@
                 <!-- 表格展示 -->
                 <el-table-column prop="file_name" label="文档名称" width="180">
                   <template slot-scope="scope">
-                    <p class="text">
+                    <p class="file-name" style="-webkit-box-orient: vertical">
                       <span
                         class="vh-iconfont"
                         :class="scope.row.ext | fileIconCss(false)"
@@ -233,7 +233,7 @@
               <el-table-column type="selection" width="55" align="left"></el-table-column>
               <el-table-column prop="file_name" label="文档名称" width="180">
                 <template slot-scope="scope">
-                  <p class="text">
+                  <p class="file-name" style="-webkit-box-orient: vertical">
                     <span
                       class="vh-iconfont"
                       :class="scope.row.ext | fileIconCss(false)"
@@ -829,5 +829,14 @@
       text-align: right;
       margin-top: 20px;
     }
+  }
+  .el-table .cell .file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    display: box;
+    -webkit-line-clamp: 2;
+    box-orient: vertical;
+    -webkit-box-orient: vertical;
   }
 </style>

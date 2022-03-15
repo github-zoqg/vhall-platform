@@ -43,7 +43,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          热度 &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -109,18 +109,6 @@
   import BScroll from '@better-scroll/core';
   import { Toast, Dialog } from 'vant';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpWapStreamList',
 
@@ -206,7 +194,11 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
+         * 4. 没有互动实例的时候高度为0
          */
+        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+          return true;
+        }
         if (!this.remoteSpeakers.length) {
           if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;
@@ -253,6 +245,10 @@
       // 开始推流到成功期间展示默认图
       defaultBg() {
         return this.interactiveServer.state.defaultStreamBg;
+      },
+      // 主持人ID 分组期间使用
+      userinfoId() {
+        return this.roomBaseServer.state.watchInitData?.webinar.userinfo.user_id;
       }
     },
     beforeCreate() {
@@ -266,16 +262,8 @@
 
     async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
-      this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
-        return langMap[item.language_type];
-      });
-      const curLang = this.roomBaseServer.state.languages.curLang;
-      this.lang =
-        langMap[sessionStorage.getItem('lang')] ||
-        langMap[this.$route.query.lang] ||
-        langMap[curLang.language_type];
-      this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.key);
+      this.languageList = this.roomBaseServer.state.languages.langList;
+      this.lang = this.roomBaseServer.state.languages.lang;
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
         return Toast(`浏览器不支持互动`);
@@ -288,9 +276,6 @@
       if (this.micServer.getSpeakerStatus()) {
         if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           this.createBScroll();
-        }
-        if (window.orientation == 90 || window.orientation == -90) {
-          this.setFullScreen();
         }
       }
 
@@ -334,56 +319,57 @@
         });
 
         // 开启分组讨论
-        this.groupServer.$on('GROUP_SWITCH_START', () => {
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
           if (this.isInGroup) {
-            this.gobackHome(1, this.groupServer.state.groupInitData.name);
+            this.gobackHome(1, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 切换小组,小组人员变动
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, changeInfo) => {
+          if (changeInfo.isNeedCare && this.isInGroup) {
+            this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
           }
         });
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           if (!msg.data.groupToast) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+            this.gobackHome(3, this.groupServer.state.groupInitData.name, msg);
           }
         });
 
         // 小组解散
-        this.groupServer.$on('GROUP_DISBAND', () => {
-          this.gobackHome(4);
+        this.groupServer.$on('GROUP_DISBAND', msg => {
+          this.gobackHome(4, '', msg);
         });
 
         // 本人被踢出来
-        this.groupServer.$on('ROOM_GROUP_KICKOUT', () => {
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          this.gobackHome(5, this.groupServer.state.groupInitData.name, msg);
         });
 
         // 组长变更
-        this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
-          this.gobackHome(7);
-        });
-
-        // 与王佳佳沟通 => wap横屏时，直接进行全屏主屏流
-        window.addEventListener('orientationchange', () => {
-          if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
-            this.setFullScreen();
-          }
+        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          this.gobackHome(7, '', msg);
         });
       },
       // 返回主房间提示
-      async gobackHome(index, name) {
+      async gobackHome(index, name, msg) {
+        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
         let title = '';
         switch (index) {
           case 1:
-            title = '主持人开启了分组讨论，您将进入' + name + '组参与讨论';
+            title = who + '开启了分组讨论，您将进入' + name + '组参与讨论';
             break;
           case 2:
-            title = '主持人已将您分配至' + name + '组';
+            title = who + '已将您分配至' + name + '组';
             break;
           case 3:
-            title = this.$t('chat.chat_1073');
+            title = who + '结束了分组讨论，您将返回主直播间';
             break;
           case 4:
-            title = this.$t('chat.chat_1074');
+            title = who + '解散了分组，您将返回主直播间';
             break;
           case 5:
             title = this.$t('chat.chat_1007');
@@ -392,13 +378,13 @@
             title = '组长身份已变更';
             break;
         }
-        if (index == 1) {
+        if (index == 5 || index == 7) {
+          Toast(title);
+        } else {
           await Dialog.alert({
             title: this.$t('account.account_1061'),
             message: title
           });
-        } else {
-          Toast(title);
         }
       },
 
@@ -479,7 +465,7 @@
       },
       changeLang(key) {
         this.isOpenlang = false;
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       openLanguage() {

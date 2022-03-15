@@ -113,7 +113,7 @@ export default async function () {
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态
-    promiseList.push(mediaCheckServer.getMediaInputPermission());
+    promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
   await Promise.all(promiseList);
 

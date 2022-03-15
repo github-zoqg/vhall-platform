@@ -71,17 +71,17 @@
         const mapList = [
           {
             code: 1,
-            name: this.$t('chat.chat_1022'),
+            name: this.$getRoleName(1),
             className: 'info-role--host'
           },
           {
             code: 3,
-            name: this.$t('chat.chat_1024'),
+            name: this.$getRoleName(3),
             className: 'info-role--assistant'
           },
           {
             code: 4,
-            name: this.$t('chat.chat_1023'),
+            name: this.$getRoleName(4),
             className: 'info-role--guest'
           }
         ];
@@ -198,10 +198,10 @@
           handleGroupJoinInfoChange(msg);
         });
         //切换分组
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          console.log('切换分组', msg);
-          _this.initList();
-        });
+        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+        //   console.log('切换分组', msg);
+        //   _this.initList();
+        // });
         //踢出小组
         function handleGroupKicked(msg) {
           if (!_this.groupInitData.isInGroup) return;

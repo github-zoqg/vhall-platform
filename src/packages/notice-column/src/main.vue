@@ -31,12 +31,6 @@
         return this.roomBaseServer.state.noticeInfo;
       }
     },
-    watch: {
-      isInGroup(val) {
-        this.isNoticeColumn = false;
-        this.openNotice();
-      }
-    },
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -72,14 +66,9 @@
           this.isNoticeColumn = false;
         });
         // 结束讨论
-        this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          if (
-            !msg.data.over_live &&
-            this.noticeLatestInfo.total &&
-            this.noticeLatestInfo.list[0].created_at
-          ) {
-            this.isNoticeColumn = true;
-            this.noticeText = this.noticeLatestInfo.list[0].content['content'];
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          if (!this.isInGroup) {
+            this.openNotice();
           }
         });
         this.groupServer.$on('GROUP_SWITCH_START', () => {

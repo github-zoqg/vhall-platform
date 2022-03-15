@@ -17,7 +17,11 @@ export function initGlobalPrototype() {
       localStorage.setItem('lang', value);
     },
     get: function () {
-      return localStorage.getItem('lang') || window.$globalConfig?.lang || 'zh';
+      return localStorage.getItem('lang') == 2
+        ? 'en'
+        : localStorage.getItem('lang') == 1
+        ? 'zh'
+        : 'es' || 'zh';
     }
   });
 

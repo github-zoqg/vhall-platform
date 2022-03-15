@@ -249,18 +249,6 @@
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -382,25 +370,17 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
-      this.languageList = this.roomBaseState.languages.langList.map(item => {
-        return langMap[item.language_type];
-      });
-      const curLang = this.roomBaseState.languages.curLang;
-      this.lang =
-        langMap[sessionStorage.getItem('lang')] ||
-        langMap[this.$route.query.lang] ||
-        langMap[curLang.language_type];
-      this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.key);
+      this.languageList = this.roomBaseServer.state.languages.langList;
+      this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
       this.getWebinerStatus();
-      if (window.orientation == 90 || window.orientation == -90) {
-        this.isOrientation = true;
-        this.setFullscreen();
-      } else {
-        this.isOrientation = false;
-      }
+      // if (window.orientation == 90 || window.orientation == -90) {
+      //   this.isOrientation = true;
+      //   this.setFullscreen();
+      // } else {
+      //   this.isOrientation = false;
+      // }
     },
     methods: {
       startPlay() {
@@ -511,7 +491,7 @@
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
           } else {
-            if (this.isAutoPlay && !this.isPlayering) {
+            if (this.isAutoPlay) {
               this.play();
             }
           }
@@ -670,7 +650,7 @@
       },
       changeLang(key) {
         this.isOpenlang = false;
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       openLanguage() {

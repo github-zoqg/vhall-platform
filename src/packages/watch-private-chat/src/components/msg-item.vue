@@ -15,7 +15,7 @@
             :class="source.roleName | roleClassFilter"
             v-if="source.roleName && source.roleName != 2"
           >
-            {{ source.roleName | roleFilter(this) }}
+            {{ source.roleName | roleFilter }}
           </span>
         </div>
 
@@ -50,27 +50,6 @@
         }
         //游客
         return 'guest';
-      },
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = vm.$tdefault(vm.customRoleName[1]);
-            break;
-          case 3:
-            ret = vm.$tdefault(vm.customRoleName[3]);
-            break;
-          case 4:
-            ret = vm.$tdefault(vm.customRoleName[4]);
-            break;
-          case 20:
-            ret = vm.$t('chat.chat_1064');
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
       }
     },
     props: {
@@ -80,11 +59,6 @@
         default: () => {
           return {};
         }
-      }
-    },
-    computed: {
-      customRoleName() {
-        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
     data() {

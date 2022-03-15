@@ -68,7 +68,7 @@
 </template>
 
 <script>
-  import { useMediaSettingServer } from 'middle-domain';
+  import { useMediaSettingServer, useMsgServer } from 'middle-domain';
   import { LIVE_MODE_MAP } from '../../js/liveMap';
   import mediaSettingConfirm from '../../js/showConfirm';
 
@@ -129,12 +129,28 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      this.msgServer = useMsgServer();
     },
     created() {
-      window.basicSetting = this;
       this.setDefault();
+      this.listenEvents();
+    },
+    beforeDestroy() {
+      this.removeEvents();
     },
     methods: {
+      listenEvents() {
+        // 结束直播时恢复 标清
+        this._onLiveOver = () => {
+          this.mediaState.rate = this.ratesConfig[2]; // 恢复标清;
+          sessionStorage.setItem('selectedRate', '');
+          this.$forceUpdate();
+        };
+        this.msgServer.$on('live_over', this._onLiveOver);
+      },
+      removeEvents() {
+        this.msgServer.$off('live_over', this._onLiveOver);
+      },
       setLayout(id) {
         if (this.liveStatus === 1) return;
         this.mediaState.layout = id;
@@ -144,7 +160,7 @@
         const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
         const saveScreenRate =
           sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
-        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[0].id;
+        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[1].id; // 默认主次平铺
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;

@@ -2,6 +2,13 @@
   <div class="vmp-basic-center" :class="isEmbed ? 'vmp-basic-center-embed' : ''">
     <!-- 流列表 -->
     <vmp-air-container :cuid="cuid"></vmp-air-container>
+    <!-- 封面，无延迟直播或者上麦观众刷新页面显示 -->
+    <div class="vmp-basic-center__cover" v-show="showcoverImg && !switchStatusDoc">
+      <img :src="coverImgUrl" alt />
+      <p class="vmp-basic-center__cover-icon" @click.stop="handleAllVideoPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -9,11 +16,33 @@
   export default {
     name: 'VmpBasicCenterContainer',
     data() {
-      return {};
+      return { showcoverImg: false };
     },
     computed: {
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 文档区域是否展示 在上麦或者分组时，右上角为主屏画面，一般在主屏画面处设置播放按钮
+      switchStatusDoc() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      }
+    },
+    created() {
+      // 如果是当前活动是无延迟直播，后者当前用户在麦上，刷新的时候展示封面图
+      if (
+        this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar ||
+        this.$domainStore.state.micServer.isSpeakOn
+      ) {
+        this.showcoverImg = true;
+      }
+    },
+    methods: {
+      handleAllVideoPlay() {
+        document.querySelectorAll('video').forEach(video => video.play());
+        this.showcoverImg = false;
       }
     }
   };
@@ -33,6 +62,38 @@
     }
     &__mainscreen-pos {
       height: 100%;
+    }
+    &__cover {
+      position: absolute;
+      top: 0;
+      bottom: 56px;
+      width: calc(100% - 380px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 6;
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      &-icon {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        width: 88px;
+        height: 88px;
+        z-index: 1;
+        .vh-iconfont {
+          font-size: 34px;
+          color: #e6e6e6;
+        }
+      }
     }
   }
   // .vmp-basic-center

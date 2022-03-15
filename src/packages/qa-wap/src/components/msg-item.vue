@@ -42,7 +42,7 @@
               />
             </span>
             <span :class="['role', source.answer.role_name]">
-              {{ source.answer.role_name | roleFilter(this) }}
+              {{ source.answer.role_name | roleFilter }}
             </span>
             <span class="nick-name">{{ source.answer.nick_name }}</span>
             <span class="time">{{ source.answer.created_at }}</span>
@@ -74,22 +74,6 @@
         return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
-    filters: {
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (value) {
-          case 'host':
-            ret = vm.$tdefault(vm.customRoleName[1]);
-            break;
-          case 'assistant':
-            ret = vm.$tdefault(vm.customRoleName[3]);
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
-      }
-    }
+    filters: {}
   };
 </script>

@@ -220,14 +220,8 @@
           isInsertFilePushing &&
           insertStreamInfo.userInfo.accountId != watchInitData.join_info.third_party_user_id
         ) {
-          const roleMap = {
-            1: '主持人',
-            3: '助理',
-            4: '嘉宾'
-          };
-
           this.$alert(
-            `${roleMap[insertStreamInfo.userInfo.role]}${
+            `${this.$getRoleName(insertStreamInfo.userInfo.role)}${
               insertStreamInfo.userInfo.role != 1 ? insertStreamInfo.userInfo.nickname : ''
             }正在插播文件，请稍后重试`,
             '',
@@ -303,13 +297,10 @@
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
-        // 设置插播类型,local 本地插播   remote 云插播
-        console.log('insertFileServer.setInsertFileType', insertFileServer.setInsertFileType);
-        insertFileServer.setInsertFileType('local');
-        // 设置当前插播文件
-        insertFileServer.setLocalInsertFile(File);
 
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitInsertFileChange'));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitInsertFileChange', [File, 'local'])
+        );
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -407,21 +398,15 @@
             cancelButtonText: '取消',
             customClass: 'zdy-message-box',
             cancelButtonClass: 'zdy-confirm-cancel'
-          })
-            .then(() => {
-              insertFileServer.setRemoteInsertFile(video);
-              insertFileServer.setInsertFileType('remote');
-
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitInsertFileChange')
-              );
-            })
-            .catch(() => {});
+          }).then(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitInsertFileChange', [video, 'remote'])
+            );
+          });
         } else {
-          insertFileServer.setRemoteInsertFile(video);
-          insertFileServer.setInsertFileType('remote');
-
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitInsertFileChange'));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitInsertFileChange', [video, 'remote'])
+          );
         }
       },
       handleDelete(video) {

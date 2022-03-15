@@ -18,7 +18,7 @@
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleNameFilter }}
+        {{ joinInfo.role_name | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
@@ -132,18 +132,7 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -295,7 +284,7 @@
         return this.micServer.speakOff();
       },
       // 处理上麦失败
-      handleSpeakOnError(err) {
+      async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
@@ -308,6 +297,10 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'noPermission') {
+          await this.interactiveServer.destroy();
+          await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          this.publishLocalStream();
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
           console.log('开启主屏失败');
@@ -356,9 +349,10 @@
           // 分组活动 自动上麦默认禁音
           console.warn('自动上麦条件：', this.autoSpeak);
           if (this.autoSpeak) {
-            this.interactiveServer.muteAudio({
-              streamId: this.localStream.streamId, // 流Id, 必填
-              isMute: true // true为禁用，false为启用。
+            this.interactiveServer.setDeviceStatus({
+              device: 1, // 1:audio    2:video
+              status: 0, // 0:禁音    1:打开麦克风
+              receive_account_id: this.joinInfo.third_party_user_id
             });
           }
           // 实时获取网络状况
@@ -384,7 +378,14 @@
           .then(() => {
             this.isStreamPublished = true;
           })
-          .catch(() => 'publishStreamError');
+          .catch(e => {
+            if (e.code === '611007') {
+              this.handleSpeakOnError('noPermission');
+            } else {
+              this.handleSpeakOnError('publishStreamError');
+            }
+          });
+        // .catch(() => 'publishStreamError');
       },
       // 结束推流
       stopPush() {

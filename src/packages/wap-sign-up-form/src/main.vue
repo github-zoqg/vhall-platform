@@ -486,22 +486,6 @@
       };
     },
     computed: {
-      // 与网易易盾图片插件语言匹配
-      langNECaptcha() {
-        const locale = window.$globalConfig.currentLang;
-        let lang = 'zh-CN';
-        switch (locale) {
-          case 'zh':
-            lang = 'zh-CN';
-            break;
-          case 'spain':
-            lang = 'es';
-            break;
-          default:
-            lang = locale;
-        }
-        return lang;
-      },
       //当前的城市列表
       currentCityList() {
         return this.cityList[this.province];
@@ -730,8 +714,7 @@
           captchaId: that.captchakey,
           element: id,
           mode: 'float',
-          // lang: sessionStorage.getItem('lang') || 'zh-CN',
-          lang: this.langNECaptcha,
+          lang: window.$globalConfig.currentLang || 'zh-CN',
           onReady(instance) {
             console.log(instance);
           },

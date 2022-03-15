@@ -197,7 +197,7 @@
       // 无延迟图片地址
       noDelayIconUrl() {
         const langArr = ['zh-CN', 'en'];
-        const langer = sessionStorage.getItem('lang') || this.languagesInfo.language_type;
+        const langer = localStorage.getItem('lang') || this.languagesInfo.language_type;
         const lang = langArr[langer - 1] || 'zh-CN';
         return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       }
@@ -212,6 +212,7 @@
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
       }
+      console.log(this.languagesInfo, '??123243');
       this.getWebinarInfo();
     },
     methods: {

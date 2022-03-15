@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-    <div v-if="roleName == 1" class="button-container">
+    <div v-if="roleName != 2" class="button-container">
       <p @click="openQa">问答管理</p>
     </div>
     <chat-operator
@@ -129,6 +129,7 @@
       this.listenEvents();
       this.getQaHistoryMsg();
       this.initLoginStatus();
+      this.initInputStatus();
     },
     filters: {},
     methods: {
@@ -139,7 +140,7 @@
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
             this.scrollBottom();
-          } else {
+          } else if (this.roleName != 2 && !this.isBottom()) {
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }

@@ -36,13 +36,13 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
-      <!-- <span
+      <span
         v-show="[1, 3, 4].includes(joinInfo.role_name)"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleNameFilter }}
-      </span> -->
+        {{ joinInfo.role_name | roleFilter }}
+      </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -63,7 +63,7 @@
     >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleNameFilter }}
+          {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
           :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
@@ -192,6 +192,7 @@
 
     <!-- 播放按钮 -->
     <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -294,20 +295,30 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
-        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 非同意主持人的邀请上麦 + 非自己申请上麦
-        return (
-          this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
-          this.mode == 6 &&
-          this.joinInfo.role_name == 2 &&
-          !this.isNotAutoSpeak
-        );
+        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 观众 + 不在麦上 + 非同意主持人的邀请上麦 + 非自己申请上麦
+        if (this.groupRole == 20) {
+          return false;
+        } else {
+          return (
+            this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
+            this.mode == 6 &&
+            this.joinInfo.role_name == 2 &&
+            !this.isNotAutoSpeak &&
+            !this.micServer.getSpeakerStatus()
+          );
+        }
       },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
         return (
           this.mainScreen == this.joinInfo.third_party_user_id &&
           this.interactiveServer.state.showPlayIcon &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          this.$domainStore.state.docServer.switchStatus
         );
+      },
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
       // 是否显示分屏占位图
       isShowSplitScreenPlaceholder() {
@@ -320,20 +331,12 @@
 
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -594,7 +597,7 @@
         return this.micServer.speakOff();
       },
       // 处理上麦失败
-      handleSpeakOnError(err) {
+      async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
           this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
@@ -607,6 +610,11 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'noPermission') {
+          // 无推流权限
+          await this.interactiveServer.destroy();
+          await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          await this.publishLocalStream();
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
           console.log('开启主屏失败');
@@ -628,6 +636,14 @@
       },
       // 开始推流
       async startPush() {
+        // 第三方推流直接开始直播
+        if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
+          // 派发事件
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
+          );
+          return;
+        }
         try {
           // 创建本地流
           await this.createLocalStream();
@@ -650,11 +666,13 @@
               await this.setBroadCastScreen();
             }
           }
+          console.log('paltForm 自动静音上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
           if (this.autoSpeak) {
-            this.interactiveServer.muteAudio({
-              streamId: this.localStream.streamId, // 流Id, 必填
-              isMute: true // true为禁用，false为启用。
+            this.interactiveServer.setDeviceStatus({
+              device: 1, // 1:audio    2:video
+              status: 0, // 0:禁音    1:打开麦克风
+              receive_account_id: this.joinInfo.third_party_user_id
             });
           }
           // 派发事件
@@ -690,7 +708,14 @@
       },
       // 推流
       async publishLocalStream() {
-        await this.interactiveServer.publishStream().catch(() => 'publishStreamError');
+        await this.interactiveServer.publishStream().catch(e => {
+          console.warn('----推流失败', e);
+          if (e.code === '611007') {
+            this.handleSpeakOnError('noPermission');
+          } else {
+            this.handleSpeakOnError('publishStreamError');
+          }
+        });
       },
 
       // 设置主屏
@@ -764,7 +789,13 @@
       // 切换大小窗
       exchange() {
         const roomBaseServer = useRoomBaseServer();
-        roomBaseServer.requestChangeMiniElement('stream-list');
+        let miniElement = '';
+        if (this.isShareScreen) {
+          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+        } else {
+          miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        }
+        roomBaseServer.setChangeElement(miniElement);
       },
       // 实时获取网路状况和麦克风能量
       getLevel() {
@@ -1085,6 +1116,12 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
       p {
         width: 108px;
         height: 108px;

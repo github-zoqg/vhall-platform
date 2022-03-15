@@ -12,14 +12,20 @@
           stream.videoMuted && !isShowSplitScreenPlaceholder
       }"
     ></section>
+
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom">
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName)"
+        v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleNameFilter }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
@@ -31,7 +37,7 @@
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
-
+    <!-- {{ joinInfo.role_name }} -- {{ groupRole }} -->
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
       <p
@@ -42,7 +48,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleNameFilter }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -107,7 +113,7 @@
 
     <section v-else class="vmp-stream-remote__shadow-box">
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="(joinInfo.role_name == 1 && !is_host_in_group) || groupRole == 20"
         class="vmp-stream-remote__shadow-first-line"
       >
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -156,7 +162,7 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2"
+            v-show="stream.attributes.roleName == 2 || joinInfo.role_name == 1"
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
@@ -164,7 +170,7 @@
 
         <el-tooltip content="下麦" placement="bottom">
           <span
-            v-show="stream.attributes.roleName != 1"
+            v-show="(stream.attributes.roleName != 1 && !is_host_in_group) || groupRole == 20"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
           ></span>
@@ -172,6 +178,7 @@
       </p>
     </section>
     <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -211,6 +218,22 @@
       }
     },
     computed: {
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      is_host_in_group() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
+      },
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -226,17 +249,36 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
+      presentationScreen() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+      },
+      //显示是否在演示中
+      isShowPresentationScreen() {
+        const { accountId } = this.stream;
+        const sameId = this.presentationScreen === accountId;
+        const groupMode = this.liveMode == 6;
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
+        return sameId && groupMode && allowedUser;
+      },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
+      // 封面图
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
         return (
           this.mainScreen == this.stream.accountId &&
           this.interactiveServer.state.showPlayIcon &&
-          this.joinInfo.role_name == 2
+          this.joinInfo.role_name == 2 &&
+          this.$domainStore.state.docServer.switchStatus
         );
       },
       isShowSplitScreenPlaceholder() {
@@ -244,20 +286,12 @@
           this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
           this.$domainStore.state.splitScreenServer.role == 'host'
         );
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -286,7 +320,7 @@
     methods: {
       // 恢复播放
       replayPlay() {
-        const videos = document.querySelectorAll('video');
+        const videos = document.querySelectorAll('.vmp-stream-remote video');
         videos.length > 0 &&
           videos.forEach(video => {
             video.play();
@@ -309,7 +343,7 @@
             this.getLevel();
             // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
             setTimeout(() => {
-              const list = document.getElementsByTagName('video');
+              const list = document.querySelectorAll('.vmp-stream-remote video');
               for (const item of list) {
                 item.play();
               }
@@ -354,9 +388,16 @@
             });
         }
       },
+      // 切换大小窗
       exchange() {
         const roomBaseServer = useRoomBaseServer();
-        roomBaseServer.requestChangeMiniElement('stream-list');
+        let miniElement = '';
+        if (this.isShareScreen) {
+          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+        } else {
+          miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        }
+        roomBaseServer.setChangeElement(miniElement);
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -536,6 +577,28 @@
         }
       }
     }
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     // 遮罩层样式
     .vmp-stream-remote__shadow-box {
       width: 100%;
@@ -596,6 +659,12 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
       p {
         width: 108px;
         height: 108px;

@@ -82,7 +82,6 @@
     useGroupServer,
     useRoomBaseServer,
     useChatServer,
-    useMediaCheckServer,
     useMsgServer,
     useUserServer,
     useMicServer
@@ -176,7 +175,7 @@
     computed: {
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return useMediaCheckServer().state.deviceInfo.device_status;
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
       },
       // 是否开启举手
       isAllowhandup() {
@@ -212,16 +211,16 @@
       },
       //是否展示互动上麦按钮
       isShowMicBtn() {
-        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        //todo 注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         return (
           this.webinar.type == 1 &&
-          device_status != 2 &&
+          this.device_status != 2 &&
           [
             this.connectMicShow &&
               !this.isAllBanned &&
               !this.isBanned &&
               !this.groupInitData.isInGroup,
-            this.groupInitData.isInGroup && !this.groupInitData.isBanned
+            this.groupInitData.isInGroup && !this.isBanned
           ].some(val => !!val)
         );
       }
@@ -237,7 +236,6 @@
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
-      this.mediaCheckServer = useMediaCheckServer();
       this.msgServer = useMsgServer();
       this.userServer = useUserServer();
     },

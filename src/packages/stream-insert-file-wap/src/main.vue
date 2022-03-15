@@ -45,6 +45,9 @@
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
           this.insertFileServer.unsubscribeInsertStream();
         });
+        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+          this.subscribeInsert();
+        });
         this.insertFileServer.$on('insert_mic_mute_change', status => {
           if (status == 'play') {
             this.$toast(this.$t('interact.interact_1026'));
@@ -61,7 +64,6 @@
   #vmp-wap-insert-file {
     width: 100%;
     height: 100%;
-    background: #2d2d2d;
     position: absolute;
     top: 0;
     left: 0;

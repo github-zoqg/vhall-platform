@@ -71,16 +71,16 @@
     },
     methods: {
       initNotice() {
+        const { groupInitData } = this.groupServer.state;
         this.noticeServer.$on('live_over', () => {
           this.isShowIcon = false;
         });
         // 结束讨论
-        this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          if (!msg.data.over_live) {
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          if (!groupInitData.isInGroup) {
             this.getNoticeInfo();
           }
         });
-        const { groupInitData } = this.groupServer.state;
         if (groupInitData.isInGroup) return;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {

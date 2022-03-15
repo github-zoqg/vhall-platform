@@ -114,8 +114,7 @@
     useZIndexServer,
     useMicServer,
     useChatServer,
-    useGroupServer,
-    useMediaCheckServer
+    useGroupServer
   } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -126,18 +125,6 @@
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -165,7 +152,6 @@
         showPay: false,
         zfQr: '',
         wxQr: '',
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
         lang: {},
         languageList: []
       };
@@ -235,7 +221,10 @@
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return useMediaCheckServer().state.deviceInfo.device_status;
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
+      },
+      isBanned() {
+        return !this.isInGroup && (useChatServer().state.banned || useChatServer().state.allBanned); //true禁言，false未禁言
       }
     },
     beforeCreate() {
@@ -247,16 +236,8 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       if (this.isEmbed) {
-        this.languageList = this.roomBaseState.languages.langList.map(item => {
-          return langMap[item.language_type];
-        });
-        const curLang = this.roomBaseState.languages.curLang;
-        this.lang =
-          langMap[sessionStorage.getItem('lang')] ||
-          langMap[this.$route.query.lang] ||
-          langMap[curLang.language_type];
-        this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.key);
+        this.languageList = this.roomBaseState.languages.langList;
+        this.lang = this.roomBaseServer.state.languages.lang;
       }
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
@@ -267,16 +248,6 @@
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
-    },
-    mounted() {
-      //监听禁言通知
-      useChatServer().$on('banned', res => {
-        this.isBanned = res;
-      });
-      //监听全体禁言通知
-      useChatServer().$on('allBanned', res => {
-        this.isBanned = res;
-      });
     },
     methods: {
       settingShow() {
@@ -318,7 +289,7 @@
         this[data] = url;
       },
       changeLang(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       needLogin() {
