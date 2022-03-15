@@ -591,7 +591,6 @@
       margin-bottom: 20px;
       .title {
         font-size: 20px;
-        font-family: PingFangSC-Medium, PingFang SC;
         font-weight: 500;
         color: #1a1a1a;
         line-height: 24px;
@@ -656,8 +655,6 @@
             border-radius: 4px;
             text-align: center;
             font-size: 12px;
-            font-family: PingFangSC-Regular, PingFang SC;
-            font-weight: 400;
             color: @font-light-low;
             line-height: 54px;
           }
@@ -672,7 +669,6 @@
         .name {
           width: 100%;
           font-size: 18px;
-          font-family: PingFangSC-Medium, PingFang SC;
           font-weight: 500;
           color: #1a1a1a;
           line-height: 22px;
@@ -681,6 +677,7 @@
           display: -webkit-box;
           -webkit-line-clamp: 2;
           line-clamp: 2;
+          /* autoprefixer: ignore next */
           -webkit-box-orient: vertical;
           text-align: left;
           margin-bottom: 12px;
@@ -690,8 +687,6 @@
           height: 140px;
           line-height: 18px;
           font-size: 14px;
-          font-family: PingFangSC-Regular, PingFang SC;
-          font-weight: 400;
           color: #666666;
           word-break: break-word;
           width: 300px;
@@ -699,9 +694,7 @@
           text-align: left;
         }
         .price-info {
-          font-family: PingFangSC-Regular, PingFang SC;
           width: 100%;
-          font-weight: 400;
           display: flex;
           flex-direction: row;
           align-items: center;
@@ -745,8 +738,6 @@
           }
           .nodiscount {
             font-size: 14px;
-            font-family: PingFangSC-Regular, PingFang SC;
-            font-weight: 400;
             color: #fb3a32;
             line-height: 20px;
             text-decoration: none;
@@ -791,8 +782,6 @@
       height: 20px;
       text-align: center;
       font-size: 14px;
-      font-family: PingFangSC-Regular, PingFang SC;
-      font-weight: 400;
       color: #999999;
       line-height: 20px;
       margin-top: 10px;
