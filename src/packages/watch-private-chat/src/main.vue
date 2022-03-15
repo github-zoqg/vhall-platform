@@ -141,7 +141,7 @@
       this.listenEvents();
       this.initInputStatus();
       this.initLoginStatus();
-      this.getHistoryMsg();
+      // this.getHistoryMsg();
     },
     methods: {
       //初始化视图数据
