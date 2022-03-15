@@ -96,7 +96,8 @@
     useInteractiveServer,
     useRoomBaseServer,
     useMicServer,
-    useGroupServer
+    useGroupServer,
+    useDocServer
   } from 'middle-domain';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
@@ -212,6 +213,29 @@
       },
       'remoteSpeakers.length'(newval) {
         this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
+      },
+      isShareScreen: {
+        handler(newval) {
+          console.error(newval, this.isUseNoDelayLayout, useDocServer().state.switchStatus);
+          if (this.isUseNoDelayLayout) {
+            // 互动无延迟模仿旁路布局
+            if (newval) {
+              // 开启共享
+              if (useDocServer().state.switchStatus) {
+                useRoomBaseServer().setChangeElement('doc');
+                // 开启文档
+              } else {
+                useRoomBaseServer().setChangeElement('');
+              }
+            }
+          } else {
+            if (newval) {
+              // 开启共享
+              useRoomBaseServer().setChangeElement('stream-list');
+            }
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -425,9 +449,9 @@
       bottom: 56px;
       height: auto;
 
-      // &.is-share-screen {
-      //   display: none;
-      // }
+      &.is-share-screen {
+        display: none;
+      }
       .vmp-stream-list__main-screen {
         bottom: 0;
         top: 0;

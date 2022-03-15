@@ -69,7 +69,8 @@
     useGroupServer,
     useDesktopShareServer,
     useMsgServer,
-    useMicServer
+    useMicServer,
+    useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -103,7 +104,7 @@
       },
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       },
       //是否在分组里
       isInGroup() {
@@ -256,8 +257,8 @@
         this.desktopShareServer.$on('screen_stream_add', () => {
           this.subscribeStream();
         });
-        this.desktopShareServer.$on('screen_stream_remove', () => {
-          this.desktopShareServer.unSubscribeDesktopShareStream();
+        this.desktopShareServer.$on('EVENT_STREAM_END', () => {
+          this.setDesktop('0');
         });
 
         useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -269,7 +270,7 @@
               this.third_party_user_id == this.desktopShareInfo.accountId &&
               msg.data.target_id != this.third_party_user_id
             ) {
-              this.desktopShareServer.stopShareScreen();
+              this.stopShare();
             }
           }
           // 演示着变更
@@ -280,14 +281,14 @@
               this.third_party_user_id == this.desktopShareInfo.accountId &&
               msg.data.target_id != this.third_party_user_id
             ) {
-              this.desktopShareServer.stopShareScreen();
+              this.stopShare();
             }
           }
           // 演示着变更
           if (msg.data.type === 'group_manager_enter') {
             // 自己正在发起桌面共享
             if (this.isShareScreen && this.third_party_user_id == this.desktopShareInfo.accountId) {
-              this.desktopShareServer.stopShareScreen();
+              this.stopShare();
             }
           }
         });
@@ -299,17 +300,13 @@
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
 
-        this.desktopShareServer.subscribeDesktopShareStream(opt).then(() => {
-          useRoomBaseServer().setChangeElement('stream-list');
-        });
+        this.desktopShareServer.subscribeDesktopShareStream(opt);
       },
       showConfirm() {
         if (!this.isShareScreen) {
           this.popAlert.visible = true;
         } else {
-          this.desktopShareServer.stopShareScreen().then(() => {
-            useRoomBaseServer().setChangeElement('stream-list');
-          });
+          this.stopShare();
         }
       },
 
@@ -336,6 +333,8 @@
                 this.interactiveServer.resetLayout();
 
                 console.log('[screen] 桌面共享推流成功');
+
+                this.setDesktop('1');
               })
               .catch(error => {
                 console.log(error, '推流失败');
@@ -349,6 +348,19 @@
               }
             }
           });
+      },
+      // 停止共享
+      stopShare() {
+        this.interactiveServer.stopShareScreen().then(() => {
+          this.setDesktop(0);
+        });
+      },
+      // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
+      setDesktop(status) {
+        if (!this.isWatch && useDocServer().state.switchStatus) {
+          // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
+          this.interactiveServer.setDesktop({ status });
+        }
       },
       // 关闭弹窗
       closeConfirm() {

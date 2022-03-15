@@ -278,7 +278,7 @@
           this.mainScreen == this.stream.accountId &&
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2 &&
-          this.$domainStore.state.docServer.switchStatus
+          this.liveMode === 6
         );
       },
       isShowSplitScreenPlaceholder() {
