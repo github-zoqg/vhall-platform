@@ -182,6 +182,9 @@
           this.dispatchDocVodCuepointLoadComplate
         );
 
+        // 回放播放时间
+        this.docServer.$on('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
+
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
 
@@ -341,6 +344,9 @@
       },
       // 回放文档加载事件
       dispatchDocVodCuepointLoadComplate: async function (data) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowMenuTab', [this.docServer.state.switchStatus])
+        );
         if (this.docServer.state.containerList.length === 0) {
           const data = this.docServer.getVodAllCids();
           this.docServer.state.containerList = data.map(item => {
@@ -349,9 +355,9 @@
             };
           });
           // console.log('[doc] containerList:', this.docServer.state.containerList);
-          this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
+          // this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
           await this.$nextTick();
-          if (this.docServer.state.switchStatus) {
+          if (this.docServer.state.containerList.length) {
             const { width, height } = this.getDocViewRect();
             if (!width || !height) return;
             for (const item of data) {
@@ -362,27 +368,18 @@
                 fileType: item.type.toLowerCase()
               });
             }
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitShowMenuTab', {
-                visible: true,
-                type: 2
-              })
-            );
-          } else {
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitShowMenuTab', {
-                visible: false,
-                type: 2
-              })
-            );
           }
         }
+      },
+      dispatchDocVodTimeUpdate() {
+        // TODO
       }
     },
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
+      this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
       this.docServer.$off(
         'dispatch_doc_vod_cuepoint_load_complate',
         this.dispatchDocVodCuepointLoadComplate
