@@ -394,7 +394,7 @@ const serverConfig = {
 
   subcribeRoot: {
     component: 'VmpAirContainer',
-    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog']
+    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog', 'comGoodsDetail']
   },
   // 顶部header容器
   subcribeHeader: {
