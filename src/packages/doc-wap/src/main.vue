@@ -124,6 +124,10 @@
       this.groupServer = useGroupServer();
     },
     mounted() {
+      console.log('[doc] wap mounted');
+      // 初始化文档server的getDocViewRect方法
+      this.docServer.getDocViewRect = this.getDocViewRect;
+
       this.initEvents();
       // 清空
       // this.docServer.resetContainer();
@@ -177,6 +181,12 @@
           'dispatch_doc_vod_cuepoint_load_complate',
           this.dispatchDocVodCuepointLoadComplate
         );
+
+        // 文档不存在或已删除
+        this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        // 文档是否可见状态变化事件
+        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
 
         // 全屏/退出全屏事件
         screenfull.onchange(ev => {
@@ -293,6 +303,20 @@
           }
         }
       },
+      // 文档是否可见状态变化事件
+      dispatchDocSwitchChange: async function (val) {
+        console.log('===[doc]====dispatch_doc_switch_change=============', val);
+        if (val && this.docLoadComplete) {
+          this.recoverLastDocs();
+        }
+      },
+      // 文档不存在或已删除
+      dispatchDocNotExit() {
+        this.$message({
+          type: 'error',
+          message: '文档不存在或已删除'
+        });
+      },
       // 选中文档容器事件
       dispatchDocSelectContainer: async function (data) {
         console.log('[doc] ===========选择容器======', data);
@@ -357,6 +381,8 @@
     },
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
+      this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       this.docServer.$off(
         'dispatch_doc_vod_cuepoint_load_complate',
         this.dispatchDocVodCuepointLoadComplate
