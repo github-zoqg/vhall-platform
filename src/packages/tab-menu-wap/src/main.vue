@@ -418,12 +418,18 @@
        * @param {String|Number} menuId
        */
       async scrollToItem({ id }) {
+        await this.$nextTick();
         const rectArr = this.visibleMenu.map(item => {
-          const id = item.id;
-          const ref = this.$refs[id][0];
-          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
-          const left = ref.offsetLeft - paddingLeft;
-          return { id, ref, left };
+          try {
+            const id = item.id;
+            const ref = this.$refs[id][0];
+            const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
+            const left = ref.offsetLeft - paddingLeft;
+            return { id, ref, left };
+          } catch (error) {
+            console.error('refs error title:', error);
+            console.error('refs:', id, this.$refs, this.$refs[id]);
+          }
         });
 
         const positionItem = rectArr.find(item => item.id === id);
