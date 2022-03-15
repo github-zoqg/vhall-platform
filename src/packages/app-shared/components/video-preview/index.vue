@@ -381,7 +381,11 @@
             if (!this._firstInit) {
               this.$emit('handleRemoteInsertVideoPlay', this._isVideoEnd);
             }
-            this._isVideoEnd = false;
+            // 如果插播播放结束之后重新开始播放，观看端通过流加入消息静音麦克风，这个时候不需要发消息，所以置为 true
+            if (this._isVideoEnd) {
+              this._firstInit = true;
+              this._isVideoEnd = false;
+            }
             if (this._firstInit) {
               const elVideo = document.querySelector(`#videoDom${this.timestamp} video`);
               this.$emit('remoteInsterSucces', elVideo);

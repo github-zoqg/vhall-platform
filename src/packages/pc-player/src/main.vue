@@ -160,7 +160,10 @@
             </div>
           </div>
           <div class="controller-tools-right">
-            <div class="controller-tools-right-lang" v-if="isEmbedVideo && !isSubscribe">
+            <div
+              class="controller-tools-right-lang"
+              v-if="isEmbedVideo && languageList.length > 1 && !isSubscribe"
+            >
               <span>{{ lang.label }}</span>
               <ul class="controller-tools-right-list controller-lang">
                 <li
@@ -276,18 +279,6 @@
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -331,6 +322,8 @@
         isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
         isAutoPlay: false,
+        lang: {},
+        languageList: [],
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -428,16 +421,8 @@
       if (this.isShowContainer) return;
       this.getWebinerStatus();
       if (this.isEmbedVideo) {
-        this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
-          return langMap[item.language_type];
-        });
-        const curLang = this.roomBaseServer.state.languages.curLang;
-        this.lang =
-          langMap[sessionStorage.getItem('lang')] ||
-          langMap[this.$route.query.lang] ||
-          langMap[curLang.language_type];
-        this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.key);
+        this.languageList = this.roomBaseServer.state.languages.langList;
+        this.lang = this.roomBaseServer.state.languages.lang;
       }
     },
     mounted() {
@@ -691,7 +676,7 @@
       },
       // 切换多语言
       changeLanguage(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       // 判断是直播还是回放 活动状态

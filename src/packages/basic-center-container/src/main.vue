@@ -71,7 +71,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1;
+      z-index: 6;
       img {
         position: absolute;
         top: 0;
