@@ -162,7 +162,10 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2 || joinInfo.role_name == 1"
+            v-show="
+              stream.attributes.roleName == 2 ||
+              (joinInfo.role_name == 1 && stream.attributes.roleName != 4)
+            "
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
@@ -278,7 +281,7 @@
           this.mainScreen == this.stream.accountId &&
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2 &&
-          this.$domainStore.state.docServer.switchStatus
+          this.liveMode === 6
         );
       },
       isShowSplitScreenPlaceholder() {
@@ -320,7 +323,7 @@
     methods: {
       // 恢复播放
       replayPlay() {
-        const videos = document.querySelectorAll('.vmp-stream-remote video');
+        const videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {
             video.play();
@@ -653,7 +656,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 6;
       background: #000;
       display: flex;
       justify-content: center;

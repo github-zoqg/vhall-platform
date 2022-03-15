@@ -9,7 +9,16 @@
     }"
   >
   </div> -->
-  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
+  <div
+    class="vmp-stream-list"
+    :class="{
+      'vmp-stream-list-h0': isStreamListH0,
+      'no-delay-layout': isUseNoDelayLayout,
+      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
+      'stream-length': isUseNoDelayLayout && remoteSpeakers.length > 1,
+      'is-share-screen': isUseNoDelayLayout && isShareScreen
+    }"
+  >
     <!-- 左翻页 -->
     <span
       v-show="isShowControlArrow"
@@ -23,6 +32,7 @@
     <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
         <div
+          v-show="localSpeaker.accountId"
           class="vmp-stream-list__local-container"
           :class="{
             'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
@@ -86,7 +96,8 @@
     useInteractiveServer,
     useRoomBaseServer,
     useMicServer,
-    useGroupServer
+    useGroupServer,
+    useDocServer
   } from 'middle-domain';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
@@ -124,6 +135,10 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
       localSpeaker() {
         return (
@@ -179,9 +194,14 @@
           return false;
         }
       },
+
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
       // 互动无延迟 未上麦观众是否使用类似旁路布局
       isUseNoDelayLayout() {
-        return !this.localSpeaker.accountId && this.mode == 3;
+        return !this.localSpeaker.accountId && this.mode == 3 && this.isNoDelay == 1;
       }
     },
     watch: {
@@ -193,6 +213,28 @@
       },
       'remoteSpeakers.length'(newval) {
         this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
+      },
+      isShareScreen: {
+        handler(newval) {
+          if (this.isUseNoDelayLayout) {
+            // 互动无延迟模仿旁路布局
+            if (newval) {
+              // 开启共享
+              if (useDocServer().state.switchStatus) {
+                useRoomBaseServer().setChangeElement('doc');
+                // 开启文档
+              } else {
+                useRoomBaseServer().setChangeElement('');
+              }
+            }
+          } else {
+            if (newval) {
+              // 开启共享
+              useRoomBaseServer().setChangeElement('stream-list');
+            }
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -345,6 +387,9 @@
         display: block;
         font-size: 40px;
       }
+      &.vmp-dom__mini {
+        height: 204px;
+      }
     }
   }
   .vmp-stream-list__local-container {
@@ -397,61 +442,57 @@
     z-index: 10;
   }
 
-  // .vmp-stream-list-wrapper {
-  //   &.no-delay-layout {
-  //     width: calc(100% - 380px);
-  //     position: absolute;
-  //     top: 0;
-  //     left: 0;
-  //     bottom: 56px;
+  .vmp-stream-list {
+    &.no-delay-layout {
+      width: calc(100% - 380px);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 56px;
+      height: auto;
 
-  //     &.vmp-dom__mini {
-  //       right: 0;
-  //       top: 0;
-  //       width: 360px;
-  //       z-index: 10;
-  //       left: auto;
-  //       height: 204px;
-  //       .vmp-stream-list {
-  //         height: 40px;
-  //       }
-  //       .vmp-stream-list__remote-container {
-  //         width: 72px;
-  //       }
-  //       .vmp-stream-list__main-screen {
-  //         width: 100%;
-  //         height: 164px;
-  //       }
-  //     }
-  //     .vmp-stream-list {
-  //       position: absolute;
-  //       left: 0;
-  //       bottom: 0;
-  //     }
-  //     .vmp-stream-list__main-screen {
-  //       bottom: 100%;
-  //       left: 0;
-  //       top: auto;
-  //       position: absolute;
-  //       width: 100%;
-  //       height: 100%;
-  //     }
-  //     &.stream-length {
-  //       .vmp-stream-list__main-screen {
-  //         bottom: 100%;
-  //         left: 0;
-  //         top: auto;
-  //         position: absolute;
-  //         width: 100%;
-  //         height: 484px;
-  //         @media screen and (max-width: 1366px) {
-  //           height: 350px;
-  //         }
-  //       }
-  //     }
-  //     .vmp-stream-list__stream-wrapper-scroll {
-  //       justify-content: flex-start;
-  //     }
-  //   }
-  // }
+      &.is-share-screen {
+        display: none;
+      }
+      .vmp-stream-list__main-screen {
+        bottom: 0;
+        top: 0;
+        position: absolute;
+        width: 100% !important;
+        height: auto !important;
+      }
+      &.stream-length {
+        .vmp-stream-list__main-screen {
+          bottom: 80px;
+        }
+      }
+      .vmp-stream-list__stream-wrapper-scroll {
+        justify-content: normal;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        align-content: flex-end;
+      }
+      // 小屏样式
+      &.vmp-dom__mini {
+        right: 0;
+        top: 0;
+        width: 360px;
+        z-index: 10;
+        left: auto;
+        height: 204px;
+        .vmp-stream-list__remote-container {
+          width: 72px;
+          height: 40px;
+        }
+        .vmp-stream-local__bootom-role {
+          display: none;
+        }
+        &.stream-length {
+          .vmp-stream-list__main-screen {
+            bottom: 40px;
+          }
+        }
+      }
+    }
+  }
 </style>

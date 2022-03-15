@@ -314,7 +314,7 @@
           this.mainScreen == this.joinInfo.third_party_user_id &&
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2 &&
-          this.$domainStore.state.docServer.switchStatus
+          this.mode === 6
         );
       },
       coverImgUrl() {
@@ -1110,7 +1110,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 6;
       background: #000;
       display: flex;
       justify-content: center;
