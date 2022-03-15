@@ -164,14 +164,7 @@
         this.isThirtPushStream = true;
       }
     },
-    mounted() {
-      this.addEventListener();
-    },
     methods: {
-      addEventListener() {
-        // 分屏关闭事件
-        this.splitScreenServer.$on('SPLIT_SCREEN_CLOSE', () => {});
-      },
       // 分屏状态更改
       handleSplitScreenChange() {
         if (this.isOpenSplitScreen) {
