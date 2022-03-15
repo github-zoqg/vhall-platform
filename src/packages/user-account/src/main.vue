@@ -199,7 +199,7 @@
                   type: 'success',
                   customClass: 'zdy-info-box'
                 });
-                this.roomBaseServer.setChangeUserInfo(1, { avatar: file_url });
+                this.roomBaseServer.setChangeUserInfo(1, { avatar: domain_url });
                 this.useUserServer.getUserInfo({ scene_id: 2 });
               } else {
                 this.$message({
