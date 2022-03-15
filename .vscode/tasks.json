@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "platform",
+      "command": "node -v",
+      "dependsOn": [
+        "live",
+        "watch",
+        "wap"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "live",
+      "command": "node scripts/cli-service.js serve --project=saas-live --mode=development331 --port=8080"
+    },
+    {
+      "type": "shell",
+      "label": "watch",
+      "command": "node scripts/cli-service.js serve --project=saas-watch --mode=development331 --port=8081"
+    },
+    {
+      "type": "shell",
+      "label": "wap",
+      "command": "node scripts/cli-service.js serve --project=saas-wap --mode=development331 --port=8082"
+    }
+  ]
+}
