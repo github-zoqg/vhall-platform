@@ -368,7 +368,7 @@
       },
       // 停止共享
       stopShare() {
-        this.interactiveServer.stopShareScreen().then(() => {
+        this.desktopShareServer.stopShareScreen().then(() => {
           this.setDesktop(0);
         });
       },
