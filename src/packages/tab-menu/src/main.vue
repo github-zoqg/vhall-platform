@@ -332,13 +332,14 @@
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
-      select({ type, id }) {
+      async select({ type, id }) {
         this.selectedType = type;
         const item = this.getItem({ type, id });
         this.scrollToItem({ id: item.id });
         this.selectedId = item.id;
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
+        await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       },
       /**
