@@ -380,8 +380,7 @@
         if (
           this.thumbnailShow &&
           this.currentCid == this.docServer.state.docCid &&
-          this.docServer.state.docCid &&
-          this.docServer.state.thumbnailList.length === 0
+          this.docServer.state.docCid
         ) {
           this.docServer.getCurrentThumbnailList();
         }
@@ -451,11 +450,13 @@
             rect = this.$refs.docWrapper?.getBoundingClientRect();
             if (rect.width === 0) {
               const parentNode = this.$refs.docWrapper.parentNode;
-              const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
-              rect = {
-                width: cWidth,
-                height: (cWidth / 16) * 9
-              };
+              if (parentNode) {
+                const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
+                rect = {
+                  width: cWidth,
+                  height: (cWidth / 16) * 9
+                };
+              }
             }
           }
         } else {

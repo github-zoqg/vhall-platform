@@ -198,10 +198,10 @@
           handleGroupJoinInfoChange(msg);
         });
         //切换分组
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          console.log('切换分组', msg);
-          _this.initList();
-        });
+        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+        //   console.log('切换分组', msg);
+        //   _this.initList();
+        // });
         //踢出小组
         function handleGroupKicked(msg) {
           if (!_this.groupInitData.isInGroup) return;

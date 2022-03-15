@@ -68,7 +68,7 @@
                     :label="
                       question.subject === '隐私声明'
                         ? ''
-                        : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$t(
+                        : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$tdefault(
                             question.subject
                           )}`
                     "
@@ -981,21 +981,21 @@
     },
     computed: {
       // 与网易易盾图片插件语言匹配
-      langNECaptcha() {
-        const locale = window.$globalConfig.currentLang;
-        let lang = 'zh-CN';
-        switch (locale) {
-          case 'zh':
-            lang = 'zh-CN';
-            break;
-          case 'spain':
-            lang = 'es';
-            break;
-          default:
-            lang = locale;
-        }
-        return lang;
-      },
+      // langNECaptcha() {
+      //   const locale = window.$globalConfig.currentLang;
+      //   let lang = 'zh-CN';
+      //   switch (locale) {
+      //     case 'zh':
+      //       lang = 'zh-CN';
+      //       break;
+      //     case 'spain':
+      //       lang = 'es';
+      //       break;
+      //     default:
+      //       lang = locale;
+      //   }
+      //   return lang;
+      // },
       //输入提示的多语言转换
       findPlaceHolder() {
         const _this = this;
@@ -1460,7 +1460,10 @@
         initNECaptcha({
           captchaId: that.captchakey,
           element: id,
-          lang: that.langNECaptcha,
+          lang:
+            (window.$globalConfig.currentLang == 'zh'
+              ? 'zh-CN'
+              : window.$globalConfig.currentLang) || 'zh-CN',
           mode: 'float',
           onReady(instance) {
             console.log('instance', instance);

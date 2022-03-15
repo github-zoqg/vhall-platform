@@ -53,8 +53,10 @@
           mode: 'float',
           width: 270,
           // FIXME: 网易易顿多语言字段 lang 需要翻译(暂时写死)
-          lang: 'zh-CN',
-          // lang: window.$globalConfig.currentLang || 'zh-CN',
+          lang:
+            (window.$globalConfig.currentLang == 'zh'
+              ? 'zh-CN'
+              : window.$globalConfig.currentLang) || 'zh-CN',
           onReady(instance) {
             console.log('🚀 ~ initNECaptcha onReady ', instance);
             that.capInstance = instance;

@@ -431,7 +431,7 @@
           line-height: 24px;
           .user-status {
             display: inline-block;
-            width: 44px;
+            padding: 0 5px;
             height: 16px;
             margin-left: 5px;
             line-height: 16px;

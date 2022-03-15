@@ -114,8 +114,7 @@
     useZIndexServer,
     useMicServer,
     useChatServer,
-    useGroupServer,
-    useMediaCheckServer
+    useGroupServer
   } from 'middle-domain';
   import handup from './handup.vue';
   import reward from './component/reward/index.vue';
@@ -222,7 +221,7 @@
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return useMediaCheckServer().state.deviceInfo.device_status;
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
       },
       isBanned() {
         return !this.isInGroup && (useChatServer().state.banned || useChatServer().state.allBanned); //true禁言，false未禁言

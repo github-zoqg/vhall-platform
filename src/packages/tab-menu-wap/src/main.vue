@@ -440,7 +440,7 @@
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
-      select({ type, id = '' }) {
+      async select({ type, id = '' }) {
         const item = this.getItem({ type, id });
 
         this.selectedType = item.type;
@@ -449,6 +449,8 @@
         item.tipsVisible = false;
 
         this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+
+        await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       }
     }
