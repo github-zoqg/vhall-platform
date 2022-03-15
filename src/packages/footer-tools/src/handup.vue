@@ -36,7 +36,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer, useMediaCheckServer } from 'middle-domain';
+  import { useMicServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -53,7 +53,7 @@
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return useMediaCheckServer().state.deviceInfo.device_status;
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
       },
       // 是否是直播中
       inLine() {

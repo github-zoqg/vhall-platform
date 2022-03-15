@@ -242,7 +242,7 @@
             nickname: '问卷',
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              text_content: `发起了问卷`,
+              text_content: `${text}发起了问卷`,
               questionnaire_id: msg.questionnaire_id
             },
             roleName: join_info.role_name,

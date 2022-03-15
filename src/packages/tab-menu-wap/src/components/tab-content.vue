@@ -1,13 +1,11 @@
 <template>
   <section class="vmp-tab-container">
-    <main>
-      <!-- 主菜单区域 -->
-      <section class="vmp-tab-container-mainarea" ref="mainArea">
-        <section v-for="tab of filterMenu" :key="tab.cuid" v-show="curItem.cuid === tab.cuid">
-          <vmp-air-container :cuid="tab.cuid" :oneself="true" />
-        </section>
+    <!-- 主菜单区域 -->
+    <section class="vmp-tab-container-mainarea" ref="mainArea">
+      <section v-for="tab of filterMenu" :key="tab.cuid" v-show="curItem.cuid === tab.cuid">
+        <vmp-air-container :cuid="tab.cuid" :oneself="true" />
       </section>
-    </main>
+    </section>
   </section>
 </template>
 
@@ -83,63 +81,13 @@
     height: calc(100%);
     display: flex;
     flex-direction: column;
-    overflow: scroll;
+    overflow: auto;
 
-    & > main {
-      flex: 1 1 auto;
+    .vmp-tab-container-mainarea {
+      height: 100%;
       position: relative;
 
-      .vmp-tab-container-mainarea {
-        height: 100%;
-        position: relative;
-
-        & > section {
-          height: 100%;
-        }
-      }
-
-      .vmp-tab-container-poparea {
-        position: relative;
-      }
-    }
-
-    .vmp-tab-container-popup__body {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-
-      & > header {
-        flex: 0 0 auto;
-        position: relative;
-        width: 100%;
-        height: 90px;
-        display: flex;
-        color: @border-bormal;
-        border-bottom: 1px solid #d4d4d4;
-
-        & > span {
-          position: relative;
-          width: 100%;
-          text-align: center;
-          display: inline-flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        & > i {
-          position: absolute;
-          right: 33px;
-          top: 50%;
-          transform: translateY(-50%);
-        }
-      }
-
-      & > main {
-        flex: 1 1 auto;
-        overflow: scroll;
-      }
-
-      & > main > section {
+      & > section {
         height: 100%;
       }
     }
