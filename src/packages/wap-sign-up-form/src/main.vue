@@ -730,7 +730,6 @@
           captchaId: that.captchakey,
           element: id,
           mode: 'float',
-          // lang: sessionStorage.getItem('lang') || 'zh-CN',
           lang: this.langNECaptcha,
           onReady(instance) {
             console.log(instance);

@@ -26,18 +26,6 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpLanguageChoice',
     data() {
@@ -52,34 +40,17 @@
         languageList: []
       };
     },
-    mounted() {
-      this.initConfig();
-    },
     created() {
       const roomBaseServer = useRoomBaseServer();
       this.setSkinInfo(roomBaseServer.state.skinInfo);
       this.mode = roomBaseServer.state.watchInitData.webinar.mode;
-      this.languageList = roomBaseServer.state.languages.langList.map(item => {
-        return langMap[item.language_type];
-      });
-      const curLang = roomBaseServer.state.languages.curLang;
-      this.lang =
-        langMap[sessionStorage.getItem('lang')] ||
-        langMap[this.$route.query.lang] ||
-        langMap[curLang.language_type];
-      this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.key);
+      this.languageList = roomBaseServer.state.languages.langList;
+      this.lang = roomBaseServer.state.languages.lang;
     },
     watch: {},
     methods: {
-      // 初始化配置
-      initConfig() {
-        // if (!this.lang) {
-        //   this.lang = window.$layoutConfig.lang;
-        // }
-      },
       handleChangeLang(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       setSkinInfo(skin) {

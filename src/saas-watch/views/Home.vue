@@ -53,6 +53,8 @@
         const roomBaseServer = useRoomBaseServer();
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
+        let lang = roomBaseServer.state.languages.lang;
+        this.$i18n.locale = lang.type;
         domain.initVhallReport(
           {
             bu: 0,

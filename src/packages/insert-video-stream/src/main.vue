@@ -307,6 +307,21 @@
           this.initRemoteInsertFile();
         }
       },
+      // 插播文件更改
+      async inertFileChange(video, type) {
+        // 如果当前正在插播中，需要先结束现有插播
+        if (this.insertFileServer.state.isInsertFilePushing) {
+          await this.closeInsertvideoHandler();
+        }
+        // 更新选择插播的文件
+        this.insertFileServer.setInsertFileType(type);
+        if (type == 'local') {
+          this.insertFileServer.setLocalInsertFile(video);
+        } else {
+          this.insertFileServer.setRemoteInsertFile(video);
+        }
+        this.startInertFile();
+      },
       // 初始化本地插播,创建video标签播放本地文件
       async initLocalInsertFile() {
         this._videoEnded = false; // 本地插播文件是否播放结束
@@ -426,6 +441,8 @@
           // 如果是结束播放，重新开始播放，需要重新推流
           if (this._videoEnded) {
             this._videoEnded = false;
+            // 播放结束之后的重新播放，观看端根据流加入事件静音麦克风，不需要发消息，所以置为 true
+            this._isFirstInsertSucces = true;
             this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
               this.pushLocalStream();
             });
@@ -928,7 +945,7 @@
       top: 0;
       right: 0;
       background: rgba(0, 0, 0, 0.7);
-      z-index: 1;
+      z-index: 5;
       display: flex;
       align-items: center;
       justify-content: center;

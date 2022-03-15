@@ -36,13 +36,13 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
-      <!-- <span
+      <span
         v-show="[1, 3, 4].includes(joinInfo.role_name)"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleNameFilter }}
-      </span> -->
+        {{ joinInfo.role_name | roleFilter }}
+      </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -661,6 +661,7 @@
               await this.setBroadCastScreen();
             }
           }
+          console.warn('自动上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
           if (this.autoSpeak) {
             this.interactiveServer.setDeviceStatus({

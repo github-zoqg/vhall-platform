@@ -18,6 +18,7 @@
         (hasDocPermission || [3].includes(roleName)) &&
         (displayMode === 'normal' || displayMode === 'fullscreen')
       "
+      @changeBrush="changeBrush"
     ></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
@@ -93,7 +94,8 @@
         <li
           data-value="move"
           title="移动"
-          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
+          :class="{ selected: canMove }"
         ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
@@ -110,7 +112,11 @@
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul class="vmp-doc-thumbnailbar" @click="handleThumbnail" v-show="thumbnailShow">
+      <ul
+        class="vmp-doc-thumbnailbar"
+        @click="handleThumbnail"
+        v-show="currentType !== 'board' && thumbnailShow"
+      >
         <li
           class="doc-thumbnailbar__opt"
           v-for="(item, index) in docServer.state.thumbnailList"
@@ -169,7 +175,8 @@
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
         keepAspectRatio: true,
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false
+        hasStreamList: false,
+        canMove: false
       };
     },
     computed: {
@@ -298,6 +305,10 @@
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
           this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
         );
+      },
+      // 当前资料类型是文档还是白板
+      currentType() {
+        return this.docServer.state.currentCid.split('-')[0];
       }
     },
     watch: {
@@ -366,6 +377,14 @@
        */
       toggleThumbnail() {
         this.thumbnailShow = !this.thumbnailShow;
+        if (
+          this.thumbnailShow &&
+          this.currentCid == this.docServer.state.docCid &&
+          this.docServer.state.docCid &&
+          this.docServer.state.thumbnailList.length === 0
+        ) {
+          this.docServer.getCurrentThumbnailList();
+        }
       },
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
@@ -786,14 +805,16 @@
             break;
           // 移动
           case 'move':
-            this.docServer.move();
-            this.$refs.docToolbar.changeTool('');
+            this.$refs.docToolbar.changeTool('move');
             break;
           // 全屏
           case 'fullscreen':
             this.fullscreen();
             break;
         }
+      },
+      changeBrush(brush) {
+        this.canMove = brush === 'move';
       },
 
       /**
@@ -1055,6 +1076,11 @@
           color: #fc5659;
         }
       }
+      .doc-pagebar__opt--move {
+        &:hover {
+          color: #fc5659;
+        }
+      }
     }
   }
   .vmp-doc-thumbnailbar {
@@ -1166,6 +1192,7 @@
 
   // 作为观看端时的样式
   .vmp-doc-une.is-watch {
+    background-color: #2d2d2d;
     // 普通模式
     &.vmp-doc-une--normal {
       position: absolute;
