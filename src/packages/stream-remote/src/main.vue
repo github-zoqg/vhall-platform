@@ -320,7 +320,7 @@
     methods: {
       // 恢复播放
       replayPlay() {
-        const videos = document.querySelectorAll('.vmp-stream-remote video');
+        const videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {
             video.play();
