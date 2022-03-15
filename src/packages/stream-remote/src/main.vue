@@ -21,7 +21,7 @@
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom">
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName)"
+        v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
       >
