@@ -110,9 +110,8 @@ function getPlugins() {
             replace: `${argv.project}/${argv.version}`
           }
         ]
-      },
-
-    ]
+      }
+    ];
 
     // 如果非测试环境  非开发环境，修改 sourceMap 的地址
     if (process.env.NODE_ENV != 'test') {
@@ -125,7 +124,7 @@ function getPlugins() {
             replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
           }
         ]
-      })
+      });
     }
 
     plugins.push(
@@ -185,7 +184,8 @@ const sharedConfig = {
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool: isDev || process.env.NODE_ENV == 'test' ? '#eval-source-map' : '#cheap-module-source-map',
+    devtool:
+      isDev || process.env.NODE_ENV == 'test' ? '#eval-source-map' : '#cheap-module-source-map',
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
       hints: isDev ? false : 'warning',
@@ -337,5 +337,3 @@ if (['serve', 'build'].includes(cmd)) {
 } else {
   module.exports = sharedConfig;
 }
-
-
