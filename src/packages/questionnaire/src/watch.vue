@@ -21,18 +21,6 @@
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaireWatch',
-    props: {
-      timeInfo: {
-        require: true,
-        default: () => {
-          return {
-            start_time: '',
-            end_time: ''
-          };
-        },
-        type: Object
-      }
-    },
     data() {
       const zIndexServerState = this.zIndexServer.state;
       return {
@@ -118,35 +106,11 @@
             });
           }
         });
-      },
-
-      checkedQuestion(id, flag) {
-        this.$vhallapi.question
-          .checkSurvey({
-            survey_id: id,
-            webinar_id: this.webinarId
-          })
-          .then(res => {
-            if (res.data) {
-              // 未提交
-              this.chatPreview(id, false);
-            } else {
-              this.loading = false;
-              if (flag) {
-                this.$message({
-                  message: this.$t('form.form_1037'),
-                  showClose: true,
-                  type: 'success',
-                  customClass: 'zdy-info-box'
-                });
-              }
-            }
-          });
       }
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .vhall-question-box {
     width: 100%;
     height: 100%;
@@ -194,10 +158,10 @@
       }
     }
   }
-  /deep/.el-loading-spinner .path {
+  .el-loading-spinner .path {
     stroke: #fb3a32;
   }
-  /deep/.el-loading-spinner .el-loading-text {
+  .el-loading-spinner .el-loading-text {
     color: #1a1a1a;
   }
   .vhall-question {

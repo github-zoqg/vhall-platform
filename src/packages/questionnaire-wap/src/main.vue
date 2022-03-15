@@ -15,7 +15,7 @@
       return {
         popupVisible: false,
         questionLastId: '', // 最后一个问卷id
-        questionnaireId: '' // 问卷Id
+        questionnaireId: '' // 当前问卷Id
       };
     },
     beforeCreate() {
@@ -25,7 +25,7 @@
       this.initEvent();
     },
     watch: {
-      // 切换
+      // 打开问卷弹窗(全屏,视频需要改为小窗)
       popupVisible(val) {
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitQuestionnaireVisible', [!!val])
@@ -37,7 +37,6 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
-        console.log('open', questionnaireId);
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$toast(this.$t('form.form_1037'));

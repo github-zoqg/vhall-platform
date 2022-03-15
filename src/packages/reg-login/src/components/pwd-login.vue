@@ -25,13 +25,6 @@
       </el-form-item>
       <!-- 请输入登录密码 -->
       <el-form-item prop="password">
-        <!-- <el-input
-          type="password"
-          v-model.trim="ruleForm.password"
-          clearable
-          :placeholder="$t('login.login_1011')"
-          @blur="autoLoginSetMargin"
-        ></el-input> -->
         <PwdInput
           v-model.trim="ruleForm.password"
           clearable

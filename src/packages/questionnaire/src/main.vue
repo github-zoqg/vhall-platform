@@ -17,9 +17,7 @@
         />
         问卷
       </header>
-      <!-- body -->
       <section class="question__content">
-        <!-- table -->
         <div class="vhall-question__content" v-show="showQuestionnaireTable">
           <div class="show-no-list" v-if="noQuestionnaire">
             <div class="text-center show-no-msg">
@@ -183,8 +181,8 @@
       };
     },
     computed: {
+      // 显示未创建过问卷面板
       noQuestionnaire() {
-        // 未创建过问卷
         return (
           this.firstLoad &&
           !this.questionnaireList.length &&
@@ -192,9 +190,11 @@
           !this.loading
         );
       },
+      // 是否为嵌入页
       isEmbed() {
         return this.$domainStore?.state?.roomBaseServer?.embedObj?.embed;
       },
+      // 当前角色
       role() {
         return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info.role_name;
       }
@@ -346,12 +346,12 @@
             this.saving = false;
           });
       },
-
       // 下拉框显示是, 中转当前选中变量
       dropDownVisibleChange(row) {
         console.log(row);
         this.selectedQuestionnarie = row;
       },
+      // 更多列表的操作
       handleCommand(command) {
         if (!this.selectedQuestionnarie) return false;
         const id = this.selectedQuestionnarie.question_id;
@@ -375,7 +375,7 @@
           `/v3/live/lookSingleQuestion/${webinar.id}?surveyId=${questionnaireItem.question_id}&subject=${questionnaireItem.title}&roomId=${interact.room_id}`
         );
       },
-      // 复制功能
+      // 复制
       copy(id) {
         this.questionnaireServer.copyQuestionnaire(id).then(res => {
           this.$message({
@@ -407,7 +407,7 @@
           });
         });
       },
-      // 推送
+      // 推送问卷
       publish(questionnaireItem) {
         const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
         const { webinar } = watchInitData;
@@ -427,6 +427,7 @@
           }
         });
       },
+      // 滚动加载
       moreLoadData() {
         if (this.queryParams.pageNum >= this.totalPages) {
           return false;
