@@ -162,7 +162,10 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2 || joinInfo.role_name == 1"
+            v-show="
+              stream.attributes.roleName == 2 ||
+              (joinInfo.role_name == 1 && stream.attributes.roleName != 4)
+            "
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
