@@ -279,7 +279,13 @@ export const serverConfig = {
 
   // 桌面共享组件
   comDesktopScreen: {
-    component: 'VmpStreamDesktopScreen'
+    component: 'VmpStreamDesktopScreen',
+    emitClickEndDemonstrate: [
+      {
+        cuid: 'comDocUne',
+        method: 'handleEndDemonstrate'
+      }
+    ]
   },
   // 插播文件
   comMediaPlayMenu: {
