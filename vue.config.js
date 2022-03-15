@@ -332,10 +332,10 @@ if (['serve', 'build'].includes(cmd)) {
 
 function getSourceMapMode() {
   if (process.env.NODE_ENV == 'test') {
-    return '#source-map'
+    return '#source-map';
   } else if (isDev) {
-    return '#eval-source-map'
+    return '#eval-source-map';
   } else {
-    return '#cheap-module-source-map'
+    return '#cheap-module-source-map';
   }
 }
