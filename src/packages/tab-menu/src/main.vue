@@ -56,8 +56,6 @@
     useRoomBaseServer
   } from 'middle-domain';
 
-  // TODO: tips
-
   export default {
     name: 'VmpTabMenu',
     components: {
@@ -96,7 +94,6 @@
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
-    watch: {},
     beforeCreate() {
       this.menuServer = useMenuServer();
     },
@@ -308,7 +305,8 @@
        * @param {String} cuid
        * @param {String|Number} menuId
        */
-      scrollToItem({ id }) {
+      async scrollToItem({ id }) {
+        await this.$nextTick();
         // 由于menu列表随时会增减，
         const itemsWithPosition = this.visibleMenu.map(item => {
           const id = item.id;
@@ -333,13 +331,13 @@
        * @example select('comCustomMenuWap','10246')
        */
       async select({ type, id }) {
+        await this.$nextTick();
         this.selectedType = type;
         const item = this.getItem({ type, id });
         this.scrollToItem({ id: item.id });
         this.selectedId = item.id;
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
-        await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       },
       /**

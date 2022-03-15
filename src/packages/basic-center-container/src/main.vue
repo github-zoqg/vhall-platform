@@ -3,7 +3,7 @@
     <!-- 流列表 -->
     <vmp-air-container :cuid="cuid"></vmp-air-container>
     <!-- 封面，无延迟直播或者上麦观众刷新页面显示 -->
-    <div class="vmp-basic-center__cover" v-show="showcoverImg && !switchStatusDoc">
+    <div class="vmp-basic-center__cover" v-show="showcoverImg && mode !== 6">
       <img :src="coverImgUrl" alt />
       <p class="vmp-basic-center__cover-icon" @click.stop="handleAllVideoPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
@@ -19,13 +19,20 @@
       return { showcoverImg: false };
     },
     computed: {
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       // 文档区域是否展示 在上麦或者分组时，右上角为主屏画面，一般在主屏画面处设置播放按钮
-      switchStatusDoc() {
-        return this.$domainStore.state.docServer.switchStatus;
-      },
+      // switchStatusDoc() {
+      //   if (this.mode == 6) {
+      //     return true;
+      //   } else {
+      //     return false;
+      //   }
+      // },
       coverImgUrl() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       }

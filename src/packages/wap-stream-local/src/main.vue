@@ -12,7 +12,7 @@
     <!-- videoMuted 的时候显示流占位图 -->
     <section v-if="localSpeaker.videoMuted" class="vmp-stream-local__stream-box__mute"></section>
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="isStreamPublished">
+    <section class="vmp-stream-local__bootom" v-show="isStreamPublished && localSpeaker.streamId">
       <span
         v-show="[1, 3, 4].includes(joinInfo.role_name)"
         class="vmp-stream-local__bootom-role"
@@ -83,13 +83,6 @@
       },
       speakerList() {
         return this.$domainStore.state.micServer.speakerList;
-      },
-      localStream() {
-        console.log(
-          '----localStream更新了----',
-          this.$domainStore.state.interactiveServer.localStream
-        );
-        return this.$domainStore.state.interactiveServer.localStream;
       },
       isInGroup() {
         // 在小组中
@@ -177,7 +170,7 @@
             !this.chatServer.state.banned &&
             !this.chatServer.state.allBanned
           ) {
-            await this.micServer.userSpeakOn();
+            await this.userSpeakOn();
           }
         } else {
           if (this.micServer.getSpeakerStatus()) {
@@ -205,7 +198,7 @@
 
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
-          if (this.localStream.streamId) return;
+          if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
           if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
             this.speakOff();
@@ -395,7 +388,7 @@
             resolve();
             return;
           }
-          this.interactiveServer.unpublishStream(this.localStream.streamId).then(() => {
+          this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
             this.isStreamPublished = false;
             clearInterval(this._audioLeveInterval);
 
@@ -410,10 +403,10 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localStream.streamId) return clearInterval(this._audioLeveInterval);
+          if (!this.localSpeaker.streamId) return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
-            .getAudioLevel({ streamId: this.localStream.streamId })
+            .getAudioLevel({ streamId: this.localSpeaker.streamId })
             .then(level => {
               this.audioLevel = calculateAudioLevel(level);
             })
@@ -425,10 +418,10 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localStream.streamId) return clearInterval(this._netWorkStatusInterval);
+          if (!this.localSpeaker.streamId) return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
-            .getStreamPacketLoss({ streamId: this.localStream.streamId })
+            .getStreamPacketLoss({ streamId: this.localSpeaker.streamId })
             .then(status => {
               this.networkStatus = calculateNetworkStatus(status);
             })
@@ -453,7 +446,7 @@
       exitFullScreen() {
         this.interactiveServer
           .exitStreamFullscreen({
-            streamId: this.localStream.streamId,
+            streamId: this.localSpeaker.streamId,
             vNode: `vmp-stream-local__${this.stream.streamId}`
           })
           .then(res => {

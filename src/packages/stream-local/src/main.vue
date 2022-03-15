@@ -36,13 +36,6 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
-      <span
-        v-show="[1, 3, 4].includes(joinInfo.role_name)"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
-      >
-        {{ joinInfo.role_name | roleFilter }}
-      </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -314,7 +307,7 @@
           this.mainScreen == this.joinInfo.third_party_user_id &&
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2 &&
-          this.$domainStore.state.docServer.switchStatus
+          this.mode === 6
         );
       },
       coverImgUrl() {

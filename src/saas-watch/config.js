@@ -166,7 +166,11 @@ export const serverConfig = {
   },
   // 桌面共享组件
   comDesktopScreen: {
-    component: 'VmpStreamDesktopScreen'
+    component: 'VmpStreamDesktopScreen',
+    emitClickExchangeView: {
+      cuid: 'comPcPlayer',
+      method: 'exchangeVideoDocs'
+    }
   },
   // 插播文件
   comInsertStream: {

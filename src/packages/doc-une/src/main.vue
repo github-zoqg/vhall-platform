@@ -12,14 +12,7 @@
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
-    <VmpDocToolbar
-      ref="docToolbar"
-      v-show="
-        (hasDocPermission || [3].includes(roleName)) &&
-        (displayMode === 'normal' || displayMode === 'fullscreen')
-      "
-      @changeBrush="changeBrush"
-    ></VmpDocToolbar>
+    <VmpDocToolbar ref="docToolbar" v-show="showToolbar" @changeBrush="changeBrush"></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
     <el-button
@@ -251,6 +244,14 @@
         // 当前用户是否演示者
         return this.presenterId == this.userId;
       },
+      // 是否显示文档白板工具栏
+      showToolbar() {
+        // 有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
+        return (
+          (this.hasDocPermission || [3].includes(this.roleName)) &&
+          ['normal', 'fullscreen'].includes(this.displayMode)
+        );
+      },
       /**
        * @description 是否显示结束演示按钮
        * 1.分组活动下没有嘉宾
@@ -373,7 +374,7 @@
         screenfull.toggle(this.$refs.docWrapper);
       },
       /**
-       * 缩略图列表展开与这都
+       * 缩略图列表展开与折叠
        */
       toggleThumbnail() {
         this.thumbnailShow = !this.thumbnailShow;
@@ -492,16 +493,14 @@
           // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
             console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
+            // 获取回放文档容器数据
             const data = this.docServer.getVodAllCids();
             this.docServer.state.containerList = data.map(item => {
               return {
                 cid: item.cid
               };
             });
-            // console.log(
-            //   '[doc]this.docServer.state.containerList:',
-            //   this.docServer.state.containerList
-            // );
+            // 等dom渲染完成
             await this.$nextTick();
 
             // 回放只在观看端可用
@@ -513,6 +512,7 @@
               return;
             }
             for (const item of data) {
+              // 循环初始化容器
               this.docServer.initContainer({
                 cid: item.cid,
                 width,
@@ -520,12 +520,14 @@
                 fileType: item.type.toLowerCase()
               });
             }
+            // 加载回放数据
             this.docServer.loadVodIframe();
           });
 
           // 点播或回放播放器播放完成
           usePlayerServer().$on(VhallPlayer.ENDED, () => {
             console.log('[doc] VhallPlayer.ENDED');
+            // 4-点播， 5-回放
             if ([4, 5].includes(this.webinarType)) {
               this.docServer.state.switchStatus = false;
             }
@@ -535,6 +537,7 @@
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 直播开始
           if (msg.data.type === 'live_start') {
+            // 3-助理，4-嘉宾
             if ([3, 4].includes(this.roleName)) {
               this.recoverLastDocs();
             }
@@ -544,6 +547,7 @@
         // 直播结束
         useMsgServer().$on('live_over', () => {
           console.log('[doc]---直播结束 live_over---');
+          // 设置观众不可见
           this.docServer.state.switchStatus = false;
           if (this.isWatch) {
             useRoomBaseServer().setChangeElement('doc');
@@ -814,6 +818,11 @@
             break;
         }
       },
+
+      /**
+       * 画笔工具变更
+       * @param {*} brush
+       */
       changeBrush(brush) {
         this.canMove = brush === 'move';
       },
@@ -932,24 +941,19 @@
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {
-        this.$message({
-          type: 'error',
-          message: '文档不存在或已删除'
-        });
+        this.$message({ type: 'error', message: '文档不存在或已删除' });
       }
     },
     mounted() {
       // 初始化事件
       this.initEvents();
-      // 清空
-      // this.docServer.resetContainer();
+
       if (this.webinarType == 1) {
-        // 直播中才执行
-        // 恢复上一次的文档数据;
+        // 直播中才执行,恢复上一次的文档数据;
         this.recoverLastDocs();
       } else {
-        if (this.roleName == 1 && [2, 3].includes(this.webinarType)) {
-          // 主持人，默认选中文档
+        // 非直播状态，主持人默认选中文档
+        if (this.roleName == 1) {
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
           );
@@ -1072,13 +1076,11 @@
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
-
-        &.selected {
+        &:hover {
           color: #fc5659;
         }
-      }
-      .doc-pagebar__opt--move {
-        &:hover {
+
+        &.selected {
           color: #fc5659;
         }
       }
