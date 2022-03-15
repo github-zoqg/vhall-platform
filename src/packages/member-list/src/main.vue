@@ -542,6 +542,28 @@
         const _this = this;
         const { isLive } = this;
 
+        // this.memberServer.$on('JOIN', msg => {
+        //   _this.$message({
+        //     message: _this.$t('message.message_1030', { n: msg.context.nickname }),
+        //     showClose: true,
+        //     type: 'success',
+        //     customClass: 'zdy-info-box'
+        //   });
+        // });
+        //
+        // this.memberServer.$on('LEFT', msg => {
+        //   if (msg.context.role_name == 1 && _this.roleName != 1) {
+        //     _this.$message.warning({ message: _this.$t('message.message_1027') });
+        //   }
+        //   if (msg.context.role_name == 4) {
+        //     _this.$message.warning({
+        //       message: _this.$t('message.message_1029', {
+        //         n: msg.context.nickname || msg.context.nick_name
+        //       })
+        //     });
+        //   }
+        // });
+
         // 加入房间
         this.msgServer.$onMsg('JOIN', msg => {
           handleUserJoinRoom(msg);
@@ -1529,10 +1551,12 @@
       //切换至某个tab
       switchToTab(index) {
         this.tabIndex = index;
+        this.memberServer.updateState('tabIndex', index);
         //清空输入的人员筛选
         this.searchUserInput = '';
         if (index === 2) {
           this.raiseHandTip = false;
+          this.memberServer.updateState('raiseHandTip', false);
         } else if (index === 3) {
           this.getLimitUserList();
         }

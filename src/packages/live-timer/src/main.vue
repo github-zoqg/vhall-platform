@@ -242,6 +242,7 @@
         );
         this.$emit('disTimer', true);
         clearInterval(this.timer);
+        if (e.data.type == 'live_over') return;
         // 添加聊天记录
         const text = this.$getRoleName(e.data.role_name);
         const data = {

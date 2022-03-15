@@ -13,7 +13,7 @@
         </template>
       </div>
       <div class="vh-goods_item-info">
-        <span class="name" :class="{ showEllipse: bLength(good.name) > 15 }">{{ good.name }}</span>
+        <span class="name">{{ good.name }}</span>
         <div class="describe">{{ good.description }}</div>
         <span v-if="good.showDiscountPrice" class="discount_price">￥{{ good.price }}</span>
         <div class="other-info">
@@ -331,8 +331,6 @@
         font-size: 12px;
         position: relative;
         .name {
-          position: relative;
-          max-height: 44px;
           display: block;
           width: 100%;
           font-size: 14px;
@@ -444,12 +442,8 @@
       justify-content: center;
       padding: 16px 24px 24px;
       .vh-goods_item {
-        margin: 24px 0;
         background: #fff;
         &-info {
-          .name {
-            color: #1a1a1a;
-          }
           .other-info {
             i {
               color: #fb3a32;
@@ -478,9 +472,6 @@
         padding-right: 24px;
         border-radius: 4px;
         border: none;
-        &:nth-child(2n) {
-          margin-left: 16px;
-        }
         .vh-goods_item-cover {
           width: 200px;
           height: 200px;
@@ -518,14 +509,13 @@
             line-height: 18px;
             word-break: break-word;
             font-size: 12px;
-            font-family: PingFangSC-Regular, PingFang SC;
-            font-weight: 400;
-            color: #666666;
+            color: #666;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
+            /* autoprefixer: ignore next */
             -webkit-box-orient: vertical;
             white-space: normal;
             margin-top: 4px;
@@ -567,15 +557,6 @@
           border-radius: 4px;
           cursor: pointer;
           border: none;
-          // .vh-goods_item-cover{
-          //   img {
-          //     transition: all .4s;
-          //     transform: scale(1.2);
-          //   }
-          // }
-          // .vh-goods_item-info .name{
-          //   color: #FB3A32;
-          // }
           .vh-goods_item-info .other-info .buy {
             border: 1px solid #fb3a32;
             background: #fff;
@@ -819,67 +800,72 @@
   }
 
   @media screen and (max-width: 1366px) {
-    .subscribe_goods {
-      width: 780px;
-    }
-    .subscribe_item {
-      width: 409px;
-      height: 200px;
-      margin-bottom: 16px;
-      .vh-goods_item-info {
-        width: 201px;
+    .vh-goods {
+      &.subscribe_goods {
+        width: 780px;
+        .subscribe_item {
+          width: 410px;
+          height: 200px;
+          margin-bottom: 16px;
+          .vh-goods_item-info {
+            width: 200px;
+          }
+        }
       }
     }
   }
 
   @media screen and (min-width: 1367px) and (max-width: 1600px) {
-    .subscribe_goods {
-      width: 932px;
-    }
-    .subscribe_item {
-      width: 433px;
-      // width: 409px;
-      height: 200px;
-      margin-bottom: 16px;
-      .vh-goods_item-info {
-        width: 225px;
-      }
-      &:nth-child(2n) {
-        margin-left: 16px;
+    .vh-goods {
+      &.subscribe_goods {
+        width: 930px;
+        .subscribe_item {
+          width: 430px;
+          height: 200px;
+          margin-bottom: 16px;
+          .vh-goods_item-info {
+            width: 225px;
+          }
+          &:nth-child(2n) {
+            margin-left: 16px;
+          }
+        }
       }
     }
   }
   @media screen and (min-width: 1601px) and (max-width: 1920px) {
-    .subscribe_goods {
-      width: 1480px;
-    }
-    .subscribe_item {
-      // width: 482px;
-      width: 458px;
-      height: 200px;
-      margin-bottom: 16px;
-      .vh-goods_item-info {
-        width: 250px;
-      }
-      &:nth-child(3n + 2) {
-        margin: 0px 16px;
+    .vh-goods {
+      &.subscribe_goods {
+        width: 1480px;
+        .subscribe_item {
+          width: 450px;
+          height: 200px;
+          margin-bottom: 16px;
+          .vh-goods_item-info {
+            width: 250px;
+          }
+          &:nth-child(3n + 2) {
+            margin: 0px 16px;
+          }
+        }
       }
     }
   }
   @media screen and (min-width: 1921px) {
-    .subscribe_goods {
-      width: 1480px;
-    }
-    .subscribe_item {
-      // width: 482px;
-      width: 458px;
-      height: 200px;
-      margin-bottom: 16px;
-      .vh-goods_item-info {
-        width: 250px;
-      }
-      &:nth-child(3n + 2) {
-        margin: 0px 16px;
+    .vh-goods {
+      &.subscribe_goods {
+        width: 1480px;
+        .subscribe_item {
+          width: 450px;
+          height: 200px;
+          margin-bottom: 16px;
+          .vh-goods_item-info {
+            width: 250px;
+          }
+          &:nth-child(3n + 2) {
+            margin: 0px 16px;
+          }
+        }
       }
     }
   }

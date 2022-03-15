@@ -61,7 +61,7 @@
           <div
             class="chat-setting-btn--chat-auth"
             v-if="
-              (roleName == 1 || roleName == 3) &&
+              (roleName == 1 || roleName == 3 || roleName == 4) &&
               !isInGroup &&
               (configList['comment_check'] || configList['disable_msg'])
             "
