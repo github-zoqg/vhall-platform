@@ -7,7 +7,7 @@
           <span id="vmp-notice-column-text">{{ noticeText }}</span>
         </span>
       </p>
-      <span class="vmp-notice-column-wrap-close" @click="isNoticeColumn = false">
+      <span class="vmp-notice-column-wrap-close" @click="closeNoticeColumn">
         <i class="vh-iconfont vh-line-close"></i>
       </span>
     </div>
@@ -65,18 +65,22 @@
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
         });
-        // 结束讨论
+        // 结束讨论/踢出
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           if (!this.isInGroup) {
             this.openNotice();
+          } else {
+            this.isNoticeColumn = false;
           }
         });
         this.groupServer.$on('GROUP_SWITCH_START', () => {
           this.isNoticeColumn = false;
         });
-        this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
-          this.isNoticeColumn = false;
-        });
+      },
+      closeNoticeColumn() {
+        const noticeText = document.querySelector('#vmp-notice-column-text');
+        window.cancelAnimationFrame(noticeText);
+        this.isNoticeColumn = false;
       },
       animates() {
         this.$nextTick(() => {
@@ -116,7 +120,7 @@
       display: flex;
       align-content: center;
       justify-content: space-between;
-      margin: 0 24px 0 24px;
+      margin: 0 24px;
       &-icons {
         width: 28px;
         height: 28px;

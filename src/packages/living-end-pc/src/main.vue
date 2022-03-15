@@ -6,7 +6,7 @@
     :style="`backgroundImage: url('${webinarsBgImg}')`"
   >
     <div>
-      <div class="vmp-player-living-end-img">
+      <div class="end_img">
         <img src="../src/img/liveEnd.png" alt="" />
       </div>
       <h1>{{ $t('player.player_1017') }}</h1>
@@ -110,7 +110,7 @@
       align-items: center;
     }
 
-    &-img {
+    .end_img {
       width: 164px;
       height: 120px;
 
