@@ -328,10 +328,10 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(this.$t('chat.chat_1068', { n: this.waitTime }));
+            this.$toast(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
         } else if (this.currentTab == 'qa' && this.time != 0) {
-          this.$message(this.$t('chat.chat_1080', { n: this.time }));
+          this.$toast(this.$t('chat.chat_1080', { n: this.time }));
         } else {
           this.$refs.chatWapInputModal.openModal();
         }
