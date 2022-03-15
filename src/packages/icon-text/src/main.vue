@@ -36,6 +36,7 @@
         return this.$domainStore.state.roomBaseServer.configList;
       }
     },
+
     methods: {
       // 设置选中转态
       setSelectedState(val) {

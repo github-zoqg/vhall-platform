@@ -1,18 +1,14 @@
 <template>
   <div class="sign-live-result">
-    <div class="sign-live-result-count" :class="signTotal == 0 ? 'sign-live-result-nocount' : ''">
+    <div class="sign-live-result_count" :class="signTotal == 0 ? 'sign-live-result_nocount' : ''">
       <div class="sign-people">
         <span>{{ signTotal }}</span>
         人签到
       </div>
     </div>
-    <div class="sign-live-result-table" v-if="signTotal != 0">
-      <!-- <div class="result-table-head">
-        <strong>昵称</strong>
-        <strong>签到时间</strong>
-      </div> -->
-      <div class="sign-live-result-table-list">
-        <div class="sign-live-result-table-item" v-for="(user, index) in signList" :key="index">
+    <div class="sign-live-result_table" v-if="signTotal != 0">
+      <div class="table-list">
+        <div class="table-list_item" v-for="(user, index) in signList" :key="index">
           <span class="sign-avatar">
             <img :src="user.signer_avatar ? user.signer_avatar : defaultAvater" alt="" />
           </span>
@@ -21,10 +17,10 @@
         </div>
       </div>
     </div>
-    <div class="sign-live-result-btn">
+    <div class="sign-live-result_btn">
       <el-button type="primary" round @click="$emit('restartsign')">开始签到</el-button>
     </div>
-    <div class="sign-live-result-tip">最多显示100人，控制台/当前活动/互动统计/签到查看数据</div>
+    <div class="sign-live-result_tip">最多显示100人，控制台/当前活动/互动统计/签到查看数据</div>
   </div>
 </template>
 
@@ -84,7 +80,7 @@
   .sign-live-result {
     text-align: center;
     padding-top: 110px;
-    &-count {
+    &_count {
       margin-bottom: 12px;
       img {
         width: 56px;
@@ -104,7 +100,7 @@
         }
       }
     }
-    &-nocount {
+    &_nocount {
       padding-top: 75px;
     }
     ::-webkit-scrollbar {
@@ -127,7 +123,7 @@
         display: block;
       }
     }
-    &-tip {
+    &_tip {
       width: 100%;
       position: absolute;
       font-size: 12px;
@@ -135,7 +131,7 @@
       color: #666;
       bottom: 40px;
     }
-    &-table {
+    &_table {
       background-color: rgba(255, 255, 255, 0.8);
       border-radius: 8px;
       color: #222;
@@ -145,7 +141,7 @@
         padding: 12px 20px;
         justify-content: space-between;
       }
-      &-item {
+      .table-list_item {
         display: flex;
         padding: 5px 24px;
         align-items: center;
@@ -155,7 +151,6 @@
           width: 24px;
           height: 24px;
           font-size: 0;
-          // border: 1px solid #ccc;
           border-radius: 50%;
           img {
             width: 100%;
@@ -182,20 +177,11 @@
         overflow-x: hidden;
       }
     }
-    &-btn {
+    &_btn {
       text-align: center;
-      // &-core {
-      //   width: 160px;
-      //   span {
-      //     color: #fff;
-      //   }
-      // }
-      ::v-deep .el-button {
+      .el-button {
         width: 160px;
         line-height: 20px;
-        // box-shadow: 0px 8px 32px 0px rgba(34, 34, 34, 0.24);
-        // border-radius: 8px;
-        // color: #FFFFFF;
       }
     }
   }

@@ -48,7 +48,11 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         // 是否跳转观看页
-        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
+        if (
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'live' ||
+          (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+            this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id)
+        ) {
           this.goWatchPage(this.clientType);
         }
       } catch (err) {
