@@ -388,6 +388,9 @@
         display: block;
         font-size: 40px;
       }
+      &.vmp-dom__mini {
+        height: 204px;
+      }
     }
   }
   .vmp-stream-list__local-container {

@@ -291,6 +291,23 @@
               this.stopShare();
             }
           }
+
+          if (msg.data.type === 'desktop_sharing_disable') {
+            if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickExchangeView')
+              );
+            }
+            useRoomBaseServer().setInavToolStatus('is_desktop', 0);
+          }
+          if (msg.data.type === 'desktop_sharing_open') {
+            if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickExchangeView')
+              );
+            }
+            useRoomBaseServer().setInavToolStatus('is_desktop', 1);
+          }
         });
       },
       // 订阅流
