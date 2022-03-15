@@ -24,7 +24,7 @@ Vue.prototype.$tdefault = function (key) {
  */
 export function initI18n() {
   window.i18n = new VueI18n({
-    locale: 'zh' || window.$globalConfig.currentLang,
+    locale: window.$globalConfig.currentLang || 'zh',
     messages: {
       zh: languages.zh,
       en: languages.en
