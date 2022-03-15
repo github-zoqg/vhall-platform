@@ -216,7 +216,6 @@
       },
       isShareScreen: {
         handler(newval) {
-          console.error(newval, this.isUseNoDelayLayout, useDocServer().state.switchStatus);
           if (this.isUseNoDelayLayout) {
             // 互动无延迟模仿旁路布局
             if (newval) {
