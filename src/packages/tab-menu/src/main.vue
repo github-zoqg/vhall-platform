@@ -56,8 +56,6 @@
     useRoomBaseServer
   } from 'middle-domain';
 
-  // TODO: tips
-
   export default {
     name: 'VmpTabMenu',
     components: {
@@ -96,7 +94,6 @@
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
-    watch: {},
     beforeCreate() {
       this.menuServer = useMenuServer();
     },

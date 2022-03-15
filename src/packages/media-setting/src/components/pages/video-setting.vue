@@ -142,11 +142,7 @@
         }
 
         return true;
-      },
-      //TODO: let stream save
-      saveStream() {},
-      uploadSuccessCanvas() {},
-      updateDeviceSetting() {}
+      }
     }
   };
 </script>
