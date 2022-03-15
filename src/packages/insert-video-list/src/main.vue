@@ -290,7 +290,6 @@
       // 进入本地文件插播
       initLocalVideo(File) {
         console.log('本地插播上传的文件', File);
-        const insertFileServer = useInsertFileServer();
         const isGt5M = File.size / 1024 / 1024 / 1024 > 5;
         console.log(File.type, 'File.type');
         if (isGt5M) {

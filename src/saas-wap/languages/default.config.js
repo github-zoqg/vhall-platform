@@ -4,8 +4,12 @@
 const defaultLanguageConf = {
   姓名: 'form.form_1001',
   地域: 'form.form_1002',
-  地址: 'form.form_1085',
   邮箱: 'form.form_1003',
+  公司: 'form.form_1054',
+  性别: 'form.form_1055',
+  职务: 'form.form_1056',
+  手机: 'form.form_1064',
+  地址: 'form.form_1085',
   手机号: 'account.account_1002',
   请输入姓名: 'interact_tools.interact_tools_1005',
   请输入手机号: 'account.account_1025',

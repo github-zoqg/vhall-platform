@@ -68,7 +68,8 @@
     useInteractiveServer,
     useGroupServer,
     useDesktopShareServer,
-    useMsgServer
+    useMsgServer,
+    useMicServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -86,6 +87,9 @@
       };
     },
     computed: {
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       // 角色
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
@@ -154,6 +158,10 @@
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
       },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
       /**
        * @description 是否显示结束演示按钮
        * 1.分组活动下没有嘉宾
@@ -206,6 +214,7 @@
       SaasAlert
     },
     beforeCreate() {
+      this.micServer = useMicServer();
       this.roomBaseServer = useRoomBaseServer();
       this.mediaSettingServer = useMediaSettingServer();
       this.groupServer = useGroupServer();
@@ -226,6 +235,9 @@
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
           console.log('[doc] streamListHeight:', newval);
+          if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
+            return;
+          }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
