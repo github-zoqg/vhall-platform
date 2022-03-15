@@ -362,19 +362,14 @@
           disable = true;
         } else {
           //如果是单人被禁言
-          if (this.isBanned) {
+          if (this.isBanned && this.roleName != 1) {
             placeholder = this.$t('chat.chat_1006');
             disable = true;
           }
           //如果是全体禁言
-          if (this.allBanned) {
+          if (this.allBanned && ![1, '1', 3, '3', 4, '4'].includes(this.roleName)) {
             placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
             disable = true;
-          }
-          //主持人不受禁言限制
-          if ([1, '1', 3, '3'].includes(this.roleName)) {
-            placeholder = this.$t('chat.chat_1021');
-            disable = false;
           }
         }
 
