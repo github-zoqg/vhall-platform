@@ -331,6 +331,16 @@
         justify-content: center;
         min-width: 100%;
         flex: none;
+        .vmp-stream-list__remote-container {
+          .vmp-stream-local__bootom {
+            &-role {
+              padding: 0 6px;
+            }
+            &-nickname {
+              width: 40px;
+            }
+          }
+        }
       }
       &::-webkit-scrollbar {
         /*隐藏滚轮*/
