@@ -36,13 +36,13 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
-      <!-- <span
+      <span
         v-show="[1, 3, 4].includes(joinInfo.role_name)"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleNameFilter }}
-      </span> -->
+        {{ joinInfo.role_name | roleFilter }}
+      </span>
       <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -295,13 +295,18 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
-        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 非同意主持人的邀请上麦 + 非自己申请上麦
-        return (
-          this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
-          this.mode == 6 &&
-          this.joinInfo.role_name == 2 &&
-          !this.isNotAutoSpeak
-        );
+        // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 观众 + 不在麦上 + 非同意主持人的邀请上麦 + 非自己申请上麦
+        if (this.groupRole == 20) {
+          return false;
+        } else {
+          return (
+            this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 1 &&
+            this.mode == 6 &&
+            this.joinInfo.role_name == 2 &&
+            !this.isNotAutoSpeak &&
+            !this.micServer.getSpeakerStatus()
+          );
+        }
       },
       // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
       showInterIsPlay() {
@@ -661,6 +666,7 @@
               await this.setBroadCastScreen();
             }
           }
+          console.log('paltForm 自动静音上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
           if (this.autoSpeak) {
             this.interactiveServer.setDeviceStatus({

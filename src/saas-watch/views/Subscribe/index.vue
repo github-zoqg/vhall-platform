@@ -117,7 +117,6 @@
     overflow-y: auto;
   }
   .vmp-subscribe-container {
-    height: 100vh;
     .vmp-basic-container {
       width: 100%;
       height: 100%;

@@ -11,7 +11,8 @@ import {
   useUserServer,
   useVirtualAudienceServer,
   useDesktopShareServer,
-  useInsertFileServer
+  useInsertFileServer,
+  useMediaCheckServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -38,6 +39,7 @@ export default new DomainStore.Store({
     virtualAudienceServer: useVirtualAudienceServer().state,
     userServer: useUserServer().state,
     desktopShareServer: useDesktopShareServer().state,
-    insertFileServer: useInsertFileServer().state
+    insertFileServer: useInsertFileServer().state,
+    mediaCheckServer: useMediaCheckServer().state
   }
 });

@@ -3,10 +3,12 @@ const move = {
     touchstart(e) {
       if (this.mini) {
         this.videoDom = document.querySelector('.vmp-wap-body-mini');
-        const style = window.getComputedStyle(this.videoDom);
-        this.DOMS = style;
-        this.touchOffsetX = e.touches[0].pageX - parseFloat(style.left);
-        this.touchOffsetY = e.touches[0].pageY - parseFloat(style.top);
+        if (this.videoDom) {
+          const style = window.getComputedStyle(this.videoDom);
+          this.DOMS = style;
+          this.touchOffsetX = e.touches[0].pageX - parseFloat(style.left);
+          this.touchOffsetY = e.touches[0].pageY - parseFloat(style.top);
+        }
       }
     },
     touchmove(e) {

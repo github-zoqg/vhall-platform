@@ -160,7 +160,7 @@
         const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
         const saveScreenRate =
           sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
-        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[0].id;
+        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[1].id; // 默认主次平铺
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;

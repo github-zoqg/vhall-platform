@@ -391,6 +391,12 @@
         width: 309px;
         height: 240px;
         z-index: 1;
+        .vmp-stream-local__bootom-role {
+          padding: 0 8px;
+        }
+        .vmp-stream-local__bootom-nickname {
+          width: 80px;
+        }
       }
     }
 
@@ -409,10 +415,20 @@
       height: 80px;
     }
 
-    .vmp-stream-list__remote-container,
+    .vmp-stream-list__remote-container {
+      width: 142px;
+      height: 80px;
+    }
+
     .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
+      .vmp-stream-local__bootom-role {
+        padding: 0 6px;
+      }
+      .vmp-stream-local__bootom-nickname {
+        width: 40px;
+      }
     }
 
     // 展开收起按钮
