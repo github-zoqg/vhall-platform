@@ -36,22 +36,7 @@
       }
     },
     methods: {
-      getComp(cuid, arr) {
-        // 由于air-container不一定是本组件的直系chilren，需要深入遍历查找
-        // const findComp = (cuid, array) => {
-        //   if (!array || array.length === 0) return false;
-        //   for (const item of array) {
-        //     // 只找cuid，以及空cuid下的cuid，一旦找到cuid便不再深入遍历
-        //     if (item.cuid && item.cuid === cuid) return item;
-        //     if (item.cuid && item.cuid !== cuid) continue;
-        //     const comp = findComp(cuid, item.$children);
-        //     if (comp) return comp;
-        //   }
-        //   return false;
-        // };
-
-        // return findComp(cuid, arr);
-
+      getComp(cuid) {
         return this.$children.find(i => i.cuid === cuid);
       },
       async switchTo(item) {
@@ -59,10 +44,9 @@
         await this.$nextTick();
 
         let child = null;
-        child = this.getComp(item.cuid, this.$children);
+        child = this.getComp(item.cuid);
 
         if (!child) return;
-        console.log('item:', item);
 
         // pre-show
         if (item.type === 1) {

@@ -56,8 +56,6 @@
     useRoomBaseServer
   } from 'middle-domain';
 
-  // TODO: tips
-
   export default {
     name: 'VmpTabMenu',
     components: {
@@ -96,7 +94,6 @@
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
-    watch: {},
     beforeCreate() {
       this.menuServer = useMenuServer();
     },
@@ -308,7 +305,8 @@
        * @param {String} cuid
        * @param {String|Number} menuId
        */
-      scrollToItem({ id }) {
+      async scrollToItem({ id }) {
+        await this.$nextTick();
         // 由于menu列表随时会增减，
         const itemsWithPosition = this.visibleMenu.map(item => {
           const id = item.id;
