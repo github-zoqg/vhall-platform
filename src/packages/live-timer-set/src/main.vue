@@ -198,7 +198,7 @@
         this.timerVisible = true;
       },
       onClose() {
-        this.$emit('disTimer', true);
+        // this.$emit('disTimer', true);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
         );

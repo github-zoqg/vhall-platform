@@ -14,7 +14,7 @@
         </header>
         <van-swipe
           class="swiper-box"
-          indicator-color="#888888"
+          indicator-color="#888"
           :loop="filterGift.length != 1"
           @change="swiperChange"
         >
