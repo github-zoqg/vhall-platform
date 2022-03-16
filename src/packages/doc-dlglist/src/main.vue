@@ -735,6 +735,9 @@
         font-size: 15px;
         color: #999;
       }
+      .el-button {
+        width: 120px;
+      }
     }
     .help-tips p {
       line-height: 20px;
@@ -798,7 +801,7 @@
 
     .doc-uploader {
       display: inline;
-      margin-right: 20px;
+      margin-right: 12px;
     }
 
     .input-search {

@@ -224,11 +224,13 @@
           this.refreshScroll();
         });
       },
-      showDetailDialog(good) {
+      showDetailDialog(goodsItem) {
         // this.openGoodInfo = true;
         // this.goodItem = good;
 
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShowDetail', [good]));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
+        );
       }
     }
   };
