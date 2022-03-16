@@ -17,7 +17,12 @@
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer, useZIndexServer } from 'middle-domain';
+  import {
+    useQuestionnaireServer,
+    useChatServer,
+    useZIndexServer,
+    useMsgServer
+  } from 'middle-domain';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaireWatch',
@@ -33,6 +38,7 @@
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
       this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
@@ -105,6 +111,10 @@
               customClass: 'zdy-info-box'
             });
           }
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
         });
       }
     }

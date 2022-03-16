@@ -6,7 +6,7 @@
   </van-popup>
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
@@ -20,6 +20,7 @@
     },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
@@ -85,6 +86,10 @@
             this.$toast(this.$t('form.form_1037'));
             this.popupVisible = false;
           }
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
         });
       }
     }
