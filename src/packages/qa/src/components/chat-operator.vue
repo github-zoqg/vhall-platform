@@ -4,7 +4,7 @@
       <i class="vh-iconfont vh-line-expression" @click.stop="toggleEmoji"></i>
       <div class="vhsaas-chat-operator__only-mine">
         <el-checkbox
-          class="filter-item__checkbox"
+          class="only-me-item__checkbox"
           @change="onClickOnlyMine"
           v-model="onlyMine"
         ></el-checkbox>
@@ -252,6 +252,7 @@
           event.preventDefault();
         }
       },
+      //发送消息
       async sendMessage() {
         if (this.inputValue.trim() === '') {
           return this.$message({
@@ -324,7 +325,7 @@
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   .vhsaas-chat-operator {
     width: calc(100% - 48px);
     padding: 12px 24px 11px;
@@ -359,6 +360,9 @@
         color: #999999;
         cursor: pointer;
         font-size: 14px;
+        .el-checkbox__inner {
+          background-color: transparent;
+        }
         &.iconfuxuankuang_yixuan {
           color: @font-error;
           &:before {
@@ -378,7 +382,7 @@
         }
       }
       .only-me-item__label {
-        margin-left: 5px;
+        // margin-left: 5px;
         font-size: 14px;
         line-height: 21px;
         color: #999999;

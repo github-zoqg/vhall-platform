@@ -1,6 +1,6 @@
 <template>
   <div class="time-open">
-    <div style="postsion: relative">
+    <div style="position: relative">
       <div v-if="timerVisible" class="bgimg" v-drag>
         <el-row class="padding45">
           <el-row
@@ -343,7 +343,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
               );
-              this.$emit('disTimer', false);
+              // this.$emit('disTimer', false);
             }
           })
           .catch(e => e);
@@ -517,7 +517,7 @@
       padding: 24px 20px;
       top: 15vh;
       left: 50vw;
-      transform: translate(-50%, 0%);
+      transform: translate(-50%, 0);
       color: #fff;
       background-image: linear-gradient(#fffaee, #fff6d5);
       border-radius: 20px;
@@ -553,7 +553,7 @@
       width: 100%;
     }
     .bg000 {
-      background: #000000;
+      background: #000;
       .ft28 {
         font-size: 28px;
         top: -33px;
@@ -570,7 +570,7 @@
       position: absolute;
       right: -35px;
       top: -10px;
-      color: #666666;
+      color: #666;
       & > i {
         font-size: 10px;
         float: right;
@@ -590,7 +590,7 @@
   }
   .timer-padtop {
     .button_cancle {
-      border: 1px solid #cccccc;
+      border: 1px solid #ccc;
       color: #666666;
       background: #fff;
     }

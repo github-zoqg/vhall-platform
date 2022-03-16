@@ -1,9 +1,9 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
-      <record-control v-if="configList['cut_record']"></record-control>
+      <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="roleName == 1">
+      <template v-if="roleName == 1 && !isInGroup">
         <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
@@ -21,7 +21,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && isLiving">
+      <template v-if="roleName == 4 && isLiving && !isInGroup">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -147,6 +147,10 @@
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       }
     },
     components: {

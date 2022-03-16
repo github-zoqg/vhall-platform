@@ -13,6 +13,9 @@
       }"
     ></section>
 
+    <!-- 音频直播的的时候显示流占位图 -->
+    <section v-if="stream.videoMuted" class="vmp-stream-remote__container__audio"></section>
+
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
       <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
@@ -74,7 +77,7 @@
         </el-tooltip>
       </p>
 
-      <p class="vmp-stream-remote__shadow-second-line">
+      <p class="vmp-stream-remote__shadow-second-line" v-if="liveMode != 1">
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
@@ -516,6 +519,18 @@
         background-position: center;
       }
     }
+
+    .vmp-stream-remote__container__audio {
+      background-image: url(./img/audio.gif);
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
     .vmp-stream-local__bootom {
       width: 100%;
       height: 24px;
