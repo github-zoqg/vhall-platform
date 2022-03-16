@@ -115,7 +115,7 @@
                 <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
                 <span v-html="source.content.text_content"></span>
                 <img
-                  @tap="$emit('preview', img)"
+                  @click="$emit('preview', img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -132,7 +132,7 @@
               <div class="msg-content_body">
                 <span v-html="msgContent"></span>
                 <img
-                  @tap="previewImg(img)"
+                  @click="previewImg(img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -155,7 +155,7 @@
                 <span class="reply-color"></span>
                 <span v-html="source.content.text_content" style="display: block"></span>
                 <img
-                  @tap="previewImg(img)"
+                  @click="previewImg(img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"

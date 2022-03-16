@@ -26,6 +26,7 @@
               {{ $t('chat.chat_1006') }}
             </span>
             <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
+            <span v-else-if="isvod">{{ $t('chat.chat_1079') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>{{ $t('chat.chat_1042') }}</span>
           </div>
@@ -223,6 +224,10 @@
             this.groupInitData.isInGroup && !this.isBanned
           ].some(val => !!val)
         );
+      },
+      //是否回放禁言
+      isvod() {
+        return this.webinar.type == 5 && this.configList['ui.watch_record_no_chatting'] == 1;
       }
     },
     watch: {

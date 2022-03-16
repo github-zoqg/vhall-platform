@@ -19,6 +19,7 @@
         <i
           class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
           @click.stop="onClickFilterSetting"
+          v-clickoutside="hidechatOptions"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
         <!-- 表情选择 -->
@@ -222,6 +223,10 @@
     },
     mounted() {},
     methods: {
+      //隐藏设置弹窗
+      hidechatOptions() {
+        this.isFilterShow = false;
+      },
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         this.$emit('changeAllBanned', val);
