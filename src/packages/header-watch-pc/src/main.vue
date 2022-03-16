@@ -43,7 +43,7 @@
       <!-- 公众号 -->
       <div class="right_officical" v-if="officialImg">
         <div
-          :class="'vmp-header-watch-right-officical-icon ' + themeClass.iconClass"
+          :class="'right_officical_icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goOfficical"
         >
@@ -58,7 +58,7 @@
         v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.mode != 6"
       >
         <div
-          :class="'right-attention_icon ' + themeClass.iconClass"
+          :class="'right_attention_icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="attentionHandler"
         >
@@ -598,7 +598,7 @@
               line-height: 32px;
             }
             &:hover {
-              .vmp-header-watch-right-login-user-list {
+              .right_login_user_list {
                 display: block;
               }
             }
@@ -606,7 +606,7 @@
           &_list {
             width: 160px;
             position: absolute;
-            top: 38px;
+            top: 42px;
             right: -6px;
             z-index: 11;
             border-radius: 4px;

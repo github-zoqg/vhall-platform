@@ -280,10 +280,11 @@
                 vn.setDisableState(true);
               }
             } else {
-              if (this.role == 1 && this.doc_permission != this.userId) {
-                vn.setDisableState(true);
-                continue;
-              }
+              // 主持人不是主讲人、也不置灰
+              // if (this.role == 1 && this.doc_permission != this.userId) {
+              //   vn.setDisableState(true);
+              //   continue;
+              // }
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {
