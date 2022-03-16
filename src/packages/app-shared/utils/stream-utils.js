@@ -1,16 +1,16 @@
 // 音量等级
 export function calculateAudioLevel(level) {
-  let audioLevelValue = 1;
+  let audioLevelValue = 0;
   if (level > 0 && level <= 0.04) {
-    audioLevelValue = 1;
+    audioLevelValue = 0;
   } else if (level > 0.04 && level <= 0.16) {
-    audioLevelValue = 2;
+    audioLevelValue = 1;
   } else if (level > 0.16 && level <= 0.36) {
-    audioLevelValue = 3;
+    audioLevelValue = 2;
   } else if (level > 0.36 && level <= 0.64) {
-    audioLevelValue = 4;
+    audioLevelValue = 3;
   } else if (level > 0.64 && level <= 1) {
-    audioLevelValue = 5;
+    audioLevelValue = 4;
   }
   return audioLevelValue;
 }

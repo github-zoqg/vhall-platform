@@ -208,7 +208,6 @@
     mounted() {
       console.log('useChatServer', useChatServer().state);
       this.listenChatServer();
-      window.chat = this;
     },
     methods: {
       //初始化视图数据

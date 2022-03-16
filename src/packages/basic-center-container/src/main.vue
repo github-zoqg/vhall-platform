@@ -49,6 +49,7 @@
     methods: {
       handleAllVideoPlay() {
         document.querySelectorAll('video').forEach(video => video.play());
+        document.querySelectorAll('.vmp-stream-remote audio').forEach(audio => audio.play());
         this.showcoverImg = false;
       }
     }
