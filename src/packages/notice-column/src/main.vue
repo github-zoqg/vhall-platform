@@ -53,6 +53,8 @@
           this.isNoticeColumn = true;
           this.noticeText = this.noticeLatestInfo.list[0].content['content'];
           this.animates();
+        } else {
+          this.isNoticeColumn = false;
         }
       },
       initNotice() {
