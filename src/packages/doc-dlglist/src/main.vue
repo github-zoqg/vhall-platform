@@ -29,9 +29,9 @@
       <!-- 标题栏 -->
       <template slot="title">
         <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
-          <i class="vh-iconfont vh-line-arrow-left" style="font-size: 14px; color: #666"></i>
+          <i class="vh-iconfont vh-line-arrow-left title-icon"></i>
         </span>
-        <span>{{ $t('doc.doc_1012') }}</span>
+        <span class="title-text">{{ $t('doc.doc_1012') }}</span>
       </template>
 
       <!-- 内容区域 -->
@@ -133,7 +133,7 @@
                 <!-- 表格展示 -->
                 <el-table-column prop="file_name" label="文档名称" width="180">
                   <template slot-scope="scope">
-                    <p class="file-name" style="-webkit-box-orient: vertical">
+                    <p class="file-name">
                       <span
                         class="vh-iconfont"
                         :class="scope.row.ext | fileIconCss(false)"
@@ -233,7 +233,7 @@
               <el-table-column type="selection" width="55" align="left"></el-table-column>
               <el-table-column prop="file_name" label="文档名称" width="180">
                 <template slot-scope="scope">
-                  <p class="file-name" style="-webkit-box-orient: vertical">
+                  <p class="file-name">
                     <span
                       class="vh-iconfont"
                       :class="scope.row.ext | fileIconCss(false)"
@@ -812,36 +812,39 @@
         border-radius: 100px;
       }
     }
-  }
 
-  .doc-dlg-sharetip {
-    width: 400px;
-    height: 200px;
-    box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
-    border-radius: 4px;
-    background-color: #fff;
-    position: relative;
-    margin-top: -10%;
+    .doc-dlg-sharetip {
+      width: 400px;
+      height: 200px;
+      box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
+      border-radius: 4px;
+      background-color: #fff;
+      position: relative;
+      margin-top: -10%;
 
-    .el-checkbox {
-      font-weight: 400 !important;
-    }
-    .el-checkbox__input.is-checked + .el-checkbox__label {
-      color: #606266 !important;
-    }
+      .el-checkbox {
+        font-weight: 400 !important;
+      }
+      .el-checkbox__input.is-checked + .el-checkbox__label {
+        color: #606266 !important;
+      }
 
-    .dialog-footer {
-      text-align: right;
-      margin-top: 20px;
+      .dialog-footer {
+        text-align: right;
+        margin-top: 20px;
+      }
     }
-  }
-  .el-table .cell .file-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    display: box;
-    -webkit-line-clamp: 2;
-    box-orient: vertical;
-    -webkit-box-orient: vertical;
+    .el-table .cell .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .title-icon {
+      font-size: 14px;
+      color: #666;
+    }
+    .title-text {
+      font-size: 20px;
+    }
   }
 </style>
