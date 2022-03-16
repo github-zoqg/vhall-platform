@@ -246,7 +246,7 @@
 
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$message(e.msg);
+        e.msg && this.$message.warning(e.msg);
       });
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
