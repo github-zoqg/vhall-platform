@@ -11,7 +11,6 @@
         <div class="vh-chose-active-item__cover">
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <!-- <i class="saasicon_redu"></i> -->
             <i class="vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
@@ -40,9 +39,6 @@
         hasDelayPermission: false
       };
     },
-    computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList'])
-    },
     watch: {
       checkedList: function () {
         this.getActiveList();
@@ -52,12 +48,10 @@
       this.customMenuServer = useCustomMenuServer();
     },
     created() {
-      // this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
       this.getActiveList();
     },
     methods: {
       linkSubject(id) {
-        // window.open(window.location.protocol + process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY + `/special/detail?id=${id}&delay=${this.hasDelayPermission ? 1 : 0}`)
         window.open(
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
@@ -66,7 +60,7 @@
         );
       },
       async getActiveList() {
-        if (this.checkedList.length == 0) {
+        if (this.checkedList.length === 0) {
           this.activeList = [];
           return;
         }
