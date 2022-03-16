@@ -75,6 +75,10 @@
           const uuid = data.red_packet_uuid;
           this.open(uuid);
         });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
+        });
       },
       openRedPacket(uuid) {
         this.dialogVisible = true;
