@@ -658,12 +658,11 @@
             tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
           })
           .then(res => {
-            if (res.code == 200) {
+            if (res.code === 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
               this.marquee = res.data['screen-config'].data;
               this.water = res.data['water-mark'].data;
               this.playerOtherOptions = res.data['basic-config'].data;
-              console.log(this.marquee, this.water, '??!23221423');
               this.initPlayer();
             }
           });
