@@ -840,6 +840,11 @@
     .el-table th > .cell {
       font-weight: normal;
     }
+    .el-table th:first-child .cell,
+    .el-table tr td:first-child .cell {
+      padding-left: 24px;
+    }
+
     .el-table--enable-row-hover .el-table__body tr:hover > td {
       background-color: #f7f7f7;
 
