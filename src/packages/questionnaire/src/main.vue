@@ -942,4 +942,13 @@
       overflow-y: hidden;
     }
   }
+  // 处理题目为必选时, 标题会折行bug,css样式覆盖,后续问卷sdk内优化
+  #qn-server-box {
+    .question-wrap .question-content .q-edit .q-subject {
+      width: calc(100% - 30px);
+    }
+    .question-wrap .question-content .q-edit .com-input.q-subject {
+      width: calc(100% - 24px);
+    }
+  }
 </style>
