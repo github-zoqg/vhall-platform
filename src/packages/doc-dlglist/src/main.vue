@@ -840,6 +840,13 @@
     .el-table th > .cell {
       font-weight: normal;
     }
+    .el-table--enable-row-hover .el-table__body tr:hover > td {
+      background-color: #f7f7f7;
+
+      .el-button--text {
+        color: #fb3a32;
+      }
+    }
 
     .help-icon {
       font-size: 16px;
