@@ -568,7 +568,7 @@
         height: 100%;
         justify-content: center;
         align-items: center;
-        padding: 0 50px;
+        padding: 0 34px;
         color: #595959;
         cursor: pointer;
         user-select: none;
@@ -609,7 +609,6 @@
           position: relative;
 
           .bottom-line {
-            content: '';
             position: absolute;
             bottom: 9px;
             height: 5px;
