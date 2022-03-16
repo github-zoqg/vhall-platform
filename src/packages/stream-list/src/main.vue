@@ -332,6 +332,16 @@
             }
           }
         }
+        .vmp-stream-list__main-screen {
+          .vmp-stream-local__bootom {
+            &-role {
+              padding: 0 6px;
+            }
+            &-nickname {
+              width: 80px;
+            }
+          }
+        }
       }
       &::-webkit-scrollbar {
         /*隐藏滚轮*/

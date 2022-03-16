@@ -24,7 +24,8 @@
     useLotteryServer,
     useRoomBaseServer,
     useChatServer,
-    useZIndexServer
+    useZIndexServer,
+    useMsgServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
@@ -58,11 +59,8 @@
     },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
-      try {
-        this.zIndexServer = useZIndexServer();
-      } catch (e) {
-        console.log(e);
-      }
+      this.msgServer = useMsgServer();
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initMsgEvent();
@@ -124,6 +122,10 @@
           this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
           this.callBackResultNotice
         );
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
+        });
       },
       removeMsgEvent() {
         this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
@@ -249,7 +251,6 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
   }

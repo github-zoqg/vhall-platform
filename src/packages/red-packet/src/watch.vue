@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer, useZIndexServer, useChatServer } from 'middle-domain';
+  import { useRedPacketServer, useZIndexServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
@@ -50,6 +50,7 @@
         mode: 'watch'
       });
       this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
@@ -90,6 +91,10 @@
           });
           const uuid = data.red_packet_uuid;
           this.open(uuid);
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
         });
       },
       close() {

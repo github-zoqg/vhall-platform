@@ -33,7 +33,7 @@
           <li :class="['mobile', { li_check_error: errorMsgShow.mobile }]">
             <div>
               <input
-                @blur="checkPh"
+                @blur="checkPhoneNum"
                 v-if="showMobileLogin"
                 type="number"
                 pattern="\d*"
@@ -42,7 +42,7 @@
                 maxlength="11"
               />
               <input
-                @blur="checkPh"
+                @blur="checkPhoneNum"
                 v-else
                 type="text"
                 :placeholder="$t('login.login_1022')"
@@ -132,7 +132,7 @@
                 :placeholder="$t('account.account_1025')"
                 v-model.trim="mobile"
                 maxlength="11"
-                @blur="checkPh"
+                @blur="checkPhoneNum"
               />
             </div>
             <p :class="['error-tip', { error: errorMsgShow.mobile }]">
@@ -263,7 +263,6 @@
     beforeCreate() {
       this.userServer = useUserServer();
     },
-    async mounted() {},
     methods: {
       // 打开弹窗
       async open() {
@@ -278,7 +277,8 @@
           this.initCaptcha();
         }
       },
-      async checkPh() {
+      // 检查手机号
+      async checkPhoneNum() {
         // showLoginCard 登录
         // showMobileLogin 手机号登录
         if (this.showLoginCard) {
@@ -678,7 +678,6 @@
         justify-content: space-between;
         > div {
           flex-grow: 1;
-          // @include border-1px-direction("bottom", #979797);
           position: relative;
           border-width: 0;
           input {
@@ -783,9 +782,6 @@
         margin-right: 58px;
       }
     }
-  }
-  .iconqudenglu {
-    font-size: 12px;
   }
   .captcha {
     margin-bottom: 60px;

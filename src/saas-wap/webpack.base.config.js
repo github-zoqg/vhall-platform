@@ -32,7 +32,7 @@ const htmlConfig = {
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
-    iconfontCommon: '//at.alicdn.com/t/font_3128919_8a91sagp8mc.css',
+    iconfontCommon: '//at.alicdn.com/t/font_3128919_pbftctan4i.css',
     iconfont: '//at.alicdn.com/t/font_3120276_vywbqplu6p.css'
   },
   // dns-prefetch
