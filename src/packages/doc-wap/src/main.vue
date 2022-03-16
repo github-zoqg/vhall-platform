@@ -344,9 +344,6 @@
       },
       // 回放文档加载事件
       dispatchDocVodCuepointLoadComplate: async function (data) {
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitShowMenuTab', [this.docServer.state.switchStatus])
-        );
         if (this.docServer.state.containerList.length === 0) {
           const data = this.docServer.getVodAllCids();
           this.docServer.state.containerList = data.map(item => {
@@ -371,8 +368,12 @@
           }
         }
       },
-      dispatchDocVodTimeUpdate() {
-        // TODO
+      dispatchDocVodTimeUpdate({ isChange }) {
+        if (isChange) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitShowMenuTab', [this.docServer.state.switchStatus])
+          );
+        }
       }
     },
     beforeDestroy() {
