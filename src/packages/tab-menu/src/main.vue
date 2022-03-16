@@ -331,13 +331,13 @@
        * @example select('comCustomMenuWap','10246')
        */
       async select({ type, id }) {
+        await this.$nextTick();
         this.selectedType = type;
         const item = this.getItem({ type, id });
         this.scrollToItem({ id: item.id });
         this.selectedId = item.id;
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
-        await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       },
       /**

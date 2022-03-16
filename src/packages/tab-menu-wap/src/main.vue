@@ -86,7 +86,7 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        return this.menu.filter(item => {
+        let m = this.menu.filter(item => {
           if (this.pageEnv === 'living') {
             return (item.status == 1 || item.status == 3) && item.visible;
           }
@@ -95,8 +95,11 @@
             return (item.status == 1 || item.status == 4) && item.visible;
           }
 
-          return item.visible;
+          return item.visible === true;
         });
+        console.log('visibleMenu', m);
+
+        return m;
       },
       // 是否为嵌入页
       embedObj() {

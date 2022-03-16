@@ -68,12 +68,11 @@
       this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
         if (!this.isInGroup) {
           this.openAnnouncement();
+        } else {
+          this.announcement.isShow = false;
         }
       });
       this.groupServer.$on('GROUP_SWITCH_START', () => {
-        this.announcement.isShow = false;
-      });
-      this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
         this.announcement.isShow = false;
       });
     },

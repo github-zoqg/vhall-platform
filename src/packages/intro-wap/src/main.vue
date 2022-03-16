@@ -206,7 +206,7 @@
           left: 0px;
           width: 4px;
           height: 30px;
-          background: @font-error;
+          background: @bg-error-light;
         }
       }
 

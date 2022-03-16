@@ -57,6 +57,9 @@ import VmpInsertStream from '@/packages/insert-video-stream';
 
 // 商品列表
 import VmpGoodList from '@/packages/good';
+// 商品详情
+import VmpGoodDetailPc from '@/packages/pc-goods-detail';
+
 // 开屏海报
 import VmpScreenPost from '@/packages/screen-post';
 
@@ -102,6 +105,7 @@ export function initUse() {
   Vue.use(VmpWatchNavMenu);
   Vue.use(VmpWatchTimer);
   Vue.use(VmpGoodList);
+  Vue.use(VmpGoodDetailPc);
   Vue.use(VmpLotteryWatch);
   Vue.use(VmpChapter);
   Vue.use(VmpScreenPost);

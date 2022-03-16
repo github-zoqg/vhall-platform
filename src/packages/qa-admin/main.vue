@@ -446,9 +446,8 @@
 <script>
   import { useRoomBaseServer, useQaAdminServer, Domain, useMsgServer } from 'middle-domain';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
-  import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-  import { debounce } from '@/packages/app-shared/utils/tool';
+  import { debounce, getQueryString } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQaAdmin',
     components: {

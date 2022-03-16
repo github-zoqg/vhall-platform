@@ -34,10 +34,15 @@
       </div>
     </section>
 
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
       <span
-        v-show="[1, 3, 4].includes(joinInfo.role_name)"
+        v-show="[1, 3, 4].includes(joinInfo.role_name) && isInGroup"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
       >
@@ -234,6 +239,9 @@
       ImgStream
     },
     computed: {
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       // 当前人插播的时候，不显示本地流的操作按钮
       isShowShadowBtn() {
         return (
@@ -265,6 +273,17 @@
         return this.$domainStore.state.micServer.speakerList;
       },
 
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
+
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -280,6 +299,32 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      presentationScreen() {
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        }
+      },
+      //显示是否在演示中
+      isShowPresentationScreen() {
+        const { accountId } = this.localSpeaker;
+        const sameId = this.presentationScreen === accountId;
+        const groupMode = this.liveMode == 6;
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
+
+        console.log('isShowPresentationScreen', {
+          localSpeaker: this.localSpeaker,
+          sameId,
+          groupMode,
+          inMainRoomUser,
+          inGroupRoomUser
+        });
+
+        return sameId && groupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -693,6 +738,7 @@
             })
             .catch(() => 'createLocalStreamError');
         } else {
+          // 若是图片推流，刷新则需等待canvas进行绘制
           await this.sleep();
           const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
           if (!videoTracks) {
@@ -709,7 +755,7 @@
       // 推流
       async publishLocalStream() {
         await this.interactiveServer.publishStream().catch(e => {
-          console.warn('----推流失败', e);
+          console.log('paltForm publishLocalStream failed....', e);
           if (e.code === '611007') {
             this.handleSpeakOnError('noPermission');
           } else {
@@ -1057,6 +1103,29 @@
         }
       }
     }
+
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     // 遮罩层样式
     .vmp-stream-local__shadow-box {
       width: 100%;
