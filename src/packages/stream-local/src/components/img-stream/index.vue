@@ -26,21 +26,25 @@
     },
 
     async mounted() {
+      // 初始化图片推流server
       const canvasStreamServer = useCanvasStreamServer();
       canvasStreamServer.init({
         canvasDom: this.$refs.capCanvas,
         canvasImgDom: this.$refs.capImage
       });
       try {
+        // 检测是否为图片推流，若为真，则进行绘制canvas的captureStream
         await canvasStreamServer.checkImgStream();
       } catch (error) {
         this.$message.error('非默认图片推流设置失败');
       }
     },
     methods: {
+      // 获取图片流
       getCanvasStream() {
         return useCanvasStreamServer().getCanvasStream();
       },
+      // 更新canvas图片
       updateCanvasImg() {
         return useCanvasStreamServer().checkImgStream();
       }

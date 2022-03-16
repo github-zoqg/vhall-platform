@@ -273,6 +273,17 @@
         return this.$domainStore.state.micServer.speakerList;
       },
 
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
+
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -727,6 +738,7 @@
             })
             .catch(() => 'createLocalStreamError');
         } else {
+          // 若是图片推流，刷新则需等待canvas进行绘制
           await this.sleep();
           const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
           if (!videoTracks) {
@@ -743,7 +755,7 @@
       // 推流
       async publishLocalStream() {
         await this.interactiveServer.publishStream().catch(e => {
-          console.warn('----推流失败', e);
+          console.log('paltForm publishLocalStream failed....', e);
           if (e.code === '611007') {
             this.handleSpeakOnError('noPermission');
           } else {

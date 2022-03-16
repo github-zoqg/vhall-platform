@@ -1,21 +1,10 @@
 <template>
-  <!-- <div
-    class="vmp-stream-list-wrapper"
-    ref="noDelayStreamContainer"
-    :class="{
-      'no-delay-layout': isUseNoDelayLayout,
-      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
-      'stream-length': remoteSpeakers.length > 1
-    }"
-  >
-  </div> -->
   <div
     class="vmp-stream-list"
     :class="{
       'vmp-stream-list-h0': isStreamListH0,
-      'no-delay-layout': isUseNoDelayLayout,
+      'no-delay-layout': isUseNoDelayLayout && remoteSpeakers.length > 1,
       'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
-      'stream-length': isUseNoDelayLayout && remoteSpeakers.length > 1,
       'is-share-screen': isUseNoDelayLayout && isShareScreen
     }"
   >
@@ -31,6 +20,7 @@
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
     <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
+        <!-- 本地流容器 -->
         <div
           v-show="localSpeaker.accountId"
           class="vmp-stream-list__local-container"
@@ -50,6 +40,7 @@
         <template
           v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
         >
+          <!-- 远端流列表 -->
           <div
             v-for="speaker in remoteSpeakers"
             :key="speaker.accountId"
@@ -66,7 +57,7 @@
           </div>
         </template>
 
-        <!-- 主持人进入小组后助理占位图 -->
+        <!-- 主持人进入小组后占位图 -->
         <div
           v-if="mode == 6 && isHostInGroup && !isInGroup"
           class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
@@ -81,6 +72,7 @@
       </div>
     </div>
 
+    <!-- 右翻页 -->
     <span
       v-show="isShowControlArrow"
       class="vmp-stream-list__scroll-btn right-btn"
@@ -109,13 +101,15 @@
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
-        // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group,
         streamInfo
       };
     },
 
     computed: {
+      // 主持人是否在小组内
+      isHostInGroup() {
+        return !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group;
+      },
       isInteractiveInited() {
         return this.$domainStore.state.interactiveServer.isInteractiveInited;
       },
@@ -211,9 +205,12 @@
         },
         immediate: true
       },
+
+      // 流列表宽度超过 streamWrapper 时显示 翻页按钮
       'remoteSpeakers.length'(newval) {
         this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
       },
+      // 监听是否有桌面共享，更改页面布局
       isShareScreen: {
         handler(newval) {
           if (this.isUseNoDelayLayout) {
@@ -249,7 +246,7 @@
 
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$message(e.msg);
+        e.msg && this.$message.warning(e.msg);
       });
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
@@ -259,15 +256,6 @@
             video.pause();
           });
         this.interactiveServer.state.showPlayIcon = true;
-      });
-
-      // 主持人进入退出小组 消息监听
-      this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-        if (msg.data.status == 'enter') {
-          this.isHostInGroup = true;
-        } else if (msg.data.status == 'quit') {
-          this.isHostInGroup = false;
-        }
       });
     },
 
@@ -282,6 +270,9 @@
         });
       },
 
+      /**
+       * 左右翻页更改streamWrapper的scrollLeft值实现滚动
+       */
       scrollStream(direction) {
         const scrollLeft = this.$refs.streamWrapper.scrollLeft;
         if (direction === 'left') {
@@ -465,17 +456,13 @@
         display: none;
       }
       .vmp-stream-list__main-screen {
-        bottom: 0;
+        bottom: 80px;
         top: 0;
         position: absolute;
         width: 100% !important;
         height: auto !important;
       }
-      &.stream-length {
-        .vmp-stream-list__main-screen {
-          bottom: 80px;
-        }
-      }
+
       .vmp-stream-list__stream-wrapper-scroll {
         justify-content: normal;
         flex-wrap: wrap;
