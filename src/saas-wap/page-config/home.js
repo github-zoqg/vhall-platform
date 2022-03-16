@@ -306,7 +306,7 @@ const serverConfig = {
     ],
     emitShowMenuTab: {
       cuid: ['comTabMenuWap'],
-      method: 'setVisible',
+      method: 'changeDocStatus',
       args: ['$0']
     },
     children: ['comInteractToolsWap'],
