@@ -170,7 +170,10 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
-
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 如果自己是推送桌面共享
             if (this.isShareScreen && this.desktopShareInfo.accountId == this.userId) {
               vn.setDisableState(false);
@@ -280,10 +283,11 @@
                 vn.setDisableState(true);
               }
             } else {
-              if (this.role == 1 && this.doc_permission != this.userId) {
-                vn.setDisableState(true);
-                continue;
-              }
+              // 主持人不是主讲人、也不置灰
+              // if (this.role == 1 && this.doc_permission != this.userId) {
+              //   vn.setDisableState(true);
+              //   continue;
+              // }
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {

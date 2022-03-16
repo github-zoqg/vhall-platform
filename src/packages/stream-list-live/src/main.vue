@@ -366,7 +366,7 @@
             .vmp-stream-local__shadow-icon {
               background: none;
               &:hover {
-                background-color: #fc5659;
+                background-color: #fb3a32;
               }
             }
           }

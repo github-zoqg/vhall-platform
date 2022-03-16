@@ -97,6 +97,8 @@
           this.timer = setTimeout(() => {
             this.announcement.isShow = false;
           }, 30000);
+        } else {
+          this.announcement.isShow = false;
         }
       }
     }

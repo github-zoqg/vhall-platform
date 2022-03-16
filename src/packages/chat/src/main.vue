@@ -301,13 +301,15 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
-        const giftsServer = useGiftsServer();
+        // const giftsServer = useGiftsServer();
         //监听到新消息过来
-        chatServer.$on('receiveMsg', () => {
+        chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
-            this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.data.role_name != 2)) {
+              this.isHasUnreadAtMeMsg = true;
+              this.unReadMessageCount++;
+              this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            }
           }
           this.dispatch('VmpTabContainer', 'noticeHint', 3);
         });
@@ -633,7 +635,7 @@
 
 <style lang="less">
   .vmp-chat-container {
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     @font-error: #fb3a32;
     width: 100%;
     height: 100%;

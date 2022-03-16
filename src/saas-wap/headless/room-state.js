@@ -118,9 +118,7 @@ export default async function () {
   await Promise.all(promiseList);
 
   // 互动、分组直播初始化micServer
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    micServer.init();
-  }
+  micServer.init();
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
