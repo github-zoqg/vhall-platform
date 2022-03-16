@@ -48,6 +48,7 @@
       </div>
       <!-- 播放 -->
       <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
+        <img :src="coverImgUrl" alt />
         <p @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
@@ -154,6 +155,9 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
       localSpeaker() {
         return (
@@ -304,6 +308,7 @@
       addSDKEvents() {
         // 监听到自动播放
         this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+          console.log('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });
@@ -547,6 +552,10 @@
         justify-content: center;
         z-index: 4;
         background: transparent;
+        img {
+          width: 100%;
+          height: 100%;
+        }
         p {
           width: 108px;
           height: 108px;
@@ -555,6 +564,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          position: absolute;
           i {
             font-size: 46px;
             color: #f5f5f5;
