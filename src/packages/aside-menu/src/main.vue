@@ -195,9 +195,13 @@
                   vn.setDisableState(true);
                 }
               } else {
-                // 显示但禁用
-                vn.setHiddenState(false);
-                vn.setDisableState(true);
+                if (this.doc_permission == this.userId || this.presenterId == this.userId) {
+                  vn.setDisableState(false);
+                } else {
+                  // 显示但禁用
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                }
               }
             } else if (this.role == 4) {
               if (this.doc_permission == this.userId) {

@@ -731,9 +731,14 @@
       align-items: center;
       justify-content: center;
       p {
-        line-height: 60px;
+        line-height: 20px;
+        margin-top: 8px;
+        margin-bottom: 30px;
         font-size: 15px;
-        color: #999;
+        color: @font-light-second;
+      }
+      .el-button {
+        width: 120px;
       }
     }
     .help-tips p {
@@ -798,7 +803,7 @@
 
     .doc-uploader {
       display: inline;
-      margin-right: 20px;
+      margin-right: 12px;
     }
 
     .input-search {
