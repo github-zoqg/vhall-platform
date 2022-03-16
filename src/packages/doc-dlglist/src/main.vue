@@ -2,9 +2,10 @@
   <div class="vmp-doc-list">
     <el-dialog
       :visible.sync="dialogVisible"
-      @open="handlOpen"
       :before-close="handleClose"
       :close-on-click-modal="false"
+      @open="handleOpen"
+      top="12vh"
       width="800px"
     >
       <!-- 内层嵌套对话框 -->
@@ -28,7 +29,7 @@
 
       <!-- 标题栏 -->
       <template slot="title">
-        <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
+        <span class="title-icon-wrap" v-show="mode === 2" @click="handleDoclibCancel">
           <i class="vh-iconfont vh-line-arrow-left title-icon"></i>
         </span>
         <span class="title-text">{{ $t('doc.doc_1012') }}</span>
@@ -105,10 +106,7 @@
                     </template>
                   </div>
                 </div>
-                <i
-                  style="font-size: 16px; color: #999; margin-left: 8px"
-                  class="el-tooltip vh-iconfont vh-line-question"
-                ></i>
+                <i class="el-tooltip vh-iconfont vh-line-question help-icon"></i>
               </el-tooltip>
 
               <!-- 搜索框 -->
@@ -135,7 +133,7 @@
                   <template slot-scope="scope">
                     <p class="file-name">
                       <span
-                        class="vh-iconfont"
+                        class="vh-iconfont doc-icon"
                         :class="scope.row.ext | fileIconCss(false)"
                         :style="scope.row.ext | fileIconCss(true)"
                       ></span>
@@ -458,7 +456,7 @@
       /**
        * 对话框打开事事件
        */
-      handlOpen() {
+      handleOpen() {
         this.docSearchKey = '';
         this.handleDocSearch();
       },
@@ -833,10 +831,27 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      .doc-icon {
+        font-size: 20px;
+        margin-right: 10px;
+      }
     }
-    .title-icon {
-      font-size: 14px;
-      color: #666;
+    .el-table th > .cell {
+      font-weight: normal;
+    }
+
+    .help-icon {
+      font-size: 16px;
+      color: #999;
+      margin-left: 8px;
+    }
+    .title-icon-wrap {
+      margin-right: 3px;
+      .title-icon {
+        font-size: 14px;
+        color: #666;
+      }
     }
     .title-text {
       font-size: 20px;
