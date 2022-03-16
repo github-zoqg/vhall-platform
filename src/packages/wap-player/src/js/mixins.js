@@ -136,6 +136,9 @@ const playerMixins = {
           element.msRequestFullscreen
         )
       ) {
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.isFullscreen = false;
+        }
         this.playerServer.enterFullScreen();
       }
       if (element.requestFullscreen) element.requestFullscreen();
