@@ -33,8 +33,8 @@
       </div>
     </div>
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="device_status === 1 && !isBanned && isInteractLive">
-      <handup></handup>
+    <div class="vmp-footer-tools__center">
+      <handup class=""></handup>
     </div>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
@@ -113,7 +113,7 @@
     useChatServer,
     useGroupServer
   } from 'middle-domain';
-  import handup from './handup.vue';
+  import handup from './component/handup/index.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
