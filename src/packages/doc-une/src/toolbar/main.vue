@@ -400,8 +400,9 @@
         margin-left: 16px;
         cursor: pointer;
         &:hover {
-          background: #fc5659;
-          border-color: #fc5659;
+          background: #fb3a32;
+          border-color: #fb3a32;
+          color: #fff;
         }
       }
       .audience-visible {
@@ -421,12 +422,15 @@
           border-color: #ddd !important;
           background-color: #2d2d2d !important;
           &::after {
-            background-color: #ddd;
+            background-color: #848484;
           }
         }
         .el-switch.is-checked .el-switch__core {
-          border-color: #13ce66 !important;
-          background-color: #13ce66 !important;
+          border-color: #3562fa !important;
+          background-color: #2d2d2d !important;
+          &::after {
+            background-color: #3562fa;
+          }
         }
       }
     }
