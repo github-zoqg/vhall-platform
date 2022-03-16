@@ -211,8 +211,6 @@
           }
         };
 
-        // params = Object.assign(videoParam, params);
-
         if (params.type === 'live') {
           Object.assign(params, {
             liveOption: videoParam.liveOption

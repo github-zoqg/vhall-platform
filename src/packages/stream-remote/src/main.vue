@@ -253,7 +253,11 @@
         }
       },
       presentationScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        }
       },
       //显示是否在演示中
       isShowPresentationScreen() {

@@ -145,6 +145,14 @@
           this.isCollapse = true;
         }
       },
+      // 主房间内检测演示人变化
+      ['roomBaseServer.state.interactToolStatus.presentation_screen'](presenterId) {
+        if (presenterId && presenterId == this.userId) {
+          this.isCollapse = false;
+        } else {
+          this.isCollapse = true;
+        }
+      },
       ['docServer.state.currentCid'](newval) {
         if (newval) {
           const t = newval.split('-')[0];
