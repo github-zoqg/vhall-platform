@@ -58,7 +58,7 @@
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
-              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button type="white-primary" v-if="!isWatch" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
