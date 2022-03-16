@@ -8,6 +8,9 @@
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图 -->
     <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
+    <!-- 音频直播的的时候显示流占位图 -->
+    <section v-if="stream.videoMuted" class="vmp-stream-remote__container__audio"></section>
+
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="stream.streamId">
       <span
@@ -205,6 +208,16 @@
       width: 100%;
       height: 100%;
     }
+    .vmp-stream-remote__container__audio {
+      background-image: url(./img/audio.gif);
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
     .vmp-stream-local__bootom {
       width: 100%;
       height: 24px;
@@ -244,7 +257,7 @@
       }
       &-nickname {
         display: inline-block;
-        width: 80px;
+        width: 160px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

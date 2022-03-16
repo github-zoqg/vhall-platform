@@ -193,15 +193,12 @@
   };
 </script>
 <style lang="less">
-  @fontRegular: ' PingFangSC-Regular';
-
   .vhall-lottery {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
     .el-form-item__label {
@@ -240,7 +237,6 @@
           font-size: 20px;
           font-weight: 600;
           line-height: 56px;
-          // padding-top: 10px;
         }
         &--close {
           position: absolute;
@@ -279,9 +275,8 @@
           }
           p {
             font-size: 14px;
-            font-family: @fontRegular;
             font-weight: 400;
-            color: #222222;
+            color: #222;
             line-height: 22px;
             margin-bottom: 12px;
           }
@@ -312,9 +307,8 @@
             padding-left: 20px;
             line-height: 42px;
             font-size: 14px;
-            font-family: @fontRegular;
             font-weight: 400;
-            color: #222222;
+            color: #222;
             img {
               width: 24px;
               height: 24px;
@@ -337,9 +331,8 @@
             }
             p {
               font-size: 16px;
-              font-family: @fontRegular;
               font-weight: 400;
-              color: #222222;
+              color: #222;
               line-height: 22px;
               margin-bottom: 48px;
             }
@@ -353,9 +346,8 @@
       .recive-prize {
         .title {
           font-size: 14px;
-          font-family: @fontRegular;
           font-weight: 400;
-          color: #222222;
+          color: #222;
           line-height: 20px;
           margin: 32px auto 14px;
           text-align: left;
@@ -378,16 +370,16 @@
     font-family: PingFangSC-Regular, PingFang SC;
     font-weight: 400;
     line-height: 20px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     padding: 9px 48px;
-    color: #666666;
+    color: #666;
     &:hover {
       color: #fff;
       background: #fb3a32;
       border: 1px solid #fb3a32;
     }
     &:active {
-      color: #ffffff;
+      color: #fff;
       background: #e2332c;
       border: 1px solid #e2332c;
     }
