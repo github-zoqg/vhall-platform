@@ -87,8 +87,9 @@
       },
       visibleMenu() {
         let m = this.menu.filter(item => {
+          // 此处逻辑较复杂，请参考tab-menu/readme.md
           if (this.pageEnv === 'living') {
-            return (item.status == 1 || item.status == 3) && item.visible;
+            return item.status !== 2 && item.visible;
           }
 
           if (this.pageEnv === 'live_over' || this.pageEnv === 'subscribe') {
