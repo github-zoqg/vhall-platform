@@ -114,10 +114,7 @@ export default async function () {
   //   hasToolbar: false
   // };
 
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    micServer.init();
-  }
+  micServer.init();
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });

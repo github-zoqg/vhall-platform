@@ -29,7 +29,7 @@
 
     <footer class="vh-footer">
       <section v-if="!isCheckSuccess" class="vh-footer_result-help">
-        <a target="_blank" href="https://e.vhall.com/v3/lives/room/624923410?type=ctrl">
+        <a target="_blank" href="https://www.vhall.com/saas/doc/1722.html">
           {{ $t('setting.setting_1029') }}
         </a>
       </section>
@@ -38,7 +38,7 @@
         <el-button round v-if="!isCheckSuccess" @click="restart" class="confirm">
           重新检测
         </el-button>
-        <el-button round type="primary" v-if="isCheckSuccess" @click="finish">
+        <el-button class="fr" round type="primary" v-if="isCheckSuccess" @click="finish">
           {{ roleName == 1 ? '去直播' : '马上互动' }}
         </el-button>
       </section>
@@ -193,6 +193,13 @@
         position: absolute;
         bottom: 4px;
         right: 32px;
+      }
+      .vh-fotter_result-btn {
+        width: 100%;
+        overflow: hidden;
+        .fr {
+          float: right;
+        }
       }
     }
   }

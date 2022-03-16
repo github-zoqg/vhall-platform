@@ -135,22 +135,14 @@
           class="info-panel__allow-raise-hand"
           v-if="configList['ui.hide_handsUp'] && mode !== 6"
         >
-          <!--          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>-->
-          <!--          <el-switch-->
-          <!--            v-model="allowRaiseHand"-->
-          <!--            :width="32"-->
-          <!--            :disabled="disabledSwitchHand"-->
-          <!--            @change="onSwitchAllowRaiseHand"-->
-          <!--            active-color="#fc5659"-->
-          <!--          ></el-switch>-->
-          <label class="lb-raisehands" for="lb-raisehands">
+          <label class="raise-hand-switch" for="raiseHandSwitch">
             允许举手
             <input
               style="display: none"
               v-model="allowRaiseHand"
               @change="onSwitchAllowRaiseHand"
               type="checkbox"
-              id="lb-raisehands"
+              id="raiseHandSwitch"
             />
             <i class="ss">
               <em></em>
@@ -295,12 +287,6 @@
         },
         // 举手列表定时器列表
         handsUpTimerList: {},
-        // 上麦人员掉线处理计时器map
-        speakerLeaveIntervalMap: {},
-        //切换举手状态,防连点
-        disabledSwitchHand: false,
-        //组长的id
-        leaderId: '',
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
@@ -383,34 +369,21 @@
       },
       //找到正确的当前主讲人
       getCurrentSpeakerId() {
-        let currentSpeakerId = '';
-        const _this = this;
-        if (this.isInGroup) {
-          currentSpeakerId = _this.groupServer.state.groupInitData.doc_permission;
-        } else {
-          currentSpeakerId = _this.interactToolStatus.doc_permission;
-        }
-        return currentSpeakerId;
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.doc_permission
+          : this.interactToolStatus.doc_permission;
       },
       //找到当前的主屏
       getCurrentMainScreen() {
-        let current = '';
-        if (this.isInGroup) {
-          current = this.groupServer.state.groupInitData.main_screen;
-        } else {
-          current = this.interactToolStatus.main_screen;
-        }
-        return current;
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.main_screen
+          : this.interactToolStatus.main_screen;
       },
       //找到当前的演示屏幕
       getCurrentPresentationScreen() {
-        let current = '';
-        if (this.isInGroup) {
-          current = this.groupServer.state.groupInitData.presentation_screen;
-        } else {
-          current = this.interactToolStatus.presentation_screen;
-        }
-        return current;
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.interactToolStatus.presentation_screen;
       },
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
@@ -590,7 +563,6 @@
 
           switch (type) {
             case 'vrtc_connect_apply':
-              console.log(temp.data, '用户申请上麦');
               //用户申请上麦
               handleApplyConnect(temp);
               break;
@@ -700,13 +672,6 @@
             if (isWatch) {
               _this.totalNum = msg.uv;
               _this.memberServer.updateState('totalNum', _this.totalNum);
-            }
-
-            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-            if (_this.mode === 6) {
-              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
-                return false;
-              }
             }
 
             if (isLive) {
@@ -963,8 +928,6 @@
               );
             }
           }, 30000);
-          //todo 信令通知其他组件(比如自定义菜单组件，有红点)
-          // this.$emit('memberUpdata');
         }
         //用户取消上麦申请
         function handleCancelApplyConnect(msg) {
@@ -984,11 +947,11 @@
         }
         //同意用户上麦
         function handleAgreeApplyConnect(msg) {
-          if (_this.memberOptions.platformType === 'live') {
+          if (_this.isLive) {
             _this.raiseHandTip = false;
             return;
           }
-          if (_this.memberOptions.platformType === 'watch') {
+          if (_this.isWatch) {
             _this.changeUserStatus(
               msg.room_join_id,
               _this.onlineUsers,
@@ -1026,8 +989,9 @@
             msg.data.room_role != 2 &&
               _this.$message.success({ message: `${msg.data.nick_name}已上麦` });
           }
+          //清除定时器
           _this.handsUpTimerList[msg.data.room_join_id] &&
-            clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]); // 取消下麦清楚定时器
+            clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]);
           delete _this.handsUpTimerList[msg.data.room_join_id];
         }
         //用户拒绝上麦邀请
@@ -1043,7 +1007,6 @@
             role = _this.$t('chat.chat_1023');
           }
           if (msg.data.extra_params == _this.userId) {
-            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
@@ -1061,11 +1024,6 @@
             },
             'onlineUsers'
           );
-
-          //如果是观看端，还要维护一下上麦列表
-          // if (_this.isWatch) {
-          //   _this.speakerList = _this.speakerList.filter(item => item.account_id != msg.sender_id);
-          // }
 
           //提示语
           if (msg.data.target_id == _this.userId) {
@@ -1097,9 +1055,6 @@
         //互动设置主讲人
         function handleChangeSpeaker(msg) {
           console.log(msg, '互动设置主讲人');
-          if (_this.isWatch) {
-            return;
-          }
         }
         //处理踢出人员
         function handleKicked(msg) {
@@ -1464,7 +1419,6 @@
        * 改变在线人员列表的状态
        */
       changeUserStatus(accountId = '', list = [], obj = {}, key = '') {
-        console.log('更改上麦状态', accountId, list, obj);
         const item = list.find(item => item.account_id === accountId);
         if (!item) {
           return;
@@ -1529,17 +1483,14 @@
           status: this.allowRaiseHand ? 1 : 0
         };
 
-        this.disabledSwitchHand = true;
         this.micServer
           .setHandsUp(params)
           .then(res => {
             console.log('switch-mic-status', res);
             //todo 上报埋点
-            this.disabledSwitchHand = false;
             this.$message.success({ message: '设置成功' });
           })
           .catch(err => {
-            this.disabledSwitchHand = false;
             this.allowRaiseHand = false;
             console.log('举手状态变更失败', err);
           });
@@ -2042,7 +1993,7 @@
           vertical-align: middle;
           margin-right: 4px;
         }
-        .lb-raisehands {
+        .raise-hand-switch {
           cursor: pointer;
           color: #ccc;
           font-size: 12px;

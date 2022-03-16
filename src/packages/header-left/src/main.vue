@@ -106,10 +106,7 @@
       border-radius: 2px;
       border: 1px solid #979797;
       display: flex;
-      -webkit-box-orient: horizontal;
-      -webkit-box-direction: normal;
       flex-direction: row;
-      -webkit-box-pack: justify;
       justify-content: space-between;
       padding-right: 3px;
     }

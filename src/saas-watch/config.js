@@ -8,7 +8,14 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comQuestionnaire']
+    children: [
+      'comHeaderWatch',
+      'layerBody',
+      'layerFooter',
+      'comAllDialog',
+      'comQuestionnaire',
+      'comGoodsDetailPc'
+    ]
     // children: ['layerBody']
   },
   // 顶部header 容器嵌入不用这个组件
@@ -418,7 +425,16 @@ export const serverConfig = {
   },
   //商品列表
   comGoodSaas: {
-    component: 'VmpGoodList'
+    component: 'VmpGoodList',
+    emitShowDetail: {
+      cuid: ['comGoodsDetailPc'],
+      method: 'open',
+      args: ['$0']
+    }
+  },
+  //商品详情
+  comGoodsDetailPc: {
+    component: 'VmpGoodDetailPc'
   },
   // 抽奖
   comLottery: {

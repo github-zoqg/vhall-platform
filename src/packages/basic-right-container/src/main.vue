@@ -71,7 +71,7 @@
     height: 100%;
     flex-direction: column;
     justify-content: flex-start;
-    z-index: 1;
+    // z-index: 1;
 
     .vmp-basic-right-hd {
       padding-top: 56.25%;

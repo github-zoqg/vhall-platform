@@ -130,6 +130,11 @@
             video: false
           };
         }
+      },
+      //当前登录人是否正在上麦
+      onlineMicStatus: {
+        type: Boolean,
+        default: false
       }
     },
     filters: {
@@ -220,6 +225,7 @@
               !this.isAllBanned &&
               !this.isBanned &&
               !this.groupInitData.isInGroup,
+            this.onlineMicStatus && !this.groupInitData.isInGroup,
             this.groupInitData.isInGroup && !this.isBanned
           ].some(val => !!val)
         );
@@ -268,6 +274,7 @@
         }
         this.connectMicShow = false;
       });
+      window.chatWap = this;
     },
     methods: {
       showMyQA() {

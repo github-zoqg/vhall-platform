@@ -57,7 +57,7 @@
           </div>
         </template>
 
-        <!-- 主持人进入小组后助理占位图 -->
+        <!-- 主持人进入小组后占位图 -->
         <div
           v-if="mode == 6 && isHostInGroup && !isInGroup"
           class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
@@ -101,13 +101,15 @@
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
-        // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group,
         streamInfo
       };
     },
 
     computed: {
+      // 主持人是否在小组内
+      isHostInGroup() {
+        return !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group;
+      },
       isInteractiveInited() {
         return this.$domainStore.state.interactiveServer.isInteractiveInited;
       },
@@ -244,7 +246,7 @@
 
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$message(e.msg);
+        e.msg && this.$message.warning(e.msg);
       });
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
@@ -254,15 +256,6 @@
             video.pause();
           });
         this.interactiveServer.state.showPlayIcon = true;
-      });
-
-      // 主持人进入退出小组 消息监听
-      this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-        if (msg.data.status == 'enter') {
-          this.isHostInGroup = true;
-        } else if (msg.data.status == 'quit') {
-          this.isHostInGroup = false;
-        }
       });
     },
 
@@ -336,6 +329,16 @@
             }
             &-nickname {
               width: 40px;
+            }
+          }
+        }
+        .vmp-stream-list__main-screen {
+          .vmp-stream-local__bootom {
+            &-role {
+              padding: 0 6px;
+            }
+            &-nickname {
+              width: 80px;
             }
           }
         }

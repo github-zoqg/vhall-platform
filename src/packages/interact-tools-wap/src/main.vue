@@ -29,7 +29,9 @@
       <div v-if="showInviteCard && !localRoomInfo.isEmbed">
         <a
           target="_blank"
-          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${
+            localRoomInfo.saasJoinId
+          }&lang=${localStorage.getItem('lang')}`"
         >
           <i class="vh-iconfont vh-line-share"></i>
         </a>
