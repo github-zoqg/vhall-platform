@@ -25,7 +25,7 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <img src="./img/doc_null.png" style="width: 100px; margin-bottom: 20px" />
+          <img src="./img/doc_empty.png" style="width: 100px; margin-bottom: 20px" />
           <span>主讲人未添加文档，请稍等...</span>
         </div>
       </div>
