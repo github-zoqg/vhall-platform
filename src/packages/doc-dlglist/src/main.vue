@@ -731,9 +731,11 @@
       align-items: center;
       justify-content: center;
       p {
-        line-height: 60px;
+        line-height: 20px;
+        margin-top: 8px;
+        margin-bottom: 30px;
         font-size: 15px;
-        color: #999;
+        color: @font-light-second;
       }
       .el-button {
         width: 120px;
