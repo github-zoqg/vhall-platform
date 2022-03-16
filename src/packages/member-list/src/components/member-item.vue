@@ -365,9 +365,7 @@
         }
       }
     },
-    mounted() {
-      console.log(this.currentSpeakerId, '当前主讲人的id');
-    },
+    mounted() {},
     data() {
       return {
         //默认头像

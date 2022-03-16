@@ -635,7 +635,7 @@
 
 <style lang="less">
   .vmp-chat-container {
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     @font-error: #fb3a32;
     width: 100%;
     height: 100%;

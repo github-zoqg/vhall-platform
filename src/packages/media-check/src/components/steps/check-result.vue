@@ -29,7 +29,7 @@
 
     <footer class="vh-footer">
       <section v-if="!isCheckSuccess" class="vh-footer_result-help">
-        <a target="_blank" href="https://e.vhall.com/v3/lives/room/624923410?type=ctrl">
+        <a target="_blank" href="https://www.vhall.com/saas/doc/1722.html">
           {{ $t('setting.setting_1029') }}
         </a>
       </section>
