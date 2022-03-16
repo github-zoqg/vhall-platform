@@ -109,9 +109,9 @@
             this.isLivingEnd = true;
           }
         }
-        if (msg.data.type == 'questionnaire_push') {
-          this.mini = true;
-        }
+        // if (msg.data.type == 'questionnaire_push') {
+        //   this.mini = true;
+        // }
       });
     },
     methods: {

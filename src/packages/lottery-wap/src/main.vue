@@ -25,7 +25,7 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import { useLotteryServer, useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
   const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
   const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
   export default {
@@ -60,6 +60,7 @@
     },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
     },
     methods: {
       accept(msg) {
@@ -105,6 +106,10 @@
       initMsgEvent() {
         this.lotteryServer.$on(LOTTERY_PUSH, this.callBackLotteryPush);
         this.lotteryServer.$on(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
+        });
       },
       removeMsgEvent() {
         this.lotteryServer.$off(LOTTERY_PUSH, this.callBackLotteryPush);

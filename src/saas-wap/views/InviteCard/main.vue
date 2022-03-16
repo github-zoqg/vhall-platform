@@ -18,6 +18,13 @@
         invite: ''
       };
     },
+    created() {
+      if (this.$route.query.lang) {
+        this.$i18n.locale = parseInt(this.$route.query.lang) == 1 ? 'zh' : 'en';
+      } else {
+        this.$i18n.locale = 'zh';
+      }
+    },
     methods: {
       toWebinar() {
         const id = this.$route.params.id;

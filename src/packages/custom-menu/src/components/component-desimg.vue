@@ -10,10 +10,6 @@
     props: {
       info: {
         required: false
-      },
-      pagetype: {
-        type: String,
-        default: 'watch'
       }
     }
   };
