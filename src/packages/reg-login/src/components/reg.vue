@@ -357,7 +357,7 @@
     .el-checkbox__label {
       font-size: 14px;
       font-weight: 400;
-      color: #999999;
+      color: #999;
       line-height: 20px;
     }
     .el-checkbox {

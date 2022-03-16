@@ -227,6 +227,6 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-code-login {
-    padding: 0 32px 24px 32px;
+    padding: 0 32px 24px;
   }
 </style>
