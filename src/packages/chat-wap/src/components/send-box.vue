@@ -274,7 +274,6 @@
         }
         this.connectMicShow = false;
       });
-      window.chatWap = this;
     },
     methods: {
       showMyQA() {
