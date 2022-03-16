@@ -1,14 +1,4 @@
 <template>
-  <!-- <div
-    class="vmp-stream-list-wrapper"
-    ref="noDelayStreamContainer"
-    :class="{
-      'no-delay-layout': isUseNoDelayLayout,
-      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
-      'stream-length': remoteSpeakers.length > 1
-    }"
-  >
-  </div> -->
   <div
     class="vmp-stream-list"
     :class="{
@@ -31,6 +21,7 @@
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
     <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
+        <!-- 本地流容器 -->
         <div
           v-show="localSpeaker.accountId"
           class="vmp-stream-list__local-container"
@@ -50,6 +41,7 @@
         <template
           v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
         >
+          <!-- 远端流列表 -->
           <div
             v-for="speaker in remoteSpeakers"
             :key="speaker.accountId"
@@ -81,6 +73,7 @@
       </div>
     </div>
 
+    <!-- 右翻页 -->
     <span
       v-show="isShowControlArrow"
       class="vmp-stream-list__scroll-btn right-btn"
@@ -211,9 +204,12 @@
         },
         immediate: true
       },
+
+      // 流列表宽度超过 streamWrapper 时显示 翻页按钮
       'remoteSpeakers.length'(newval) {
         this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
       },
+      // 监听是否有桌面共享，更改页面布局
       isShareScreen: {
         handler(newval) {
           if (this.isUseNoDelayLayout) {
@@ -282,6 +278,9 @@
         });
       },
 
+      /**
+       * 左右翻页更改streamWrapper的scrollLeft值实现滚动
+       */
       scrollStream(direction) {
         const scrollLeft = this.$refs.streamWrapper.scrollLeft;
         if (direction === 'left') {
