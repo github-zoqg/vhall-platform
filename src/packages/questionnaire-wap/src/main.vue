@@ -200,7 +200,6 @@
     height: 100%;
     background: white;
     left: 0;
-    // overflow: hidden;
     z-index: 4200;
     // 更多那个弹窗是慢慢增加的
   }
@@ -211,27 +210,7 @@
     position: relative;
     background: #fff;
     height: 100%;
-    // -webkit-overflow-scrolling: touch;
     overflow: auto;
-    //   ::v-deep {
-    //     .q-wrap {
-    //       // 软键盘挡住input框问题
-    //       padding-bottom: 400px;
-    //       // padding-bottom: 160px;
-    //       // padding-bottom: calc(env(safe-area-inset-bottom) + 160px);
-    //       // .q-btns {
-    //       //   height: 100px;
-    //       //   position: fixed;
-    //       //   left: 0;
-    //       //   background: white;
-    //       //   bottom: 0;
-    //       //   bottom: env(safe-area-inset-bottom);
-    //       //   span {
-    //       //     margin: 0 auto;
-    //       //   }
-    //       // }
-    //     }
-    //   }
   }
   .quest-header {
     z-index: 99;

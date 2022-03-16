@@ -118,30 +118,6 @@
             });
           }
         });
-      },
-
-      checkedQuestion(id, flag) {
-        this.$vhallapi.question
-          .checkSurvey({
-            survey_id: id,
-            webinar_id: this.webinarId
-          })
-          .then(res => {
-            if (res.data) {
-              // 未提交
-              this.chatPreview(id, false);
-            } else {
-              this.loading = false;
-              if (flag) {
-                this.$message({
-                  message: this.$t('form.form_1037'),
-                  showClose: true,
-                  type: 'success',
-                  customClass: 'zdy-info-box'
-                });
-              }
-            }
-          });
       }
     }
   };

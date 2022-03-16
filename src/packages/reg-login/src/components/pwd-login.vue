@@ -170,7 +170,7 @@
           });
         } else if (this.captchaReady) {
           // 如果选择的图形码有值，表示触发了账号锁定，再次登录需要图片验证码逻辑。这个时候直接往下走。
-          this.snedLogin();
+          this.sendLogin();
         } else {
           // 如果没有选择过图形码，走账号检测判断
           this.$refs.ruleForm.validate(async valid => {
@@ -196,7 +196,7 @@
                   } else if (res.code == 200) {
                     this.captchaIsShow = false;
                     // 非异常情况下，触发登录逻辑
-                    this.snedLogin();
+                    this.sendLogin();
                   } else {
                     failure(res);
                   }
@@ -216,7 +216,7 @@
         }
       },
       // 触发login表单验证，若验证通过，执行登录
-      snedLogin() {
+      sendLogin() {
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
             let relt = await this.userServer.handlePassword(this.ruleForm.password);
@@ -276,6 +276,6 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-pwd-login {
-    padding: 0 32px 24px 32px;
+    padding: 0 32px 24px;
   }
 </style>
