@@ -27,7 +27,10 @@
               chatOptions && chatOptions.userControlOptions && chatOptions.userControlOptions.enable
             "
           >
-            <div class="normal-msg__avatar" @click="setPersonStatus($event, source)">
+            <div
+              :class="['normal-msg__avatar', 'cur-pointer']"
+              @click="setPersonStatus($event, source)"
+            >
               <img class="normal-msg__avatar-img" :src="source.avatar" alt />
               <img
                 v-if="source.client === 'h5_browser'"
@@ -55,9 +58,23 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">
-                {{ source.nickname }}
-              </span>
+              <template>
+                <span
+                  :class="['info-wrap__nick-name', 'cur-pointer']"
+                  @click="setPersonStatus($event, source)"
+                  v-if="
+                    chatOptions &&
+                    chatOptions.userControlOptions &&
+                    chatOptions.userControlOptions.enable
+                  "
+                >
+                  {{ source.nickname }}
+                </span>
+                <span class="info-wrap__nick-name" v-else>
+                  {{ source.nickname }}
+                </span>
+              </template>
+
               <span
                 v-if="
                   (source.type === 'text' || source.type === 'image' || source.isHistoryMsg) &&
