@@ -1164,8 +1164,12 @@
         background: hsla(0, 0%, 100%, 0.3);
         border-radius: 100%;
         margin-right: 10px;
+
+        .vh-line-copy-document {
+          font-size: 14px;
+        }
         &:hover {
-          background-color: #fc5659;
+          background-color: #fb3a32;
         }
         &:last-child {
           margin-right: 0;
