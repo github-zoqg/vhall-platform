@@ -1076,13 +1076,11 @@
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
-
-        &.selected {
+        &:hover {
           color: #fc5659;
         }
-      }
-      .doc-pagebar__opt--move {
-        &:hover {
+
+        &.selected {
           color: #fc5659;
         }
       }

@@ -5,6 +5,7 @@
     :class="{ 'vmp-stream-list-h0': isStreamListH0, shrink: isShrink }"
   >
     <div class="vmp-stream-list__stream-wrapper">
+      <!-- 本地流容器 -->
       <div
         class="vmp-stream-list__local-container"
         :class="{
@@ -21,6 +22,8 @@
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
+
+      <!-- 远端流列表 -->
       <template v-if="remoteSpeakers.length">
         <div
           v-for="speaker in remoteSpeakers"
@@ -54,33 +57,25 @@
       </div>
     </div>
 
-    <div
-      class="vmp-stream-list__folder"
-      v-show="remoteSpeakers.length > 0 || (splited && speakerList.length > 0)"
-      v-if="!isSplited"
-    >
+    <!-- 滚动操作 -->
+    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0">
       <span
         class="vmp-stream-list__folder--up"
         :class="{
-          disable:
-            isShrink ||
-            (!splited && remoteSpeakers.length <= remoteMaxLength) ||
-            (splited && speakerList.length - 1 <= remoteMaxLength)
+          disable: isShrink || remoteSpeakers.length <= remoteMaxLength
         }"
         @click="toggleShrink(true)"
       ></span>
       <span
         class="vmp-stream-list__folder--down"
         :class="{
-          disable:
-            !isShrink ||
-            (!splited && remoteSpeakers.length <= remoteMaxLength) ||
-            (splited && speakerList.length - 1 <= remoteMaxLength)
+          disable: !isShrink || remoteSpeakers.length <= remoteMaxLength
         }"
         @click="toggleShrink(false)"
       ></span>
     </div>
 
+    <!-- 异常弹窗 -->
     <saas-alert
       :visible="PopAlertOffline.visible"
       :retry="'点击重试'"
@@ -112,12 +107,11 @@
     data() {
       return {
         childrenCom: [],
-        maxElement: '',
-        isSplited: false,
-        splited: false,
         isShrink: false, // 是否收起
         isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
         remoteMaxLength: 0, //一行最大数
+
+        // 网络异常弹窗状态
         PopAlertOffline: {
           visible: false
         },
@@ -128,6 +122,7 @@
       SaasAlert
     },
     computed: {
+      // 3互动 //6分组
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -138,7 +133,6 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        console.warn(this.$domainStore.state, 789);
         if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
         } else {
@@ -223,7 +217,6 @@
     },
 
     created() {
-      window.streamListLive = this;
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
       // 房间信令异常断开事件
@@ -305,7 +298,7 @@
         this.isShrink = flag;
       },
       /**
-       * 计算
+       * 计算streamList变动
        */
       computTop() {
         const MutationObserver =

@@ -419,9 +419,11 @@
           this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
             this.pushLocalStream();
           });
+        } else {
+          // 如果是播放结束重新开始播放，对端会通过流加入时间更改上麦人员麦克风状态，不需要发消息
+          // 发送自定义消息，通知开始插播，互动角色关闭麦克风
+          this.insertFileServer.sendStateChangeMessage(1);
         }
-        // 发送自定义消息，通知开始插播，互动角色关闭麦克风
-        this.insertFileServer.sendStateChangeMessage(1);
       },
       // 云插播播放器暂停播放
       handleRemoteInsertVideoPause() {
@@ -686,7 +688,7 @@
         });
 
         // 流加入
-        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+        this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
           this.reSetBroadcast();
           this.subscribeInsert();
         });
