@@ -3,9 +3,8 @@
     class="vmp-stream-list"
     :class="{
       'vmp-stream-list-h0': isStreamListH0,
-      'no-delay-layout': isUseNoDelayLayout,
+      'no-delay-layout': isUseNoDelayLayout && remoteSpeakers.length > 1,
       'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
-      'stream-length': isUseNoDelayLayout && remoteSpeakers.length > 1,
       'is-share-screen': isUseNoDelayLayout && isShareScreen
     }"
   >
@@ -464,17 +463,13 @@
         display: none;
       }
       .vmp-stream-list__main-screen {
-        bottom: 0;
+        bottom: 80px;
         top: 0;
         position: absolute;
         width: 100% !important;
         height: auto !important;
       }
-      &.stream-length {
-        .vmp-stream-list__main-screen {
-          bottom: 80px;
-        }
-      }
+
       .vmp-stream-list__stream-wrapper-scroll {
         justify-content: normal;
         flex-wrap: wrap;
