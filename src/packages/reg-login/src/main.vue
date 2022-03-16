@@ -111,14 +111,14 @@
     methods: {
       // 打开弹出框
       open(params = {}) {
-        this.isMobile =
-          /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
-            navigator.userAgent
-          );
-        this.options = {
-          ...this.options,
-          ...params
-        };
+        // this.isMobile =
+        //   /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
+        //     navigator.userAgent
+        //   );
+        // this.options = {
+        //   ...this.options,
+        //   ...params
+        // };
         console.log('打开登录&注册弹框，初始预设值为', this.options);
         // 打开弹出框的时候，设定登录&注册默认tab选中状态 & 组件引入
         this.handleChangeTag(this.options.loginType == '0-1' ? 'pwd' : 'code');
@@ -196,7 +196,7 @@
           height: 30px;
           font-size: 22px;
           font-weight: 400;
-          color: #333333;
+          color: #333;
           line-height: 30px;
           padding-bottom: 4px;
           &.active {
@@ -207,7 +207,7 @@
               border-bottom: 0;
               font-size: 22px;
               font-weight: 400;
-              color: #333333;
+              color: #333;
               line-height: 30px;
             }
           }
@@ -239,7 +239,7 @@
           height: 30px;
           font-size: 22px;
           font-weight: 400;
-          color: #333333;
+          color: #333;
           line-height: 30px;
           padding-bottom: 4px;
           &.active {
@@ -250,7 +250,7 @@
               border-bottom: 0;
               font-size: 22px;
               font-weight: 400;
-              color: #333333;
+              color: #333;
               line-height: 30px;
             }
           }

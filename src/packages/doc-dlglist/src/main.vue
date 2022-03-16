@@ -58,7 +58,7 @@
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
-              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button type="white-primary" v-if="!isWatch" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
@@ -844,6 +844,18 @@
     }
     .el-table th > .cell {
       font-weight: normal;
+    }
+    .el-table th:first-child .cell,
+    .el-table tr td:first-child .cell {
+      padding-left: 24px;
+    }
+
+    .el-table--enable-row-hover .el-table__body tr:hover > td {
+      background-color: #f7f7f7;
+
+      .el-button--text {
+        color: #fb3a32;
+      }
     }
 
     .help-icon {

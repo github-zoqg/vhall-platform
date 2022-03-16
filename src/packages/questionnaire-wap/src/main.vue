@@ -6,7 +6,7 @@
   </van-popup>
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
@@ -15,17 +15,18 @@
       return {
         popupVisible: false,
         questionLastId: '', // 最后一个问卷id
-        questionnaireId: '' // 问卷Id
+        questionnaireId: '' // 当前问卷Id
       };
     },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
     },
     watch: {
-      // 切换
+      // 打开问卷弹窗(全屏,视频需要改为小窗)
       popupVisible(val) {
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitQuestionnaireVisible', [!!val])
@@ -37,7 +38,6 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
-        console.log('open', questionnaireId);
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$toast(this.$t('form.form_1037'));
@@ -86,6 +86,10 @@
             this.$toast(this.$t('form.form_1037'));
             this.popupVisible = false;
           }
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
         });
       }
     }
@@ -200,7 +204,6 @@
     height: 100%;
     background: white;
     left: 0;
-    // overflow: hidden;
     z-index: 4200;
     // 更多那个弹窗是慢慢增加的
   }
@@ -211,27 +214,7 @@
     position: relative;
     background: #fff;
     height: 100%;
-    // -webkit-overflow-scrolling: touch;
     overflow: auto;
-    //   ::v-deep {
-    //     .q-wrap {
-    //       // 软键盘挡住input框问题
-    //       padding-bottom: 400px;
-    //       // padding-bottom: 160px;
-    //       // padding-bottom: calc(env(safe-area-inset-bottom) + 160px);
-    //       // .q-btns {
-    //       //   height: 100px;
-    //       //   position: fixed;
-    //       //   left: 0;
-    //       //   background: white;
-    //       //   bottom: 0;
-    //       //   bottom: env(safe-area-inset-bottom);
-    //       //   span {
-    //       //     margin: 0 auto;
-    //       //   }
-    //       // }
-    //     }
-    //   }
   }
   .quest-header {
     z-index: 99;

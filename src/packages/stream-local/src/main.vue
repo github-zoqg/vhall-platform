@@ -1109,15 +1109,15 @@
       width: 100%;
       height: 100%;
       position: absolute;
-      left: 0;
-      top: 0;
+      top: 8px;
+      left: 8px;
       &-presentation {
         position: absolute;
         top: 0;
         left: 0;
         font-size: 12px;
         color: @font-dark-normal;
-        padding: 0 8px;
+        padding: 0 6px;
         background: rgba(0, 0, 0, 0.5);
         border-radius: 8px;
         margin: 4px 0 0 4px;
