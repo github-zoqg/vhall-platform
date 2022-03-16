@@ -53,7 +53,7 @@
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from './img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -181,24 +181,12 @@
       },
       //是否已上麦
       onlineMicStatus() {
-        const { interactToolStatus = {} } = this.roomBaseServer.state;
-        const { groupInitData = {} } = this.groupServer.state;
-        let isOnMic = false;
-        if (groupInitData && groupInitData.isInGroup) {
-          isOnMic =
-            Array.isArray(groupInitData.speaker_list) &&
-            !groupInitData.speaker_list.some(
-              ele => ele.account_id === this.joinInfo.third_party_user_id
-            );
-        } else {
-          isOnMic =
-            interactToolStatus &&
-            Array.isArray(interactToolStatus.speaker_list) &&
-            !interactToolStatus.speaker_list.some(
-              ele => ele.account_id === this.joinInfo.third_party_user_id
-            );
-        }
-        return isOnMic;
+        return (useMicServer().state.speakerList || []).some(item => {
+          return (
+            item.account_id == this.joinInfo.third_party_user_id ||
+            item.accountId == this.joinInfo.third_party_user_id
+          );
+        });
       }
     },
     beforeCreate() {
@@ -220,6 +208,7 @@
     mounted() {
       console.log('useChatServer', useChatServer().state);
       this.listenChatServer();
+      window.chat = this;
     },
     methods: {
       //初始化视图数据
