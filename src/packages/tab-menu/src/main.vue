@@ -77,7 +77,7 @@
       visibleMenu() {
         return this.menu.filter(item => {
           if (this.pageEnv === 'live-room') {
-            return (item.status == 1 || item.status == 3) && item.visible;
+            return item.status != 2 && item.visible;
           }
 
           if (this.pageEnv === 'subscribe') {

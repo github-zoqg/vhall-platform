@@ -374,7 +374,7 @@
           color: #999;
           cursor: pointer;
           &:hover {
-            color: @active-color;
+            color: @font-error;
             cursor: pointer;
           }
         }

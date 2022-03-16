@@ -1,5 +1,15 @@
 <template>
-  <div class="vmp-handup">
+  <div class="vmp-handup" v-if="device_status === 1 && isInteractLive">
+    <!-- <div style="color: #fff">
+      {{
+        `isBanned : ${isBanned};
+    isAllowhandup : ${isAllowhandup};
+    isSpeakOn : ${isSpeakOn};
+    isInGroup : ${isInGroup};
+    groupRole : ${![3, 4, 20].includes(parseInt(this.groupRole))};
+    isGroupBanned : ${isGroupBanned}; `
+      }}
+    </div> -->
     <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
@@ -8,10 +18,9 @@
         size="medium"
         round
         v-if="
-          inLine &&
-          (isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn && isBanned
-            : isAllowhandup && !isSpeakOn)
+          isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && !isSpeakOn
+            : isBanned && isAllowhandup && !isSpeakOn
         "
       >
         {{ btnText }}
@@ -23,10 +32,9 @@
         type="primary"
         size="medium"
         v-if="
-          inLine &&
-          (isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn && isBanned
-            : isSpeakOn)
+          isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && isSpeakOn
+            : isBanned && isSpeakOn
         "
         round
       >
@@ -36,7 +44,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer } from 'middle-domain';
+  import { useMicServer, useChatServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -53,16 +61,22 @@
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
+        return parseInt(this.$domainStore.state.mediaCheckServer.deviceInfo.device_status);
       },
-      // 是否是直播中
-      inLine() {
-        return parseInt(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type) === 1;
+      // 是否是互动 | 无延迟 | 分组直播
+      isInteractLive() {
+        const { watchInitData } = this.$domainStore.state.roomBaseServer;
+        return (
+          (watchInitData.webinar.mode == 3 ||
+            watchInitData.webinar.no_delay_webinar === 1 ||
+            watchInitData.webinar.mode == 6) &&
+          watchInitData.webinar.type == 1
+        );
       },
       // 是否开启举手
       isAllowhandup() {
         const status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
-        return status;
+        return parseInt(status) === 1;
       },
       // 是否已上麦
       isSpeakOn() {
@@ -75,8 +89,12 @@
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
       },
-      // 分组 组内 禁言 状态
+      // 非分组内的禁言状态
       isBanned() {
+        return !useChatServer().state.banned || !useChatServer().state.allBanned; //true禁言，false未禁言
+      },
+      // 分组 组内 禁言 状态
+      isGroupBanned() {
         return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },

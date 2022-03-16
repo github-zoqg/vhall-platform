@@ -218,8 +218,8 @@
     useSplitScreenServer,
     useMediaCheckServer,
     useChatServer,
-    useMsgServer,
-    useDocServer
+    useDocServer,
+    useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -533,7 +533,7 @@
           }
         });
         // 结束直播
-        useMsgServer().$on('live_over', async () => {
+        this.micServer.$on('live_over', async () => {
           // 如果开启分屏并且是主页面，不需要停止推流
           if (
             this.splitScreenServer.state.isOpenSplitScreen &&
@@ -542,10 +542,36 @@
             return;
           }
           await this.stopPush();
-          this.roomBaseServer.setChangeElement('stream-list');
+          this.roomBaseServer.setChangeElement('');
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
+          }
+
+          this.micServer.setSpeakerList([]);
+        });
+        // 结束直播
+        useMsgServer().$onMsg('ROOM_MSG', async msg => {
+          if (msg.data.event_type === 'group_switch_end') {
+            // 如果开启分屏并且是主页面，不需要停止推流
+            if (
+              this.splitScreenServer.state.isOpenSplitScreen &&
+              this.splitScreenServer.state.role == 'host'
+            ) {
+              return;
+            }
+
+            // 由于结束直播导致的结束讨论
+            if (msg.data.over_live == 1) {
+              await this.stopPush();
+              this.roomBaseServer.setChangeElement('');
+
+              if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
+                this.interactiveServer.destroy();
+              }
+
+              this.micServer.setSpeakerList([]);
+            }
           }
         });
 
