@@ -536,7 +536,14 @@
       },
       // 设为组长
       setLeader(groupId, accountId) {
-        this.groupServer.setLeader(groupId, accountId);
+        this.$confirm('是否将此组员设为组长?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          this.groupServer.setLeader(groupId, accountId);
+        });
       },
       // 进入小组
       handleEnterGroup: async function (groupId) {
