@@ -9,8 +9,8 @@
         round
         v-if="
           isInGroup
-            ? +this.groupRole !== 20 && isNotGroupBanned && !isSpeakOn
-            : isNotBanned && isAllowhandup && !isSpeakOn
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && !isSpeakOn
+            : isBanned && isAllowhandup && !isSpeakOn
         "
       >
         {{ btnText }}
@@ -21,7 +21,11 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
+        v-if="
+          isInGroup
+            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && isSpeakOn
+            : isBanned && isSpeakOn
+        "
         round
       >
         {{ $t('interact.interact_1007') }}
@@ -76,11 +80,11 @@
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
       },
       // 非分组内的禁言状态
-      isNotBanned() {
+      isBanned() {
         return !useChatServer().state.banned || !useChatServer().state.allBanned; //true禁言，false未禁言
       },
       // 分组 组内 禁言 状态
-      isNotGroupBanned() {
+      isGroupBanned() {
         return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },

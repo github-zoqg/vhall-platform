@@ -226,11 +226,11 @@
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          const { interactToolStatus, watchInitData } = useRoomBaseServer().state;
+          // 如果已经开启了讨论，而且被踢出的人是自己
           if (
-            msg &&
-            msg.data.target_id &&
-            msg.data.target_id ===
-              useRoomBaseServer().state.watchInitData.join_info.third_party_user_id
+            interactToolStatus.is_open_switch == 1 &&
+            msg.data.target_id === watchInitData.join_info.third_party_user_id
           ) {
             this.isCollapse = true;
             this.grouAlert('您已被踢出该小组');

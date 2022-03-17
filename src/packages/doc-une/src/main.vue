@@ -44,7 +44,6 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
-          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
           <span v-if="hasDocPermission || [3, 4].includes(roleName)">暂未分享任何文档</span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
@@ -164,12 +163,11 @@
     },
     data() {
       return {
-        className: '',
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
-        keepAspectRatio: true,
+        keepAspectRatio: true, //保持纵横比
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false,
-        canMove: false
+        hasStreamList: false, // 是否展示流列表
+        canMove: false //文档能否拖拽
       };
     },
     computed: {
@@ -199,7 +197,7 @@
       showPagebar() {
         // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
         return (
-          this.docServer.state.currentCid.split('-')[0] === 'document' &&
+          this.currentType === 'document' &&
           (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
         );
       },
@@ -227,6 +225,8 @@
       },
       // 文档是否可见
       show() {
+        // 1、发起端没有开启桌面共享时展示
+        // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
           (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
@@ -688,7 +688,7 @@
         });
 
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
-          const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
+          const fileType = this.currentType || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
           );
@@ -923,7 +923,7 @@
           this.docServer.activeContainer(data.id);
         } else {
           const { id: cid, docId } = data;
-          const fileType = cid.split('-')[0];
+          const fileType = this.currentType;
           if (fileType === 'document' && !docId) {
             // 文档id没有
             console.log('[doc] 文档id没有 cid:', cid);
