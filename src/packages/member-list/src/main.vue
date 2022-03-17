@@ -862,6 +862,7 @@
           }
           _this._deleteUser(msg.sender_id, _this.onlineUsers, 'onlineUsers');
           _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
+          _this._deleteUser(msg.sender_id, _this.limitedUsers, 'limitedUsers');
           setTimeout(() => {
             _this.refresh();
           }, 50);
@@ -1310,12 +1311,7 @@
               _this.getOnlineUserList();
             } else {
               // 不等于时删除该人员
-              _this.onlineUsers.forEach((item, index) => {
-                if (item.account_id == msg.data.target_id) {
-                  _this.onlineUsers.splice(index, 1);
-                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
-                }
-              });
+              this._deleteUser(msg.data.target_id, this.onlineUsers, 'onlineUsers');
             }
           }
         }
