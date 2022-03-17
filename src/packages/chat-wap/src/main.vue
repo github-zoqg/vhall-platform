@@ -187,6 +187,18 @@
             item.accountId == this.joinInfo.third_party_user_id
           );
         });
+      },
+      // 聊天区欢迎语
+      welcomeText() {
+        if (Array.isArray(this.roomBaseServer.state.customMenu?.list)) {
+          // 获取聊天菜单内容
+          const chatItem = this.roomBaseServer.state.customMenu.list.find(item => {
+            return item.type == 3;
+          });
+          // 返回欢迎语
+          return chatItem?.welcome_content || '';
+        }
+        return '';
       }
     },
     beforeCreate() {
@@ -206,10 +218,13 @@
       // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
-      console.log('useChatServer', useChatServer().state);
       this.listenChatServer();
+      this.showWelcomeTxt();
     },
     methods: {
+      showWelcomeTxt() {
+        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+      },
       //初始化视图数据
       initViewData() {
         const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;

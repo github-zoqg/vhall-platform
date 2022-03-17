@@ -2,6 +2,7 @@ import './extend';
 import { initGlobalPrototype } from './prototype';
 import { initUse } from './use';
 import { initMixin } from './mixin';
+import initDirective from './directive';
 import { initI18n } from './lang';
 import { initRoleFilter } from '@/packages/app-shared/filters/role-filter';
 
@@ -15,6 +16,9 @@ export function initGlobalAPI() {
 
   // 全局混入
   initMixin();
+
+  //全局注册指令
+  initDirective();
 }
 export const i18n = initI18n();
 console.log('i18n', i18n);
