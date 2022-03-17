@@ -2,7 +2,7 @@
   <div ref="chat" class="vhsaas-chat">
     <div
       class="vhsaas-chat__body-wrapper"
-      :style="{ height: 'calc(100% - ' + operatorHieght + 'px)' }"
+      :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
       <virtual-list
         ref="qalist"
@@ -71,7 +71,7 @@
         },
         chatLoginStatus: false,
 
-        operatorHieght: 91,
+        operatorHeight: 91,
         // 滚动条状态 start
         osComponentOptions: {
           resize: 'none',
@@ -206,8 +206,8 @@
       getQaHistoryMsg() {
         useQaServer().getQaHistory();
       },
-      chatTextareaHeightChange(operatorHieght) {
-        this.operatorHieght = operatorHieght;
+      chatTextareaHeightChange(operatorHeight) {
+        this.operatorHeight = operatorHeight;
         this.$refs.chatQaOperator.overlayScrollbar.update();
       },
       // 只看我的按钮 change 事件

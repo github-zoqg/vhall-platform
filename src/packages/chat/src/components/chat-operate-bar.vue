@@ -115,7 +115,7 @@
         @needLogin="handleLogin"
         @clearUploadImg="clearUploadImg"
         @getUploadImg="updateImgUrls"
-        @inputHeightChange="chatInputHeightChangeHandle"
+        @chatTextareaHeightChange="chatTextareaHeightChange"
       ></chat-input>
     </div>
   </div>
@@ -306,7 +306,7 @@
         }
       },
       //响应输入框高度变化事件
-      chatInputHeightChangeHandle() {
+      chatTextareaHeightChange() {
         this.$emit('updateHeight', this.$refs.chatOperateContainer.offsetHeight);
       },
       //更新滚动区域高度
