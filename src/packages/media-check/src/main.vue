@@ -198,7 +198,10 @@
        */
       async getVideoDeviceInfo() {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(trackInput => trackInput.stop());
+        stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -1');
+          trackInput.stop();
+        });
         await this.getDevices();
         this.setDefaultSelected();
       },

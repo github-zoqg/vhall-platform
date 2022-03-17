@@ -83,6 +83,7 @@
         this.analyserNode = null;
         this.zeroGain = null;
         this.stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -5');
           trackInput.stop();
         });
       }
