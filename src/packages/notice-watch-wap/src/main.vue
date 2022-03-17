@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="vmp-notice-wap">
     <van-notice-bar
       class="notice"
       ref="notice"
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-  //  && !this.zIndexObj.Ques && !videoEnd
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeWap',
@@ -105,15 +104,17 @@
   };
 </script>
 
-<style lang="less" scoped>
-  .notice {
-    position: absolute;
-    top: 80px;
-    left: 0px;
-    width: 100%;
-    z-index: 25;
-  }
-  .van-notice-bar {
-    box-sizing: border-box;
+<style lang="less">
+  .vmp-notice-wap {
+    .notice {
+      position: absolute;
+      top: 80px;
+      left: 0px;
+      width: 100%;
+      z-index: 25;
+    }
+    .van-notice-bar {
+      box-sizing: border-box;
+    }
   }
 </style>

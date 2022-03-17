@@ -44,15 +44,19 @@
       const roomBaseServer = useRoomBaseServer();
       this.setSkinInfo(roomBaseServer.state.skinInfo);
       this.mode = roomBaseServer.state.watchInitData.webinar.mode;
+      // 语言列表
       this.languageList = roomBaseServer.state.languages.langList;
+      // 当前语言
       this.lang = roomBaseServer.state.languages.lang;
     },
     watch: {},
     methods: {
+      // 设置语言
       handleChangeLang(key) {
         localStorage.setItem('lang', key);
         window.location.reload();
       },
+      // 设置皮肤
       setSkinInfo(skin) {
         if (skin && skin.skin_json_pc && skin.status == 1) {
           this.$nextTick(() => {
