@@ -339,7 +339,7 @@
       grouAlert(message) {
         this.$alert(message, '提示', {
           confirmButtonText: '我知道了',
-          customClass: 'know-message-box',
+          customClass: 'zdy-message-box',
           lockScroll: false,
           cancelButtonClass: 'zdy-confirm-cancel'
         })
@@ -374,7 +374,7 @@
         }
         this.$alert(title, '提示', {
           confirmButtonText: '我知道了',
-          customClass: 'know-message-box',
+          customClass: 'zdy-message-box',
           lockScroll: false,
           cancelButtonClass: 'zdy-confirm-cancel'
         })
