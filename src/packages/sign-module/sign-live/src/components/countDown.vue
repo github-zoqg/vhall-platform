@@ -91,8 +91,7 @@
       justify-content: center;
       align-items: center;
       font-size: 28px;
-      color: #fb3a32;
-      font-weight: bold;
+      color: #1a1a1a;
       background-color: #fff9e9;
     }
     > svg {

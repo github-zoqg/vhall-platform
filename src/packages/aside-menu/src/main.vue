@@ -14,7 +14,7 @@
       return {};
     },
     computed: {
-      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
       webinarMode() {
         return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
@@ -288,6 +288,16 @@
               //   vn.setDisableState(true);
               //   continue;
               // }
+              // 如果问答权限没有，隐藏互动工具栏
+              if (this.role == 3 && this.webinarMode == 5 && !configList['ui.is_hide_qa_button']) {
+                vn.setHiddenState(true);
+                continue;
+              }
+              // 定时直播未开播时，互动工具置灰
+              if (this.role == 3 && this.webinarMode == 5 && this.webinarType == 2) {
+                vn.setDisableState(true);
+                continue;
+              }
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {

@@ -80,7 +80,7 @@
       return {
         loading: false,
         mediaState: this.mediaSettingServer.state,
-        lastSelectRate: '', // 上一选中的值
+        lastSelectRate: '', // 上一选中的画质的值（用于取消更改时还原）
         ratesConfig: Object.freeze([
           'RTC_VIDEO_PROFILE_720P_16x9_M', // 超清
           'RTC_VIDEO_PROFILE_480P_16x9_M', // 高清
@@ -103,18 +103,23 @@
       webinar() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
       },
+      // 直播状态： 直播中、已结束....
       liveStatus() {
         return this.webinar.type;
       },
+      // 直播类型：1-音频 2-视频 3-互动 6-互动
       liveMode() {
         return this.webinar.mode;
       },
+      // 是否是无延迟
       isNoDelay() {
         return this.webinar.no_delay_webinar === 1;
       },
+      // 在不同场景下的layoutConfig
       filterLayoutConfig() {
         // 分组、无延迟时，只展示一种布局
         const isGroupLive = this.liveMode === LIVE_MODE_MAP['GROUP'];
+
         if (isGroupLive || this.isNoDelay) {
           return this.layoutConfig.filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE');
         }
@@ -146,7 +151,6 @@
         this._onLiveOver = () => {
           this.mediaState.rate = this.ratesConfig[2]; // 恢复标清;
           sessionStorage.setItem('selectedRate', '');
-          this.$forceUpdate();
         };
         this.msgServer.$on('live_over', this._onLiveOver);
       },

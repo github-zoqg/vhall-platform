@@ -1,7 +1,7 @@
 <template>
   <div class="sign-live-counter" functional>
     <h3 :class="autoSign ? '' : 'autoNotSignTop'">{{ title || '主持人发起了签到' }}</h3>
-    <p v-if="autoSign">{{ tip }}</p>
+    <p>{{ tip }}</p>
     <CountDown
       class="sign-live-counter-down"
       :duration="total"
@@ -71,12 +71,11 @@
       margin-top: 10px;
       &-btn {
         width: 160px;
-        // margin-bottom: 39px;
         line-height: 20px;
         color: #fff;
       }
       > p {
-        margin-top: 34px;
+        margin-top: 30px;
         font-size: 12px;
         color: #888;
       }

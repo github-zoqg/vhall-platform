@@ -420,9 +420,10 @@
 
     &__header {
       flex: 0 0 auto;
+      box-sizing: border-box;
       border-bottom: 1px solid #1a1a1a;
       display: flex;
-      height: 46px;
+      height: 45px;
 
       .vmp-tab-menu-page-btn {
         position: relative;
@@ -433,14 +434,19 @@
         height: 100%;
         text-align: center;
         font-size: 14px;
-        color: #fff;
+        color: #999;
         height: 100%;
         cursor: pointer;
 
+        i {
+          font-size: 14px;
+          cursor: pointer;
+        }
+
         &.disabledClick:hover {
-          cursor: auto;
           i {
-            color: @font-light-low;
+            cursor: pointer;
+            color: @border-lighter-color;
           }
         }
 
@@ -461,7 +467,7 @@
           position: relative;
           display: inline-flex;
           flex-direction: column;
-          height: 45px;
+          height: 100%;
           justify-content: center;
           align-items: center;
           padding: 0 20px;
