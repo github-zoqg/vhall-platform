@@ -188,7 +188,9 @@
               this.isCollapse = false;
               this.selectedMenu = 'document';
             }
-            this.gobackHome(1, this.groupServer.state.groupInitData.name);
+            this.grouAlert(
+              `主持人开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
+            );
           }
         });
 
@@ -196,14 +198,14 @@
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           this.isCollapse = true;
           if (!msg.data.groupToast) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name);
+            this.grouAlert('主持人结束了分组讨论，您将返回主直播间');
           }
         });
 
         // 小组解散
-        this.groupServer.$on('GROUP_DISBAND', () => {
+        this.groupServer.$on('GROUP_DISBAND', msg => {
           this.isCollapse = true;
-          this.gobackHome(4);
+          this.grouAlert('主持人解散了分组，您将返回主直播间');
         });
 
         // 接收设为主讲人消息
@@ -251,9 +253,9 @@
             }
 
             if (this.groupServer.state.groupInitData.join_role == 20) {
-              this.gobackHome(6);
+              this.grouAlert('您被提升为组长');
             } else {
-              this.gobackHome(7);
+              this.grouAlert('组长身份已变更');
             }
           }
         });
@@ -338,41 +340,6 @@
       },
       grouAlert(message) {
         this.$alert(message, '提示', {
-          confirmButtonText: '我知道了',
-          customClass: 'zdy-message-box',
-          lockScroll: false,
-          cancelButtonClass: 'zdy-confirm-cancel'
-        })
-          .then(() => {})
-          .catch(() => {});
-      },
-      // 返回主房间提示
-      gobackHome(index, name) {
-        let title = '';
-        switch (index) {
-          case 1:
-            title = '主持人开启了分组讨论，您将进入' + name + '组参与讨论';
-            break;
-          case 2:
-            title = '主持人已将您分配至' + name + '组';
-            break;
-          case 3:
-            title = '主持人结束了分组讨论，您将返回主直播间';
-            break;
-          case 4:
-            title = '主持人解散了分组，您将返回主直播间';
-            break;
-          case 5:
-            title = '您已被踢出该小组';
-            break;
-          case 6:
-            title = '您被提升为组长!';
-            break;
-          case 7:
-            title = '组长身份已变更';
-            break;
-        }
-        this.$alert(title, '提示', {
           confirmButtonText: '我知道了',
           customClass: 'zdy-message-box',
           lockScroll: false,
