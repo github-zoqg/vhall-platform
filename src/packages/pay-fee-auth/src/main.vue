@@ -1,5 +1,5 @@
 <template>
-  <div class="pay-fee-wrap" v-if="showPay">
+  <div class="vmp-watch-pay" v-if="showPay">
     <div class="pay-fee">
       <div class="pay-fee__head">
         <span>{{ $t('interact_tools.interact_tools_1048') }}</span>
@@ -117,7 +117,7 @@
   };
 </script>
 <style lang="less">
-  .pay-fee-wrap {
+  .vmp-watch-pay {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);

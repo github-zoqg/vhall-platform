@@ -66,7 +66,7 @@
       return {
         shareVisible: false,
         shareOtherVisible: false,
-        watchWebUrl: `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
+        watchWebUrl: `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
         isInviteShare: false,
