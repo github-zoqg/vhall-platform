@@ -450,7 +450,7 @@
         left: 0;
       }
       &__chat-filter-wrap {
-        width: 120px;
+        // width: 120px;
         height: 80px;
         padding: 4px 0;
         background-color: #383838;

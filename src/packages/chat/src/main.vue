@@ -181,7 +181,7 @@
         //聊天配置
         chatOptions: {},
         //底部操作栏高度
-        operatorHeight: 91,
+        operatorHeight: 100,
         //是否展示礼物特效
         showSpecialEffects: true,
         //礼物特效数组
@@ -698,9 +698,9 @@
     .chat-content {
       position: relative;
       .vmp-chat-msg-item {
-        &:last-child {
-          padding-bottom: 20px;
-        }
+        // &:last-child {
+        //   padding-bottom: 20px;
+        // }
       }
       &__get-list-btn-container {
         display: block;

@@ -400,8 +400,11 @@
   background-color: @seleted-color-normal;
   border-color: @seleted-color-normal;
 }
-.el-checkbox__inner:hover {
-  border-color: @seleted-color-normal;
+.el-checkbox__inner {
+  background-color: transparent;
+  &:hover {
+    border-color: @seleted-color-normal;
+  }
 }
 .el-checkbox__input.is-focus .el-checkbox__inner {
   border-color: @seleted-border-normal;
