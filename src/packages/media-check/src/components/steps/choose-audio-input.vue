@@ -94,7 +94,6 @@
     .vh-media-check-selector {
       display: flex;
       align-items: center;
-      margin-top: 11px;
 
       label {
         flex: 0;
