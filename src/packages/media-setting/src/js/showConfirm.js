@@ -2,7 +2,7 @@ const confirm = {
   showCb: null,
   actionCb: null,
 
-  destory() {
+  destroy() {
     this.showCb = null;
     this.actionCb = null;
   },

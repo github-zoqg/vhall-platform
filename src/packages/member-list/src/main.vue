@@ -283,7 +283,7 @@
         //分页配置
         pageConfig: {
           page: 0,
-          limit: 10
+          limit: 100
         },
         // 举手列表定时器列表
         handsUpTimerList: {},
@@ -1189,9 +1189,9 @@
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          if (isLive) return;
+          if (isLive && !this.isInGroup) return;
           this.leader_id = msg.data.account_id;
-          this.getOnlineUserList();
+          this.updateOnlineUserList();
         });
 
         // 主持人进入退出小组 消息监听
