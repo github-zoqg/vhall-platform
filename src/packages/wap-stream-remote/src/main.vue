@@ -61,7 +61,11 @@
     },
     props: {
       stream: {
-        require: true
+        require: true,
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     watch: {
