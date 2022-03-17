@@ -402,7 +402,7 @@
   border-color: @border-low-color;
 }
 .el-select .el-input.is-focus .el-input__inner {
-  border-color: @border-light-color;
+  border-color: @border-low-color;
 }
 
 /*-----------------------------------------复选选中效果重置-----------------------------------------*/
@@ -676,4 +676,17 @@
 }
 .el-popper[x-placement^='top'] .popper__arrow::after {
   border-top-color: @popper-normal;
+}
+
+// ======== slider 滑条
+.el-slider__bar {
+  background-color: @seleted-color-normal;
+}
+
+.el-slider__button {
+  width: 17px;
+  height: 17px;
+  border: none;
+  background-color: @seleted-color-normal;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
 }

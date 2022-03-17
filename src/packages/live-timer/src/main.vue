@@ -1,92 +1,80 @@
 <template>
-  <div class="time-open">
-    <div style="position: relative">
-      <div v-if="timerVisible" class="bgimg" v-drag>
-        <el-row class="padding45">
-          <el-row
-            :class="
-              status == 'zanting'
-                ? 'colorFC9600'
-                : status == 'kaishi'
-                ? 'color0FBB5A'
-                : 'colorFB3A32'
-            "
-          >
-            <el-col align="center" class="ft14">
-              <div v-if="shijian < 0">超时，开始正向计时</div>
-              <div v-else>
-                {{
-                  60 > beifenshijian
-                    ? beifenshijian + '秒'
-                    : parseInt(beifenshijian / 60) + '分' + (beifenshijian % 60) + '秒'
-                }}
-                倒计时{{
-                  status == 'zanting' ? '已暂停' : status == 'jieshu' ? '已结束' : '进行中...'
-                }}
-              </div>
-            </el-col>
-            <!-- 如果角色是助理:3 或者 是主讲人可以关闭 -->
-            <span class="close ps" @click="onClose" v-if="permissionFlag">
-              <i class="vh-iconfont vh-line-close"></i>
-            </span>
-          </el-row>
-          <!-- 时间显示区 -->
-          <el-row class="margin10 bg000 pr mt24 font_zdy">
-            <div class="border3 ps"></div>
-
-            <div class="margin5 timerbg">
-              <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ ten_mon }}</strong>
+  <div class="vmp-live-timer">
+    <div v-if="timerVisible" class="background-img" v-drag>
+      <el-row class="padding45">
+        <el-row
+          :class="
+            status == 'timeout' ? 'colorFC9600' : status == 'start' ? 'color0FBB5A' : 'colorFB3A32'
+          "
+        >
+          <el-col align="center" class="ft14">
+            <div v-if="time < 0">超时，开始正向计时</div>
+            <div v-else>
+              {{ timeComputed }}
+              倒计时{{ status == 'timeout' ? '已暂停' : status == 'end' ? '已结束' : '进行中...' }}
             </div>
-            <div class="margin5 timerbg">
-              <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ mon }}</strong>
-            </div>
-
-            <span class="pr ft28" :class="shijian < 1 ? 'colorFB3A32' : ''">:</span>
-
-            <div class="margin5 timerbg">
-              <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ ten_sec }}</strong>
-            </div>
-            <div class="margin5 timerbg">
-              <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ sec }}</strong>
-            </div>
-          </el-row>
-
-          <el-row v-if="permissionFlag">
-            <el-col align="center" class="mt20">
-              <el-button
-                round
-                v-if="status == 'zanting'"
-                type="primary"
-                @click="goOn(5)"
-                size="mini"
-                class="w92 button_zanting"
-              >
-                继续
-              </el-button>
-              <el-button
-                round
-                v-else
-                :disabled="(shijian == 0 && is_timeout == 0) || shijian == -3599"
-                type="primary"
-                @click="goOn(4)"
-                size="mini"
-                class="w92 button_zanting"
-              >
-                暂停
-              </el-button>
-              <el-button
-                round
-                type="primary"
-                @click="reset"
-                size="mini"
-                class="w92 button_chongzhi"
-              >
-                重置
-              </el-button>
-            </el-col>
-          </el-row>
+          </el-col>
+          <!-- 如果角色是助理:3 或者 是主讲人可以关闭 -->
+          <span class="close ps" @click="onClose" v-if="permissionFlag">
+            <i class="vh-iconfont vh-line-close"></i>
+          </span>
         </el-row>
-      </div>
+        <!-- 时间显示区 -->
+        <el-row class="margin10 bg000 pr mt24 font_zdy">
+          <div class="border3 ps"></div>
+
+          <div class="margin5 timerbg">
+            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_mon }}</span>
+          </div>
+          <div class="margin5 timerbg">
+            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ mon }}</span>
+          </div>
+
+          <span class="pr ft28" :class="time < 1 ? 'colorFB3A32' : ''">:</span>
+
+          <div class="margin5 timerbg">
+            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_sec }}</span>
+          </div>
+          <div class="margin5 timerbg">
+            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ sec }}</span>
+          </div>
+        </el-row>
+
+        <el-row v-if="permissionFlag">
+          <el-col align="center" class="mt20">
+            <el-button
+              round
+              v-if="status == 'timeout'"
+              type="primary"
+              @click="goOn(5)"
+              size="mini"
+              class="button_width button_timeout"
+            >
+              继续
+            </el-button>
+            <el-button
+              round
+              v-else
+              :disabled="(time == 0 && is_timeout == 0) || time == -3599"
+              type="primary"
+              @click="goOn(4)"
+              size="mini"
+              class="button_width button_timeout"
+            >
+              暂停
+            </el-button>
+            <el-button
+              round
+              type="primary"
+              @click="resetTimer"
+              size="mini"
+              class="button_width button_reset"
+            >
+              重置
+            </el-button>
+          </el-col>
+        </el-row>
+      </el-row>
     </div>
   </div>
 </template>
@@ -100,8 +88,8 @@
     directives: {
       drag(el) {
         el.onmousedown = function (e) {
-          var disx = e.pageX - el.offsetLeft;
-          var disy = e.pageY - el.offsetTop;
+          const disx = e.pageX - el.offsetLeft;
+          const disy = e.pageY - el.offsetTop;
           document.onmousemove = function (e) {
             let l = e.pageX - disx;
             let t = e.pageY - disy;
@@ -128,9 +116,9 @@
     },
     data() {
       return {
-        status: 'kaishi',
-        beifenshijian: 60,
-        shijian: 0,
+        status: 'start',
+        totalTimeNum: 60,
+        time: 0,
         timer: null,
         auth: 1,
         timerVisible: false,
@@ -140,11 +128,10 @@
         ten_sec: 0,
         mon: 0,
         ten_mon: 0
-        // userInfo: {}
-        // doc_permission: ''
       };
     },
     computed: {
+      // 自身信息获取
       userInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
@@ -153,9 +140,11 @@
         const { interactToolStatus = {} } = this.$domainStore.state.roomBaseServer;
         return interactToolStatus;
       },
+      // 小组信息获取
       groupInitData() {
         return this.$domainStore.state.groupServer.groupInitData;
       },
+      // 主讲人id
       doc_permission() {
         let currentSpeakerId;
         if (this.groupInitData.isInGroup) {
@@ -172,17 +161,19 @@
        */
       permissionFlag() {
         //是否在分组里
-        let flag = false;
         if (this.userInfo.role_name == 3) {
-          flag = true;
-        } else {
-          if (this.userInfo.third_party_user_id == this.doc_permission) {
-            flag = true;
-          } else {
-            flag = false;
-          }
+          return true;
         }
-        return flag;
+        if (this.userInfo.third_party_user_id == this.doc_permission) {
+          return true;
+        }
+        return false;
+      },
+      // 总时间计算显示
+      timeComputed() {
+        return 60 > this.totalTimeNum
+          ? this.totalTimeNum + '秒'
+          : parseInt(this.totalTimeNum / 60) + '分' + (this.totalTimeNum % 60) + '秒';
       }
     },
     beforeCreate() {
@@ -205,33 +196,53 @@
       this.timerServer.$on('timer_resume', temp => this.timer_resume(temp));
     },
     methods: {
+      // 添加聊天记录
+      addChatToList(e) {
+        let str = '';
+        switch (e.data.type) {
+          case 'timer_start':
+            str = '发起了计时器';
+            break;
+          case 'timer_end':
+            str = '关闭了计时器';
+            break;
+          case 'timer_pause':
+            str = '暂停了计时器';
+            break;
+          case 'timer_reset':
+            str = '重置了计时器';
+            break;
+          case 'timer_resume':
+            str = '继续了计时器';
+            break;
+        }
+        const text = this.$getRoleName(e.data.role_name);
+        const data = {
+          nickname: '计时器',
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text}${str}`
+          },
+          type: e.data.type
+        };
+        useChatServer().addChatToList(data);
+      },
       // 计时器开始
       timer_start(e) {
         console.warn('监听到了计时器开始-------', e);
         this.timerVisible = true;
-        this.status = 'kaishi';
-        this.shijian = e.data.duration;
-        this.beifenshijian = e.data.duration;
+        this.status = 'start';
+        this.time = e.data.duration;
+        this.totalTimeNum = e.data.duration;
         this.is_timeout = e.data.is_timeout;
         this.is_all_show = e.data.is_all_show;
-        this.timeFormat(Math.abs(this.shijian));
+        this.timeFormat(Math.abs(this.time));
         this.timerFun(e.data.duration);
         // 禁用互动工具-计时器
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', true])
         );
-        this.$emit('disTimer', true);
-        // 添加聊天记录
-        const text = this.$getRoleName(e.data.role_name);
-        const data = {
-          nickname: '计时器', // TODO: 缺翻译
-          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-          content: {
-            text_content: `${text}发起了计时器` // TODO: 缺翻译
-          },
-          type: e.data.type
-        };
-        useChatServer().addChatToList(data);
+        this.addChatToList(e);
       },
       // 计时器结束
       timer_end(e) {
@@ -240,82 +251,42 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
         );
-        this.$emit('disTimer', true);
+        // this.$emit('disTimer', true);
         clearInterval(this.timer);
         if (e.data.type == 'live_over') return;
-        // 添加聊天记录
-        const text = this.$getRoleName(e.data.role_name);
-        const data = {
-          nickname: '计时器', // TODO: 缺翻译
-          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-          content: {
-            text_content: `${text}关闭了计时器` // TODO: 缺翻译
-          },
-          type: e.data.type
-        };
-        useChatServer().addChatToList(data);
+        this.addChatToList(e);
       },
       // 计时器暂停
       timer_pause(e) {
         console.warn('监听到了计时器暂停-------', e);
-        this.status = 'zanting';
+        this.status = 'timeout';
         this.timeFormat(Math.abs(e.data.remain_time));
         clearInterval(this.timer);
-        // 添加聊天记录
-        const text = this.$getRoleName(e.data.role_name);
-        const data = {
-          nickname: '计时器', // TODO: 缺翻译
-          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-          content: {
-            text_content: `${text}暂停了计时器` // TODO: 缺翻译
-          },
-          type: e.data.type
-        };
-        useChatServer().addChatToList(data);
+        this.addChatToList(e);
       },
       // 计时器重置
       timer_reset(e) {
-        // 添加聊天记录
-        const text = this.$getRoleName(e.data.role_name);
-        const data = {
-          nickname: '计时器', // TODO: 缺翻译
-          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-          content: {
-            text_content: `${text}重置了计时器` // TODO: 缺翻译
-          },
-          type: e.data.type
-        };
-        useChatServer().addChatToList(data);
         console.warn('监听到了计时器重置-------', e);
         clearInterval(this.timer);
         this.timerVisible = false;
         // 关闭计时器
         // 主讲人助理打开计时设置弹框
-        this.$emit('disTimer', true);
-        if (
-          this.userInfo.role_name == 3 ||
-          this.userInfo.third_party_user_id == this.doc_permission
-        ) {
-          this.$emit('openSetTimer');
-          return false;
-        }
+        // this.$emit('disTimer', true);
+        // if (
+        //   this.userInfo.role_name == 3 ||
+        //   this.userInfo.third_party_user_id == this.doc_permission
+        // ) {
+        //   this.$emit('openSetTimer');
+        //   return false;
+        // }
+        this.addChatToList(e);
       },
       // 计时器继续
       timer_resume(e) {
         console.warn('监听到了计时器继续-------', e);
-        this.status = 'kaishi';
-        this.timerFun(this.shijian);
-        // 添加聊天记录
-        const text = this.$getRoleName(e.data.role_name);
-        const data = {
-          nickname: '计时器', // TODO: 缺翻译
-          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-          content: {
-            text_content: `${text}继续了计时器` // TODO: 缺翻译
-          },
-          type: e.data.type
-        };
-        useChatServer().addChatToList(data);
+        this.status = 'start';
+        this.timerFun(this.time);
+        this.addChatToList(e);
       },
       init() {
         this.timerServer
@@ -324,20 +295,20 @@
             if (JSON.stringify(res.data) != '{}') {
               console.log(res.data, 'timerInfo');
               const resData = res.data;
-              this.shijian = resData.remain_time;
-              this.beifenshijian = resData.duration;
+              this.time = resData.remain_time;
+              this.totalTimeNum = resData.duration;
               this.is_timeout = resData.is_timeout;
               this.is_all_show = resData.is_all_show;
-              this.timeFormat(Math.abs(this.shijian));
+              this.timeFormat(Math.abs(this.time));
               this.timerVisible = true;
               if (resData.status != 4) {
-                this.timerFun(this.shijian);
+                this.timerFun(this.time);
               }
               if (resData.status == 4) {
-                this.status = 'zanting';
+                this.status = 'timeout';
               }
               if (resData.status == 2) {
-                this.status = 'jieshu';
+                this.status = 'end';
               }
               // 禁用互动工具-计时器
               window.$middleEventSdk?.event?.send(
@@ -348,21 +319,9 @@
           })
           .catch(e => e);
       },
-      // 打开计时弹框
-      openTimer() {
-        // this.$nextTick(()=>{
-        //   console.log(this.shijian)
-        //   this.shijian = this.timerInfo.time;
-        //   this.beifenshijian = this.timerInfo.time;
-        //   this.timerVisible = true;
-        this.$emit('disTimer', false);
-        //   this.timeFormat(this.shijian)
-        //   this.timerFun(this.shijian);
-        // })
-      },
       // open关闭提示
       onClose() {
-        this.$emit('disTimer', true);
+        // this.$emit('disTimer', true);
         this.$confirm('是否关闭计时器', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -397,7 +356,7 @@
         this.timer = setInterval(() => {
           if (this.is_timeout == 0) {
             if (data == 1) {
-              this.status = 'jieshu';
+              this.status = 'end';
             }
             if (data == 0) {
               clearInterval(this.timer);
@@ -412,29 +371,28 @@
             this.status = 'chaoshi';
           }
           this.timeFormat(Math.abs(--data));
-          this.shijian = data;
+          this.time = data;
         }, 1000);
       },
       // 暂停 || 继续
       goOn(status) {
         if (status == 4) {
-          this.status = 'zanting';
+          this.status = 'timeout';
           // if (window.chatSDK) {
-          // TODO: // 主动向房间暂停发送消息
           this.msgServer.sendCustomMsg({
             role_name: this.userInfo.role_name,
             type: 'timer_pause',
-            remain_time: this.shijian
+            remain_time: this.time
           });
           // }
         } else {
-          this.status = this.shijian > 0 ? 'kaishi' : 'chaoshi';
-          this.timerFun(this.shijian);
+          this.status = this.time > 0 ? 'start' : 'chaoshi';
+          this.timerFun(this.time);
         }
         this.editTimer(status);
       },
       // open重置弹框
-      reset() {
+      resetTimer() {
         this.$confirm('是否重新设置计时器？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -452,7 +410,7 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
         // this.$emit('openSetTimer');
         clearInterval(this.timer);
-        this.status = 'kaishi';
+        this.status = 'start';
         this.editTimer(3);
       },
       // 操作计时器
@@ -460,8 +418,8 @@
         this.timerServer
           .timerEdit({
             action_type: status,
-            duration: this.beifenshijian || this.shijian,
-            remain_time: this.shijian,
+            duration: this.totalTimeNum || this.time,
+            remain_time: this.time,
             is_all_show: this.is_all_show ? 1 : 0,
             is_timeout: this.is_timeout ? 1 : 0
           })
@@ -478,17 +436,17 @@
   .ft14 {
     font-size: 14px;
   }
-  .time-open {
-    .w92 {
+  .vmp-live-timer {
+    .button_width {
       padding: 9px 34px !important;
       color: #fff;
     }
-    .button_zanting,
-    .button_zanting:hover {
+    .button_timeout,
+    .button_timeout:hover {
       border: 1px solid #595959 !important;
       background: #595959 !important;
     }
-    .button_chongzhi {
+    .button_reset {
       border: 1px solid #fb3a32;
       background: #fb3a32;
     }
@@ -501,16 +459,13 @@
     .colorFB3A32 {
       color: #fb3a32;
     }
-    .mt10 {
-      margin-top: 10px;
-    }
     .mt20 {
       margin-top: 20px;
     }
     .mt24 {
       margin-top: 24px;
     }
-    .bgimg {
+    .background-img {
       width: 292px;
       position: fixed;
       z-index: 102;
@@ -528,9 +483,10 @@
       height: 75px;
       width: 53px;
       position: relative;
-      strong {
+      & > :first-child {
         font-size: 38px;
         position: absolute;
+        font-weight: bold;
         top: 15px;
         left: 14px;
       }
@@ -581,39 +537,8 @@
       box-sizing: border-box;
       margin: 4px 3px;
     }
-    .mb20 {
-      margin-bottom: 20px;
-    }
     .pr {
       position: relative;
     }
-  }
-  .timer-padtop {
-    .button_cancle {
-      border: 1px solid #ccc;
-      color: #666666;
-      background: #fff;
-    }
-    .button_cancle:hover {
-      border: 1px solid #fb3a32;
-      color: #fb3a32;
-      background: #fff;
-    }
-    .el-dialog__body {
-      padding-top: 0 !important;
-    }
-    .mt10 {
-      margin-top: 10px;
-    }
-    .mt20 {
-      margin-top: 20px;
-    }
-  }
-  .time-open .el-dialog__wrapper {
-    // position: absolute;
-    left: 400px;
-    right: 400px;
-    top: 200px;
-    bottom: 200px;
   }
 </style>

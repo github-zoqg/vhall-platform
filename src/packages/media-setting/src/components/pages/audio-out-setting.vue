@@ -150,19 +150,4 @@
     font-size: 14px;
     margin-bottom: 14px;
   }
-
-  .vmp-media-setting-voice-slider {
-    @theme-color: #fb3a32;
-    .el-slider__bar {
-      background-color: @theme-color;
-    }
-
-    .el-slider__button {
-      width: 17px;
-      height: 17px;
-      border: none;
-      background-color: @theme-color;
-      box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
-    }
-  }
 </style>
