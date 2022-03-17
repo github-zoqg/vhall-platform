@@ -83,7 +83,9 @@
             type: 1, // 0-拒绝上麦 , 1-拒绝演示
             extra_params: this.senderId
           });
-          if (res.code != 200) {
+
+          // 513030:没有被邀请
+          if (res.code !== 200 && res.code !== 513030) {
             this.$message({
               message: res.msg,
               showClose: true,

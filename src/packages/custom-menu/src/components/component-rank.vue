@@ -129,7 +129,7 @@
         </div>
       </div>
 
-      <div v-if="open == 1" class="invite-friends">
+      <div v-if="isInviteCardMode" class="invite-friends">
         <span @click="showInviteFriends">{{ $t('nav.nav_1042') }}</span>
       </div>
     </div>
@@ -137,7 +137,7 @@
 </template>
 
 <script>
-  import { useCustomMenuServer } from 'middle-domain';
+  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
     name: 'component-rank',
@@ -166,11 +166,6 @@
     },
     props: {
       info: {
-        required: false
-      },
-      open: {
-        type: String,
-        default: '0',
         required: false
       },
       pagetype: {
@@ -206,6 +201,9 @@
       };
     },
     computed: {
+      isInviteCardMode() {
+        return this.$domainStore.state.roomBaseServer.inviteCard.status == '1';
+      },
       watchInitData() {
         return this.$domainStore.state.roomBaseServer.watchInitData;
       },
@@ -362,7 +360,7 @@
         this.clearBottomInfo();
       },
       showInviteFriends() {
-        this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_OPEN_INVITE_FRIENDS_QR);
+        this.$emit('send', 'emitOpenShareDialog', 4); // 呼出分享弹窗(4-邀请卡)
       },
 
       changeRulesShow() {
