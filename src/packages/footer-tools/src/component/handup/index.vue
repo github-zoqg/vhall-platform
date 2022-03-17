@@ -1,15 +1,5 @@
 <template>
   <div class="vmp-handup" v-if="device_status === 1 && isInteractLive">
-    <!-- <div style="color: #fff">
-      {{
-        `isBanned : ${isBanned};
-    isAllowhandup : ${isAllowhandup};
-    isSpeakOn : ${isSpeakOn};
-    isInGroup : ${isInGroup};
-    groupRole : ${![3, 4, 20].includes(parseInt(this.groupRole))};
-    isGroupBanned : ${isGroupBanned}; `
-      }}
-    </div> -->
     <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
@@ -19,8 +9,8 @@
         round
         v-if="
           isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && !isSpeakOn
-            : isBanned && isAllowhandup && !isSpeakOn
+            ? +this.groupRole !== 20 && isNotGroupBanned && !isSpeakOn
+            : isNotBanned && isAllowhandup && !isSpeakOn
         "
       >
         {{ btnText }}
@@ -31,11 +21,7 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="
-          isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && isSpeakOn
-            : isBanned && isSpeakOn
-        "
+        v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
         round
       >
         {{ $t('interact.interact_1007') }}
@@ -68,7 +54,7 @@
         const { watchInitData } = this.$domainStore.state.roomBaseServer;
         return (
           (watchInitData.webinar.mode == 3 ||
-            watchInitData.webinar.no_delay_webinar === 1 ||
+            watchInitData.webinar.no_delay_webinar == 1 ||
             watchInitData.webinar.mode == 6) &&
           watchInitData.webinar.type == 1
         );
@@ -90,11 +76,11 @@
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
       },
       // 非分组内的禁言状态
-      isBanned() {
+      isNotBanned() {
         return !useChatServer().state.banned || !useChatServer().state.allBanned; //true禁言，false未禁言
       },
       // 分组 组内 禁言 状态
-      isGroupBanned() {
+      isNotGroupBanned() {
         return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },
@@ -102,10 +88,6 @@
       if (this.waitInterval) {
         clearInterval(this.waitInterval);
       }
-      // 申请上麦
-      useMicServer().$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', this.joinInfo, msg);
-      });
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
@@ -130,18 +112,6 @@
           this.$message.success(this.$t('interact.interact_1002'));
         }
       });
-
-      /**
-       *
-       * // 主持人同意上麦申请
-      useMicServer().$on('user_apply_host_agree', msg => {
-        console.log(msg);
-      });
-      // 主持人拒绝上麦申请
-      useMicServer().$on('user_apply_host_reject', msg => {
-        // TODO:被拒绝的处理
-        console.log(msg);
-      });**/
     },
     methods: {
       // 下麦
