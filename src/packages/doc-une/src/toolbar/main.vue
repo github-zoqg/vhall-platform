@@ -357,6 +357,7 @@
         }
         this.changeTool(brush);
       },
+      // 画布清除确认
       confirmSave() {
         this.isConfirmVisible = false;
         this.docServer.clear();
@@ -366,6 +367,7 @@
       closeConfirm() {
         this.isConfirmVisible = false;
       },
+      // 是否观众可见
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();
       }
