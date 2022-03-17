@@ -200,7 +200,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip
@@ -213,10 +213,6 @@
         & > .iconfont {
           font-size: 20px;
         }
-        &.audio-preview {
-          padding-top: 15px;
-        }
-
         .icon-tip {
           color: #fb3a32;
           padding-right: 7px;
