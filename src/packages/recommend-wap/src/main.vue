@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-recommend" ref="recommendWrapper">
-    <ul class="a-wrap">
+    <ul class="vmp-recommend-list">
       <li
         class="recommend-item"
         v-for="item in advs"
@@ -10,8 +10,8 @@
         <img class="banner" :src="item.img_url ? item.img_url : defaultBanner" />
         <h4 class="title ellipsis">{{ item.subject }}</h4>
       </li>
+      <li class="vmp-recommend-loading" v-if="loading">{{ $t('common.common_1001') }}</li>
     </ul>
-    <div class="vh-loading" v-if="loading">{{ $t('common.common_1001') }}</div>
   </div>
 </template>
 <script>
@@ -49,7 +49,6 @@
         }
       });
     },
-    beforeDestroy() {},
     methods: {
       /**
        * 初始化默认广告信息
@@ -66,7 +65,7 @@
         if (!wrapper) return;
 
         this.scroll = new BScroll(wrapper, {
-          pullUpLoad: true,
+          pullUpLoad: true, // 下滑到底读取更多
           bindToWrapper: true,
           scrollX: false,
           scrollY: true,
@@ -89,16 +88,10 @@
         });
 
         this.scroll.on('pullingUp', async () => {
-          console.log({
-            pos: this.pos,
-            limit: this.limit,
-            total: this.total
-          });
+          console.log('pullingUp', this.pos, this.total, this.loading);
           if (this.pos > this.total) return;
           if (this.loading === true) return;
-          this.loading = true;
           await this.queryAdsList();
-          this.scroll.refresh();
         });
       },
       /**
@@ -106,6 +99,7 @@
        */
       async queryAdsList() {
         try {
+          this.loading = true;
           const res = await this.recommendServer.queryAdsList({
             webinar_id: this.$route.params.id,
             pos: this.pos + this.limit,
@@ -117,12 +111,12 @@
           this.total = res.data.total;
           this.limit = 10;
           this.pos = res.data.pos;
-          this.loading = false;
-          this.scroll.finishPullUp();
         } catch (error) {
           console.log(error);
+        } finally {
+          this.scroll && this.scroll.finishPullUp();
+          this.scroll && this.scroll.refresh();
           this.loading = false;
-          this.scroll.finishPullUp();
         }
       },
       /**
@@ -142,11 +136,11 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    .a-wrap {
+    overflow: hidden;
+    .vmp-recommend-list {
       display: block;
       width: 100%;
-      overflow-y: scroll;
-      touch-action: pan-y !important;
+      overflow-y: hidden;
     }
     .recommend-item {
       width: 330px;
@@ -174,6 +168,12 @@
         line-height: 30px;
         height: 34px;
       }
+    }
+    .vmp-recommend-loading {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      padding: 30px 0px;
     }
   }
 </style>

@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer, useChatServer } from 'middle-domain';
+  import { useRedPacketServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
@@ -43,6 +43,7 @@
       this.redPacketServer = useRedPacketServer({
         mode: 'watch'
       });
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
