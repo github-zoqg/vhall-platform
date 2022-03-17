@@ -220,7 +220,7 @@
         this.rewardServer
           .createReward({ ...params })
           .then(res => {
-            if (res.data) {
+            if (res.code == 200) {
               if (isWechat()) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
@@ -249,6 +249,8 @@
               } else {
                 window.location.href = res.data.pay_data;
               }
+            } else {
+              that.$toast(res.msg);
             }
           })
           .catch(e => {
