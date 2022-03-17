@@ -371,6 +371,10 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
     filters: {},
@@ -534,7 +538,11 @@
             return;
           }
           await this.stopPush();
-          this.roomBaseServer.setChangeElement('');
+          if (this.isWatch) {
+            this.roomBaseServer.setChangeElement('');
+          } else {
+            this.roomBaseServer.setChangeElement('stream-list');
+          }
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
@@ -556,7 +564,11 @@
             // 由于结束直播导致的结束讨论
             if (msg.data.over_live == 1) {
               await this.stopPush();
-              this.roomBaseServer.setChangeElement('');
+              if (this.isWatch) {
+                this.roomBaseServer.setChangeElement('');
+              } else {
+                this.roomBaseServer.setChangeElement('stream-list');
+              }
 
               if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
                 this.interactiveServer.destroy();

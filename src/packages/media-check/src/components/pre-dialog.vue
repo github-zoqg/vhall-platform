@@ -61,11 +61,10 @@
         this.popAlertCheckVisible = false;
         this.$emit('show');
       },
-      popAlertCheckClose() {
+      async popAlertCheckClose() {
         this.popAlertCheckVisible = false;
-        this.$nextTick(() => {
-          this.popAlertCheckConfirmVisible = true;
-        });
+        await this.$nextTick();
+        this.popAlertCheckConfirmVisible = true;
       },
       popAlertCheckConfirm() {
         this.popAlertCheckConfirmVisible = false;
