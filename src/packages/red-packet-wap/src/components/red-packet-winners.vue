@@ -4,7 +4,7 @@
       <i class="vhsaas-other-return vh-iconfont vh-line-arrow-left" @click="back" />
       <p v-if="amount > 0" class="vhsaas-other-unit">
         <i>￥</i>
-        {{ amount }}
+        <span class="amount" v-text="amount" />
       </p>
       <p v-if="!(amount > 0)" class="vhsaas-other-null">
         {{ $t('interact_tools.interact_tools_1034') + $t('interact_tools.interact_tools_1035') }}
@@ -20,7 +20,7 @@
         <span class="vhsaas-red-packet__count">
           {{
             $t('interact_tools.interact_tools_1043', {
-              n: redPacketInfo.get_user_count || 0
+              n: `${redPacketInfo.get_user_count}/${redPacketInfo.number}`
             })
           }}
         </span>
@@ -148,21 +148,20 @@
     z-index: 21;
 
     &.other {
+      height: initial;
       background: transparent;
-      height: 838px;
-      padding-top: 78px;
       .vhsaas-red-packet-close-btn {
-        bottom: -35px;
+        bottom: -78px;
       }
     }
   }
 
   .vhsaas-dialog__other {
-    width: 600px;
-    height: 720px;
+    width: 640px;
+    position: relative;
     background: #ee2121;
     border-radius: 32px;
-    padding: 0 0 24px 0;
+    padding: 24px 32px 25px;
   }
   .vhsaas-red-packet-cover {
     width: 588px;
@@ -175,27 +174,27 @@
     z-index: 25;
   }
   .vhsaas-other-return {
-    font-size: 22px;
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    font-size: 23px;
     color: #ffffff;
-    margin-top: 40px;
-    display: block;
-    margin-left: 44px;
-    cursor: pointer;
   }
   /* 看看大家的手气 */
   .vhsaas-other-unit {
-    font-size: 68px;
+    height: 79px;
     font-weight: bold;
     color: #fee4b3;
-    line-height: 68px;
     text-align: center;
-    margin-bottom: 16px;
-    margin-top: -16px;
+    font-size: 0;
     i {
       font-size: 40px;
       font-weight: 400;
       color: #fee4b3;
       line-height: 20px;
+    }
+    .amount {
+      font-size: 68px;
     }
   }
   .vhsaas-other-null {
@@ -210,15 +209,14 @@
   }
   .vhsaas-other-type {
     text-align: center;
-    margin: 0 0;
+    margin-bottom: 12px;
     line-height: 32px;
     .vhsaas-red-packet__tag {
-      width: auto;
+      width: 32px;
       height: 32px;
-      border-radius: 8px;
-      border: 1px solid #fde3b2;
+      border-radius: 4px;
+      border: 2px solid #fde3b2;
       font-size: 24px;
-      font-weight: 400;
       color: #fee4b3;
       line-height: 32px;
       margin-right: 12px;
@@ -235,15 +233,13 @@
     }
   }
   .vhsaas-other__item {
-    width: 552px;
-    height: 500px;
-    background: #fde9e9;
-    margin: 30px auto 0 auto;
-    padding-top: 10px;
-    border-radius: 8px;
+    height: 720px;
+    background: #fde6e6;
+    border-radius: 12px;
     overflow-y: auto;
     li {
       padding: 18px 32px 16px 32px;
+      height: 120px;
     }
     .nodata {
       margin-top: 100px;
