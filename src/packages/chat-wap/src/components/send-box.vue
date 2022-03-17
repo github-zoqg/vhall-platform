@@ -327,7 +327,8 @@
         if (
           (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
-          (this.groupInitData.isBanned && this.groupInitData.isInGroup)
+          (this.groupInitData.isBanned && this.groupInitData.isInGroup) ||
+          this.isvod
         ) {
           return;
         }

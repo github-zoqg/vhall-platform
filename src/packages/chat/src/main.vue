@@ -305,7 +305,7 @@
         //监听到新消息过来
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
-            if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.data.role_name != 2)) {
+            if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.context.role_name != 2)) {
               this.isHasUnreadAtMeMsg = true;
               this.unReadMessageCount++;
               this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
