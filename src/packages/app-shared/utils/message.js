@@ -5,6 +5,13 @@ const offset = 8;
 
 const $message = options => {
   Message.closeAll(); // 调起新的 message 之前关闭之前 message
+  if (typeof options === 'string') {
+    options = {
+      message: options,
+      offset: offset
+    };
+  }
+  options.type = 'info';
   return Message({
     offset: offset,
     ...options
