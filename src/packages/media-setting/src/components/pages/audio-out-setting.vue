@@ -66,7 +66,6 @@
       return {
         mediaState: this.mediaSettingServer.state,
         isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
-        speakerReady: false,
         isPaused: true,
         volume: 0.5
       };
@@ -93,24 +92,29 @@
     },
     methods: {
       listenEvents() {
-        this.setisPaused = () => (this.isPaused = true);
+        this.setIsPaused = () => (this.isPaused = true);
         this.setAudioPlay = () => (this.isPaused = false);
 
-        this.$refs.outputAudioPlayer.addEventListener('pause', this.setisPaused);
+        this.$refs.outputAudioPlayer.addEventListener('pause', this.setIsPaused);
         this.$refs.outputAudioPlayer.addEventListener('play', this.setAudioPlay);
       },
       removeEvents() {
-        this.$refs.outputAudioPlayer.removeEventListener('pause', this.setisPaused);
+        this.$refs.outputAudioPlayer.removeEventListener('pause', this.setIsPaused);
         this.$refs.outputAudioPlayer.removeEventListener('play', this.setAudioPlay);
       },
+      /**
+       * 试播音频
+       */
       playAudio: debounce(function () {
         if (!this.$refs.outputAudioPlayer) return;
         if (!this.isPaused) return this.$refs.outputAudioPlayer.pause();
         if (!this.mediaState.audioOutput && !this.isSafari)
           return this.$message.warning('无可用的扬声器');
         this.$refs.outputAudioPlayer.play();
-        this.speakerReady = true;
       }, 500),
+      /**
+       * 设备变更
+       */
       audioOutputChange() {
         const audioPlayer = this.$refs.outputAudioPlayer;
         if (!audioPlayer) return;

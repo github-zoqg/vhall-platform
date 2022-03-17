@@ -132,7 +132,6 @@
     },
     beforeDestroy() {
       mediaSettingConfirm && mediaSettingConfirm.destroy();
-      this.removeEvents();
     },
     methods: {
       /**
