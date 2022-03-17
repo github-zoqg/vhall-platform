@@ -73,6 +73,7 @@
         const mediaOptions = { audio: { deviceId: this.selectedAudioDeviceId } };
         const stream = await navigator.mediaDevices.getUserMedia(mediaOptions);
         stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -3');
           trackInput.stop();
         });
         this.$refs.previewAudio.initAudio(this.selectedId);

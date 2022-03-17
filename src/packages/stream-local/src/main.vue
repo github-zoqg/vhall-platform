@@ -113,7 +113,7 @@
         <el-tooltip content="切换" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
-            v-if="!isFullScreen"
+            v-if="!isFullScreen && switchStatus"
             @click="exchange"
           ></span>
         </el-tooltip>
@@ -239,6 +239,10 @@
       ImgStream
     },
     computed: {
+      // 文档是否对观众可见
+      switchStatus() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -1195,7 +1199,7 @@
         border-radius: 100%;
         margin-right: 10px;
 
-        .vh-line-copy-document {
+        &.vh-line-copy-document {
           font-size: 14px;
         }
         &:hover {

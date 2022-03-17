@@ -1141,10 +1141,10 @@
               break;
             case 'group_switch_start':
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
-              handleStartGroupDiscuss();
+              _this.updateOnlineUserList();
               break;
             case 'group_join_change':
-              _this.getOnlineUserList();
+              _this.updateOnlineUserList();
               break;
             default:
               break;
@@ -1202,7 +1202,7 @@
 
         // 频道变更-开始讨论(刷新数据)
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
-          isWatch && handleRoomChannelChange(msg);
+          isWatch && _this.updateOnlineUserList(msg);
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', msg => {
@@ -1267,15 +1267,7 @@
         //主持人/助理进入小组
         function handleHostJoin(msg) {
           if (_this.isLive) {
-            if (msg.data.status == 'enter') {
-              setTimeout(() => {
-                _this.onlineUsers = [];
-                _this.getOnlineUserList();
-              }, 1000);
-            } else if (msg.data.status == 'quit') {
-              _this.onlineUsers = [];
-              _this.getOnlineUserList();
-            }
+            ['enter', 'quit'].includes(msg.data.status) && _this.updateOnlineUserList();
           }
         }
 
@@ -1283,14 +1275,14 @@
         function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
           _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
-          _this.getOnlineUserList();
+          _this.updateOnlineUserList();
         }
         //
         function handleEndGroupDiscuss(msg) {
           console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
           _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
-          _this.getOnlineUserList();
+          _this.updateOnlineUserList();
         }
         //重新获取最新的groupInitData
         function changeGroupInitData(msg) {
@@ -1355,10 +1347,14 @@
           console.log(msg);
         }
       },
-      updateOnlineUserList() {
+      // updateOnlineUserList() {
+      //   this.onlineUsers = [];
+      //   this.getOnlineUserList();
+      // },
+      updateOnlineUserList: _.throttle(function () {
         this.onlineUsers = [];
         this.getOnlineUserList();
-      },
+      }, 1500),
       //获取在线人员列表
       getOnlineUserList(pos) {
         const _this = this;
