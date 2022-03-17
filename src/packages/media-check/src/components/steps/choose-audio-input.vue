@@ -94,7 +94,6 @@
     .vh-media-check-selector {
       display: flex;
       align-items: center;
-      margin-top: 11px;
 
       label {
         flex: 0;
@@ -109,7 +108,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip
