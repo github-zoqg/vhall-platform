@@ -8,7 +8,7 @@
     </template>
     <template v-else>
       <section v-show="isVisibleMiniElement" class="vmp-basic-right-hd"></section>
-      <section class="vmp-basic-right-bd">
+      <section class="vmp-basic-right-bd vmp-basic-bd-relative">
         <vmp-air-container :cuid="cuid"></vmp-air-container>
       </section>
     </template>
@@ -80,6 +80,9 @@
       background: #2a2a2a;
       flex: 1;
       height: 1px;
+    }
+    .vmp-basic-bd-relative {
+      position: relative;
     }
     .vmp-try-watch {
       display: flex;
