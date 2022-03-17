@@ -1,11 +1,7 @@
 <!-- 观看页-红包组件（颤动 + 弹出层） -->
 <template>
-  <div
-    class="vhsaas-red-packet"
-    v-if="dialogVisible"
-    :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
-  >
-    <div class="vhsaas-interact-mask">
+  <div class="vhsaas-red-packet" v-if="dialogVisible">
+    <div class="vhsaas-interact-mask" :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }">
       <components
         :is="componentsView"
         :amount="redPacketServerState.amount * 1"

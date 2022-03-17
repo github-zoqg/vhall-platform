@@ -170,7 +170,10 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
-
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 如果自己是推送桌面共享
             if (this.isShareScreen && this.desktopShareInfo.accountId == this.userId) {
               vn.setDisableState(false);

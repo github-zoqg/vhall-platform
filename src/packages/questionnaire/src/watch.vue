@@ -1,10 +1,6 @@
 <template>
-  <div
-    class="vhall-question"
-    v-if="dialogVisible"
-    :style="{ zIndex: zIndexServerState.zIndexMap.questionnaire }"
-  >
-    <div class="vhall-question-box">
+  <div class="vhall-question" v-if="dialogVisible">
+    <div class="vhall-question-box" :style="{ zIndex: zIndexServerState.zIndexMap.questionnaire }">
       <div class="question-box">
         <div class="question-close" @click="dialogVisible = false">
           <i class="vh-iconfont vh-line-close"></i>
@@ -131,7 +127,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 27;
     .question-box {
       float: left;
       left: 0;

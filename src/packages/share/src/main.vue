@@ -66,7 +66,7 @@
       return {
         shareVisible: false,
         shareOtherVisible: false,
-        watchWebUrl: `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
+        watchWebUrl: `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
         isInviteShare: false,
@@ -166,7 +166,7 @@
           const url = encodeURIComponent(
             `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/invite/${
               this.$route.params.id
-            }?invite_id=${join_info.join_id || ''}`
+            }?invite_id=${join_info.join_id || ''}&lang=${localStorage.getItem('lang')}`
           );
           this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         }

@@ -9,6 +9,9 @@
     <!-- videoMuted 的时候显示流占位图 -->
     <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
 
+    <!-- 音频直播的的时候显示流占位图 -->
+    <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
+
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
       <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>

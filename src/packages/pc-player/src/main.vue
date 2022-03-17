@@ -1,11 +1,9 @@
 <template>
   <div
     v-if="!isShowContainer"
-    class="vmp-player"
     :class="[
-      { 'is-watch': isWatch },
-      { 'vmp-player-embed': isEmbedVideo },
-      { 'vmp-player-embedFull': isEmbed },
+      'vmp-player',
+      { 'is-watch': isWatch, 'vmp-player-embed': isEmbedVideo, 'vmp-player-embedFull': isEmbed },
       isSubscribe ? '' : `vmp-player--${displayMode}`
     ]"
     @mousemove="wrapEnter"
@@ -20,11 +18,13 @@
       :element-loading-text="$t('common.common_1001')"
     >
       <template class="vmp-player-living">
+        <!-- 背景图片 -->
         <div
           v-if="isShowPoster"
           class="vmp-player-living-background"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         ></div>
+        <!-- 暖场视频播放按钮 -->
         <div
           v-if="isEmbed && isSubscribe && isWarnPreview && !isPlayering"
           class="vmp-player-living-play"
@@ -33,6 +33,7 @@
             <i class="vh-iconfont vh-line-video-play"></i>
           </div>
         </div>
+        <!-- 直播、回放播放按钮 -->
         <template v-else>
           <div class="vmp-player-living-btn" v-if="!isPlayering && !isVodEnd">
             <div
@@ -65,7 +66,7 @@
             </div>
             <p class="replay-try" @click="replayPlay">
               <i class="vh-iconfont vh-line-refresh-left">
-                <b>{{ $t('appointment.appointment_1014') }}</b>
+                {{ $t('appointment.appointment_1014') }}
               </i>
             </p>
           </div>
@@ -658,12 +659,11 @@
             tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
           })
           .then(res => {
-            if (res.code == 200) {
+            if (res.code === 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
               this.marquee = res.data['screen-config'].data;
               this.water = res.data['water-mark'].data;
               this.playerOtherOptions = res.data['basic-config'].data;
-              console.log(this.marquee, this.water, '??!23221423');
               this.initPlayer();
             }
           });

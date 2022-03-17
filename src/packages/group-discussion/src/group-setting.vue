@@ -42,8 +42,8 @@
 
         <!-- 底部按钮 -->
         <div class="vmp-group-ft">
-          <el-button type="primary" @click="handleGroup">开始分组</el-button>
-          <el-button @click="handleClose">取消</el-button>
+          <el-button type="primary" round @click="handleGroup">开始分组</el-button>
+          <el-button round @click="handleClose">取消</el-button>
         </div>
       </div>
     </el-dialog>

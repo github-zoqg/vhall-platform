@@ -187,7 +187,7 @@
           ...params
         };
         this.subscribeServer.watchAuth(data).then(res => {
-          if (res.code == 200) {
+          if (res.code === 200) {
             if (res.data.status == 'live') {
               let pageUrl = '';
               if (location.pathname.indexOf('embedclient') != -1) {

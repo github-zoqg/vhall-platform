@@ -9,7 +9,7 @@
         <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__leftt-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div class="vmp-footer-tools__left-hot" v-if="roomBaseState.watchInitData.pv.show">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
@@ -32,20 +32,17 @@
         </el-dropdown>
       </div>
     </div>
-    <!-- <div class="vmp-footer-tools__right">
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
-    </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="device_status === 1 && !isBanned && isInteractLive">
-      <handup></handup>
+    <div class="vmp-footer-tools__center">
+      <handup class=""></handup>
     </div>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
-        <!-- 公告 -->
+        <!-- 公告 直播显示公告 -->
         <notice></notice>
       </li>
-      <li v-if="1">
+      <li v-if="isLiving">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -116,7 +113,7 @@
     useChatServer,
     useGroupServer
   } from 'middle-domain';
-  import handup from './handup.vue';
+  import handup from './component/handup/index.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';

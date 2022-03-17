@@ -31,7 +31,8 @@
           @click="select({ type: item.type, id: item.id })"
         >
           <span class="item-text">{{ $tdefault(item.name) }}</span>
-          <i v-show="item.tipsVisible" class="tips"></i>
+          <i class="tips" v-show="item.tipsVisible"></i>
+          <aside v-show="selectedId === item.id" class="bottom-line"></aside>
         </li>
       </ul>
 
@@ -73,7 +74,6 @@
     data() {
       return {
         isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
-        direciton: 'row', // row(横)，column(纵)
         selectedType: '',
         selectedId: '',
         menu: [],
@@ -87,8 +87,9 @@
       },
       visibleMenu() {
         let m = this.menu.filter(item => {
+          // 此处逻辑较复杂，请参考tab-menu/readme.md
           if (this.pageEnv === 'living') {
-            return (item.status == 1 || item.status == 3) && item.visible;
+            return item.status !== 2 && item.visible;
           }
 
           if (this.pageEnv === 'live_over' || this.pageEnv === 'subscribe') {
@@ -261,6 +262,7 @@
             type: 'private',
             name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
             text: this.$t('common.common_1008'), // 同上
+            visible: false,
             status: 3
           });
         }
@@ -287,7 +289,7 @@
       },
       /**
        * 设置显示条件
-       * @param {String} condition [default|living|predition]
+       * @param {String} condition [default|living]
        */
       setPageEnv(condition = 'default') {
         this.pageEnv = condition;
@@ -471,7 +473,7 @@
     height: 100%;
     position: relative;
     background: #fff;
-    font-size: 32px;
+    font-size: 28px;
     display: flex;
     flex-direction: column;
     &__try {
@@ -555,16 +557,20 @@
       display: flex;
       flex-wrap: nowrap;
       overflow-x: auto;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
       .vmp-tab-menu-item {
         flex: 0 0 auto;
-        min-width: 33%;
         position: relative;
         display: inline-flex;
         height: 100%;
         justify-content: center;
         align-items: center;
-        padding: 0 20px;
-        color: #333333;
+        padding: 0 34px;
+        color: #595959;
         cursor: pointer;
         user-select: none;
 
@@ -585,16 +591,12 @@
         }
 
         .bottom-line {
-          display: none;
           position: absolute;
-          border: none;
-          border-radius: 2px 2px 0 0;
-          bottom: 1px;
-          left: 50%;
-          width: 34px;
-          transform: translateX(-50%);
-          height: 3px;
-          background-color: #fb3a32;
+          bottom: 9px;
+          width: 40px;
+          height: 5px;
+          background: #fb2626;
+          border-radius: 3px;
         }
 
         &:hover {
@@ -604,12 +606,21 @@
         }
 
         &__active {
-          color: @font-error;
-          font-weight: bolder;
+          color: #262626;
+          position: relative;
+
+          .bottom-line {
+            position: absolute;
+            bottom: 9px;
+            height: 5px;
+            width: 40px;
+            background: #fb2626;
+            border-radius: 3px;
+          }
 
           .item-text {
+            font-weight: 500;
             position: relative;
-            border-bottom: 6px solid @font-error;
           }
 
           .bottom-line {

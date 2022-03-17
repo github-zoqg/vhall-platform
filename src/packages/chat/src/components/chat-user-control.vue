@@ -77,29 +77,26 @@
     },
     mounted() {
       //todo 待改为信令
-      EventBus.$on(
-        'set_person_status_in_chat',
-        async (el, accountId, count, nickname, msgroleName) => {
-          const roleName = this.roomBaseServer.state.watchInitData.join_info.role_name;
-          if (accountId == this.userId) return; // 不能点击自己
-          if (((roleName == 3 || roleName == 4) && msgroleName == 2) || roleName == 1) {
-            this.accountId = accountId;
-            this.count = count;
-            const boundedList = await this.getUserStatus();
-            this.userStatus.is_banned = boundedList[0].data.list.some(user => {
-              return user.account_id == accountId;
-            });
-            this.userStatus.is_kicked = boundedList[1].data.list.some(user => {
-              return user.account_id == accountId;
-            });
-            this.isShow = true;
-            this.godMode = roleName == 1;
-            this.calculate(el);
-            this.nickname = nickname;
-            this.roleName = roleName;
-          }
+      EventBus.$on('set_person_status_in_chat', async (el, accountId, count, nickname) => {
+        const roleName = this.roomBaseServer.state.watchInitData.join_info.role_name;
+        if (accountId == this.userId) return; // 不能点击自己
+        if (roleName == 3 || roleName == 4 || roleName == 1) {
+          this.accountId = accountId;
+          this.count = count;
+          const boundedList = await this.getUserStatus();
+          this.userStatus.is_banned = boundedList[0].data.list.some(user => {
+            return user.account_id == accountId;
+          });
+          this.userStatus.is_kicked = boundedList[1].data.list.some(user => {
+            return user.account_id == accountId;
+          });
+          this.isShow = true;
+          this.godMode = [1, '1', 3, '3', 4, '4'].includes(roleName);
+          this.calculate(el);
+          this.nickname = nickname;
+          this.roleName = roleName;
         }
-      );
+      });
       //todo 待改为信令
       // 监听客户端踢出操作
       EventBus.$on('assistantKickoutCallback', msg => {

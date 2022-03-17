@@ -218,8 +218,8 @@
     useSplitScreenServer,
     useMediaCheckServer,
     useChatServer,
-    useMsgServer,
-    useDocServer
+    useDocServer,
+    useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -316,14 +316,6 @@
         const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
         const allowedUser = inMainRoomUser || inGroupRoomUser;
 
-        console.log('isShowPresentationScreen', {
-          localSpeaker: this.localSpeaker,
-          sameId,
-          groupMode,
-          inMainRoomUser,
-          inGroupRoomUser
-        });
-
         return sameId && groupMode && allowedUser;
       },
       joinInfo() {
@@ -379,6 +371,10 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
     filters: {},
@@ -465,7 +461,7 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStream.streamId) return;
+            if (this.localStream.streamId) return; // 只有主持人使用
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
             if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
               this.speakOff();
@@ -533,7 +529,7 @@
           }
         });
         // 结束直播
-        useMsgServer().$on('live_over', async () => {
+        this.micServer.$on('live_over', async () => {
           // 如果开启分屏并且是主页面，不需要停止推流
           if (
             this.splitScreenServer.state.isOpenSplitScreen &&
@@ -542,10 +538,44 @@
             return;
           }
           await this.stopPush();
-          this.roomBaseServer.setChangeElement('stream-list');
+          if (this.isWatch) {
+            this.roomBaseServer.setChangeElement('');
+          } else {
+            this.roomBaseServer.setChangeElement('stream-list');
+          }
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
+          }
+
+          this.micServer.setSpeakerList([]);
+        });
+        // 结束直播
+        useMsgServer().$onMsg('ROOM_MSG', async msg => {
+          if (msg.data.event_type === 'group_switch_end') {
+            // 如果开启分屏并且是主页面，不需要停止推流
+            if (
+              this.splitScreenServer.state.isOpenSplitScreen &&
+              this.splitScreenServer.state.role == 'host'
+            ) {
+              return;
+            }
+
+            // 由于结束直播导致的结束讨论
+            if (msg.data.over_live == 1) {
+              await this.stopPush();
+              if (this.isWatch) {
+                this.roomBaseServer.setChangeElement('');
+              } else {
+                this.roomBaseServer.setChangeElement('stream-list');
+              }
+
+              if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
+                this.interactiveServer.destroy();
+              }
+
+              this.micServer.setSpeakerList([]);
+            }
           }
         });
 
@@ -1164,8 +1194,12 @@
         background: hsla(0, 0%, 100%, 0.3);
         border-radius: 100%;
         margin-right: 10px;
+
+        .vh-line-copy-document {
+          font-size: 14px;
+        }
         &:hover {
-          background-color: #fc5659;
+          background-color: #fb3a32;
         }
         &:last-child {
           margin-right: 0;
