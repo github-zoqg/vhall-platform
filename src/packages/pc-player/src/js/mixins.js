@@ -126,7 +126,10 @@ const playerMixins = {
         this.isShowPoster = true;
         if (this.isWarnPreview) return;
         this.isVodEnd = true;
-        this.roomBaseServer.setChangeElement('doc');
+        if (this.isVisibleMiniElement) {
+          // 如果回放时没有文档，就不用重置最小值
+          this.roomBaseServer.setChangeElement('doc');
+        }
         this.displayMode = 'normal';
       });
 

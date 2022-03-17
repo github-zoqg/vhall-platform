@@ -1,6 +1,6 @@
 <template>
   <section class="vmp-custom-menu" v-show="!loading">
-    <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
+    <overlay-scrollbars ref="scroll" :options="overlayScrollBarsOptions" style="height: 100%">
       <div class="vmp-custom-menu-wrapper">
         <component
           v-for="(block, index) in customTabs"
@@ -62,6 +62,10 @@
       this.customMenuServer = useCustomMenuServer();
     },
     methods: {
+      onScrollStop() {
+        const state = this.$refs.scroll.getState();
+        console.log('state', state);
+      },
       async queryDetail(id) {
         if (id === undefined || id === null) {
           return;
