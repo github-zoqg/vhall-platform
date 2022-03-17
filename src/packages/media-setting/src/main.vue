@@ -57,9 +57,9 @@
         :confirm="true"
         :confirmText="$t('common.common_1010')"
         :cancelText="$t('account.account_1063')"
-        @onSubmit="confirmSave"
-        @onClose="closeConfirm"
-        @onCancel="closeConfirm"
+        @onSubmit="onConfirmSave"
+        @onClose="onCloseConfirm"
+        @onCancel="onCloseConfirm"
       >
         <main slot="content">{{ alertText }}</main>
       </saas-alert>
@@ -83,9 +83,7 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
-
   import { getDiffObject } from './js/getDiffObject';
-  import { LIVE_MODE_MAP } from './js/liveMap';
 
   import mediaSettingConfirm from './js/showConfirm';
 
@@ -105,12 +103,10 @@
       return {
         loading: false,
         mediaState: this.mediaSettingServer.state,
-        isShow: false, // dialog可视性
+        isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
         selectedMenuItem: 'basic-setting',
-        alertText: '修改设置后会导致重新推流，是否继续保存？',
-        liveMode: 0, // 1-音频 2-视频 3-互动 6-分组
-        LIVE_MODE_MAP
+        alertText: '修改设置后会导致重新推流，是否继续保存？'
       };
     },
     computed: {
@@ -127,7 +123,6 @@
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
-      this.liveMode = watchInitData?.webinar?.mode;
       this.webinar = watchInitData.webinar;
 
       mediaSettingConfirm.onShow(text => {
@@ -136,37 +131,52 @@
       });
     },
     beforeDestroy() {
-      mediaSettingConfirm.destory();
+      mediaSettingConfirm && mediaSettingConfirm.destroy();
       this.removeEvents();
     },
     methods: {
+      /**
+       * 展示弹窗
+       */
       showMediaSetting() {
         this.isShow = true;
-        this.restart();
+        this.reset();
       },
-
+      /**
+       * 关闭弹窗
+       */
       closeMediaSetting() {
         this.isShow = false;
         this.$refs['videoSetting'].destroyStream();
       },
-
-      confirmSave() {
+      /**
+       * 点击对话框确认按钮（保存）的回调
+       */
+      onConfirmSave() {
         this.isConfirmVisible = false;
         mediaSettingConfirm.dispatchAction('confirm');
       },
-
-      closeConfirm() {
+      /**
+       * 关闭对话框按钮的回调
+       */
+      onCloseConfirm() {
         this.isConfirmVisible = false;
         mediaSettingConfirm.dispatchAction('close');
       },
-
+      /**
+       * 更改左侧菜单选中项
+       * @param {String} id
+       */
       changeSelectedMenuItem(id) {
         this.selectedMenuItem = id;
       },
-      async restart() {
+      /**
+       * 重置状态并重新获取设备状态
+       */
+      async reset() {
         try {
           this.loading = true;
-          this.setDefaultSelectType();
+          this.setDefaultVideoType();
           await this.getDevices();
           this.setDefaultSelected();
           this.$refs['videoSetting'].createPreview();
@@ -177,7 +187,8 @@
         }
       },
       /**
-       * 保存确认
+       * 保存操作
+       * (中途会弹窗确认，否决将不执行真实保存操作)
        */
       async saveMediaSetting() {
         const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
@@ -187,8 +198,6 @@
         this._diffOptions = this.getDiffOptions();
         const videoTypeChanged = this._diffOptions.videoType !== undefined;
         const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
-
-        console.log('diffOptions', this._diffOptions);
 
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
@@ -204,13 +213,13 @@
         }
       },
       /**
-       * 获得产生变化的字段
+       * 获得用户更改的字段（diff字段）
        */
       getDiffOptions() {
         const source = this._originCaptureState;
         let current = { ...this.mediaState };
 
-        const ignoreKeys = ['devices', 'videoPreivewStreamId', 'videoPreviewStream'];
+        const ignoreKeys = ['devices', 'videoPreviewStreamId', 'videoPreviewStream'];
 
         return getDiffObject(source, current, { ignoreKeys });
       },
@@ -230,15 +239,13 @@
         const { watchInitData } = useRoomBaseServer().state;
 
         if (watchInitData?.join_info?.role_name == '1') {
-          // 配置上传服务器
+          // 保存的配置上传服务器
           await this.mediaSettingServer.setStream({
             room_id: watchInitData.interact.room_id,
             definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
             layout: this.mediaState.layout || 0,
             screen_definition: this.mediaState.screenRate // 桌面共享清晰度
           });
-        } else {
-          // TODO: event.deviceSplit(options)&selectVideoType
         }
 
         this.saveSelected();
@@ -263,6 +270,9 @@
 
         return true;
       },
+      /**
+       * 获取所有设置的快照
+       */
       getStateCapture() {
         // 关心的都是浅拷贝数据
         let state = { ...this.mediaSettingServer.state };
@@ -299,10 +309,11 @@
         for (const [key, value] of sessionMap) {
           sessionStorage.setItem(key, value);
         }
-
-        console.log('[media-setting] 记录字段成功');
       },
-      setDefaultSelectType() {
+      /**
+       * 设置默认的视频类型
+       */
+      setDefaultVideoType() {
         // 视频类型
         // 设置图片推流
         const param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
@@ -311,7 +322,10 @@
           this.mediaState.canvasImgUrl = param.streamUrl;
         }
       },
-
+      /**
+       * 从缓存中取回默认值并应用进去
+       * @notices 设置默认选中值前，会先请求设备，是异步状态。但在异步请求的过程中如果用户做了新的选择，就优先选中他自身。比如this.mediaState.video = this.mediaState.video。以免数据跳动。
+       */
       setDefaultSelected() {
         const {
           videoInputDevices = [],
@@ -358,7 +372,6 @@
 
     background: #fff;
     display: flex;
-    // height: 100%;
     height: 500px;
     box-sizing: border-box;
 
@@ -378,7 +391,7 @@
       display: flex;
       flex-direction: column;
       width: 360px;
-      padding: 64px 32px 24px 32px;
+      padding: 64px 32px 24px;
 
       &-main {
         flex: 1;

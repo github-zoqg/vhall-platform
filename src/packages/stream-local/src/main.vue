@@ -316,14 +316,6 @@
         const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
         const allowedUser = inMainRoomUser || inGroupRoomUser;
 
-        console.log('isShowPresentationScreen', {
-          localSpeaker: this.localSpeaker,
-          sameId,
-          groupMode,
-          inMainRoomUser,
-          inGroupRoomUser
-        });
-
         return sameId && groupMode && allowedUser;
       },
       joinInfo() {

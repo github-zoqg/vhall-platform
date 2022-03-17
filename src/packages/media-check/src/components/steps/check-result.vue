@@ -195,7 +195,6 @@
         right: 32px;
       }
       .vh-fotter_result-btn {
-        width: 100%;
         overflow: hidden;
         .fr {
           float: right;
