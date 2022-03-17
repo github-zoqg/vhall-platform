@@ -136,12 +136,13 @@
             ? `${replyText}${this.replyMsg.nickname}: ${this.trimPlaceHolder('reply')}`
             : `${replyText}${this.replyMsg.nickname}: `;
         }
-      },
-      inputValue(newValue) {
-        if (!newValue) {
-          this.replyMsg = {};
-        }
       }
+      // inputValue(newValue) {
+      //   if (!newValue) {
+      //     console.log('chat input 值发生变化了', newValue);
+      //     this.replyMsg = {};
+      //   }
+      // }
     },
     beforeCreate() {},
     mounted() {
@@ -163,32 +164,33 @@
       },
       //输入框输入事件,改变高度等
       inputHandle() {
-        const chatOldTextareaHeight = this.$refs.chatTextarea.style.height;
+        // const chatOldTextareaHeight = this.$refs.chatTextarea.style.height;
         // 最大字数限制 140
         if (this.inputValue.length > 140) {
           this.inputValue = this.inputValue.substring(0, 140);
         }
-        setTimeout(() => {
-          this.$nextTick(() => {
-            const chatTextareaHeight = this.$refs.chatTextarea.style.height;
-            if (chatOldTextareaHeight !== chatTextareaHeight) {
-              const hostTextarea = document.querySelector(
-                '.vmp-chat-input__textarea-box .os-host-textarea'
-              );
-              const chatTextAreaHeight = parseInt(chatTextareaHeight);
-              if (chatTextAreaHeight <= 60) {
-                // 解决删除文本之后 textarea 高度不会自动减小的问题
-                this.$refs.chatTextarea.style.minHeight = '20px';
-                hostTextarea.style.minHeight = chatTextareaHeight;
-              } else {
-                hostTextarea.style.minHeight = '59px';
-              }
-              // 三行的时候显示字数限制，否则不显示
-              this.showLimit = chatTextAreaHeight > 40;
+        this.$nextTick(() => {
+          const chatTextareaHeight = this.$refs.chatTextarea.style.height;
+          // if (chatOldTextareaHeight !== chatTextareaHeight) {
+          const hostTextarea = document.querySelector(
+            '.vmp-chat-input__textarea-box .os-host-textarea'
+          );
+          const chatTextAreaHeight = parseInt(chatTextareaHeight);
+          if (chatTextAreaHeight <= 60) {
+            // 解决删除文本之后 textarea 高度不会自动减小的问题
+            this.$refs.chatTextarea.style.minHeight = '20px';
+            hostTextarea.style.minHeight = chatTextareaHeight;
+          } else {
+            hostTextarea.style.minHeight = '59px';
+          }
+          // 三行的时候显示字数限制，否则不显示
+          this.showLimit = chatTextAreaHeight > 40;
 
-              this.$emit('inputHeightChange');
-            }
+          // 触发父元素绑定的高度发生变化事件
+          setTimeout(() => {
+            this.$emit('chatTextareaHeightChange');
           });
+          // }
         });
       },
       //按下enter键的处理
@@ -243,7 +245,7 @@
         }
       },
       /** 发送聊天消息 */
-      sendMsg(callback) {
+      sendMessage(callback) {
         //是否是聊天禁言状态
         if (this.inputStatus.disable) {
           return;
@@ -275,6 +277,13 @@
         //todo 建议移入domain  清空一下@列表，但是保持引用
         this.atList.splice(0, this.atList.length);
         callback && callback();
+
+        this.$nextTick(() => {
+          // 输入框内容发生变化，更新滚动条
+          this.overlayScrollbar.update();
+
+          this.inputHandle();
+        });
         this.dispatch('VmpChatOperateBar', 'sendEnd');
       },
       /** 发送聊天消息节流 */
@@ -284,7 +293,7 @@
           return;
         }
         if (this.roleName !== 2) {
-          this.sendMsg();
+          this.sendMessage();
           return;
         }
         if (this.chatGap > 0) {
@@ -293,7 +302,7 @@
             this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
           }
         } else {
-          this.sendMsg(() => {
+          this.sendMessage(() => {
             this.chatGapInterval && window.clearInterval(this.chatGapInterval);
             this.lock = sessionStorage.getItem('chatLock');
             this.chatGap = this.delayTime(this.onlineUsers);
