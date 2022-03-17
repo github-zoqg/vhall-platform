@@ -379,38 +379,7 @@
         // 监听文档消息
         this.msgServer.$onMsg('CUSTOM_MSG', this.listenDocMsg);
       },
-      // 使用具名消息，后面offMsg的时候使用
-      // TODO 暂时没有offMsg事件，后面有的时候加上
       listenDocMsg(msg) {
-        console.log('[doc] ------CUSTOM_MSG-----文档消息：', msg);
-        // {
-        //   "type": "host_msg_webinar",
-        //   "data": {
-        //       "page": "1",
-        //       "document_id": "64f984ff",
-        //       "converted_page": "0",
-        //       "status": "0",
-        //       "status_jpeg": "200",
-        //       "converted_page_jpeg": "1",
-        //       "doc_type": "doc_convert",
-        //       "user_id": 101643
-        //    },
-        //   "webinar_id": "131121788"
-        // }
-        try {
-          if (typeof msg === 'string') {
-            msg = JSON.parse(msg);
-          }
-          if (typeof msg.context === 'string') {
-            msg.context = JSON.parse(msg.context);
-          }
-          if (typeof msg.data === 'string') {
-            msg.data = JSON.parse(msg.data);
-          }
-        } catch (ex) {
-          console.log('消息转换错误：', ex);
-          return;
-        }
         if (msg.data.type === 'host_msg_webinar') {
           const msgData = msg.data.data;
           // status: "200" // 动态转换状态 0待转换 100转换中 200完成 500失败
@@ -460,6 +429,7 @@
         this.docSearchKey = '';
         this.handleDocSearch();
       },
+      // 关闭对话框
       handleClose() {
         if (this.mode === 2) {
           this.handleDoclibCancel();
@@ -717,6 +687,9 @@
         });
         this.innerVisible = false;
       }
+    },
+    beforeDestroy() {
+      this.msgServer.$offMsg('CUSTOM_MSG', this.listenDocMsg);
     }
   };
 </script>

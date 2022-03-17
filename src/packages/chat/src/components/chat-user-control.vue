@@ -91,7 +91,7 @@
             return user.account_id == accountId;
           });
           this.isShow = true;
-          this.godMode = roleName == 1;
+          this.godMode = [1, '1', 3, '3', 4, '4'].includes(roleName);
           this.calculate(el);
           this.nickname = nickname;
           this.roleName = roleName;

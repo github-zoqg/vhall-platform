@@ -9,7 +9,7 @@
       class="vmp-sign-watch_sign"
       :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
     >
-      <div class="sign-container">
+      <div class="sign_container">
         <div class="sign_content">
           <p class="sign_title">{{ title }}</p>
           <CountDown :duration="duration" :consume="sign_time" class="sign_counter"></CountDown>
@@ -235,7 +235,7 @@
       display: flex;
       justify-content: center;
       z-index: 28;
-      .sign-container {
+      .sign_container {
         width: 399px;
         height: 464px;
         margin-top: 10vh;
@@ -246,7 +246,7 @@
       .sign_counter {
         margin: 0 auto;
       }
-      .sign_counter {
+      .sign_content {
         text-align: center;
         padding-top: 180px;
         margin: 0 auto;
