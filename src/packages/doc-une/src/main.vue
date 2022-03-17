@@ -1122,7 +1122,7 @@
       position: relative;
 
       &.selected {
-        box-shadow: 0 0 0 2px #f57274;
+        box-shadow: 0 0 0 2px #fb3a32;
       }
 
       img {

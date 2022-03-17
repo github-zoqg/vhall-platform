@@ -262,6 +262,7 @@
             type: 'private',
             name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
             text: this.$t('common.common_1008'), // 同上
+            visible: false,
             status: 3
           });
         }
