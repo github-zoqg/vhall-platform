@@ -92,8 +92,13 @@
       this.destroyStream();
     },
     methods: {
+      /**
+       * 视频设备变更
+       * @param {String} value 视频设备ID
+       */
       async onVideoTypeChange(value) {
         this.mediaSettingServer.setState('videoType', value);
+
         if (value === 'picture') {
           return this.destroyStream();
         }
@@ -102,9 +107,12 @@
           this.createPreview();
         }
       },
-      // 创建视频流
+      /**
+       * 创建视频预览流
+       */
       async createPreview() {
         if (this.mediaState.videoType !== 'camera') return;
+
         await this.destroyStream();
 
         this.$refs['videoPreviewer'].innerHTML = '';
@@ -133,10 +141,12 @@
           console.error(this.$t('message.message_1028'), err);
         }
       },
+      /**
+       * 销毁预览流
+       */
       async destroyStream() {
         try {
-          const stoped = await this.mediaSettingServer.stopVideoPreview();
-          return stoped;
+          return this.mediaSettingServer.stopVideoPreview();
         } catch (err) {
           console.error(`销毁流异常`, err);
         }
