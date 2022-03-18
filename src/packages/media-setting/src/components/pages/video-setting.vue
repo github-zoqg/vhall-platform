@@ -158,16 +158,16 @@
 </script>
 
 <style lang="less">
+  .vmp-media-setting-item__video-type {
+    display: flex;
+    align-items: center;
+  }
+
   .vmp-media-setting-video-canvas {
     height: 166px;
     border-radius: 4px;
     overflow: hidden;
     position: relative;
-
-    .vmp-media-setting-item__video-type {
-      display: flex;
-      align-items: center;
-    }
 
     .vmp-media-setting-preview-loading-container {
       position: absolute;

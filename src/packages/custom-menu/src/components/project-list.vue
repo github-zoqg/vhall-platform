@@ -110,7 +110,7 @@
     overflow: hidden;
     width: 312px;
     height: 80px;
-    padding: 0px 10px 8px;
+    padding: 8px 10px 8px;
     font-family: PingFangSC-Regular, PingFang SC;
     border-radius: 4px;
     &:hover {

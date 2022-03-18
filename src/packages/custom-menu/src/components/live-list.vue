@@ -157,9 +157,8 @@
     overflow: hidden;
     width: 312px;
     height: 80px;
-    padding: 0px 10px 8px;
+    padding: 8px 10px 8px;
     border-radius: 4px;
-    font-family: PingFangSC-Regular, PingFang SC;
     &:hover {
       background: #383838;
       cursor: pointer;
@@ -260,7 +259,6 @@
     .liveTag {
       color: #fff;
       font-size: 12px;
-      // padding:12px;
       border-radius: 20px;
       position: relative;
       z-index: 2;

@@ -392,7 +392,7 @@
     }
 
     .vh-media-check-main {
-      width: 296px;
+      width: 330px;
       padding-top: 20px;
       margin: 0 auto;
     }
