@@ -20,6 +20,10 @@
       menu: {
         type: Array,
         default: () => []
+      },
+      auth: {
+        type: Object,
+        default: () => ({})
       }
     },
     data() {
@@ -35,6 +39,14 @@
             set.push(item);
           }
         }
+
+        set = set.filter(item => {
+          if (item.type == 8 && !this.auth.member) return false; // 成员
+          if (item.type == 'notice' && !this.auth.notice) return false; // 公告
+          if (item.type == 7 && !this.auth.chapter) return false; // 章节
+
+          return true;
+        });
 
         return [...set];
       }

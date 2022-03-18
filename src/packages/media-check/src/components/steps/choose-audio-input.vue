@@ -91,6 +91,9 @@
 
 <style lang="less">
   .vh-media-check-audioinput {
+    width: 296px;
+    margin: 0 auto;
+
     // selector
     .vh-media-check-selector {
       display: flex;

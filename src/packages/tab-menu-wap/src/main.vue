@@ -49,7 +49,7 @@
 
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
-      <tab-content ref="tabContent" :menu="menu" @noticeHint="handleHint" />
+      <tab-content ref="tabContent" :menu="menu" :auth="auth" @noticeHint="handleHint" />
     </section>
     <!-- </template> -->
   </section>
@@ -78,7 +78,12 @@
         selectedId: '',
         menu: [],
         pageEnv: 'default',
-        tabOptions: {}
+        tabOptions: {},
+        auth: {
+          member: true,
+          notice: true,
+          chapter: true
+        }
       };
     },
     computed: {
@@ -86,8 +91,12 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        let m = this.menu.filter(item => {
+        return this.menu.filter(item => {
           // 此处逻辑较复杂，请参考tab-menu/readme.md
+          if (item.type == 8 && !this.auth.member) return false; // 成员
+          if (item.type == 'notice' && !this.auth.notice) return false; // 公告
+          if (item.type == 7 && !this.auth.chapter) return false; // 章节
+
           if (this.pageEnv === 'living') {
             return item.status !== 2 && item.visible;
           }
@@ -98,9 +107,6 @@
 
           return item.visible === true;
         });
-        console.log('visibleMenu', m);
-
-        return m;
       },
       // 是否为嵌入页
       embedObj() {
