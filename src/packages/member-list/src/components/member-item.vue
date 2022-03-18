@@ -541,7 +541,7 @@
       //PC观看端设为组长
       isShowWatchSetLeader() {
         return (
-          this.tabIndex !== 3 &&
+          this.tabIndex === 1 &&
           [2, '2'].includes(this.userInfo.role_name) &&
           [2, '2'].includes(this.userInfo.device_type) &&
           [0, '0'].includes(this.userInfo.is_banned) &&
@@ -580,7 +580,7 @@
       },
       //是否显示邀请演示操作选项(PC观看)
       isShowWatchInvitation() {
-        if ([1, 2].includes(this.tabIndex)) {
+        if (this.tabIndex === 1) {
           return (
             this.isInteract &&
             [2, '2'].includes(this.userInfo.device_type) &&
