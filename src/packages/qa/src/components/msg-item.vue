@@ -17,7 +17,9 @@
       <div class="vhsaas-chat-msg-item__content">
         <!-- 昵称和角色 -->
         <p class="msg-item__content-name clearfix">
-          <span class="msg-item_content-name-nick">{{ source.answer.nick_name }}</span>
+          <span class="msg-item_content-name-nick">
+            {{ source.answer.nick_name | overHidden(5) }}
+          </span>
           <span class="msg-item_content-name-role" :class="source.answer.role_name">
             {{ source.answer.role_name | roleFilter }}
           </span>
@@ -38,7 +40,7 @@
           <div class="vhsaas-chat-msg-item__content">
             <!-- 昵称和角色 -->
             <p class="msg-item__content-name clearfix">
-              <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
+              <span class="msg-item_content-name-nick">{{ source.nick_name | overHidden(5) }}</span>
               <!-- <span class="msg-item_content-name-role" :class="source.answer.role_name">
                 {{ source.role_name | roleFilter(this) }}
               </span> -->
@@ -61,7 +63,7 @@
       <div class="vhsaas-chat-msg-item__content">
         <!-- 昵称和角色 -->
         <p class="msg-item__content-name clearfix">
-          <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
+          <span class="msg-item_content-name-nick">{{ source.nick_name | overHidden(5) }}</span>
           <!-- <span
             class="msg-item_content-name-role"
             :class="msg.role_name"

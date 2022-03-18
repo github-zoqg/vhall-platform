@@ -478,7 +478,7 @@
       display: flex;
       width: 100%;
       height: 100%;
-      background: #2d2d2d;
+      background: #000;
       flex-direction: column;
       color: #999;
       justify-content: center;

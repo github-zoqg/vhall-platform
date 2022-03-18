@@ -68,8 +68,8 @@ export default class TaskQueue {
     if (this.queue.length == 0 || this.running >= this.maxQueueLen) {
       return;
     }
-    this.running++;
     await this.sleep(this.minTaskTime * this.running);
+    this.running++;
     const queueTaskItem = this.queue.shift();
     console.log('this.queue.queueTaskItem-------->', queueTaskItem);
     if (queueTaskItem) {
@@ -77,8 +77,8 @@ export default class TaskQueue {
       this.running--;
       await this.sleep(this.minTaskTime * (this.running || 1));
       await queueTaskItem.removeRewardEffect();
+      this.execute();
     }
-    this.execute();
   }
 
   /**
