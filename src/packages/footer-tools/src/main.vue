@@ -40,7 +40,7 @@
     <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
         <!-- 公告 直播显示公告 -->
-        <notice></notice>
+        <notice ref="notice"></notice>
       </li>
       <li v-if="isLiving">
         <!-- 计时器 -->
@@ -266,7 +266,7 @@
           this.showGiftCount++;
         }
         // TODO:是否需要处理
-        this.$refs.notice && (this.$refs.notice.isShowNotice = false);
+        this.$refs.notice && this.$refs.notice.closeNoticeList();
       },
       // 打开打赏弹框
       onClickReward() {

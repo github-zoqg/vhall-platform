@@ -200,15 +200,13 @@
       listenServer() {
         this.giftsServer.$on('gift_send_success', msg => {
           console.log('VmpWapRewardEffect-------->', msg);
+          const nickname = msg.data.gift_user_nickname || msg.data.nickname;
           const data = {
-            nickname:
-              msg.data.gift_user_nickname.length > 8
-                ? msg.data.gift_user_nickname.substr(0, 8) + '...'
-                : msg.data.gift_user_nickname,
+            nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
             avatar: msg.data.avatar,
             content: {
               gift_name: msg.data.gift_name,
-              gift_url: `${msg.data.gift_image_url}`,
+              gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
               source_status: msg.data.source_status
             },
             type: 'gift_send_success',
@@ -244,7 +242,6 @@
             this.roomBaseServer.state.watchInitData.join_info.third_party_user_id ==
             rawMsg.data.rewarder_id
           ) {
-            this.closeDialog();
             this.$message({
               message: this.$t('common.common_1005'),
               showClose: true,

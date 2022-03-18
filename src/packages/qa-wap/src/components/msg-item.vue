@@ -21,7 +21,7 @@
           <span class="nick-name">
             {{ source.data ? source.data.nick_name : source.nick_name }}
           </span>
-          <span class="time">{{ source.created_at }}</span>
+          <span class="time">{{ source.created_time.slice(-8) }}</span>
         </div>
         <div class="content">
           <span class="question-label">{{ $t('chat.chat_1040') }}：</span>
@@ -45,7 +45,7 @@
               {{ source.answer.role_name | roleFilter }}
             </span>
             <span class="nick-name">{{ source.answer.nick_name }}</span>
-            <span class="time">{{ source.answer.created_at }}</span>
+            <span class="time">{{ source.answer.created_time.slice(-8) }}</span>
           </div>
           <div class="content">
             <span class="question-label">{{ $t('chat.chat_1041') }}：</span>
