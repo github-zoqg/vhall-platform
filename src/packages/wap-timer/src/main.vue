@@ -113,8 +113,7 @@
         ten_mon: 0,
         mon: 0,
         ten_sec: 0,
-        sec: 0,
-        timerInfo: {}
+        sec: 0
       };
     },
     computed: {
@@ -146,16 +145,15 @@
       // 是否为直播
       isLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      timerInfo() {
+        return this.roomBaseServer.state?.timerInfo;
       }
     },
     beforeCreate() {
       this.timerServer = useTimerServer();
     },
     async mounted() {
-      // await this.getCommonConfig();
-      console.log(this.roomBaseServer.state?.timerInfo, 'this.roomBaseServer.state?.timerInfo');
-      this.timerInfo = this.roomBaseServer.state?.timerInfo;
-      // this.timerServer.listenMsg();
       console.log(this.$domainStore.state.roomBaseServer, 'this.timerServer');
       // 计时器开始
       this.timerServer.$on('timer_start', temp => this.timer_start(temp));
