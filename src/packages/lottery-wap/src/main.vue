@@ -64,11 +64,18 @@
     },
     methods: {
       accept(msg) {
-        console.log('accept', msg);
-        this.open(msg.lottery_id);
-        // this.setFitment(msg);
-        // this.lotteryView = 'LotteryWin';
-        // this.popupVisible = true;
+        console.log(msg);
+        this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
+          if (res.code === 200) {
+            if (res.data.take_award === 0) {
+              this.lotteryView = 'LotteryWin';
+            } else {
+              this.lotteryView = 'LotterySuccess';
+            }
+            this.dialogVisible = true;
+            this.zIndexServer.setDialogZIndex('lottery');
+          }
+        });
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
