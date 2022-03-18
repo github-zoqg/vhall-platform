@@ -62,7 +62,7 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && !is_host_in_group && mainScreenDom ? 'opcity-true' : 'opcity-flase']"
+        :class="[iconShow && !is_host_in_group && mainScreen ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -314,6 +314,12 @@
         // 接收设为主讲人消息   组内
         useGroupServer().$on('VRTC_BIG_SCREEN_SET', msg => {
           this.setBigScreen(msg);
+        });
+
+        // 接收设为主讲人消息   组内
+        useGroupServer().$on('GROUP_JOIN_CHANGE', msg => {
+          // this.setBigScreen(msg);
+          console.warn(456, msg);
         });
       },
 
