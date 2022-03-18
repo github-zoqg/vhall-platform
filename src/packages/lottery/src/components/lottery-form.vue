@@ -95,7 +95,7 @@
           class="search-user"
           placeholder="请输入用户名"
         >
-          <span slot="suffix" @click="lotterySearch">搜索</span>
+          <span slot="append" @click="lotterySearch">搜索</span>
         </el-input>
         <ul class="user-list" v-if="userListShow">
           <li v-for="(item, index) in userList" :key="index" @click="selector(item, index)">
@@ -418,6 +418,25 @@
     }
   };
 </script>
+<style lang="less">
+  .repeat-winning {
+    margin-bottom: 12px;
+    .el-switch {
+      margin-right: 5px;
+      width: 28px;
+      height: 16px;
+      line-height: 16px;
+      &__core {
+        width: 100%;
+        height: 16px;
+      }
+      &__core:after {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+</style>
 <style lang="less" scoped>
   .lottery-dialog-content {
     padding: 10px 15px 25px 10px;
@@ -591,6 +610,13 @@
       .iconfont:hover {
         color: #fb3a32;
       }
+    }
+  }
+</style>
+<style lang="less">
+  .search-user {
+    .el-input__suffix {
+      right: 0;
     }
   }
 </style>

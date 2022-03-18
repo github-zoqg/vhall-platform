@@ -113,7 +113,7 @@
         <el-tooltip content="切换" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
-            v-if="!isFullScreen"
+            v-if="!isFullScreen && switchStatus"
             @click="exchange"
           ></span>
         </el-tooltip>
@@ -239,6 +239,10 @@
       ImgStream
     },
     computed: {
+      // 文档是否对观众可见
+      switchStatus() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -371,6 +375,10 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
     filters: {},
@@ -534,7 +542,11 @@
             return;
           }
           await this.stopPush();
-          this.roomBaseServer.setChangeElement('');
+          if (this.isWatch) {
+            this.roomBaseServer.setChangeElement('');
+          } else {
+            this.roomBaseServer.setChangeElement('stream-list');
+          }
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
@@ -556,7 +568,11 @@
             // 由于结束直播导致的结束讨论
             if (msg.data.over_live == 1) {
               await this.stopPush();
-              this.roomBaseServer.setChangeElement('');
+              if (this.isWatch) {
+                this.roomBaseServer.setChangeElement('');
+              } else {
+                this.roomBaseServer.setChangeElement('stream-list');
+              }
 
               if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
                 this.interactiveServer.destroy();
@@ -1183,7 +1199,7 @@
         border-radius: 100%;
         margin-right: 10px;
 
-        .vh-line-copy-document {
+        &.vh-line-copy-document {
           font-size: 14px;
         }
         &:hover {

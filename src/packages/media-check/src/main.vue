@@ -198,7 +198,10 @@
        */
       async getVideoDeviceInfo() {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(trackInput => trackInput.stop());
+        stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -1');
+          trackInput.stop();
+        });
         await this.getDevices();
         this.setDefaultSelected();
       },
@@ -369,7 +372,7 @@
     .el-step__title {
       font-size: 14px;
       line-height: 16px;
-      padding-top: 3px;
+      padding-top: 4px;
       color: #666;
       &.is-process {
         color: #3562fa;
@@ -390,7 +393,7 @@
 
     .vh-media-check-main {
       width: 296px;
-      padding-top: 16px;
+      padding-top: 20px;
       margin: 0 auto;
     }
   }

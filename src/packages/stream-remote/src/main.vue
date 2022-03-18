@@ -104,10 +104,14 @@
           ></span>
         </el-tooltip>
 
+        <!-- 主持人和组长不能互相下麦 -->
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="joinInfo.role_name == 1 && stream.attributes.roleName != 20"
+            v-if="
+              (joinInfo.role_name == 1 && stream.roleName != 20) ||
+              (groupRole == 20 && stream.roleName != 1)
+            "
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -653,7 +657,7 @@
         border-radius: 100%;
         margin-right: 10px;
 
-        .vh-line-copy-document {
+        &.vh-line-copy-document {
           font-size: 14px;
         }
         &:hover {

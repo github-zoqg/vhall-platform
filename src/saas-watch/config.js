@@ -111,7 +111,12 @@ export const serverConfig = {
   /**** 组件定义 */
   // 自定义菜单
   comCustomMenu: {
-    component: 'VmpCustomMenu'
+    component: 'VmpCustomMenu',
+    emitOpenShareDialog: {
+      cuid: 'comShare',
+      method: 'shareOtherDialog',
+      args: ['$0']
+    }
   },
 
   // 文档白板组件

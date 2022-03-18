@@ -50,10 +50,8 @@
     },
     data() {
       return {
-        // showInviteList: this.info.inSwitch == 1,
-        // showAwardsList: this.info.rewardSwitch == 1,
-        showInviteList: true,
-        showAwardsList: true,
+        showInviteList: this.info.inSwitch == 1,
+        showAwardsList: this.info.rewardSwitch == 1,
         inviteListData: [],
         awardsListData: [],
         showRule: false,

@@ -82,7 +82,7 @@
     useWatchRewardServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcRewardEffect',
@@ -311,11 +311,10 @@
 <style lang="less">
   // 飘屏
   .vmp-reward-effect {
-    // .flex();
     position: absolute;
     overflow: hidden;
     left: 16px;
-    top: 24px;
+    top: 60px;
     z-index: 100;
     .reward-effect-box {
       width: 230px;

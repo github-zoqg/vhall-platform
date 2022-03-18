@@ -44,8 +44,9 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
-          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
-          <span v-if="hasDocPermission || [3, 4].includes(roleName)">暂未分享任何文档</span>
+          <span v-if="hasDocPermission || [3, 4].includes(roleName)">
+            {{ $t('doc.doc_1011') }}
+          </span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
       </div>
@@ -58,7 +59,7 @@
           title="上一步"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
-        <li v-if="hasPager" class="page-number">
+        <li v-if="hasPager || webinarMode == 5" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
           <span class="page-split">/</span>
           <span class="page-total">{{ docServer.state.pageTotal }}</span>
@@ -71,35 +72,35 @@
         ></li>
         <li
           data-value="zoomIn"
-          title="放大"
+          :title="$t('doc.doc_1005')"
           class="doc-pagebar__opt vh-iconfont vh-line-zoom-in"
         ></li>
         <li
           data-value="zoomOut"
-          title="缩小"
+          :title="$t('doc.doc_1006')"
           class="doc-pagebar__opt vh-iconfont vh-line-zoom-out"
         ></li>
         <li
           data-value="zoomReset"
-          title="还原"
+          :title="$t('doc.doc_1008')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-a-line-11"
         ></li>
         <li
           data-value="move"
-          title="移动"
+          :title="$t('doc.doc_1007')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
           :class="{ selected: canMove }"
         ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
           data-value="fullscreen"
-          title="全屏"
+          :title="$t('doc.doc_1010')"
           class="doc-pagebar__opt vh-iconfont vh-a-line-fullscreen"
         ></li>
         <li
           v-if="isWatch && displayMode === 'fullscreen'"
           data-value="fullscreen"
-          title="退出全屏"
+          :title="$t('doc.doc_1009')"
           class="doc-pagebar__opt vh-iconfont vh-a-line-exitfullscreen"
         ></li>
       </ul>
@@ -108,7 +109,7 @@
       <ul
         class="vmp-doc-thumbnailbar"
         @click="handleThumbnail"
-        v-show="currentType !== 'board' && thumbnailShow"
+        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
       >
         <li
           class="doc-thumbnailbar__opt"
@@ -164,12 +165,11 @@
     },
     data() {
       return {
-        className: '',
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
-        keepAspectRatio: true,
+        keepAspectRatio: true, //保持纵横比
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false,
-        canMove: false
+        hasStreamList: false, // 是否展示流列表
+        canMove: false //文档能否拖拽
       };
     },
     computed: {
@@ -178,6 +178,10 @@
       },
       groupInitData() {
         return this.groupServer.state.groupInitData;
+      },
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
+      webinarMode() {
+        return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
       // 文档是否加载完成
       docLoadComplete() {
@@ -199,7 +203,7 @@
       showPagebar() {
         // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
         return (
-          this.docServer.state.currentCid.split('-')[0] === 'document' &&
+          this.currentType === 'document' &&
           (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
         );
       },
@@ -227,6 +231,8 @@
       },
       // 文档是否可见
       show() {
+        // 1、发起端没有开启桌面共享时展示
+        // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
           (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
@@ -246,8 +252,9 @@
       },
       // 是否显示文档白板工具栏
       showToolbar() {
-        // 有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
+        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
         return (
+          this.webinarMode != 5 &&
           (this.hasDocPermission || [3].includes(this.roleName)) &&
           ['normal', 'fullscreen'].includes(this.displayMode)
         );
@@ -301,6 +308,9 @@
       },
       // 是否有翻页操作权限
       hasPager() {
+        // 定时直播所有人都没有翻页权限
+        if (this.webinarMode == 5) return false;
+        // 有演示权限，或者助理配有翻页权限，或者活动设置了有翻页权限
         return (
           this.hasDocPermission ||
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
@@ -688,7 +698,7 @@
         });
 
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
-          const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
+          const fileType = this.currentType || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
           );
@@ -923,7 +933,7 @@
           this.docServer.activeContainer(data.id);
         } else {
           const { id: cid, docId } = data;
-          const fileType = cid.split('-')[0];
+          const fileType = this.currentType;
           if (fileType === 'document' && !docId) {
             // 文档id没有
             console.log('[doc] 文档id没有 cid:', cid);
@@ -1105,7 +1115,7 @@
       background-color: #000 !important;
     }
     &::-webkit-scrollbar-track {
-      background-color: transpar ent;
+      background-color: transparent;
     }
 
     &::-webkit-scrollbar-thumb {

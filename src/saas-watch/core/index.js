@@ -5,6 +5,7 @@ import { initMixin } from './mixin';
 import initDirective from './directive';
 import { initI18n } from './lang';
 import { initRoleFilter } from '@/packages/app-shared/filters/role-filter';
+import '@/packages/app-shared/filters/index';
 
 // 初始化全局属性
 initGlobalPrototype();

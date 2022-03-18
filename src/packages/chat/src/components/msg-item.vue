@@ -200,7 +200,7 @@
               v-show="source.nickname && source.roleName != 1"
               class="interact-content__nick-name"
             >
-              {{ source.nickname }}
+              {{ source.nickname | overHidden(8) }}
             </span>
             <span
               v-show="source.roleName"
@@ -769,11 +769,11 @@
           }
           &.assistant {
             background-color: rgba(166, 166, 166, 0.15);
-            color: #a6a6a6;
+            color: #3562fa;
           }
           &.guest {
             background-color: rgba(53, 98, 250, 0.2);
-            color: #3562fa;
+            color: #a6a6a6;
           }
         }
         .interact-content__redpackage-img {
