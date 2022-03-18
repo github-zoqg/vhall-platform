@@ -182,7 +182,7 @@
       }
       .des {
         display: inline-block;
-        height: 24px;
+        line-height: 24px;
         vertical-align: top;
       }
       .pay-wx-icon {
