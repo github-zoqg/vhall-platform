@@ -14,15 +14,7 @@
         }"
       >
         <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
-        <img
-          class="gift-user-avatar"
-          :src="
-            rewardEffectInfo.data.type == 'gift_send_success' ||
-            rewardEffectInfo.data.event_type == 'free_gift_send'
-              ? rewardEffectInfo.data.gift_user_avatar
-              : rewardEffectInfo.data.rewarder_avatar || default_user_avatar
-          "
-        />
+        <img class="gift-user-avatar" :src="gift_user_avatar(rewardEffectInfo)" />
         <span class="nick-name">
           {{
             rewardEffectInfo.data.type == 'gift_send_success' ||
@@ -103,16 +95,11 @@
         taskQueue: null // 飘窗列队
       };
     },
-    filters: {
-      overHidden(data, len) {
-        return data.substr(0, len) + '...';
-      }
-    },
     computed: {
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
       },
-      // 用户头像
+      // 默认用户头像
       default_user_avatar() {
         return require('./images/default_avatar.png');
       }
@@ -131,7 +118,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 1000
+        minTaskTime: 2000
       });
       // setInterval(() => {
       //   this.watchRewardServer.$emit('reward_pay_ok', {
@@ -251,6 +238,25 @@
             });
           }
         });
+      },
+      // 礼物用户头像
+      gift_user_avatar(rewardEffectInfo) {
+        console.log('gift_user_avatar------>', rewardEffectInfo);
+        if (
+          rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.event_type == 'free_gift_send'
+        ) {
+          // 来源于接口消息字段
+          if (rewardEffectInfo.data.gift_user_avatar) {
+            return rewardEffectInfo.data.gift_user_avatar;
+          } else if (rewardEffectInfo.data.rewarder_avatar) {
+            return rewardEffectInfo.data.rewarder_avatar;
+          } else {
+            return this.default_user_avatar;
+          }
+        } else {
+          return this.default_user_avatar;
+        }
       },
       //设置是否屏蔽特效
       setHideEffect(status) {
