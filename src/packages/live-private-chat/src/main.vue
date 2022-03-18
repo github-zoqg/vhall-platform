@@ -263,7 +263,7 @@
       //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
         const isExit = this.chatGroupList.some((chatItem, index) => {
-          if (chatItemInfo.id == chatItem.user_id) {
+          if (chatItemInfo.id == chatItem.id) {
             this.selectGroup(index);
             return true;
           } else {
@@ -364,6 +364,7 @@
         useChatServer().clearCurMsg();
         this.imgList.length = 0;
         this.inputText = '';
+        this.$refs.chatRef.scrollBottom();
       }
     }
   };
