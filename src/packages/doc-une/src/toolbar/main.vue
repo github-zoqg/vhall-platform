@@ -15,7 +15,8 @@
           <el-switch
             @click.native="handleSwitchStatus"
             v-model="switchStatus"
-            active-color="#13ce66"
+            active-color="#fb3a32"
+            inactive-color="#cecece"
           ></el-switch>
           <!-- 提示 -->
           <div class="audience-tip" v-show="showAudienceTip">
@@ -420,20 +421,20 @@
         margin-left: 20px;
         position: relative;
 
-        .el-switch .el-switch__core {
-          border-color: #ddd !important;
-          background-color: #2d2d2d !important;
-          &::after {
-            background-color: #848484;
-          }
-        }
-        .el-switch.is-checked .el-switch__core {
-          border-color: #3562fa !important;
-          background-color: #2d2d2d !important;
-          &::after {
-            background-color: #3562fa;
-          }
-        }
+        // .el-switch .el-switch__core {
+        //   border-color: #ddd !important;
+        //   background-color: #2d2d2d !important;
+        //   &::after {
+        //     background-color: #848484;
+        //   }
+        // }
+        // .el-switch.is-checked .el-switch__core {
+        //   border-color: #3562fa !important;
+        //   background-color: #2d2d2d !important;
+        //   &::after {
+        //     background-color: #3562fa;
+        //   }
+        // }
       }
     }
     .vmp-doc-toolbar__bd {
