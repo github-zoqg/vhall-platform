@@ -2,6 +2,7 @@ import { initGlobalPrototype } from './prototype';
 import { initUse } from './use';
 import { initMixin } from './mixin';
 import { initI18n } from './lang';
+import { initRoleFilter } from '@/packages/app-shared/filters/role-filter';
 import './filters';
 import './setFontSize';
 
@@ -18,3 +19,5 @@ export function initGlobalAPI() {
 }
 
 export const i18n = initI18n();
+
+initRoleFilter(i18n);

@@ -1,23 +1,30 @@
 <template>
   <div
     v-if="!isShowContainer"
-    class="vmp-player"
     :class="[
-      { 'is-watch': isWatch },
-      { 'vmp-player-embed': isEmbedVideo },
-      { 'vmp-player-embedFull': isEmbed },
+      'vmp-player',
+      { 'is-watch': isWatch, 'vmp-player-embed': isEmbedVideo, 'vmp-player-embedFull': isEmbed },
       isSubscribe ? '' : `vmp-player--${displayMode}`
     ]"
     @mousemove="wrapEnter"
     @mouseleave="wrapLeave"
   >
-    <div id="vmp-player" class="vmp-player-watch">
+    <div
+      id="vmp-player"
+      class="vmp-player-watch"
+      ref="playerWatch"
+      v-loading="loading"
+      element-loading-background="#1a1a1a"
+      :element-loading-text="$t('common.common_1001')"
+    >
       <template class="vmp-player-living">
+        <!-- 背景图片 -->
         <div
           v-if="isShowPoster"
           class="vmp-player-living-background"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         ></div>
+        <!-- 暖场视频播放按钮 -->
         <div
           v-if="isEmbed && isSubscribe && isWarnPreview && !isPlayering"
           class="vmp-player-living-play"
@@ -26,6 +33,7 @@
             <i class="vh-iconfont vh-line-video-play"></i>
           </div>
         </div>
+        <!-- 直播、回放播放按钮 -->
         <template v-else>
           <div class="vmp-player-living-btn" v-if="!isPlayering && !isVodEnd">
             <div
@@ -41,7 +49,7 @@
           </div>
         </template>
 
-        <div class="vmp-player-living-vodend" v-if="isVodEnd && !isPlayering">
+        <div class="vmp-player-living-vodend" v-if="isVodEnd">
           <div class="vmp-player-living-vodend-try" v-if="isTryPreview">
             <h3>{{ $t('appointment.appointment_1013') }}</h3>
             <div>
@@ -58,7 +66,7 @@
             </div>
             <p class="replay-try" @click="replayPlay">
               <i class="vh-iconfont vh-line-refresh-left">
-                <b>{{ $t('appointment.appointment_1014') }}</b>
+                {{ $t('appointment.appointment_1014') }}
               </i>
             </p>
           </div>
@@ -153,7 +161,10 @@
             </div>
           </div>
           <div class="controller-tools-right">
-            <div class="controller-tools-right-lang" v-if="isEmbedVideo && !isSubscribe">
+            <div
+              class="controller-tools-right-lang"
+              v-if="isEmbedVideo && languageList.length > 1 && !isSubscribe"
+            >
               <span>{{ lang.label }}</span>
               <ul class="controller-tools-right-list controller-lang">
                 <li
@@ -238,7 +249,7 @@
         </div>
       </div>
       <!-- 试看和断点续播提示 -->
-      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini'">
+      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini' && isPlayering">
         <!-- 试看 -->
         <div v-if="vodType === 'shikan' && isTryPreview">
           <i18n path="appointment.appointment_1012">
@@ -249,7 +260,7 @@
             <i style="color: #fff">{{ $t('interact.interact_1020') }}</i>
             <b @click="authTryWatch(4)">{{ $t('appointment.appointment_1011') }}</b>
           </span>
-          <span v-else @click="authTryWatch()">{{ authText }}</span>
+          <span v-else class="red" @click="authTryWatch()">{{ authText }}</span>
           <i class="vh-iconfont vh-line-close" @click="vodType = ''"></i>
         </div>
         <!-- 断点续播 -->
@@ -269,18 +280,6 @@
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -289,6 +288,7 @@
     },
     data() {
       return {
+        loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
@@ -322,6 +322,9 @@
         hoveVideo: true, //显示控制条
         isLivingEnd: false, // 直播结束
         isVodEnd: false, // 回放结束
+        isAutoPlay: false,
+        lang: {},
+        languageList: [],
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -373,7 +376,7 @@
         );
       },
       isVisibleMiniElement() {
-        // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
+        // 添加插播桌面共享后，再添加插播桌面共享场景的处理
         return this.$domainStore.state.docServer.switchStatus;
       },
       isSubscribe() {
@@ -419,16 +422,8 @@
       if (this.isShowContainer) return;
       this.getWebinerStatus();
       if (this.isEmbedVideo) {
-        this.languageList = this.roomBaseServer.state.languages.langList.map(item => {
-          return langMap[item.language_type];
-        });
-        const curLang = this.roomBaseServer.state.languages.curLang;
-        this.lang =
-          langMap[sessionStorage.getItem('lang')] ||
-          langMap[this.$route.query.lang] ||
-          langMap[curLang.language_type];
-        this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.key);
+        this.languageList = this.roomBaseServer.state.languages.langList;
+        this.lang = this.roomBaseServer.state.languages.lang;
       }
     },
     mounted() {
@@ -438,53 +433,6 @@
       }
     },
     methods: {
-      listenEvents() {
-        // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-        if (this.playerServer.state.type === 'vod' && !this.isTryPreview) {
-          window.addEventListener('beforeunload', () => {
-            this.endTime = this.playerServer.getCurrentTime(() => {
-              console.log('获取当前视频播放时间失败----------');
-            });
-
-            this.totalTime = this.playerServer.getDuration(() => {
-              console.log('获取视频总时长失败');
-            });
-            const curLocalHistoryTime = window.sessionStorage.getItem(
-              this.roomBaseServer.state.watchInitData.paas_record_id
-            );
-            if (!curLocalHistoryTime && this.recordHistoryTime) {
-              return;
-            }
-            window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
-          });
-        }
-        // 全屏事件
-        const setFullscreen = () => {
-          const fullscreenElement =
-            document.fullscreenElement ||
-            document.webkitFullscreenElement ||
-            document.mozFullscreenElement ||
-            document.msFullscreenElement;
-          if (
-            fullscreenElement &&
-            fullscreenElement.className &&
-            fullscreenElement.className.indexOf('vmp-player-watch') != -1
-          ) {
-            this.isFullscreen = true;
-          } else {
-            this.isFullscreen = false;
-          }
-        };
-        clearTimeout(this.hoverVideoTimer);
-        this.hoverVideoTimer = setTimeout(() => {
-          this.hoveVideo = false;
-        }, 3000);
-        window.addEventListener('fullscreenchange', setFullscreen);
-        window.addEventListener('webkitfullscreenchange', setFullscreen);
-        window.addEventListener('mozfullscreenchange', setFullscreen);
-        window.addEventListener('msfullscreenchange', setFullscreen);
-        window.addEventListener('MSFullscreenChange', setFullscreen);
-      },
       // 初始化播放器配置项
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
@@ -568,11 +516,17 @@
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
           this.getQualitys(); // 获取清晰度列表和当前清晰度
+          this.listenEvents();
+          this.getListenPlayer();
           if (this.playerServer.state.type === 'vod') {
             this.eventPointList = this.playerServer.state.markPoints;
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+          } else {
+            if (this.isAutoPlay) {
+              this.play();
+            }
           }
         });
       },
@@ -681,7 +635,12 @@
       },
       // 播放
       play() {
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {
@@ -700,12 +659,11 @@
             tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
           })
           .then(res => {
-            if (res.code == 200) {
+            if (res.code === 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
               this.marquee = res.data['screen-config'].data;
               this.water = res.data['water-mark'].data;
               this.playerOtherOptions = res.data['basic-config'].data;
-              console.log(this.marquee, this.water, '??!23221423');
               this.initPlayer();
             }
           });
@@ -718,11 +676,14 @@
       },
       // 切换多语言
       changeLanguage(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       // 判断是直播还是回放 活动状态
-      getWebinerStatus() {
+      getWebinerStatus(info) {
+        if (info && info.autoPlay) {
+          this.isAutoPlay = info.autoPlay;
+        }
         const { webinar, warmup, record } = this.roomBaseServer.state.watchInitData;
         if (this.roomBaseServer.state.watchInitData.status === 'live') {
           if (webinar.type === 1) {
@@ -754,8 +715,6 @@
           // 暖场视频或者试看
           this.optionTypeInfo('vod', _id);
         }
-        this.listenEvents();
-        this.getListenPlayer();
       },
       optionTypeInfo(type, id) {
         // 暖场视频或者试看
@@ -882,6 +841,15 @@
     }
     #vhy-danmaku-wrapbox {
       z-index: 1;
+    }
+    .el-loading-spinner .el-loading-text {
+      color: #fff;
+    }
+    .el-loading-spinner .path {
+      stroke: #fb3a32;
+    }
+    .el-loading-mask {
+      z-index: 7;
     }
     &-living {
       &-background {

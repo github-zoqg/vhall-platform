@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
-    <!-- 发起抽奖 -->
+    <!-- 发起抽奖/问答 -->
     <template
       v-if="
         source.type == 'lottery_push' ||
@@ -9,7 +9,9 @@
       "
     >
       <div class="msg-item interact">
-        <div class="interact-msg">{{ source.content.text_content }}</div>
+        <div class="interact-msg">
+          {{ source.roleName | roleFilter }}{{ source.content.text_content }}
+        </div>
       </div>
     </template>
     <!-- 抽奖结果 -->
@@ -31,8 +33,13 @@
     <!-- 收到问卷 -->
     <template v-else-if="source.type == 'questionnaire_push'">
       <div class="msg-item interact">
-        <div class="interact-msg" @tap="checkQuestionDetail(source.content.questionnaire_id)">
-          1{{ source.content.text_content }},{{ $t('common.common_1030') }}
+        <div
+          class="interact-msg"
+          @tap="checkQuestionDetail(source.content.questionnaire_id)"
+          @click="checkQuestionDetail(source.content.questionnaire_id)"
+        >
+          {{ source.roleName | roleFilter }}{{ source.roleName != 1 ? source.nickname : ''
+          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
@@ -70,12 +77,6 @@
         <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
     </template>
-    <!-- 签到 -->
-    <template v-else-if="['sign_in_push'].includes(source.type)">
-      <div align="center" class="margin-top-bottom">
-        <p class="msg-item sign-msg">{{ source.content.text_content }}</p>
-      </div>
-    </template>
     <!-- 聊天消息 -->
     <template v-else>
       <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
@@ -90,7 +91,7 @@
               class="role"
               :class="source.roleName | roleClassFilter"
             >
-              {{ roleFilter(source.roleName) }}
+              {{ source.roleName | roleFilter }}
             </span>
             <span class="nickname">{{ source.nickname }}</span>
           </p>
@@ -114,7 +115,7 @@
                 <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
                 <span v-html="source.content.text_content"></span>
                 <img
-                  @tap="$emit('preview', img)"
+                  @click="$emit('preview', img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -131,7 +132,7 @@
               <div class="msg-content_body">
                 <span v-html="msgContent"></span>
                 <img
-                  @tap="previewImg(img)"
+                  @click="previewImg(img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -154,7 +155,7 @@
                 <span class="reply-color"></span>
                 <span v-html="source.content.text_content" style="display: block"></span>
                 <img
-                  @tap="previewImg(img)"
+                  @click="previewImg(img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -205,32 +206,6 @@
         msgContent: '',
         jiantou: require('../img/jiantou.png')
       };
-    },
-    computed: {
-      //角色转换
-      roleFilter() {
-        const _this = this;
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = _this.$t('chat.chat_1022');
-              break;
-            case 3:
-              ret = _this.$t('chat.chat_1024');
-              break;
-            case 4:
-              ret = _this.$t('chat.chat_1023');
-              break;
-            case 20:
-              ret = _this.$t('chat.chat_1064');
-              break;
-            default:
-              ret = _this.$t('chat.chat_1062');
-          }
-          return ret;
-        };
-      }
     },
     filters: {
       //角色标签样式

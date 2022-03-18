@@ -8,7 +8,13 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'comAllDialog'],
+    checkStartPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'checkStartPush'
+      }
+    ]
   },
   // 顶部header容器
   layerHeader: {
@@ -219,6 +225,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
@@ -240,6 +251,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
@@ -263,7 +279,13 @@ export const serverConfig = {
 
   // 桌面共享组件
   comDesktopScreen: {
-    component: 'VmpStreamDesktopScreen'
+    component: 'VmpStreamDesktopScreen',
+    emitClickEndDemonstrate: [
+      {
+        cuid: 'comDocUne',
+        method: 'handleEndDemonstrate'
+      }
+    ]
   },
   // 插播文件
   comMediaPlayMenu: {
@@ -462,6 +484,11 @@ export const serverConfig = {
     options: {
       //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
       platformType: 'live'
+    },
+    emitTabTips: {
+      cuid: ['comTabMenu'],
+      method: 'setTipsVisible',
+      args: ['$0']
     }
   },
   comQa: {
@@ -554,7 +581,8 @@ export const serverConfig = {
     emitInsertFileChange: [
       {
         cuid: 'comInsertStream',
-        method: 'startInertFile'
+        method: 'inertFileChange',
+        args: ['$0', '$1']
       }
     ]
   },
@@ -751,12 +779,12 @@ export const serverConfig = {
         method: 'startPush'
       }
     ],
-    emitClickEndLive: [
-      {
-        cuid: 'recordComStreamLocal',
-        method: 'stopPush'
-      }
-    ],
+    // emitClickEndLive: [
+    //   {
+    //     cuid: 'recordComStreamLocal',
+    //     method: 'stopPush'
+    //   }
+    // ],
     emitMediaSettingClick: [
       {
         cuid: 'comMediaSetting',
@@ -807,7 +835,18 @@ export const serverConfig = {
   // 【分屏页面】分屏组件
   splitScreenContainer: {
     component: 'VmpSplitScreen',
-    children: ['comStreamLocal']
+    children: ['splitScreenStreamLocal']
+  },
+  // 【分屏页面】本地流
+  splitScreenStreamLocal: {
+    component: 'VmpStreamLocal',
+    // 停止推流完成事件
+    emitClickUnpublishComplate: [
+      {
+        cuid: 'splitScreenContainer',
+        method: 'handleUnpublishComplate'
+      }
+    ]
   },
   // *******分屏页面****结束
 

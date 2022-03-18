@@ -53,7 +53,7 @@
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from './img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -89,8 +89,6 @@
         webinar: {},
         //是否隐藏聊天历史加载记录
         configList: {},
-        //在线的上麦状态 todo 待确认从哪里取全局的speakerList
-        onlineMicStatus: false,
         //当前页数
         page: 1,
         //是否已经下拉刷新
@@ -180,6 +178,27 @@
             video: false
           };
         }
+      },
+      //是否已上麦
+      onlineMicStatus() {
+        return (useMicServer().state.speakerList || []).some(item => {
+          return (
+            item.account_id == this.joinInfo.third_party_user_id ||
+            item.accountId == this.joinInfo.third_party_user_id
+          );
+        });
+      },
+      // 聊天区欢迎语
+      welcomeText() {
+        if (Array.isArray(this.roomBaseServer.state.customMenu?.list)) {
+          // 获取聊天菜单内容
+          const chatItem = this.roomBaseServer.state.customMenu.list.find(item => {
+            return item.type == 3;
+          });
+          // 返回欢迎语
+          return chatItem?.welcome_content || '';
+        }
+        return '';
       }
     },
     beforeCreate() {
@@ -199,10 +218,13 @@
       // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
-      console.log('useChatServer', useChatServer().state);
       this.listenChatServer();
+      this.showWelcomeTxt();
     },
     methods: {
+      showWelcomeTxt() {
+        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+      },
       //初始化视图数据
       initViewData() {
         const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
@@ -255,7 +277,7 @@
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$toast(this.$t('chat.chat_1007'));
         });
       },
       //处理分组讨论频道变更
@@ -268,8 +290,9 @@
       async getHistoryMessage() {
         const data = {
           room_id: this.roomId,
+          // webinar_id: this.webinar_id,
           pos: this.page * 10,
-          limit: 10 // 所有端统一显示50条
+          limit: 50 // 所有端统一显示50条
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
@@ -306,7 +329,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$refs.chatlist.scrollToBottom();
+          this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
         });

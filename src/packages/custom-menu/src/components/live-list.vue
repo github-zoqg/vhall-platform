@@ -17,7 +17,9 @@
               </label>
               <div class="scale8">
                 <span>{{ getLiveTag(item) }}</span>
-                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">| 无延迟</span>
+                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">
+                  | {{ $t('common.common_1023') }}
+                </span>
               </div>
             </span>
           </div>
@@ -39,21 +41,22 @@
   </div>
 </template>
 <script>
-  import { useCustomMenuServer } from 'middle-domain';
+  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
     props: ['checkedList', 'pagetype'],
     data() {
       return {
         activeList: [],
-        loading: false,
-        hasDelayPermission: false
+        loading: false
       };
     },
     computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList']),
       userId() {
         return this.watchInitData.join_info.third_party_user_id;
+      },
+      hasDelayPermission() {
+        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
       }
     },
     watch: {
@@ -69,9 +72,7 @@
     },
     beforeCreate() {
       this.customMenuServer = useCustomMenuServer();
-    },
-    mounted() {
-      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       getLiveTag(val) {
@@ -231,22 +232,21 @@
         margin: 4px 10px 0px 0px;
       }
     }
-    &__titleInfo {
-      height: 55px;
-    }
     &__title {
-      margin: 10px 0px 4px 0px;
+      margin: 10px 0 4px 0;
       font-size: 14px;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: #e6e6e6;
       line-height: 20px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
-      -webkit-box-orient: vertical;
       text-align: left;
+      /**autoprefixer: ignore next */
+      -webkit-box-orient: vertical;
+      max-height: 200px;
     }
     &__info {
       font-weight: 400;
@@ -340,6 +340,7 @@
       -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
     }
     &__info {
       font-size: 14px;

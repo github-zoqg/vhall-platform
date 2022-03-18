@@ -28,8 +28,8 @@ const htmlConfig = {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
-    iconfontCommon: '//at.alicdn.com/t/font_3128919_dcbhpaxzl9v.css',
-    iconfont: '//at.alicdn.com/t/font_3120276_xa4utodgrg8.css'
+    iconfontCommon: '//at.alicdn.com/t/font_3128919_6bfbf4ih4e4.css',
+    iconfont: '//at.alicdn.com/t/font_3120276_qfwcqqjapv.css'
   },
   // dns-prefetch
   dnsPrefetch: {

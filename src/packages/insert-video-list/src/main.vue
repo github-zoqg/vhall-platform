@@ -20,21 +20,33 @@
                 <br />
                 4.发起端插播文件仅支持本地插播，不会上传到活动下哦！
               </div>
-              <i class="iconfont iconicon_help_m"></i>
+              <i class="vh-iconfont vh-line-question"></i>
             </el-tooltip>
             <el-input
               v-model="searchKey"
               placeholder="请输入音视频文件名称"
               style="width: 220px; float: right"
-              @keyup.enter.native="getTableList(false)"
-              @clear="getTableList(false)"
+              @keyup.enter.native="
+                getTableList({
+                  isNeedResetPage: true
+                })
+              "
+              @clear="
+                getTableList({
+                  isNeedResetPage: true
+                })
+              "
               clearable
             >
               <i
                 slot="prefix"
                 class="el-icon-search el-input__icon"
                 style="cursor: pointer; line-height: 36px"
-                @click="getTableList(false)"
+                @click="
+                  getTableList({
+                    isNeedResetPage: true
+                  })
+                "
               ></i>
             </el-input>
           </div>
@@ -64,10 +76,10 @@
                   </p>
                   <p class="insert-header-item">
                     <i
-                      class="iconfont iconyinpinwenjian"
+                      class="vh-iconfont vh-fill-audio"
                       v-if="video.file_type == '.mp3' || video.file_type == '.mav'"
                     ></i>
-                    <i class="iconfont iconshipinwenjian" v-else></i>
+                    <i class="vh-iconfont vh-fill-video" v-else></i>
                     <span>{{ video.name }}</span>
                   </p>
                   <p class="insert-header-item">{{ video.created_at }}</p>
@@ -208,14 +220,8 @@
           isInsertFilePushing &&
           insertStreamInfo.userInfo.accountId != watchInitData.join_info.third_party_user_id
         ) {
-          const roleMap = {
-            1: '主持人',
-            3: '助理',
-            4: '嘉宾'
-          };
-
           this.$alert(
-            `${roleMap[insertStreamInfo.userInfo.role]}${
+            `${this.$getRoleName(insertStreamInfo.userInfo.role)}${
               insertStreamInfo.userInfo.role != 1 ? insertStreamInfo.userInfo.nickname : ''
             }正在插播文件，请稍后重试`,
             '',
@@ -284,20 +290,16 @@
       // 进入本地文件插播
       initLocalVideo(File) {
         console.log('本地插播上传的文件', File);
-        const insertFileServer = useInsertFileServer();
         const isGt5M = File.size / 1024 / 1024 / 1024 > 5;
         console.log(File.type, 'File.type');
         if (isGt5M) {
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
-        // 设置插播类型,local 本地插播   remote 云插播
-        console.log('insertFileServer.setInsertFileType', insertFileServer.setInsertFileType);
-        insertFileServer.setInsertFileType('local');
-        // 设置当前插播文件
-        insertFileServer.setLocalInsertFile(File);
 
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitInsertFileChange'));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitInsertFileChange', [File, 'local'])
+        );
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -395,21 +397,15 @@
             cancelButtonText: '取消',
             customClass: 'zdy-message-box',
             cancelButtonClass: 'zdy-confirm-cancel'
-          })
-            .then(() => {
-              insertFileServer.setRemoteInsertFile(video);
-              insertFileServer.setInsertFileType('remote');
-
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitInsertFileChange')
-              );
-            })
-            .catch(() => {});
+          }).then(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitInsertFileChange', [video, 'remote'])
+            );
+          });
         } else {
-          insertFileServer.setRemoteInsertFile(video);
-          insertFileServer.setInsertFileType('remote');
-
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitInsertFileChange'));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitInsertFileChange', [video, 'remote'])
+          );
         }
       },
       handleDelete(video) {
@@ -486,7 +482,7 @@
   .vmp-insert-video {
     &-wrap {
       &-search {
-        .iconicon_help_m {
+        .vh-line-question {
           margin-left: 10px;
           color: #999;
         }
@@ -533,13 +529,14 @@
             li {
               border-bottom: 1px solid #e6e6e6;
               .insert-header-item {
-                .iconfont {
-                  margin-right: 12px;
+                .vh-iconfont {
+                  margin-right: 14px;
+                  font-size: 18px;
                 }
-                .iconshipinwenjian {
+                .vh-fill-video {
                   color: #ff733c;
                 }
-                .iconyinpinwenjian {
+                .vh-fill-audio {
                   color: #10d3a8;
                 }
                 .insert-process-icon {

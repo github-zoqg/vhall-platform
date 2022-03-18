@@ -11,7 +11,6 @@
         <div class="vh-chose-active-item__cover">
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <!-- <i class="saasicon_redu"></i> -->
             <i class="vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
@@ -40,9 +39,6 @@
         hasDelayPermission: false
       };
     },
-    computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList'])
-    },
     watch: {
       checkedList: function () {
         this.getActiveList();
@@ -52,12 +48,10 @@
       this.customMenuServer = useCustomMenuServer();
     },
     created() {
-      // this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
       this.getActiveList();
     },
     methods: {
       linkSubject(id) {
-        // window.open(window.location.protocol + process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY + `/special/detail?id=${id}&delay=${this.hasDelayPermission ? 1 : 0}`)
         window.open(
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
@@ -66,7 +60,7 @@
         );
       },
       async getActiveList() {
-        if (this.checkedList.length == 0) {
+        if (this.checkedList.length === 0) {
           this.activeList = [];
           return;
         }
@@ -111,7 +105,7 @@
     flex-direction: column;
     overflow: hidden;
     width: 300px;
-    height: 250px;
+    height: 266px;
     margin: 20px 14px;
     border-radius: 6px;
     background: #f7f7f7;
@@ -193,7 +187,6 @@
       width: 100%;
       height: 36px;
       font-size: 28px;
-      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: #1a1a1a;
       line-height: 36px;
@@ -206,9 +199,9 @@
       font-weight: 400;
       word-break: keep-all;
       white-space: nowrap;
-      font-size: 12px;
+      font-size: 24px;
       color: @font-dark-low;
-      line-height: 16px;
+      line-height: 42px;
       text-align: left;
       padding: 0px 8px;
     }

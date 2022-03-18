@@ -1,6 +1,6 @@
 <template>
   <div class="vhall-question" v-if="dialogVisible">
-    <div class="vhall-question-box">
+    <div class="vhall-question-box" :style="{ zIndex: zIndexServerState.zIndexMap.questionnaire }">
       <div class="question-box">
         <div class="question-close" @click="dialogVisible = false">
           <i class="vh-iconfont vh-line-close"></i>
@@ -13,24 +13,19 @@
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  import {
+    useQuestionnaireServer,
+    useChatServer,
+    useZIndexServer,
+    useMsgServer
+  } from 'middle-domain';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaireWatch',
-    props: {
-      timeInfo: {
-        require: true,
-        default: () => {
-          return {
-            start_time: '',
-            end_time: ''
-          };
-        },
-        type: Object
-      }
-    },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         dialogVisible: false,
         questionLastId: '', // 最后一个问卷id
         questionnaireId: '' // 问卷Id
@@ -38,6 +33,8 @@
     },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
+      this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
@@ -59,6 +56,7 @@
             });
           } else {
             this.dialogVisible = true;
+            this.zIndexServer.setDialogZIndex('questionnaire');
             this.$nextTick(() => {
               this.questionnaireServer.renderQuestionnaire4Watch(
                 '#qs-preview-box-content',
@@ -71,16 +69,27 @@
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
           useChatServer().addChatToList({
+            nickname: msg.nick_name,
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
               text_content: this.$t('chat.chat_1030'),
               questionnaire_id: msg.questionnaire_id
             },
             roleName: msg.room_role,
-            type: msg.data.type,
+            type: msg.type,
             interactStatus: true,
             isCheck: true
           });
+          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+            msg.questionnaire_id
+          );
+          if (canAnswer !== true) {
+            this.questionnaireServer.setDotVisible(false);
+            return false;
+          }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('questionnaire');
+          this.questionnaireServer.setDotVisible(true);
           await this.$nextTick(); // 等dom渲染
           this.questionnaireServer.renderQuestionnaire4Watch(
             '#qs-preview-box-content',
@@ -99,35 +108,15 @@
             });
           }
         });
-      },
-
-      checkedQuestion(id, flag) {
-        this.$vhallapi.question
-          .checkSurvey({
-            survey_id: id,
-            webinar_id: this.webinarId
-          })
-          .then(res => {
-            if (res.data) {
-              // 未提交
-              this.chatPreview(id, false);
-            } else {
-              this.loading = false;
-              if (flag) {
-                this.$message({
-                  message: this.$t('form.form_1037'),
-                  showClose: true,
-                  type: 'success',
-                  customClass: 'zdy-info-box'
-                });
-              }
-            }
-          });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
+        });
       }
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .vhall-question-box {
     width: 100%;
     height: 100%;
@@ -138,7 +127,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 27;
     .question-box {
       float: left;
       left: 0;
@@ -175,10 +163,10 @@
       }
     }
   }
-  /deep/.el-loading-spinner .path {
+  .el-loading-spinner .path {
     stroke: #fb3a32;
   }
-  /deep/.el-loading-spinner .el-loading-text {
+  .el-loading-spinner .el-loading-text {
     color: #1a1a1a;
   }
   .vhall-question {

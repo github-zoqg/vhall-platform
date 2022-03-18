@@ -16,7 +16,7 @@ const serverConfig = {
       'comWapRewardEffect',
       'comGoodsDetail',
       'comUserAccountWap',
-      'compQuestionnaireWap'
+      'comQuestionnaireWap'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
@@ -82,10 +82,18 @@ const serverConfig = {
   // 播放器容器和推流容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
   },
   comWapPlayer: {
-    component: 'VmpWapPlayer'
+    component: 'VmpWapPlayer',
+    emitCheckAuth: [
+      //权限验证
+      {
+        cuid: 'comSubcribeWapBody',
+        method: 'playerAuthCheck',
+        args: ['$0'] // 获取动态参数的第一个
+      }
+    ]
   },
   comWapStreamList: {
     component: 'VmpWapStreamList',
@@ -93,6 +101,9 @@ const serverConfig = {
   },
   comWapDesktopScreen: {
     component: 'VmpWapDesktopScreen'
+  },
+  comWapInsertFIle: {
+    component: 'VmpWapInsertFIle'
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
@@ -132,6 +143,17 @@ const serverConfig = {
     emitClickLotteryIcon: {
       cuid: ['comLotteryWap'],
       method: 'open'
+    },
+    // 红包弹窗
+    emitClickRedPacketIcon: {
+      cuid: ['comRedPacketWap'],
+      method: 'open'
+    },
+    // 问卷弹窗
+    emitClickQuestionnaireIcon: {
+      cuid: ['comQuestionnaireWap'],
+      method: 'open',
+      args: ['$0']
     }
   },
   // notice横幅
@@ -151,7 +173,7 @@ const serverConfig = {
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001' }, // 文档
+        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, // 文档
         { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
         { type: 'private', cuid: 'comPrivateChatWap', text: 'common.common_1008' }, // 私聊
         { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
@@ -233,7 +255,7 @@ const serverConfig = {
       args: ['$0']
     },
     emitClickQuestionnaireChatItem: {
-      cuid: ['comQuestionnaire'],
+      cuid: ['comQuestionnaireWap'],
       method: 'open',
       args: ['$0']
     },
@@ -284,7 +306,7 @@ const serverConfig = {
     ],
     emitShowMenuTab: {
       cuid: ['comTabMenuWap'],
-      method: 'setVisible',
+      method: 'changeDocStatus',
       args: ['$0']
     },
     children: ['comInteractToolsWap'],
@@ -351,23 +373,12 @@ const serverConfig = {
       }
     ]
   },
-  // 红包
-  compRedPacketWap: {
-    component: 'VmpRedPacketWap',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLoginWap',
-        method: 'open'
-      }
-    ]
-  },
   // 章节
   comChapterWap: {
     component: 'VmpChapterWap'
   },
   // 问卷
-  compQuestionnaireWap: {
+  comQuestionnaireWap: {
     component: 'VmpQuestionnaireWap',
     emitQuestionnaireVisible: [
       // 问卷弹窗的显示和隐藏(全屏)
@@ -383,7 +394,7 @@ const serverConfig = {
 
   subcribeRoot: {
     component: 'VmpAirContainer',
-    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog']
+    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog', 'comGoodsDetail']
   },
   // 顶部header容器
   subcribeHeader: {
@@ -416,6 +427,8 @@ const serverConfig = {
   comSubcribeTabMenuWap: {
     component: 'VmpTabMenuWap',
     options: {
+      // 是否展示左右按钮
+      isToggleBtnVisible: false,
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
@@ -428,11 +441,25 @@ const serverConfig = {
       ]
     }
   },
+  // 红包
   comRedPacketWap: {
-    component: 'VmpRedPacketWap'
+    component: 'VmpRedPacketWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
   },
   comInviteHandup: {
-    component: 'VmpInviteHandup'
+    component: 'VmpInviteHandup',
+    emitAgreeInvite: [
+      {
+        cuid: 'comWapStreamLocal',
+        method: 'updateAutoSpeak'
+      }
+    ]
   }
 };
 

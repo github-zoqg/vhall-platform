@@ -22,7 +22,7 @@
       :class="userInfo.role_name | roleClassFilter"
       v-if="![2, '2'].includes(userInfo.role_name)"
     >
-      {{ roleFilter(userInfo.role_name) }}
+      {{ userInfo.role_name | roleFilter }}
     </span>
     <div class="vmp-member-item__control">
       <template v-if="memberOptions.platformType === 'live'">
@@ -178,7 +178,6 @@
             tabIndex === 1 &&
             ['1', '3', '20', 1, 3, 20].includes(roleName) &&
             [2, '2'].includes(userInfo.role_name) &&
-            [2, '2'].includes(userInfo.device_type) &&
             [0, '0'].includes(userInfo.is_banned) &&
             ![2, '2'].includes(userInfo.device_status)
           "
@@ -197,7 +196,7 @@
           <!-- 显示条件：当前登录者是主持人  正在上麦 -->
           <i
             v-if="
-              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId !== userInfo.account_id
+              [1, '1'].includes(isInteract) && userInfo.is_speak && leaderId != userInfo.account_id
             "
             class="vmp-member-item__control__down-mic"
             @click="downMic(userInfo.account_id)"
@@ -366,9 +365,7 @@
         }
       }
     },
-    mounted() {
-      console.log(this.currentSpeakerId, '当前主讲人的id');
-    },
+    mounted() {},
     data() {
       return {
         //默认头像
@@ -481,30 +478,6 @@
       }
     },
     computed: {
-      //角色转换
-      roleFilter() {
-        const _this = this;
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = _this.$t('chat.chat_1022');
-              break;
-            case 3:
-              ret = _this.$t('chat.chat_1024');
-              break;
-            case 4:
-              ret = _this.$t('chat.chat_1023');
-              break;
-            case 20:
-              ret = _this.$t('chat.chat_1064');
-              break;
-            default:
-              ret = '';
-          }
-          return ret;
-        };
-      },
       //人员操作项是否显示(PC发起)
       showUserControl() {
         return (
@@ -518,7 +491,7 @@
       },
       //发起端演示的是否是选中的用户
       isLiveInviteDisable() {
-        return this.userInfo.account_id == this.currentSpeakerId;
+        return this.userInfo.account_id == this.presentationScreen;
       },
       //观看端演示的是否是选中的用户
       isWatchInviteDisable() {
@@ -568,7 +541,7 @@
       //PC观看端设为组长
       isShowWatchSetLeader() {
         return (
-          this.tabIndex !== 3 &&
+          this.tabIndex === 1 &&
           [2, '2'].includes(this.userInfo.role_name) &&
           [2, '2'].includes(this.userInfo.device_type) &&
           [0, '0'].includes(this.userInfo.is_banned) &&
@@ -607,7 +580,7 @@
       },
       //是否显示邀请演示操作选项(PC观看)
       isShowWatchInvitation() {
-        if ([1, 2].includes(this.tabIndex)) {
+        if (this.tabIndex === 1) {
           return (
             this.isInteract &&
             [2, '2'].includes(this.userInfo.device_type) &&

@@ -8,7 +8,7 @@
       get-container="#connectMicPopupContainer"
     >
       <div class="invite-box">
-        <p class="invite-desc">是否接受上麦邀请，请确认？</p>
+        <p class="invite-desc">{{ $t('interact.interact_1031', { n: roleName }) }}</p>
         <div class="invite-btn-box">
           <button class="btn btn-agree" @click="customAgreeConnect">
             {{ $t('interact.interact_1009') }}
@@ -22,6 +22,7 @@
 </template>
 <script>
   import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpInviteHandup',
     data() {
@@ -29,6 +30,7 @@
         refusedText: this.$t('interact.interact_1010'),
         showInviteConnectMic: false, // 邀请上麦弹框展示
         inviteFun: null,
+        roleName: this.$t('chat.chat_1022'),
         isWaitting: false,
         inviteTime: 30,
         senderId: ''
@@ -40,6 +42,9 @@
       },
       roomBaseState() {
         return useRoomBaseServer().state;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     mounted() {
@@ -58,6 +63,11 @@
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
+          }
+          if (this.isInGroup) {
+            this.roleName = this.$t('chat.chat_1064');
+          } else {
+            this.roleName = this.$t('chat.chat_1022');
           }
           this.senderId = temp.sender_id;
           this.showInviteConnectMic = true;
@@ -91,6 +101,10 @@
             extra_params: this.senderId
           })
           .then(res => {
+            if (res.code !== 200) {
+              this.$message.error(res.msg);
+            }
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             useMicServer().userSpeakOn();
             clearInterval(this.inviteFun);
             this.inviteTime = 30;

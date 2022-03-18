@@ -27,7 +27,10 @@
               chatOptions && chatOptions.userControlOptions && chatOptions.userControlOptions.enable
             "
           >
-            <div class="normal-msg__avatar" @click="setPersonStatus($event, source)">
+            <div
+              :class="['normal-msg__avatar', 'cur-pointer']"
+              @click="setPersonStatus($event, source)"
+            >
               <img class="normal-msg__avatar-img" :src="source.avatar" alt />
               <img
                 v-if="source.client === 'h5_browser'"
@@ -55,9 +58,23 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">
-                {{ source.nickname }}
-              </span>
+              <template>
+                <span
+                  :class="['info-wrap__nick-name', 'cur-pointer']"
+                  @click="setPersonStatus($event, source)"
+                  v-if="
+                    chatOptions &&
+                    chatOptions.userControlOptions &&
+                    chatOptions.userControlOptions.enable
+                  "
+                >
+                  {{ source.nickname }}
+                </span>
+                <span class="info-wrap__nick-name" v-else>
+                  {{ source.nickname }}
+                </span>
+              </template>
+
               <span
                 v-if="
                   (source.type === 'text' || source.type === 'image' || source.isHistoryMsg) &&
@@ -67,7 +84,7 @@
                 class="info-wrap__role-name"
                 :class="source.roleName | roleClassFilter"
               >
-                {{ source.roleName | roleFilter(this) }}
+                {{ source.roleName | roleFilter }}
               </span>
             </p>
             <!-- 被回复的消息 -->
@@ -138,7 +155,9 @@
               class="normal-msg__content-wrapper"
               v-html="
                 source.replyMsg && source.replyMsg.content
-                  ? `<span class='normal-msg__content-wrapper__label'>回复&nbsp;</span> ${msgContent}`
+                  ? `<span class='normal-msg__content-wrapper__label'>${$t(
+                      'chat.chat_1036'
+                    )}&nbsp;</span> ${msgContent}`
                   : msgContent
               "
             ></p>
@@ -149,7 +168,7 @@
                 v-if="source.replyMsg && source.replyMsg.content && !source.content.text_content"
                 class="normal-msg__img-wrapper__label"
               >
-                回复
+                {{ $t('chat.chat_1036') }}
               </span>
               <p class="msg-item__content-hr"></p>
               <div
@@ -163,7 +182,7 @@
                   width="34"
                   height="34"
                   :src="img"
-                  alt="聊天图片加载失败"
+                  alt="$t('chat.chat_1065')"
                   @click="previewImg(index, source.content.image_urls)"
                 />
               </div>
@@ -181,14 +200,14 @@
               v-show="source.nickname && source.roleName != 1"
               class="interact-content__nick-name"
             >
-              {{ source.nickname }}
+              {{ source.nickname | overHidden(8) }}
             </span>
             <span
               v-show="source.roleName"
               class="interact-content__role-name"
               :class="source.roleName | roleClassFilterForMsg"
             >
-              {{ source.roleName | roleFilter(this) }}
+              {{ source.roleName | roleFilter }}
             </span>
             <img
               v-if="source.type == 'red_envelope_ok'"
@@ -217,7 +236,9 @@
             </span>
             <span>
               {{
-                source.type === 'reward_pay_ok' ? '打赏了红包' : `送出${source.content.gift_name}`
+                source.type === 'reward_pay_ok'
+                  ? $t('chat.chat_1029')
+                  : `${$t('chat.chat_1032')}${source.content.gift_name}`
               }}
             </span>
             <img
@@ -320,27 +341,6 @@
           return val.substring(0, len) + '...';
         }
         return val;
-      },
-      //角色转换
-      roleFilter: (value, vm) => {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = vm.$t('chat.chat_1022');
-            break;
-          case 3:
-            ret = vm.$t('chat.chat_1024');
-            break;
-          case 4:
-            ret = vm.$t('chat.chat_1023');
-            break;
-          case 20:
-            ret = vm.$t('chat.chat_1064');
-            break;
-          default:
-            ret = vm.$t('chat.chat_1062');
-        }
-        return ret;
       },
       //角色标签样式
       roleClassFilter(value) {
@@ -735,7 +735,7 @@
         display: flex;
         justify-content: center;
         &-content {
-          margin: 20px 46px 0;
+          // margin: 20px 46px 0;
           line-height: 20px;
           padding: 5px 16px;
           background-color: #222222;
@@ -769,11 +769,11 @@
           }
           &.assistant {
             background-color: rgba(166, 166, 166, 0.15);
-            color: #a6a6a6;
+            color: #3562fa;
           }
           &.guest {
             background-color: rgba(53, 98, 250, 0.2);
-            color: #3562fa;
+            color: #a6a6a6;
           }
         }
         .interact-content__redpackage-img {

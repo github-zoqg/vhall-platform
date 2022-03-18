@@ -22,7 +22,7 @@
             class="role"
             :class="source.roleName | roleClassFilter"
           >
-            {{ roleFilter(source.roleName) }}
+            {{ source.roleName | roleFilter }}
           </span>
           <span class="nickname">{{ source.nickname }}</span>
         </p>
@@ -57,6 +57,11 @@
         default: () => ({})
       }
     },
+    computed: {
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
+      }
+    },
     filters: {
       //角色标签样式
       roleClassFilter(value) {
@@ -70,28 +75,6 @@
         }
         //游客
         return 'guest';
-      }
-    },
-    methods: {
-      roleFilter(value) {
-        let ret = '';
-        switch (value) {
-          case 1:
-          case 'host':
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 3:
-          case 'assistant':
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 4:
-          case 'guest':
-            ret = this.$t('chat.chat_1023');
-            break;
-          default:
-            ret = this.$t('chat.chat_1062');
-        }
-        return ret;
       }
     }
   };

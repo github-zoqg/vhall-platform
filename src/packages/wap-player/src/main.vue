@@ -4,12 +4,7 @@
       <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
       <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
     </div>
-    <div
-      v-show="!isNoBuffer"
-      id="videoWapBox"
-      class="vmp-wap-player-video"
-      @click.stop="videoShowIcon"
-    >
+    <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
       <!-- 播放器背景图片 -->
       <div class="vmp-wap-player-prompt" v-if="isShowPoster">
         <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
@@ -20,7 +15,11 @@
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
-      <div id="vmp-wap-player">
+      <div
+        id="vmp-wap-player"
+        style="width: 100%; height: 100%"
+        @click.stop.prevent="videoShowIcon"
+      >
         <!-- 视频容器 -->
       </div>
       <!-- 直播结束 -->
@@ -33,8 +32,8 @@
         class="vmp-wap-player-ending"
         :style="`backgroundImage: url('${webinarsBgImg}')`"
       >
-        <!-- 试看播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
+        <!-- 试看播放结束 和线上保持一致 -->
+        <!-- <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
           <p class="vmp-wap-player-ending-box-title">{{ $t('appointment.appointment_1013') }}</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
@@ -47,13 +46,13 @@
               {{ authText }}
             </span>
           </div>
-          <p class="tryKan" @click="startPlay">
+          <p class="vmp-wap-player-ending-box-title" @click="startPlay">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
-        </div>
+        </div> -->
         <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" v-else @click="startPlay">
+        <div class="vmp-wap-player-ending-box" @click="startPlay">
           <p class="vmp-wap-player-ending-box-noraml">
             <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
           </p>
@@ -83,7 +82,7 @@
           </i18n>
         </span>
       </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条 -->
+      <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
       <div
         class="vmp-wap-player-footer"
         v-show="isPlayering"
@@ -102,7 +101,8 @@
           </span>
         </div>
         <div class="vmp-wap-player-control">
-          <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
+          <!-- 试看逻辑不加 按照线上 -->
+          <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
               <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
             </i18n>
@@ -119,7 +119,7 @@
               {{ authText }}
             </span>
             <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
-          </div>
+          </div> -->
           <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
             <i18n path="player.player_1012">
               <span place="n" class="red">{{ currentTime | secondToDate }}</span>
@@ -127,7 +127,7 @@
             <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
           </div>
           <div class="vmp-wap-player-control-slider">
-            <div v-if="eventPointList.length" ref="vhTailoringWrap">
+            <div v-if="eventPointList.length && totalTime && !isWarnPreview" ref="vhTailoringWrap">
               <controlEventPoint
                 v-for="(item, index) in eventPointList"
                 :key="'controlEventPoint' + index"
@@ -248,18 +248,7 @@
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -292,8 +281,8 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id) {
+        const { warmup, webinar, join_info } = this.roomBaseState.watchInitData;
+        if (warmup && warmup.warmup_paas_record_id && join_info.is_subscribe == 1) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -355,6 +344,7 @@
         endTime: '', // 播放到结束时刷新页面
         eventPointList: [], //
         isVodEnd: false, // 回放结束
+        isAutoPlay: false, // 记录下麦后自动播放
         marquee: {}, // 跑马灯
         water: {}, //水印
         playerOtherOptions: {
@@ -363,6 +353,7 @@
           speed: 0,
           autoplay: false
         },
+        isOrientation: false,
         lang: {},
         languageList: []
       };
@@ -379,19 +370,17 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
-      this.languageList = this.roomBaseState.languages.langList.map(item => {
-        return langMap[item.language_type];
-      });
-      const curLang = this.roomBaseState.languages.curLang;
-      this.lang =
-        langMap[sessionStorage.getItem('lang')] ||
-        langMap[this.$route.query.lang] ||
-        langMap[curLang.language_type];
-      this.$i18n.locale = this.lang.type;
-      sessionStorage.setItem('lang', this.lang.key);
+      this.languageList = this.roomBaseServer.state.languages.langList;
+      this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
       this.getWebinerStatus();
+      // if (window.orientation == 90 || window.orientation == -90) {
+      //   this.isOrientation = true;
+      //   this.setFullscreen();
+      // } else {
+      //   this.isOrientation = false;
+      // }
     },
     methods: {
       startPlay() {
@@ -401,14 +390,22 @@
       play() {
         this.iconShow = false;
         this.fiveDown();
-        this.playerServer && this.playerServer.play();
+        // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
+        try {
+          this.playerServer && this.playerServer.play();
+        } catch (error) {
+          console.log(error);
+        }
       },
       // 暂停
       pause() {
         this.playerServer && this.playerServer.pause();
       },
       // 判断是直播还是回放 活动状态
-      getWebinerStatus() {
+      getWebinerStatus(info) {
+        if (info && info.autoPlay) {
+          this.isAutoPlay = info.autoPlay;
+        }
         const { webinar, warmup, record } = this.roomBaseState.watchInitData;
         if (this.roomBaseState.watchInitData.status === 'live') {
           if (webinar.type === 1) {
@@ -493,6 +490,10 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+          } else {
+            if (this.isAutoPlay) {
+              this.play();
+            }
           }
           this.playerServer.openControls(false);
           this.playerServer.openUI(false);
@@ -619,8 +620,11 @@
       refresh() {
         window.location.reload();
       },
-      handleAuth() {
-        console.log('shikan试看权限');
+      handleAuth(type) {
+        let params = {
+          type: this.authText == 6 ? type : this.roomBaseServer.state.watchInitData.webinar.verify
+        };
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCheckAuth', params));
       },
       openSpeed() {
         this.iconShow = true;
@@ -646,12 +650,19 @@
       },
       changeLang(key) {
         this.isOpenlang = false;
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       openLanguage() {
         this.iconShow = true;
         this.isOpenlang = true;
+      },
+      showLabelFun(eventTime) {
+        this.sliderVal = (eventTime / this.totalTime) * 100;
+        this.playerServer.setCurrentTime(eventTime, () => {
+          this.$toast('调整播放时间失败');
+        });
+        this.playerServer.play();
       },
       replay() {
         this.isVodEnd = false;
@@ -664,6 +675,10 @@
   .vmp-wap-player {
     height: 100%;
     width: 100%;
+    &-video {
+      height: 100%;
+      width: 100%;
+    }
     // position: relative;
     &-opcity-flase {
       // opacity: 0;
@@ -792,13 +807,13 @@
           font-size: 28px;
         }
         &-try {
-          padding-top: 24px;
+          padding: 24px 0;
           span {
             display: inline-block;
             background: #fb3a32;
             color: #fff;
-            height: 64px;
-            line-height: 64px;
+            height: 56px;
+            line-height: 56px;
             font-size: 24px;
             border-radius: 32px;
             text-align: center;
@@ -816,8 +831,9 @@
           }
           &-see {
             font-size: 24px;
+            padding: 0 24px;
             color: #fff;
-            padding-top: 40px;
+            margin: 20px 0;
           }
         }
       }
@@ -934,7 +950,7 @@
         background: rgba(0, 0, 0, 0.7);
         box-shadow: 0px 4px 8px 0px rgba(118, 118, 118, 0.2);
         border-radius: 32px 32px 32px 0px;
-        padding: 0 24px;
+        padding: 5px 24px;
         &-red {
           color: #fb2626;
           margin: 0px 4px;

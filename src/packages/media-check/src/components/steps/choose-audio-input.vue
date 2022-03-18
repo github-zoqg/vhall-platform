@@ -73,6 +73,7 @@
         const mediaOptions = { audio: { deviceId: this.selectedAudioDeviceId } };
         const stream = await navigator.mediaDevices.getUserMedia(mediaOptions);
         stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -3');
           trackInput.stop();
         });
         this.$refs.previewAudio.initAudio(this.selectedId);
@@ -94,7 +95,6 @@
     .vh-media-check-selector {
       display: flex;
       align-items: center;
-      margin-top: 11px;
 
       label {
         flex: 0;
@@ -109,7 +109,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip

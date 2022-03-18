@@ -63,7 +63,7 @@
                     assistantRole: item.context.role_name == 4 || item.context.role_name == 3
                   }"
                 >
-                  {{ item.context.role_name | filterRoleName }}
+                  {{ item.context.role_name | roleFilter }}
                 </span>
               </div>
               <span class="private-content-li-content-time">
@@ -142,17 +142,6 @@
       };
     },
     filters: {
-      filterRoleName(val) {
-        if (val == 1) {
-          return '主持人';
-        } else if (val == 3) {
-          return '助理';
-        } else if (val == 4) {
-          return '嘉宾';
-        } else {
-          return '';
-        }
-      },
       filterNickName(val) {
         if (val && val.length > 8) {
           return val.substring(0, 8) + '...';

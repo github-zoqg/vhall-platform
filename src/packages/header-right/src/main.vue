@@ -1,9 +1,9 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
-      <record-control v-if="configList['cut_record']"></record-control>
+      <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="roleName == 1">
+      <template v-if="roleName == 1 && !isInGroup">
         <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
@@ -21,7 +21,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && isLiving">
+      <template v-if="roleName == 4 && isLiving && !isInGroup">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -88,7 +88,8 @@
     useRoomBaseServer,
     useMicServer,
     useInteractiveServer,
-    useSubscribeServer
+    useSubscribeServer,
+    useSplitScreenServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -146,6 +147,10 @@
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       }
     },
     components: {
@@ -156,6 +161,7 @@
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
+      this.splitScreenServer = useSplitScreenServer();
       this.initConfig();
       this.listenEvents();
     },
@@ -165,6 +171,10 @@
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
         this.liveStep = 2;
+        // 如果开启了分屏
+        if (this.splitScreenServer.state.isOpenSplitScreen) {
+          this.handlePublishComplate();
+        }
       }
     },
     methods: {
@@ -172,7 +182,7 @@
       handleApplyClick() {
         useMicServer()
           .userApply()
-          .then(res => {
+          .then(() => {
             this.isApplying = true;
             this.applyTime = 30;
             this._applyInterval = setInterval(async () => {
@@ -193,7 +203,7 @@
       handleApplyCancleClick() {
         useMicServer()
           .userCancelApply()
-          .then(res => {
+          .then(() => {
             this.isApplying = false;
             this.applyTime = 30;
             clearInterval(this._applyInterval);
@@ -203,8 +213,10 @@
       async handleSpeakOffClick() {
         // 下麦接口停止推流，成功之后执行下面的逻辑
         const { code, msg } = await useMicServer().speakOff();
-        if (code === 513035) {
-          this.$message.error(msg);
+        if (parseInt(this.roleName) !== 4) {
+          if (code !== 200) {
+            this.$message.error(msg);
+          }
         }
         this.isApplying = false;
         this.applyTimerCount = 30;
@@ -334,6 +346,9 @@
       },
       // 结束直播/录制
       handleEndClick() {
+        if (this.splitScreenServer.state.isHostWaitingSplit) {
+          return this.$message.warning('请分屏关闭完成以后结束直播');
+        }
         if (this.isRecord) {
           this.handleEndClickInRecord();
         } else {
@@ -349,6 +364,11 @@
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type
         });
+        // 如果开启了分屏
+        if (this.splitScreenServer.state.isOpenSplitScreen) {
+          this.splitScreenServer.staet.isOpenSplitScreen = false;
+          return;
+        }
 
         if (res.code == 200 && interactToolStatus.start_type == 4) {
           // 如果是第三方推流直接生成回放

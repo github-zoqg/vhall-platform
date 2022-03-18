@@ -3,7 +3,7 @@
     <main>
       <section
         style="height: 100%"
-        v-for="tab of menu"
+        v-for="tab of filterMenu"
         :key="tab.cuid"
         v-show="curItem.cuid === tab.cuid"
       >
@@ -26,6 +26,18 @@
       return {
         curItem: {}
       };
+    },
+    computed: {
+      filterMenu() {
+        let set = [];
+        for (const item of this.menu) {
+          if (set.every(i => i.cuid !== item.cuid)) {
+            set.push(item);
+          }
+        }
+
+        return [...set];
+      }
     },
 
     methods: {

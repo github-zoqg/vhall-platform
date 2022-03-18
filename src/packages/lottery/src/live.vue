@@ -10,7 +10,7 @@
       :lottery-info="lotteryInfo"
       :disabled-time="disabledTime"
       @close="close"
-      @end="handleEndLottery"
+      @end="endLottery"
     />
     <lottery-winner
       mode="live"
@@ -57,20 +57,46 @@
         lotteryServer: this.lotteryServer
       };
     },
-    mounted() {
-      if (this.mode === 'live') {
-        this.coutDown();
-      }
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({
         mode: 'live'
       });
     },
+    created() {
+      this.initMsgEvent();
+    },
+    mounted() {
+      if (this.mode === 'live') {
+        this.coutDown();
+      }
+    },
     destroyed() {
+      this.removeMsgEvent();
       this.clearTimer();
     },
     methods: {
+      initMsgEvent() {
+        //监听结束抽奖
+        this.lotteryServer.$on(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
+      },
+      removeMsgEvent() {
+        this.lotteryServer.$off(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
+      },
+      // 抽奖结束(需要同步助理/嘉宾)
+      callBackResultNotice(msg) {
+        const lotteryId = msg.data.lottery_id;
+        this.lotteryServer.getWinnerList(lotteryId).then(res => {
+          this.winLotteryUserList = res.data.list;
+          this.prizeShow = false;
+          this.lotteryResultShow = true;
+        });
+      },
       // 开始计时
       coutDown() {
         this.clearTimer();
@@ -127,28 +153,10 @@
         this.prizeShow = false; // 抽奖中
         this.dialogVisible = false;
       },
-      // 结束抽奖
-      handleEndLottery() {
+      // 结束抽奖()
+      endLottery() {
         if (!this.lotteryInfoId) return;
-        return this.lotteryServer.endLottery(this.lotteryInfoId).then(res => {
-          if (res.code === 200) {
-            this.winLotteryUserList = res.data.lottery_users;
-            // console.warn('抽奖完成', res.data, res.data.award_snapshoot);
-            // this.closeShow = true;
-            // this.lotteryResultShow = true;
-            // this.lotteryEndResult = res.data.lottery_users; // 中奖用户人信息列表
-            // this.lotteryResultObj.url =
-            //   res.data.award_snapshoot && res.data.award_snapshoot.image_url
-            //     ? res.data.award_snapshoot.image_url
-            //     : '';
-            // this.lotteryResultObj.text =
-            //   res.data.award_snapshoot && res.data.award_snapshoot.award_name
-            //     ? res.data.award_snapshoot.award_name
-            //     : '';
-            this.prizeShow = false;
-            this.lotteryResultShow = true;
-          }
-        });
+        return this.lotteryServer.endLottery(this.lotteryInfoId);
       },
       /**
        * @description 重新开始一轮抽奖
@@ -176,7 +184,7 @@
           title: payload.title,
           img_order: payload.img_order
         };
-        this.prizeObj = payload.award_snapshoot;
+        this.prizeInfo = payload.award_snapshoot;
         this.prizeShow = true;
         this.lotteryContentShow = false;
         this.lotteryInfo = payload;
@@ -185,15 +193,12 @@
   };
 </script>
 <style lang="less">
-  @fontRegular: ' PingFangSC-Regular';
-
   .vhall-lottery {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
     .el-form-item__label {
@@ -232,7 +237,6 @@
           font-size: 20px;
           font-weight: 600;
           line-height: 56px;
-          // padding-top: 10px;
         }
         &--close {
           position: absolute;
@@ -271,9 +275,8 @@
           }
           p {
             font-size: 14px;
-            font-family: @fontRegular;
             font-weight: 400;
-            color: #222222;
+            color: #222;
             line-height: 22px;
             margin-bottom: 12px;
           }
@@ -304,9 +307,8 @@
             padding-left: 20px;
             line-height: 42px;
             font-size: 14px;
-            font-family: @fontRegular;
             font-weight: 400;
-            color: #222222;
+            color: #222;
             img {
               width: 24px;
               height: 24px;
@@ -329,9 +331,8 @@
             }
             p {
               font-size: 16px;
-              font-family: @fontRegular;
               font-weight: 400;
-              color: #222222;
+              color: #222;
               line-height: 22px;
               margin-bottom: 48px;
             }
@@ -345,9 +346,8 @@
       .recive-prize {
         .title {
           font-size: 14px;
-          font-family: @fontRegular;
           font-weight: 400;
-          color: #222222;
+          color: #222;
           line-height: 20px;
           margin: 32px auto 14px;
           text-align: left;
@@ -370,16 +370,16 @@
     font-family: PingFangSC-Regular, PingFang SC;
     font-weight: 400;
     line-height: 20px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     padding: 9px 48px;
-    color: #666666;
+    color: #666;
     &:hover {
       color: #fff;
       background: #fb3a32;
       border: 1px solid #fb3a32;
     }
     &:active {
-      color: #ffffff;
+      color: #fff;
       background: #e2332c;
       border: 1px solid #e2332c;
     }

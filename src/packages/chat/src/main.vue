@@ -18,7 +18,7 @@
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
+        :keeps="20"
         :data-key="'count'"
         :data-sources="renderList"
         :data-component="MsgItem"
@@ -181,7 +181,7 @@
         //聊天配置
         chatOptions: {},
         //底部操作栏高度
-        operatorHeight: 91,
+        operatorHeight: 100,
         //是否展示礼物特效
         showSpecialEffects: true,
         //礼物特效数组
@@ -301,15 +301,17 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
-        const giftsServer = useGiftsServer();
+        // const giftsServer = useGiftsServer();
         //监听到新消息过来
-        chatServer.$on('receiveMsg', () => {
+        chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
-            this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.context.role_name != 2)) {
+              this.isHasUnreadAtMeMsg = true;
+              this.unReadMessageCount++;
+              this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            }
           }
-          this.dispatch('VmpTabContainer', 'noticeHint', '3');
+          this.dispatch('VmpTabContainer', 'noticeHint', 3);
         });
         //监听@我的消息
         chatServer.$on('atMe', () => {
@@ -341,7 +343,7 @@
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$message(this.$t('chat.chat_1007'));
         });
       },
       init() {
@@ -362,19 +364,14 @@
           disable = true;
         } else {
           //如果是单人被禁言
-          if (this.isBanned) {
+          if (this.isBanned && this.roleName != 1) {
             placeholder = this.$t('chat.chat_1006');
             disable = true;
           }
           //如果是全体禁言
-          if (this.allBanned) {
+          if (this.allBanned && ![1, '1', 3, '3', 4, '4'].includes(this.roleName)) {
             placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
             disable = true;
-          }
-          //主持人不受禁言限制
-          if ([1, '1'].includes(this.roleName)) {
-            placeholder = this.$t('chat.chat_1021');
-            disable = false;
           }
         }
 
@@ -408,6 +405,7 @@
       // 获取历史消息
       async getHistoryMsg() {
         const params = {
+          // webinar_id: this.webinarId,
           room_id: this.roomId,
           pos: Number(this.page) * 50,
           limit: 50
@@ -568,6 +566,7 @@
         useChatServer()
           .setAllBanned(params)
           .then(res => {
+            this.allBanned = flag;
             this.buriedPointReport(flag ? 110116 : 110117, {
               business_uid: this.userId,
               webinar_id: this.webinarId
@@ -636,7 +635,7 @@
 
 <style lang="less">
   .vmp-chat-container {
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     @font-error: #fb3a32;
     width: 100%;
     height: 100%;
@@ -699,9 +698,9 @@
     .chat-content {
       position: relative;
       .vmp-chat-msg-item {
-        &:last-child {
-          padding-bottom: 20px;
-        }
+        // &:last-child {
+        //   padding-bottom: 20px;
+        // }
       }
       &__get-list-btn-container {
         display: block;

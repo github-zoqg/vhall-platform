@@ -396,6 +396,11 @@
       padding-bottom: 20px;
     }
   }
+  .pay-box {
+    .el-radio__label {
+      margin-left: 8px;
+    }
+  }
 </style>
 <style lang="less" scoped>
   &.qrCodeDialogVisible {

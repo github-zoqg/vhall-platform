@@ -6,6 +6,8 @@
 }
 .el-dialog__header {
   padding: 24px 32px 20px 32px; /*跟此间距不同时，在各自业务里重置*/
+  font-size: 20px;
+  font-weight: 500;
 }
 .el-dialog__body {
   padding: 0 32px;
@@ -399,6 +401,9 @@
 .el-select .el-input__inner:focus {
   border-color: @border-low-color;
 }
+.el-select .el-input.is-focus .el-input__inner {
+  border-color: @border-low-color;
+}
 
 /*-----------------------------------------复选选中效果重置-----------------------------------------*/
 .el-checkbox__input.is-checked .el-checkbox__inner,
@@ -406,8 +411,11 @@
   background-color: @seleted-color-normal;
   border-color: @seleted-color-normal;
 }
-.el-checkbox__inner:hover {
-  border-color: @seleted-color-normal;
+.el-checkbox__inner {
+  background-color: transparent;
+  &:hover {
+    border-color: @seleted-color-normal;
+  }
 }
 .el-checkbox__input.is-focus .el-checkbox__inner {
   border-color: @seleted-border-normal;
@@ -493,9 +501,9 @@
     border: 1px solid @font-high-light-normal;
   }
   &:focus {
-    color: @font-error-low;
-    background: @font-high-light-normal;
-    border: 1px solid @font-high-light-normal;
+    color: @font-light-second;
+    background: transparent;
+    border: 1px solid @border-normal-color;
   }
   &:active {
     color: @font-error-low;
@@ -671,4 +679,22 @@
 }
 .el-popper[x-placement^='top'] .popper__arrow::after {
   border-top-color: @popper-normal;
+}
+
+/* -----------------------------------------slider 滑条----------------------------------------- */
+.el-slider__bar {
+  background-color: @seleted-color-normal;
+}
+
+.el-slider__button {
+  width: 17px;
+  height: 17px;
+  border: none;
+  background-color: @seleted-color-normal;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+//-----------------------------------------el-switch 滑块-----------------------------------------
+.el-switch__core {
+  width: 36px !important;
 }

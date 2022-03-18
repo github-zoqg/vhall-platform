@@ -10,10 +10,6 @@
     props: {
       info: {
         required: false
-      },
-      pagetype: {
-        type: String,
-        default: 'watch'
       }
     }
   };
@@ -24,10 +20,10 @@
     font-size: 14px;
     font-weight: 400;
     color: #1a1a1a;
-    line-height: 22px;
     overflow-x: hidden;
     img {
       width: 100%;
+      pointer-events: none;
     }
   }
 </style>

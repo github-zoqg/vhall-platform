@@ -25,13 +25,13 @@
             </template>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
-              {{ $t('chat.chat_1022') }}
+              {{ chat.roleName | roleFilter }}
             </span>
             <span class="user-status user-assistant" v-else-if="[3, '3'].includes(chat.roleName)">
-              {{ $t('chat.chat_1024') }}
+              {{ chat.roleName | roleFilter }}
             </span>
             <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
-              {{ $t('chat.chat_1023') }}
+              {{ chat.roleName | roleFilter }}
             </span>
 
             <template v-else>
@@ -176,7 +176,7 @@
     mounted() {
       // this.initEvent();
       // this.initScroll();
-      this.listenEvents();
+      // this.listenEvents();
     },
     methods: {
       init() {
@@ -197,10 +197,10 @@
         this.queryChatList();
         this.finishData = true;
       },
-      //事件监听
-      listenEvents() {
-        this.chatServer.$on('receivePrivateMsg', msg => {});
-      },
+      // //事件监听
+      // listenEvents() {
+      //   this.chatServer.$on('receivePrivateMsg', msg => {});
+      // },
       //todo 待替换
       initScroll() {
         let preTop = 0;
@@ -212,7 +212,7 @@
           let top = e.target.scrollTop;
           if (top < preTop && top < 100) {
             // 向上滚动到50px处
-            this.nextPageChatList();
+            // this.nextPageChatList();
           }
           preTop = top;
         };
@@ -431,7 +431,7 @@
           line-height: 24px;
           .user-status {
             display: inline-block;
-            width: 44px;
+            padding: 0 5px;
             height: 16px;
             margin-left: 5px;
             line-height: 16px;

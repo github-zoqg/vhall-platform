@@ -8,6 +8,7 @@ import {
   useGroupServer,
   useUserServer,
   useDesktopShareServer,
+  useInsertFileServer,
   useMediaSettingServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
@@ -23,6 +24,7 @@ export default async function () {
   const micServer = useMicServer();
   const userServer = useUserServer();
   const desktopShareServer = useDesktopShareServer();
+  const insertFileServer = useInsertFileServer();
   const mediaSettingServer = useMediaSettingServer();
 
   if (!roomBaseServer) {
@@ -86,7 +88,8 @@ export default async function () {
             webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
           });
         }
-      })
+      }),
+    roomBaseServer.getCustomRoleName()
   ];
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
@@ -98,7 +101,7 @@ export default async function () {
   // 互动、分组直播进行设备检测
   if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
     // 获取媒体许可，设置设备状态
-    promiseList.push(mediaCheckServer.getMediaInputPermission());
+    promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
 
   await Promise.all(promiseList);
@@ -111,10 +114,7 @@ export default async function () {
   //   hasToolbar: false
   // };
 
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    micServer.init();
-  }
+  micServer.init();
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
@@ -123,10 +123,14 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-  await interactiveServer.init();
-  console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  if (roomBaseServer.state.watchInitData.webinar.type == 1) {
+    await interactiveServer.init();
+    console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  }
 
   mediaSettingServer.init();
+
+  insertFileServer.init();
 
   desktopShareServer.init();
 
@@ -140,4 +144,5 @@ export default async function () {
   window.docServer = docServer;
   window.groupServer = groupServer;
   window.micServer = micServer;
+  window.insertFileServer = insertFileServer;
 }

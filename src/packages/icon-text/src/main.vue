@@ -1,7 +1,7 @@
 <template>
   <a
     href="javascript:;"
-    v-if="!hidden && (configList[auth] || auth)"
+    v-if="!hidden && (configList[auth] == 1 || auth == true)"
     :id="cuid"
     :ref="cuid"
     class="vmp-icon-text"
@@ -36,6 +36,7 @@
         return this.$domainStore.state.roomBaseServer.configList;
       }
     },
+
     methods: {
       // 设置选中转态
       setSelectedState(val) {
@@ -48,6 +49,10 @@
       // 设置显示隐藏状态
       setHiddenState(val) {
         this.hidden = val;
+      },
+      // 设置文本
+      setText(val) {
+        this.text = val;
       },
       // click事件
       handleClick: function () {
@@ -88,7 +93,7 @@
     &.selected {
       span.text,
       i {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
 

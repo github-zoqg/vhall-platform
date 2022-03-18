@@ -69,15 +69,27 @@
         if (this.userId == 0) {
           return this.$emit('needLogin');
         }
-        this.redPacketServer.openRedPacket().then(res => {
-          if (res.code === 200) {
+        const available = this.redPacketServer.state.available; // 是否可参与开红包
+        console.log('available', available);
+        if (available) {
+          this.redPacketServer.openRedPacket().then(res => {
+            if (res.code === 200) {
+              this.opened = true;
+              const st = setTimeout(() => {
+                clearTimeout(st);
+                this.$emit('navTo', 'RedPacketSuccess');
+              }, 1000);
+            }
+          });
+        } else {
+          this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
             this.opened = true;
             const st = setTimeout(() => {
               clearTimeout(st);
               this.$emit('navTo', 'RedPacketSuccess');
             }, 1000);
-          }
-        });
+          });
+        }
       }
     }
   };

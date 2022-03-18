@@ -26,7 +26,7 @@
           </div>
 
           <div class="self" v-if="item.role_name == 1">
-            <i class="vh-iconfont vh-saas-line-speaker"></i>
+            <i class="vh-saas-iconfont vh-saas-line-speaker"></i>
           </div>
         </div>
       </van-list>
@@ -71,17 +71,17 @@
         const mapList = [
           {
             code: 1,
-            name: this.$t('chat.chat_1022'),
+            name: this.$getRoleName(1),
             className: 'info-role--host'
           },
           {
             code: 3,
-            name: this.$t('chat.chat_1024'),
+            name: this.$getRoleName(3),
             className: 'info-role--assistant'
           },
           {
             code: 4,
-            name: this.$t('chat.chat_1023'),
+            name: this.$getRoleName(4),
             className: 'info-role--guest'
           }
         ];
@@ -154,15 +154,19 @@
             case 'main_room_join_change':
               handleMainRoomJoinChange(temp);
               break;
+            case 'group_switch_start':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              _this.initList();
+              break;
             default:
               break;
           }
         });
         //开始讨论
-        this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          console.log('开始讨论', msg);
-          _this.initList();
-        });
+        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
+        //   console.log('开始讨论', msg);
+        //   _this.initList();
+        // });
         //结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           console.log('结束讨论', msg);
@@ -194,10 +198,10 @@
           handleGroupJoinInfoChange(msg);
         });
         //切换分组
-        this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-          console.log('切换分组', msg);
-          _this.initList();
-        });
+        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
+        //   console.log('切换分组', msg);
+        //   _this.initList();
+        // });
         //踢出小组
         function handleGroupKicked(msg) {
           if (!_this.groupInitData.isInGroup) return;
@@ -447,7 +451,7 @@
     .self {
       position: absolute;
       right: 32px;
-      .vh-iconfont {
+      .vh-saas-iconfont {
         color: #ff9446;
         font-size: 30px;
       }

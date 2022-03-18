@@ -1,5 +1,10 @@
 <template>
-  <div class="qa-item-wrapper">
+  <div
+    class="qa-item-wrapper"
+    v-if="
+      source.join_id == joinId || (source.answer && source.answer.join_id == joinId) || !isOnlyMine
+    "
+  >
     <template>
       <div class="question">
         <div class="user">
@@ -16,7 +21,7 @@
           <span class="nick-name">
             {{ source.data ? source.data.nick_name : source.nick_name }}
           </span>
-          <span class="time">{{ source.created_at }}</span>
+          <span class="time">{{ source.created_time.slice(-8) }}</span>
         </div>
         <div class="content">
           <span class="question-label">{{ $t('chat.chat_1040') }}：</span>
@@ -37,10 +42,10 @@
               />
             </span>
             <span :class="['role', source.answer.role_name]">
-              {{ roleFilter(source.answer.role_name) }}
+              {{ source.answer.role_name | roleFilter }}
             </span>
             <span class="nick-name">{{ source.answer.nick_name }}</span>
-            <span class="time">{{ source.answer.created_at }}</span>
+            <span class="time">{{ source.answer.created_time.slice(-8) }}</span>
           </div>
           <div class="content">
             <span class="question-label">{{ $t('chat.chat_1041') }}：</span>
@@ -58,29 +63,17 @@
         type: Object,
         required: true,
         default: () => {}
+      },
+      isOnlyMine: {
+        default: false
+      },
+      joinId: {}
+    },
+    computed: {
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
     },
-    methods: {
-      roleFilter(value) {
-        let ret = '';
-        switch (value) {
-          case 'host':
-            ret = this.$t('chat.chat_1022');
-            break;
-          case 'assistant':
-            ret = this.$t('chat.chat_1024');
-            break;
-          case 'guest':
-            ret = this.$t('chat.chat_1023');
-            break;
-          case 'user':
-            ret = this.$t('chat.chat_1063');
-            break;
-          default:
-            ret = this.$t('chat.chat_1062');
-        }
-        return ret;
-      }
-    }
+    filters: {}
   };
 </script>

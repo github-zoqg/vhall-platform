@@ -22,35 +22,49 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span
-              v-if="
-                (isBanned && !groupInitData.isInGroup) ||
-                (groupInitData.isBanned && groupInitData.isInGroup)
-              "
-            >
+            <span v-if="isBanned">
               {{ $t('chat.chat_1006') }}
             </span>
             <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
+            <span v-else-if="isvod">{{ $t('chat.chat_1079') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>{{ $t('chat.chat_1042') }}</span>
           </div>
         </template>
       </div>
+      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+        {{ $t('chat.chat_1018') }}
+      </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
-        <div
-          class="icon-wrapper"
-          v-show="
-            (webinar.type == 1 &&
-              deviceStatus != 2 &&
-              connectMicShow &&
-              !disabledAll &&
-              !isBanned &&
-              !groupInitData.isInGroup) ||
-            (onlineMicStatus && !groupInitData.isInGroup) ||
-            (!groupInitData.isBanned && groupInitData.isInGroup)
-          "
-        ></div>
+        <div class="icon-wrapper" v-show="isShowMicBtn">
+          <!-- 上麦 -->
+          <div
+            v-if="isAllowhandup || isSpeakOn"
+            style="position: relative"
+            auth="{ 'ui.hide_reward': 0 }"
+          >
+            <i
+              v-if="!handUpStatus"
+              class="vh-saas-iconfont vh-saas-line-shangmai"
+              @click="$refs.handup.openConnectPop()"
+            ></i>
+            <i
+              v-else
+              class="vh-saas-iconfont vh-saas-line-shangmaizhong"
+              @click="$refs.handup.openConnectPop()"
+            ></i>
+            <span class="red-dot" v-if="handUpStatus"></span>
+            <Handup
+              ref="handup"
+              @handupLoading="
+                s => {
+                  handUpStatus = s;
+                }
+              "
+            />
+          </div>
+        </div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
           <!-- 底部互动工具组件 comChatWap-->
           <vmp-air-container cuid="comChatWap"></vmp-air-container>
@@ -69,10 +83,11 @@
     useGroupServer,
     useRoomBaseServer,
     useChatServer,
-    useMediaCheckServer,
     useMsgServer,
-    useUserServer
+    useUserServer,
+    useMicServer
   } from 'middle-domain';
+  import Handup from './handup.vue';
 
   export default {
     props: {
@@ -108,10 +123,6 @@
         type: Boolean,
         default: false
       },
-      onlineMicStatus: {
-        type: Boolean,
-        default: false
-      },
       deviceType: {
         require: true,
         default: () => {
@@ -120,6 +131,11 @@
             video: false
           };
         }
+      },
+      //当前登录人是否正在上麦
+      onlineMicStatus: {
+        type: Boolean,
+        default: false
       }
     },
     filters: {
@@ -129,7 +145,8 @@
       }
     },
     components: {
-      chatWapInputModal
+      chatWapInputModal,
+      Handup
     },
     data() {
       const { state: roomBaseState } = this.roomBaseServer;
@@ -155,10 +172,26 @@
         //配置列表
         configList: {},
         //用户头像
-        avatar: require('../img/default_avatar.png')
+        avatar: require('../img/default_avatar.png'),
+        handUpStatus: false,
+        //只看我的问答
+        isShowMyQA: false
       };
     },
     computed: {
+      device_status() {
+        // 设备状态  0未检测 1可以上麦 2不可以上麦
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
+      },
+      // 是否开启举手
+      isAllowhandup() {
+        let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
+        return status;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       //分组讨论的信息
       groupInitData() {
         const { groupInitData = {} } = this.groupServer.state;
@@ -182,9 +215,25 @@
         const { join_info = {} } = watchInitData;
         return join_info;
       },
-      //设备状态
-      deviceStatus() {
-        return this.mediaCheckServer.state.isBrowserNotSupport;
+      //是否展示互动上麦按钮
+      isShowMicBtn() {
+        //todo 注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
+        return (
+          this.webinar.type == 1 &&
+          this.device_status != 2 &&
+          [
+            this.connectMicShow &&
+              !this.isAllBanned &&
+              !this.isBanned &&
+              !this.groupInitData.isInGroup,
+            this.onlineMicStatus && !this.groupInitData.isInGroup,
+            this.groupInitData.isInGroup && !this.isBanned
+          ].some(val => !!val)
+        );
+      },
+      //是否回放禁言
+      isvod() {
+        return this.webinar.type == 5 && this.configList['ui.watch_record_no_chatting'] == 1;
       }
     },
     watch: {
@@ -198,11 +247,13 @@
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.chatServer = useChatServer();
-      this.mediaCheckServer = useMediaCheckServer();
       this.msgServer = useMsgServer();
       this.userServer = useUserServer();
     },
     created() {
+      if (this.isSpeakOn && useChatServer().state.allBanned) {
+        useMicServer().speakOff();
+      }
       this.initViewData();
     },
     mounted() {
@@ -214,13 +265,30 @@
       this.checkIsLogin();
       // eventBus监听
       this.eventListener();
+
+      useMicServer().$on('vrtc_connect_open', msg => {
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1003'));
+        }
+        this.connectMicShow = true;
+      });
+
+      useMicServer().$on('vrtc_connect_close', msg => {
+        if (parseInt(this.device_status) === 1) {
+          this.$toast(this.$t('interact.interact_1002'));
+        }
+        this.connectMicShow = false;
+      });
     },
     methods: {
+      showMyQA() {
+        this.isShowMyQA = !this.isShowMyQA;
+        this.$emit('showMyQA', this.isShowMyQA);
+      },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        console.log(this.roomBaseServer, 'roomBaseServer');
         this.webinar = webinar;
         this.configList = configList;
       },
@@ -240,20 +308,9 @@
       },
       // eventBus监听
       eventListener() {
-        // 直播结束不展示入口
+        // 直播结束不展示连麦入口
         this.msgServer.$on('live_over', e => {
           console.log(e);
-          this.connectMicShow = false;
-        });
-        // 接收开启连麦消息事件
-        this.msgServer.$on('vrtc_connect_open', msg => {
-          console.log(msg);
-          this.connectMicShow = true;
-        });
-
-        // 接收关闭连麦消息事件
-        this.msgServer.$on('vrtc_connect_close', msg => {
-          console.log(msg);
           this.connectMicShow = false;
         });
 
@@ -270,7 +327,8 @@
         if (
           (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
-          (this.groupInitData.isBanned && this.groupInitData.isInGroup)
+          (this.groupInitData.isBanned && this.groupInitData.isInGroup) ||
+          this.isvod
         ) {
           return;
         }
@@ -279,10 +337,10 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(this.$t('chat.chat_1068', { n: this.waitTime }));
+            this.$toast(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
         } else if (this.currentTab == 'qa' && this.time != 0) {
-          this.$message(this.$t('chat.chat_1080', { n: this.time }));
+          this.$toast(this.$t('chat.chat_1080', { n: this.time }));
         } else {
           this.$refs.chatWapInputModal.openModal();
         }
@@ -429,7 +487,25 @@
           .iconyaoqingka {
             font-size: 44px;
           }
+          .vh-saas-iconfont,
+          .vh-iconfont {
+            font-size: 47px;
+            color: #666666;
+          }
+
+          .red-dot {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background-color: #ff3030;
+            border-radius: 10px;
+          }
         }
+      }
+      .only-my {
+        color: #fc5659;
       }
     }
   }

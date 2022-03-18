@@ -19,6 +19,7 @@
         <i
           class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
           @click.stop="onClickFilterSetting"
+          v-clickoutside="hidechatOptions"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
         <!-- 表情选择 -->
@@ -57,9 +58,14 @@
           <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
           <!--            {{ $t('common.common_1008') }}-->
           <!--          </i>-->
+          <!-- 主持人不在小组或组长在小组显示聊天设置 -->
           <div
             class="chat-setting-btn--chat-auth"
-            v-if="configList['comment_check'] || configList['disable_msg']"
+            v-if="
+              (roleName == 1 || roleName == 3 || roleName == 4) &&
+              !isInGroup &&
+              (configList['comment_check'] || configList['disable_msg'])
+            "
           >
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
@@ -109,13 +115,14 @@
         @needLogin="handleLogin"
         @clearUploadImg="clearUploadImg"
         @getUploadImg="updateImgUrls"
-        @inputHeightChange="chatInputHeightChangeHandle"
+        @chatTextareaHeightChange="chatTextareaHeightChange"
       ></chat-input>
     </div>
   </div>
 </template>
 
 <script>
+  import { useGroupServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
@@ -127,6 +134,13 @@
       ChatInput
     },
     computed: {
+      isInGroup() {
+        // 在小组中
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
+      joinRole() {
+        return !!this.groupServer.state.groupInitData?.join_role;
+      },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
       }
@@ -204,8 +218,15 @@
         assistantType: this.$route.query.assistantType
       };
     },
+    beforeCreate() {
+      this.groupServer = useGroupServer();
+    },
     mounted() {},
     methods: {
+      //隐藏设置弹窗
+      hidechatOptions() {
+        this.isFilterShow = false;
+      },
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         this.$emit('changeAllBanned', val);
@@ -285,7 +306,7 @@
         }
       },
       //响应输入框高度变化事件
-      chatInputHeightChangeHandle() {
+      chatTextareaHeightChange() {
         this.$emit('updateHeight', this.$refs.chatOperateContainer.offsetHeight);
       },
       //更新滚动区域高度
@@ -353,7 +374,7 @@
           color: #999;
           cursor: pointer;
           &:hover {
-            color: @active-color;
+            color: @font-error;
             cursor: pointer;
           }
         }
@@ -388,7 +409,7 @@
         .chat-setting-box {
           display: none;
           position: absolute;
-          top: -105px;
+          bottom: 30px;
           right: 0;
           width: 180px;
           padding: 4px 0;
@@ -429,7 +450,7 @@
         left: 0;
       }
       &__chat-filter-wrap {
-        width: 120px;
+        // width: 120px;
         height: 80px;
         padding: 4px 0;
         background-color: #383838;

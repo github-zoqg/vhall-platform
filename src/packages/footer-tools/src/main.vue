@@ -9,7 +9,7 @@
         <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__leftt-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div class="vmp-footer-tools__left-hot" v-if="roomBaseState.watchInitData.pv.show">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
@@ -32,20 +32,17 @@
         </el-dropdown>
       </div>
     </div>
-    <!-- <div class="vmp-footer-tools__right">
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
-    </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="device_status === 1 && !isBanned && isInteractLive">
-      <handup></handup>
+    <div class="vmp-footer-tools__center">
+      <handup class=""></handup>
     </div>
     <!-- 互动工具 -->
-    <ul v-if="!isTrySee && !groupState.groupInitData.isInGroup" class="vmp-footer-tools__right">
+    <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
-        <!-- 公告 -->
-        <notice></notice>
+        <!-- 公告 直播显示公告 -->
+        <notice ref="notice"></notice>
       </li>
-      <li v-if="1">
+      <li v-if="isLiving">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -55,6 +52,7 @@
       </li>
       <li>
         <!-- 问卷-->
+        <questionnaire-icon @clickIcon="checkQuestionIcon" />
       </li>
       <li>
         <!-- 签到 -->
@@ -96,7 +94,12 @@
       </li>
       <!-- 支付弹框 -->
       <li v-if="showPay">
-        <Pay :wxQr="wxQr" :zfQr="zfQr" @changeShow="changeStatus"></Pay>
+        <Pay
+          :wxQr="wxQr"
+          :zfQr="zfQr"
+          @changeShow="changeStatus"
+          :style="{ zIndex: zIndexServerState.zIndexMap.giftPay }"
+        ></Pay>
       </li>
     </ul>
   </div>
@@ -105,32 +108,20 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import {
     useRoomBaseServer,
-    useMsgServer,
+    useZIndexServer,
     useMicServer,
     useChatServer,
-    useGroupServer,
-    useMediaCheckServer
+    useGroupServer
   } from 'middle-domain';
-  import handup from './handup.vue';
+  import handup from './component/handup/index.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
+  import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -141,10 +132,13 @@
       praise,
       Pay,
       RedPacketIcon,
+      QuestionnaireIcon,
       LotteryIcon
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         roomBaseState: null,
         showGiftIcon: true,
         showGift: false,
@@ -155,7 +149,6 @@
         showPay: false,
         zfQr: '',
         wxQr: '',
-        isBanned: useChatServer().state.banned || useChatServer().state.allBanned, //true禁言，false未禁言
         lang: {},
         languageList: []
       };
@@ -225,10 +218,14 @@
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return useMediaCheckServer().state.deviceInfo.device_status;
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
+      },
+      isBanned() {
+        return !this.isInGroup && (useChatServer().state.banned || useChatServer().state.allBanned); //true禁言，false未禁言
       }
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
     },
@@ -236,17 +233,8 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       if (this.isEmbed) {
-        this.languageList = this.roomBaseState.languages.langList.map(item => {
-          return langMap[item.language_type];
-        });
-        console.log(this.languageList, '??!32142435');
-        const curLang = this.roomBaseState.languages.curLang;
-        this.lang =
-          langMap[sessionStorage.getItem('lang')] ||
-          langMap[this.$route.query.lang] ||
-          langMap[curLang.language_type];
-        this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.key);
+        this.languageList = this.roomBaseState.languages.langList;
+        this.lang = this.roomBaseServer.state.languages.lang;
       }
       this.groupState = this.groupServer.state;
       window.addEventListener('click', () => {
@@ -257,28 +245,6 @@
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
-    },
-    mounted() {
-      //监听禁言通知
-      useChatServer().$on('banned', res => {
-        this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-      //监听全体禁言通知
-      useChatServer().$on('allBanned', res => {
-        this.isBanned = res;
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
-      //监听直播结束的通知，下麦并停止推流
-      useMsgServer().$on('live_over', e => {
-        if (this.isSpeakOn) {
-          useMicServer().speakOff();
-        }
-      });
     },
     methods: {
       settingShow() {
@@ -300,7 +266,7 @@
           this.showGiftCount++;
         }
         // TODO:是否需要处理
-        this.$refs.notice && (this.$refs.notice.isShowNotice = false);
+        this.$refs.notice && this.$refs.notice.closeNoticeList();
       },
       // 打开打赏弹框
       onClickReward() {
@@ -314,11 +280,13 @@
       },
       // 接收支付码
       acceptPay(data, url) {
+        // 修改付费礼物支付弹窗层级
+        this.zIndexServer.setDialogZIndex('giftPay');
         this.showPay = true;
         this[data] = url;
       },
       changeLang(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       needLogin() {
@@ -327,11 +295,14 @@
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
       },
-      checkredPacketIcon() {
+      checkredPacketIcon(redPacketId) {
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [
-            this.$domainStore.state.roomBaseServer.redPacket.red_packet_uuid
-          ])
+          boxEventOpitons(this.cuid, 'emitClickRedPacketIcon', [redPacketId])
+        );
+      },
+      checkQuestionIcon(questionnaireId) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionIcon', [questionnaireId])
         );
       }
     }
@@ -347,7 +318,7 @@
     align-items: center;
     padding: 0 24px;
     position: relative;
-    z-index: 10;
+    // z-index: 10;
 
     &__left {
       display: flex;

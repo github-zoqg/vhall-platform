@@ -13,7 +13,7 @@
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
-                <img src="../assets/imgs/live.gif" alt="" />
+                <img src="../assets/imgs/live.gif" />
               </label>
               <div>
                 <span>{{ getLiveTag(item) }}</span>
@@ -161,7 +161,7 @@
     overflow: hidden;
     box-sizing: border-box;
     width: 300px;
-    height: 250px;
+    height: 266px;
     margin: 20px 14px;
     border-radius: 6px;
     overflow: hidden;
@@ -261,9 +261,9 @@
       font-weight: 400;
       word-break: keep-all;
       white-space: nowrap;
-      font-size: 12px;
+      font-size: 24px;
       color: @font-dark-low;
-      line-height: 28px;
+      line-height: 42px;
       text-align: left;
       padding: 0px 8px;
     }
@@ -279,18 +279,12 @@
       align-items: center;
       .live-status {
         padding-right: 6px;
+
+        & > img {
+          width: 16px;
+          height: 16px;
+        }
       }
-      // .live-status {
-      //   display: inline-block;
-      //   width: 12px;
-      //   img {
-      //     display: inline-block;
-      //     width: 8px;
-      //     height: 8px;
-      //     border-radius: 0px;
-      //     // margin-top: 4px;
-      //   }
-      // }
     }
     .vh-chose-active-item__cover-status {
       padding: 0px 8px !important;

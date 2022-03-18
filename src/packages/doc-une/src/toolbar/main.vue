@@ -15,7 +15,8 @@
           <el-switch
             @click.native="handleSwitchStatus"
             v-model="switchStatus"
-            active-color="#13ce66"
+            active-color="#fb3a32"
+            inactive-color="#cecece"
           ></el-switch>
           <!-- 提示 -->
           <div class="audience-tip" v-show="showAudienceTip">
@@ -117,7 +118,12 @@
     </div>
     <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
     <div class="vmp-doc-toolbar__ft" v-if="!isWatch && !isInGroup">
-      <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
+      <div
+        class="vmp-icon-item"
+        :title="$t('doc.doc_1010')"
+        v-if="roleName != 3"
+        @click="fullscreen"
+      >
         <i class="vh-iconfont vh-line-amplification"></i>
       </div>
       <div
@@ -173,7 +179,7 @@
       return {
         showAudienceTip: true,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
-        currentBrush: 'pen',
+        currentBrush: '',
         // 画笔状态
         pen: {
           size: 7, // 粗细
@@ -242,6 +248,10 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
+      // 角色
+      roleName() {
+        return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
+      },
       // 是否文档演示权限
       hasDocPermission() {
         if (this.isWatch && [4, 5].includes(this.webinarType)) {
@@ -284,8 +294,10 @@
         if (key) {
           this[brush][key] = value;
         }
-        // 取消缩放、移动模式
-        this.docServer.cancelZoom();
+        if (brush !== 'move') {
+          // 取消缩放、移动模式
+          this.docServer.cancelZoom();
+        }
         switch (brush) {
           // 选择
           case 'select': {
@@ -322,34 +334,31 @@
             this.docServer.setEraser();
             break;
           }
+          case 'move': {
+            this.docServer.move();
+            break;
+          }
         }
+        this.$emit('changeBrush', brush);
       },
       /**
        * 切换画板工具
        */
       async handleBoardTool(brush) {
+        if (
+          !this.docServer?.state.currentCid ||
+          !document.getElementById(this.docServer.state.currentCid)
+        ) {
+          console.log('容器不存在，不执行操作');
+          return;
+        }
         if (brush === 'clear') {
-          // TODO 提示文本进行国际化处理
-          // try {
-          //   await this.$confirm('<p>确定要清空文档标记么？</p>', '提示', {
-          //     customClass: 'saas-message-box',
-          //     dangerouslyUseHTMLString: true,
-          //     closeOnClickModal: false,
-          //     roundButton: true,
-          //     confirmButtonText: '确定',
-          //     cancelButtonText: '取消',
-          //     confirmButtonClass: 'btn-saas',
-          //     cancelButtonClass: 'btn-saas btn-saas-cancel'
-          //   });
-          //   this.docServer.clear();
-          // } catch (err) {
-          //   console.log(err);
-          // }
           this.isConfirmVisible = true;
           return;
         }
         this.changeTool(brush);
       },
+      // 画布清除确认
       confirmSave() {
         this.isConfirmVisible = false;
         this.docServer.clear();
@@ -359,6 +368,7 @@
       closeConfirm() {
         this.isConfirmVisible = false;
       },
+      // 是否观众可见
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();
       }
@@ -393,8 +403,9 @@
         margin-left: 16px;
         cursor: pointer;
         &:hover {
-          background: #fc5659;
-          border-color: #fc5659;
+          background: #fb3a32;
+          border-color: #fb3a32;
+          color: #fff;
         }
       }
       .audience-visible {
@@ -410,17 +421,20 @@
         margin-left: 20px;
         position: relative;
 
-        .el-switch .el-switch__core {
-          border-color: #ddd !important;
-          background-color: #2d2d2d !important;
-          &::after {
-            background-color: #ddd;
-          }
-        }
-        .el-switch.is-checked .el-switch__core {
-          border-color: #13ce66 !important;
-          background-color: #13ce66 !important;
-        }
+        // .el-switch .el-switch__core {
+        //   border-color: #ddd !important;
+        //   background-color: #2d2d2d !important;
+        //   &::after {
+        //     background-color: #848484;
+        //   }
+        // }
+        // .el-switch.is-checked .el-switch__core {
+        //   border-color: #3562fa !important;
+        //   background-color: #2d2d2d !important;
+        //   &::after {
+        //     background-color: #3562fa;
+        //   }
+        // }
       }
     }
     .vmp-doc-toolbar__bd {

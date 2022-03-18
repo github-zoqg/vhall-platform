@@ -283,6 +283,10 @@
 }
 
 /*-----------------------------------------重置Input框框 ---------------------------------------------*/
+.el-select .el-input.is-focus .el-input__inner {
+  border-color: @bg-error-light;
+}
+
 .el-input__count-inner__numerator {
   color: @font-light-low;
   &.el-input__count-inner__numerator-hasnum {
@@ -396,8 +400,11 @@
   background-color: @seleted-color-normal;
   border-color: @seleted-color-normal;
 }
-.el-checkbox__inner:hover {
-  border-color: @seleted-color-normal;
+.el-checkbox__inner {
+  background-color: transparent;
+  &:hover {
+    border-color: @seleted-color-normal;
+  }
 }
 .el-checkbox__input.is-focus .el-checkbox__inner {
   border-color: @seleted-border-normal;
@@ -666,4 +673,17 @@
 // 重置表单
 .el-form-item__label {
   color: @font-light-normal;
+}
+
+// ======== slider 滑条
+.el-slider__bar {
+  background-color: @seleted-color-normal;
+}
+
+.el-slider__button {
+  width: 17px;
+  height: 17px;
+  border: none;
+  background-color: @seleted-color-normal;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
 }

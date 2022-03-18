@@ -103,7 +103,7 @@
 <script>
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { debounce } from 'lodash';
-  import { useQaServer, useRoomBaseServer } from 'middle-domain';
+  import { useQaServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpInteractMenu',
@@ -135,7 +135,24 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
     },
+    mounted() {
+      this.listenEvents();
+    },
     methods: {
+      listenEvents() {
+        const msgServer = useMsgServer();
+        const qaServer = useQaServer();
+        msgServer.$on('live_over', () => {
+          this.isQAEnabled = false;
+          this.qaVisible = false;
+        });
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
+          this.isQAEnabled = true;
+        });
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
+          this.isQAEnabled = false;
+        });
+      },
       handleQAPopup() {
         if (!this.qaVisible && this.isQAEnabled) {
           useQaServer()
@@ -161,8 +178,19 @@
         useQaServer()
           .qaEnable()
           .then(res => {
-            this.isQAEnabled = true;
-            this.qaVisible = false;
+            if (res.code == 200) {
+              this.isQAEnabled = true;
+              this.qaVisible = false;
+              this.$message({
+                message: '开启问答成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '开启问答失败',
+                type: 'error'
+              });
+            }
             // window.$middleEventSdk?.event?.send(
             //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
             // );
@@ -172,8 +200,19 @@
         useQaServer()
           .qaDisable()
           .then(res => {
-            this.isQAEnabled = false;
-            this.qaVisible = false;
+            if (res.code == 200) {
+              this.isQAEnabled = false;
+              this.qaVisible = false;
+              this.$message({
+                message: '关闭问答成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '关闭问答失败',
+                type: 'error'
+              });
+            }
             // window.$middleEventSdk?.event?.send(
             //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
             // );

@@ -4,6 +4,7 @@
     <saas-alert
       :visible="isConfirmVisible"
       :confirm="true"
+      :title="$t('account.account_1061')"
       :confirmText="$t('common.common_1010')"
       :cancelText="btnText"
       @onSubmit="confirmSave"
@@ -17,6 +18,7 @@
 <script>
   import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpMicInvited',
     components: {
@@ -25,7 +27,7 @@
     data() {
       return {
         isConfirmVisible: false,
-        btnText: this.$t('account.account_1063'),
+        btnText: this.$t('interact.interact_1010'),
         waitTime: 30,
         roleName: this.$t('chat.chat_1022'),
         senderId: ''
@@ -68,14 +70,14 @@
           this.isConfirmVisible = true;
           this.waitTime = 30;
           clearInterval(this.waitInterval);
-          this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
+          this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
           this.waitInterval = setInterval(() => {
             this.waitTime--;
-            this.btnText = `${this.$t('account.account_1063')}(${this.waitTime}s)`;
+            this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
               this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
-              this.btnText = this.$t('account.account_1063');
+              this.btnText = this.$t('interact.interact_1010');
               this.isConfirmVisible = false;
             }
           }, 1000);
@@ -92,9 +94,13 @@
             extra_params: this.senderId
           })
           .then(res => {
+            if (res.code !== 200) {
+              this.$message.error(res.msg);
+            }
             useMicServer().userSpeakOn();
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             clearInterval(this.waitInterval);
-            this.btnText = this.$t('account.account_1063');
+            this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
           });
       },
@@ -108,7 +114,7 @@
           })
           .then(res => {
             clearInterval(this.waitInterval);
-            this.btnText = this.$t('account.account_1063');
+            this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
           });
       }

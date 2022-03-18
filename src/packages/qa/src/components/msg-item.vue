@@ -1,5 +1,10 @@
 <template>
-  <div class="vhsaas-chat-msg-item__wrapper">
+  <div
+    class="vhsaas-chat-msg-item__wrapper"
+    v-if="
+      source.join_id == joinId || (source.answer && source.answer.join_id == joinId) || !isOnlyMine
+    "
+  >
     <div v-if="source.answer" class="vhsaas-chat-msg-item clearfix">
       <!-- 头像 -->
       <div class="vhsaas-chat-msg-item__avatar">
@@ -14,7 +19,7 @@
         <p class="msg-item__content-name clearfix">
           <span class="msg-item_content-name-nick">{{ source.answer.nick_name }}</span>
           <span class="msg-item_content-name-role" :class="source.answer.role_name">
-            {{ roleMap[source.answer.role_name] }}
+            {{ source.answer.role_name | roleFilter }}
           </span>
           <span class="msg-item__content-time">{{ source.answer.created_time.slice(-8) }}</span>
         </p>
@@ -34,10 +39,9 @@
             <!-- 昵称和角色 -->
             <p class="msg-item__content-name clearfix">
               <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
-              <!-- <span
-                class="msg-item_content-name-role"
-                :class="msg.answer.role_name"
-              >{{ roleMap[msg.answer.role_name] }}</span> -->
+              <!-- <span class="msg-item_content-name-role" :class="source.answer.role_name">
+                {{ source.role_name | roleFilter(this) }}
+              </span> -->
             </p>
             <!-- 文本 -->
             <p
@@ -74,6 +78,25 @@
 <script>
   import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
   export default {
+    props: {
+      source: {
+        type: Object,
+        required: true,
+        default: () => {}
+      },
+      isOnlyMine: {
+        default: false
+      },
+      joinId: {}
+    },
+    data() {
+      return {
+        msgContent: '',
+        answerContent: '',
+        mineContent: '',
+        defaultAvatar
+      };
+    },
     filters: {
       filterName(val) {
         if (val && val.length > 8) {
@@ -82,27 +105,26 @@
           return val;
         }
       }
+      // //角色转换
+      // roleFilter: (value, vm) => {
+      //   let ret = '';
+      //   switch (value) {
+      //     case 'host':
+      //       ret = vm.$tdefault(vm.customRoleName[1]);
+      //       break;
+      //     case 'assistant':
+      //       ret = vm.$tdefault(vm.customRoleName[3]);
+      //       break;
+      //     default:
+      //       ret = vm.$t('chat.chat_1062');
+      //   }
+      //   return ret;
+      // }
     },
-    props: {
-      source: {
-        type: Object,
-        required: true,
-        default: () => {}
+    computed: {
+      customRoleName() {
+        return this.$domainStore.state.roomBaseServer.customRoleName;
       }
-    },
-    data() {
-      return {
-        msgContent: '',
-        answerContent: '',
-        mineContent: '',
-        roleMap: {
-          host: this.$t('chat.chat_1022'),
-          guest: this.$t('chat.chat_1023'),
-          assistant: this.$t('chat.chat_1024'),
-          user: this.$t('chat.chat_1063')
-        },
-        defaultAvatar
-      };
     },
     mounted() {
       this.handleAnswerContent();

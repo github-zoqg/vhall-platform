@@ -8,7 +8,14 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comQuestionnaire']
+    children: [
+      'comHeaderWatch',
+      'layerBody',
+      'layerFooter',
+      'comAllDialog',
+      'comQuestionnaire',
+      'comGoodsDetailPc'
+    ]
     // children: ['layerBody']
   },
   // 顶部header 容器嵌入不用这个组件
@@ -43,6 +50,7 @@ export const serverConfig = {
       'comWatchAsideMenu',
       'comDocUne',
       'comDesktopScreen',
+      'comInsertStream',
       'comFooterTools',
       'comNoticeColumn',
       'comLivingEnd'
@@ -83,10 +91,10 @@ export const serverConfig = {
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
+       * watch观看端tab不展示文档
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
         { type: 'private', cuid: 'comWatchPrivateChat', text: 'common.common_1008' }, // 私聊
         { type: 'notice', cuid: 'comNotice', text: '公告' },
@@ -103,7 +111,12 @@ export const serverConfig = {
   /**** 组件定义 */
   // 自定义菜单
   comCustomMenu: {
-    component: 'VmpCustomMenu'
+    component: 'VmpCustomMenu',
+    emitOpenShareDialog: {
+      cuid: 'comShare',
+      method: 'shareOtherDialog',
+      args: ['$0']
+    }
   },
 
   // 文档白板组件
@@ -156,7 +169,8 @@ export const serverConfig = {
     component: 'VmpStreamLocal',
     initPlayer: {
       cuid: 'comPcPlayer',
-      method: 'getWebinerStatus'
+      method: 'getWebinerStatus',
+      args: ['$0']
     }
   },
   comStreamRemote: {
@@ -164,7 +178,15 @@ export const serverConfig = {
   },
   // 桌面共享组件
   comDesktopScreen: {
-    component: 'VmpStreamDesktopScreen'
+    component: 'VmpStreamDesktopScreen',
+    emitClickExchangeView: {
+      cuid: 'comPcPlayer',
+      method: 'exchangeVideoDocs'
+    }
+  },
+  // 插播文件
+  comInsertStream: {
+    component: 'VmpInsertStream'
   },
   // 播放器
   comPcPlayer: {
@@ -306,6 +328,12 @@ export const serverConfig = {
       method: 'openRedPacket',
       args: ['$0']
     },
+    //问卷弹窗
+    emitClickQuestionIcon: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
     children: ['comSignWatch', 'comWatchTimer']
   },
   comSignWatch: {
@@ -402,7 +430,16 @@ export const serverConfig = {
   },
   //商品列表
   comGoodSaas: {
-    component: 'VmpGoodList'
+    component: 'VmpGoodList',
+    emitShowDetail: {
+      cuid: ['comGoodsDetailPc'],
+      method: 'open',
+      args: ['$0']
+    }
+  },
+  //商品详情
+  comGoodsDetailPc: {
+    component: 'VmpGoodDetailPc'
   },
   // 抽奖
   comLottery: {
@@ -559,6 +596,12 @@ export const serverConfig = {
   },
   // 邀请上麦弹窗
   comMicInvited: {
-    component: 'VmpMicInvited'
+    component: 'VmpMicInvited',
+    emitAgreeInvite: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'updateAutoSpeak'
+      }
+    ]
   }
 };

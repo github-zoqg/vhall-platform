@@ -186,7 +186,7 @@
                             item.operator.role_name == 'guest'
                         }"
                       >
-                        {{ item.operator.role_name | filterRoleName }}
+                        {{ item.operator.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ item.operator.operate_time }}</span>
                     </p>
@@ -272,7 +272,7 @@
                           'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
                         }"
                       >
-                        {{ ite.role_name | filterRoleName }}
+                        {{ ite.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
                       <template v-if="ite.is_open == 1">
@@ -370,7 +370,7 @@
                           item.operator.role_name == 'assistant'
                       }"
                     >
-                      {{ item.operator.role_name | filterRoleName }}
+                      {{ item.operator.role_name | roleFilter }}
                     </span>
                   </div>
                   <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
@@ -446,26 +446,14 @@
 <script>
   import { useRoomBaseServer, useQaAdminServer, Domain, useMsgServer } from 'middle-domain';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
-  import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-  import { debounce } from '@/packages/app-shared/utils/tool';
+  import { debounce, getQueryString } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQaAdmin',
     components: {
       PrivateChat
     },
     filters: {
-      filterRoleName(val) {
-        if (val == 'host' || val == 1) {
-          return '主持人';
-        } else if (val == 'assistant' || val == 3) {
-          return '助理';
-        } else if (val == 'guest' || val == 4) {
-          return '嘉宾';
-        } else {
-          return '';
-        }
-      },
       filterNickName(val) {
         if (val.length > 8) {
           return val.substring(0, 8) + '...';
@@ -585,12 +573,15 @@
     },
     async created() {
       this.webinar_id = this.$router.currentRoute.params.id;
-
+      const { liveT = '' } = this.$route.query;
       if (location.search.includes('assistant_token=')) {
         sessionStorage.setItem('vhall_client_token', getQueryString('assistant_token') || '');
       }
       await new Domain({
         plugins: ['chat'],
+        requestBody: {
+          live_token: liveT
+        },
         isNotInitRoom: true
       });
       const watchInitData = await this.qaServer
@@ -606,7 +597,7 @@
         });
 
       await useMsgServer().initMaintMsg({ ...watchInitData, hide: 1 });
-      await this.chatPrivateGetRankList();
+      await Promise.all([this.roomBaseServer.getCustomRoleName(), this.chatPrivateGetRankList()]);
 
       this.getChat(0); // 待处理
       this.getChat(1); // 不处理
@@ -747,7 +738,7 @@
             this.$nextTick(() => {
               this.$refs.privateChat.addChatItem({
                 type: 1,
-                id: item.user_id,
+                id: item.join_id,
                 chat_name: item.nick_name
               });
             });

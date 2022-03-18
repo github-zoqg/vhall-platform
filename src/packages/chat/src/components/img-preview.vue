@@ -73,6 +73,7 @@
         this.swiper.el.onmouseover = () => {
           this.swiper.navigation.$nextEl.removeClass('hide');
           this.swiper.navigation.$prevEl.removeClass('hide');
+          console.log('[interactiveServer]  look stop -2');
           this.swiper.autoplay.stop();
         };
         // 鼠标移入隐藏前进后退按钮
@@ -103,7 +104,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 11;
+    z-index: 200;
   }
   .preview-img__container {
     width: 800px;

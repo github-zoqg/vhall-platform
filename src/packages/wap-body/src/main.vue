@@ -34,6 +34,9 @@
 
       <!-- wap端订阅桌面共享的容器 -->
       <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+
+      <!-- wap端订阅桌面共享的容器 -->
+      <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
       <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
@@ -44,9 +47,14 @@
   </div>
 </template>
 <script>
-  import { useMsgServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useInteractiveServer,
+    useGroupServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   import move from './js/move';
-  import { Dialog } from 'vant';
+  import { Dialog, Toast } from 'vant';
   import masksliding from './components/mask.vue';
   export default {
     name: 'VmpWapBody',
@@ -69,6 +77,10 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url || cover;
+      },
+      // 主持人ID 分组期间使用
+      userinfoId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
       }
     },
     components: {
@@ -76,40 +88,122 @@
     },
     beforeCreate() {
       this.msgServer = useMsgServer();
+      this.groupServer = useGroupServer();
     },
     async created() {
+      // 监听自动上麦的异常code
+      useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        this.$toast(e.msg);
+      });
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
       ) {
         await Dialog.alert({
-          title: '提示',
-          message: '本场直播支持视频连线，建议您允许系统启用相应设备以使用该功能。'
+          title: this.$t('account.account_1061'),
+          message: this.$t('other.other_1009')
         });
       }
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
     mounted() {
-      this.msgServer.$onMsg('ROOM_MSG', msg => {
-        // live_over 结束直播
-        if (msg.data.type == 'live_over') {
-          this.isLivingEnd = true;
-          this.mini = false;
-        }
-        // 分组直播 没有结束讨论 直接结束直播
-        if (msg.data.type == 'group_switch_end') {
-          if (msg.data.over_live) {
-            this.isLivingEnd = true;
-          }
-        }
-        if (msg.data.type == 'questionnaire_push') {
-          this.mini = true;
-        }
-      });
+      this.listenEvents();
     },
     methods: {
       questionnaireVisible(flag) {
         this.mini = flag;
+      },
+      listenEvents() {
+        // 开启分组讨论
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
+          if (this.isInGroup) {
+            this.gobackHome(1, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 切换小组,小组人员变动
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, changeInfo) => {
+          if (changeInfo.isNeedCare && this.isInGroup) {
+            this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 结束分组讨论     groupToast为开发自行增加，为true代表是走到 不提醒 的处理
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          if (!msg.data.groupToast) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 小组解散
+        this.groupServer.$on('GROUP_DISBAND', msg => {
+          this.gobackHome(4, '', msg);
+        });
+
+        // 本人被踢出来
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          const { interactToolStatus, watchInitData } = useRoomBaseServer().state;
+          // 如果已经开启了讨论，而且被踢出的人是自己
+          if (
+            interactToolStatus.is_open_switch == 1 &&
+            msg.data.target_id === watchInitData.join_info.third_party_user_id
+          ) {
+            this.gobackHome(5, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 组长变更
+        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          this.gobackHome(7, '', msg);
+        });
+
+        // 监听消息移动
+        this.msgServer.$onMsg('ROOM_MSG', msg => {
+          // live_over 结束直播
+          if (msg.data.type == 'live_over') {
+            this.isLivingEnd = true;
+            this.mini = false;
+          }
+          // 分组直播 没有结束讨论 直接结束直播
+          if (msg.data.type == 'group_switch_end') {
+            if (msg.data.over_live) {
+              this.isLivingEnd = true;
+            }
+          }
+        });
+      },
+      // 返回主房间提示
+      async gobackHome(index, name, msg) {
+        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
+        let title = '';
+        switch (index) {
+          case 1:
+            title = who + '开启了分组讨论，您将进入' + name + '组参与讨论';
+            break;
+          case 2:
+            title = who + '已将您分配至' + name + '组';
+            break;
+          case 3:
+            title = who + '结束了分组讨论，您将返回主直播间';
+            break;
+          case 4:
+            title = who + '解散了分组，您将返回主直播间';
+            break;
+          case 5:
+            title = this.$t('chat.chat_1007');
+            break;
+          case 7:
+            title = '组长身份已变更';
+            break;
+        }
+        if (index == 5 || index == 7) {
+          Toast(title);
+        } else {
+          await Dialog.alert({
+            title: this.$t('account.account_1061'),
+            message: title
+          });
+        }
       }
     }
   };
@@ -171,14 +265,23 @@
       .vmp-wap-player-footer {
         display: none;
       }
+      // 小屏后互动样式
       .vmp-wap-stream-wrap {
         height: 100%;
+        .vmp-stream-list {
+          height: 100%;
+          width: 100%;
+        }
         .vmp-stream-list__main-screen {
           position: absolute;
           top: 0;
-          left: 0;
+          left: 0 !important; // 由于小屏后，和产品沟通，只展示主画面
           width: 100%;
           height: 100%;
+          z-index: 7;
+          .vmp-stream-remote-exitscreen {
+            display: none;
+          }
         }
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,

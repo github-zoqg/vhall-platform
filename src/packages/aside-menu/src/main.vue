@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
@@ -14,7 +14,7 @@
       return {};
     },
     computed: {
-      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
       webinarMode() {
         return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
@@ -40,13 +40,33 @@
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
       },
-      //互动工具状态
+      // 主讲人权限
       doc_permission() {
         if (this.isInGroup) {
           return this.groupServer.state.groupInitData.doc_permission;
         } else {
           return this.roomBaseServer.state.interactToolStatus.doc_permission;
         }
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
+      // 是否开启分屏
+      isOpenSplitScreen() {
+        return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
+      },
+      // 桌面共享推流用户信息
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
       }
     },
     beforeCreate() {
@@ -66,6 +86,9 @@
       ['presenterId']() {
         this.resetMenus();
       },
+      ['isShareScreen']() {
+        this.resetMenus();
+      },
       ['roomBaseServer.state.configList']: {
         deep: true,
         immediate: true,
@@ -73,12 +96,23 @@
           this.resetMenus();
         }
       },
+      ['isInsertFilePushing']() {
+        this.resetMenus();
+      },
       // // 演示者发生变化
       // presenterId() {
       //   this.resetMenus();
       // },
       // 主讲人发生变化
       doc_permission() {
+        this.resetMenus();
+      },
+      // 是否开启分屏
+      isOpenSplitScreen() {
+        this.resetMenus();
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
         this.resetMenus();
       }
     },
@@ -91,6 +125,10 @@
         for (const vn of this.$children) {
           if (!vn.kind || !vn.setDisableState || !vn.setHiddenState) continue;
           if (vn.kind === 'document') {
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 文档菜单
             if (this.role == 4) {
               // 嘉宾
@@ -110,6 +148,10 @@
             }
           } else if (vn.kind === 'board') {
             // 白板菜单
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
+            }
             if (this.role == 4) {
               // 嘉宾
               if (this.doc_permission == this.userId) {
@@ -128,15 +170,41 @@
             }
           } else if (vn.kind === 'desktopShare') {
             // 桌面共享菜单
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
+            }
+            // 如果自己是推送桌面共享
+            if (this.isShareScreen && this.desktopShareInfo.accountId == this.userId) {
+              vn.setDisableState(false);
+              vn.setText('关闭共享');
+              vn.setSelectedState(true);
+              continue;
+            }
+            vn.setText('桌面共享');
+            vn.setSelectedState(false);
             if (this.role === 1) {
               // 主持人
-              if (this.webinarType === 1) {
+              if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
+                // 如果主持人把别人设为了主讲人，或者有人正在演示，桌面共享禁用
+                if (
+                  this.doc_permission != this.userId ||
+                  this.presenterId != this.userId ||
+                  this.isThirdStream
+                ) {
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                }
               } else {
-                // 显示但禁用
-                vn.setHiddenState(false);
-                vn.setDisableState(true);
+                if (this.doc_permission == this.userId || this.presenterId == this.userId) {
+                  vn.setDisableState(false);
+                } else {
+                  // 显示但禁用
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                }
               }
             } else if (this.role == 4) {
               if (this.doc_permission == this.userId) {
@@ -149,17 +217,46 @@
             } else {
               vn.setHiddenState(true); //隐藏
             }
+            // 如果在插播就禁用
+            if (this.isInsertFilePushing) {
+              vn.setDisableState(true);
+              continue;
+            }
           } else if (vn.kind === 'insertMedia') {
             // 插播文件菜单
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);
             } else if (this.role == 4) {
-              if (this.doc_permission == this.userId) {
+              // 是主讲人并且没有开启分屏的时候并且没有开启第三方推流，插播可用
+              if (
+                this.doc_permission == this.userId &&
+                !this.isOpenSplitScreen &&
+                !this.isThirdStream
+              ) {
                 vn.setDisableState(false);
               } else {
                 // 嘉宾显示但禁用
                 vn.setHiddenState(false);
                 vn.setDisableState(true);
+              }
+            } else if (this.role == 1) {
+              if (this.isInGroup) {
+                vn.setHiddenState(true);
+              } else {
+                // 如果不在小组中
+                // 如果主持人把别人设为了主讲人，或者有人正在演示，或者开启分屏，或者开启第三方推流,插播文件禁用
+                if (
+                  this.doc_permission != this.userId ||
+                  this.presenterId != this.userId ||
+                  this.isOpenSplitScreen ||
+                  this.isThirdStream
+                ) {
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                } else {
+                  vn.setHiddenState(false);
+                  vn.setDisableState(false);
+                }
               }
             } else {
               if (this.isInGroup) {
@@ -168,6 +265,11 @@
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
               }
+            }
+            // 如果在桌面共享就禁用
+            if (this.isShareScreen) {
+              vn.setDisableState(true);
+              continue;
             }
           } else if (vn.kind === 'interactTool') {
             // 互动工具菜单
@@ -181,6 +283,21 @@
                 vn.setDisableState(true);
               }
             } else {
+              // 主持人不是主讲人、也不置灰
+              // if (this.role == 1 && this.doc_permission != this.userId) {
+              //   vn.setDisableState(true);
+              //   continue;
+              // }
+              // 如果问答权限没有，隐藏互动工具栏
+              if (this.role == 3 && this.webinarMode == 5 && !configList['ui.is_hide_qa_button']) {
+                vn.setHiddenState(true);
+                continue;
+              }
+              // 定时直播未开播时，互动工具置灰
+              if (this.role == 3 && this.webinarMode == 5 && this.webinarType == 2) {
+                vn.setDisableState(true);
+                continue;
+              }
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {

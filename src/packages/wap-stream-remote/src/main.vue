@@ -8,14 +8,23 @@
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图 -->
     <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
+
+    <!-- 音频直播的的时候显示流占位图 -->
+    <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
+
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom">
+    <section class="vmp-stream-local__bootom" v-show="stream.streamId">
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName)"
+        v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
         class="vmp-stream-local__bootom-role"
         :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleNameFilter }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
@@ -52,25 +61,49 @@
     },
     props: {
       stream: {
-        require: true
+        require: true,
+        type: Object,
+        default: () => {
+          return {};
+        }
+      }
+    },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          if (newval) {
+            this.$nextTick(() => {
+              this.subscribeRemoteStream();
+            });
+          }
+        },
+        immediate: true
       }
     },
     computed: {
-      // 是否显示摄像头开关按钮
-      isShowVideoControl() {
-        // 如果当前人是主持人,并且是主屏,显示
-        // if (this.joinInfo.role_name == 1 && this.mainScreen == this.joinInfo.third_party_user_id) {
-        //   return true
-        // } else
-        return true;
-      },
-      // 是否显示麦克风开关按钮
-      isShowAudioControl() {
-        return true;
-      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
+      presentationScreen() {
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        }
       },
       mainScreen() {
         if (this.isInGroup) {
@@ -79,6 +112,24 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
+      //显示是否在演示中
+      isShowPresentationScreen() {
+        const { accountId } = this.stream;
+        const sameId = this.presentationScreen === accountId;
+        const groupMode = this.liveMode == 6;
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
+
+        console.log('isShowPresentationScreen', {
+          sameId,
+          groupMode,
+          inMainRoomUser,
+          inGroupRoomUser
+        });
+
+        return sameId && groupMode && allowedUser;
+      },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
@@ -86,24 +137,10 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
-      }
-    },
+    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
-    },
-    mounted() {
-      this.subscribeRemoteStream();
     },
     beforeDestroy() {
       // 清空计时器
@@ -116,7 +153,7 @@
     },
     methods: {
       subscribeRemoteStream() {
-        console.warn('开始订阅', this.stream);
+        console.log('开始订阅', JSON.stringify(this.stream));
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
@@ -130,7 +167,7 @@
             this.getLevel();
           })
           .catch(e => {
-            console.warn('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
+            console.error('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
       speakOff() {
@@ -198,19 +235,52 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: #000;
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {
         display: flex;
       }
     }
+
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     .vmp-stream-remote__container {
       width: 100%;
       height: 100%;
     }
     .vmp-stream-remote__container__mute {
       background-image: url(./img/no_video_bg.png);
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .vmp-stream-remote__container__audio {
+      background-image: url(./img/audio.gif);
       background-size: cover;
       background-repeat: no-repeat;
       position: absolute;
@@ -258,7 +328,7 @@
       }
       &-nickname {
         display: inline-block;
-        width: 80px;
+        width: 160px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

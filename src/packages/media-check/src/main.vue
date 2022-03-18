@@ -8,7 +8,7 @@
       destroy-on-close
       center
       top="15vh"
-      @open="restart"
+      @open="reset"
     >
       <!-- step导航条 -->
       <header v-if="currentStep !== STEP_OPTS.RESULT - firstStep">
@@ -100,8 +100,8 @@
 
         // 步骤控制和检查
         checkList: getCheckList(),
-        currentStep: 0,
-        firstStep: 0,
+        currentStep: 0, // 当前检测到第几步
+        firstStep: 0, // 从第几步骤开始检测
 
         // devices 设备列表
         videoDevices: [], // 视频设备列表
@@ -131,21 +131,30 @@
       show() {
         this.$refs['pre-dialog'].show();
       },
+      /**
+       * 展示check弹窗
+       */
       showCheckDialog() {
         this.isShow = true;
-        this.restart();
+        this.reset();
       },
+      /**
+       * 从session中获取选中的video\audioInput\audioOutput
+       */
       getSessionSelectedDevice() {
         this.selected.video = getSession('selected.video');
         this.selected.audioInput = getSession('selected.audioInput');
         this.selected.audioOutput = getSession('selected.audioOutput');
       },
+      /**
+       * 将选中项设置进 session中
+       */
       setSessionSelectedDevice() {
         setSession('selected.video', this.selected.video);
         setSession('selected.audioInput', this.selected.audioInput);
         setSession('selected.audioOutput', this.selected.audioOutput);
       },
-      async restart() {
+      async reset() {
         // reset-data
         this.checkList = getCheckList();
         if (this.liveMode === 1) {
@@ -179,9 +188,8 @@
       },
       finish({ result }) {
         if (result === 'fail') {
-          this.restart();
+          this.reset();
         } else {
-          //TODO: EventBus.$emit('MEDIACHECK_FINISH')
           this.isShow = false;
         }
       },
@@ -190,9 +198,16 @@
        */
       async getVideoDeviceInfo() {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(trackInput => trackInput.stop());
-        this.getDevices();
+        stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -1');
+          trackInput.stop();
+        });
+        await this.getDevices();
+        this.setDefaultSelected();
       },
+      /**
+       * 获取设备
+       */
       async getDevices() {
         // 获取视频列表
         await this.mediaCheckServer.getCameras(
@@ -207,8 +222,11 @@
         // 获取扬声器
         await this.mediaCheckServer.getSpeakers(item => item.label);
 
-        this.setDefaultSelected();
+        return true;
       },
+      /**
+       * 获取默认设备
+       */
       setDefaultSelected() {
         // 设置默认选项
         if (this.devices.videoInputDevices.length > 0) {
@@ -250,7 +268,7 @@
 
     .el-dialog__body {
       height: 500px;
-      padding: 50px 56px 0 56px !important;
+      padding: 50px 56px 0 56px;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
@@ -269,7 +287,7 @@
             & > .el-step__line {
               height: 1px;
               top: 19px;
-              width: 180px;
+              width: 70px;
               left: 38%;
               background: #e8e8e8;
               & > .el-step__line-inner {
@@ -354,7 +372,7 @@
     .el-step__title {
       font-size: 14px;
       line-height: 16px;
-      padding-top: 3px;
+      padding-top: 4px;
       color: #666;
       &.is-process {
         color: #3562fa;
@@ -375,7 +393,7 @@
 
     .vh-media-check-main {
       width: 296px;
-      padding-top: 16px;
+      padding-top: 20px;
       margin: 0 auto;
     }
   }

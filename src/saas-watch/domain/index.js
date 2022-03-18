@@ -11,7 +11,10 @@ import {
   useVirtualAudienceServer,
   useUserServer,
   useGroupServer,
-  useDesktopShareServer
+  useDesktopShareServer,
+  useSplitScreenServer,
+  useInsertFileServer,
+  useMediaCheckServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -22,6 +25,9 @@ setBaseUrl({
 setRequestHeaders({
   platform: 7
 });
+
+// 平台标识
+window.platform = 7;
 
 Vue.use(DomainStore);
 
@@ -35,6 +41,9 @@ export default new DomainStore.Store({
     virtualAudienceServer: useVirtualAudienceServer().state,
     userServer: useUserServer().state,
     groupServer: useGroupServer().state,
-    desktopShareServer: useDesktopShareServer().state
+    desktopShareServer: useDesktopShareServer().state,
+    splitScreenServer: useSplitScreenServer().state,
+    insertFileServer: useInsertFileServer().state,
+    mediaCheckServer: useMediaCheckServer().state
   }
 });

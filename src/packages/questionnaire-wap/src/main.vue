@@ -6,7 +6,7 @@
   </van-popup>
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
@@ -15,17 +15,18 @@
       return {
         popupVisible: false,
         questionLastId: '', // 最后一个问卷id
-        questionnaireId: '' // 问卷Id
+        questionnaireId: '' // 当前问卷Id
       };
     },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
     },
     watch: {
-      // 切换
+      // 打开问卷弹窗(全屏,视频需要改为小窗)
       popupVisible(val) {
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitQuestionnaireVisible', [!!val])
@@ -37,17 +38,11 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
-        console.log('open', questionnaireId);
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
-            this.$message({
-              message: this.$t('form.form_1037'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
+            this.$toast(this.$t('form.form_1037'));
           } else {
-            this.dialogVisible = true;
+            this.popupVisible = true;
             this.$nextTick(() => {
               this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
             }); // 等dom渲染
@@ -59,16 +54,26 @@
       },
       initEvent() {
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
-          console.log('questionnaireServer22222222');
-          console.log(msg);
           useChatServer().addChatToList({
+            nickname: msg.nick_name,
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              // TODO 发起问卷文案提示不对
-              text_content: this.$t('interact_tools.interact_tools_1021')
+              text_content: this.$t('chat.chat_1030'),
+              questionnaire_id: msg.questionnaire_id
             },
-            type: msg.data.type,
-            interactStatus: true
+            roleName: msg.room_role,
+            type: msg.type,
+            interactStatus: true,
+            isCheck: true
           });
+          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+            msg.questionnaire_id
+          );
+          if (canAnswer !== true) {
+            this.questionnaireServer.setDotVisible(false);
+            return false;
+          }
+          this.questionnaireServer.setDotVisible(true);
           this.popupVisible = true;
           await this.$nextTick();
           this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', msg.questionnaire_id);
@@ -81,6 +86,10 @@
             this.$toast(this.$t('form.form_1037'));
             this.popupVisible = false;
           }
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
         });
       }
     }
@@ -195,7 +204,6 @@
     height: 100%;
     background: white;
     left: 0;
-    // overflow: hidden;
     z-index: 4200;
     // 更多那个弹窗是慢慢增加的
   }
@@ -206,27 +214,7 @@
     position: relative;
     background: #fff;
     height: 100%;
-    // -webkit-overflow-scrolling: touch;
     overflow: auto;
-    //   ::v-deep {
-    //     .q-wrap {
-    //       // 软键盘挡住input框问题
-    //       padding-bottom: 400px;
-    //       // padding-bottom: 160px;
-    //       // padding-bottom: calc(env(safe-area-inset-bottom) + 160px);
-    //       // .q-btns {
-    //       //   height: 100px;
-    //       //   position: fixed;
-    //       //   left: 0;
-    //       //   background: white;
-    //       //   bottom: 0;
-    //       //   bottom: env(safe-area-inset-bottom);
-    //       //   span {
-    //       //     margin: 0 auto;
-    //       //   }
-    //       // }
-    //     }
-    //   }
   }
   .quest-header {
     z-index: 99;

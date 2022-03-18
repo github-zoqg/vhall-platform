@@ -45,11 +45,6 @@
   import { throttle } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
-    filters: {
-      formatTime(value) {
-        return value.substring(11, 16);
-      }
-    },
     data() {
       const domainState = this.noticeServer.state;
 
@@ -86,6 +81,7 @@
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
+      // 保持和线上一直，不调用接口， 刷新时，就没有公告了
       // this.getNoticeList(false);
     },
     mounted() {
@@ -255,7 +251,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background: @font-error;
+              background: @bg-error-light;
               position: absolute;
               top: 2px;
               left: 2px;

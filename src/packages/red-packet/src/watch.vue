@@ -1,7 +1,7 @@
 <!-- 观看页-红包组件（颤动 + 弹出层） -->
 <template>
   <div class="vhsaas-red-packet" v-if="dialogVisible">
-    <div class="vhsaas-interact-mask">
+    <div class="vhsaas-interact-mask" :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }">
       <components
         :is="componentsView"
         :amount="redPacketServerState.amount * 1"
@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer } from 'middle-domain';
+  import { useRedPacketServer, useZIndexServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
@@ -33,14 +33,20 @@
     },
     data() {
       const redPacketServerState = this.redPacketServer.state;
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         redPacketServerState,
         dialogVisible: false, // 组件显示
         componentsView: 'RedPacketAccept'
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
+      this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
@@ -57,10 +63,12 @@
             this.componentsView = 'RedPacketAccept';
           }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('redPacket');
         });
       },
       openRedPacket(uuid) {
         this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('redPacket');
         this.open(uuid);
       },
       handleGoLogin() {
@@ -68,8 +76,21 @@
       },
       initEvent() {
         this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
+          useChatServer().addChatToList({
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+            content: {
+              text_content: this.$t('chat.chat_1038')
+            },
+            type: data.type,
+            interactStatus: true,
+            Show: true
+          });
           const uuid = data.red_packet_uuid;
           this.open(uuid);
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
         });
       },
       close() {

@@ -1,17 +1,21 @@
 <template>
-  <section class="vmp-rebroadcast-stream mini" v-show="isShow">
-    <span class="toggle-tips" @click="toggleScreen">
+  <section
+    class="vmp-rebroadcast-stream"
+    :class="[miniElement === 'rebroadcast-stream' ? 'mini' : '']"
+    v-show="isShow"
+  >
+    <span class="toggle-tips" @click="exchangeScreen">
       <el-tooltip content="切换">
         <i class="vh-iconfont vh-line-copy-document"></i>
       </el-tooltip>
     </span>
-    <video-preview v-if="isShow" :videoParam="videoParam" />
+    <video-preview ref="videoPreview" v-if="isShow" :videoParam="videoParam" />
   </section>
 </template>
 
 <script>
   import VideoPreview from '@/packages/app-shared/components/video-preview';
-  import { useInteractiveServer, useRebroadcastServer } from 'middle-domain';
+  import { useRoomBaseServer, useInteractiveServer, useRebroadcastServer } from 'middle-domain';
 
   export default {
     name: 'VmpRebroadcastStream',
@@ -27,20 +31,33 @@
         interactiveState
       };
     },
+    computed: {
+      miniElement() {
+        return this.$domainStore.state.roomBaseServer.miniElement;
+      }
+    },
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
       this.rebroadcastServer = useRebroadcastServer();
     },
     mounted() {
-      if (this.rebroadcastServer.state.rebroadcastId) {
+      if (this.roomBaseServer.state.watchInitData.rebroadcast.id) {
         this.open();
       }
     },
     methods: {
       async open() {
-        await this.interactiveServer.unpublishStream();
+        if (this.interactiveServer.state.localStream.streamId) {
+          await this.interactiveServer.unpublishStream();
+        }
 
-        const { token, appId, accountId, roomId } = this.domainState;
+        const { watchInitData } = this.roomBaseServer.state;
+
+        const token = watchInitData.interact.paas_access_token;
+        const appId = watchInitData.interact.paas_app_id;
+        const accountId = watchInitData.join_info.user_id;
+        const roomId = watchInitData.interact.room_id;
 
         console.log('open rebroadcast stream:', { token, appId, accountId, roomId });
 
@@ -58,15 +75,20 @@
         };
         console.log('videoParam:', this.videoParam);
         this.isShow = true;
-      },
-      async close(options = {}) {
-        if (options.pushLocalStream === true) {
-          await this.interactiveServer.publishStream();
-        }
 
+        this.roomBaseServer.setChangeElement('doc');
+      },
+      async close() {
+        this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
         this.isShow = false;
       },
-      toggleScreen() {}
+      exchangeScreen() {
+        const miniElement =
+          this.miniElement === 'rebroadcast-stream' ? 'doc' : 'rebroadcast-stream';
+        console.log('next miniElement', miniElement);
+        this.roomBaseServer.setChangeElement(miniElement);
+      }
     }
   };
 </script>

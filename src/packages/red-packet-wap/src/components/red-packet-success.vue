@@ -8,7 +8,7 @@
         <p class="vhsaas-gold-title">{{ $t('interact_tools.interact_tools_1033') }}</p>
         <p class="vhsaas-gold-unit">
           <i>￥</i>
-          {{ amount }}
+          <span v-text="amount"></span>
         </p>
       </div>
       <!-- 未抢到金额  -->
@@ -38,14 +38,14 @@
       <p class="vhsaas-red-packet__btn" @click="navToList">
         {{ $t('interact_tools.interact_tools_1036') }}
       </p>
-      <!-- <p v-if="amount > 0" class="vhsaas-red-packet__remark">
+      <p v-if="amount > 0" class="vhsaas-red-packet__remark">
         {{ $t('interact_tools.interact_tools_1037') }}
         <i
           class="vhsaas-red-packet__help vh-iconfont vh-line-question"
           @mouseover="noticeShow = true"
           @mouseout="noticeShow = false"
         ></i>
-      </p> -->
+      </p>
     </div>
     <!-- 第五层 - 提现备注悬浮层-->
     <div v-show="noticeShow" class="vhsaas-red-packet_notice">
@@ -163,7 +163,7 @@
   }
   .vhsaas-gold-title {
     font-size: 24px;
-    font-weight: 400;
+    font-weight: bold;
     color: #ba5003;
     line-height: 34px;
     margin-top: 240px;
@@ -265,11 +265,12 @@
   }
   .vhsaas-red-packet__btn {
     cursor: pointer;
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 400;
     color: #fee4b3;
     line-height: 40px;
     text-align: center;
+    font-weight: bold;
   }
   .vhsaas-red-packet__remark {
     font-size: 24px;
@@ -295,7 +296,7 @@
     position: absolute;
     z-index: 28;
     bottom: 206px;
-    left: 230px;
+    text-align: justify;
     padding: 16px 20px 14px 40px;
     p {
       font-size: 24px;

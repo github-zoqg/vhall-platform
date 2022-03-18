@@ -68,7 +68,7 @@
 </template>
 
 <script>
-  import { useMediaSettingServer } from 'middle-domain';
+  import { useMediaSettingServer, useMsgServer } from 'middle-domain';
   import { LIVE_MODE_MAP } from '../../js/liveMap';
   import mediaSettingConfirm from '../../js/showConfirm';
 
@@ -80,7 +80,7 @@
       return {
         loading: false,
         mediaState: this.mediaSettingServer.state,
-        lastSelectRate: '', // 上一选中的值
+        lastSelectRate: '', // 上一选中的画质的值（用于取消更改时还原）
         ratesConfig: Object.freeze([
           'RTC_VIDEO_PROFILE_720P_16x9_M', // 超清
           'RTC_VIDEO_PROFILE_480P_16x9_M', // 高清
@@ -103,18 +103,23 @@
       webinar() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
       },
+      // 直播状态： 直播中、已结束....
       liveStatus() {
         return this.webinar.type;
       },
+      // 直播类型：1-音频 2-视频 3-互动 6-互动
       liveMode() {
         return this.webinar.mode;
       },
+      // 是否是无延迟
       isNoDelay() {
         return this.webinar.no_delay_webinar === 1;
       },
+      // 在不同场景下的layoutConfig
       filterLayoutConfig() {
         // 分组、无延迟时，只展示一种布局
         const isGroupLive = this.liveMode === LIVE_MODE_MAP['GROUP'];
+
         if (isGroupLive || this.isNoDelay) {
           return this.layoutConfig.filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE');
         }
@@ -129,12 +134,29 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      this.msgServer = useMsgServer();
     },
     created() {
-      window.basicSetting = this;
+      this.listenEvents();
+    },
+    mounted() {
       this.setDefault();
     },
+    beforeDestroy() {
+      this.removeEvents();
+    },
     methods: {
+      listenEvents() {
+        // 结束直播时恢复 标清
+        this._onLiveOver = () => {
+          this.mediaState.rate = this.ratesConfig[2]; // 恢复标清;
+          sessionStorage.setItem('selectedRate', '');
+        };
+        this.msgServer.$on('live_over', this._onLiveOver);
+      },
+      removeEvents() {
+        this.msgServer.$off('live_over', this._onLiveOver);
+      },
       setLayout(id) {
         if (this.liveStatus === 1) return;
         this.mediaState.layout = id;
@@ -144,7 +166,8 @@
         const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
         const saveScreenRate =
           sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
-        const savedLayout = sessionStorage.getItem('layout') || this.filterLayoutConfig[0].id;
+
+        const savedLayout = sessionStorage.getItem('layout') || 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE'; // 默认主次平铺
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;

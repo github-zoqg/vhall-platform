@@ -34,7 +34,20 @@ function getPlugins() {
     new webpack.DefinePlugin({
       'process.env': {
         // https://router.vuejs.org/zh/api/#base 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/"
-        ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl')
+        ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl'),
+        VUE_APP_WAP_WATCH_MIDDLE: JSON.stringify(process.env.VUE_APP_WAP_WATCH_MIDDLE),
+        VUE_APP_WEB_BASE_MIDDLE: JSON.stringify(process.env.VUE_APP_WEB_BASE_MIDDLE),
+        VUE_MIDDLE_SAAS_WATCH_PC_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_WATCH_PC_PROJECT
+        ),
+        VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT
+        ),
+        VUE_MIDDLE_SAAS_LIVE_PC_PROJECT: JSON.stringify(
+          process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT
+        ),
+        VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS), //化蝶观看端域名
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS) //化蝶发起端域名
       }
     })
   ];
@@ -42,6 +55,77 @@ function getPlugins() {
   if (!isDev) {
     // 项目资源路径
     let projectResourceDir = path.join(pathConfig.ROOT, `dist/${argv.project}/static/js/`);
+
+    // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
+    if (argv.middle) {
+      process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
+    }
+
+    // ReplaceInFileWebpackPlugin 参数
+    const replaceInFileWebpackPluginData = [
+      {
+        dir: `dist/${argv.project}/docker`,
+        files: ['index.html'],
+        rules: [
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}`
+          }
+        ]
+      },
+      {
+        dir: `dist/${argv.project}/docker/${argv.version}`,
+        files: ['index.html'],
+        rules: [
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}/${argv.version}`
+          }
+        ]
+      },
+      {
+        dir: `dist/${argv.project}/cloud/static`,
+        test: /\.js$/,
+        rules: [
+          {
+            search: /@routerBaseUrl/g,
+            replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
+          },
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}`
+          }
+        ]
+      },
+      {
+        dir: `dist/${argv.project}/cloud/${argv.version}/static`,
+        test: /\.js$/,
+        rules: [
+          {
+            search: /@routerBaseUrl/g,
+            replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
+          },
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}/${argv.version}`
+          }
+        ]
+      }
+    ];
+
+    // 如果非测试环境  非开发环境，修改 sourceMap 的地址
+    if (process.env.NODE_ENV != 'test') {
+      replaceInFileWebpackPluginData.push({
+        dir: `dist/${argv.project}`,
+        test: /\.js$/,
+        rules: [
+          {
+            search: /sourceMappingURL=/gi,
+            replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
+          }
+        ]
+      });
+    }
 
     plugins.push(
       new SentryCliPlugin({
@@ -86,66 +170,7 @@ function getPlugins() {
         }
       }),
       // 修改文件内容替换路由标记
-      new ReplaceInFileWebpackPlugin([
-        {
-          dir: `dist/${argv.project}/docker`,
-          files: ['index.html'],
-          rules: [
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}/docker/${argv.version}`,
-          files: ['index.html'],
-          rules: [
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}/${argv.version}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}/cloud/static`,
-          test: /\.js$/,
-          rules: [
-            {
-              search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-            },
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}/cloud/${argv.version}/static`,
-          test: /\.js$/,
-          rules: [
-            {
-              search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
-            },
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}/${argv.version}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}`,
-          test: /\.js$/,
-          rules: [
-            {
-              search: /sourceMappingURL=/gi,
-              replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
-            }
-          ]
-        }
-      ])
+      new ReplaceInFileWebpackPlugin(replaceInFileWebpackPluginData)
     );
   }
   return plugins;
@@ -159,7 +184,8 @@ const sharedConfig = {
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool: isDev ? '#source-map' : '#cheap-module-source-map',
+    devtool:
+      isDev || process.env.NODE_ENV == 'test' ? '#eval-source-map' : '#cheap-module-source-map',
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
       hints: isDev ? false : 'warning',
@@ -256,8 +282,13 @@ const sharedConfig = {
   // 不使用thread-loader, 否则有很大概率编译不通过
   parallel: false,
   devServer: {
-    port: 8080,
+    // port: 443,
     host: '0.0.0.0',
+    // https: true,
+    // disableHostCheck: true,
+    // allowedHosts: [
+    //   'dev-csd-saas-web.vhall.com'
+    // ],
     contentBase: resolve('public'),
     proxy: {
       '/mock': {
@@ -303,7 +334,6 @@ if (['serve', 'build'].includes(cmd)) {
 
   // 导出
   module.exports = vueConfig;
-  return;
+} else {
+  module.exports = sharedConfig;
 }
-
-module.exports = sharedConfig;

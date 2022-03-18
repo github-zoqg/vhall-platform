@@ -7,7 +7,7 @@
   >
     <div
       class="vmp-basic-container"
-      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : ''"
+      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : 'vmp-basic-container-normarl'"
       v-if="state === 1"
     >
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
@@ -49,9 +49,12 @@
           this.clientType = 'embed';
         }
         const domain = await this.initReceiveLive(this.clientType);
+        await roomState();
         const roomBaseServer = useRoomBaseServer();
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
-        await roomState();
+        document.title = roomBaseServer.state.languages.curLang.subject;
+        let lang = roomBaseServer.state.languages.lang;
+        this.$i18n.locale = lang.type;
         domain.initVhallReport(
           {
             bu: 0,
@@ -174,6 +177,10 @@
       height: 100%;
     }
   }
+  .vmp-basic-container-normarl {
+    overflow: auto;
+  }
+
   // 媒体查询分辨率下效果
   @media screen and (min-width: 1920px) {
     .vmp-basic-bd {

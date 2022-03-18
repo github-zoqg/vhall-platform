@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { initGlobalAPI, i18n } from './core';
 import domainStore from './domain';
+import '@/packages/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';

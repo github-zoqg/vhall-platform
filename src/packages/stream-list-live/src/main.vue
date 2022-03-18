@@ -5,41 +5,51 @@
     :class="{ 'vmp-stream-list-h0': isStreamListH0, shrink: isShrink }"
   >
     <div class="vmp-stream-list__stream-wrapper">
+      <!-- 本地流容器 -->
       <div
         class="vmp-stream-list__local-container"
         :class="{
           'height-lower': isMainScreenHeightLower && !isShrink,
           'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__mini':
-            miniElement == 'stream-list' && joinInfo.third_party_user_id == mainScreen,
-          'vmp-dom__max': miniElement != 'stream-list' && joinInfo.third_party_user_id == mainScreen
+            ['stream-list', 'insert-video'].includes(miniElement) &&
+            joinInfo.third_party_user_id == mainScreen,
+          'vmp-dom__max':
+            !['stream-list', 'insert-video'].includes(miniElement) &&
+            joinInfo.third_party_user_id == mainScreen
         }"
-        v-show="localStream.streamId"
+        v-show="localSpeaker.accountId"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
-      <template v-if="remoteStreams.length">
+
+      <!-- 远端流列表 -->
+      <template v-if="remoteSpeakers.length">
         <div
-          v-for="stream in remoteStreams"
-          :key="stream.streamId"
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-            'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen,
-            'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-dom__mini':
+              ['stream-list', 'insert-video'].includes(miniElement) &&
+              speaker.accountId == mainScreen,
+            'vmp-dom__max':
+              !['stream-list', 'insert-video'].includes(miniElement) &&
+              speaker.accountId == mainScreen
           }"
         >
-          <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+          <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
         </div>
       </template>
 
       <!-- 主持人进入小组后助理占位图 -->
       <div
-        v-if="mode == 6 && isHostInGroup && joinInfo.role_name == 3 && !isInGroup"
+        v-if="showGroupMask"
         class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
         :class="{
-          'vmp-dom__mini': miniElement == 'stream-list',
-          'vmp-dom__max': miniElement != 'stream-list'
+          'vmp-dom__mini': ['stream-list', 'insert-video'].includes(miniElement),
+          'vmp-dom__max': !['stream-list', 'insert-video'].includes(miniElement)
         }"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
@@ -47,33 +57,25 @@
       </div>
     </div>
 
-    <div
-      class="vmp-stream-list__folder"
-      v-show="remoteStreams.length > 0 || (splited && speakerList.length > 0)"
-      v-if="!isSplited"
-    >
+    <!-- 滚动操作 -->
+    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0">
       <span
         class="vmp-stream-list__folder--up"
         :class="{
-          disable:
-            isShrink ||
-            (!splited && remoteStreams.length <= remoteMaxLength) ||
-            (splited && speakerList.length - 1 <= remoteMaxLength)
+          disable: isShrink || remoteSpeakers.length <= remoteMaxLength
         }"
         @click="toggleShrink(true)"
       ></span>
       <span
         class="vmp-stream-list__folder--down"
         :class="{
-          disable:
-            !isShrink ||
-            (!splited && remoteStreams.length <= remoteMaxLength) ||
-            (splited && speakerList.length - 1 <= remoteMaxLength)
+          disable: !isShrink || remoteSpeakers.length <= remoteMaxLength
         }"
         @click="toggleShrink(false)"
       ></span>
     </div>
 
+    <!-- 异常弹窗 -->
     <saas-alert
       :visible="PopAlertOffline.visible"
       :retry="'点击重试'"
@@ -97,6 +99,7 @@
     useGroupServer
   } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
   export default {
     name: 'VmpStreamListLive',
@@ -104,25 +107,22 @@
     data() {
       return {
         childrenCom: [],
-        maxElement: '',
-        isSplited: false,
-        splited: false,
         isShrink: false, // 是否收起
         isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
         remoteMaxLength: 0, //一行最大数
-        speakerList: [],
+
+        // 网络异常弹窗状态
         PopAlertOffline: {
           visible: false
         },
-
-        // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group
+        streamInfo
       };
     },
     components: {
       SaasAlert
     },
     computed: {
+      // 3互动 //6分组
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -133,15 +133,28 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        console.warn(this.$domainStore.state, 789);
         if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
-      remoteStreams() {
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
+        );
+      },
+      remoteSpeakers() {
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -159,19 +172,20 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
+         * 4. 没有互动实例的时候高度为0
          */
-        if (!this.remoteStreams.length) {
-          if (
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          ) {
+        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+          return true;
+        }
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;
           } else {
             return true;
           }
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
@@ -181,6 +195,16 @@
       },
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
+      },
+      showGroupMask() {
+        // 主持人是否在组内 + 直播中 + 分组 + 助理 + 自身不在小组中
+        return (
+          this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1 &&
+          this.mode == 6 &&
+          this.joinInfo.role_name == 3 &&
+          !this.isInGroup
+        );
       }
     },
 
@@ -193,25 +217,16 @@
     },
 
     created() {
-      window.streamListLive = this;
       this.childrenCom = window.$serverConfig[this.cuid].children;
-      console.log(
-        '-- this.childrenCom:',
-        this.childrenCom,
-        this.$domainStore.state.interactiveServer.remoteStreams
-      );
 
       // 房间信令异常断开事件
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
         this.PopAlertOffline.visible = true;
       });
       this.listenEvents();
-      // this.getStreamList();
     },
 
     mounted() {
-      console.log(this.joinInfo, '----stream-list----joinInfo');
-
       // 计算一行最多放几个
       this.remoteMaxLength = parseInt(this.$refs.streamList.offsetWidth / 142);
 
@@ -267,34 +282,23 @@
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
           if (this.joinInfo.role_name == 1) {
-            const streams = this.interactiveServer.getRoomStreams();
-            const mainScreenStream = streams.find(
-              stream => stream.accountId == msg.data.room_join_id
+            const mainScreenSpeaker = this.speakerList.find(
+              speaker => speaker.accountId == msg.data.room_join_id
             );
-            if (mainScreenStream) {
-              this.interactiveServer.setBroadCastScreen(mainScreenStream.streamId);
+            if (mainScreenSpeaker.streamId) {
+              this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
+            } else {
+              this.$message.warning('当前用户正在推流，请稍等');
             }
           }
         });
+      },
 
-        // 主持人进入退出小组 消息监听
-        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-          if (msg.data.status == 'enter') {
-            this.isHostInGroup = true;
-          } else if (msg.data.status == 'quit') {
-            this.isHostInGroup = false;
-          }
-        });
-      },
-      getStreamList() {
-        this.interactiveServer.getRoomStreams();
-        console.log('------remoteStreams------', this.remoteStreams);
-      },
       toggleShrink(flag) {
         this.isShrink = flag;
       },
       /**
-       * 计算
+       * 计算streamList变动
        */
       computTop() {
         const MutationObserver =
@@ -362,7 +366,7 @@
             .vmp-stream-local__shadow-icon {
               background: none;
               &:hover {
-                background-color: #fc5659;
+                background-color: #fb3a32;
               }
             }
           }
@@ -380,6 +384,12 @@
         width: 309px;
         height: 240px;
         z-index: 1;
+        .vmp-stream-local__bootom-role {
+          padding: 0 8px;
+        }
+        .vmp-stream-local__bootom-nickname {
+          width: 80px;
+        }
       }
     }
 
@@ -398,10 +408,20 @@
       height: 80px;
     }
 
-    .vmp-stream-list__remote-container,
+    .vmp-stream-list__remote-container {
+      width: 142px;
+      height: 80px;
+    }
+
     .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
+      .vmp-stream-local__bootom-role {
+        padding: 0 6px;
+      }
+      .vmp-stream-local__bootom-nickname {
+        width: 40px;
+      }
     }
 
     // 展开收起按钮

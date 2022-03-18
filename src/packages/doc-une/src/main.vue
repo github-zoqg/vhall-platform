@@ -12,10 +12,7 @@
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
-    <VmpDocToolbar
-      ref="docToolbar"
-      v-show="hasDocPermission && (displayMode === 'normal' || displayMode === 'fullscreen')"
-    ></VmpDocToolbar>
+    <VmpDocToolbar ref="docToolbar" v-show="showToolbar" @changeBrush="changeBrush"></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
     <el-button
@@ -47,8 +44,9 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
-          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
-          <span v-if="hasDocPermission || [3, 4].includes(roleName)">暂未分享任何文档</span>
+          <span v-if="hasDocPermission || [3, 4].includes(roleName)">
+            {{ $t('doc.doc_1011') }}
+          </span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
       </div>
@@ -61,7 +59,7 @@
           title="上一步"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
-        <li v-if="hasPager" class="page-number">
+        <li v-if="hasPager || webinarMode == 5" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
           <span class="page-split">/</span>
           <span class="page-total">{{ docServer.state.pageTotal }}</span>
@@ -74,40 +72,45 @@
         ></li>
         <li
           data-value="zoomIn"
-          title="放大"
+          :title="$t('doc.doc_1005')"
           class="doc-pagebar__opt vh-iconfont vh-line-zoom-in"
         ></li>
         <li
           data-value="zoomOut"
-          title="缩小"
+          :title="$t('doc.doc_1006')"
           class="doc-pagebar__opt vh-iconfont vh-line-zoom-out"
         ></li>
         <li
           data-value="zoomReset"
-          title="还原"
+          :title="$t('doc.doc_1008')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-a-line-11"
         ></li>
         <li
           data-value="move"
-          title="移动"
-          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag"
+          :title="$t('doc.doc_1007')"
+          class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
+          :class="{ selected: canMove }"
         ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
           data-value="fullscreen"
-          title="全屏"
+          :title="$t('doc.doc_1010')"
           class="doc-pagebar__opt vh-iconfont vh-a-line-fullscreen"
         ></li>
         <li
           v-if="isWatch && displayMode === 'fullscreen'"
           data-value="fullscreen"
-          title="退出全屏"
+          :title="$t('doc.doc_1009')"
           class="doc-pagebar__opt vh-iconfont vh-a-line-exitfullscreen"
         ></li>
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul class="vmp-doc-thumbnailbar" @click="handleThumbnail" v-show="thumbnailShow">
+      <ul
+        class="vmp-doc-thumbnailbar"
+        @click="handleThumbnail"
+        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
+      >
         <li
           class="doc-thumbnailbar__opt"
           v-for="(item, index) in docServer.state.thumbnailList"
@@ -162,11 +165,11 @@
     },
     data() {
       return {
-        className: '',
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
-        keepAspectRatio: true,
+        keepAspectRatio: true, //保持纵横比
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false
+        hasStreamList: false, // 是否展示流列表
+        canMove: false //文档能否拖拽
       };
     },
     computed: {
@@ -175,6 +178,10 @@
       },
       groupInitData() {
         return this.groupServer.state.groupInitData;
+      },
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
+      webinarMode() {
+        return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
       // 文档是否加载完成
       docLoadComplete() {
@@ -196,7 +203,7 @@
       showPagebar() {
         // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
         return (
-          this.docServer.state.currentCid.split('-')[0] === 'document' &&
+          this.currentType === 'document' &&
           (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
         );
       },
@@ -224,8 +231,10 @@
       },
       // 文档是否可见
       show() {
+        // 1、发起端没有开启桌面共享时展示
+        // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
-          (!this.isWatch && !this.desktopShareServer.state.isShareScreen) ||
+          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -240,6 +249,15 @@
         }
         // 当前用户是否演示者
         return this.presenterId == this.userId;
+      },
+      // 是否显示文档白板工具栏
+      showToolbar() {
+        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
+        return (
+          this.webinarMode != 5 &&
+          (this.hasDocPermission || [3].includes(this.roleName)) &&
+          ['normal', 'fullscreen'].includes(this.displayMode)
+        );
       },
       /**
        * @description 是否显示结束演示按钮
@@ -290,18 +308,24 @@
       },
       // 是否有翻页操作权限
       hasPager() {
+        // 定时直播所有人都没有翻页权限
+        if (this.webinarMode == 5) return false;
+        // 有演示权限，或者助理配有翻页权限，或者活动设置了有翻页权限
         return (
           this.hasDocPermission ||
-          ([3, 4].includes(this.roleName) &&
-            this.roomBaseServer.state.configList.close_assistant_flip_doc == 1) ||
+          (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
           this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
         );
+      },
+      // 当前资料类型是文档还是白板
+      currentType() {
+        return this.docServer.state.currentCid.split('-')[0];
       }
     },
     watch: {
       // 回放的时候
       ['docServer.state.switchStatus'](newval) {
-        if ([4, 5].includes(this.webinarType)) {
+        if (this.isWatch && [4, 5].includes(this.webinarType)) {
           // 如果是回放会点播,文档显示与不显示是切换处理
           if (newval) {
             useRoomBaseServer().setChangeElement('player');
@@ -360,10 +384,17 @@
         screenfull.toggle(this.$refs.docWrapper);
       },
       /**
-       * 缩略图列表展开与这都
+       * 缩略图列表展开与折叠
        */
       toggleThumbnail() {
         this.thumbnailShow = !this.thumbnailShow;
+        if (
+          this.thumbnailShow &&
+          this.currentCid == this.docServer.state.docCid &&
+          this.docServer.state.docCid
+        ) {
+          this.docServer.getCurrentThumbnailList();
+        }
       },
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
@@ -391,15 +422,37 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
+        console.log('----resize-----');
         this.resize();
       },
       /**
        * 屏幕缩放
        */
       resize() {
-        let rect;
+        let { width, height } = this.getDocViewRect();
+        if (!width || !height) {
+          console.error(`[doc] resize 获取容器宽高异常width=${width},height=${height}`);
+          return;
+        }
+        if (
+          (document.getElementById(this.docServer.state.docCid) &&
+            document.getElementById(this.docServer.state.docCid).childNodes.length) ||
+          (document.getElementById(this.docServer.state.boardCid) &&
+            document.getElementById(this.docServer.state.boardCid).childNodes.length)
+        ) {
+          try {
+            this.docServer.setSize(width, height);
+          } catch (ex) {
+            console.error('[doc] setSize:', ex);
+          }
+        }
+      },
+      getDocViewRect() {
+        let rect = { width: 0, height: 0 };
         if (this.isWatch) {
+          console.log('----this.isWatch-----');
           if (this.displayMode === 'mini') {
+            console.log('----is mini-----');
             rect = {
               width: 360,
               height: 204
@@ -408,11 +461,13 @@
             rect = this.$refs.docWrapper?.getBoundingClientRect();
             if (rect.width === 0) {
               const parentNode = this.$refs.docWrapper.parentNode;
-              const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
-              rect = {
-                width: cWidth,
-                height: (cWidth / 16) * 9
-              };
+              if (parentNode) {
+                const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
+                rect = {
+                  width: cWidth,
+                  height: (cWidth / 16) * 9
+                };
+              }
             }
           }
         } else {
@@ -421,10 +476,8 @@
               ? this.$refs.docWrapper?.getBoundingClientRect()
               : this.$refs.docContent?.getBoundingClientRect();
         }
-        if (!rect) return;
-        let { width, height } = rect;
-        if (!width || !height) return;
-
+        if (!rect.width || !rect.height) return rect;
+        const { width, height } = rect;
         let w = null,
           h = null;
         if (this.keepAspectRatio) {
@@ -439,13 +492,7 @@
           w = width;
           h = height;
         }
-        this.docViewRect = { width: w, height: h };
-        if (
-          document.getElementById(this.docServer.state.docCid) ||
-          document.getElementById(this.docServer.state.boardCid)
-        ) {
-          this.docServer.setSize(w, h);
-        }
+        return { width: w, height: h };
       },
       /**
        * 初始化各种事件
@@ -453,35 +500,29 @@
       initEvents() {
         if (this.isWatch) {
           // 观看端事件
-          // 文档是否可见状态变化事件
-          this.docServer.$on('dispatch_doc_switch_change', val => {
-            console.log('===[doc]=======dispatch_doc_switch_change=============', val);
-            if (val && this.show) {
-              this.recoverLastDocs();
-            }
-          });
-
           // 回放文档加载事件
           this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
             console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
+            // 获取回放文档容器数据
             const data = this.docServer.getVodAllCids();
             this.docServer.state.containerList = data.map(item => {
               return {
                 cid: item.cid
               };
             });
-            // console.log(
-            //   '[doc]this.docServer.state.containerList:',
-            //   this.docServer.state.containerList
-            // );
+            // 等dom渲染完成
             await this.$nextTick();
 
             // 回放只在观看端可用
-            this.resize();
-            // console.log('[doc] vod recoverLastDocs docViewRect:', this.docViewRect);
-            const { width, height } = this.docViewRect;
-            if (!width || !height) return;
+            const { width, height } = this.getDocViewRect();
+            if (!width || !height) {
+              console.error(
+                `[doc] cuepoint_load_complate 获取容器宽高异常width=${width},height=${height}`
+              );
+              return;
+            }
             for (const item of data) {
+              // 循环初始化容器
               this.docServer.initContainer({
                 cid: item.cid,
                 width,
@@ -489,12 +530,14 @@
                 fileType: item.type.toLowerCase()
               });
             }
+            // 加载回放数据
             this.docServer.loadVodIframe();
           });
 
           // 点播或回放播放器播放完成
           usePlayerServer().$on(VhallPlayer.ENDED, () => {
             console.log('[doc] VhallPlayer.ENDED');
+            // 4-点播， 5-回放
             if ([4, 5].includes(this.webinarType)) {
               this.docServer.state.switchStatus = false;
             }
@@ -504,6 +547,7 @@
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 直播开始
           if (msg.data.type === 'live_start') {
+            // 3-助理，4-嘉宾
             if ([3, 4].includes(this.roleName)) {
               this.recoverLastDocs();
             }
@@ -513,8 +557,17 @@
         // 直播结束
         useMsgServer().$on('live_over', () => {
           console.log('[doc]---直播结束 live_over---');
+          // 设置观众不可见
           this.docServer.state.switchStatus = false;
-          useRoomBaseServer().setChangeElement('doc');
+          if (this.isWatch) {
+            useRoomBaseServer().setChangeElement('doc');
+          } else {
+            this.setDisplayMode('normal');
+            // 通知默认菜单和工具栏默认为文档
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+            );
+          }
           this.hasStreamList = false;
         });
 
@@ -551,30 +604,14 @@
           }
         });
 
-        // 文档不存在或已删除
-        this.docServer.on('dispatch_doc_not_exit', () => {
-          this.$message({
-            type: 'error',
-            message: '文档不存在或已删除'
-          });
-        });
+        // 文档容器选择事件
+        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
 
-        this.docServer.on(VHDocSDK.Event.SELECT_CONTAINER, async data => {
-          // if (this.currentCid == data.id || (this.roleName != 1 && this.liveStatus != 1)) {
-          //   return;
-          // }
-          console.log('[doc] ===========选择容器======', data);
-          // this.docInfo.docShowType = data.id.split('-')[0];
-          // 判断容器是否存在
-          const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-          if (currentItem) {
-            this.docServer.activeContainer(data.id);
-          } else {
-            const { id: cid, docId } = data;
-            console.log('[doc] cid:', cid);
-            this.addNewFile({ fileType: cid.split('-')[0], docId, cid });
-          }
-        });
+        // 文档不存在或已删除
+        this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        // 文档是否可见状态变化事件
+        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       },
 
       listenKeydown(e) {
@@ -594,7 +631,7 @@
        * @param {*} docType
        */
       async addNewFile({ fileType, docId, docType, cid }) {
-        const { width, height } = this.docViewRect;
+        const { width, height } = this.getDocViewRect();
         console.log(
           '[doc] addNewFile:',
           JSON.stringify({
@@ -612,11 +649,7 @@
           fileType,
           cid,
           docId,
-          docType,
-          bindCidFun: async cid => {
-            console.log('[doc] bindCidFun:', cid);
-            await this.$nextTick();
-          }
+          docType
         });
         this.resize();
       },
@@ -625,6 +658,8 @@
        */
       recoverLastDocs: async function () {
         console.log('[doc] 刷新或者退出重进恢复上次的文档');
+        if (!this.docLoadComplete) return;
+        this.docServer.setDocLoadComplete(false);
         try {
           // 获取容器列表
           await this.docServer.getContainerList();
@@ -650,22 +685,20 @@
         }
         // 确定文档最外层节点显示，并且文档dom绑定ID成功
         await this.$nextTick();
-
-        console.log('[doc] recoverLastDocs resize');
         // 初始化文档最外层节点大小
-        this.resize();
-        console.log('[doc] recoverLastDocs docViewRect:', this.docViewRect);
-        const { width, height } = this.docViewRect;
+        const { width, height } = this.getDocViewRect();
+        if (!width || !height) {
+          console.error(`[doc] recoverLastDocs 获取容器宽高异常width=${width},height=${height}`);
+          this.docServer.setDocLoadComplete();
+          return;
+        }
         await this.docServer.recover({
           width,
-          height,
-          bindCidFun: async cid => {
-            console.log('[doc] recoverLastDocs bindCidFun:', cid);
-            await this.$nextTick();
-          }
+          height
         });
+
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
-          const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
+          const fileType = this.currentType || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
           );
@@ -787,14 +820,21 @@
             break;
           // 移动
           case 'move':
-            this.docServer.move();
-            this.$refs.docToolbar.changeTool('');
+            this.$refs.docToolbar.changeTool('move');
             break;
           // 全屏
           case 'fullscreen':
             this.fullscreen();
             break;
         }
+      },
+
+      /**
+       * 画笔工具变更
+       * @param {*} brush
+       */
+      changeBrush(brush) {
+        this.canMove = brush === 'move';
       },
 
       /**
@@ -819,17 +859,18 @@
 
       /**
        * 结束演示
-       * 1.主持人在小组中,且主持人正在演示中,则结束 - 自己演示
-       * 2.主持人在主直播间或小组内，别人演示中, 则结束 - 他人演示
+       * 1.观众演示时，组长和主持人都可以结束演示
+       * 2.主持人在小组中自己演示时，只有自己可以结束演示
        */
       async handleEndDemonstrate() {
         // 在主直播间
-        let confirmTip = '结束演示';
-        if (
-          (this.isInGroup && this.groupServer.state.groupInitData.join_role == 2) ||
-          (!this.isInGroup && this.roomBaseServer.state.watchInitData.join_info.role_name == 2)
-        ) {
-          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示';
+        let confirmTip = '结束演示?';
+        if (this.presenterId == this.userId) {
+          // 如果演示者是自己，自己结束自己的演示
+          confirmTip = '结束演示后将不能再使用白板、文档、桌面共享功能， 确认结束演示？';
+        } else if (this.isInGroup && this.groupServer.state.groupInitData.join_role == 20) {
+          // 如果是组长结束观众的演示
+          confirmTip = '是否结束演示?';
         }
         try {
           await this.$confirm(confirmTip, '提示', {
@@ -841,36 +882,98 @@
           if (this.hasDocPermission) {
             console.log('结束自己的演示');
             // 结束自己的演示
-            await this.memberServer.userEndPresentation({
+            const result = await this.memberServer.userEndPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             });
+            if (result && result.code == 200) {
+              if (this.groupServer.state.groupInitData.join_role == 2) {
+                // 如果是观众结束了自己的演示
+                this.$message({
+                  message: '结束演示',
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
           } else {
             // 结束他人的演示
             console.log('结束他人的演示');
-            await this.memberServer.endUserPresentation({
+            const result = await this.memberServer.endUserPresentation({
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
               receive_account_id: this.isInGroup
                 ? this.groupServer.state.groupInitData.presentation_screen
                 : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
+            if (result && result.code == 200) {
+              if (this.groupServer.state.groupInitData.join_role == 20) {
+                // 如果是组长结束了观众的演示
+                this.$message({
+                  message: '结束演示',
+                  showClose: true,
+                  type: 'success',
+                  customClass: 'zdy-info-box'
+                });
+              }
+            }
           }
         } catch (ex) {
           return;
         }
+      },
+      // 选中文档容器事件
+      dispatchDocSelectContainer: async function (data) {
+        console.log('[doc] ===========选择容器======', data);
+        if (this.currentCid == data.id) {
+          return;
+        }
+        // 判断容器是否存在
+        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
+        if (currentItem) {
+          this.docServer.activeContainer(data.id);
+        } else {
+          const { id: cid, docId } = data;
+          const fileType = this.currentType;
+          if (fileType === 'document' && !docId) {
+            // 文档id没有
+            console.log('[doc] 文档id没有 cid:', cid);
+            return;
+          }
+          this.addNewFile({ fileType, docId, cid });
+        }
+      },
+      // 文档是否可见状态变化事件
+      dispatchDocSwitchChange: async function (val) {
+        console.log('===[doc]====dispatch_doc_switch_change=============', val);
+        if (val && this.show && this.docLoadComplete) {
+          this.recoverLastDocs();
+        }
+      },
+      // 文档不存在或已删除
+      dispatchDocNotExit() {
+        this.$message({ type: 'error', message: '文档不存在或已删除' });
       }
     },
     mounted() {
       // 初始化事件
       this.initEvents();
-      // 清空
-      // this.docServer.resetContainer();
+
       if (this.webinarType == 1) {
-        // 直播中才执行
-        // 恢复上一次的文档数据;
+        // 直播中才执行,恢复上一次的文档数据;
         this.recoverLastDocs();
+      } else {
+        // 非直播状态，主持人默认选中文档
+        if (this.roleName == 1) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+          );
+        }
       }
     },
-    destroyed() {
+    beforeDestroy() {
+      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
+      this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
@@ -983,6 +1086,9 @@
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
+        &:hover {
+          color: #fc5659;
+        }
 
         &.selected {
           color: #fc5659;
@@ -1009,14 +1115,14 @@
       background-color: #000 !important;
     }
     &::-webkit-scrollbar-track {
-      background-color: transpar ent;
+      background-color: transparent;
     }
 
     &::-webkit-scrollbar-thumb {
       height: 60px;
       border-radius: 10px;
-      border: 1px solid #fff;
-      background: #000 !important;
+      border: 1px solid #333;
+      background: #333 !important;
     }
 
     li.doc-thumbnailbar__opt {
@@ -1026,7 +1132,7 @@
       position: relative;
 
       &.selected {
-        box-shadow: 0 0 0 2px #f57274;
+        box-shadow: 0 0 0 2px #fb3a32;
       }
 
       img {
@@ -1099,6 +1205,7 @@
 
   // 作为观看端时的样式
   .vmp-doc-une.is-watch {
+    background-color: #2d2d2d;
     // 普通模式
     &.vmp-doc-une--normal {
       position: absolute;

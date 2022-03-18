@@ -25,45 +25,48 @@ const playerMixins = {
         this.isPlayering = false;
         console.warn('PAUSE');
       });
+
       // 视频清晰度发生改变----卡顿切换清晰度时触发
       this.playerServer.$on(VhallPlayer.DEFINITION_CHANGE, () => {
         console.warn('DEFINITION_CHANGE');
         this.isNoBuffer = true;
       });
-      this.playerServer.$on(VhallPlayer.LOADEDMETADATA, () => {
-        console.warn('LOADEDMETADATA');
-      });
+
+      // 卡顿
       this.playerServer.$on(VhallPlayer.LAG_REPORT, () => {
         console.warn('LAG_REPORT');
         this.isNoBuffer = true;
       });
+
+      // 卡顿恢复
+      this.playerServer.$on(VhallPlayer.LAG_RECOVER, () => {
+        console.warn('LAG_RECOVER');
+        this.isNoBuffer = false;
+      });
+
+      // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
       });
+
+      // 视频出错
       this.playerServer.$on(VhallPlayer.ERROR, e => {
         this.isNoBuffer = true;
         console.log('播放器sdk VhallPlayer.ERROR事件', e);
       });
+
+      // 视频播放完毕
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听暂停状态
         console.log('wap-播放完毕');
         this.isShowPoster = true;
         this.isPlayering = false;
-        // 如果是暖场视频不显示回放结束的标识
-        if (this.isWarnPreview) return;
+        // 如果是暖场视频和试看不显示回放结束的标识
+        if (this.isWarnPreview || this.isTryPreview) return;
         this.isVodEnd = true;
+        // 为了将打开的弹窗关闭
+        this.videoShowIcon();
       });
-      // 打开弹幕
-      this.playerServer.$on('push_barrage', data => {
-        if (!this.danmuIsOpen) return;
-        this.addBarrage(data);
-      });
-
-      // // 结束直播
-      // this.playerServer.$on('live_over', data => {
-      //   console.log(data);
-      //   this.isLivingEnd = true;
-      // });
     },
     listenEvents() {
       // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
@@ -85,6 +88,15 @@ const playerMixins = {
           window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
         });
       }
+      // 横屏逻辑 和佳佳沟通暂时不加
+      // window.addEventListener('orientationchange', () => {
+      //   if (screen.orientation.angle == 90 || screen.orientation.angle == 270) {
+      //     this.isOrientation = true;
+      //     this.setFullScreen();
+      //   } else {
+      //     this.isOrientation = false;
+      //   }
+      // });
     },
     initSlider() {
       this.playerServer.$on(VhallPlayer.TIMEUPDATE, () => {
@@ -92,8 +104,6 @@ const playerMixins = {
           console.log('获取当前视频播放时间失败----------');
         });
         this.sliderVal = (this.currentTime / this.totalTime) * 100;
-        // 派发播放器时间更新事件，通知章节当前播放的时间节点
-        // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, this.currentTime);
       });
     },
     changeSlider(value) {
@@ -115,42 +125,47 @@ const playerMixins = {
         console.log(e);
       }
     },
+    setFullscreen() {
+      this.isFullscreen = true;
+      const element = document.getElementById('videoWapBox');
+      if (
+        !(
+          element.requestFullscreen ||
+          element.mozRequestFullScreen ||
+          element.webkitRequestFullscreen ||
+          element.msRequestFullscreen
+        )
+      ) {
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.isFullscreen = false;
+        }
+        this.playerServer.enterFullScreen();
+      }
+      if (element.requestFullscreen) element.requestFullscreen();
+      else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+      else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+      else if (element.msRequestFullscreen) element.msRequestFullscreen();
+    },
+    exitFullScreen() {
+      this.isFullscreen = false;
+      if (
+        !(
+          document.exitFullscreen ||
+          document.mozCancelFullScreen ||
+          document.webkitExitFullscreen ||
+          document.msExitFullscreen
+        )
+      ) {
+        this.playerServer.exitFullScreen();
+      }
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    },
     // 全屏
     enterFullscreen() {
-      if (this.isFullscreen) {
-        this.isFullscreen = false;
-        if (
-          !(
-            document.exitFullscreen ||
-            document.mozCancelFullScreen ||
-            document.webkitExitFullscreen ||
-            document.msExitFullscreen
-          )
-        ) {
-          this.playerServer.exitFullScreen();
-        }
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
-      } else {
-        this.isFullscreen = true;
-        const element = document.getElementById('videoWapBox');
-        if (
-          !(
-            element.requestFullscreen ||
-            element.mozRequestFullScreen ||
-            element.webkitRequestFullscreen ||
-            element.msRequestFullscreen
-          )
-        ) {
-          this.playerServer.enterFullScreen();
-        }
-        if (element.requestFullscreen) element.requestFullscreen();
-        else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
-        else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
-        else if (element.msRequestFullscreen) element.msRequestFullscreen();
-      }
+      this.isFullscreen ? this.exitFullScreen() : this.setFullscreen();
     },
     // 设置默认视频清晰度
     setDefaultQuality() {
@@ -245,7 +260,7 @@ const playerMixins = {
           return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
         });
       if (sessionStorage.getItem('localSpeedValue')) {
-        this.currentSpeed = sessionStorage.getItem('localSpeedValue');
+        this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
         if (suc) {

@@ -15,27 +15,43 @@
     data() {
       return {
         showIcon: false, //显示图标
-        showDot: false // 显示小红点
+        showDot: false, // 显示小红点
+        lastUUID: ''
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer();
+      this.redPacketServer = useRedPacketServer({
+        mode: 'watch'
+      });
     },
     created() {
-      console.log(this.$domainStore.state.roomBaseServer.redPacket, '红包红包1111');
-      // 当红包status==1 时表示有红包
-      this.showIcon = this.$domainStore.state.roomBaseServer.redPacket.status == '1' ? true : false;
-      this.showDot = this.$domainStore.state.roomBaseServer.redPacket.status == '1' ? true : false;
+      this.initStatus();
       this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
     destroyed() {
       this.redPacketServer.$off(RED_ENVELOPE_OK, this.handleNewRedPacket);
     },
     methods: {
-      checkRedPacketIcon() {
-        this.$emit('clickIcon');
+      initStatus() {
+        const redPacketInfo = this.$domainStore.state.roomBaseServer.redPacket;
+        redPacketInfo.number * 1 == redPacketInfo.get_user_count * 1
+          ? this.redPacketServer.setAvailable(false)
+          : this.redPacketServer.setAvailable(true);
+        if (redPacketInfo.red_packet_uuid) {
+          this.redPacketServer.setUUid(redPacketInfo.red_packet_uuid);
+          this.lastUUID = redPacketInfo.red_packet_uuid;
+        }
+        if (redPacketInfo.status === '1') {
+          this.showIcon = true;
+          this.showDot = true;
+        }
       },
-      handleNewRedPacket() {
+      checkRedPacketIcon() {
+        this.$emit('clickIcon', this.lastUUID);
+        this.showDot = false;
+      },
+      handleNewRedPacket(msg) {
+        this.lastUUID = msg.red_packet_uuid;
         this.showIcon = true;
         this.showDot = true;
       }
@@ -45,7 +61,6 @@
 <style lang="less" scoped>
   .vmp-red-packet-icon {
     color: #fff;
-    margin-left: 16px;
     position: relative;
     .vmp-dot {
       position: absolute;

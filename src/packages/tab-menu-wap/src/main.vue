@@ -1,10 +1,29 @@
 <template>
   <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
+    <!-- <template v-if="isTryVideo && isSubscribe">
+      <div class="vmp-tab-menu__try">
+        <div class="try-img">
+          <img src="./img/trySee.png" alt="" />
+        </div>
+        <p>{{ $t('appointment.appointment_1030') }}</p>
+      </div>
+    </template> -->
+    <!-- <template v-else> -->
     <section class="vmp-tab-menu__header">
+      <!-- prev-btn -->
+      <span
+        class="vmp-tab-menu-page-btn prev-btn"
+        v-if="isToggleBtnVisible"
+        :class="{ disabledClick: selectedIndex === 0 }"
+        @click="prev"
+      >
+        <i class="vh-iconfont vh-line-arrow-left" />
+      </span>
+
       <!-- 菜单区域 -->
       <ul class="vmp-tab-menu-scroll-container" ref="menu">
         <li
-          v-for="item of mainMenu"
+          v-for="item of visibleMenu"
           :ref="item.id"
           class="vmp-tab-menu-item"
           :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
@@ -12,47 +31,40 @@
           @click="select({ type: item.type, id: item.id })"
         >
           <span class="item-text">{{ $tdefault(item.name) }}</span>
-          <i v-show="item.tipsVisible" class="tips"></i>
-        </li>
-        <li
-          v-if="visibleMenu.length > 3"
-          class="vmp-tab-menu-more"
-          :class="{ selected: isSubMenuShow }"
-          @click="toggleSubMenuVisible"
-        >
-          <i class="vh-iconfont vh-full-more"></i>
+          <i class="tips" v-show="item.tipsVisible"></i>
+          <aside v-show="selectedId === item.id" class="bottom-line"></aside>
         </li>
       </ul>
 
-      <!-- 次级菜单 -->
-      <ul v-if="isSubMenuShow" class="vmp-tab-menu-sub">
-        <li
-          class="vmp-tab-menu-sub__item"
-          v-for="item of subMenu"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span>{{ $tdefault(item.name) }}</span>
-          <i class="tips" v-show="item.tipsVisible"></i>
-        </li>
-      </ul>
+      <!-- next btn -->
+      <span
+        v-if="isToggleBtnVisible"
+        class="vmp-tab-menu-page-btn next-btn"
+        :class="{ disabledClick: selectedIndex === menu.length - 1 }"
+        @click="next"
+      >
+        <i class="vh-iconfont vh-line-arrow-right" />
+      </span>
     </section>
 
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
-      <tab-content
-        ref="tabContent"
-        :mainMenu="mainMenu"
-        :subMenu="subMenu"
-        @noticeHint="handleHint"
-        @closePopup="selectDefault"
-      />
+      <tab-content ref="tabContent" :menu="menu" @noticeHint="handleHint" />
     </section>
+    <!-- </template> -->
   </section>
 </template>
 
 <script>
-  import { useMenuServer, useQaServer, useChatServer, useDocServer } from 'middle-domain';
+  import {
+    useMenuServer,
+    useQaServer,
+    useChatServer,
+    useDocServer,
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
 
@@ -61,31 +73,54 @@
     components: { tabContent },
     data() {
       return {
-        direciton: 'row', // row(横)，column(纵)
+        isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
         selectedType: '',
         selectedId: '',
         menu: [],
-        isSubMenuShow: false,
+        pageEnv: 'default',
         tabOptions: {}
       };
     },
     computed: {
-      visibleMenu() {
-        return this.menu.filter(item => item.visible);
-      },
-      mainMenu() {
-        return this.visibleMenu.filter((item, index) => index < 3);
-      },
-      subMenu() {
-        if (this.visibleMenu.length <= 3) return [];
-        return this.visibleMenu.filter((item, index) => index >= 3);
-      },
       selectedIndex() {
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
+      },
+      visibleMenu() {
+        let m = this.menu.filter(item => {
+          // 此处逻辑较复杂，请参考tab-menu/readme.md
+          if (this.pageEnv === 'living') {
+            return item.status !== 2 && item.visible;
+          }
+
+          if (this.pageEnv === 'live_over' || this.pageEnv === 'subscribe') {
+            return (item.status == 1 || item.status == 4) && item.visible;
+          }
+
+          return item.visible === true;
+        });
+        console.log('visibleMenu', m);
+
+        return m;
       },
       // 是否为嵌入页
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 是否是试看
+      isTryVideo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
+      },
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
+    watch: {
+      async 'visibleMenu.length'() {
+        await this.$nextTick();
+        this.scrollToItem({ id: this.selectedId });
       }
     },
     beforeCreate() {
@@ -93,11 +128,13 @@
       this.docServer = useDocServer();
     },
     created() {
+      // if (this.isTryVideo && this.isSubscribe) return;
       this.initConfig();
       this.initMenu();
       this.listenEvents();
     },
     async mounted() {
+      // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.selectDefault();
     },
@@ -106,6 +143,8 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
+        const groupServer = useGroupServer();
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
           this.setVisible({ visible: true, type: 'v5' });
           chatServer.addChatToList({
@@ -119,6 +158,7 @@
         });
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
+          this.setVisible({ visible: false, type: 'private' });
           chatServer.addChatToList({
             content: {
               text_content: this.$t('chat.chat_1081')
@@ -135,15 +175,59 @@
           this.setVisible({ visible: true, type: 'private' });
         });
 
+        if (this.isSubscribe) {
+          this.setPageEnv('subscribe');
+          this.setVisible({ visible: false, type: 3 }); // chat
+        } else {
+          this.setPageEnv('live-room');
+        }
+
+        // 直播中、结束直播更改状态
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          const { clientType } = useRoomBaseServer().state;
+
+          if (msg.data.type === 'live_start') {
+            this.setPageEnv('live-room');
+          }
+
+          if (msg.data.type === 'live_over') {
+            this.setVisible({ visible: false, type: 'private' }); // private-chat
+            this.setVisible({ visible: false, type: 'v5' }); // qa
+            clientType === 'send' && this.selectDefault();
+          }
+        });
+
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
-          this.setVisible({ visible: val, type: 2 });
-          if (val) {
-            let obj = this.getItem({ type: 2 });
-            this.select({ type: obj.type, id: obj.id });
+          this.changeDocStatus(val);
+        });
+        // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_status', val => {
+          console.log('dispatch_doc_switch_status', val);
+          this.changeDocStatus(val);
+        });
+        //监听进出子房间消息
+        groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          const { interactToolStatus } = useRoomBaseServer().state;
+          if (this.isInGroup) {
+            this.setVisible({ visible: false, type: 'v5' });
+            this.setVisible({ visible: false, type: 'private' });
+          } else {
+            if (interactToolStatus.question_status == 1) {
+              this.setVisible({ visible: true, type: 'v5' });
+            } else {
+              this.setVisible({ visible: false, type: 'v5' });
+            }
           }
         });
+      },
+      changeDocStatus(val) {
+        this.setVisible({ visible: val, type: 2 });
+        if (val) {
+          let obj = this.getItem({ type: 2 });
+          this.select({ type: obj.type, id: obj.id });
+        }
       },
       /**
        * 初始化配置
@@ -161,43 +245,65 @@
         const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
-        console.log('[menu] list--:', list);
         for (const item of list) {
           this.addItem(item);
         }
 
-        // TODO: temp，增加私聊
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 2, {
-            type: 'private',
-            name: '私聊', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '私聊', // 同上
-            status: 2
-          });
           this.addItemByIndex(chatIndex + 1, {
             type: 'v5',
-            name: '问答', // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: '问答', // 同上
-            status: roomState.interactToolStatus.question_status ? 1 : 2
+            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1004'), // 同上
+            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
+          });
+          this.addItemByIndex(chatIndex + 2, {
+            type: 'private',
+            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1008'), // 同上
+            visible: false,
+            status: 3
           });
         }
+      },
+      /**
+       * 选中当前项左边一项
+       */
+      prev() {
+        if (this.selectedIndex === 0) return;
+        const index = this.selectedIndex - 1;
+        const item = this.visibleMenu[index];
+        const { type, id } = item;
+        this.select({ type, id });
+      },
+      /**
+       * 选中当前想右边一项
+       */
+      next() {
+        if (this.selectedIndex >= this.visibleMenu.length - 1) return;
+        const index = this.selectedIndex + 1;
+        const item = this.visibleMenu[index];
+        const { type, id } = item;
+        this.select({ type, id });
+      },
+      /**
+       * 设置显示条件
+       * @param {String} condition [default|living]
+       */
+      setPageEnv(condition = 'default') {
+        this.pageEnv = condition;
       },
       /**
        * 选中默认的菜单项（第一项）
+       *
        */
       selectDefault() {
-        // 选择默认项
-        if (this.visibleMenu.length > 0) {
-          const { type, id } = this.visibleMenu[0];
-          this.select({ type, id });
-        }
-      },
-      /**
-       * 切换次级菜单的显隐
-       */
-      toggleSubMenuVisible() {
-        this.isSubMenuShow = !this.isSubMenuShow;
+        if (this.visibleMenu.length === 0) return;
+
+        const item = this.visibleMenu[0];
+        const { type, id } = item;
+        this.select({ type, id });
       },
       /**
        * 删除某个位置的菜单项
@@ -246,11 +352,14 @@
        * @param {String} cuid cuid
        * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
-      setVisible({ visible = true, type, id }) {
+      async setVisible({ visible = true, type, id }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
-        visible === false && this.jumpToNearestItemById(id);
+
+        if (tab.id == this.selectedId) {
+          visible === false && this.jumpToNearestItemById(tab.id);
+        }
       },
       /**
        * 切换某个菜单tab的可视性
@@ -273,7 +382,7 @@
        */
       setTipsVisible({ visible, type, id }) {
         const tab = this.getItem({ type, id });
-        if (!tab) return;
+        if (!tab || this.selectedId === tab.id) return;
         tab.tipsVisible = visible;
       },
       handleHint(cuid) {
@@ -304,8 +413,36 @@
         }
 
         // 前后都没有清空任何选择(基本不会发生的极端情况)
-        this.selectedId = '';
-        this.selectedType = '';
+        // this.selectedId = '';
+        // this.selectedType = '';
+      },
+
+      /**
+       *
+       * @param {String} cuid
+       * @param {String|Number} menuId
+       */
+      async scrollToItem({ id }) {
+        await this.$nextTick();
+        const rectArr = this.visibleMenu.map(item => {
+          try {
+            const id = item.id;
+            const ref = this.$refs[id][0];
+            const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
+            const left = ref.offsetLeft - paddingLeft;
+            return { id, ref, left };
+          } catch (error) {
+            console.error('refs error title:', error);
+            console.error('refs:', id, this.$refs, this.$refs[id]);
+          }
+        });
+
+        const positionItem = rectArr.find(item => item.id === id);
+
+        this.$refs['menu'].scrollTo({
+          left: positionItem.left,
+          behavior: 'smooth'
+        });
       },
 
       /**
@@ -314,16 +451,17 @@
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
        * @example select('comCustomMenuWap','10246')
        */
-      select({ type, id = '' }) {
-        this.selectedType = type;
-        this.selectedId = id;
-
-        this.isSubMenuShow = false;
-
+      async select({ type, id = '' }) {
         const item = this.getItem({ type, id });
+
+        this.selectedType = item.type;
+        this.selectedId = item.id;
+        this.scrollToItem({ id: item.id });
         item.tipsVisible = false;
 
         this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+
+        await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       }
     }
@@ -335,12 +473,36 @@
     height: 100%;
     position: relative;
     background: #fff;
-    font-size: 32px;
+    font-size: 28px;
     display: flex;
     flex-direction: column;
+    &__try {
+      height: 100%;
+      width: 100%;
+      background: #f7f7f7;
+      .try-img {
+        width: 221px;
+        height: 136px;
+        margin: 0 auto;
+        margin-top: 40%;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      p {
+        text-align: center;
+        font-size: 28px;
+        color: #8c8c8c;
+        padding-top: 24px;
+        text-indent: -20px;
+      }
+    }
 
     &__header {
       position: relative;
+      padding: 0 24px;
       width: 100%;
       height: 90px;
       flex: 0 0 auto;
@@ -355,6 +517,31 @@
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
       }
+
+      .vmp-tab-menu-page-btn {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 24px;
+        height: 100%;
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        height: 100%;
+        cursor: pointer;
+
+        &.disabledClick:hover {
+          cursor: auto;
+          i {
+            color: @font-light-low;
+          }
+        }
+
+        &:hover {
+          color: #666;
+        }
+      }
     }
 
     &__main {
@@ -366,20 +553,24 @@
     .vmp-tab-menu-scroll-container {
       height: 100%;
       flex: 1 1 auto;
-      overflow-y: scroll;
+      overflow-x: auto;
       display: flex;
       flex-wrap: nowrap;
-      overflow: hidden;
+      overflow-x: auto;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
       .vmp-tab-menu-item {
-        flex: 1 1 auto;
-        width: calc((100% - 100px) / 4);
+        flex: 0 0 auto;
         position: relative;
         display: inline-flex;
         height: 100%;
         justify-content: center;
         align-items: center;
-        padding: 0 20px;
-        color: #333333;
+        padding: 0 34px;
+        color: #595959;
         cursor: pointer;
         user-select: none;
 
@@ -400,16 +591,12 @@
         }
 
         .bottom-line {
-          display: none;
           position: absolute;
-          border: none;
-          border-radius: 2px 2px 0 0;
-          bottom: 1px;
-          left: 50%;
-          width: 34px;
-          transform: translateX(-50%);
-          height: 3px;
-          background-color: #fb3a32;
+          bottom: 9px;
+          width: 40px;
+          height: 5px;
+          background: #fb2626;
+          border-radius: 3px;
         }
 
         &:hover {
@@ -419,67 +606,26 @@
         }
 
         &__active {
-          color: @font-error;
-          font-weight: bolder;
+          color: #262626;
+          position: relative;
+
+          .bottom-line {
+            position: absolute;
+            bottom: 9px;
+            height: 5px;
+            width: 40px;
+            background: #fb2626;
+            border-radius: 3px;
+          }
 
           .item-text {
+            font-weight: 500;
             position: relative;
-            border-bottom: 6px solid @font-error;
           }
 
           .bottom-line {
             display: block;
           }
-        }
-      }
-
-      .vmp-tab-menu-more {
-        height: 100%;
-        width: 100px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-
-        &.selected {
-          background-color: #f3f3f3;
-        }
-      }
-    }
-
-    .vmp-tab-menu-sub {
-      position: relative;
-      font-size: 32px;
-      position: absolute;
-      top: 90px;
-      left: 0;
-      right: 0;
-      z-index: 22; // 危险值
-      background-color: #f3f3f3;
-      color: #444;
-      width: 100%;
-      max-height: 352px;
-      overflow-y: scroll;
-
-      &__item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 88px;
-        padding: 0 40px;
-
-        &:not(:last-child) {
-          border-bottom: 1px solid #d4d4d4;
-        }
-
-        .tips {
-          display: inline-block;
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
-          background: #ff0005;
-          border: 9px solid #ff0005;
         }
       }
     }

@@ -2,30 +2,27 @@
   <div class="lottery-winner-info" :class="{ big: stepHtmlList.length !== 3 }">
     <lottery-header :prizeInfo="prizeInfo" />
     <el-form ref="forms" class="winner-info-form">
-      <overlay-scrollbars ref="osComponentRef" :options="osComponentOptions">
-        <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
-          <span v-if="item.is_required == 1" class="required-flag">*</span>
-          <el-input
-            v-if="item.field_key !== 'address'"
-            v-model="reciveInfo[item.field_key]"
-            :placeholder="$t(item.placeholder)"
-            maxlength="200"
-            @keyup.native.stop="foo()"
-            @input.native="handleInput(item.field_key)"
-          ></el-input>
-          <textarea
-            v-else
-            id="address-textarea"
-            ref="chatTextarea"
-            v-model="reciveInfo[item.field_key]"
-            :placeholder="$t(item.placeholder)"
-            rows="2"
-            class="address-textarea"
-            maxlength="200"
-            @keyup.stop="foo"
-          ></textarea>
-        </el-form-item>
-      </overlay-scrollbars>
+      <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
+        <span v-if="item.is_required == 1" class="required-flag">*</span>
+        <el-input
+          v-if="item.field_key !== 'address'"
+          v-model="reciveInfo[item.field_key]"
+          :placeholder="$t(item.placeholder)"
+          maxlength="200"
+          @keyup.native.stop="foo()"
+          @input.native="handleInput(item.field_key)"
+        ></el-input>
+        <textarea
+          v-else
+          id="address-textarea"
+          v-model="reciveInfo[item.field_key]"
+          :placeholder="$t(item.placeholder)"
+          rows="2"
+          class="address-textarea"
+          maxlength="200"
+          @keyup.stop="foo"
+        ></textarea>
+      </el-form-item>
     </el-form>
     <p class="winner-info-tip">{{ $t('interact_tools.interact_tools_1018') }}</p>
     <div class="winner-info__submit-btn" @click="postWinnerInfo">
@@ -85,11 +82,12 @@
         retReciveInfo[element.field_key] = '';
       });
       this.reciveInfo = retReciveInfo;
+      // await this.$nextTick();
+      // this.overlayScrollbarInit();
     },
-    mounted() {
-      // 滚动条初始化
-      this.overlayScrollbarInit();
-    },
+    // mounted() {
+    //   // 滚动条初始化
+    // },
     methods: {
       async initStepHtmlList() {
         await this.lotteryServer.getDrawPrizeInfo().then(res => {
@@ -106,6 +104,7 @@
       // 滚动条初始化
       overlayScrollbarInit() {
         this.$nextTick(() => {
+          console.log(document.getElementById('address-textarea'));
           this.overlayScrollbar = OverlayScrollbars(document.getElementById('address-textarea'), {
             paddingAbsolute: true,
             className: 'os-theme-light os-theme-vhall',
@@ -173,6 +172,7 @@
             })
             .then(res => {
               if (res.code === 200) {
+                this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
                 this.$nextTick(() => {
                   this.$emit('navTo', 'LotterySuccess');
                 });
@@ -200,6 +200,18 @@
 </script>
 <style lang="less">
   .lottery-winner-info {
+    .os-theme-vhall > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle {
+      background-color: #cccccc;
+    }
+    .os-theme-vhall > .os-scrollbar-vertical {
+      right: -10px;
+    }
+    .address-textarea > .os-scrollbar-vertical {
+      right: 0;
+    }
+    .os-host-overflow {
+      overflow: visible !important;
+    }
     .lottery-header {
       margin-top: 68px;
     }
@@ -207,6 +219,17 @@
       margin-bottom: 5px;
     }
     .winner-info-form {
+      max-height: 194px;
+      overflow: auto;
+      .el-form-item__content {
+        line-height: 0;
+      }
+      .el-form-item {
+        margin-bottom: 8px;
+        &::after {
+          display: none;
+        }
+      }
       .el-input__inner {
         height: 36px;
         background: rgba(254, 239, 228, 0.9);
@@ -227,14 +250,18 @@
         }
       }
       .address-textarea {
-        width: 236px;
-        height: 42px;
+        width: 230px;
+        height: 44px;
         line-height: 20px;
         background: rgba(254, 239, 228, 0.9);
         border-radius: 4px;
+        border-color: transparent;
       }
       #address-textarea {
         padding: 7px 0 7px 22px;
+        &:focus-visible {
+          outline: none;
+        }
         &::-webkit-input-placeholder {
           color: #666666;
         }
@@ -275,14 +302,13 @@
     position: relative;
     .winner-info-form {
       width: 260px;
-      height: 150px;
+      // height: 150px;
       margin-top: 24px;
-
       .required-flag {
         position: absolute;
         color: #666666;
         left: 8px;
-        top: 3px;
+        top: 20px;
         z-index: 1;
       }
     }
@@ -312,9 +338,6 @@
     &.big {
       background: url(../img/bg-winner-info-big.png);
       height: 507px;
-      .winner-info-form {
-        height: 194px;
-      }
     }
   }
 </style>

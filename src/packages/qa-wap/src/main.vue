@@ -10,6 +10,10 @@
           :data-sources="qaList"
           :data-component="MsgItem"
           @tobottom="tobottom"
+          :extra-props="{
+            isOnlyMine,
+            joinId
+          }"
         ></virtual-list>
       </div>
       <div class="new-msg-tips" v-show="unReadMessageCount > 0" @click="scrollToTarget">
@@ -19,6 +23,7 @@
     </div>
     <send-box
       currentTab="qa"
+      @showMyQA="showMyQA"
       @sendQa="sendQa"
       key="qa"
       :is-banned="isBanned"
@@ -41,6 +46,7 @@
         qaList: useQaServer().state.qaList,
         listCopy: [],
         tipMsg: '',
+        isOnlyMine: false,
         unReadMessageCount: 0, // 是否点击了只看我的
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
@@ -93,8 +99,9 @@
         //收到问答回复
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
           if (msg.sender_id != this.thirdPartyId) {
-            this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.scrollBottom();
+            // this.unReadMessageCount++;
+            // this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
             this.dispatch('TabContent', 'noticeHint', 'v5');
           }
         });
@@ -153,6 +160,9 @@
             this.$refs.qalist.getClientSize() <
           5
         );
+      },
+      showMyQA(status) {
+        this.isOnlyMine = status;
       }
     }
   };

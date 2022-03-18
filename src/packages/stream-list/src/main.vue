@@ -1,5 +1,13 @@
 <template>
-  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
+  <div
+    class="vmp-stream-list"
+    :class="{
+      'vmp-stream-list-h0': isStreamListH0,
+      'no-delay-layout': isUseNoDelayLayout && remoteSpeakers.length > 1,
+      'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
+      'is-share-screen': isUseNoDelayLayout && isShareScreen
+    }"
+  >
     <!-- 左翻页 -->
     <span
       v-show="isShowControlArrow"
@@ -12,7 +20,9 @@
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
     <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
+        <!-- 本地流容器 -->
         <div
+          v-show="localSpeaker.accountId"
           class="vmp-stream-list__local-container"
           :class="{
             'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
@@ -27,24 +37,27 @@
           </div>
         </div>
 
-        <template v-if="remoteStreams.length">
+        <template
+          v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
+        >
+          <!-- 远端流列表 -->
           <div
-            v-for="stream in remoteStreams"
-            :key="stream.streamId"
+            v-for="speaker in remoteSpeakers"
+            :key="speaker.accountId"
             class="vmp-stream-list__remote-container"
             :class="{
-              'vmp-stream-list__main-screen': stream.accountId == mainScreen,
-              'vmp-dom__max': miniElement != 'stream-list' && stream.accountId == mainScreen,
-              'vmp-dom__mini': miniElement == 'stream-list' && stream.accountId == mainScreen
+              'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+              'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen,
+              'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen
             }"
           >
             <div class="vmp-stream-list__remote-container-h">
-              <vmp-stream-remote :stream="stream"></vmp-stream-remote>
+              <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
             </div>
           </div>
         </template>
 
-        <!-- 主持人进入小组后助理占位图 -->
+        <!-- 主持人进入小组后占位图 -->
         <div
           v-if="mode == 6 && isHostInGroup && !isInGroup"
           class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
@@ -59,6 +72,7 @@
       </div>
     </div>
 
+    <!-- 右翻页 -->
     <span
       v-show="isShowControlArrow"
       class="vmp-stream-list__scroll-btn right-btn"
@@ -74,8 +88,11 @@
     useInteractiveServer,
     useRoomBaseServer,
     useMicServer,
-    useGroupServer
+    useGroupServer,
+    useDocServer
   } from 'middle-domain';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
+
   export default {
     name: 'VmpStreamList',
 
@@ -84,12 +101,18 @@
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
-        // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group
+        streamInfo
       };
     },
 
     computed: {
+      // 主持人是否在小组内
+      isHostInGroup() {
+        return !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group;
+      },
+      isInteractiveInited() {
+        return this.$domainStore.state.interactiveServer.isInteractiveInited;
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -107,12 +130,26 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
-      remoteStreams() {
-        console.log(
-          '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
         );
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+      },
+      remoteSpeakers() {
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -130,21 +167,35 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
+         * 4. 没有互动实例的时候高度为0
          */
-        if (!this.remoteStreams.length) {
-          return !(
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          );
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+          return true;
+        }
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
+            return false;
+          } else {
+            return true;
+          }
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
         } else {
           return false;
         }
+      },
+
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 互动无延迟 未上麦观众是否使用类似旁路布局
+      isUseNoDelayLayout() {
+        return !this.localSpeaker.accountId && this.mode == 3 && this.isNoDelay == 1;
       }
     },
     watch: {
@@ -154,8 +205,33 @@
         },
         immediate: true
       },
-      'remoteStreams.length'(newval) {
+
+      // 流列表宽度超过 streamWrapper 时显示 翻页按钮
+      'remoteSpeakers.length'(newval) {
         this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
+      },
+      // 监听是否有桌面共享，更改页面布局
+      isShareScreen: {
+        handler(newval) {
+          if (this.isUseNoDelayLayout) {
+            // 互动无延迟模仿旁路布局
+            if (newval) {
+              // 开启共享
+              if (useDocServer().state.switchStatus) {
+                useRoomBaseServer().setChangeElement('doc');
+                // 开启文档
+              } else {
+                useRoomBaseServer().setChangeElement('');
+              }
+            }
+          } else {
+            if (newval) {
+              // 开启共享
+              useRoomBaseServer().setChangeElement('stream-list');
+            }
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -168,6 +244,10 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
+      // 监听自动上麦的异常code
+      useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        e.msg && this.$message.warning(e.msg);
+      });
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
         let videos = document.querySelectorAll('video');
@@ -177,23 +257,11 @@
           });
         this.interactiveServer.state.showPlayIcon = true;
       });
-
-      // 主持人进入退出小组 消息监听
-      this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-        if (msg.data.status == 'enter') {
-          this.isHostInGroup = true;
-        } else if (msg.data.status == 'quit') {
-          this.isHostInGroup = false;
-        }
-      });
     },
 
     mounted() {},
 
     methods: {
-      getStreamList() {
-        this.interactiveServer.getRoomStreams();
-      },
       exchange(compName) {
         window.$middleEventSdk?.event?.send({
           cuid: 'ps.surface',
@@ -202,6 +270,9 @@
         });
       },
 
+      /**
+       * 左右翻页更改streamWrapper的scrollLeft值实现滚动
+       */
       scrollStream(direction) {
         const scrollLeft = this.$refs.streamWrapper.scrollLeft;
         if (direction === 'left') {
@@ -211,6 +282,22 @@
           this.$refs.streamWrapper.scrollLeft =
             scrollLeft <= scrollWidth ? scrollLeft + 142 : scrollWidth;
         }
+      },
+      /**
+       * 监听无延迟未上麦时，观众采用类似旁路布局的容器高度变化
+       */
+      computeTop() {
+        const MutationObserver =
+          window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+        const _this = this;
+        const observer = new MutationObserver(function () {
+          console.log(
+            '监听到noDelayStreamContainer变动了',
+            _this.$refs.noDelayStreamContainer.clientHeight
+          );
+        });
+        observer.observe(this.$refs.noDelayStreamContainer, { childList: true, subtree: true });
       }
     }
   };
@@ -235,6 +322,26 @@
         justify-content: center;
         min-width: 100%;
         flex: none;
+        .vmp-stream-list__remote-container {
+          .vmp-stream-local__bootom {
+            &-role {
+              padding: 0 6px;
+            }
+            &-nickname {
+              width: 40px;
+            }
+          }
+        }
+        .vmp-stream-list__main-screen {
+          .vmp-stream-local__bootom {
+            &-role {
+              padding: 0 6px;
+            }
+            &-nickname {
+              width: 80px;
+            }
+          }
+        }
       }
       &::-webkit-scrollbar {
         /*隐藏滚轮*/
@@ -244,7 +351,7 @@
 
     // 流列表高度为0
     &-h0 {
-      height: 0;
+      height: 0 !important;
       .vmp-stream-list__main-screen {
         top: 0;
       }
@@ -290,6 +397,9 @@
       i {
         display: block;
         font-size: 40px;
+      }
+      &.vmp-dom__mini {
+        height: 204px;
       }
     }
   }
@@ -341,5 +451,55 @@
     top: 0;
     width: 360px;
     z-index: 10;
+  }
+
+  .vmp-stream-list {
+    &.no-delay-layout {
+      width: calc(100% - 380px);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 56px;
+      height: auto;
+
+      &.is-share-screen {
+        display: none;
+      }
+      .vmp-stream-list__main-screen {
+        bottom: 80px;
+        top: 0;
+        position: absolute;
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      .vmp-stream-list__stream-wrapper-scroll {
+        justify-content: normal;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        align-content: flex-end;
+      }
+      // 小屏样式
+      &.vmp-dom__mini {
+        right: 0;
+        top: 0;
+        width: 360px;
+        z-index: 10;
+        left: auto;
+        height: 204px;
+        .vmp-stream-list__remote-container {
+          width: 72px;
+          height: 40px;
+        }
+        .vmp-stream-local__bootom-role {
+          display: none;
+        }
+        &.stream-length {
+          .vmp-stream-list__main-screen {
+            bottom: 40px;
+          }
+        }
+      }
+    }
   }
 </style>

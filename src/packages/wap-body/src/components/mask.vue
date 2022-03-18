@@ -1,9 +1,9 @@
 <template>
   <div class="popContainer" v-show="showMask">
     <div class="center" :class="[activeClass]" id="mask-center">
-      <div class="top-area"><i class="iconfont icona-icon_zuoyouhuadong2x"></i></div>
-      <div class="center-text">左右滑动</div>
-      <div class="bottom-btn" @click="clickSure">我知道了</div>
+      <div class="top-area"><i class="vh-saas-iconfont vh-saas-a-icon_zuoyouhuadong2x"></i></div>
+      <div class="center-text">{{ $t('other.other_1007') }}</div>
+      <div class="bottom-btn" @click="clickSure">{{ $t('other.other_1015') }}</div>
     </div>
   </div>
 </template>

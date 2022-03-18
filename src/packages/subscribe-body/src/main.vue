@@ -60,18 +60,6 @@
   import BottomTab from './components/bottomTab';
   import EmbedTime from './components/embedTime.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const langMap = {
-    1: {
-      label: '简体中文',
-      type: 'zh',
-      key: 1
-    },
-    2: {
-      label: 'English',
-      type: 'en',
-      key: 2
-    }
-  };
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -81,6 +69,8 @@
         isLiving: false,
         wxQr: '',
         zfQr: '',
+        lang: {},
+        languageList: [],
         subOption: {
           startTime: '',
           type: 0,
@@ -127,17 +117,8 @@
     created() {
       this.handlerInitInfo();
       if (this.isEmbed) {
-        const { languages } = this.roomBaseServer.state;
-        this.languageList = languages.langList.map(item => {
-          return langMap[item.language_type];
-        });
-        const curLang = languages.curLang;
-        this.lang =
-          langMap[sessionStorage.getItem('lang')] ||
-          langMap[this.$route.query.lang] ||
-          langMap[curLang.language_type];
-        this.$i18n.locale = this.lang.type;
-        sessionStorage.setItem('lang', this.lang.key);
+        this.languageList = this.roomBaseServer.state.languages.langList;
+        this.lang = this.roomBaseServer.state.languages.lang;
       }
     },
     mounted() {
@@ -206,7 +187,7 @@
           ...params
         };
         this.subscribeServer.watchAuth(data).then(res => {
-          if (res.code == 200) {
+          if (res.code === 200) {
             if (res.data.status == 'live') {
               let pageUrl = '';
               if (location.pathname.indexOf('embedclient') != -1) {
@@ -301,7 +282,7 @@
       },
       handlePlay() {},
       changeLang(key) {
-        sessionStorage.setItem('lang', key);
+        localStorage.setItem('lang', key);
         window.location.reload();
       },
       livingLink() {

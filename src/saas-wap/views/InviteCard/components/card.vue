@@ -285,7 +285,11 @@
       },
       // 记录生成邀请卡, /create-invite-self-relation 传递了join_id
       async submitCreateHistory(join_id) {
-        const token = this.$route.query.token || '';
+        const token =
+          this.$route.query.token ||
+          localStorage.getItem('token') ||
+          sessionStorage.getItem('token') ||
+          '';
 
         await this.inviteServer.createInvite(
           // data
@@ -516,9 +520,12 @@
                 flex-direction: column;
                 justify-content: space-between;
                 padding: 24px 0px;
+                word-break: break-all;
+                white-space: nowrap;
                 h1 {
+                  white-space: nowrap;
                   padding: 0;
-                  font-size: 40px;
+                  font-size: 14px;
                   color: #ffffff;
                   font-weight: 600;
                   line-height: 42px;
@@ -527,6 +534,7 @@
                   letter-spacing: 10px;
                 }
                 p {
+                  white-space: nowrap;
                   padding: 0;
                   font-size: 32px;
                   color: #fff;
@@ -536,6 +544,7 @@
                   text-align: center;
                 }
                 .qr-value {
+                  white-space: nowrap;
                   letter-spacing: 7px;
                 }
               }
@@ -661,6 +670,7 @@
               justify-content: space-between;
               margin-left: 20px;
               padding: 10px 0;
+              white-space: nowrap;
               h1 {
                 padding: 0;
                 font-size: 40px;

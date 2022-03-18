@@ -5,14 +5,24 @@
       v-loading="loading"
       element-loading-text="加载中"
       element-loading-background="rgba(0,0,0,.9)"
+      @mousemove="wrapEnter"
+      @mouseleave="wrapLeave(true)"
     >
-      <div :id="'videoDom' + timestamp" class="vmp-video-preview-wrap-container">
-        <div class="vmp-video-preview-wrap-tips" v-if="isAudio">
+      <div
+        :id="'videoDom' + timestamp"
+        class="vmp-video-preview-wrap-container"
+        :class="isAudio && isInsertVideoPreview ? 'vmp-video-preview-wrap-container__hide' : ''"
+      >
+        <div class="vmp-video-preview-wrap-tips" v-if="isAudio && !isInsertVideoPreview">
           <div class="vmp-video-img">
             <img class="audio-img" :src="audioImg" alt="" />
           </div>
         </div>
-        <div class="vmp-video-preview-wrap-controller">
+        <div
+          class="vmp-video-preview-wrap-controller"
+          :class="hoveVideo ? 'vmp-video-preview-wrap-controller__active' : ''"
+          v-show="isShowController"
+        >
           <div class="vmp-video-preview-wrap-controller-slider">
             <!-- 进度条 -->
             <el-slider
@@ -75,7 +85,7 @@
               <!-- 插播视频播放器显示的按钮 -->
               <template v-if="isInsertVideoPreview">
                 <el-tooltip effect="dark" content="插播列表">
-                  <i @click="$emit('openInsert')" class="iconfont iconchaboliebiao_icon"></i>
+                  <i @click="$emit('openInsert')" class="vh-iconfont vh-line-menu"></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="关闭插播">
                   <i
@@ -84,10 +94,7 @@
                   ></i>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="隐藏">
-                  <i
-                    @click="$emit('hideInsertVideoControl')"
-                    class="vh-iconfont vh-line-arrow-down"
-                  ></i>
+                  <i @click="hideInsertVideoControl" class="vh-iconfont vh-line-arrow-down"></i>
                 </el-tooltip>
               </template>
             </div>
@@ -106,6 +113,12 @@
       videoParam: {
         type: Object,
         required: true
+      },
+      // 是否显示控制栏
+      isShowController: {
+        type: Boolean,
+        require: false,
+        default: false
       },
       isInsertVideoPreview: {
         type: Boolean,
@@ -197,8 +210,6 @@
             enable: true
           }
         };
-
-        // params = Object.assign(videoParam, params);
 
         if (params.type === 'live') {
           Object.assign(params, {
@@ -399,6 +410,20 @@
           },
           true
         );
+      },
+      // 隐藏播放器控制栏
+      hideInsertVideoControl() {
+        this.hoveVideo = false;
+      },
+      wrapEnter() {
+        this.hoveVideo = true;
+      },
+      wrapLeave(isSelfInvok) {
+        // 如果是插播播放器，禁止组件自身触发leave方法，只能通过 parent.refs 调用
+        if (isSelfInvok && this.isInsertVideoPreview) {
+          return;
+        }
+        this.hoveVideo = false;
       }
     },
     beforeDestroy() {
@@ -420,7 +445,7 @@
         height: 100%;
         width: 100%;
         background: black;
-        &.hide {
+        &__hide {
           background: rgba(0, 0, 0, 0);
           /deep/ video {
             visibility: hidden;
@@ -451,10 +476,13 @@
         z-index: 20;
         width: 100%;
         height: 40px;
-        bottom: 0px;
+        bottom: -31px;
         background: rgba(0, 0, 0, 0.7);
         transition: all 0.8s;
         color: white;
+        &__active {
+          bottom: 0;
+        }
         &-slider {
           width: 100%;
           position: absolute;
@@ -566,12 +594,15 @@
                 }
               }
             }
-            .iconchaboliebiao_icon,
-            .iconguanbichabo_icon {
+            .vh-line-menu,
+            .vh-line-close {
               margin-left: 12px;
             }
-            .iconfont {
+            .vh-iconfont {
               cursor: pointer;
+              &:hover {
+                color: #fb3a32;
+              }
             }
           }
         }

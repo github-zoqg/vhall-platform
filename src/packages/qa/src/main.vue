@@ -2,7 +2,7 @@
   <div ref="chat" class="vhsaas-chat">
     <div
       class="vhsaas-chat__body-wrapper"
-      :style="{ height: 'calc(100% - ' + operatorHieght + 'px)' }"
+      :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
       <virtual-list
         ref="qalist"
@@ -11,6 +11,10 @@
         :data-key="'id'"
         :data-sources="qaList"
         :data-component="MsgItem"
+        :extra-props="{
+          isOnlyMine,
+          joinId
+        }"
         @tobottom="tobottom"
       ></virtual-list>
       <div class="vhsaas-chat__body__bottom-tip-box">
@@ -24,7 +28,7 @@
         </div>
       </div>
     </div>
-    <div v-if="roleName == 1" class="button-container">
+    <div v-if="roleName != 2" class="button-container">
       <p @click="openQa">问答管理</p>
     </div>
     <chat-operator
@@ -67,7 +71,7 @@
         },
         chatLoginStatus: false,
 
-        operatorHieght: 91,
+        operatorHeight: 91,
         // 滚动条状态 start
         osComponentOptions: {
           resize: 'none',
@@ -125,6 +129,7 @@
       this.listenEvents();
       this.getQaHistoryMsg();
       this.initLoginStatus();
+      this.initInputStatus();
     },
     filters: {},
     methods: {
@@ -135,7 +140,7 @@
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
             this.scrollBottom();
-          } else {
+          } else if (this.roleName != 2 && !this.isBottom()) {
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
@@ -201,8 +206,8 @@
       getQaHistoryMsg() {
         useQaServer().getQaHistory();
       },
-      chatTextareaHeightChange(operatorHieght) {
-        this.operatorHieght = operatorHieght;
+      chatTextareaHeightChange(operatorHeight) {
+        this.operatorHeight = operatorHeight;
         this.$refs.chatQaOperator.overlayScrollbar.update();
       },
       // 只看我的按钮 change 事件

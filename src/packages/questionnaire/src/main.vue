@@ -17,9 +17,7 @@
         />
         问卷
       </header>
-      <!-- body -->
       <section class="question__content">
-        <!-- table -->
         <div class="vhall-question__content" v-show="showQuestionnaireTable">
           <div class="show-no-list" v-if="noQuestionnaire">
             <div class="text-center show-no-msg">
@@ -34,10 +32,10 @@
                 创建问卷
               </el-button>
               <el-input
-                v-model="queryParams.keyword"
+                v-model="keyword"
                 placeholder="请输入问卷名称"
                 style="width: 220px; float: right"
-                @keyup.enter.native="queryQuestionnaireList"
+                @keyup.enter.native="queryQuestionnaireList(true)"
                 @clear="clearKeyword"
                 clearable
               >
@@ -50,59 +48,65 @@
               </el-input>
             </div>
             <div class="popbody">
-              <el-table
-                :data="questionnaireList"
-                v-loading="loading"
-                style="width: 100%"
-                max-height="400"
-              >
-                <!-- 没有搜到数据 -->
-                <div slot="empty" class="show-no-msg">
-                  <span v-if="!loading" class="no-img">
+              <ul class="vhall-question__content-list">
+                <!-- 标题头 -->
+                <li class="vhall-question__content-list__title">
+                  <span class="vhall-question__content-list__colmun-title fontColor">问卷名称</span>
+                  <span class="vhall-question__content-list__colmun-time fontColor">题数</span>
+                  <span class="vhall-question__content-list__colmun-source fontColor">
+                    更新时间
+                  </span>
+                  <span class="vhall-question__content-list__colmun-action fontColor">操作</span>
+                </li>
+                <div
+                  v-if="questionnaireList.length"
+                  class="data-list"
+                  v-infinite-scroll="moreLoadData"
+                >
+                  <li v-for="(item, idx) in questionnaireList" :key="idx">
+                    <span class="vhall-question__content-list__colmun-title">{{ item.title }}</span>
+                    <span class="vhall-question__content-list__colmun-time">
+                      {{ item.topic_num }}
+                    </span>
+                    <span class="vhall-question__content-list__colmun-source">
+                      {{ item.updated_at }}
+                    </span>
+                    <span class="vhall-question__content-list__colmun-action">
+                      <span class="item" @click="publish(item)">推送</span>
+                      <span class="item" @click="prevQuestion(item.question_id)">预览</span>
+                      <span class="item" @click="editQuestion(item.question_id)">编辑</span>
+                      <span @click.prevent.stop class="item">
+                        <el-dropdown
+                          @command="handleCommand"
+                          @visible-change="dropDownVisibleChange(item)"
+                        >
+                          <span class="colorItem">更多</span>
+                          <el-dropdown-menu
+                            style="width: 140px; text-align: center"
+                            slot="dropdown"
+                            class="questionnarie"
+                          >
+                            <el-dropdown-item
+                              command="data"
+                              v-if="item.publish == 1 && !isEmbed && role == 1"
+                            >
+                              数据
+                            </el-dropdown-item>
+                            <el-dropdown-item command="copy">复制</el-dropdown-item>
+                            <el-dropdown-item command="del">删除</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                      </span>
+                    </span>
+                  </li>
+                </div>
+                <div v-else-if="!loading" class="show-no-msg">
+                  <span class="no-img">
                     <img src="./images/no-search@2x.png" alt="" />
                   </span>
                   <p class="no-msg">暂未搜索到您想要的内容！</p>
                 </div>
-                <el-table-column prop="title" width="220" label="问卷名称"></el-table-column>
-                <el-table-column
-                  prop="topic_num"
-                  width="60"
-                  align="center"
-                  label="题数"
-                ></el-table-column>
-                <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-                <el-table-column label="操作">
-                  <template slot-scope="scope">
-                    <el-button type="text" @click="publish(scope.row)">推送</el-button>
-                    <el-button type="text" @click="prevQuestion(scope.row.question_id)">
-                      预览
-                    </el-button>
-                    <el-button type="text" @click="editQuestion(scope.row.question_id)">
-                      编辑
-                    </el-button>
-                    <el-dropdown
-                      style="margin-left: 10px"
-                      trigger="click"
-                      @click.prevent.stop
-                      @command="handleCommand"
-                      @visible-change="dropDownVisibleChange(scope.row)"
-                    >
-                      <el-button type="text">更多</el-button>
-                      <el-dropdown-menu
-                        style="text-align: center"
-                        class="qn-more__dropdown"
-                        slot="dropdown"
-                      >
-                        <el-dropdown-item v-if="scope.row.publish === 1" command="data">
-                          数据
-                        </el-dropdown-item>
-                        <el-dropdown-item command="copy">复制</el-dropdown-item>
-                        <el-dropdown-item command="del">删除</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </el-dropdown>
-                  </template>
-                </el-table-column>
-              </el-table>
+              </ul>
             </div>
           </template>
         </div>
@@ -129,14 +133,22 @@
         <el-checkbox v-model="shareQuestionnaire">共享到资料管理</el-checkbox>
       </div>
       <div class="async__footer" slot="footer">
-        <el-button type="primary" @click="saveQuestionnaire(true)" round>确 定</el-button>
+        <el-button
+          type="primary"
+          :disabled="!saveDialogVisible"
+          @click="saveQuestionnaire(true)"
+          round
+        >
+          确 定
+        </el-button>
         <el-button @click="saveQuestionnaire(false)" round>取 消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer } from 'middle-domain';
+  import { useQuestionnaireServer, useChatServer } from 'middle-domain';
+  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
   export default {
     name: 'VmpQuestionnaire',
     provide() {
@@ -159,22 +171,32 @@
           pageNum: 1,
           keyword: ''
         },
+        keyword: '', //input的value;
         questionnaireCreateInfo: null, // 已创建弹窗的中转
         saveDialogVisible: false, // 同步问卷弹窗
         shareQuestionnaire: true, // 同步到管理
         prevQuestionnaireId: false, // 显示预览状态的相关UI
-        saving: false //保存中的状态
+        saving: false, //保存中的状态
+        totalPages: 0 // 总页数
       };
     },
     computed: {
+      // 显示未创建过问卷面板
       noQuestionnaire() {
-        // 未创建过问卷
         return (
           this.firstLoad &&
           !this.questionnaireList.length &&
           this.queryParams.keyword === '' &&
           !this.loading
         );
+      },
+      // 是否为嵌入页
+      isEmbed() {
+        return this.$domainStore?.state?.roomBaseServer?.embedObj?.embed;
+      },
+      // 当前角色
+      role() {
+        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info.role_name;
       }
     },
     methods: {
@@ -187,15 +209,8 @@
       },
       initPage() {
         this.firstLoad = false;
-        this.queryParams = {
-          // 问卷列表搜索参数
-          limit: 10,
-          pos: 0,
-          pageNum: 1,
-          keyword: ''
-        };
         this.showQuestionnaireTable = true;
-        this.queryQuestionnaireList();
+        this.queryQuestionnaireList(true);
       },
       initSDK() {
         this.questionnaireServer = useQuestionnaireServer({
@@ -217,12 +232,39 @@
             this.initPage();
           }
         });
+        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
+          const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
+          let text = this.$getRoleName(msg.room_role);
+          if (msg.room_role !== 1) {
+            text = `${text}${msg.nick_name}`;
+          }
+          useChatServer().addChatToList({
+            nickname: '问卷',
+            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+            content: {
+              text_content: `${text}发起了问卷`,
+              questionnaire_id: msg.questionnaire_id
+            },
+            roleName: join_info.role_name,
+            type: msg.type
+          });
+        });
       },
       /**
        * @description 条件搜索列表
        */
-      queryQuestionnaireList() {
+      queryQuestionnaireList(refresh = false) {
+        if (refresh) {
+          this.queryParams = {
+            limit: 10,
+            pos: 0,
+            pageNum: 1,
+            keyword: ''
+          };
+          this.questionnaireList = [];
+        }
         this.loading = true;
+        this.queryParams.keyword = this.keyword;
         this.questionnaireServer
           .queryQuestionnaireList({
             keyword: this.queryParams.keyword,
@@ -230,22 +272,20 @@
             pos: this.queryParams.pos
           })
           .then(res => {
-            this.questionnaireList = res.data.list || [];
-            this.loading = false;
+            const dataList = res.data.list || [];
+            this.questionnaireList = this.questionnaireList.concat(dataList);
             this.firstLoad = true;
+            this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
+          })
+          .finally(() => {
+            this.loading = false;
           });
       },
       /**
        * @description 清空关键字搜索
        */
       clearKeyword() {
-        this.queryParams = {
-          limit: 10,
-          pos: 0,
-          pageNum: 1,
-          keyword: ''
-        };
-        this.queryQuestionnaireList();
+        this.queryQuestionnaireList(true);
       },
       /**
        * @description 创建问卷
@@ -284,6 +324,7 @@
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
+            console.log('saveQuestionnaire', res);
             if (confirm) {
               // 确认同步才需要弹窗提示
               this.$message({
@@ -296,7 +337,7 @@
             if (res.code === 200) {
               // 数据有延迟
               const st = setTimeout(() => {
-                this.queryQuestionnaireList();
+                this.queryQuestionnaireList(true);
                 clearInterval(st);
               }, 1000);
             }
@@ -305,11 +346,12 @@
             this.saving = false;
           });
       },
-
       // 下拉框显示是, 中转当前选中变量
       dropDownVisibleChange(row) {
+        console.log(row);
         this.selectedQuestionnarie = row;
       },
+      // 更多列表的操作
       handleCommand(command) {
         if (!this.selectedQuestionnarie) return false;
         const id = this.selectedQuestionnarie.question_id;
@@ -333,7 +375,7 @@
           `/v3/live/lookSingleQuestion/${webinar.id}?surveyId=${questionnaireItem.question_id}&subject=${questionnaireItem.title}&roomId=${interact.room_id}`
         );
       },
-      // 复制功能
+      // 复制
       copy(id) {
         this.questionnaireServer.copyQuestionnaire(id).then(res => {
           this.$message({
@@ -341,7 +383,7 @@
             message: res.msg
           });
           if (res.code == 200) {
-            this.queryQuestionnaireList();
+            this.queryQuestionnaireList(true);
           }
         });
       },
@@ -360,12 +402,12 @@
               message: res.msg
             });
             if (res.code == 200) {
-              this.queryQuestionnaireList();
+              this.queryQuestionnaireList(true);
             }
           });
         });
       },
-      // 推送
+      // 推送问卷
       publish(questionnaireItem) {
         const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
         const { webinar } = watchInitData;
@@ -384,6 +426,15 @@
             questionnaireItem.publish = 1;
           }
         });
+      },
+      // 滚动加载
+      moreLoadData() {
+        if (this.queryParams.pageNum >= this.totalPages) {
+          return false;
+        }
+        this.queryParams.pageNum++;
+        this.queryParams.pos = parseInt((this.queryParams.pageNum - 1) * this.queryParams.limit);
+        this.queryQuestionnaireList();
       }
     }
   };
@@ -431,6 +482,16 @@
   }
 </style>
 <style lang="less">
+  .questionnarie.el-dropdown-menu {
+    background-color: #fff;
+    .el-dropdown-menu__item:hover {
+      background-color: #f7f7f7;
+      color: #606266;
+    }
+    .popper__arrow::after {
+      border-bottom-color: #fff !important;
+    }
+  }
   .save-dialog {
     .el-dialog__body {
       min-height: initial;
@@ -669,7 +730,6 @@
       padding-top: 24px;
       .vhall-question__content-list {
         max-height: 420px;
-        margin: 0 32px;
         &.assistantStyle {
           height: 370px;
         }
@@ -680,6 +740,10 @@
           height: 56px;
           font-size: 14px;
           color: #1a1a1a;
+        }
+        .data-list {
+          height: 360px;
+          overflow: auto;
         }
       }
       .creatBtn {
@@ -701,8 +765,8 @@
       li {
         height: 45px;
         line-height: 56px;
-        padding-left: 40px;
-        padding-right: 15px;
+        padding-left: 12px;
+        padding-right: 5px;
         // &:nth-child(odd) {
         //   background: #f8f8f8;
         // }
@@ -749,7 +813,13 @@
           padding: 0 8px;
         }
         .el-dropdown {
-          color: #1a1a1a !important;
+          // color: #1a1a1a !important;
+        }
+        .el-dropdown-menu {
+          background-color: #fff;
+          &:hover {
+            background-color: #f7f7f7;
+          }
         }
         &--send {
           background: url(./images/fq.png) no-repeat;
@@ -870,6 +940,15 @@
   .cef-q-wrap {
     .q-wrap {
       overflow-y: hidden;
+    }
+  }
+  // 处理题目为必选时, 标题会折行bug,css样式覆盖,后续问卷sdk内优化
+  #qn-server-box {
+    .question-wrap .question-content .q-edit .q-subject {
+      width: calc(100% - 30px);
+    }
+    .question-wrap .question-content .q-edit .com-input.q-subject {
+      width: calc(100% - 24px);
     }
   }
 </style>

@@ -1,13 +1,20 @@
 import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-import { useRoomBaseServer, useWatchRewardServer, useChatServer } from 'middle-domain';
+import {
+  useRoomBaseServer,
+  useWatchRewardServer,
+  useChatServer,
+  useZIndexServer
+} from 'middle-domain';
 import QRcode from 'qrcode';
 // import { mapMutations } from 'vuex';
 export default {
   name: 'reward',
   data() {
     let { watchInitData } = useRoomBaseServer().state;
+    const zIndexServerState = this.zIndexServer.state;
     return {
       watchInitData,
+      zIndexServerState,
       showRewardDialog: false,
       showGiveMoneyQr: false,
       giveMoneyUrl: '',
@@ -27,6 +34,7 @@ export default {
     // }
   },
   beforeCreate() {
+    this.zIndexServer = useZIndexServer();
     this.watchRewardServer = useWatchRewardServer();
   },
   created() {
@@ -41,37 +49,9 @@ export default {
   methods: {
     // ...mapMutations('watchBase', ['setDialogZIndexQueue', 'setToolsCount']),
     listenEvent() {
+      // 改为飘屏组件监听
       this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
-        // 添加聊天消息
-        const data = {
-          avatar: rawMsg.data.rewarder_avatar,
-          nickName:
-            rawMsg.data.rewarder_nickname.length > 8
-              ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
-              : rawMsg.data.rewarder_nickname,
-          type: 'reward_pay_ok',
-          content: {
-            text_content: rawMsg.data.reward_describe
-              ? rawMsg.data.reward_describe
-              : '很精彩，赞一个！',
-            num: rawMsg.data.reward_amount
-          },
-          sendId: this.userId,
-          roleName: this.roleName,
-          interactToolsStatus: true
-        };
-        this.chatServer.addChatToList(data);
-
-        if (this.userId == rawMsg.data.rewarder_id) {
-          this.closeDialog();
-          this.$message({
-            message: this.$t('common.common_1005'),
-            showClose: true,
-            // duration: 0,
-            type: 'success',
-            customClass: 'zdy-info-box'
-          });
-        }
+        this.closeDialog();
       });
     },
     /**
@@ -124,8 +104,8 @@ export default {
     },
     // open支付金额设置弹框
     onClickReward() {
+      this.zIndexServer.setDialogZIndex('reward');
       this.showRewardDialog = true;
-      // this.setDialogZIndexQueue('reward');
     },
     // 选择支付金额
     onClickRewardItem(index) {

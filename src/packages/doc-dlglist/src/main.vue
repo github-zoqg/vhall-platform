@@ -2,9 +2,10 @@
   <div class="vmp-doc-list">
     <el-dialog
       :visible.sync="dialogVisible"
-      @open="handlOpen"
       :before-close="handleClose"
       :close-on-click-modal="false"
+      @open="handleOpen"
+      top="12vh"
       width="800px"
     >
       <!-- 内层嵌套对话框 -->
@@ -28,10 +29,10 @@
 
       <!-- 标题栏 -->
       <template slot="title">
-        <span v-show="mode === 2" style="margin-right: 3px" @click="handleDoclibCancel">
-          <i class="vh-iconfont vh-line-arrow-left" style="font-size: 14px; color: #666"></i>
+        <span class="title-icon-wrap" v-show="mode === 2" @click="handleDoclibCancel">
+          <i class="vh-iconfont vh-line-arrow-left title-icon"></i>
         </span>
-        <span>{{ $t('doc.doc_1012') }}</span>
+        <span class="title-text">{{ $t('doc.doc_1012') }}</span>
       </template>
 
       <!-- 内容区域 -->
@@ -57,7 +58,7 @@
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
-              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button type="white-primary" v-if="!isWatch" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
@@ -105,10 +106,7 @@
                     </template>
                   </div>
                 </div>
-                <i
-                  style="font-size: 16px; color: #999; margin-left: 8px"
-                  class="el-tooltip vh-iconfont vh-line-question"
-                ></i>
+                <i class="el-tooltip vh-iconfont vh-line-question help-icon"></i>
               </el-tooltip>
 
               <!-- 搜索框 -->
@@ -133,9 +131,9 @@
                 <!-- 表格展示 -->
                 <el-table-column prop="file_name" label="文档名称" width="180">
                   <template slot-scope="scope">
-                    <p class="text">
+                    <p class="file-name">
                       <span
-                        class="vh-iconfont"
+                        class="vh-iconfont doc-icon"
                         :class="scope.row.ext | fileIconCss(false)"
                         :style="scope.row.ext | fileIconCss(true)"
                       ></span>
@@ -233,7 +231,7 @@
               <el-table-column type="selection" width="55" align="left"></el-table-column>
               <el-table-column prop="file_name" label="文档名称" width="180">
                 <template slot-scope="scope">
-                  <p class="text">
+                  <p class="file-name">
                     <span
                       class="vh-iconfont"
                       :class="scope.row.ext | fileIconCss(false)"
@@ -381,38 +379,7 @@
         // 监听文档消息
         this.msgServer.$onMsg('CUSTOM_MSG', this.listenDocMsg);
       },
-      // 使用具名消息，后面offMsg的时候使用
-      // TODO 暂时没有offMsg事件，后面有的时候加上
       listenDocMsg(msg) {
-        console.log('[doc] ------CUSTOM_MSG-----文档消息：', msg);
-        // {
-        //   "type": "host_msg_webinar",
-        //   "data": {
-        //       "page": "1",
-        //       "document_id": "64f984ff",
-        //       "converted_page": "0",
-        //       "status": "0",
-        //       "status_jpeg": "200",
-        //       "converted_page_jpeg": "1",
-        //       "doc_type": "doc_convert",
-        //       "user_id": 101643
-        //    },
-        //   "webinar_id": "131121788"
-        // }
-        try {
-          if (typeof msg === 'string') {
-            msg = JSON.parse(msg);
-          }
-          if (typeof msg.context === 'string') {
-            msg.context = JSON.parse(msg.context);
-          }
-          if (typeof msg.data === 'string') {
-            msg.data = JSON.parse(msg.data);
-          }
-        } catch (ex) {
-          console.log('消息转换错误：', ex);
-          return;
-        }
         if (msg.data.type === 'host_msg_webinar') {
           const msgData = msg.data.data;
           // status: "200" // 动态转换状态 0待转换 100转换中 200完成 500失败
@@ -458,10 +425,11 @@
       /**
        * 对话框打开事事件
        */
-      handlOpen() {
+      handleOpen() {
         this.docSearchKey = '';
         this.handleDocSearch();
       },
+      // 关闭对话框
       handleClose() {
         if (this.mode === 2) {
           this.handleDoclibCancel();
@@ -719,6 +687,9 @@
         });
         this.innerVisible = false;
       }
+    },
+    beforeDestroy() {
+      this.msgServer.$offMsg('CUSTOM_MSG', this.listenDocMsg);
     }
   };
 </script>
@@ -731,9 +702,14 @@
       align-items: center;
       justify-content: center;
       p {
-        line-height: 60px;
+        line-height: 20px;
+        margin-top: 8px;
+        margin-bottom: 30px;
         font-size: 15px;
-        color: #999;
+        color: @font-light-second;
+      }
+      .el-button {
+        width: 120px;
       }
     }
     .help-tips p {
@@ -798,7 +774,7 @@
 
     .doc-uploader {
       display: inline;
-      margin-right: 20px;
+      margin-right: 12px;
     }
 
     .input-search {
@@ -807,27 +783,68 @@
         border-radius: 100px;
       }
     }
-  }
 
-  .doc-dlg-sharetip {
-    width: 400px;
-    height: 200px;
-    box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
-    border-radius: 4px;
-    background-color: #fff;
-    position: relative;
-    margin-top: -10%;
+    .doc-dlg-sharetip {
+      width: 400px;
+      height: 200px;
+      box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
+      border-radius: 4px;
+      background-color: #fff;
+      position: relative;
+      margin-top: -10%;
 
-    .el-checkbox {
-      font-weight: 400 !important;
+      .el-checkbox {
+        font-weight: 400 !important;
+      }
+      .el-checkbox__input.is-checked + .el-checkbox__label {
+        color: #606266 !important;
+      }
+
+      .dialog-footer {
+        text-align: right;
+        margin-top: 20px;
+      }
     }
-    .el-checkbox__input.is-checked + .el-checkbox__label {
-      color: #606266 !important;
+    .el-table .cell .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      .doc-icon {
+        font-size: 20px;
+        margin-right: 10px;
+      }
+    }
+    .el-table th > .cell {
+      font-weight: normal;
+    }
+    .el-table th:first-child .cell,
+    .el-table tr td:first-child .cell {
+      padding-left: 24px;
     }
 
-    .dialog-footer {
-      text-align: right;
-      margin-top: 20px;
+    .el-table--enable-row-hover .el-table__body tr:hover > td {
+      background-color: #f7f7f7;
+
+      .el-button--text {
+        color: #fb3a32;
+      }
+    }
+
+    .help-icon {
+      font-size: 16px;
+      color: #999;
+      margin-left: 8px;
+    }
+    .title-icon-wrap {
+      margin-right: 3px;
+      .title-icon {
+        font-size: 14px;
+        color: #666;
+      }
+    }
+    .title-text {
+      font-size: 20px;
     }
   }
 </style>

@@ -17,7 +17,13 @@
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import {
+    Domain,
+    useRoomBaseServer,
+    useSplitScreenServer,
+    useInteractiveServer
+  } from 'middle-domain';
   export default {
     name: 'Home',
     components: {
@@ -70,6 +76,7 @@
           type: 'log' // log 日志埋点，event 业务数据埋点
         });
         const res = await roomState();
+
         // 如果浏览器不支持
         if (res === 'isBrowserNotSupport') {
           this.state = 3;
@@ -103,8 +110,10 @@
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
-            liveToken: liveT,
             'gray-id': sessionStorage.getItem('initGrayId')
+          },
+          requestBody: {
+            live_token: liveT
           },
           initRoom: {
             webinar_id: id, //活动id
@@ -116,13 +125,54 @@
       },
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
+        const splitScreenServer = useSplitScreenServer();
+        const interactiveServer = useInteractiveServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
+        });
+        // 第三方推流改变背景图片
+        roomBaseServer.$on('LIVE_START', () => {
+          this.changePushImage();
+        });
+        // 关闭分屏模式
+        splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
+          // 还原流信息
+          interactiveServer.state.localStream = {
+            streamId: null, // 本地流id
+            videoMuted: false,
+            audioMuted: false,
+            attributes: {}
+          };
+          interactiveServer.state.remoteStreams = [];
+          await interactiveServer.init();
+          window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
+        });
+        // 分屏页面关闭
+        splitScreenServer.$on('SPLIT_SHADOW_CLOSE', async () => {
+          this.$message('正在与分屏页面建立连接，请稍等...');
+        });
+        // 分屏页面关闭10s未重新连接
+        splitScreenServer.$on('SPLIT_CLOSE_TO_HOST', async () => {
+          this.$message('关闭分屏模式');
+        });
+        splitScreenServer.$on('SPLIT_CUSTOM_MESSAGE', msg => {
+          // 分屏停止推流完成的消息
+          if (msg.data.body.type == 'split_unpublish_complete') {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons('comStreamLocal', 'emitClickUnpublishComplate')
+            );
+          }
         });
       },
       handleKickout() {
         this.state = 2;
-        this.errMsg = '您已被禁止访问当前活动';
+        this.errMsg = this.$t('message.message_1007');
+      },
+      changePushImage() {
+        const thirdBackground = document.querySelector('.vmp-basic-right__hd');
+        thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
+        thirdBackground.style.backgroundSize = '100% 100%';
+        thirdBackground.style.backgroundPosition = 'center';
       }
     }
   };

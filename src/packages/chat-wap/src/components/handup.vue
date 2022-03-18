@@ -13,11 +13,11 @@
           <button class="btn" @click="handleClickMuteDevice('video')">
             <i
               class="vh-iconfont iconfont-bottom vh-line-turn-off-video-camera"
-              v-show="localStream.videoMuted"
+              v-show="localSpeaker.videoMuted"
             ></i>
             <i
               class="vh-iconfont iconfont-bottom vh-line-video-camera"
-              v-show="!localStream.videoMuted"
+              v-show="!localSpeaker.videoMuted"
             ></i>
             <div class="btn-text">{{ $t('setting.setting_1003') }}</div>
           </button>
@@ -25,11 +25,11 @@
           <button class="btn" @click="handleClickMuteDevice('audio')">
             <i
               class="vh-iconfont iconfont-bottom vh-line-microphone"
-              v-show="!localStream.audioMuted"
+              v-show="!localSpeaker.audioMuted"
             ></i>
             <i
               class="vh-iconfont iconfont-bottom vh-line-turn-off-microphone"
-              v-show="localStream.audioMuted"
+              v-show="localSpeaker.audioMuted"
             ></i>
             <div class="btn-text">{{ $t('setting.setting_1004') }}</div>
           </button>
@@ -40,7 +40,7 @@
         </div>
         <button class="btn btn-handsup" v-if="!isSpeakOn" @click="handsUpToConnect">
           <i
-            v-if="handText.search('等待...') != -1"
+            v-if="handText.search(`${$t('interact.interact_1004')}...`) != -1"
             class="vh-iconfont iconfont-bottom vh-a-line-handsup"
           ></i>
           <div class="btn-text">{{ handText }}</div>
@@ -64,6 +64,13 @@
       };
     },
     computed: {
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
+        );
+      },
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
       },
@@ -157,7 +164,7 @@
                 if (this.isInGroup) {
                   tip = '组长拒绝了您的上麦请求';
                 } else {
-                  tip = '主持人拒绝了您的上麦请求';
+                  tip = this.$t('other.other_1006');
                 }
                 this.$toast(tip);
 
@@ -168,22 +175,13 @@
           });
       },
       async handleClickMuteDevice(deviceType) {
-        const status = useInteractiveServer().state.localStream[`${deviceType}Muted`] ? 1 : 0;
+        // 1 为打开 [不禁止画面]         0 关闭 [禁止画面]
+        const status = this.localSpeaker[`${deviceType}Muted`] ? 1 : 0;
         await useInteractiveServer().setDeviceStatus({
           device: deviceType == 'video' ? 2 : 1,
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
-        if (deviceType === 'video') {
-          status
-            ? this.$toast(this.$t('interact.interact_1024'))
-            : this.$toast(this.$t('interact.interact_1023'));
-        }
-        if (deviceType === 'audio') {
-          status
-            ? this.$toast(this.$t('interact.interact_1015'))
-            : this.$toast(this.$t('interact.interact_1026'));
-        }
       }
     }
   };

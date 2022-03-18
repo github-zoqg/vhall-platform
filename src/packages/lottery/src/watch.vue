@@ -1,5 +1,9 @@
 <template>
-  <div class="vhall-lottery-wap" v-if="dialogVisible">
+  <div
+    class="vhall-lottery-wap"
+    v-if="dialogVisible"
+    :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
+  >
     <component
       :is="lotteryView"
       :winner-list="winLotteryUserList"
@@ -16,7 +20,13 @@
   </div>
 </template>
 <script>
-  import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import {
+    useLotteryServer,
+    useRoomBaseServer,
+    useChatServer,
+    useZIndexServer,
+    useMsgServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpLotteryWatch',
@@ -28,8 +38,15 @@
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
       LotterySuccess: () => import('./components/lottery-success.vue') // 领取结果页面
     },
-    data() {
+    provide() {
       return {
+        lotteryServer: this.lotteryServer
+      };
+    },
+    data() {
+      const zIndexServerState = this.zIndexServer.state;
+      return {
+        zIndexServerState,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
         lotteryView: '', // 抽奖组件视图名称
@@ -40,17 +57,13 @@
         lotteryInfo: {}
       };
     },
-    provide() {
-      return {
-        lotteryServer: this.lotteryServer
-      };
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initMsgEvent();
-      // this.open();
     },
     destroyed() {
       this.removeMsgEvent();
@@ -66,10 +79,6 @@
        */
       accept(msg) {
         this.open(msg.lottery_id);
-        // console.log('accept', msg);
-        // this.setFitment(msg);
-        // this.lotteryView = 'LotteryWin';
-        // this.dialogVisible = true;
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
@@ -77,6 +86,7 @@
       open(uuid = '') {
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
+          this.lotteryId = data.id;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
@@ -97,6 +107,7 @@
             }
           }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('lottery');
         });
       },
 
@@ -111,6 +122,10 @@
           this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
           this.callBackResultNotice
         );
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
+        });
       },
       removeMsgEvent() {
         this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
@@ -124,6 +139,7 @@
         this.setFitment(msg.data);
         this.lotteryView = 'LotteryPending';
         this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('lottery');
         useChatServer().addChatToList({
           content: {
             text_content: this.$t('interact_tools.interact_tools_1021')
@@ -149,6 +165,7 @@
         }
         this.showWinnerList = !!msg.data.publish_winner;
         this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('lottery');
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
         useChatServer().addChatToList({
           content: {
@@ -164,6 +181,12 @@
           interactStatus: true,
           isCheck: lotteryResult
         });
+        // 服务之间传递抽奖结果消息
+        this.lotteryServer.$emit(
+          lotteryResult
+            ? this.lotteryServerthis.Events.LOTTERY_WIN
+            : this.lotteryServerthis.Events.LOTTERY_MISS
+        );
       },
       close() {
         this.dialogVisible = false;
@@ -228,7 +251,6 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
   }

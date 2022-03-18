@@ -27,7 +27,7 @@
 
     <footer class="vh-media-check-footer">
       <div class="vh-check-tip">
-        <span class="vh-iconfont vh-line-video-camera icon-tip"></span>
+        <span class="vh-iconfont vh-line-detection icon-tip"></span>
         <span>您能看到摄像头画面吗？</span>
       </div>
       <div class="button-container">
@@ -194,7 +194,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip

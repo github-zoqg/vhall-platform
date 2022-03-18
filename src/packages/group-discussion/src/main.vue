@@ -336,6 +336,18 @@
     methods: {
       // 初始化事件
       initEvent() {
+        // 发起端收到同意邀约演示
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
+          if (msg.data.extra_params == this.userId) {
+            this.$message({
+              message: '对方已接受邀请',
+              showClose: true,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+
         // 发起端收到拒绝邀请演示
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
           // 如果申请人是自己, 或者自己不是主持人
@@ -352,23 +364,25 @@
             role = '嘉宾';
           }
           if (msg.data.extra_params == this.userId) {
-            this.$message.warning({
-              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`
+            console.log('拒绝邀请', msg);
+            this.$message({
+              message: `${role}${msg.data.nick_name}拒绝了你的演示邀请`,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
             });
           }
-        });
-
-        // 发起端收到同意演示成功消息
-        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_SUCCESS', () => {
-          // if (msg.sender_id != this.userId) {
-          //    // 如果是主持人演示
-          // }
         });
 
         // 发起端收到结束演示成功消息
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
           if (msg.sender_id != this.userId) {
-            this.$message.warning('观众结束了演示');
+            this.$message({
+              message: '观众结束了演示',
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
           }
         });
       },
@@ -522,7 +536,14 @@
       },
       // 设为组长
       setLeader(groupId, accountId) {
-        this.groupServer.setLeader(groupId, accountId);
+        this.$confirm('是否将此组员设为组长?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          this.groupServer.setLeader(groupId, accountId);
+        });
       },
       // 进入小组
       handleEnterGroup: async function (groupId) {
@@ -565,8 +586,9 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         })
-          .then(() => {
-            this.groupServer.groupDisband(id);
+          .then(async () => {
+            await this.groupServer.groupDisband(id);
+            await this.roomBaseServer.getInavToolStatus();
           })
           .catch(() => {});
       },
