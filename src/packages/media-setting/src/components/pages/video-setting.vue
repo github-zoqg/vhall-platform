@@ -2,7 +2,7 @@
   <section class="vmp-media-setting-video">
     <main>
       <section class="vmp-media-setting-item">
-        <label class="vmp-media-setting-item__label">{{ $t('setting.setting_1003') }}</label>
+        <label class="vmp-media-setting-item__label">{{ $t('setting.setting_1006') }}</label>
         <section class="vmp-media-setting-item__content">
           <el-radio-group v-model="mediaState.videoType" @change="onVideoTypeChange">
             <el-radio label="camera">{{ $t('setting.setting_1003') }}</el-radio>
