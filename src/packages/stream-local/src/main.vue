@@ -113,7 +113,7 @@
         <el-tooltip content="切换" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
-            v-if="!isFullScreen && switchStatus"
+            v-if="!isFullScreen && isShowExchangeBtn"
             @click="exchange"
           ></span>
         </el-tooltip>
@@ -168,7 +168,7 @@
         </el-tooltip>
       </p>
       <p
-        v-if="joinInfo.role_name == 1 || localSpeaker.roleName === 20"
+        v-if="joinInfo.role_name == 1 || groupRole === 20"
         class="vmp-stream-local__shadow-second-line"
       >
         <!-- 设为主讲人 -->
@@ -196,12 +196,12 @@
     </section>
 
     <!-- 播放按钮 -->
-    <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
+    <!-- <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
       <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section>
+    </section> -->
 
     <ImgStream ref="imgPushStream"></ImgStream>
   </div>
@@ -242,6 +242,14 @@
       // 文档是否对观众可见
       switchStatus() {
         return this.$domainStore.state.docServer.switchStatus;
+      },
+      // 是否展示切换按钮
+      isShowExchangeBtn() {
+        if (this.isInGroup) {
+          return true;
+        } else {
+          return this.joinInfo.role_name != 2 ? true : this.switchStatus;
+        }
       },
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
@@ -951,6 +959,9 @@
             console.error('setmainscreen failed ::', err);
           });
       },
+      /**
+       * 初始化互动实例时，进行自动上麦判断时，会调用speakOn接口，此时vrtc_connect_success已经收到，但互动实例还没有，所以在推流之前需要等待互动实例化完成
+       */
       checkVRTCInstance() {
         return new Promise((resolve, reject) => {
           let count = 0;

@@ -11,7 +11,7 @@ const $message = options => {
       offset: offset
     };
   }
-  options.type = 'info';
+  options.type = options.type || 'info';
   return Message({
     offset: offset,
     ...options
@@ -36,6 +36,7 @@ const $message = options => {
   };
 });
 // 将$message挂载到this上，用异步任务，是为了能覆盖element自动写入的 $message
-setTimeout(() => {
+const st = setTimeout(() => {
   Vue.prototype.$message = $message;
-});
+  clearTimeout(st)
+}, 0);

@@ -445,7 +445,8 @@
     .form-group {
       overflow: hidden;
       .label-left {
-        width: 60px;
+        width: 48px;
+        padding-right: 12px;
         float: left;
         display: block;
         color: #1a1a1a;
@@ -458,6 +459,7 @@
         line-height: 55px;
       }
       input {
+        box-sizing: border-box;
         display: block;
         line-height: 40px;
         height: 40px;
@@ -478,8 +480,6 @@
         margin-top: 7px;
       }
       .envelope-note {
-        box-sizing: border-box;
-        width: 310px;
         text-align: left;
         padding: 0 12px;
         margin-left: 5px;

@@ -108,10 +108,7 @@
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="
-              (joinInfo.role_name == 1 && stream.roleName != 20) ||
-              (groupRole == 20 && stream.roleName != 1)
-            "
+            v-if="isShowDownMicBtn"
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -120,7 +117,7 @@
 
     <section v-else class="vmp-stream-remote__shadow-box">
       <p
-        v-if="(joinInfo.role_name == 1 && !is_host_in_group) || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-remote__shadow-first-line"
       >
         <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
@@ -161,7 +158,9 @@
         <el-tooltip content="设为主讲人" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
-            v-show="stream.attributes.roleName == 4 || stream.attributes.roleName == 1"
+            v-show="
+              !isInGroup && (stream.attributes.roleName == 4 || stream.attributes.roleName == 1)
+            "
             @click="setOwner(stream.accountId)"
           ></span>
         </el-tooltip>
@@ -169,10 +168,7 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="
-              stream.attributes.roleName == 2 ||
-              (joinInfo.role_name == 1 && stream.attributes.roleName != 4)
-            "
+            v-show="isShowSetMainScreenBtn"
             @click="setMainScreen"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
@@ -180,19 +176,21 @@
 
         <el-tooltip content="下麦" placement="bottom">
           <span
-            v-show="(stream.attributes.roleName != 1 && !is_host_in_group) || groupRole == 20"
+            v-show="isShowDownMicBtn"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
           ></span>
         </el-tooltip>
       </p>
     </section>
-    <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
+
+    <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
+    <!-- <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
       <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section>
+    </section> -->
   </div>
 </template>
 
@@ -230,9 +228,6 @@
     computed: {
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
-      is_host_in_group() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
       //默认的主持人id
       hostId() {
@@ -303,6 +298,22 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 主持人、组长是否显示下麦按钮
+      isShowDownMicBtn() {
+        return (
+          (this.joinInfo.role_name == 1 && this.stream.accountId != this.groupLeaderId) ||
+          (this.groupRole == 20 && this.stream.roleName != 1)
+        );
+      },
+      isShowSetMainScreenBtn() {
+        if (this.isInGroup) {
+          return true;
+        } else {
+          return (
+            this.stream.roleName == 2 || (this.joinInfo.role_name == 1 && this.stream.roleName != 4)
+          );
+        }
       }
     },
     filters: {},
@@ -689,15 +700,15 @@
         z-index: -1;
       }
       p {
-        width: 108px;
-        height: 108px;
+        width: 72px;
+        height: 72px;
         border-radius: 50%;
         background: rgba(0, 0, 0, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
         i {
-          font-size: 46px;
+          font-size: 32px;
           color: #f5f5f5;
         }
       }
