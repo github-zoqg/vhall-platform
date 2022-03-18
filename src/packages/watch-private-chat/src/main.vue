@@ -242,8 +242,7 @@
   .vmp-watch-private-chat {
     position: relative;
     width: 100%;
-    //flex: 1;
-    height: calc(100% - 20px);
+    height: 100%;
     .private-chat-content {
       position: relative;
       &:last-child {

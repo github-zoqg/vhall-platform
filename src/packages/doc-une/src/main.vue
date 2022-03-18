@@ -59,7 +59,7 @@
           title="上一步"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
-        <li v-if="hasPager" class="page-number">
+        <li v-if="hasPager || webinarMode == 5" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
           <span class="page-split">/</span>
           <span class="page-total">{{ docServer.state.pageTotal }}</span>

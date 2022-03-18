@@ -8,6 +8,7 @@
           :key="index"
           :info="block"
           :room-id="roomId"
+          @send="handleSendEvent"
         />
       </div>
     </overlay-scrollbars>
@@ -15,6 +16,8 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   import ComponentDesimg from './components/component-desimg.vue';
   import ComponentQrcode from './components/component-qrcode.vue';
   import ComponentTitle from './components/component-title.vue';
@@ -67,9 +70,7 @@
         console.log('state', state);
       },
       async queryDetail(id) {
-        if (id === undefined || id === null) {
-          return;
-        }
+        if (id === undefined || id === null) return;
 
         this.loading = true;
         await this.$nextTick();
@@ -89,6 +90,9 @@
         } catch (error) {
           this.loading = false;
         }
+      },
+      handleSendEvent(method, args) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, method, args));
       }
     }
   };

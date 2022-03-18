@@ -27,9 +27,9 @@
           :placeholder="inputStatus.placeholder"
           rows="1"
           class="vhsaas-chat-operator__textarea"
-          @input="onTextareaInput"
-          @keydown.stop="onKeyUP($event)"
-          @keyup.stop="foo"
+          @input="inputHandle"
+          @keydown.stop="onkeydownHandle($event)"
+          @keyup.stop="onKeyUpHandle($event)"
         ></textarea>
         <span v-show="showLimit" class="vhsaas-chat-operator__textarea-show-limit">
           <i
@@ -118,16 +118,16 @@
         return this.watchInitData.interact.room_id;
       }
     },
-    watch: {
-      inputValue: {
-        handler(newValue) {
-          console.log('input 值发生变化了');
-          // 输入框内容发生变化，更新滚动条
-          this.overlayScrollbar.update();
-          this.onTextareaInput();
-        }
-      }
-    },
+    // watch: {
+    //   inputValue: {
+    //     handler(newValue) {
+    //       console.log('chat-operator 值发生变化了', newValue);
+    //       // 输入框内容发生变化，更新滚动条
+    //       this.overlayScrollbar.update();
+    //       this.inputHandle();
+    //     }
+    //   }
+    // },
     mounted() {
       this.overlayScrollbarInit();
       this.watchInitData = useRoomBaseServer().state.watchInitData;
@@ -136,8 +136,10 @@
       });
     },
     methods: {
-      // 空函数，阻止输入框空格按键事件冒泡，触发播放器暂停/播放
-      foo() {},
+      //阻止输入框空格按键事件冒泡，触发播放器暂停/播放
+      onKeyUpHandle(event) {
+        event.stopPropagation();
+      },
       // 滚动条初始化
       overlayScrollbarInit() {
         this.$nextTick(() => {
@@ -152,39 +154,35 @@
         });
       },
       // 输入框 input 事件
-      onTextareaInput() {
-        const chatOldTextareaHeight = this.$refs.chatQaTextarea.style.height;
-        console.log('chatOldTextareaHeight', chatOldTextareaHeight);
+      inputHandle() {
+        // const chatOldTextareaHeight = this.$refs.chatQaTextarea.style.height;
         // 最大字数限制 140
         if (this.inputValue.length > 140) {
           this.inputValue = this.inputValue.substring(0, 140);
         }
-        setTimeout(() => {
-          this.$nextTick(() => {
-            console.dir(this.$refs.chatQaTextarea);
-            const chatTextareaHeight = this.$refs.chatQaTextarea.style.height;
-            console.log('chatTextareaHeight', chatTextareaHeight);
-            if (chatOldTextareaHeight !== chatTextareaHeight) {
-              const hostTextarea = document.querySelector(
-                '.vhsaas-chat-qa-operator__body-wrap .os-host-textarea'
-              );
-              const chatTextAreaHeight = parseInt(chatTextareaHeight);
-              if (chatTextAreaHeight <= 60) {
-                // 解决删除文本之后 textarea 高度不会自动减小的问题
-                this.$refs.chatQaTextarea.style.minHeight = '20px';
-                hostTextarea.style.minHeight = chatTextareaHeight;
-              } else {
-                hostTextarea.style.minHeight = '59px';
-              }
-              // 三行的时候显示字数限制，否则不显示
-              this.showLimit = chatTextAreaHeight > 40;
+        this.$nextTick(() => {
+          const chatTextareaHeight = this.$refs.chatQaTextarea.style.height;
+          console.log('chatTextareaHeight', chatTextareaHeight);
+          // if (chatOldTextareaHeight !== chatTextareaHeight) {
+          const hostTextarea = document.querySelector(
+            '.vhsaas-chat-qa-operator__body-wrap .os-host-textarea'
+          );
+          const chatTextAreaHeight = parseInt(chatTextareaHeight);
+          if (chatTextAreaHeight <= 60) {
+            // 解决删除文本之后 textarea 高度不会自动减小的问题
+            this.$refs.chatQaTextarea.style.minHeight = '20px';
+            hostTextarea.style.minHeight = chatTextareaHeight;
+          } else {
+            hostTextarea.style.minHeight = '59px';
+          }
+          // 三行的时候显示字数限制，否则不显示
+          this.showLimit = chatTextAreaHeight > 40;
 
-              // 触发父元素绑定的高度发生变化事件
-              setTimeout(() => {
-                this.$emit('chatTextareaHeightChange', this.$refs.chatQaOperator.offsetHeight);
-              });
-            }
+          // 触发父元素绑定的高度发生变化事件
+          setTimeout(() => {
+            this.$emit('chatTextareaHeightChange', this.$refs.chatQaOperator.offsetHeight);
           });
+          // }
         });
       },
       // 登录
@@ -246,7 +244,7 @@
         }
         this.$emit('onOnlyMine', this.onlyMine);
       },
-      onKeyUP(event) {
+      onkeydownHandle(event) {
         if (event.keyCode == 13) {
           this.sendMessage();
           event.preventDefault();
@@ -283,7 +281,7 @@
           useQaServer()
             .sendQaMsg(params)
             .then(res => {
-              console.warn('获取发送问答-----成功---');
+              console.warn('获取发送问答-----成功---', res);
               this.lock = sessionStorage.getItem('QALock');
               this.questionGap = 15;
               this.questionGapInterval = window.setInterval(() => {
@@ -316,10 +314,16 @@
         // 这块看起来很奇怪的代码，是为了清空输入框内容之后自适应高度。
         // 没有更好的替换方案，误删！
         this.inputValue = '  ';
-        setTimeout(() => {
-          this.inputValue = '';
-          // this.$emit('performScroll');
+
+        this.$nextTick(() => {
+          // 输入框内容发生变化，更新滚动条
+          this.overlayScrollbar.update();
+          this.inputHandle();
         });
+        // setTimeout(() => {
+        //   this.inputValue = '';
+        //   // this.$emit('performScroll');
+        // });
       }
     }
   };
