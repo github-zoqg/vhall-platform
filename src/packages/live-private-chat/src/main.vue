@@ -32,7 +32,12 @@
               chatGroupList[activeGroupIndex].type == 2
           }"
         >
-          <span class="wrap__right__header">提示：如想结束当前聊天，关闭左侧用户窗口即可</span>
+          <span class="wrap__right__header" v-if="currentSelectUser">
+            提示：如想结束当前聊天，关闭左侧用户窗口即可
+          </span>
+          <span class="wrap__right__header" v-if="!currentSelectUser">
+            提示：选择私聊的人员后，可以发送私聊消息
+          </span>
           <div class="wrap__right__content">
             <chat-list
               @showImg="openImgPreview"
@@ -87,14 +92,32 @@
               <!--              ></i>-->
             </div>
             <!--聊天内容输入-->
-            <textarea
+            <!--            <textarea-->
+            <!--              class="wrap__right__private-txt"-->
+            <!--              :placeholder="inputPlaceholder"-->
+            <!--              ref="sendBox"-->
+            <!--              v-model="inputText"-->
+            <!--              maxlength="200"-->
+            <!--              @keydown.prevent.13="sendMessage"-->
+            <!--            ></textarea>-->
+            <el-input
               class="wrap__right__private-txt"
+              type="textarea"
               :placeholder="inputPlaceholder"
-              ref="sendBox"
               v-model="inputText"
-              @keydown.prevent.13="sendMessage"
-            ></textarea>
-            <el-button type="primary" size="small" class="small-button" round @click="sendMessage">
+              maxlength="200"
+              show-word-limit
+              :row="4"
+              @keyup.enter.native="sendMessage"
+            ></el-input>
+            <el-button
+              type="primary"
+              size="small"
+              class="small-button"
+              round
+              @click="sendMessage"
+              :disabled="!currentSelectUser"
+            >
               发送
             </el-button>
           </div>
@@ -344,13 +367,24 @@
       },
       //发送消息
       sendMessage() {
+        //未选中私聊人员
+        if (!this.currentSelectUser) {
+          return;
+        }
         //判断是否有输入内容，或者上传图片
         if (
           (!this.inputText || (this.inputText && !this.inputText.trim())) &&
           !this.imgList.length
         ) {
           this.$message.warning('内容不能为空');
+          return;
         }
+
+        if (this.inputText.length > 200) {
+          this.$message.warning('聊天内容不能超过200个字');
+          return;
+        }
+
         const curmsg = useChatServer().createCurMsg();
         const target = this.chatGroupList[this.activeGroupIndex].user_id;
         curmsg.setTarget(target);
@@ -528,10 +562,13 @@
         }
         &__private-txt {
           width: 80%;
-          height: 70px;
-          padding: 0 10px 10px 10px;
+          padding: 0 10px 0 10px;
           border: none;
           outline: none;
+          .el-textarea__inner {
+            height: 70px;
+            border: none;
+          }
         }
         .small-button {
           position: absolute;
