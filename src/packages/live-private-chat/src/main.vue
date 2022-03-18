@@ -173,12 +173,9 @@
         previewImgList: [],
         //当前的用户角色
         roleName: '',
-        //当前的活动id
-        webinarId: '',
+
         //当前的登录信息
-        loginInfo: {},
-        //房间号
-        roomId: ''
+        loginInfo: {}
       };
     },
     computed: {
@@ -190,6 +187,13 @@
           userId = temp.account_id || temp.user_id;
         }
         return userId;
+      },
+      roomId() {
+        return this.roomBaseServer.state.watchInitData.interact.room_id;
+      },
+      //当前的活动id
+      webinarId() {
+        return this.roomBaseServer.state.watchInitData.webinar.id;
       }
     },
     beforeCreate() {
@@ -208,11 +212,9 @@
       },
       //获取私聊联系人列表
       getPrivateContactList() {
-        const roomId = this.roomBaseServer.state.watchInitData.interact.room_id;
-        const webinarId = this.roomBaseServer.state.watchInitData.webinar.id;
         const params = {
-          room_id: roomId,
-          webinar_id: webinarId
+          room_id: this.roomId,
+          webinar_id: this.webinarId
         };
         return this.chatServer
           .getPrivateContactList(params)
@@ -242,14 +244,11 @@
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         const interact_token = interact.interact_token || '';
-        const roomId = interact.room_id;
-        this.roomId = roomId;
-        this.webinarId = webinar.id;
         this.roleName = join_info.role_name;
         this.loginInfo = join_info;
         console.log(this.loginInfo, '当前的登录信息');
         this.extraParams = {
-          path: `${roomId}/img`,
+          path: `${this.roomId}/img`,
           type: 'image',
           interact_token
         };
@@ -264,7 +263,7 @@
       //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
         const isExit = this.chatGroupList.some((chatItem, index) => {
-          if (chatItemInfo.id == chatItem.user_id) {
+          if (chatItemInfo.id == chatItem.id) {
             this.selectGroup(index);
             return true;
           } else {
@@ -275,8 +274,15 @@
           const { id, chat_name } = chatItemInfo;
           this.chatGroupList.push({ user_id: id, nickname: chat_name });
           this.selectGroup(this.chatGroupList.length - 1);
+          //将联系人添加到私聊列表存储
+          this.chatServer.addToRankList({
+            room_id: this.roomId,
+            webinar_id: this.webinarId,
+            to: id
+          });
         }
       },
+      setRankList() {},
       //删除某个对话
       delChatItem(index) {
         this.chatGroupList.splice(index, 1);
@@ -358,6 +364,7 @@
         useChatServer().clearCurMsg();
         this.imgList.length = 0;
         this.inputText = '';
+        this.$refs.chatRef.scrollBottom();
       }
     }
   };
