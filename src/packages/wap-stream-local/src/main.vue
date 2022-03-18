@@ -94,7 +94,8 @@
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
-      liveMode() {
+      // 直播模式
+      mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
       //默认的主持人id
@@ -118,7 +119,7 @@
       isShowPresentationScreen() {
         const { accountId } = this.localSpeaker;
         const sameId = this.presentationScreen === accountId;
-        const groupMode = this.liveMode == 6;
+        const groupMode = this.mode == 6;
         const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
         const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
         const allowedUser = inMainRoomUser || inGroupRoomUser;
@@ -144,10 +145,6 @@
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      // 直播模式
-      mode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
@@ -169,7 +166,6 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {},
     created() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -338,18 +334,6 @@
           await this.interactiveServer.destroy();
           await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
           this.publishLocalStream();
-        } else if (err == 'startBroadCastError') {
-          // 开启主屏失败
-          console.log('开启主屏失败');
-          // TODO: 主屏失败错误处理
-        } else if (err == 'setBroadCastScreenError') {
-          // 设置旁路主屏布局失败
-          console.log('设置主屏失败');
-          // TODO: 设置旁路主屏布局失败错误处理
-        } else if (err == 'getCanvasStreamError') {
-          console.error('获取图片流track错误');
-        } else if (err == 'createLocalPhotoStreamError') {
-          this.$message.error('初始化图片流失败');
         } else {
           console.error(err);
           throw new Error('代码错误');

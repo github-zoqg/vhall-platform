@@ -409,7 +409,7 @@
                   :label="
                     question.subject === '隐私声明'
                       ? ''
-                      : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$t(
+                      : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$tdefault(
                           question.subject
                         )}`
                   "
