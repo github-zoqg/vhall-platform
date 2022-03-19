@@ -13,7 +13,7 @@
             v-for="(group, index) in chatGroupList"
             :class="{ active: activeGroupIndex === index }"
             @click="selectGroup(index)"
-            :key="group.user_id"
+            :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
             <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
@@ -207,7 +207,7 @@
         let userId = '';
         if (this.chatGroupList.length && this.activeGroupIndex >= 0) {
           let temp = this.chatGroupList[this.activeGroupIndex];
-          userId = temp.account_id || temp.user_id;
+          userId = temp.account_id;
         }
         return userId;
       },
@@ -294,8 +294,8 @@
           }
         });
         if (!isExit) {
-          const { id, chat_name } = chatItemInfo;
-          this.chatGroupList.push({ user_id: id, nickname: chat_name });
+          const { id, chat_name, account_id } = chatItemInfo;
+          this.chatGroupList.push({ id: id, nickname: chat_name, account_id });
           this.selectGroup(this.chatGroupList.length - 1);
           //将联系人添加到私聊列表存储
           this.chatServer.addToRankList({
@@ -386,7 +386,7 @@
         }
 
         const curmsg = useChatServer().createCurMsg();
-        const target = this.chatGroupList[this.activeGroupIndex].user_id;
+        const target = this.chatGroupList[this.activeGroupIndex].account_id;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
