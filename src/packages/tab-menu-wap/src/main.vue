@@ -127,6 +127,13 @@
       async 'visibleMenu.length'() {
         await this.$nextTick();
         this.scrollToItem({ id: this.selectedId });
+      },
+      ['roomBaseServer.state.configList']: {
+        deep: true,
+        immediate: true,
+        handler() {
+          this.updateAuth();
+        }
       }
     },
     beforeCreate() {
@@ -146,6 +153,12 @@
     },
 
     methods: {
+      updateAuth() {
+        const configList = this.roomBaseServer.state.configList;
+        this.auth.member = configList.members_manager;
+        this.auth.notice = configList.webinar_notice;
+        this.auth.chapter = configList['ui.watch_record_chapter'];
+      },
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
