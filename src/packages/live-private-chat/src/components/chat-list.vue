@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-live-private-chat-list" :id="id">
     <div v-if="topLoading" class="private-chat__top-loading">加载中...</div>
-    <ul class="private-chat__list-wrap" v-if="finishData && chatList.length">
+    <ul class="private-chat__list-wrap" :id="id" v-if="finishData && chatList.length">
       <li
         class="private-chat__list-item"
         :class="{
