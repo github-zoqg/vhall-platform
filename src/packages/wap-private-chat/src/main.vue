@@ -130,7 +130,6 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          alert();
           this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;

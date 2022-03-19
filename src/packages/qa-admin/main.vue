@@ -739,6 +739,7 @@
               this.$refs.privateChat.addChatItem({
                 type: 1,
                 id: item.join_id,
+                account_id: item.account_id,
                 chat_name: item.nick_name
               });
             });
