@@ -163,6 +163,7 @@
           const _this = this;
           console.log(oldVal);
           if (newVal) {
+            this.chatServer.setCurPrivateTarget && this.chatServer.setCurPrivateTarget(newVal);
             _this.init();
           }
         },
