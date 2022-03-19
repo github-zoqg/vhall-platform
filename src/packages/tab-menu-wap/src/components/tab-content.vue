@@ -16,6 +16,10 @@
       menu: {
         type: Array,
         default: () => []
+      },
+      auth: {
+        type: Object,
+        default: () => ({})
       }
     },
     data() {
@@ -24,6 +28,12 @@
       };
     },
     computed: {
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
+      },
       filterMenu() {
         let set = [];
         for (const item of this.menu) {
@@ -33,9 +43,12 @@
         }
 
         set = set.filter(item => {
-          if (item.type == 8 && !this.auth.member) return false; // 成员
-          if (item.type == 'notice' && !this.auth.notice) return false; // 公告
-          if (item.type == 7 && !this.auth.chapter) return false; // 章节
+          if (!this.isWatch) {
+            if (item.type == 8 && !this.auth.member) return false; // 成员
+            if (item.type == 'notice' && !this.auth.notice) return false; // 公告
+          } else {
+            if (item.type == 7 && !this.auth.chapter) return false; // 章节
+          }
 
           return true;
         });
