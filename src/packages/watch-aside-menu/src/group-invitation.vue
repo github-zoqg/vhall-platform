@@ -63,20 +63,23 @@
         this.timer = setInterval(() => {
           this.second--;
           if (this.second <= 0) {
-            clearInterval(this.timer);
-            // this.close();
-            this.handleClose();
+            this.close();
           }
         }, 1000);
       },
       close() {
+        this.timer && clearInterval(this.timer);
+        this.timer = 0;
         this.dialogVisible = false;
         this.$emit('update:show', false);
       },
       // 拒绝邀请演示
       handleClose: async function () {
-        clearInterval(this.timer);
         this.close();
+        // 已经不在小组中了
+        if (!this.groupServer.state.groupInitData.isInGroup) {
+          return;
+        }
         try {
           const res = await this.micServer.userRejectInvite({
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id,
@@ -100,6 +103,11 @@
       },
       // 同意邀请演示
       handleSubmit: async function () {
+        this.close();
+        // 已经不在小组中了
+        if (!this.groupServer.state.groupInitData.isInGroup) {
+          return;
+        }
         try {
           // 同意邀请演示
           await this.micServer.userAgreeInvite({
@@ -114,12 +122,7 @@
         // 设置主讲人
         try {
           await this.groupServer.presentation();
-          this.timer && clearInterval(this.timer);
-          this.timer = 0;
-          this.second = 30;
-          this.close();
         } catch (ex) {
-          this.close;
           console.error('[group] 设置主讲人:', ex);
         }
       }

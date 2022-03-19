@@ -242,7 +242,6 @@
             this.roomBaseServer.state.watchInitData.join_info.third_party_user_id ==
             rawMsg.data.rewarder_id
           ) {
-            this.closeDialog();
             this.$message({
               message: this.$t('common.common_1005'),
               showClose: true,

@@ -38,10 +38,10 @@
               {{ $t('setting.setting_1029') }}
             </a>
             <section>
-              <el-button size="small" type="primary" @click="saveMediaSetting">
+              <el-button size="small" round type="primary" @click="saveMediaSetting">
                 {{ $t('account.account_1062') }}
               </el-button>
-              <el-button @click="closeMediaSetting" size="small">
+              <el-button @click="closeMediaSetting" round size="small">
                 {{ $t('account.account_1063') }}
               </el-button>
             </section>
