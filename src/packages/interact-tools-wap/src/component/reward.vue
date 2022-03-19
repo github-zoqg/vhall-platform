@@ -250,12 +250,12 @@
                 window.location.href = res.data.pay_data;
               }
             } else {
-              that.$toast(res.msg);
+              that.$toast(`${this.$tes(res.code) || res.msg}`);
             }
           })
-          .catch(e => {
-            console.log('获取支付信息失败>>>', e);
-            that.$toast(`${this.$tes(e.code) || e.msg}`);
+          .catch(res => {
+            console.log('获取支付信息失败>>>', res);
+            that.$toast(`${this.$tes(res.code) || res.msg}`);
           });
       },
       close() {
