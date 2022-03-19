@@ -1009,12 +1009,15 @@
       right: 20px;
       background: transparent;
       border-radius: 97px;
-      border: 1px solid #666;
+      border: 1px solid #dadada;
       color: #fff;
       cursor: pointer;
       &:hover {
         background: #fc5659;
         border-color: #fc5659;
+        color: #fff;
+      }
+      &:focus {
         color: #fff;
       }
     }

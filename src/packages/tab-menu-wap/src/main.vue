@@ -49,7 +49,7 @@
 
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
-      <tab-content ref="tabContent" :menu="menu" @noticeHint="handleHint" />
+      <tab-content ref="tabContent" :menu="menu" :auth="auth" @noticeHint="handleHint" />
     </section>
     <!-- </template> -->
   </section>
@@ -77,18 +77,35 @@
         selectedType: '',
         selectedId: '',
         menu: [],
-        pageEnv: 'default',
-        tabOptions: {}
+        pageEnv: 'live-room',
+        tabOptions: {},
+        auth: {
+          member: true,
+          notice: true,
+          chapter: true
+        }
       };
     },
     computed: {
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
+      },
       selectedIndex() {
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        let m = this.menu.filter(item => {
-          // 此处逻辑较复杂，请参考tab-menu/readme.md
-          if (this.pageEnv === 'living') {
+        return this.menu.filter(item => {
+          if (!this.isWatch) {
+            // 此处逻辑较复杂，请参考tab-menu/readme.md
+            if (item.type == 8 && !this.auth.member) return false; // 成员
+            if (item.type == 'notice' && !this.auth.notice) return false; // 公告
+          } else {
+            if (item.type == 7 && !this.auth.chapter) return false; // 章节
+          }
+
+          if (this.pageEnv === 'live-room') {
             return item.status !== 2 && item.visible;
           }
 
@@ -98,9 +115,6 @@
 
           return item.visible === true;
         });
-        console.log('visibleMenu', m);
-
-        return m;
       },
       // 是否为嵌入页
       embedObj() {
@@ -121,11 +135,19 @@
       async 'visibleMenu.length'() {
         await this.$nextTick();
         this.scrollToItem({ id: this.selectedId });
+      },
+      ['roomBaseServer.state.configList']: {
+        deep: true,
+        immediate: true,
+        handler() {
+          this.updateAuth();
+        }
       }
     },
     beforeCreate() {
       this.menuServer = useMenuServer();
       this.docServer = useDocServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       // if (this.isTryVideo && this.isSubscribe) return;
@@ -140,6 +162,12 @@
     },
 
     methods: {
+      updateAuth() {
+        const configList = this.roomBaseServer.state.configList;
+        this.auth.member = configList.members_manager;
+        this.auth.notice = configList.webinar_notice;
+        this.auth.chapter = configList['ui.watch_record_chapter'];
+      },
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
@@ -250,15 +278,17 @@
         }
 
         const chatIndex = this.menu.findIndex(el => el.type === 3);
+        const hasMember = this.menu.findIndex(el => el.type === 'notice');
         if (chatIndex >= -1) {
-          this.addItemByIndex(chatIndex + 1, {
+          const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+          this.addItemByIndex(index, {
             type: 'v5',
             name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
             text: this.$t('common.common_1004'), // 同上
             visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
             status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
           });
-          this.addItemByIndex(chatIndex + 2, {
+          this.addItemByIndex(index + 1, {
             type: 'private',
             name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
             text: this.$t('common.common_1008'), // 同上
@@ -291,7 +321,7 @@
        * 设置显示条件
        * @param {String} condition [default|living]
        */
-      setPageEnv(condition = 'default') {
+      setPageEnv(condition = 'live-room') {
         this.pageEnv = condition;
       },
       /**

@@ -3,7 +3,7 @@
     <!-- 流列表 -->
     <vmp-air-container :cuid="cuid"></vmp-air-container>
     <!-- 封面，无延迟直播或者上麦观众刷新页面显示 -->
-    <div class="vmp-basic-center__cover" v-show="showcoverImg && mode !== 6">
+    <div class="vmp-basic-center__cover" v-show="showcoverImg">
       <img :src="coverImgUrl" alt />
       <p class="vmp-basic-center__cover-icon" @click.stop="handleAllVideoPlay">
         <i class="vh-iconfont vh-line-video-play"></i>

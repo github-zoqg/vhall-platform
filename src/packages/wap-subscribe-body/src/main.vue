@@ -171,7 +171,7 @@
           if (this.countDowntimer) clearInterval(this.countDowntimer);
           this.countDownTime = '';
           this.popupLivingStart = true;
-          this.subscribeText = this.$t('webinar.webinar_1020');
+          this.subscribeText = this.$t('player.player_1013');
         });
 
         this.subscribeServer.$on('pay_success', data => {
@@ -181,9 +181,9 @@
           }
         });
 
-        this.subscribeServer.$on('live_over', data => {
+        this.subscribeServer.$on('live_over', () => {
           this.subOption.type = 3;
-          console.log(data);
+          this.subscribeText = this.$t('player.player_1017');
         });
       },
       handlerInitInfo() {
@@ -197,10 +197,18 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        if (webinar.type == 1 && join_info.is_subscribe == 1) {
-          this.subscribeText = this.$t('webinar.webinar_1023');
+        if (webinar.type == 1 || webinar.type == 5) {
+          this.subscribeText = this.$t('player.player_1013');
         } else {
-          this.filterText(webinar.verify, join_info.is_subscribe);
+          if (join_info.is_subscribe == 1) {
+            this.subscribeText = this.$t('appointment.appointment_1006');
+          } else {
+            if (webinar.verify == 3) {
+              this.subscribeText = this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
+            } else {
+              this.subscribeText = this.$t('appointment.appointment_1017');
+            }
+          }
         }
         if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
           this.showVideo = true;
