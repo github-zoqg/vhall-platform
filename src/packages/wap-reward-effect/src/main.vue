@@ -14,14 +14,7 @@
         }"
       >
         <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
-        <img
-          class="gift-user-avatar"
-          :src="
-            rewardEffectInfo.data.type == 'gift_send_success'
-              ? rewardEffectInfo.data.gift_user_avatar
-              : rewardEffectInfo.data.rewarder_avatar || default_user_avatar
-          "
-        />
+        <img class="gift-user-avatar" :src="gift_user_avatar(rewardEffectInfo)" />
         <span class="nick-name">
           {{
             rewardEffectInfo.data.type == 'gift_send_success'
@@ -71,7 +64,7 @@
     useWatchRewardServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -113,7 +106,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 1000
+        minTaskTime: 2000
       });
 
       //测试数据
@@ -156,19 +149,17 @@
       listenServer() {
         this.giftsServer.$on('gift_send_success', msg => {
           console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
+          const nickname = msg.data.gift_user_nickname || msg.data.nickname;
           const data = {
-            nickname:
-              msg.data.gift_user_nickname.length > 8
-                ? msg.data.gift_user_nickname.substr(0, 8) + '...'
-                : msg.data.gift_user_nickname,
+            nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
             avatar: msg.data.avatar,
             content: {
               gift_name: msg.data.gift_name,
-              gift_url: `${msg.data.gift_image_url}`,
+              gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
               source_status: msg.data.source_status
             },
-            type: msg.data.type
-            // interactToolsStatus: true
+            type: msg.data.type,
+            interactToolsStatus: true
           };
           this.chatServer.addChatToList(data);
           this.addRewardEffect(msg);
@@ -210,6 +201,25 @@
             });
           }
         });
+      },
+      // 礼物用户头像
+      gift_user_avatar(rewardEffectInfo) {
+        console.log('gift_user_avatar------>', rewardEffectInfo);
+        if (
+          rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.event_type == 'free_gift_send'
+        ) {
+          // 来源于接口消息字段
+          if (rewardEffectInfo.data.gift_user_avatar) {
+            return rewardEffectInfo.data.gift_user_avatar;
+          } else if (rewardEffectInfo.data.rewarder_avatar) {
+            return rewardEffectInfo.data.rewarder_avatar;
+          } else {
+            return this.default_user_avatar;
+          }
+        } else {
+          return this.default_user_avatar;
+        }
       },
       /**
        * 根据消息里的sender_id判断, 是否是自己发送的

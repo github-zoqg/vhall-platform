@@ -13,7 +13,7 @@
             v-for="(group, index) in chatGroupList"
             :class="{ active: activeGroupIndex === index }"
             @click="selectGroup(index)"
-            :key="group.user_id"
+            :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
             <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
@@ -32,7 +32,12 @@
               chatGroupList[activeGroupIndex].type == 2
           }"
         >
-          <span class="wrap__right__header">提示：如想结束当前聊天，关闭左侧用户窗口即可</span>
+          <span class="wrap__right__header" v-if="currentSelectUser">
+            提示：如想结束当前聊天，关闭左侧用户窗口即可
+          </span>
+          <span class="wrap__right__header" v-if="!currentSelectUser">
+            提示：选择私聊的人员后，可以发送私聊消息
+          </span>
           <div class="wrap__right__content">
             <chat-list
               @showImg="openImgPreview"
@@ -87,14 +92,32 @@
               <!--              ></i>-->
             </div>
             <!--聊天内容输入-->
-            <textarea
+            <!--            <textarea-->
+            <!--              class="wrap__right__private-txt"-->
+            <!--              :placeholder="inputPlaceholder"-->
+            <!--              ref="sendBox"-->
+            <!--              v-model="inputText"-->
+            <!--              maxlength="200"-->
+            <!--              @keydown.prevent.13="sendMessage"-->
+            <!--            ></textarea>-->
+            <el-input
               class="wrap__right__private-txt"
+              type="textarea"
               :placeholder="inputPlaceholder"
-              ref="sendBox"
               v-model="inputText"
-              @keydown.prevent.13="sendMessage"
-            ></textarea>
-            <el-button type="primary" size="small" class="small-button" round @click="sendMessage">
+              maxlength="200"
+              show-word-limit
+              :row="4"
+              @keyup.enter.native="sendMessage"
+            ></el-input>
+            <el-button
+              type="primary"
+              size="small"
+              class="small-button"
+              round
+              @click="sendMessage"
+              :disabled="!currentSelectUser"
+            >
               发送
             </el-button>
           </div>
@@ -173,12 +196,9 @@
         previewImgList: [],
         //当前的用户角色
         roleName: '',
-        //当前的活动id
-        webinarId: '',
+
         //当前的登录信息
-        loginInfo: {},
-        //房间号
-        roomId: ''
+        loginInfo: {}
       };
     },
     computed: {
@@ -187,9 +207,16 @@
         let userId = '';
         if (this.chatGroupList.length && this.activeGroupIndex >= 0) {
           let temp = this.chatGroupList[this.activeGroupIndex];
-          userId = temp.account_id || temp.user_id;
+          userId = temp.account_id;
         }
         return userId;
+      },
+      roomId() {
+        return this.roomBaseServer.state.watchInitData.interact.room_id;
+      },
+      //当前的活动id
+      webinarId() {
+        return this.roomBaseServer.state.watchInitData.webinar.id;
       }
     },
     beforeCreate() {
@@ -208,11 +235,9 @@
       },
       //获取私聊联系人列表
       getPrivateContactList() {
-        const roomId = this.roomBaseServer.state.watchInitData.interact.room_id;
-        const webinarId = this.roomBaseServer.state.watchInitData.webinar.id;
         const params = {
-          room_id: roomId,
-          webinar_id: webinarId
+          room_id: this.roomId,
+          webinar_id: this.webinarId
         };
         return this.chatServer
           .getPrivateContactList(params)
@@ -242,14 +267,11 @@
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         const interact_token = interact.interact_token || '';
-        const roomId = interact.room_id;
-        this.roomId = roomId;
-        this.webinarId = webinar.id;
         this.roleName = join_info.role_name;
         this.loginInfo = join_info;
         console.log(this.loginInfo, '当前的登录信息');
         this.extraParams = {
-          path: `${roomId}/img`,
+          path: `${this.roomId}/img`,
           type: 'image',
           interact_token
         };
@@ -264,7 +286,7 @@
       //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
         const isExit = this.chatGroupList.some((chatItem, index) => {
-          if (chatItemInfo.id == chatItem.user_id) {
+          if (chatItemInfo.id == chatItem.id) {
             this.selectGroup(index);
             return true;
           } else {
@@ -272,11 +294,18 @@
           }
         });
         if (!isExit) {
-          const { id, chat_name } = chatItemInfo;
-          this.chatGroupList.push({ user_id: id, nickname: chat_name });
+          const { id, chat_name, account_id } = chatItemInfo;
+          this.chatGroupList.push({ id: id, nickname: chat_name, account_id });
           this.selectGroup(this.chatGroupList.length - 1);
+          //将联系人添加到私聊列表存储
+          this.chatServer.addToRankList({
+            room_id: this.roomId,
+            webinar_id: this.webinarId,
+            to: id
+          });
         }
       },
+      setRankList() {},
       //删除某个对话
       delChatItem(index) {
         this.chatGroupList.splice(index, 1);
@@ -338,15 +367,26 @@
       },
       //发送消息
       sendMessage() {
+        //未选中私聊人员
+        if (!this.currentSelectUser) {
+          return;
+        }
         //判断是否有输入内容，或者上传图片
         if (
           (!this.inputText || (this.inputText && !this.inputText.trim())) &&
           !this.imgList.length
         ) {
           this.$message.warning('内容不能为空');
+          return;
         }
+
+        if (this.inputText.length > 200) {
+          this.$message.warning('聊天内容不能超过200个字');
+          return;
+        }
+
         const curmsg = useChatServer().createCurMsg();
-        const target = this.chatGroupList[this.activeGroupIndex].user_id;
+        const target = this.chatGroupList[this.activeGroupIndex].account_id;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
@@ -358,6 +398,7 @@
         useChatServer().clearCurMsg();
         this.imgList.length = 0;
         this.inputText = '';
+        this.$refs.chatRef.scrollBottom();
       }
     }
   };
@@ -521,10 +562,13 @@
         }
         &__private-txt {
           width: 80%;
-          height: 70px;
-          padding: 0 10px 10px 10px;
+          padding: 0 10px 0 10px;
           border: none;
           outline: none;
+          .el-textarea__inner {
+            height: 70px;
+            border: none;
+          }
         }
         .small-button {
           position: absolute;

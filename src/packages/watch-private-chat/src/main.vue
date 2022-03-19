@@ -2,24 +2,22 @@
   <div class="vmp-watch-private-chat">
     <!--消息区域-->
     <div class="private-chat-content" :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }">
-      <div class="private-chat-content__tip-box">
-        <virtual-list
-          ref="chatlist"
-          style="height: 100%; overflow: auto"
-          :keeps="30"
-          :data-key="'count'"
-          :data-sources="chatList"
-          :data-component="msgItem"
-          :extra-props="{}"
-        ></virtual-list>
-        <div
-          v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
-          class="private-chat-content__tip-box-content"
-          @click="scrollToTarget"
-        >
-          {{ tipMsg }}
-          <span class="vh-iconfont vh-d-arrow-down"></span>
-        </div>
+      <virtual-list
+        ref="chatlist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'count'"
+        :data-sources="chatList"
+        :data-component="msgItem"
+        :extra-props="{}"
+      ></virtual-list>
+      <div
+        v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
+        class="private-chat-content__tip-box-content"
+        @click="scrollToTarget"
+      >
+        {{ tipMsg }}
+        <span class="vh-iconfont vh-d-arrow-down"></span>
       </div>
     </div>
     <!--操作栏-->

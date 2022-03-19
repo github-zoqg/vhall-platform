@@ -58,6 +58,7 @@
 
     <!-- 邀请演示对话框 -->
     <GroupInvitaion
+      ref="groupInvitaion"
       :show.sync="dialogVisibleInvite"
       :senderId="senderId"
       :inviteName="inviteName"
@@ -195,6 +196,8 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          // 关闭邀请演示对话框
+          this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
           if (!msg.data.groupToast) {
             this.grouAlert('主持人结束了分组讨论，您将返回主直播间');
@@ -203,6 +206,8 @@
 
         // 小组解散
         this.groupServer.$on('GROUP_DISBAND', () => {
+          // 关闭邀请演示对话框
+          this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
           this.grouAlert('主持人解散了分组，您将返回主直播间');
         });
@@ -232,6 +237,9 @@
             interactToolStatus.is_open_switch == 1 &&
             msg.data.target_id === watchInitData.join_info.third_party_user_id
           ) {
+            // 关闭邀请演示对话框
+            this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
+            // 折叠菜单并提示
             this.isCollapse = true;
             this.grouAlert('您已被踢出该小组');
           }
@@ -416,6 +424,7 @@
       bottom: 0;
       display: flex;
       width: 60px;
+      height: calc(100% - 56px);
       background: rgba(42, 42, 42, 0.9);
       overflow: hidden;
       border-radius: 4px 0 0 0;

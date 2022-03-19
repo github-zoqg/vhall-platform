@@ -65,5 +65,5 @@ input[type='number'] {
   /*滚动条里面小方块*/
   height: 60px;
   border-radius: 10px;
-  background: transparent !important;
+  background: #e0e0e0;
 }

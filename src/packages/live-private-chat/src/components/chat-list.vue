@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-live-private-chat-list" :id="id">
     <div v-if="topLoading" class="private-chat__top-loading">加载中...</div>
-    <ul class="private-chat__list-wrap" v-if="finishData && chatList.length">
+    <ul class="private-chat__list-wrap" :id="id" v-if="finishData && chatList.length">
       <li
         class="private-chat__list-item"
         :class="{
@@ -163,6 +163,7 @@
           const _this = this;
           console.log(oldVal);
           if (newVal) {
+            this.chatServer.setCurPrivateTarget && this.chatServer.setCurPrivateTarget(newVal);
             _this.init();
           }
         },
@@ -176,7 +177,7 @@
     mounted() {
       // this.initEvent();
       // this.initScroll();
-      this.listenEvents();
+      // this.listenEvents();
     },
     methods: {
       init() {
@@ -194,13 +195,13 @@
         this.count = 0;
       },
       initEvent() {
-        // this.queryChatList();
+        this.queryChatList();
         this.finishData = true;
       },
-      //事件监听
-      listenEvents() {
-        this.chatServer.$on('receivePrivateMsg', msg => {});
-      },
+      // //事件监听
+      // listenEvents() {
+      //   this.chatServer.$on('receivePrivateMsg', msg => {});
+      // },
       //todo 待替换
       initScroll() {
         let preTop = 0;

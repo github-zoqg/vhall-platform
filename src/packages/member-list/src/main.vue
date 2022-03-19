@@ -734,8 +734,15 @@
                   ? 0
                   : Number(context.groupInitData.is_banned);
               }
+
+              //在主房间，但是是分组内成员上线
+              if(!_this.isInGroup && context?.groupInitData?.isInGroup){
+                  return;
+              }
+
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+              _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
               setTimeout(() => {
                 _this.refresh();
               }, 100);
@@ -775,6 +782,7 @@
                     }
                   });
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 } else {
                   const user = {
                     account_id: msg.sender_id,
@@ -798,6 +806,7 @@
                   }
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 }
               } else {
                 const user = {
@@ -813,6 +822,7 @@
                 };
                 _this.onlineUsers.push(user);
                 _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 if (msg.context.role_name == 4) {
                   if (msg.sender_id == _this.userId) {
                     return;

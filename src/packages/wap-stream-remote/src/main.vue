@@ -19,13 +19,6 @@
 
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bootom" v-show="stream.streamId">
-      <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
-      >
-        {{ stream.attributes.roleName | roleFilter }}
-      </span>
       <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
         class="vmp-stream-local__bootom-signal"
@@ -301,34 +294,9 @@
       bottom: 0;
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
-      &-role {
-        border-radius: 8px;
-        padding: 0 6px;
-        vertical-align: top;
-        // 主持人
-        &__1 {
-          background: rgba(251, 58, 50, 0.2);
-          color: #fb3a32;
-        }
-        // 观众
-        &__2 {
-          background: rgba(251, 58, 50, 0.2);
-          color: #fb3a32;
-        }
-        // 助理
-        &__3 {
-          background-color: rgba(53, 98, 250, 0.2);
-          color: #3562fa;
-        }
-        // 嘉宾
-        &__4 {
-          background-color: rgba(53, 98, 250, 0.2);
-          color: #3562fa;
-        }
-      }
       &-nickname {
         display: inline-block;
-        width: 160px;
+        width: 80px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

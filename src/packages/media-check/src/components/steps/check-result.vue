@@ -96,6 +96,7 @@
 <style lang="less">
   .check-end {
     width: 330px;
+    margin: 0 auto;
 
     .check-end-icon {
       display: flex;

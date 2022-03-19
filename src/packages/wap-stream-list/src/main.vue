@@ -62,7 +62,7 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && !is_host_in_group && mainScreenDom ? 'opcity-true' : 'opcity-flase']"
+        :class="[iconShow && !is_host_in_group && mainScreen ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -419,6 +419,7 @@
     width: 100%;
     position: relative;
     background: #000;
+    // 小组协作中
     &-group {
       position: absolute;
       top: 100px;
@@ -438,6 +439,7 @@
         margin-bottom: 14px;
       }
     }
+    // 蒙层
     &-mask {
       position: absolute;
       top: 0;
@@ -591,12 +593,12 @@
   .vmp-stream-list {
     height: 83px;
     display: inline-block;
-    .vmp-stream-list__local-container {
+    &__local-container {
       width: 148px;
       height: 100%;
       display: inline-block;
     }
-    .vmp-stream-list__remote-container {
+    &__remote-container {
       width: 148px;
       height: 100%;
       display: inline-block;
@@ -606,7 +608,7 @@
     }
 
     // 流列表高度不为0
-    .vmp-stream-list__main-screen {
+    &__main-screen {
       position: absolute;
       top: 83px;
       width: 597px;
@@ -625,6 +627,13 @@
       .vmp-stream-local {
         position: absolute;
         top: 0;
+      }
+      // 主屏下的 后续nick_name 应为全显示
+      .vmp-stream-local__bootom {
+        // 此处不能使用&去代替  由于父级无样式，直接使用&会导致class优先级降低
+        .vmp-stream-local__bootom-nickname {
+          width: 160px;
+        }
       }
     }
 

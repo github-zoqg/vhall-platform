@@ -4,7 +4,6 @@
       <div class="vmp-private-chat__content">
         <virtual-list
           ref="chatlist"
-          style="height: 100%; overflow: auto"
           :keeps="30"
           :data-key="'count'"
           :data-sources="privateChatList"
@@ -155,10 +154,13 @@
 <style lang="less">
   .vmp-wap-private-chat {
     height: 100%;
-    .vmp-private-chat__content {
+    .vmp-wap-private-chat__wrapper {
       height: 100%;
-      overflow-y: scroll;
-      touch-action: pan-y;
+      .vmp-private-chat__content {
+        height: calc(100% - 1.6rem);
+        overflow-y: scroll;
+        touch-action: pan-y;
+      }
     }
   }
 </style>

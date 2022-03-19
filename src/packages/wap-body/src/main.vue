@@ -67,6 +67,10 @@
       };
     },
     computed: {
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       isShowContainer() {
         return (
           (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
