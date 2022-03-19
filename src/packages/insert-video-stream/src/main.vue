@@ -349,7 +349,7 @@
       },
       // 本地插播，video成功创建之后的处理逻辑
       handleLocalInsertVideoCreated(videoElement) {
-        // TODO: 设置插播画面在大窗,文档在小窗
+        // 设置插播画面在大窗,文档在小窗
         this.roomBaseServer.setChangeElement('doc');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -649,8 +649,13 @@
             this.roomBaseServer.setChangeElement('doc');
           } else {
             // 如果是观众
-            // 设置 miniElement 为主屏流
-            this.roomBaseServer.setChangeElement('doc');
+            // 如果文档可见
+            if (this.docServer.state.switchStatus) {
+              // 设置 miniElement 为主屏流
+              this.roomBaseServer.setChangeElement('doc');
+            } else {
+              this.roomBaseServer.setChangeElement('');
+            }
           }
         });
       },
