@@ -168,6 +168,9 @@
 
 <style lang="less">
   .vh-media-check-audiooutput {
+    width: 296px;
+    margin: 0 auto;
+
     // selector
     .vh-media-check-selector {
       display: flex;

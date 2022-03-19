@@ -101,8 +101,7 @@
         ten_mon: 0,
         mon: 3,
         ten_sec: 4,
-        sec: 0,
-        timerInfo: {}
+        sec: 0
       };
     },
     watch: {
@@ -110,8 +109,14 @@
         deep: true,
         immediate: true,
         handler: function () {
+          console.log(this.timerInfo, 'this.timerInfo');
           this.init();
         }
+      }
+    },
+    computed: {
+      timerInfo() {
+        return this.roomBaseServer.state?.timerInfo;
       }
     },
     beforeCreate() {
@@ -119,7 +124,6 @@
     },
     async mounted() {
       // await this.getCommonConfig();
-      this.timerInfo = this.roomBaseServer.state?.timerInfo;
       // this.init();
       // this.timerServer.listenMsg();
       // 计时器开始

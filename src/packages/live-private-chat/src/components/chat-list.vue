@@ -176,7 +176,7 @@
     mounted() {
       // this.initEvent();
       // this.initScroll();
-      this.listenEvents();
+      // this.listenEvents();
     },
     methods: {
       init() {
@@ -194,13 +194,13 @@
         this.count = 0;
       },
       initEvent() {
-        // this.queryChatList();
+        this.queryChatList();
         this.finishData = true;
       },
-      //事件监听
-      listenEvents() {
-        this.chatServer.$on('receivePrivateMsg', msg => {});
-      },
+      // //事件监听
+      // listenEvents() {
+      //   this.chatServer.$on('receivePrivateMsg', msg => {});
+      // },
       //todo 待替换
       initScroll() {
         let preTop = 0;

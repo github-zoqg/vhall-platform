@@ -75,10 +75,21 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       /**
-       * @description 聊天区域点击,显示中奖信息
+       * @description 聊天区域点击,显示中奖信息(都是中奖,提交与未提交的区别)
        */
       accept(msg) {
-        this.open(msg.lottery_id);
+        console.log(msg);
+        this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
+          if (res.code === 200) {
+            if (res.data.take_award === 0) {
+              this.lotteryView = 'LotteryWin';
+            } else {
+              this.lotteryView = 'LotterySuccess';
+            }
+            this.dialogVisible = true;
+            this.zIndexServer.setDialogZIndex('lottery');
+          }
+        });
       },
       /**
        * @description 点开抽奖(按钮或者聊天)

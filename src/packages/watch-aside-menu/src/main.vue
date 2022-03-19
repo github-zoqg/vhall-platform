@@ -416,6 +416,7 @@
       bottom: 0;
       display: flex;
       width: 60px;
+      height: calc(100% - 56px);
       background: rgba(42, 42, 42, 0.9);
       overflow: hidden;
       border-radius: 4px 0 0 0;

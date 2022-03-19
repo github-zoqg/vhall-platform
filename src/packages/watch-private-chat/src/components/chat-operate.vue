@@ -263,7 +263,7 @@
 
         const msg = this.inputValue.trim();
         const curmsg = useChatServer().createCurMsg();
-        const target = useRoomBaseServer().state.watchInitData.webinar.userinfo.user_id;
+        const target = useChatServer().state.curPrivateTargetId;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(msg);
