@@ -13,7 +13,7 @@
             v-for="(group, index) in chatGroupList"
             :class="{ active: activeGroupIndex === index }"
             @click="selectGroup(index)"
-            :key="group.user_id"
+            :key="group.account_id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
             <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
@@ -352,7 +352,7 @@
           this.$message.warning('内容不能为空');
         }
         const curmsg = useChatServer().createCurMsg();
-        const target = this.chatGroupList[this.activeGroupIndex].user_id;
+        const target = this.chatGroupList[this.activeGroupIndex].account_id;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
