@@ -82,7 +82,13 @@
       <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
       <div class="msg-item">
         <div class="avatar-wrap">
-          <img class="chat-avatar" width="35" height="35" :src="source.avatar" alt />
+          <img
+            class="chat-avatar"
+            width="35"
+            height="35"
+            :src="source.avatar || defaultAvatar"
+            alt
+          />
         </div>
         <div class="msg-content">
           <p class="msg-content_name">
@@ -174,6 +180,7 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   export default {
     props: {
       source: {
@@ -204,6 +211,7 @@
     data() {
       return {
         msgContent: '',
+        defaultAvatar: defaultAvatar,
         jiantou: require('../img/jiantou.png')
       };
     },

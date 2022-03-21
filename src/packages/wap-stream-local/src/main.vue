@@ -55,6 +55,8 @@
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { Dialog } from 'vant';
+
   export default {
     name: 'VmpWapStreamLocal',
     data() {
@@ -169,6 +171,14 @@
     },
     mounted() {
       this.checkStartPush();
+
+      // 监听设备禁用
+      useInteractiveServer().$on('EVENT_STREAM_END', msg => {
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: this.$t('interact.interact_1011')
+        });
+      });
     },
     async beforeDestroy() {
       // 清空计时器
@@ -248,7 +258,6 @@
           if (!this.interactiveServer.state.autoSpeak) {
             //  初始化互动实例
             await this.interactiveServer.init();
-            // 开始推流
           }
 
           // 轮询判断是否有互动实例

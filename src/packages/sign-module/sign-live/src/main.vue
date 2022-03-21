@@ -254,7 +254,7 @@
       height: 100%;
       display: flex;
       justify-content: center;
-      z-index: 28;
+      z-index: 128;
       .down-container {
         height: 469px;
         width: 400px;

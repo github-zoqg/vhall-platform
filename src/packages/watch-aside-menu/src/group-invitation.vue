@@ -34,6 +34,11 @@
         type: String,
         default: ''
       },
+      // 被邀请时用户所在分组，默认在主直播间，为空
+      inviteGroupId: {
+        type: String,
+        default: undefined
+      },
       show: {
         type: Boolean,
         default: false
@@ -76,8 +81,8 @@
       // 拒绝邀请演示
       handleClose: async function () {
         this.close();
-        // 已经不在小组中了
-        if (!this.groupServer.state.groupInitData.isInGroup) {
+        if (this.inviteGroupId != this.groupServer.state.groupInitData.group_id) {
+          // 用户当前环境已改变
           return;
         }
         try {
@@ -104,8 +109,8 @@
       // 同意邀请演示
       handleSubmit: async function () {
         this.close();
-        // 已经不在小组中了
-        if (!this.groupServer.state.groupInitData.isInGroup) {
+        if (this.inviteGroupId != this.groupServer.state.groupInitData.group_id) {
+          // 用户当前环境已改变
           return;
         }
         try {

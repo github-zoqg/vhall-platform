@@ -201,10 +201,11 @@
       },
       // 是否显示文档翻页相关操作栏
       showPagebar() {
-        // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
+        // 显示文档资料时 && && (普通模式，或 观看端全屏模式下) && (有演示权限，或是助理和观众)
         return (
           this.currentType === 'document' &&
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
+          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
+          (this.hasDocPermission || [2, 3].includes(this.roleName))
         );
       },
       // 当前用户Id
@@ -945,9 +946,9 @@
       // 文档是否可见状态变化事件
       dispatchDocSwitchChange: async function (val) {
         console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.show && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
+        // if (val && this.show && this.docLoadComplete) {
+        //   this.recoverLastDocs();
+        // }
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {
@@ -1043,7 +1044,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #2d2d2d;
+        background: @bg-black;
         flex-direction: column;
         i {
           font-size: 137px;

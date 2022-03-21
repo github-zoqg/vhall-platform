@@ -58,6 +58,8 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
+      this.signServer.$off('sign_in_push');
+      this.signServer.$off('sign_end');
       // 初始化有签到信息
       if (this.signInfo && !this.signInfo.is_signed && this.signInfo.id) {
         this.getHistorySignInfo();
