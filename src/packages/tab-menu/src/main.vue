@@ -245,6 +245,19 @@
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
 
+        // 发起端逻辑
+        if (!this.isWatch) {
+          this.addItem({
+            type: 'v5',
+            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+            text: this.$t('common.common_1004'), // 同上
+            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
+          });
+
+          return;
+        }
+
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         const hasMember = this.menu.findIndex(el => el.type === 'notice');
 
