@@ -5,16 +5,9 @@
       <!-- <el-row :class="status == 'zanting'?'colorFC9600':status == 'kaishi'?'color0FBB5A':'colorFB3A32'"> -->
       <el-row class="colorFFF">
         <el-col class="ft12">
-          <div v-if="shijian < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
+          <div v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
           <div v-else>
-            {{
-              60 > beifenshijian
-                ? beifenshijian + $t('appointment.appointment_1029')
-                : parseInt(beifenshijian / 60) +
-                  $t('appointment.appointment_1028') +
-                  (beifenshijian % 60) +
-                  $t('appointment.appointment_1029')
-            }}
+            {{ timeComputed }}
             {{ $t('interact_tools.interact_tools_1054') }}
             {{
               status == 'zanting'
@@ -34,19 +27,19 @@
           <div class="border3 ps"></div>
 
           <div class="margin5 timerbg">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ ten_mon }}</strong>
+            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_mon }}</strong>
           </div>
           <div class="margin5 timerbg">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ mon }}</strong>
+            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ mon }}</strong>
           </div>
 
-          <strong class="pr ft28 font_zdy" :class="shijian < 1 ? 'colorFB3A32' : ''">:</strong>
+          <strong class="pr ft28 font_zdy" :class="time < 1 ? 'colorFB3A32' : ''">:</strong>
 
           <div class="margin5 timerbg">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ ten_sec }}</strong>
+            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_sec }}</strong>
           </div>
           <div class="margin5 timerbg">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''">{{ sec }}</strong>
+            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ sec }}</strong>
           </div>
         </el-row>
       </div>
@@ -96,8 +89,8 @@
         status: 'kaishi',
         is_all_show: false,
         is_timeout: false,
-        shijian: 0,
-        beifenshijian: 60,
+        time: 0,
+        totalTimeNum: 60,
         ten_mon: 0,
         mon: 3,
         ten_sec: 4,
@@ -117,6 +110,15 @@
     computed: {
       timerInfo() {
         return this.roomBaseServer.state?.timerInfo;
+      },
+      // 总时间计算显示
+      timeComputed() {
+        return 60 > this.totalTimeNum
+          ? this.totalTimeNum + this.$t('appointment.appointment_1029')
+          : parseInt(this.totalTimeNum / 60) +
+              this.$t('appointment.appointment_1028') +
+              (this.totalTimeNum % 60) +
+              this.$t('appointment.appointment_1029');
       }
     },
     beforeCreate() {
@@ -141,11 +143,11 @@
       // 计时器开始
       timer_start(e) {
         console.log('计时器开始');
-        this.shijian = e.data.duration;
-        this.beifenshijian = e.data.duration;
+        this.time = e.data.duration;
+        this.totalTimeNum = e.data.duration;
         this.is_timeout = e.data.is_timeout;
         this.is_all_show = e.data.is_all_show;
-        this.timeFormat(this.shijian);
+        this.timeFormat(this.time);
         this.timerFun(e.data.duration);
         // 打开计时器组件
         this.status = 'kaishi';
@@ -187,17 +189,19 @@
       },
       init() {
         // setTimeout(() => {
+        clearInterval(this.timer);
+        this.timerVisible = false;
         const resData = this.timerInfo;
         console.log(resData, ',,,,,,,,,,,,,,,,,,,');
         if (resData && JSON.stringify(resData) != '{}') {
-          this.shijian = resData.remain_time;
-          this.beifenshijian = resData.duration;
+          this.time = resData.remain_time;
+          this.totalTimeNum = resData.duration;
           this.is_timeout = resData.is_timeout;
           this.is_all_show = resData.is_all_show;
           if (resData.duration == -3599) return false;
-          this.timeFormat(Math.abs(this.shijian));
+          this.timeFormat(Math.abs(this.time));
           if (resData.status != 4) {
-            this.timerFun(this.shijian);
+            this.timerFun(this.time);
           }
           // 打开计时器组件
           this.status = resData.status == 4 ? 'zanting' : 'kaishi';
@@ -255,7 +259,7 @@
             this.status = 'chaoshi';
           }
           this.timeFormat(Math.abs(--data));
-          this.shijian = data;
+          this.time = data;
         }, 1000);
       }
       // TODO: 不应在此处调getCommonConfig用接口 须退出小组相关逻辑调用
