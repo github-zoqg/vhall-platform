@@ -366,7 +366,7 @@
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.staet.isOpenSplitScreen = false;
+          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
