@@ -97,7 +97,10 @@
     async created() {
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$toast(e.msg);
+        if (+this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2) {
+          return;
+        }
+        e.msg && this.$toast(e.msg);
       });
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&

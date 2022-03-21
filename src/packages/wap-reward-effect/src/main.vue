@@ -64,6 +64,7 @@
     useWatchRewardServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
@@ -89,7 +90,7 @@
       },
       // 用户头像
       default_user_avatar() {
-        return require('./images/default_avatar.png');
+        return defaultAvatar;
       }
     },
     created() {
