@@ -321,7 +321,6 @@
       },
       // open关闭提示
       onClose() {
-        // this.$emit('disTimer', true);
         this.$confirm('是否关闭计时器', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -378,13 +377,11 @@
       goOn(status) {
         if (status == 4) {
           this.status = 'timeout';
-          // if (window.chatSDK) {
           this.msgServer.sendCustomMsg({
             role_name: this.userInfo.role_name,
             type: 'timer_pause',
             remain_time: this.time
           });
-          // }
         } else {
           this.status = this.time > 0 ? 'start' : 'chaoshi';
           this.timerFun(this.time);
@@ -408,7 +405,6 @@
       resetTimerConfirmClose() {
         this.timerVisible = false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
-        // this.$emit('openSetTimer');
         clearInterval(this.timer);
         this.status = 'start';
         this.editTimer(3);
