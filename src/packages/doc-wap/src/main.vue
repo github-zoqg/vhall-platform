@@ -129,11 +129,9 @@
       this.docServer.getDocViewRect = this.getDocViewRect;
 
       this.initEvents();
-      // 清空
-      // this.docServer.resetContainer();
+
       if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
-        // 恢复上一次的文档数据;
-        console.log('----- recoverLastDocs type == 1');
+        // 直播中才执行,恢复上一次的文档数据;
         this.$nextTick(() => {
           this.recoverLastDocs();
         });
