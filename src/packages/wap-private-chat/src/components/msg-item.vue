@@ -2,7 +2,7 @@
   <div
     class="vmp-wap-private-chat-msg-item"
     style="pointer-events: auto"
-    :class="{ 'is-self-msg': source.self }"
+    :class="{ 'is-self-msg': source.sendId == userId }"
   >
     <div v-if="source.showTime" class="private-chat-msg__showtime">{{ source.showTime }}</div>
     <div class="private-chat-msg__item-main">
@@ -55,6 +55,9 @@
       source: {
         required: true,
         default: () => ({})
+      },
+      userId: {
+        required: true
       }
     },
     computed: {
