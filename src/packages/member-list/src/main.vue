@@ -983,6 +983,8 @@
             member_info,
             'onlineUsers'
           );
+          //上麦成功，需要更新一下申请上麦的人（因为主持人和助理、组长等都会看到申请列表）
+          _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
           //如果已经没有举手的人，清除一下举手一栏的小红点
           if (!_this.applyUsers.length) {
             _this.raiseHandTip = false;
