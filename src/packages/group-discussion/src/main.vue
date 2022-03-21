@@ -567,14 +567,9 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         }).then(() => {
-          this.groupServer
-            .groupQuit()
-            .then(() => {
-              this.groupServer.state.panelShow = true;
-            })
-            .catch(ex => {
-              console.error(ex);
-            });
+          this.groupServer.groupQuit().catch(ex => {
+            console.error(ex);
+          });
         });
       },
       // 解散
