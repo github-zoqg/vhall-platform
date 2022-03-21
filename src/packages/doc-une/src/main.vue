@@ -955,12 +955,18 @@
       }
     },
     mounted() {
+      console.log('[doc] doc mounted');
+      // 初始化文档server的getDocViewRect方法
+      this.docServer.getDocViewRect = this.getDocViewRect;
+
       // 初始化事件
       this.initEvents();
 
       if (this.webinarType == 1) {
         // 直播中才执行,恢复上一次的文档数据;
-        this.recoverLastDocs();
+        this.$nextTick(() => {
+          this.recoverLastDocs();
+        });
       } else {
         // 非直播状态，主持人默认选中文档
         if (this.roleName == 1) {
