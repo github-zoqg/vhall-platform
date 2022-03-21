@@ -190,15 +190,17 @@
         this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
 
         // 全屏/退出全屏事件
-        screenfull.onchange(ev => {
-          // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-          if (ev.target.id !== 'docWrapper') return;
-          if (screenfull.isFullscreen) {
-            this.displayMode = 'fullscreen';
-          } else {
-            this.displayMode = screenfull.targetMode || 'normal';
-          }
-        });
+        if (screenfull.isEnabled) {
+          screenfull.onchange(ev => {
+            // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+            if (ev.target.id !== 'docWrapper') return;
+            if (screenfull.isFullscreen) {
+              this.displayMode = 'fullscreen';
+            } else {
+              this.displayMode = screenfull.targetMode || 'normal';
+            }
+          });
+        }
       },
 
       /**
