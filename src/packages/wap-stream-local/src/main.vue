@@ -258,7 +258,6 @@
           if (!this.interactiveServer.state.autoSpeak) {
             //  初始化互动实例
             await this.interactiveServer.init();
-            // 开始推流
           }
 
           // 轮询判断是否有互动实例
