@@ -169,8 +169,10 @@
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
+        } else if (err.code == 611001) {
+          this.liveErrorTip = '互动初始化失败，' + err.message;
         } else {
-          this.liveErrorTip = this.$tes(err.code) || err.msg;
+          this.liveErrorTip = this.$tes(err.code) || err.msg || err.message;
         }
       },
       goSubscribePage(clientType) {

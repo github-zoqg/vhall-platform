@@ -955,9 +955,9 @@
       // 文档是否可见状态变化事件
       dispatchDocSwitchChange: async function (val) {
         console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.show && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
+        // if (val && this.show && this.docLoadComplete) {
+        //   this.recoverLastDocs();
+        // }
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {
@@ -1053,7 +1053,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #2d2d2d;
+        background: @bg-black;
         flex-direction: column;
         i {
           font-size: 137px;
