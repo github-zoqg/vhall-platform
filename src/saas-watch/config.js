@@ -252,7 +252,7 @@ export const serverConfig = {
       }
     ],
     emitOpenCash: [
-      //弹出个人资料
+      //弹出提现组件
       {
         cuid: 'comCash',
         method: 'openCashDialog'

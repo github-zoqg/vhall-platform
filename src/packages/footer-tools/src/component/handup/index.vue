@@ -1,17 +1,13 @@
 <template>
-  <div class="vmp-handup" v-if="device_status === 1 && isInteractLive">
-    <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
+  <div class="vmp-handup" v-if="device_status === 1 && isInteractLive && !isBanned && !allBanned">
+    <!-- // 分组内 20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
         @click="handleHandClick"
         type="primary"
         size="medium"
         round
-        v-if="
-          isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && !isSpeakOn
-            : isBanned && isAllowhandup && !isSpeakOn
-        "
+        v-if="isInGroup ? +this.groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
       >
         {{ btnText }}
       </el-button>
@@ -21,11 +17,7 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="
-          isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isGroupBanned && isSpeakOn
-            : isBanned && isSpeakOn
-        "
+        v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
         round
       >
         {{ $t('interact.interact_1007') }}
@@ -42,7 +34,9 @@
         btnText: this.$t('interact.interact_1001'),
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
-        waitInterval: null
+        waitInterval: null,
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
     computed: {
@@ -78,14 +72,6 @@
       // 组内角色
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
-      },
-      // 非分组内的禁言状态
-      isBanned() {
-        return !useChatServer().state.banned || !useChatServer().state.allBanned; //true禁言，false未禁言
-      },
-      // 分组 组内 禁言 状态
-      isGroupBanned() {
-        return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },
     created() {
@@ -115,6 +101,15 @@
         if (parseInt(this.device_status) === 1) {
           this.$message.success(this.$t('interact.interact_1002'));
         }
+      });
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        console.log('监听禁言通知', res);
+        this.isBanned = res;
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.allBanned = res;
       });
     },
     methods: {
