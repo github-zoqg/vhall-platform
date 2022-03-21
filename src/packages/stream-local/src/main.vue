@@ -403,7 +403,6 @@
       this.listenEvents();
     },
     async mounted() {
-      window.streamLocal = this;
       this.checkStartPush();
     },
     beforeDestroy() {
