@@ -259,7 +259,7 @@
         }
 
         const chatIndex = this.menu.findIndex(el => el.type === 3);
-        const hasMember = this.menu.findIndex(el => el.type === 'notice');
+        const hasMember = this.menu.includes(el => el.type === 'notice');
 
         if (chatIndex <= -1) return;
         const index = hasMember ? chatIndex + 2 : chatIndex + 1;
