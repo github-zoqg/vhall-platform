@@ -736,8 +736,8 @@
               }
 
               //在主房间，但是是分组内成员上线
-              if(!_this.isInGroup && context?.groupInitData?.isInGroup){
-                  return;
+              if (!_this.isInGroup && context?.groupInitData?.isInGroup) {
+                return;
               }
 
               _this.onlineUsers.push(user);
@@ -1202,6 +1202,8 @@
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
           if (isLive && !this.isInGroup) return;
           this.leader_id = msg.data.account_id;
+          //还原一下tab
+          this.tabIndex = 1;
           this.updateOnlineUserList();
         });
 
