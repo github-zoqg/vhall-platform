@@ -342,8 +342,7 @@ const serverConfig = {
     emitOpenCashWap: [
       {
         cuid: ['comCashWap'],
-        method: 'openCashWap',
-        args: ['$0']
+        method: 'openCashWap'
       }
     ]
   },

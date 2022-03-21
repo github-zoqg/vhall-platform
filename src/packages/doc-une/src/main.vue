@@ -201,10 +201,11 @@
       },
       // 是否显示文档翻页相关操作栏
       showPagebar() {
-        // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
+        // 显示文档资料时 && && (普通模式，或 观看端全屏模式下) && (有演示权限，或是助理和观众)
         return (
           this.currentType === 'document' &&
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
+          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
+          (this.hasDocPermission || [2, 3].includes(this.roleName))
         );
       },
       // 当前用户Id

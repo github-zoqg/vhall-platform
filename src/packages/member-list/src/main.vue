@@ -509,6 +509,11 @@
               break;
           }
         });
+        //监听自定义消息
+        this.msgServer.$onMsg('CUSTOM_MSG', msg => {
+          //人员上下线消息丢失时，会收到这个消息
+          msg.data.type === 'reload_online_user_list' && this.updateOnlineUserList();
+        });
       },
       //初始化房间消息回调监听
       listenRoomMsg() {

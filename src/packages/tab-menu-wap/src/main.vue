@@ -253,7 +253,7 @@
       changeDocStatus(val) {
         this.setVisible({ visible: val, type: 2 });
         if (val) {
-          let obj = this.getItem({ type: 2 });
+          const obj = this.getItem({ type: 2 });
           this.select({ type: obj.type, id: obj.id });
         }
       },
@@ -270,32 +270,35 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
-        const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         for (const item of list) {
           this.addItem(item);
         }
 
+        this.addSpecialItem();
+      },
+      addSpecialItem() {
+        const roomState = this.$domainStore.state.roomBaseServer;
+
         const chatIndex = this.menu.findIndex(el => el.type === 3);
         const hasMember = this.menu.findIndex(el => el.type === 'notice');
-        if (chatIndex >= -1) {
-          const index = hasMember ? chatIndex + 2 : chatIndex + 1;
-          this.addItemByIndex(index, {
-            type: 'v5',
-            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: this.$t('common.common_1004'), // 同上
-            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
-            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
-          });
-          this.addItemByIndex(index + 1, {
-            type: 'private',
-            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: this.$t('common.common_1008'), // 同上
-            visible: false,
-            status: 3
-          });
-        }
+        if (chatIndex <= -1) return;
+        const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        this.addItemByIndex(index, {
+          type: 'v5',
+          name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+          text: this.$t('common.common_1004'), // 同上
+          visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+          status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
+        });
+        this.addItemByIndex(index + 1, {
+          type: 'private',
+          name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+          text: this.$t('common.common_1008'), // 同上
+          visible: false,
+          status: 3
+        });
       },
       /**
        * 选中当前项左边一项
