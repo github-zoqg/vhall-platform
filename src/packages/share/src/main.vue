@@ -188,8 +188,10 @@
 </script>
 <style lang="less">
   .vmp-share {
+    .el-dialog__body {
+      padding: 0 32px 24px 32px;
+    }
     &-wrap {
-      padding-bottom: 15px;
       &_imgs {
         display: flex;
         align-items: center;
@@ -298,7 +300,7 @@
       line-height: 20px;
       text-align: center;
       word-break: break-word;
-      padding-bottom: 12px;
+      // padding-bottom: 12px;
     }
   }
 </style>
