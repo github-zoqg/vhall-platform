@@ -946,9 +946,9 @@
       // 文档是否可见状态变化事件
       dispatchDocSwitchChange: async function (val) {
         console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.show && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
+        // if (val && this.show && this.docLoadComplete) {
+        //   this.recoverLastDocs();
+        // }
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {
