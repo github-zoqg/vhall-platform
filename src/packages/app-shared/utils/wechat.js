@@ -56,9 +56,8 @@ function filterAddressParams(path) {
     search = _newArr.length > 0 ? _newArr.join('&') : '';
   }
 
-  const nextUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${newPath}${
-    search ? '?' + search : ''
-  }`;
+  const nextUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${newPath}${search ? '?' + search : ''
+    }`;
   console.log('wechatjs 看看当前走入到了哪里_next不为空------->', nextUrl);
   // replaceState 添加或替换历史记录后，浏览器地址栏会变成你传的地址，而页面并不会重新载入或跳转
   window.history.replaceState(null, null, nextUrl);
@@ -172,7 +171,7 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
   });
 }
 
-export function initHideChatSdk(initData = {}, failedCb = () => {}) {
+export function initHideChatSdk(initData = {}, failedCb = () => { }) {
   let hideConfigSdk = {
     debug: false,
     jsApiList: ['hideMenuItems'],
@@ -213,6 +212,11 @@ export async function authWeixinAjax(to, address, _next) {
       webinar_id: to.params.id,
       webinar_user_id: window.sessionStorage.getItem('initGrayId'),
       scene_id: 2 //观看端传2
+    });
+    await roomBaseServer.getDegradationConfig({
+      staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+      environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+      systemKey: 2
     });
     if (
       roomBaseServer.state.configList &&
