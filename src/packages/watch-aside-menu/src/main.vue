@@ -62,6 +62,7 @@
       :show.sync="dialogVisibleInvite"
       :senderId="senderId"
       :inviteName="inviteName"
+      :inviteGroupId="inviteGroupId"
     ></GroupInvitaion>
   </div>
 </template>
@@ -81,7 +82,8 @@
         selectedMenu: '',
         dialogVisibleInvite: false, //邀请演示对话框是否显示
         senderId: '', //邀请人id
-        inviteName: '' //邀请人身份
+        inviteName: '', //邀请人身份
+        inviteGroupId: '' //被邀请时用户所在分组，默认在主直播间，为空
       };
     },
     computed: {
@@ -288,6 +290,8 @@
             this.senderId = msg.sender_id; // 邀请人id
             // 邀请人身份
             this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人';
+            // 被邀请人当时所在小组
+            this.inviteGroupId = this.groupServer.state.groupInitData?.group_id;
             this.dialogVisibleInvite = true;
           }
         });
