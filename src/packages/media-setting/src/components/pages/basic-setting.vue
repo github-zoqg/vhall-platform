@@ -223,7 +223,7 @@
       cursor: pointer;
 
       &--selected {
-        border: 1px solid #fc5659;
+        border: 1px solid #fb3a32;
       }
 
       &.disabled {

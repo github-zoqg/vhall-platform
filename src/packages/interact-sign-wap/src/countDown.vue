@@ -8,8 +8,8 @@
     >
       <defs>
         <linearGradient id="greenGradient" x1="0" y1="100%" x2="100%" y2="0">
-          <stop offset="0%" stop-color="#FC5659" />
-          <stop offset="50%" stop-color="#FC5659" />
+          <stop offset="0%" stop-color="#fb3a32" />
+          <stop offset="50%" stop-color="#fb3a32" />
           <stop offset="100%" stop-color="#FFA32B" />
         </linearGradient>
       </defs>
@@ -101,7 +101,7 @@
       justify-content: center;
       align-items: center;
       font-size: 48px;
-      color: #fc5659;
+      color: #fb3a32;
       font-weight: bold;
     }
     &-ani {

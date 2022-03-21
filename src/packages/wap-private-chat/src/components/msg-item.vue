@@ -132,7 +132,7 @@
             font-size: 20px;
             &.host {
               background-color: rgba(252, 86, 89, 0.2);
-              color: #fc5659;
+              color: #fb3a32;
             }
             &.assistant {
               background-color: rgba(166, 166, 166, 0.2);

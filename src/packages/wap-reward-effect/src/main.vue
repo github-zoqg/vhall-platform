@@ -310,8 +310,8 @@
         width: 80px;
         height: 80px;
         position: absolute;
-        left: 8px;
-        top: 22px;
+        left: 4px;
+        bottom: 4px;
         background: white;
         border-radius: 50%;
         overflow: hidden;

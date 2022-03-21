@@ -859,7 +859,7 @@
       color: #222222;
       line-height: 20px;
       strong {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
   }

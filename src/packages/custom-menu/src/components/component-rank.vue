@@ -105,7 +105,7 @@
               <span class="nickname">{{ item.nickname | filterNickname }}</span>
               <span class="num">
                 <i18n path="interact_tools.interact_tools_1073">
-                  <span style="color: #fc5659" place="n">
+                  <span style="color: #fb3a32" place="n">
                     ¥{{item.reward_amount | filterAmount)}}
                   </span>
                 </i18n>

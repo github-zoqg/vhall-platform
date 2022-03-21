@@ -27,7 +27,7 @@
       padding: 0px 24px;
       padding-left: 20px;
       line-height: 1.2;
-      border-left: 2px solid #fc5659;
+      border-left: 2px solid #fb3a32;
       color: #333;
       font-weight: 500;
     }

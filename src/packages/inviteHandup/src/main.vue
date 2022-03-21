@@ -3,6 +3,7 @@
     <!-- 邀请上麦弹窗 -->
     <van-popup
       v-model="showInviteConnectMic"
+      :close-on-click-overlay="false"
       position="bottom"
       class="connect-mic-popup"
       get-container="#connectMicPopupContainer"

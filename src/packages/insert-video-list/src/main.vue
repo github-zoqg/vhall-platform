@@ -145,6 +145,7 @@
   import { useInsertFileServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
   import videoPreview from '@/packages/app-shared/components/video-preview';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { debounce } from 'lodash';
   export default {
     name: 'VmpInsertVideoList',
     data() {
@@ -312,7 +313,7 @@
           isNeedResetPage: false
         });
       },
-      getTableList(
+      getTableList: debounce(function (
         options = {
           isNeedResetPage: false,
           isInvokeInCreated: false
@@ -369,7 +370,7 @@
             }
           }
         });
-      },
+      }, 300),
       // 云插播开始播放
       handlePlay(video) {
         const insertFileServer = useInsertFileServer();

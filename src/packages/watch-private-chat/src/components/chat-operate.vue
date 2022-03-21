@@ -297,7 +297,7 @@
     @font-error: #fb3a32;
     // 链接字体颜色
     @font-link: #3562fa;
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     width: calc(100% - 48px);
     padding: 12px 24px 11px;
     background: #2a2a2a;

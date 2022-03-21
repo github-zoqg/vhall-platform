@@ -457,7 +457,7 @@
         color: #444;
       }
       &.active {
-        border: 2px solid #fc5659;
+        border: 2px solid #fb3a32;
         border-radius: 12px;
       }
     }
