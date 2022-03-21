@@ -114,6 +114,15 @@
       // 是否开启第三方推流
       isThirdStream() {
         this.resetMenus();
+      },
+      // 文档和白板切换是菜单变化
+      ['$domainStore.state.docServer.currentCid'](val) {
+        if (!val) return;
+        if (val.startsWith('document')) {
+          this.switchTo('document');
+        } else {
+          this.switchTo('board');
+        }
       }
     },
     methods: {

@@ -74,6 +74,7 @@
 
   import FloatImg from '../../assets/img/float.png';
   import TiledImg from '../../assets/img/tiled.png';
+  import TiledReverseImg from '../../assets/img/tiled-reverse.png';
   import GridImg from '../../assets/img/grid.png';
   export default {
     data() {
@@ -120,7 +121,16 @@
         // 分组、无延迟时，只展示一种布局
         const isGroupLive = this.liveMode === LIVE_MODE_MAP['GROUP'];
 
-        if (isGroupLive || this.isNoDelay) {
+        if (isGroupLive) {
+          return this.layoutConfig
+            .filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE')
+            .map(item => {
+              item.img = TiledReverseImg;
+              return item;
+            });
+        }
+
+        if (this.isNoDelay) {
           return this.layoutConfig.filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE');
         }
 

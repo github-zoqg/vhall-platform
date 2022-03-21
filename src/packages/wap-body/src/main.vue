@@ -97,7 +97,10 @@
     async created() {
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$toast(e.msg);
+        if (+this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2) {
+          return;
+        }
+        e.msg && this.$toast(e.msg);
       });
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
@@ -178,7 +181,8 @@
       },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
-        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
+        // 1 主持人    3 助理
+        const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
         let title = '';
         switch (index) {
           case 1:

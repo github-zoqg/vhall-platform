@@ -246,6 +246,9 @@
 
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        if (+this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2) {
+          return;
+        }
         e.msg && this.$message.warning(e.msg);
       });
       // 订阅流播放失败
@@ -389,7 +392,7 @@
       display: flex;
       width: 100%;
       height: 100%;
-      background: #2d2d2d;
+      background: #000;
       flex-direction: column;
       color: #999;
       justify-content: center;
@@ -494,10 +497,8 @@
         .vmp-stream-local__bootom-role {
           display: none;
         }
-        &.stream-length {
-          .vmp-stream-list__main-screen {
-            bottom: 40px;
-          }
+        .vmp-stream-list__main-screen {
+          bottom: 40px;
         }
       }
     }

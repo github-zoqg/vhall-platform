@@ -64,6 +64,16 @@
         <main slot="content">{{ alertText }}</main>
       </saas-alert>
     </aside>
+
+    <!--设备禁用弹窗 -->
+    <saas-alert
+      :visible="popAlert.visible"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+      :knowText="'确定'"
+    >
+      <main slot="content">{{ popAlert.text }}</main>
+    </saas-alert>
   </section>
 </template>
 
@@ -82,7 +92,7 @@
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
-  import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
+  import { useMediaSettingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
   import { getDiffObject } from './js/getDiffObject';
 
   import mediaSettingConfirm from './js/showConfirm';
@@ -106,7 +116,12 @@
         isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
         selectedMenuItem: 'basic-setting',
-        alertText: '修改设置后会导致重新推流，是否继续保存？'
+        alertText: '修改设置后会导致重新推流，是否继续保存？',
+        popAlert: {
+          text: this.$t('interact.interact_1011'),
+          visible: false,
+          confirm: true
+        }
       };
     },
     computed: {
@@ -129,11 +144,19 @@
         this.alertText = text;
         this.isConfirmVisible = true;
       });
+      // 监听设备禁用
+      useInteractiveServer().$on('EVENT_STREAM_END', msg => {
+        this.popAlert.visible = true;
+      });
     },
     beforeDestroy() {
       mediaSettingConfirm && mediaSettingConfirm.destroy();
     },
     methods: {
+      // 关闭弹窗
+      closeConfirm() {
+        this.popAlert.visible = false;
+      },
       /**
        * 展示弹窗
        */

@@ -93,7 +93,7 @@
           <span @click="openLanguage" v-if="languageList.length > 1">
             {{ lang.key == 1 ? '中文' : 'EN' }}
           </span>
-          <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed">
+          <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
             {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
           </span>
           <span @click="openQuality" v-if="!isWarnPreview">
@@ -167,7 +167,10 @@
               </span>
               <!-- 右侧icon集合 -->
               <p class="vmp-wap-player-control-icons-right">
-                <span @click="openBarrage" v-if="playerOtherOptions.barrage_button">
+                <span
+                  @click="openBarrage"
+                  v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
+                >
                   <i
                     :class="`vh-iconfont ${
                       danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'

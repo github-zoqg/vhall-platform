@@ -8,7 +8,9 @@
           :data-key="'count'"
           :data-sources="privateChatList"
           :data-component="msgItem"
-          :extra-props="{}"
+          :extra-props="{
+            userId: userId
+          }"
           @tobottom="tobottom"
         ></virtual-list>
       </div>
@@ -18,6 +20,7 @@
       :is-banned="isMuted"
       :is-all-banned="isAllMuted"
       @sendPrivate="sendMsg"
+      @sendEnd="sendMsgEnd"
     ></send-box>
   </div>
 </template>
@@ -110,7 +113,7 @@
       //发送消息
       sendMsg(value) {
         const curmsg = useChatServer().createCurMsg();
-        const target = useRoomBaseServer().state.watchInitData.webinar.userinfo.user_id;
+        const target = useChatServer().state.curPrivateTargetId;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(value);
@@ -146,6 +149,9 @@
             this.$refs.chatlist.getClientSize() <
           5
         );
+      },
+      sendMsgEnd() {
+        this.scrollBottom();
       }
     }
   };

@@ -275,10 +275,15 @@
               this.stopShare();
             }
           }
-          // 主持人/助理进出小组
-          if (msg.data.type === 'group_manager_enter') {
+          // 主持人进出小组如果正在演示桌面共享，需要停止共享
+
+          if (msg.data.type === 'group_manager_enter' && msg.data.role == 1) {
             // 自己正在发起桌面共享
-            if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
+            if (
+              this.roleName == 1 &&
+              this.isShareScreen &&
+              this.accountId == this.desktopShareInfo.accountId
+            ) {
               this.stopShare();
             }
           }
