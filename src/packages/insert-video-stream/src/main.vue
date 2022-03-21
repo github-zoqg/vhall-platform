@@ -994,7 +994,7 @@
         border-radius: 100%;
         margin-right: 10px;
         &:hover {
-          background: #fc5659;
+          background: #fb3a32;
         }
         &.iconsheweizhujiangren {
           font-size: 14px;

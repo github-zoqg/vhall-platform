@@ -1263,12 +1263,12 @@
             color: #fff;
           }
           &.active {
-            background-color: #fc5659;
+            background-color: #fb3a32;
             color: #fff;
             &:hover {
               color: #fff;
 
-              background-color: #fc5659;
+              background-color: #fb3a32;
             }
           }
           &.raise-hand {
@@ -1280,7 +1280,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background-color: #fc5659;
+              background-color: #fb3a32;
               position: absolute;
             }
           }

@@ -259,7 +259,7 @@
           <div class="vmp-doc-lib__ft">
             <div class="vmp-doc-lib__ft-tip">
               当前选中
-              <span style="color: #fc5659">{{ selectDocIdList.length }}</span>
+              <span style="color: #fb3a32">{{ selectDocIdList.length }}</span>
               个文档
             </div>
             <div>

@@ -54,7 +54,7 @@
       font-size: 32px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: #fc5659;
+      color: #fb3a32;
       line-height: 46px;
       margin-top: 32px;
     }
@@ -62,7 +62,7 @@
       display: inline-block;
       width: 364px;
       height: 90px;
-      background: #fc5659;
+      background: #fb3a32;
       border-radius: 14px;
       margin: 116px auto 0px auto;
       color: #fff;

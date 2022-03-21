@@ -663,8 +663,8 @@
       z-index: 100;
       &:hover {
         color: #fff;
-        border: 1px solid #fc5659;
-        background-color: #fc5659;
+        border: 1px solid #fb3a32;
+        background-color: #fb3a32;
       }
     }
   }
