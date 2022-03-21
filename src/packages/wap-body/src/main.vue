@@ -181,7 +181,8 @@
       },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
-        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
+        // 1 主持人    3 助理
+        const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
         let title = '';
         switch (index) {
           case 1:

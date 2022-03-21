@@ -63,7 +63,11 @@
       });
     },
     created() {
-      this.initMsgEvent();
+      const role =
+        this.$domainStore?.state?.roomBaseServer?.watchInitData?.webinar?.join_info?.role_name;
+      if (role === 1) {
+        this.initMsgEvent();
+      }
     },
     mounted() {
       if (this.mode === 'live') {
@@ -71,7 +75,11 @@
       }
     },
     destroyed() {
-      this.removeMsgEvent();
+      const role =
+        this.$domainStore?.state?.roomBaseServer?.watchInitData?.webinar?.join_info?.role_name;
+      if (role === 1) {
+        this.removeMsgEvent();
+      }
       this.clearTimer();
     },
     methods: {

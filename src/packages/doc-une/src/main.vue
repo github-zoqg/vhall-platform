@@ -147,7 +147,8 @@
     useMemberServer,
     useRebroadcastServer,
     useDesktopShareServer,
-    usePlayerServer
+    usePlayerServer,
+    useMicServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -321,6 +322,10 @@
       // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     watch: {
@@ -361,6 +366,9 @@
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
           console.log('[doc] streamListHeight:', newval);
+          if (this.webinarMode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
+            return;
+          }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -373,6 +381,7 @@
       this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
+      this.micServer = useMicServer();
     },
     created() {
       window.addEventListener('keydown', this.listenKeydown);
@@ -946,9 +955,9 @@
       // 文档是否可见状态变化事件
       dispatchDocSwitchChange: async function (val) {
         console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.show && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
+        // if (val && this.show && this.docLoadComplete) {
+        //   this.recoverLastDocs();
+        // }
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {
@@ -1044,7 +1053,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #2d2d2d;
+        background: @bg-black;
         flex-direction: column;
         i {
           font-size: 137px;
