@@ -20,6 +20,7 @@
       :is-banned="isMuted"
       :is-all-banned="isAllMuted"
       @sendPrivate="sendMsg"
+      @sendEnd="sendMsgEnd"
     ></send-box>
   </div>
 </template>
@@ -148,6 +149,9 @@
             this.$refs.chatlist.getClientSize() <
           5
         );
+      },
+      sendMsgEnd() {
+        this.scrollBottom();
       }
     }
   };
