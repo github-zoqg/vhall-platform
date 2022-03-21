@@ -326,6 +326,9 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'NotAllowed') {
+          // 本地流创建失败
+          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
@@ -392,7 +395,13 @@
           .createWapLocalStream({
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
-          .catch(() => 'createLocalStreamError');
+          .catch(e => {
+            if (e && e?.name == 'NotAllowed') {
+              return Promise.reject('NotAllowed');
+            } else {
+              return Promise.reject('createLocalStreamError');
+            }
+          });
       },
       // 推流
       async publishLocalStream() {
@@ -408,7 +417,6 @@
               this.handleSpeakOnError('publishStreamError');
             }
           });
-        // .catch(() => 'publishStreamError');
       },
       // 结束推流
       stopPush() {
@@ -418,15 +426,18 @@
             resolve();
             return;
           }
-          this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
-            this.isStreamPublished = false;
-            clearInterval(this._audioLeveInterval);
+          this.interactiveServer
+            .unpublishStream(this.localSpeaker.streamId)
+            .then(() => {
+              this.isStreamPublished = false;
+              clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
-            resolve();
-          });
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+              resolve();
+            })
+            .catch(e => {});
         });
       },
       // 实时获取网路状况和麦克风能量
