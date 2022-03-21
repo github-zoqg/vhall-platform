@@ -292,7 +292,14 @@ const serverConfig = {
     component: 'VmpMemberListWap'
   },
   comQa: {
-    component: 'VmpQaWap'
+    component: 'VmpQaWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
   },
   //wap端文档
   comDocWap: {
@@ -335,8 +342,7 @@ const serverConfig = {
     emitOpenCashWap: [
       {
         cuid: ['comCashWap'],
-        method: 'openCashWap',
-        args: ['$0']
+        method: 'openCashWap'
       }
     ]
   },
