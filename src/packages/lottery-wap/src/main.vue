@@ -164,7 +164,7 @@
             msg: msg,
             type: msg.data.type,
             userId: join_info.user_id || join_info.third_party_user_id,
-            Show: true
+            Show: lotteryResult ? true : false
           },
           type: msg.data.type,
           interactStatus: true,

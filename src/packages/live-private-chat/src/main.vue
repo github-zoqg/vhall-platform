@@ -272,6 +272,9 @@
       selectGroup(index) {
         this.activeGroupIndex = index;
         this.$refs.chatRef.resetData();
+        this.$nextTick(() => {
+          this.$refs.chatRef.initEvent();
+        });
       },
       //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {

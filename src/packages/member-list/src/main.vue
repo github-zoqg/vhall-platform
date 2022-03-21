@@ -1015,9 +1015,15 @@
         //用户拒绝上麦邀请
         function handleUserRejectConnect(msg) {
           // 如果申请人是自己
-          if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
+          if (msg.data.room_join_id == _this.userId) {
             return;
           }
+
+          //发起端需要判断一下是不是非主持人
+          if (_this.isLive && _this.roleName != 1) {
+            return;
+          }
+
           let role = '';
           if (msg.data.room_role == 2) {
             role = _this.$t('chat.chat_1063');

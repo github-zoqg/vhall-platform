@@ -62,6 +62,7 @@
       :show.sync="dialogVisibleInvite"
       :senderId="senderId"
       :inviteName="inviteName"
+      :inviteGroupId="inviteGroupId"
     ></GroupInvitaion>
   </div>
 </template>
@@ -81,7 +82,8 @@
         selectedMenu: '',
         dialogVisibleInvite: false, //邀请演示对话框是否显示
         senderId: '', //邀请人id
-        inviteName: '' //邀请人身份
+        inviteName: '', //邀请人身份
+        inviteGroupId: '' //被邀请时用户所在分组，默认在主直播间，为空
       };
     },
     computed: {
@@ -193,9 +195,9 @@
               this.selectedMenu = 'document';
             }
             this.grouAlert(
-              `${msg.sender_id == this.userinfoId ? '主持人' : '助理'}开启了分组讨论，您将进入${
-                this.groupServer.state.groupInitData.name
-              }组参与讨论`
+              `${
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+              }开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
             );
           }
         });
@@ -208,7 +210,7 @@
           if (!msg.data.groupToast) {
             this.grouAlert(
               `${
-                msg.sender_id == this.userinfoId ? '主持人' : '助理'
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
               }结束了分组讨论，您将返回主直播间`
             );
           }
@@ -220,7 +222,9 @@
           this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
           this.grouAlert(
-            `${msg.sender_id == this.userinfoId ? '主持人' : '助理'}解散了分组，您将返回主直播间`
+            `${
+              msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+            }解散了分组，您将返回主直播间`
           );
         });
 
@@ -236,7 +240,10 @@
           if (this.isInGroup) {
             const { watchInitData } = useRoomBaseServer().state;
             if (groupJoinChangeInfo && groupJoinChangeInfo.isNeedCare === false) return;
-            const who = msg.sender_id == watchInitData.webinar.userinfo.user_id ? '主持人' : '助理';
+            const who =
+              msg.sender_id == watchInitData.webinar.userinfo.user_id
+                ? this.$getRoleName(1)
+                : this.$getRoleName(3);
             this.grouAlert(`${who}已将您分配至${this.groupServer.state.groupInitData.name}`);
           }
         });
@@ -288,6 +295,8 @@
             this.senderId = msg.sender_id; // 邀请人id
             // 邀请人身份
             this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人';
+            // 被邀请人当时所在小组
+            this.inviteGroupId = this.groupServer.state.groupInitData?.group_id;
             this.dialogVisibleInvite = true;
           }
         });
@@ -413,7 +422,7 @@
       position: absolute;
       z-index: 6;
       left: 0;
-      bottom: 60%;
+      top: 102px;
       cursor: pointer;
       display: inline-block;
       width: 32px;

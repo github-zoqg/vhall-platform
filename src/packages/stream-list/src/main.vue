@@ -497,11 +497,13 @@
         .vmp-stream-local__bootom-role {
           display: none;
         }
-        &.stream-length {
-          .vmp-stream-list__main-screen {
-            bottom: 40px;
-          }
+        .vmp-stream-list__main-screen {
+          bottom: 40px;
         }
+      }
+
+      .vmp-stream-list__remote-container-h {
+        padding-top: 0;
       }
     }
   }

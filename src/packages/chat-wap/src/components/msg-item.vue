@@ -10,7 +10,12 @@
     >
       <div class="msg-item interact">
         <div class="interact-msg">
-          {{ source.roleName | roleFilter }}{{ source.content.text_content }}
+          <template
+            v-if="source.type == 'question_answer_open' || source.type == 'question_answer_close'"
+          >
+            {{ source.roleName | roleFilter }}
+          </template>
+          {{ source.content.text_content }}
         </div>
       </div>
     </template>

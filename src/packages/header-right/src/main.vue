@@ -143,7 +143,7 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       },
       isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
+        return useMicServer().getSpeakerStatus();
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
@@ -366,7 +366,7 @@
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.staet.isOpenSplitScreen = false;
+          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 

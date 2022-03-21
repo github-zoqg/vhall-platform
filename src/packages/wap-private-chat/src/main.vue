@@ -4,6 +4,7 @@
       <div class="vmp-private-chat__content">
         <virtual-list
           ref="chatlist"
+          style="height: 100%; overflow: auto"
           :keeps="30"
           :data-key="'count'"
           :data-sources="privateChatList"
@@ -17,8 +18,8 @@
     </div>
     <send-box
       currentTab="private"
-      :is-banned="isMuted"
-      :is-all-banned="isAllMuted"
+      :isAllBanned="allBanned"
+      :isBanned="isBanned"
       @sendPrivate="sendMsg"
     ></send-box>
   </div>
@@ -52,10 +53,8 @@
         userId: '',
         //房间id
         roomId: '',
-        //私聊消息发送人
-        privateSendId: '',
-        //私聊消息主体
-        privateMsg: {}
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
     computed: {
@@ -72,18 +71,7 @@
         return this.userServer.state.userInfo;
       }
     },
-    watch: {
-      privateMsg: {
-        handler(val) {
-          console.log('收到私聊消息', val);
-          if (val && val.data) {
-            this.handleMsg(val);
-          }
-        },
-        deep: true,
-        immediate: true
-      }
-    },
+    watch: {},
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.msgServer = useMsgServer();
@@ -107,6 +95,14 @@
         this.chatServer.$on('receivePrivateMsg', msg => {
           this.unReadMessageCount++;
           this.dispatch('TabContent', 'noticeHint', 'private');
+        });
+        //监听禁言通知
+        this.chatServer.$on('banned', res => {
+          this.isBanned = res;
+        });
+        //监听全体禁言通知
+        this.chatServer.$on('allBanned', res => {
+          this.allBanned = res;
         });
       },
       //发送消息
@@ -132,6 +128,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
+          console.log(this.$refs.chatlist.scrollToBottom);
           this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
