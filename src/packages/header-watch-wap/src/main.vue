@@ -33,6 +33,7 @@
 <script>
   import { useAttentionServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
 
   export default {
     name: 'VmpHeaderWatchWap',
@@ -108,7 +109,7 @@
         if (this.watchInitData.webinar && this.watchInitData.webinar.userinfo.avatar) {
           avatar = this.watchInitData.webinar.userinfo.avatar;
         } else {
-          avatar = require('./images/default_avatar.png');
+          avatar = defaultAvatar;
         }
         return avatar;
       },
