@@ -35,9 +35,6 @@
           <span class="wrap__right__header" v-if="currentSelectUser">
             提示：如想结束当前聊天，关闭左侧用户窗口即可
           </span>
-          <span class="wrap__right__header" v-if="!currentSelectUser">
-            提示：选择私聊的人员后，可以发送私聊消息
-          </span>
           <div class="wrap__right__content">
             <chat-list
               @showImg="openImgPreview"
@@ -110,14 +107,7 @@
               :row="4"
               @keyup.enter.native="sendMessage"
             ></el-input>
-            <el-button
-              type="primary"
-              size="small"
-              class="small-button"
-              round
-              @click="sendMessage"
-              :disabled="!currentSelectUser"
-            >
+            <el-button type="primary" size="small" class="small-button" round @click="sendMessage">
               发送
             </el-button>
           </div>
@@ -172,7 +162,7 @@
         imgList: [],
         //图片上传地址
         actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`,
-        //私聊群组列表 todo 假数据替换
+        //私聊群组列表
         chatGroupList: [
           // {
           //   id: 0,
@@ -369,6 +359,7 @@
       sendMessage() {
         //未选中私聊人员
         if (!this.currentSelectUser) {
+          this.$message.warning('请选择私聊人员');
           return;
         }
         //判断是否有输入内容，或者上传图片

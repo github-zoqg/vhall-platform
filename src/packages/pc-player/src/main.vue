@@ -190,7 +190,10 @@
                 </li>
               </ul>
             </div>
-            <div class="controller-tools-right-speed" v-if="!isLiving && !isWarnPreview">
+            <div
+              class="controller-tools-right-speed"
+              v-if="!isLiving && !isWarnPreview && playerOtherOptions.speed"
+            >
               <span>
                 {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
               </span>
@@ -214,7 +217,10 @@
                 <el-slider v-model="voice" vertical height="100px" :show-tooltip="true"></el-slider>
               </div>
             </div>
-            <div class="controller-tools-right-danmuis" v-if="!isWarnPreview">
+            <div
+              class="controller-tools-right-danmuis"
+              v-if="!isWarnPreview && playerOtherOptions.barrage_button"
+            >
               <i
                 :class="`vh-iconfont ${danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'}`"
                 @click="openBarrage"
@@ -1174,7 +1180,7 @@
         &:hover {
           .el-slider__runway,
           .el-slider__bar {
-            height: 10px;
+            height: 9px;
           }
           .el-slider__button {
             width: 14px;
