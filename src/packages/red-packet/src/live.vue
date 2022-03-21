@@ -554,7 +554,7 @@
       height: 40px;
       line-height: 40px;
       font-size: 14px;
-      background: #fc5659;
+      background: #fb3a32;
       color: #fff;
       border: none;
       border-radius: 4px;

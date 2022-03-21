@@ -148,7 +148,7 @@
         line-height: 48px;
         color: #444444;
         &.active {
-          color: #fc5659;
+          color: #fb3a32;
         }
       }
       .line {

@@ -1019,8 +1019,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
       &:focus {
@@ -1090,13 +1090,13 @@
         cursor: pointer;
 
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
 
         &.selected {
@@ -1237,8 +1237,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }

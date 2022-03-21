@@ -461,8 +461,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }

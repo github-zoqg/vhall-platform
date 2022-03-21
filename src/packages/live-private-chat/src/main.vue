@@ -398,11 +398,11 @@
 <style lang="less">
   .vmp-live-private-chat {
     @color-bd: #e2e2e2;
-    @color-red: #fc5659;
+    @color-red: #fb3a32;
     @color-default: #ffd021;
     @color-default-hover: #fdd43f;
 
-    @main-color: #fc5659;
+    @main-color: #fb3a32;
     .el-dialog__body {
       padding: 0;
     }

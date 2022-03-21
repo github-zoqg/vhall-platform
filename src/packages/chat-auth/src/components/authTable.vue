@@ -300,7 +300,7 @@
 <style lang="less">
   .vmp-chat-auth-table {
     @color-blue-hover: #5d6afe;
-    @color-red: #fc5659;
+    @color-red: #fb3a32;
     height: 100%;
     &__list {
       position: relative;

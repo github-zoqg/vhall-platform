@@ -464,7 +464,7 @@
           html = '非默认回放将暂存15天';
         } else if (watchInitData.record_notice == 2) {
           html =
-            "非默认回放将暂存15天，联系您的客户经理或 <a href=\"https://vhall.s4.udesk.cn/im_client/?web_plugin_id=15038\" style='color: #fc5659' target='_blank'>客服</a> 开通点播服务，即可将非默认回放永久保存和播放";
+            "非默认回放将暂存15天，联系您的客户经理或 <a href=\"https://vhall.s4.udesk.cn/im_client/?web_plugin_id=15038\" style='color: #fb3a32' target='_blank'>客服</a> 开通点播服务，即可将非默认回放永久保存和播放";
         } else if (watchInitData.record_notice == 3) {
           html = '非默认回放将暂存15天，发布为点播，即可将非默认回放永久保存和播放';
         }

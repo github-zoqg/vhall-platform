@@ -755,7 +755,7 @@
     @color-blue: #4b5afe;
     @color-blue-hover: #5d6afe;
     @color-bd: #e2e2e2;
-    @color-default-hover: #fc5659;
+    @color-default-hover: #fb3a32;
     @color-default-active: #fc5659;
     @color-blue-hover: #5d6afe;
     @color-blue: #4b5afe;

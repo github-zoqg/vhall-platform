@@ -286,7 +286,7 @@
         font-size: 12px;
       }
       &:hover {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
     &:hover {
@@ -345,7 +345,7 @@
           padding-bottom: 4px;
         }
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
       }
       &-disable {

@@ -124,7 +124,7 @@
       padding: 0 36px;
       text-align: center;
       &--send-btn {
-        color: #fc5659;
+        color: #fb3a32;
         font-size: 28px;
         float: right;
       }

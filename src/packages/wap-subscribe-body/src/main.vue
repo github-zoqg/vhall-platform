@@ -597,7 +597,7 @@
       font-weight: 500;
       color: #fff;
       line-height: 1.333333rem;
-      background: #fc5659;
+      background: #fb3a32;
       text-align: center;
       margin-bottom: env(safe-area-inset-bottom);
       div {
@@ -635,7 +635,7 @@
       }
       .van-dialog__confirm {
         font-size: 36px;
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
     &-popup {

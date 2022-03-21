@@ -847,7 +847,7 @@
                 }
                 div:hover {
                   cursor: pointer;
-                  background: #fc5659;
+                  background: #fb3a32;
                   color: white;
                 }
               }

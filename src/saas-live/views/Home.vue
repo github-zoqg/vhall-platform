@@ -65,6 +65,13 @@
             method: 'post' // 上报方式
           }
         );
+        domain.initVhallReportForProduct({
+          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test',
+          app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653',
+          pf: 8,
+          noConsole: false,
+          isProduction: process.env.NODE_ENV === 'production'
+        });
         window.vhallReport.report('ENTER_WATCH');
         window.vhallLog({
           tag: 'doc', // 日志所属功能模块

@@ -88,7 +88,7 @@
                   :value="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
-                  active-color="#fc5659"
+                  active-color="#fb3a32"
                   @change="toggleMutedAllStatus"
                 />
               </div>
