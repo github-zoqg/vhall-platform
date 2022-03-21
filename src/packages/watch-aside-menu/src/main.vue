@@ -401,7 +401,7 @@
       position: absolute;
       z-index: 6;
       left: 0;
-      bottom: 60%;
+      top: 102px;
       cursor: pointer;
       display: inline-block;
       width: 32px;
