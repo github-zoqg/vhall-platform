@@ -143,7 +143,7 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       },
       isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
+        return useMicServer().getSpeakerStatus();
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
