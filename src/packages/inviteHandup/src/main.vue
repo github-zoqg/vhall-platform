@@ -71,8 +71,11 @@
           this.inviteTime = 30;
           clearInterval(this.inviteFun);
           this.refusedText = `${this.$t('interact.interact_1010')}(${this.inviteTime}s)`;
+          let st = Date.now();
+          let i = 0;
           this.inviteFun = setInterval(() => {
-            this.inviteTime--;
+            i = ~~((Date.now() - st) / 1000);
+            this.inviteTime = 30 - i;
             this.refusedText = `${this.$t('interact.interact_1010')}(${this.inviteTime}s)`;
             if (this.inviteTime <= 0) {
               this.$toast(this.$t('interact.interact_1025'));
