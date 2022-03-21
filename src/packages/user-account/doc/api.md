@@ -9,6 +9,8 @@
 
 ### 输入 api(向其他组件发送的指令)
 
-| 方法名              | 参数 1 | 描述                 | 代码块                                                                                  |
-| ------------------- | ------ | -------------------- | --------------------------------------------------------------------------------------- |
-| emitOpenUserAccount | 无参数 | 打开个人资料组件弹框 | `window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitOpenUserAccount'));` |
+| 方法名                 | 参数 1 | 描述                 | 代码块                                                                                     |
+| ---------------------- | ------ | -------------------- | ------------------------------------------------------------------------------------------ |
+| emitOpenUserAccountWap | 无参数 | 打开个人资料组件弹框 | `window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitOpenUserAccountWap'));` |
+
+流程图同 PC

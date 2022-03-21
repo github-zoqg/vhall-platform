@@ -10,3 +10,5 @@
 | 方法名          | 参数 1 | 描述             | 代码块                                                                              |
 | --------------- | ------ | ---------------- | ----------------------------------------------------------------------------------- |
 | emitOpenCashWap | 无参数 | 打开提现组件弹框 | `window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitOpenCashWap'));` |
+
+流程图同 PC
