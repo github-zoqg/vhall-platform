@@ -662,7 +662,7 @@
     height: 100%;
     flex-direction: column;
     background-color: #2d2d2d;
-    z-index: 100;
+    z-index: 10;
     .vmp-group-split__hd {
       display: flex;
       flex-direction: row;
