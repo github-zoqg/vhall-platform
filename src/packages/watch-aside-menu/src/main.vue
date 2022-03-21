@@ -195,9 +195,9 @@
               this.selectedMenu = 'document';
             }
             this.grouAlert(
-              `${msg.sender_id == this.userinfoId ? '主持人' : '助理'}开启了分组讨论，您将进入${
-                this.groupServer.state.groupInitData.name
-              }组参与讨论`
+              `${
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+              }开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
             );
           }
         });
@@ -210,7 +210,7 @@
           if (!msg.data.groupToast) {
             this.grouAlert(
               `${
-                msg.sender_id == this.userinfoId ? '主持人' : '助理'
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
               }结束了分组讨论，您将返回主直播间`
             );
           }
@@ -222,7 +222,9 @@
           this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
           this.grouAlert(
-            `${msg.sender_id == this.userinfoId ? '主持人' : '助理'}解散了分组，您将返回主直播间`
+            `${
+              msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+            }解散了分组，您将返回主直播间`
           );
         });
 
@@ -238,7 +240,10 @@
           if (this.isInGroup) {
             const { watchInitData } = useRoomBaseServer().state;
             if (groupJoinChangeInfo && groupJoinChangeInfo.isNeedCare === false) return;
-            const who = msg.sender_id == watchInitData.webinar.userinfo.user_id ? '主持人' : '助理';
+            const who =
+              msg.sender_id == watchInitData.webinar.userinfo.user_id
+                ? this.$getRoleName(1)
+                : this.$getRoleName(3);
             this.grouAlert(`${who}已将您分配至${this.groupServer.state.groupInitData.name}`);
           }
         });
