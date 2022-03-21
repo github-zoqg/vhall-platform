@@ -157,7 +157,11 @@
         </div>
       </div>
     </div>
-    <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+    <vmp-air-container
+      v-if="childrenCom && childrenCom.length"
+      :oneself="true"
+      :cuid="childrenCom[0]"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
