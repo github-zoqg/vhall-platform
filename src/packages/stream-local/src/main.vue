@@ -168,7 +168,7 @@
         </el-tooltip>
       </p>
       <p
-        v-if="joinInfo.role_name == 1 || groupRole === 20"
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-local__shadow-second-line"
       >
         <!-- 设为主讲人 -->

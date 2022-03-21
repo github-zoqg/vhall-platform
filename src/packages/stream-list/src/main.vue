@@ -501,6 +501,10 @@
           bottom: 40px;
         }
       }
+
+      .vmp-stream-list__remote-container-h {
+        padding-top: 0;
+      }
     }
   }
 </style>
