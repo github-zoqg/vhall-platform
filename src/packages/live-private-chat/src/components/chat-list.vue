@@ -90,8 +90,8 @@
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
-      <dt></dt>
-      <dd>暂时没有聊天哦～</dd>
+      <!--      <dt></dt>-->
+      <!--      <dd>暂时没有聊天哦～</dd>-->
     </dl>
   </div>
 </template>
@@ -363,7 +363,7 @@
             line-height: 24px;
             text-align: center;
             border-radius: 50%;
-            background-color: @color-default;
+            //background-color: @color-default;
             vertical-align: middle;
             background-size: cover;
             background-position: center center;
@@ -448,14 +448,16 @@
             font-size: 12px;
           }
           .user-host {
-            background-color: #ffd021;
+            background: rgba(251, 58, 50, 0.2);
+            color: #fb3a32;
           }
           .user-assistant {
-            background-color: #e2e2e2;
+            background: #ade1ff;
+            color: #0a7ff5;
           }
           .user-admin {
-            background-color: @color-role-admin;
-            color: #fff;
+            background: #ade1ff;
+            color: #0a7ff5;
           }
         }
         &.list-item__self-item {

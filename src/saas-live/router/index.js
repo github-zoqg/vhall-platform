@@ -35,7 +35,7 @@ const routes = [
     meta: { title: '口令登录', grayType: 'webinar' }
   },
   {
-    path: '/lives/chat-auth/:id',
+    path: '/lives/authchat/:id',
     name: 'ChatAuth',
     component: ChatAuth,
     meta: { title: '聊天审核', grayType: 'webinar' }

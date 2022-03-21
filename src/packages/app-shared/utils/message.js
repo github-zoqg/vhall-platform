@@ -38,5 +38,5 @@ const $message = options => {
 // 将$message挂载到this上，用异步任务，是为了能覆盖element自动写入的 $message
 const st = setTimeout(() => {
   Vue.prototype.$message = $message;
-  clearTimeout(st)
+  clearTimeout(st);
 }, 0);
