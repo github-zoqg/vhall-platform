@@ -25,6 +25,7 @@
       currentTab="qa"
       @showMyQA="showMyQA"
       @sendQa="sendQa"
+      @login="handleLogin"
       key="qa"
       :is-banned="isBanned"
       :is-all-banned="allBanned"
@@ -98,7 +99,11 @@
         });
         //收到问答回复
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          if (msg.sender_id != this.thirdPartyId) {
+          if (
+            msg.sender_id != this.thirdPartyId &&
+            ((msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+              msg.data.answer.is_open != '0')
+          ) {
             this.scrollBottom();
             // this.unReadMessageCount++;
             // this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
