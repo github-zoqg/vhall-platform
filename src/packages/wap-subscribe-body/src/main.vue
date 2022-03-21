@@ -202,14 +202,16 @@
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
             if (webinar.verify == 3) {
-              this.subscribeText = this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
+              this.subscribeText = this.$t('webinar.webinar_1040', {
+                n: `￥${this.subOption.fee}`
+              });
             } else {
               this.subscribeText = this.$t('appointment.appointment_1017');
             }
           }
         } else {
           if (webinar.verify == 3) {
-            this.subscribeText = this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
+            this.subscribeText = this.$t('webinar.webinar_1041', { n: `￥${this.subOption.fee}` });
           } else {
             this.subscribeText = this.$t('player.player_1013');
           }
