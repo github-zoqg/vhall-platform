@@ -24,7 +24,8 @@ const htmlConfig = {
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
     jsencrypt: '//s1.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
-    // wx: '//res.wx.qq.com/open/js/jweixin-1.4.0.js',
+    wx: '//s1.e.vhall.com/common-static/middle/loadjweixin/1.0.0/index.min.js',
+    iOSUserScalable: '//s1.e.vhall.com/common-static/middle/iOSUserScalable/1.0.0/index.min.js',
     ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js'
   },
   // cdn css

@@ -12,7 +12,7 @@
     <el-button
       round
       size="mini"
-      v-if="renderEndDemonstrateBtn"
+      v-if="renderEndDemonstrateBtn && isShareScreen"
       @click="handleEndDemonstrate"
       class="end-demonstrate"
     >
@@ -226,7 +226,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
           if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
             return;
           }

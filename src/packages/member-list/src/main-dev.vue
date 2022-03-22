@@ -7,16 +7,19 @@
     </div>
     <!--成员区域-->
     <div class="vmp-member-list__container">
-      <scroll class="vmp-member-list__container__scroll" ref="scroll" @pullingUp="loadMore">
+      <scroll
+        class="vmp-member-list__container__scroll"
+        :class="{ 'show-empty-img': isShowEmptyImg }"
+        ref="scroll"
+        @pullingUp="loadMore"
+      >
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div
-              v-if="searchEmpty"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwusousuo"></span>
+            <div v-if="searchEmpty" class="empty-container">
+              <span class="empty-img">
+                <img src="./images/search@2x.png" alt="" />
+              </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
             <template v-else style="overflow: auto">
@@ -48,12 +51,10 @@
         <!--举手的成员-->
         <template v-if="tabIndex === 2">
           <div class="member-list__apply-tab">
-            <div
-              v-if="!applyUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwujushou"></span>
+            <div v-if="!applyUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/noTop@2x.png" alt="" />
+              </span>
               <p>暂无人举手</p>
             </div>
             <template v-else>
@@ -85,12 +86,10 @@
         <!--受限制的成员-->
         <template v-if="tabIndex === 3">
           <div class="member-list__limit-tab">
-            <div
-              v-if="!limitedUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwuchengyuan"></span>
+            <div v-if="!limitedUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/no@2x.png" alt="" />
+              </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
             <template v-else>
@@ -301,23 +300,23 @@
       this.interactiveServer = useInteractiveServer();
       this.groupServer = useGroupServer();
     },
-    beforeDestroy() {},
+    beforeDestroy() {
+      this.removeEventsListener();
+    },
     async mounted() {
       //初始化配置
       this.initConfig();
       //初始化视图数据
       await this.initViewData();
-      this.isLive && this.handleStartGroup();
       //开始初始化流程
       this.init();
       this.listenEvents();
     },
     updated() {
-      const _this = this;
       //hack处理BsScroll不能滚动的问题
       this.$nextTick(() => {
-        if (_this.$refs && _this.$refs.scroll) {
-          _this.$refs.scroll.refresh();
+        if (this.$refs && this.$refs.scroll) {
+          this.$refs.scroll.refresh();
         }
       });
     },
@@ -327,11 +326,19 @@
       }
     },
     computed: {
+      //是否显示搜索结果图片
+      isShowEmptyImg() {
+        return [
+          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 2 && !this.applyUsers.length,
+          this.tabIndex === 3 && !this.limitedUsers.length
+        ].some(item => !!item);
+      },
       //是否显示底部区域
       isShowBottom() {
         let show = true;
         if (this.isWatch) {
-          return this.leader_id == this.userId && this.isInGroup;
+          return this.isInGroup && this.leader_id == this.userId;
         }
         if (this.isLive) {
           show = true;
@@ -415,205 +422,233 @@
       init() {
         this.refreshList();
       },
-      //开始讨论后的处理（发起端）
-      handleStartGroup() {
-        const _this = this;
-        // 开始讨论后重新初始化页面
-        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          if (type === 'start_discussion') {
-            _this.init();
-          }
-        });
-      },
       //初始化房间消息回调监听
       listenEvents() {
         const _this = this;
         const { isLive } = this;
 
         //加入房间
-        this.memberServer.$on('JOIN', msg => {
-          this.$message({
-            message: this.$t('message.message_1030', {
-              n: msg.context.nickname || msg.context.nick_name
-            }),
-            showClose: true,
-            type: 'success',
-            customClass: 'zdy-info-box'
-          });
-        });
+        this.memberServer.$on('JOIN', this.handleJoinRoom);
 
         //离开房间
-        this.memberServer.$on('LEFT', msg => {
-          if (msg.context.role_name == 1 && this.roleName != 1) {
-            this.$message.warning({ message: this.$t('message.message_1027') });
-          }
-          if (msg.context.role_name == 4) {
-            this.$message.warning({
-              message: this.$t('message.message_1029', {
-                n: msg.context.nickname || msg.context.nick_name
-              })
-            });
-          }
-        });
+        this.memberServer.$on('LEFT', this.handleLeaveRoom);
 
         //直播结束
-        this.memberServer.$on('live_over', () => {
-          //更新一下列表数据
-          this.refreshList();
-          //重置一下视图里各个状态
-          this.resetViewData();
-        });
+        this.memberServer.$on('live_over', this.handleEndLive);
 
         //用户申请上麦
-        this.memberServer.$on('UPDATE_TAB_TIPS', msg => {
-          const { visible = false } = msg || {};
-          //tab提示小红点
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(_this.cuid, 'emitTabTips', { visible: visible, type: 8 })
-          );
-        });
+        this.memberServer.$on('UPDATE_TAB_TIPS', this.handleUpdateTabTips);
 
         //用户上麦成功
-        this.memberServer.$on('vrtc_connect_success', msg => {
-          if (this.isInteract !== 1 && msg.data.room_role == 1) {
-            this.$message.success({ message: '直播发起成功' });
-            return;
-          }
-
-          if (msg.data.room_join_id == this.userId) {
-            this.$message.success({ message: '您已上麦' });
-            return;
-          }
-
-          if (msg.data.room_role != 2) {
-            this.$message.success({ message: `${msg.data.nick_name}已上麦` });
-          }
-        });
+        this.memberServer.$on('vrtc_connect_success', this.handleConnectSuccess);
 
         //用户拒绝上麦邀请
-        this.memberServer.$on('vrtc_connect_invite_refused', msg => {
-          let role = '';
-
-          if (msg.data.room_role == 2) {
-            role = this.$t('chat.chat_1063');
-          }
-
-          if (msg.data.room_role == 4) {
-            role = this.$t('chat.chat_1023');
-          }
-
-          if (msg.data.extra_params == this.userId) {
-            this.$message.warning({
-              message: `${role}${msg.data.nick_name || msg.data.nickname}拒绝了你的上麦邀请`
-            });
-          }
-        });
+        this.memberServer.$on('vrtc_connect_invite_refused', this.handleUserRejectConnect);
 
         //互动连麦断开成功
-        this.memberServer.$on('vrtc_disconnect_success', msg => {
-          //提示语
-          if (msg.data.target_id == this.userId) {
-            this.$message.success({ message: this.$t('interact.interact_1028') });
-            return;
-          }
-          //如果两次消息的人员不一样，并且是非观众，则提示（domain已判断是否非观众）
-          this.$message.success({
-            message: this.$t('interact.interact_1030', {
-              n: msg.data.nick_name || msg.data.nickname
-            })
-          });
-        });
+        this.memberServer.$on('vrtc_disconnect_success', this.handleSuccessDisconnect);
 
-        //房间消息结束直播
-        this.memberServer.$on('endLive', msg => {
-          console.log(msg);
-          this.allowRaiseHand = false;
-        });
+        //房间消息结束直播 todo 是否和live_over重复了
+        this.memberServer.$on('endLive', this.handleEndLive);
 
         //取消踢出
-        this.memberServer.$on('room_kickout_cancel', msg => {
-          console.log(msg);
-          this.refreshList();
-        });
+        this.memberServer.$on('room_kickout_cancel', this.handleCancelKickedOut);
 
         //用户被邀请演示-同意演示
-        this.memberServer.$on('vrtc_connect_presentation_agree', msg => {
-          console.log(msg);
-          if (msg.data.extra_params == this.userId) {
-            this.$message({
-              message: '对方已接受邀请',
-              showClose: true,
-              // duration: 0,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-          }
-        });
+        this.memberServer.$on('vrtc_connect_presentation_agree', this.handleUserAgreePresentation);
 
         //开始讨论
-        this.memberServer.$on('group_switch_start', msg => {
-          console.log(msg);
-          this.refreshList();
-        });
+        this.memberServer.$on('group_switch_start', this.handleStartDiscussion);
 
         //组内人员变动
-        this.memberServer.$on('group_join_change', msg => {
-          console.log(msg);
-          this.refreshList();
-        });
+        this.memberServer.$on('group_join_change', this.handleGroupJoinChange);
 
         //切换频道
-        this.groupServer.$on('GROUP_MSG_CREATED', msg => {
-          console.log('【成员列表】切换频道', msg);
-          isLive && this.refreshList();
-        });
+        this.memberServer.$on('GROUP_MSG_CREATED', this.updateOnlineUserList);
 
         //  结束讨论
-        this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          console.log('【成员列表】结束讨论', msg);
-          this.refreshList();
-        });
+        this.memberServer.$on('GROUP_SWITCH_END', this.updateOnlineUserList);
 
         //踢出小组
-        this.memberServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          console.log('【成员列表】踢出小组', msg);
-          this.refreshList();
-        });
+        this.memberServer.$on('ROOM_GROUP_KICKOUT', this.updateOnlineUserList);
 
         // 解散分组(主播&观看均更新)
-        this.groupServer.$on('GROUP_DISBAND', () => {
-          this.refreshList();
-        });
+        this.memberServer.$on('GROUP_DISBAND', this.updateOnlineUserList);
 
         // 切换组长(组长变更)
-        this.memberServer.$on('GROUP_LEADER_CHANGE', msg => {
-          this.refreshList();
-        });
+        this.memberServer.$on('GROUP_LEADER_CHANGE', this.handleLeaderChange);
 
         // 主持人进入退出小组 消息监听
-        this.memberServer.$on('GROUP_MANAGER_ENTER', msg => {
-          ['enter', 'quit'].includes(msg.data.status) && this.refreshList();
-        });
+        this.memberServer.$on('GROUP_MANAGER_ENTER', this.handleGroupManagerEnter);
 
         // 频道变更-开始讨论(刷新数据)
-        this.memberServer.$on('ROOM_CHANNEL_CHANGE', msg => {
-          console.log(msg);
-          this.refreshList();
+        this.memberServer.$on('ROOM_CHANNEL_CHANGE', this.updateOnlineUserList);
+      },
+      //移除事件监听
+      removeEventsListener() {
+        //加入房间事件
+        this.memberServer.$off('JOIN', this.handleJoinRoom);
+        //离开房间事件
+        this.memberServer.$off('LEFT', this.handleLeaveRoom);
+        //直播结束
+        this.memberServer.$off('live_over', this.handleEndLive);
+        //用户申请上麦
+        this.memberServer.$off('UPDATE_TAB_TIPS', this.handleUpdateTabTips);
+        //移除用户上麦成功
+        this.memberServer.$off('vrtc_connect_success', this.handleConnectSuccess);
+        //用户拒绝上麦邀请
+        this.memberServer.$off('vrtc_connect_invite_refused', this.handleUserRejectConnect);
+        //互动连麦断开成功
+        this.memberServer.$off('vrtc_disconnect_success', this.handleSuccessDisconnect);
+        //房间消息结束直播 todo 是否和live_over重复了
+        this.memberServer.$off('endLive', this.handleEndLive);
+        //取消踢出
+        this.memberServer.$off('room_kickout_cancel', this.handleCancelKickedOut);
+        //用户被邀请演示-同意演示
+        this.memberServer.$off('vrtc_connect_presentation_agree', this.handleUserAgreePresentation);
+        //开始讨论
+        this.memberServer.$off('group_switch_start', this.handleStartDiscussion);
+        //组内人员变动
+        this.memberServer.$off('group_join_change', this.handleGroupJoinChange);
+        //  结束讨论
+        this.memberServer.$off('GROUP_SWITCH_END', this.updateOnlineUserList);
+
+        //踢出小组
+        this.memberServer.$off('ROOM_GROUP_KICKOUT', this.updateOnlineUserList);
+
+        // 解散分组(主播&观看均更新)
+        this.memberServer.$off('GROUP_DISBAND', this.updateOnlineUserList);
+
+        // 切换组长(组长变更)
+        this.memberServer.$off('GROUP_LEADER_CHANGE', this.handleLeaderChange);
+
+        // 主持人进入退出小组 消息监听
+        this.memberServer.$off('GROUP_MANAGER_ENTER', this.handleGroupManagerEnter);
+
+        // 频道变更-开始讨论(刷新数据)
+        this.memberServer.$off('ROOM_CHANNEL_CHANGE', this.updateOnlineUserList);
+
+        //memberServer还原一下视图相关数据
+        this.memberServer.resetStateData();
+      },
+      //加入房间的处理
+      handleJoinRoom(msg) {
+        this.$message.success(
+          this.$t('message.message_1030', {
+            n: msg.context.nickname || msg.context.nick_name
+          })
+        );
+      },
+      //离开房间处理
+      handleLeaveRoom(msg) {
+        if (msg.context.role_name == 1 && this.roleName != 1) {
+          this.$message.warning({ message: this.$t('message.message_1027') });
+        }
+        if (msg.context.role_name == 4) {
+          this.$message.warning({
+            message: this.$t('message.message_1029', {
+              n: msg.context.nickname || msg.context.nick_name
+            })
+          });
+        }
+      },
+      //直播结束处理
+      handleEndLive() {
+        //更新一下列表数据
+        this.updateOnlineUserList();
+        //重置一下视图里各个状态
+        this.resetViewData();
+      },
+      //用户申请上麦处理(成员tab的红点提示)
+      handleUpdateTabTips(msg) {
+        const { visible = false } = msg || {};
+        //tab提示小红点
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitTabTips', { visible: visible, type: 8 })
+        );
+      },
+      //用户上麦成功
+      handleConnectSuccess(msg) {
+        if (this.isInteract !== 1 && msg.data.room_role == 1) {
+          this.$message.success({ message: '直播发起成功' });
+          return;
+        }
+
+        if (msg.data.room_join_id == this.userId) {
+          this.$message.success({ message: '您已上麦' });
+          return;
+        }
+
+        if (msg.data.room_role != 2) {
+          this.$message.success({ message: `${msg.data.nick_name}已上麦` });
+        }
+      },
+      //用户拒绝上麦邀请
+      handleUserRejectConnect(msg) {
+        let role = '';
+
+        if (msg.data.room_role == 2) {
+          role = this.$t('chat.chat_1063');
+        }
+
+        if (msg.data.room_role == 4) {
+          role = this.$t('chat.chat_1023');
+        }
+
+        if (msg.data.extra_params == this.userId) {
+          this.$message.warning({
+            message: `${role}${msg.data.nick_name || msg.data.nickname}拒绝了你的上麦邀请`
+          });
+        }
+      },
+      //互动连麦断开成功
+      handleSuccessDisconnect(msg) {
+        //提示语
+        if (msg.data.target_id == this.userId) {
+          this.$message.success({ message: this.$t('interact.interact_1028') });
+          return;
+        }
+        //如果两次消息的人员不一样，并且是非观众，则提示（domain已判断是否非观众）
+        this.$message.success({
+          message: this.$t('interact.interact_1030', {
+            n: msg.data.nick_name || msg.data.nickname
+          })
         });
       },
-      updateOnlineUserList() {
-        this.onlineUsers = [];
-        this.getOnlineUserList();
+      //取消踢出
+      handleCancelKickedOut() {
+        this.updateOnlineUserList();
       },
+      //用户接受演示邀请
+      handleUserAgreePresentation(msg) {
+        if (msg.data.extra_params == this.userId) {
+          this.$message.success('对方已接受邀请');
+        }
+      },
+      //开始讨论
+      handleStartDiscussion() {
+        this.updateOnlineUserList();
+      },
+      //组内人员变动
+      handleGroupJoinChange() {
+        this.updateOnlineUserList();
+      },
+      //组长变更
+      handleLeaderChange(msg) {
+        this.leader_id = msg.data.account_id;
+        this.updateOnlineUserList();
+      },
+      //主持人进入、退出小组
+      handleGroupManagerEnter(msg) {
+        ['enter', 'quit'].includes(msg.data.status) && this.updateOnlineUserList();
+      },
+      //刷新在线的成员列表
+      updateOnlineUserList: _.throttle(function () {
+        this.pageConfig.page = 0;
+        this.getOnlineUserList();
+      }, 1500),
       //获取在线人员列表
       getOnlineUserList(pos) {
-        const _this = this;
         const params = {
           room_id: this.roomId,
           pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
@@ -631,29 +666,11 @@
             if (res.code === 200) {
               this.$refs.scroll.finishPullUp();
               this.onlineUsers = this.memberServer.state.onlineUsers || [];
-              (this.onlineUsers || []).forEach(item => {
-                //更新一下成员的role
-                if (_this.isWatch && item.account_id == _this.userId) {
-                  _this.roleName = item.role_name;
-                }
-                //刷新当前的组长id
-                if ([20, '20'].includes(item.role_name)) {
-                  _this.leader_id = item.account_id;
-                }
-                //维护举手状态
-                if (_this.applyUsers.map(user => user.account_id).includes(item.account_id)) {
-                  item.is_apply = 1;
-                }
-              });
-
               if (!this.onlineUsers.length) {
                 this.pageConfig.page--;
               }
               //在线总人数
               this.totalNum = this.memberServer.state.totalNum;
-              setTimeout(() => {
-                _this.refresh();
-              }, 50);
             }
             if (![200, '200'].includes(res.code)) {
               this.pageConfig.page--;
@@ -1111,16 +1128,19 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #434343;
+    background-color: #2a2a2a;
     &__group-name {
+      display: flex;
+      align-items: center;
       padding: 18px 20px 5px;
       color: #ccc;
       i {
-        vertical-align: bottom;
+        //vertical-align: bottom;
       }
       .pr_top {
-        position: relative;
-        top: -2px;
+        //position: relative;
+        //top: -2px;
+        margin-left: 10px;
         font-size: 14px;
       }
     }
@@ -1139,6 +1159,12 @@
         bottom: 0;
         //overflow: hidden;
       }
+      .show-empty-img {
+        .test_01 {
+          display: flex;
+          flex: 1;
+        }
+      }
       .empty-container {
         width: 100%;
         height: 100%;
@@ -1147,12 +1173,25 @@
         flex-direction: column;
         align-items: center;
         span {
-          font-size: 80px;
-          color: #7e7e7e;
+          display: inline-block;
+          //margin-top: 20%;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
         }
         p {
           margin-top: 10px;
           color: #999999;
+        }
+        .empty-img {
+          width: 120px;
+          height: 120px;
+        }
+        .empty-img-top {
+          width: 180px;
+          height: 100px;
         }
       }
       .member-list__all-tab {
@@ -1170,9 +1209,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #34363a;
+      background-color: #2a2a2a;
       box-sizing: border-box;
       color: #e2e2e2;
+      border-top: 1px solid #1a1a1a;
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
@@ -1252,8 +1292,8 @@
           width: 74px;
           height: 30px;
           text-align: center;
-          background-color: #666666;
-          color: #cacaca;
+          background-color: #434343;
+          color: #999;
           float: left;
           cursor: pointer;
           position: relative;
@@ -1263,12 +1303,11 @@
             color: #fff;
           }
           &.active {
-            background-color: #fb3a32;
-            color: #fff;
+            background-color: #595959;
+            color: #e6e6e6;
             &:hover {
-              color: #fff;
-
-              background-color: #fb3a32;
+              color: #e6e6e6;
+              background-color: #595959;
             }
           }
           &.raise-hand {
@@ -1292,8 +1331,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          color: #fff;
-          background-color: #666666;
+          color: #999;
+          background-color: #434343;
         }
       }
       &__search-panel {

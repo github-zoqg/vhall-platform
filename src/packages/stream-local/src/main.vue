@@ -404,6 +404,14 @@
     },
     async mounted() {
       this.checkStartPush();
+      // 接收设为主讲人消息
+      this.micServer.$on('vrtc_big_screen_set', msg => {
+        const str =
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+            ? '主画面'
+            : '主讲人';
+        this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -427,7 +435,7 @@
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
-          useMediaCheckServer().state.deviceInfo.device_status === 1 &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2 &&
           isSpeakOn &&
           (!this.isOpenSplitScreen ||
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))

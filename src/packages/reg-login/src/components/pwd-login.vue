@@ -172,7 +172,7 @@
               const failure = err => {
                 console.log('获取账号检测接口结果错误', err);
                 this.$message({
-                  message: err.msg || this.$t('login.login_1021'),
+                  message: this.$te(err.msg) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -215,7 +215,7 @@
             let relt = await this.userServer.handlePassword(this.ruleForm.password);
             if (!relt.pass) {
               this.$message({
-                message: relt.msg || this.$t('register.register_1010'),
+                message: this.$te(relt.msg) || this.$t('register.register_1010'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -249,7 +249,7 @@
                   this.reloadCaptha();
                 }
                 this.$message({
-                  message: res.msg || this.$t('login.login_1021'),
+                  message: this.$te(res.msg) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'

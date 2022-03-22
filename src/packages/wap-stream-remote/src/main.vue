@@ -12,6 +12,11 @@
     <!-- 音频直播的的时候显示流占位图 -->
     <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
 
+    <!-- 网络异常时占位图，根据是否有streamId判断 -->
+    <section v-if="!stream.streamId" class="vmp-stream-remote__container__net-error">
+      <div class="net-error-img"></div>
+    </section>
+
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
       <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
@@ -282,6 +287,28 @@
       width: 100%;
       height: 100%;
     }
+
+    // 网络异常占位图
+    .vmp-stream-remote__container__net-error {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      .net-error-img {
+        width: 25px;
+        height: 18px;
+        margin-bottom: 1px;
+        background-image: url('./img/net-error.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+    }
+
     .vmp-stream-local__bootom {
       width: 100%;
       height: 24px;

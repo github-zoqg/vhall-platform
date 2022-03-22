@@ -6,7 +6,8 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
-      { 'has-stream-list': hasStreamList }
+      { 'has-stream-list': hasStreamList },
+      { 'no-delay-layout': isUseNoDelayLayout }
     ]"
     v-show="show"
     ref="docWrapper"
@@ -323,9 +324,20 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.userId
+          ) || {}
+        );
+      },
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 互动无延迟 未上麦观众是否使用类似旁路布局
+      isUseNoDelayLayout() {
+        return !this.localSpeaker.accountId && this.webinarMode == 3 && this.isNoDelay == 1;
       }
     },
     watch: {
@@ -365,10 +377,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
-          if (this.webinarMode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
-            return;
-          }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -510,40 +518,6 @@
       initEvents() {
         if (this.isWatch) {
           // 观看端事件
-          // 回放文档加载事件
-          this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-            console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
-            // 获取回放文档容器数据
-            const data = this.docServer.getVodAllCids();
-            this.docServer.state.containerList = data.map(item => {
-              return {
-                cid: item.cid
-              };
-            });
-            // 等dom渲染完成
-            await this.$nextTick();
-
-            // 回放只在观看端可用
-            const { width, height } = this.getDocViewRect();
-            if (!width || !height) {
-              console.error(
-                `[doc] cuepoint_load_complate 获取容器宽高异常width=${width},height=${height}`
-              );
-              return;
-            }
-            for (const item of data) {
-              // 循环初始化容器
-              this.docServer.initContainer({
-                cid: item.cid,
-                width,
-                height,
-                fileType: item.type.toLowerCase()
-              });
-            }
-            // 加载回放数据
-            this.docServer.loadVodIframe();
-          });
-
           // 点播或回放播放器播放完成
           usePlayerServer().$on(VhallPlayer.ENDED, () => {
             console.log('[doc] VhallPlayer.ENDED');
@@ -619,9 +593,6 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
-
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       },
 
       listenKeydown(e) {
@@ -952,13 +923,6 @@
           this.addNewFile({ fileType, docId, cid });
         }
       },
-      // 文档是否可见状态变化事件
-      dispatchDocSwitchChange: async function (val) {
-        console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        // if (val && this.show && this.docLoadComplete) {
-        //   this.recoverLastDocs();
-        // }
-      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
@@ -989,7 +953,6 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
-      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
@@ -1053,7 +1016,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: @bg-black;
+        background: #2d2d2d;
         flex-direction: column;
         i {
           font-size: 137px;
@@ -1114,72 +1077,73 @@
         }
       }
     }
-  }
-  .vmp-doc-thumbnailbar {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 144px;
-    background-color: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
 
-    &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-      border-radius: 0;
-      background-color: #000 !important;
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      height: 60px;
-      border-radius: 10px;
-      border: 1px solid #333;
-      background: #333 !important;
-    }
-
-    li.doc-thumbnailbar__opt {
-      height: 63px;
-      width: 110px;
-      margin-top: 15px;
-      position: relative;
-
-      &.selected {
-        box-shadow: 0 0 0 2px #fb3a32;
-      }
-
-      img {
-        width: 100%;
-        height: 100%;
-      }
-    }
-    li.doc-thumbnailbar__opt:not(.selected) {
-      &:hover {
-        box-shadow: 0 0 0 2px #f3686b;
-      }
-    }
-    li:last-child {
-      margin-bottom: 20px;
-    }
-    .doc-thumbnailbar-seq {
-      display: block;
-      min-width: 20px;
-      height: 14px;
-      background: #000;
-      opacity: 0.7;
-      color: #fff;
-      font-size: 12px;
-      line-height: 14px;
-      text-align: center;
+    .vmp-doc-thumbnailbar {
       position: absolute;
-      left: 0;
+      top: 0;
       bottom: 0;
+      right: 0;
+      width: 144px;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        border-radius: 0;
+        background-color: #000 !important;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        height: 60px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        background: #333 !important;
+      }
+
+      li.doc-thumbnailbar__opt {
+        height: 63px;
+        width: 110px;
+        margin-top: 15px;
+        position: relative;
+
+        &.selected {
+          box-shadow: 0 0 0 2px #fb3a32;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      li.doc-thumbnailbar__opt:not(.selected) {
+        &:hover {
+          box-shadow: 0 0 0 2px #f3686b;
+        }
+      }
+      li:last-child {
+        margin-bottom: 20px;
+      }
+      .doc-thumbnailbar-seq {
+        display: block;
+        min-width: 20px;
+        height: 14px;
+        background: #000;
+        opacity: 0.7;
+        color: #fff;
+        font-size: 12px;
+        line-height: 14px;
+        text-align: center;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
     }
   }
 
@@ -1255,6 +1219,9 @@
 
     &.vmp-doc-une--normal.has-stream-list {
       top: 80px;
+    }
+    &.vmp-doc-une--normal.no-delay-layout {
+      top: 0px;
     }
 
     //mini模式

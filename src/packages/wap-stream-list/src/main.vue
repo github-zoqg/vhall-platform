@@ -363,20 +363,30 @@
         let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
         if (mainScreenStream) {
           if (mainScreenStream.streamSource == 'remote') {
-            this.interactiveServer.setStreamFullscreen({
-              streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
-            });
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
           } else {
-            this.interactiveServer.setStreamFullscreen({
-              streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-local__${mainScreenStream.streamId}`
-            });
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-local__${mainScreenStream.accountId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
           }
-          // 参考player组件内的brower内的ios判断条件
-          if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
-            this.interactiveServer.state.fullScreenType = true;
-          }
+        }
+      },
+      setFullScreenStatus() {
+        // 参考player组件内的brower内的ios判断条件
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.interactiveServer.state.fullScreenType = true;
         }
       },
 
