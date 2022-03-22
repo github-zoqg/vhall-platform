@@ -241,7 +241,7 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-y: auto;
     background: #fff;
     .vh-goods_list {
       display: block;
