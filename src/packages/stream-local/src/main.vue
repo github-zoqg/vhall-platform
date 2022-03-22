@@ -404,6 +404,14 @@
     },
     async mounted() {
       this.checkStartPush();
+      // 接收设为主讲人消息
+      this.micServer.$on('vrtc_big_screen_set', msg => {
+        const str =
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+            ? '主画面'
+            : '主讲人';
+        this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+      });
     },
     beforeDestroy() {
       // 清空计时器
