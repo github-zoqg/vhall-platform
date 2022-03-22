@@ -51,13 +51,7 @@
               />
             </div>
             <p :class="['error-tip', { error: errorMsgShow.mobile }]">
-              {{
-                errorMsgShow.mobile
-                  ? showMobileLogin
-                    ? $t('account.account_1070')
-                    : $t('login.login_1022')
-                  : ''
-              }}
+              {{ errorMsgShow.mobileText }}
             </p>
           </li>
           <!-- 图片滑动 -->
@@ -314,12 +308,13 @@
        * 校验手机号
        */
       checkMobile() {
+        console.log('checkMobile');
         const valid = /^1[0-9]{10}$/.test(this.mobile);
         if (valid) {
           this.errorMsgShow.mobile = false;
         } else {
           this.errorMsgShow.mobile = true;
-          this.errorMsgShow.mobileText = this.$t('account.account_1069');
+          this.errorMsgShow.mobileText = this.$t('account.account_1025');
         }
         return valid;
       },
