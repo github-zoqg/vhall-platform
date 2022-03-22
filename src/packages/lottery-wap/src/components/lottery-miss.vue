@@ -45,7 +45,7 @@
       display: block;
       width: 364px;
       height: 90px;
-      background: #fc5659;
+      background: #fb3a32;
       border-radius: 14px;
       margin: 70px auto 0px auto;
       color: #fff;

@@ -3,9 +3,9 @@
     class="vmp-insert-stream"
     @mouseenter="wrapHover"
     @mouseleave="wrapLeave"
-    v-show="insertFileStreamVisible"
     ref="insterWarpRef"
     :class="{
+      'vmp-insert-stream__h0': !insertFileStreamVisible,
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
       'vmp-insert-stream__has-stream-list': hasStreamList
@@ -157,6 +157,11 @@
         </div>
       </div>
     </div>
+    <vmp-air-container
+      v-if="childrenCom && childrenCom.length"
+      :oneself="true"
+      :cuid="childrenCom[0]"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
@@ -175,6 +180,7 @@
     name: 'VmpInsertStream',
     data() {
       return {
+        childrenCom: [],
         insertFileStreamVisible: false, // 是否展示插播流组件
         remoteVideoParam: {
           paas_record_id: '',
@@ -281,6 +287,9 @@
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
       this.docServer = useDocServer();
+    },
+    created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
       this.initEventListener();
@@ -883,6 +892,9 @@
     width: 100%;
     height: 100%;
     position: relative;
+    &__h0 {
+      height: 0;
+    }
     &__mini {
       width: 309px;
       height: 240px;
@@ -982,7 +994,7 @@
         border-radius: 100%;
         margin-right: 10px;
         &:hover {
-          background: #fc5659;
+          background: #fb3a32;
         }
         &.iconsheweizhujiangren {
           font-size: 14px;

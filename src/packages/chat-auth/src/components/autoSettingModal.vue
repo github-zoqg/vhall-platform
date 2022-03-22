@@ -109,7 +109,7 @@
       padding: 0 20px;
       line-height: 40px;
       border-radius: 4px 4px 0 0;
-      background-color: #fc5659;
+      background-color: #fb3a32;
     }
     .el-dialog__title {
       font-size: 16px;

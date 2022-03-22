@@ -347,7 +347,7 @@
               margin-bottom: 48px;
             }
             .winning-status {
-              color: #fc5659;
+              color: #fb3a32;
             }
           }
         }

@@ -214,6 +214,11 @@ export async function authWeixinAjax(to, address, _next) {
       webinar_user_id: window.sessionStorage.getItem('initGrayId'),
       scene_id: 2 //观看端传2
     });
+    await roomBaseServer.getDegradationConfig({
+      staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+      environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+      systemKey: 2
+    });
     if (
       roomBaseServer.state.configList &&
       roomBaseServer.state.configList['ui.hide_wechat'] == '0'
