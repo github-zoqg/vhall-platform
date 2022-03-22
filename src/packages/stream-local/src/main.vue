@@ -840,6 +840,24 @@
             resolve();
             return;
           }
+
+          // 当前角色为主持人&&设备被禁用
+          if (
+            +this.joinInfo.role_name === 1 &&
+            useMediaCheckServer().state.deviceInfo.device_status === 2
+          ) {
+            clearInterval(this._audioLeveInterval);
+
+            // 主持人不在小组中，停止推流触发 直播结束 生成回放
+            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+            }
+            resolve();
+            return;
+          }
+
           this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
             console.warn('结束推流成功----');
             clearInterval(this._audioLeveInterval);
