@@ -94,7 +94,7 @@
   import ChatOperateBar from './components/chat-operate-bar';
   import eventMixin from './mixin/event-mixin';
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer, useGiftsServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
@@ -338,7 +338,10 @@
           this.initInputStatus();
         });
         //监听分组房间变更通知
-        chatServer.$on('changeChannel', () => {
+        // chatServer.$on('changeChannel', () => {
+        //   this.handleChannelChange();
+        // });
+        useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
         //监听被提出房间消息
