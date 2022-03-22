@@ -160,12 +160,6 @@
         // 文档容器选择事件
         this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
 
-        // 回放文档加载事件
-        this.docServer.$on(
-          'dispatch_doc_vod_cuepoint_load_complate',
-          this.dispatchDocVodCuepointLoadComplate
-        );
-
         // 回放播放时间
         this.docServer.$on('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
 
@@ -309,30 +303,6 @@
           this.addNewFile({ fileType, docId, cid });
         }
       },
-      // 回放文档加载事件
-      dispatchDocVodCuepointLoadComplate: async function () {
-        if (this.docServer.state.containerList.length === 0) {
-          const data = this.docServer.getVodAllCids();
-          this.docServer.state.containerList = data.map(item => {
-            return {
-              cid: item.cid
-            };
-          });
-          await this.$nextTick();
-          if (this.docServer.state.containerList.length) {
-            const { width, height } = this.getDocViewRect();
-            if (!width || !height) return;
-            for (const item of data) {
-              this.docServer.initContainer({
-                cid: item.cid,
-                width,
-                height,
-                fileType: item.type.toLowerCase()
-              });
-            }
-          }
-        }
-      },
       // 回放视频播放更新事件
       dispatchDocVodTimeUpdate({ isChange }) {
         if (isChange) {
@@ -346,10 +316,6 @@
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
-      this.docServer.$off(
-        'dispatch_doc_vod_cuepoint_load_complate',
-        this.dispatchDocVodCuepointLoadComplate
-      );
     }
   };
 </script>
