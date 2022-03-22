@@ -1353,7 +1353,7 @@
       color: #333;
     }
     .el-radio__input.is-checked + .el-radio__label {
-      color: #fc5659;
+      color: #fb3a32;
     }
 
     .exact-search {
@@ -1398,8 +1398,8 @@
     // 问答管理 回复
     .text-reply {
       .el-radio__input.is-checked .el-radio__inner {
-        border-color: #fc5659;
-        background: #fc5659;
+        border-color: #fb3a32;
+        background: #fb3a32;
       }
       width: 500px !important;
       height: 356px !important;

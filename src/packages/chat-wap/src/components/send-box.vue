@@ -506,7 +506,7 @@
         }
       }
       .only-my {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
   }

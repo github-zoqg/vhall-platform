@@ -347,6 +347,6 @@
   }
   .red-btn {
     width: 364px;
-    background-color: #fc5659;
+    background-color: #fb3a32;
   }
 </style>
