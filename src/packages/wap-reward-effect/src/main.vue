@@ -16,11 +16,7 @@
         <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
         <img class="gift-user-avatar" :src="gift_user_avatar(rewardEffectInfo)" />
         <span class="nick-name">
-          {{
-            rewardEffectInfo.data.type == 'gift_send_success'
-              ? rewardEffectInfo.data.gift_user_nickname
-              : rewardEffectInfo.data.rewarder_nickname | overHidden(7)
-          }}
+          {{ gift_user_nickname(rewardEffectInfo) | overHidden(7) }}
         </span>
         <!-- <span v-if="rewardEffectInfo.type == 'reward'">
             打赏
@@ -42,7 +38,9 @@
           class="gift-img"
           :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
-            backgroundImage: `url(${rewardEffectInfo.data.gift_image_url}?x-oss-process=image/resize,m_lfit,w_100)`
+            backgroundImage: `url(${
+              rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url
+            }?x-oss-process=image/resize,m_lfit,w_100)`
           }"
         ></span>
         <img
@@ -219,6 +217,24 @@
           }
         } else {
           return this.default_user_avatar;
+        }
+      },
+      // 用户昵称
+      gift_user_nickname(rewardEffectInfo) {
+        if (
+          rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.event_type == 'free_gift_send'
+        ) {
+          if (rewardEffectInfo.data.gift_user_nickname) {
+            return rewardEffectInfo.data.gift_user_nickname;
+          } else if (rewardEffectInfo.data.rewarder_nickname) {
+            return rewardEffectInfo.data.rewarder_nickname;
+          } else {
+            // 默认返回nickname
+            return rewardEffectInfo.data.nickname;
+          }
+        } else {
+          return rewardEffectInfo.data.nickname;
         }
       },
       /**
