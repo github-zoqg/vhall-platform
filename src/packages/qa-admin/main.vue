@@ -816,7 +816,7 @@
           })
           .join(' ');
       },
-      textReply: debounce(function () {
+      textReply() {
         if (this.sendMessage.text.trim() == '') {
           return this.$message.warning('请输入回复内容!');
         }
@@ -831,11 +831,14 @@
           .then(res => {
             if (res.code == 200) {
               if (this.activeIndex == 2) {
-                this.setReply(0);
+                //发送回复后延时调用拉取列表接口，防止后端入库未完成，列表未更新
+                setTimeout(() => {
+                  this.setReply(0);
+                }, 1000);
               }
             }
           });
-      }, 300)
+      }
     }
   };
 </script>

@@ -11,7 +11,7 @@
           class="private-chat-msg__item-main__chat-avatar"
           width="35"
           height="35"
-          :src="source.avatar"
+          :src="source.avatar || defaultAvatar"
           alt
         />
       </div>
@@ -49,6 +49,7 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   export default {
     name: 'VmpWapPrivateChatMsgItem',
     props: {
@@ -59,6 +60,11 @@
       userId: {
         required: true
       }
+    },
+    data() {
+      return {
+        defaultAvatar: defaultAvatar
+      };
     },
     computed: {
       customRoleName() {
