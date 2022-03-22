@@ -1128,16 +1128,19 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #434343;
+    background-color: #2a2a2a;
     &__group-name {
+      display: flex;
+      align-items: center;
       padding: 18px 20px 5px;
       color: #ccc;
       i {
-        vertical-align: bottom;
+        //vertical-align: bottom;
       }
       .pr_top {
-        position: relative;
-        top: -2px;
+        //position: relative;
+        //top: -2px;
+        margin-left: 10px;
         font-size: 14px;
       }
     }
@@ -1206,9 +1209,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #34363a;
+      background-color: #2a2a2a;
       box-sizing: border-box;
       color: #e2e2e2;
+      border-top: 1px solid #1a1a1a;
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
@@ -1288,8 +1292,8 @@
           width: 74px;
           height: 30px;
           text-align: center;
-          background-color: #666666;
-          color: #cacaca;
+          background-color: #434343;
+          color: #999;
           float: left;
           cursor: pointer;
           position: relative;
@@ -1299,12 +1303,11 @@
             color: #fff;
           }
           &.active {
-            background-color: #fb3a32;
-            color: #fff;
+            background-color: #595959;
+            color: #e6e6e6;
             &:hover {
-              color: #fff;
-
-              background-color: #fb3a32;
+              color: #e6e6e6;
+              background-color: #595959;
             }
           }
           &.raise-hand {
@@ -1328,8 +1331,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          color: #fff;
-          background-color: #666666;
+          color: #999;
+          background-color: #434343;
         }
       }
       &__search-panel {
