@@ -427,7 +427,7 @@
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
-          useMediaCheckServer().state.deviceInfo.device_status === 1 &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2 &&
           isSpeakOn &&
           (!this.isOpenSplitScreen ||
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
