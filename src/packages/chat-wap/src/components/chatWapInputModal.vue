@@ -6,7 +6,15 @@
           {{ $t('account.account_1063') }}
         </span>
         <!-- 聊天 -->
-        <span class="send-box__top--title">{{ $t('menu.menu_1002') }}</span>
+        <span class="send-box__top--title">
+          {{
+            showTabType == 'qa'
+              ? $t('common.common_1004')
+              : showTabType == 'private'
+              ? $t('common.common_1008')
+              : $t('menu.menu_1002')
+          }}
+        </span>
         <span class="send-box__top--send-btn" @click="send">{{ $t('webinar.webinar_1010') }}</span>
       </div>
       <div class="send-box__bottom">
@@ -15,7 +23,13 @@
             v-model="inputValue"
             id="textareaChat"
             ref="textarea"
-            :placeholder="$t('webinar.webinar_1011')"
+            :placeholder="
+              showTabType == 'qa'
+                ? $t('chat.chat_1066')
+                : showTabType == 'private'
+                ? $t('chat.chat_1045')
+                : $t('webinar.webinar_1011')
+            "
             :rows="3"
             maxlength="140"
             @blur="handleOnBlur"
@@ -52,6 +66,12 @@
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
   export default {
     name: 'VmpChatWapInputModal',
+    props: {
+      showTabType: {
+        type: [String, Number],
+        default: ''
+      }
+    },
     data() {
       return {
         //是否显示模态窗

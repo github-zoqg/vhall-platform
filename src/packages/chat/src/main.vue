@@ -94,7 +94,7 @@
   import ChatOperateBar from './components/chat-operate-bar';
   import eventMixin from './mixin/event-mixin';
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
@@ -301,7 +301,7 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
-        // const giftsServer = useGiftsServer();
+        const msgServer = useMsgServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
@@ -347,6 +347,12 @@
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
           this.$message(this.$t('chat.chat_1007'));
+        });
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          // live_over 结束直播
+          if (msg.data.type == 'live_over') {
+            this.allBanned = false;
+          }
         });
       },
       init() {
