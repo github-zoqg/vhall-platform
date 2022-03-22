@@ -164,18 +164,30 @@
       });
     },
     created() {
-      this.redPacketServer.$on(RED_ENVELOPE_OK, () => {
+      this.redPacketServer.$on(RED_ENVELOPE_OK, msgData => {
         this.paySuccess = true;
         this.qrCodeDialogVisible = true;
         this.sendDialogVisible = false;
+        this.amount = `${msgData.red_packet_amount}`;
       });
     },
     methods: {
       open() {
-        this.channel === 'ALIPAY';
         this.sendDialogVisible = true;
         this.qrCodeDialogVisible = false;
+        this.restForm();
+      },
+      // 发起红包页面表单参数重置
+      restForm() {
+        this.redcouponMaxNum = false;
+        this.redcouponMaxNumError = false;
+        this.redcouponType = 0;
+        this.inputAmount = '';
+        this.numbers = '';
+        this.channel === 'ALIPAY';
         this.paySuccess = false;
+        this.amount = '0.00';
+        this.describe = '多谢大家支持';
         this.redPacketServer.getOnline();
       },
       backPay() {
@@ -363,6 +375,11 @@
   };
 </script>
 <style lang="less">
+  .red-packet {
+    .el-dialog__body {
+      padding: 0 30px;
+    }
+  }
   .pay-form {
     .el-radio {
       margin-right: 20px;
@@ -445,7 +462,7 @@
     .form-group {
       overflow: hidden;
       .label-left {
-        width: 48px;
+        width: 58px;
         padding-right: 12px;
         float: left;
         display: block;
@@ -489,7 +506,7 @@
     .envelope-tips {
       font-size: 14px;
       color: #999;
-      padding-left: 64px;
+      padding-left: 74px;
       text-align: left;
       .online {
         color: #fb3a32;
@@ -554,7 +571,7 @@
       height: 40px;
       line-height: 40px;
       font-size: 14px;
-      background: #fc5659;
+      background: #fb3a32;
       color: #fff;
       border: none;
       border-radius: 4px;

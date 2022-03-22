@@ -1732,8 +1732,8 @@
       }
     }
     .submit-btn {
-      border: 0.024rem solid #fc5659;
-      background-color: #fc5659;
+      border: 0.024rem solid #fb3a32;
+      background-color: #fb3a32;
       font-size: 0.37rem;
       color: #fff;
       outline: none;

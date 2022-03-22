@@ -147,7 +147,8 @@
     useMemberServer,
     useRebroadcastServer,
     useDesktopShareServer,
-    usePlayerServer
+    usePlayerServer,
+    useMicServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -201,10 +202,11 @@
       },
       // 是否显示文档翻页相关操作栏
       showPagebar() {
-        // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
+        // 显示文档资料时 && && (普通模式，或 观看端全屏模式下) && (有演示权限，或是助理和观众)
         return (
           this.currentType === 'document' &&
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
+          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
+          (this.hasDocPermission || [2, 3].includes(this.roleName))
         );
       },
       // 当前用户Id
@@ -320,6 +322,10 @@
       // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     watch: {
@@ -360,6 +366,9 @@
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
           console.log('[doc] streamListHeight:', newval);
+          if (this.webinarMode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
+            return;
+          }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -372,6 +381,7 @@
       this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
+      this.micServer = useMicServer();
     },
     created() {
       window.addEventListener('keydown', this.listenKeydown);
@@ -945,9 +955,9 @@
       // 文档是否可见状态变化事件
       dispatchDocSwitchChange: async function (val) {
         console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.show && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
+        // if (val && this.show && this.docLoadComplete) {
+        //   this.recoverLastDocs();
+        // }
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {
@@ -955,12 +965,18 @@
       }
     },
     mounted() {
+      console.log('[doc] doc mounted');
+      // 初始化文档server的getDocViewRect方法
+      this.docServer.getDocViewRect = this.getDocViewRect;
+
       // 初始化事件
       this.initEvents();
 
       if (this.webinarType == 1) {
         // 直播中才执行,恢复上一次的文档数据;
-        this.recoverLastDocs();
+        this.$nextTick(() => {
+          this.recoverLastDocs();
+        });
       } else {
         // 非直播状态，主持人默认选中文档
         if (this.roleName == 1) {
@@ -1013,8 +1029,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
       &:focus {
@@ -1084,13 +1100,13 @@
         cursor: pointer;
 
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
 
         &.selected {
@@ -1231,8 +1247,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }

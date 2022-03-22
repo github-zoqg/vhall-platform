@@ -129,11 +129,9 @@
       this.docServer.getDocViewRect = this.getDocViewRect;
 
       this.initEvents();
-      // 清空
-      // this.docServer.resetContainer();
+
       if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
-        // 恢复上一次的文档数据;
-        console.log('----- recoverLastDocs type == 1');
+        // 直播中才执行,恢复上一次的文档数据;
         this.$nextTick(() => {
           this.recoverLastDocs();
         });
@@ -192,15 +190,17 @@
         this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
 
         // 全屏/退出全屏事件
-        screenfull.onchange(ev => {
-          // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-          if (ev.target.id !== 'docWrapper') return;
-          if (screenfull.isFullscreen) {
-            this.displayMode = 'fullscreen';
-          } else {
-            this.displayMode = screenfull.targetMode || 'normal';
-          }
-        });
+        if (screenfull.isEnabled) {
+          screenfull.onchange(ev => {
+            // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
+            if (ev.target.id !== 'docWrapper') return;
+            if (screenfull.isFullscreen) {
+              this.displayMode = 'fullscreen';
+            } else {
+              this.displayMode = screenfull.targetMode || 'normal';
+            }
+          });
+        }
       },
 
       /**
@@ -309,9 +309,9 @@
       // 文档是否可见状态变化事件
       dispatchDocSwitchChange: async function (val) {
         console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
+        // if (val && this.docLoadComplete) {
+        //   this.recoverLastDocs();
+        // }
       },
       // 文档不存在或已删除
       dispatchDocNotExit() {

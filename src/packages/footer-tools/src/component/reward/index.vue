@@ -1,5 +1,5 @@
 <template>
-  <div class="vhsaas-reward-wrapper">
+  <div class="vmp-reward">
     <div
       v-show="showRewardDialog"
       class="reward-dialog-wrapper"
@@ -106,8 +106,8 @@
 
 <script src="./reward.js"></script>
 
-<style lang="less" scoped>
-  .vhsaas-reward-wrapper {
+<style lang="less">
+  .vmp-reward {
     color: black;
     .vhsaas-reward-icon {
       width: 32px;
@@ -170,7 +170,11 @@
             }
           }
           .reward-input {
-            margin-top: 10px;
+            &:last-child {
+              vertical-align: top;
+            }
+            // margin-top: 10px;
+            line-height: 40px;
             ::v-deep .el-input__inner {
               line-height: 36px;
               height: 36px;
@@ -200,7 +204,7 @@
               .money-icon {
                 line-height: 36px;
                 margin-left: 10px;
-                color: #666666;
+                color: #666;
                 font-size: 14px;
               }
             }

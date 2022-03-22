@@ -10,7 +10,12 @@
     >
       <div class="msg-item interact">
         <div class="interact-msg">
-          {{ source.roleName | roleFilter }}{{ source.content.text_content }}
+          <template
+            v-if="source.type == 'question_answer_open' || source.type == 'question_answer_close'"
+          >
+            {{ source.roleName | roleFilter }}
+          </template>
+          {{ source.content.text_content }}
         </div>
       </div>
     </template>
@@ -82,7 +87,13 @@
       <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
       <div class="msg-item">
         <div class="avatar-wrap">
-          <img class="chat-avatar" width="35" height="35" :src="source.avatar" alt />
+          <img
+            class="chat-avatar"
+            width="35"
+            height="35"
+            :src="source.avatar || defaultAvatar"
+            alt
+          />
         </div>
         <div class="msg-content">
           <p class="msg-content_name">
@@ -174,6 +185,7 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   export default {
     props: {
       source: {
@@ -204,6 +216,7 @@
     data() {
       return {
         msgContent: '',
+        defaultAvatar: defaultAvatar,
         jiantou: require('../img/jiantou.png')
       };
     },
@@ -382,7 +395,7 @@
             font-size: 20px;
             &.host {
               background-color: rgba(252, 86, 89, 0.2);
-              color: #fc5659;
+              color: #fb3a32;
             }
             &.assistant {
               background-color: rgba(166, 166, 166, 0.2);

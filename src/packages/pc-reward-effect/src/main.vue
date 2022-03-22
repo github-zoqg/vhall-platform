@@ -335,8 +335,8 @@
     top: 60px;
     z-index: 100;
     .reward-effect-box {
-      width: 230px;
-      height: 53px;
+      width: 234px;
+      height: 54px;
       position: relative;
       background-size: 100%;
       background-repeat: no-repeat;
@@ -366,7 +366,7 @@
         height: 40px;
         position: absolute;
         left: 4px;
-        top: 10px;
+        bottom: 4px;
         border-radius: 50%;
         overflow: hidden;
       }

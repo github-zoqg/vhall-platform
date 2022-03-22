@@ -88,7 +88,7 @@
                   :value="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
-                  active-color="#fc5659"
+                  active-color="#fb3a32"
                   @change="toggleMutedAllStatus"
                 />
               </div>
@@ -235,9 +235,9 @@
       joinChatAuth() {
         let url = '';
         if (location.search === '') {
-          url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}`].join('');
+          url = [this.chatFilterUrl, `/lives/authchat/${this.webinarId}`].join('');
         } else {
-          url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}${location.search}`].join(
+          url = [this.chatFilterUrl, `/lives/authchat/${this.webinarId}${location.search}`].join(
             ''
           );
         }

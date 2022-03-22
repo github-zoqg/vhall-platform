@@ -168,7 +168,7 @@
         </el-tooltip>
       </p>
       <p
-        v-if="joinInfo.role_name == 1 || groupRole === 20"
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-local__shadow-second-line"
       >
         <!-- 设为主讲人 -->
@@ -403,7 +403,6 @@
       this.listenEvents();
     },
     async mounted() {
-      window.streamLocal = this;
       this.checkStartPush();
     },
     beforeDestroy() {
@@ -679,7 +678,6 @@
         } else if (res.code == 513025) {
           // 麦位已满，上麦失败
           this.$message.error(`上麦席位已满员，您的账号支持${res.data.replace_data}人上麦`);
-          // TODO: 麦位已满的处理
         } else {
           console.error('上麦接口失败----', res);
         }
@@ -697,6 +695,9 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'NotAllowed') {
+          // 本地流创建失败
+          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
@@ -784,7 +785,13 @@
             .createLocalVideoStream({
               videoNode: `stream-${this.joinInfo.third_party_user_id}`
             })
-            .catch(() => 'createLocalStreamError');
+            .catch(e => {
+              if (e && e?.name == 'NotAllowed') {
+                return Promise.reject('NotAllowed');
+              } else {
+                return Promise.reject('createLocalStreamError');
+              }
+            });
         } else {
           // 若是图片推流，刷新则需等待canvas进行绘制
           await this.sleep();
@@ -797,7 +804,9 @@
               videoNode: `stream-${this.joinInfo.third_party_user_id}`,
               videoTrack: videoTracks
             })
-            .catch(() => 'createLocalPhotoStreamError');
+            .catch(() => {
+              return Promise.reject('createLocalPhotoStreamError');
+            });
         }
       },
       // 推流
@@ -814,7 +823,9 @@
 
       // 设置主屏
       async setBroadCastScreen() {
-        await this.interactiveServer.setBroadCastScreen().catch(() => 'setBroadCastScreenError');
+        await this.interactiveServer.setBroadCastScreen().catch(() => {
+          return Promise.reject('setBroadCastScreenError');
+        });
       },
 
       // 设置旁路布局
@@ -822,9 +833,9 @@
         const param = {
           adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')]
         };
-        await this.interactiveServer
-          .setBroadCastAdaptiveLayoutMode(param)
-          .catch(() => 'setBroadCastAdaptiveLayoutModeError');
+        await this.interactiveServer.setBroadCastAdaptiveLayoutMode(param).catch(() => {
+          return Promise.reject('setBroadCastAdaptiveLayoutModeError');
+        });
       },
 
       // 结束推流

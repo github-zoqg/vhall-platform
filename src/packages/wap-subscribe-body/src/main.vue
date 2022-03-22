@@ -197,17 +197,23 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        if (webinar.type == 1 || webinar.type == 5) {
-          this.subscribeText = this.$t('player.player_1013');
-        } else {
+        if (webinar.type == 2) {
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
             if (webinar.verify == 3) {
-              this.subscribeText = this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
+              this.subscribeText = this.$t('webinar.webinar_1040', {
+                n: `￥${this.subOption.fee}`
+              });
             } else {
               this.subscribeText = this.$t('appointment.appointment_1017');
             }
+          }
+        } else {
+          if (webinar.verify == 3) {
+            this.subscribeText = this.$t('webinar.webinar_1041', { n: `￥${this.subOption.fee}` });
+          } else {
+            this.subscribeText = this.$t('player.player_1013');
           }
         }
         if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
@@ -593,7 +599,7 @@
       font-weight: 500;
       color: #fff;
       line-height: 1.333333rem;
-      background: #fc5659;
+      background: #fb3a32;
       text-align: center;
       margin-bottom: env(safe-area-inset-bottom);
       div {
@@ -631,7 +637,7 @@
       }
       .van-dialog__confirm {
         font-size: 36px;
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
     &-popup {

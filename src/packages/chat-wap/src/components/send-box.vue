@@ -385,6 +385,7 @@
         //将文本消息加入消息体
         curmsg.setText(value);
         //发送消息
+        console.log('msg', curmsg);
         chatServer.sendMsg(curmsg);
         //清除当前消息
         chatServer.clearCurMsg();
@@ -505,7 +506,7 @@
         }
       }
       .only-my {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
   }

@@ -4,7 +4,11 @@
       <el-row class="padding45">
         <el-row
           :class="
-            status == 'timeout' ? 'colorFC9600' : status == 'start' ? 'color0FBB5A' : 'colorFB3A32'
+            status == 'timeout'
+              ? 'pause_font_color'
+              : status == 'start'
+              ? 'start_font_color'
+              : 'timeout_font_color'
           "
         >
           <el-col align="center" class="ft14">
@@ -20,23 +24,23 @@
           </span>
         </el-row>
         <!-- 时间显示区 -->
-        <el-row class="margin10 bg000 pr mt24 font_zdy">
-          <div class="border3 ps"></div>
+        <el-row class="margin10 number_bg pr mt24 font_zdy">
+          <div class="block-line ps"></div>
 
-          <div class="margin5 timerbg">
-            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_mon }}</span>
+          <div class="number_mar timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
           </div>
-          <div class="margin5 timerbg">
-            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ mon }}</span>
+          <div class="number_mar timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</span>
           </div>
 
-          <span class="pr ft28" :class="time < 1 ? 'colorFB3A32' : ''">:</span>
+          <span class="pr ft28" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
-          <div class="margin5 timerbg">
-            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_sec }}</span>
+          <div class="number_mar timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
           </div>
-          <div class="margin5 timerbg">
-            <span :class="time < 1 ? 'colorFB3A32' : ''">{{ sec }}</span>
+          <div class="number_mar timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ sec }}</span>
           </div>
         </el-row>
 
@@ -321,7 +325,6 @@
       },
       // open关闭提示
       onClose() {
-        // this.$emit('disTimer', true);
         this.$confirm('是否关闭计时器', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -378,13 +381,11 @@
       goOn(status) {
         if (status == 4) {
           this.status = 'timeout';
-          // if (window.chatSDK) {
           this.msgServer.sendCustomMsg({
             role_name: this.userInfo.role_name,
             type: 'timer_pause',
             remain_time: this.time
           });
-          // }
         } else {
           this.status = this.time > 0 ? 'start' : 'chaoshi';
           this.timerFun(this.time);
@@ -408,7 +409,6 @@
       resetTimerConfirmClose() {
         this.timerVisible = false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
-        // this.$emit('openSetTimer');
         clearInterval(this.timer);
         this.status = 'start';
         this.editTimer(3);
@@ -447,17 +447,17 @@
       background: #595959 !important;
     }
     .button_reset {
-      border: 1px solid #fb3a32;
-      background: #fb3a32;
+      border: 1px solid @font-high-light-normal;
+      background: @font-high-light-normal;
     }
-    .color0FBB5A {
+    .start_font_color {
       color: #0fbb5a;
     }
-    .colorFC9600 {
+    .pause_font_color {
       color: #fc9600;
     }
-    .colorFB3A32 {
-      color: #fb3a32;
+    .timeout_font_color {
+      color: @font-high-light-normal;
     }
     .mt20 {
       margin-top: 20px;
@@ -502,13 +502,13 @@
     .ps {
       position: absolute;
     }
-    .border3 {
+    .block-line {
       border-top: 4px solid #000;
       top: 40px;
       z-index: 999;
       width: 100%;
     }
-    .bg000 {
+    .number_bg {
       background: #000;
       .ft28 {
         font-size: 28px;
@@ -533,7 +533,7 @@
         line-height: 20px;
       }
     }
-    .margin5 {
+    .number_mar {
       box-sizing: border-box;
       margin: 4px 3px;
     }

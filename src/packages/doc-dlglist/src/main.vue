@@ -86,7 +86,7 @@
               <!-- 提示信息 -->
               <el-tooltip placement="right">
                 <div slot="content">
-                  <div class="help-tips">
+                  <div class="doc-help-tips">
                     <p>1.支持的文档格式： doc/docx,xls/xlsx,ppt</p>
                     <p>/pptx,pdf,jpeg/jpg,png,bmp</p>
                     <p>2.单份文档不能超过200页,不超过100M</p>
@@ -259,7 +259,7 @@
           <div class="vmp-doc-lib__ft">
             <div class="vmp-doc-lib__ft-tip">
               当前选中
-              <span style="color: #fc5659">{{ selectDocIdList.length }}</span>
+              <span style="color: #fb3a32">{{ selectDocIdList.length }}</span>
               个文档
             </div>
             <div>
@@ -712,9 +712,6 @@
         width: 120px;
       }
     }
-    .help-tips p {
-      line-height: 20px;
-    }
     .vmp-doc-cur {
       display: flex;
       flex-direction: column;
@@ -845,6 +842,14 @@
     }
     .title-text {
       font-size: 20px;
+    }
+  }
+
+  // el-tooltip组件会挂载到body下
+  .doc-help-tips {
+    p {
+      font-size: 12px;
+      line-height: 18px;
     }
   }
 </style>

@@ -62,6 +62,7 @@
       :show.sync="dialogVisibleInvite"
       :senderId="senderId"
       :inviteName="inviteName"
+      :inviteGroupId="inviteGroupId"
     ></GroupInvitaion>
   </div>
 </template>
@@ -81,7 +82,8 @@
         selectedMenu: '',
         dialogVisibleInvite: false, //邀请演示对话框是否显示
         senderId: '', //邀请人id
-        inviteName: '' //邀请人身份
+        inviteName: '', //邀请人身份
+        inviteGroupId: '' //被邀请时用户所在分组，默认在主直播间，为空
       };
     },
     computed: {
@@ -134,6 +136,10 @@
       // 是否在桌面共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 主持人ID 分组期间使用
+      userinfoId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
       }
     },
     watch: {
@@ -181,7 +187,7 @@
     methods: {
       initEvent() {
         // 开启分组讨论
-        this.groupServer.$on('GROUP_SWITCH_START', () => {
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
           if (this.groupServer.state.groupInitData.isInGroup) {
             if (this.groupServer.state.groupInitData.join_role == 20) {
               // 如果是组长，默认展开菜单,选中文档
@@ -189,7 +195,9 @@
               this.selectedMenu = 'document';
             }
             this.grouAlert(
-              `主持人开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
+              `${
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+              }开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
             );
           }
         });
@@ -200,16 +208,24 @@
           this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
           if (!msg.data.groupToast) {
-            this.grouAlert('主持人结束了分组讨论，您将返回主直播间');
+            this.grouAlert(
+              `${
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+              }结束了分组讨论，您将返回主直播间`
+            );
           }
         });
 
         // 小组解散
-        this.groupServer.$on('GROUP_DISBAND', () => {
+        this.groupServer.$on('GROUP_DISBAND', msg => {
           // 关闭邀请演示对话框
           this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
-          this.grouAlert('主持人解散了分组，您将返回主直播间');
+          this.grouAlert(
+            `${
+              msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+            }解散了分组，您将返回主直播间`
+          );
         });
 
         // 接收设为主讲人消息
@@ -224,7 +240,10 @@
           if (this.isInGroup) {
             const { watchInitData } = useRoomBaseServer().state;
             if (groupJoinChangeInfo && groupJoinChangeInfo.isNeedCare === false) return;
-            const who = msg.sender_id == watchInitData.webinar.userinfo.user_id ? '主持人' : '助理';
+            const who =
+              msg.sender_id == watchInitData.webinar.userinfo.user_id
+                ? this.$getRoleName(1)
+                : this.$getRoleName(3);
             this.grouAlert(`${who}已将您分配至${this.groupServer.state.groupInitData.name}`);
           }
         });
@@ -276,6 +295,8 @@
             this.senderId = msg.sender_id; // 邀请人id
             // 邀请人身份
             this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人';
+            // 被邀请人当时所在小组
+            this.inviteGroupId = this.groupServer.state.groupInitData?.group_id;
             this.dialogVisibleInvite = true;
           }
         });

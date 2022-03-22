@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-live-private-chat-list" :id="id">
     <div v-if="topLoading" class="private-chat__top-loading">加载中...</div>
-    <ul class="private-chat__list-wrap" :id="id" v-if="finishData && chatList.length">
+    <ul class="private-chat__list-wrap" v-if="finishData && chatList.length">
       <li
         class="private-chat__list-item"
         :class="{
@@ -15,14 +15,14 @@
           <template
             v-if="loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId"
           >
-            <template v-if="chat.avatar">
-              <span
-                class="list-item__user-info__avatar"
-                :style="{
-                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-                }"
-              ></span>
-            </template>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
@@ -33,27 +33,16 @@
             <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
             </span>
-
-            <template v-else>
-              <span class="list-item__user-info__avatar">
-                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
-              </span>
-            </template>
           </template>
           <template v-else>
-            <template v-if="chat.avatar">
-              <span
-                class="list-item__user-info__avatar"
-                :style="{
-                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-                }"
-              ></span>
-            </template>
-            <template v-else>
-              <span class="list-item__user-info__avatar">
-                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
-              </span>
-            </template>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ $t('chat.chat_1022') }}
             </span>
@@ -90,16 +79,17 @@
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
-      <dt></dt>
-      <dd>暂时没有聊天哦～</dd>
+      <!--      <dt></dt>-->
+      <!--      <dd>暂时没有聊天哦～</dd>-->
     </dl>
   </div>
 </template>
 
 <script>
-  import { faceArr as emojiFace, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import { faceArr as emojiFace } from '@/packages/chat/src/js/emoji';
   import { uniqueId } from 'lodash';
   import { useChatServer, useMsgServer } from 'middle-domain';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'livePrivateChatList',
     filters: {
@@ -114,6 +104,8 @@
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //是否是webp
         isWebp: window.webp,
         //取一个唯一id
@@ -160,11 +152,11 @@
     watch: {
       selectUserId: {
         handler(newVal, oldVal) {
-          const _this = this;
+          // const _this = this;
           console.log(oldVal);
           if (newVal) {
             this.chatServer.setCurPrivateTarget && this.chatServer.setCurPrivateTarget(newVal);
-            _this.init();
+            // _this.init();
           }
         },
         immediate: true
@@ -175,11 +167,17 @@
       this.msgServer = useMsgServer();
     },
     mounted() {
+      this.listenEvent();
       // this.initEvent();
-      // this.initScroll();
+      this.initScroll();
       // this.listenEvents();
     },
     methods: {
+      listenEvent() {
+        this.chatServer.$on('receivePrivateMsg', () => {
+          this.scrollBottom();
+        });
+      },
       init() {
         this.resetData();
         this.initEvent();
@@ -357,7 +355,7 @@
             line-height: 24px;
             text-align: center;
             border-radius: 50%;
-            background-color: @color-default;
+            //background-color: @color-default;
             vertical-align: middle;
             background-size: cover;
             background-position: center center;
@@ -442,14 +440,16 @@
             font-size: 12px;
           }
           .user-host {
-            background-color: #ffd021;
+            background: rgba(251, 58, 50, 0.2);
+            color: #fb3a32;
           }
           .user-assistant {
-            background-color: #e2e2e2;
+            background: #ade1ff;
+            color: #0a7ff5;
           }
           .user-admin {
-            background-color: @color-role-admin;
-            color: #fff;
+            background: #ade1ff;
+            color: #0a7ff5;
           }
         }
         &.list-item__self-item {

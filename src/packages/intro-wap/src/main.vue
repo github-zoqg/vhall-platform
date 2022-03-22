@@ -240,6 +240,9 @@
         img {
           width: 100%;
         }
+        strong {
+          font-weight: bold;
+        }
       }
 
       &__auth {

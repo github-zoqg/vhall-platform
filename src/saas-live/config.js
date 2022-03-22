@@ -104,7 +104,6 @@ export const serverConfig = {
       'comLivePrivateChat',
       'comMediaSetting',
       'comPcMediaCheck',
-      'comInsertVideoList',
       'liveTimerSet',
       'liveTimer',
       'comQuestionnaire',
@@ -601,6 +600,7 @@ export const serverConfig = {
   },
   comInsertStream: {
     component: 'VmpInsertStream',
+    children: ['comInsertVideoList'],
     emitCloseInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',

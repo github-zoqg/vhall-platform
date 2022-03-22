@@ -25,6 +25,7 @@
       currentTab="qa"
       @showMyQA="showMyQA"
       @sendQa="sendQa"
+      @login="handleLogin"
       key="qa"
       :is-banned="isBanned"
       :is-all-banned="allBanned"
@@ -98,7 +99,11 @@
         });
         //收到问答回复
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          if (msg.sender_id != this.thirdPartyId) {
+          if (
+            msg.sender_id != this.thirdPartyId &&
+            ((msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+              msg.data.answer.is_open != '0')
+          ) {
             this.scrollBottom();
             // this.unReadMessageCount++;
             // this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
@@ -221,7 +226,7 @@
               font-size: 20px;
               &.host {
                 background-color: rgba(252, 86, 89, 0.2);
-                color: #fc5659;
+                color: #fb3a32;
               }
               &.assistant {
                 background-color: rgba(166, 166, 166, 0.2);
@@ -248,7 +253,7 @@
             // text-align: justify;
             word-break: break-word;
             .question-label {
-              color: #fc5659;
+              color: #fb3a32;
               float: left;
             }
             .question-reply {
@@ -298,7 +303,7 @@
         line-height: 42px;
       }
       .only-my {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
   }

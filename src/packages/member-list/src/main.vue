@@ -509,6 +509,11 @@
               break;
           }
         });
+        //监听自定义消息
+        this.msgServer.$onMsg('CUSTOM_MSG', msg => {
+          //人员上下线消息丢失时，会收到这个消息
+          msg.data.type === 'reload_online_user_list' && this.updateOnlineUserList();
+        });
       },
       //初始化房间消息回调监听
       listenRoomMsg() {
@@ -736,8 +741,8 @@
               }
 
               //在主房间，但是是分组内成员上线
-              if(!_this.isInGroup && context?.groupInitData?.isInGroup){
-                  return;
+              if (!_this.isInGroup && context?.groupInitData?.isInGroup) {
+                return;
               }
 
               _this.onlineUsers.push(user);
@@ -983,6 +988,8 @@
             member_info,
             'onlineUsers'
           );
+          //上麦成功，需要更新一下申请上麦的人（因为主持人和助理、组长等都会看到申请列表）
+          _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
           //如果已经没有举手的人，清除一下举手一栏的小红点
           if (!_this.applyUsers.length) {
             _this.raiseHandTip = false;
@@ -1008,9 +1015,15 @@
         //用户拒绝上麦邀请
         function handleUserRejectConnect(msg) {
           // 如果申请人是自己
-          if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
+          if (msg.data.room_join_id == _this.userId) {
             return;
           }
+
+          //发起端需要判断一下是不是非主持人
+          if (_this.isLive && _this.roleName != 1) {
+            return;
+          }
+
           let role = '';
           if (msg.data.room_role == 2) {
             role = _this.$t('chat.chat_1063');
@@ -1202,6 +1215,8 @@
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
           if (isLive && !this.isInGroup) return;
           this.leader_id = msg.data.account_id;
+          //还原一下tab
+          this.tabIndex = 1;
           this.updateOnlineUserList();
         });
 
@@ -2059,12 +2074,12 @@
             color: #fff;
           }
           &.active {
-            background-color: #fc5659;
+            background-color: #fb3a32;
             color: #fff;
             &:hover {
               color: #fff;
 
-              background-color: #fc5659;
+              background-color: #fb3a32;
             }
           }
           &.raise-hand {
@@ -2076,7 +2091,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background-color: #fc5659;
+              background-color: #fb3a32;
               position: absolute;
             }
           }

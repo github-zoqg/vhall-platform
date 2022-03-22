@@ -3,9 +3,9 @@
     class="vmp-insert-stream"
     @mouseenter="wrapHover"
     @mouseleave="wrapLeave"
-    v-show="insertFileStreamVisible"
     ref="insterWarpRef"
     :class="{
+      'vmp-insert-stream__h0': !insertFileStreamVisible,
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
       'vmp-insert-stream__has-stream-list': hasStreamList
@@ -157,6 +157,11 @@
         </div>
       </div>
     </div>
+    <vmp-air-container
+      v-if="childrenCom && childrenCom.length"
+      :oneself="true"
+      :cuid="childrenCom[0]"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
@@ -175,6 +180,7 @@
     name: 'VmpInsertStream',
     data() {
       return {
+        childrenCom: [],
         insertFileStreamVisible: false, // 是否展示插播流组件
         remoteVideoParam: {
           paas_record_id: '',
@@ -282,6 +288,9 @@
       this.insertFileServer = useInsertFileServer();
       this.docServer = useDocServer();
     },
+    created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
+    },
     mounted() {
       this.initEventListener();
     },
@@ -349,7 +358,7 @@
       },
       // 本地插播，video成功创建之后的处理逻辑
       handleLocalInsertVideoCreated(videoElement) {
-        // TODO: 设置插播画面在大窗,文档在小窗
+        // 设置插播画面在大窗,文档在小窗
         this.roomBaseServer.setChangeElement('doc');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -649,8 +658,13 @@
             this.roomBaseServer.setChangeElement('doc');
           } else {
             // 如果是观众
-            // 设置 miniElement 为主屏流
-            this.roomBaseServer.setChangeElement('doc');
+            // 如果文档可见
+            if (this.docServer.state.switchStatus) {
+              // 设置 miniElement 为主屏流
+              this.roomBaseServer.setChangeElement('doc');
+            } else {
+              this.roomBaseServer.setChangeElement('');
+            }
           }
         });
       },
@@ -878,6 +892,9 @@
     width: 100%;
     height: 100%;
     position: relative;
+    &__h0 {
+      height: 0;
+    }
     &__mini {
       width: 309px;
       height: 240px;
@@ -977,7 +994,7 @@
         border-radius: 100%;
         margin-right: 10px;
         &:hover {
-          background: #fc5659;
+          background: #fb3a32;
         }
         &.iconsheweizhujiangren {
           font-size: 14px;
