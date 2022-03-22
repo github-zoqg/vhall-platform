@@ -426,12 +426,6 @@
         const isSpeakOn = this.micServer.getSpeakerStatus();
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
-        console.log(
-          '上麦状态---',
-          isSpeakOn,
-          '设备状态',
-          useMediaCheckServer().state.deviceInfo.device_status
-        );
         if (
           useMediaCheckServer().state.deviceInfo.device_status === 1 &&
           isSpeakOn &&
@@ -439,10 +433,6 @@
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();
-        } else {
-          if (isSpeakOn) {
-            this.speakOff();
-          }
         }
       },
       // 恢复播放
@@ -555,6 +545,10 @@
             return;
           }
           await this.stopPush();
+
+          clearInterval(this._audioLeveInterval);
+          clearInterval(this._netWorkStatusInterval);
+
           if (this.isWatch) {
             this.roomBaseServer.setChangeElement('');
           } else {
@@ -846,6 +840,24 @@
             resolve();
             return;
           }
+
+          // 当前角色为主持人&&设备被禁用
+          if (
+            +this.joinInfo.role_name === 1 &&
+            useMediaCheckServer().state.deviceInfo.device_status === 2
+          ) {
+            clearInterval(this._audioLeveInterval);
+
+            // 主持人不在小组中，停止推流触发 直播结束 生成回放
+            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+            }
+            resolve();
+            return;
+          }
+
           this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
             console.warn('结束推流成功----');
             clearInterval(this._audioLeveInterval);

@@ -714,10 +714,7 @@
           captchaId: that.captchakey,
           element: id,
           mode: 'float',
-          lang:
-            (window.$globalConfig.currentLang == 'zh'
-              ? 'zh-CN'
-              : window.$globalConfig.currentLang) || 'zh-CN',
+          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady(instance) {
             console.log(instance);
           },
