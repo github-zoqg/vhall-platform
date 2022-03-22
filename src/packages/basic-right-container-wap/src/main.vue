@@ -45,6 +45,15 @@
         return this.$domainStore.state.groupServer.groupInitData;
       }
     },
+    watch: {
+      'groupInitData.isInGroup': {
+        handler: function (val) {
+          if (val) {
+            this.roomBaseServer.state.timerInfo = {};
+          }
+        }
+      }
+    },
     methods: {
       changeStatus(data, status) {
         // console.log(data, status, 'data, status');
