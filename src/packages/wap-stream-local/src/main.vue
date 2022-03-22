@@ -491,7 +491,7 @@
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.localSpeaker.streamId,
-            vNode: `vmp-stream-local__${this.stream.streamId}`
+            vNode: `vmp-stream-local__${this.localSpeaker.accountId}`
           })
           .then(res => {
             console.warn('res----', res);
