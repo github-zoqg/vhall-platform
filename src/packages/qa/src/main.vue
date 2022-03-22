@@ -194,10 +194,10 @@
       initLoginStatus() {
         const { configList = {} } = useRoomBaseServer().state;
         if (
-          ![1, '1'].includes(this.roleName) &&
-          ['', null, 0].includes(
-            this.userId || this.Embed || configList['ui.show_chat_without_login'] == 1
-          )
+          [2, '2'].includes(this.roleName) &&
+          ['', null, 0].includes(this.userId) &&
+          !this.Embed &&
+          configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
@@ -312,14 +312,14 @@
       display: block;
       margin: 0 auto;
       border-radius: 5px;
-      background: #fc5659;
+      background: #fb3a32;
       line-height: 35px;
       font-size: 12px;
       text-align: center;
       margin: 10px;
       &:hover,
       &:active {
-        background: #fc5659;
+        background: #fb3a32;
       }
     }
   }

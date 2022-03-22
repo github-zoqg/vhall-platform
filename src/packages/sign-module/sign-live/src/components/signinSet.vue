@@ -216,7 +216,7 @@
       &-btn {
         text-align: center;
         width: 120px;
-        background: #fc5659;
+        background: #fb3a32;
         color: #fff;
         line-height: 20px;
       }

@@ -170,7 +170,7 @@
         if (this.isOpenSplitScreen) {
           this.splitScreenServer.closeSplit();
         } else {
-          // quertString
+          // queryString
           const search = location.search
             ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
             : `?s=1&layout=${sessionStorage.getItem('layout')}`;

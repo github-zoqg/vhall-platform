@@ -3,7 +3,8 @@
     class="vmp-insert-stream"
     @mouseenter="wrapHover"
     @mouseleave="wrapLeave"
-    ref="insterWarpRef"
+    v-show="insertFileStreamVisible || !isWatch"
+    ref="insertWrapRef"
     :class="{
       'vmp-insert-stream__h0': !insertFileStreamVisible,
       'vmp-insert-stream__mini': miniElement == 'insert-video',
@@ -75,7 +76,7 @@
         :videoParam="remoteVideoParam"
         :isInsertVideoPreview="true"
         :isShowController="miniElement != 'insert-video'"
-        @remoteInsterSucces="remoteInsterSucces"
+        @remoteInsertSuccess="remoteInsertSuccess"
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
         @handleRemoteInsertVideoPause="handleRemoteInsertVideoPause"
@@ -157,7 +158,11 @@
         </div>
       </div>
     </div>
-    <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+    <vmp-air-container
+      v-if="childrenCom && childrenCom.length"
+      :oneself="true"
+      :cuid="childrenCom[0]"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
@@ -372,7 +377,7 @@
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
-      creatLoaclStream() {
+      createLocalStream() {
         return new Promise((resolve, reject) => {
           this.insertFileServer
             .createLocalInsertStream({
@@ -400,7 +405,7 @@
         // 如果未开播，不推流
         if (watchInitData.webinar.type != 1) return;
 
-        this.creatLoaclStream()
+        this.createLocalStream()
           .then(res => {
             this.insertFileServer
               .publishInsertStream({ streamId: res.streamId })
@@ -574,7 +579,7 @@
           boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
         );
       },
-      remoteInsterSucces(videEl) {
+      remoteInsertSuccess(videEl) {
         console.log(videEl, '点播初始化成功');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -697,7 +702,7 @@
           this.reSetBroadcast();
         });
 
-        // 流加入
+        // 订阅失败
         this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
           this.reSetBroadcast();
           this.subscribeInsert();
@@ -855,7 +860,7 @@
       // 全屏
       enterFullScreen() {
         this.isFullScreen = true;
-        const fullarea = this.$refs.insterWarpRef;
+        const fullarea = this.$refs.insertWrapRef;
         if (fullarea.requestFullscreen) {
           fullarea.requestFullscreen();
         } else if (fullarea.webkitRequestFullScreen) {
@@ -890,6 +895,7 @@
     position: relative;
     &__h0 {
       height: 0;
+      overflow: hidden;
     }
     &__mini {
       width: 309px;
@@ -990,7 +996,7 @@
         border-radius: 100%;
         margin-right: 10px;
         &:hover {
-          background: #fc5659;
+          background: #fb3a32;
         }
         &.iconsheweizhujiangren {
           font-size: 14px;

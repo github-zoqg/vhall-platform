@@ -226,7 +226,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
           if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
             return;
           }
@@ -461,8 +460,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }

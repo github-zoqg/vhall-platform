@@ -207,8 +207,11 @@
       },
 
       // 流列表宽度超过 streamWrapper 时显示 翻页按钮
-      'remoteSpeakers.length'(newval) {
-        this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
+      'remoteSpeakers.length': {
+        handler() {
+          this.handleControlArrowShow();
+        },
+        immediate: true
       },
       // 监听是否有桌面共享，更改页面布局
       isShareScreen: {
@@ -245,12 +248,16 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
       // 监听自动上麦的异常code
-      useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        if (+this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2) {
+      /**
+       * useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        if (
+          +e.code === 513025 ||
+          +this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2
+        ) {
           return;
         }
         e.msg && this.$message.warning(e.msg);
-      });
+      });*/
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
         let videos = document.querySelectorAll('video');
@@ -262,7 +269,9 @@
       });
     },
 
-    mounted() {},
+    mounted() {
+      this.computTop();
+    },
 
     methods: {
       exchange(compName) {
@@ -287,20 +296,32 @@
         }
       },
       /**
-       * 监听无延迟未上麦时，观众采用类似旁路布局的容器高度变化
+       * 计算streamList变动
        */
-      computeTop() {
+      computTop() {
         const MutationObserver =
           window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 
         const _this = this;
         const observer = new MutationObserver(function () {
-          console.log(
-            '监听到noDelayStreamContainer变动了',
-            _this.$refs.noDelayStreamContainer.clientHeight
-          );
+          console.log('监听到streamWrapper变动了', _this.$refs.streamWrapper.offsetWidth);
+
+          _this.handleControlArrowShow();
         });
-        observer.observe(this.$refs.noDelayStreamContainer, { childList: true, subtree: true });
+        observer.observe(this.$refs.streamWrapper, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+      },
+      /**
+       * 计算是否显示箭头
+       */
+      handleControlArrowShow() {
+        if (this.$refs.streamWrapper) {
+          this.isShowControlArrow =
+            this.remoteSpeakers.length * 142 > this.$refs.streamWrapper.clientWidth;
+        }
       }
     }
   };

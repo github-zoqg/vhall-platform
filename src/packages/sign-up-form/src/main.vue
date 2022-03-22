@@ -1460,10 +1460,7 @@
         initNECaptcha({
           captchaId: that.captchakey,
           element: id,
-          lang:
-            (window.$globalConfig.currentLang == 'zh'
-              ? 'zh-CN'
-              : window.$globalConfig.currentLang) || 'zh-CN',
+          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           mode: 'float',
           onReady(instance) {
             console.log('instance', instance);
