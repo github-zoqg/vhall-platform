@@ -202,14 +202,16 @@
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
             if (webinar.verify == 3) {
-              this.subscribeText = this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
+              this.subscribeText = this.$t('webinar.webinar_1040', {
+                n: `￥${this.subOption.fee}`
+              });
             } else {
               this.subscribeText = this.$t('appointment.appointment_1017');
             }
           }
         } else {
           if (webinar.verify == 3) {
-            this.subscribeText = this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
+            this.subscribeText = this.$t('webinar.webinar_1041', { n: `￥${this.subOption.fee}` });
           } else {
             this.subscribeText = this.$t('player.player_1013');
           }
@@ -407,7 +409,21 @@
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       filterText(verify, status) {
         switch (verify) {
@@ -597,7 +613,7 @@
       font-weight: 500;
       color: #fff;
       line-height: 1.333333rem;
-      background: #fc5659;
+      background: #fb3a32;
       text-align: center;
       margin-bottom: env(safe-area-inset-bottom);
       div {
@@ -635,7 +651,7 @@
       }
       .van-dialog__confirm {
         font-size: 36px;
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
     &-popup {

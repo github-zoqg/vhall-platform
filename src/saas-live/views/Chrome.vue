@@ -51,7 +51,7 @@
           width: 120px;
           height: 40px;
           display: block;
-          background-color: #fc5659;
+          background-color: #fb3a32;
           border-radius: 4px;
           text-decoration: none;
           color: #ffffff;

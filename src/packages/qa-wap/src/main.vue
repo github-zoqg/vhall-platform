@@ -226,7 +226,7 @@
               font-size: 20px;
               &.host {
                 background-color: rgba(252, 86, 89, 0.2);
-                color: #fc5659;
+                color: #fb3a32;
               }
               &.assistant {
                 background-color: rgba(166, 166, 166, 0.2);
@@ -253,7 +253,7 @@
             // text-align: justify;
             word-break: break-word;
             .question-label {
-              color: #fc5659;
+              color: #fb3a32;
               float: left;
             }
             .question-reply {
@@ -303,7 +303,7 @@
         line-height: 42px;
       }
       .only-my {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
   }

@@ -215,10 +215,6 @@
           ) {
             await this.userSpeakOn();
           }
-        } else {
-          if (this.micServer.getSpeakerStatus()) {
-            this.speakOff();
-          }
         }
       },
       async listenEvents() {
@@ -240,7 +236,7 @@
         });
 
         // 上麦成功
-        this.micServer.$on('vrtc_connect_success', async msg => {
+        this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
           if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
@@ -271,8 +267,12 @@
 
           await this.interactiveServer.destroy();
 
-          if (this.isNoDelay === 1 || this.mode === 6) {
+          if (this.isNoDelay === 1) {
             //  初始化互动实例
+
+            if (this.mode === 6) {
+              await this.groupServer.updateGroupInitData();
+            }
             await this.interactiveServer.init();
           }
         });
@@ -308,7 +308,6 @@
         } else if (res.code == 513025) {
           // 麦位已满，上麦失败
           this.$message.error(`上麦席位已满员，您的账号支持${res.data.replace_data}人上麦`);
-          // TODO: 麦位已满的处理
         } else {
           console.error('上麦接口失败----', res);
         }

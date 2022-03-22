@@ -80,7 +80,8 @@
               market_tools_status: 1 // 购买
             });
           }
-          window.location.href = this.info.goods_url;
+          window.open(this.info.goods_url);
+          // window.location.href = this.info.goods_url;
         }
       },
       goBack() {

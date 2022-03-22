@@ -106,7 +106,7 @@
         this.state = 1;
         this.addEventListener();
       } catch (err) {
-        console.error('---初始化直播房间出现异常--');
+        console.error('---初始化直播房间出现异常--', err);
         console.error(err);
         this.state = 2;
         this.handleErrorCode(err);

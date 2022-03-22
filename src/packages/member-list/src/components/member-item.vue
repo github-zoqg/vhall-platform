@@ -70,7 +70,7 @@
         >
           <i
             class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
-            style="color: #fc5659; font-size: 15px"
+            style="color: #fb3a32; font-size: 15px"
           ></i>
         </template>
         <!--同意上麦-->
@@ -91,7 +91,7 @@
           "
         >
           <i
-            style="color: #fc5659; font-size: 15px; vertical-align: middle"
+            style="color: #fb3a32; font-size: 15px; vertical-align: middle"
             class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"
           ></i>
         </template>
@@ -972,7 +972,7 @@
       padding: 0;
       margin: 3px 0;
       &:hover {
-        background-color: #fc5659;
+        background-color: #fb3a32;
         color: #fff;
       }
     }

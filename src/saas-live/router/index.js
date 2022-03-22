@@ -81,8 +81,8 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   const res = await grayInit(to);
+  console.log('---grayInit---', res);
   if (res) {
-    console.log('---grayInit---', res);
     //处理限流逻辑
     if (res.code == 200) {
       //处理灰度

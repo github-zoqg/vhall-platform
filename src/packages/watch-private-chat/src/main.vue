@@ -98,7 +98,9 @@
         //观看端初始化的信息
         watchInitData: null,
         //房间号
-        roomId: ''
+        roomId: '',
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁
       };
     },
     watch: {
@@ -124,16 +126,7 @@
       this.chatServer = useChatServer();
       this.msgServer = useMsgServer();
     },
-    computed: {
-      //是否被禁言
-      isBanned() {
-        return this.chatServer.state.banned;
-      },
-      //是否是全体禁言
-      allBanned() {
-        return this.chatServer.state.allBanned;
-      }
-    },
+    computed: {},
     mounted() {
       this.initViewData();
       this.listenEvents();
@@ -197,6 +190,16 @@
         this.chatServer.$on('receivePrivateMsg', () => {
           this.unReadMessageCount++;
           this.dispatch('VmpTabContainer', 'noticeHint', 'private');
+        });
+        //监听禁言通知
+        this.chatServer.$on('banned', res => {
+          this.isBanned = res;
+          this.initInputStatus();
+        });
+        //监听全体禁言通知
+        this.chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+          this.initInputStatus();
         });
       },
       //获取历史的私聊消息

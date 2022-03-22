@@ -714,10 +714,7 @@
           captchaId: that.captchakey,
           element: id,
           mode: 'float',
-          lang:
-            (window.$globalConfig.currentLang == 'zh'
-              ? 'zh-CN'
-              : window.$globalConfig.currentLang) || 'zh-CN',
+          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady(instance) {
             console.log(instance);
           },
@@ -1732,8 +1729,8 @@
       }
     }
     .submit-btn {
-      border: 0.024rem solid #fc5659;
-      background-color: #fc5659;
+      border: 0.024rem solid #fb3a32;
+      background-color: #fb3a32;
       font-size: 0.37rem;
       color: #fff;
       outline: none;

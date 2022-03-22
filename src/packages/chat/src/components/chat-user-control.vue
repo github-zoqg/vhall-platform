@@ -260,7 +260,7 @@
         }
         &:hover {
           color: #ffffff;
-          background-color: #fc5659;
+          background-color: #fb3a32;
         }
       }
     }
