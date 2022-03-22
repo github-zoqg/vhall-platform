@@ -203,7 +203,11 @@
          *     2、默认不在麦上 ----->
          *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
          */
-        if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
+        console.warn(
+          '[platform] 查看设备状态',
+          useMediaCheckServer().state.deviceInfo.device_status
+        );
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           // 检测设备状态
           const isSpeakOn = this.micServer.getSpeakerStatus();
           if (isSpeakOn) {
@@ -214,10 +218,6 @@
             !this.chatServer.state.allBanned
           ) {
             await this.userSpeakOn();
-          }
-        } else {
-          if (this.micServer.getSpeakerStatus()) {
-            this.speakOff();
           }
         }
       },
@@ -240,7 +240,7 @@
         });
 
         // 上麦成功
-        this.micServer.$on('vrtc_connect_success', async msg => {
+        this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
           if (useMediaCheckServer().state.deviceInfo.device_status == 2) {

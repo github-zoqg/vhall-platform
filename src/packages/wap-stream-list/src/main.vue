@@ -380,14 +380,6 @@
         }
       },
 
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
-      },
-
       videoShowIcon() {
         this.iconShow = true;
         this.fiveDown();
