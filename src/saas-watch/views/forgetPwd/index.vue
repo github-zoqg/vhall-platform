@@ -318,7 +318,18 @@
       this.useUserServer = useUserServer();
       this.logo_jump_url = window.location.protocol + '//www.vhall.com';
     },
+    mounted() {
+      this.$i18n.locale = 'zh';
+    },
     methods: {
+      // filterLang() {
+      //   let langType = localStorage.getItem('lang');
+      //   if (langType) {
+      //     return langType == 1 ? 'zh' : 'en';
+      //   } else {
+      //     return 'zh';
+      //   }
+      // },
       findPassword(type, index) {
         this.isType = type;
         this.findStep = 2;
