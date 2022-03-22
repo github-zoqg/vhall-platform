@@ -22,7 +22,8 @@
     Domain,
     useRoomBaseServer,
     useSplitScreenServer,
-    useInteractiveServer
+    useInteractiveServer,
+    useMicServer
   } from 'middle-domain';
   export default {
     name: 'Home',
@@ -126,13 +127,15 @@
             webinar_id: id, //活动id
             clientType: 'send', //客户端类型
             nickname,
-            email
+            email,
+            check_online: 0 // 不检查主持人是否在房间
           }
         });
       },
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
         const splitScreenServer = useSplitScreenServer();
+        const micServer = useMicServer();
         const interactiveServer = useInteractiveServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
@@ -144,13 +147,10 @@
         // 关闭分屏模式
         splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
           // 还原流信息
-          interactiveServer.state.localStream = {
-            streamId: null, // 本地流id
-            videoMuted: false,
-            audioMuted: false,
-            attributes: {}
-          };
-          interactiveServer.state.remoteStreams = [];
+          micServer.state.speakerList = micServer.state.speakerList.map(element => ({
+            ...element,
+            streamId: ''
+          }));
           await interactiveServer.init();
           window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
         });

@@ -518,40 +518,6 @@
       initEvents() {
         if (this.isWatch) {
           // 观看端事件
-          // 回放文档加载事件
-          this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-            console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
-            // 获取回放文档容器数据
-            const data = this.docServer.getVodAllCids();
-            this.docServer.state.containerList = data.map(item => {
-              return {
-                cid: item.cid
-              };
-            });
-            // 等dom渲染完成
-            await this.$nextTick();
-
-            // 回放只在观看端可用
-            const { width, height } = this.getDocViewRect();
-            if (!width || !height) {
-              console.error(
-                `[doc] cuepoint_load_complate 获取容器宽高异常width=${width},height=${height}`
-              );
-              return;
-            }
-            for (const item of data) {
-              // 循环初始化容器
-              this.docServer.initContainer({
-                cid: item.cid,
-                width,
-                height,
-                fileType: item.type.toLowerCase()
-              });
-            }
-            // 加载回放数据
-            this.docServer.loadVodIframe();
-          });
-
           // 点播或回放播放器播放完成
           usePlayerServer().$on(VhallPlayer.ENDED, () => {
             console.log('[doc] VhallPlayer.ENDED');
@@ -627,9 +593,6 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
-
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       },
 
       listenKeydown(e) {
@@ -960,13 +923,6 @@
           this.addNewFile({ fileType, docId, cid });
         }
       },
-      // 文档是否可见状态变化事件
-      dispatchDocSwitchChange: async function (val) {
-        console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        // if (val && this.show && this.docLoadComplete) {
-        //   this.recoverLastDocs();
-        // }
-      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
@@ -997,7 +953,6 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
-      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
@@ -1061,7 +1016,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: @bg-black;
+        background: #2d2d2d;
         flex-direction: column;
         i {
           font-size: 137px;

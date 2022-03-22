@@ -203,7 +203,11 @@
          *     2、默认不在麦上 ----->
          *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
          */
-        if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
+        console.warn(
+          '[platform] 查看设备状态',
+          useMediaCheckServer().state.deviceInfo.device_status
+        );
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           // 检测设备状态
           const isSpeakOn = this.micServer.getSpeakerStatus();
           if (isSpeakOn) {
@@ -487,7 +491,7 @@
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.localSpeaker.streamId,
-            vNode: `vmp-stream-local__${this.stream.streamId}`
+            vNode: `vmp-stream-local__${this.localSpeaker.accountId}`
           })
           .then(res => {
             console.warn('res----', res);

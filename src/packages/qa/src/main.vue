@@ -69,6 +69,7 @@
           disable: false,
           placeholder: this.$t('chat.chat_1003')
         },
+        //是否需要登录
         chatLoginStatus: false,
 
         operatorHeight: 91,
