@@ -555,6 +555,10 @@
             return;
           }
           await this.stopPush();
+
+          clearInterval(this._audioLeveInterval);
+          clearInterval(this._netWorkStatusInterval);
+
           if (this.isWatch) {
             this.roomBaseServer.setChangeElement('');
           } else {

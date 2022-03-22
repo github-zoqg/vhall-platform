@@ -271,8 +271,12 @@
 
           await this.interactiveServer.destroy();
 
-          if (this.isNoDelay === 1 || this.mode === 6) {
+          if (this.isNoDelay === 1) {
             //  初始化互动实例
+
+            if (this.mode === 6) {
+              await this.groupServer.updateGroupInitData();
+            }
             await this.interactiveServer.init();
           }
         });
