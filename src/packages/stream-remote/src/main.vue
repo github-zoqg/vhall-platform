@@ -435,7 +435,8 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.stream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.stream.streamId || !this.$domainStore.state.interactiveServer.isInstanceInit)
+            return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.stream.streamId })
@@ -450,7 +451,8 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.stream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.stream.streamId || !this.$domainStore.state.interactiveServer.isInstanceInit)
+            return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.stream.streamId })

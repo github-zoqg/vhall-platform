@@ -272,7 +272,10 @@
           this.allBanned = res;
         });
         //监听分组房间变更通知
-        chatServer.$on('changeChannel', () => {
+        // chatServer.$on('changeChannel', () => {
+        //   this.handleChannelChange();
+        // });
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
         //监听被提出房间消息
