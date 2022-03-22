@@ -31,6 +31,7 @@ export default async function () {
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
+    console.log('&c--------------浏览器支持情况', 'color:blue', checkSystemResult);
     return 'isBrowserNotSupport';
   }
 
