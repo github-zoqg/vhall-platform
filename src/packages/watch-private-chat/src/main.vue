@@ -150,17 +150,17 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        if (this.configList['ui.show_chat_without_login'] == '0') {
-          if (this.joinInfo || this.isEmbed) {
-            // 嵌入或者未登录并且需要登录
-            this.chatLoginStatus = false;
-          } else {
-            // 非嵌入并或者是没有登录
-            this.chatLoginStatus = true;
-            this.inputStatus.placeholder = '';
-          }
+        const { configList = {} } = useRoomBaseServer().state;
+        if (
+          [2, '2'].includes(this.roleName) &&
+          ['', null, 0].includes(this.userId) &&
+          !this.Embed &&
+          configList['ui.show_chat_without_login'] != 1
+        ) {
+          this.chatLoginStatus = true;
+          this.inputStatus.placeholder = '';
         } else {
-          // 不需要登录
+          // 非嵌入并或者是没有登录
           this.chatLoginStatus = false;
         }
       },

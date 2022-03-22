@@ -1,3 +1,4 @@
+import moment from 'moment';
 const handleTime = date => {
   if (!date) {
     return '';
@@ -77,12 +78,12 @@ Date.prototype.format = function (fmt) {
 const handleChatShowTime = (preMsgTime, curMsgTime) => {
   // 如果是第一条消息,显示 showTime
   if (!preMsgTime) {
-    return new Date(curMsgTime).format('hh:mm');
+    return moment(curMsgTime).format('HH:mm');
   }
   // 如果是同一天的同一小时发的消息, showTime 为空串
   if (preMsgTime.slice(0, 13) === curMsgTime.slice(0, 13)) {
     return '';
   }
-  return new Date(curMsgTime).format('hh:mm');
+  return moment(curMsgTime).format('HH:mm');
 };
 export { handleTime, formatTime, handleChatShowTime };
