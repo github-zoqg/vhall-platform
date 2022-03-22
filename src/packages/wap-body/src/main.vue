@@ -96,7 +96,8 @@
     },
     async created() {
       // 监听自动上麦的异常code
-      useInteractiveServer().$on('SPEAKON_FAILED', e => {
+      /**
+       * useInteractiveServer().$on('SPEAKON_FAILED', e => {
         if (
           +e.code === 513025 ||
           +this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2
@@ -104,7 +105,7 @@
           return;
         }
         e.msg && this.$toast(e.msg);
-      });
+      });*/
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
