@@ -16,6 +16,9 @@
             :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
+            <span class="wrap__left-item__group-avatar_img">
+              <img :src="group.avatar || defaultAvatar" alt="" />
+            </span>
             <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
             <i
               class="el-icon-circle-close wrap__left-item__close-icon"
@@ -142,6 +145,7 @@
   import chatList from './components/chat-list';
   import comUpload from '@/packages/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpLivePrivateChat',
     components: {
@@ -152,6 +156,8 @@
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //模态窗是否可见
         visible: false,
         //模态窗标题
@@ -438,17 +444,18 @@
       overflow: hidden;
       .wrap__left {
         height: 100%;
-        width: 180px;
+        width: 200px;
         border-right: solid 1px @color-bd;
         overflow: auto;
         user-select: none;
       }
       .wrap__left-item {
         position: relative;
-        display: block;
+        display: flex;
+        align-items: center;
         height: 44px;
         line-height: 44px;
-        padding: 0 10px 0 20px;
+        padding-left: 10px;
         border-bottom: solid 1px @color-bd;
         transition: all 0.2s;
         .vh-iconfont {
@@ -459,20 +466,30 @@
             color: @color-red;
           }
         }
+        &__group-avatar_img {
+          // display: inline-block;
+          width: 30px;
+          height: 30px;
+          margin-right: 8px;
+          img {
+            display: block;
+            width: 100%;
+          }
+        }
         &__close-icon {
           display: none;
           font-size: 18px;
         }
         &:hover {
           cursor: pointer;
-          background-color: #f5f5f5;
+          background-color: #f7f7f7;
           .wrap__left-item__close-icon {
             display: inline-block;
           }
         }
         &.active {
           cursor: pointer;
-          background-color: @color-bd;
+          background-color: #f7f7f7;
         }
       }
 
@@ -488,8 +505,7 @@
         background-color: @color-red;
       }
       .wrap__left-item__group-name {
-        display: inline-block;
-        width: calc(100% - 24px);
+        width: 130px;
         vertical-align: middle;
         overflow: hidden;
         text-overflow: ellipsis;

@@ -54,6 +54,9 @@
             </span>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
           </template>
+          <span class="list-item__chat-time">
+            {{ chat.sendTime | chatTime }}
+          </span>
         </div>
         <div
           class="list-item__chat-txt"
@@ -73,9 +76,6 @@
             @click="showImgBrowser(imgIdx, chat.content.img_list)"
           ></div>
         </div>
-        <span class="list-item__chat-time">
-          {{ chat.sendTime | chatTime }}
-        </span>
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
@@ -421,8 +421,8 @@
           }
         }
         .list-item__chat-time {
-          display: block;
-          margin-left: 30px;
+          float: right;
+          margin-right: 30px;
           color: #aaa;
           font-size: 12px;
         }

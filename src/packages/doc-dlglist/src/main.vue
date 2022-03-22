@@ -137,13 +137,13 @@
                         :class="scope.row.ext | fileIconCss(false)"
                         :style="scope.row.ext | fileIconCss(true)"
                       ></span>
-                      {{ scope.row.file_name }}
+                      <span class="file-name__text">{{ scope.row.file_name }}</span>
                     </p>
                   </template>
                 </el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
                 <el-table-column prop="page" label="页码"></el-table-column>
-                <el-table-column prop="uploadPropress" label="进度">
+                <el-table-column prop="uploadPropress" label="进度" width="100">
                   <template slot-scope="scope">
                     <DocProgressStatus
                       :docExt="scope.row.ext"
@@ -465,7 +465,8 @@
           await this.$confirm('删除后将会影响文档演示和观看，确定删除？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
-            type: 'warning'
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
           });
           const result = await this.docServer.delDocList({
             tag: 1,
@@ -781,27 +782,6 @@
       }
     }
 
-    .doc-dlg-sharetip {
-      width: 400px;
-      height: 200px;
-      box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
-      border-radius: 4px;
-      background-color: #fff;
-      position: relative;
-      margin-top: -10%;
-
-      .el-checkbox {
-        font-weight: 400 !important;
-      }
-      .el-checkbox__input.is-checked + .el-checkbox__label {
-        color: #606266 !important;
-      }
-
-      .dialog-footer {
-        text-align: right;
-        margin-top: 20px;
-      }
-    }
     .el-table .cell .file-name {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -809,7 +789,11 @@
 
       .doc-icon {
         font-size: 20px;
+        vertical-align: middle;
         margin-right: 10px;
+      }
+      &__text {
+        vertical-align: middle;
       }
     }
     .el-table th > .cell {
@@ -850,6 +834,30 @@
     p {
       font-size: 12px;
       line-height: 18px;
+    }
+  }
+
+  // 内嵌对话框，挂载到body下
+  .doc-dlg-sharetip {
+    width: 400px;
+    height: 200px;
+    box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+    margin-top: -10%;
+
+    .el-checkbox {
+      font-weight: 400 !important;
+    }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #606266 !important;
+    }
+
+    .dialog-footer {
+      text-align: right;
+      margin-top: 20px;
+      padding-left: 130px;
     }
   }
 </style>
