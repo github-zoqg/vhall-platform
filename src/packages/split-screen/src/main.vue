@@ -89,6 +89,7 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
+      // TODO: 限定特定的组件的全屏更改
       screenfull.on('change', () => {
         this.isFullscreen = screenfull.isFullscreen;
       });

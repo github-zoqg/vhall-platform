@@ -125,6 +125,24 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 有剩余红包提示 -->
+    <el-dialog :visible.sync="residualDialogVisible" width="400px" title="提示">
+      <div class="had-envelope-wrap">
+        <p>
+          当前红包还未被领完，未被领取的金额则会在直播结束后自动进入您的账户，
+          <a href="/v3/finance/income" target="_blank" class="finance-link">
+            可在财务中心-账号收益-红包收益中提现
+          </a>
+        </p>
+        <p class="btnsbox">
+          <el-button @click="openSendForm" type="primary" round>继续发红包</el-button>
+          <el-button @click="residualDialogVisible = false" type="primary-white" round>
+            等等再发
+          </el-button>
+        </p>
+      </div>
+      <!-- </div> -->
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -139,6 +157,7 @@
         redPacketServerState,
         sendDialogVisible: false, // 发送红包的dialog界面
         qrCodeDialogVisible: false, // 微信支付和成功的弹窗
+        residualDialogVisible: false, // 有剩余红包的提示
         paySuccess: false,
         paying: false,
         wechatPayImg: '',
@@ -172,7 +191,25 @@
       });
     },
     methods: {
-      open() {
+      async open() {
+        const failure = res => {
+          console.error(res);
+          this.openSendForm();
+        };
+        const res = await this.redPacketServer.getLatestRedpacketUsage();
+        if (res.code !== 200) return failure(res);
+        const data = res.data;
+        if (parseInt(data.get_user_count) < parseInt(res.data.number) && data.status == 1) {
+          this.residualDialogVisible = true;
+          this.sendDialogVisible = false;
+          this.qrCodeDialogVisible = false;
+        } else {
+          this.openSendForm();
+        }
+      },
+      // 打开发起红包界面
+      openSendForm() {
+        this.residualDialogVisible = false;
         this.sendDialogVisible = true;
         this.qrCodeDialogVisible = false;
         this.restForm();
@@ -657,6 +694,57 @@
             width: 160px;
           }
         }
+      }
+    }
+  }
+  .had-envelope-wrap {
+    .title {
+      background: #fff;
+      // height: 56px;
+      line-height: 56px;
+      color: #1a1a1a;
+      // border-bottom: 1px solid #dfdfdf;
+      text-align: center;
+      font-weight: 500;
+      font-size: 20px;
+      padding: 5px 32px;
+      position: relative;
+      span {
+        cursor: pointer;
+        position: absolute;
+        width: 24px;
+        height: 18px;
+        right: 24px;
+        top: 5px;
+      }
+    }
+    .finance-link {
+      color: #3562fa;
+      margin: 0 3px;
+      &:visited {
+        color: #3562fa;
+      }
+    }
+    .btnsbox {
+      padding: 24px 0;
+      text-align: right;
+      .btn-light-red {
+        background: #f34b46;
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        &:hover {
+          background: #c51f1d;
+          color: #fff;
+        }
+      }
+      .btn-cancel {
+        background-color: #eee;
+        height: 38px;
+        line-height: 38px;
+        border: 1px solid #e1e1e1;
+        width: 138px;
+        margin-left: 5px;
       }
     }
   }
