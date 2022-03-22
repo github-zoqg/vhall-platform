@@ -21,7 +21,10 @@ export default function grayInit(options) {
           resolve(res);
         })
         .catch(res => {
-          resolve(res);
+          console.log('webinarInitBefore------->', res.response);
+          resolve({
+            code: res.response.status
+          });
         });
     } else if (options.meta.grayType == 'subject') {
       roomSubjectApi.subject
@@ -37,7 +40,10 @@ export default function grayInit(options) {
           resolve(res);
         })
         .catch(res => {
-          resolve(res);
+          console.log('subjectInitBefore------->', res.response);
+          resolve({
+            code: res.response.status
+          });
         });
     } else if (options.meta.grayType == 'user') {
       if (options.params.id) {
