@@ -168,6 +168,13 @@
         return value + unit;
       }
     },
+    watch: {
+      isInGroup(val) {
+        if (val) {
+          this.roomBaseServer.state.timerInfo = {};
+        }
+      }
+    },
     computed: {
       // 是否已上麦
       isSpeakOn() {
