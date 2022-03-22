@@ -7,16 +7,19 @@
     </div>
     <!--成员区域-->
     <div class="vmp-member-list__container">
-      <scroll class="vmp-member-list__container__scroll" ref="scroll" @pullingUp="loadMore">
+      <scroll
+        class="vmp-member-list__container__scroll"
+        :class="{ 'show-empty-img': isShowEmptyImg }"
+        ref="scroll"
+        @pullingUp="loadMore"
+      >
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div
-              v-if="searchEmpty"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwusousuo"></span>
+            <div v-if="searchEmpty" class="empty-container">
+              <span class="empty-img">
+                <img src="./images/search@2x.png" alt="" />
+              </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
             <template v-else style="overflow: auto">
@@ -48,12 +51,10 @@
         <!--举手的成员-->
         <template v-if="tabIndex === 2">
           <div class="member-list__apply-tab">
-            <div
-              v-if="!applyUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwujushou"></span>
+            <div v-if="!applyUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/noTop@2x.png" alt="" />
+              </span>
               <p>暂无人举手</p>
             </div>
             <template v-else>
@@ -85,12 +86,10 @@
         <!--受限制的成员-->
         <template v-if="tabIndex === 3">
           <div class="member-list__limit-tab">
-            <div
-              v-if="!limitedUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwuchengyuan"></span>
+            <div v-if="!limitedUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/no@2x.png" alt="" />
+              </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
             <template v-else>
@@ -327,6 +326,14 @@
       }
     },
     computed: {
+      //是否显示搜索结果图片
+      isShowEmptyImg() {
+        return [
+          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 2 && !this.applyUsers.length,
+          this.tabIndex === 3 && !this.limitedUsers.length
+        ].some(item => !!item);
+      },
       //是否显示底部区域
       isShowBottom() {
         let show = true;
@@ -1149,6 +1156,12 @@
         bottom: 0;
         //overflow: hidden;
       }
+      .show-empty-img {
+        .test_01 {
+          display: flex;
+          flex: 1;
+        }
+      }
       .empty-container {
         width: 100%;
         height: 100%;
@@ -1157,12 +1170,25 @@
         flex-direction: column;
         align-items: center;
         span {
-          font-size: 80px;
-          color: #7e7e7e;
+          display: inline-block;
+          //margin-top: 20%;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
         }
         p {
           margin-top: 10px;
           color: #999999;
+        }
+        .empty-img {
+          width: 120px;
+          height: 120px;
+        }
+        .empty-img-top {
+          width: 180px;
+          height: 100px;
         }
       }
       .member-list__all-tab {
