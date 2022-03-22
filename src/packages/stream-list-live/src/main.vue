@@ -242,7 +242,7 @@
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
           // 订阅流播放失败    监听到播放失败, 然后展示按钮
-          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
             let videos = document.querySelectorAll('video');
             videos.length > 0 &&
               videos.forEach(video => {

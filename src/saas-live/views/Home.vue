@@ -127,7 +127,8 @@
             webinar_id: id, //活动id
             clientType: 'send', //客户端类型
             nickname,
-            email
+            email,
+            check_online: 0 // 不检查主持人是否在房间
           }
         });
       },

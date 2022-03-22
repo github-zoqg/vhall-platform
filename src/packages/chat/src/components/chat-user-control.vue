@@ -20,11 +20,11 @@
         <i></i>
         <span>删除</span>
       </div>
-      <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode && !isInGroup">
         <i></i>
         <span>{{ userStatus.is_banned ? '取消禁言' : '禁言' }}</span>
       </div>
-      <div class="vmp-chat-user-control__item" @click="setKicked" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="setKicked" v-if="godMode && !isInGroup">
         <i></i>
         <span>{{ userStatus.is_kicked ? '取消踢出' : '踢出' }}</span>
       </div>
@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
 
   export default {
     mixins: [dataReportMixin],
@@ -71,6 +71,13 @@
     beforeCreate() {
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
+    },
+    computed: {
+      // 是否在小组中
+      isInGroup() {
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      }
     },
     created() {
       this.assistantType = this.$route.query.assistantType;

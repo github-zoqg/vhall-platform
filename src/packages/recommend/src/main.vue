@@ -7,7 +7,7 @@
             class="subscribe-wrap-item"
             v-for="item in advs"
             :key="item.adv_id"
-            @click="handleJump(item.url)"
+            @click="goto(item.url)"
           >
             <div class="subscribe-wrap-item_cover">
               <img :src="item.img_url ? item.img_url : defaultBanner" alt="" />
