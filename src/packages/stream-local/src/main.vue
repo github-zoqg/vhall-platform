@@ -426,12 +426,6 @@
         const isSpeakOn = this.micServer.getSpeakerStatus();
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
-        console.log(
-          '上麦状态---',
-          isSpeakOn,
-          '设备状态',
-          useMediaCheckServer().state.deviceInfo.device_status
-        );
         if (
           useMediaCheckServer().state.deviceInfo.device_status === 1 &&
           isSpeakOn &&
@@ -439,10 +433,6 @@
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
         ) {
           this.startPush();
-        } else {
-          if (isSpeakOn) {
-            this.speakOff();
-          }
         }
       },
       // 恢复播放

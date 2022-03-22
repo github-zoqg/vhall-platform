@@ -215,10 +215,6 @@
           ) {
             await this.userSpeakOn();
           }
-        } else {
-          if (this.micServer.getSpeakerStatus()) {
-            this.speakOff();
-          }
         }
       },
       async listenEvents() {
@@ -240,7 +236,7 @@
         });
 
         // 上麦成功
-        this.micServer.$on('vrtc_connect_success', async msg => {
+        this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
           if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
