@@ -61,7 +61,13 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useDocServer,
+    useMsgServer,
+    usePlayerServer,
+    useGroupServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
@@ -79,6 +85,10 @@
       };
     },
     computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
       // 文档是否加载完成
       docLoadComplete() {
         return this.docServer.state.docLoadComplete;
@@ -165,6 +175,18 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        // 点播或回放播放器播放完成
+        usePlayerServer().$on(VhallPlayer.ENDED, () => {
+          console.log('[doc] VhallPlayer.ENDED');
+          // 4-点播， 5-回放
+          if ([4, 5].includes(this.webinarType)) {
+            this.docServer.state.switchStatus = false;
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowMenuTab', [false])
+            );
+          }
+        });
       },
 
       /**
