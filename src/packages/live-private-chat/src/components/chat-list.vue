@@ -15,14 +15,14 @@
           <template
             v-if="loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId"
           >
-            <template v-if="chat.avatar">
-              <span
-                class="list-item__user-info__avatar"
-                :style="{
-                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-                }"
-              ></span>
-            </template>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
@@ -33,27 +33,16 @@
             <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
             </span>
-
-            <template v-else>
-              <span class="list-item__user-info__avatar">
-                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
-              </span>
-            </template>
           </template>
           <template v-else>
-            <template v-if="chat.avatar">
-              <span
-                class="list-item__user-info__avatar"
-                :style="{
-                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-                }"
-              ></span>
-            </template>
-            <template v-else>
-              <span class="list-item__user-info__avatar">
-                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
-              </span>
-            </template>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ $t('chat.chat_1022') }}
             </span>
@@ -97,9 +86,10 @@
 </template>
 
 <script>
-  import { faceArr as emojiFace, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import { faceArr as emojiFace } from '@/packages/chat/src/js/emoji';
   import { uniqueId } from 'lodash';
   import { useChatServer, useMsgServer } from 'middle-domain';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'livePrivateChatList',
     filters: {
@@ -114,6 +104,8 @@
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //是否是webp
         isWebp: window.webp,
         //取一个唯一id

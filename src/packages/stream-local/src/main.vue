@@ -403,7 +403,6 @@
       this.listenEvents();
     },
     async mounted() {
-      window.streamLocal = this;
       this.checkStartPush();
     },
     beforeDestroy() {
@@ -556,6 +555,10 @@
             return;
           }
           await this.stopPush();
+
+          clearInterval(this._audioLeveInterval);
+          clearInterval(this._netWorkStatusInterval);
+
           if (this.isWatch) {
             this.roomBaseServer.setChangeElement('');
           } else {
