@@ -6,7 +6,8 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
-      { 'has-stream-list': hasStreamList }
+      { 'has-stream-list': hasStreamList },
+      { 'no-delay-layout': isUseNoDelayLayout }
     ]"
     v-show="show"
     ref="docWrapper"
@@ -323,9 +324,20 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.userId
+          ) || {}
+        );
+      },
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 互动无延迟 未上麦观众是否使用类似旁路布局
+      isUseNoDelayLayout() {
+        return !this.localSpeaker.accountId && this.webinarMode == 3 && this.isNoDelay == 1;
       }
     },
     watch: {
@@ -365,10 +377,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
-          if (this.webinarMode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
-            return;
-          }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -1255,6 +1263,9 @@
 
     &.vmp-doc-une--normal.has-stream-list {
       top: 80px;
+    }
+    &.vmp-doc-une--normal.no-delay-layout {
+      top: 0px;
     }
 
     //mini模式
