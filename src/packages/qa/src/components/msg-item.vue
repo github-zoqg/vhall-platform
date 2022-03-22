@@ -144,7 +144,7 @@
       handleAnswerContent() {
         if (this.source.answer && this.source.answer.content) {
           if (this.source.answer.content == '直播中回复') {
-            this.answerContent = `<span class="msg-item__qa-flag">${this.$t(
+            this.answerContent = `<span class="msg-item__qa-flag color-e6e">${this.$t(
               'chat.chat_1039'
             )}</span>`;
           } else if (this.source.answer.is_open == 0) {
@@ -277,6 +277,9 @@
     }
     ::v-deep .msg-item__qa-flag {
       color: #fa9a32;
+      &.color-e6e {
+        color: #e6e6e6;
+      }
     }
   }
   .msg-item__content-hr {
