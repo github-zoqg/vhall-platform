@@ -59,7 +59,7 @@
     },
     computed: {
       role() {
-        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.webinar?.join_info
+        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info
           ?.role_name;
       }
     },
