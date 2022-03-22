@@ -1,15 +1,10 @@
 <template>
-  <div class="timer" v-if="!embedObj.embedVideo">
+  <div class="vmp-wap-timer" v-if="!embedObj.embedVideo">
     <!-- 时间显示区 -->
     <div v-show="timerVisible" class="bgimg" id="timer" v-drag>
       <div>
         <div class="ft12">
-          <!-- <div class="ml16"
-            v-if="shijian<0">超时,开始正向计时</div>
-          <div class="ml16"
-            v-else>{{60 > beifenshijian ? beifenshijian+'秒' : (parseInt(beifenshijian/60)) +'分'+ ( beifenshijian % 60) +'秒'}} 倒计时{{status == 'zanting'?'已暂停':status == 'jieshu'?'已结束':'进行中...'}}</div> -->
-
-          <div class="ml16" v-if="shijian < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
+          <div class="ml16" v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
           <div class="ml16" v-else>{{ timeStatus }}</div>
         </div>
       </div>
@@ -17,25 +12,29 @@
         <i class="vh-iconfont vh-line-close"></i>
       </span>
       <div align="center">
-        <div class="margin10 pr mt10 font_zdy">
-          <div class="margin5 timerbg bg000">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''" class="fontWeight">
+        <div class="timer_base pr font_zdy">
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
               {{ ten_mon }}
-            </strong>
+            </span>
           </div>
-          <div class="margin5 timerbg bg000">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''" class="fontWeight">{{ mon }}</strong>
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
+              {{ mon }}
+            </span>
           </div>
 
-          <strong class="pr ft28 fontWeight color1D1C1F">:</strong>
+          <span class="pr ft28 fontWeight">:</span>
 
-          <div class="margin5 timerbg bg000">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''" class="fontWeight">
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
               {{ ten_sec }}
-            </strong>
+            </span>
           </div>
-          <div class="margin5 timerbg bg000">
-            <strong :class="shijian < 1 ? 'colorFB3A32' : ''" class="fontWeight">{{ sec }}</strong>
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
+              {{ sec }}
+            </span>
           </div>
         </div>
       </div>
@@ -105,11 +104,11 @@
       return {
         roomBaseServer,
         timerVisible: true,
-        shijian: 0,
-        beifenshijian: 60,
+        time: 0,
+        totleTimeNum: 60,
         is_timeout: false,
         is_all_show: false,
-        status: 'zanting',
+        status: 'pause',
         ten_mon: 0,
         mon: 0,
         ten_sec: 0,
@@ -119,17 +118,17 @@
     computed: {
       timeStatus() {
         const timeStr =
-          this.beifenshijian < 60
-            ? `${this.beifenshijian}${this.$t('appointment.appointment_1029')}`
-            : `${parseInt(this.beifenshijian / 60)}${this.$t('appointment.appointment_1028')}${
-                this.beifenshijian % 60
+          this.totleTimeNum < 60
+            ? `${this.totleTimeNum}${this.$t('appointment.appointment_1029')}`
+            : `${parseInt(this.totleTimeNum / 60)}${this.$t('appointment.appointment_1028')}${
+                this.totleTimeNum % 60
               }${this.$t('appointment.appointment_1029')}`;
         // console.log(timeStr);
         let statusStr = '';
-        if (this.status == 'jieshu') {
+        if (this.status == 'end') {
           // '已结束';
           statusStr = this.$t('interact_tools.interact_tools_1056');
-        } else if (this.status == 'zanting') {
+        } else if (this.status == 'pause') {
           // '已暂停';
           statusStr = this.$t('interact_tools.interact_tools_1055');
         } else {
@@ -169,17 +168,17 @@
     methods: {
       // 计时器开始
       timer_start(e) {
-        this.shijian = e.data.duration;
-        this.beifenshijian = e.data.duration || 70;
+        this.time = e.data.duration;
+        this.totleTimeNum = e.data.duration || 70;
         this.is_timeout = e.data.is_timeout;
         this.is_all_show = e.data.is_all_show;
-        this.timeFormat(this.shijian);
+        this.timeFormat(this.time);
         if (e.data.status != 4) {
-          this.timerFun(this.shijian);
+          this.timerFun(this.time);
         }
         // 打开计时器组件
         if (this.is_all_show == 1 && this.isLive) {
-          this.status = 'kaishi';
+          this.status = 'start';
           this.handleTimer();
         }
       },
@@ -189,18 +188,18 @@
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
         );
         this.timerVisible = false;
-        this.status = 'jieshu';
+        this.status = 'end';
         clearInterval(this.timer);
       },
       // 计时器暂停
       timer_pause(e) {
-        this.status = 'zanting';
+        this.status = 'pause';
         this.timeFormat(Math.abs(e.data.remain_time));
         clearInterval(this.timer);
       },
       // 计时器重置
       timer_reset() {
-        this.status = 'kaishi';
+        this.status = 'start';
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
         );
@@ -209,23 +208,23 @@
       },
       // 计时器继续
       timer_resume(e) {
-        this.status = 'kaishi';
+        this.status = 'start';
         this.timerFun(e.data.remain_time);
       },
       init() {
         if (JSON.stringify(this.timerInfo) != '{}') {
           const resData = this.timerInfo;
-          this.shijian = resData.remain_time;
-          this.beifenshijian = resData.duration;
+          this.time = resData.remain_time;
+          this.totleTimeNum = resData.duration;
           this.is_timeout = resData.is_timeout;
           this.is_all_show = resData.is_all_show;
           if (resData.duration == -3599) return false;
-          this.timeFormat(Math.abs(this.shijian));
+          this.timeFormat(Math.abs(this.time));
           if (resData.status != 4) {
-            this.timerFun(this.shijian);
+            this.timerFun(this.time);
           }
           // 打开计时器组件
-          this.status = resData.status == 4 ? 'zanting' : 'kaishi';
+          this.status = resData.status == 4 ? 'pause' : 'start';
           if (this.is_all_show == 1 && this.isLive) {
             this.handleTimer();
             console.log(this.cuid, 'emitChangeTimer');
@@ -235,16 +234,18 @@
             boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
           );
           this.timerVisible = false;
-          this.status = 'jieshu';
+          this.status = 'end';
           clearInterval(this.timer);
         }
       },
+      // 打开计时器及icon红点
       handleTimer() {
         this.timerVisible = true;
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
         );
       },
+      // 关闭计时器及icon红点
       onClose() {
         this.timerVisible = false;
         window.$middleEventSdk?.event?.send(
@@ -264,7 +265,7 @@
         this.timer = setInterval(() => {
           if (this.is_timeout == 0) {
             if (data == 1) {
-              this.status = 'jieshu';
+              this.status = 'end';
             }
             if (data == 0) {
               clearInterval(this.timer);
@@ -284,7 +285,7 @@
             this.status = 'chaoshi';
           }
           this.timeFormat(Math.abs(--data));
-          this.shijian = data;
+          this.time = data;
         }, 1000);
       }
       // TODO: 不应在此处调getCommonConfig用接口 须退出小组相关逻辑调用
@@ -314,12 +315,9 @@
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   @import url(./style.less);
-  .timer {
-    .mt10 {
-      margin-top: 0.17rem;
-    }
+  .vmp-wap-timer {
     .pr {
       position: relative;
     }
@@ -334,30 +332,6 @@
     }
     .ml16 {
       margin-left: 32px;
-    }
-    .color1D1C1F {
-      color: #1d1c1f;
-    }
-    .icon-wrap {
-      margin-bottom: 10px;
-      width: 84px;
-      height: 84px;
-      position: relative;
-      background-color: transparent;
-      img {
-        width: 84px;
-        height: 84px;
-      }
-    }
-    .have {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background-color: #ff0005;
-      content: '';
     }
     .bgimg {
       width: 322px;
@@ -375,45 +349,33 @@
       border-radius: 20px;
       .timerbg {
         display: inline-block;
-        // background: url('./image/timerbg.png');
         background-size: 100%;
         height: 1.093333rem;
         width: 0.773333rem;
         position: relative;
-        strong {
+        background: linear-gradient(180deg, #323136 0%, #0b0b0b 100%);
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin: 4px;
+        & > :first-child {
           font-size: 38px;
           position: absolute;
           top: 24px;
           left: 18px;
         }
       }
-      .bg000 {
-        background: linear-gradient(180deg, #323136 0%, #0b0b0b 100%);
-        border-radius: 4px;
-      }
-      .margin5 {
-        box-sizing: border-box;
-        margin: 4px;
-      }
-      .margin10 {
+      .timer_base {
+        margin-top: 0.17rem;
         border-radius: 4px;
         height: 1.2rem;
         .ft28 {
+          color: #1d1c1f;
           font-size: 38px;
           top: -40px;
         }
       }
-      .color0FBB5A {
-        color: #0fbb5a;
-      }
-      .colorFC9600 {
-        color: #fc9600;
-      }
-      .colorFB3A32 {
+      .timeout_font_color {
         color: #fb3a32;
-      }
-      .pad20 {
-        padding: 0 20px;
       }
       .close {
         margin-right: 11px;
