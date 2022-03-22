@@ -59,8 +59,7 @@
     },
     computed: {
       role() {
-        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info
-          ?.role_name;
+        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info?.role_name;
       }
     },
     beforeCreate() {
