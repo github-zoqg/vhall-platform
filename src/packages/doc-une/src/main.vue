@@ -1061,7 +1061,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: @bg-black;
+        background: #2d2d2d;
         flex-direction: column;
         i {
           font-size: 137px;
