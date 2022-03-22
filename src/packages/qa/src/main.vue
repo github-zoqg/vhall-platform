@@ -194,10 +194,10 @@
       initLoginStatus() {
         const { configList = {} } = useRoomBaseServer().state;
         if (
-          ![1, '1'].includes(this.roleName) &&
-          ['', null, 0].includes(
-            this.userId || this.Embed || configList['ui.show_chat_without_login'] == 1
-          )
+          [2, '2'].includes(this.roleName) &&
+          ['', null, 0].includes(this.userId) &&
+          !this.Embed &&
+          configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
