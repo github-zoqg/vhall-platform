@@ -94,7 +94,7 @@
       .vmp-msgtip__image-loading {
         text-align: center;
         img {
-          height: 200px;
+          height: 60px;
           width: 200px;
         }
       }
