@@ -249,7 +249,10 @@
 
       // 监听自动上麦的异常code
       useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        if (+this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2) {
+        if (
+          +e.code === 513025 ||
+          +this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2
+        ) {
           return;
         }
         e.msg && this.$message.warning(e.msg);
