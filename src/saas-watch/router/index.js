@@ -61,19 +61,19 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   const res = await grayInit(to);
+  console.log('---grayInit---', res);
   if (res) {
-    console.log('---grayInit---', res);
     //处理限流逻辑
     if (res.code == 200) {
       //处理灰度、如果是中台用户, 跳转到中台
-      const VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT = process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT;
-      const VUE_APP_WAP_WATCH_MIDDLE = process.env.VUE_APP_WAP_WATCH_MIDDLE;
-      let protocol = window.location.protocol;
-      if (res.data.is_csd_user == 1) {
-        if (window.location.origin != `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}`) {
-          window.location.href = `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}/${VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT}${window.location.pathname}`;
-        }
-      }
+      // const VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT = process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT;
+      // const VUE_APP_WAP_WATCH_MIDDLE = process.env.VUE_APP_WAP_WATCH_MIDDLE;
+      // let protocol = window.location.protocol;
+      // if (res.data.is_csd_user == 1) {
+      //   if (window.location.origin != `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}`) {
+      //     window.location.href = `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}/${VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT}${window.location.pathname}`;
+      //   }
+      // }
       next();
     } else {
       next({

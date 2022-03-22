@@ -321,18 +321,10 @@
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
     },
-    mounted() {
-      window.addEventListener(
-        'fullscreenchange',
-        () => {
-          if (!document.fullscreenElement) {
-            // 离开全屏
-            this.isFullScreen = false;
-          }
-        },
-        true
-      );
+    created() {
+      this.listenEvents();
     },
+    mounted() {},
     beforeDestroy() {
       // 清空计时器
       if (this._audioLeveInterval) {
@@ -343,6 +335,23 @@
       }
     },
     methods: {
+      listenEvents() {
+        this.micServer.$on('live_over', () => {
+          clearInterval(this._audioLeveInterval);
+          clearInterval(this._netWorkStatusInterval);
+        });
+
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              // 离开全屏
+              this.isFullScreen = false;
+            }
+          },
+          true
+        );
+      },
       // 恢复播放
       replayPlay() {
         const videos = document.querySelectorAll('video');
