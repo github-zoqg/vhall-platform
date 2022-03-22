@@ -61,7 +61,6 @@
   </div>
 </template>
 <script>
-  import screenfull from 'screenfull';
   import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
@@ -139,32 +138,13 @@
     },
     methods: {
       /**
-       * 全屏
+       * 全屏切换
+       * 这里使用的是样式模拟全屏，不用真实全屏事件，是因为在iphone手机上存在兼容性问题
        */
       fullscreen() {
-        screenfull.toggle(this.$refs.docWrapper);
-      },
-      async setDisplayMode(mode) {
-        console.log('[doc] setDisplayMode:', mode);
-        if (!['normal', 'fullscreen'].includes(mode)) {
-          console.error('展示模式必须是normal,  fullscreen中的一个');
-          return;
-        }
-        if (this.displayMode === mode) {
-          console.log('当前已经是该模式，无需设置');
-          return;
-        }
-
-        if (this.displayMode === 'fullscreen') {
-          // 全屏模式转其它模式
-          this.fullscreen();
-          screenfull.targetMode = mode;
-        } else if (mode === 'fullscreen') {
-          // 其它模式转全屏模式
-          this.fullscreen();
-        }
-        await this.$nextTick();
-        // 文档大小的改变，会自动触发 erd.listenTo 事件;
+        this.displayMode = this.displayMode === 'fullscreen' ? 'normal' : 'fullscreen';
+        // 切换后还原位置
+        this.docServer.zoomReset();
       },
       // 文档移动后还原
       restore() {
@@ -185,22 +165,6 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
-
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
-
-        // 全屏/退出全屏事件
-        if (screenfull.isEnabled) {
-          screenfull.onchange(ev => {
-            // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-            if (ev.target.id !== 'docWrapper') return;
-            if (screenfull.isFullscreen) {
-              this.displayMode = 'fullscreen';
-            } else {
-              this.displayMode = screenfull.targetMode || 'normal';
-            }
-          });
-        }
       },
 
       /**
@@ -306,13 +270,6 @@
           }
         }
       },
-      // 文档是否可见状态变化事件
-      dispatchDocSwitchChange: async function (val) {
-        console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        // if (val && this.docLoadComplete) {
-        //   this.recoverLastDocs();
-        // }
-      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({
@@ -343,7 +300,7 @@
         }
       },
       // 回放文档加载事件
-      dispatchDocVodCuepointLoadComplate: async function (data) {
+      dispatchDocVodCuepointLoadComplate: async function () {
         if (this.docServer.state.containerList.length === 0) {
           const data = this.docServer.getVodAllCids();
           this.docServer.state.containerList = data.map(item => {
@@ -379,7 +336,6 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
-      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
       this.docServer.$off(
         'dispatch_doc_vod_cuepoint_load_complate',
@@ -502,9 +458,13 @@
 
     // 全屏模式下
     &.vmp-doc-wap--fullscreen {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
       background-color: rgba(0, 0, 0, 0.9);
 
-      z-index: 1000000;
       .vmp-doc-une__content {
         .vmp-doc-inner {
           .doc-box {

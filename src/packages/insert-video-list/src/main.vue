@@ -557,7 +557,7 @@
                   margin-right: 10px;
                   color: #666;
                   &.disable {
-                    color: #666666;
+                    color: #666;
                     pointer-events: none;
                   }
                 }
@@ -572,7 +572,7 @@
             }
           }
           .insert-list-uncontainer {
-            padding: 80px 0 140px 0;
+            padding: 80px 0 140px;
             margin: 0 auto;
             text-align: center;
             p {
@@ -583,7 +583,7 @@
         }
       }
       &-null {
-        padding: 50px 0 100px 0;
+        padding: 50px 0 100px;
         text-align: center;
         &-text {
           margin: 15px 0;

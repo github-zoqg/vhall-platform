@@ -6,7 +6,8 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
-      { 'has-stream-list': hasStreamList }
+      { 'has-stream-list': hasStreamList },
+      { 'no-delay-layout': isUseNoDelayLayout }
     ]"
     v-show="show"
     ref="docWrapper"
@@ -323,9 +324,20 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.userId
+          ) || {}
+        );
+      },
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 互动无延迟 未上麦观众是否使用类似旁路布局
+      isUseNoDelayLayout() {
+        return !this.localSpeaker.accountId && this.webinarMode == 3 && this.isNoDelay == 1;
       }
     },
     watch: {
@@ -365,10 +377,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
-          if (this.webinarMode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
-            return;
-          }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -1114,72 +1122,73 @@
         }
       }
     }
-  }
-  .vmp-doc-thumbnailbar {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 144px;
-    background-color: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
 
-    &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-      border-radius: 0;
-      background-color: #000 !important;
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      height: 60px;
-      border-radius: 10px;
-      border: 1px solid #333;
-      background: #333 !important;
-    }
-
-    li.doc-thumbnailbar__opt {
-      height: 63px;
-      width: 110px;
-      margin-top: 15px;
-      position: relative;
-
-      &.selected {
-        box-shadow: 0 0 0 2px #fb3a32;
-      }
-
-      img {
-        width: 100%;
-        height: 100%;
-      }
-    }
-    li.doc-thumbnailbar__opt:not(.selected) {
-      &:hover {
-        box-shadow: 0 0 0 2px #f3686b;
-      }
-    }
-    li:last-child {
-      margin-bottom: 20px;
-    }
-    .doc-thumbnailbar-seq {
-      display: block;
-      min-width: 20px;
-      height: 14px;
-      background: #000;
-      opacity: 0.7;
-      color: #fff;
-      font-size: 12px;
-      line-height: 14px;
-      text-align: center;
+    .vmp-doc-thumbnailbar {
       position: absolute;
-      left: 0;
+      top: 0;
       bottom: 0;
+      right: 0;
+      width: 144px;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        border-radius: 0;
+        background-color: #000 !important;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        height: 60px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        background: #333 !important;
+      }
+
+      li.doc-thumbnailbar__opt {
+        height: 63px;
+        width: 110px;
+        margin-top: 15px;
+        position: relative;
+
+        &.selected {
+          box-shadow: 0 0 0 2px #fb3a32;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      li.doc-thumbnailbar__opt:not(.selected) {
+        &:hover {
+          box-shadow: 0 0 0 2px #f3686b;
+        }
+      }
+      li:last-child {
+        margin-bottom: 20px;
+      }
+      .doc-thumbnailbar-seq {
+        display: block;
+        min-width: 20px;
+        height: 14px;
+        background: #000;
+        opacity: 0.7;
+        color: #fff;
+        font-size: 12px;
+        line-height: 14px;
+        text-align: center;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
     }
   }
 
@@ -1255,6 +1264,9 @@
 
     &.vmp-doc-une--normal.has-stream-list {
       top: 80px;
+    }
+    &.vmp-doc-une--normal.no-delay-layout {
+      top: 0px;
     }
 
     //mini模式

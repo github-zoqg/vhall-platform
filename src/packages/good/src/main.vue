@@ -250,6 +250,7 @@
         height: 100px;
         font-size: 12px;
         position: relative;
+        width: calc(100% - 100px);
         .name {
           display: block;
           width: 100%;
