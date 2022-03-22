@@ -2,7 +2,7 @@
   <div class="vmp-watch-private-chat-msg-template">
     <!--头像-->
     <div class="msg-item__avatar">
-      <img class="msg-item__avatar__img" :src="source.avatar ? source.avatar : defaultAvatar" alt />
+      <img class="msg-item__avatar__img" :src="source.avatar || defaultAvatar" alt />
     </div>
     <!--内容-->
     <div class="msg-item__content">

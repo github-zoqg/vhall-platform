@@ -36,8 +36,9 @@
     created() {
       this.useUserServer = useUserServer();
     },
-    mounted() {
-      this.init();
+    async mounted() {
+      await this.useUserServer.initNECaptcha('#captchaDom', 1);
+      // this.init();
     },
     beforeDestroy() {
       this.refreshNECaptha();
@@ -52,10 +53,7 @@
           element: '#captchaDom',
           mode: 'float',
           width: 270,
-          lang:
-            (window.$globalConfig.currentLang == 'zh'
-              ? 'zh-CN'
-              : window.$globalConfig.currentLang) || 'zh-CN',
+          // lang: 'zh-CN',
           onReady(instance) {
             console.log('🚀 ~ initNECaptcha onReady ', instance);
             that.capInstance = instance;

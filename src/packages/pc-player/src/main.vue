@@ -683,7 +683,21 @@
       // 切换多语言
       changeLanguage(key) {
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus(info) {
@@ -1140,7 +1154,8 @@
     }
     &-controller {
       position: absolute;
-      bottom: -48px;
+      bottom: 0;
+      // bottom: -48px;
       z-index: 8;
       width: 100%;
       height: 38px;
@@ -1178,13 +1193,16 @@
           box-shadow: 0 0 10px @bg-error-light;
         }
         &:hover {
-          .el-slider__runway,
-          .el-slider__bar {
-            height: 9px;
-          }
+          // .el-slider__bar {
+          //   height: 9px;
+          // }
+          // .el-slider__runway {
+          //   background: transparent;
+          // }
           .el-slider__button {
-            width: 14px;
-            height: 14px;
+            width: 13px;
+            height: 13px;
+            top: 11px;
             transform: scale(1) !important;
           }
         }
@@ -1355,13 +1373,14 @@
           box-shadow: 0 0 10px @bg-error-light;
         }
         &:hover {
-          .el-slider__runway,
-          .el-slider__bar {
-            height: 5px;
-          }
+          // .el-slider__runway,
+          // .el-slider__bar {
+          //   height: 5px;
+          // }
           .el-slider__button {
             width: 10px;
             height: 10px;
+            // top: -2px;
             transform: scale(1) !important;
           }
         }
