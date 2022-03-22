@@ -17,11 +17,15 @@ export function initGlobalPrototype() {
       localStorage.setItem('lang', value);
     },
     get: function () {
-      return localStorage.getItem('lang') == 2
-        ? 'en'
-        : localStorage.getItem('lang') == 1
-        ? 'zh'
-        : 'es' || 'zh';
+      if (localStorage.getItem('lang')) {
+        return localStorage.getItem('lang') == 2
+          ? 'en'
+          : localStorage.getItem('lang') == 1
+          ? 'zh'
+          : 'es' || 'zh';
+      } else {
+        return 'zh';
+      }
     }
   });
 
