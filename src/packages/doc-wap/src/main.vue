@@ -69,9 +69,9 @@
 
     data() {
       return {
-        className: '',
-        displayMode: 'normal', // normal: 正常; fullscreen:全屏
-        keepAspectRatio: true,
+        //文档展示模式： normal-正常; fullscreen-全屏
+        displayMode: 'normal',
+        //文档宽高
         docViewRect: {
           width: 0,
           height: 0
@@ -79,18 +79,23 @@
       };
     },
     computed: {
+      // 文档是否加载完成
       docLoadComplete() {
         return this.docServer.state.docLoadComplete;
       },
+      // 当前文档白板容器id
       currentCid() {
         return this.docServer.state.currentCid;
       },
+      // 是否观众可见
       switchStatus() {
         return this.docServer.state.switchStatus;
       },
+      // 页码
       pageNum() {
         return this.docServer.state.pageNum;
       },
+      // 总页数
       pageTotal() {
         return this.docServer.state.pageTotal;
       },
@@ -107,8 +112,6 @@
             this.docServer.state.isChannelChanged = false;
             // 初始化事件
             this.initEvents();
-            // 清空
-            // this.docServer.resetContainer();
             // 恢复上一次的文档数据;
             console.log('----- recoverLastDocs 频道变更');
             this.recoverLastDocs();
@@ -146,10 +149,13 @@
         // 切换后还原位置
         this.docServer.zoomReset();
       },
+
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();
       },
+
+      // 初始化事件
       initEvents() {
         // 文档容器选择事件
         this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
@@ -180,6 +186,10 @@
           this.docServer.setSize(width, height);
         }
       },
+
+      /**
+       * 获取文档白板容器大小
+       */
       getDocViewRect() {
         let rect = this.$refs.docWrapper?.getBoundingClientRect();
         let w = 0;
@@ -257,15 +267,15 @@
 
       // 翻页
       handlePage(type) {
-        if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
+        if (!this.currentCid || this.currentCid.startsWith('board')) {
           return;
         }
         if (type === 'prev') {
-          if (this.docServer.state.pageNum > 1) {
+          if (this.pageNum > 1) {
             this.docServer.prevStep();
           }
         } else if (type === 'next') {
-          if (this.docServer.state.pageNum < this.docServer.state.pageTotal) {
+          if (this.pageNum < this.pageTotal) {
             this.docServer.nextStep();
           }
         }
@@ -308,8 +318,6 @@
               cid: item.cid
             };
           });
-          // console.log('[doc] containerList:', this.docServer.state.containerList);
-          // this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
           await this.$nextTick();
           if (this.docServer.state.containerList.length) {
             const { width, height } = this.getDocViewRect();
@@ -325,6 +333,7 @@
           }
         }
       },
+      // 回放视频播放更新事件
       dispatchDocVodTimeUpdate({ isChange }) {
         if (isChange) {
           window.$middleEventSdk?.event?.send(
