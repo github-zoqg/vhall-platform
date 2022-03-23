@@ -691,6 +691,7 @@
        */
       async switchTo(fileType) {
         console.log('[doc] doc-une 切换到。。。:', fileType);
+        this.docServer.setDocLoadComplete(true);
         // 缩略图栏隐藏
         this.thumbnailShow = false;
         if (fileType === 'document') {
