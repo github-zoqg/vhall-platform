@@ -287,8 +287,8 @@
 
       return {
         dialogVisible: false, // 组件是否显示
-        useUserServer: {}, // 用户相关的接口
-        useCashServer: {}, // 提现相关的接口
+        // useUserServer: {}, // 用户相关的接口
+        // useCashServer: {}, // 提现相关的接口
         step: 0, // 当前步骤
         bindForm: {
           money: '',
@@ -314,7 +314,7 @@
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
-    created() {
+    beforeCreate() {
       this.useUserServer = useUserServer();
       this.useCashServer = useCashServer();
     },
