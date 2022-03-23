@@ -358,6 +358,9 @@
         item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.push(item);
+        if (this.isInGroup) {
+          this.setVisible({ visible: false, type: 'notice' });
+        }
       },
 
       addItemByIndex(index, item) {

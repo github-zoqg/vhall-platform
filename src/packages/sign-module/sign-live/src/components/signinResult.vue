@@ -143,7 +143,7 @@
       }
       .table-list_item {
         display: flex;
-        padding: 5px 24px;
+        padding: 8px 24px;
         align-items: center;
         color: #1a1a1a;
         .sign-avatar {

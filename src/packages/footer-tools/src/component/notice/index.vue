@@ -143,8 +143,9 @@
 <style lang="less">
   .vmp-notice-list {
     height: 100%;
-    position: relative;
+    // position: relative;
     &_icon {
+      position: relative;
       .icon-img {
         height: 32px;
         width: 32px;
@@ -175,7 +176,7 @@
     }
     &_container {
       position: absolute;
-      right: -100px;
+      right: -48px;
       bottom: 50px;
       z-index: 12;
       width: 492px;
