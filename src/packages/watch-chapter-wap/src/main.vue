@@ -1,5 +1,5 @@
 <template>
-  <div class="chapter-wrap">
+  <div class="vmp-chapter-wap">
     <ul v-if="support && chapterData.length != 0">
       <li v-for="(item, index) in chapterData" :key="index">
         <div
@@ -168,8 +168,8 @@
     }
   };
 </script>
-<style lang="less" scoped>
-  .chapter-wrap {
+<style lang="less">
+  .vmp-chapter-wap {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -219,22 +219,22 @@
       display: inline-block;
       width: 20%;
     }
-  }
-  .step-info {
-    margin-left: 25px;
-  }
-  .posit {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    img {
-      width: 260px;
+    .step-info {
+      margin-left: 25px;
     }
-    .font_sty {
-      font-size: 30px;
-      color: #8c8c8c;
-      text-align: center;
+    .posit {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      img {
+        width: 260px;
+      }
+      .font_sty {
+        font-size: 30px;
+        color: #8c8c8c;
+        text-align: center;
+      }
     }
   }
 </style>
