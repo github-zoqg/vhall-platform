@@ -1481,7 +1481,10 @@
       },
       //直播结束重置视图里的一些状态
       resetViewData() {
-        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+        this.allowRaiseHand = false;
+        if (this.tabIndex !== 1) {
+          this.switchToTab(1);
+        }
       },
       //切换允许举手状态
       onSwitchAllowRaiseHand(element) {
