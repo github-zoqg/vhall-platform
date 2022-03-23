@@ -67,7 +67,7 @@
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openRebroadcast"
-          v-if="configList['rebroadcast']"
+          v-if="!isNoDelay && configList['rebroadcast']"
         >
           <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
@@ -127,6 +127,10 @@
     computed: {
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 无延迟 Type:Boolean
+      isNoDelay() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
