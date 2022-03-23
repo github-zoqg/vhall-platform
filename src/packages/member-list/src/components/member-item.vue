@@ -90,10 +90,7 @@
             [2, '2'].includes(userInfo.device_status)
           "
         >
-          <i
-            style="color: #fb3a32; font-size: 15px; vertical-align: middle"
-            class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"
-          ></i>
+          <i class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"></i>
         </template>
         <template v-if="tabIndex === 1">
           <!--我要演示-->
@@ -806,11 +803,10 @@
   .vmp-member-item {
     position: relative;
     color: #999999;
-    height: 44px;
-    line-height: 44px;
-    padding: 8px 10px 8px 14px;
+    line-height: 48px;
+    padding: 0 10px 0 14px;
     font-size: 12px;
-    box-sizing: content-box;
+    overflow-x: hidden;
     &:hover {
       background-color: #595959;
       .vmp-member-item__control {
@@ -875,6 +871,12 @@
         vertical-align: middle;
         margin-right: 6px;
       }
+      &__device-abnormal {
+        color: #fb3a32;
+        font-size: 15px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
       &__up-mic,
       &__down-mic {
         display: inline-block;
@@ -882,6 +884,7 @@
         height: 16px;
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
+        margin-right: 6px;
         color: #dddddd;
         text-align: center;
         vertical-align: middle;

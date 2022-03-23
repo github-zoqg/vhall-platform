@@ -214,13 +214,22 @@
       is_host_in_group() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
         return (
           !this.isInGroup &&
           this.is_host_in_group &&
-          this.roomBaseServer.state.watchInitData.webinar.mode == 6
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
+          !this.isShowMainScreen
         );
       },
       hotNum() {
