@@ -683,7 +683,7 @@
           if (this.docServer.state.switchStatus) {
             this.roomBaseServer.setChangeElement('stream-list');
           } else {
-            this.roomBaseServer.setChangeElement('doc');
+            this.roomBaseServer.setChangeElement('');
           }
         }
         this.insertFileServer.clearInsertFileInfo();
