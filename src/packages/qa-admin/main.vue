@@ -1386,7 +1386,11 @@
         background: #fb3a32;
       }
       width: 500px !important;
-      height: 356px !important;
+      .footer {
+        text-align: right;
+        padding-top: 20px;
+      }
+      // height: 356px !important;
       .el-message-box__header {
         padding: 0;
       }

@@ -1,5 +1,5 @@
 <template>
-  <div class="vhsaas-chapter-wrap">
+  <div class="vmp-chapter">
     <overlay-scrollbars ref="osComponentRef" :options="osComponentOptions" style="height: 100%">
       <template v-if="chapterInfo.length">
         <template v-for="(item, index) in chapterInfo">
@@ -147,8 +147,8 @@
     }
   };
 </script>
-<style lang="less" scoped>
-  .vhsaas-chapter-wrap {
+<style lang="less">
+  .vmp-chapter {
     width: 100%;
     height: 100%;
     background: #2a2a2a;

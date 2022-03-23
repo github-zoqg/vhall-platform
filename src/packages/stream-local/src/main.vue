@@ -548,7 +548,9 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          await this.interactiveServer.destroy();
+          if (this.joinInfo.role_name != 1) {
+            await this.interactiveServer.destroy();
+          }
 
           // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
           if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
@@ -1169,6 +1171,11 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
         padding: 0 6px;
         vertical-align: top;

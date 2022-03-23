@@ -17,7 +17,10 @@
     <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
-    <section v-if="!stream.streamId" class="vmp-stream-remote__container__net-error">
+    <section
+      v-if="isShowNetError && !stream.streamId"
+      class="vmp-stream-remote__container__net-error"
+    >
       <div class="net-error-img"></div>
       <p>对方网络异常</p>
     </section>
@@ -209,7 +212,8 @@
       return {
         audioLevel: 1,
         networkStatus: 0,
-        isFullScreen: false
+        isFullScreen: false,
+        isShowNetError: false
       };
     },
     props: {
@@ -328,6 +332,11 @@
     },
     created() {
       this.listenEvents();
+
+      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
+      setTimeout(() => {
+        this.isShowNetError = true;
+      }, 5000);
     },
     mounted() {},
     beforeDestroy() {
@@ -379,6 +388,11 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            setTimeout(() => {
+              this.replayPlay();
+
+              // 开始测试100ms，刷新页面还是有订阅流不播放的情况。所以改为和原线上代码一致2s
+            }, 2000);
             this.getLevel();
           })
           .catch(e => {
@@ -593,6 +607,11 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
         padding: 0 6px;
         vertical-align: top;

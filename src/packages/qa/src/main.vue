@@ -106,7 +106,7 @@
         return this.watchInitData.join_info.join_id;
       },
       userId() {
-        return this.watchInitData.join_info.user_id;
+        return this.watchInitData.join_info.third_party_user_id;
       },
       roomId() {
         return this.watchInitData.interact.room_id;
@@ -179,7 +179,9 @@
         } else {
           this.inputStatus.placeholder = this.$t('chat.chat_1003');
         }
-        const isVod = this.watchInitData.webinar.type == 5 && this.watchInitData.paas_record_id;
+        const isVod =
+          (this.watchInitData.webinar.type == 5 || this.watchInitData.webinar.type == 4) &&
+          this.watchInitData.paas_record_id;
         // 判断控制台回放禁言状态
         if (isVod) {
           this.inputStatus.disable = true;

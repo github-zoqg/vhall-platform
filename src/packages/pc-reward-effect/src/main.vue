@@ -38,7 +38,7 @@
             </span> -->
         </span>
         <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
-          {{ rewardEffectInfo.data.text_content }}
+          {{ rewardEffectInfo.data.reward_describe | overHidden(8) }}
         </span>
         <span
           v-if="
@@ -242,6 +242,7 @@
         console.log('gift_user_avatar------>', rewardEffectInfo);
         if (
           rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.type == 'reward_pay_ok' ||
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           // 来源于接口消息字段
@@ -260,6 +261,7 @@
       gift_user_nickname(rewardEffectInfo) {
         if (
           rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.type == 'reward_pay_ok' ||
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           if (rewardEffectInfo.data.gift_user_nickname) {

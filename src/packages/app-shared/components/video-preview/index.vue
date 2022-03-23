@@ -474,7 +474,7 @@
           top: 0;
           left: 0;
           &:hover {
-            top: -2px;
+            // top: -2px;
             .el-slider__runway {
               height: 3px;
             }
