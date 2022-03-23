@@ -8,13 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: [
-      'comHeaderWatch',
-      'layerBody',
-      'layerFooter',
-      'comAllDialog',
-      'comGoodsDetailPc'
-    ]
+    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comGoodsDetailPc']
     // children: ['layerBody']
   },
   // 顶部header 容器嵌入不用这个组件
