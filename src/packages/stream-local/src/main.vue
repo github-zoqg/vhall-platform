@@ -1201,8 +1201,8 @@
       width: 100%;
       height: 100%;
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 0px;
+      left: px;
       &-presentation {
         position: absolute;
         top: 0;
