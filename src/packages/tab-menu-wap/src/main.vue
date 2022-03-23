@@ -200,7 +200,9 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          this.setVisible({ visible: true, type: 'private' });
+          if (!this.embedObj.embed) {
+            this.setVisible({ visible: true, type: 'private' });
+          }
         });
 
         if (this.isSubscribe) {
@@ -220,7 +222,7 @@
 
           if (msg.data.type === 'live_over') {
             this.setVisible({ visible: false, type: 'private' }); // private-chat
-            this.setVisible({ visible: false, type: 'v5' }); // qa
+            // this.setVisible({ visible: false, type: 'v5' }); // qa
             clientType === 'send' && this.selectDefault();
           }
         });
