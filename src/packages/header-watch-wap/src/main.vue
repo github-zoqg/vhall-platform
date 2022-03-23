@@ -8,7 +8,7 @@
         @click="skipAction"
         srcset
       />
-      {{ watchInitData.webinar.userinfo.nickname | splitLenStr(8) }}
+      {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
@@ -50,22 +50,6 @@
           pageStyle: '' // icon默认色
         }
       };
-    },
-    filters: {
-      webinarFilter(val) {
-        // const webinarArr = [
-        //   this.$t('common.common_1018'),
-        //   this.$t('common.common_1019'),
-        //   this.$t('common.common_1020'),
-        //   this.$t('common.common_1024'),
-        //   this.$t('common.common_1021')
-        // ];
-        const webinarArr = ['直播', '预告', '结束', '点播', '回放'];
-        return webinarArr[val - 1];
-      },
-      splitLenStr(name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
     },
     mounted() {
       // 关注的domain服务

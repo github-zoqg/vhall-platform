@@ -79,8 +79,8 @@
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
-      <!--      <dt></dt>-->
-      <!--      <dd>暂时没有聊天哦～</dd>-->
+      <dt></dt>
+      <dd>暂时没有聊天哦～</dd>
     </dl>
   </div>
 </template>
@@ -94,13 +94,13 @@
     name: 'livePrivateChatList',
     filters: {
       //todo 考虑全局公共utils里处理这个
-      chatTime(value) {
-        if (['', null, void 0].includes(value)) {
-          return;
-        }
-        if (value < 15) return value;
-        return value.substring(0, 16);
-      }
+      // chatTime(value) {
+      //   if (['', null, void 0].includes(value)) {
+      //     return;
+      //   }
+      //   if (value < 15) return value;
+      //   return value.substring(0, 16);
+      // }
     },
     data() {
       return {
@@ -417,7 +417,7 @@
       dt {
         width: 130px;
         height: 130px;
-        background: url(../images/no-data.png) no-repeat center;
+        background: url(../images/no-create.png) no-repeat center;
         border-radius: 50%;
         background-size: contain;
       }

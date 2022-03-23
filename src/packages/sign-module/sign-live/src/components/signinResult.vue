@@ -171,7 +171,7 @@
           font-size: 14px;
         }
       }
-      &-list {
+      .table-list {
         height: 150px;
         overflow-y: auto;
         overflow-x: hidden;

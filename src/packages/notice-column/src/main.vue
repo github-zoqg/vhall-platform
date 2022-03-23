@@ -66,7 +66,7 @@
         this.noticeServer.$on('room_announcement', msg => {
           this.isNoticeColumn = true;
           this.noticeText = msg.room_announcement_text;
-          this.animates();
+          this.noticeAnimates();
         });
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;

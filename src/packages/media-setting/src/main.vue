@@ -131,15 +131,17 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      window.mediaSettingServer = this.mediaSettingServer;
     },
     created() {
-      this._originCaptureState = {};
-      this._diffOptions = {};
+      this._originCaptureState = {}; // 原始选中的数据
+      this._diffOptions = {}; // 差异数据（更改的数据）
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
 
+      // 绑定confirm对应的视图操作
       mediaSettingConfirm.onShow(text => {
         this.alertText = text;
         this.isConfirmVisible = true;
@@ -224,6 +226,8 @@
         const videoTypeChanged = this._diffOptions.videoType !== undefined;
         const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
 
+        console.log('diffOptions:', this._diffOptions);
+
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
           const text = '修改设置后导致重新推流，是否继续保存';
@@ -231,7 +235,7 @@
         }
 
         if (action === 'not-living' || action === 'confirm') {
-          this.updateDeviceSetting();
+          await this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
           this.getStateCapture(); // 更新快照
@@ -275,6 +279,7 @@
 
         this.saveSelected();
         this.$message.success(this.$t('common.common_1034'));
+        return true;
       },
       /**
        * 获取所有设备

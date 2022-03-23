@@ -41,7 +41,7 @@
             <div>
               <p>
                 <span class="vhsaas-red-packet__item__name">
-                  {{ item.nickname | splitLenStr(8) }}
+                  {{ item.nickname | overHidden(8) }}
                 </span>
                 <span class="vhsaas-red-packet__amount">
                   <i>￥</i>
@@ -83,11 +83,6 @@
         default() {
           return 0;
         }
-      }
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
     created() {

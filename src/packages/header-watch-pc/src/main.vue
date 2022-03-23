@@ -16,7 +16,7 @@
     </div>
     <div class="vmp-header-watch_center">
       <div class="center_title">
-        {{ languagesInfo.subject | splitLenStr(40) }}
+        {{ languagesInfo.subject | overHidden(40) }}
         <span :class="'tags tags_' + webinarInfo.type">
           <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
           <label>{{ formatType(webinarInfo.type) }}</label>
@@ -101,7 +101,7 @@
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
               <img v-else src="./img/my-dark@2x.png" alt="" />
             </p>
-            <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
+            <span>{{ userInfo.nick_name | overHidden(8) }}</span>
             <div class="right_login_user_list">
               <ul>
                 <li @click="goUserInfo">
@@ -147,11 +147,6 @@
         isAttention: false,
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
-    },
-    filters: {
-      splitLenStr(name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
     },
     components: {
       officaialDialog
