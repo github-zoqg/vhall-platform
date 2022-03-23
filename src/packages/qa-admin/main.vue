@@ -433,7 +433,7 @@
           <i>1000</i>
         </span>
       </div>
-      <div slot="footer">
+      <div class="footer">
         <el-button type="primary" @click="handlerAnswer('public')">
           {{ $t('chat.chat_1089') }}
         </el-button>
@@ -1386,7 +1386,11 @@
         background: #fb3a32;
       }
       width: 500px !important;
-      height: 356px !important;
+      .footer {
+        text-align: right;
+        padding-top: 20px;
+      }
+      // height: 356px !important;
       .el-message-box__header {
         padding: 0;
       }
