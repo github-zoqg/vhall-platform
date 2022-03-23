@@ -23,7 +23,13 @@
             <span class="money">{{ rewardEffectInfo.gift_price }}</span>
             元
           </span> -->
-        <span class="gift-name" v-if="rewardEffectInfo.data.type == 'gift_send_success'">
+        <span
+          class="gift-name"
+          v-if="
+            rewardEffectInfo.data.type == 'gift_send_success' ||
+            rewardEffectInfo.data.event_type == 'free_gift_send'
+          "
+        >
           {{ rewardEffectInfo.data.gift_name }}
           <!-- <span class="count">
               <span class="multiple">x</span>
@@ -34,7 +40,10 @@
           {{ rewardEffectInfo.data.text_content }}
         </span>
         <span
-          v-if="rewardEffectInfo.data.type == 'gift_send_success'"
+          v-if="
+            rewardEffectInfo.data.type == 'gift_send_success' ||
+            rewardEffectInfo.data.event_type == 'free_gift_send'
+          "
           class="gift-img"
           :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
