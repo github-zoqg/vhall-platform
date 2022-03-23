@@ -31,7 +31,7 @@
           @keydown.stop="onkeydownHandle($event)"
           @keyup.stop="onKeyUpHandle($event)"
         ></textarea>
-        <span v-show="showLimit" class="vhsaas-chat-operator__textarea-show-limit">
+        <span v-show="showWordLimit" class="vhsaas-chat-operator__textarea-show-limit">
           <i
             class="textarea-show-limit__current-count"
             :class="{ limited: inputValue.length >= 140 }"
@@ -101,7 +101,7 @@
     data() {
       return {
         inputValue: '',
-        showLimit: false,
+        showWordLimit: false,
         overlayScrollbar: null, // 滚动条实例
         onlyMine: false,
         questionGap: 0 // 每次发送问答成功以后需要等待15秒才能再此发送问答
@@ -118,16 +118,21 @@
         return this.watchInitData.interact.room_id;
       }
     },
-    // watch: {
-    //   inputValue: {
-    //     handler(newValue) {
-    //       console.log('chat-operator 值发生变化了', newValue);
-    //       // 输入框内容发生变化，更新滚动条
-    //       this.overlayScrollbar.update();
-    //       this.inputHandle();
-    //     }
-    //   }
-    // },
+    watch: {
+      inputValue: {
+        handler(newValue) {
+          // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
+          if (!newValue) {
+            // console.log('chat input 值发生变化了', newValue);
+            // 输入框内容发生变化，更新滚动条
+            this.$nextTick(() => {
+              this.overlayScrollbar.update();
+              this.inputHandle();
+            });
+          }
+        }
+      }
+    },
     mounted() {
       this.overlayScrollbarInit();
       this.watchInitData = useRoomBaseServer().state.watchInitData;
@@ -176,7 +181,7 @@
             hostTextarea.style.minHeight = '59px';
           }
           // 三行的时候显示字数限制，否则不显示
-          this.showLimit = chatTextAreaHeight > 40;
+          this.showWordLimit = chatTextAreaHeight > 40;
 
           // 触发父元素绑定的高度发生变化事件
           setTimeout(() => {

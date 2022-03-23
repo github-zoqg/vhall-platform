@@ -434,10 +434,10 @@
         </span>
       </div>
       <div class="footer">
-        <el-button type="primary" @click="handlerAnswer('public')">
+        <el-button type="primary" round @click="handlerAnswer('public')">
           {{ $t('chat.chat_1089') }}
         </el-button>
-        <el-button @click="handlerAnswer('private')">{{ $t('chat.chat_1090') }}</el-button>
+        <el-button round @click="handlerAnswer('private')">{{ $t('chat.chat_1090') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -1394,12 +1394,18 @@
       .el-message-box__header {
         padding: 0;
       }
-
+      .el-dialog__header {
+        padding: 24px 32px;
+      }
       .el-dialog__body {
         padding-top: 0px;
+        padding-bottom: 0px;
         .el-textarea__inner {
           height: 196px;
           color: #1a1a1a;
+        }
+        .el-button + .el-button {
+          padding-left: 16px;
         }
       }
       .send-left {
