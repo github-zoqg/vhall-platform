@@ -153,8 +153,8 @@
         const { configList = {} } = useRoomBaseServer().state;
         if (
           [2, '2'].includes(this.roleName) &&
-          ['', null, 0].includes(this.userId) &&
           !this.Embed &&
+          (!this.userId || this.userId == 0) &&
           configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
