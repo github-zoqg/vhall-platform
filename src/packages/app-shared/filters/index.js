@@ -119,7 +119,13 @@ Vue.filter('formatHotNum', value => {
   value = parseInt(value);
   let unit = '';
   const k = 99999;
-  const sizes = ['', '万', '亿', '万亿'];
+  const sizes = [
+    '',
+    window.i18n.t('common.common_1014'),
+    window.i18n.t('common.common_1015'),
+    window.i18n.t('common.common_1016')
+  ];
+  // const sizes = ['', '万', '亿', '万亿'];
   let i;
   if (value > k) {
     i = Math.floor(Math.log(value) / Math.log(k));
@@ -129,14 +135,33 @@ Vue.filter('formatHotNum', value => {
   return value + unit;
 });
 
+// 邀请榜人数
+Vue.filter('filterInvitePeople', val => {
+  const num = Number(val);
+  if (num > 10000) {
+    return (num / 10000).toFixed(2) + window.i18n.t('common.common_1014');
+  }
+  return parseInt(num);
+});
+
+// 打赏金额
+Vue.filter('filterAmount', val => {
+  const num = Number(val);
+  if (num > 10000) {
+    return (num / 10000).toFixed(2) + window.i18n.t('common.common_1014');
+  }
+  return num.toFixed(2);
+});
+
 // 播放器回放时间转化
-Vue.filter('secondToDate', val => {
+Vue.filter('secondToDate', (val, type) => {
+  // type= 1 :表示章节
   let time = moment.duration(val, 'seconds');
   let hours = time.hours();
   let minutes = time.minutes();
   let seconds = time.seconds();
   let totalTime = '00:00';
-  if (hours) {
+  if (hours || type == 1) {
     totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
   } else {
     totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
