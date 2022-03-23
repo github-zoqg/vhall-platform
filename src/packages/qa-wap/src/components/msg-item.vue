@@ -78,7 +78,6 @@
       customRoleName() {
         return this.$domainStore.state.roomBaseServer.customRoleName;
       }
-    },
-    filters: {}
+    }
   };
 </script>

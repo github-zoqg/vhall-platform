@@ -157,7 +157,7 @@
                   {{
                     (useCashServer.state.wxInfo.wechat_name_wap
                       ? useCashServer.state.wxInfo.wechat_name_wap
-                      : '') | splitLenStr(6)
+                      : '') | overHidden(6)
                   }}
                   {{
                     useCashServer.state.wxInfo.wechat_name_wap
@@ -308,11 +308,6 @@
         pollTimer: null, // 轮询定时器
         countPoll: 0 // 轮询执行次数
       };
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
     },
     created() {
       this.useUserServer = useUserServer();

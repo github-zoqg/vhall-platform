@@ -334,16 +334,6 @@
       }
     },
     filters: {
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人

@@ -102,7 +102,7 @@
                     <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                     <!-- <img src="./img/saasicon_redu.png"
                       alt="" /> -->
-                    <span>{{ item.pv | unitCovert }}</span>
+                    <span>{{ item.pv | formatHotNum }}</span>
                   </span>
                   <span class="v-date pull-right">
                     {{ tabType === 'live' ? item.start_time : item.created_at.substring(0, 16) }}
@@ -154,25 +154,6 @@
         heightAuto: 200,
         isBool: true // 是否触发下一页加载
       };
-    },
-    filters: {
-      unitCovert(val) {
-        val = Number(val);
-        if (isNaN(val)) return 0;
-        if (val > 1e5 && val < 1e8) {
-          return `${(val / 1e4).toFixed(2)}万`;
-        } else if (val > 1e8) {
-          return `${(val / 1e8).toFixed(2)}亿`;
-        } else {
-          return val;
-        }
-      },
-      subLiveTitle(str) {
-        if (typeof str == 'string') {
-          str = `${str.substring(0, 32)}...`;
-        }
-        return str;
-      }
     },
     beforeCreate() {
       this.homePageServer = useHomepageServer();

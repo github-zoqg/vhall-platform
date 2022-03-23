@@ -15,7 +15,7 @@
               <img class="active-img" src="./img/playing.gif" alt="" />
               <span class="title-label">{{ index + 1 }}.{{ item.title }}</span>
             </div>
-            <span class="time">{{ item.createTime | filterTime }}</span>
+            <span class="time">{{ item.createTime | secondToDate(1) }}</span>
           </div>
           <!-- 子章节 -->
           <template v-if="item.sub.length > 0">
@@ -30,7 +30,7 @@
                 <img class="active-img" src="./img/playing.gif" alt="" />
                 <span class="title-label">{{ index + 1 }}-{{ i + 1 }}.{{ sub.title }}</span>
               </div>
-              <span class="time">{{ sub.createTime | filterTime }}</span>
+              <span class="time">{{ sub.createTime | secondToDate(1) }}</span>
             </div>
           </template>
         </template>
@@ -62,31 +62,6 @@
           }
         }
       };
-    },
-    // props: ['chapterInfo'],
-    filters: {
-      filterTime: val => {
-        const result = parseInt(val);
-        let hour = Math.floor(result / 3600);
-        let minute = Math.floor((result / 60) % 60);
-        let second = Math.floor(result % 60);
-        if (hour == 0) {
-          hour = '00';
-        } else if (hour < 10) {
-          hour = '0' + hour;
-        }
-        if (minute == 0) {
-          minute = '00';
-        } else if (minute < 10) {
-          minute = '0' + minute;
-        }
-        if (second == 0) {
-          second = '00';
-        } else if (second < 10) {
-          second = '0' + second;
-        }
-        return hour + ':' + minute + ':' + second;
-      }
     },
     components: {},
     beforeCreate() {

@@ -99,30 +99,6 @@
         defaultAvatar
       };
     },
-    filters: {
-      filterName(val) {
-        if (val && val.length > 8) {
-          return val.substr(0, 8) + '...';
-        } else {
-          return val;
-        }
-      }
-      // //角色转换
-      // roleFilter: (value, vm) => {
-      //   let ret = '';
-      //   switch (value) {
-      //     case 'host':
-      //       ret = vm.$tdefault(vm.customRoleName[1]);
-      //       break;
-      //     case 'assistant':
-      //       ret = vm.$tdefault(vm.customRoleName[3]);
-      //       break;
-      //     default:
-      //       ret = vm.$t('chat.chat_1062');
-      //   }
-      //   return ret;
-      // }
-    },
     computed: {
       customRoleName() {
         return this.$domainStore.state.roomBaseServer.customRoleName;

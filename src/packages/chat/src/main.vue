@@ -205,18 +205,6 @@
       };
     },
     computed: {
-      //文字过长截取
-      textOverflowSlice() {
-        return function (val = '', len = 0) {
-          if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-            return '';
-          }
-          if (val.length > len) {
-            return val.substring(0, len) + '...';
-          }
-          return val;
-        };
-      },
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor

@@ -94,13 +94,13 @@
     name: 'livePrivateChatList',
     filters: {
       //todo 考虑全局公共utils里处理这个
-      chatTime(value) {
-        if (['', null, void 0].includes(value)) {
-          return;
-        }
-        if (value < 15) return value;
-        return value.substring(0, 16);
-      }
+      // chatTime(value) {
+      //   if (['', null, void 0].includes(value)) {
+      //     return;
+      //   }
+      //   if (value < 15) return value;
+      //   return value.substring(0, 16);
+      // }
     },
     data() {
       return {
