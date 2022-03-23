@@ -23,6 +23,9 @@
         mode: 'watch'
       });
     },
+    created() {
+      this.questionnaireServer.checkIconStatus();
+    },
     methods: {
       checkQuestionnaireIcon() {
         this.$emit('clickIcon', this.questionnaireServerState.lastQuestionnaireId);

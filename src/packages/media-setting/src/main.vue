@@ -146,7 +146,10 @@
       });
       // 监听设备禁用
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        this.popAlert.visible = true;
+        if (+msg.data.streamType !== 3) {
+          // 非桌面共享
+          this.popAlert.visible = true;
+        }
       });
     },
     beforeDestroy() {

@@ -270,6 +270,11 @@
             } else {
               if (this.isInGroup) {
                 vn.setHiddenState(true);
+              } else if (
+                this.presenterId != this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id
+              ) {
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
               } else {
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
