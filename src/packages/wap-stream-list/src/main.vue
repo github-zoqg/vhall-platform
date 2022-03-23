@@ -43,7 +43,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          热度 &nbsp;{{ hotNum | formatHotNum }}
+          &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
