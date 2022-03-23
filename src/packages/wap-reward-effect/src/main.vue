@@ -23,7 +23,13 @@
             <span class="money">{{ rewardEffectInfo.gift_price }}</span>
             元
           </span> -->
-        <span class="gift-name" v-if="rewardEffectInfo.data.type == 'gift_send_success'">
+        <span
+          class="gift-name"
+          v-if="
+            rewardEffectInfo.data.type == 'gift_send_success' ||
+            rewardEffectInfo.data.event_type == 'free_gift_send'
+          "
+        >
           {{ rewardEffectInfo.data.gift_name }}
           <!-- <span class="count">
               <span class="multiple">x</span>
@@ -31,10 +37,13 @@
             </span> -->
         </span>
         <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
-          {{ rewardEffectInfo.data.text_content }}
+          {{ rewardEffectInfo.data.reward_describe | overHidden(8) }}
         </span>
         <span
-          v-if="rewardEffectInfo.data.type == 'gift_send_success'"
+          v-if="
+            rewardEffectInfo.data.type == 'gift_send_success' ||
+            rewardEffectInfo.data.event_type == 'free_gift_send'
+          "
           class="gift-img"
           :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
@@ -206,6 +215,7 @@
         console.log('gift_user_avatar------>', rewardEffectInfo);
         if (
           rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.type == 'reward_pay_ok' ||
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           // 来源于接口消息字段
@@ -224,6 +234,7 @@
       gift_user_nickname(rewardEffectInfo) {
         if (
           rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.type == 'reward_pay_ok' ||
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           if (rewardEffectInfo.data.gift_user_nickname) {

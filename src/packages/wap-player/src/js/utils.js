@@ -1,27 +1,5 @@
 import semver from 'semver';
 import UAParser from 'ua-parser-js';
-const mat = ms => {
-  const val = ms + '';
-  if (val.length < 2) {
-    return '0' + val;
-  }
-  return val;
-};
-export const secondToDateZH = result => {
-  if (!result) return '00:00';
-  const h = mat(Math.floor(result / 3600));
-  const m = mat(Math.floor((result / 60) % 60));
-  const s = mat(Math.floor(result % 60));
-
-  // let _h = h > 0 ? h + "时" : '';
-  // let _m = m > 0 ? m + "分" : '';
-  // let _s = s > 0 ? s + "秒" : '';
-  if (h < 1) {
-    return `${m}:${s}`;
-  } else {
-    return `${h}:${m}:${s}`;
-  }
-};
 export function computeRecordTime(val) {
   const s = val; // 秒
   let m = 0; // 分

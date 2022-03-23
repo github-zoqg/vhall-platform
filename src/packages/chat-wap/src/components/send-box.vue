@@ -237,7 +237,10 @@
       },
       //是否回放禁言
       isvod() {
-        return this.webinar.type == 5 && this.configList['ui.watch_record_no_chatting'] == 1;
+        return (
+          (this.webinar.type == 5 || this.webinar.type == 4) &&
+          this.configList['ui.watch_record_no_chatting'] == 1
+        );
       }
     },
     watch: {

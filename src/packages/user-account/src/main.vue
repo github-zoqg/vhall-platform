@@ -27,7 +27,7 @@
           <label>{{ $t('account.account_1006') }}</label>
           <div class="vmp-user-account-wrap-item__center nick-item">
             <span v-if="!isNickNameEdit">
-              {{ userServer.state.userInfo.nick_name | splitLenStr(6) }}
+              {{ userServer.state.userInfo.nick_name | overHidden(6) }}
             </span>
             <el-input
               v-if="isNickNameEdit"
@@ -97,7 +97,7 @@
         <div class="vmp-user-account-wrap-item bind-item">
           <label>{{ $t('account.account_1018') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ userServer.state.thirdInfo.QQNickName | splitLenStr(6) }}
+            {{ userServer.state.thirdInfo.QQNickName | overHidden(6) }}
             {{
               userServer.state.thirdInfo.QQNickName
                 ? `（${$t('account.account_1019')}）`
@@ -117,7 +117,7 @@
         <div class="vmp-user-account-wrap-item bind-item">
           <label>{{ $t('account.account_1023') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ userServer.state.thirdInfo.WeixinNickName | splitLenStr(6) }}
+            {{ userServer.state.thirdInfo.WeixinNickName | overHidden(6) }}
             {{
               userServer.state.thirdInfo.WeixinNickName
                 ? `（${$t('account.account_1019')}）`
@@ -451,11 +451,6 @@
         this.isNickNameEdit = false;
         this.nickError = '';
         this.userServer.getUserInfo({ scene_id: 2 });
-      }
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     }
   };

@@ -23,7 +23,9 @@
       >
         <!-- 本地流 -->
         <div class="vmp-split-screen__stream-container">
-          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+          <div class="vmp-split-screen__stream-container-box">
+            <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
+          </div>
         </div>
         <!-- 远端流 -->
         <div
@@ -31,7 +33,9 @@
           v-for="speaker in remoteSpeakers"
           :key="speaker.id"
         >
-          <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
+          <div class="vmp-split-screen__stream-container-box">
+            <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
+          </div>
         </div>
       </div>
     </div>
@@ -180,8 +184,17 @@
       justify-content: center;
       &__1 {
         .vmp-split-screen__stream-container {
-          // width: 100%;
-          height: 100vh;
+          overflow: hidden;
+          &-box {
+            height: 100vh;
+            padding-top: 0 !important;
+            .vmp-stream-local {
+              position: static !important;
+            }
+            .vmp-stream-remote {
+              position: static !important;
+            }
+          }
         }
       }
       &__2 {
@@ -203,8 +216,17 @@
       }
       .vmp-split-screen__stream-container {
         box-sizing: border-box;
+        position: relative;
         &-box {
           padding-top: 56.25%;
+          .vmp-stream-local {
+            position: absolute;
+            top: 0;
+          }
+          .vmp-stream-remote {
+            position: absolute;
+            top: 0;
+          }
         }
         .vmp-stream-local__shadow-box,
         .vmp-stream-remote__shadow-box {

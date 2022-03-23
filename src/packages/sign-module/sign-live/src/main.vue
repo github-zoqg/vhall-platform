@@ -96,6 +96,8 @@
       });
       // 签到关闭
       this.signServer.$on('sign_end', e => {
+        this.remaining = 0;
+        clearInterval(this.timer);
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,
@@ -126,6 +128,7 @@
               this.nowSignObj = res.data;
               this.signInfo.autoSign = res.data.is_auto_sign == 1;
               if (res.data.is_auto_sign == 1) {
+                window.sessionStorage.setItem('isAutoSign', 'true');
                 this.remaining = res.data.auto_sign_time_ttl;
                 this.signInfo.interval = res.data.auto_sign_time;
                 this.totalTime = res.data.auto_sign_time;
@@ -150,7 +153,7 @@
       setIntervalAction() {
         clearInterval(this.timer);
         this.timer = setInterval(() => {
-          if (--this.remaining <= 0) {
+          if (--this.remaining == 0) {
             if (sessionStorage.getItem('isAutoSign')) {
               this.remaining = this.totalTime;
               this.signVisible = false;

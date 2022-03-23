@@ -139,7 +139,6 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
