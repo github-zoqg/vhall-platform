@@ -18,14 +18,14 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="isStreamPublished && localSpeaker.streamId">
-      <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
+    <section class="vmp-stream-local__bottom" v-show="isStreamPublished && localSpeaker.streamId">
+      <span class="vmp-stream-local__bottom-nickname">{{ joinInfo.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="
           localSpeaker.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
@@ -168,6 +168,16 @@
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
       this.listenEvents();
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: '网络异常导致互动房间连接失败'
+        }).then(() => {
+          window.location.reload();
+        });
+      });
     },
     mounted() {
       this.checkStartPush();
@@ -546,7 +556,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;

@@ -101,11 +101,13 @@
         //字数限制
         inputMaxLength: 140,
         //显示字数限制提示
-        showWordLimit: true,
+        showWordLimit: false,
         //聊天里临时选择的图片
         imgUrls: [],
         //回复消息
-        replyMsg: {}
+        replyMsg: {},
+        // 聊天输入框的值，是否是从无到有。默认null表示一开始是无内容的，一但有内容了，除非当前inputValue为空，否则不处理
+        isWordNull: null
       };
     },
     computed: {
@@ -136,13 +138,19 @@
             ? `${replyText}${this.replyMsg.nickname}: ${this.trimPlaceHolder('reply')}`
             : `${replyText}${this.replyMsg.nickname}: `;
         }
+      },
+      inputValue(newValue) {
+        // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
+        if (!newValue) {
+          // console.log('chat input 值发生变化了', newValue);
+          // 输入框内容发生变化，更新滚动条
+          this.$nextTick(() => {
+            this.overlayScrollbar.update();
+            this.inputHandle();
+          });
+          // this.replyMsg = {};
+        }
       }
-      // inputValue(newValue) {
-      //   if (!newValue) {
-      //     console.log('chat input 值发生变化了', newValue);
-      //     this.replyMsg = {};
-      //   }
-      // }
     },
     beforeCreate() {},
     mounted() {
@@ -184,7 +192,7 @@
             hostTextarea.style.minHeight = '59px';
           }
           // 三行的时候显示字数限制，否则不显示
-          this.showLimit = chatTextAreaHeight > 40;
+          this.showWordLimit = chatTextAreaHeight > 40;
 
           // 触发父元素绑定的高度发生变化事件
           setTimeout(() => {
@@ -195,6 +203,7 @@
       },
       //按下enter键的处理
       onkeydownHandle(event) {
+        console.log('当前按键....', event.keyCode, event, this.inputValue.length);
         if (event.keyCode === 13) {
           this.sendMsgThrottle();
           //阻止默认行为
@@ -425,7 +434,7 @@
     align-items: flex-end;
 
     &__textarea-box {
-      width: 220px;
+      width: 264px;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -479,7 +488,7 @@
     }
 
     &__textarea-placeholder {
-      width: 220px;
+      width: 264px;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;

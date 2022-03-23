@@ -24,7 +24,7 @@
           @keydown.stop="onkeydownHandle($event)"
           @keyup.stop="onKeyUpHandle"
         ></textarea>
-        <span v-show="showLimit" class="input-bar__textarea-box__textarea-show-limit">
+        <span v-show="showWordLimit" class="input-bar__textarea-box__textarea-show-limit">
           <i
             class="textarea-show-limit__current-count"
             :class="{ limited: inputValue.length >= 140 }"
@@ -40,10 +40,11 @@
         class="input-bar__textarea-box__textarea-placeholder"
       >
         <span v-show="chatLoginStatus" class="input-bar__textarea-box__no-login">
-          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">
-            {{ $t('nav.nav_1005') }}
-          </span>
-          {{ $t('chat.chat_1001', '') }}
+          <i18n path="chat.chat_1001">
+            <span class="input-bar__textarea-box__chat-login-btn" place="n" @click="callLogin">
+              {{ $t('nav.nav_1005') }}
+            </span>
+          </i18n>
         </span>
         <span
           v-show="inputStatus.disable && !chatLoginStatus"
@@ -114,7 +115,7 @@
         //输入框的值
         inputValue: '',
         //是否展示字数限制
-        showLimit: false,
+        showWordLimit: false,
         //保存的滚动条实例
         overlayScrollbar: null,
         //发送私聊消息的间隔
@@ -126,15 +127,21 @@
       };
     },
     computed: {},
-    // watch: {
-    //   // inputValue: {
-    //   //   handler(newValue) {
-    //   //     // 输入框内容发生变化，更新滚动条
-    //   //     // this.overlayScrollbar.update();
-    //   //     this.inputHandle();
-    //   //   }
-    //   // }
-    // },
+    watch: {
+      inputValue: {
+        handler(newValue) {
+          // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
+          if (!newValue) {
+            // console.log('chat input 值发生变化了', newValue);
+            // 输入框内容发生变化，更新滚动条
+            this.$nextTick(() => {
+              this.overlayScrollbar.update();
+              this.inputHandle();
+            });
+          }
+        }
+      }
+    },
     beforeCreate() {
       this.chatServer = useChatServer();
     },
@@ -185,7 +192,7 @@
             hostTextarea.style.minHeight = '59px';
           }
           // 三行的时候显示字数限制，否则不显示
-          this.showLimit = chatTextAreaHeight > 40;
+          this.showWordLimit = chatTextAreaHeight > 40;
 
           // 触发父元素绑定的高度发生变化事件
           setTimeout(() => {
@@ -419,12 +426,9 @@
         width: 220px;
         background-color: @bg-dark-normal;
         font-size: 14px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        font-weight: 400;
         color: @font-dark-normal;
         line-height: 20px;
         padding: 10px 12px;
-        text-align: center;
         border-radius: 20px;
       }
       .input-bar__textarea-box__no-login {

@@ -14,7 +14,7 @@
         {{
           (redPacketInfo && redPacketInfo.describe
             ? $t(redPacketInfo.describe) || $t('interact_tools.interact_tools_1032')
-            : $t('interact_tools.interact_tools_1032')) | splitLenStr(8)
+            : $t('interact_tools.interact_tools_1032')) | overHidden(8)
         }}
       </h1>
       <img
@@ -26,7 +26,7 @@
       <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
       <p>
         {{
-          (redPacketInfo && redPacketInfo.nickname ? redPacketInfo.nickname : '') | splitLenStr(8)
+          (redPacketInfo && redPacketInfo.nickname ? redPacketInfo.nickname : '') | overHidden(8)
         }}
       </p>
     </div>
@@ -50,11 +50,6 @@
         accepted: false, // 是否已领取
         opened: false
       };
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
     },
     computed: {
       userId() {

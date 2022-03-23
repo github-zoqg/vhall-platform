@@ -30,9 +30,9 @@
       class="vmp-desktop-screen__tip"
       v-show="isShareScreen && desktopShareInfo.accountId == accountId && roleName != 2"
     >
-      <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
+      <i class="vmp-desktop-screen__img"></i>
       <br />
-      <p>桌面共享中...</p>
+      <p>桌面共享中....</p>
     </div>
 
     <!--没有权限弹窗 -->
@@ -249,6 +249,7 @@
         });
         this.desktopShareServer.$on('EVENT_STREAM_END', () => {
           this.setDesktop('0');
+          this.interactiveServer.resetLayout();
         });
 
         useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -290,6 +291,9 @@
           // 桌面共享开启消息
           if (msg.data.type === 'desktop_sharing_disable') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
+              if (useRoomBaseServer().state.miniElement == 'player') {
+                return;
+              }
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -300,6 +304,9 @@
           // 桌面共享关闭消息
           if (msg.data.type === 'desktop_sharing_open') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
+              if (useRoomBaseServer().state.miniElement == 'doc') {
+                return;
+              }
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -345,9 +352,8 @@
               .publishDesktopShareStream()
               .then(() => {
                 // 重新布局旁路
-                this.interactiveServer.resetLayout();
-
                 console.log('[screen] 桌面共享推流成功');
+                this.interactiveServer.resetLayout();
 
                 this.setDesktop('1');
               })
@@ -357,7 +363,7 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
-            if (error?.data?.error?.type == 'access-denied') {
+            if (error?.name == 'NotAllowed') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
               }
@@ -368,6 +374,7 @@
       stopShare() {
         this.desktopShareServer.stopShareScreen().then(() => {
           this.setDesktop(0);
+          this.interactiveServer.resetLayout();
         });
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
@@ -434,11 +441,17 @@
       margin: auto;
       width: 400px;
       height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
       & > i {
-        font-size: 137px;
-        display: block;
-        color: #999;
-        width: 100%;
+        width: 124px;
+        height: 86px;
+        background: url('./img/desktop-share.png');
+        background-repeat: no-repeat;
+        background-size: 100%;
       }
 
       & > p {

@@ -11,7 +11,7 @@
         <ul v-if="noticeList.length" v-infinite-scroll="moreLoadData">
           <li v-for="(item, index) in noticeList" :key="index">
             <div class="data-time">
-              {{ item.created_at | formatTime }}
+              {{ item.created_at | chatTime }}
             </div>
             <div class="data-text">
               <span class="data-text_circle">
@@ -32,11 +32,6 @@
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeList',
-    filters: {
-      formatTime(value) {
-        return value.substring(11, 16);
-      }
-    },
     data() {
       return {
         noticeNum: 0,
@@ -148,8 +143,9 @@
 <style lang="less">
   .vmp-notice-list {
     height: 100%;
-    position: relative;
+    // position: relative;
     &_icon {
+      position: relative;
       .icon-img {
         height: 32px;
         width: 32px;
@@ -180,7 +176,7 @@
     }
     &_container {
       position: absolute;
-      right: -100px;
+      right: -48px;
       bottom: 50px;
       z-index: 12;
       width: 492px;

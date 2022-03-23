@@ -197,7 +197,11 @@
       handleApplyClick() {
         useMicServer()
           .userApply()
-          .then(() => {
+          .then(res => {
+            if (+res.code !== 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this.isApplying = true;
             this.applyTime = 30;
             this._applyInterval = setInterval(async () => {

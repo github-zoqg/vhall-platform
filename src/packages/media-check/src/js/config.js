@@ -1,5 +1,4 @@
 const STEP_OPTS = {
-  DEFAULT: 0, // 预留字段，表示进来时默认从第几个开始
   VIDEO: 0,
   AUDIO_INPUT: 1,
   AUDIO_OUTPUT: 2,

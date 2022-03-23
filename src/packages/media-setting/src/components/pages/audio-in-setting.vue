@@ -27,7 +27,7 @@
       <section class="vmp-media-setting-tips">
         <section class="vmp-media-setting-tips__title">
           <p>{{ $t('setting.setting_1018') }}</p>
-          <p>{{ $t('setting.setting_1019') }}：</p>
+          <p>{{ $t('setting.setting_1019') }}</p>
         </section>
         <section class="vmp-media-setting-tips__content">
           <p>1. {{ $t('setting.setting_1020') }}</p>

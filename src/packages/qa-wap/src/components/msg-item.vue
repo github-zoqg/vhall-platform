@@ -1,6 +1,6 @@
 <template>
   <div
-    class="qa-item-wrapper"
+    :class="['qa-item-wrapper', { 'qa-last-ios-progress': index == length - 1 }]"
     v-if="
       source.join_id == joinId || (source.answer && source.answer.join_id == joinId) || !isOnlyMine
     "
@@ -59,6 +59,10 @@
 <script>
   export default {
     props: {
+      index: {
+        // 每一行的唯一索引
+        type: Number
+      },
       source: {
         type: Object,
         required: true,
@@ -67,13 +71,13 @@
       isOnlyMine: {
         default: false
       },
-      joinId: {}
+      joinId: {},
+      length: {}
     },
     computed: {
       customRoleName() {
         return this.$domainStore.state.roomBaseServer.customRoleName;
       }
-    },
-    filters: {}
+    }
   };
 </script>

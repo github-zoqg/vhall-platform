@@ -13,7 +13,10 @@
     <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
-    <section v-if="!stream.streamId" class="vmp-stream-remote__container__net-error">
+    <section
+      v-if="isShowNetError && !stream.streamId"
+      class="vmp-stream-remote__container__net-error"
+    >
       <div class="net-error-img"></div>
     </section>
 
@@ -23,14 +26,14 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="stream.streamId">
-      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
+    <section class="vmp-stream-local__bottom" v-show="stream.streamId">
+      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
@@ -54,7 +57,8 @@
       return {
         audioLevel: 1,
         networkStatus: 0,
-        isFullScreen: false
+        isFullScreen: false,
+        isShowNetError: false
       };
     },
     props: {
@@ -135,10 +139,15 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
+    },
+    created() {
+      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
+      setTimeout(() => {
+        this.isShowNetError = true;
+      }, 5000);
     },
     beforeDestroy() {
       // 清空计时器
@@ -309,7 +318,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;

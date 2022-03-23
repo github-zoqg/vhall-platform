@@ -143,6 +143,7 @@
         this.roomId = interact.room_id;
         this.configList = configList;
         this.roleName = join_info.role_name;
+        this.userId = join_info.third_party_user_id;
         this.isEmbed = embed;
         this.joinInfo = join_info;
         this.webinar = webinar;
@@ -153,8 +154,8 @@
         const { configList = {} } = useRoomBaseServer().state;
         if (
           [2, '2'].includes(this.roleName) &&
-          ['', null, 0].includes(this.userId) &&
           !this.Embed &&
+          (!this.userId || this.userId == 0) &&
           configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
@@ -174,7 +175,8 @@
         } else {
           this.inputStatus.placeholder = this.$t('chat.chat_1021');
         }
-        const isVod = this.webinar.type == 5 && this.watchInitData.paas_record_id;
+        const isVod =
+          (this.webinar.type == 5 || this.webinar.type == 4) && this.watchInitData.paas_record_id;
         // 判断控制台回放禁言状态
         if (isVod && this.configList && this.configList['ui.watch_record_no_chatting'] == 1) {
           this.inputStatus.disable = true;

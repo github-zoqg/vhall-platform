@@ -126,7 +126,7 @@
               <i
                 class="vh-iconfont"
                 :class="voice > 1 ? 'vh-line-voice' : 'vh-line-mute'"
-                @click="jingYin"
+                @click="videoMute"
               ></i>
             </span>
             <div class="vmp-ver-slider">
@@ -264,21 +264,6 @@
           this.insertFileStreamVisible =
             this.$domainStore.state.insertFileServer.isInsertFilePushing;
         }
-      }
-    },
-    filters: {
-      secondToDate(val) {
-        let time = moment.duration(val, 'seconds');
-        let hours = time.hours();
-        let minutes = time.minutes();
-        let seconds = time.seconds();
-        let totalTime = '00:00';
-        if (hours) {
-          totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
-        } else {
-          totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
-        }
-        return totalTime;
       }
     },
     components: { videoPreview },
@@ -683,7 +668,7 @@
           if (this.docServer.state.switchStatus) {
             this.roomBaseServer.setChangeElement('stream-list');
           } else {
-            this.roomBaseServer.setChangeElement('doc');
+            this.roomBaseServer.setChangeElement('');
           }
         }
         this.insertFileServer.clearInsertFileInfo();
@@ -827,13 +812,13 @@
         }
       },
       // video静音
-      jingYin() {
+      videoMute() {
         const vo = this._localFileVideoElement && this._localFileVideoElement.volume;
         if (vo) {
           if (vo > 0.01) {
             this._cacheVolume = vo;
-            this._localFileVideoElement.volume = 0.01;
-            this.voice = 1;
+            this._localFileVideoElement.volume = 0;
+            this.voice = 0;
           } else {
             this._localFileVideoElement.volume = this._cacheVolume;
             this.voice = this._cacheVolume * 100;

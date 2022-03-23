@@ -373,7 +373,7 @@
               }
             }
           }
-          .vmp-stream-local__bootom {
+          .vmp-stream-local__bottom {
             bottom: 17px;
           }
         }
@@ -387,11 +387,22 @@
         width: 309px;
         height: 240px;
         z-index: 1;
-        .vmp-stream-local__bootom-role {
+        .vmp-stream-local__bottom {
+          padding: 0 10px;
+          height: 28px;
+          line-height: 28px;
+        }
+        .vmp-stream-local__bottom-role {
           padding: 0 8px;
         }
-        .vmp-stream-local__bootom-nickname {
+        .vmp-stream-local__bottom-nickname {
           width: 80px;
+        }
+        .vmp-stream-local__bottom-mic {
+          font-size: 14px;
+        }
+        .vmp-stream-local__bottom-signal {
+          margin-left: 10px;
         }
       }
     }
@@ -419,10 +430,10 @@
     .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
-      .vmp-stream-local__bootom-role {
+      .vmp-stream-local__bottom-role {
         padding: 0 6px;
       }
-      .vmp-stream-local__bootom-nickname {
+      .vmp-stream-local__bottom-nickname {
         width: 40px;
       }
     }

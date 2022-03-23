@@ -86,7 +86,7 @@
     height: calc(100%);
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    // overflow: auto;
 
     .vmp-tab-container-mainarea {
       height: 100%;
