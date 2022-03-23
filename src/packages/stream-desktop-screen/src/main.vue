@@ -246,6 +246,7 @@
       addEvents() {
         this.desktopShareServer.$on('screen_stream_add', () => {
           this.subscribeStream();
+          this.interactiveServer.resetLayout();
         });
         this.desktopShareServer.$on('EVENT_STREAM_END', () => {
           this.setDesktop('0');
