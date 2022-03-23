@@ -436,6 +436,11 @@
       }
     }
   }
+  .lottery-dialog-content {
+    .el-switch.is-checked .el-switch__core::after {
+      margin-left: -13px;
+    }
+  }
 </style>
 <style lang="less" scoped>
   .lottery-dialog-content {
@@ -458,9 +463,7 @@
           height: 12px;
         }
       }
-      .el-switch.is-checked .el-switch__core::after {
-        margin-left: -13px;
-      }
+
       span {
         font-size: 14px;
         font-family: @fontRegular;

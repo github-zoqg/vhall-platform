@@ -78,8 +78,10 @@
        * @description 聊天区域点击,显示中奖信息(都是中奖,提交与未提交的区别)
        */
       accept(msg) {
-        console.log(msg);
         this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
+          console.log(msg);
+          this.showWinnerList = !!msg.publish_winner;
+          console.log(' this.showWinnerList ', this.showWinnerList);
           if (res.code === 200) {
             if (res.data.take_award === 0) {
               this.lotteryView = 'LotteryWin';
@@ -98,6 +100,7 @@
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
           this.lotteryId = data.id;
+          this.showWinnerList = !!data.publish_winner;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
@@ -174,7 +177,6 @@
           // 未中奖
           this.lotteryView = 'LotteryMiss';
         }
-        this.showWinnerList = !!msg.data.publish_winner;
         this.dialogVisible = true;
         this.zIndexServer.setDialogZIndex('lottery');
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
@@ -246,7 +248,7 @@
   .vhall-lottery-wap {
     .lottery__close-btn {
       position: absolute;
-      bottom: -18px;
+      bottom: -36px;
       left: 50%;
       transform: translateX(-15px);
       font-size: 30px;
