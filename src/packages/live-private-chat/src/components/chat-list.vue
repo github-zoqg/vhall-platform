@@ -79,8 +79,8 @@
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
-      <!--      <dt></dt>-->
-      <!--      <dd>暂时没有聊天哦～</dd>-->
+      <!-- <dt></dt>
+      <dd>暂时没有聊天哦～</dd> -->
     </dl>
   </div>
 </template>
