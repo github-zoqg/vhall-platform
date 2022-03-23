@@ -144,6 +144,7 @@
     margin: 0px auto;
     .tab {
       & > span {
+        display: inline-block;
         font-size: 34px;
         line-height: 48px;
         color: #444444;
@@ -153,7 +154,7 @@
       }
       .line {
         position: relative;
-        margin: 0 30px;
+        margin: 0 16px;
         height: 27px;
         border-left: 1px solid #444;
       }

@@ -59,7 +59,7 @@
                 </div>
               </div>
               <img v-else class="avatar" :src="item.img_url" alt="" />
-              <span class="nickname">{{ item.nick_name | filterNickname }}</span>
+              <span class="nickname">{{ item.nick_name | overHidden(8) }}</span>
               <span class="num">
                 <i18n path="nav.nav_1037">
                   <span style="color: #fb3a32" place="n">
@@ -102,7 +102,7 @@
                 </div>
               </div>
               <img v-else class="avatar" :src="item.avatar" alt="" />
-              <span class="nickname">{{ item.nickname | filterNickname }}</span>
+              <span class="nickname">{{ item.nickname | overHidden(8) }}</span>
               <span class="num">
                 <i18n path="interact_tools.interact_tools_1073">
                   <span style="color: #fb3a32" place="n">
@@ -141,29 +141,6 @@
 
   export default {
     name: 'component-rank',
-    filters: {
-      filterNickname(val) {
-        if (val.length > 8) {
-          return val.substr(0, 8) + '...';
-        } else {
-          return val;
-        }
-      },
-      filterInvitePeople(val) {
-        const num = Number(val);
-        if (num > 10000) {
-          return (num / 10000).toFixed(2) + this.$t('common.common_1014');
-        }
-        return parseInt(num);
-      },
-      filterAmount(val) {
-        const num = Number(val);
-        if (num > 10000) {
-          return (num / 10000).toFixed(2) + this.$t('common.common_1014');
-        }
-        return num.toFixed(2);
-      }
-    },
     props: {
       info: {
         required: false

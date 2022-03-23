@@ -125,7 +125,7 @@
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
         <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
-          {{ totalNum | numberCompression }}人在线
+          {{ totalNum | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -226,19 +226,6 @@
     components: {
       memberItem,
       scroll
-    },
-    filters: {
-      //数值压缩
-      numberCompression(num) {
-        if (num < 10000) {
-          return num;
-        } else {
-          const n = Math.floor(num / 10000);
-          let l = Math.floor((num % 10000) / 1000);
-          l = l === 0 ? '' : '.' + l;
-          return n + l + '万';
-        }
-      }
     },
     data() {
       return {
@@ -691,7 +678,10 @@
       },
       //直播结束重置视图里的一些状态
       resetViewData() {
-        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+        this.allowRaiseHand = false;
+        if (this.tabIndex !== 1) {
+          this.switchToTab(1);
+        }
       },
       //切换允许举手状态
       onSwitchAllowRaiseHand(element) {

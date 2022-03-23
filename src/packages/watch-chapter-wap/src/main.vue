@@ -9,7 +9,7 @@
           :class="{ active: select == item.createTime }"
         >
           <span class="title">{{ index + 1 }}.{{ $t(item.title) }}</span>
-          <span class="time">{{ item.createTime | filterTime }}</span>
+          <span class="time">{{ item.createTime | secondToDate(1) }}</span>
         </div>
         <template v-if="item.sub.length > 0">
           <div
@@ -20,7 +20,7 @@
             :class="{ active: select == sub.createTime }"
           >
             <span class="title">{{ index + 1 }}-{{ i + 1 }}.{{ $t(sub.title) }}</span>
-            <span class="time">{{ sub.createTime | filterTime }}</span>
+            <span class="time">{{ sub.createTime | secondToDate(1) }}</span>
           </div>
         </template>
       </li>
@@ -45,31 +45,6 @@
         chapterData: [],
         webinarData: {}
       };
-    },
-    // props: ['chapterData', 'webinarData'],
-    filters: {
-      filterTime: val => {
-        const result = parseInt(val);
-        let hour = Math.floor(result / 3600);
-        let minute = Math.floor((result / 60) % 60);
-        let second = Math.floor(result % 60);
-        if (hour == 0) {
-          hour = '00';
-        } else if (hour < 10) {
-          hour = '0' + hour;
-        }
-        if (minute == 0) {
-          minute = '00';
-        } else if (minute < 10) {
-          minute = '0' + minute;
-        }
-        if (second == 0) {
-          second = '00';
-        } else if (second < 10) {
-          second = '0' + second;
-        }
-        return hour + ':' + minute + ':' + second;
-      }
     },
     beforeCreate() {
       this.webinarData = useRoomBaseServer().state.watchInitDate;

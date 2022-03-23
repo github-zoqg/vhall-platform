@@ -295,6 +295,10 @@
             display: none;
           }
         }
+        &-group {
+          top: 0;
+          height: 100%;
+        }
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
       .vmp-wap-stream-wrap-mask-screen {
