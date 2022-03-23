@@ -126,7 +126,7 @@
               <i
                 class="vh-iconfont"
                 :class="voice > 1 ? 'vh-line-voice' : 'vh-line-mute'"
-                @click="jingYin"
+                @click="videoMute"
               ></i>
             </span>
             <div class="vmp-ver-slider">
@@ -827,13 +827,13 @@
         }
       },
       // video静音
-      jingYin() {
+      videoMute() {
         const vo = this._localFileVideoElement && this._localFileVideoElement.volume;
         if (vo) {
           if (vo > 0.01) {
             this._cacheVolume = vo;
-            this._localFileVideoElement.volume = 0.01;
-            this.voice = 1;
+            this._localFileVideoElement.volume = 0;
+            this.voice = 0;
           } else {
             this._localFileVideoElement.volume = this._cacheVolume;
             this.voice = this._cacheVolume * 100;
