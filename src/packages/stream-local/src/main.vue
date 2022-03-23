@@ -532,7 +532,7 @@
           if (
             this.isNoDelay === 1 ||
             this.mode === 6 ||
-            [4, '4'].includes(this.joinInfo.role_name)
+            [1, 4, '1', '4'].includes(this.joinInfo.role_name)
           ) {
             //  初始化互动实例
             this.interactiveServer.init();
