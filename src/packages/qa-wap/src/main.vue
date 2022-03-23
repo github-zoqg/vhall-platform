@@ -12,7 +12,8 @@
           @tobottom="tobottom"
           :extra-props="{
             isOnlyMine,
-            joinId
+            joinId,
+            length: qaList.length
           }"
         ></virtual-list>
       </div>
@@ -190,6 +191,9 @@
         overflow: auto;
         .qa-item-wrapper {
           padding: 0 30px;
+          &.qa-last-ios-progress {
+            padding-bottom: 34px;
+          }
           .question {
             padding: 20px 0;
           }
