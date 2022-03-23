@@ -51,7 +51,7 @@
               />
             </div>
             <p :class="['error-tip', { error: errorMsgShow.mobile }]">
-              {{ errorMsgShow.mobileText }}
+              {{ errorMsgShow.mobile ? errorMsgShow.mobileText : '' }}
             </p>
           </li>
           <!-- 图片滑动 -->

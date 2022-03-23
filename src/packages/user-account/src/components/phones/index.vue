@@ -49,7 +49,7 @@
             :maxlength="11"
           />
         </el-form-item>
-        <el-form-item id="captcha-box" prop="imgCode">
+        <el-form-item id="captcha-box">
           <NECaptcha ref="NECaptcha" v-model="setPhoneForm.imgCode" />
         </el-form-item>
         <el-form-item prop="code" class="vmp-user-account-wrap__code">

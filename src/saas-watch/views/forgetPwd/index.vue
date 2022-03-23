@@ -340,6 +340,16 @@
       },
       // 第二步获取短信验证码
       getDyCode() {
+        const failure = res => {
+          this.$message({
+            message: this.$tec(res.code) || res.msg,
+            showClose: true,
+            // duration: 0,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          this.$refs.NECaptcha?.refreshNECaptha();
+        };
         if (this.isType === 'phone') {
           if (this.checkMobile()) {
             if (!this.dynamicForm.text) {
@@ -363,23 +373,11 @@
                 if (res && res.code == 200) {
                   this.countDown();
                 } else {
-                  this.$message({
-                    message: this.$tec(res.code) || res.msg,
-                    showClose: true,
-                    // duration: 0,
-                    type: 'error',
-                    customClass: 'zdy-info-box'
-                  });
+                  failure(res);
                 }
               })
               .catch(res => {
-                this.$message({
-                  message: this.$tec(res.code) || res.msg,
-                  showClose: true,
-                  // duration: 0,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
+                failure(res);
               });
           }
         } else if (this.isType === 'email') {
@@ -392,24 +390,14 @@
                 scene_id: this.isType === 'phone' ? 5 : 4
               })
               .then(res => {
-                res && res.code == 200
-                  ? this.countDown()
-                  : this.$message({
-                      message: this.$tec(res.code) || res.msg,
-                      showClose: true,
-                      // duration: 0,
-                      type: 'error',
-                      customClass: 'zdy-info-box'
-                    });
+                if (res && res.code == 200) {
+                  this.countDown();
+                } else {
+                  failure(res);
+                }
               })
               .catch(res => {
-                this.$message({
-                  message: this.$tec(res.code) || res.msg,
-                  showClose: true,
-                  // duration: 0,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
+                failure(res);
               });
           }
         }
