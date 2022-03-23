@@ -410,7 +410,7 @@
     .gift-name {
       width: 216px;
       height: 24px;
-      font-size: 16px;
+      font-size: 14px;
       color: #ffffff;
       line-height: 24px;
       position: absolute;

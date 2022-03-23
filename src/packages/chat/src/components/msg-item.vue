@@ -797,7 +797,7 @@
         display: flex;
         justify-content: center;
         .interact-tools-content {
-          margin-top: 20px;
+          /*  margin-top: 20px; TODO: 注释掉内部20间距，外部有20间距设定 */
           line-height: 20px;
           padding: 5px 16px;
           background-color: #222222;

@@ -434,7 +434,7 @@
     align-items: flex-end;
 
     &__textarea-box {
-      width: 220px;
+      width: 264px;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -488,7 +488,7 @@
     }
 
     &__textarea-placeholder {
-      width: 220px;
+      width: 264px;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
