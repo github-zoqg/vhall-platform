@@ -13,7 +13,6 @@ export const serverConfig = {
       'layerBody',
       'layerFooter',
       'comAllDialog',
-      'comQuestionnaire',
       'comGoodsDetailPc'
     ]
     // children: ['layerBody']
@@ -74,11 +73,9 @@ export const serverConfig = {
       'comSignUpForm',
       'comUserAccount',
       'comCash',
-      'comLottery',
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comRedPacket',
       'comMicInvited'
     ]
   },
@@ -334,7 +331,7 @@ export const serverConfig = {
       method: 'open',
       args: ['$0']
     },
-    children: ['comSignWatch', 'comWatchTimer']
+    children: ['comSignWatch', 'comWatchTimer', 'comQuestionnaire', 'comLottery', 'comRedPacket']
   },
   comSignWatch: {
     component: 'VmpSignWatch'

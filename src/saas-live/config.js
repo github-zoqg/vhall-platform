@@ -106,9 +106,7 @@ export const serverConfig = {
       'comPcMediaCheck',
       'liveTimerSet',
       'liveTimer',
-      'comQuestionnaire',
       'comRebroadcast',
-      'comRedPacket',
       'comRebroadcastList',
       'comMicInvited'
     ]
@@ -187,7 +185,9 @@ export const serverConfig = {
       'comShareMenu',
       'comExitGroupMenu',
       'comLottery',
-      'comSignLive'
+      'comSignLive',
+      'comQuestionnaire',
+      'comRedPacket'
     ]
   },
   // 语言选择组件

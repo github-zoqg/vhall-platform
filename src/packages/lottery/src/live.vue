@@ -57,20 +57,13 @@
         disabledTime: 0 // 5秒禁止点击
       };
     },
-    computed: {
-      role() {
-        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info?.role_name;
-      }
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({
         mode: 'live'
       });
     },
     created() {
-      if (this.role === 1) {
-        this.initMsgEvent();
-      }
+      this.initMsgEvent();
     },
     mounted() {
       if (this.mode === 'live') {
@@ -78,9 +71,7 @@
       }
     },
     destroyed() {
-      if (this.role === 1) {
-        this.removeMsgEvent();
-      }
+      this.removeMsgEvent();
       this.clearTimer();
     },
     methods: {
