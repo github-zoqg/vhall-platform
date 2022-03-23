@@ -30,7 +30,8 @@
             rewardEffectInfo.data.event_type == 'free_gift_send'
           "
         >
-          {{ rewardEffectInfo.data.gift_name }}
+          <!-- 礼物标题 -->
+          送出{{ rewardEffectInfo.data.gift_name }}
           <!-- <span class="count">
               <span class="multiple">x</span>
               {{ rewardEffectInfo.num }}
@@ -411,7 +412,7 @@
     .gift-name {
       width: 216px;
       height: 24px;
-      font-size: 16px;
+      font-size: 14px;
       color: #ffffff;
       line-height: 24px;
       position: absolute;

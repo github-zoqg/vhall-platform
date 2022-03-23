@@ -612,5 +612,20 @@
       height: calc(100% - 46px);
       overflow: hidden;
     }
+
+    /*滚动条*/
+    div::-webkit-scrollbar {
+      width: 6px; // 横向滚动条
+      height: 6px; // 纵向滚动条 必写
+    }
+    // 滚动条的滑块
+    div::-webkit-scrollbar-thumb {
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #666666;
+    }
+    div::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
   }
 </style>
