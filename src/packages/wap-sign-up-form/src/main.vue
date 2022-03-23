@@ -850,9 +850,13 @@
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
-            sessionStorage.setItem('visitorId', res.data.visit_id);
-            // 报名成功
-            this.getWebinarStatus();
+            if (res && [200, '200'].includes(res.code)) {
+              sessionStorage.setItem('visitorId', res.data.visit_id);
+              // 报名成功
+              this.getWebinarStatus();
+            } else {
+              return Promise.reject(res);
+            }
           })
           .catch(err => {
             if (err.code == 512809 || err.code == 512570) {
