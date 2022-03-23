@@ -23,7 +23,7 @@
         >
           <span class="item-text">{{ $tdefault(item.name) }}</span>
           <i v-show="item.tipsVisible" class="tips"></i>
-          <hr class="bottom-line" />
+          <hr class="bottom-line" :style="themeBgColor" />
         </li>
       </ul>
 
@@ -64,18 +64,25 @@
     data() {
       return {
         isToggleBtnVisible: true, // cfg-options:是否显示左右切换按钮
-        direciton: 'row', // row(横)，column(纵)
-        selectedId: '',
+        selectedId: '', // 选中的tab项
         pageEnv: 'live-room',
         menu: [],
         auth: {
-          member: true,
-          notice: true,
-          chapter: true
+          member: true, // 成员-tab
+          notice: true, // 公告-tab
+          chapter: true // 章节-tab
+        },
+        themeClass: {
+          pageBg: '#fb3a32'
         }
       };
     },
     computed: {
+      themeBgColor() {
+        return {
+          'background-color': this.themeClass.pageBg
+        };
+      },
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
@@ -87,6 +94,7 @@
       },
       visibleMenu() {
         return this.menu.filter(item => {
+          // 权限判断
           if (!this.isWatch) {
             if (item.type == 8 && !this.auth.member) return false; // 成员
             if (item.type == 'notice' && !this.auth.notice) return false; // 公告
@@ -94,6 +102,7 @@
             if (item.type == 7 && !this.auth.chapter) return false; // 章节
           }
 
+          // pageEnv判断
           if (this.pageEnv === 'live-room') {
             return item.status != 2 && item.visible;
           }
@@ -136,9 +145,24 @@
     },
     async mounted() {
       await this.$nextTick(0);
+      this.setSkinInfo();
       this.selectDefault();
     },
     methods: {
+      async setSkinInfo() {
+        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+
+        // 默认皮肤
+        if (!skinInfo || !skinInfo.skin_json_pc || skinInfo.status != 1) {
+          this.themeClass.pageBg = '#fb3a32';
+          return;
+        }
+
+        // 自定义皮肤
+        await this.$nextTick();
+        const { pageStyle } = JSON.parse(skinInfo.skin_json_pc) || {};
+        this.themeClass.pageBg = pageStyle;
+      },
       updateAuth() {
         const configList = this.roomBaseServer.state.configList;
         this.auth.member = configList.members_manager;
@@ -280,9 +304,9 @@
       },
       /**
        * 设置显示条件
-       * @param {String} condition [default|living|predition]
+       * @param {String} condition [live-room|subscribe]
        */
-      setPageEnv(condition = 'default') {
+      setPageEnv(condition = 'live-room') {
         this.pageEnv = condition;
       },
       /**
@@ -317,13 +341,9 @@
       },
 
       /**
-       * 通过index删除tab-item
-       * @param {Number} index
+       * 组装tab的数据实体
+       * @param {Object} item
        */
-      removeItemByIndex(index) {
-        this.menu.splice(index);
-      },
-
       getItemEntity(item) {
         return getItemEntity(item, this.tabOptions.menuConfig);
       },
@@ -341,10 +361,10 @@
       },
 
       /**
-       * 获取某个菜单项（根据cuid和menuId获取某个菜单项）
+       * 获取某个菜单项（根据type和id获取某个菜单项）
        * @param {String} type tab的type
-       * @param {String|Number} menuId [非必传] 菜单id，由后端返得
-       * @example getItem(2,'10468')
+       * @param {String|Number} id [非必传] 菜单id，由后端返得
+       * @example getItem({type:2,id:'10468'})
        */
       getItem({ type, id }) {
         return this.menu.find(item => {
@@ -357,11 +377,11 @@
       },
 
       /**
-       *
+       * 平滑滚动到指定元素
        * @param {String} cuid
        * @param {String|Number} menuId
        */
-      async scrollToItem({ id }) {
+      async smoothScrollToItem({ id }) {
         await this.$nextTick();
         // 由于menu列表随时会增减，
         const itemsWithPosition = this.visibleMenu.map(item => {
@@ -384,18 +404,19 @@
        * 选中一个菜单项，并显示对应内容
        * @param {String} type 后端传过来的menu type
        * @param {String|Number} menuId 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容(customMenu必传)
-       * @example select('comCustomMenuWap','10246')
+       * @example select({type:1,id:'10246'})
        */
       async select({ type, id }) {
         await this.$nextTick();
         this.selectedType = type;
         const item = this.getItem({ type, id });
-        this.scrollToItem({ id: item.id });
+        this.smoothScrollToItem({ id: item.id });
         this.selectedId = item.id;
         item.tipsVisible = false;
         this.$refs['tabContent'].switchTo(item);
         this.menuServer.$emit('tab-switched', item);
       },
+
       /**
        * 设置菜单项显隐
        * @param {Boolean} visible [true|false] 显隐值
@@ -410,6 +431,7 @@
           visible === false && this.jumpToNearestItemById(tab.id);
         }
       },
+
       /**
        * 切换某个菜单tab的可视性
        * @param {*} type
@@ -422,6 +444,7 @@
 
         tab.visible = !tab.visible;
       },
+
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
@@ -435,11 +458,14 @@
 
         tab.tipsVisible = visible;
       },
-      handleHint(cuid) {
-        if (this.selectedType == cuid) {
-          return;
-        }
-        this.setTipsVisible({ visible: true, type: cuid });
+
+      /**
+       * 接受从子孙组件冒的setTips
+       * @param {String} type
+       */
+      handleHint(type) {
+        if (this.selectedType == type) return;
+        this.setTipsVisible({ visible: true, type });
       },
       /**
        * 跳转到最近的item
@@ -460,10 +486,6 @@
           const { type, id } = lastItem;
           this.select({ type, id });
         }
-
-        // 前后都没有清空任何选择(基本不会发生的极端情况)
-        // this.selectedId = '';
-        // this.selectedType = '';
       }
     }
   };
@@ -554,7 +576,6 @@
             width: 34px;
             transform: translateX(-50%);
             height: 3px;
-            background-color: #fb3a32;
           }
 
           &:hover {
