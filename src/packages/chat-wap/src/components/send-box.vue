@@ -11,7 +11,7 @@
         <template v-if="chatShow">
           <div
             class="content-input__placeholder"
-            v-if="isNeedLogin && !isLogin && !noChatLogin && !isEmbed"
+            v-if="!isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -92,14 +92,10 @@
     useMicServer
   } from 'middle-domain';
   import Handup from './handup.vue';
+  import { browserType } from '@/packages/app-shared/utils/tool';
 
   export default {
     props: {
-      noChatLogin: {
-        // 是否免登陆
-        type: Boolean,
-        default: false
-      },
       currentTab: {
         type: [String, Number],
         default: ''
@@ -173,8 +169,6 @@
         webinar: {},
         //是否已经登录
         isLogin: false,
-        //配置列表
-        configList: {},
         //用户头像
         avatar: require('../img/default_avatar.png'),
         handUpStatus: false,
@@ -201,13 +195,26 @@
         const { groupInitData = {} } = this.groupServer.state;
         return groupInitData;
       },
-      //是否需要登录
-      isNeedLogin() {
-        let needLogin = true;
-        if (['', null, void 0].includes(this.configList['ui.show_chat_without_login'])) {
-          return needLogin;
+      //是否不需要登录
+      noChatLogin() {
+        let noChatLogin = false;
+        if (browserType()) {
+          /**
+           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
+           */
+          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
+            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+          } else {
+            noChatLogin = true;
+          }
+        } else {
+          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
         }
-        return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
+        return noChatLogin;
+      },
+      //黄金链路配置
+      configList() {
+        return this.roomBaseServer.state.configList;
       },
       isEmbed() {
         // 是不是音视频嵌入
@@ -286,6 +293,7 @@
         }
         this.connectMicShow = false;
       });
+      window.chat = this;
     },
     methods: {
       showMyQA() {
@@ -294,10 +302,9 @@
       },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
         this.webinar = webinar;
-        this.configList = configList;
       },
       // 判断登录
       checkIsLogin() {

@@ -79,7 +79,7 @@
   export default {
     data() {
       return {
-        loading: false,
+        loading: false, // 读取中
         mediaState: this.mediaSettingServer.state,
         lastSelectRate: '', // 上一选中的画质的值（用于取消更改时还原）
         ratesConfig: Object.freeze([

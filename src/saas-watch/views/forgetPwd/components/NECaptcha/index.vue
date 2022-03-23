@@ -1,13 +1,13 @@
 <template>
   <div>
     <div id="captchaDom" class="vhsaas-yundun-captcha">
-      <el-input v-model.trim="imgCode"></el-input>
+      <!-- <el-input v-model.trim="imgCode"></el-input> -->
     </div>
   </div>
 </template>
 
 <script>
-  import { useUserServer } from 'middle-domain';
+  //TODO: 此部分逻辑没有走userServer ,依照原先逻辑修改
   export default {
     name: 'NECaptcha',
     props: {
@@ -19,8 +19,7 @@
     data() {
       return {
         captchaId: 'b7982ef659d64141b7120a6af27e19a0', // 识别
-        capInstance: null, // 云盾实例
-        useUserServer: {}
+        capInstance: null // 云盾实例
       };
     },
     computed: {
@@ -29,16 +28,13 @@
           return this.value;
         },
         set(val) {
+          console.log(val);
           this.$emit('input', val);
         }
       }
     },
-    created() {
-      this.useUserServer = useUserServer();
-    },
     async mounted() {
-      await this.useUserServer.initNECaptcha('#captchaDom', 1);
-      // this.init();
+      this.init();
     },
     beforeDestroy() {
       this.refreshNECaptha();
@@ -47,13 +43,12 @@
       // 初始化易盾
       async init() {
         const that = this;
-        const captchaId = await this.useUserServer.getCaptchaId();
+        const captchaId = this.captchaId;
         const NECaptchaOpts = {
           captchaId,
           element: '#captchaDom',
           mode: 'float',
           width: 270,
-          // lang: 'zh-CN',
           onReady(instance) {
             console.log('🚀 ~ initNECaptcha onReady ', instance);
             that.capInstance = instance;
