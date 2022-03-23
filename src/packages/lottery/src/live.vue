@@ -156,7 +156,12 @@
       // 结束抽奖()
       endLottery() {
         if (!this.lotteryInfoId) return;
-        return this.lotteryServer.endLottery(this.lotteryInfoId);
+        return this.lotteryServer.endLottery(this.lotteryInfoId).fianlly(res => {
+          if (res.code === 516703) {
+            // 抽奖已结束
+            this.close();
+          }
+        });
       },
       /**
        * @description 重新开始一轮抽奖
