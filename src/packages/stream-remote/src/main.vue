@@ -299,7 +299,7 @@
       isShowSplitScreenPlaceholder() {
         return (
           this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
-          this.$domainStore.state.splitScreenServer.role == 'host'
+          this.$domainStore.state.splitScreenServer.role == 'hostPage'
         );
       },
       isShareScreen() {

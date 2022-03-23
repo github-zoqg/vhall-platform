@@ -42,7 +42,11 @@
       this.rebroadcastServer = useRebroadcastServer();
     },
     mounted() {
-      if (this.roomBaseServer.state.watchInitData.rebroadcast.id) {
+      if (
+        this.roomBaseServer.state.watchInitData.rebroadcast.id ||
+        (this.roomBaseServer.state.isThirdStream &&
+          this.roomBaseServer.state.watchInitData.join_info.role_name == 3)
+      ) {
         this.open();
       }
     },
