@@ -629,12 +629,14 @@
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
+              })
+              .finally(() => {
+                this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+                this.$refs.bindForm?.resetFields(); // 重置表单
+                this.initInterval(); // 初始化定时器
               });
           }
         });
-        this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-        this.$refs.bindForm?.resetFields(); // 重置表单
-        this.initInterval(); // 初始化定时器
       },
 
       // 初始化定时器
