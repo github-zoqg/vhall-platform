@@ -28,7 +28,7 @@
             ></span>
           </span>
           <span class="ellsips">
-            {{ ite.nickname | filterNickName }}
+            {{ ite.nickname | overHidden(8) }}
           </span>
           <i @click.stop="closeUser(ite, index)" class="iconfont iconguanbichabo_icon close"></i>
         </li>
@@ -51,10 +51,10 @@
                   v-if="hostInfo && hostInfo.third_party_user_id == item.sender_id"
                   class="private-content-li-content-name ellsips"
                 >
-                  {{ hostInfo.nickname | filterNickName }}
+                  {{ hostInfo.nickname | overHidden(8) }}
                 </span>
                 <span v-else class="private-content-li-content-name ellsips">
-                  {{ item.context.nick_name | filterNickName }}
+                  {{ item.context.nick_name | overHidden(8) }}
                 </span>
                 <span
                   class="priveta-role"
@@ -140,15 +140,6 @@
         privateValue: '', // 私聊内容
         chatList: [] // 获取到
       };
-    },
-    filters: {
-      filterNickName(val) {
-        if (val && val.length > 8) {
-          return val.substring(0, 8) + '...';
-        } else {
-          return val || '';
-        }
-      }
     },
     watch: {
       'privateValue.length': {

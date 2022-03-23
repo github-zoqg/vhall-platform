@@ -1,5 +1,5 @@
 import Vue from 'vue';
-
+import moment from 'moment';
 /**
  * 原知客用到
  */
@@ -112,4 +112,58 @@ Vue.filter('fmtTimeByExp', (time, exp) => {
       break;
   }
   return relt;
+});
+
+// 热度、在线人数过滤器
+Vue.filter('formatHotNum', value => {
+  value = parseInt(value);
+  let unit = '';
+  const k = 99999;
+  const sizes = ['', '万', '亿', '万亿'];
+  let i;
+  if (value > k) {
+    i = Math.floor(Math.log(value) / Math.log(k));
+    value = (value / Math.pow(k / 10, i)).toFixed(1);
+    unit = sizes[i];
+  }
+  return value + unit;
+});
+
+// 播放器回放时间转化
+Vue.filter('secondToDate', val => {
+  let time = moment.duration(val, 'seconds');
+  let hours = time.hours();
+  let minutes = time.minutes();
+  let seconds = time.seconds();
+  let totalTime = '00:00';
+  if (hours) {
+    totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
+  } else {
+    totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
+  }
+  return totalTime;
+});
+
+// 点赞
+Vue.filter('transformWatchPraise', num => {
+  num = Number(num);
+  if (num < 10000) {
+    return num;
+  } else if (num >= 10000 && num < 1000000) {
+    const n = Math.floor(num / 10000);
+    let l = Math.floor((num % 10000) / 1000); // eslint-disable-line
+    l = l === 0 ? '' : '.' + l;
+    return (num = n + l + 'w');
+  } else {
+    return (num = '999w');
+  }
+});
+
+// 聊天数
+Vue.filter('filterChatCount', num => {
+  if (num > 9999) {
+    return 9999 + '+';
+  } else {
+    return num;
+  }
 });

@@ -76,7 +76,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -141,7 +141,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -170,7 +170,7 @@
                         placement="top-start"
                       >
                         <span class="answer-time" style="color: #666">
-                          {{ item.operator.nick_name | filterNickName }}
+                          {{ item.operator.nick_name | overHidden(8) }}
                         </span>
                       </el-tooltip>
                       <span
@@ -226,7 +226,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -259,7 +259,7 @@
                         :content="ite.nick_name"
                         placement="top-start"
                       >
-                        <span class="answer-time">{{ ite.nick_name | filterNickName }}</span>
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
                       </el-tooltip>
                       <span
                         v-if="
@@ -342,7 +342,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -359,7 +359,7 @@
                       :content="item.operator.nick_name"
                       placement="top-start"
                     >
-                      <span class="ellsips">{{ item.operator.nick_name | filterNickName }}</span>
+                      <span class="ellsips">{{ item.operator.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span
                       class="role-name"
@@ -452,22 +452,6 @@
     name: 'VmpQaAdmin',
     components: {
       PrivateChat
-    },
-    filters: {
-      filterNickName(val) {
-        if (val.length > 8) {
-          return val.substring(0, 8) + '...';
-        } else {
-          return val;
-        }
-      },
-      filterChatCount: function (num) {
-        if (num > 9999) {
-          return 9999 + '+';
-        } else {
-          return num;
-        }
-      }
     },
     watch: {
       'sendMessage.text.length': {
