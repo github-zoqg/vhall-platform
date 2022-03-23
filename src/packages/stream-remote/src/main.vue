@@ -322,7 +322,6 @@
         }
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -594,6 +593,11 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
         padding: 0 6px;
         vertical-align: top;

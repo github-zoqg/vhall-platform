@@ -188,7 +188,7 @@
       p {
         padding-top: 10px;
         font-size: 12px;
-        color: #ffffff;
+        color: #fff;
         line-height: 20px;
       }
     }

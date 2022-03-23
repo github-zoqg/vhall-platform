@@ -41,6 +41,9 @@
       this.interactiveServer = useInteractiveServer();
       this.rebroadcastServer = useRebroadcastServer();
     },
+    created() {
+      this.listenEvents();
+    },
     mounted() {
       if (
         this.roomBaseServer.state.watchInitData.rebroadcast.id ||
@@ -51,6 +54,19 @@
       }
     },
     methods: {
+      listenEvents() {
+        // 只有第三方推流时才会触发这个事件
+        this.roomBaseServer.$on('LIVE_START', () => {
+          if (this.roomBaseServer.state.watchInitData.join_info.role_name == 3) {
+            this.open();
+          }
+        });
+        this.roomBaseServer.$on('LIVE_OVER', () => {
+          if (this.roomBaseServer.state.watchInitData.join_info.role_name == 3) {
+            this.close();
+          }
+        });
+      },
       async open() {
         if (this.interactiveServer.state.localStream.streamId) {
           await this.interactiveServer.unpublishStream();
@@ -79,8 +95,11 @@
         };
         console.log('videoParam:', this.videoParam);
         this.isShow = true;
-
-        this.roomBaseServer.setChangeElement('doc');
+        if (this.roomBaseServer.state.isThirdStream) {
+          this.roomBaseServer.setChangeElement('rebroadcast-stream');
+        } else {
+          this.roomBaseServer.setChangeElement('doc');
+        }
       },
       async close() {
         this.$refs.videoPreview && this.$refs.videoPreview.destroy();

@@ -204,6 +204,19 @@
     </section> -->
 
     <ImgStream ref="imgPushStream"></ImgStream>
+
+    <!-- 异常弹窗 -->
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>网络异常导致互动房间连接失败</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
@@ -224,6 +237,7 @@
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -232,11 +246,17 @@
         networkStatus: 2,
         audioLevel: 1,
         showDownMic: false,
-        isNotAutoSpeak: false // 分组模式下的是否为自动静音上麦自动
+        isNotAutoSpeak: false, // 分组模式下的是否为自动静音上麦自动
+
+        // 网络异常弹窗状态
+        PopAlertOffline: {
+          visible: false
+        }
       };
     },
     components: {
-      ImgStream
+      ImgStream,
+      SaasAlert
     },
     computed: {
       // 文档是否对观众可见
@@ -391,7 +411,6 @@
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -402,6 +421,11 @@
       this.splitScreenServer = useSplitScreenServer();
     },
     created() {
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        this.PopAlertOffline.visible = true;
+      });
       this.listenEvents();
     },
     async mounted() {
@@ -1027,6 +1051,12 @@
             }
           }, 100);
         });
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
     }
   };
@@ -1139,6 +1169,11 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
         padding: 0 6px;
         vertical-align: top;
@@ -1201,8 +1236,8 @@
       width: 100%;
       height: 100%;
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 0px;
+      left: px;
       &-presentation {
         position: absolute;
         top: 0;

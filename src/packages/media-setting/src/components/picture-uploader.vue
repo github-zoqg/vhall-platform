@@ -177,7 +177,7 @@
       height: 100%;
       font-size: 14px;
       font-weight: 400;
-      color: #ffffff;
+      color: #fff;
       line-height: 20px;
       background: rgba(0, 0, 0, 0.7);
     }
