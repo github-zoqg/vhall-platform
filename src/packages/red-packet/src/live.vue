@@ -669,7 +669,7 @@
     .code-img {
       width: 140px;
       height: 140px;
-      margin: 20px auto 0;
+      margin: 20px auto 32px;
       border-radius: 4px;
       padding: 1px;
       border: 1px solid #e2e2e2;
