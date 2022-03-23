@@ -221,13 +221,30 @@
     },
     mounted() {
       this.initViewData();
+      this.listenEvents();
+    },
+    destroyed() {
+      this.chatServer.$off('receivePrivateMsg', this.showTip);
     },
     methods: {
+      listenEvents() {
+        this.chatServer.$on('receivePrivateMsg', this.showTip);
+      },
+      showTip(msg) {
+        if (msg.sendId != this.currentSelectUser) {
+          this.chatGroupList.forEach(item => {
+            if (item.account_id == msg.sendId) {
+              this.$set(item, 'news', true);
+            }
+          });
+        }
+      },
       //打开模态窗
       async openModal() {
         console.log('收到打开窗口的信令');
         await this.getPrivateContactList();
         this.visible = true;
+        this.activeGroupIndex = 0;
       },
       //获取私聊联系人列表
       getPrivateContactList() {
@@ -277,6 +294,7 @@
       //选中某个群组
       selectGroup(index) {
         this.activeGroupIndex = index;
+        this.chatGroupList[index].news = false;
         this.$refs.chatRef.resetData();
         this.$nextTick(() => {
           this.$refs.chatRef.initEvent();
@@ -470,10 +488,13 @@
           // display: inline-block;
           width: 30px;
           height: 30px;
+          border-radius: 50%;
+          overflow: hidden;
           margin-right: 8px;
           img {
             display: block;
-            width: 100%;
+            width: 30px;
+            height: 30px;
           }
         }
         &__close-icon {

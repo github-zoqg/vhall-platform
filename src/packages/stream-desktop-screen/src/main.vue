@@ -12,7 +12,7 @@
     <el-button
       round
       size="mini"
-      v-if="renderEndDemonstrateBtn"
+      v-if="renderEndDemonstrateBtn && isShareScreen"
       @click="handleEndDemonstrate"
       class="end-demonstrate"
     >

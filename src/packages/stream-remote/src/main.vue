@@ -16,6 +16,12 @@
     <!-- 音频直播的的时候显示流占位图 -->
     <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
 
+    <!-- 网络异常时占位图，根据是否有streamId判断 -->
+    <section v-if="!stream.streamId" class="vmp-stream-remote__container__net-error">
+      <div class="net-error-img"></div>
+      <p>对方网络异常</p>
+    </section>
+
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
       <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
@@ -293,7 +299,7 @@
       isShowSplitScreenPlaceholder() {
         return (
           this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
-          this.$domainStore.state.splitScreenServer.role == 'host'
+          this.$domainStore.state.splitScreenServer.role == 'hostPage'
         );
       },
       isShareScreen() {
@@ -429,7 +435,8 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.stream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.stream.streamId || !this.$domainStore.state.interactiveServer.isInstanceInit)
+            return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.stream.streamId })
@@ -444,7 +451,8 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.stream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.stream.streamId || !this.$domainStore.state.interactiveServer.isInstanceInit)
+            return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.stream.streamId })
@@ -546,6 +554,31 @@
       left: 0;
       width: 100%;
       height: 100%;
+    }
+
+    // 网络异常占位图
+    .vmp-stream-remote__container__net-error {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      .net-error-img {
+        width: 25px;
+        height: 18px;
+        margin-bottom: 1px;
+        background-image: url('./img/net-error.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+      & > p {
+        font-size: 12px;
+        color: #ccc;
+      }
     }
 
     .vmp-stream-local__bootom {

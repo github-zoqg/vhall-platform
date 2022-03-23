@@ -128,6 +128,9 @@
       this.getSessionSelectedDevice();
     },
     methods: {
+      /**
+       * 展示pre-dialog 对话框（是否检测的对话框）
+       */
       show() {
         this.$refs['pre-dialog'].show();
       },

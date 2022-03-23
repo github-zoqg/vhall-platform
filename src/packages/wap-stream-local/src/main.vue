@@ -168,6 +168,16 @@
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
       this.listenEvents();
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: '网络异常导致互动房间连接失败'
+        }).then(() => {
+          window.location.reload();
+        });
+      });
     },
     mounted() {
       this.checkStartPush();
@@ -491,7 +501,7 @@
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.localSpeaker.streamId,
-            vNode: `vmp-stream-local__${this.stream.streamId}`
+            vNode: `vmp-stream-local__${this.localSpeaker.accountId}`
           })
           .then(res => {
             console.warn('res----', res);

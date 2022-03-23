@@ -133,20 +133,24 @@
       this.mediaSettingServer = useMediaSettingServer();
     },
     created() {
-      this._originCaptureState = {};
-      this._diffOptions = {};
+      this._originCaptureState = {}; // 原始选中的数据
+      this._diffOptions = {}; // 差异数据（更改的数据）
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
 
+      // 绑定confirm对应的视图操作
       mediaSettingConfirm.onShow(text => {
         this.alertText = text;
         this.isConfirmVisible = true;
       });
       // 监听设备禁用
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        this.popAlert.visible = true;
+        if (+msg.data.streamType !== 3) {
+          // 非桌面共享
+          this.popAlert.visible = true;
+        }
       });
     },
     beforeDestroy() {
@@ -220,6 +224,8 @@
         this._diffOptions = this.getDiffOptions();
         const videoTypeChanged = this._diffOptions.videoType !== undefined;
         const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
+
+        console.log('diffOptions:', this._diffOptions);
 
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {

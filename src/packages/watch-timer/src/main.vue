@@ -1,9 +1,8 @@
 <template>
-  <div class="vhsaas-praise-timer">
+  <div class="vmp-watch-timer">
     <!-- 时间显示区 -->
     <div v-show="timerVisible" v-drag class="bgimg">
-      <!-- <el-row :class="status == 'zanting'?'colorFC9600':status == 'kaishi'?'color0FBB5A':'colorFB3A32'"> -->
-      <el-row class="colorFFF">
+      <el-row class="time_number">
         <el-col class="ft12">
           <div v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
           <div v-else>
@@ -22,24 +21,24 @@
       <span class="close ps" @click="onClose">
         <i class="vh-iconfont vh-line-close"></i>
       </span>
-      <div class="pad20">
-        <el-row class="margin10 bg000 pr mt10">
-          <div class="border3 ps"></div>
+      <div class="num_box">
+        <el-row class="num_base pr font_zdy">
+          <div class="black_line ps"></div>
 
-          <div class="margin5 timerbg">
-            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_mon }}</strong>
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
           </div>
-          <div class="margin5 timerbg">
-            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ mon }}</strong>
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</span>
           </div>
 
-          <strong class="pr ft28 font_zdy" :class="time < 1 ? 'colorFB3A32' : ''">:</strong>
+          <span class="pr ft28" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
-          <div class="margin5 timerbg">
-            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ ten_sec }}</strong>
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
           </div>
-          <div class="margin5 timerbg">
-            <strong :class="time < 1 ? 'colorFB3A32' : ''">{{ sec }}</strong>
+          <div class="timerbg">
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ sec }}</span>
           </div>
         </el-row>
       </div>
@@ -289,19 +288,16 @@
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   @import url(./style.less);
-  .vhsaas-praise-timer {
-    .mt10 {
-      margin-top: 10px;
-    }
+  .vmp-watch-timer {
     .pr {
       position: relative;
     }
     .ps {
       position: absolute;
     }
-    .colorFFF {
+    .time_number {
       color: #fff;
       font-size: 14px;
       line-height: 32px;
@@ -385,11 +381,14 @@
         background-size: contain;
         height: 68px;
         width: 43px;
+        box-sizing: border-box;
+        margin: 6px 4px;
         position: relative;
-        strong {
+        & > :first-child {
+          font-weight: bold;
           font-size: 38px;
           position: absolute;
-          top: 8px;
+          top: 4px;
           left: 11px;
           .font_zdy;
         }
@@ -397,20 +396,15 @@
       .ft14 {
         font-size: 13px;
       }
-      .border3 {
+      .black_line {
         border-top: 3px solid #000;
         top: 35px;
         z-index: 999;
         width: 100%;
       }
-      .bg000 {
+      .num_base {
+        margin-top: 10px;
         background: #000;
-      }
-      .margin5 {
-        box-sizing: border-box;
-        margin: 6px 4px;
-      }
-      .margin10 {
         border-radius: 4px;
         height: 74px;
         .ft28 {
@@ -418,16 +412,10 @@
           top: -37px;
         }
       }
-      .color0FBB5A {
-        color: #0fbb5a;
-      }
-      .colorFC9600 {
-        color: #fc9600;
-      }
-      .colorFB3A32 {
+      .timeout_font_color {
         color: #fb3a32;
       }
-      .pad20 {
+      .num_box {
         padding: 0 3px;
       }
       .close {

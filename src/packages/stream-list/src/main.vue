@@ -259,7 +259,7 @@
         e.msg && this.$message.warning(e.msg);
       });*/
       // 订阅流播放失败
-      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
         let videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {

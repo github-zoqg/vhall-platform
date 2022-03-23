@@ -5,7 +5,7 @@
       <li
         class="private-chat__list-item"
         :class="{
-          'self-item':
+          'list-item__self-item':
             loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId
         }"
         v-for="(chat, idx) in chatList"
@@ -15,14 +15,6 @@
           <template
             v-if="loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId"
           >
-            <span
-              class="list-item__user-info__avatar"
-              :style="{
-                backgroundImage: !chat.avatar
-                  ? `url(${defaultAvatar})`
-                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-              }"
-            ></span>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
@@ -33,6 +25,14 @@
             <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
             </span>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
           </template>
           <template v-else>
             <span
@@ -54,9 +54,6 @@
             </span>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
           </template>
-          <span class="list-item__chat-time">
-            {{ chat.sendTime | chatTime }}
-          </span>
         </div>
         <div
           class="list-item__chat-txt"
@@ -76,11 +73,14 @@
             @click="showImgBrowser(imgIdx, chat.content.img_list)"
           ></div>
         </div>
+        <p class="list-item__chat-time">
+          {{ chat.sendTime | chatTime }}
+        </p>
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
-      <!--      <dt></dt>-->
-      <!--      <dd>暂时没有聊天哦～</dd>-->
+      <dt></dt>
+      <dd>暂时没有聊天哦～</dd>
     </dl>
   </div>
 </template>
@@ -174,8 +174,8 @@
     },
     methods: {
       listenEvent() {
-        this.chatServer.$on('receivePrivateMsg', () => {
-          this.scrollBottom();
+        this.chatServer.$on('receivePrivateMsg', msg => {
+          if (msg.sendId == this.selectUserId) this.scrollBottom();
         });
       },
       init() {
@@ -196,10 +196,6 @@
         this.queryChatList();
         this.finishData = true;
       },
-      // //事件监听
-      // listenEvents() {
-      //   this.chatServer.$on('receivePrivateMsg', msg => {});
-      // },
       //todo 待替换
       initScroll() {
         let preTop = 0;
@@ -240,66 +236,6 @@
           this.scrollBottom();
         });
       },
-      //todo 移入domain
-      formatChatMsg(msg) {
-        msg.data = msg.data || msg.msg_data;
-        if (msg.context && typeof msg.context === 'string') {
-          msg.context = JSON.parse(msg.context);
-        }
-        if (typeof msg.data === 'string') {
-          msg.data = JSON.parse(msg.data);
-        }
-        let obj = {
-          msg_id: msg.msgId || msg.msg_id,
-          user_id: msg.context.consumer_user_id,
-          role: msg.context.role,
-          name: msg.context.nick_name,
-          avatar: msg.context.avatar,
-          txt: msg.data.text_content,
-          time: msg.send_time || new Date(msg.time).format('yyyy-MM-dd hh:mm:ss')
-        };
-        if (msg.data.type === 'imgChat') {
-          obj.msgType = 'imgChat';
-          obj.img_list = msg.data.img_list;
-        } else {
-          obj.msgType = 'chat';
-        }
-        obj.avatar = msg.context.avatar || msg.avatar;
-        if (obj.avatar && obj.avatar.indexOf('//') !== 0 && obj.avatar.indexOf('https') !== 0) {
-          obj.avatar = obj.avatar ? `${this.$imgHost}/${obj.avatar}` : '';
-        }
-        if (obj.txt) {
-          obj.txt = obj.txt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          if (obj.role !== 'watch') {
-            /* 正则匹配校验url */
-            /* eslint-disable */
-            let reg =
-              /(https:\/\/|http:\/\/|\/\/|www\.)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
-            obj.txt = obj.txt.replace(reg, url => {
-              let href = url;
-              if (url.indexOf('www.') === 0) {
-                href = `//${url}`;
-              }
-              return `<a class='a_link' href="${href}" title="点击打开链接" target='_blank'>${url}</a>`;
-            });
-            /* eslint-enable */
-          }
-        }
-        /* 替换表情图片 */
-        for (let i = 0; i < emojiFace.length; i++) {
-          for (let key in emojiFace[i]) {
-            let test = key.replace(/\[/, '\\[').replace(/\]/, '\\]');
-            let reg = new RegExp(test, 'g');
-            obj.txt = obj.txt.replace(
-              reg,
-              "<img src='//cnstatic01.e.vhall.com/static/img/arclist/Expression_" +
-                emojiFace[i][key] +
-                "@2x.png'>"
-            );
-          }
-        }
-        return obj;
-      },
       // 根据新消息数量计算滚动定位位置
       computeScrollPosition(count) {
         let newChatEles = this.$chatDom.querySelectorAll('.chat-list-item');
@@ -313,7 +249,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$chatDom.scrollTop = 100000;
+          this.$chatDom.scrollTop = this.$chatDom.scrollHeight;
         });
       },
       //查看图片预览
@@ -421,8 +357,7 @@
           }
         }
         .list-item__chat-time {
-          float: right;
-          margin-right: 30px;
+          margin-left: 30px;
           color: #aaa;
           font-size: 12px;
         }
@@ -482,7 +417,7 @@
       dt {
         width: 130px;
         height: 130px;
-        background: url(../images/no-data.png) no-repeat center;
+        background: url(../images/no-create.png) no-repeat center;
         border-radius: 50%;
         background-size: contain;
       }

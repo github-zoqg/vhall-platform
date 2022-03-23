@@ -445,23 +445,6 @@
           })
           .catch(() => {});
       },
-      autoPlay() {
-        setTimeout(() => {
-          this.$alert('您已进入直播房间，马上开始互动吧', '', {
-            title: '提示',
-            confirmButtonText: '立即开始',
-            // center: true,
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            callback: () => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
-            }
-          });
-        }, 500);
-      },
       // 预览页面
       handlePreview(video) {
         this.previewDialog = true;

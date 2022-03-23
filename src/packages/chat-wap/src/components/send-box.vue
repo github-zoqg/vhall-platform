@@ -71,7 +71,11 @@
         </div>
       </div>
     </div>
-    <chat-wap-input-modal ref="chatWapInputModal" @sendMsg="sendMessage"></chat-wap-input-modal>
+    <chat-wap-input-modal
+      ref="chatWapInputModal"
+      @sendMsg="sendMessage"
+      :showTabType="currentTab"
+    ></chat-wap-input-modal>
   </div>
 </template>
 

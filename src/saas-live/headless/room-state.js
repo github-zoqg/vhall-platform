@@ -31,6 +31,7 @@ export default async function () {
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
+    console.log('&c--------------浏览器支持情况', 'color:blue', checkSystemResult);
     return 'isBrowserNotSupport';
   }
 
@@ -68,7 +69,7 @@ export default async function () {
 
   await splitScreenServer.init({
     splitScreenPageUrl: getSplitScreenPageUrl(roomBaseServer.state.watchInitData.webinar.id),
-    role: 'host'
+    role: 'hostPage'
   });
   console.log('%c------服务初始化 splitScreenServer 初始化完成', 'color:blue', splitScreenServer);
 

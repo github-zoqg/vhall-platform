@@ -40,10 +40,11 @@
         class="input-bar__textarea-box__textarea-placeholder"
       >
         <span v-show="chatLoginStatus" class="input-bar__textarea-box__no-login">
-          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">
-            {{ $t('nav.nav_1005') }}
-          </span>
-          {{ $t('chat.chat_1001', '') }}
+          <i18n path="chat.chat_1001">
+            <span class="input-bar__textarea-box__chat-login-btn" place="n" @click="callLogin">
+              {{ $t('nav.nav_1005') }}
+            </span>
+          </i18n>
         </span>
         <span
           v-show="inputStatus.disable && !chatLoginStatus"
@@ -425,12 +426,9 @@
         width: 220px;
         background-color: @bg-dark-normal;
         font-size: 14px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        font-weight: 400;
         color: @font-dark-normal;
         line-height: 20px;
         padding: 10px 12px;
-        text-align: center;
         border-radius: 20px;
       }
       .input-bar__textarea-box__no-login {
