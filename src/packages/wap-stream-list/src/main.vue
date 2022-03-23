@@ -477,7 +477,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 4;
+        z-index: 7;
         background: transparent;
         img {
           width: 100%;
