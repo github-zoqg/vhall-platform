@@ -39,7 +39,6 @@
       :isAllBanned="allBanned"
       :isBanned="isBanned"
       :isHandsUp="isHandsUp"
-      :noChatLogin="noChatLogin"
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
@@ -87,8 +86,6 @@
         unReadMessageCount: 0,
         //活动信息
         webinar: {},
-        //是否隐藏聊天历史加载记录
-        configList: {},
         //当前页数
         page: 1,
         //是否已经下拉刷新
@@ -125,23 +122,6 @@
       isHandsUp() {
         const { interactToolStatus = {} } = this.roomBaseServer.state;
         return interactToolStatus && !!interactToolStatus['is_handsup'];
-      },
-      //是否不登陆也可以参与聊天
-      noChatLogin() {
-        let noChatLogin = false;
-        if (browserType()) {
-          /**
-           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
-           */
-          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
-            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
-          } else {
-            noChatLogin = true;
-          }
-        } else {
-          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
-        }
-        return noChatLogin;
       },
       // 设备状态
       deviceType() {
@@ -199,6 +179,10 @@
           return chatItem?.welcome_content || '';
         }
         return '';
+      },
+      //黄金链路配置
+      configList() {
+        return this.roomBaseServer.state.configList;
       }
     },
     beforeCreate() {
@@ -227,13 +211,10 @@
       },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
-        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        const { watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { webinar = {}, interact = {} } = watchInitData;
         const { embed = false } = embedObj;
-        console.log(this.roomBaseServer, 'roomBaseServer');
-        console.log(join_info);
         this.webinar = webinar;
-        this.configList = configList;
         this.roomId = interact.room_id;
         this.isEmbed = embed;
       },
