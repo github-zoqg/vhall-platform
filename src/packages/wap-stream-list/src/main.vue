@@ -639,9 +639,9 @@
         top: 0;
       }
       // 主屏下的 后续nick_name 应为全显示
-      .vmp-stream-local__bootom {
+      .vmp-stream-local__bottom {
         // 此处不能使用&去代替  由于父级无样式，直接使用&会导致class优先级降低
-        .vmp-stream-local__bootom-nickname {
+        .vmp-stream-local__bottom-nickname {
           width: 160px;
         }
       }

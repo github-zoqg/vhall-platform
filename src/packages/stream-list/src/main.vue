@@ -348,7 +348,7 @@
         min-width: 100%;
         flex: none;
         .vmp-stream-list__remote-container {
-          .vmp-stream-local__bootom {
+          .vmp-stream-local__bottom {
             &-role {
               padding: 0 6px;
             }
@@ -358,7 +358,7 @@
           }
         }
         .vmp-stream-list__main-screen {
-          .vmp-stream-local__bootom {
+          .vmp-stream-local__bottom {
             &-role {
               padding: 0 6px;
             }
@@ -516,7 +516,7 @@
           width: 72px;
           height: 40px;
         }
-        .vmp-stream-local__bootom-role {
+        .vmp-stream-local__bottom-role {
           display: none;
         }
         .vmp-stream-list__main-screen {

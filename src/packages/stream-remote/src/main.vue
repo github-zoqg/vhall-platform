@@ -31,21 +31,21 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom">
+    <section class="vmp-stream-local__bottom">
       <span
         v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
+        class="vmp-stream-local__bottom-role"
+        :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
         {{ stream.attributes.roleName | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
+      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
@@ -594,7 +594,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -645,7 +645,7 @@
       }
       &-mic {
         float: right;
-        font-size: 12px;
+        font-size: 13px;
       }
       &-signal {
         float: right;
