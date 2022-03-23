@@ -433,7 +433,7 @@
           <i>1000</i>
         </span>
       </div>
-      <div slot="footer">
+      <div class="footer">
         <el-button type="primary" round @click="handlerAnswer('public')">
           {{ $t('chat.chat_1089') }}
         </el-button>
