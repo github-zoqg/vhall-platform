@@ -44,7 +44,6 @@
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
-    filters: {},
     props: ['checkedList', 'pagetype'],
     data() {
       return {

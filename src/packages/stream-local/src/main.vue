@@ -411,7 +411,6 @@
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();

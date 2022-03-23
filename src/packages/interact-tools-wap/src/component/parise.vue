@@ -2,7 +2,7 @@
   <div class="vhall-praise">
     <div ref="dianzan" class="v-praise-dom" @touchstart="support">
       <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i>
-      <span v-if="like">{{ like | transformWatchNum }}</span>
+      <span v-if="like">{{ like | transformWatchPraise }}</span>
     </div>
     <div>
       <div class="hello"></div>
@@ -57,21 +57,6 @@
       if (this.localRoomInfo.type != 1) {
         if (timeId) {
           clearInterval(timeId);
-        }
-      }
-    },
-    filters: {
-      transformWatchNum(num) {
-        num = Number(num);
-        if (num < 10000) {
-          return num;
-        } else if (num >= 10000 && num < 1000000) {
-          const n = Math.floor(num / 10000);
-          let l = Math.floor((num % 10000) / 1000); // eslint-disable-line
-          l = l === 0 ? '' : '.' + l;
-          return (num = n + l + 'w');
-        } else {
-          return (num = '999w');
         }
       }
     },

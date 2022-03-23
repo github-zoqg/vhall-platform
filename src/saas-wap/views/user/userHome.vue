@@ -166,12 +166,6 @@
         } else {
           return val;
         }
-      },
-      subLiveTitle(str) {
-        if (typeof str == 'string') {
-          str = `${str.substring(0, 32)}...`;
-        }
-        return str;
       }
     },
     beforeCreate() {

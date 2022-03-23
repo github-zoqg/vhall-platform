@@ -3,7 +3,6 @@ import { initUse } from './use';
 import { initMixin } from './mixin';
 import { initI18n } from './lang';
 import { initRoleFilter } from '@/packages/app-shared/filters/role-filter';
-import './filters';
 import './setFontSize';
 
 // 初始化全局属性

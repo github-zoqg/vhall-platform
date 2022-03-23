@@ -132,7 +132,6 @@
       this.initLoginStatus();
       this.initInputStatus();
     },
-    filters: {},
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
