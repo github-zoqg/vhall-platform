@@ -161,6 +161,7 @@
                       <el-select
                         ref="autoCloseRefFlag"
                         v-model="form[question.id]"
+                        popper-class="vmp-sign-up-form__entry-form-select"
                         style="width: 100%"
                         :placeholder="$t('form.form_1018')"
                       >
@@ -1739,12 +1740,21 @@
         color: #fff;
       }
     }
-
+    /** 全局重置的未起作用,这里在组件里调整下 */
+    .el-form-item.is-success .el-input__inner,
+    .el-form-item.is-success .el-input__inner:focus,
+    .el-form-item.is-success .el-textarea__inner,
+    .el-form-item.is-success .el-textarea__inner:focus {
+      border-color: #ccc;
+    }
+    .el-select .el-input.is-focus .el-input__inner {
+      border-color: #999;
+    }
     .el-dialog__body {
       padding: 0;
     }
     &__wrap {
-      padding-bottom: 87px;
+      //padding-bottom: 87px;
     }
     &__banner {
       width: 100%;
@@ -1759,7 +1769,9 @@
       }
     }
     &__content {
-      padding: 0 75px;
+      padding: 0 75px 87px;
+      max-height: 420px;
+      overflow-y: auto;
     }
     &__title {
       font-size: 22px;
@@ -1888,51 +1900,68 @@
         color: #ffffff;
         cursor: pointer;
       }
-      // 云盾样式重置
+      // 云盾样式重置,注释部分为设计稿样式，暂时不删除，有备无患
       .captcha {
-        .yidun_tips {
-          color: #999999;
-          height: 40px;
-          line-height: 38px !important;
-          .yidun_tips__text {
-            vertical-align: initial;
-          }
+        ::v-deep .yidun_tips {
+          color: #999999 !important;
+          line-height: 1.05rem !important;
+          // .yidun_tips__text {
+          // vertical-align: initial!important;
+          // }
         }
-        .yidun_slider {
+        ::v-deep .yidun_slide_indicator {
+          line-height: 1.07rem !important;
+          height: 1.07rem !important;
+        }
+        ::v-deep .yidun_control {
+          line-height: 1.07rem !important;
+          height: 1.07rem !important;
+        }
+        ::v-deep .yidun_slider {
           .yidun_slider__icon {
-            background-image: url(img/icon-slide1.png) !important;
-            background-size: 28px 20px;
-            background-position: center;
-            margin-top: -5px;
+            width: 0.42rem !important;
+            margin-left: -0.19rem !important;
+            background-image: url(./img/icon-slide1.png) !important;
+            background-size: 0.77rem 0.53rem !important;
+            background-position: center !important;
+            margin-top: -0.13rem !important;
           }
           &:hover {
             .yidun_slider__icon {
-              background-image: url(img/icon-slide.png) !important;
+              background-image: url(./img/icon-slide.png) !important;
             }
           }
         }
-        .yidun--success {
+        ::v-deep
+          .yidun.yidun--light
+          .yidun_control.yidun_control--moving
+          .yidun_slider
+          .yidun_slider__icon {
+          background-image: url(./img/icon-slide.png) !important;
+        }
+        ::v-deep .yidun.yidun--light.yidun--success {
           .yidun_control {
+            // border-color: #3562FA!important;
             .yidun_slider__icon {
-              background-image: url(img/icon-succeed.png) !important;
+              background-image: url(./img/icon-succeed.png) !important;
             }
             .yidun_slider {
               .yidun_slider__icon {
-                background-image: url(img/icon-succeed.png);
-                background-size: 28px 20px;
-                background-position: center;
+                background-image: url(./img/icon-succeed.png) !important;
+                background-size: 0.77rem 0.53rem !important;
+                background-position: center !important;
               }
               &:hover {
                 .yidun_slider__icon {
-                  background-image: url(img/icon-succeed.png);
-                  background-size: 28px 20px;
-                  background-position: center;
+                  background-image: url(./img/icon-succeed.png) !important;
+                  background-size: 0.77rem 0.53rem !important;
+                  background-position: center !important;
                 }
               }
             }
           }
         }
-        .yidun.yidun--light.yidun--success.yidun--jigsaw {
+        ::v-deep .yidun.yidun--light.yidun--success.yidun--jigsaw {
           .yidun_control .yidun_slider {
             background-color: #3562fa;
           }
@@ -1941,13 +1970,13 @@
             background-color: #f0f1fe;
           }
         }
-        .yidun.yidun--light {
+        ::v-deep .yidun.yidun--light {
           .yidun_feedback {
-            background-position: 0px -240px;
-            height: 30px;
+            background-position: 0px -6.4rem;
+            height: 0.53rem;
           }
           .yidun_refresh {
-            background-position: 0px -339px;
+            background-position: 0px -9.1rem;
           }
         }
       }
@@ -1961,6 +1990,10 @@
         border-radius: 2px;
         font-size: 13px;
         border: 0;
+      }
+      .el-form-item__error {
+        left: 50%;
+        padding-left: 10px;
       }
     }
     .btn-box {
@@ -1991,5 +2024,8 @@
       margin: 0 auto;
       padding-bottom: 87px;
     }
+  }
+  .vmp-sign-up-form__entry-form-select {
+    max-width: 564px;
   }
 </style>

@@ -244,6 +244,7 @@
         console.log('收到打开窗口的信令');
         await this.getPrivateContactList();
         this.visible = true;
+        this.activeGroupIndex = 0;
       },
       //获取私聊联系人列表
       getPrivateContactList() {

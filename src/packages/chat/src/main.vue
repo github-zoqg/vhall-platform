@@ -205,18 +205,6 @@
       };
     },
     computed: {
-      //文字过长截取
-      textOverflowSlice() {
-        return function (val = '', len = 0) {
-          if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-            return '';
-          }
-          if (val.length > len) {
-            return val.substring(0, len) + '...';
-          }
-          return val;
-        };
-      },
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
@@ -368,7 +356,10 @@
         let disable = false;
 
         // 控制台配置回放禁言状态
-        if (this.playerType == 5 && this.configList['ui.watch_record_no_chatting'] == 1) {
+        if (
+          (this.playerType == 5 || this.playerType == 4) &&
+          this.configList['ui.watch_record_no_chatting'] == 1
+        ) {
           placeholder = this.$t('chat.chat_1079');
           disable = true;
         } else {
@@ -706,6 +697,18 @@
     }
     .chat-content {
       position: relative;
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #666;
+      }
+      ::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background-color: #434343;
+      }
       .vmp-chat-msg-item {
         // &:last-child {
         //   padding-bottom: 20px;

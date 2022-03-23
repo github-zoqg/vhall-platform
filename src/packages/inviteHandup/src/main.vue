@@ -22,7 +22,7 @@
   </section>
 </template>
 <script>
-  import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import { useMsgServer, useChatServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpInviteHandup',
@@ -87,8 +87,23 @@
           }, 1000);
         }
       });
+
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.showInviteConnectMic && this.clearTime();
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.showInviteConnectMic && this.clearTime();
+      });
     },
     methods: {
+      clearTime() {
+        this.inviteFun && clearInterval(this.inviteFun);
+        this.refusedText = this.$t('interact.interact_1010');
+        this.showInviteConnectMic = false;
+        this.inviteTime = 30;
+      },
       // 关闭邀请连麦弹框
       closeInviteConnectPop() {
         this.showInviteConnectMic = false;

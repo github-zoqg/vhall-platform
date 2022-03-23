@@ -94,7 +94,7 @@
     flex-direction: column;
 
     .vmp-intro-block {
-      padding: 0.4rem;
+      padding: 0 0;
 
       &__content-main {
         box-sizing: border-box;

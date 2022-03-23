@@ -119,6 +119,10 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {
@@ -201,7 +205,9 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          this.setVisible({ visible: true, type: 'private' });
+          if (!this.isEmbed) {
+            this.setVisible({ visible: true, type: 'private' });
+          }
         });
 
         if (this.isSubscribe) {
@@ -221,7 +227,7 @@
 
           if (msg.data.type === 'live_over') {
             this.setVisible({ visible: false, type: 'private' }); // private-chat
-            this.setVisible({ visible: false, type: 'v5' }); // qa
+            // this.setVisible({ visible: false, type: 'v5' }); // qa
             clientType === 'send' && this.selectDefault();
           }
         });
@@ -352,6 +358,9 @@
         item = this.getItemEntity(item);
         if (item === false) return;
         this.menu.push(item);
+        if (this.isInGroup) {
+          this.setVisible({ visible: false, type: 'notice' });
+        }
       },
 
       addItemByIndex(index, item) {
@@ -602,6 +611,21 @@
     &__main {
       height: calc(100% - 46px);
       overflow: hidden;
+    }
+
+    /*滚动条*/
+    div::-webkit-scrollbar {
+      width: 6px; // 横向滚动条
+      height: 6px; // 纵向滚动条 必写
+    }
+    // 滚动条的滑块
+    div::-webkit-scrollbar-thumb {
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #666666;
+    }
+    div::-webkit-scrollbar-track {
+      background-color: transparent;
     }
   }
 </style>

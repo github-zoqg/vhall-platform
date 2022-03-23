@@ -157,7 +157,7 @@
                   {{
                     (useCashServer.state.wxInfo.wechat_name_wap
                       ? useCashServer.state.wxInfo.wechat_name_wap
-                      : '') | splitLenStr(6)
+                      : '') | overHidden(6)
                   }}
                   {{
                     useCashServer.state.wxInfo.wechat_name_wap

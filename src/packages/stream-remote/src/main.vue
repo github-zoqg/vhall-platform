@@ -17,7 +17,10 @@
     <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
-    <section v-if="!stream.streamId" class="vmp-stream-remote__container__net-error">
+    <section
+      v-if="isShowNetError && !stream.streamId"
+      class="vmp-stream-remote__container__net-error"
+    >
       <div class="net-error-img"></div>
       <p>对方网络异常</p>
     </section>
@@ -28,21 +31,21 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom">
+    <section class="vmp-stream-local__bottom">
       <span
         v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
+        class="vmp-stream-local__bottom-role"
+        :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
         {{ stream.attributes.roleName | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
+      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
@@ -209,7 +212,8 @@
       return {
         audioLevel: 1,
         networkStatus: 0,
-        isFullScreen: false
+        isFullScreen: false,
+        isShowNetError: false
       };
     },
     props: {
@@ -322,13 +326,17 @@
         }
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
     },
     created() {
       this.listenEvents();
+
+      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
+      setTimeout(() => {
+        this.isShowNetError = true;
+      }, 5000);
     },
     mounted() {},
     beforeDestroy() {
@@ -380,6 +388,11 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            setTimeout(() => {
+              this.replayPlay();
+
+              // 开始测试100ms，刷新页面还是有订阅流不播放的情况。所以改为和原线上代码一致2s
+            }, 2000);
             this.getLevel();
           })
           .catch(e => {
@@ -581,7 +594,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -594,6 +607,11 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
         padding: 0 6px;
         vertical-align: top;
@@ -627,7 +645,7 @@
       }
       &-mic {
         float: right;
-        font-size: 12px;
+        font-size: 13px;
       }
       &-signal {
         float: right;

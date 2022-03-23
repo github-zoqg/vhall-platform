@@ -260,6 +260,7 @@
       });*/
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+        console.error('EVENT_STREAM_PLAYABORT----自动播放失败-');
         let videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {
@@ -347,7 +348,7 @@
         min-width: 100%;
         flex: none;
         .vmp-stream-list__remote-container {
-          .vmp-stream-local__bootom {
+          .vmp-stream-local__bottom {
             &-role {
               padding: 0 6px;
             }
@@ -357,7 +358,7 @@
           }
         }
         .vmp-stream-list__main-screen {
-          .vmp-stream-local__bootom {
+          .vmp-stream-local__bottom {
             &-role {
               padding: 0 6px;
             }
@@ -515,7 +516,7 @@
           width: 72px;
           height: 40px;
         }
-        .vmp-stream-local__bootom-role {
+        .vmp-stream-local__bottom-role {
           display: none;
         }
         .vmp-stream-list__main-screen {

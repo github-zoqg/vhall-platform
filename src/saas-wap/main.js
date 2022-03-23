@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { initGlobalAPI, i18n } from './core';
 import domainStore from './domain';
+import '@/packages/app-shared/filters/index';
 
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 // 导入样式及皮肤

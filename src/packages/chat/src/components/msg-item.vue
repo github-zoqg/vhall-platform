@@ -334,16 +334,6 @@
       }
     },
     filters: {
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人
@@ -797,7 +787,7 @@
         display: flex;
         justify-content: center;
         .interact-tools-content {
-          margin-top: 20px;
+          /*  margin-top: 20px; TODO: 注释掉内部20间距，外部有20间距设定 */
           line-height: 20px;
           padding: 5px 16px;
           background-color: #222222;

@@ -103,7 +103,7 @@
       const roomBaseServer = useRoomBaseServer();
       return {
         roomBaseServer,
-        timerVisible: true,
+        timerVisible: false,
         time: 0,
         totleTimeNum: 60,
         is_timeout: false,

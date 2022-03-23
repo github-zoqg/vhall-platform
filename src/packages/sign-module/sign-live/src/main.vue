@@ -96,6 +96,10 @@
       });
       // 签到关闭
       this.signServer.$on('sign_end', e => {
+        window.sessionStorage.removeItem('isAutoSign');
+        this.signInfo.autoSign = 0;
+        this.remaining = 0;
+        clearInterval(this.timer);
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,

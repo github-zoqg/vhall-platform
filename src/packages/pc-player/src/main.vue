@@ -152,11 +152,11 @@
             </div>
             <div class="controller-tools-left-time" v-if="!isLiving">
               <span class="controller-tools-left-time-current">
-                {{ secondToDate(currentTime) }}
+                {{ currentTime | secondToDate }}
               </span>
               <span>/</span>
               <span class="controller-tools-left-time-total">
-                {{ secondToDate(totalTime) }}
+                {{ totalTime | secondToDate }}
               </span>
             </div>
           </div>
@@ -272,7 +272,7 @@
         <!-- 断点续播 -->
         <div v-if="isPickupVideo && currentTime > 0">
           <i18n path="player.player_1012">
-            <span place="n" class="red">{{ secondToDate(currentTime) }}</span>
+            <span place="n" class="red">{{ currentTime | secondToDate }}</span>
           </i18n>
           <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
         </div>
@@ -282,7 +282,7 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
-  import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
+  import { computeRecordTime, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -829,9 +829,6 @@
           this.$toast('调整播放时间失败');
         });
         this.playerServer.play();
-      },
-      secondToDate(val) {
-        return secondToDateZH(val);
       }
     }
   };

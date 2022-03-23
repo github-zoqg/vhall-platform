@@ -40,21 +40,21 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
+    <section class="vmp-stream-local__bottom" v-show="localSpeaker.streamId">
       <span
         v-show="[1, 3, 4].includes(joinInfo.role_name) && isInGroup"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
+        class="vmp-stream-local__bottom-role"
+        :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
         {{ joinInfo.role_name | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
+      <span class="vmp-stream-local__bottom-nickname">{{ joinInfo.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="
           localSpeaker.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
@@ -204,6 +204,19 @@
     </section> -->
 
     <ImgStream ref="imgPushStream"></ImgStream>
+
+    <!-- 异常弹窗 -->
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>网络异常导致互动房间连接失败</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
@@ -224,6 +237,7 @@
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -232,11 +246,17 @@
         networkStatus: 2,
         audioLevel: 1,
         showDownMic: false,
-        isNotAutoSpeak: false // 分组模式下的是否为自动静音上麦自动
+        isNotAutoSpeak: false, // 分组模式下的是否为自动静音上麦自动
+
+        // 网络异常弹窗状态
+        PopAlertOffline: {
+          visible: false
+        }
       };
     },
     components: {
-      ImgStream
+      ImgStream,
+      SaasAlert
     },
     computed: {
       // 文档是否对观众可见
@@ -391,7 +411,6 @@
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -402,6 +421,11 @@
       this.splitScreenServer = useSplitScreenServer();
     },
     created() {
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        this.PopAlertOffline.visible = true;
+      });
       this.listenEvents();
     },
     async mounted() {
@@ -524,7 +548,9 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          await this.interactiveServer.destroy();
+          if (this.joinInfo.role_name != 1) {
+            await this.interactiveServer.destroy();
+          }
 
           // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
           if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
@@ -1027,6 +1053,12 @@
             }
           }, 100);
         });
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
     }
   };
@@ -1126,7 +1158,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -1139,6 +1171,11 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
         padding: 0 6px;
         vertical-align: top;
@@ -1173,11 +1210,10 @@
       }
       &-mic {
         float: right;
-        font-size: 12px;
+        font-size: 13px;
       }
       &-signal {
         float: right;
-        font-size: 12px;
         margin-left: 5px;
         margin-top: 4px;
         background-size: contain;
@@ -1201,8 +1237,8 @@
       width: 100%;
       height: 100%;
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 0px;
+      left: px;
       &-presentation {
         position: absolute;
         top: 0;

@@ -42,15 +42,6 @@
         }
       }
     },
-    filters: {
-      filterAmount(val) {
-        const num = Number(val);
-        if (num > 10000) {
-          return (num / 10000).toFixed(2) + this.$t('common.common_1014');
-        }
-        return num.toFixed(2);
-      }
-    },
     data() {
       return {
         defaultAvatar,
