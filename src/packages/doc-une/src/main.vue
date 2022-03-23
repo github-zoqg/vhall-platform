@@ -405,13 +405,13 @@
        * 缩略图列表展开与折叠
        */
       toggleThumbnail() {
-        this.thumbnailShow = !this.thumbnailShow;
-        if (
-          this.thumbnailShow &&
-          this.currentCid == this.docServer.state.docCid &&
-          this.docServer.state.docCid
-        ) {
-          this.docServer.getCurrentThumbnailList();
+        if (this.thumbnailShow) {
+          this.thumbnailShow = false;
+        } else {
+          if (this.currentCid == this.docServer.state.docCid && this.docServer.state.docCid) {
+            this.thumbnailShow = true;
+            this.docServer.getCurrentThumbnailList();
+          }
         }
       },
       async setDisplayMode(mode) {
