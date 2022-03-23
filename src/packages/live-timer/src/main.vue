@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-live-timer">
-    <div v-if="timerVisible" class="background-img" v-drag>
+    <div v-if="timerVisible && !groupInitData.isInGroup" class="background-img" v-drag>
       <el-row class="padding45">
         <el-row
           :class="
