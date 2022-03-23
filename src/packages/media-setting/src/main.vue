@@ -131,6 +131,7 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      window.mediaSettingServer = this.mediaSettingServer;
     },
     created() {
       this._originCaptureState = {}; // 原始选中的数据
@@ -234,7 +235,7 @@
         }
 
         if (action === 'not-living' || action === 'confirm') {
-          this.updateDeviceSetting();
+          await this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
           this.getStateCapture(); // 更新快照
@@ -278,6 +279,7 @@
 
         this.saveSelected();
         this.$message.success(this.$t('common.common_1034'));
+        return true;
       },
       /**
        * 获取所有设备
