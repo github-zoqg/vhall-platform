@@ -371,7 +371,9 @@
       },
       // 是否显示分屏占位图
       isShowSplitScreenPlaceholder() {
-        return this.isOpenSplitScreen && this.$domainStore.state.splitScreenServer.role == 'host';
+        return (
+          this.isOpenSplitScreen && this.$domainStore.state.splitScreenServer.role == 'hostPage'
+        );
       },
       // 是否开启分屏
       isOpenSplitScreen() {
@@ -438,7 +440,7 @@
           useMediaCheckServer().state.deviceInfo.device_status != 2 &&
           isSpeakOn &&
           (!this.isOpenSplitScreen ||
-            (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
+            (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'splitPage'))
         ) {
           this.startPush();
         }
@@ -548,7 +550,7 @@
           // 如果开启分屏并且是主页面，不需要停止推流
           if (
             this.splitScreenServer.state.isOpenSplitScreen &&
-            this.splitScreenServer.state.role == 'host'
+            this.splitScreenServer.state.role == 'hostPage'
           ) {
             return;
           }
@@ -575,7 +577,7 @@
             // 如果开启分屏并且是主页面，不需要停止推流
             if (
               this.splitScreenServer.state.isOpenSplitScreen &&
-              this.splitScreenServer.state.role == 'host'
+              this.splitScreenServer.state.role == 'hostPage'
             ) {
               return;
             }
