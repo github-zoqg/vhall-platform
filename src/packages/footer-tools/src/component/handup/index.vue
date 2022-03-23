@@ -7,6 +7,7 @@
         type="primary"
         size="medium"
         round
+        :disabled="loading"
         v-if="isInGroup ? +this.groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
       >
         {{ btnText }}
@@ -17,6 +18,7 @@
         @click="speakOff"
         type="primary"
         size="medium"
+        :disabled="loading"
         v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
         round
       >
@@ -35,6 +37,7 @@
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
         waitInterval: null,
+        loading: false,
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
@@ -115,13 +118,20 @@
     methods: {
       // 下麦
       async speakOff() {
-        const { code, msg } = await useMicServer().speakOff();
-        if (code === 513035) {
-          this.$message.error(msg);
+        this.loading = true;
+        try {
+          const { code, msg } = await useMicServer().speakOff();
+          if (code === 513035) {
+            this.$message.error(msg);
+          }
+          this.loading = false;
+        } catch (error) {
+          this.loading = false;
         }
       },
       // 举手按钮点击事件
       handleHandClick() {
+        this.loading = true;
         if (this.isApplyed) {
           this.userCancelApply();
         } else {
@@ -133,6 +143,7 @@
         useMicServer()
           .userApply()
           .then(res => {
+            this.loading = false;
             if (res.code != 200) {
               this.$message.error(res.msg);
               return;
@@ -141,6 +152,9 @@
             this.waitTime = 30;
             this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
             this.startWaitInterval();
+          })
+          .catch(err => {
+            this.loading = false;
           });
       },
       // 取消申请
@@ -148,6 +162,7 @@
         useMicServer()
           .userCancelApply()
           .then(() => {
+            this.loading = false;
             this.isApplyed = false;
             this.waitInterval && clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1001');
@@ -157,6 +172,9 @@
               type: 'success',
               customClass: 'zdy-info-box'
             });
+          })
+          .catch(err => {
+            this.loading = false;
           });
       },
       // 等待倒计时
