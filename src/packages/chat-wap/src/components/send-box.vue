@@ -214,7 +214,7 @@
       },
       //黄金链路配置
       configList() {
-        return this.roomBaseServer.state.configList;
+        return this.$domainStore.state.roomBaseServer.configList;
       },
       isEmbed() {
         // 是不是音视频嵌入
