@@ -287,8 +287,8 @@
 
       return {
         dialogVisible: false, // 组件是否显示
-        useUserServer: {}, // 用户相关的接口
-        useCashServer: {}, // 提现相关的接口
+        // useUserServer: {}, // 用户相关的接口
+        // useCashServer: {}, // 提现相关的接口
         step: 0, // 当前步骤
         bindForm: {
           money: '',
@@ -309,7 +309,12 @@
         countPoll: 0 // 轮询执行次数
       };
     },
-    created() {
+    filters: {
+      splitLenStr: function (name, len) {
+        return name && name.length > len ? name.substring(0, len) + '...' : name;
+      }
+    },
+    beforeCreate() {
       this.useUserServer = useUserServer();
       this.useCashServer = useCashServer();
     },
@@ -624,12 +629,14 @@
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
+              })
+              .finally(() => {
+                this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+                this.$refs.bindForm?.resetFields(); // 重置表单
+                this.initInterval(); // 初始化定时器
               });
           }
         });
-        this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-        this.$refs.bindForm?.resetFields(); // 重置表单
-        this.initInterval(); // 初始化定时器
       },
 
       // 初始化定时器
