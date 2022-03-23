@@ -96,6 +96,8 @@
       });
       // 签到关闭
       this.signServer.$on('sign_end', e => {
+        window.sessionStorage.removeItem('isAutoSign');
+        this.signInfo.autoSign = 0;
         this.remaining = 0;
         clearInterval(this.timer);
         const data = {
