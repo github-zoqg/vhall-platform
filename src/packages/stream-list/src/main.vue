@@ -260,6 +260,7 @@
       });*/
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+        console.error('EVENT_STREAM_PLAYABORT----自动播放失败-');
         let videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {

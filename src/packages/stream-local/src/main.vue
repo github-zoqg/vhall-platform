@@ -522,7 +522,9 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          await this.interactiveServer.destroy();
+          if (this.joinInfo.role_name != 1) {
+            await this.interactiveServer.destroy();
+          }
 
           // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
           if (useDocServer().state.switchStatus && this.isNoDelay === 0) {

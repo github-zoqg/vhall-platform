@@ -39,10 +39,7 @@
     },
     created() {
       // 如果是当前活动是无延迟直播，后者当前用户在麦上，刷新的时候展示封面图
-      if (
-        this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar ||
-        this.$domainStore.state.micServer.isSpeakOn
-      ) {
+      if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar) {
         this.showcoverImg = true;
       }
     },
