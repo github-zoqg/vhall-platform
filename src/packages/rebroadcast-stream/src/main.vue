@@ -41,8 +41,10 @@
       this.interactiveServer = useInteractiveServer();
       this.rebroadcastServer = useRebroadcastServer();
     },
-    mounted() {
+    created() {
       this.listenEvents();
+    },
+    mounted() {
       if (
         this.roomBaseServer.state.watchInitData.rebroadcast.id ||
         (this.roomBaseServer.state.isThirdStream &&
