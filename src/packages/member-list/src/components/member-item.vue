@@ -812,7 +812,7 @@
     font-size: 12px;
     box-sizing: content-box;
     &:hover {
-      background-color: #2d2d2d;
+      background-color: #595959;
       .vmp-member-item__control {
         &__more {
           opacity: 1;

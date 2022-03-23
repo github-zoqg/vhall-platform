@@ -404,6 +404,14 @@
     },
     async mounted() {
       this.checkStartPush();
+      // 接收设为主讲人消息
+      this.micServer.$on('vrtc_big_screen_set', msg => {
+        const str =
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+            ? '主画面'
+            : '主讲人';
+        this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -524,7 +532,7 @@
           if (
             this.isNoDelay === 1 ||
             this.mode === 6 ||
-            [4, '4'].includes(this.joinInfo.role_name)
+            [1, 4, '1', '4'].includes(this.joinInfo.role_name)
           ) {
             //  初始化互动实例
             this.interactiveServer.init();
@@ -918,7 +926,11 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localSpeaker.streamId) return clearInterval(this._audioLeveInterval);
+          if (
+            !this.localSpeaker.streamId ||
+            !this.$domainStore.state.interactiveServer.isInstanceInit
+          )
+            return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.localSpeaker.streamId })
@@ -933,7 +945,11 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localSpeaker.streamId) return clearInterval(this._netWorkStatusInterval);
+          if (
+            !this.localSpeaker.streamId ||
+            !this.$domainStore.state.interactiveServer.isInstanceInit
+          )
+            return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.localSpeaker.streamId })

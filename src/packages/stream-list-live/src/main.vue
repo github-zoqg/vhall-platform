@@ -172,9 +172,12 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
-         * 4. 没有互动实例的时候高度为0
+         * 4. 没有互动实例并且分屏没有打开的时候高度为0，如果分屏打开根绝上麦列表的长度判断
          */
-        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+        if (
+          !this.$domainStore.state.interactiveServer.isInstanceInit &&
+          !this.$domainStore.state.splitScreenServer.isOpenSplitScreen
+        ) {
           return true;
         }
         if (!this.remoteSpeakers.length) {
@@ -239,7 +242,7 @@
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
           // 订阅流播放失败    监听到播放失败, 然后展示按钮
-          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
             let videos = document.querySelectorAll('video');
             videos.length > 0 &&
               videos.forEach(video => {
