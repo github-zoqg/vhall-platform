@@ -96,6 +96,8 @@
       });
       // 签到关闭
       this.signServer.$on('sign_end', e => {
+        this.remaining = 0;
+        clearInterval(this.timer);
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,
