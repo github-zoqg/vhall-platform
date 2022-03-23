@@ -41,7 +41,7 @@ export default async function () {
   });
 
   const splitRes = await splitScreenServer.init({
-    role: 'split'
+    role: 'splitPage'
   });
   if (splitRes == 'SPLIT_OPEN_ERROR') {
     return 'splitOpenError';
