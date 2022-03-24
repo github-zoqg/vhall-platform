@@ -697,7 +697,7 @@
     }
     .chat-content {
       position: relative;
-      ::-webkit-scrollbar {
+      /* ::-webkit-scrollbar {
         width: 6px;
         height: 10px;
       }
@@ -708,7 +708,7 @@
       ::-webkit-scrollbar-track {
         border-radius: 4px;
         background-color: #434343;
-      }
+      } */
       .vmp-chat-msg-item {
         // &:last-child {
         //   padding-bottom: 20px;
