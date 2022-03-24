@@ -820,6 +820,14 @@
       },
 
       /**
+       * 重新设置当前画笔
+       */
+      resetCurrentBrush() {
+        console.log('---resetCurrentBrush---');
+        this.$refs.docToolbar.resetCurrentBrush();
+      },
+
+      /**
        * 缩略图点击
        */
       handleThumbnail(e) {
