@@ -631,6 +631,10 @@
             // id: 20855
             // page: 1
             // size: 362733
+            // 上传埋点
+            window.vhallReportForProduct.report(110022, {
+              report_extra: { documentId: res.data.document_id }
+            });
             const fuid = file.uid;
             this.allList.forEach(item => {
               if (fuid === item.uid) {
