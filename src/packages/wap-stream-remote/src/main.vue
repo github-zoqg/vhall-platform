@@ -188,6 +188,17 @@
           .subscribe(opt)
           .then(e => {
             console.warn('订阅成功---------', e);
+            try {
+              setTimeout(() => {
+                let videos = document.querySelectorAll('video');
+                videos.length > 0 &&
+                  videos.forEach(video => {
+                    video.play();
+                  });
+              }, 1000);
+            } catch (error) {
+              console.warn('自动播放失败----------', error);
+            }
             this.getLevel();
           })
           .catch(e => {
