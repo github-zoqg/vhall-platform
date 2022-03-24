@@ -442,6 +442,7 @@
       &.is-watch {
         width: 264px;
       }
+      flex: 1;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -527,6 +528,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      margin-left: 8px;
       .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;

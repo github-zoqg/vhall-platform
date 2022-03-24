@@ -355,7 +355,7 @@
         margin-left: 10px;
         margin-bottom: 1px;
         &:hover {
-          color: @active-color;
+          color: #ccc;
           cursor: pointer;
         }
       }
