@@ -169,8 +169,6 @@
         webinar: {},
         //是否已经登录
         isLogin: false,
-        //用户头像
-        avatar: require('../img/default_avatar.png'),
         handUpStatus: false,
         //只看我的问答
         isShowMyQA: false
@@ -248,6 +246,10 @@
           (this.webinar.type == 5 || this.webinar.type == 4) &&
           this.configList['ui.watch_record_no_chatting'] == 1
         );
+      },
+      avatar() {
+        const avatar = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.avatar;
+        return avatar || require('../img/default_avatar.png');
       }
     },
     watch: {
@@ -314,7 +316,7 @@
           this.isLogin = true;
           // 若用户已经登录过，获取userInfo
           this.isShowUser = true;
-          this.avatar = userInfo.avatar || require('../img/default_avatar.png');
+          // this.avatar = userInfo.avatar ||
         } else {
           this.isLogin = false;
           this.isShowUser = false;
@@ -333,9 +335,9 @@
         });
 
         // 头像更新
-        this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
-          this.avatar = avatar;
-        });
+        // this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
+        //   this.avatar = avatar;
+        // });
       },
       saySomething() {
         if (

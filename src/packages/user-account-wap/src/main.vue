@@ -206,9 +206,11 @@
               if (avatar === '') {
                 this.fileList = [];
               }
-              this.roomBaseServer.setChangeUserInfo(1, { avatar: avatar });
               // 用户信息接口更新
-              this.userServer.getUserInfo({ scene_id: 2 });
+              this.userServer.getUserInfo({ scene_id: 2 }).then(res => {
+                const avatarUrl = res.data?.avatar;
+                this.roomBaseServer.setChangeUserInfo(1, { avatar: avatarUrl });
+              });
             } else {
               this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1048'));
             }

@@ -1,6 +1,7 @@
 <template>
   <div class="rank-wrapbox" :class="{ 'rank-preview-box': pagetype == 'subscribe' }">
     <div v-if="info.inSwitch == 1 || info.rewardSwitch == 1" class="rank-previewbox">
+      <!-- 顶部区域 -->
       <header class="ranking-title">
         <div class="rank-menu">
           <span
@@ -27,7 +28,8 @@
         </div>
       </header>
 
-      <div v-show="showRules" class="ranking-box watch-area">
+      <!-- 规则浮窗 -->
+      <section v-show="showRules" class="ranking-box watch-area">
         <div v-show="activeTab === 'invite'" class="rank-con" v-html="info.inContent"></div>
         <div v-show="activeTab === 'invite' && !info.inContent" class="rank-con center">
           {{ $t('nav.nav_1036') }}
@@ -40,10 +42,17 @@
         <div v-show="activeTab === 'award' && !info.rewardContent" class="rank-con center">
           {{ $t('nav.nav_1036') }}
         </div>
-      </div>
+      </section>
 
-      <div class="rank-band">
-        <div v-show="activeTab === 'invite'" class="band-list">
+      <!-- 正文区域 -->
+      <main
+        class="rank-band"
+        v-loading="loading"
+        element-loading-text="加载中"
+        element-loading-background="rgba(0,0,0,0)"
+      >
+        <!-- 邀请榜 -->
+        <section v-show="activeTab === 'invite'" class="band-list">
           <template v-if="inviteRankList.length > 0">
             <div v-for="(item, index) in inviteRankList" :key="index" class="rank-item">
               <img
@@ -81,12 +90,14 @@
               {{ bottomText }}
             </div>
           </template>
-          <template v-else>
+          <template v-else-if="!loading">
             <img class="default-icon" src="../assets/imgs/empty-pay.png" alt="" />
             <span class="default-tip">{{ $t('nav.nav_1038') }}</span>
           </template>
-        </div>
-        <div v-show="activeTab == 'award'" class="band-list">
+        </section>
+
+        <!-- 打赏榜 -->
+        <section v-show="activeTab == 'award'" class="band-list">
           <template v-if="awardRankList.length > 0">
             <div v-for="(item, index) in awardRankList" :key="index" class="rank-item">
               <img
@@ -122,16 +133,17 @@
               {{ bottomText }}
             </div>
           </template>
-          <template v-else>
+          <template v-else-if="!loading">
             <img class="default-icon" src="../assets/imgs/empty-reward.png" alt />
             <span class="default-tip">{{ $t('nav.nav_1041') }}</span>
           </template>
-        </div>
-      </div>
+        </section>
+      </main>
 
-      <div v-if="isInviteCardMode" class="invite-friends">
+      <!-- 邀请观看 -->
+      <aside v-if="isInviteCardMode" class="invite-friends">
         <span @click="showInviteFriends">{{ $t('nav.nav_1042') }}</span>
-      </div>
+      </aside>
     </div>
   </div>
 </template>
@@ -157,6 +169,7 @@
         bangdan3: require('../assets/imgs/bangdan-3.png'),
         avatar: require('../assets/imgs/avatar.png'),
 
+        loading: false,
         pageLock: false,
         scrollLock: false,
         showBottom: false,
@@ -239,7 +252,8 @@
           }
         });
       },
-      changeTab(tab = 'invite') {
+      async changeTab(tab = 'invite') {
+        this.loading = true;
         this.activeTab = tab;
 
         this.pageLock = false;
@@ -253,7 +267,7 @@
             total: 0
           };
           this.inviteRankList = [];
-          this.getInviteRankList();
+          await this.getInviteRankList();
         }
 
         if (tab === 'award') {
@@ -263,8 +277,10 @@
             total: 0
           };
           this.awardRankList = [];
-          this.getAwardRankList();
+          await this.getAwardRankList();
         }
+
+        this.loading = false;
       },
       /**
        * 获取邀请列表
@@ -301,6 +317,8 @@
         this.scrollLock = false;
 
         this.clearBottomInfo();
+
+        return true;
       },
       /**
        * 获取打赏列表
@@ -335,6 +353,8 @@
         this.scrollLock = false;
 
         this.clearBottomInfo();
+
+        return true;
       },
       showInviteFriends() {
         this.$emit('send', 'emitOpenShareDialog', 4); // 呼出分享弹窗(4-邀请卡)
