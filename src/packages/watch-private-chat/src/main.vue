@@ -98,7 +98,9 @@
         //观看端初始化的信息
         watchInitData: null,
         //房间号
-        roomId: ''
+        roomId: '',
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁
       };
     },
     watch: {
@@ -124,16 +126,7 @@
       this.chatServer = useChatServer();
       this.msgServer = useMsgServer();
     },
-    computed: {
-      //是否被禁言
-      isBanned() {
-        return this.chatServer.state.banned;
-      },
-      //是否是全体禁言
-      allBanned() {
-        return this.chatServer.state.allBanned;
-      }
-    },
+    computed: {},
     mounted() {
       this.initViewData();
       this.listenEvents();
@@ -157,17 +150,17 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        if (this.configList['ui.show_chat_without_login'] == '0') {
-          if (this.joinInfo || this.isEmbed) {
-            // 嵌入或者未登录并且需要登录
-            this.chatLoginStatus = false;
-          } else {
-            // 非嵌入并或者是没有登录
-            this.chatLoginStatus = true;
-            this.inputStatus.placeholder = '';
-          }
+        const { configList = {} } = useRoomBaseServer().state;
+        if (
+          [2, '2'].includes(this.roleName) &&
+          !this.Embed &&
+          (!this.userId || this.userId == 0) &&
+          configList['ui.show_chat_without_login'] != 1
+        ) {
+          this.chatLoginStatus = true;
+          this.inputStatus.placeholder = '';
         } else {
-          // 不需要登录
+          // 非嵌入并或者是没有登录
           this.chatLoginStatus = false;
         }
       },
@@ -197,6 +190,16 @@
         this.chatServer.$on('receivePrivateMsg', () => {
           this.unReadMessageCount++;
           this.dispatch('VmpTabContainer', 'noticeHint', 'private');
+        });
+        //监听禁言通知
+        this.chatServer.$on('banned', res => {
+          this.isBanned = res;
+          this.initInputStatus();
+        });
+        //监听全体禁言通知
+        this.chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+          this.initInputStatus();
         });
       },
       //获取历史的私聊消息

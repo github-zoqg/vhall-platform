@@ -96,9 +96,16 @@
     },
     async created() {
       // 监听自动上麦的异常code
-      useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$toast(e.msg);
-      });
+      /**
+       * useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        if (
+          +e.code === 513025 ||
+          +this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2
+        ) {
+          return;
+        }
+        e.msg && this.$toast(e.msg);
+      });*/
       if (
         [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
@@ -178,7 +185,8 @@
       },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
-        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
+        // 1 主持人    3 助理
+        const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
         let title = '';
         switch (index) {
           case 1:
@@ -286,6 +294,10 @@
           .vmp-stream-remote-exitscreen {
             display: none;
           }
+        }
+        &-group {
+          top: 0;
+          height: 100%;
         }
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,

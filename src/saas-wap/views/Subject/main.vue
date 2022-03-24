@@ -104,7 +104,7 @@
         stateArr: [
           {
             value: this.$t('common.common_1018'),
-            bgcolor: '#fc5659'
+            bgcolor: '#fb3a32'
           },
           {
             value: this.$t('common.common_1019'),

@@ -145,6 +145,7 @@
   import { useInsertFileServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
   import videoPreview from '@/packages/app-shared/components/video-preview';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { debounce } from 'lodash';
   export default {
     name: 'VmpInsertVideoList',
     data() {
@@ -312,7 +313,7 @@
           isNeedResetPage: false
         });
       },
-      getTableList(
+      getTableList: debounce(function (
         options = {
           isNeedResetPage: false,
           isInvokeInCreated: false
@@ -369,7 +370,7 @@
             }
           }
         });
-      },
+      }, 300),
       // 云插播开始播放
       handlePlay(video) {
         const insertFileServer = useInsertFileServer();
@@ -443,23 +444,6 @@
               });
           })
           .catch(() => {});
-      },
-      autoPlay() {
-        setTimeout(() => {
-          this.$alert('您已进入直播房间，马上开始互动吧', '', {
-            title: '提示',
-            confirmButtonText: '立即开始',
-            // center: true,
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            callback: () => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
-            }
-          });
-        }, 500);
       },
       // 预览页面
       handlePreview(video) {
@@ -556,7 +540,7 @@
                   margin-right: 10px;
                   color: #666;
                   &.disable {
-                    color: #666666;
+                    color: #666;
                     pointer-events: none;
                   }
                 }
@@ -571,7 +555,7 @@
             }
           }
           .insert-list-uncontainer {
-            padding: 80px 0 140px 0;
+            padding: 80px 0 140px;
             margin: 0 auto;
             text-align: center;
             p {
@@ -582,7 +566,7 @@
         }
       }
       &-null {
-        padding: 50px 0 100px 0;
+        padding: 50px 0 100px;
         text-align: center;
         &-text {
           margin: 15px 0;

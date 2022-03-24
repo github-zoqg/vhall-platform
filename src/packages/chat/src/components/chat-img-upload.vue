@@ -141,7 +141,7 @@
 
 <style lang="less">
   .vmp-chat-img-upload-container {
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     .iconfont {
       color: #999999;
       font-size: 19px;

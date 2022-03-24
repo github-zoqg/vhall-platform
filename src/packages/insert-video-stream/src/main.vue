@@ -3,9 +3,10 @@
     class="vmp-insert-stream"
     @mouseenter="wrapHover"
     @mouseleave="wrapLeave"
-    v-show="insertFileStreamVisible"
-    ref="insterWarpRef"
+    v-show="insertFileStreamVisible || !isWatch"
+    ref="insertWrapRef"
     :class="{
+      'vmp-insert-stream__h0': !insertFileStreamVisible,
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
       'vmp-insert-stream__has-stream-list': hasStreamList
@@ -75,7 +76,7 @@
         :videoParam="remoteVideoParam"
         :isInsertVideoPreview="true"
         :isShowController="miniElement != 'insert-video'"
-        @remoteInsterSucces="remoteInsterSucces"
+        @remoteInsertSuccess="remoteInsertSuccess"
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
         @handleRemoteInsertVideoPause="handleRemoteInsertVideoPause"
@@ -125,7 +126,7 @@
               <i
                 class="vh-iconfont"
                 :class="voice > 1 ? 'vh-line-voice' : 'vh-line-mute'"
-                @click="jingYin"
+                @click="videoMute"
               ></i>
             </span>
             <div class="vmp-ver-slider">
@@ -157,6 +158,11 @@
         </div>
       </div>
     </div>
+    <vmp-air-container
+      v-if="childrenCom && childrenCom.length"
+      :oneself="true"
+      :cuid="childrenCom[0]"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
@@ -175,6 +181,7 @@
     name: 'VmpInsertStream',
     data() {
       return {
+        childrenCom: [],
         insertFileStreamVisible: false, // 是否展示插播流组件
         remoteVideoParam: {
           paas_record_id: '',
@@ -259,21 +266,6 @@
         }
       }
     },
-    filters: {
-      secondToDate(val) {
-        let time = moment.duration(val, 'seconds');
-        let hours = time.hours();
-        let minutes = time.minutes();
-        let seconds = time.seconds();
-        let totalTime = '00:00';
-        if (hours) {
-          totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
-        } else {
-          totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
-        }
-        return totalTime;
-      }
-    },
     components: { videoPreview },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
@@ -281,6 +273,9 @@
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
       this.docServer = useDocServer();
+    },
+    created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
       this.initEventListener();
@@ -367,7 +362,7 @@
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
-      creatLoaclStream() {
+      createLocalStream() {
         return new Promise((resolve, reject) => {
           this.insertFileServer
             .createLocalInsertStream({
@@ -395,7 +390,7 @@
         // 如果未开播，不推流
         if (watchInitData.webinar.type != 1) return;
 
-        this.creatLoaclStream()
+        this.createLocalStream()
           .then(res => {
             this.insertFileServer
               .publishInsertStream({ streamId: res.streamId })
@@ -569,7 +564,7 @@
           boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
         );
       },
-      remoteInsterSucces(videEl) {
+      remoteInsertSuccess(videEl) {
         console.log(videEl, '点播初始化成功');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -692,7 +687,7 @@
           this.reSetBroadcast();
         });
 
-        // 流加入
+        // 订阅失败
         this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
           this.reSetBroadcast();
           this.subscribeInsert();
@@ -817,13 +812,13 @@
         }
       },
       // video静音
-      jingYin() {
+      videoMute() {
         const vo = this._localFileVideoElement && this._localFileVideoElement.volume;
         if (vo) {
           if (vo > 0.01) {
             this._cacheVolume = vo;
-            this._localFileVideoElement.volume = 0.01;
-            this.voice = 1;
+            this._localFileVideoElement.volume = 0;
+            this.voice = 0;
           } else {
             this._localFileVideoElement.volume = this._cacheVolume;
             this.voice = this._cacheVolume * 100;
@@ -850,7 +845,7 @@
       // 全屏
       enterFullScreen() {
         this.isFullScreen = true;
-        const fullarea = this.$refs.insterWarpRef;
+        const fullarea = this.$refs.insertWrapRef;
         if (fullarea.requestFullscreen) {
           fullarea.requestFullscreen();
         } else if (fullarea.webkitRequestFullScreen) {
@@ -883,6 +878,10 @@
     width: 100%;
     height: 100%;
     position: relative;
+    &__h0 {
+      height: 0;
+      overflow: hidden;
+    }
     &__mini {
       width: 309px;
       height: 240px;
@@ -982,7 +981,7 @@
         border-radius: 100%;
         margin-right: 10px;
         &:hover {
-          background: #fc5659;
+          background: #fb3a32;
         }
         &.iconsheweizhujiangren {
           font-size: 14px;

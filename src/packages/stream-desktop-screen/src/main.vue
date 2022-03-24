@@ -12,7 +12,7 @@
     <el-button
       round
       size="mini"
-      v-if="renderEndDemonstrateBtn"
+      v-if="renderEndDemonstrateBtn && isShareScreen"
       @click="handleEndDemonstrate"
       class="end-demonstrate"
     >
@@ -226,7 +226,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
           if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
             return;
           }
@@ -275,10 +274,15 @@
               this.stopShare();
             }
           }
-          // 主持人/助理进出小组
-          if (msg.data.type === 'group_manager_enter') {
+          // 主持人进出小组如果正在演示桌面共享，需要停止共享
+
+          if (msg.data.type === 'group_manager_enter' && msg.data.role == 1) {
             // 自己正在发起桌面共享
-            if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
+            if (
+              this.roleName == 1 &&
+              this.isShareScreen &&
+              this.accountId == this.desktopShareInfo.accountId
+            ) {
               this.stopShare();
             }
           }
@@ -456,8 +460,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }

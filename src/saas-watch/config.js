@@ -252,7 +252,7 @@ export const serverConfig = {
       }
     ],
     emitOpenCash: [
-      //弹出个人资料
+      //弹出提现组件
       {
         cuid: 'comCash',
         method: 'openCashDialog'
@@ -501,7 +501,13 @@ export const serverConfig = {
   // 预约页面配置
   layerSubscribeRoot: {
     component: 'VmpAirContainer',
-    children: ['layerSubscribeHeader', 'layerSubscribeBody', 'layerSubscribeFooter', 'comAllDialog']
+    children: [
+      'layerSubscribeHeader',
+      'layerSubscribeBody',
+      'layerSubscribeFooter',
+      'comAllDialog',
+      'comGoodsDetailPc'
+    ]
   },
   // 顶部header容器
   layerSubscribeHeader: {

@@ -64,6 +64,16 @@
         <main slot="content">{{ alertText }}</main>
       </saas-alert>
     </aside>
+
+    <!--设备禁用弹窗 -->
+    <saas-alert
+      :visible="popAlert.visible"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+      :knowText="'确定'"
+    >
+      <main slot="content">{{ popAlert.text }}</main>
+    </saas-alert>
   </section>
 </template>
 
@@ -82,7 +92,7 @@
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
-  import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
+  import { useMediaSettingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
   import { getDiffObject } from './js/getDiffObject';
 
   import mediaSettingConfirm from './js/showConfirm';
@@ -106,7 +116,12 @@
         isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
         selectedMenuItem: 'basic-setting',
-        alertText: '修改设置后会导致重新推流，是否继续保存？'
+        alertText: '修改设置后会导致重新推流，是否继续保存？',
+        popAlert: {
+          text: this.$t('interact.interact_1011'),
+          visible: false,
+          confirm: true
+        }
       };
     },
     computed: {
@@ -118,22 +133,34 @@
       this.mediaSettingServer = useMediaSettingServer();
     },
     created() {
-      this._originCaptureState = {};
-      this._diffOptions = {};
+      this._originCaptureState = {}; // 原始选中的数据
+      this._diffOptions = {}; // 差异数据（更改的数据）
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
 
+      // 绑定confirm对应的视图操作
       mediaSettingConfirm.onShow(text => {
         this.alertText = text;
         this.isConfirmVisible = true;
+      });
+      // 监听设备禁用
+      useInteractiveServer().$on('EVENT_STREAM_END', msg => {
+        if (+msg.data.streamType !== 3) {
+          // 非桌面共享
+          this.popAlert.visible = true;
+        }
       });
     },
     beforeDestroy() {
       mediaSettingConfirm && mediaSettingConfirm.destroy();
     },
     methods: {
+      // 关闭弹窗
+      closeConfirm() {
+        this.popAlert.visible = false;
+      },
       /**
        * 展示弹窗
        */
@@ -197,6 +224,8 @@
         this._diffOptions = this.getDiffOptions();
         const videoTypeChanged = this._diffOptions.videoType !== undefined;
         const pictureUrlChanged = this._diffOptions.canvasImgUrl !== undefined;
+
+        console.log('diffOptions:', this._diffOptions);
 
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {

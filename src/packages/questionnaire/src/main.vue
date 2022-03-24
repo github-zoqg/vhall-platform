@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div class="questionnaire-lve">
     <el-dialog
       :visible.sync="dialogVisible"
       width="720px"
       custom-class="questionnaire-dialog"
       lock-scroll
+      :modal-append-to-body="false"
       :close-on-click-modal="false"
     >
       <!-- title -->
@@ -118,7 +119,19 @@
           v-show="!showQuestionnaireTable"
         >
           <div id="qn-server-box"></div>
-          <el-button class="publish-btn" round v-if="prevQuestionnaireId">发布</el-button>
+          <el-button
+            class="publish-btn"
+            round
+            v-if="prevQuestionnaireId"
+            @click="
+              publish({
+                question_id: prevQuestionnaireId,
+                fromPrev: true
+              })
+            "
+          >
+            发布
+          </el-button>
         </section>
       </section>
     </el-dialog>
@@ -210,6 +223,7 @@
       initPage() {
         this.firstLoad = false;
         this.showQuestionnaireTable = true;
+        this.prevQuestionnaireId = null;
         this.queryQuestionnaireList(true);
       },
       initSDK() {
@@ -423,7 +437,11 @@
               type: 'success',
               message: res.msg
             });
-            questionnaireItem.publish = 1;
+            if (questionnaireItem.fromPrev) {
+              this.initPage();
+            } else {
+              questionnaireItem.publish = 1;
+            }
           }
         });
       },
@@ -440,7 +458,14 @@
   };
 </script>
 <style lang="less">
+  .questionnaire-lve {
+    .el-dialog__wrapper {
+      height: 100vh;
+      overflow: hidden;
+    }
+  }
   .questionnaire-dialog {
+    margin-top: calc((100vh - 572px) / 2); // 让弹窗保持居中
     .el-dialog__body {
       // padding: 10px 20px 20px;
       padding: 0;
@@ -663,8 +688,8 @@
       z-index: 100;
       &:hover {
         color: #fff;
-        border: 1px solid #fc5659;
-        background-color: #fc5659;
+        border: 1px solid #fb3a32;
+        background-color: #fb3a32;
       }
     }
   }

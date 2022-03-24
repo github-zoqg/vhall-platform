@@ -4,12 +4,18 @@
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 主持人显示开始结束直播按钮 -->
       <template v-if="roleName == 1 && !isInGroup">
-        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+        <div
+          v-if="liveStep == 1 && deviceStatus != 2"
+          class="vmp-header-right_btn"
+          @click="handleStartClick"
+        >
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
-        <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
+        <div v-if="liveStep == 2 && deviceStatus != 2" class="vmp-header-right_btn">
+          正在启动...
+        </div>
         <div
-          v-if="liveStep == 3 && configList['ui.hide_live_end']"
+          v-if="liveStep == 3 && configList['ui.hide_live_end'] && deviceStatus != 2"
           class="vmp-header-right_btn vmp-header-right_duration"
           @click="handleEndClick"
         >
@@ -18,7 +24,12 @@
             {{ isRecord ? '结束录制' : '结束直播' }}
           </span>
         </div>
-        <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
+        <div v-if="liveStep == 4 && deviceStatus != 2" class="vmp-header-right_btn">
+          正在结束...
+        </div>
+        <div v-if="deviceStatus == 2" class="vmp-header-right_btn" @click="handleRecheck">
+          重新检测
+        </div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
       <template v-if="roleName == 4 && isLiving && !isInGroup">
@@ -89,7 +100,8 @@
     useMicServer,
     useInteractiveServer,
     useSubscribeServer,
-    useSplitScreenServer
+    useSplitScreenServer,
+    useMediaCheckServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -143,7 +155,7 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       },
       isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
+        return useMicServer().getSpeakerStatus();
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
@@ -151,6 +163,9 @@
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
+      deviceStatus() {
+        return useMediaCheckServer().state.deviceInfo?.device_status;
       }
     },
     components: {
@@ -182,7 +197,11 @@
       handleApplyClick() {
         useMicServer()
           .userApply()
-          .then(() => {
+          .then(res => {
+            if (+res.code !== 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this.isApplying = true;
             this.applyTime = 30;
             this._applyInterval = setInterval(async () => {
@@ -220,6 +239,11 @@
         }
         this.isApplying = false;
         this.applyTimerCount = 30;
+      },
+
+      // 重新检测
+      handleRecheck() {
+        this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       },
       listenEvents() {
         // 全屏事件
@@ -366,7 +390,7 @@
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.staet.isOpenSplitScreen = false;
+          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
@@ -464,7 +488,7 @@
           html = '非默认回放将暂存15天';
         } else if (watchInitData.record_notice == 2) {
           html =
-            "非默认回放将暂存15天，联系您的客户经理或 <a href=\"https://vhall.s4.udesk.cn/im_client/?web_plugin_id=15038\" style='color: #fc5659' target='_blank'>客服</a> 开通点播服务，即可将非默认回放永久保存和播放";
+            "非默认回放将暂存15天，联系您的客户经理或 <a href=\"https://vhall.s4.udesk.cn/im_client/?web_plugin_id=15038\" style='color: #fb3a32' target='_blank'>客服</a> 开通点播服务，即可将非默认回放永久保存和播放";
         } else if (watchInitData.record_notice == 3) {
           html = '非默认回放将暂存15天，发布为点播，即可将非默认回放永久保存和播放';
         }

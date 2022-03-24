@@ -86,7 +86,7 @@
               <!-- 提示信息 -->
               <el-tooltip placement="right">
                 <div slot="content">
-                  <div class="help-tips">
+                  <div class="doc-help-tips">
                     <p>1.支持的文档格式： doc/docx,xls/xlsx,ppt</p>
                     <p>/pptx,pdf,jpeg/jpg,png,bmp</p>
                     <p>2.单份文档不能超过200页,不超过100M</p>
@@ -137,13 +137,13 @@
                         :class="scope.row.ext | fileIconCss(false)"
                         :style="scope.row.ext | fileIconCss(true)"
                       ></span>
-                      {{ scope.row.file_name }}
+                      <span class="file-name__text">{{ scope.row.file_name }}</span>
                     </p>
                   </template>
                 </el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
                 <el-table-column prop="page" label="页码"></el-table-column>
-                <el-table-column prop="uploadPropress" label="进度">
+                <el-table-column prop="uploadPropress" label="进度" width="100">
                   <template slot-scope="scope">
                     <DocProgressStatus
                       :docExt="scope.row.ext"
@@ -259,7 +259,7 @@
           <div class="vmp-doc-lib__ft">
             <div class="vmp-doc-lib__ft-tip">
               当前选中
-              <span style="color: #fc5659">{{ selectDocIdList.length }}</span>
+              <span style="color: #fb3a32">{{ selectDocIdList.length }}</span>
               个文档
             </div>
             <div>
@@ -465,7 +465,8 @@
           await this.$confirm('删除后将会影响文档演示和观看，确定删除？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
-            type: 'warning'
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
           });
           const result = await this.docServer.delDocList({
             tag: 1,
@@ -712,9 +713,6 @@
         width: 120px;
       }
     }
-    .help-tips p {
-      line-height: 20px;
-    }
     .vmp-doc-cur {
       display: flex;
       flex-direction: column;
@@ -784,27 +782,6 @@
       }
     }
 
-    .doc-dlg-sharetip {
-      width: 400px;
-      height: 200px;
-      box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
-      border-radius: 4px;
-      background-color: #fff;
-      position: relative;
-      margin-top: -10%;
-
-      .el-checkbox {
-        font-weight: 400 !important;
-      }
-      .el-checkbox__input.is-checked + .el-checkbox__label {
-        color: #606266 !important;
-      }
-
-      .dialog-footer {
-        text-align: right;
-        margin-top: 20px;
-      }
-    }
     .el-table .cell .file-name {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -812,7 +789,11 @@
 
       .doc-icon {
         font-size: 20px;
+        vertical-align: middle;
         margin-right: 10px;
+      }
+      &__text {
+        vertical-align: middle;
       }
     }
     .el-table th > .cell {
@@ -845,6 +826,38 @@
     }
     .title-text {
       font-size: 20px;
+    }
+  }
+
+  // el-tooltip组件会挂载到body下
+  .doc-help-tips {
+    p {
+      font-size: 12px;
+      line-height: 18px;
+    }
+  }
+
+  // 内嵌对话框，挂载到body下
+  .doc-dlg-sharetip {
+    width: 400px;
+    height: 200px;
+    box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+    margin-top: -10%;
+
+    .el-checkbox {
+      font-weight: 400 !important;
+    }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #606266 !important;
+    }
+
+    .dialog-footer {
+      text-align: right;
+      margin-top: 20px;
+      padding-left: 130px;
     }
   }
 </style>

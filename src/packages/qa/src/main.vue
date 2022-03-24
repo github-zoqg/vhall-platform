@@ -69,6 +69,7 @@
           disable: false,
           placeholder: this.$t('chat.chat_1003')
         },
+        //是否需要登录
         chatLoginStatus: false,
 
         operatorHeight: 91,
@@ -131,7 +132,6 @@
       this.initLoginStatus();
       this.initInputStatus();
     },
-    filters: {},
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
@@ -147,7 +147,11 @@
         });
         //监听问答回复消息
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          if (msg.sender_id != this.thirdPartyId) {
+          if (
+            msg.sender_id != this.thirdPartyId &&
+            ((msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+              msg.data.answer.is_open != '0')
+          ) {
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
             this.dispatch('VmpTabContainer', 'noticeHint', 'v5');
@@ -190,10 +194,10 @@
       initLoginStatus() {
         const { configList = {} } = useRoomBaseServer().state;
         if (
-          ![1, '1'].includes(this.roleName) &&
-          ['', null, 0].includes(
-            this.userId || this.Embed || configList['ui.show_chat_without_login'] == 1
-          )
+          [2, '2'].includes(this.roleName) &&
+          ['', null, 0].includes(this.userId) &&
+          !this.Embed &&
+          configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
@@ -308,14 +312,14 @@
       display: block;
       margin: 0 auto;
       border-radius: 5px;
-      background: #fc5659;
+      background: #fb3a32;
       line-height: 35px;
       font-size: 12px;
       text-align: center;
       margin: 10px;
       &:hover,
       &:active {
-        background: #fc5659;
+        background: #fb3a32;
       }
     }
   }

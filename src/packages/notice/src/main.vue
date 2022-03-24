@@ -327,7 +327,7 @@
           display: inline-block;
           outline: none;
           &:hover {
-            background: #fc5659;
+            background: #fb3a32;
           }
         }
       }

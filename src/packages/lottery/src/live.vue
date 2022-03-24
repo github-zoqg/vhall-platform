@@ -38,6 +38,11 @@
   export default {
     components: { lotteryForm, lotteryPending, lotteryWinner },
     name: 'VmpLotteryLive',
+    provide() {
+      return {
+        lotteryServer: this.lotteryServer
+      };
+    },
     data() {
       return {
         dialogVisible: false, // 整个组件的显隐(包括背景遮罩)
@@ -52,10 +57,10 @@
         disabledTime: 0 // 5秒禁止点击
       };
     },
-    provide() {
-      return {
-        lotteryServer: this.lotteryServer
-      };
+    computed: {
+      role() {
+        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info?.role_name;
+      }
     },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({
@@ -63,7 +68,9 @@
       });
     },
     created() {
-      this.initMsgEvent();
+      if (this.role === 1) {
+        this.initMsgEvent();
+      }
     },
     mounted() {
       if (this.mode === 'live') {
@@ -71,7 +78,9 @@
       }
     },
     destroyed() {
-      this.removeMsgEvent();
+      if (this.role === 1) {
+        this.removeMsgEvent();
+      }
       this.clearTimer();
     },
     methods: {
@@ -337,7 +346,7 @@
               margin-bottom: 48px;
             }
             .winning-status {
-              color: #fc5659;
+              color: #fb3a32;
             }
           }
         }

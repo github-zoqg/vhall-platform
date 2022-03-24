@@ -7,7 +7,7 @@
             class="subscribe-wrap-item"
             v-for="item in advs"
             :key="item.adv_id"
-            @click="handleJump(item.url)"
+            @click="goto(item.url)"
           >
             <div class="subscribe-wrap-item_cover">
               <img :src="item.img_url ? item.img_url : defaultBanner" alt="" />
@@ -18,12 +18,13 @@
             </div>
           </div>
         </div>
+
         <ul class="a-wrap" v-else>
           <li
             class="recommend-item"
             v-for="item in advs"
             :key="item.adv_id"
-            @click="handleJump(item.url)"
+            @click="goto(item.url)"
           >
             <div class="recommend-item">
               <div class="banner">
@@ -108,8 +109,20 @@
     },
     mounted() {
       this.setDefaultAdvs();
+      this.listenEvents();
+    },
+    beforeDestroy() {
+      this.removeEvents();
     },
     methods: {
+      listenEvents() {
+        if (!this.isSubscribe) return;
+        this.onScrollStopForSubscribePage = this.onScrollStopForSubscribePage.bind(this);
+        window.addEventListener('scroll', this.onScrollStopForSubscribePage);
+      },
+      removeEvents() {
+        window.removeEventListener('scroll', this.onScrollStopForSubscribePage);
+      },
       /**
        * 初始化默认广告信息
        */
@@ -121,6 +134,17 @@
         if (!this.$refs.scroll) return;
         const state = this.$refs.scroll.osInstance().getState();
         if (!state.hasOverflow.y) return; // 未触底
+        if (this.total !== 0 && this.pos >= this.total) return;
+        if (this.loading) return;
+
+        this.getAdsInfo();
+      },
+      onScrollStopForSubscribePage() {
+        const currentY = document.body.clientHeight + window.scrollY;
+        const fullY = document.body.scrollHeight;
+        const hasOverflowY = currentY === fullY;
+
+        if (!hasOverflowY) return;
         if (this.total !== 0 && this.pos >= this.total) return;
         if (this.loading) return;
 
@@ -144,12 +168,13 @@
           this.loading = false;
         }
       },
-      handleJump(url) {
+      goto(url) {
         window.open(url, '_blank');
       }
     }
   };
 </script>
+
 <style lang="less">
   .vmp-recommend {
     height: 100%;

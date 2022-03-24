@@ -93,7 +93,7 @@
           <span @click="openLanguage" v-if="languageList.length > 1">
             {{ lang.key == 1 ? '中文' : 'EN' }}
           </span>
-          <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed">
+          <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
             {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
           </span>
           <span @click="openQuality" v-if="!isWarnPreview">
@@ -167,7 +167,10 @@
               </span>
               <!-- 右侧icon集合 -->
               <p class="vmp-wap-player-control-icons-right">
-                <span @click="openBarrage" v-if="playerOtherOptions.barrage_button">
+                <span
+                  @click="openBarrage"
+                  v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
+                >
                   <i
                     :class="`vh-iconfont ${
                       danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
@@ -244,7 +247,7 @@
   </div>
 </template>
 <script>
-  import { secondToDateZH, isMse } from './js/utils';
+  import { isMse } from './js/utils';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
@@ -252,24 +255,6 @@
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
-    filters: {
-      secondToDate(val) {
-        return secondToDateZH(val);
-      },
-      formatHotNum(value) {
-        value = parseInt(value);
-        let unit = '';
-        const k = 99999;
-        const sizes = ['', '万', '亿', '万亿'];
-        let i;
-        if (value > k) {
-          i = Math.floor(Math.log(value) / Math.log(k));
-          value = (value / Math.pow(k / 10, i)).toFixed(1);
-          unit = sizes[i];
-        }
-        return value + unit;
-      }
-    },
     components: {
       controlEventPoint
     },
@@ -651,7 +636,21 @@
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       openLanguage() {
         this.iconShow = true;

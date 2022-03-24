@@ -268,33 +268,6 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
-        // const headerDom = document.getElementById('header');
-        // const interactDoc = document.getElementById('interactBox');
-        // if (headerDom) {
-        //   if (interactDoc) {
-        //     this.popHeight =
-        //       document.body.clientHeight -
-        //       document.getElementById('interactBox').offsetHeight -
-        //       headerDom.offsetHeight +
-        //       'px';
-        //   } else {
-        //     this.popHeight =
-        //       document.body.clientHeight -
-        //       document.getElementById('videoBox').offsetHeight -
-        //       headerDom.offsetHeight +
-        //       'px';
-        //   }
-        // } else {
-        //   if (interactDoc) {
-        //     this.popHeight =
-        //       document.body.clientHeight -
-        //       document.getElementById('interactBox').offsetHeight +
-        //       'px';
-        //   } else {
-        //     this.popHeight =
-        //       document.body.clientHeight - document.getElementById('videoBox').offsetHeight + 'px';
-        //   }
-        // }
       },
       // 打开打赏弹框
       showReward() {

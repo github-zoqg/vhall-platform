@@ -10,7 +10,12 @@
     >
       <div class="msg-item interact">
         <div class="interact-msg">
-          {{ source.roleName | roleFilter }}{{ source.content.text_content }}
+          <template
+            v-if="source.type == 'question_answer_open' || source.type == 'question_answer_close'"
+          >
+            {{ source.roleName | roleFilter }}
+          </template>
+          {{ source.content.text_content }}
         </div>
       </div>
     </template>
@@ -49,11 +54,11 @@
       <div class="msg-item interact new-gift" :class="Math.random() * 10 > 3 ? 'purpose' : 'red'">
         <div class="interact-gift-box">
           <p class="new-gift-name">
-            {{ source.nickName | textOverflowSlice(10) }}
+            {{ source.nickName | overHidden(10) }}
           </p>
           <p class="new-gift-content">
             {{ $t('interact_tools.interact_tools_1044') }}{{ source.content.num
-            }}{{ $t('cash.cash_1003') }},{{ source.content.text_content | textOverflowSlice(6) }}
+            }}{{ $t('cash.cash_1003') }},{{ source.content.text_content | overHidden(6) }}
           </p>
         </div>
         <img class="new-award-img" src="../img/red-package.png" />
@@ -68,10 +73,10 @@
       >
         <div class="interact-gift-box">
           <p class="new-gift-name">
-            {{ source.nickname | textOverflowSlice(10) }}
+            {{ source.nickname | overHidden(10) }}
           </p>
           <p class="new-gift-content">
-            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | textOverflowSlice(10) }}
+            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </p>
         </div>
         <img class="new-gift-img" :src="source.content.gift_url" />
@@ -82,7 +87,13 @@
       <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
       <div class="msg-item">
         <div class="avatar-wrap">
-          <img class="chat-avatar" width="35" height="35" :src="source.avatar" alt />
+          <img
+            class="chat-avatar"
+            width="35"
+            height="35"
+            :src="source.avatar || defaultAvatar"
+            alt
+          />
         </div>
         <div class="msg-content">
           <p class="msg-content_name">
@@ -174,6 +185,7 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   export default {
     props: {
       source: {
@@ -204,6 +216,7 @@
     data() {
       return {
         msgContent: '',
+        defaultAvatar: defaultAvatar,
         jiantou: require('../img/jiantou.png')
       };
     },
@@ -236,16 +249,6 @@
           return 'guest';
         }
         return '';
-      },
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
       }
     },
     mounted() {
@@ -382,7 +385,7 @@
             font-size: 20px;
             &.host {
               background-color: rgba(252, 86, 89, 0.2);
-              color: #fc5659;
+              color: #fb3a32;
             }
             &.assistant {
               background-color: rgba(166, 166, 166, 0.2);

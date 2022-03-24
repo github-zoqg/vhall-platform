@@ -61,8 +61,13 @@
   </div>
 </template>
 <script>
-  import screenfull from 'screenfull';
-  import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useDocServer,
+    useMsgServer,
+    usePlayerServer,
+    useGroupServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
@@ -70,9 +75,9 @@
 
     data() {
       return {
-        className: '',
-        displayMode: 'normal', // normal: 正常; fullscreen:全屏
-        keepAspectRatio: true,
+        //文档展示模式： normal-正常; fullscreen-全屏
+        displayMode: 'normal',
+        //文档宽高
         docViewRect: {
           width: 0,
           height: 0
@@ -80,18 +85,27 @@
       };
     },
     computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      // 文档是否加载完成
       docLoadComplete() {
         return this.docServer.state.docLoadComplete;
       },
+      // 当前文档白板容器id
       currentCid() {
         return this.docServer.state.currentCid;
       },
+      // 是否观众可见
       switchStatus() {
         return this.docServer.state.switchStatus;
       },
+      // 页码
       pageNum() {
         return this.docServer.state.pageNum;
       },
+      // 总页数
       pageTotal() {
         return this.docServer.state.pageTotal;
       },
@@ -108,8 +122,6 @@
             this.docServer.state.isChannelChanged = false;
             // 初始化事件
             this.initEvents();
-            // 清空
-            // this.docServer.resetContainer();
             // 恢复上一次的文档数据;
             console.log('----- recoverLastDocs 频道变更');
             this.recoverLastDocs();
@@ -129,11 +141,9 @@
       this.docServer.getDocViewRect = this.getDocViewRect;
 
       this.initEvents();
-      // 清空
-      // this.docServer.resetContainer();
+
       if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
-        // 恢复上一次的文档数据;
-        console.log('----- recoverLastDocs type == 1');
+        // 直播中才执行,恢复上一次的文档数据;
         this.$nextTick(() => {
           this.recoverLastDocs();
         });
@@ -141,46 +151,24 @@
     },
     methods: {
       /**
-       * 全屏
+       * 全屏切换
+       * 这里使用的是样式模拟全屏，不用真实全屏事件，是因为在iphone手机上存在兼容性问题
        */
       fullscreen() {
-        screenfull.toggle(this.$refs.docWrapper);
+        this.displayMode = this.displayMode === 'fullscreen' ? 'normal' : 'fullscreen';
+        // 切换后还原位置
+        this.docServer.zoomReset();
       },
-      async setDisplayMode(mode) {
-        console.log('[doc] setDisplayMode:', mode);
-        if (!['normal', 'fullscreen'].includes(mode)) {
-          console.error('展示模式必须是normal,  fullscreen中的一个');
-          return;
-        }
-        if (this.displayMode === mode) {
-          console.log('当前已经是该模式，无需设置');
-          return;
-        }
 
-        if (this.displayMode === 'fullscreen') {
-          // 全屏模式转其它模式
-          this.fullscreen();
-          screenfull.targetMode = mode;
-        } else if (mode === 'fullscreen') {
-          // 其它模式转全屏模式
-          this.fullscreen();
-        }
-        await this.$nextTick();
-        // 文档大小的改变，会自动触发 erd.listenTo 事件;
-      },
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();
       },
+
+      // 初始化事件
       initEvents() {
         // 文档容器选择事件
         this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
-
-        // 回放文档加载事件
-        this.docServer.$on(
-          'dispatch_doc_vod_cuepoint_load_complate',
-          this.dispatchDocVodCuepointLoadComplate
-        );
 
         // 回放播放时间
         this.docServer.$on('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
@@ -188,17 +176,15 @@
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
 
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
-
-        // 全屏/退出全屏事件
-        screenfull.onchange(ev => {
-          // console.log('screenfull.isFullscreen:', screenfull.isFullscreen);
-          if (ev.target.id !== 'docWrapper') return;
-          if (screenfull.isFullscreen) {
-            this.displayMode = 'fullscreen';
-          } else {
-            this.displayMode = screenfull.targetMode || 'normal';
+        // 点播或回放播放器播放完成
+        usePlayerServer().$on(VhallPlayer.ENDED, () => {
+          console.log('[doc] VhallPlayer.ENDED');
+          // 4-点播， 5-回放
+          if ([4, 5].includes(this.webinarType)) {
+            this.docServer.state.switchStatus = false;
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitShowMenuTab', [false])
+            );
           }
         });
       },
@@ -216,6 +202,10 @@
           this.docServer.setSize(width, height);
         }
       },
+
+      /**
+       * 获取文档白板容器大小
+       */
       getDocViewRect() {
         let rect = this.$refs.docWrapper?.getBoundingClientRect();
         let w = 0;
@@ -293,24 +283,17 @@
 
       // 翻页
       handlePage(type) {
-        if (!this.docServer.state.currentCid || this.docServer.state.currentCid === 'board') {
+        if (!this.currentCid || this.currentCid.startsWith('board')) {
           return;
         }
         if (type === 'prev') {
-          if (this.docServer.state.pageNum > 1) {
+          if (this.pageNum > 1) {
             this.docServer.prevStep();
           }
         } else if (type === 'next') {
-          if (this.docServer.state.pageNum < this.docServer.state.pageTotal) {
+          if (this.pageNum < this.pageTotal) {
             this.docServer.nextStep();
           }
-        }
-      },
-      // 文档是否可见状态变化事件
-      dispatchDocSwitchChange: async function (val) {
-        console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.docLoadComplete) {
-          this.recoverLastDocs();
         }
       },
       // 文档不存在或已删除
@@ -342,32 +325,7 @@
           this.addNewFile({ fileType, docId, cid });
         }
       },
-      // 回放文档加载事件
-      dispatchDocVodCuepointLoadComplate: async function (data) {
-        if (this.docServer.state.containerList.length === 0) {
-          const data = this.docServer.getVodAllCids();
-          this.docServer.state.containerList = data.map(item => {
-            return {
-              cid: item.cid
-            };
-          });
-          // console.log('[doc] containerList:', this.docServer.state.containerList);
-          // this.docServer.state.switchStatus = this.docServer.state.containerList.length > 0;
-          await this.$nextTick();
-          if (this.docServer.state.containerList.length) {
-            const { width, height } = this.getDocViewRect();
-            if (!width || !height) return;
-            for (const item of data) {
-              this.docServer.initContainer({
-                cid: item.cid,
-                width,
-                height,
-                fileType: item.type.toLowerCase()
-              });
-            }
-          }
-        }
-      },
+      // 回放视频播放更新事件
       dispatchDocVodTimeUpdate({ isChange }) {
         if (isChange) {
           window.$middleEventSdk?.event?.send(
@@ -379,12 +337,7 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
-      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
-      this.docServer.$off(
-        'dispatch_doc_vod_cuepoint_load_complate',
-        this.dispatchDocVodCuepointLoadComplate
-      );
     }
   };
 </script>
@@ -502,9 +455,13 @@
 
     // 全屏模式下
     &.vmp-doc-wap--fullscreen {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
       background-color: rgba(0, 0, 0, 0.9);
 
-      z-index: 1000000;
       .vmp-doc-une__content {
         .vmp-doc-inner {
           .doc-box {

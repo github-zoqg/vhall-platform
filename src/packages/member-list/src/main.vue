@@ -7,16 +7,19 @@
     </div>
     <!--成员区域-->
     <div class="vmp-member-list__container">
-      <scroll class="vmp-member-list__container__scroll" ref="scroll" @pullingUp="loadMore">
+      <scroll
+        class="vmp-member-list__container__scroll"
+        :class="{ 'show-empty-img': isShowEmptyImg }"
+        ref="scroll"
+        @pullingUp="loadMore"
+      >
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div
-              v-if="searchEmpty"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwusousuo"></span>
+            <div v-if="searchEmpty" class="empty-container">
+              <span class="empty-img">
+                <img src="./images/search@2x.png" alt="" />
+              </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
             <template v-else style="overflow: auto">
@@ -48,12 +51,10 @@
         <!--举手的成员-->
         <template v-if="tabIndex === 2">
           <div class="member-list__apply-tab">
-            <div
-              v-if="!applyUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwujushou"></span>
+            <div v-if="!applyUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/noTop@2x.png" alt="" />
+              </span>
               <p>暂无人举手</p>
             </div>
             <template v-else>
@@ -85,12 +86,10 @@
         <!--受限制的成员-->
         <template v-if="tabIndex === 3">
           <div class="member-list__limit-tab">
-            <div
-              v-if="!limitedUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwuchengyuan"></span>
+            <div v-if="!limitedUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/no@2x.png" alt="" />
+              </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
             <template v-else>
@@ -126,7 +125,7 @@
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
         <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
-          {{ totalNum | numberCompression }}人在线
+          {{ totalNum | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -228,19 +227,6 @@
       memberItem,
       scroll
     },
-    filters: {
-      //数值压缩
-      numberCompression(num) {
-        if (num < 10000) {
-          return num;
-        } else {
-          const n = Math.floor(num / 10000);
-          let l = Math.floor((num % 10000) / 1000);
-          l = l === 0 ? '' : '.' + l;
-          return n + l + '万';
-        }
-      }
-    },
     data() {
       return {
         //成员列表组件配置
@@ -327,6 +313,14 @@
       }
     },
     computed: {
+      //是否显示搜索结果图片
+      isShowEmptyImg() {
+        return [
+          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 2 && !this.applyUsers.length,
+          this.tabIndex === 3 && !this.limitedUsers.length
+        ].some(item => !!item);
+      },
       //是否显示底部区域
       isShowBottom() {
         let show = true;
@@ -508,6 +502,11 @@
             default:
               break;
           }
+        });
+        //监听自定义消息
+        this.msgServer.$onMsg('CUSTOM_MSG', msg => {
+          //人员上下线消息丢失时，会收到这个消息
+          msg.data.type === 'reload_online_user_list' && this.updateOnlineUserList();
         });
       },
       //初始化房间消息回调监听
@@ -736,8 +735,8 @@
               }
 
               //在主房间，但是是分组内成员上线
-              if(!_this.isInGroup && context?.groupInitData?.isInGroup){
-                  return;
+              if (!_this.isInGroup && context?.groupInitData?.isInGroup) {
+                return;
               }
 
               _this.onlineUsers.push(user);
@@ -983,6 +982,10 @@
             member_info,
             'onlineUsers'
           );
+          //上麦成功，需要更新一下申请上麦的人（因为主持人和助理、组长等都会看到申请列表）
+          _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
+          //上麦成功，重新对在线人员排一下序
+          _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
           //如果已经没有举手的人，清除一下举手一栏的小红点
           if (!_this.applyUsers.length) {
             _this.raiseHandTip = false;
@@ -1008,9 +1011,15 @@
         //用户拒绝上麦邀请
         function handleUserRejectConnect(msg) {
           // 如果申请人是自己
-          if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
+          if (msg.data.room_join_id == _this.userId) {
             return;
           }
+
+          //发起端需要判断一下是不是非主持人
+          if (_this.isLive && _this.roleName != 1) {
+            return;
+          }
+
           let role = '';
           if (msg.data.room_role == 2) {
             role = _this.$t('chat.chat_1063');
@@ -1202,6 +1211,8 @@
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
           if (isLive && !this.isInGroup) return;
           this.leader_id = msg.data.account_id;
+          //还原一下tab
+          this.tabIndex = 1;
           this.updateOnlineUserList();
         });
 
@@ -1470,7 +1481,10 @@
       },
       //直播结束重置视图里的一些状态
       resetViewData() {
-        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+        this.allowRaiseHand = false;
+        if (this.tabIndex !== 1) {
+          this.switchToTab(1);
+        }
       },
       //切换允许举手状态
       onSwitchAllowRaiseHand(element) {
@@ -1907,16 +1921,19 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #434343;
+    background-color: #2a2a2a;
     &__group-name {
+      display: flex;
+      align-items: center;
       padding: 18px 20px 5px;
       color: #ccc;
       i {
-        vertical-align: bottom;
+        //vertical-align: bottom;
       }
       .pr_top {
-        position: relative;
-        top: -2px;
+        //position: relative;
+        //top: -2px;
+        margin-left: 10px;
         font-size: 14px;
       }
     }
@@ -1935,6 +1952,12 @@
         bottom: 0;
         //overflow: hidden;
       }
+      .show-empty-img {
+        .test_01 {
+          display: flex;
+          flex: 1;
+        }
+      }
       .empty-container {
         width: 100%;
         height: 100%;
@@ -1943,12 +1966,25 @@
         flex-direction: column;
         align-items: center;
         span {
-          font-size: 80px;
-          color: #7e7e7e;
+          display: inline-block;
+          //margin-top: 20%;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
         }
         p {
           margin-top: 10px;
           color: #999999;
+        }
+        .empty-img {
+          width: 120px;
+          height: 120px;
+        }
+        .empty-img-top {
+          width: 180px;
+          height: 100px;
         }
       }
       .member-list__all-tab {
@@ -1966,9 +2002,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #34363a;
+      background-color: #2a2a2a;
       box-sizing: border-box;
       color: #e2e2e2;
+      border-top: 1px solid #1a1a1a;
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
@@ -2048,8 +2085,8 @@
           width: 74px;
           height: 30px;
           text-align: center;
-          background-color: #666666;
-          color: #cacaca;
+          background-color: #434343;
+          color: #999;
           float: left;
           cursor: pointer;
           position: relative;
@@ -2059,12 +2096,11 @@
             color: #fff;
           }
           &.active {
-            background-color: #fc5659;
-            color: #fff;
+            background-color: #595959;
+            color: #e6e6e6;
             &:hover {
-              color: #fff;
-
-              background-color: #fc5659;
+              color: #e6e6e6;
+              background-color: #595959;
             }
           }
           &.raise-hand {
@@ -2076,7 +2112,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background-color: #fc5659;
+              background-color: #fb3a32;
               position: absolute;
             }
           }
@@ -2088,8 +2124,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          color: #fff;
-          background-color: #666666;
+          color: #999;
+          background-color: #434343;
         }
       }
       &__search-panel {

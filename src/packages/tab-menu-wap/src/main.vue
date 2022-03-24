@@ -32,7 +32,7 @@
         >
           <span class="item-text">{{ $tdefault(item.name) }}</span>
           <i class="tips" v-show="item.tipsVisible"></i>
-          <aside v-show="selectedId === item.id" class="bottom-line"></aside>
+          <hr v-show="selectedId === item.id" class="bottom-line" :style="themeBgColor" />
         </li>
       </ul>
 
@@ -80,13 +80,22 @@
         pageEnv: 'live-room',
         tabOptions: {},
         auth: {
-          member: true,
-          notice: true,
-          chapter: true
+          member: true, // 成员-tab
+          notice: true, // 公告-tab
+          chapter: true // 章节-tab
+        },
+        themeClass: {
+          bgColor: '',
+          pageBg: '#fb3a32'
         }
       };
     },
     computed: {
+      themeBgColor() {
+        return {
+          'background-color': this.themeClass.pageBg
+        };
+      },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -158,10 +167,25 @@
     async mounted() {
       // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
+      this.setSkinInfo();
       this.selectDefault();
     },
 
     methods: {
+      async setSkinInfo() {
+        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+
+        // 默认皮肤
+        if (!skinInfo || !skinInfo.skin_json_pc || skinInfo.status != 1) {
+          this.themeClass.pageBg = '#fb3a32';
+          return;
+        }
+
+        // 自定义皮肤
+        await this.$nextTick();
+        const { pageStyle } = JSON.parse(skinInfo.skin_json_pc) || {};
+        this.themeClass.pageBg = pageStyle;
+      },
       updateAuth() {
         const configList = this.roomBaseServer.state.configList;
         this.auth.member = configList.members_manager;
@@ -253,7 +277,7 @@
       changeDocStatus(val) {
         this.setVisible({ visible: val, type: 2 });
         if (val) {
-          let obj = this.getItem({ type: 2 });
+          const obj = this.getItem({ type: 2 });
           this.select({ type: obj.type, id: obj.id });
         }
       },
@@ -270,32 +294,35 @@
        * 拉取接口，初始化菜单项
        */
       initMenu() {
-        const roomState = this.$domainStore.state.roomBaseServer;
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         for (const item of list) {
           this.addItem(item);
         }
 
+        this.addSpecialItem();
+      },
+      addSpecialItem() {
+        const roomState = this.$domainStore.state.roomBaseServer;
+
         const chatIndex = this.menu.findIndex(el => el.type === 3);
-        const hasMember = this.menu.findIndex(el => el.type === 'notice');
-        if (chatIndex >= -1) {
-          const index = hasMember ? chatIndex + 2 : chatIndex + 1;
-          this.addItemByIndex(index, {
-            type: 'v5',
-            name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: this.$t('common.common_1004'), // 同上
-            visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
-            status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
-          });
-          this.addItemByIndex(index + 1, {
-            type: 'private',
-            name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
-            text: this.$t('common.common_1008'), // 同上
-            visible: false,
-            status: 3
-          });
-        }
+        const hasMember = this.menu.includes(el => el.type === 'notice');
+        if (chatIndex <= -1) return;
+        const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        this.addItemByIndex(index, {
+          type: 'v5',
+          name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
+          text: this.$t('common.common_1004'), // 同上
+          visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
+          status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
+        });
+        this.addItemByIndex(index + 1, {
+          type: 'private',
+          name: this.$t('common.common_1008'), // name只有自定义菜单有用，其他默认不采用而走i18n
+          text: this.$t('common.common_1008'), // 同上
+          visible: false,
+          status: 3
+        });
       },
       /**
        * 选中当前项左边一项
@@ -335,23 +362,16 @@
         const { type, id } = item;
         this.select({ type, id });
       },
-      /**
-       * 删除某个位置的菜单项
-       * @param {*} index
-       */
-      removeItemByIndex(index) {
-        this.menu = this.menu.splice(index);
-      },
+
       /**
        * 添加一个菜单项
        * @param {*} item
        */
       addItem(item) {
-        console.log('[menu] this.tabOptions.menuConfig:', this.tabOptions.menuConfig);
         item = getItemEntity(item, this.tabOptions.menuConfig);
-        console.log('[menu] item:', item);
         this.menu.push(item);
       },
+
       /**
        * 在某个index位点添加菜单项
        * @param {*} index
@@ -361,6 +381,7 @@
         item = getItemEntity(item, this.tabOptions.menuConfig);
         this.menu.splice(index, 0, item);
       },
+
       /**
        * 获取某个菜单项（根据cuid和menuId获取某个菜单项）
        * @param {String} type tab的type
@@ -376,6 +397,7 @@
           }
         });
       },
+
       /**
        * 设置菜单项显隐
        * @param {Boolean} visible [true|false] 显隐值
@@ -391,6 +413,7 @@
           visible === false && this.jumpToNearestItemById(tab.id);
         }
       },
+
       /**
        * 切换某个菜单tab的可视性
        * @param {*} cuid
@@ -441,10 +464,6 @@
           const { type, id } = lastItem;
           this.select({ type, id });
         }
-
-        // 前后都没有清空任何选择(基本不会发生的极端情况)
-        // this.selectedId = '';
-        // this.selectedType = '';
       },
 
       /**
@@ -578,6 +597,7 @@
       width: 100%;
       flex: 1 1 auto;
       overflow: hidden;
+      height: 100%;
     }
 
     .vmp-tab-menu-scroll-container {
@@ -621,11 +641,12 @@
         }
 
         .bottom-line {
+          display: block;
+          border: none;
           position: absolute;
           bottom: 9px;
           width: 40px;
           height: 5px;
-          background: #fb2626;
           border-radius: 3px;
         }
 
@@ -644,17 +665,12 @@
             bottom: 9px;
             height: 5px;
             width: 40px;
-            background: #fb2626;
             border-radius: 3px;
           }
 
           .item-text {
             font-weight: 500;
             position: relative;
-          }
-
-          .bottom-line {
-            display: block;
           }
         }
       }

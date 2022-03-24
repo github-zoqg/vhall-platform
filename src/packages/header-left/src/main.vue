@@ -47,6 +47,15 @@
     methods: {
       // 负责roomId
       handleCopy() {
+        window.vhallReportForProduct.report({
+          k: 110000,
+          data: {
+            business_uid: this.webinarInfo.userinfo.user_id,
+            webinar_id: this.webinarInfo.id,
+            user_id: '',
+            report_extra: {}
+          }
+        });
         // this.$vhall_paas_port({
         //   k: 110000,
         //   data: {

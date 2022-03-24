@@ -1,5 +1,5 @@
 <template>
-  <div class="tools-box">
+  <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
@@ -114,8 +114,8 @@
   };
 </script>
 
-<style lang="less" scoped>
-  .tools-box {
+<style lang="less">
+  .vmp-interact-tools-wap {
     .icon-wrapper {
       display: flex;
       div {

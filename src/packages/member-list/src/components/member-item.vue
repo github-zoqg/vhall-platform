@@ -70,7 +70,7 @@
         >
           <i
             class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
-            style="color: #fc5659; font-size: 15px"
+            style="color: #fb3a32; font-size: 15px"
           ></i>
         </template>
         <!--同意上麦-->
@@ -91,7 +91,7 @@
           "
         >
           <i
-            style="color: #fc5659; font-size: 15px; vertical-align: middle"
+            style="color: #fb3a32; font-size: 15px; vertical-align: middle"
             class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"
           ></i>
         </template>
@@ -381,6 +381,14 @@
             text: '设为主讲',
             sequence: 1
           },
+          //邀请演示（全部人员里展示）
+          {
+            command: 'inviteMic',
+            isShow: 'isShowInvitation',
+            disable: 'isLiveInviteDisable',
+            text: '邀请演示',
+            sequence: 2
+          },
           //设置禁言/取消禁言
           {
             command: 'setBanned',
@@ -389,7 +397,7 @@
             //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
             type: 'toggleButton',
-            sequence: 2
+            sequence: 3
           },
           //踢出 / 取消踢出
           {
@@ -398,7 +406,7 @@
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
             type: 'toggleButton',
-            sequence: 3
+            sequence: 4
           },
           {
             command: 'setKicked',
@@ -406,14 +414,6 @@
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
-            sequence: 4
-          },
-          //邀请演示（全部人员里展示）
-          {
-            command: 'inviteMic',
-            isShow: 'isShowInvitation',
-            disable: 'isLiveInviteDisable',
-            text: '邀请演示',
             sequence: 5
           },
           //升为组长 （全部人员下展示）
@@ -812,7 +812,7 @@
     font-size: 12px;
     box-sizing: content-box;
     &:hover {
-      background-color: #2d2d2d;
+      background-color: #595959;
       .vmp-member-item__control {
         &__more {
           opacity: 1;
@@ -972,7 +972,7 @@
       padding: 0;
       margin: 3px 0;
       &:hover {
-        background-color: #fc5659;
+        background-color: #fb3a32;
         color: #fff;
       }
     }

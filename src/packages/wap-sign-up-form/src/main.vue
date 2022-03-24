@@ -714,10 +714,7 @@
           captchaId: that.captchakey,
           element: id,
           mode: 'float',
-          lang:
-            (window.$globalConfig.currentLang == 'zh'
-              ? 'zh-CN'
-              : window.$globalConfig.currentLang) || 'zh-CN',
+          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady(instance) {
             console.log(instance);
           },
@@ -853,9 +850,13 @@
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
-            sessionStorage.setItem('visitorId', res.data.visit_id);
-            // 报名成功
-            this.getWebinarStatus();
+            if (res && [200, '200'].includes(res.code)) {
+              sessionStorage.setItem('visitorId', res.data.visit_id);
+              // 报名成功
+              this.getWebinarStatus();
+            } else {
+              return Promise.reject(res);
+            }
           })
           .catch(err => {
             if (err.code == 512809 || err.code == 512570) {
@@ -1732,8 +1733,8 @@
       }
     }
     .submit-btn {
-      border: 0.024rem solid #fc5659;
-      background-color: #fc5659;
+      border: 0.024rem solid #fb3a32;
+      background-color: #fb3a32;
       font-size: 0.37rem;
       color: #fff;
       outline: none;

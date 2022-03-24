@@ -2,7 +2,7 @@
   <div
     class="vmp-wap-private-chat-msg-item"
     style="pointer-events: auto"
-    :class="{ 'is-self-msg': source.self }"
+    :class="{ 'is-self-msg': source.sendId == userId }"
   >
     <div v-if="source.showTime" class="private-chat-msg__showtime">{{ source.showTime }}</div>
     <div class="private-chat-msg__item-main">
@@ -11,7 +11,7 @@
           class="private-chat-msg__item-main__chat-avatar"
           width="35"
           height="35"
-          :src="source.avatar"
+          :src="source.avatar || defaultAvatar"
           alt
         />
       </div>
@@ -49,13 +49,22 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   export default {
     name: 'VmpWapPrivateChatMsgItem',
     props: {
       source: {
         required: true,
         default: () => ({})
+      },
+      userId: {
+        required: true
       }
+    },
+    data() {
+      return {
+        defaultAvatar: defaultAvatar
+      };
     },
     computed: {
       customRoleName() {
@@ -129,7 +138,7 @@
             font-size: 20px;
             &.host {
               background-color: rgba(252, 86, 89, 0.2);
-              color: #fc5659;
+              color: #fb3a32;
             }
             &.assistant {
               background-color: rgba(166, 166, 166, 0.2);

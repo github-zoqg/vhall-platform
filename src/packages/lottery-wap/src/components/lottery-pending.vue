@@ -42,7 +42,7 @@
       joinLottery() {
         const state = useUserServer().state;
         const { userInfo } = state;
-        if (!userInfo) {
+        if (!userInfo || !userInfo.user_id) {
           return this.$emit('needLogin');
         }
         if (this.loading || this.joined) return;
@@ -91,7 +91,7 @@
       display: block;
       width: 364px;
       height: 90px;
-      background: #fc5659;
+      background: #fb3a32;
       border-radius: 14px;
       margin: 0px auto;
       // padding-bottom: 20px;

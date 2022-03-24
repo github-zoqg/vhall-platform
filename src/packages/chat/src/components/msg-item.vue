@@ -31,7 +31,7 @@
               :class="['normal-msg__avatar', 'cur-pointer']"
               @click="setPersonStatus($event, source)"
             >
-              <img class="normal-msg__avatar-img" :src="source.avatar" alt />
+              <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
               <img
                 v-if="source.client === 'h5_browser'"
                 class="chat-phone"
@@ -44,7 +44,7 @@
           </template>
           <template v-else>
             <div class="normal-msg__avatar">
-              <img class="normal-msg__avatar-img" :src="source.avatar" alt />
+              <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
               <img
                 v-if="source.client === 'h5_browser'"
                 class="chat-phone"
@@ -262,6 +262,7 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
+  import defaultAvatar from '../img/my-dark@2x.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',
@@ -317,7 +318,8 @@
       return {
         msgContent: '',
         //是否是嵌入端
-        isEmbed: false
+        isEmbed: false,
+        defaultAvatar: defaultAvatar
       };
     },
     computed: {
@@ -332,16 +334,6 @@
       }
     },
     filters: {
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人

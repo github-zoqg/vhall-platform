@@ -16,6 +16,9 @@
             :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
+            <span class="wrap__left-item__group-avatar_img">
+              <img :src="group.avatar || defaultAvatar" alt="" />
+            </span>
             <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
             <i
               class="el-icon-circle-close wrap__left-item__close-icon"
@@ -34,9 +37,6 @@
         >
           <span class="wrap__right__header" v-if="currentSelectUser">
             提示：如想结束当前聊天，关闭左侧用户窗口即可
-          </span>
-          <span class="wrap__right__header" v-if="!currentSelectUser">
-            提示：选择私聊的人员后，可以发送私聊消息
           </span>
           <div class="wrap__right__content">
             <chat-list
@@ -110,14 +110,7 @@
               :row="4"
               @keyup.enter.native="sendMessage"
             ></el-input>
-            <el-button
-              type="primary"
-              size="small"
-              class="small-button"
-              round
-              @click="sendMessage"
-              :disabled="!currentSelectUser"
-            >
+            <el-button type="primary" size="small" class="small-button" round @click="sendMessage">
               发送
             </el-button>
           </div>
@@ -152,6 +145,7 @@
   import chatList from './components/chat-list';
   import comUpload from '@/packages/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpLivePrivateChat',
     components: {
@@ -162,6 +156,8 @@
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //模态窗是否可见
         visible: false,
         //模态窗标题
@@ -172,7 +168,7 @@
         imgList: [],
         //图片上传地址
         actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`,
-        //私聊群组列表 todo 假数据替换
+        //私聊群组列表
         chatGroupList: [
           // {
           //   id: 0,
@@ -225,13 +221,30 @@
     },
     mounted() {
       this.initViewData();
+      this.listenEvents();
+    },
+    destroyed() {
+      this.chatServer.$off('receivePrivateMsg', this.showTip);
     },
     methods: {
+      listenEvents() {
+        this.chatServer.$on('receivePrivateMsg', this.showTip);
+      },
+      showTip(msg) {
+        if (msg.sendId != this.currentSelectUser) {
+          this.chatGroupList.forEach(item => {
+            if (item.account_id == msg.sendId) {
+              this.$set(item, 'news', true);
+            }
+          });
+        }
+      },
       //打开模态窗
       async openModal() {
         console.log('收到打开窗口的信令');
         await this.getPrivateContactList();
         this.visible = true;
+        this.activeGroupIndex = 0;
       },
       //获取私聊联系人列表
       getPrivateContactList() {
@@ -281,7 +294,11 @@
       //选中某个群组
       selectGroup(index) {
         this.activeGroupIndex = index;
+        this.chatGroupList[index].news = false;
         this.$refs.chatRef.resetData();
+        this.$nextTick(() => {
+          this.$refs.chatRef.initEvent();
+        });
       },
       //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
@@ -369,6 +386,7 @@
       sendMessage() {
         //未选中私聊人员
         if (!this.currentSelectUser) {
+          this.$message.warning('请选择私聊人员');
           return;
         }
         //判断是否有输入内容，或者上传图片
@@ -407,11 +425,11 @@
 <style lang="less">
   .vmp-live-private-chat {
     @color-bd: #e2e2e2;
-    @color-red: #fc5659;
+    @color-red: #fb3a32;
     @color-default: #ffd021;
     @color-default-hover: #fdd43f;
 
-    @main-color: #fc5659;
+    @main-color: #fb3a32;
     .el-dialog__body {
       padding: 0;
     }
@@ -444,17 +462,18 @@
       overflow: hidden;
       .wrap__left {
         height: 100%;
-        width: 180px;
+        width: 200px;
         border-right: solid 1px @color-bd;
         overflow: auto;
         user-select: none;
       }
       .wrap__left-item {
         position: relative;
-        display: block;
+        display: flex;
+        align-items: center;
         height: 44px;
         line-height: 44px;
-        padding: 0 10px 0 20px;
+        padding-left: 10px;
         border-bottom: solid 1px @color-bd;
         transition: all 0.2s;
         .vh-iconfont {
@@ -465,20 +484,33 @@
             color: @color-red;
           }
         }
+        &__group-avatar_img {
+          // display: inline-block;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          overflow: hidden;
+          margin-right: 8px;
+          img {
+            display: block;
+            width: 30px;
+            height: 30px;
+          }
+        }
         &__close-icon {
           display: none;
           font-size: 18px;
         }
         &:hover {
           cursor: pointer;
-          background-color: #f5f5f5;
+          background-color: #f7f7f7;
           .wrap__left-item__close-icon {
             display: inline-block;
           }
         }
         &.active {
           cursor: pointer;
-          background-color: @color-bd;
+          background-color: #f7f7f7;
         }
       }
 
@@ -494,8 +526,7 @@
         background-color: @color-red;
       }
       .wrap__left-item__group-name {
-        display: inline-block;
-        width: calc(100% - 24px);
+        width: 130px;
         vertical-align: middle;
         overflow: hidden;
         text-overflow: ellipsis;

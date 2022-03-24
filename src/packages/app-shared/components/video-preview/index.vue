@@ -126,21 +126,6 @@
         required: false
       }
     },
-    filters: {
-      secondToDate(val) {
-        let time = moment.duration(val, 'seconds');
-        let hours = time.hours();
-        let minutes = time.minutes();
-        let seconds = time.seconds();
-        let totalTime = '00:00';
-        if (hours) {
-          totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
-        } else {
-          totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
-        }
-        return totalTime;
-      }
-    },
     data() {
       return {
         roomBaseState: null,
@@ -382,7 +367,7 @@
             this._isVideoEnd = false;
             if (this._firstInit) {
               const elVideo = document.querySelector(`#videoDom${this.timestamp} video`);
-              this.$emit('remoteInsterSucces', elVideo);
+              this.$emit('remoteInsertSuccess', elVideo);
               this._firstInit = false;
             }
           }

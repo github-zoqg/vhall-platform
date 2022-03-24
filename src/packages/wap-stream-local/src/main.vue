@@ -55,6 +55,8 @@
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { Dialog } from 'vant';
+
   export default {
     name: 'VmpWapStreamLocal',
     data() {
@@ -166,9 +168,27 @@
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
       this.listenEvents();
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: '网络异常导致互动房间连接失败'
+        }).then(() => {
+          window.location.reload();
+        });
+      });
     },
     mounted() {
       this.checkStartPush();
+
+      // 监听设备禁用
+      useInteractiveServer().$on('EVENT_STREAM_END', msg => {
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: this.$t('interact.interact_1011')
+        });
+      });
     },
     async beforeDestroy() {
       // 清空计时器
@@ -193,7 +213,11 @@
          *     2、默认不在麦上 ----->
          *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
          */
-        if (useMediaCheckServer().state.deviceInfo.device_status === 1) {
+        console.warn(
+          '[platform] 查看设备状态',
+          useMediaCheckServer().state.deviceInfo.device_status
+        );
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
           // 检测设备状态
           const isSpeakOn = this.micServer.getSpeakerStatus();
           if (isSpeakOn) {
@@ -204,10 +228,6 @@
             !this.chatServer.state.allBanned
           ) {
             await this.userSpeakOn();
-          }
-        } else {
-          if (this.micServer.getSpeakerStatus()) {
-            this.speakOff();
           }
         }
       },
@@ -230,7 +250,7 @@
         });
 
         // 上麦成功
-        this.micServer.$on('vrtc_connect_success', async msg => {
+        this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
           if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
@@ -248,7 +268,6 @@
           if (!this.interactiveServer.state.autoSpeak) {
             //  初始化互动实例
             await this.interactiveServer.init();
-            // 开始推流
           }
 
           // 轮询判断是否有互动实例
@@ -262,8 +281,12 @@
 
           await this.interactiveServer.destroy();
 
-          if (this.isNoDelay === 1 || this.mode === 6) {
+          if (this.isNoDelay === 1) {
             //  初始化互动实例
+
+            if (this.mode === 6) {
+              await this.groupServer.updateGroupInitData();
+            }
             await this.interactiveServer.init();
           }
         });
@@ -299,7 +322,6 @@
         } else if (res.code == 513025) {
           // 麦位已满，上麦失败
           this.$message.error(`上麦席位已满员，您的账号支持${res.data.replace_data}人上麦`);
-          // TODO: 麦位已满的处理
         } else {
           console.error('上麦接口失败----', res);
         }
@@ -317,6 +339,9 @@
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'NotAllowed') {
+          // 本地流创建失败
+          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
         } else if (err == 'publishStreamError') {
           // 推流失败
           this.$message.error('推流失败');
@@ -383,7 +408,13 @@
           .createWapLocalStream({
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
-          .catch(() => 'createLocalStreamError');
+          .catch(e => {
+            if (e && e?.name == 'NotAllowed') {
+              return Promise.reject('NotAllowed');
+            } else {
+              return Promise.reject('createLocalStreamError');
+            }
+          });
       },
       // 推流
       async publishLocalStream() {
@@ -399,7 +430,6 @@
               this.handleSpeakOnError('publishStreamError');
             }
           });
-        // .catch(() => 'publishStreamError');
       },
       // 结束推流
       stopPush() {
@@ -409,15 +439,18 @@
             resolve();
             return;
           }
-          this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
-            this.isStreamPublished = false;
-            clearInterval(this._audioLeveInterval);
+          this.interactiveServer
+            .unpublishStream(this.localSpeaker.streamId)
+            .then(() => {
+              this.isStreamPublished = false;
+              clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
-            resolve();
-          });
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+              resolve();
+            })
+            .catch(e => {});
         });
       },
       // 实时获取网路状况和麦克风能量
@@ -468,7 +501,7 @@
         this.interactiveServer
           .exitStreamFullscreen({
             streamId: this.localSpeaker.streamId,
-            vNode: `vmp-stream-local__${this.stream.streamId}`
+            vNode: `vmp-stream-local__${this.localSpeaker.accountId}`
           })
           .then(res => {
             console.warn('res----', res);

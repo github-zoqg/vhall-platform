@@ -567,14 +567,9 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         }).then(() => {
-          this.groupServer
-            .groupQuit()
-            .then(() => {
-              this.groupServer.state.panelShow = true;
-            })
-            .catch(ex => {
-              console.error(ex);
-            });
+          this.groupServer.groupQuit().catch(ex => {
+            console.error(ex);
+          });
         });
       },
       // 解散
@@ -667,7 +662,7 @@
     height: 100%;
     flex-direction: column;
     background-color: #2d2d2d;
-    z-index: 100;
+    z-index: 10;
     .vmp-group-split__hd {
       display: flex;
       flex-direction: row;
@@ -847,7 +842,7 @@
                 }
                 div:hover {
                   cursor: pointer;
-                  background: #fc5659;
+                  background: #fb3a32;
                   color: white;
                 }
               }

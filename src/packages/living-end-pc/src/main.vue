@@ -21,21 +21,6 @@
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpLivingEnd',
-    filters: {
-      formatHotNum(value) {
-        value = parseInt(value);
-        let unit = '';
-        const k = 99999;
-        const sizes = ['', '万', '亿', '万亿'];
-        let i;
-        if (value > k) {
-          i = Math.floor(Math.log(value) / Math.log(k));
-          value = (value / Math.pow(k / 10, i)).toFixed(1);
-          unit = sizes[i];
-        }
-        return value + unit;
-      }
-    },
     computed: {
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';

@@ -153,19 +153,11 @@
         languageList: []
       };
     },
-    filters: {
-      formatHotNum(value) {
-        value = parseInt(value);
-        let unit = '';
-        const k = 99999;
-        const sizes = ['', '万', '亿', '万亿'];
-        let i;
-        if (value > k) {
-          i = Math.floor(Math.log(value) / Math.log(k));
-          value = (value / Math.pow(k / 10, i)).toFixed(1);
-          unit = sizes[i];
+    watch: {
+      isInGroup(val) {
+        if (val) {
+          this.roomBaseServer.state.timerInfo = {};
         }
-        return value + unit;
       }
     },
     computed: {
@@ -287,7 +279,21 @@
       },
       changeLang(key) {
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));

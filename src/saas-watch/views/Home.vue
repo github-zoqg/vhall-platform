@@ -176,9 +176,12 @@
           case 512539:
             this.errorData.errorPageTitle = 'embed_verify'; // 观看页为嵌入页，设置观看限制为付费、邀请码、白名单、付费or邀请码、设置了报名报单时，访问观看页时，页面提示
             break;
+          case 611001:
+            this.errorData.errorPageTitle = '互动初始化失败，' + err.message;
+            break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
-            this.errorData.errorPageText = err.msg;
+            this.errorData.errorPageText = err.msg || err.message;
         }
       }
     }

@@ -43,7 +43,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          热度 &nbsp;{{ hotNum | formatHotNum }}
+          &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -127,21 +127,6 @@
         languageList: [],
         streamInfo
       };
-    },
-    filters: {
-      formatHotNum(value) {
-        value = parseInt(value);
-        let unit = '';
-        const k = 99999;
-        const sizes = ['', '万', '亿', '万亿'];
-        let i;
-        if (value > k) {
-          i = Math.floor(Math.log(value) / Math.log(k));
-          value = (value / Math.pow(k / 10, i)).toFixed(1);
-          unit = sizes[i];
-        }
-        return value + unit;
-      }
     },
     computed: {
       isInGroup() {
@@ -229,13 +214,22 @@
       is_host_in_group() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
         return (
           !this.isInGroup &&
           this.is_host_in_group &&
-          this.roomBaseServer.state.watchInitData.webinar.mode == 6
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
+          !this.isShowMainScreen
         );
       },
       hotNum() {
@@ -363,29 +357,31 @@
         let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
         if (mainScreenStream) {
           if (mainScreenStream.streamSource == 'remote') {
-            this.interactiveServer.setStreamFullscreen({
-              streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
-            });
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
           } else {
-            this.interactiveServer.setStreamFullscreen({
-              streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-local__${mainScreenStream.streamId}`
-            });
-          }
-          // 参考player组件内的brower内的ios判断条件
-          if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
-            this.interactiveServer.state.fullScreenType = true;
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-local__${mainScreenStream.accountId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
           }
         }
       },
-
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
+      setFullScreenStatus() {
+        // 参考player组件内的brower内的ios判断条件
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
       },
 
       videoShowIcon() {
@@ -395,7 +391,21 @@
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       openLanguage() {
         this.iconShow = true;
@@ -476,7 +486,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 4;
+        z-index: 7;
         background: transparent;
         img {
           width: 100%;

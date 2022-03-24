@@ -55,7 +55,7 @@
   import sendBox from './components/send-box';
   import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
-  import defaultAvatar from './img/default_avatar.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
@@ -272,7 +272,10 @@
           this.allBanned = res;
         });
         //监听分组房间变更通知
-        chatServer.$on('changeChannel', () => {
+        // chatServer.$on('changeChannel', () => {
+        //   this.handleChannelChange();
+        // });
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
         //监听被提出房间消息
