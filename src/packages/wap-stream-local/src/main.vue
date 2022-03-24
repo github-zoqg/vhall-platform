@@ -223,7 +223,7 @@
             this.mediaCheckServer.setDevice({ status: 2, send_msg: 0 });
             this.$toast('当前设备不支持连麦');
             if (isSpeakOn) {
-              await this.userSpeakOn();
+              await this.speakOff();
             }
             return;
           }
