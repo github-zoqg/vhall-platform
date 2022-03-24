@@ -7,7 +7,7 @@
         <el-input
           v-if="item.field_key !== 'address'"
           v-model="reciveInfo[item.field_key]"
-          :placeholder="$t(item.placeholder)"
+          :placeholder="$tdefault(item.placeholder)"
           maxlength="200"
           @keyup.native.stop="foo()"
           @input.native="handleInput(item.field_key)"
@@ -16,7 +16,7 @@
           v-else
           id="address-textarea"
           v-model="reciveInfo[item.field_key]"
-          :placeholder="$t(item.placeholder)"
+          :placeholder="$tdefault(item.placeholder)"
           rows="2"
           class="address-textarea"
           maxlength="200"

@@ -11,7 +11,7 @@
         <div class="form-item">
           <input
             type="text"
-            :placeholder="$t(item.placeholder)"
+            :placeholder="$tdefault(item.placeholder)"
             style="line-height: normal"
             autocomplete="off"
             v-model="item.field_value"
