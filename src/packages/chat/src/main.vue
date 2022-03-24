@@ -26,7 +26,6 @@
           chatOptions,
           isOnlyShowSponsor,
           previewImg: previewImg.bind(this),
-          userId: userId,
           isWatch: isWatch,
           emitLotteryEvent,
           emitQuestionnaireEvent

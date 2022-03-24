@@ -28,7 +28,7 @@
             "
           >
             <div
-              :class="['normal-msg__avatar', source.roleName != 1 ? 'cur-pointer' : '']"
+              :class="['normal-msg__avatar', 'cur-pointer']"
               @click="setPersonStatus($event, source)"
             >
               <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
@@ -61,7 +61,7 @@
               <template>
                 <!-- TODO: 自己不能@自己 -->
                 <span
-                  :class="['info-wrap__nick-name', userId != source.sendId ? 'cur-pointer' : '']"
+                  class="info-wrap__nick-name cur-pointer"
                   @click="setPersonStatus($event, source)"
                   v-if="
                     chatOptions &&
@@ -319,11 +319,6 @@
       emitQuestionnaireEvent: {
         type: Function,
         default: function () {}
-      },
-      // 当前登录用户
-      userId: {
-        type: Number,
-        default: null
       },
       // 是否观看端
       isWatch: {
