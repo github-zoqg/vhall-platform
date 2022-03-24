@@ -2,8 +2,8 @@
   <div
     class="vmp-stream-list"
     :class="{
-      'vmp-stream-list-h0': isStreamListH0,
-      'no-delay-layout': isUseNoDelayLayout && remoteSpeakers.length > 1,
+      'vmp-stream-list-h0': isStreamListH0 && !isUseNoDelayLayout,
+      'no-delay-layout': isUseNoDelayLayout,
       'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
       'is-share-screen': isUseNoDelayLayout && isShareScreen
     }"
@@ -166,7 +166,7 @@
          *    2) 如果不存在本地流并且远端流不是主屏,高度不为 0,返回 false
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
-         *    高度不为 0,返回 false
+         *    高度不为 0,但是为无延迟旁路布局，返回true,否则返回 false
          * 4. 没有互动实例的时候高度为0
          */
         if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
@@ -185,7 +185,11 @@
             return false;
           }
         } else {
-          return false;
+          if (this.isUseNoDelayLayout) {
+            return true;
+          } else {
+            return false;
+          }
         }
       },
 
@@ -195,7 +199,12 @@
       },
       // 互动无延迟 未上麦观众是否使用类似旁路布局
       isUseNoDelayLayout() {
-        return !this.localSpeaker.accountId && this.mode == 3 && this.isNoDelay == 1;
+        return (
+          !this.localSpeaker.accountId &&
+          this.mode == 3 &&
+          this.isNoDelay == 1 &&
+          this.remoteSpeakers.length > 1
+        );
       },
       // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
       isShowMainScreen() {
