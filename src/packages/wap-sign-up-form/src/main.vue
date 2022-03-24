@@ -880,7 +880,7 @@
                 `/lives/watch/${this.webinar_id}${queryString}`;
               // this.$router.push(`/lives/watch/${this.webinar_id}`)
             } else {
-              this.$toast(this.$tes(err.code) || err.msg);
+              this.$toast(this.$tec(err.code) || err.msg);
             }
           });
       },

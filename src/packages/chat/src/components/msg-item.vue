@@ -193,7 +193,7 @@
                   width="34"
                   height="34"
                   :src="img"
-                  alt="$t('chat.chat_1065')"
+                  :alt="$t('chat.chat_1065')"
                   @click="previewImg(index, source.content.image_urls)"
                 />
               </div>
@@ -823,7 +823,7 @@
           font-size: 14px;
           text-align: center;
           > span {
-            float: left;
+            //float: left;
           }
           &__nick-name {
             color: @font-dark-low;

@@ -738,6 +738,7 @@
         margin: 0 8px;
 
         .el-switch__core {
+          width: 28px;
           height: 16px;
 
           &:after {

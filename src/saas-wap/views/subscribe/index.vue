@@ -93,7 +93,7 @@
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
         } else {
-          this.liveErrorTip = this.$tes(err.code) || err.msg;
+          this.liveErrorTip = this.$tec(err.code) || err.msg;
         }
       },
       goWatchPage(clientType) {
