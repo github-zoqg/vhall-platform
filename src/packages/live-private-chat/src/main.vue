@@ -311,8 +311,8 @@
           }
         });
         if (!isExit) {
-          const { id, chat_name, account_id } = chatItemInfo;
-          this.chatGroupList.push({ id: id, nickname: chat_name, account_id });
+          const { id, chat_name, account_id, avatar } = chatItemInfo;
+          this.chatGroupList.push({ id: id, nickname: chat_name, account_id, avatar });
           this.selectGroup(this.chatGroupList.length - 1);
           //将联系人添加到私聊列表存储
           this.chatServer.addToRankList({

@@ -181,7 +181,6 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-content: center;
         align-items: center;
         .preview-video-error__img {
           width: 72px;
@@ -189,7 +188,7 @@
         .preview-video-error__desc {
           padding-top: 10px;
           font-size: 12px;
-          color: #ffffff;
+          color: #fff;
           line-height: 20px;
         }
       }

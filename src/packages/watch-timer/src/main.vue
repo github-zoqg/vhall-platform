@@ -7,14 +7,6 @@
           <div v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
           <div v-else>
             {{ timeComputed }}
-            {{ $t('interact_tools.interact_tools_1054') }}
-            {{
-              status == 'zanting'
-                ? $t('interact_tools.interact_tools_1055')
-                : status == 'jieshu'
-                ? $t('interact_tools.interact_tools_1056')
-                : $t('interact_tools.interact_tools_1057')
-            }}
           </div>
         </el-col>
       </el-row>
@@ -112,12 +104,25 @@
       },
       // 总时间计算显示
       timeComputed() {
-        return 60 > this.totalTimeNum
-          ? this.totalTimeNum + this.$t('appointment.appointment_1029')
-          : parseInt(this.totalTimeNum / 60) +
-              this.$t('appointment.appointment_1028') +
-              (this.totalTimeNum % 60) +
-              this.$t('appointment.appointment_1029');
+        const timeStr =
+          this.totalTimeNum < 60
+            ? `${this.totalTimeNum}${this.$t('appointment.appointment_1029')}`
+            : `${parseInt(this.totalTimeNum / 60)}${this.$t('appointment.appointment_1028')}${
+                this.totalTimeNum % 60
+              }${this.$t('appointment.appointment_1029')}`;
+        // console.log(timeStr);
+        let statusStr = '';
+        if (this.status == 'end') {
+          // '已结束';
+          statusStr = this.$t('webinar.webinar_1008');
+        } else if (this.status == 'pause') {
+          // '已暂停';
+          statusStr = this.$t('webinar.webinar_1007');
+        } else {
+          // '进行中...';
+          statusStr = this.$t('webinar.webinar_1009');
+        }
+        return `${timeStr} ${statusStr}`;
       }
     },
     beforeCreate() {

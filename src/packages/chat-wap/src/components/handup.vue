@@ -140,7 +140,7 @@
           .userApply()
           .then(res => {
             if (res.code != 200) {
-              // TODO 根据code码提示 this.$tes(res.code) || res.msg
+              // TODO 根据code码提示 this.$tec(res.code) || res.msg
               this.$toast(res.msg);
               return;
             }

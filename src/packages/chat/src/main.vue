@@ -24,8 +24,10 @@
         :data-component="MsgItem"
         :extra-props="{
           chatOptions,
+          joinInfo,
           isOnlyShowSponsor,
           previewImg: previewImg.bind(this),
+          isWatch: isWatch,
           emitLotteryEvent,
           emitQuestionnaireEvent
         }"
@@ -76,7 +78,7 @@
       ></img-preview>
       <chat-user-control
         :roomId="roomId"
-        :userId="userId"
+        :userId="accountId"
         :reply="reply"
         @deleteMsg="deleteMsg"
         :atUser="atUser"
@@ -126,8 +128,10 @@
         roomId: '',
         //用户角色
         roleName: '',
-        //用户id
+        //登录后用户id
         userId: '',
+        //游客或用户id
+        accountId: '',
         //聊天消息列表
         chatList: chatList,
         //聊天消息页码
@@ -282,6 +286,7 @@
         this.roomId = interact.room_id;
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
+        this.accountId = join_info.third_party_user_id;
       },
       //处理唤起登录
       handleLogin() {
@@ -508,7 +513,7 @@
       //回复消息
       reply(count) {
         this.buriedPointReport(110119, {
-          business_uid: this.userId,
+          business_uid: this.accountId,
           webinar_id: this.$route.params.il_id
         });
         this.$refs.chatOperator.handleReply(count);
@@ -528,7 +533,7 @@
           .deleteMessage(params)
           .then(res => {
             this.buriedPointReport(110121, {
-              business_uid: this.userId,
+              business_uid: this.accountId,
               webinar_id: this.$route.params.il_id
             });
             return res;
@@ -539,7 +544,7 @@
       atUser(accountId) {
         //数据上报
         this.buriedPointReport(110120, {
-          business_uid: this.userId,
+          business_uid: this.accountId,
           webinar_id: this.$route.params.il_id
         });
         this.$refs.chatOperator.handleAtUser(accountId);
@@ -568,7 +573,7 @@
           .then(res => {
             this.allBanned = flag;
             this.buriedPointReport(flag ? 110116 : 110117, {
-              business_uid: this.userId,
+              business_uid: this.accountId,
               webinar_id: this.webinarId
             });
             return res;

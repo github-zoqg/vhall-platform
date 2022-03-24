@@ -238,10 +238,8 @@
 
 <style lang="less">
   .vh-goods-wrapper {
-    height: 100%;
     width: 100%;
-    box-sizing: border-box;
-    overflow-y: auto;
+    height: 100%;
     background: #fff;
     .vh-goods_list {
       display: block;

@@ -290,12 +290,12 @@
               if (at) {
                 this.msgContent = this.msgContent.replace(
                   userName,
-                  `<span style='color:#4DA1FF'>${userName}</span>`
+                  `<span style='color:#3562fa'>${userName}</span>`
                 );
               } else {
                 this.msgContent = this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#4DA1FF'>${userName}</span>`
+                  `<span style='color:#3562fa'>${userName}</span>`
                 );
               }
               at = true;

@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-chat-input">
     <div
-      class="vmp-chat-input__textarea-box"
+      :class="['vmp-chat-input__textarea-box', { 'is-watch': isWatch }]"
       v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
     >
       <textarea
@@ -30,7 +30,7 @@
 
     <div
       v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
-      class="vmp-chat-input__textarea-placeholder"
+      :class="['vmp-chat-input__textarea-placeholder', { 'is-watch': isWatch }]"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
         <i18n path="chat.chat_1001">
@@ -126,6 +126,10 @@
       isEmbed() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseState.clientType);
       }
     },
     watch: {
@@ -434,7 +438,10 @@
     align-items: flex-end;
 
     &__textarea-box {
-      width: 264px;
+      width: 220px;
+      &.is-watch {
+        width: 264px;
+      }
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -488,7 +495,10 @@
     }
 
     &__textarea-placeholder {
-      width: 264px;
+      width: 220px;
+      &.is-watch {
+        width: 264px;
+      }
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
