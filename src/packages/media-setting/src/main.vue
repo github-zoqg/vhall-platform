@@ -93,9 +93,28 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
   import { useMediaSettingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
-  import { getDiffObject } from './js/getDiffObject';
 
   import mediaSettingConfirm from './js/showConfirm';
+
+  /**
+   * 获取差异obj
+   * @param {*} source 源对象
+   * @param {*} current 对比对象
+   * @param {*} options 配置项
+   */
+  function getDiffObject(source, current, { ignoreKeys = [] }) {
+    let diff = {};
+
+    for (const key in current) {
+      if (Object.hasOwnProperty.call(current, key)) {
+        if (ignoreKeys.includes(key)) continue;
+        if (current[key] !== source[key]) {
+          diff[key] = current[key];
+        }
+      }
+    }
+    return diff;
+  }
 
   export default {
     name: 'VmpPcMediaSetting',
@@ -131,7 +150,6 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
-      window.mediaSettingServer = this.mediaSettingServer;
     },
     created() {
       this._originCaptureState = {}; // 原始选中的数据
@@ -385,7 +403,7 @@
         if (audioOutputDevices.length > 0) {
           const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
           this.mediaState.audioOutput =
-            this.mediaState.audioOuput || sessionAudioOutputId || audioOutputDevices[0].deviceId;
+            this.mediaState.audioOutput || sessionAudioOutputId || audioOutputDevices[0].deviceId;
         } else {
           sessionStorage.removeItem('selectedAudioOutputDeviceId');
         }

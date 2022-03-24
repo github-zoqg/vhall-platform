@@ -98,8 +98,10 @@ export default async function () {
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
+  const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
+  const liveType = roomBaseServer.state.watchInitData.webinar.type;
   // 互动、分组直播进行设备检测
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+  if ([3, 6].includes(liveMode) && liveType == 1) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
