@@ -553,7 +553,11 @@
           }
 
           // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
-          if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
+          if (
+            this.joinInfo.role_name == 2 &&
+            useDocServer().state.switchStatus &&
+            this.isNoDelay === 0
+          ) {
             useRoomBaseServer().setChangeElement('player');
           }
 

@@ -246,6 +246,7 @@
       addEvents() {
         this.desktopShareServer.$on('screen_stream_add', () => {
           this.subscribeStream();
+          this.interactiveServer.resetLayout();
         });
         this.desktopShareServer.$on('EVENT_STREAM_END', () => {
           this.setDesktop('0');
@@ -373,7 +374,7 @@
       // 停止共享
       stopShare() {
         this.desktopShareServer.stopShareScreen().then(() => {
-          this.setDesktop(0);
+          this.setDesktop('0');
           this.interactiveServer.resetLayout();
         });
       },

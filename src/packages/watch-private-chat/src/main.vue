@@ -85,8 +85,6 @@
         latestMessage: {},
         //用户角色
         roleName: '',
-        //配置信息
-        configList: {},
         //提示消息
         tipMsg: {},
         //是否是嵌入端
@@ -126,7 +124,12 @@
       this.chatServer = useChatServer();
       this.msgServer = useMsgServer();
     },
-    computed: {},
+    computed: {
+      //配置信息
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      }
+    },
     mounted() {
       this.initViewData();
       this.listenEvents();
@@ -137,13 +140,13 @@
     methods: {
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         const { embed = false } = embedObj;
         this.roomId = interact.room_id;
-        this.configList = configList;
         this.roleName = join_info.role_name;
-        this.userId = join_info.third_party_user_id;
+        this.userId = join_info.user_id;
+        this.thirdPartyUserId = join_info.third_party_user_id;
         this.isEmbed = embed;
         this.joinInfo = join_info;
         this.webinar = webinar;
@@ -151,12 +154,11 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        const { configList = {} } = useRoomBaseServer().state;
         if (
           [2, '2'].includes(this.roleName) &&
           !this.Embed &&
           (!this.userId || this.userId == 0) &&
-          configList['ui.show_chat_without_login'] != 1
+          this.configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';

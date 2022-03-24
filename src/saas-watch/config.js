@@ -8,14 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: [
-      'comHeaderWatch',
-      'layerBody',
-      'layerFooter',
-      'comAllDialog',
-      'comQuestionnaire',
-      'comGoodsDetailPc'
-    ]
+    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comGoodsDetailPc']
     // children: ['layerBody']
   },
   // 顶部header 容器嵌入不用这个组件
@@ -74,11 +67,9 @@ export const serverConfig = {
       'comSignUpForm',
       'comUserAccount',
       'comCash',
-      'comLottery',
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comRedPacket',
       'comMicInvited'
     ]
   },
@@ -334,7 +325,7 @@ export const serverConfig = {
       method: 'open',
       args: ['$0']
     },
-    children: ['comSignWatch', 'comWatchTimer']
+    children: ['comSignWatch', 'comWatchTimer', 'comQuestionnaire', 'comLottery', 'comRedPacket']
   },
   comSignWatch: {
     component: 'VmpSignWatch'
