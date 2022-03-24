@@ -1719,6 +1719,13 @@
     @blueBg: #ebefff;
     @purple: #8d57a4;
     @purpleBg: #f5bdea;
+    .el-dialog {
+      margin-top: 0 !important;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
     .el-dialog__header {
       padding: 0;
     }
@@ -1750,6 +1757,9 @@
     .el-select .el-input.is-focus .el-input__inner {
       border-color: #999;
     }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #666;
+    }
     .el-dialog__body {
       padding: 0;
     }
@@ -1770,7 +1780,7 @@
     }
     &__content {
       padding: 0 75px 87px;
-      max-height: 420px;
+      max-height: 60vh;
       overflow-y: auto;
     }
     &__title {
@@ -1880,8 +1890,14 @@
       .el-input__inner[maxlength='60'] {
         padding-right: 60px !important;
       }
+      .el-form-item__error {
+        color: #fb3a32;
+      }
     }
     &__verify-form {
+      .el-form-item__error {
+        color: #fb3a32;
+      }
     }
     .verify-code-box {
       .no-border {
@@ -1994,6 +2010,7 @@
       .el-form-item__error {
         left: 50%;
         padding-left: 10px;
+        color: #fb3a32;
       }
     }
     .btn-box {
