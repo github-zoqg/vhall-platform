@@ -561,11 +561,10 @@
             useRoomBaseServer().setChangeElement('player');
           }
 
-          if (
-            this.isNoDelay === 1 ||
-            this.mode === 6 ||
-            [1, 4, '1', '4'].includes(this.joinInfo.role_name)
-          ) {
+          if (this.isNoDelay === (1)[(1, 4)].includes(+this.joinInfo.role_name)) {
+            if (this.mode === 6) {
+              await this.groupServer.updateGroupInitData();
+            }
             //  初始化互动实例
             this.interactiveServer.init();
           } else {

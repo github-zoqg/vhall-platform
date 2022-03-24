@@ -284,6 +284,7 @@
           if (this.isNoDelay === 1) {
             //  初始化互动实例
 
+            //后端踢出后会检测有没有在麦上，在麦上会派发下麦消息，下麦消息内的逻辑会比组内踢出消息内的逻辑先执行，所以先调用小组信息接口，避免初始化互动参数房间ID不对。
             if (this.mode === 6) {
               await this.groupServer.updateGroupInitData();
             }
