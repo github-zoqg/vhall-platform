@@ -222,6 +222,9 @@
           this.joinInfo.third_party_user_id == this.mainScreen;
         return _flag;
       },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
@@ -229,7 +232,8 @@
           !this.isInGroup &&
           this.is_host_in_group &&
           this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
-          !this.isShowMainScreen
+          !this.isShowMainScreen &&
+          !this.isShareScreen
         );
       },
       hotNum() {

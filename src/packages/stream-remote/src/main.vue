@@ -347,6 +347,11 @@
     },
     created() {
       this.listenEvents();
+      setTimeout(() => {
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
+      }, 5000);
     },
     mounted() {},
     beforeDestroy() {
@@ -384,13 +389,13 @@
         useMsgServer().$onMsg('LEFT', this.handleUserLeave);
       },
 
+      // 监听离开加入房间事件，显示网络异常占位图
       handleUserJoin(msg) {
         if (msg.sender_id == this.stream.accountId) {
           this.isShowNetError = false;
         }
       },
       handleUserLeave(msg) {
-        console.error('sss', msg);
         if (msg.sender_id == this.stream.accountId) {
           this.isShowNetError = true;
         }
@@ -611,10 +616,10 @@
       flex-direction: column;
       .net-error-img {
         width: 25px;
-        height: 18px;
+        height: 19px;
         margin-bottom: 1px;
         background-image: url('./img/net-error.png');
-        background-size: cover;
+        background-size: contain;
         background-repeat: no-repeat;
       }
       & > p {
