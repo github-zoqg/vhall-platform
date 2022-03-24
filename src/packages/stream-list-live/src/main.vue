@@ -235,10 +235,6 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
-      // 房间信令异常断开事件
-      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
-        this.PopAlertOffline.visible = true;
-      });
       this.listenEvents();
     },
 
@@ -248,6 +244,21 @@
 
       // 监听流列表高度变化
       this.computTop();
+
+      // if (this.liveStatus == 1) {
+      //   this.$alert('您已进入直播房间，马上开始互动吧', '', {
+      //     title: '提示',
+      //     confirmButtonText: '立即开始',
+      //     customClass: 'zdy-message-box',
+      //     cancelButtonClass: 'zdy-confirm-cancel',
+      //     callback: () => {
+      //       const list = document.getElementsByTagName('video');
+      //       for (const item of list) {
+      //         item.play();
+      //       }
+      //     }
+      //   });
+      // }
     },
 
     methods: {
@@ -291,21 +302,9 @@
           }
         });
 
-        this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', () => {
-          if (this.liveStatus.type == 1) {
-            this.$alert('您已进入直播房间，马上开始互动吧', '', {
-              title: '提示',
-              confirmButtonText: '立即开始',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel',
-              callback: () => {
-                const list = document.getElementsByTagName('video');
-                for (const item of list) {
-                  item.play();
-                }
-              }
-            });
-          }
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
+          this.PopAlertOffline.visible = true;
         });
       },
 

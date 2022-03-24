@@ -823,7 +823,7 @@
           font-size: 14px;
           text-align: center;
           > span {
-            float: left;
+            //float: left;
           }
           &__nick-name {
             color: @font-dark-low;

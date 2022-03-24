@@ -226,9 +226,9 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
-            return;
-          }
+          // if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
+          //   return;
+          // }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -245,8 +245,12 @@
     methods: {
       addEvents() {
         this.desktopShareServer.$on('screen_stream_add', () => {
-          this.subscribeStream();
-          this.interactiveServer.resetLayout();
+          this.subscribeStream().then(() => {
+            // 重置布局
+            useDocServer().resetLayoutByMiniElement();
+            // 设置旁路
+            this.interactiveServer.resetLayout();
+          });
         });
         this.desktopShareServer.$on('EVENT_STREAM_END', () => {
           this.setDesktop('0');
@@ -323,7 +327,7 @@
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
 
-        this.desktopShareServer.subscribeDesktopShareStream(opt);
+        return this.desktopShareServer.subscribeDesktopShareStream(opt);
       },
       showConfirm() {
         if (!this.isShareScreen) {
