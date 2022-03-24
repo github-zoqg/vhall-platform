@@ -514,6 +514,10 @@
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.localStream.streamId) {
               // 只有主持人使用
+              if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
+                await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
+                this.startPush();
+              }
               return;
             }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
