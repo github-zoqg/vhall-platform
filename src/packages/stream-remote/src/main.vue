@@ -33,13 +33,20 @@
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bottom">
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
+        v-show="showRole"
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
         {{ stream.attributes.roleName | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
+      <span
+        class="vmp-stream-local__bottom-nickname"
+        :class="{
+          'vmp-stream-local__bottom-nickname-width': showRole
+        }"
+      >
+        {{ stream.attributes.nickname }}
+      </span>
       <span
         class="vmp-stream-local__bottom-signal"
         :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
@@ -63,7 +70,10 @@
           {{ stream.attributes.roleName | roleFilter }}
         </span>
 
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -75,7 +85,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -114,7 +127,7 @@
         </el-tooltip>
 
         <!-- 主持人和组长不能互相下麦 -->
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="isShowDownMicBtn"
@@ -129,7 +142,10 @@
         v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-remote__shadow-first-line"
       >
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -141,7 +157,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -183,7 +202,7 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             v-show="isShowDownMicBtn"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
@@ -204,7 +223,12 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useRoomBaseServer,
+    useMsgServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -324,6 +348,9 @@
             this.stream.roleName == 2 || (this.joinInfo.role_name == 1 && this.stream.roleName != 4)
           );
         }
+      },
+      showRole() {
+        return [1, 3, 4].includes(this.stream.attributes.roleName) && this.isInGroup;
       }
     },
     beforeCreate() {
@@ -332,10 +359,10 @@
     },
     created() {
       this.listenEvents();
-
-      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
       setTimeout(() => {
-        this.isShowNetError = true;
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
       }, 5000);
     },
     mounted() {},
@@ -347,6 +374,9 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
+
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin.bind(this));
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave.bind(this));
     },
     methods: {
       listenEvents() {
@@ -365,6 +395,22 @@
           },
           true
         );
+
+        // 加入房间
+        useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+        useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+      },
+
+      // 监听离开加入房间事件，显示网络异常占位图
+      handleUserJoin(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = false;
+        }
+      },
+      handleUserLeave(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = true;
+        }
       },
       // 恢复播放
       replayPlay() {
@@ -549,6 +595,9 @@
       height: 100%;
       &-mute {
         background-image: url(./img/no_video_bg.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
       }
       &-spliting {
         background-color: #2d2d2d;
@@ -582,10 +631,10 @@
       flex-direction: column;
       .net-error-img {
         width: 25px;
-        height: 18px;
+        height: 19px;
         margin-bottom: 1px;
         background-image: url('./img/net-error.png');
-        background-size: cover;
+        background-size: contain;
         background-repeat: no-repeat;
       }
       & > p {
@@ -613,7 +662,7 @@
         align-items: center;
 
         border-radius: 8px;
-        padding: 0 6px;
+        padding: 0 4px;
         vertical-align: top;
         // 主持人
         &__1 {
@@ -642,6 +691,9 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        &-width {
+          width: 40px;
+        }
       }
       &-mic {
         float: right;

@@ -386,6 +386,7 @@
     align-items: center;
     justify-content: space-between;
     z-index: 2;
+    pointer-events: none;
 
     .vmp-doc-toolbar__hd {
       max-width: 250px;
@@ -402,6 +403,8 @@
         text-align: center;
         margin-left: 16px;
         cursor: pointer;
+        pointer-events: initial;
+
         &:hover {
           background: #fb3a32;
           border-color: #fb3a32;
@@ -420,21 +423,7 @@
         align-items: center;
         margin-left: 20px;
         position: relative;
-
-        // .el-switch .el-switch__core {
-        //   border-color: #ddd !important;
-        //   background-color: #2d2d2d !important;
-        //   &::after {
-        //     background-color: #848484;
-        //   }
-        // }
-        // .el-switch.is-checked .el-switch__core {
-        //   border-color: #3562fa !important;
-        //   background-color: #2d2d2d !important;
-        //   &::after {
-        //     background-color: #3562fa;
-        //   }
-        // }
+        pointer-events: initial;
       }
     }
     .vmp-doc-toolbar__bd {
@@ -450,6 +439,7 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
+      pointer-events: initial;
     }
     .vmp-doc-toolbar__ft {
       display: flex;
@@ -468,6 +458,7 @@
       line-height: 36px;
       cursor: pointer;
       z-index: 100;
+      pointer-events: initial;
 
       i {
         font-size: 17px;

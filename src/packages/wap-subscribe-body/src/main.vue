@@ -43,7 +43,10 @@
     </div>
     <template v-if="showBottomBtn">
       <div class="vmp-subscribe-body-auth">
-        <div class="vmp-subscribe-body-auth-two" v-if="subOption.verify == 6">
+        <div
+          class="vmp-subscribe-body-auth-two"
+          v-if="subOption.verify == 6 && !subOption.is_subscribe"
+        >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
@@ -326,7 +329,7 @@
             this.handlePay(params);
             break;
           default:
-            this.$toast(this.$tes(code) || msg);
+            this.$toast(this.$tec(code) || msg);
             break;
         }
       },
@@ -396,7 +399,7 @@
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
             window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
           } else {
-            this.$toast(this.$tes(res.code) || res.msg);
+            this.$toast(this.$tec(res.code) || res.msg);
           }
         });
       },

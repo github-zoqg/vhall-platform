@@ -311,12 +311,12 @@
                 }
               }, 1000);
             } else {
-              this.$toast(this.$tes(res.code) || res.msg);
+              this.$toast(this.$tec(res.code) || res.msg);
               this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
             }
           })
           .catch(err => {
-            this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1051'));
+            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1051'));
             // 图片验证码重置
             this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
           });
@@ -338,7 +338,7 @@
         if (this.cashForm.money === '') {
           this.errorTip.money = this.$t('cash.cash_1030');
           return false;
-        } else if (!/^\d+$|^\d*\.\d{2}$/g.test(this.cashForm.money)) {
+        } else if (!/^\d+$|^\d*\.\d{1,2}$/g.test(this.cashForm.money)) {
           this.errorTip.money = this.$t('cash.cash_1034');
           return false;
         } else {
@@ -367,11 +367,14 @@
 
       // 校验验证码
       validtorCode() {
-        if (/^\d{6}$/.test(this.cashForm.code)) {
+        if (this.cashForm.code === '') {
+          this.errorTip.code = this.$t('cash.cash_1038');
+          return false;
+        } else if (/^\d{6}$/.test(this.cashForm.code)) {
           this.errorTip.code = '';
           return true;
         } else {
-          this.errorTip.code = this.$t('cash.cash_1038');
+          this.errorTip.code = this.$t('cash.cash_1039');
           return false;
         }
       },
@@ -412,11 +415,11 @@
               if (res && res.code == 200 && res.data.check_result === 1) {
                 this.bindPhoneSave(res.data.key);
               } else {
-                this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1052'));
+                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1052'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1052'));
+              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1052'));
             });
         }
       },
@@ -437,12 +440,12 @@
               // 关闭当前弹出框
               this.checkPhoneToWx();
             } else {
-              this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1054'));
+              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1054'));
             }
           })
           .catch(err => {
             console.log(err);
-            this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1054'));
+            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1054'));
           });
       },
 
@@ -468,12 +471,12 @@
                   } else {
                     console.log(res);
                     this.step = 4;
-                    this.drawErrorTip = this.$tes(res.code) || res.msg || this.$t('cash.cash_1037');
+                    this.drawErrorTip = this.$tec(res.code) || res.msg || this.$t('cash.cash_1037');
                   }
                 })
                 .catch(err => {
                   this.step = 4;
-                  this.drawErrorTip = this.$tes(err.code) || err.msg || this.$t('cash.cash_1037');
+                  this.drawErrorTip = this.$tec(err.code) || err.msg || this.$t('cash.cash_1037');
                 });
           }
         } catch (err) {
@@ -499,12 +502,12 @@
               if (res.code === 200) {
                 resolve(res);
               } else {
-                this.$toast(this.$tes(res.code) || res.msg || this.$t('cash.cash_1040'));
+                this.$toast(this.$tec(res.code) || res.msg || this.$t('cash.cash_1040'));
                 reject(res);
               }
             },
             err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('cash.cash_1040'));
+              this.$toast(this.$tec(err.code) || err.msg || this.$t('cash.cash_1040'));
               reject(err);
             }
           );

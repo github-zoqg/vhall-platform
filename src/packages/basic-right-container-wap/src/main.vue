@@ -1,5 +1,5 @@
 <template>
-  <div class="base-box" v-if="!groupInitData.isInGroup">
+  <div class="base-box" v-if="!groupInitData.isInGroup && !showDoc">
     <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+  import { useMenuServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import lotteryIcon from './components/lottery-icon/index.vue';
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
@@ -37,7 +38,8 @@
       return {
         showTimer: false,
         timerVisible: true,
-        showSign: false
+        showSign: false,
+        showDoc: false
       };
     },
     computed: {
@@ -53,6 +55,15 @@
           }
         }
       }
+    },
+    mounted() {
+      useMenuServer().$on('tab-switched', async data => {
+        if ('comDocWap' === data.cuid) {
+          this.showDoc = true;
+        } else {
+          this.showDoc = false;
+        }
+      });
     },
     methods: {
       changeStatus(data, status) {

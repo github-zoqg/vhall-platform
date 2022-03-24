@@ -166,6 +166,12 @@ export const serverConfig = {
         method: 'showThirdStream',
         args: ['$0']
       }
+    ],
+    emitClickCheckStartPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'checkStartPush'
+      }
     ]
   },
   // 顶部左侧组件

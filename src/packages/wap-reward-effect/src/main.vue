@@ -86,6 +86,8 @@
           666: 'bg-666'
           // 'bg-custom': 'bg-custom' //用户自定义礼物
         },
+        //是否屏蔽特效
+        hideEffect: false,
         rewardEffectList: [],
         // rewardEffectInfo: null,
         taskQueue: null // 飘窗列队
@@ -166,11 +168,11 @@
               gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
               source_status: msg.data.source_status
             },
-            type: msg.data.type,
+            type: 'gift_send_success',
             interactToolsStatus: true
           };
           this.chatServer.addChatToList(data);
-          this.addRewardEffect(msg);
+          !this.hideEffect && this.addRewardEffect(msg);
         });
         // 打赏消息
         this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
@@ -193,7 +195,7 @@
             interactToolsStatus: true
           };
           this.chatServer.addChatToList(data);
-          this.addRewardEffect(rawMsg);
+          !this.hideEffect && this.addRewardEffect(rawMsg);
 
           if (
             this.roomBaseServer.state.watchInitData.join_info.third_party_user_id ==
@@ -248,6 +250,10 @@
         } else {
           return rewardEffectInfo.data.nickname;
         }
+      },
+      //设置是否屏蔽特效
+      setHideEffect(status) {
+        this.hideEffect = status;
       },
       /**
        * 根据消息里的sender_id判断, 是否是自己发送的
