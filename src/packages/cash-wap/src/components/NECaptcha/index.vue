@@ -7,7 +7,6 @@
 </template>
 
 <script>
-  import { useUserServer } from 'middle-domain';
   export default {
     name: 'NECaptcha',
     props: {
@@ -19,8 +18,7 @@
     data() {
       return {
         captchaId: 'b7982ef659d64141b7120a6af27e19a0', // 识别
-        capInstance: null, // 云盾实例
-        useUserServer: {}
+        capInstance: null // 云盾实例
       };
     },
     computed: {
@@ -33,12 +31,8 @@
         }
       }
     },
-    created() {
-      this.useUserServer = useUserServer();
-    },
     async mounted() {
-      await this.useUserServer.initNECaptcha('#captchaDom');
-      // this.init();
+      this.init();
     },
     beforeDestroy() {
       this.refreshNECaptha();
@@ -47,7 +41,7 @@
       // 初始化易盾
       async init() {
         const that = this;
-        const captchaId = await this.useUserServer.getCaptchaId();
+        const captchaId = this.captchaId;
         const NECaptchaOpts = {
           captchaId,
           element: '#captchaDom',
