@@ -5,7 +5,6 @@
     </div>
   </div>
 </template>
-
 <script>
   import { useUserServer } from 'middle-domain';
   export default {
@@ -37,8 +36,8 @@
       this.useUserServer = useUserServer();
     },
     async mounted() {
-      await this.useUserServer.initNECaptcha('#captchaDom');
-      // this.init();
+      // await this.useUserServer.initNECaptcha('#captchaDom');
+      this.init();
     },
     beforeDestroy() {
       this.refreshNECaptha();
@@ -47,9 +46,9 @@
       // 初始化易盾
       async init() {
         const that = this;
-        const captchaId = await this.useUserServer.getCaptchaId();
+        // const captchaId = await this.useUserServer.getCaptchaId();
         const NECaptchaOpts = {
-          captchaId,
+          captchaId: this.captchaId,
           element: '#captchaDom',
           mode: 'float',
           width: 270,

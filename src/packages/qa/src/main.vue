@@ -106,7 +106,7 @@
         return this.watchInitData.join_info.join_id;
       },
       userId() {
-        return this.watchInitData.join_info.third_party_user_id;
+        return this.watchInitData.join_info.user_id;
       },
       roomId() {
         return this.watchInitData.interact.room_id;
@@ -117,6 +117,10 @@
       isEmbed() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      //黄金链路配置
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       }
     },
     watch: {
@@ -194,12 +198,11 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        const { configList = {} } = useRoomBaseServer().state;
         if (
           [2, '2'].includes(this.roleName) &&
-          ['', null, 0].includes(this.userId) &&
           !this.Embed &&
-          configList['ui.show_chat_without_login'] != 1
+          (!this.userId || this.userId == 0) &&
+          this.configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';

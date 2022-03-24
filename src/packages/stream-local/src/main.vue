@@ -40,21 +40,21 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
+    <section class="vmp-stream-local__bottom" v-show="localSpeaker.streamId">
       <span
         v-show="[1, 3, 4].includes(joinInfo.role_name) && isInGroup"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
+        class="vmp-stream-local__bottom-role"
+        :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
         {{ joinInfo.role_name | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
+      <span class="vmp-stream-local__bottom-nickname">{{ joinInfo.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="
           localSpeaker.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
@@ -553,7 +553,11 @@
           }
 
           // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
-          if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
+          if (
+            this.joinInfo.role_name == 2 &&
+            useDocServer().state.switchStatus &&
+            this.isNoDelay === 0
+          ) {
             useRoomBaseServer().setChangeElement('player');
           }
 
@@ -1158,7 +1162,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -1210,11 +1214,10 @@
       }
       &-mic {
         float: right;
-        font-size: 12px;
+        font-size: 13px;
       }
       &-signal {
         float: right;
-        font-size: 12px;
         margin-left: 5px;
         margin-top: 4px;
         background-size: contain;

@@ -26,14 +26,14 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="stream.streamId">
-      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
+    <section class="vmp-stream-local__bottom" v-show="stream.streamId">
+      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
@@ -309,8 +309,8 @@
       align-items: center;
       flex-direction: column;
       .net-error-img {
-        width: 25px;
-        height: 18px;
+        width: 30px;
+        height: 25px;
         margin-bottom: 1px;
         background-image: url('./img/net-error.png');
         background-size: cover;
@@ -318,7 +318,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
