@@ -175,6 +175,9 @@
     computed: {
       onlineAmount() {
         return this.redPacketServerState.online;
+      },
+      role() {
+        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info?.role_name;
       }
     },
     beforeCreate() {
@@ -183,14 +186,28 @@
       });
     },
     created() {
-      this.redPacketServer.$on(RED_ENVELOPE_OK, msgData => {
+      if (this.role === 1) {
+        this.initMsgEvent();
+      }
+    },
+    destroyed() {
+      if (this.role === 1) {
+        this.removeMsgEvent();
+      }
+    },
+    methods: {
+      initMsgEvent() {
+        this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleEedEnvelope);
+      },
+      removeMsgEvent() {
+        this.redPacketServer.$off(RED_ENVELOPE_OK, this.handleEedEnvelope);
+      },
+      handleEedEnvelope(msgData) {
         this.paySuccess = true;
         this.qrCodeDialogVisible = true;
         this.sendDialogVisible = false;
         this.amount = `${msgData.red_packet_amount}`;
-      });
-    },
-    methods: {
+      },
       async open() {
         const failure = res => {
           console.error(res);
@@ -652,7 +669,7 @@
     .code-img {
       width: 140px;
       height: 140px;
-      margin: 20px auto 0;
+      margin: 20px auto 32px;
       border-radius: 4px;
       padding: 1px;
       border: 1px solid #e2e2e2;

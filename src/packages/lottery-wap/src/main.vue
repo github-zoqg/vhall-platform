@@ -64,16 +64,15 @@
     },
     methods: {
       accept(msg) {
-        console.log(msg);
         this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
           if (res.code === 200) {
+            this.showWinnerList = res.data.publish_winner;
             if (res.data.take_award === 0) {
               this.lotteryView = 'LotteryWin';
             } else {
               this.lotteryView = 'LotterySuccess';
             }
             this.dialogVisible = true;
-            this.zIndexServer.setDialogZIndex('lottery');
           }
         });
       },
