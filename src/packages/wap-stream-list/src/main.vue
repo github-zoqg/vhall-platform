@@ -645,6 +645,12 @@
           width: 160px;
         }
       }
+      .vmp-stream-list__remote-container-h .vmp-stream-remote__container__net-error {
+        .net-error-img {
+          width: 90px;
+          height: 75px;
+        }
+      }
     }
 
     // 流列表高度为0

@@ -250,7 +250,7 @@
         }
       }
       .address-textarea {
-        width: 230px;
+        width: 235px;
         height: 44px;
         line-height: 20px;
         background: rgba(254, 239, 228, 0.9);

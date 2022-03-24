@@ -163,6 +163,18 @@
 
 <style lang="less">
   .vmp-notice-list {
+    .os-theme-dark > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle,
+    .os-theme-light > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle,
+    .os-theme-dark > .os-scrollbar > .os-scrollbar-track,
+    .os-theme-light > .os-scrollbar > .os-scrollbar-track {
+      border-radius: 6px;
+    }
+    .os-theme-light > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle {
+      background: #666666;
+    }
+    .os-theme-light > .os-scrollbar:hover > .os-scrollbar-track > .os-scrollbar-handle {
+      background-color: #666666;
+    }
     height: 100%;
     position: relative;
     &-container {

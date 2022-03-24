@@ -33,13 +33,20 @@
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bottom">
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName) && isInGroup"
+        v-show="showRole"
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
         {{ stream.attributes.roleName | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
+      <span
+        class="vmp-stream-local__bottom-nickname"
+        :class="{
+          'vmp-stream-local__bottom-nickname-width': showRole
+        }"
+      >
+        {{ stream.attributes.nickname }}
+      </span>
       <span
         class="vmp-stream-local__bottom-signal"
         :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
@@ -324,6 +331,9 @@
             this.stream.roleName == 2 || (this.joinInfo.role_name == 1 && this.stream.roleName != 4)
           );
         }
+      },
+      showRole() {
+        return [1, 3, 4].includes(this.stream.attributes.roleName) && this.isInGroup;
       }
     },
     beforeCreate() {
@@ -613,7 +623,7 @@
         align-items: center;
 
         border-radius: 8px;
-        padding: 0 6px;
+        padding: 0 4px;
         vertical-align: top;
         // 主持人
         &__1 {
@@ -642,6 +652,9 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        &-width {
+          width: 40px;
+        }
       }
       &-mic {
         float: right;

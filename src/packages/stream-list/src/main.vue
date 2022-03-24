@@ -59,7 +59,7 @@
 
         <!-- 主持人进入小组后占位图 -->
         <div
-          v-if="mode == 6 && isHostInGroup && !isInGroup"
+          v-if="showGroupMask"
           class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
           :class="{
             'vmp-dom__mini': miniElement == 'stream-list',
@@ -196,6 +196,19 @@
       // 互动无延迟 未上麦观众是否使用类似旁路布局
       isUseNoDelayLayout() {
         return !this.localSpeaker.accountId && this.mode == 3 && this.isNoDelay == 1;
+      },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
+      // 小组协作中
+      showGroupMask() {
+        // 分组活动 + 自己不在小组 + 主持人不在小组 + 无主画面
+        return !this.isInGroup && this.isHostInGroup && this.mode == 6 && !this.isShowMainScreen;
       }
     },
     watch: {
@@ -347,16 +360,6 @@
         justify-content: center;
         min-width: 100%;
         flex: none;
-        .vmp-stream-list__remote-container {
-          .vmp-stream-local__bottom {
-            &-role {
-              padding: 0 6px;
-            }
-            &-nickname {
-              width: 40px;
-            }
-          }
-        }
         .vmp-stream-list__main-screen {
           .vmp-stream-local__bottom {
             &-role {

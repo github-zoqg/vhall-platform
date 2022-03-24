@@ -215,7 +215,7 @@
             let relt = await this.userServer.handlePassword(this.ruleForm.password);
             if (!relt.pass) {
               this.$message({
-                message: this.$te(relt.msg) || this.$t('register.register_1010'),
+                message: this.$t('register.register_1010'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -248,8 +248,9 @@
                 if (this.captchaIsShow && !this.captchaReady) {
                   this.reloadCaptha();
                 }
+                // console.log(this.$te(res.msg));
                 this.$message({
-                  message: this.$te(res.msg) || this.$t('login.login_1021'),
+                  message: this.$tec(res.code) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'

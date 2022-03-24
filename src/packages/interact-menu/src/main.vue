@@ -53,6 +53,7 @@
         >
           <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
+          <!-- <vmp-air-container cuid="" :oneself="true"></vmp-air-container> -->
         </div>
         <div
           class="vmp-interact-menu-list-item"

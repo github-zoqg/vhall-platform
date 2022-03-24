@@ -203,14 +203,23 @@
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
       showGroupMask() {
-        // 主持人是否在组内 + 直播中 + 分组 + 助理 + 自身不在小组中
+        // 主持人是否在组内 + 直播中 + 分组 + 助理 + 自身不在小组中 + 无主画面
         return (
           this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1 &&
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1 &&
           this.mode == 6 &&
           this.joinInfo.role_name == 3 &&
-          !this.isInGroup
+          !this.isInGroup &&
+          !this.isShowMainScreen
         );
       }
     },
@@ -433,12 +442,6 @@
     .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
-      .vmp-stream-local__bottom-role {
-        padding: 0 6px;
-      }
-      .vmp-stream-local__bottom-nickname {
-        width: 40px;
-      }
     }
 
     // 展开收起按钮

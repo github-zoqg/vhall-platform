@@ -32,18 +32,11 @@
           <p class="winner-avatar">
             <img
               class="winner-avatar-img"
-              :src="item.lottery_user_avatar ? item.lottery_user_avatar : defaultAvatarImg"
+              :src="item.lottery_user_avatar || defaultAvatarImg"
               alt=""
             />
           </p>
           <p class="winner-name">{{ item.lottery_user_nickname }}</p>
-          <!-- <p class="winner-avatar">
-            <img
-              class="winner-avatar-img"
-              :src="prizeInfo.image_url ? prizeInfo.image_url : defaultLotteryImg"
-              alt=""
-            />
-          </p> -->
         </li>
       </ul>
     </div>
@@ -250,13 +243,11 @@
           display: flex;
           align-items: center;
           .winner-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 15px;
-            overflow: hidden;
             &-img {
-              width: 100%;
-              height: 100%;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              overflow: hidden;
               object-fit: cover;
             }
           }
