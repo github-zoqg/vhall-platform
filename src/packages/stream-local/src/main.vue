@@ -512,7 +512,12 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStream.streamId) return; // 只有主持人使用
+            if (this.localStream.streamId) {
+              // 只有主持人使用
+              if (+this.joinInfo.role_name === 1) {
+                this.startPush();
+              }
+            }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
             if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
               this.speakOff();
