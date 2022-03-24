@@ -146,3 +146,11 @@ export default async function () {
   window.micServer = micServer;
   window.insertFileServer = insertFileServer;
 }
+export function isMSECanUse() {
+  let mse = false;
+  VhallPlayer &&
+    VhallPlayer.probe({}, data => {
+      mse = data.MediaSourceExtensions;
+    });
+  return mse;
+}
