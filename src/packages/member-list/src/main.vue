@@ -124,7 +124,10 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
+        <span
+          class="info-panel__online-num"
+          v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
+        >
           {{ totalNum | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
