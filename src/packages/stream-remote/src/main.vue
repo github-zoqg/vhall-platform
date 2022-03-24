@@ -578,6 +578,9 @@
       height: 100%;
       &-mute {
         background-image: url(./img/no_video_bg.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
       }
       &-spliting {
         background-color: #2d2d2d;

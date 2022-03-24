@@ -62,8 +62,9 @@
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
               <template>
+                <!-- TODO: 自己不能@自己 -->
                 <span
-                  :class="['info-wrap__nick-name', 'cur-pointer']"
+                  class="info-wrap__nick-name cur-pointer"
                   @click="setPersonStatus($event, source)"
                   v-if="
                     chatOptions &&
@@ -139,8 +140,11 @@
                 <div
                   v-for="(img, index) in source.replyMsg.content.image_urls"
                   :key="index"
-                  class="reply-wrapper__img-wrapper__img-box reply-msg"
-                  :class="index === 0 ? 'first-child' : ''"
+                  :class="[
+                    'reply-wrapper__img-wrapper__img-box reply-msg',
+                    { 'is-watch': isWatch },
+                    { 'first-child': index === 0 }
+                  ]"
                 >
                   <img
                     class="img-box__content-img"
@@ -178,8 +182,11 @@
               <div
                 v-for="(img, index) in source.content.image_urls"
                 :key="index"
-                class="normal-msg__img-wrapper__img-box"
-                :class="index === 0 ? 'first-child' : ''"
+                :class="[
+                  'normal-msg__img-wrapper__img-box',
+                  { 'is-watch': isWatch },
+                  { 'first-child': index === 0 }
+                ]"
               >
                 <img
                   class="normal-msg__img-wrapper__img-box__content-img"
@@ -316,6 +323,11 @@
       emitQuestionnaireEvent: {
         type: Function,
         default: function () {}
+      },
+      // 是否观看端
+      isWatch: {
+        type: Boolean,
+        default: null
       }
     },
     data() {
@@ -661,8 +673,12 @@
           }
           .reply-wrapper__img-wrapper__img-box {
             display: inline-block;
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
+            &.is-watch {
+              width: 60px;
+              height: 60px;
+            }
             border-radius: 4px;
             overflow: hidden;
             background-color: @bg-dark-normal;
@@ -708,8 +724,12 @@
           }
           .normal-msg__img-wrapper__img-box {
             display: inline-block;
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
+            &.is-watch {
+              width: 60px;
+              height: 60px;
+            }
             border-radius: 4px;
             overflow: hidden;
             background-color: @bg-dark-normal;
