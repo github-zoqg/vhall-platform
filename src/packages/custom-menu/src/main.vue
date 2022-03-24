@@ -1,6 +1,6 @@
 <template>
   <section class="vmp-custom-menu" v-show="!loading">
-    <overlay-scrollbars ref="scroll" :options="overlayScrollBarsOptions" style="height: 100%">
+    <overlay-scrollbars v-if="!loading" ref="scroll" :options="overlayScrollBarsOptions">
       <div class="vmp-custom-menu-wrapper">
         <component
           v-for="(block, index) in customTabs"
