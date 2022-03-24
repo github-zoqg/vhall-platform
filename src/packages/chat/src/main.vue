@@ -26,6 +26,7 @@
           chatOptions,
           isOnlyShowSponsor,
           previewImg: previewImg.bind(this),
+          isWatch: isWatch,
           emitLotteryEvent,
           emitQuestionnaireEvent
         }"
