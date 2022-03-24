@@ -392,7 +392,6 @@
        */
       async smoothScrollToItem({ id }) {
         await this.$nextTick();
-        // 由于menu列表随时会增减，
         const itemsWithPosition = this.visibleMenu.map(item => {
           const id = item.id;
           const ref = this.$refs[id][0];

@@ -85,9 +85,6 @@
             </main>
             <footer class="vmp-rebroadcast-preview-panel__footer" v-if="currentRoomId">
               <section>
-                <p v-if="pushStreamSeperately" class="start-local-stream" @click="pushLocalStream">
-                  开始本地推流
-                </p>
                 <p v-if="rebroadcastingRoomId">
                   <el-checkbox v-model="isPushLocalStream">同时开始本地推流</el-checkbox>
                 </p>
@@ -258,7 +255,6 @@
           if (res.code !== 200) return this.$message.error(`转播失败!`);
 
           this.rebroadcastRoomId = this.currentRoomId; // 记录
-          this.report();
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
           this.$message.success(`转播成功！`);
           this.close();
@@ -294,28 +290,6 @@
           console.error('error:', error);
           this.$message.error('停止转播失败!');
         }
-      },
-      report() {
-        // window.vhallReport.report({
-        //   k: 120001,
-        //   data: {
-        //     business_uid: this.webinar.third_party_user_id,
-        //     user_id: '',
-        //     webinar_id: this.webinar_id,
-        //     refer: '',
-        //     s: '',
-        //     report_extra: {},
-        //     ref_url: '',
-        //     req_url: ''
-        //   }
-        // });
-      },
-      /**
-       * 推本地流
-       */
-      pushLocalStream() {
-        // this.$EventBus.$emit('rebroadcastPushStream');
-        // this.$emit('onClose');
       }
     }
   };

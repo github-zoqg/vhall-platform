@@ -22,7 +22,7 @@
 
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import roomState from '../headless/room-state.js';
+  import roomState, { isMSECanUse } from '../headless/room-state.js';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   export default {
@@ -82,6 +82,23 @@
         );
         window.vhallReport.report('ENTER_WATCH');
         console.log('%c---初始化直播房间 完成', 'color:blue');
+        // 如果加密状态为 1 或者 2
+        // 并且是点播或者回放
+        // 需要判断当前浏览器是否支持 MSE
+        if (
+          roomBaseServer.state.watchInitData.webinar &&
+          (roomBaseServer.state.watchInitData.webinar.type == 4 ||
+            roomBaseServer.state.watchInitData.webinar.type == 5) &&
+          roomBaseServer.state.watchInitData.record.encrypt_status == 2
+        ) {
+          if (!isMSECanUse()) {
+            this.state = 2;
+            this.errorData.errorPageTitle = 'encrypt_error';
+            this.errorData.errorPageText =
+              '主办方设置了视频加密功能，建议使用最新版Chrome浏览器观看';
+            return false;
+          }
+        }
         this.state = 1;
         this.addEventListener();
       } catch (err) {

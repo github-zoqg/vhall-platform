@@ -62,7 +62,7 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && !is_host_in_group && mainScreen ? 'opcity-true' : 'opcity-flase']"
+        :class="[iconShow && isShowMainScreen ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>

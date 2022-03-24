@@ -167,6 +167,7 @@
       this.chatServer = useChatServer();
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.mediaCheckServer = useMediaCheckServer();
       this.listenEvents();
       // 房间信令异常断开事件
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
@@ -207,19 +208,25 @@
     methods: {
       // 检查推流
       async checkStartPush() {
-        /*
-         * 刷新进入页面 是否自动上麦 ( 若在分组+在小组内的麦上  || 在麦上)
-         *     1、默认在麦上  ------>   不论什么活动直接上麦
-         *     2、默认不在麦上 ----->
-         *             a: 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
-         */
-        console.warn(
-          '[platform] 查看设备状态',
-          useMediaCheckServer().state.deviceInfo.device_status
-        );
-        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
-          // 检测设备状态
+        if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
+          return;
+        }
+        console.warn('[platform] 查看设备状态', this.mediaCheckServer.state);
+        // 检测设备状态
+        if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
           const isSpeakOn = this.micServer.getSpeakerStatus();
+          /* 
+            未检测时，则检测互动SDK的支持情况
+              不支持上麦时，确认是否在麦上          
+          */
+          if (this.mediaCheckServer.state.isBrowserNotSupport) {
+            this.mediaCheckServer.setDevice({ status: 2, send_msg: 0 });
+            this.$toast('当前设备不支持连麦');
+            if (isSpeakOn) {
+              await this.speakOff();
+            }
+            return;
+          }
           if (isSpeakOn) {
             this.startPush();
           } else if (
@@ -227,6 +234,7 @@
             !this.chatServer.state.banned &&
             !this.chatServer.state.allBanned
           ) {
+            // 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
             await this.userSpeakOn();
           }
         }
@@ -253,7 +261,7 @@
         this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-          if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
+          if (this.mediaCheckServer.state.deviceInfo.device_status == 2) {
             this.speakOff();
             return;
           }
@@ -284,6 +292,7 @@
           if (this.isNoDelay === 1) {
             //  初始化互动实例
 
+            //后端踢出后会检测有没有在麦上，在麦上会派发下麦消息，下麦消息内的逻辑会比组内踢出消息内的逻辑先执行，所以先调用小组信息接口，避免初始化互动参数房间ID不对。
             if (this.mode === 6) {
               await this.groupServer.updateGroupInitData();
             }

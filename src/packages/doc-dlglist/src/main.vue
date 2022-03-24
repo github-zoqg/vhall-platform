@@ -288,8 +288,6 @@
         dialogVisible: false,
         mode: 1, //模式，默认1:当前直播列表 ，2：资料库列表
 
-        uploadUrl: `${process.env.VUE_APP_BASE_URL}/v3/interacts/document/upload-webinar-document`,
-
         // 要演示的文档观众是否可见
         switchStatus: true,
         // 当前活动文档列表相关
@@ -659,7 +657,7 @@
           this.setDataList();
         };
         // 开始上传
-        this.docServer.uploadFile(param, this.uploadUrl);
+        this.docServer.uploadFile(param);
       },
 
       // 共享对话框提示确认

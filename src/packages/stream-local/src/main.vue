@@ -42,13 +42,20 @@
     <!-- 底部流信息 -->
     <section class="vmp-stream-local__bottom" v-show="localSpeaker.streamId">
       <span
-        v-show="[1, 3, 4].includes(joinInfo.role_name) && isInGroup"
+        v-show="showRole"
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
         {{ joinInfo.role_name | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bottom-nickname">{{ joinInfo.nickname }}</span>
+      <span
+        class="vmp-stream-local__bottom-nickname"
+        :class="{
+          'vmp-stream-local__bottom-nickname-width': showRole
+        }"
+      >
+        {{ joinInfo.nickname }}
+      </span>
       <span
         class="vmp-stream-local__bottom-signal"
         :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
@@ -417,6 +424,9 @@
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      showRole() {
+        return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
       }
     },
     beforeCreate() {
@@ -510,7 +520,14 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStream.streamId) return; // 只有主持人使用
+            if (this.localStream.streamId) {
+              // 只有主持人使用
+              if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
+                await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
+                this.startPush();
+              }
+              return;
+            }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
             if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
               this.speakOff();
@@ -569,11 +586,10 @@
             useRoomBaseServer().setChangeElement('player');
           }
 
-          if (
-            this.isNoDelay === 1 ||
-            this.mode === 6 ||
-            [1, 4, '1', '4'].includes(this.joinInfo.role_name)
-          ) {
+          if (this.isNoDelay === 1 || [1, 4].includes(+this.joinInfo.role_name)) {
+            if (this.mode === 6) {
+              await this.groupServer.updateGroupInitData();
+            }
             //  初始化互动实例
             this.interactiveServer.init();
           } else {
@@ -1189,7 +1205,7 @@
         align-items: center;
 
         border-radius: 8px;
-        padding: 0 6px;
+        padding: 0 4px;
         vertical-align: top;
         // 主持人
         &__1 {
@@ -1219,6 +1235,9 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         margin-left: 5px;
+        &-width {
+          width: 40px;
+        }
       }
       &-mic {
         float: right;

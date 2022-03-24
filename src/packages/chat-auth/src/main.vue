@@ -136,6 +136,7 @@
             :select-menu-type="selectMenuType"
             :options="options"
             :list="currentList"
+            :operate-disable="enableChatAuth === 1"
             ref="authTable"
             @cancelMuted="handleCancelMuted"
             @cancelKicked="handleCancelKicked"
@@ -977,6 +978,16 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+    }
+    .el-button--danger {
+      &:focus,
+      &:hover {
+        background: #fb3a32;
+        border: 1px solid #fb3a32;
+      }
+      &.is-disabled {
+        background: #fb3a32;
+      }
     }
   }
 </style>

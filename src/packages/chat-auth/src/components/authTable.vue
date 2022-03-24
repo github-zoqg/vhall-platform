@@ -71,7 +71,11 @@
                   </template>
                 </div>
               </div>
-              <div class="chat-info__operate-box" v-if="selectMenuType === 'auth'">
+              <div
+                class="chat-info__operate-box"
+                v-if="selectMenuType === 'auth'"
+                :class="{ 'operate-disable': operateDisable }"
+              >
                 <span
                   class="handle-item"
                   @click.stop="handleSetBanned(row)"
@@ -118,6 +122,7 @@
               <div
                 class="chat-info__operate-box"
                 v-if="['muted', 'kickedOut'].includes(selectMenuType)"
+                :class="{ 'operate-disable': operateDisable }"
               >
                 <span
                   class="handle-item"
@@ -184,6 +189,11 @@
         default: () => {
           return [];
         }
+      },
+      //是否开启了聊天审核(开启后才允许做操作)
+      operateDisable: {
+        type: Boolean,
+        default: false
       }
     },
     components: {
@@ -408,6 +418,11 @@
       margin-top: 30px;
       margin-bottom: 10px;
       text-align: center;
+    }
+    .operate-disable {
+      pointer-events: none;
+      opacity: 0.6;
+      user-select: none;
     }
   }
 </style>
