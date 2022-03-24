@@ -34,7 +34,6 @@
           navigator.requestAnimationFrame =
             navigator.webkitRequestAnimationFrame || navigator.mozRequestAnimationFrame;
         }
-
         navigator.getUserMedia(
           { audio: { deviceId: audioId } },
           stream => {
