@@ -71,7 +71,9 @@
           {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
-          :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          :content="
+            localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+          "
           placement="top"
         >
           <span
@@ -86,7 +88,9 @@
         </el-tooltip>
 
         <el-tooltip
-          :content="localSpeaker.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          :content="
+            localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+          "
           placement="top"
         >
           <span
@@ -98,7 +102,7 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="top">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="top">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
@@ -134,7 +138,9 @@
     <section v-show="isShowShadowBtn" v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
         <el-tooltip
-          :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          :content="
+            localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+          "
           placement="top"
         >
           <span
@@ -148,7 +154,9 @@
           ></span>
         </el-tooltip>
         <el-tooltip
-          :content="localSpeaker.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          :content="
+            localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+          "
           placement="top"
         >
           <span
@@ -159,7 +167,7 @@
             "
           ></span>
         </el-tooltip>
-        <el-tooltip content="下麦" placement="top">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="top">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"

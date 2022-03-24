@@ -63,7 +63,10 @@
           {{ stream.attributes.roleName | roleFilter }}
         </span>
 
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -75,7 +78,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -114,7 +120,7 @@
         </el-tooltip>
 
         <!-- 主持人和组长不能互相下麦 -->
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="isShowDownMicBtn"
@@ -129,7 +135,10 @@
         v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-remote__shadow-first-line"
       >
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -141,7 +150,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -183,7 +195,7 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             v-show="isShowDownMicBtn"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
