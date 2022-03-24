@@ -72,7 +72,7 @@
             } else {
               this.lotteryView = 'LotterySuccess';
             }
-            this.dialogVisible = true;
+            this.popupVisible = true;
           }
         });
       },

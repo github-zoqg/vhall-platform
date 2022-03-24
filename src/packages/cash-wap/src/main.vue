@@ -338,7 +338,7 @@
         if (this.cashForm.money === '') {
           this.errorTip.money = this.$t('cash.cash_1030');
           return false;
-        } else if (!/^\d+$|^\d*\.\d{2}$/g.test(this.cashForm.money)) {
+        } else if (!/^\d+$|^\d*\.\d{1,2}$/g.test(this.cashForm.money)) {
           this.errorTip.money = this.$t('cash.cash_1034');
           return false;
         } else {
@@ -367,11 +367,14 @@
 
       // 校验验证码
       validtorCode() {
-        if (/^\d{6}$/.test(this.cashForm.code)) {
+        if (this.cashForm.code === '') {
+          this.errorTip.code = this.$t('cash.cash_1038');
+          return false;
+        } else if (/^\d{6}$/.test(this.cashForm.code)) {
           this.errorTip.code = '';
           return true;
         } else {
-          this.errorTip.code = this.$t('cash.cash_1038');
+          this.errorTip.code = this.$t('cash.cash_1039');
           return false;
         }
       },
