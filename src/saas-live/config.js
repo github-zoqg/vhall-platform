@@ -638,6 +638,13 @@ export const serverConfig = {
         method: 'setSelectedState',
         args: false
       }
+    ],
+    // 触发画笔重置
+    emitDocResetBrush: [
+      {
+        cuid: 'comDocUne',
+        method: 'resetCurrentBrush'
+      }
     ]
   },
   // 转播列表

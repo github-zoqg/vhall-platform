@@ -144,6 +144,7 @@
       @onSubmit="confirmSave"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
+      style="pointer-events: initial"
     >
       <main slot="content">确定要清空文档标记么？</main>
     </saas-alert>
@@ -340,6 +341,11 @@
           }
         }
         this.$emit('changeBrush', brush);
+      },
+      // 重设当前画笔
+      resetCurrentBrush() {
+        console.log('---resetCurrentBrush---this.currentBrush:', this.currentBrush);
+        this.changeTool(this.currentBrush);
       },
       /**
        * 切换画板工具
