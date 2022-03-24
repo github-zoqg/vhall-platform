@@ -2039,12 +2039,12 @@
           margin-right: 1px;
           & > input:checked + i em {
             border-color: #ff9446;
-            left: 22px;
+            left: 14px;
             transition: all 0.1s ease-in-out;
           }
           & > i {
             display: inline-block;
-            width: 30px;
+            width: 26px;
             height: 14px;
             background-color: #242527;
             border-radius: 100px;
