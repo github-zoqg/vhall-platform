@@ -211,7 +211,12 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useRoomBaseServer,
+    useMsgServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -342,11 +347,6 @@
     },
     created() {
       this.listenEvents();
-
-      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
-      setTimeout(() => {
-        this.isShowNetError = true;
-      }, 5000);
     },
     mounted() {},
     beforeDestroy() {
@@ -357,6 +357,9 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
+
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin.bind(this));
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave.bind(this));
     },
     methods: {
       listenEvents() {
@@ -375,6 +378,22 @@
           },
           true
         );
+
+        // 加入房间
+        useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+        useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+      },
+
+      handleUserJoin(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = false;
+        }
+      },
+      handleUserLeave(msg) {
+        console.error('sss', msg);
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = true;
+        }
       },
       // 恢复播放
       replayPlay() {

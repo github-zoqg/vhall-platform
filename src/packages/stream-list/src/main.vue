@@ -525,6 +525,23 @@
         .vmp-stream-list__main-screen {
           bottom: 40px;
         }
+        .vmp-stream-local__bottom {
+          padding: 0 10px;
+          height: 28px;
+          line-height: 28px;
+        }
+        .vmp-stream-local__bottom-role {
+          padding: 0 8px;
+        }
+        .vmp-stream-local__bottom-nickname {
+          width: 80px;
+        }
+        .vmp-stream-local__bottom-mic {
+          font-size: 14px;
+        }
+        .vmp-stream-local__bottom-signal {
+          margin-left: 10px;
+        }
       }
 
       .vmp-stream-list__remote-container-h {

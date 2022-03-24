@@ -3,19 +3,16 @@
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="roleName == 1 && !isInGroup">
-        <div
-          v-if="liveStep == 1 && deviceStatus != 2"
-          class="vmp-header-right_btn"
-          @click="handleStartClick"
-        >
+      <template v-if="deviceStatus == 2">
+        <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
+      </template>
+      <template v-else-if="roleName == 1 && !isInGroup">
+        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
-        <div v-if="liveStep == 2 && deviceStatus != 2" class="vmp-header-right_btn">
-          正在启动...
-        </div>
+        <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
         <div
-          v-if="liveStep == 3 && configList['ui.hide_live_end'] && deviceStatus != 2"
+          v-if="liveStep == 3 && configList['ui.hide_live_end']"
           class="vmp-header-right_btn vmp-header-right_duration"
           @click="handleEndClick"
         >
@@ -24,12 +21,7 @@
             {{ isRecord ? '结束录制' : '结束直播' }}
           </span>
         </div>
-        <div v-if="liveStep == 4 && deviceStatus != 2" class="vmp-header-right_btn">
-          正在结束...
-        </div>
-        <div v-if="deviceStatus == 2" class="vmp-header-right_btn" @click="handleRecheck">
-          重新检测
-        </div>
+        <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
       <template v-if="roleName == 4 && isLiving && !isInGroup">
@@ -131,7 +123,8 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        }
+        },
+        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
       };
     },
     computed: {
@@ -163,9 +156,6 @@
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
-      },
-      deviceStatus() {
-        return useMediaCheckServer().state.deviceInfo?.device_status;
       }
     },
     components: {
@@ -181,6 +171,9 @@
       this.listenEvents();
     },
     mounted() {
+      if (this.deviceStatus == 2) {
+        this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
+      }
       const { watchInitData } = this.roomBaseServer.state;
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
@@ -241,9 +234,30 @@
         this.applyTimerCount = 30;
       },
 
-      // 重新检测
-      handleRecheck() {
-        this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
+      /**
+       * 描述 重新检测当前设备
+       *      1、提示麦克风设备不可用
+       *      2、检测麦克风设备
+       *          可用 则本地修改deviceStatus值
+       *               检测是否在直播中，若在直播中，则liveStep = 3
+       * @date 2022-03-24
+       * @returns {any}
+       */
+      async handleRecheck() {
+        await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
+          this.deviceStatus = 1;
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
+          );
+          if (this.isLiving) {
+            this.liveStep = 3;
+          } else {
+            this.liveStep = 1;
+          }
+        } else {
+          this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
+        }
       },
       listenEvents() {
         // 全屏事件

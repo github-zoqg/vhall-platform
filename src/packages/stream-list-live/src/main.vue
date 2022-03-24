@@ -122,6 +122,10 @@
       SaasAlert
     },
     computed: {
+      // 1直播
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
       // 3互动 //6分组
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
@@ -272,24 +276,6 @@
                 : '主讲人';
             this.$message.success(`${msg.data.nick_name}设置成为${str}`);
           });
-          // 嘉宾：
-          if (
-            (this.joinInfo.role_name == 4 || this.joinInfo.role_name == 3) &&
-            this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
-          ) {
-            this.$alert('您已进入直播房间，马上开始互动吧', '', {
-              title: '提示',
-              confirmButtonText: '立即开始',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel',
-              callback: () => {
-                const list = document.getElementsByTagName('video');
-                for (const item of list) {
-                  item.play();
-                }
-              }
-            });
-          }
         }
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
@@ -302,6 +288,23 @@
             } else {
               this.$message.warning('当前用户正在推流，请稍等');
             }
+          }
+        });
+
+        this.interactiveServer.$on('INTERACTIVE_INSTANCE_INIT_SUCCESS', () => {
+          if (this.liveStatus.type == 1) {
+            this.$alert('您已进入直播房间，马上开始互动吧', '', {
+              title: '提示',
+              confirmButtonText: '立即开始',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel',
+              callback: () => {
+                const list = document.getElementsByTagName('video');
+                for (const item of list) {
+                  item.play();
+                }
+              }
+            });
           }
         });
       },
