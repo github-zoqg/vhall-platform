@@ -62,6 +62,7 @@
         this.$emit('show');
       },
       async popAlertCheckClose() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110005);
         this.popAlertCheckVisible = false;
         await this.$nextTick();
         this.popAlertCheckConfirmVisible = true;
