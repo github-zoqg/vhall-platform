@@ -299,7 +299,7 @@
       addSDKEvents() {
         // 监听到自动播放
         this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
-          console.log('自动播放失败------', e);
+          console.warn('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });
