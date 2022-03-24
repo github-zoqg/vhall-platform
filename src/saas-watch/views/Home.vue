@@ -50,6 +50,13 @@
         }
         const domain = await this.initReceiveLive(this.clientType);
         await roomState();
+        // 是否跳转预约页
+        if (
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+        ) {
+          this.goSubscribePage(this.clientType);
+        }
         const roomBaseServer = useRoomBaseServer();
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
@@ -93,13 +100,6 @@
           }
         }
         this.state = 1;
-        // 是否跳转预约页
-        if (
-          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
-        ) {
-          this.goSubscribePage(this.clientType);
-        }
         this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -114,6 +114,9 @@
         this.state = 2;
         this.errorData.errorPageTitle = 'it_end';
       });
+    },
+    beforeDestroy() {
+      window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
     },
     methods: {
       initReceiveLive(clientType) {
@@ -142,12 +145,19 @@
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
         });
+        // 浏览器或者页面关闭时上报
+        window.addEventListener('beforeunload', function (e) {
+          // 离开H5观看端页面
+          if (/lives\/watch/.test(window.location.pathname)) {
+            window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
+          }
+        });
       },
       handleKickout() {
         this.state = 2;
         this.handleErrorCode({
           code: 512514,
-          msg: '您已被禁止访问当前活动'
+          msg: this.$t('message.message_1007')
         });
       },
       handleErrorCode(err) {
