@@ -1,39 +1,40 @@
 <template>
   <div class="vmp-wap-player">
-    <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
-      <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
-      <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
-    </div>
-    <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
-      <!-- 播放器背景图片 -->
-      <div class="vmp-wap-player-prompt" v-if="isShowPoster">
-        <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
+    <template v-if="encrypt">
+      <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
+        <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
+        <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
       </div>
-      <!-- 播放 按钮 -->
-      <div v-show="!isPlayering && !isVodEnd" class="vmp-wap-player-pause">
-        <p @click="startPlay">
-          <i class="vh-iconfont vh-line-video-play"></i>
-        </p>
-      </div>
-      <div
-        id="vmp-wap-player"
-        style="width: 100%; height: 100%"
-        @click.stop.prevent="videoShowIcon"
-      >
-        <!-- 视频容器 -->
-      </div>
-      <!-- 直播结束 -->
-      <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
-        <p>{{ $t('player.player_1014') }}</p>
-      </div>
-      <!-- 回放结束（正常回放和试看回放结束） -->
-      <div
-        v-show="isVodEnd && !isPlayering"
-        class="vmp-wap-player-ending"
-        :style="`backgroundImage: url('${webinarsBgImg}')`"
-      >
-        <!-- 试看播放结束 和线上保持一致 -->
-        <!-- <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
+      <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
+        <!-- 播放器背景图片 -->
+        <div class="vmp-wap-player-prompt" v-if="isShowPoster">
+          <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
+        </div>
+        <!-- 播放 按钮 -->
+        <div v-show="!isPlayering && !isVodEnd" class="vmp-wap-player-pause">
+          <p @click="startPlay">
+            <i class="vh-iconfont vh-line-video-play"></i>
+          </p>
+        </div>
+        <div
+          id="vmp-wap-player"
+          style="width: 100%; height: 100%"
+          @click.stop.prevent="videoShowIcon"
+        >
+          <!-- 视频容器 -->
+        </div>
+        <!-- 直播结束 -->
+        <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
+          <p>{{ $t('player.player_1014') }}</p>
+        </div>
+        <!-- 回放结束（正常回放和试看回放结束） -->
+        <div
+          v-show="isVodEnd && !isPlayering"
+          class="vmp-wap-player-ending"
+          :style="`backgroundImage: url('${webinarsBgImg}')`"
+        >
+          <!-- 试看播放结束 和线上保持一致 -->
+          <!-- <div class="vmp-wap-player-ending-box" v-if="isTryPreview">
           <p class="vmp-wap-player-ending-box-title">{{ $t('appointment.appointment_1013') }}</p>
           <div class="vmp-wap-player-ending-box-try">
             <p v-if="authText == 6">
@@ -47,62 +48,62 @@
             </span>
           </div>
           <p class="vmp-wap-player-ending-box-title" @click="startPlay">
-            <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
+            <i class="vh-iconfont vh-line-refresh-left"></i>
             {{ $t('appointment.appointment_1014') }}
           </p>
         </div> -->
-        <!-- 回放播放结束 -->
-        <div class="vmp-wap-player-ending-box" @click="startPlay">
-          <p class="vmp-wap-player-ending-box-noraml">
-            <i class="vh-iconfont vh-a-line-counterclockwiserotation"></i>
+          <!-- 回放播放结束 -->
+          <div class="vmp-wap-player-ending-box" @click="startPlay">
+            <p class="vmp-wap-player-ending-box-noraml">
+              <i class="vh-iconfont vh-line-refresh-left"></i>
+            </p>
+            <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
+          </div>
+        </div>
+        <!-- 观看次数  -->
+        <div
+          class="vmp-wap-player-header"
+          v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview"
+          :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
+        >
+          <p>
+            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+            &nbsp;{{ hotNum | formatHotNum }}
           </p>
-          <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
         </div>
-      </div>
-      <!-- 观看次数  -->
-      <div
-        class="vmp-wap-player-header"
-        v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview"
-        :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
-      >
-        <p>
-          <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
-        </p>
-      </div>
-      <!-- 倍速、清晰度切换 -->
-      <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
-        {{ $t('player.player_1009') }}
-        <span v-if="isSetQuality">{{ formatQualityText(currentQualitys.def) }}</span>
-        <span v-if="isSetSpeed">
-          <i18n path="player.player_1015" style="color: #fff">
-            <span place="n">
-              {{ currentSpeed == 1 ? $t('player.player_1025') : currentSpeed }}
+        <!-- 倍速、清晰度切换 -->
+        <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
+          {{ $t('player.player_1009') }}
+          <span v-if="isSetQuality">{{ formatQualityText(currentQualitys.def) }}</span>
+          <span v-if="isSetSpeed">
+            <i18n path="player.player_1015" style="color: #fff">
+              <span place="n">
+                {{ currentSpeed == 1 ? $t('player.player_1025') : currentSpeed }}
+              </span>
+            </i18n>
+          </span>
+        </div>
+        <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
+        <div
+          class="vmp-wap-player-footer"
+          v-show="isPlayering"
+          :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
+        >
+          <!-- 倍速和画质合并 -->
+          <div class="vmp-wap-player-speed">
+            <span @click="openLanguage" v-if="languageList.length > 1">
+              {{ lang.key == 1 ? '中文' : 'EN' }}
             </span>
-          </i18n>
-        </span>
-      </div>
-      <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
-      <div
-        class="vmp-wap-player-footer"
-        v-show="isPlayering"
-        :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
-      >
-        <!-- 倍速和画质合并 -->
-        <div class="vmp-wap-player-speed">
-          <span @click="openLanguage" v-if="languageList.length > 1">
-            {{ lang.key == 1 ? '中文' : 'EN' }}
-          </span>
-          <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
-            {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
-          </span>
-          <span @click="openQuality" v-if="!isWarnPreview">
-            {{ formatQualityText(currentQualitys.def) }}
-          </span>
-        </div>
-        <div class="vmp-wap-player-control">
-          <!-- 试看逻辑不加 按照线上 -->
-          <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
+            <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
+              {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+            </span>
+            <span @click="openQuality" v-if="!isWarnPreview">
+              {{ formatQualityText(currentQualitys.def) }}
+            </span>
+          </div>
+          <div class="vmp-wap-player-control">
+            <!-- 试看逻辑不加 按照线上 -->
+            <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
               <span class="vmp-wap-player-control-preview-red" place="n">{{ recordTime }}</span>
             </i18n>
@@ -120,130 +121,144 @@
             </span>
             <i class="vh-iconfont vh-line-close" @click="vodType === ''"></i>
           </div> -->
-          <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
-            <i18n path="player.player_1012">
-              <span place="n" class="red">{{ currentTime | secondToDate }}</span>
-            </i18n>
-            <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
-          </div>
-          <div class="vmp-wap-player-control-slider">
-            <div v-if="eventPointList.length && totalTime && !isWarnPreview" ref="vhTailoringWrap">
-              <controlEventPoint
-                v-for="(item, index) in eventPointList"
-                :key="'controlEventPoint' + index"
-                :eventTime="item.timePoint"
-                :eventLabel="item.msg"
-                :videoTime="totalTime"
-                @showLabel="showLabelFun"
-              ></controlEventPoint>
+            <div class="vmp-wap-player-control-preview" v-if="isPickupVideo && currentTime > 0">
+              <i18n path="player.player_1012">
+                <span place="n" class="red">{{ currentTime | secondToDate }}</span>
+              </i18n>
+              <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
             </div>
-            <van-slider
-              v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
-              v-model="sliderVal"
-              active-color="rgba(252,86,89,.7)"
-              inactive-color="rgba(255,255,255,.3)"
-              @change="changeSlider"
-            >
-              <div slot="button">
-                <img src="./img/player.png" alt />
+            <div class="vmp-wap-player-control-slider">
+              <div
+                v-if="eventPointList.length && totalTime && !isWarnPreview"
+                ref="vhTailoringWrap"
+              >
+                <controlEventPoint
+                  v-for="(item, index) in eventPointList"
+                  :key="'controlEventPoint' + index"
+                  :eventTime="item.timePoint"
+                  :eventLabel="item.msg"
+                  :videoTime="totalTime"
+                  @showLabel="showLabelFun"
+                ></controlEventPoint>
               </div>
-            </van-slider>
-            <div class="vmp-wap-player-control-icons">
-              <span class="vmp-wap-player-control-icons-left">
-                <i
-                  @click="startPlay"
-                  :class="`vh-iconfont ${
-                    isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
-                  }`"
-                ></i>
-                <i
-                  class="vh-iconfont vh-line-refresh-left"
-                  @click.stop="refresh"
-                  v-if="isLiving"
-                ></i>
-                <span class="vmp-wap-player-control-icons-left-time" v-if="!isLiving">
-                  {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
-                </span>
-              </span>
-              <!-- 右侧icon集合 -->
-              <p class="vmp-wap-player-control-icons-right">
-                <span
-                  @click="openBarrage"
-                  v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
-                >
+              <van-slider
+                v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
+                v-model="sliderVal"
+                active-color="rgba(252,86,89,.7)"
+                inactive-color="rgba(255,255,255,.3)"
+                @change="changeSlider"
+              >
+                <div slot="button">
+                  <img src="./img/player.png" alt />
+                </div>
+              </van-slider>
+              <div class="vmp-wap-player-control-icons">
+                <span class="vmp-wap-player-control-icons-left">
                   <i
+                    @click="startPlay"
                     :class="`vh-iconfont ${
-                      danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
+                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
                     }`"
                   ></i>
-                </span>
-                <span v-if="!isAudio" @click="enterFullscreen">
                   <i
-                    :class="`vh-iconfont ${
-                      isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
-                    }`"
+                    class="vh-iconfont vh-line-refresh-left"
+                    @click.stop="refresh"
+                    v-if="isLiving"
                   ></i>
+                  <span class="vmp-wap-player-control-icons-left-time" v-if="!isLiving">
+                    {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+                  </span>
                 </span>
-              </p>
+                <!-- 右侧icon集合 -->
+                <p class="vmp-wap-player-control-icons-right">
+                  <span
+                    @click="openBarrage"
+                    v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
+                  >
+                    <i
+                      :class="`vh-iconfont ${
+                        danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
+                      }`"
+                    ></i>
+                  </span>
+                  <span v-if="!isAudio" @click="enterFullscreen">
+                    <i
+                      :class="`vh-iconfont ${
+                        isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
+                      }`"
+                    ></i>
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
+        <van-popup
+          v-model="isOpenSpeed"
+          :overlay="false"
+          position="right"
+          style="z-index: 12"
+          class="vmp-wap-player-popup"
+        >
+          <ul>
+            <li
+              v-for="item in UsableSpeed"
+              :key="item"
+              :class="{ 'popup-active': currentSpeed == item }"
+              @click="changeSpeed(item)"
+            >
+              {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
+            </li>
+          </ul>
+        </van-popup>
+        <van-popup
+          v-model="isOpenQuality"
+          :overlay="false"
+          position="right"
+          style="z-index: 12"
+          class="vmp-wap-player-popup"
+        >
+          <ul>
+            <li
+              v-for="item in qualitysList"
+              :key="item.def"
+              :class="{ 'popup-active': currentQualitys.def == item.def }"
+              @click="changeQualitys(item)"
+            >
+              {{ formatQualityText(item.def) }}
+            </li>
+          </ul>
+        </van-popup>
+        <van-popup
+          v-model="isOpenlang"
+          :overlay="false"
+          position="right"
+          style="z-index: 12"
+          class="vmp-wap-player-popup"
+        >
+          <ul>
+            <li
+              v-for="(item, index) in languageList"
+              :key="index"
+              :class="{ 'popup-active': item.key == lang.key }"
+              @click="changeLang(item.key)"
+            >
+              {{ item.label }}
+            </li>
+          </ul>
+        </van-popup>
       </div>
-      <van-popup
-        v-model="isOpenSpeed"
-        :overlay="false"
-        position="right"
-        style="z-index: 12"
-        class="vmp-wap-player-popup"
-      >
-        <ul>
-          <li
-            v-for="item in UsableSpeed"
-            :key="item"
-            :class="{ 'popup-active': currentSpeed == item }"
-            @click="changeSpeed(item)"
-          >
-            {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
-          </li>
-        </ul>
-      </van-popup>
-      <van-popup
-        v-model="isOpenQuality"
-        :overlay="false"
-        position="right"
-        style="z-index: 12"
-        class="vmp-wap-player-popup"
-      >
-        <ul>
-          <li
-            v-for="item in qualitysList"
-            :key="item.def"
-            :class="{ 'popup-active': currentQualitys.def == item.def }"
-            @click="changeQualitys(item)"
-          >
-            {{ formatQualityText(item.def) }}
-          </li>
-        </ul>
-      </van-popup>
-      <van-popup
-        v-model="isOpenlang"
-        :overlay="false"
-        position="right"
-        style="z-index: 12"
-        class="vmp-wap-player-popup"
-      >
-        <ul>
-          <li
-            v-for="(item, index) in languageList"
-            :key="index"
-            :class="{ 'popup-active': item.key == lang.key }"
-            @click="changeLang(item.key)"
-          >
-            {{ item.label }}
-          </li>
-        </ul>
-      </van-popup>
-    </div>
+    </template>
+    <template v-else>
+      <div class="player-encrypt" :style="`backgroundImage: url('${webinarsBgImg}')`">
+        <div class="player-encrypt_box"></div>
+        <img src="./img/jiami.png" alt="" class="player-encrypt_img" />
+        <div class="player-encrypt_tip">
+          <div>{{ $t('message.message_1018') }}</div>
+          <div class="pt10">{{ $t('message.message_1019') }}</div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 <script>
@@ -338,6 +353,7 @@
           speed: 0,
           autoplay: false
         },
+        encrypt: true,
         isOrientation: false,
         lang: {},
         languageList: []
@@ -359,6 +375,17 @@
       this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
+      let isMES = false;
+      VhallPlayer.probe({}, data => {
+        isMES = data.MediaSourceExtensions;
+      });
+      const { record } = this.roomBaseState.watchInitData;
+      // 判断是否支持加密视频播放
+      console.log(isMES, '是否支持MES');
+      if (record && record.paas_record_id && record.encrypt_status == 2 && !isMES) {
+        this.encrypt = false;
+        return false;
+      }
       this.getWebinerStatus();
       // if (window.orientation == 90 || window.orientation == -90) {
       //   this.isOrientation = true;
@@ -678,7 +705,31 @@
       height: 100%;
       width: 100%;
     }
-    // position: relative;
+    .player-encrypt {
+      width: 100%;
+      height: 100%;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      &_box {
+        height: 100%;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.4);
+      }
+      &_img {
+        position: absolute;
+        width: 250px;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      &_tip {
+        text-align: center;
+        position: absolute;
+        width: 100%;
+        top: 280px;
+        color: #fff;
+      }
+    }
     &-opcity-flase {
       // opacity: 0;
       display: none;

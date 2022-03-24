@@ -27,7 +27,7 @@
     </div>
 
     <footer class="vh-footer">
-      <section class="vh-fotter_result-btn">
+      <section class="vh-footer_result-btn">
         <el-button round v-if="!isCheckSuccess" @click="restart" class="confirm">
           重新检测
         </el-button>
@@ -195,7 +195,7 @@
         bottom: 4px;
         right: 32px;
       }
-      .vh-fotter_result-btn {
+      .vh-footer_result-btn {
         overflow: hidden;
         .fr {
           float: right;

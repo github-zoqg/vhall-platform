@@ -208,6 +208,9 @@
     methods: {
       // 检查推流
       async checkStartPush() {
+        if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
+          return;
+        }
         console.warn('[platform] 查看设备状态', this.mediaCheckServer.state);
         // 检测设备状态
         if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
@@ -220,7 +223,7 @@
             this.mediaCheckServer.setDevice({ status: 2, send_msg: 0 });
             this.$toast('当前设备不支持连麦');
             if (isSpeakOn) {
-              await this.userSpeakOn();
+              await this.speakOff();
             }
             return;
           }

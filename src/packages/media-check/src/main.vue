@@ -271,7 +271,7 @@
 
     .el-dialog__body {
       height: 500px;
-      padding: 50px 56px 0 56px;
+      padding: 50px 56px 0;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
@@ -310,7 +310,7 @@
           }
           &.is-no-check {
             .el-step__line {
-              background-color: #cccccc;
+              background-color: #ccc;
             }
           }
           & > .el-step__line {

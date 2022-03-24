@@ -24,7 +24,10 @@
         >
           <template
             v-if="
-              chatOptions && chatOptions.userControlOptions && chatOptions.userControlOptions.enable
+              chatOptions &&
+              chatOptions.userControlOptions &&
+              chatOptions.userControlOptions.enable &&
+              !isSelfMsg(source.sendId)
             "
           >
             <div
@@ -66,7 +69,8 @@
                   v-if="
                     chatOptions &&
                     chatOptions.userControlOptions &&
-                    chatOptions.userControlOptions.enable
+                    chatOptions.userControlOptions.enable &&
+                    !isSelfMsg(source.sendId)
                   "
                 >
                   {{ source.nickname }}
@@ -380,7 +384,6 @@
       this.handleAt();
     },
     methods: {
-      //todo domain负责
       setPersonStatus(event, msg) {
         if (!msg.sendId) {
           return;
@@ -410,6 +413,10 @@
           msg.nickname,
           msg.roleName
         );
+      },
+      // 判断是不是自己的消息
+      isSelfMsg(id) {
+        return this.joinInfo.third_party_user_id == id;
       },
       //todo 信令唤起其他模块 点击查看消息
       clickToView(type, content) {
@@ -452,14 +459,14 @@
                 this.msgContent = this.urlToLink(
                   this.msgContent.replace(
                     userName,
-                    `<span style='color:#4DA1FF'>${userName}</span>`
+                    `<span style='color:#3562fa'>${userName}</span>`
                   )
                 );
               } else {
                 this.msgContent = this.urlToLink(
                   this.source.content.text_content.replace(
                     userName,
-                    `<span style='color:#4DA1FF'>${userName}</span>`
+                    `<span style='color:#3562fa'>${userName}</span>`
                   )
                 );
               }
