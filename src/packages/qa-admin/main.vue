@@ -1388,8 +1388,8 @@
       }
       width: 500px !important;
       .footer {
-        text-align: right;
         padding-top: 20px;
+        text-align: right;
       }
       // height: 356px !important;
       .el-message-box__header {
@@ -1400,13 +1400,14 @@
       }
       .el-dialog__body {
         padding-top: 0px;
-        padding-bottom: 0px;
         .el-textarea__inner {
           height: 196px;
           color: #1a1a1a;
+          padding-top: 10px;
+          padding-bottom: 10px;
         }
         .el-button + .el-button {
-          padding-left: 16px;
+          margin-left: 16px;
         }
       }
       .send-left {

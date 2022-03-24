@@ -53,6 +53,7 @@
       <li>
         <!-- 问卷-->
         <questionnaire-icon @clickIcon="checkQuestionIcon" />
+        <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
       <li>
         <!-- 签到 -->
@@ -61,9 +62,11 @@
       <li v-if="isLiving">
         <!-- 抽奖 -->
         <lottery-icon @clickIcon="checkLotteryIcon" />
+        <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
       <li>
         <red-packet-icon @clickIcon="checkredPacketIcon" />
+        <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
       </li>
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">

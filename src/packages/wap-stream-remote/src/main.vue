@@ -309,8 +309,8 @@
       align-items: center;
       flex-direction: column;
       .net-error-img {
-        width: 25px;
-        height: 18px;
+        width: 30px;
+        height: 25px;
         margin-bottom: 1px;
         background-image: url('./img/net-error.png');
         background-size: cover;
