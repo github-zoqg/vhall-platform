@@ -208,6 +208,9 @@
     methods: {
       // 检查推流
       async checkStartPush() {
+        if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
+          return;
+        }
         console.warn('[platform] 查看设备状态', this.mediaCheckServer.state);
         // 检测设备状态
         if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
