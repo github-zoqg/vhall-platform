@@ -43,7 +43,10 @@
     </div>
     <template v-if="showBottomBtn">
       <div class="vmp-subscribe-body-auth">
-        <div class="vmp-subscribe-body-auth-two" v-if="subOption.verify == 6">
+        <div
+          class="vmp-subscribe-body-auth-two"
+          v-if="subOption.verify == 6 && !subOption.is_subscribe"
+        >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
