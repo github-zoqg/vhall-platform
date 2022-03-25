@@ -386,7 +386,7 @@
         if (this.cashForm.code === '') {
           this.errorTip.code = this.$t('cash.cash_1038');
           return false;
-        } else if (/^\d{6}$/.test(this.cashForm.code)) {
+        } else if (/^\d{4,6}$/.test(this.cashForm.code)) {
           this.errorTip.code = '';
           return true;
         } else {
