@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-download-wrap">
     <div class="vmp-download-chrome">
-      <span class="iconfont iconyemiancuowu"></span>
+      <img src="../assets/images/chome_update.png" alt="" />
       <div class="vmp-download__right-donwload">
         <p>请使用Chrome浏览器74以上版本或使用Safari浏览器13.0.4以上版本</p>
         <a
@@ -32,9 +32,8 @@
       margin-top: -78px;
       width: 740px;
       height: 156px;
-      span {
-        font-size: 156px;
-        color: #dce5ec;
+      img {
+        width: 156px;
         display: inline-block;
         vertical-align: middle;
         margin-right: 27px;
