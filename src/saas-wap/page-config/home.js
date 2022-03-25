@@ -122,7 +122,13 @@ const serverConfig = {
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
-    children: ['comSignWap', 'comWatchTimer', 'comLotteryWap', 'comRedPacketWap', 'comQuestionnaireWap'],
+    children: [
+      'comSignWap',
+      'comWatchTimer',
+      'comLotteryWap',
+      'comRedPacketWap',
+      'comQuestionnaireWap'
+    ],
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
