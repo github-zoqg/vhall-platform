@@ -167,6 +167,7 @@
     methods: {
       // 分屏状态更改
       handleSplitScreenChange() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120003);
         if (this.isOpenSplitScreen) {
           this.splitScreenServer.closeSplit();
         } else {

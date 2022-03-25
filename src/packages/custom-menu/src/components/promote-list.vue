@@ -17,8 +17,6 @@
 </template>
 
 <script>
-  // TODO: isWebp
-
   export default {
     name: 'component-promote',
     data() {

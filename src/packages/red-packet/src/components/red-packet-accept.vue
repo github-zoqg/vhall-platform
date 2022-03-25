@@ -11,11 +11,7 @@
       />
       <!-- 文案 -->
       <h1>
-        {{
-          (redPacketInfo && redPacketInfo.describe
-            ? $t(redPacketInfo.describe) || $t('interact_tools.interact_tools_1032')
-            : $t('interact_tools.interact_tools_1032')) | overHidden(8)
-        }}
+        {{ $tdefault(redPacketInfo.describe) | overHidden(8) }}
       </h1>
       <img
         v-if="redPacketInfo && redPacketInfo.avatar"

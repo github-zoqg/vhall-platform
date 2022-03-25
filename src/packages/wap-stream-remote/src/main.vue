@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpWapStreamRemote',
@@ -144,10 +144,13 @@
       this.micServer = useMicServer();
     },
     created() {
-      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
       setTimeout(() => {
-        this.isShowNetError = true;
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
       }, 5000);
+      useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$onMsg('LEFT', this.handleUserLeave);
     },
     beforeDestroy() {
       // 清空计时器
@@ -157,8 +160,22 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
+
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      // 监听离开加入房间事件，显示网络异常占位图
+      handleUserJoin(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = false;
+        }
+      },
+      handleUserLeave(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = true;
+        }
+      },
       subscribeRemoteStream() {
         console.log('开始订阅', JSON.stringify(this.stream));
         // TODO:主屏订阅大流，小窗订阅小流
@@ -171,6 +188,16 @@
           .subscribe(opt)
           .then(e => {
             console.warn('订阅成功---------', e);
+            try {
+              if (document.querySelector(`#stream${e.streamId}`)) {
+                document.querySelector(`#stream${e.streamId}`).play();
+              }
+              if (document.querySelector(`#stream${e.streamId}`)) {
+                document.querySelector(`#stream${e.streamId}`).play();
+              }
+            } catch (error) {
+              console.error('业务自行--- 播放失败----------', error);
+            }
             this.getLevel();
           })
           .catch(e => {
@@ -309,8 +336,8 @@
       align-items: center;
       flex-direction: column;
       .net-error-img {
-        width: 25px;
-        height: 18px;
+        width: 30px;
+        height: 25px;
         margin-bottom: 1px;
         background-image: url('./img/net-error.png');
         background-size: cover;

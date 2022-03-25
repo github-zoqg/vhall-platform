@@ -288,8 +288,6 @@
         dialogVisible: false,
         mode: 1, //模式，默认1:当前直播列表 ，2：资料库列表
 
-        uploadUrl: `${process.env.VUE_APP_BASE_URL}/v3/interacts/document/upload-webinar-document`,
-
         // 要演示的文档观众是否可见
         switchStatus: true,
         // 当前活动文档列表相关
@@ -633,6 +631,10 @@
             // id: 20855
             // page: 1
             // size: 362733
+            // 上传埋点
+            window.vhallReportForProduct.report(110022, {
+              report_extra: { documentId: res.data.document_id }
+            });
             const fuid = file.uid;
             this.allList.forEach(item => {
               if (fuid === item.uid) {
@@ -659,7 +661,7 @@
           this.setDataList();
         };
         // 开始上传
-        this.docServer.uploadFile(param, this.uploadUrl);
+        this.docServer.uploadFile(param);
       },
 
       // 共享对话框提示确认
@@ -740,6 +742,7 @@
         margin: 0 8px;
 
         .el-switch__core {
+          width: 28px;
           height: 16px;
 
           &:after {

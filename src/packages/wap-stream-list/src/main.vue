@@ -62,7 +62,7 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && !is_host_in_group && mainScreen ? 'opcity-true' : 'opcity-flase']"
+        :class="[iconShow && isShowMainScreen ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -222,6 +222,9 @@
           this.joinInfo.third_party_user_id == this.mainScreen;
         return _flag;
       },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
@@ -229,7 +232,8 @@
           !this.isInGroup &&
           this.is_host_in_group &&
           this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
-          !this.isShowMainScreen
+          !this.isShowMainScreen &&
+          !this.isShareScreen
         );
       },
       hotNum() {
@@ -295,7 +299,7 @@
       addSDKEvents() {
         // 监听到自动播放
         this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
-          console.log('自动播放失败------', e);
+          console.warn('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });
@@ -643,6 +647,12 @@
         // 此处不能使用&去代替  由于父级无样式，直接使用&会导致class优先级降低
         .vmp-stream-local__bottom-nickname {
           width: 160px;
+        }
+      }
+      .vmp-stream-list__remote-container-h .vmp-stream-remote__container__net-error {
+        .net-error-img {
+          width: 90px;
+          height: 75px;
         }
       }
     }
