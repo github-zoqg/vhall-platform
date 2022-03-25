@@ -96,7 +96,10 @@
           />
         </div>
         <div class="msg-content">
-          <p class="msg-content_name">
+          <!-- 签到消息头部 相类似的可优化 -->
+          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">签到</p>
+          <!-- 正常聊天消息 -->
+          <p class="msg-content_name" v-else>
             <span
               v-if="source.roleName && source.roleName != '2'"
               class="role"
@@ -104,7 +107,9 @@
             >
               {{ source.roleName | roleFilter }}
             </span>
-            <span class="nickname">{{ source.nickname }}</span>
+            <span class="nickname">
+              {{ source.nickname }}
+            </span>
           </p>
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
