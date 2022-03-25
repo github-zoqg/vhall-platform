@@ -161,7 +161,23 @@
         });
       },
       handleErrorCode(err) {
+        let currentQuery = location.search;
         switch (err.code) {
+          case 512534:
+            window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
+            break;
+          case 512502: // 不支持的活动类型（flash）
+          case 512503: // 不支持的活动类型（旧H5）
+            currentQuery =
+              currentQuery.indexOf('nickname=') != -1
+                ? currentQuery.replace('nickname=', 'name=')
+                : currentQuery;
+            currentQuery =
+              currentQuery.indexOf('record_id=') > -1
+                ? currentQuery.replace('record_id=', 'rid=')
+                : currentQuery;
+            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.is}${currentQuery}`; // 跳转到老 saas
+            break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了
             break;
