@@ -106,7 +106,7 @@
         this.state = 1;
         this.addEventListener();
       } catch (err) {
-        console.error('---初始化直播房间出现异常--');
+        console.error('---初始化直播房间出现异常--', err);
         console.error(err);
         this.state = 2;
         this.handleErrorCode(err);
@@ -117,6 +117,9 @@
         this.state = 2;
         this.liveErrorTip = this.$t('message.message_1003');
       });
+    },
+    beforeDestroy() {
+      window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
     },
     methods: {
       initReceiveLive(clientType) {
@@ -142,12 +145,19 @@
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
         });
+        // 浏览器或者页面关闭时上报
+        window.addEventListener('beforeunload', function (e) {
+          // 离开H5观看端页面
+          if (/lives\/watch/.test(window.location.pathname)) {
+            window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
+          }
+        });
       },
       handleKickout() {
         this.state = 2;
         this.handleErrorCode({
           code: 512514,
-          msg: '您已被禁止访问当前活动'
+          msg: this.$t('message.message_1007')
         });
       },
       handleErrorCode(err) {
@@ -169,8 +179,10 @@
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
+        } else if (err.code == 611001) {
+          this.liveErrorTip = '互动初始化失败，' + err.message;
         } else {
-          this.liveErrorTip = this.$tes(err.code) || err.msg;
+          this.liveErrorTip = this.$tec(err.code) || err.msg || err.message;
         }
       },
       goSubscribePage(clientType) {

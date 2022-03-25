@@ -3,6 +3,7 @@
     <!-- 邀请上麦弹窗 -->
     <van-popup
       v-model="showInviteConnectMic"
+      :close-on-click-overlay="false"
       position="bottom"
       class="connect-mic-popup"
       get-container="#connectMicPopupContainer"
@@ -21,7 +22,7 @@
   </section>
 </template>
 <script>
-  import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import { useMsgServer, useChatServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpInviteHandup',
@@ -59,23 +60,23 @@
           temp.context = JSON.parse(temp.context);
         }
         const { type = '' } = temp.data || {};
+        this.roleName =
+          temp.data.room_role == 20 ? this.$t('chat.chat_1064') : this.$t('chat.chat_1022');
         if (type === 'vrtc_connect_invite') {
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
-          }
-          if (this.isInGroup) {
-            this.roleName = this.$t('chat.chat_1064');
-          } else {
-            this.roleName = this.$t('chat.chat_1022');
           }
           this.senderId = temp.sender_id;
           this.showInviteConnectMic = true;
           this.inviteTime = 30;
           clearInterval(this.inviteFun);
           this.refusedText = `${this.$t('interact.interact_1010')}(${this.inviteTime}s)`;
+          let st = Date.now();
+          let i = 0;
           this.inviteFun = setInterval(() => {
-            this.inviteTime--;
+            i = ~~((Date.now() - st) / 1000);
+            this.inviteTime = 30 - i;
             this.refusedText = `${this.$t('interact.interact_1010')}(${this.inviteTime}s)`;
             if (this.inviteTime <= 0) {
               this.$toast(this.$t('interact.interact_1025'));
@@ -86,8 +87,23 @@
           }, 1000);
         }
       });
+
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.showInviteConnectMic && this.clearTime();
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.showInviteConnectMic && this.clearTime();
+      });
     },
     methods: {
+      clearTime() {
+        this.inviteFun && clearInterval(this.inviteFun);
+        this.refusedText = this.$t('interact.interact_1010');
+        this.showInviteConnectMic = false;
+        this.inviteTime = 30;
+      },
       // 关闭邀请连麦弹框
       closeInviteConnectPop() {
         this.showInviteConnectMic = false;

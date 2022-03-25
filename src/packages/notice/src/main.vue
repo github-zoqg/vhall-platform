@@ -45,11 +45,6 @@
   import { throttle } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
-    filters: {
-      formatTime(value) {
-        return value.substring(11, 16);
-      }
-    },
     data() {
       const domainState = this.noticeServer.state;
 
@@ -86,6 +81,7 @@
     },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
+      // 保持和线上一直，不调用接口， 刷新时，就没有公告了
       // this.getNoticeList(false);
     },
     mounted() {
@@ -167,6 +163,18 @@
 
 <style lang="less">
   .vmp-notice-list {
+    .os-theme-dark > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle,
+    .os-theme-light > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle,
+    .os-theme-dark > .os-scrollbar > .os-scrollbar-track,
+    .os-theme-light > .os-scrollbar > .os-scrollbar-track {
+      border-radius: 6px;
+    }
+    .os-theme-light > .os-scrollbar > .os-scrollbar-track > .os-scrollbar-handle {
+      background: #666666;
+    }
+    .os-theme-light > .os-scrollbar:hover > .os-scrollbar-track > .os-scrollbar-handle {
+      background-color: #666666;
+    }
     height: 100%;
     position: relative;
     &-container {
@@ -255,7 +263,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background: @font-error;
+              background: @bg-error-light;
               position: absolute;
               top: 2px;
               left: 2px;
@@ -331,7 +339,7 @@
           display: inline-block;
           outline: none;
           &:hover {
-            background: #fc5659;
+            background: #fb3a32;
           }
         }
       }

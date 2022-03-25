@@ -1,13 +1,13 @@
 <template>
   <div class="vmp-notice-column" v-show="isNoticeColumn">
-    <div class="vmp-notice-column-wrap">
-      <span class="vmp-notice-column-wrap-icons"><img src="./img/icon.png" alt="" /></span>
-      <p class="vmp-notice-column-wrap-nowrap">
-        <span class="vmp-notice-column-wrap-animated">
-          <span id="vmp-notice-column-text">{{ noticeText }}</span>
+    <div class="vmp-notice-column_wrap">
+      <span class="column_icons"><img src="./img/icon.png" alt="" /></span>
+      <p class="column_nowrap">
+        <span class="column_nowrap_animated">
+          <span id="notice_text">{{ noticeText }}</span>
         </span>
       </p>
-      <span class="vmp-notice-column-wrap-close" @click="isNoticeColumn = false">
+      <span class="column_close" @click="closeNoticeColumn">
         <i class="vh-iconfont vh-line-close"></i>
       </span>
     </div>
@@ -24,9 +24,11 @@
       };
     },
     computed: {
+      // 是否在小组内
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       },
+      // 公告信息 domain中获取
       noticeLatestInfo() {
         return this.roomBaseServer.state.noticeInfo;
       }
@@ -43,6 +45,7 @@
       this.initNotice();
     },
     methods: {
+      // 是否显示公告 / 公告信息
       openNotice() {
         if (
           this.noticeLatestInfo.total &&
@@ -52,44 +55,54 @@
         ) {
           this.isNoticeColumn = true;
           this.noticeText = this.noticeLatestInfo.list[0].content['content'];
-          this.animates();
+          this.noticeAnimates();
+        } else {
+          this.isNoticeColumn = false;
         }
       },
+      // 公告消息
       initNotice() {
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
           this.isNoticeColumn = true;
           this.noticeText = msg.room_announcement_text;
-          this.animates();
+          this.noticeAnimates();
         });
         this.noticeServer.$on('live_over', () => {
           this.isNoticeColumn = false;
         });
-        // 结束讨论
+        // 结束讨论、踢出、解散小组回到主房间 有公告显示
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           if (!this.isInGroup) {
             this.openNotice();
+          } else {
+            this.isNoticeColumn = false;
           }
         });
+        // 从主房间进入小组时，公告隐藏
         this.groupServer.$on('GROUP_SWITCH_START', () => {
           this.isNoticeColumn = false;
         });
-        this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
-          this.isNoticeColumn = false;
-        });
       },
-      animates() {
+      // 关闭公告显示
+      closeNoticeColumn() {
+        const noticeText = document.querySelector('#notice_text');
+        window.cancelAnimationFrame(noticeText);
+        this.isNoticeColumn = false;
+      },
+      // 公告滚动动画
+      noticeAnimates() {
         this.$nextTick(() => {
-          const noticeText = document.querySelector('#vmp-notice-column-text');
-          const widthWrap = document.querySelector('.vmp-notice-column-wrap-nowrap').offsetWidth;
+          const noticeText = document.querySelector('#notice_text');
+          const widthWrap = document.querySelector('.column_nowrap').offsetWidth;
           const widthtext = noticeText.offsetWidth;
-          let left = widthWrap;
+          let noticeLeft = widthWrap;
           function render() {
-            if (-left >= widthtext) {
-              left = widthWrap;
+            if (-noticeLeft >= widthtext) {
+              noticeLeft = widthWrap;
             }
-            left = left - 0.5;
-            noticeText.style.marginLeft = left + 'px';
+            noticeLeft = noticeLeft - 0.5;
+            noticeText.style.marginLeft = noticeLeft + 'px';
             window.requestAnimationFrame(render);
           }
           window.requestAnimationFrame(render);
@@ -112,12 +125,12 @@
     height: 44px;
     line-height: 44px;
     font-size: 16px;
-    &-wrap {
+    &_wrap {
       display: flex;
       align-content: center;
       justify-content: space-between;
-      margin: 0 24px 0 24px;
-      &-icons {
+      margin: 0 24px;
+      .column_icons {
         width: 28px;
         height: 28px;
         border-radius: 50%;
@@ -130,20 +143,20 @@
           object-fit: scale-down;
         }
       }
-      &-nowrap {
+      .column_nowrap {
         color: #ec7b03;
         font-size: 14px;
         overflow: hidden;
         width: 100%;
         height: 35px;
         flex: 1;
-        &-animated {
+        &_animated {
           span {
             white-space: nowrap;
           }
         }
       }
-      &-close {
+      .column_close {
         cursor: pointer;
         display: inline-block;
         font-size: 14px;

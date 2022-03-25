@@ -2,7 +2,7 @@
   <div ref="chat" class="vhsaas-chat">
     <div
       class="vhsaas-chat__body-wrapper"
-      :style="{ height: 'calc(100% - ' + operatorHieght + 'px)' }"
+      :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
       <virtual-list
         ref="qalist"
@@ -69,9 +69,10 @@
           disable: false,
           placeholder: this.$t('chat.chat_1003')
         },
+        //是否需要登录
         chatLoginStatus: false,
 
-        operatorHieght: 91,
+        operatorHeight: 91,
         // 滚动条状态 start
         osComponentOptions: {
           resize: 'none',
@@ -116,6 +117,10 @@
       isEmbed() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      //黄金链路配置
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       }
     },
     watch: {
@@ -131,7 +136,6 @@
       this.initLoginStatus();
       this.initInputStatus();
     },
-    filters: {},
     methods: {
       listenEvents() {
         const qaServer = useQaServer();
@@ -147,7 +151,11 @@
         });
         //监听问答回复消息
         qaServer.$on(qaServer.Events.QA_COMMIT, msg => {
-          if (msg.sender_id != this.thirdPartyId) {
+          if (
+            msg.sender_id != this.thirdPartyId &&
+            ((msg.data.join_id == this.joinId && msg.data.answer.is_open == '0') ||
+              msg.data.answer.is_open != '0')
+          ) {
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
             this.dispatch('VmpTabContainer', 'noticeHint', 'v5');
@@ -175,7 +183,9 @@
         } else {
           this.inputStatus.placeholder = this.$t('chat.chat_1003');
         }
-        const isVod = this.watchInitData.webinar.type == 5 && this.watchInitData.paas_record_id;
+        const isVod =
+          (this.watchInitData.webinar.type == 5 || this.watchInitData.webinar.type == 4) &&
+          this.watchInitData.paas_record_id;
         // 判断控制台回放禁言状态
         if (isVod) {
           this.inputStatus.disable = true;
@@ -188,12 +198,11 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        const { configList = {} } = useRoomBaseServer().state;
         if (
-          ![1, '1'].includes(this.roleName) &&
-          ['', null, 0].includes(
-            this.userId || this.Embed || configList['ui.show_chat_without_login'] == 1
-          )
+          [2, '2'].includes(this.roleName) &&
+          !this.Embed &&
+          (!this.userId || this.userId == 0) &&
+          this.configList['ui.show_chat_without_login'] != 1
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
@@ -206,8 +215,8 @@
       getQaHistoryMsg() {
         useQaServer().getQaHistory();
       },
-      chatTextareaHeightChange(operatorHieght) {
-        this.operatorHieght = operatorHieght;
+      chatTextareaHeightChange(operatorHeight) {
+        this.operatorHeight = operatorHeight;
         this.$refs.chatQaOperator.overlayScrollbar.update();
       },
       // 只看我的按钮 change 事件
@@ -308,14 +317,14 @@
       display: block;
       margin: 0 auto;
       border-radius: 5px;
-      background: #fc5659;
+      background: #fb3a32;
       line-height: 35px;
       font-size: 12px;
       text-align: center;
       margin: 10px;
       &:hover,
       &:active {
-        background: #fc5659;
+        background: #fb3a32;
       }
     }
   }

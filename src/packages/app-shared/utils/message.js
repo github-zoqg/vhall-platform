@@ -5,6 +5,13 @@ const offset = 8;
 
 const $message = options => {
   Message.closeAll(); // 调起新的 message 之前关闭之前 message
+  if (typeof options === 'string') {
+    options = {
+      message: options,
+      offset: offset
+    };
+  }
+  options.type = options.type || 'info';
   return Message({
     offset: offset,
     ...options
@@ -29,6 +36,7 @@ const $message = options => {
   };
 });
 // 将$message挂载到this上，用异步任务，是为了能覆盖element自动写入的 $message
-setTimeout(() => {
+const st = setTimeout(() => {
   Vue.prototype.$message = $message;
-});
+  clearTimeout(st);
+}, 0);

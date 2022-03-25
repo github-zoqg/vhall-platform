@@ -19,6 +19,7 @@
         <i
           class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
           @click.stop="onClickFilterSetting"
+          v-clickoutside="hidechatOptions"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
         ></i>
         <!-- 表情选择 -->
@@ -61,7 +62,7 @@
           <div
             class="chat-setting-btn--chat-auth"
             v-if="
-              (roleName == 1 || roleName == 3) &&
+              (roleName == 1 || roleName == 3 || roleName == 4) &&
               !isInGroup &&
               (configList['comment_check'] || configList['disable_msg'])
             "
@@ -87,7 +88,7 @@
                   :value="allBanned"
                   inactive-color="#E2E2E2"
                   :width="32"
-                  active-color="#fc5659"
+                  active-color="#fb3a32"
                   @change="toggleMutedAllStatus"
                 />
               </div>
@@ -114,7 +115,7 @@
         @needLogin="handleLogin"
         @clearUploadImg="clearUploadImg"
         @getUploadImg="updateImgUrls"
-        @inputHeightChange="chatInputHeightChangeHandle"
+        @chatTextareaHeightChange="chatTextareaHeightChange"
       ></chat-input>
     </div>
   </div>
@@ -222,6 +223,10 @@
     },
     mounted() {},
     methods: {
+      //隐藏设置弹窗
+      hidechatOptions() {
+        this.isFilterShow = false;
+      },
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         this.$emit('changeAllBanned', val);
@@ -230,9 +235,9 @@
       joinChatAuth() {
         let url = '';
         if (location.search === '') {
-          url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}`].join('');
+          url = [this.chatFilterUrl, `/lives/authchat/${this.webinarId}`].join('');
         } else {
-          url = [this.chatFilterUrl, `/lives/chat-auth/${this.webinarId}${location.search}`].join(
+          url = [this.chatFilterUrl, `/lives/authchat/${this.webinarId}${location.search}`].join(
             ''
           );
         }
@@ -301,7 +306,7 @@
         }
       },
       //响应输入框高度变化事件
-      chatInputHeightChangeHandle() {
+      chatTextareaHeightChange() {
         this.$emit('updateHeight', this.$refs.chatOperateContainer.offsetHeight);
       },
       //更新滚动区域高度
@@ -350,7 +355,7 @@
         margin-left: 10px;
         margin-bottom: 1px;
         &:hover {
-          color: @active-color;
+          color: #ccc;
           cursor: pointer;
         }
       }
@@ -369,7 +374,7 @@
           color: #999;
           cursor: pointer;
           &:hover {
-            color: @active-color;
+            color: @font-error;
             cursor: pointer;
           }
         }
@@ -445,7 +450,7 @@
         left: 0;
       }
       &__chat-filter-wrap {
-        width: 120px;
+        // width: 120px;
         height: 80px;
         padding: 4px 0;
         background-color: #383838;

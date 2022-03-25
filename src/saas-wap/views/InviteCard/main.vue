@@ -2,7 +2,7 @@
   <div class="inviteWrap">
     <invitation-Card @changeInvite="changeInvite"></invitation-Card>
     <div @click="toWebinar" class="webinarEntrance">
-      <p class="btnVal">进入活动</p>
+      <p class="btnVal">{{ $t('webinar.webinar_1015') }}</p>
     </div>
   </div>
 </template>
@@ -17,6 +17,13 @@
       return {
         invite: ''
       };
+    },
+    created() {
+      if (this.$route.query.lang) {
+        this.$i18n.locale = parseInt(this.$route.query.lang) == 1 ? 'zh' : 'en';
+      } else {
+        this.$i18n.locale = 'zh';
+      }
     },
     methods: {
       toWebinar() {

@@ -76,7 +76,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -141,7 +141,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -170,7 +170,7 @@
                         placement="top-start"
                       >
                         <span class="answer-time" style="color: #666">
-                          {{ item.operator.nick_name | filterNickName }}
+                          {{ item.operator.nick_name | overHidden(8) }}
                         </span>
                       </el-tooltip>
                       <span
@@ -226,7 +226,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -259,7 +259,7 @@
                         :content="ite.nick_name"
                         placement="top-start"
                       >
-                        <span class="answer-time">{{ ite.nick_name | filterNickName }}</span>
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
                       </el-tooltip>
                       <span
                         v-if="
@@ -342,7 +342,7 @@
                       :content="item.nick_name"
                       placement="top-start"
                     >
-                      <span>{{ item.nick_name | filterNickName }}</span>
+                      <span>{{ item.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span>{{ item.created_at }}</span>
                   </p>
@@ -359,7 +359,7 @@
                       :content="item.operator.nick_name"
                       placement="top-start"
                     >
-                      <span class="ellsips">{{ item.operator.nick_name | filterNickName }}</span>
+                      <span class="ellsips">{{ item.operator.nick_name | overHidden(8) }}</span>
                     </el-tooltip>
                     <span
                       class="role-name"
@@ -433,11 +433,11 @@
           <i>1000</i>
         </span>
       </div>
-      <div slot="footer">
-        <el-button type="primary" @click="handlerAnswer('public')">
+      <div class="footer">
+        <el-button type="primary" round @click="handlerAnswer('public')">
           {{ $t('chat.chat_1089') }}
         </el-button>
-        <el-button @click="handlerAnswer('private')">{{ $t('chat.chat_1090') }}</el-button>
+        <el-button round @click="handlerAnswer('private')">{{ $t('chat.chat_1090') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -446,29 +446,12 @@
 <script>
   import { useRoomBaseServer, useQaAdminServer, Domain, useMsgServer } from 'middle-domain';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
-  import { getQueryString } from './utils';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-  import { debounce } from '@/packages/app-shared/utils/tool';
+  import { debounce, getQueryString } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpQaAdmin',
     components: {
       PrivateChat
-    },
-    filters: {
-      filterNickName(val) {
-        if (val.length > 8) {
-          return val.substring(0, 8) + '...';
-        } else {
-          return val;
-        }
-      },
-      filterChatCount: function (num) {
-        if (num > 9999) {
-          return 9999 + '+';
-        } else {
-          return num;
-        }
-      }
     },
     watch: {
       'sendMessage.text.length': {
@@ -574,12 +557,15 @@
     },
     async created() {
       this.webinar_id = this.$router.currentRoute.params.id;
-
+      const { liveT = '' } = this.$route.query;
       if (location.search.includes('assistant_token=')) {
         sessionStorage.setItem('vhall_client_token', getQueryString('assistant_token') || '');
       }
       await new Domain({
         plugins: ['chat'],
+        requestBody: {
+          live_token: liveT
+        },
         isNotInitRoom: true
       });
       const watchInitData = await this.qaServer
@@ -736,8 +722,10 @@
             this.$nextTick(() => {
               this.$refs.privateChat.addChatItem({
                 type: 1,
-                id: item.user_id,
-                chat_name: item.nick_name
+                id: item.join_id,
+                account_id: item.account_id,
+                chat_name: item.nick_name,
+                avatar: item.avatar
               });
             });
           } else {
@@ -813,7 +801,7 @@
           })
           .join(' ');
       },
-      textReply: debounce(function () {
+      textReply() {
         if (this.sendMessage.text.trim() == '') {
           return this.$message.warning('请输入回复内容!');
         }
@@ -828,11 +816,14 @@
           .then(res => {
             if (res.code == 200) {
               if (this.activeIndex == 2) {
-                this.setReply(0);
+                //发送回复后延时调用拉取列表接口，防止后端入库未完成，列表未更新
+                setTimeout(() => {
+                  this.setReply(0);
+                }, 1000);
               }
             }
           });
-      }, 300)
+      }
     }
   };
 </script>
@@ -1347,7 +1338,7 @@
       color: #333;
     }
     .el-radio__input.is-checked + .el-radio__label {
-      color: #fc5659;
+      color: #fb3a32;
     }
 
     .exact-search {
@@ -1392,20 +1383,31 @@
     // 问答管理 回复
     .text-reply {
       .el-radio__input.is-checked .el-radio__inner {
-        border-color: #fc5659;
-        background: #fc5659;
+        border-color: #fb3a32;
+        background: #fb3a32;
       }
       width: 500px !important;
-      height: 356px !important;
+      .footer {
+        padding-top: 20px;
+        text-align: right;
+      }
+      // height: 356px !important;
       .el-message-box__header {
         padding: 0;
       }
-
+      .el-dialog__header {
+        padding: 24px 32px;
+      }
       .el-dialog__body {
         padding-top: 0px;
         .el-textarea__inner {
           height: 196px;
           color: #1a1a1a;
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+        .el-button + .el-button {
+          margin-left: 16px;
         }
       }
       .send-left {

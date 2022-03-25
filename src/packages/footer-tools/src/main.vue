@@ -9,7 +9,7 @@
         <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__leftt-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div class="vmp-footer-tools__left-hot" v-if="roomBaseState.watchInitData.pv.show">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
@@ -32,20 +32,17 @@
         </el-dropdown>
       </div>
     </div>
-    <!-- <div class="vmp-footer-tools__right">
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
-    </div> -->
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center" v-if="device_status === 1 && !isBanned && isInteractLive">
-      <handup></handup>
+    <div class="vmp-footer-tools__center">
+      <handup class=""></handup>
     </div>
     <!-- 互动工具 -->
     <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
       <li v-if="isLiving">
-        <!-- 公告 -->
-        <notice></notice>
+        <!-- 公告 直播显示公告 -->
+        <notice ref="notice"></notice>
       </li>
-      <li v-if="1">
+      <li v-if="isLiving">
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
@@ -56,6 +53,7 @@
       <li>
         <!-- 问卷-->
         <questionnaire-icon @clickIcon="checkQuestionIcon" />
+        <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
       <li>
         <!-- 签到 -->
@@ -64,9 +62,11 @@
       <li v-if="isLiving">
         <!-- 抽奖 -->
         <lottery-icon @clickIcon="checkLotteryIcon" />
+        <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
       <li>
         <red-packet-icon @clickIcon="checkredPacketIcon" />
+        <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
       </li>
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
@@ -116,7 +116,7 @@
     useChatServer,
     useGroupServer
   } from 'middle-domain';
-  import handup from './handup.vue';
+  import handup from './component/handup/index.vue';
   import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
@@ -156,19 +156,11 @@
         languageList: []
       };
     },
-    filters: {
-      formatHotNum(value) {
-        value = parseInt(value);
-        let unit = '';
-        const k = 99999;
-        const sizes = ['', '万', '亿', '万亿'];
-        let i;
-        if (value > k) {
-          i = Math.floor(Math.log(value) / Math.log(k));
-          value = (value / Math.pow(k / 10, i)).toFixed(1);
-          unit = sizes[i];
+    watch: {
+      isInGroup(val) {
+        if (val) {
+          this.roomBaseServer.state.timerInfo = {};
         }
-        return value + unit;
       }
     },
     computed: {
@@ -269,7 +261,7 @@
           this.showGiftCount++;
         }
         // TODO:是否需要处理
-        this.$refs.notice && (this.$refs.notice.isShowNotice = false);
+        this.$refs.notice && this.$refs.notice.closeNoticeList();
       },
       // 打开打赏弹框
       onClickReward() {
@@ -290,7 +282,21 @@
       },
       changeLang(key) {
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       needLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));

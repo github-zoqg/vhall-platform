@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { initGlobalAPI, i18n } from './core';
 import domainStore from './domain';
+import '@/packages/app-shared/filters/index';
 
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 // 导入样式及皮肤
@@ -16,7 +17,7 @@ import * as Sentry from '@sentry/vue';
 import { Integrations } from '@sentry/tracing';
 
 // code码相关翻译方法 老代码
-Vue.prototype.$tes = function (path) {
+Vue.prototype.$tec = function (path) {
   return this.$te(path) ? this.$t(path) : undefined;
 };
 try {

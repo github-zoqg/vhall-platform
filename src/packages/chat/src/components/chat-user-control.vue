@@ -20,11 +20,11 @@
         <i></i>
         <span>删除</span>
       </div>
-      <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="setBanned" v-if="godMode && !isInGroup">
         <i></i>
         <span>{{ userStatus.is_banned ? '取消禁言' : '禁言' }}</span>
       </div>
-      <div class="vmp-chat-user-control__item" @click="setKicked" v-if="godMode">
+      <div class="vmp-chat-user-control__item" @click="setKicked" v-if="godMode && !isInGroup">
         <i></i>
         <span>{{ userStatus.is_kicked ? '取消踢出' : '踢出' }}</span>
       </div>
@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
-  import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
 
   export default {
     mixins: [dataReportMixin],
@@ -71,35 +71,39 @@
     beforeCreate() {
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.groupServer = useGroupServer();
+    },
+    computed: {
+      // 是否在小组中
+      isInGroup() {
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      }
     },
     created() {
       this.assistantType = this.$route.query.assistantType;
     },
     mounted() {
       //todo 待改为信令
-      EventBus.$on(
-        'set_person_status_in_chat',
-        async (el, accountId, count, nickname, msgroleName) => {
-          const roleName = this.roomBaseServer.state.watchInitData.join_info.role_name;
-          if (accountId == this.userId) return; // 不能点击自己
-          if (((roleName == 3 || roleName == 4) && msgroleName == 2) || roleName == 1) {
-            this.accountId = accountId;
-            this.count = count;
-            const boundedList = await this.getUserStatus();
-            this.userStatus.is_banned = boundedList[0].data.list.some(user => {
-              return user.account_id == accountId;
-            });
-            this.userStatus.is_kicked = boundedList[1].data.list.some(user => {
-              return user.account_id == accountId;
-            });
-            this.isShow = true;
-            this.godMode = roleName == 1;
-            this.calculate(el);
-            this.nickname = nickname;
-            this.roleName = roleName;
-          }
+      EventBus.$on('set_person_status_in_chat', async (el, accountId, count, nickname) => {
+        const roleName = this.roomBaseServer.state.watchInitData.join_info.role_name;
+        if (accountId == this.userId) return; // 不能点击自己
+        if (roleName == 3 || roleName == 4 || roleName == 1) {
+          this.accountId = accountId;
+          this.count = count;
+          const boundedList = await this.getUserStatus();
+          this.userStatus.is_banned = boundedList[0].data.list.some(user => {
+            return user.account_id == accountId;
+          });
+          this.userStatus.is_kicked = boundedList[1].data.list.some(user => {
+            return user.account_id == accountId;
+          });
+          this.isShow = true;
+          this.godMode = [1, '1', 3, '3', 4, '4'].includes(roleName);
+          this.calculate(el);
+          this.nickname = nickname;
+          this.roleName = roleName;
         }
-      );
+      });
       //todo 待改为信令
       // 监听客户端踢出操作
       EventBus.$on('assistantKickoutCallback', msg => {
@@ -263,7 +267,7 @@
         }
         &:hover {
           color: #ffffff;
-          background-color: #fc5659;
+          background-color: #fb3a32;
         }
       }
     }

@@ -61,11 +61,11 @@
         this.popAlertCheckVisible = false;
         this.$emit('show');
       },
-      popAlertCheckClose() {
+      async popAlertCheckClose() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110005);
         this.popAlertCheckVisible = false;
-        this.$nextTick(() => {
-          this.popAlertCheckConfirmVisible = true;
-        });
+        await this.$nextTick();
+        this.popAlertCheckConfirmVisible = true;
       },
       popAlertCheckConfirm() {
         this.popAlertCheckConfirmVisible = false;

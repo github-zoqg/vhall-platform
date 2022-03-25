@@ -9,15 +9,17 @@
           :data-key="'count'"
           :data-sources="privateChatList"
           :data-component="msgItem"
-          :extra-props="{}"
+          :extra-props="{
+            userId: userId
+          }"
           @tobottom="tobottom"
         ></virtual-list>
       </div>
     </div>
     <send-box
       currentTab="private"
-      :is-banned="isMuted"
-      :is-all-banned="isAllMuted"
+      :isAllBanned="allBanned"
+      :isBanned="isBanned"
       @sendPrivate="sendMsg"
     ></send-box>
   </div>
@@ -51,10 +53,8 @@
         userId: '',
         //房间id
         roomId: '',
-        //私聊消息发送人
-        privateSendId: '',
-        //私聊消息主体
-        privateMsg: {}
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
     computed: {
@@ -71,18 +71,7 @@
         return this.userServer.state.userInfo;
       }
     },
-    watch: {
-      privateMsg: {
-        handler(val) {
-          console.log('收到私聊消息', val);
-          if (val && val.data) {
-            this.handleMsg(val);
-          }
-        },
-        deep: true,
-        immediate: true
-      }
-    },
+    watch: {},
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.msgServer = useMsgServer();
@@ -107,11 +96,19 @@
           this.unReadMessageCount++;
           this.dispatch('TabContent', 'noticeHint', 'private');
         });
+        //监听禁言通知
+        this.chatServer.$on('banned', res => {
+          this.isBanned = res;
+        });
+        //监听全体禁言通知
+        this.chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+        });
       },
       //发送消息
       sendMsg(value) {
         const curmsg = useChatServer().createCurMsg();
-        const target = useRoomBaseServer().state.watchInitData.webinar.userinfo.user_id;
+        const target = useChatServer().state.curPrivateTargetId;
         curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(value);
@@ -131,6 +128,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
+          console.log(this.$refs.chatlist.scrollToBottom);
           this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
@@ -155,10 +153,13 @@
 <style lang="less">
   .vmp-wap-private-chat {
     height: 100%;
-    .vmp-private-chat__content {
+    .vmp-wap-private-chat__wrapper {
       height: 100%;
-      overflow-y: scroll;
-      touch-action: pan-y;
+      .vmp-private-chat__content {
+        height: calc(100% - 1.6rem);
+        overflow-y: scroll;
+        touch-action: pan-y;
+      }
     }
   }
 </style>

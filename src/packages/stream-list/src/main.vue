@@ -1,15 +1,13 @@
 <template>
-  <!-- <div
-    class="vmp-stream-list-wrapper"
-    ref="noDelayStreamContainer"
+  <div
+    class="vmp-stream-list"
     :class="{
+      'vmp-stream-list-h0': isStreamListH0 && !isUseNoDelayLayout,
       'no-delay-layout': isUseNoDelayLayout,
       'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
-      'stream-length': remoteSpeakers.length > 1
+      'is-share-screen': isUseNoDelayLayout && isShareScreen
     }"
   >
-  </div> -->
-  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
     <!-- 左翻页 -->
     <span
       v-show="isShowControlArrow"
@@ -22,7 +20,9 @@
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
     <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
+        <!-- 本地流容器 -->
         <div
+          v-show="localSpeaker.accountId"
           class="vmp-stream-list__local-container"
           :class="{
             'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
@@ -37,9 +37,8 @@
           </div>
         </div>
 
-        <template
-          v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
-        >
+        <template v-if="isShowRemoteList">
+          <!-- 远端流列表 -->
           <div
             v-for="speaker in remoteSpeakers"
             :key="speaker.accountId"
@@ -56,9 +55,9 @@
           </div>
         </template>
 
-        <!-- 主持人进入小组后助理占位图 -->
+        <!-- 主持人进入小组后占位图 -->
         <div
-          v-if="mode == 6 && isHostInGroup && !isInGroup"
+          v-if="showGroupMask"
           class="vmp-stream-list__host-placeholder-in-group vmp-stream-list__main-screen"
           :class="{
             'vmp-dom__mini': miniElement == 'stream-list',
@@ -71,6 +70,7 @@
       </div>
     </div>
 
+    <!-- 右翻页 -->
     <span
       v-show="isShowControlArrow"
       class="vmp-stream-list__scroll-btn right-btn"
@@ -86,7 +86,8 @@
     useInteractiveServer,
     useRoomBaseServer,
     useMicServer,
-    useGroupServer
+    useGroupServer,
+    useDocServer
   } from 'middle-domain';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
@@ -98,13 +99,15 @@
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
-        // 主持人是否在小组内
-        isHostInGroup: !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group,
         streamInfo
       };
     },
 
     computed: {
+      // 主持人是否在小组内
+      isHostInGroup() {
+        return !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group;
+      },
       isInteractiveInited() {
         return this.$domainStore.state.interactiveServer.isInteractiveInited;
       },
@@ -124,6 +127,10 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
       localSpeaker() {
         return (
@@ -157,7 +164,7 @@
          *    2) 如果不存在本地流并且远端流不是主屏,高度不为 0,返回 false
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
-         *    高度不为 0,返回 false
+         *    高度不为 0,但是为无延迟旁路布局，返回true,否则返回 false
          * 4. 没有互动实例的时候高度为0
          */
         if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
@@ -176,12 +183,47 @@
             return false;
           }
         } else {
-          return false;
+          if (this.isUseNoDelayLayout) {
+            return true;
+          } else {
+            return false;
+          }
         }
+      },
+
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       // 互动无延迟 未上麦观众是否使用类似旁路布局
       isUseNoDelayLayout() {
-        return !this.localSpeaker.accountId && this.mode == 3;
+        return (
+          !this.localSpeaker.accountId &&
+          this.mode == 3 &&
+          this.isNoDelay == 1 &&
+          this.remoteSpeakers.length > 1
+        );
+      },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
+      // 小组协作中
+      showGroupMask() {
+        // 分组活动 + 自己不在小组 + 主持人不在小组 + 无主画面
+        return !this.isInGroup && this.isHostInGroup && this.mode == 6 && !this.isShowMainScreen;
+      },
+      // 直播状态 1直播
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      // 是否展示流列表
+      isShowRemoteList() {
+        return this.remoteSpeakers.length && this.liveStatus == 1;
       }
     },
     watch: {
@@ -191,8 +233,36 @@
         },
         immediate: true
       },
-      'remoteSpeakers.length'(newval) {
-        this.isShowControlArrow = newval * 142 > this.$refs.streamWrapper.clientWidth;
+
+      // 流列表宽度超过 streamWrapper 时显示 翻页按钮
+      'remoteSpeakers.length': {
+        handler() {
+          this.handleControlArrowShow();
+        },
+        immediate: true
+      },
+      // 监听是否有桌面共享，更改页面布局
+      isShareScreen: {
+        handler(newval) {
+          if (this.isUseNoDelayLayout) {
+            // 互动无延迟模仿旁路布局
+            if (newval) {
+              // 开启共享
+              if (useDocServer().state.switchStatus) {
+                useRoomBaseServer().setChangeElement('doc');
+                // 开启文档
+              } else {
+                useRoomBaseServer().setChangeElement('');
+              }
+            }
+          } else {
+            if (newval) {
+              // 开启共享
+              useRoomBaseServer().setChangeElement('stream-list');
+            }
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -206,11 +276,18 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
       // 监听自动上麦的异常code
-      useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        this.$message(e.msg);
-      });
+      /**
+       * useInteractiveServer().$on('SPEAKON_FAILED', e => {
+        if (
+          +e.code === 513025 ||
+          +this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2
+        ) {
+          return;
+        }
+        e.msg && this.$message.warning(e.msg);
+      });*/
       // 订阅流播放失败
-      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
         let videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {
@@ -218,18 +295,11 @@
           });
         this.interactiveServer.state.showPlayIcon = true;
       });
-
-      // 主持人进入退出小组 消息监听
-      this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-        if (msg.data.status == 'enter') {
-          this.isHostInGroup = true;
-        } else if (msg.data.status == 'quit') {
-          this.isHostInGroup = false;
-        }
-      });
     },
 
-    mounted() {},
+    mounted() {
+      this.computTop();
+    },
 
     methods: {
       exchange(compName) {
@@ -240,6 +310,9 @@
         });
       },
 
+      /**
+       * 左右翻页更改streamWrapper的scrollLeft值实现滚动
+       */
       scrollStream(direction) {
         const scrollLeft = this.$refs.streamWrapper.scrollLeft;
         if (direction === 'left') {
@@ -251,20 +324,32 @@
         }
       },
       /**
-       * 监听无延迟未上麦时，观众采用类似旁路布局的容器高度变化
+       * 计算streamList变动
        */
-      computeTop() {
+      computTop() {
         const MutationObserver =
           window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 
         const _this = this;
         const observer = new MutationObserver(function () {
-          console.log(
-            '监听到noDelayStreamContainer变动了',
-            _this.$refs.noDelayStreamContainer.clientHeight
-          );
+          console.log('监听到streamWrapper变动了', _this.$refs.streamWrapper.offsetWidth);
+
+          _this.handleControlArrowShow();
         });
-        observer.observe(this.$refs.noDelayStreamContainer, { childList: true, subtree: true });
+        observer.observe(this.$refs.streamWrapper, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+      },
+      /**
+       * 计算是否显示箭头
+       */
+      handleControlArrowShow() {
+        if (this.$refs.streamWrapper) {
+          this.isShowControlArrow =
+            this.remoteSpeakers.length * 142 > this.$refs.streamWrapper.clientWidth;
+        }
       }
     }
   };
@@ -289,6 +374,16 @@
         justify-content: center;
         min-width: 100%;
         flex: none;
+        .vmp-stream-list__main-screen {
+          .vmp-stream-local__bottom {
+            &-role {
+              padding: 0 6px;
+            }
+            &-nickname {
+              width: 80px;
+            }
+          }
+        }
       }
       &::-webkit-scrollbar {
         /*隐藏滚轮*/
@@ -298,7 +393,7 @@
 
     // 流列表高度为0
     &-h0 {
-      height: 0;
+      height: 0 !important;
       .vmp-stream-list__main-screen {
         top: 0;
       }
@@ -336,7 +431,7 @@
       display: flex;
       width: 100%;
       height: 100%;
-      background: #2d2d2d;
+      background: #000;
       flex-direction: column;
       color: #999;
       justify-content: center;
@@ -344,6 +439,9 @@
       i {
         display: block;
         font-size: 40px;
+      }
+      &.vmp-dom__mini {
+        height: 204px;
       }
     }
   }
@@ -395,63 +493,74 @@
     top: 0;
     width: 360px;
     z-index: 10;
+    .vmp-stream-local__bottom-role {
+      padding: 0 8px;
+    }
+    .vmp-stream-local__bottom-nickname {
+      width: 80px;
+    }
+    .vmp-stream-local__bottom-mic {
+      font-size: 14px;
+    }
+    .vmp-stream-local__bottom-signal {
+      margin-left: 10px;
+    }
   }
 
-  // .vmp-stream-list-wrapper {
-  //   &.no-delay-layout {
-  //     width: calc(100% - 380px);
-  //     position: absolute;
-  //     top: 0;
-  //     left: 0;
-  //     bottom: 56px;
+  .vmp-stream-list {
+    &.no-delay-layout {
+      width: calc(100% - 380px);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 56px;
+      height: auto;
 
-  //     &.vmp-dom__mini {
-  //       right: 0;
-  //       top: 0;
-  //       width: 360px;
-  //       z-index: 10;
-  //       left: auto;
-  //       height: 204px;
-  //       .vmp-stream-list {
-  //         height: 40px;
-  //       }
-  //       .vmp-stream-list__remote-container {
-  //         width: 72px;
-  //       }
-  //       .vmp-stream-list__main-screen {
-  //         width: 100%;
-  //         height: 164px;
-  //       }
-  //     }
-  //     .vmp-stream-list {
-  //       position: absolute;
-  //       left: 0;
-  //       bottom: 0;
-  //     }
-  //     .vmp-stream-list__main-screen {
-  //       bottom: 100%;
-  //       left: 0;
-  //       top: auto;
-  //       position: absolute;
-  //       width: 100%;
-  //       height: 100%;
-  //     }
-  //     &.stream-length {
-  //       .vmp-stream-list__main-screen {
-  //         bottom: 100%;
-  //         left: 0;
-  //         top: auto;
-  //         position: absolute;
-  //         width: 100%;
-  //         height: 484px;
-  //         @media screen and (max-width: 1366px) {
-  //           height: 350px;
-  //         }
-  //       }
-  //     }
-  //     .vmp-stream-list__stream-wrapper-scroll {
-  //       justify-content: flex-start;
-  //     }
-  //   }
-  // }
+      &.is-share-screen {
+        display: none;
+      }
+      .vmp-stream-list__main-screen {
+        bottom: 80px;
+        top: 0;
+        position: absolute;
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      .vmp-stream-list__stream-wrapper-scroll {
+        justify-content: normal;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        align-content: flex-end;
+      }
+      // 小屏样式
+      &.vmp-dom__mini {
+        right: 0;
+        top: 0;
+        width: 360px;
+        z-index: 10;
+        left: auto;
+        height: 204px;
+        .vmp-stream-list__remote-container {
+          width: 72px;
+          height: 40px;
+        }
+        .vmp-stream-local__bottom-role {
+          display: none;
+        }
+        .vmp-stream-list__main-screen {
+          bottom: 40px;
+        }
+        .vmp-stream-local__bottom {
+          padding: 0 10px;
+          height: 28px;
+          line-height: 28px;
+        }
+      }
+
+      .vmp-stream-list__remote-container-h {
+        padding-top: 0;
+      }
+    }
+  }
 </style>

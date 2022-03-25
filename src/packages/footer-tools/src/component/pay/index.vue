@@ -70,7 +70,7 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .pay-fee-wrap {
     width: 100%;
     height: 100%;
@@ -80,120 +80,120 @@
     top: 0px;
     left: 0px;
     z-index: 18;
-  }
-  .pay-fee {
-    width: 364px;
-    height: 380px;
-    background: #ffffff;
-    border-radius: 4px;
-    // position: absolute;
-    // top: 50%;
-    // left: 50%;
-    // transform: translate(-50%, -50%);
-    margin: 15vh auto;
-    box-sizing: border-box;
-    padding: 24px 32px 34px;
-    &__head {
-      width: 100%;
-      height: 24px;
-      clear: both;
-      line-height: 24px;
-      margin-bottom: 24px;
-      .close-auth {
-        float: right;
-        &:hover {
-          cursor: pointer;
-        }
-      }
-    }
-    &__qr {
-      width: 140px;
-      height: 140px;
+    .pay-fee {
+      width: 364px;
+      height: 380px;
+      background: #ffffff;
       border-radius: 4px;
-      border: 1px solid #e2e2e2;
+      // position: absolute;
+      // top: 50%;
+      // left: 50%;
+      // transform: translate(-50%, -50%);
+      margin: 15vh auto;
       box-sizing: border-box;
-      padding: 10px;
-      margin: 0px auto;
-      margin-bottom: 12px;
-
-      img {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-    }
-    &__tip {
-      display: inline-block;
-      width: 100%;
-      text-align: center;
-      margin-bottom: 30px;
-      line-height: 1;
-    }
-    &__select {
-      width: 100%;
-      line-height: 1;
-      .wx,
-      .zf {
+      padding: 24px 32px 34px;
+      &__head {
         width: 100%;
         height: 24px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
+        clear: both;
+        line-height: 24px;
         margin-bottom: 24px;
-        &:hover {
-          cursor: pointer;
+        .close-auth {
+          float: right;
+          &:hover {
+            cursor: pointer;
+          }
         }
       }
-      .wx-icon,
-      .zf-icon {
-        display: inline-block;
-        width: 150px;
-      }
-      .circle {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 1px solid #999999;
-        border-radius: 9px;
-        top: 0;
-        right: 0;
-        background: none;
-        position: relative;
-      }
-      .choose {
-        background: #fb3a32;
-        text-align: center;
-        line-height: 16px;
-        position: relative;
-        border-color: #fb3a32;
-        &:after {
+      &__qr {
+        width: 140px;
+        height: 140px;
+        border-radius: 4px;
+        border: 1px solid #e2e2e2;
+        box-sizing: border-box;
+        padding: 10px;
+        margin: 0px auto;
+        margin-bottom: 12px;
+
+        img {
           display: block;
-          content: '';
-          width: 8px;
-          height: 8px;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          border-radius: 5px;
-          background: #fff;
+          width: 100%;
+          height: 100%;
         }
       }
-      .des {
+      &__tip {
         display: inline-block;
-        height: 24px;
-        vertical-align: top;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 30px;
+        line-height: 1;
       }
-      .pay-wx-icon {
-        margin-right: 8px;
-        color: #41b035;
-        font-size: 24px;
-      }
-      .pay-zf-icon {
-        margin-right: 8px;
-        color: #4ba6ec;
-        font-size: 24px;
+      &__select {
+        width: 100%;
+        line-height: 1;
+        .wx,
+        .zf {
+          width: 100%;
+          height: 24px;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-around;
+          align-items: center;
+          margin-bottom: 24px;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+        .wx-icon,
+        .zf-icon {
+          display: inline-block;
+          width: 150px;
+        }
+        .circle {
+          display: inline-block;
+          width: 16px;
+          height: 16px;
+          border: 1px solid #999999;
+          border-radius: 9px;
+          top: 0;
+          right: 0;
+          background: none;
+          position: relative;
+        }
+        .choose {
+          background: #fb3a32;
+          text-align: center;
+          line-height: 16px;
+          position: relative;
+          border-color: #fb3a32;
+          &:after {
+            display: block;
+            content: '';
+            width: 8px;
+            height: 8px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 5px;
+            background: #fff;
+          }
+        }
+        .des {
+          display: inline-block;
+          line-height: 24px;
+          vertical-align: top;
+        }
+        .pay-wx-icon {
+          margin-right: 8px;
+          color: #41b035;
+          font-size: 24px;
+        }
+        .pay-zf-icon {
+          margin-right: 8px;
+          color: #4ba6ec;
+          font-size: 24px;
+        }
       }
     }
   }

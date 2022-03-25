@@ -1,10 +1,12 @@
 <template>
   <div class="vmp-sign-live">
     <el-dialog title="签到" :visible.sync="signVisible" :close-on-click-modal="false" width="440px">
+      <!-- 签到信息 -->
       <signinSet v-if="showSet" @start="startSign"></signinSet>
     </el-dialog>
-    <div class="vmp-sign-live-down" v-if="signinDown">
-      <div class="vmp-sign-live-down-container">
+    <div class="vmp-sign-live_down" v-if="signinDown">
+      <div class="down-container">
+        <!-- 签到倒计时弹窗 -->
         <Counter
           @close-sign="closeAutoSignin"
           :autoSign="signInfo.autoSign"
@@ -14,13 +16,14 @@
           v-if="starting"
           ref="counter"
         ></Counter>
+        <!-- 签到结果 -->
         <signinResult
           v-if="showResult"
           @restartsign="resetSignState"
           :room_id="roomId"
           :signId="signId"
         ></signinResult>
-        <div class="vmp-sign-live-down-container-close" @click="signinDown = false">
+        <div class="vmp-sign-live_close" @click="signinDown = false">
           <i class="vh-iconfont vh-line-circle-close"></i>
         </div>
       </div>
@@ -40,16 +43,20 @@
       signinResult
     },
     computed: {
+      // 总时间
       total() {
         const { duration, autoSign, interval } = this.signInfo;
         return autoSign ? interval : duration;
       },
+      // 签到现在的剩余的时间
       starting() {
         return this.signInfo !== null && !!this.remaining;
       },
+      // 签到信息是否显示
       showSet() {
         return this.signInfo === null;
       },
+      // 签到结果
       showResult() {
         return this.signInfo !== null && !this.remaining && !this.signInfo.autoSign;
       },
@@ -73,6 +80,7 @@
       this.signServer = useSignServer();
     },
     mounted() {
+      // 签到推送
       this.signServer.$on('sign_in_push', e => {
         const data = {
           roleName: e.data.role_name,
@@ -86,7 +94,12 @@
         };
         useChatServer().addChatToList(data);
       });
+      // 签到关闭
       this.signServer.$on('sign_end', e => {
+        window.sessionStorage.removeItem('isAutoSign');
+        this.signInfo.autoSign = 0;
+        this.remaining = 0;
+        clearInterval(this.timer);
         const data = {
           roleName: e.data.role_name,
           nickname: e.data.sign_creator_nickname,
@@ -102,6 +115,7 @@
     },
     methods: {
       openSign() {
+        // 是否发起了签到
         this.getSignInfo();
       },
       getSignInfo() {
@@ -116,6 +130,7 @@
               this.nowSignObj = res.data;
               this.signInfo.autoSign = res.data.is_auto_sign == 1;
               if (res.data.is_auto_sign == 1) {
+                window.sessionStorage.setItem('isAutoSign', 'true');
                 this.remaining = res.data.auto_sign_time_ttl;
                 this.signInfo.interval = res.data.auto_sign_time;
                 this.totalTime = res.data.auto_sign_time;
@@ -128,16 +143,19 @@
             } else {
               this.signInfo = null;
               this.signVisible = true;
+              this.remaining = 0;
+              this.signinDown = false;
             }
           })
           .catch(res => {
             this.$message.error(res.msg);
           });
       },
+      // 倒计时
       setIntervalAction() {
         clearInterval(this.timer);
         this.timer = setInterval(() => {
-          if (--this.remaining <= 0) {
+          if (--this.remaining == 0) {
             if (sessionStorage.getItem('isAutoSign')) {
               this.remaining = this.totalTime;
               this.signVisible = false;
@@ -151,6 +169,7 @@
           clearInterval(this.timer);
         });
       },
+      // 开始签到按钮
       startSign(state) {
         const _data = {
           room_id: this.roomId,
@@ -165,6 +184,7 @@
               this.totalTime = state.interval;
               window.sessionStorage.setItem('isAutoSign', 'true');
             }
+            this.reportSign(state);
             this.signinDown = true;
             this.signVisible = false;
             this.signId = res.data.id;
@@ -177,6 +197,26 @@
           }
         });
       },
+      // 数据埋点
+      reportSign(state) {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110039);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(state.autoSign ? 110040 : 110041);
+        if (state.signTip != '主持人发起了签到') {
+          window.vhallReportForProduct && window.vhallReportForProduct.report(110042);
+        }
+        const duration = [10, 30, 60, 120, 180];
+        const index = duration.indexOf(state.duration);
+        const signType = [110043, 110044, 110045, 110046, 110047];
+        window.vhallReportForProduct && window.vhallReportForProduct.report(signType[index]);
+        if (state.autoSign) {
+          const interval = [60, 300, 900, 1800];
+          const indexs = interval.indexOf(state.interval);
+          const intervalType = [110048, 110049, 110050, 110051];
+          window.vhallReportForProduct && window.vhallReportForProduct.report(intervalType[indexs]);
+        }
+      },
+      // 结束签到
       endSignServe() {
         this.signServer
           .signClose({
@@ -195,18 +235,16 @@
             this.$message.error(err.msg);
           });
       },
-      // 设置状态
+      // 设置签到信息和状态
       setSignState(state) {
         this.signInfo = state.signInfo;
         this.remaining = state.remaining ? state.remaining : this.total;
       },
-      // 重置状态
+      // 开始签到时先判断是否已经存在签到
       resetSignState() {
-        this.signInfo = null;
-        this.remaining = 0;
-        this.signVisible = true;
-        this.signinDown = false;
+        this.getSignInfo();
       },
+      // 关闭签到
       closeAutoSignin(form) {
         if (form == 'client') {
           // 客户端走的方法
@@ -232,7 +270,7 @@
     .el-dialog__body {
       padding: 10px 32px 24px 32px;
     }
-    &-down {
+    &_down {
       position: fixed;
       top: 0;
       left: 0;
@@ -241,25 +279,25 @@
       height: 100%;
       display: flex;
       justify-content: center;
-      z-index: 28;
-      &-container {
+      z-index: 128;
+      .down-container {
         height: 469px;
         width: 400px;
         margin-top: 15vh;
         background-image: url('./img/signBox@2x.png');
         background-size: 100% 100%;
         position: relative;
-        &-close {
-          position: absolute;
-          left: 47%;
-          bottom: -18px;
-          cursor: pointer;
-          border-radius: 50%;
-          i {
-            font-size: 24px;
-            color: #fff;
-          }
-        }
+      }
+    }
+    &_close {
+      position: absolute;
+      left: 47%;
+      bottom: -18px;
+      cursor: pointer;
+      border-radius: 50%;
+      i {
+        font-size: 24px;
+        color: #fff;
       }
     }
   }

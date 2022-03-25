@@ -14,7 +14,7 @@
       return {};
     },
     computed: {
-      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
       webinarMode() {
         return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
@@ -114,6 +114,15 @@
       // 是否开启第三方推流
       isThirdStream() {
         this.resetMenus();
+      },
+      // 文档和白板切换是菜单变化
+      ['$domainStore.state.docServer.currentCid'](val) {
+        if (!val) return;
+        if (val.startsWith('document')) {
+          this.switchTo('document');
+        } else {
+          this.switchTo('board');
+        }
       }
     },
     methods: {
@@ -169,8 +178,15 @@
               }
             }
           } else if (vn.kind === 'desktopShare') {
+            if (this.role == 3) {
+              vn.setHiddenState(true);
+              continue;
+            }
             // 桌面共享菜单
-
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 如果自己是推送桌面共享
             if (this.isShareScreen && this.desktopShareInfo.accountId == this.userId) {
               vn.setDisableState(false);
@@ -195,9 +211,13 @@
                   vn.setDisableState(true);
                 }
               } else {
-                // 显示但禁用
-                vn.setHiddenState(false);
-                vn.setDisableState(true);
+                if (this.doc_permission == this.userId || this.presenterId == this.userId) {
+                  vn.setDisableState(false);
+                } else {
+                  // 显示但禁用
+                  vn.setHiddenState(false);
+                  vn.setDisableState(true);
+                }
               }
             } else if (this.role == 4) {
               if (this.doc_permission == this.userId) {
@@ -254,6 +274,11 @@
             } else {
               if (this.isInGroup) {
                 vn.setHiddenState(true);
+              } else if (
+                this.presenterId != this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id
+              ) {
+                vn.setHiddenState(false);
+                vn.setDisableState(true);
               } else {
                 vn.setHiddenState(false);
                 vn.setDisableState(false);
@@ -276,6 +301,21 @@
                 vn.setDisableState(true);
               }
             } else {
+              // 主持人不是主讲人、也不置灰
+              // if (this.role == 1 && this.doc_permission != this.userId) {
+              //   vn.setDisableState(true);
+              //   continue;
+              // }
+              // 如果问答权限没有，隐藏互动工具栏
+              if (this.role == 3 && this.webinarMode == 5 && !configList['ui.is_hide_qa_button']) {
+                vn.setHiddenState(true);
+                continue;
+              }
+              // 定时直播未开播时，互动工具置灰
+              if (this.role == 3 && this.webinarMode == 5 && this.webinarType == 2) {
+                vn.setDisableState(true);
+                continue;
+              }
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {
@@ -324,6 +364,7 @@
         }
       },
       goWatchShare() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110115);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShareClick'));
       }
     }

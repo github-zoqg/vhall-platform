@@ -125,6 +125,24 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 有剩余红包提示 -->
+    <el-dialog :visible.sync="residualDialogVisible" width="400px" title="提示">
+      <div class="had-envelope-wrap">
+        <p>
+          当前红包还未被领完，未被领取的金额则会在直播结束后自动进入您的账户，
+          <a href="/v3/finance/income" target="_blank" class="finance-link">
+            可在财务中心-账号收益-红包收益中提现
+          </a>
+        </p>
+        <p class="btnsbox">
+          <el-button @click="openSendForm" type="primary" round>继续发红包</el-button>
+          <el-button @click="residualDialogVisible = false" type="primary-white" round>
+            等等再发
+          </el-button>
+        </p>
+      </div>
+      <!-- </div> -->
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -139,6 +157,7 @@
         redPacketServerState,
         sendDialogVisible: false, // 发送红包的dialog界面
         qrCodeDialogVisible: false, // 微信支付和成功的弹窗
+        residualDialogVisible: false, // 有剩余红包的提示
         paySuccess: false,
         paying: false,
         wechatPayImg: '',
@@ -156,6 +175,9 @@
     computed: {
       onlineAmount() {
         return this.redPacketServerState.online;
+      },
+      role() {
+        return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info?.role_name;
       }
     },
     beforeCreate() {
@@ -164,18 +186,62 @@
       });
     },
     created() {
-      this.redPacketServer.$on(RED_ENVELOPE_OK, () => {
+      if (this.role === 1) {
+        this.initMsgEvent();
+      }
+    },
+    destroyed() {
+      if (this.role === 1) {
+        this.removeMsgEvent();
+      }
+    },
+    methods: {
+      initMsgEvent() {
+        this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleEedEnvelope);
+      },
+      removeMsgEvent() {
+        this.redPacketServer.$off(RED_ENVELOPE_OK, this.handleEedEnvelope);
+      },
+      handleEedEnvelope(msgData) {
         this.paySuccess = true;
         this.qrCodeDialogVisible = true;
         this.sendDialogVisible = false;
-      });
-    },
-    methods: {
-      open() {
-        this.channel === 'ALIPAY';
+        this.amount = `${msgData.red_packet_amount}`;
+      },
+      async open() {
+        const failure = res => {
+          console.error(res);
+          this.openSendForm();
+        };
+        const res = await this.redPacketServer.getLatestRedpacketUsage();
+        if (res.code !== 200) return failure(res);
+        const data = res.data;
+        if (parseInt(data.get_user_count) < parseInt(res.data.number) && data.status == 1) {
+          this.residualDialogVisible = true;
+          this.sendDialogVisible = false;
+          this.qrCodeDialogVisible = false;
+        } else {
+          this.openSendForm();
+        }
+      },
+      // 打开发起红包界面
+      openSendForm() {
+        this.residualDialogVisible = false;
         this.sendDialogVisible = true;
         this.qrCodeDialogVisible = false;
+        this.restForm();
+      },
+      // 发起红包页面表单参数重置
+      restForm() {
+        this.redcouponMaxNum = false;
+        this.redcouponMaxNumError = false;
+        this.redcouponType = 0;
+        this.inputAmount = '';
+        this.numbers = '';
+        this.channel === 'ALIPAY';
         this.paySuccess = false;
+        this.amount = '0.00';
+        this.describe = '多谢大家支持';
         this.redPacketServer.getOnline();
       },
       backPay() {
@@ -225,6 +291,7 @@
           .then(res => {
             this.paying = false;
             if (res.code === 200) {
+              this.reportRedPacket();
               if (this.channel === 'ALIPAY') {
                 window.open(res.data.pay_data);
               } else {
@@ -243,6 +310,13 @@
             this.$message.error(error.msg);
             console.log(error);
           });
+      },
+      reportRedPacket() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110054);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.redcouponType === 1 ? 110055 : 110056);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       changeType(val) {
         this.redcouponType = val;
@@ -363,6 +437,11 @@
   };
 </script>
 <style lang="less">
+  .red-packet {
+    .el-dialog__body {
+      padding: 0 30px;
+    }
+  }
   .pay-form {
     .el-radio {
       margin-right: 20px;
@@ -394,6 +473,11 @@
   .payment-dialog-wechat-qr {
     .el-dialog__body {
       padding-bottom: 20px;
+    }
+  }
+  .pay-box {
+    .el-radio__label {
+      margin-left: 8px;
     }
   }
 </style>
@@ -440,7 +524,8 @@
     .form-group {
       overflow: hidden;
       .label-left {
-        width: 60px;
+        width: 58px;
+        padding-right: 12px;
         float: left;
         display: block;
         color: #1a1a1a;
@@ -453,6 +538,7 @@
         line-height: 55px;
       }
       input {
+        box-sizing: border-box;
         display: block;
         line-height: 40px;
         height: 40px;
@@ -473,8 +559,6 @@
         margin-top: 7px;
       }
       .envelope-note {
-        box-sizing: border-box;
-        width: 310px;
         text-align: left;
         padding: 0 12px;
         margin-left: 5px;
@@ -484,7 +568,7 @@
     .envelope-tips {
       font-size: 14px;
       color: #999;
-      padding-left: 64px;
+      padding-left: 74px;
       text-align: left;
       .online {
         color: #fb3a32;
@@ -549,7 +633,7 @@
       height: 40px;
       line-height: 40px;
       font-size: 14px;
-      background: #fc5659;
+      background: #fb3a32;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -593,7 +677,7 @@
     .code-img {
       width: 140px;
       height: 140px;
-      margin: 20px auto 0;
+      margin: 20px auto 32px;
       border-radius: 4px;
       padding: 1px;
       border: 1px solid #e2e2e2;
@@ -635,6 +719,57 @@
             width: 160px;
           }
         }
+      }
+    }
+  }
+  .had-envelope-wrap {
+    .title {
+      background: #fff;
+      // height: 56px;
+      line-height: 56px;
+      color: #1a1a1a;
+      // border-bottom: 1px solid #dfdfdf;
+      text-align: center;
+      font-weight: 500;
+      font-size: 20px;
+      padding: 5px 32px;
+      position: relative;
+      span {
+        cursor: pointer;
+        position: absolute;
+        width: 24px;
+        height: 18px;
+        right: 24px;
+        top: 5px;
+      }
+    }
+    .finance-link {
+      color: #3562fa;
+      margin: 0 3px;
+      &:visited {
+        color: #3562fa;
+      }
+    }
+    .btnsbox {
+      padding: 24px 0;
+      text-align: right;
+      .btn-light-red {
+        background: #f34b46;
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        &:hover {
+          background: #c51f1d;
+          color: #fff;
+        }
+      }
+      .btn-cancel {
+        background-color: #eee;
+        height: 38px;
+        line-height: 38px;
+        border: 1px solid #e1e1e1;
+        width: 138px;
+        margin-left: 5px;
       }
     }
   }

@@ -136,6 +136,7 @@
             :select-menu-type="selectMenuType"
             :options="options"
             :list="currentList"
+            :operate-disable="enableChatAuth === 1"
             ref="authTable"
             @cancelMuted="handleCancelMuted"
             @cancelKicked="handleCancelKicked"
@@ -755,7 +756,7 @@
     @color-blue: #4b5afe;
     @color-blue-hover: #5d6afe;
     @color-bd: #e2e2e2;
-    @color-default-hover: #fc5659;
+    @color-default-hover: #fb3a32;
     @color-default-active: #fc5659;
     @color-blue-hover: #5d6afe;
     @color-blue: #4b5afe;
@@ -977,6 +978,16 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+    }
+    .el-button--danger {
+      &:focus,
+      &:hover {
+        background: #fb3a32;
+        border: 1px solid #fb3a32;
+      }
+      &.is-disabled {
+        background: #fb3a32;
+      }
     }
   }
 </style>

@@ -12,11 +12,7 @@
       </div>
       <!-- 文案 -->
       <h1>
-        {{
-          (redPacketInfo && redPacketInfo.describe
-            ? $t(redPacketInfo.describe) || $t('interact_tools.interact_tools_1032')
-            : $t('interact_tools.interact_tools_1032')) | splitLenStr(8)
-        }}
+        {{ $tdefault(redPacketInfo.describe) | overHidden(8) }}
       </h1>
       <img
         v-if="redPacketInfo && redPacketInfo.avatar"
@@ -27,7 +23,7 @@
       <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
       <p>
         {{
-          (redPacketInfo && redPacketInfo.nickname ? redPacketInfo.nickname : '') | splitLenStr(8)
+          (redPacketInfo && redPacketInfo.nickname ? redPacketInfo.nickname : '') | overHidden(8)
         }}
       </p>
     </div>
@@ -57,11 +53,6 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
       }
     },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
-    },
     methods: {
       openRedPacket() {
         // if (this.accepted) return;
@@ -71,14 +62,12 @@
         }
         const available = this.redPacketServer.state.available;
         if (available) {
-          this.redPacketServer.openRedPacket().then(res => {
-            if (res.code === 200) {
-              this.opened = true;
-              const st = setTimeout(() => {
-                clearTimeout(st);
-                this.$emit('navTo', 'RedPacketSuccess');
-              }, 1000);
-            }
+          this.redPacketServer.openRedPacket().fially(() => {
+            this.opened = true;
+            const st = setTimeout(() => {
+              clearTimeout(st);
+              this.$emit('navTo', 'RedPacketSuccess');
+            }, 1000);
           });
         } else {
           this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {

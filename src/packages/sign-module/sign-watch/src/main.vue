@@ -1,27 +1,23 @@
 <template>
   <div class="vmp-sign-watch">
-    <div v-show="isShowCircle" class="vmp-sign-watch-icon" @click="reShowSignBox">
+    <div v-show="isShowCircle" class="vmp-sign-watch_icon" @click="reShowSignBox">
       <i class="sign-circle"></i>
       <img src="./img/icon@2x.png" alt="" />
     </div>
     <div
       v-show="showSign"
-      class="vmp-sign-watch-sign"
+      class="vmp-sign-watch_sign"
       :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
     >
-      <div class="vmp-sign-watch-sign-container">
-        <div class="vmp-sign-watch-sign-content">
-          <p class="sign-title">{{ title }}</p>
-          <CountDown
-            :duration="duration"
-            :consume="sign_time"
-            class="vmp-sign-watch-sign-counter"
-          ></CountDown>
-          <el-button type="danger" class="sign-btn" @click="signLogin">
+      <div class="sign_container">
+        <div class="sign_content">
+          <p class="sign_title">{{ title }}</p>
+          <CountDown :duration="duration" :consume="sign_time" class="sign_counter"></CountDown>
+          <el-button type="danger" class="sign_btn" @click="signLogin">
             {{ $t('interact_tools.interact_tools_1026') }}
           </el-button>
         </div>
-        <div class="vmp-sign-watch-sign-close" @click="closeSign">
+        <div class="sign_close" @click="closeSign">
           <i class="vh-iconfont vh-line-circle-close"></i>
         </div>
       </div>
@@ -42,17 +38,6 @@
     components: {
       CountDown
     },
-    // watch: {
-    //   signInfo: {
-    //     handler(val) {
-    //       if (val && !val.is_signed && val.id) {
-    //         this.getHistorySignInfo();
-    //       }
-    //     },
-    //     immediate: true,
-    //     deep: true
-    //   }
-    // },
     data() {
       const zIndexServerState = this.zIndexServer.state;
       return {
@@ -73,15 +58,19 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     mounted() {
+      this.signServer.$off('sign_in_push');
+      this.signServer.$off('sign_end');
+      // 初始化有签到信息
       if (this.signInfo && !this.signInfo.is_signed && this.signInfo.id) {
         this.getHistorySignInfo();
       }
-      // // 结束讨论
+      //  结束讨论 / 踢出小组等
       this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
         if (!this.isInGroup && !this.signInfo.is_signed && this.signInfo.id) {
           this.getHistorySignInfo();
         }
       });
+      // 收到开始签到的消息
       this.signServer.$on('sign_in_push', e => {
         this.sign_id = e.data.sign_id;
         this.reShowSignBox();
@@ -102,6 +91,7 @@
         };
         useChatServer().addChatToList(data);
       });
+      // 收到结束签到的消息
       this.signServer.$on('sign_end', e => {
         this.showSign = false;
         this.isShowCircle = false;
@@ -111,7 +101,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+            text_content: `${this.$t('chat.chat_1028')}`
           },
           type: e.data.type,
           interactStatus: true
@@ -126,6 +116,7 @@
       roomId() {
         return this.roomBaseServer.state.watchInitData.interact.room_id;
       },
+      // 签到信息
       signInfo() {
         return this.roomBaseServer.state.signInfo;
       },
@@ -134,6 +125,7 @@
       }
     },
     methods: {
+      // 签到
       signLogin() {
         this.signServer
           .sign({
@@ -171,6 +163,7 @@
             });
           });
       },
+      // 关闭签到
       closeSign() {
         this.showSign = false;
         this.isShowCircle = true;
@@ -179,6 +172,7 @@
         this.zIndexServer.setDialogZIndex('signIn');
         this.showSign = true;
       },
+      // 获取签到信息
       getHistorySignInfo() {
         this.sign_id = this.signInfo.id;
         this.isShowCircle = true;
@@ -191,6 +185,7 @@
         this.duration = Number(this.signInfo.show_time);
         this.countDownTime();
       },
+      // 签到倒计时
       countDownTime() {
         this.timer = setInterval(() => {
           if (this.sign_time <= 1) {
@@ -207,7 +202,7 @@
 </script>
 <style lang="less">
   .vmp-sign-watch {
-    &-icon {
+    &_icon {
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -232,7 +227,7 @@
         object-fit: scale-down;
       }
     }
-    &-sign {
+    &_sign {
       position: fixed;
       top: 0;
       left: 0;
@@ -242,7 +237,7 @@
       display: flex;
       justify-content: center;
       z-index: 28;
-      &-container {
+      .sign_container {
         width: 399px;
         height: 464px;
         margin-top: 10vh;
@@ -250,20 +245,20 @@
         background-size: 100% 100%;
         position: relative;
       }
-      &-counter {
+      .sign_counter {
         margin: 0 auto;
       }
-      &-content {
+      .sign_content {
         text-align: center;
         padding-top: 180px;
         margin: 0 auto;
-        .sign-title {
+        .sign_title {
           font-size: 14px;
           color: @font-light-normal;
           line-height: 20px;
           margin-bottom: 20px;
         }
-        .sign-btn {
+        .sign_btn {
           width: 160px;
           font-size: 14px;
           color: #fff;
@@ -273,7 +268,7 @@
           border-radius: 20px;
         }
       }
-      &-close {
+      .sign_close {
         position: absolute;
         left: 47%;
         bottom: -35px;

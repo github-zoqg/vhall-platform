@@ -366,3 +366,22 @@ export const validEmail = (required, value, vueThis) => {
     return true;
   }
 };
+
+/**
+ * 数字转成带金钱单位的数值
+ * @param {*} value
+ * @returns
+ */
+export const formatHotNum = value => {
+  value = parseInt(value);
+  let unit = '';
+  const k = 99999;
+  const sizes = ['', '万', '亿', '万亿'];
+  let i;
+  if (value > k) {
+    i = Math.floor(Math.log(value) / Math.log(k));
+    value = (value / Math.pow(k / 10, i)).toFixed(1);
+    unit = sizes[i];
+  }
+  return value + unit;
+};

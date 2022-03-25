@@ -28,6 +28,13 @@
     async created() {
       await this.getGrayConfig();
       this.getFormOpenLinkStatus();
+      //多语言接口
+      this.roomBaseServer.getLangList(this.webinar_id);
+      if (localStorage.getItem('lang')) {
+        this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      } else {
+        this.$i18n.locale = 'zh';
+      }
     },
     methods: {
       getGrayConfig() {

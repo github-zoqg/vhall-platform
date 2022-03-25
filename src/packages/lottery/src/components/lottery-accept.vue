@@ -2,13 +2,12 @@
   <div class="lottery-winner-info" :class="{ big: stepHtmlList.length !== 3 }">
     <lottery-header :prizeInfo="prizeInfo" />
     <el-form ref="forms" class="winner-info-form">
-      <!-- <overlay-scrollbars ref="osComponentRef" :options="osComponentOptions"> -->
       <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
         <span v-if="item.is_required == 1" class="required-flag">*</span>
         <el-input
           v-if="item.field_key !== 'address'"
           v-model="reciveInfo[item.field_key]"
-          :placeholder="$t(item.placeholder)"
+          :placeholder="$tdefault(item.placeholder)"
           maxlength="200"
           @keyup.native.stop="foo()"
           @input.native="handleInput(item.field_key)"
@@ -17,14 +16,13 @@
           v-else
           id="address-textarea"
           v-model="reciveInfo[item.field_key]"
-          :placeholder="$t(item.placeholder)"
+          :placeholder="$tdefault(item.placeholder)"
           rows="2"
           class="address-textarea"
           maxlength="200"
           @keyup.stop="foo"
         ></textarea>
       </el-form-item>
-      <!-- </overlay-scrollbars> -->
     </el-form>
     <p class="winner-info-tip">{{ $t('interact_tools.interact_tools_1018') }}</p>
     <div class="winner-info__submit-btn" @click="postWinnerInfo">
@@ -84,12 +82,12 @@
         retReciveInfo[element.field_key] = '';
       });
       this.reciveInfo = retReciveInfo;
-      await this.$nextTick();
+      // await this.$nextTick();
       // this.overlayScrollbarInit();
     },
-    mounted() {
-      // 滚动条初始化
-    },
+    // mounted() {
+    //   // 滚动条初始化
+    // },
     methods: {
       async initStepHtmlList() {
         await this.lotteryServer.getDrawPrizeInfo().then(res => {
@@ -223,11 +221,6 @@
     .winner-info-form {
       max-height: 194px;
       overflow: auto;
-      // &::-webkit-scrollbar {
-      //   /*滚动条整体样式*/
-      //   width: 3px; /*高宽分别对应横竖滚动条的尺寸*/
-      //   background-color: #c5c5c5 !important;
-      // }
       .el-form-item__content {
         line-height: 0;
       }
@@ -257,7 +250,7 @@
         }
       }
       .address-textarea {
-        width: 230px;
+        width: 235px;
         height: 44px;
         line-height: 20px;
         background: rgba(254, 239, 228, 0.9);

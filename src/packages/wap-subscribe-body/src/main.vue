@@ -41,9 +41,12 @@
         </template>
       </template>
     </div>
-    <template v-if="showBottomBtn">
+    <template v-if="showBottomBtn && subOption.hide_subscribe">
       <div class="vmp-subscribe-body-auth">
-        <div class="vmp-subscribe-body-auth-two" v-if="subOption.verify == 6">
+        <div
+          class="vmp-subscribe-body-auth-two"
+          v-if="subOption.verify == 6 && !subOption.is_subscribe"
+        >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
@@ -171,7 +174,7 @@
           if (this.countDowntimer) clearInterval(this.countDowntimer);
           this.countDownTime = '';
           this.popupLivingStart = true;
-          this.subscribeText = this.$t('webinar.webinar_1020');
+          this.subscribeText = this.$t('player.player_1013');
         });
 
         this.subscribeServer.$on('pay_success', data => {
@@ -181,9 +184,9 @@
           }
         });
 
-        this.subscribeServer.$on('live_over', data => {
+        this.subscribeServer.$on('live_over', () => {
           this.subOption.type = 3;
-          console.log(data);
+          this.subscribeText = this.$t('player.player_1017');
         });
       },
       handlerInitInfo() {
@@ -197,10 +200,24 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        if (webinar.type == 1 && join_info.is_subscribe == 1) {
-          this.subscribeText = this.$t('webinar.webinar_1023');
+        if (webinar.type == 2) {
+          if (join_info.is_subscribe == 1) {
+            this.subscribeText = this.$t('appointment.appointment_1006');
+          } else {
+            if (webinar.verify == 3) {
+              this.subscribeText = this.$t('webinar.webinar_1040', {
+                n: `￥${this.subOption.fee}`
+              });
+            } else {
+              this.subscribeText = this.$t('appointment.appointment_1017');
+            }
+          }
         } else {
-          this.filterText(webinar.verify, join_info.is_subscribe);
+          if (webinar.verify == 3) {
+            this.subscribeText = this.$t('webinar.webinar_1041', { n: `￥${this.subOption.fee}` });
+          } else {
+            this.subscribeText = this.$t('player.player_1013');
+          }
         }
         if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
           this.showVideo = true;
@@ -312,7 +329,7 @@
             this.handlePay(params);
             break;
           default:
-            this.$toast(this.$tes(code) || msg);
+            this.$toast(this.$tec(code) || msg);
             break;
         }
       },
@@ -382,7 +399,7 @@
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
             window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
           } else {
-            this.$toast(this.$tes(res.code) || res.msg);
+            this.$toast(this.$tec(res.code) || res.msg);
           }
         });
       },
@@ -395,7 +412,21 @@
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       filterText(verify, status) {
         switch (verify) {
@@ -585,7 +616,7 @@
       font-weight: 500;
       color: #fff;
       line-height: 1.333333rem;
-      background: #fc5659;
+      background: #fb3a32;
       text-align: center;
       margin-bottom: env(safe-area-inset-bottom);
       div {
@@ -623,7 +654,7 @@
       }
       .van-dialog__confirm {
         font-size: 36px;
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
     &-popup {

@@ -36,7 +36,8 @@
     created() {
       this.useUserServer = useUserServer();
     },
-    mounted() {
+    async mounted() {
+      // await this.useUserServer.initNECaptcha('#captchaDom');
       this.init();
     },
     beforeDestroy() {
@@ -46,17 +47,15 @@
       // 初始化易盾
       async init() {
         const that = this;
-        const captchaId = await this.useUserServer.getCaptchaId();
+        // const captchaId = await this.useUserServer.getCaptchaId();
+        const captchaId = this.captchaId;
         const NECaptchaOpts = {
           captchaId,
           element: '#captchaDom',
           mode: 'float',
           width: 270,
           // FIXME: 网易易顿多语言字段 lang 需要翻译(暂时写死)
-          lang:
-            (window.$globalConfig.currentLang == 'zh'
-              ? 'zh-CN'
-              : window.$globalConfig.currentLang) || 'zh-CN',
+          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady(instance) {
             console.log('🚀 ~ initNECaptcha onReady ', instance);
             that.capInstance = instance;

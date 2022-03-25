@@ -70,7 +70,7 @@
         >
           <i
             class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
-            style="color: #fc5659; font-size: 15px"
+            style="color: #fb3a32; font-size: 15px"
           ></i>
         </template>
         <!--同意上麦-->
@@ -90,10 +90,7 @@
             [2, '2'].includes(userInfo.device_status)
           "
         >
-          <i
-            style="color: #fc5659; font-size: 15px; vertical-align: middle"
-            class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"
-          ></i>
+          <i class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"></i>
         </template>
         <template v-if="tabIndex === 1">
           <!--我要演示-->
@@ -365,9 +362,7 @@
         }
       }
     },
-    mounted() {
-      console.log(this.currentSpeakerId, '当前主讲人的id');
-    },
+    mounted() {},
     data() {
       return {
         //默认头像
@@ -383,6 +378,14 @@
             text: '设为主讲',
             sequence: 1
           },
+          //邀请演示（全部人员里展示）
+          {
+            command: 'inviteMic',
+            isShow: 'isShowInvitation',
+            disable: 'isLiveInviteDisable',
+            text: '邀请演示',
+            sequence: 2
+          },
           //设置禁言/取消禁言
           {
             command: 'setBanned',
@@ -391,7 +394,7 @@
             //注意，这里只是为了进行初始赋值，实际动态切换文案是在计算属性中
             text: ![0, '0'].includes(this.userInfo.is_banned) ? '取消禁言' : '聊天禁言',
             type: 'toggleButton',
-            sequence: 2
+            sequence: 3
           },
           //踢出 / 取消踢出
           {
@@ -400,7 +403,7 @@
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出活动',
             type: 'toggleButton',
-            sequence: 3
+            sequence: 4
           },
           {
             command: 'setKicked',
@@ -408,14 +411,6 @@
             disable: false,
             text: this.userInfo.is_kicked ? '取消踢出' : '踢出小组',
             type: 'toggleButton',
-            sequence: 4
-          },
-          //邀请演示（全部人员里展示）
-          {
-            command: 'inviteMic',
-            isShow: 'isShowInvitation',
-            disable: 'isLiveInviteDisable',
-            text: '邀请演示',
             sequence: 5
           },
           //升为组长 （全部人员下展示）
@@ -543,7 +538,7 @@
       //PC观看端设为组长
       isShowWatchSetLeader() {
         return (
-          this.tabIndex !== 3 &&
+          this.tabIndex === 1 &&
           [2, '2'].includes(this.userInfo.role_name) &&
           [2, '2'].includes(this.userInfo.device_type) &&
           [0, '0'].includes(this.userInfo.is_banned) &&
@@ -582,7 +577,7 @@
       },
       //是否显示邀请演示操作选项(PC观看)
       isShowWatchInvitation() {
-        if ([1, 2].includes(this.tabIndex)) {
+        if (this.tabIndex === 1) {
           return (
             this.isInteract &&
             [2, '2'].includes(this.userInfo.device_type) &&
@@ -808,13 +803,12 @@
   .vmp-member-item {
     position: relative;
     color: #999999;
-    height: 44px;
-    line-height: 44px;
-    padding: 8px 10px 8px 14px;
+    line-height: 48px;
+    padding: 0 10px 0 14px;
     font-size: 12px;
-    box-sizing: content-box;
+    overflow-x: hidden;
     &:hover {
-      background-color: #2d2d2d;
+      background-color: #333;
       .vmp-member-item__control {
         &__more {
           opacity: 1;
@@ -851,7 +845,7 @@
       vertical-align: middle;
       padding: 0 4px;
       font-size: 10px;
-      border-radius: 10px;
+      border-radius: 8px;
       &.host {
         background-color: rgba(252, 86, 89, 0.15);
         color: #fb3a32;
@@ -861,8 +855,8 @@
         color: #a6a6a6;
       }
       &.guest {
-        background-color: rgba(77, 161, 255, 0.15);
-        color: #4da1ff;
+        background: rgba(10, 127, 245, 0.2);
+        color: #0a7ff5;
       }
       &.leadercol {
         background-color: rgba(77, 161, 255, 0.15);
@@ -877,6 +871,12 @@
         vertical-align: middle;
         margin-right: 6px;
       }
+      &__device-abnormal {
+        color: #fb3a32;
+        font-size: 15px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
       &__up-mic,
       &__down-mic {
         display: inline-block;
@@ -884,6 +884,7 @@
         height: 16px;
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
+        margin-right: 6px;
         color: #dddddd;
         text-align: center;
         vertical-align: middle;
@@ -903,6 +904,7 @@
         height: 13px;
         vertical-align: middle;
         margin-left: 3px;
+        padding: 2px 4px;
         color: #cccccc;
         font-size: 12px;
         opacity: 0;
@@ -957,7 +959,7 @@
     right: 8px;
     z-index: 2;
     width: 96px;
-    background-color: #fff !important;
+    background: #383838 !important;
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
     box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
@@ -966,16 +968,19 @@
     box-sizing: border-box;
     cursor: pointer;
 
+    .popper__arrow {
+      display: none;
+    }
     .el-dropdown-menu__item {
       height: 28px;
-      color: #666;
+      color: #ccc;
       text-align: center;
       line-height: 28px;
       padding: 0;
       margin: 3px 0;
       &:hover {
-        background-color: #fc5659;
-        color: #fff;
+        background-color: #444;
+        color: #e6e6e6;
       }
     }
     .is-disabled {

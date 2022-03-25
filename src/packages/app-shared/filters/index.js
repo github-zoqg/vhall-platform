@@ -1,6 +1,9 @@
 import Vue from 'vue';
-
-Vue.filter('isEmpty', function (value, replaceStr) {
+import moment from 'moment';
+/**
+ * 原知客用到
+ */
+Vue.filter('isEmpty', (value, replaceStr) => {
   replaceStr = replaceStr || '--';
   return value || replaceStr;
 });
@@ -20,7 +23,10 @@ Vue.filter('chatTime', value => {
   return value.substring(0, 16);
 });
 
-Vue.filter('overHidden', function (value = '', len = 0) {
+/**
+ * 字符串截取,超出点点点
+ */
+Vue.filter('overHidden', (value = '', len = 0) => {
   if (value === null || value === undefined) return '';
   if (value.length > len) {
     return value.substring(0, len) + '...';
@@ -66,6 +72,9 @@ Vue.filter('fmtDeposit', deposit => {
   }
 });
 
+/**
+ * 时间过滤器
+ */
 Vue.filter('fmtTimeByExp', (time, exp) => {
   let date = null;
   let relt = '-';
@@ -103,4 +112,83 @@ Vue.filter('fmtTimeByExp', (time, exp) => {
       break;
   }
   return relt;
+});
+
+// 热度、在线人数过滤器
+Vue.filter('formatHotNum', value => {
+  value = parseInt(value);
+  let unit = '';
+  const k = 99999;
+  const sizes = [
+    '',
+    window.i18n.t('common.common_1014'),
+    window.i18n.t('common.common_1015'),
+    window.i18n.t('common.common_1016')
+  ];
+  // const sizes = ['', '万', '亿', '万亿'];
+  let i;
+  if (value > k) {
+    i = Math.floor(Math.log(value) / Math.log(k));
+    value = (value / Math.pow(k / 10, i)).toFixed(1);
+    unit = sizes[i];
+  }
+  return value + unit;
+});
+
+// 邀请榜人数
+Vue.filter('filterInvitePeople', val => {
+  const num = Number(val);
+  if (num > 10000) {
+    return (num / 10000).toFixed(2) + window.i18n.t('common.common_1014');
+  }
+  return parseInt(num);
+});
+
+// 打赏金额
+Vue.filter('filterAmount', val => {
+  const num = Number(val);
+  if (num > 10000) {
+    return (num / 10000).toFixed(2) + window.i18n.t('common.common_1014');
+  }
+  return num.toFixed(2);
+});
+
+// 播放器回放时间转化
+Vue.filter('secondToDate', (val, type) => {
+  // type= 1 :表示章节
+  let time = moment.duration(val, 'seconds');
+  let hours = time.hours();
+  let minutes = time.minutes();
+  let seconds = time.seconds();
+  let totalTime = '00:00';
+  if (hours || type == 1) {
+    totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
+  } else {
+    totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
+  }
+  return totalTime;
+});
+
+// 点赞
+Vue.filter('transformWatchPraise', num => {
+  num = Number(num);
+  if (num < 10000) {
+    return num;
+  } else if (num >= 10000 && num < 1000000) {
+    const n = Math.floor(num / 10000);
+    let l = Math.floor((num % 10000) / 1000); // eslint-disable-line
+    l = l === 0 ? '' : '.' + l;
+    return (num = n + l + 'w');
+  } else {
+    return (num = '999w');
+  }
+});
+
+// 聊天数
+Vue.filter('filterChatCount', num => {
+  if (num > 9999) {
+    return 9999 + '+';
+  } else {
+    return num;
+  }
 });

@@ -35,7 +35,7 @@ const routes = [
     meta: { title: '口令登录', grayType: 'webinar' }
   },
   {
-    path: '/lives/chat-auth/:id',
+    path: '/lives/authchat/:id',
     name: 'ChatAuth',
     component: ChatAuth,
     meta: { title: '聊天审核', grayType: 'webinar' }
@@ -81,8 +81,8 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   const res = await grayInit(to);
+  console.log('---grayInit---', res);
   if (res) {
-    console.log('---grayInit---', res);
     //处理限流逻辑
     if (res.code == 200) {
       //处理灰度

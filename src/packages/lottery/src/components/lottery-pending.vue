@@ -7,7 +7,7 @@
       <img v-if="fitment.url" :src="fitment.url" />
     </div>
     <p class="prize-pending__desc">
-      {{ `${$t('interact_tools.interact_tools_1002')}....` }}
+      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
     </p>
     <p
       v-if="mode === 'live'"
@@ -115,7 +115,7 @@
         // }
         const state = useUserServer().state;
         const { userInfo } = state;
-        if (!userInfo) {
+        if (!userInfo || !userInfo.user_id) {
           return this.$emit('needLogin');
         }
         if (this.loading || this.joined) return;

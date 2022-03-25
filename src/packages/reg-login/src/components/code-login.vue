@@ -34,11 +34,6 @@
           :placeholder="$t('account.account_1029')"
           @blur="autoLoginSetMargin"
         ></el-input>
-        <!--
-          start: 默认态，红色。条件：手机号 & 图片验证码 校验通过，当前倒计时结束 或 倒计时未开启。
-          disabled: 禁用态，灰色。条件：手机号 或 图片验证码 校验失败。
-          pending: 验证码发送中，灰色。条件：手机号 & 图片验证码 校验通过，当前倒计时进行中。
-         -->
         <span
           type="danger"
           :disabled="btnDisabled || isDownTime"
@@ -188,7 +183,6 @@
           return false;
         }
         this.$refs.ruleForm.validateField('phone', err => {
-          // console.log('校验结果：', !err);
           if (!err) {
             this.userServer.sendCode(this.ruleForm.phone); // 相应与异常已在domain处理
           }
@@ -209,14 +203,12 @@
             }
             this.userServer.userLogin(params).then(res => {
               if (res.code === 200) {
-                // this.resetForm();
                 this.$emit('handleClose', 'code');
                 // 刷新页面
-                // this.$router.go(0);
                 window.location.reload();
               } else {
                 this.$message({
-                  message: res.msg || this.$t('login.login_1021'),
+                  message: this.$te(res.msg) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -235,6 +227,6 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-code-login {
-    padding: 0 32px 24px 32px;
+    padding: 0 32px 24px;
   }
 </style>

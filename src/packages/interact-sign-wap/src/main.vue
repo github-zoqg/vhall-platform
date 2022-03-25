@@ -16,7 +16,7 @@
         <div class="center">
           <CountDown :duration="duration" :consume="seconds" class="countdown"></CountDown>
           <!-- TODO -->
-          <div class="title">{{ $t(title) }}</div>
+          <div class="title">{{ title }}</div>
           <van-Button type="danger" class="red-btn" @click="signin">
             <!-- 立即签到 -->
             {{ $t('interact_tools.interact_tools_1026') }}
@@ -347,6 +347,6 @@
   }
   .red-btn {
     width: 364px;
-    background-color: #fc5659;
+    background-color: #fb3a32;
   }
 </style>

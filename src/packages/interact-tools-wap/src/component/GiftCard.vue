@@ -14,7 +14,7 @@
         </header>
         <van-swipe
           class="swiper-box"
-          indicator-color="#888888"
+          indicator-color="#888"
           :loop="filterGift.length != 1"
           @change="swiperChange"
         >
@@ -329,10 +329,10 @@
             avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
-            nickname: this.joinInfoInGift.nickname,
+            gift_user_nickname: this.joinInfoInGift.nickname,
             role_name: 2,
             gift_name: this.currentGift.name,
-            gift_url: this.currentGift.image_url,
+            gift_image_url: this.currentGift.image_url,
             source_status: this.currentGift.source_status
           };
           const context = {
@@ -457,7 +457,7 @@
         color: #444;
       }
       &.active {
-        border: 2px solid #fc5659;
+        border: 2px solid #fb3a32;
         border-radius: 12px;
       }
     }

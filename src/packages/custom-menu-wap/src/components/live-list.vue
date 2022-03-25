@@ -13,7 +13,7 @@
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
-                <img src="../assets/imgs/live.gif" alt="" />
+                <img src="../assets/imgs/live.gif" />
               </label>
               <div>
                 <span>{{ getLiveTag(item) }}</span>
@@ -44,7 +44,6 @@
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
-    filters: {},
     props: ['checkedList', 'pagetype'],
     data() {
       return {
@@ -279,18 +278,12 @@
       align-items: center;
       .live-status {
         padding-right: 6px;
+
+        & > img {
+          width: 16px;
+          height: 16px;
+        }
       }
-      // .live-status {
-      //   display: inline-block;
-      //   width: 12px;
-      //   img {
-      //     display: inline-block;
-      //     width: 8px;
-      //     height: 8px;
-      //     border-radius: 0px;
-      //     // margin-top: 4px;
-      //   }
-      // }
     }
     .vh-chose-active-item__cover-status {
       padding: 0px 8px !important;

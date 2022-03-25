@@ -27,6 +27,7 @@ function getRoleName(value) {
       ret = Vue.prototype.$tdefault.call(i18n, customRoleName[3]);
       break;
     case 4:
+    case 'guest':
       ret = Vue.prototype.$tdefault.call(i18n, customRoleName[4]);
       break;
     case 20:

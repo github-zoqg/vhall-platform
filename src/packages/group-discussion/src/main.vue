@@ -322,6 +322,12 @@
           }
         }
         return false;
+      },
+      // 当前的演示者Id
+      presenterId() {
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.roomBaseServer.state.interactToolStatus.presentation_screen;
       }
     },
     watch: {
@@ -376,6 +382,11 @@
 
         // 发起端收到结束演示成功消息
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
+          if (this.presenterId === this.userId) {
+            // 如果结束后演示者是自己，说明是演示权限回收
+            // 通知文档重设笔刷, 后面可以考虑当前笔刷放到文档server中
+            window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitDocResetBrush'));
+          }
           if (msg.sender_id != this.userId) {
             this.$message({
               message: '观众结束了演示',
@@ -385,11 +396,6 @@
             });
           }
         });
-      },
-      // 正在演示的人，切换channel需要自己结束演示
-      handleEndDemonstrateInChannelChange() {
-        // if (this.groupServer.state.groupInitData.isInGroup && this.isInvitedId == this.userId) {
-        // }
       },
       hiddenAll() {
         this.settingDialogVisible = false;
@@ -536,7 +542,14 @@
       },
       // 设为组长
       setLeader(groupId, accountId) {
-        this.groupServer.setLeader(groupId, accountId);
+        this.$confirm('是否将此组员设为组长?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          this.groupServer.setLeader(groupId, accountId);
+        });
       },
       // 进入小组
       handleEnterGroup: async function (groupId) {
@@ -560,14 +573,9 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         }).then(() => {
-          this.groupServer
-            .groupQuit()
-            .then(() => {
-              this.groupServer.state.panelShow = true;
-            })
-            .catch(ex => {
-              console.error(ex);
-            });
+          this.groupServer.groupQuit().catch(ex => {
+            console.error(ex);
+          });
         });
       },
       // 解散
@@ -660,7 +668,7 @@
     height: 100%;
     flex-direction: column;
     background-color: #2d2d2d;
-    z-index: 100;
+    z-index: 10;
     .vmp-group-split__hd {
       display: flex;
       flex-direction: row;
@@ -840,7 +848,7 @@
                 }
                 div:hover {
                   cursor: pointer;
-                  background: #fc5659;
+                  background: #fb3a32;
                   color: white;
                 }
               }

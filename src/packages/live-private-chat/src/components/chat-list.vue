@@ -5,7 +5,7 @@
       <li
         class="private-chat__list-item"
         :class="{
-          'self-item':
+          'list-item__self-item':
             loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId
         }"
         v-for="(chat, idx) in chatList"
@@ -15,14 +15,6 @@
           <template
             v-if="loginInfo.user_id == chat.sendId || loginInfo.third_party_user_id == chat.sendId"
           >
-            <template v-if="chat.avatar">
-              <span
-                class="list-item__user-info__avatar"
-                :style="{
-                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-                }"
-              ></span>
-            </template>
             <span class="list-item__user-info__user-name">{{ chat.nickname }}</span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
@@ -33,27 +25,24 @@
             <span class="user-status user-admin" v-else-if="[4, '4'].includes(chat.roleName)">
               {{ chat.roleName | roleFilter }}
             </span>
-
-            <template v-else>
-              <span class="list-item__user-info__avatar">
-                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
-              </span>
-            </template>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
           </template>
           <template v-else>
-            <template v-if="chat.avatar">
-              <span
-                class="list-item__user-info__avatar"
-                :style="{
-                  backgroundImage: `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
-                }"
-              ></span>
-            </template>
-            <template v-else>
-              <span class="list-item__user-info__avatar">
-                {{ chat.nickname ? chat.nickname.substr(0, 1) : '' }}
-              </span>
-            </template>
+            <span
+              class="list-item__user-info__avatar"
+              :style="{
+                backgroundImage: !chat.avatar
+                  ? `url(${defaultAvatar})`
+                  : `url(${chat.avatar}?x-oss-process=image/resize,m_lfit,w_50)`
+              }"
+            ></span>
             <span class="user-status user-host" v-if="[1, '1'].includes(chat.roleName)">
               {{ $t('chat.chat_1022') }}
             </span>
@@ -84,9 +73,9 @@
             @click="showImgBrowser(imgIdx, chat.content.img_list)"
           ></div>
         </div>
-        <span class="list-item__chat-time">
+        <p class="list-item__chat-time">
           {{ chat.sendTime | chatTime }}
-        </span>
+        </p>
       </li>
     </ul>
     <dl class="private-chat__empty" v-else-if="finishData">
@@ -97,23 +86,26 @@
 </template>
 
 <script>
-  import { faceArr as emojiFace, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import { faceArr as emojiFace } from '@/packages/chat/src/js/emoji';
   import { uniqueId } from 'lodash';
   import { useChatServer, useMsgServer } from 'middle-domain';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'livePrivateChatList',
     filters: {
       //todo 考虑全局公共utils里处理这个
-      chatTime(value) {
-        if (['', null, void 0].includes(value)) {
-          return;
-        }
-        if (value < 15) return value;
-        return value.substring(0, 16);
-      }
+      // chatTime(value) {
+      //   if (['', null, void 0].includes(value)) {
+      //     return;
+      //   }
+      //   if (value < 15) return value;
+      //   return value.substring(0, 16);
+      // }
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //是否是webp
         isWebp: window.webp,
         //取一个唯一id
@@ -160,10 +152,11 @@
     watch: {
       selectUserId: {
         handler(newVal, oldVal) {
-          const _this = this;
+          // const _this = this;
           console.log(oldVal);
           if (newVal) {
-            _this.init();
+            this.chatServer.setCurPrivateTarget && this.chatServer.setCurPrivateTarget(newVal);
+            // _this.init();
           }
         },
         immediate: true
@@ -174,11 +167,17 @@
       this.msgServer = useMsgServer();
     },
     mounted() {
+      this.listenEvent();
       // this.initEvent();
-      // this.initScroll();
-      this.listenEvents();
+      this.initScroll();
+      // this.listenEvents();
     },
     methods: {
+      listenEvent() {
+        this.chatServer.$on('receivePrivateMsg', msg => {
+          if (msg.sendId == this.selectUserId) this.scrollBottom();
+        });
+      },
       init() {
         this.resetData();
         this.initEvent();
@@ -194,12 +193,8 @@
         this.count = 0;
       },
       initEvent() {
-        // this.queryChatList();
+        this.queryChatList();
         this.finishData = true;
-      },
-      //事件监听
-      listenEvents() {
-        this.chatServer.$on('receivePrivateMsg', msg => {});
       },
       //todo 待替换
       initScroll() {
@@ -241,66 +236,6 @@
           this.scrollBottom();
         });
       },
-      //todo 移入domain
-      formatChatMsg(msg) {
-        msg.data = msg.data || msg.msg_data;
-        if (msg.context && typeof msg.context === 'string') {
-          msg.context = JSON.parse(msg.context);
-        }
-        if (typeof msg.data === 'string') {
-          msg.data = JSON.parse(msg.data);
-        }
-        let obj = {
-          msg_id: msg.msgId || msg.msg_id,
-          user_id: msg.context.consumer_user_id,
-          role: msg.context.role,
-          name: msg.context.nick_name,
-          avatar: msg.context.avatar,
-          txt: msg.data.text_content,
-          time: msg.send_time || new Date(msg.time).format('yyyy-MM-dd hh:mm:ss')
-        };
-        if (msg.data.type === 'imgChat') {
-          obj.msgType = 'imgChat';
-          obj.img_list = msg.data.img_list;
-        } else {
-          obj.msgType = 'chat';
-        }
-        obj.avatar = msg.context.avatar || msg.avatar;
-        if (obj.avatar && obj.avatar.indexOf('//') !== 0 && obj.avatar.indexOf('https') !== 0) {
-          obj.avatar = obj.avatar ? `${this.$imgHost}/${obj.avatar}` : '';
-        }
-        if (obj.txt) {
-          obj.txt = obj.txt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          if (obj.role !== 'watch') {
-            /* 正则匹配校验url */
-            /* eslint-disable */
-            let reg =
-              /(https:\/\/|http:\/\/|\/\/|www\.)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
-            obj.txt = obj.txt.replace(reg, url => {
-              let href = url;
-              if (url.indexOf('www.') === 0) {
-                href = `//${url}`;
-              }
-              return `<a class='a_link' href="${href}" title="点击打开链接" target='_blank'>${url}</a>`;
-            });
-            /* eslint-enable */
-          }
-        }
-        /* 替换表情图片 */
-        for (let i = 0; i < emojiFace.length; i++) {
-          for (let key in emojiFace[i]) {
-            let test = key.replace(/\[/, '\\[').replace(/\]/, '\\]');
-            let reg = new RegExp(test, 'g');
-            obj.txt = obj.txt.replace(
-              reg,
-              "<img src='//cnstatic01.e.vhall.com/static/img/arclist/Expression_" +
-                emojiFace[i][key] +
-                "@2x.png'>"
-            );
-          }
-        }
-        return obj;
-      },
       // 根据新消息数量计算滚动定位位置
       computeScrollPosition(count) {
         let newChatEles = this.$chatDom.querySelectorAll('.chat-list-item');
@@ -314,7 +249,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$chatDom.scrollTop = 100000;
+          this.$chatDom.scrollTop = this.$chatDom.scrollHeight;
         });
       },
       //查看图片预览
@@ -356,7 +291,7 @@
             line-height: 24px;
             text-align: center;
             border-radius: 50%;
-            background-color: @color-default;
+            //background-color: @color-default;
             vertical-align: middle;
             background-size: cover;
             background-position: center center;
@@ -422,7 +357,6 @@
           }
         }
         .list-item__chat-time {
-          display: block;
           margin-left: 30px;
           color: #aaa;
           font-size: 12px;
@@ -431,7 +365,7 @@
           line-height: 24px;
           .user-status {
             display: inline-block;
-            width: 44px;
+            padding: 0 5px;
             height: 16px;
             margin-left: 5px;
             line-height: 16px;
@@ -441,14 +375,16 @@
             font-size: 12px;
           }
           .user-host {
-            background-color: #ffd021;
+            background: rgba(251, 58, 50, 0.2);
+            color: #fb3a32;
           }
           .user-assistant {
-            background-color: #e2e2e2;
+            background: #ade1ff;
+            color: #0a7ff5;
           }
           .user-admin {
-            background-color: @color-role-admin;
-            color: #fff;
+            background: #ade1ff;
+            color: #0a7ff5;
           }
         }
         &.list-item__self-item {
@@ -481,7 +417,7 @@
       dt {
         width: 130px;
         height: 130px;
-        background: url(../images/no-data.png) no-repeat center;
+        background: url(../images/no-create.png) no-repeat center;
         border-radius: 50%;
         background-size: contain;
       }

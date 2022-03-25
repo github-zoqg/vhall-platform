@@ -8,7 +8,7 @@
         @click="skipAction"
         srcset
       />
-      {{ watchInitData.webinar.userinfo.nickname | splitLenStr(8) }}
+      {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
@@ -33,6 +33,7 @@
 <script>
   import { useAttentionServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
 
   export default {
     name: 'VmpHeaderWatchWap',
@@ -49,22 +50,6 @@
           pageStyle: '' // icon默认色
         }
       };
-    },
-    filters: {
-      webinarFilter(val) {
-        // const webinarArr = [
-        //   this.$t('common.common_1018'),
-        //   this.$t('common.common_1019'),
-        //   this.$t('common.common_1020'),
-        //   this.$t('common.common_1024'),
-        //   this.$t('common.common_1021')
-        // ];
-        const webinarArr = ['直播', '预告', '结束', '点播', '回放'];
-        return webinarArr[val - 1];
-      },
-      splitLenStr(name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
     },
     mounted() {
       // 关注的domain服务
@@ -108,7 +93,7 @@
         if (this.watchInitData.webinar && this.watchInitData.webinar.userinfo.avatar) {
           avatar = this.watchInitData.webinar.userinfo.avatar;
         } else {
-          avatar = require('./images/default_avatar.png');
+          avatar = defaultAvatar;
         }
         return avatar;
       },

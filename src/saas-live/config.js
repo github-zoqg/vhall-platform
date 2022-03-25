@@ -104,12 +104,9 @@ export const serverConfig = {
       'comLivePrivateChat',
       'comMediaSetting',
       'comPcMediaCheck',
-      'comInsertVideoList',
       'liveTimerSet',
       'liveTimer',
-      'comQuestionnaire',
       'comRebroadcast',
-      'comRedPacket',
       'comRebroadcastList',
       'comMicInvited'
     ]
@@ -169,6 +166,12 @@ export const serverConfig = {
         method: 'showThirdStream',
         args: ['$0']
       }
+    ],
+    emitClickCheckStartPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'checkStartPush'
+      }
     ]
   },
   // 顶部左侧组件
@@ -188,7 +191,9 @@ export const serverConfig = {
       'comShareMenu',
       'comExitGroupMenu',
       'comLottery',
-      'comSignLive'
+      'comSignLive',
+      'comQuestionnaire',
+      'comRedPacket'
     ]
   },
   // 语言选择组件
@@ -601,6 +606,7 @@ export const serverConfig = {
   },
   comInsertStream: {
     component: 'VmpInsertStream',
+    children: ['comInsertVideoList'],
     emitCloseInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
@@ -631,6 +637,13 @@ export const serverConfig = {
         cuid: ['comGroupMenu'],
         method: 'setSelectedState',
         args: false
+      }
+    ],
+    // 触发画笔重置
+    emitDocResetBrush: [
+      {
+        cuid: 'comDocUne',
+        method: 'resetCurrentBrush'
       }
     ]
   },
@@ -700,7 +713,7 @@ export const serverConfig = {
   recordLayerBodyCenter: {
     component: 'VmpContainer',
     className: 'vmp-basic-center',
-    children: ['recordComStreamList', 'comDocUne', 'recordComRecordVideoSuccess']
+    children: ['recordComStreamList', 'recordComDocUne', 'recordComRecordVideoSuccess']
   },
   // 【录制页面】 中间右侧容器
   recordLayerBodyRight: {
@@ -729,11 +742,12 @@ export const serverConfig = {
     options: {
       icon: 'vh-iconfont vh-line-document',
       text: 'aside_menu.aside_menu_1000',
-      kind: 'document'
+      kind: 'document',
+      auth: 'hide-document'
     },
     handleClick: [
       {
-        cuid: ['recordComAsideMenu', 'comDocUne'],
+        cuid: ['recordComAsideMenu', 'recordComDocUne'],
         method: 'switchTo',
         args: 'document'
       }
@@ -745,13 +759,39 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-line-whiteboard',
       text: 'aside_menu.aside_menu_1001',
-      kind: 'board'
+      kind: 'board',
+      auth: true
     },
     handleClick: [
       {
-        cuid: ['recordComAsideMenu', 'comDocUne'],
+        cuid: ['recordComAsideMenu', 'recordComDocUne'],
         method: 'switchTo',
         args: 'board'
+      }
+    ]
+  },
+  // 文档白板组件
+  recordComDocUne: {
+    component: 'VmpDocUne',
+    emitSwitchTo: {
+      cuid: ['recordComAsideMenu'],
+      method: 'switchTo',
+      args: ['$0'] // 获取动态参数的第一个
+    },
+    // 打开对话框
+    emitOpenDocList: {
+      cuid: 'recordDlgDocList',
+      method: 'show'
+    }
+  },
+  //文档列表对话框
+  recordDlgDocList: {
+    component: 'VmpDocDlglist',
+    emitDemonstrateDoc: [
+      {
+        cuid: 'recordComDocUne',
+        method: 'demonstrate',
+        args: ['$0', '$1', '$2']
       }
     ]
   },
@@ -779,12 +819,6 @@ export const serverConfig = {
         method: 'startPush'
       }
     ],
-    // emitClickEndLive: [
-    //   {
-    //     cuid: 'recordComStreamLocal',
-    //     method: 'stopPush'
-    //   }
-    // ],
     emitMediaSettingClick: [
       {
         cuid: 'comMediaSetting',
@@ -822,7 +856,7 @@ export const serverConfig = {
   // 【录制页面】所有弹窗集合
   recordComAllDialog: {
     component: 'VmpAirContainer',
-    children: ['dlgDocList', 'comMediaSetting']
+    children: ['recordDlgDocList', 'comMediaSetting']
   },
   // *******录制页面****结束
 

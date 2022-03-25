@@ -15,7 +15,8 @@
           <el-switch
             @click.native="handleSwitchStatus"
             v-model="switchStatus"
-            active-color="#13ce66"
+            active-color="#fb3a32"
+            inactive-color="#cecece"
           ></el-switch>
           <!-- 提示 -->
           <div class="audience-tip" v-show="showAudienceTip">
@@ -143,6 +144,7 @@
       @onSubmit="confirmSave"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
+      style="pointer-events: initial"
     >
       <main slot="content">确定要清空文档标记么？</main>
     </saas-alert>
@@ -340,6 +342,11 @@
         }
         this.$emit('changeBrush', brush);
       },
+      // 重设当前画笔
+      resetCurrentBrush() {
+        console.log('---resetCurrentBrush---this.currentBrush:', this.currentBrush);
+        this.changeTool(this.currentBrush);
+      },
       /**
        * 切换画板工具
        */
@@ -357,6 +364,7 @@
         }
         this.changeTool(brush);
       },
+      // 画布清除确认
       confirmSave() {
         this.isConfirmVisible = false;
         this.docServer.clear();
@@ -366,6 +374,7 @@
       closeConfirm() {
         this.isConfirmVisible = false;
       },
+      // 是否观众可见
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();
       }
@@ -383,6 +392,7 @@
     align-items: center;
     justify-content: space-between;
     z-index: 2;
+    pointer-events: none;
 
     .vmp-doc-toolbar__hd {
       max-width: 250px;
@@ -399,9 +409,12 @@
         text-align: center;
         margin-left: 16px;
         cursor: pointer;
+        pointer-events: initial;
+
         &:hover {
-          background: #fc5659;
-          border-color: #fc5659;
+          background: #fb3a32;
+          border-color: #fb3a32;
+          color: #fff;
         }
       }
       .audience-visible {
@@ -416,18 +429,7 @@
         align-items: center;
         margin-left: 20px;
         position: relative;
-
-        .el-switch .el-switch__core {
-          border-color: #ddd !important;
-          background-color: #2d2d2d !important;
-          &::after {
-            background-color: #ddd;
-          }
-        }
-        .el-switch.is-checked .el-switch__core {
-          border-color: #13ce66 !important;
-          background-color: #13ce66 !important;
-        }
+        pointer-events: initial;
       }
     }
     .vmp-doc-toolbar__bd {
@@ -443,6 +445,7 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
+      pointer-events: initial;
     }
     .vmp-doc-toolbar__ft {
       display: flex;
@@ -461,6 +464,7 @@
       line-height: 36px;
       cursor: pointer;
       z-index: 100;
+      pointer-events: initial;
 
       i {
         font-size: 17px;

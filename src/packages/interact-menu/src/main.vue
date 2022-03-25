@@ -53,6 +53,7 @@
         >
           <i class="vh-iconfont vh-a-line-redpacket"></i>
           <p>红包</p>
+          <!-- <vmp-air-container cuid="" :oneself="true"></vmp-air-container> -->
         </div>
         <div
           class="vmp-interact-menu-list-item"
@@ -67,7 +68,7 @@
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openRebroadcast"
-          v-if="configList['rebroadcast']"
+          v-if="!isNoDelay && configList['rebroadcast']"
         >
           <i class="vh-saas-iconfont vh-saas-a-color-Playbackmanagement"></i>
           <p>转播</p>
@@ -128,6 +129,10 @@
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
+      // 无延迟 Type:Boolean
+      isNoDelay() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
+      },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
       }
@@ -154,6 +159,7 @@
         });
       },
       handleQAPopup() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110061);
         if (!this.qaVisible && this.isQAEnabled) {
           useQaServer()
             .getCurrentPlayQuestionNum()
@@ -179,6 +185,7 @@
           .qaEnable()
           .then(res => {
             if (res.code == 200) {
+              window.vhallReportForProduct && window.vhallReportForProduct.report(110052);
               this.isQAEnabled = true;
               this.qaVisible = false;
               this.$message({
@@ -203,6 +210,7 @@
             if (res.code == 200) {
               this.isQAEnabled = false;
               this.qaVisible = false;
+              window.vhallReportForProduct && window.vhallReportForProduct.report(110053);
               this.$message({
                 message: '关闭问答成功',
                 type: 'success'
@@ -246,6 +254,7 @@
       },
       // 打开问卷弹窗
       emitOpenQuestionnaire() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110060);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenQuestionnaire'));
       },
       // 打开签到弹窗
@@ -286,7 +295,7 @@
         font-size: 12px;
       }
       &:hover {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
     &:hover {
@@ -345,7 +354,7 @@
           padding-bottom: 4px;
         }
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
       }
       &-disable {

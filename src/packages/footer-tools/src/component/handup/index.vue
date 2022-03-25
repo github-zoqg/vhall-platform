@@ -1,18 +1,14 @@
 <template>
-  <div class="vmp-handup">
-    <!-- // 分组内 3|4|20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
+  <div class="vmp-handup" v-if="device_status === 1 && isInteractLive && !isBanned && !allBanned">
+    <!-- // 分组内 20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
         @click="handleHandClick"
         type="primary"
         size="medium"
         round
-        v-if="
-          inLine &&
-          (isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && !isSpeakOn && isBanned
-            : isAllowhandup && !isSpeakOn)
-        "
+        :disabled="loading"
+        v-if="isInGroup ? +this.groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
       >
         {{ btnText }}
       </el-button>
@@ -22,12 +18,8 @@
         @click="speakOff"
         type="primary"
         size="medium"
-        v-if="
-          inLine &&
-          (isInGroup
-            ? ![3, 4, 20].includes(parseInt(this.groupRole)) && isSpeakOn && isBanned
-            : isSpeakOn)
-        "
+        :disabled="loading"
+        v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
         round
       >
         {{ $t('interact.interact_1007') }}
@@ -36,7 +28,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer } from 'middle-domain';
+  import { useMicServer, useChatServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -44,7 +36,10 @@
         btnText: this.$t('interact.interact_1001'),
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
-        waitInterval: null
+        waitInterval: null,
+        loading: false,
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
       };
     },
     computed: {
@@ -53,16 +48,22 @@
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
-        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
+        return parseInt(this.$domainStore.state.mediaCheckServer.deviceInfo.device_status);
       },
-      // 是否是直播中
-      inLine() {
-        return parseInt(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type) === 1;
+      // 是否是互动 | 无延迟 | 分组直播
+      isInteractLive() {
+        const { watchInitData } = this.$domainStore.state.roomBaseServer;
+        return (
+          (watchInitData.webinar.mode == 3 ||
+            watchInitData.webinar.no_delay_webinar == 1 ||
+            watchInitData.webinar.mode == 6) &&
+          watchInitData.webinar.type == 1
+        );
       },
       // 是否开启举手
       isAllowhandup() {
         const status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
-        return status;
+        return parseInt(status) === 1;
       },
       // 是否已上麦
       isSpeakOn() {
@@ -74,20 +75,12 @@
       // 组内角色
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
-      },
-      // 分组 组内 禁言 状态
-      isBanned() {
-        return parseInt(this.$domainStore.state.groupServer.groupInitData.is_banned) === 0;
       }
     },
     created() {
       if (this.waitInterval) {
         clearInterval(this.waitInterval);
       }
-      // 申请上麦
-      useMicServer().$on('vrtc_connect_apply', msg => {
-        console.log('---申请上麦消息---', this.joinInfo, msg);
-      });
       // 用户成功上麦
       useMicServer().$on('vrtc_connect_success', msg => {
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
@@ -112,29 +105,33 @@
           this.$message.success(this.$t('interact.interact_1002'));
         }
       });
-
-      /**
-       *
-       * // 主持人同意上麦申请
-      useMicServer().$on('user_apply_host_agree', msg => {
-        console.log(msg);
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        console.log('监听禁言通知', res);
+        this.isBanned = res;
       });
-      // 主持人拒绝上麦申请
-      useMicServer().$on('user_apply_host_reject', msg => {
-        // TODO:被拒绝的处理
-        console.log(msg);
-      });**/
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.allBanned = res;
+      });
     },
     methods: {
       // 下麦
       async speakOff() {
-        const { code, msg } = await useMicServer().speakOff();
-        if (code === 513035) {
-          this.$message.error(msg);
+        this.loading = true;
+        try {
+          const { code, msg } = await useMicServer().speakOff();
+          if (code === 513035) {
+            this.$message.error(msg);
+          }
+          this.loading = false;
+        } catch (error) {
+          this.loading = false;
         }
       },
       // 举手按钮点击事件
       handleHandClick() {
+        this.loading = true;
         if (this.isApplyed) {
           this.userCancelApply();
         } else {
@@ -146,6 +143,7 @@
         useMicServer()
           .userApply()
           .then(res => {
+            this.loading = false;
             if (res.code != 200) {
               this.$message.error(res.msg);
               return;
@@ -154,6 +152,9 @@
             this.waitTime = 30;
             this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
             this.startWaitInterval();
+          })
+          .catch(err => {
+            this.loading = false;
           });
       },
       // 取消申请
@@ -161,6 +162,7 @@
         useMicServer()
           .userCancelApply()
           .then(() => {
+            this.loading = false;
             this.isApplyed = false;
             this.waitInterval && clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1001');
@@ -170,6 +172,9 @@
               type: 'success',
               customClass: 'zdy-info-box'
             });
+          })
+          .catch(err => {
+            this.loading = false;
           });
       },
       // 等待倒计时

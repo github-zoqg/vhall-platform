@@ -16,6 +16,10 @@
       menu: {
         type: Array,
         default: () => []
+      },
+      auth: {
+        type: Object,
+        default: () => ({})
       }
     },
     data() {
@@ -24,6 +28,12 @@
       };
     },
     computed: {
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
+      },
       filterMenu() {
         let set = [];
         for (const item of this.menu) {
@@ -32,26 +42,22 @@
           }
         }
 
+        set = set.filter(item => {
+          if (!this.isWatch) {
+            if (item.type == 8 && !this.auth.member) return false; // 成员
+            if (item.type == 'notice' && !this.auth.notice) return false; // 公告
+          } else {
+            if (item.type == 7 && !this.auth.chapter) return false; // 章节
+          }
+
+          return true;
+        });
+
         return [...set];
       }
     },
     methods: {
-      getComp(cuid, arr) {
-        // 由于air-container不一定是本组件的直系chilren，需要深入遍历查找
-        // const findComp = (cuid, array) => {
-        //   if (!array || array.length === 0) return false;
-        //   for (const item of array) {
-        //     // 只找cuid，以及空cuid下的cuid，一旦找到cuid便不再深入遍历
-        //     if (item.cuid && item.cuid === cuid) return item;
-        //     if (item.cuid && item.cuid !== cuid) continue;
-        //     const comp = findComp(cuid, item.$children);
-        //     if (comp) return comp;
-        //   }
-        //   return false;
-        // };
-
-        // return findComp(cuid, arr);
-
+      getComp(cuid) {
         return this.$children.find(i => i.cuid === cuid);
       },
       async switchTo(item) {
@@ -59,10 +65,9 @@
         await this.$nextTick();
 
         let child = null;
-        child = this.getComp(item.cuid, this.$children);
+        child = this.getComp(item.cuid);
 
         if (!child) return;
-        console.log('item:', item);
 
         // pre-show
         if (item.type === 1) {
@@ -81,12 +86,12 @@
     height: calc(100%);
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    // overflow: auto;
 
     .vmp-tab-container-mainarea {
       height: 100%;
       position: relative;
-
+      overflow: auto;
       & > section {
         height: 100%;
       }

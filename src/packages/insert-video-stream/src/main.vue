@@ -3,9 +3,10 @@
     class="vmp-insert-stream"
     @mouseenter="wrapHover"
     @mouseleave="wrapLeave"
-    v-show="insertFileStreamVisible"
-    ref="insterWarpRef"
+    v-show="insertFileStreamVisible || !isWatch"
+    ref="insertWrapRef"
     :class="{
+      'vmp-insert-stream__h0': !insertFileStreamVisible,
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
       'vmp-insert-stream__has-stream-list': hasStreamList
@@ -75,7 +76,7 @@
         :videoParam="remoteVideoParam"
         :isInsertVideoPreview="true"
         :isShowController="miniElement != 'insert-video'"
-        @remoteInsterSucces="remoteInsterSucces"
+        @remoteInsertSuccess="remoteInsertSuccess"
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
         @handleRemoteInsertVideoPause="handleRemoteInsertVideoPause"
@@ -125,7 +126,7 @@
               <i
                 class="vh-iconfont"
                 :class="voice > 1 ? 'vh-line-voice' : 'vh-line-mute'"
-                @click="jingYin"
+                @click="videoMute"
               ></i>
             </span>
             <div class="vmp-ver-slider">
@@ -157,6 +158,11 @@
         </div>
       </div>
     </div>
+    <vmp-air-container
+      v-if="childrenCom && childrenCom.length"
+      :oneself="true"
+      :cuid="childrenCom[0]"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
@@ -167,14 +173,15 @@
     useInteractiveServer,
     useGroupServer,
     useMsgServer,
+    useMicServer,
     useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import moment from 'moment';
   export default {
     name: 'VmpInsertStream',
     data() {
       return {
+        childrenCom: [],
         insertFileStreamVisible: false, // 是否展示插播流组件
         remoteVideoParam: {
           paas_record_id: '',
@@ -257,21 +264,17 @@
           this.insertFileStreamVisible =
             this.$domainStore.state.insertFileServer.isInsertFilePushing;
         }
-      }
-    },
-    filters: {
-      secondToDate(val) {
-        let time = moment.duration(val, 'seconds');
-        let hours = time.hours();
-        let minutes = time.minutes();
-        let seconds = time.seconds();
-        let totalTime = '00:00';
-        if (hours) {
-          totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
-        } else {
-          totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
+      },
+      // 主讲人切换，关闭插播
+      '$domainStore.state.roomBaseServer.interactToolStatus.doc_permission': {
+        handler() {
+          if (
+            this.isCurrentRoleInsert &&
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name != 3
+          ) {
+            this.closeInsertvideoHandler();
+          }
         }
-        return totalTime;
       }
     },
     components: { videoPreview },
@@ -281,6 +284,9 @@
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
       this.docServer = useDocServer();
+    },
+    created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
       this.initEventListener();
@@ -349,7 +355,7 @@
       },
       // 本地插播，video成功创建之后的处理逻辑
       handleLocalInsertVideoCreated(videoElement) {
-        // TODO: 设置插播画面在大窗,文档在小窗
+        // 设置插播画面在大窗,文档在小窗
         this.roomBaseServer.setChangeElement('doc');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -367,7 +373,7 @@
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
-      creatLoaclStream() {
+      createLocalStream() {
         return new Promise((resolve, reject) => {
           this.insertFileServer
             .createLocalInsertStream({
@@ -395,7 +401,7 @@
         // 如果未开播，不推流
         if (watchInitData.webinar.type != 1) return;
 
-        this.creatLoaclStream()
+        this.createLocalStream()
           .then(res => {
             this.insertFileServer
               .publishInsertStream({ streamId: res.streamId })
@@ -419,9 +425,11 @@
           this.stopPushStream({ isNotClearInsertFileInfo: true }).then(() => {
             this.pushLocalStream();
           });
+        } else {
+          // 如果是播放结束重新开始播放，对端会通过流加入时间更改上麦人员麦克风状态，不需要发消息
+          // 发送自定义消息，通知开始插播，互动角色关闭麦克风
+          this.insertFileServer.sendStateChangeMessage(1);
         }
-        // 发送自定义消息，通知开始插播，互动角色关闭麦克风
-        this.insertFileServer.sendStateChangeMessage(1);
       },
       // 云插播播放器暂停播放
       handleRemoteInsertVideoPause() {
@@ -567,7 +575,7 @@
           boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
         );
       },
-      remoteInsterSucces(videEl) {
+      remoteInsertSuccess(videEl) {
         console.log(videEl, '点播初始化成功');
         // 隐藏分组设置
         const groupServer = useGroupServer();
@@ -596,6 +604,7 @@
         this.addSDKEvents();
         // 注册发起端独有的事件
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+          const micServer = useMicServer();
           this.interactiveServer.$on('live_start', () => {
             this.closeInsertvideoHandler(true);
           });
@@ -612,6 +621,16 @@
           groupServer.$on(groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
             if (this.isCurrentRoleInsert) {
               this.closeInsertvideoHandler();
+            }
+          });
+          // 如果是拥有主讲人权限的嘉宾下麦，需要直接设置miniElement
+          micServer.$on('vrtc_disconnect_success', () => {
+            if (
+              this.roomBaseServer.state.interactToolStatus.doc_permission ==
+                this.roomBaseServer.state.watchInitData.join_info.third_party_user_id &&
+              this.isCurrentRoleInsert
+            ) {
+              this.roomBaseServer.setChangeElement('stream-list');
             }
           });
         }
@@ -647,8 +666,13 @@
             this.roomBaseServer.setChangeElement('doc');
           } else {
             // 如果是观众
-            // 设置 miniElement 为主屏流
-            this.roomBaseServer.setChangeElement('doc');
+            // 如果文档可见
+            if (this.docServer.state.switchStatus) {
+              // 设置 miniElement 为主屏流
+              this.roomBaseServer.setChangeElement('doc');
+            } else {
+              this.roomBaseServer.setChangeElement('');
+            }
           }
         });
       },
@@ -666,7 +690,7 @@
           if (this.docServer.state.switchStatus) {
             this.roomBaseServer.setChangeElement('stream-list');
           } else {
-            this.roomBaseServer.setChangeElement('doc');
+            this.roomBaseServer.setChangeElement('');
           }
         }
         this.insertFileServer.clearInsertFileInfo();
@@ -685,8 +709,8 @@
           this.reSetBroadcast();
         });
 
-        // 流加入
-        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+        // 订阅失败
+        this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
           this.reSetBroadcast();
           this.subscribeInsert();
         });
@@ -810,13 +834,13 @@
         }
       },
       // video静音
-      jingYin() {
+      videoMute() {
         const vo = this._localFileVideoElement && this._localFileVideoElement.volume;
         if (vo) {
           if (vo > 0.01) {
             this._cacheVolume = vo;
-            this._localFileVideoElement.volume = 0.01;
-            this.voice = 1;
+            this._localFileVideoElement.volume = 0;
+            this.voice = 0;
           } else {
             this._localFileVideoElement.volume = this._cacheVolume;
             this.voice = this._cacheVolume * 100;
@@ -843,7 +867,7 @@
       // 全屏
       enterFullScreen() {
         this.isFullScreen = true;
-        const fullarea = this.$refs.insterWarpRef;
+        const fullarea = this.$refs.insertWrapRef;
         if (fullarea.requestFullscreen) {
           fullarea.requestFullscreen();
         } else if (fullarea.webkitRequestFullScreen) {
@@ -876,6 +900,10 @@
     width: 100%;
     height: 100%;
     position: relative;
+    &__h0 {
+      height: 0;
+      overflow: hidden;
+    }
     &__mini {
       width: 309px;
       height: 240px;
@@ -975,7 +1003,7 @@
         border-radius: 100%;
         margin-right: 10px;
         &:hover {
-          background: #fc5659;
+          background: #fb3a32;
         }
         &.iconsheweizhujiangren {
           font-size: 14px;

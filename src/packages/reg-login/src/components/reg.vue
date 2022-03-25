@@ -264,7 +264,7 @@
               relt = await this.userServer.handlePassword(this.ruleForm.password);
               if (!relt.pass) {
                 this.$message({
-                  message: relt.msg || this.$t('register.register_1010'),
+                  message: this.$te(relt.msg) || this.$t('register.register_1010'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -287,7 +287,7 @@
             const failure = err => {
               console.log('注册失败', err);
               this.$message({
-                message: err.msg || this.$t('register.register_1010'),
+                message: this.$te(err.msg) || this.$t('register.register_1010'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -357,7 +357,7 @@
     .el-checkbox__label {
       font-size: 14px;
       font-weight: 400;
-      color: #999999;
+      color: #999;
       line-height: 20px;
     }
     .el-checkbox {

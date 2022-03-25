@@ -7,16 +7,19 @@
     </div>
     <!--成员区域-->
     <div class="vmp-member-list__container">
-      <scroll class="vmp-member-list__container__scroll" ref="scroll" @pullingUp="loadMore">
+      <scroll
+        class="vmp-member-list__container__scroll"
+        :class="{ 'show-empty-img': isShowEmptyImg }"
+        ref="scroll"
+        @pullingUp="loadMore"
+      >
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div
-              v-if="searchEmpty"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwusousuo"></span>
+            <div v-if="searchEmpty" class="empty-container">
+              <span class="empty-img">
+                <img src="./images/search@2x.png" alt="" />
+              </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
             <template v-else style="overflow: auto">
@@ -48,12 +51,10 @@
         <!--举手的成员-->
         <template v-if="tabIndex === 2">
           <div class="member-list__apply-tab">
-            <div
-              v-if="!applyUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwujushou"></span>
+            <div v-if="!applyUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/noTop@2x.png" alt="" />
+              </span>
               <p>暂无人举手</p>
             </div>
             <template v-else>
@@ -85,12 +86,10 @@
         <!--受限制的成员-->
         <template v-if="tabIndex === 3">
           <div class="member-list__limit-tab">
-            <div
-              v-if="!limitedUsers.length"
-              class="empty-container"
-              :style="{ 'padding-top': `${this.emptyContainerPaddingTop}px` }"
-            >
-              <span class="vh-saas-iconfont vh-saas-zanwuchengyuan"></span>
+            <div v-if="!limitedUsers.length" class="empty-container">
+              <span class="empty-img-top">
+                <img src="./images/no@2x.png" alt="" />
+              </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
             <template v-else>
@@ -125,8 +124,11 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
-          {{ totalNum | numberCompression }}人在线
+        <span
+          class="info-panel__online-num"
+          v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
+        >
+          {{ totalNum | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -135,22 +137,14 @@
           class="info-panel__allow-raise-hand"
           v-if="configList['ui.hide_handsUp'] && mode !== 6"
         >
-          <!--          <span class="info-panel__allow-raise-hand__switch-title">允许举手</span>-->
-          <!--          <el-switch-->
-          <!--            v-model="allowRaiseHand"-->
-          <!--            :width="32"-->
-          <!--            :disabled="disabledSwitchHand"-->
-          <!--            @change="onSwitchAllowRaiseHand"-->
-          <!--            active-color="#fc5659"-->
-          <!--          ></el-switch>-->
-          <label class="lb-raisehands" for="lb-raisehands">
+          <label class="raise-hand-switch" for="raiseHandSwitch">
             允许举手
             <input
               style="display: none"
               v-model="allowRaiseHand"
               @change="onSwitchAllowRaiseHand"
               type="checkbox"
-              id="lb-raisehands"
+              id="raiseHandSwitch"
             />
             <i class="ss">
               <em></em>
@@ -236,19 +230,6 @@
       memberItem,
       scroll
     },
-    filters: {
-      //数值压缩
-      numberCompression(num) {
-        if (num < 10000) {
-          return num;
-        } else {
-          const n = Math.floor(num / 10000);
-          let l = Math.floor((num % 10000) / 1000);
-          l = l === 0 ? '' : '.' + l;
-          return n + l + '万';
-        }
-      }
-    },
     data() {
       return {
         //成员列表组件配置
@@ -291,16 +272,10 @@
         //分页配置
         pageConfig: {
           page: 0,
-          limit: 10
+          limit: 100
         },
         // 举手列表定时器列表
         handsUpTimerList: {},
-        // 上麦人员掉线处理计时器map
-        speakerLeaveIntervalMap: {},
-        //切换举手状态,防连点
-        disabledSwitchHand: false,
-        //组长的id
-        leaderId: '',
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
@@ -341,6 +316,14 @@
       }
     },
     computed: {
+      //是否显示搜索结果图片
+      isShowEmptyImg() {
+        return [
+          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 2 && !this.applyUsers.length,
+          this.tabIndex === 3 && !this.limitedUsers.length
+        ].some(item => !!item);
+      },
       //是否显示底部区域
       isShowBottom() {
         let show = true;
@@ -383,34 +366,21 @@
       },
       //找到正确的当前主讲人
       getCurrentSpeakerId() {
-        let currentSpeakerId = '';
-        const _this = this;
-        if (this.isInGroup) {
-          currentSpeakerId = _this.groupServer.state.groupInitData.doc_permission;
-        } else {
-          currentSpeakerId = _this.interactToolStatus.doc_permission;
-        }
-        return currentSpeakerId;
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.doc_permission
+          : this.interactToolStatus.doc_permission;
       },
       //找到当前的主屏
       getCurrentMainScreen() {
-        let current = '';
-        if (this.isInGroup) {
-          current = this.groupServer.state.groupInitData.main_screen;
-        } else {
-          current = this.interactToolStatus.main_screen;
-        }
-        return current;
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.main_screen
+          : this.interactToolStatus.main_screen;
       },
       //找到当前的演示屏幕
       getCurrentPresentationScreen() {
-        let current = '';
-        if (this.isInGroup) {
-          current = this.groupServer.state.groupInitData.presentation_screen;
-        } else {
-          current = this.interactToolStatus.presentation_screen;
-        }
-        return current;
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.interactToolStatus.presentation_screen;
       },
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
@@ -536,11 +506,38 @@
               break;
           }
         });
+        //监听自定义消息
+        this.msgServer.$onMsg('CUSTOM_MSG', msg => {
+          //人员上下线消息丢失时，会收到这个消息
+          msg.data.type === 'reload_online_user_list' && this.updateOnlineUserList();
+        });
       },
       //初始化房间消息回调监听
       listenRoomMsg() {
         const _this = this;
         const { isLive } = this;
+
+        // this.memberServer.$on('JOIN', msg => {
+        //   _this.$message({
+        //     message: _this.$t('message.message_1030', { n: msg.context.nickname }),
+        //     showClose: true,
+        //     type: 'success',
+        //     customClass: 'zdy-info-box'
+        //   });
+        // });
+        //
+        // this.memberServer.$on('LEFT', msg => {
+        //   if (msg.context.role_name == 1 && _this.roleName != 1) {
+        //     _this.$message.warning({ message: _this.$t('message.message_1027') });
+        //   }
+        //   if (msg.context.role_name == 4) {
+        //     _this.$message.warning({
+        //       message: _this.$t('message.message_1029', {
+        //         n: msg.context.nickname || msg.context.nick_name
+        //       })
+        //     });
+        //   }
+        // });
 
         // 加入房间
         this.msgServer.$onMsg('JOIN', msg => {
@@ -568,7 +565,6 @@
 
           switch (type) {
             case 'vrtc_connect_apply':
-              console.log(temp.data, '用户申请上麦');
               //用户申请上麦
               handleApplyConnect(temp);
               break;
@@ -680,13 +676,6 @@
               _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
-            // 如果是分组直播 主持人/助理在主房间,小组内观众上线
-            if (_this.mode === 6) {
-              if (!_this.isInGroup && context.groupInitData?.isInGroup) {
-                return false;
-              }
-            }
-
             if (isLive) {
               const groupUsersNumber = _this.groupServer.state.groupedUserList.length || 0;
               _this.totalNum = _this.isInGroup
@@ -747,8 +736,15 @@
                   ? 0
                   : Number(context.groupInitData.is_banned);
               }
+
+              //在主房间，但是是分组内成员上线
+              if (!_this.isInGroup && context?.groupInitData?.isInGroup) {
+                return;
+              }
+
               _this.onlineUsers.push(user);
               _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+              _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
               setTimeout(() => {
                 _this.refresh();
               }, 100);
@@ -788,6 +784,7 @@
                     }
                   });
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 } else {
                   const user = {
                     account_id: msg.sender_id,
@@ -811,6 +808,7 @@
                   }
                   _this.onlineUsers.push(user);
                   _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 }
               } else {
                 const user = {
@@ -826,6 +824,7 @@
                 };
                 _this.onlineUsers.push(user);
                 _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
+                _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 if (msg.context.role_name == 4) {
                   if (msg.sender_id == _this.userId) {
                     return;
@@ -875,6 +874,7 @@
           }
           _this._deleteUser(msg.sender_id, _this.onlineUsers, 'onlineUsers');
           _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
+          _this._deleteUser(msg.sender_id, _this.limitedUsers, 'limitedUsers');
           setTimeout(() => {
             _this.refresh();
           }, 50);
@@ -941,8 +941,6 @@
               );
             }
           }, 30000);
-          //todo 信令通知其他组件(比如自定义菜单组件，有红点)
-          // this.$emit('memberUpdata');
         }
         //用户取消上麦申请
         function handleCancelApplyConnect(msg) {
@@ -962,11 +960,11 @@
         }
         //同意用户上麦
         function handleAgreeApplyConnect(msg) {
-          if (_this.memberOptions.platformType === 'live') {
+          if (_this.isLive) {
             _this.raiseHandTip = false;
             return;
           }
-          if (_this.memberOptions.platformType === 'watch') {
+          if (_this.isWatch) {
             _this.changeUserStatus(
               msg.room_join_id,
               _this.onlineUsers,
@@ -987,6 +985,10 @@
             member_info,
             'onlineUsers'
           );
+          //上麦成功，需要更新一下申请上麦的人（因为主持人和助理、组长等都会看到申请列表）
+          _this._deleteUser(msg.sender_id, _this.applyUsers, 'applyUsers');
+          //上麦成功，重新对在线人员排一下序
+          _this.onlineUsers = _this.memberServer._sortUsers(_this.onlineUsers);
           //如果已经没有举手的人，清除一下举手一栏的小红点
           if (!_this.applyUsers.length) {
             _this.raiseHandTip = false;
@@ -1004,16 +1006,23 @@
             msg.data.room_role != 2 &&
               _this.$message.success({ message: `${msg.data.nick_name}已上麦` });
           }
+          //清除定时器
           _this.handsUpTimerList[msg.data.room_join_id] &&
-            clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]); // 取消下麦清楚定时器
+            clearTimeout(_this.handsUpTimerList[msg.data.room_join_id]);
           delete _this.handsUpTimerList[msg.data.room_join_id];
         }
         //用户拒绝上麦邀请
         function handleUserRejectConnect(msg) {
           // 如果申请人是自己
-          if (msg.data.room_join_id == _this.userId || _this.roleName != 1) {
+          if (msg.data.room_join_id == _this.userId) {
             return;
           }
+
+          //发起端需要判断一下是不是非主持人
+          if (_this.isLive && _this.roleName != 1) {
+            return;
+          }
+
           let role = '';
           if (msg.data.room_role == 2) {
             role = _this.$t('chat.chat_1063');
@@ -1021,7 +1030,6 @@
             role = _this.$t('chat.chat_1023');
           }
           if (msg.data.extra_params == _this.userId) {
-            console.log('拒绝邀请', msg);
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
@@ -1039,11 +1047,6 @@
             },
             'onlineUsers'
           );
-
-          //如果是观看端，还要维护一下上麦列表
-          // if (_this.isWatch) {
-          //   _this.speakerList = _this.speakerList.filter(item => item.account_id != msg.sender_id);
-          // }
 
           //提示语
           if (msg.data.target_id == _this.userId) {
@@ -1075,9 +1078,6 @@
         //互动设置主讲人
         function handleChangeSpeaker(msg) {
           console.log(msg, '互动设置主讲人');
-          if (_this.isWatch) {
-            return;
-          }
         }
         //处理踢出人员
         function handleKicked(msg) {
@@ -1163,10 +1163,10 @@
               break;
             case 'group_switch_start':
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
-              handleStartGroupDiscuss();
+              _this.updateOnlineUserList();
               break;
             case 'group_join_change':
-              _this.getOnlineUserList();
+              _this.updateOnlineUserList();
               break;
             default:
               break;
@@ -1212,9 +1212,11 @@
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          if (isLive) return;
+          if (isLive && !this.isInGroup) return;
           this.leader_id = msg.data.account_id;
-          this.getOnlineUserList();
+          //还原一下tab
+          this.tabIndex = 1;
+          this.updateOnlineUserList();
         });
 
         // 主持人进入退出小组 消息监听
@@ -1224,7 +1226,7 @@
 
         // 频道变更-开始讨论(刷新数据)
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
-          isWatch && handleRoomChannelChange(msg);
+          isWatch && _this.updateOnlineUserList(msg);
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', msg => {
@@ -1289,15 +1291,7 @@
         //主持人/助理进入小组
         function handleHostJoin(msg) {
           if (_this.isLive) {
-            if (msg.data.status == 'enter') {
-              setTimeout(() => {
-                _this.onlineUsers = [];
-                _this.getOnlineUserList();
-              }, 1000);
-            } else if (msg.data.status == 'quit') {
-              _this.onlineUsers = [];
-              _this.getOnlineUserList();
-            }
+            ['enter', 'quit'].includes(msg.data.status) && _this.updateOnlineUserList();
           }
         }
 
@@ -1305,14 +1299,14 @@
         function handleStartGroupDiscuss() {
           _this.onlineUsers = [];
           _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
-          _this.getOnlineUserList();
+          _this.updateOnlineUserList();
         }
         //
         function handleEndGroupDiscuss(msg) {
           console.log('GROUP_SWITCH_END 分组--结束讨论:', msg);
           _this.onlineUsers = [];
           _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
-          _this.getOnlineUserList();
+          _this.updateOnlineUserList();
         }
         //重新获取最新的groupInitData
         function changeGroupInitData(msg) {
@@ -1333,12 +1327,7 @@
               _this.getOnlineUserList();
             } else {
               // 不等于时删除该人员
-              _this.onlineUsers.forEach((item, index) => {
-                if (item.account_id == msg.data.target_id) {
-                  _this.onlineUsers.splice(index, 1);
-                  _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
-                }
-              });
+              this._deleteUser(msg.data.target_id, this.onlineUsers, 'onlineUsers');
             }
           }
         }
@@ -1382,10 +1371,14 @@
           console.log(msg);
         }
       },
-      updateOnlineUserList() {
+      // updateOnlineUserList() {
+      //   this.onlineUsers = [];
+      //   this.getOnlineUserList();
+      // },
+      updateOnlineUserList: _.throttle(function () {
         this.onlineUsers = [];
         this.getOnlineUserList();
-      },
+      }, 1500),
       //获取在线人员列表
       getOnlineUserList(pos) {
         const _this = this;
@@ -1442,7 +1435,6 @@
        * 改变在线人员列表的状态
        */
       changeUserStatus(accountId = '', list = [], obj = {}, key = '') {
-        console.log('更改上麦状态', accountId, list, obj);
         const item = list.find(item => item.account_id === accountId);
         if (!item) {
           return;
@@ -1492,7 +1484,10 @@
       },
       //直播结束重置视图里的一些状态
       resetViewData() {
-        this.allowRaiseHand = !!parseInt(this.interactToolStatus.is_handsup);
+        this.allowRaiseHand = false;
+        if (this.tabIndex !== 1) {
+          this.switchToTab(1);
+        }
       },
       //切换允许举手状态
       onSwitchAllowRaiseHand(element) {
@@ -1507,17 +1502,14 @@
           status: this.allowRaiseHand ? 1 : 0
         };
 
-        this.disabledSwitchHand = true;
         this.micServer
           .setHandsUp(params)
           .then(res => {
             console.log('switch-mic-status', res);
             //todo 上报埋点
-            this.disabledSwitchHand = false;
             this.$message.success({ message: '设置成功' });
           })
           .catch(err => {
-            this.disabledSwitchHand = false;
             this.allowRaiseHand = false;
             console.log('举手状态变更失败', err);
           });
@@ -1529,10 +1521,12 @@
       //切换至某个tab
       switchToTab(index) {
         this.tabIndex = index;
+        this.memberServer.updateState('tabIndex', index);
         //清空输入的人员筛选
         this.searchUserInput = '';
         if (index === 2) {
           this.raiseHandTip = false;
+          this.memberServer.updateState('raiseHandTip', false);
         } else if (index === 3) {
           this.getLimitUserList();
         }
@@ -1930,16 +1924,19 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #434343;
+    background-color: #2a2a2a;
     &__group-name {
+      display: flex;
+      align-items: center;
       padding: 18px 20px 5px;
       color: #ccc;
       i {
-        vertical-align: bottom;
+        //vertical-align: bottom;
       }
       .pr_top {
-        position: relative;
-        top: -2px;
+        //position: relative;
+        //top: -2px;
+        margin-left: 10px;
         font-size: 14px;
       }
     }
@@ -1958,6 +1955,12 @@
         bottom: 0;
         //overflow: hidden;
       }
+      .show-empty-img {
+        .test_01 {
+          display: flex;
+          flex: 1;
+        }
+      }
       .empty-container {
         width: 100%;
         height: 100%;
@@ -1966,12 +1969,25 @@
         flex-direction: column;
         align-items: center;
         span {
-          font-size: 80px;
-          color: #7e7e7e;
+          display: inline-block;
+          //margin-top: 20%;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
         }
         p {
           margin-top: 10px;
           color: #999999;
+        }
+        .empty-img {
+          width: 120px;
+          height: 120px;
+        }
+        .empty-img-top {
+          width: 180px;
+          height: 100px;
         }
       }
       .member-list__all-tab {
@@ -1989,9 +2005,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #34363a;
+      background-color: #2a2a2a;
       box-sizing: border-box;
       color: #e2e2e2;
+      border-top: 1px solid #1a1a1a;
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
@@ -2018,19 +2035,19 @@
           vertical-align: middle;
           margin-right: 4px;
         }
-        .lb-raisehands {
+        .raise-hand-switch {
           cursor: pointer;
           color: #ccc;
           font-size: 12px;
           margin-right: 1px;
           & > input:checked + i em {
             border-color: #ff9446;
-            left: 22px;
+            left: 14px;
             transition: all 0.1s ease-in-out;
           }
           & > i {
             display: inline-block;
-            width: 30px;
+            width: 26px;
             height: 14px;
             background-color: #242527;
             border-radius: 100px;
@@ -2071,8 +2088,8 @@
           width: 74px;
           height: 30px;
           text-align: center;
-          background-color: #666666;
-          color: #cacaca;
+          background-color: #434343;
+          color: #999;
           float: left;
           cursor: pointer;
           position: relative;
@@ -2082,12 +2099,11 @@
             color: #fff;
           }
           &.active {
-            background-color: #fc5659;
-            color: #fff;
+            background-color: #595959;
+            color: #e6e6e6;
             &:hover {
-              color: #fff;
-
-              background-color: #fc5659;
+              color: #e6e6e6;
+              background-color: #595959;
             }
           }
           &.raise-hand {
@@ -2099,7 +2115,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background-color: #fc5659;
+              background-color: #fb3a32;
               position: absolute;
             }
           }
@@ -2111,8 +2127,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          color: #fff;
-          background-color: #666666;
+          color: #999;
+          background-color: #434343;
         }
       }
       &__search-panel {

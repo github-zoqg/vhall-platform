@@ -33,7 +33,7 @@
       />
       <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
       <p class="vhsaas-red-packet__name">
-        {{ (redPacketInfo.nickname || '') | splitLenStr(8) }}
+        {{ (redPacketInfo.nickname || '') | overHidden(8) }}
       </p>
       <p class="vhsaas-red-packet__btn" @click="navToList">
         {{ $t('interact_tools.interact_tools_1036') }}
@@ -76,11 +76,6 @@
         default() {
           return 0;
         }
-      }
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
     data() {
@@ -353,14 +348,6 @@
         margin-left: -9px;
       }
     }
-  }
-  .vhsaas-other-return {
-    font-size: 11px;
-    color: #ffffff;
-    margin-top: 20px;
-    display: block;
-    margin-left: 22px;
-    cursor: pointer;
   }
   /* 看看大家的手气 */
   .vhsaas-other-unit {

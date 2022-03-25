@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-error">
+  <div class="vmp-error" :class="propType == 'encrypt_error' ? 'vmp-error-encrypt' : ''">
     <div
       :class="`vmp-error__main error__pc ${propType} ${layout_line ? 'vmp__layout__line' : ''}`"
       :style="{ 'margin-top': mainTop }"
@@ -32,6 +32,8 @@
         <img v-else-if="propType == 'transcoding'" src="./img/transcoding.png" alt="" />
         <!-- 页面404 page_404 -->
         <img v-else-if="propType == 'page_404'" src="./img/page_404.png" alt="" />
+        <!-- 加密视频无法观看提示 -->
+        <img v-else-if="propType == 'encrypt_error'" src="./img/encrypt_error.png" alt="" />
         <slot v-else name="image">
           <!-- 空页面，网络开小差 network -->
           <img src="./img/network.png" alt="" />
@@ -123,7 +125,8 @@
             'browser_version',
             'embed_verify',
             'page_404',
-            'transcoding'
+            'transcoding',
+            'encrypt_error'
           ].includes(this.$route.params.str)
             ? this.$route.params.str
             : 'network';
@@ -336,5 +339,22 @@
     margin-top: auto;
     width: 100%;
     flex: 1;
+  }
+  .vmp-error-encrypt {
+    background: rgba(0, 0, 0, 0.9);
+    .vmp-error__content {
+      p {
+        padding: 0;
+        color: #fff;
+      }
+    }
+    .vmp-error__main .vmp-error__img {
+      transform-origin: center;
+    }
+    .vmp-error__content {
+      margin: 0;
+      position: relative;
+      top: -190px;
+    }
   }
 </style>

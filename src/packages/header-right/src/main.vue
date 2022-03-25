@@ -1,9 +1,12 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
-      <record-control v-if="configList['cut_record']"></record-control>
+      <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="roleName == 1">
+      <template v-if="deviceStatus == 2">
+        <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
+      </template>
+      <template v-else-if="roleName == 1 && !isInGroup">
         <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
@@ -21,7 +24,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && isLiving">
+      <template v-if="roleName == 4 && isLiving && !isInGroup">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -89,7 +92,8 @@
     useMicServer,
     useInteractiveServer,
     useSubscribeServer,
-    useSplitScreenServer
+    useSplitScreenServer,
+    useMediaCheckServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -119,7 +123,8 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        }
+        },
+        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
       };
     },
     computed: {
@@ -143,10 +148,14 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       },
       isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
+        return useMicServer().getSpeakerStatus();
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       }
     },
     components: {
@@ -162,6 +171,9 @@
       this.listenEvents();
     },
     mounted() {
+      if (this.deviceStatus == 2) {
+        this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
+      }
       const { watchInitData } = this.roomBaseServer.state;
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
@@ -178,7 +190,11 @@
       handleApplyClick() {
         useMicServer()
           .userApply()
-          .then(() => {
+          .then(res => {
+            if (+res.code !== 200) {
+              this.$message.error(res.msg);
+              return;
+            }
             this.isApplying = true;
             this.applyTime = 30;
             this._applyInterval = setInterval(async () => {
@@ -216,6 +232,32 @@
         }
         this.isApplying = false;
         this.applyTimerCount = 30;
+      },
+
+      /**
+       * 描述 重新检测当前设备
+       *      1、提示麦克风设备不可用
+       *      2、检测麦克风设备
+       *          可用 则本地修改deviceStatus值
+       *               检测是否在直播中，若在直播中，则liveStep = 3
+       * @date 2022-03-24
+       * @returns {any}
+       */
+      async handleRecheck() {
+        await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
+          this.deviceStatus = 1;
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
+          );
+          if (this.isLiving) {
+            this.liveStep = 3;
+          } else {
+            this.liveStep = 1;
+          }
+        } else {
+          this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
+        }
       },
       listenEvents() {
         // 全屏事件
@@ -362,7 +404,7 @@
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.staet.isOpenSplitScreen = false;
+          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
@@ -460,7 +502,7 @@
           html = '非默认回放将暂存15天';
         } else if (watchInitData.record_notice == 2) {
           html =
-            "非默认回放将暂存15天，联系您的客户经理或 <a href=\"https://vhall.s4.udesk.cn/im_client/?web_plugin_id=15038\" style='color: #fc5659' target='_blank'>客服</a> 开通点播服务，即可将非默认回放永久保存和播放";
+            "非默认回放将暂存15天，联系您的客户经理或 <a href=\"https://vhall.s4.udesk.cn/im_client/?web_plugin_id=15038\" style='color: #fb3a32' target='_blank'>客服</a> 开通点播服务，即可将非默认回放永久保存和播放";
         } else if (watchInitData.record_notice == 3) {
           html = '非默认回放将暂存15天，发布为点播，即可将非默认回放永久保存和播放';
         }
@@ -481,6 +523,7 @@
       },
       // 全屏
       fullScreen(el) {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120000);
         this.isFullscreen = !this.isFullscreen;
         if (this.isFullscreen) {
           this.enterFullscreen(el);

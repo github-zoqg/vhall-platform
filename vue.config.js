@@ -61,6 +61,72 @@ function getPlugins() {
       process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
     }
 
+    // ReplaceInFileWebpackPlugin 参数
+    const replaceInFileWebpackPluginData = [
+      {
+        dir: `dist/${argv.project}/docker`,
+        files: ['index.html'],
+        rules: [
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}`
+          }
+        ]
+      },
+      {
+        dir: `dist/${argv.project}/docker/${argv.version}`,
+        files: ['index.html'],
+        rules: [
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}/${argv.version}`
+          }
+        ]
+      },
+      {
+        dir: `dist/${argv.project}/cloud/static`,
+        test: /\.js$/,
+        rules: [
+          {
+            search: /@routerBaseUrl/g,
+            replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
+          },
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}`
+          }
+        ]
+      },
+      {
+        dir: `dist/${argv.project}/cloud/${argv.version}/static`,
+        test: /\.js$/,
+        rules: [
+          {
+            search: /@routerBaseUrl/g,
+            replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
+          },
+          {
+            search: /@projectName/g,
+            replace: `${argv.project}/${argv.version}`
+          }
+        ]
+      }
+    ];
+
+    // 如果非测试环境  非开发环境，修改 sourceMap 的地址
+    if (process.env.NODE_ENV != 'test') {
+      replaceInFileWebpackPluginData.push({
+        dir: `dist/${argv.project}`,
+        test: /\.js$/,
+        rules: [
+          {
+            search: /sourceMappingURL=/gi,
+            replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
+          }
+        ]
+      });
+    }
+
     plugins.push(
       new SentryCliPlugin({
         release: `${argv.version}`, // 版本号
@@ -104,66 +170,7 @@ function getPlugins() {
         }
       }),
       // 修改文件内容替换路由标记
-      new ReplaceInFileWebpackPlugin([
-        {
-          dir: `dist/${argv.project}/docker`,
-          files: ['index.html'],
-          rules: [
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}/docker/${argv.version}`,
-          files: ['index.html'],
-          rules: [
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}/${argv.version}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}/cloud/static`,
-          test: /\.js$/,
-          rules: [
-            {
-              search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-            },
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}/cloud/${argv.version}/static`,
-          test: /\.js$/,
-          rules: [
-            {
-              search: /@routerBaseUrl/g,
-              replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
-            },
-            {
-              search: /@projectName/g,
-              replace: `${argv.project}/${argv.version}`
-            }
-          ]
-        },
-        {
-          dir: `dist/${argv.project}`,
-          test: /\.js$/,
-          rules: [
-            {
-              search: /sourceMappingURL=/gi,
-              replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
-            }
-          ]
-        }
-      ])
+      new ReplaceInFileWebpackPlugin(replaceInFileWebpackPluginData)
     );
   }
   return plugins;
@@ -177,7 +184,8 @@ const sharedConfig = {
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool: isDev ? '#eval-source-map' : '#cheap-module-source-map',
+    devtool:
+      isDev || process.env.NODE_ENV == 'test' ? '#eval-source-map' : '#cheap-module-source-map',
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
       hints: isDev ? false : 'warning',

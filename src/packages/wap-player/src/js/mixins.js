@@ -136,6 +136,9 @@ const playerMixins = {
           element.msRequestFullscreen
         )
       ) {
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.isFullscreen = false;
+        }
         this.playerServer.enterFullScreen();
       }
       if (element.requestFullscreen) element.requestFullscreen();
@@ -184,7 +187,6 @@ const playerMixins = {
           this.playerServer.getDuration(() => {
             console.log('获取视频总时长失败');
           });
-        console.log(this.totalTime, 'zog总时间');
         if (this.isTryPreview && this.totalTime > 0) {
           this.recordTime = computeRecordTime(this.totalTime);
           if (this.recordTime === 0) {

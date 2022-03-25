@@ -12,12 +12,13 @@
     <el-button
       round
       size="mini"
-      v-if="renderEndDemonstrateBtn"
+      v-if="renderEndDemonstrateBtn && isShareScreen"
       @click="handleEndDemonstrate"
       class="end-demonstrate"
     >
       结束演示
     </el-button>
+
     <!-- 推桌面共享容器 -->
     <div id="vmp-desktop-screen-publish" style="width: 0; height: 0; position: relative"></div>
 
@@ -27,14 +28,14 @@
     <!-- 推桌面共享时占位图 -->
     <div
       class="vmp-desktop-screen__tip"
-      v-show="isShareScreen && desktopShareInfo.accountId == accountId && role != 2"
+      v-show="isShareScreen && desktopShareInfo.accountId == accountId && roleName != 2"
     >
-      <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
+      <i class="vmp-desktop-screen__img"></i>
       <br />
-      <p>桌面共享中...</p>
+      <p>桌面共享中....</p>
     </div>
 
-    <!--弹窗 -->
+    <!--没有权限弹窗 -->
     <saas-alert
       :visible="popAlert.visible"
       :confirm="popAlert.confirm"
@@ -68,7 +69,9 @@
     useInteractiveServer,
     useGroupServer,
     useDesktopShareServer,
-    useMsgServer
+    useMsgServer,
+    useMicServer,
+    useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -86,20 +89,17 @@
       };
     },
     computed: {
-      // 角色
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾？）
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
-      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾？）
-      role() {
-        return this.roomBaseServer.state.watchInitData.join_info.role_name;
-      },
-      third_party_user_id() {
-        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
-      },
+
       // 是否观看端
       isWatch() {
-        return this.roomBaseServer.state.clientType !== 'send';
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
       },
       //是否在分组里
       isInGroup() {
@@ -121,9 +121,9 @@
       isShowWrapper() {
         return (
           (this.isShareScreen &&
-            (this.presentation_screen != this.third_party_user_id ||
-              this.role == 1 ||
-              this.role == 4)) ||
+            (this.presentation_screen != this.accountId ||
+              this.roleName == 1 ||
+              this.roleName == 4)) ||
           this.popAlert.visible ||
           this.isShowAccessDeniedAlert
         );
@@ -144,15 +144,15 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
-      // 当前用户Id
-      userId() {
-        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
-      },
       // 当前的演示者Id
       presenterId() {
         return this.isInGroup
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       /**
        * @description 是否显示结束演示按钮
@@ -180,22 +180,22 @@
             return true; // 对于主持人，演示者不是组长的时候显示
           } else if (
             this.groupInitData.join_role == 20 &&
-            this.presenterId != this.userId &&
+            this.presenterId != this.accountId &&
             this.presenterId != this.watchInitData.webinar.userinfo.user_id
           ) {
             return true; // 对于组长，演示者不是自己,也不是主持人的时候显示
-          } else if (this.groupInitData.join_role == 2 && this.presenterId == this.userId) {
+          } else if (this.groupInitData.join_role == 2 && this.presenterId == this.accountId) {
             return true; // 对于观众，演示者是自己的时候显示
           }
           return false;
         } else {
           // 在主直播间内
           // 如果是主持人，演示人不是自己，说明有人在演示
-          if (this.roleName == 1 && this.presenterId != this.userId) {
+          if (this.roleName == 1 && this.presenterId != this.accountId) {
             return true;
           }
           // 如果不是主持人, 演示者是自己,显示
-          if (this.roleName != 1 && this.presenterId == this.userId) {
+          if (this.roleName != 1 && this.presenterId == this.accountId) {
             return true;
           }
           return false;
@@ -206,6 +206,7 @@
       SaasAlert
     },
     beforeCreate() {
+      this.micServer = useMicServer();
       this.roomBaseServer = useRoomBaseServer();
       this.mediaSettingServer = useMediaSettingServer();
       this.groupServer = useGroupServer();
@@ -225,7 +226,9 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
+          // if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
+          //   return;
+          // }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -242,10 +245,28 @@
     methods: {
       addEvents() {
         this.desktopShareServer.$on('screen_stream_add', () => {
-          this.subscribeStream();
+          this.subscribeStream().then(() => {
+            // 重置布局
+            useDocServer().resetLayoutByMiniElement();
+            // 设置旁路
+            this.interactiveServer.resetLayout();
+          });
         });
-        this.desktopShareServer.$on('screen_stream_remove', () => {
-          this.desktopShareServer.unSubscribeDesktopShareStream();
+        this.desktopShareServer.$on('EVENT_STREAM_END', () => {
+          this.setDesktop('0');
+          this.interactiveServer.resetLayout();
+        });
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+            this.$message({
+              message: this.$t(`interact.interact_1013`),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            this.subscribeStream();
+          }
         });
 
         useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -254,10 +275,10 @@
             // 自己正在发起桌面共享
             if (
               this.isShareScreen &&
-              this.third_party_user_id == this.desktopShareInfo.accountId &&
-              msg.data.target_id != this.third_party_user_id
+              this.accountId == this.desktopShareInfo.accountId &&
+              msg.data.target_id != this.accountId
             ) {
-              this.desktopShareServer.stopShareScreen();
+              this.stopShare();
             }
           }
           // 演示着变更
@@ -265,39 +286,68 @@
             // 自己正在发起桌面共享
             if (
               this.isShareScreen &&
-              this.third_party_user_id == this.desktopShareInfo.accountId &&
-              msg.data.target_id != this.third_party_user_id
+              this.accountId == this.desktopShareInfo.accountId &&
+              msg.data.target_id != this.accountId
             ) {
-              this.desktopShareServer.stopShareScreen();
+              this.stopShare();
             }
           }
-          // 演示着变更
-          if (msg.data.type === 'group_manager_enter') {
+          // 主持人进出小组如果正在演示桌面共享，需要停止共享
+
+          if (msg.data.type === 'group_manager_enter' && msg.data.role == 1) {
             // 自己正在发起桌面共享
-            if (this.isShareScreen && this.third_party_user_id == this.desktopShareInfo.accountId) {
-              this.desktopShareServer.stopShareScreen();
+            if (
+              this.roleName == 1 &&
+              this.isShareScreen &&
+              this.accountId == this.desktopShareInfo.accountId
+            ) {
+              this.stopShare();
             }
+          }
+
+          // 桌面共享开启消息
+          if (msg.data.type === 'desktop_sharing_disable') {
+            if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
+              if (useRoomBaseServer().state.miniElement == 'player') {
+                return;
+              }
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickExchangeView')
+              );
+            }
+            useRoomBaseServer().setInavToolStatus('is_desktop', 0);
+          }
+
+          // 桌面共享关闭消息
+          if (msg.data.type === 'desktop_sharing_open') {
+            if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
+              if (useRoomBaseServer().state.miniElement == 'doc') {
+                return;
+              }
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickExchangeView')
+              );
+            }
+            useRoomBaseServer().setInavToolStatus('is_desktop', 1);
           }
         });
       },
       // 订阅流
       subscribeStream() {
+        let videoNode = 'vmp-desktop-screen-subscribe';
+        document.getElementById(videoNode).innerHTML = '';
         const opt = {
-          videoNode: 'vmp-desktop-screen-subscribe', // 远端流显示容器，必填
+          videoNode, // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
 
-        this.desktopShareServer.subscribeDesktopShareStream(opt).then(() => {
-          useRoomBaseServer().setChangeElement('stream-list');
-        });
+        return this.desktopShareServer.subscribeDesktopShareStream(opt);
       },
       showConfirm() {
         if (!this.isShareScreen) {
           this.popAlert.visible = true;
         } else {
-          this.desktopShareServer.stopShareScreen().then(() => {
-            useRoomBaseServer().setChangeElement('stream-list');
-          });
+          this.stopShare();
         }
       },
 
@@ -321,22 +371,37 @@
               .publishDesktopShareStream()
               .then(() => {
                 // 重新布局旁路
+                console.log('[screen] 桌面共享推流成功');
                 this.interactiveServer.resetLayout();
 
-                console.log('[screen] 桌面共享推流成功');
+                this.setDesktop('1');
               })
               .catch(error => {
-                console.log(error, '推流失败');
+                console.log(error, this.$t('interact.interact_1021'));
               });
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
-            if (error?.data?.error?.type == 'access-denied') {
+            if (error?.name == 'NotAllowed') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
               }
             }
           });
+      },
+      // 停止共享
+      stopShare() {
+        this.desktopShareServer.stopShareScreen().then(() => {
+          this.setDesktop('0');
+          this.interactiveServer.resetLayout();
+        });
+      },
+      // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
+      setDesktop(status) {
+        if (!this.isWatch && useDocServer().state.switchStatus) {
+          // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
+          this.interactiveServer.setDesktop({ status });
+        }
       },
       // 关闭弹窗
       closeConfirm() {
@@ -395,11 +460,17 @@
       margin: auto;
       width: 400px;
       height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
       & > i {
-        font-size: 137px;
-        display: block;
-        color: #999;
-        width: 100%;
+        width: 124px;
+        height: 86px;
+        background: url('./img/desktop-share.png');
+        background-repeat: no-repeat;
+        background-size: 100%;
       }
 
       & > p {
@@ -421,8 +492,8 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }

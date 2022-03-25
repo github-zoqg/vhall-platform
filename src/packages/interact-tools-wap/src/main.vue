@@ -1,5 +1,5 @@
 <template>
-  <div class="tools-box">
+  <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
@@ -29,7 +29,7 @@
       <div v-if="showInviteCard && !localRoomInfo.isEmbed">
         <a
           target="_blank"
-          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
+          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}&lang=${lang}`"
         >
           <i class="vh-iconfont vh-line-share"></i>
         </a>
@@ -88,7 +88,8 @@
         showInviteCard: roomBaseState.inviteCard.status == '1',
         location:
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
-        qwe: 1
+        qwe: 1,
+        lang: localStorage.getItem('lang')
       };
     },
     created() {
@@ -113,8 +114,8 @@
   };
 </script>
 
-<style lang="less" scoped>
-  .tools-box {
+<style lang="less">
+  .vmp-interact-tools-wap {
     .icon-wrapper {
       display: flex;
       div {

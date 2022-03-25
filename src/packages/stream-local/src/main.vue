@@ -34,22 +34,34 @@
       </div>
     </section>
 
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="localSpeaker.streamId">
+    <section class="vmp-stream-local__bottom" v-show="localSpeaker.streamId">
       <span
-        v-show="[1, 3, 4].includes(joinInfo.role_name)"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${joinInfo.role_name}`"
+        v-show="showRole"
+        class="vmp-stream-local__bottom-role"
+        :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
         {{ joinInfo.role_name | roleFilter }}
       </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ joinInfo.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-nickname"
+        :class="{
+          'vmp-stream-local__bottom-nickname-width': showRole
+        }"
+      >
+        {{ joinInfo.nickname }}
+      </span>
+      <span
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="
           localSpeaker.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
         "
@@ -66,7 +78,9 @@
           {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
-          :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          :content="
+            localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+          "
           placement="top"
         >
           <span
@@ -81,7 +95,9 @@
         </el-tooltip>
 
         <el-tooltip
-          :content="localSpeaker.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          :content="
+            localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+          "
           placement="top"
         >
           <span
@@ -93,7 +109,7 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="top">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="top">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
@@ -108,7 +124,7 @@
         <el-tooltip content="切换" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
-            v-if="!isFullScreen"
+            v-if="!isFullScreen && isShowExchangeBtn"
             @click="exchange"
           ></span>
         </el-tooltip>
@@ -129,7 +145,9 @@
     <section v-show="isShowShadowBtn" v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
         <el-tooltip
-          :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          :content="
+            localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+          "
           placement="top"
         >
           <span
@@ -143,7 +161,9 @@
           ></span>
         </el-tooltip>
         <el-tooltip
-          :content="localSpeaker.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          :content="
+            localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+          "
           placement="top"
         >
           <span
@@ -154,7 +174,7 @@
             "
           ></span>
         </el-tooltip>
-        <el-tooltip content="下麦" placement="top">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="top">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
@@ -163,7 +183,7 @@
         </el-tooltip>
       </p>
       <p
-        v-if="joinInfo.role_name == 1 || localSpeaker.roleName === 20"
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-local__shadow-second-line"
       >
         <!-- 设为主讲人 -->
@@ -191,14 +211,27 @@
     </section>
 
     <!-- 播放按钮 -->
-    <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
+    <!-- <section class="vmp-stream-local__pause" v-show="showInterIsPlay">
       <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section>
+    </section> -->
 
     <ImgStream ref="imgPushStream"></ImgStream>
+
+    <!-- 异常弹窗 -->
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>网络异常导致互动房间连接失败</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
@@ -213,12 +246,13 @@
     useSplitScreenServer,
     useMediaCheckServer,
     useChatServer,
-    useMsgServer,
-    useDocServer
+    useDocServer,
+    useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpStreamLocal',
     data() {
@@ -227,13 +261,34 @@
         networkStatus: 2,
         audioLevel: 1,
         showDownMic: false,
-        isNotAutoSpeak: false // 分组模式下的是否为自动静音上麦自动
+        isNotAutoSpeak: false, // 分组模式下的是否为自动静音上麦自动
+
+        // 网络异常弹窗状态
+        PopAlertOffline: {
+          visible: false
+        }
       };
     },
     components: {
-      ImgStream
+      ImgStream,
+      SaasAlert
     },
     computed: {
+      // 文档是否对观众可见
+      switchStatus() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
+      // 是否展示切换按钮
+      isShowExchangeBtn() {
+        if (this.isInGroup) {
+          return true;
+        } else {
+          return this.joinInfo.role_name != 2 ? true : this.switchStatus;
+        }
+      },
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       // 当前人插播的时候，不显示本地流的操作按钮
       isShowShadowBtn() {
         return (
@@ -265,6 +320,17 @@
         return this.$domainStore.state.micServer.speakerList;
       },
 
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
+
       // 小组内角色，20为组长
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
@@ -280,6 +346,24 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      presentationScreen() {
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        }
+      },
+      //显示是否在演示中
+      isShowPresentationScreen() {
+        const { accountId } = this.localSpeaker;
+        const sameId = this.presentationScreen === accountId;
+        const groupMode = this.liveMode == 6;
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
+
+        return sameId && groupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -314,7 +398,7 @@
           this.mainScreen == this.joinInfo.third_party_user_id &&
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2 &&
-          this.$domainStore.state.docServer.switchStatus
+          this.mode === 6
         );
       },
       coverImgUrl() {
@@ -322,7 +406,9 @@
       },
       // 是否显示分屏占位图
       isShowSplitScreenPlaceholder() {
-        return this.isOpenSplitScreen && this.$domainStore.state.splitScreenServer.role == 'host';
+        return (
+          this.isOpenSplitScreen && this.$domainStore.state.splitScreenServer.role == 'hostPage'
+        );
       },
       // 是否开启分屏
       isOpenSplitScreen() {
@@ -334,9 +420,15 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      showRole() {
+        return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -350,7 +442,6 @@
       this.listenEvents();
     },
     async mounted() {
-      window.streamLocal = this;
       this.checkStartPush();
     },
     beforeDestroy() {
@@ -375,16 +466,12 @@
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
         if (
-          useMediaCheckServer().state.deviceInfo.device_status === 1 &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2 &&
           isSpeakOn &&
           (!this.isOpenSplitScreen ||
-            (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'split'))
+            (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'splitPage'))
         ) {
           this.startPush();
-        } else {
-          if (isSpeakOn) {
-            this.speakOff();
-          }
         }
       },
       // 恢复播放
@@ -420,7 +507,14 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStream.streamId) return;
+            if (this.localStream.streamId) {
+              // 只有主持人使用
+              if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
+                await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
+                this.startPush();
+              }
+              return;
+            }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
             if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
               this.speakOff();
@@ -466,18 +560,23 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          await this.interactiveServer.destroy();
+          if (this.joinInfo.role_name != 1) {
+            await this.interactiveServer.destroy();
+          }
 
           // 下麦成功后，如果开启了文档可见并且不是无延迟，把播放器置为小屏
-          if (useDocServer().state.switchStatus && this.isNoDelay === 0) {
+          if (
+            this.joinInfo.role_name == 2 &&
+            useDocServer().state.switchStatus &&
+            this.isNoDelay === 0
+          ) {
             useRoomBaseServer().setChangeElement('player');
           }
 
-          if (
-            this.isNoDelay === 1 ||
-            this.mode === 6 ||
-            [4, '4'].includes(this.joinInfo.role_name)
-          ) {
+          if (this.isNoDelay === 1 || [1, 4].includes(+this.joinInfo.role_name)) {
+            if (this.mode === 6) {
+              await this.groupServer.updateGroupInitData();
+            }
             //  初始化互动实例
             this.interactiveServer.init();
           } else {
@@ -488,19 +587,85 @@
           }
         });
         // 结束直播
-        useMsgServer().$on('live_over', async () => {
+        this.micServer.$on('live_over', async () => {
           // 如果开启分屏并且是主页面，不需要停止推流
           if (
             this.splitScreenServer.state.isOpenSplitScreen &&
-            this.splitScreenServer.state.role == 'host'
+            this.splitScreenServer.state.role == 'hostPage'
           ) {
             return;
           }
           await this.stopPush();
-          this.roomBaseServer.setChangeElement('stream-list');
+
+          clearInterval(this._audioLeveInterval);
+          clearInterval(this._netWorkStatusInterval);
+
+          if (this.isWatch) {
+            this.roomBaseServer.setChangeElement('');
+          } else {
+            this.roomBaseServer.setChangeElement('stream-list');
+          }
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
             this.interactiveServer.destroy();
+          }
+
+          this.micServer.setSpeakerList([]);
+        });
+        // 结束直播
+        useMsgServer().$onMsg('ROOM_MSG', async msg => {
+          if (msg.data.event_type === 'group_switch_end') {
+            // 如果开启分屏并且是主页面，不需要停止推流
+            if (
+              this.splitScreenServer.state.isOpenSplitScreen &&
+              this.splitScreenServer.state.role == 'hostPage'
+            ) {
+              return;
+            }
+
+            // 由于结束直播导致的结束讨论
+            if (msg.data.over_live == 1) {
+              await this.stopPush();
+              if (this.isWatch) {
+                this.roomBaseServer.setChangeElement('');
+              } else {
+                this.roomBaseServer.setChangeElement('stream-list');
+              }
+
+              if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
+                this.interactiveServer.destroy();
+              }
+
+              this.micServer.setSpeakerList([]);
+            }
+          }
+        });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          const str =
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : '主讲人';
+          this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+        });
+
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+          console.log('网络异常断开', msg);
+          this.PopAlertOffline.visible = true;
+        });
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
+          if (e.data.stream.getID() == this.localStream.streamId) {
+            this.$message({
+              message: this.$t('因网络问题推流失败，正在重新推流'),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            await this.stopPush();
+            this.startPush();
           }
         });
 
@@ -586,7 +751,6 @@
         } else if (res.code == 513025) {
           // 麦位已满，上麦失败
           this.$message.error(`上麦席位已满员，您的账号支持${res.data.replace_data}人上麦`);
-          // TODO: 麦位已满的处理
         } else {
           console.error('上麦接口失败----', res);
         }
@@ -600,13 +764,16 @@
       async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
-          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
+          this.$message.error(this.$t('interact.interact_1016'));
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
+        } else if (err == 'NotAllowed') {
+          // 本地流创建失败
+          this.$message.error(this.$t('interact.interact_1016'));
         } else if (err == 'publishStreamError') {
           // 推流失败
-          this.$message.error('推流失败');
+          this.$message.error(this.$t('interact.interact_1021'));
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
@@ -691,8 +858,15 @@
             .createLocalVideoStream({
               videoNode: `stream-${this.joinInfo.third_party_user_id}`
             })
-            .catch(() => 'createLocalStreamError');
+            .catch(e => {
+              if (e && e?.name == 'NotAllowed') {
+                return Promise.reject('NotAllowed');
+              } else {
+                return Promise.reject('createLocalStreamError');
+              }
+            });
         } else {
+          // 若是图片推流，刷新则需等待canvas进行绘制
           await this.sleep();
           const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
           if (!videoTracks) {
@@ -703,13 +877,15 @@
               videoNode: `stream-${this.joinInfo.third_party_user_id}`,
               videoTrack: videoTracks
             })
-            .catch(() => 'createLocalPhotoStreamError');
+            .catch(() => {
+              return Promise.reject('createLocalPhotoStreamError');
+            });
         }
       },
       // 推流
       async publishLocalStream() {
         await this.interactiveServer.publishStream().catch(e => {
-          console.warn('----推流失败', e);
+          console.log('paltForm publishLocalStream failed....', e);
           if (e.code === '611007') {
             this.handleSpeakOnError('noPermission');
           } else {
@@ -720,7 +896,9 @@
 
       // 设置主屏
       async setBroadCastScreen() {
-        await this.interactiveServer.setBroadCastScreen().catch(() => 'setBroadCastScreenError');
+        await this.interactiveServer.setBroadCastScreen().catch(() => {
+          return Promise.reject('setBroadCastScreenError');
+        });
       },
 
       // 设置旁路布局
@@ -728,21 +906,25 @@
         const param = {
           adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')]
         };
-        await this.interactiveServer
-          .setBroadCastAdaptiveLayoutMode(param)
-          .catch(() => 'setBroadCastAdaptiveLayoutModeError');
+        await this.interactiveServer.setBroadCastAdaptiveLayoutMode(param).catch(() => {
+          return Promise.reject('setBroadCastAdaptiveLayoutModeError');
+        });
       },
 
       // 结束推流
       stopPush() {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
           if (!this.localSpeaker.streamId) {
             resolve();
             return;
           }
-          this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
-            console.warn('结束推流成功----');
+
+          // 当前角色为主持人&&设备被禁用
+          if (
+            +this.joinInfo.role_name === 1 &&
+            useMediaCheckServer().state.deviceInfo.device_status === 2
+          ) {
             clearInterval(this._audioLeveInterval);
 
             // 主持人不在小组中，停止推流触发 直播结束 生成回放
@@ -752,7 +934,26 @@
               );
             }
             resolve();
-          });
+            return;
+          }
+
+          this.interactiveServer
+            .unpublishStream(this.localSpeaker.streamId)
+            .then(() => {
+              console.warn('结束推流成功----');
+              clearInterval(this._audioLeveInterval);
+
+              // 主持人不在小组中，停止推流触发 直播结束 生成回放
+              if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+                );
+              }
+              resolve();
+            })
+            .catch(err => {
+              reject(err);
+            });
         });
       },
       // 点击mute按钮事件
@@ -801,7 +1002,11 @@
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.localSpeaker.streamId) return clearInterval(this._audioLeveInterval);
+          if (
+            !this.localSpeaker.streamId ||
+            !this.$domainStore.state.interactiveServer.isInstanceInit
+          )
+            return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.localSpeaker.streamId })
@@ -816,7 +1021,11 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.localSpeaker.streamId) return clearInterval(this._netWorkStatusInterval);
+          if (
+            !this.localSpeaker.streamId ||
+            !this.$domainStore.state.interactiveServer.isInstanceInit
+          )
+            return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.localSpeaker.streamId })
@@ -871,6 +1080,9 @@
             console.error('setmainscreen failed ::', err);
           });
       },
+      /**
+       * 初始化互动实例时，进行自动上麦判断时，会调用speakOn接口，此时vrtc_connect_success已经收到，但互动实例还没有，所以在推流之前需要等待互动实例化完成
+       */
       checkVRTCInstance() {
         return new Promise((resolve, reject) => {
           let count = 0;
@@ -889,6 +1101,12 @@
             }
           }, 100);
         });
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
     }
   };
@@ -988,7 +1206,7 @@
       }
     }
 
-    .vmp-stream-local__bootom {
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -1001,8 +1219,13 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin: 5px 4px 0 0;
+        align-items: center;
+
         border-radius: 8px;
-        padding: 0 6px;
+        padding: 0 4px;
         vertical-align: top;
         // 主持人
         &__1 {
@@ -1032,14 +1255,16 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         margin-left: 5px;
+        &-width {
+          width: 40px;
+        }
       }
       &-mic {
         float: right;
-        font-size: 12px;
+        font-size: 13px;
       }
       &-signal {
         float: right;
-        font-size: 12px;
         margin-left: 5px;
         margin-top: 4px;
         background-size: contain;
@@ -1057,6 +1282,29 @@
         }
       }
     }
+
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+      left: px;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 6px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     // 遮罩层样式
     .vmp-stream-local__shadow-box {
       width: 100%;
@@ -1095,8 +1343,12 @@
         background: hsla(0, 0%, 100%, 0.3);
         border-radius: 100%;
         margin-right: 10px;
+
+        &.vh-line-copy-document {
+          font-size: 14px;
+        }
         &:hover {
-          background-color: #fc5659;
+          background-color: #fb3a32;
         }
         &:last-child {
           margin-right: 0;
@@ -1110,7 +1362,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 6;
       background: #000;
       display: flex;
       justify-content: center;

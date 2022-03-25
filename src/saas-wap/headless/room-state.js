@@ -110,17 +110,18 @@ export default async function () {
     console.log('微信分享', e);
   }
 
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
+  const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
+  const liveType = roomBaseServer.state.watchInitData.webinar.type;
+
+  // 互动、分组直播 并且 为直播模式，才进行设备检测
+  if ([3, 6].includes(liveMode) && liveType == 1) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
   await Promise.all(promiseList);
 
   // 互动、分组直播初始化micServer
-  if ([3, 6].includes(roomBaseServer.state.watchInitData.webinar.mode)) {
-    micServer.init();
-  }
+  micServer.init();
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
@@ -129,8 +130,10 @@ export default async function () {
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
-  await interactiveServer.init();
-  console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  if (roomBaseServer.state.watchInitData.webinar.type == 1) {
+    await interactiveServer.init();
+    console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+  }
 
   insertFileServer.init();
 

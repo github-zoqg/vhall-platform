@@ -8,7 +8,7 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comQuestionnaire']
+    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comGoodsDetailPc']
     // children: ['layerBody']
   },
   // 顶部header 容器嵌入不用这个组件
@@ -67,11 +67,9 @@ export const serverConfig = {
       'comSignUpForm',
       'comUserAccount',
       'comCash',
-      'comLottery',
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comRedPacket',
       'comMicInvited'
     ]
   },
@@ -104,7 +102,12 @@ export const serverConfig = {
   /**** 组件定义 */
   // 自定义菜单
   comCustomMenu: {
-    component: 'VmpCustomMenu'
+    component: 'VmpCustomMenu',
+    emitOpenShareDialog: {
+      cuid: 'comShare',
+      method: 'shareOtherDialog',
+      args: ['$0']
+    }
   },
 
   // 文档白板组件
@@ -147,6 +150,13 @@ export const serverConfig = {
         method: 'showConfirm',
         args: ['$0']
       }
+    ],
+    // 触发画笔重置
+    emitDocResetBrush: [
+      {
+        cuid: 'comDocUne',
+        method: 'resetCurrentBrush'
+      }
     ]
   },
   comStreamList: {
@@ -166,7 +176,11 @@ export const serverConfig = {
   },
   // 桌面共享组件
   comDesktopScreen: {
-    component: 'VmpStreamDesktopScreen'
+    component: 'VmpStreamDesktopScreen',
+    emitClickExchangeView: {
+      cuid: 'comPcPlayer',
+      method: 'exchangeVideoDocs'
+    }
   },
   // 插播文件
   comInsertStream: {
@@ -236,7 +250,7 @@ export const serverConfig = {
       }
     ],
     emitOpenCash: [
-      //弹出个人资料
+      //弹出提现组件
       {
         cuid: 'comCash',
         method: 'openCashDialog'
@@ -318,7 +332,7 @@ export const serverConfig = {
       method: 'open',
       args: ['$0']
     },
-    children: ['comSignWatch', 'comWatchTimer']
+    children: ['comSignWatch', 'comWatchTimer', 'comQuestionnaire', 'comLottery', 'comRedPacket']
   },
   comSignWatch: {
     component: 'VmpSignWatch'
@@ -414,7 +428,16 @@ export const serverConfig = {
   },
   //商品列表
   comGoodSaas: {
-    component: 'VmpGoodList'
+    component: 'VmpGoodList',
+    emitShowDetail: {
+      cuid: ['comGoodsDetailPc'],
+      method: 'open',
+      args: ['$0']
+    }
+  },
+  //商品详情
+  comGoodsDetailPc: {
+    component: 'VmpGoodDetailPc'
   },
   // 抽奖
   comLottery: {
@@ -476,7 +499,13 @@ export const serverConfig = {
   // 预约页面配置
   layerSubscribeRoot: {
     component: 'VmpAirContainer',
-    children: ['layerSubscribeHeader', 'layerSubscribeBody', 'layerSubscribeFooter', 'comAllDialog']
+    children: [
+      'layerSubscribeHeader',
+      'layerSubscribeBody',
+      'layerSubscribeFooter',
+      'comAllDialog',
+      'comGoodsDetailPc'
+    ]
   },
   // 顶部header容器
   layerSubscribeHeader: {

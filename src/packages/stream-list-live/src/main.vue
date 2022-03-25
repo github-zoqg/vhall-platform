@@ -5,6 +5,7 @@
     :class="{ 'vmp-stream-list-h0': isStreamListH0, shrink: isShrink }"
   >
     <div class="vmp-stream-list__stream-wrapper">
+      <!-- 本地流容器 -->
       <div
         class="vmp-stream-list__local-container"
         :class="{
@@ -21,6 +22,8 @@
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
       </div>
+
+      <!-- 远端流列表 -->
       <template v-if="remoteSpeakers.length">
         <div
           v-for="speaker in remoteSpeakers"
@@ -54,44 +57,23 @@
       </div>
     </div>
 
-    <div
-      class="vmp-stream-list__folder"
-      v-show="remoteSpeakers.length > 0 || (splited && speakerList.length > 0)"
-      v-if="!isSplited"
-    >
+    <!-- 滚动操作 -->
+    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0">
       <span
         class="vmp-stream-list__folder--up"
         :class="{
-          disable:
-            isShrink ||
-            (!splited && remoteSpeakers.length <= remoteMaxLength) ||
-            (splited && speakerList.length - 1 <= remoteMaxLength)
+          disable: isShrink || remoteSpeakers.length <= remoteMaxLength
         }"
         @click="toggleShrink(true)"
       ></span>
       <span
         class="vmp-stream-list__folder--down"
         :class="{
-          disable:
-            !isShrink ||
-            (!splited && remoteSpeakers.length <= remoteMaxLength) ||
-            (splited && speakerList.length - 1 <= remoteMaxLength)
+          disable: !isShrink || remoteSpeakers.length <= remoteMaxLength
         }"
         @click="toggleShrink(false)"
       ></span>
     </div>
-
-    <saas-alert
-      :visible="PopAlertOffline.visible"
-      :retry="'点击重试'"
-      :isShowClose="false"
-      @onClose="PopAlertOfflineClose"
-      @onSubmit="PopAlertOfflineConfirm"
-    >
-      <div slot="content">
-        <span>网络异常导致互动房间连接失败</span>
-      </div>
-    </saas-alert>
   </div>
 </template>
 
@@ -103,7 +85,6 @@
     useMsgServer,
     useGroupServer
   } from 'middle-domain';
-  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
   export default {
@@ -112,22 +93,19 @@
     data() {
       return {
         childrenCom: [],
-        maxElement: '',
-        isSplited: false,
-        splited: false,
         isShrink: false, // 是否收起
         isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
         remoteMaxLength: 0, //一行最大数
-        PopAlertOffline: {
-          visible: false
-        },
+
         streamInfo
       };
     },
-    components: {
-      SaasAlert
-    },
     computed: {
+      // 1直播
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      // 3互动 //6分组
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -138,7 +116,6 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       mainScreen() {
-        console.warn(this.$domainStore.state, 789);
         if (this.$domainStore.state.groupServer.groupInitData.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
         } else {
@@ -178,9 +155,12 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
-         * 4. 没有互动实例的时候高度为0
+         * 4. 没有互动实例并且分屏没有打开的时候高度为0，如果分屏打开根绝上麦列表的长度判断
          */
-        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+        if (
+          !this.$domainStore.state.interactiveServer.isInstanceInit &&
+          !this.$domainStore.state.splitScreenServer.isOpenSplitScreen
+        ) {
           return true;
         }
         if (!this.remoteSpeakers.length) {
@@ -202,14 +182,23 @@
       localStream() {
         return this.$domainStore.state.interactiveServer.localStream;
       },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
       showGroupMask() {
-        // 主持人是否在组内 + 直播中 + 分组 + 助理 + 自身不在小组中
+        // 主持人是否在组内 + 直播中 + 分组 + 助理 + 自身不在小组中 + 无主画面
         return (
           this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1 &&
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1 &&
           this.mode == 6 &&
           this.joinInfo.role_name == 3 &&
-          !this.isInGroup
+          !this.isInGroup &&
+          !this.isShowMainScreen
         );
       }
     },
@@ -223,13 +212,8 @@
     },
 
     created() {
-      window.streamListLive = this;
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
-      // 房间信令异常断开事件
-      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
-        this.PopAlertOffline.visible = true;
-      });
       this.listenEvents();
     },
 
@@ -243,18 +227,25 @@
 
     methods: {
       listenEvents() {
+        // 订阅流播放失败    监听到播放失败, 然后展示按钮
+        this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+          this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+          if (this.playboartCount > 1) {
+            return;
+          }
+          this.$alert('您已进入直播房间，马上开始互动吧', '', {
+            title: '提示',
+            confirmButtonText: '立即开始',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            callback: () => {
+              this.interactiveServer.playAbortStreams();
+            }
+          });
+        });
+
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
-          // 订阅流播放失败    监听到播放失败, 然后展示按钮
-          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
-            let videos = document.querySelectorAll('video');
-            videos.length > 0 &&
-              videos.forEach(video => {
-                video.pause();
-              });
-            this.interactiveServer.state.showPlayIcon = true;
-          });
-
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
             this.$message.warning(this.$t('player.player_1017'));
@@ -267,24 +258,6 @@
                 : '主讲人';
             this.$message.success(`${msg.data.nick_name}设置成为${str}`);
           });
-          // 嘉宾：
-          if (
-            (this.joinInfo.role_name == 4 || this.joinInfo.role_name == 3) &&
-            this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
-          ) {
-            this.$alert('您已进入直播房间，马上开始互动吧', '', {
-              title: '提示',
-              confirmButtonText: '立即开始',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel',
-              callback: () => {
-                const list = document.getElementsByTagName('video');
-                for (const item of list) {
-                  item.play();
-                }
-              }
-            });
-          }
         }
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
@@ -305,7 +278,7 @@
         this.isShrink = flag;
       },
       /**
-       * 计算
+       * 计算streamList变动
        */
       computTop() {
         const MutationObserver =
@@ -318,12 +291,6 @@
           _this.isMainScreenHeightLower = _this.$refs.streamList.offsetHeight === 160;
         });
         observer.observe(this.$refs.streamList, { childList: true, subtree: true });
-      },
-      PopAlertOfflineClose() {
-        this.PopAlertOffline.visible = false;
-      },
-      PopAlertOfflineConfirm() {
-        window.location.reload();
       }
     }
   };
@@ -373,11 +340,11 @@
             .vmp-stream-local__shadow-icon {
               background: none;
               &:hover {
-                background-color: #fc5659;
+                background-color: #fb3a32;
               }
             }
           }
-          .vmp-stream-local__bootom {
+          .vmp-stream-local__bottom {
             bottom: 17px;
           }
         }
@@ -391,11 +358,22 @@
         width: 309px;
         height: 240px;
         z-index: 1;
-        .vmp-stream-local__bootom-role {
+        .vmp-stream-local__bottom {
+          padding: 0 10px;
+          height: 28px;
+          line-height: 28px;
+        }
+        .vmp-stream-local__bottom-role {
           padding: 0 8px;
         }
-        .vmp-stream-local__bootom-nickname {
+        .vmp-stream-local__bottom-nickname {
           width: 80px;
+        }
+        .vmp-stream-local__bottom-mic {
+          font-size: 14px;
+        }
+        .vmp-stream-local__bottom-signal {
+          margin-left: 10px;
         }
       }
     }
@@ -423,12 +401,6 @@
     .vmp-stream-list__local-container {
       width: 142px;
       height: 80px;
-      .vmp-stream-local__bootom-role {
-        padding: 0 6px;
-      }
-      .vmp-stream-local__bootom-nickname {
-        width: 40px;
-      }
     }
 
     // 展开收起按钮

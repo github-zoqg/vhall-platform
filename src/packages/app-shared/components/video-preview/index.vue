@@ -106,7 +106,6 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
-  import moment from 'moment';
   export default {
     name: 'VmpVideoPreview',
     props: {
@@ -124,21 +123,6 @@
         type: Boolean,
         default: false,
         required: false
-      }
-    },
-    filters: {
-      secondToDate(val) {
-        let time = moment.duration(val, 'seconds');
-        let hours = time.hours();
-        let minutes = time.minutes();
-        let seconds = time.seconds();
-        let totalTime = '00:00';
-        if (hours) {
-          totalTime = moment({ h: hours, m: minutes, s: seconds }).format('HH:mm:ss');
-        } else {
-          totalTime = moment({ m: minutes, s: seconds }).format('mm:ss');
-        }
-        return totalTime;
       }
     },
     data() {
@@ -210,8 +194,6 @@
             enable: true
           }
         };
-
-        // params = Object.assign(videoParam, params);
 
         if (params.type === 'live') {
           Object.assign(params, {
@@ -381,14 +363,10 @@
             if (!this._firstInit) {
               this.$emit('handleRemoteInsertVideoPlay', this._isVideoEnd);
             }
-            // 如果插播播放结束之后重新开始播放，观看端通过流加入消息静音麦克风，这个时候不需要发消息，所以置为 true
-            if (this._isVideoEnd) {
-              this._firstInit = true;
-              this._isVideoEnd = false;
-            }
+            this._isVideoEnd = false;
             if (this._firstInit) {
               const elVideo = document.querySelector(`#videoDom${this.timestamp} video`);
-              this.$emit('remoteInsterSucces', elVideo);
+              this.$emit('remoteInsertSuccess', elVideo);
               this._firstInit = false;
             }
           }
@@ -406,7 +384,7 @@
          */
         window.addEventListener(
           'fullscreenchange',
-          e => {
+          () => {
             if (document.fullscreenElement) {
               // 进入全屏
             } else {
@@ -495,7 +473,7 @@
           top: 0;
           left: 0;
           &:hover {
-            top: -2px;
+            // top: -2px;
             .el-slider__runway {
               height: 3px;
             }

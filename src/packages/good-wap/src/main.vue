@@ -224,11 +224,13 @@
           this.refreshScroll();
         });
       },
-      showDetailDialog(good) {
+      showDetailDialog(goodsItem) {
         // this.openGoodInfo = true;
         // this.goodItem = good;
 
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShowDetail', [good]));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
+        );
       }
     }
   };
@@ -236,10 +238,8 @@
 
 <style lang="less">
   .vh-goods-wrapper {
-    height: 100%;
     width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
+    height: 100%;
     background: #fff;
     .vh-goods_list {
       display: block;

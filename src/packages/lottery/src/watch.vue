@@ -24,7 +24,8 @@
     useLotteryServer,
     useRoomBaseServer,
     useChatServer,
-    useZIndexServer
+    useZIndexServer,
+    useMsgServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
@@ -58,11 +59,8 @@
     },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
-      try {
-        this.zIndexServer = useZIndexServer();
-      } catch (e) {
-        console.log(e);
-      }
+      this.msgServer = useMsgServer();
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initMsgEvent();
@@ -77,10 +75,23 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       /**
-       * @description 聊天区域点击,显示中奖信息
+       * @description 聊天区域点击,显示中奖信息(都是中奖,提交与未提交的区别)
        */
       accept(msg) {
-        this.open(msg.lottery_id);
+        this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
+          console.log(msg);
+          this.showWinnerList = !!msg.publish_winner;
+          console.log(' this.showWinnerList ', this.showWinnerList);
+          if (res.code === 200) {
+            if (res.data.take_award === 0) {
+              this.lotteryView = 'LotteryWin';
+            } else {
+              this.lotteryView = 'LotterySuccess';
+            }
+            this.dialogVisible = true;
+            this.zIndexServer.setDialogZIndex('lottery');
+          }
+        });
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
@@ -89,6 +100,7 @@
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
           this.lotteryId = data.id;
+          this.showWinnerList = !!data.publish_winner;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
@@ -124,6 +136,10 @@
           this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
           this.callBackResultNotice
         );
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
+        });
       },
       removeMsgEvent() {
         this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
@@ -161,7 +177,6 @@
           // 未中奖
           this.lotteryView = 'LotteryMiss';
         }
-        this.showWinnerList = !!msg.data.publish_winner;
         this.dialogVisible = true;
         this.zIndexServer.setDialogZIndex('lottery');
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
@@ -233,7 +248,7 @@
   .vhall-lottery-wap {
     .lottery__close-btn {
       position: absolute;
-      bottom: -18px;
+      bottom: -36px;
       left: 50%;
       transform: translateX(-15px);
       font-size: 30px;
@@ -249,7 +264,6 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
   }

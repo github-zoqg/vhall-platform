@@ -24,8 +24,10 @@
         :data-component="MsgItem"
         :extra-props="{
           chatOptions,
+          joinInfo,
           isOnlyShowSponsor,
           previewImg: previewImg.bind(this),
+          isWatch: isWatch,
           emitLotteryEvent,
           emitQuestionnaireEvent
         }"
@@ -76,7 +78,7 @@
       ></img-preview>
       <chat-user-control
         :roomId="roomId"
-        :userId="userId"
+        :userId="accountId"
         :reply="reply"
         @deleteMsg="deleteMsg"
         :atUser="atUser"
@@ -94,7 +96,7 @@
   import ChatOperateBar from './components/chat-operate-bar';
   import eventMixin from './mixin/event-mixin';
   import { sessionOrLocal } from './js/utils';
-  import { useChatServer, useRoomBaseServer, useGiftsServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
@@ -126,8 +128,10 @@
         roomId: '',
         //用户角色
         roleName: '',
-        //用户id
+        //登录后用户id
         userId: '',
+        //游客或用户id
+        accountId: '',
         //聊天消息列表
         chatList: chatList,
         //聊天消息页码
@@ -181,7 +185,7 @@
         //聊天配置
         chatOptions: {},
         //底部操作栏高度
-        operatorHeight: 91,
+        operatorHeight: 100,
         //是否展示礼物特效
         showSpecialEffects: true,
         //礼物特效数组
@@ -205,18 +209,6 @@
       };
     },
     computed: {
-      //文字过长截取
-      textOverflowSlice() {
-        return function (val = '', len = 0) {
-          if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-            return '';
-          }
-          if (val.length > len) {
-            return val.substring(0, len) + '...';
-          }
-          return val;
-        };
-      },
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
@@ -294,6 +286,7 @@
         this.roomId = interact.room_id;
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
+        this.accountId = join_info.third_party_user_id;
       },
       //处理唤起登录
       handleLogin() {
@@ -301,13 +294,15 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
-        const giftsServer = useGiftsServer();
+        const msgServer = useMsgServer();
         //监听到新消息过来
-        chatServer.$on('receiveMsg', () => {
+        chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
-            this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.context.role_name != 2)) {
+              this.isHasUnreadAtMeMsg = true;
+              this.unReadMessageCount++;
+              this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            }
           }
           this.dispatch('VmpTabContainer', 'noticeHint', 3);
         });
@@ -336,12 +331,21 @@
           this.initInputStatus();
         });
         //监听分组房间变更通知
-        chatServer.$on('changeChannel', () => {
+        // chatServer.$on('changeChannel', () => {
+        //   this.handleChannelChange();
+        // });
+        useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
           this.$message(this.$t('chat.chat_1007'));
+        });
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          // live_over 结束直播
+          if (msg.data.type == 'live_over') {
+            this.allBanned = false;
+          }
         });
       },
       init() {
@@ -357,24 +361,22 @@
         let disable = false;
 
         // 控制台配置回放禁言状态
-        if (this.playerType == 5 && this.configList['ui.watch_record_no_chatting'] == 1) {
+        if (
+          (this.playerType == 5 || this.playerType == 4) &&
+          this.configList['ui.watch_record_no_chatting'] == 1
+        ) {
           placeholder = this.$t('chat.chat_1079');
           disable = true;
         } else {
           //如果是单人被禁言
-          if (this.isBanned) {
+          if (this.isBanned && this.roleName != 1) {
             placeholder = this.$t('chat.chat_1006');
             disable = true;
           }
           //如果是全体禁言
-          if (this.allBanned) {
+          if (this.allBanned && ![1, '1', 3, '3', 4, '4'].includes(this.roleName)) {
             placeholder = this.$t('chat.chat_1044'); // TODO: 缺翻译
             disable = true;
-          }
-          //主持人不受禁言限制
-          if ([1, '1', 3, '3'].includes(this.roleName)) {
-            placeholder = this.$t('chat.chat_1021');
-            disable = false;
           }
         }
 
@@ -511,7 +513,7 @@
       //回复消息
       reply(count) {
         this.buriedPointReport(110119, {
-          business_uid: this.userId,
+          business_uid: this.accountId,
           webinar_id: this.$route.params.il_id
         });
         this.$refs.chatOperator.handleReply(count);
@@ -531,7 +533,7 @@
           .deleteMessage(params)
           .then(res => {
             this.buriedPointReport(110121, {
-              business_uid: this.userId,
+              business_uid: this.accountId,
               webinar_id: this.$route.params.il_id
             });
             return res;
@@ -542,7 +544,7 @@
       atUser(accountId) {
         //数据上报
         this.buriedPointReport(110120, {
-          business_uid: this.userId,
+          business_uid: this.accountId,
           webinar_id: this.$route.params.il_id
         });
         this.$refs.chatOperator.handleAtUser(accountId);
@@ -571,7 +573,7 @@
           .then(res => {
             this.allBanned = flag;
             this.buriedPointReport(flag ? 110116 : 110117, {
-              business_uid: this.userId,
+              business_uid: this.accountId,
               webinar_id: this.webinarId
             });
             return res;
@@ -638,7 +640,7 @@
 
 <style lang="less">
   .vmp-chat-container {
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     @font-error: #fb3a32;
     width: 100%;
     height: 100%;
@@ -700,10 +702,22 @@
     }
     .chat-content {
       position: relative;
+      /* ::-webkit-scrollbar {
+        width: 6px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #666;
+      }
+      ::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background-color: #434343;
+      } */
       .vmp-chat-msg-item {
-        &:last-child {
-          padding-bottom: 20px;
-        }
+        // &:last-child {
+        //   padding-bottom: 20px;
+        // }
       }
       &__get-list-btn-container {
         display: block;

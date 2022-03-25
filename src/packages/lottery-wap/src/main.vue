@@ -25,7 +25,7 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useLotteryServer, useRoomBaseServer, useChatServer } from 'middle-domain';
+  import { useLotteryServer, useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
   const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
   const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
   export default {
@@ -60,14 +60,21 @@
     },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
     },
     methods: {
       accept(msg) {
-        console.log('accept', msg);
-        this.open(msg.lottery_id);
-        // this.setFitment(msg);
-        // this.lotteryView = 'LotteryWin';
-        // this.popupVisible = true;
+        this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
+          if (res.code === 200) {
+            this.showWinnerList = res.data.publish_winner;
+            if (res.data.take_award === 0) {
+              this.lotteryView = 'LotteryWin';
+            } else {
+              this.lotteryView = 'LotterySuccess';
+            }
+            this.popupVisible = true;
+          }
+        });
       },
       /**
        * @description 点开抽奖(按钮或者聊天)
@@ -105,6 +112,10 @@
       initMsgEvent() {
         this.lotteryServer.$on(LOTTERY_PUSH, this.callBackLotteryPush);
         this.lotteryServer.$on(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
+        });
       },
       removeMsgEvent() {
         this.lotteryServer.$off(LOTTERY_PUSH, this.callBackLotteryPush);
@@ -152,7 +163,7 @@
             msg: msg,
             type: msg.data.type,
             userId: join_info.user_id || join_info.third_party_user_id,
-            Show: true
+            Show: lotteryResult ? true : false
           },
           type: msg.data.type,
           interactStatus: true,

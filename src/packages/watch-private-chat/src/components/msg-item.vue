@@ -2,7 +2,7 @@
   <div class="vmp-watch-private-chat-msg-template">
     <!--头像-->
     <div class="msg-item__avatar">
-      <img class="msg-item__avatar__img" :src="source.avatar" alt />
+      <img class="msg-item__avatar__img" :src="source.avatar || defaultAvatar" alt />
     </div>
     <!--内容-->
     <div class="msg-item__content">
@@ -20,7 +20,7 @@
         </div>
 
         <span class="msg-item__content__time">
-          {{ source.sendTime ? source.sendTime.slice(-8) : new Date().toLocaleString().slice(-8) }}
+          {{ source.sendTime && source.sendTime.slice(-8) }}
         </span>
       </div>
       <!-- 文本 -->

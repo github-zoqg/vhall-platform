@@ -22,7 +22,7 @@
           <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
           <p v-if="watchInitData.online.show">
             <i class="vh-iconfont vh-line-user"></i>
-            {{ $t('common.common_1013') }}:{{ personCount }} 人
+            {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }} 人
           </p>
         </template>
       </main>
@@ -76,17 +76,6 @@
 <script>
   export default {
     name: 'VmpIntroWap',
-    filters: {
-      formatCount(num) {
-        if (num < 10000) return num;
-
-        const integer = Math.floor(num / 10000); // 整数
-        let decimals = Math.floor((num % 10000) / 1000); // 小数
-        decimals = decimals === 0 ? '' : '.' + decimals;
-
-        return integer + decimals + '万';
-      }
-    },
     data() {
       return {
         type: 'default' // default、subscribe
@@ -206,7 +195,7 @@
           left: 0px;
           width: 4px;
           height: 30px;
-          background: @font-error;
+          background: @bg-error-light;
         }
       }
 
@@ -239,6 +228,9 @@
 
         img {
           width: 100%;
+        }
+        strong {
+          font-weight: bold;
         }
       }
 

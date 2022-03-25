@@ -2,24 +2,22 @@
   <div class="vmp-watch-private-chat">
     <!--消息区域-->
     <div class="private-chat-content" :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }">
-      <div class="private-chat-content__tip-box">
-        <virtual-list
-          ref="chatlist"
-          style="height: 100%; overflow: auto"
-          :keeps="30"
-          :data-key="'count'"
-          :data-sources="chatList"
-          :data-component="msgItem"
-          :extra-props="{}"
-        ></virtual-list>
-        <div
-          v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
-          class="private-chat-content__tip-box-content"
-          @click="scrollToTarget"
-        >
-          {{ tipMsg }}
-          <span class="vh-iconfont vh-d-arrow-down"></span>
-        </div>
+      <virtual-list
+        ref="chatlist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'count'"
+        :data-sources="chatList"
+        :data-component="msgItem"
+        :extra-props="{}"
+      ></virtual-list>
+      <div
+        v-show="unReadMessageCount !== 0 && isHasUnreadNormalMsg"
+        class="private-chat-content__tip-box-content"
+        @click="scrollToTarget"
+      >
+        {{ tipMsg }}
+        <span class="vh-iconfont vh-d-arrow-down"></span>
       </div>
     </div>
     <!--操作栏-->
@@ -87,8 +85,6 @@
         latestMessage: {},
         //用户角色
         roleName: '',
-        //配置信息
-        configList: {},
         //提示消息
         tipMsg: {},
         //是否是嵌入端
@@ -100,7 +96,9 @@
         //观看端初始化的信息
         watchInitData: null,
         //房间号
-        roomId: ''
+        roomId: '',
+        isBanned: useChatServer().state.banned, //true禁言，false未禁言
+        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁
       };
     },
     watch: {
@@ -127,13 +125,9 @@
       this.msgServer = useMsgServer();
     },
     computed: {
-      //是否被禁言
-      isBanned() {
-        return this.chatServer.state.banned;
-      },
-      //是否是全体禁言
-      allBanned() {
-        return this.chatServer.state.allBanned;
+      //配置信息
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       }
     },
     mounted() {
@@ -141,17 +135,18 @@
       this.listenEvents();
       this.initInputStatus();
       this.initLoginStatus();
-      this.getHistoryMsg();
+      // this.getHistoryMsg();
     },
     methods: {
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         const { embed = false } = embedObj;
         this.roomId = interact.room_id;
-        this.configList = configList;
         this.roleName = join_info.role_name;
+        this.userId = join_info.user_id;
+        this.thirdPartyUserId = join_info.third_party_user_id;
         this.isEmbed = embed;
         this.joinInfo = join_info;
         this.webinar = webinar;
@@ -159,17 +154,16 @@
       },
       // 初始化聊天登录状态
       initLoginStatus() {
-        if (this.configList['ui.show_chat_without_login'] == '0') {
-          if (this.joinInfo || this.isEmbed) {
-            // 嵌入或者未登录并且需要登录
-            this.chatLoginStatus = false;
-          } else {
-            // 非嵌入并或者是没有登录
-            this.chatLoginStatus = true;
-            this.inputStatus.placeholder = '';
-          }
+        if (
+          [2, '2'].includes(this.roleName) &&
+          !this.Embed &&
+          (!this.userId || this.userId == 0) &&
+          this.configList['ui.show_chat_without_login'] != 1
+        ) {
+          this.chatLoginStatus = true;
+          this.inputStatus.placeholder = '';
         } else {
-          // 不需要登录
+          // 非嵌入并或者是没有登录
           this.chatLoginStatus = false;
         }
       },
@@ -183,7 +177,8 @@
         } else {
           this.inputStatus.placeholder = this.$t('chat.chat_1021');
         }
-        const isVod = this.webinar.type == 5 && this.watchInitData.paas_record_id;
+        const isVod =
+          (this.webinar.type == 5 || this.webinar.type == 4) && this.watchInitData.paas_record_id;
         // 判断控制台回放禁言状态
         if (isVod && this.configList && this.configList['ui.watch_record_no_chatting'] == 1) {
           this.inputStatus.disable = true;
@@ -199,6 +194,16 @@
         this.chatServer.$on('receivePrivateMsg', () => {
           this.unReadMessageCount++;
           this.dispatch('VmpTabContainer', 'noticeHint', 'private');
+        });
+        //监听禁言通知
+        this.chatServer.$on('banned', res => {
+          this.isBanned = res;
+          this.initInputStatus();
+        });
+        //监听全体禁言通知
+        this.chatServer.$on('allBanned', res => {
+          this.allBanned = res;
+          this.initInputStatus();
         });
       },
       //获取历史的私聊消息
@@ -242,8 +247,7 @@
   .vmp-watch-private-chat {
     position: relative;
     width: 100%;
-    //flex: 1;
-    height: calc(100% - 20px);
+    height: 100%;
     .private-chat-content {
       position: relative;
       &:last-child {

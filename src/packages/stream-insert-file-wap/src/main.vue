@@ -45,7 +45,8 @@
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
           this.insertFileServer.unsubscribeInsertStream();
         });
-        this.insertFileServer.$on('INSERT_OTHER_STREAM_ADD', () => {
+        // 本地推流或订阅远端流异常断开事件
+        this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
           this.subscribeInsert();
         });
         this.insertFileServer.$on('insert_mic_mute_change', status => {
@@ -67,5 +68,6 @@
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 1;
   }
 </style>

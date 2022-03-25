@@ -7,7 +7,7 @@
           <!-- 活动-标题、状态、主办方、时间-->
           <div class="header-content__title-wrap">
             <div class="header-content__title">
-              <span>{{ (webinarInfo.subject || '') | textOverflowSlice(40) }}</span>
+              <span>{{ (webinarInfo.subject || '') | overHidden(40) }}</span>
               <p
                 v-if="webinarInfo && webinarInfo.subject && webinarInfo.subject.length > 40"
                 class="header-content__title_hover"
@@ -34,7 +34,7 @@
               v-show="[1, '1'].includes(webinarInfo.webinar_state)"
               class="header-content__tag live"
             >
-              <img src="img/live-white.gif" alt="" />
+              <img src="./img/live-white.gif" alt="" />
               <label>
                 {{ $t('直播')
                 }}{{
@@ -104,7 +104,7 @@
           ]"
         >
           <img v-if="webinarInfo.img_url" :src="webinarInfo.img_url" alt="背景图" />
-          <img v-else src="img/code-login__img.png" alt="背景图" />
+          <img v-else src="./img/code-login__img.png" alt="背景图" />
         </div>
         <div class="vmp-password-login__main-wrap__form">
           <div
@@ -192,18 +192,6 @@
   import { useRoomBaseServer, useKeyLoginServer } from 'middle-domain';
   export default {
     name: 'VmpPasswordLogin',
-    filters: {
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
-      }
-    },
     data() {
       return {
         //默认头像

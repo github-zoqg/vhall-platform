@@ -15,7 +15,7 @@
           <div>
             <p class="vmp-cash-wrap-top__title">{{ $t('cash.cash_1002') }}</p>
             <p class="vmp-cash-wrap-top__money">
-              ¥{{ useCashServer.state.cashInfo.red_packet_balance || '0.00' }}
+              ¥{{ cashServerState.cashInfo.red_packet_balance || '0.00' }}
             </p>
           </div>
           <div>
@@ -24,19 +24,19 @@
               class="vmp-cash-red-button vmp-cash-length-middle"
               round
               :disabled="
-                useCashServer.state.cashInfo.red_packet_balance < 1 ||
-                useCashServer.state.cashInfo.in_red_withdraw
+                cashServerState.cashInfo.red_packet_balance < 1 ||
+                cashServerState.cashInfo.in_red_withdraw
               "
               :style="{ visibility: step === 0 ? 'visible' : 'hidden' }"
               @click="checkPhoneToWx"
             >
               {{
-                useCashServer.state.cashInfo.in_red_withdraw
+                cashServerState.cashInfo.in_red_withdraw
                   ? $t('cash.cash_1004')
                   : $t('cash.cash_1005')
               }}
               <div
-                v-if="useCashServer.state.cashInfo.red_packet_balance < 1"
+                v-if="cashServerState.cashInfo.red_packet_balance < 1"
                 class="vmp-cash_btn_hover"
               >
                 {{ $t('cash.cash_1006') }}
@@ -77,9 +77,9 @@
 
         <!-- 第二段-00， 200条数据 -->
         <div v-show="step === 0" class="vmp-cash-list-box">
-          <div v-if="useCashServer.state.cashList.length > 0" class="vmp-cash-list">
+          <div v-if="cashServerState.cashList.length > 0" class="vmp-cash-list">
             <ul>
-              <li v-for="(item, index) in useCashServer.state.cashList" :key="index">
+              <li v-for="(item, index) in cashServerState.cashList" :key="index">
                 <div>
                   <p>{{ item.type == 0 ? $t('cash.cash_1019') : $t('cash.cash_1005') }}</p>
                   <p>{{ item.time }}</p>
@@ -143,24 +143,24 @@
                 <label class="vmp-wrap-cash__title">{{ $t('cash.cash_1026') }}</label>
                 <div class="vmp-wrap-cash__avatar">
                   <img
-                    v-show="!useCashServer.state.wxInfo.wechat_profile"
+                    v-show="!cashServerState.wxInfo.wechat_profile"
                     src="./images/my-dark@2x.png"
                     alt=""
                   />
                   <img
-                    v-show="useCashServer.state.wxInfo.wechat_profile"
-                    :src="useCashServer.state.wxInfo.wechat_profile"
+                    v-show="cashServerState.wxInfo.wechat_profile"
+                    :src="cashServerState.wxInfo.wechat_profile"
                     alt=""
                   />
                 </div>
                 <label class="vmp-wrap-cash__name">
                   {{
-                    (useCashServer.state.wxInfo.wechat_name_wap
-                      ? useCashServer.state.wxInfo.wechat_name_wap
-                      : '') | splitLenStr(6)
+                    (cashServerState.wxInfo.wechat_name_wap
+                      ? cashServerState.wxInfo.wechat_name_wap
+                      : '') | overHidden(6)
                   }}
                   {{
-                    useCashServer.state.wxInfo.wechat_name_wap
+                    cashServerState.wxInfo.wechat_name_wap
                       ? `（${$t('account.account_1019')}）`
                       : `（${$t('account.account_1020')}）`
                   }}
@@ -209,7 +209,7 @@
             <div
               class="vmp-qr-reload"
               v-if="countPoll === 12"
-              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1 ? 2 : 1)"
+              @click="goBangWeixin(cashServerState.wxInfo.is_oauth === 1 ? 2 : 1)"
             >
               <i class="vh-iconfont vh-a-line-clockwiserotation"></i>
             </div>
@@ -239,7 +239,7 @@
           if (value < 1) {
             this.handleInputChange(value);
             callback(new Error(this.$t('cash.cash_1031')));
-          } else if (value - this.useCashServer.state.cashInfo.red_packet_balance > 0) {
+          } else if (value - this.cashServerState.cashInfo.red_packet_balance > 0) {
             this.handleInputChange(value);
             callback(new Error(this.$t('cash.cash_1032')));
           } else if (value - 800 > 0) {
@@ -285,10 +285,12 @@
         }
       };
 
+      const cashServerState = this.useCashServer.state;
       return {
+        cashServerState,
         dialogVisible: false, // 组件是否显示
-        useUserServer: {}, // 用户相关的接口
-        useCashServer: {}, // 提现相关的接口
+        // useUserServer: {}, // 用户相关的接口
+        // useCashServer: {}, // 提现相关的接口
         step: 0, // 当前步骤
         bindForm: {
           money: '',
@@ -314,7 +316,7 @@
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
-    created() {
+    beforeCreate() {
       this.useUserServer = useUserServer();
       this.useCashServer = useCashServer();
     },
@@ -354,10 +356,10 @@
         if (!this.useUserServer.state.userInfo.phone) {
           console.log('手机号未绑定进入... ...');
           this.step = 1;
-        } else if (this.useCashServer.state.wxInfo.is_oauth === 1) {
+        } else if (this.cashServerState.wxInfo.is_oauth === 1) {
           console.log('手机号已绑定、微信已绑定(昵称和头像都有)进入... ...');
           this.step = 3;
-        } else if (this.useCashServer.state.wxInfo.is_oauth !== 1) {
+        } else if (this.cashServerState.wxInfo.is_oauth !== 1) {
           console.log('手机号已绑定、（微信未绑定or绑定无头像or绑定无昵称）进入... ...');
           await this.goBangWeixin(1);
           this.step = 2;
@@ -629,12 +631,14 @@
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
+              })
+              .finally(() => {
+                this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+                this.$refs.bindForm?.resetFields(); // 重置表单
+                this.initInterval(); // 初始化定时器
               });
           }
         });
-        this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-        this.$refs.bindForm?.resetFields(); // 重置表单
-        this.initInterval(); // 初始化定时器
       },
 
       // 初始化定时器

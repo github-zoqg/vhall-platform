@@ -1,11 +1,7 @@
 <!-- 观看页-红包组件（颤动 + 弹出层） -->
 <template>
-  <div
-    class="vhsaas-red-packet"
-    v-if="dialogVisible"
-    :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
-  >
-    <div class="vhsaas-interact-mask">
+  <div class="vhsaas-red-packet" v-if="dialogVisible">
+    <div class="vhsaas-interact-mask" :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }">
       <components
         :is="componentsView"
         :amount="redPacketServerState.amount * 1"
@@ -20,7 +16,7 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer, useZIndexServer, useChatServer } from 'middle-domain';
+  import { useRedPacketServer, useZIndexServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
@@ -50,6 +46,7 @@
         mode: 'watch'
       });
       this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initEvent();
@@ -90,6 +87,10 @@
           });
           const uuid = data.red_packet_uuid;
           this.open(uuid);
+        });
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.dialogVisible = false;
         });
       },
       close() {

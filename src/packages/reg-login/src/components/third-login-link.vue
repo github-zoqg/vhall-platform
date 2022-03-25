@@ -77,16 +77,12 @@
   };
 </script>
 <style lang="less">
-  @iconpath: '../images';
-  .vmp-third-layout {
-    margin-top: auto;
-  }
   .vmp-third-remark {
     text-align: center;
     height: 17px;
     font-size: 12px;
     font-weight: 400;
-    color: #999999;
+    color: #999;
     line-height: 17px;
     &.height__max {
       padding-top: 8px;
@@ -111,19 +107,19 @@
     }
   }
   .vmp-third__login__qq {
-    background: url('@{iconpath}/qq@2x.png') center center no-repeat;
+    background: url('../images/qq@2x.png') center center no-repeat;
     background-size: 100% 100%;
     margin-right: 16px;
     &:hover {
-      background: url('@{iconpath}/qq_hover@2x.png') center center no-repeat;
+      background: url('../images/qq_hover@2x.png') center center no-repeat;
       background-size: 100% 100%;
     }
   }
   .vmp-third__login__wechat {
-    background: url('@{iconpath}/wechat@2x.png') center center no-repeat;
+    background: url('../images/wechat@2x.png') center center no-repeat;
     background-size: 100% 100%;
     &:hover {
-      background: url('@{iconpath}/wechat_hover@2x.png') center center no-repeat;
+      background: url('../images/wechat_hover@2x.png') center center no-repeat;
       background-size: 100% 100%;
     }
   }

@@ -51,6 +51,7 @@
             v-show="![6, '6'].includes(question.type)"
             v-for="(question, quesIndex) in list"
             :key="question.id"
+            class="tab-content-li"
           >
             <p class="title-text">
               <span v-if="!!question.is_must" class="star" style="font-family: monospace">*</span>
@@ -146,20 +147,28 @@
             <!-- 下拉 -->
             <template v-if="question.type === 4">
               <div class="select-box">
-                <div class="select-xl">
-                  <select
-                    :ref="question.id"
-                    @change="onValidate(question)"
-                    v-model="form[question.id]"
-                    class="select-item"
-                  >
-                    <option value disabled selected hidden>{{ $t('form.form_1018') }}</option>
-                    <option v-for="option in question.items" :key="option.id">
-                      {{ option.subject }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
+                <custom-select-picker
+                  :ref="question.id"
+                  v-model="form[question.id]"
+                  @change="onValidate(question)"
+                  :placeholder="$t('form.form_1018')"
+                  :columns="question.items"
+                  :option="{ label: 'subject', value: 'id' }"
+                ></custom-select-picker>
+                <!--                <div class="select-xl">-->
+                <!--                  <select-->
+                <!--                    :ref="question.id"-->
+                <!--                    @change="onValidate(question)"-->
+                <!--                    v-model="form[question.id]"-->
+                <!--                    class="select-item"-->
+                <!--                  >-->
+                <!--                    <option value disabled selected hidden>{{ $t('form.form_1018') }}</option>-->
+                <!--                    <option v-for="option in question.items" :key="option.id">-->
+                <!--                      {{ option.subject }}-->
+                <!--                    </option>-->
+                <!--                  </select>-->
+                <!--                  <label class="select-arrow"></label>-->
+                <!--                </div>-->
               </div>
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
@@ -213,13 +222,13 @@
               </p>
             </template>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div id="setCaptcha1" class="captcha">
               <input v-model.trim="form.imgCode" type="text" />
             </div>
             <p class="err-msg" v-show="errorMsgShow">{{ $t('account.account_1028') }}</p>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div>
               <input
                 type="number"
@@ -242,7 +251,7 @@
             </div>
             <p v-show="!!errMsgMap.code" class="err-msg">{{ errMsgMap.code }}</p>
           </li>
-          <li v-if="privacy">
+          <li v-if="privacy" class="tab-content-li">
             <div class="provicyBox clearfix" @click="handleClickPrivacy(privacy)">
               <i
                 class="privicyitem vh-iconfont vh-line-check"
@@ -252,7 +261,7 @@
             </div>
             <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
           </li>
-          <li>
+          <li class="tab-content-li">
             <button @click="submit" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1019') }}
             </button>
@@ -260,7 +269,7 @@
         </ul>
         <!--验证码表单-->
         <ul v-show="activeTab === 2" class="vmp-wap-sign-up-form__content__tab-content">
-          <li>
+          <li class="tab-content-li">
             <p class="title-text">
               <span class="star" style="font-family: monospace">*</span>
               <span class="label">{{ $t('form.form_1081') }}</span>
@@ -274,13 +283,13 @@
             />
             <p class="err-msg" v-show="errPhone">{{ errPhoneMsg }}</p>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div id="setCaptcha2" class="captcha">
               <input style="margin-top: 0" v-model.trim="verifyForm.imgCode" type="text" />
             </div>
             <p class="err-msg" v-show="errorMsgShow">{{ $t('account.account_1028') }}</p>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div>
               <input
                 type="number"
@@ -303,7 +312,7 @@
             </div>
             <p v-show="errCode" class="err-msg">{{ errCode }}</p>
           </li>
-          <li>
+          <li class="tab-content-li">
             <button @click="submitVerify" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1082') }}
             </button>
@@ -332,8 +341,12 @@
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
   import { useSignUpFormServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import customSelectPicker from './components/customSelectPicker';
   export default {
     name: 'VmpWapSignUpForm',
+    components: {
+      customSelectPicker
+    },
     data() {
       return {
         //活动id
@@ -714,7 +727,7 @@
           captchaId: that.captchakey,
           element: id,
           mode: 'float',
-          lang: window.$globalConfig.currentLang || 'zh-CN',
+          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady(instance) {
             console.log(instance);
           },
@@ -850,9 +863,13 @@
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
-            sessionStorage.setItem('visitorId', res.data.visit_id);
-            // 报名成功
-            this.getWebinarStatus();
+            if (res && [200, '200'].includes(res.code)) {
+              sessionStorage.setItem('visitorId', res.data.visit_id);
+              // 报名成功
+              this.getWebinarStatus();
+            } else {
+              return Promise.reject(res);
+            }
           })
           .catch(err => {
             if (err.code == 512809 || err.code == 512570) {
@@ -876,7 +893,7 @@
                 `/lives/watch/${this.webinar_id}${queryString}`;
               // this.$router.push(`/lives/watch/${this.webinar_id}`)
             } else {
-              this.$toast(this.$tes(err.code) || err.msg);
+              this.$toast(this.$tec(err.code) || err.msg);
             }
           });
       },
@@ -1122,6 +1139,7 @@
       },
       //表单验证
       onValidate(question, isSubmit = false) {
+        console.log(question);
         // 如果验证的是隐私声明，并且是第一次验证，则直接通过
         if (question.type === 6 && this.isFirstChange && !isSubmit) {
           this.isFirstChange = false;
@@ -1163,6 +1181,7 @@
         } else if (question.type === 2 || question.type === 4) {
           // 单选/下拉
           this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1029') : '';
+          console.log(this.form[question.id]);
         } else if (question.type === 3) {
           // 多选
           this.errMsgMap[question.id] = !this.form[question.id].length
@@ -1487,7 +1506,7 @@
         }
       }
       &__tab-content {
-        li {
+        .tab-content-li {
           margin-top: 0.52rem;
           position: relative;
           margin-bottom: 0.02rem;
@@ -1495,6 +1514,14 @@
             margin-top: 90px;
           }
         }
+        //li {
+        //  margin-top: 0.52rem;
+        //  position: relative;
+        //  margin-bottom: 0.02rem;
+        //  &:last-child {
+        //    margin-top: 90px;
+        //  }
+        //}
         input {
           // line-height: 1.04rem !important;
           height: 1.04rem;
@@ -1729,8 +1756,8 @@
       }
     }
     .submit-btn {
-      border: 0.024rem solid #fc5659;
-      background-color: #fc5659;
+      border: 0.024rem solid #fb3a32;
+      background-color: #fb3a32;
       font-size: 0.37rem;
       color: #fff;
       outline: none;

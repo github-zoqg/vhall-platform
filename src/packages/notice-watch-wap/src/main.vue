@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="vmp-notice-wap">
     <van-notice-bar
       class="notice"
       ref="notice"
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-  //  && !this.zIndexObj.Ques && !videoEnd
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeWap',
@@ -68,12 +67,11 @@
       this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
         if (!this.isInGroup) {
           this.openAnnouncement();
+        } else {
+          this.announcement.isShow = false;
         }
       });
       this.groupServer.$on('GROUP_SWITCH_START', () => {
-        this.announcement.isShow = false;
-      });
-      this.groupServer.$on('GROUP_JOIN_CHANGE', () => {
         this.announcement.isShow = false;
       });
     },
@@ -98,21 +96,25 @@
           this.timer = setTimeout(() => {
             this.announcement.isShow = false;
           }, 30000);
+        } else {
+          this.announcement.isShow = false;
         }
       }
     }
   };
 </script>
 
-<style lang="less" scoped>
-  .notice {
-    position: absolute;
-    top: 80px;
-    left: 0px;
-    width: 100%;
-    z-index: 25;
-  }
-  .van-notice-bar {
-    box-sizing: border-box;
+<style lang="less">
+  .vmp-notice-wap {
+    .notice {
+      position: absolute;
+      top: 80px;
+      left: 0px;
+      width: 100%;
+      z-index: 25;
+    }
+    .van-notice-bar {
+      box-sizing: border-box;
+    }
   }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="qa-item-wrapper"
+    :class="['qa-item-wrapper', { 'qa-last-ios-progress': index == length - 1 }]"
     v-if="
       source.join_id == joinId || (source.answer && source.answer.join_id == joinId) || !isOnlyMine
     "
@@ -21,7 +21,7 @@
           <span class="nick-name">
             {{ source.data ? source.data.nick_name : source.nick_name }}
           </span>
-          <span class="time">{{ source.created_at }}</span>
+          <span class="time">{{ source.created_time.slice(-8) }}</span>
         </div>
         <div class="content">
           <span class="question-label">{{ $t('chat.chat_1040') }}：</span>
@@ -45,7 +45,7 @@
               {{ source.answer.role_name | roleFilter }}
             </span>
             <span class="nick-name">{{ source.answer.nick_name }}</span>
-            <span class="time">{{ source.answer.created_at }}</span>
+            <span class="time">{{ source.answer.created_time.slice(-8) }}</span>
           </div>
           <div class="content">
             <span class="question-label">{{ $t('chat.chat_1041') }}：</span>
@@ -59,6 +59,10 @@
 <script>
   export default {
     props: {
+      index: {
+        // 每一行的唯一索引
+        type: Number
+      },
       source: {
         type: Object,
         required: true,
@@ -67,13 +71,13 @@
       isOnlyMine: {
         default: false
       },
-      joinId: {}
+      joinId: {},
+      length: {}
     },
     computed: {
       customRoleName() {
         return this.$domainStore.state.roomBaseServer.customRoleName;
       }
-    },
-    filters: {}
+    }
   };
 </script>

@@ -43,11 +43,12 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          热度 &nbsp;{{ hotNum | formatHotNum }}
+          &nbsp;{{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
       <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
+        <img :src="coverImgUrl" alt />
         <p @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
@@ -61,7 +62,7 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && !is_host_in_group && mainScreenDom ? 'opcity-true' : 'opcity-flase']"
+        :class="[iconShow && isShowMainScreen ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -100,14 +101,13 @@
   import {
     useInteractiveServer,
     useMicServer,
-    useMsgServer,
     useRoomBaseServer,
     useMediaCheckServer,
     useGroupServer
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast, Dialog } from 'vant';
+  import { Toast } from 'vant';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
   export default {
     name: 'VmpWapStreamList',
@@ -128,21 +128,6 @@
         streamInfo
       };
     },
-    filters: {
-      formatHotNum(value) {
-        value = parseInt(value);
-        let unit = '';
-        const k = 99999;
-        const sizes = ['', '万', '亿', '万亿'];
-        let i;
-        if (value > k) {
-          i = Math.floor(Math.log(value) / Math.log(k));
-          value = (value / Math.pow(k / 10, i)).toFixed(1);
-          unit = sizes[i];
-        }
-        return value + unit;
-      }
-    },
     computed: {
       isInGroup() {
         // 在小组中
@@ -154,6 +139,9 @@
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
       localSpeaker() {
         return (
@@ -226,13 +214,26 @@
       is_host_in_group() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
         return (
           !this.isInGroup &&
           this.is_host_in_group &&
-          this.roomBaseServer.state.watchInitData.webinar.mode == 6
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
+          !this.isShowMainScreen &&
+          !this.isShareScreen
         );
       },
       hotNum() {
@@ -245,10 +246,6 @@
       // 开始推流到成功期间展示默认图
       defaultBg() {
         return this.interactiveServer.state.defaultStreamBg;
-      },
-      // 主持人ID 分组期间使用
-      userinfoId() {
-        return this.roomBaseServer.state.watchInitData?.webinar.userinfo.user_id;
       }
     },
     beforeCreate() {
@@ -256,8 +253,6 @@
       useMediaCheckServer().checkSystemRequirements();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
-      this.msgServer = useMsgServer();
-      this.groupServer = useGroupServer();
     },
 
     async created() {
@@ -304,88 +299,20 @@
       addSDKEvents() {
         // 监听到自动播放
         this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+          console.warn('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });
 
-        // 接收设为主讲人消息
+        // 接收设为主讲人消息  主直播间
         this.micServer.$on('vrtc_big_screen_set', msg => {
           this.setBigScreen(msg);
         });
 
-        // 接收设为主讲人消息
-        this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
+        // 接收设为主讲人消息   组内
+        useGroupServer().$on('VRTC_BIG_SCREEN_SET', msg => {
           this.setBigScreen(msg);
         });
-
-        // 开启分组讨论
-        this.groupServer.$on('GROUP_SWITCH_START', msg => {
-          if (this.isInGroup) {
-            this.gobackHome(1, this.groupServer.state.groupInitData.name, msg);
-          }
-        });
-
-        // 切换小组,小组人员变动
-        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, changeInfo) => {
-          if (changeInfo.isNeedCare && this.isInGroup) {
-            this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
-          }
-        });
-
-        // 结束分组讨论
-        this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          if (!msg.data.groupToast) {
-            this.gobackHome(3, this.groupServer.state.groupInitData.name, msg);
-          }
-        });
-
-        // 小组解散
-        this.groupServer.$on('GROUP_DISBAND', msg => {
-          this.gobackHome(4, '', msg);
-        });
-
-        // 本人被踢出来
-        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          this.gobackHome(5, this.groupServer.state.groupInitData.name, msg);
-        });
-
-        // 组长变更
-        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          this.gobackHome(7, '', msg);
-        });
-      },
-      // 返回主房间提示
-      async gobackHome(index, name, msg) {
-        const who = msg.sender_id == this.userinfoId ? '主持人' : '助理';
-        let title = '';
-        switch (index) {
-          case 1:
-            title = who + '开启了分组讨论，您将进入' + name + '组参与讨论';
-            break;
-          case 2:
-            title = who + '已将您分配至' + name + '组';
-            break;
-          case 3:
-            title = who + '结束了分组讨论，您将返回主直播间';
-            break;
-          case 4:
-            title = who + '解散了分组，您将返回主直播间';
-            break;
-          case 5:
-            title = this.$t('chat.chat_1007');
-            break;
-          case 7:
-            title = '组长身份已变更';
-            break;
-        }
-        if (index == 5 || index == 7) {
-          Toast(title);
-        } else {
-          await Dialog.alert({
-            title: this.$t('account.account_1061'),
-            message: title
-          });
-        }
       },
 
       // 创建betterScroll
@@ -434,29 +361,31 @@
         let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
         if (mainScreenStream) {
           if (mainScreenStream.streamSource == 'remote') {
-            this.interactiveServer.setStreamFullscreen({
-              streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
-            });
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
           } else {
-            this.interactiveServer.setStreamFullscreen({
-              streamId: mainScreenStream.streamId,
-              vNode: `vmp-stream-local__${mainScreenStream.streamId}`
-            });
-          }
-          // 参考player组件内的brower内的ios判断条件
-          if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
-            this.interactiveServer.state.fullScreenType = true;
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-local__${mainScreenStream.accountId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
           }
         }
       },
-
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
+      setFullScreenStatus() {
+        // 参考player组件内的brower内的ios判断条件
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
       },
 
       videoShowIcon() {
@@ -466,7 +395,21 @@
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       openLanguage() {
         this.iconShow = true;
@@ -490,6 +433,7 @@
     width: 100%;
     position: relative;
     background: #000;
+    // 小组协作中
     &-group {
       position: absolute;
       top: 100px;
@@ -509,6 +453,7 @@
         margin-bottom: 14px;
       }
     }
+    // 蒙层
     &-mask {
       position: absolute;
       top: 0;
@@ -545,8 +490,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 4;
+        z-index: 7;
         background: transparent;
+        img {
+          width: 100%;
+          height: 100%;
+        }
         p {
           width: 108px;
           height: 108px;
@@ -555,6 +504,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          position: absolute;
           i {
             font-size: 46px;
             color: #f5f5f5;
@@ -657,12 +607,12 @@
   .vmp-stream-list {
     height: 83px;
     display: inline-block;
-    .vmp-stream-list__local-container {
+    &__local-container {
       width: 148px;
       height: 100%;
       display: inline-block;
     }
-    .vmp-stream-list__remote-container {
+    &__remote-container {
       width: 148px;
       height: 100%;
       display: inline-block;
@@ -672,7 +622,7 @@
     }
 
     // 流列表高度不为0
-    .vmp-stream-list__main-screen {
+    &__main-screen {
       position: absolute;
       top: 83px;
       width: 597px;
@@ -691,6 +641,19 @@
       .vmp-stream-local {
         position: absolute;
         top: 0;
+      }
+      // 主屏下的 后续nick_name 应为全显示
+      .vmp-stream-local__bottom {
+        // 此处不能使用&去代替  由于父级无样式，直接使用&会导致class优先级降低
+        .vmp-stream-local__bottom-nickname {
+          width: 160px;
+        }
+      }
+      .vmp-stream-list__remote-container-h .vmp-stream-remote__container__net-error {
+        .net-error-img {
+          width: 90px;
+          height: 75px;
+        }
       }
     }
 

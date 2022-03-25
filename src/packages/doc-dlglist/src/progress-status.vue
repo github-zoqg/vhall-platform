@@ -4,7 +4,8 @@
     <template v-if="docStatus === 'uploading'">
       <el-progress :percentage="uploadPropress"></el-progress>
     </template>
-    <template v-if="Array.isArray(docStatusStr)">
+    <!-- 上传中有上传进度条，所以不用显示文字 -->
+    <template v-if="docStatus !== 'uploading' && Array.isArray(docStatusStr)">
       <div
         v-for="(item, index) in docStatusStr"
         v-bind:key="'status' + index"
@@ -14,7 +15,9 @@
         {{ item }}
       </div>
     </template>
-    <div v-else class="transform-status" :class="docStatus">{{ docStatusStr }}</div>
+    <div v-else-if="docStatus !== 'uploading'" class="transform-status" :class="docStatus">
+      {{ docStatusStr }}
+    </div>
   </div>
 </template>
 <script>

@@ -109,7 +109,7 @@
                 </el-tooltip>
               </span>
               <el-switch
-                :width="30"
+                :width="28"
                 v-model="form.is_all_show"
                 @change="changeAllShow"
                 size="mini"
@@ -136,7 +136,7 @@
                 </el-tooltip>
               </span>
               <el-switch
-                :width="30"
+                :width="28"
                 v-model="form.is_timeout"
                 size="mini"
                 active-color="#fb3a32"
@@ -181,7 +181,7 @@
         this.timerVisible = false;
       });
       // 计时器结束
-      this.timerServer.$on('timer_end', temp => {
+      this.timerServer.$on('timer_end', () => {
         console.warn('监听到了计时器结束-------');
         this.form = {
           is_all_show: false,
@@ -198,7 +198,7 @@
         this.timerVisible = true;
       },
       onClose() {
-        this.$emit('disTimer', true);
+        // this.$emit('disTimer', true);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
         );

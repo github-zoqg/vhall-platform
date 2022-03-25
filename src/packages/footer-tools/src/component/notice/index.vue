@@ -1,28 +1,28 @@
 <template>
   <div class="vmp-notice-list" v-show="isShowIcon && noticeNum">
-    <div class="vmp-notice-list-icon">
-      <div class="vmp-notice-list-icon-num">{{ noticeNum }}</div>
-      <div class="vmp-notice-list-icon-img" @click="getNoticeHistoryList">
+    <div class="vmp-notice-list_icon">
+      <div class="icon-num">{{ noticeNum > 99 ? '99+' : noticeNum }}</div>
+      <div class="icon-img" @click="getNoticeHistoryList">
         <img src="./img/notice-icon.png" alt="" />
       </div>
     </div>
-    <div class="vmp-notice-list-container" v-if="isShowNotice">
-      <div class="vmp-notice-list-container-data">
+    <div class="vmp-notice-list_container" v-if="isShowNotice">
+      <div class="container-data">
         <ul v-if="noticeList.length" v-infinite-scroll="moreLoadData">
           <li v-for="(item, index) in noticeList" :key="index">
-            <div class="vmp-notice-list-container-data-time">
-              {{ item.created_at | formatTime }}
+            <div class="data-time">
+              {{ item.created_at | chatTime }}
             </div>
-            <div class="vmp-notice-list-container-data-text">
-              <span class="vmp-notice-list-container-data-text-circle">
-                <i v-if="index == 0"></i>
+            <div class="data-text">
+              <span class="data-text_circle">
+                <i class="num" v-if="index == 0"></i>
               </span>
-              <p class="vmp-notice-list-container-data-text-title">{{ item.content.content }}</p>
+              <p class="data-text_title">{{ item.content.content }}</p>
             </div>
           </li>
         </ul>
       </div>
-      <div class="vmp-notice-list-container-close">
+      <div class="container-close">
         <i class="vh-iconfont vh-line-close" @click="closeNoticeList"></i>
       </div>
     </div>
@@ -32,11 +32,6 @@
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpNoticeList',
-    filters: {
-      formatTime(value) {
-        return value.substring(11, 16);
-      }
-    },
     data() {
       return {
         noticeNum: 0,
@@ -118,7 +113,7 @@
         };
 
         this.noticeServer.getNoticeList({ params, flag }).then(result => {
-          if (result.code == 200 && result.data) {
+          if (result.code === 200 && result.data) {
             this.noticeList = this.noticeServer.state.noticeList;
             this.totalPages = this.noticeServer.state.totalPages;
             this.total = result.data.total;
@@ -148,9 +143,10 @@
 <style lang="less">
   .vmp-notice-list {
     height: 100%;
-    position: relative;
-    &-icon {
-      &-img {
+    // position: relative;
+    &_icon {
+      position: relative;
+      .icon-img {
         height: 32px;
         width: 32px;
         line-height: 32px;
@@ -162,7 +158,7 @@
           width: 32px;
         }
       }
-      &-num {
+      .icon-num {
         position: absolute;
         top: -10px;
         right: -8px;
@@ -178,9 +174,9 @@
         border: solid 1px @border-tools-color;
       }
     }
-    &-container {
+    &_container {
       position: absolute;
-      right: -100px;
+      right: -48px;
       bottom: 50px;
       z-index: 12;
       width: 492px;
@@ -188,7 +184,7 @@
       background: transparent;
       background-image: url('./img/notice.png');
       background-size: 100% 100%;
-      &-data {
+      .container-data {
         position: absolute;
         top: 108px;
         left: 60px;
@@ -207,17 +203,17 @@
             line-height: 20px;
           }
         }
-        &-time {
+        .data-time {
           display: inline-block;
           width: 50px;
           text-align: left;
         }
-        &-text {
+        .data-text {
           display: flex;
           position: relative;
           // padding-bottom: 16px;
           width: calc(100% - 50px);
-          &-circle {
+          &_circle {
             display: inline-block;
             width: 11px;
             height: 11px;
@@ -227,18 +223,18 @@
             top: 4px;
             left: -6px;
             position: absolute;
-            i {
+            .num {
               display: inline-block;
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background: @font-error;
+              background: @bg-error-light;
               position: absolute;
               top: 2px;
               left: 2px;
             }
           }
-          &-title {
+          &_title {
             padding-left: 16px;
             word-break: break-word;
             padding-bottom: 16px;
@@ -247,13 +243,12 @@
           }
         }
       }
-      &-close {
+      .container-close {
         position: absolute;
         top: 60px;
         right: 75px;
         cursor: pointer;
-        cursor: pointer;
-        i {
+        .vh-iconfont {
           font-size: 12px;
           color: @font-error;
         }

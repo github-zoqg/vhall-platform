@@ -6,20 +6,14 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
-      { 'has-stream-list': hasStreamList }
+      { 'has-stream-list': hasStreamList },
+      { 'no-delay-layout': isUseNoDelayLayout }
     ]"
     v-show="show"
     ref="docWrapper"
   >
     <!-- 这里配置的是文档工具栏 -->
-    <VmpDocToolbar
-      ref="docToolbar"
-      v-show="
-        (hasDocPermission || [3].includes(roleName)) &&
-        (displayMode === 'normal' || displayMode === 'fullscreen')
-      "
-      @changeBrush="changeBrush"
-    ></VmpDocToolbar>
+    <VmpDocToolbar ref="docToolbar" v-show="showToolbar" @changeBrush="changeBrush"></VmpDocToolbar>
 
     <!-- 结束演示按钮 -->
     <el-button
@@ -51,8 +45,9 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
-          <!-- <i class="vh-saas-iconfont vh-saas-zanwuwendang"></i> -->
-          <span v-if="hasDocPermission || [3, 4].includes(roleName)">暂未分享任何文档</span>
+          <span v-if="hasDocPermission || [3, 4].includes(roleName)">
+            {{ $t('doc.doc_1011') }}
+          </span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>
       </div>
@@ -65,7 +60,7 @@
           title="上一步"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
-        <li v-if="hasPager" class="page-number">
+        <li v-if="hasPager || webinarMode == 5" class="page-number">
           <span class="page-index">{{ docServer.state.pageNum }}</span>
           <span class="page-split">/</span>
           <span class="page-total">{{ docServer.state.pageTotal }}</span>
@@ -78,35 +73,35 @@
         ></li>
         <li
           data-value="zoomIn"
-          title="放大"
+          :title="$t('doc.doc_1005')"
           class="doc-pagebar__opt vh-iconfont vh-line-zoom-in"
         ></li>
         <li
           data-value="zoomOut"
-          title="缩小"
+          :title="$t('doc.doc_1006')"
           class="doc-pagebar__opt vh-iconfont vh-line-zoom-out"
         ></li>
         <li
           data-value="zoomReset"
-          title="还原"
+          :title="$t('doc.doc_1008')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-a-line-11"
         ></li>
         <li
           data-value="move"
-          title="移动"
+          :title="$t('doc.doc_1007')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
           :class="{ selected: canMove }"
         ></li>
         <li
           v-if="isWatch && displayMode === 'normal'"
           data-value="fullscreen"
-          title="全屏"
+          :title="$t('doc.doc_1010')"
           class="doc-pagebar__opt vh-iconfont vh-a-line-fullscreen"
         ></li>
         <li
           v-if="isWatch && displayMode === 'fullscreen'"
           data-value="fullscreen"
-          title="退出全屏"
+          :title="$t('doc.doc_1009')"
           class="doc-pagebar__opt vh-iconfont vh-a-line-exitfullscreen"
         ></li>
       </ul>
@@ -115,7 +110,7 @@
       <ul
         class="vmp-doc-thumbnailbar"
         @click="handleThumbnail"
-        v-show="currentType !== 'board' && thumbnailShow"
+        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
       >
         <li
           class="doc-thumbnailbar__opt"
@@ -153,7 +148,8 @@
     useMemberServer,
     useRebroadcastServer,
     useDesktopShareServer,
-    usePlayerServer
+    usePlayerServer,
+    useMicServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
   import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -171,12 +167,11 @@
     },
     data() {
       return {
-        className: '',
         displayMode: 'normal', // normal: 正常; mini: 小屏 fullscreen:全屏
-        keepAspectRatio: true,
+        keepAspectRatio: true, //保持纵横比
         thumbnailShow: false, // 文档缩略是否显示
-        hasStreamList: false,
-        canMove: false
+        hasStreamList: false, // 是否展示流列表
+        canMove: false //文档能否拖拽
       };
     },
     computed: {
@@ -185,6 +180,10 @@
       },
       groupInitData() {
         return this.groupServer.state.groupInitData;
+      },
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
+      webinarMode() {
+        return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
       // 文档是否加载完成
       docLoadComplete() {
@@ -204,10 +203,11 @@
       },
       // 是否显示文档翻页相关操作栏
       showPagebar() {
-        // 显示文档资料时 && (普通模式，或 观看端全屏模式下);
+        // 显示文档资料时 && && (普通模式，或 观看端全屏模式下) && (有演示权限，或是助理和观众)
         return (
-          this.docServer.state.currentCid.split('-')[0] === 'document' &&
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch))
+          this.currentType === 'document' &&
+          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
+          (this.hasDocPermission || [2, 3].includes(this.roleName))
         );
       },
       // 当前用户Id
@@ -234,6 +234,8 @@
       },
       // 文档是否可见
       show() {
+        // 1、发起端没有开启桌面共享时展示
+        // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
           (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
@@ -250,6 +252,15 @@
         }
         // 当前用户是否演示者
         return this.presenterId == this.userId;
+      },
+      // 是否显示文档白板工具栏
+      showToolbar() {
+        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
+        return (
+          this.webinarMode != 5 &&
+          (this.hasDocPermission || [3].includes(this.roleName)) &&
+          ['normal', 'fullscreen'].includes(this.displayMode)
+        );
       },
       /**
        * @description 是否显示结束演示按钮
@@ -300,15 +311,33 @@
       },
       // 是否有翻页操作权限
       hasPager() {
+        // 定时直播所有人都没有翻页权限
+        if (this.webinarMode == 5) return false;
+        // 有演示权限，或者助理配有翻页权限，或者活动设置了有翻页权限(开发状态下)
         return (
           this.hasDocPermission ||
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
-          this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc
+          (this.webinarType === 1 && this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc)
         );
       },
       // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
+      },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.userId
+          ) || {}
+        );
+      },
+      isNoDelay() {
+        // 1：无延迟直播
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 互动无延迟 未上麦观众是否使用类似旁路布局
+      isUseNoDelayLayout() {
+        return !this.localSpeaker.accountId && this.webinarMode == 3 && this.isNoDelay == 1;
       }
     },
     watch: {
@@ -348,7 +377,6 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          console.log('[doc] streamListHeight:', newval);
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -361,6 +389,7 @@
       this.groupServer = useGroupServer();
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
+      this.micServer = useMicServer();
     },
     created() {
       window.addEventListener('keydown', this.listenKeydown);
@@ -373,17 +402,16 @@
         screenfull.toggle(this.$refs.docWrapper);
       },
       /**
-       * 缩略图列表展开与这都
+       * 缩略图列表展开与折叠
        */
       toggleThumbnail() {
-        this.thumbnailShow = !this.thumbnailShow;
-        if (
-          this.thumbnailShow &&
-          this.currentCid == this.docServer.state.docCid &&
-          this.docServer.state.docCid &&
-          this.docServer.state.thumbnailList.length === 0
-        ) {
-          this.docServer.getCurrentThumbnailList();
+        if (this.thumbnailShow) {
+          this.thumbnailShow = false;
+        } else {
+          if (this.currentCid == this.docServer.state.docCid && this.docServer.state.docCid) {
+            this.thumbnailShow = true;
+            this.docServer.getCurrentThumbnailList();
+          }
         }
       },
       async setDisplayMode(mode) {
@@ -490,43 +518,10 @@
       initEvents() {
         if (this.isWatch) {
           // 观看端事件
-          // 回放文档加载事件
-          this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', async () => {
-            console.log('[doc] dispatch_doc_vod_cuepoint_load_complate');
-            const data = this.docServer.getVodAllCids();
-            this.docServer.state.containerList = data.map(item => {
-              return {
-                cid: item.cid
-              };
-            });
-            // console.log(
-            //   '[doc]this.docServer.state.containerList:',
-            //   this.docServer.state.containerList
-            // );
-            await this.$nextTick();
-
-            // 回放只在观看端可用
-            const { width, height } = this.getDocViewRect();
-            if (!width || !height) {
-              console.error(
-                `[doc] cuepoint_load_complate 获取容器宽高异常width=${width},height=${height}`
-              );
-              return;
-            }
-            for (const item of data) {
-              this.docServer.initContainer({
-                cid: item.cid,
-                width,
-                height,
-                fileType: item.type.toLowerCase()
-              });
-            }
-            this.docServer.loadVodIframe();
-          });
-
           // 点播或回放播放器播放完成
           usePlayerServer().$on(VhallPlayer.ENDED, () => {
             console.log('[doc] VhallPlayer.ENDED');
+            // 4-点播， 5-回放
             if ([4, 5].includes(this.webinarType)) {
               this.docServer.state.switchStatus = false;
             }
@@ -536,6 +531,7 @@
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 直播开始
           if (msg.data.type === 'live_start') {
+            // 3-助理，4-嘉宾
             if ([3, 4].includes(this.roleName)) {
               this.recoverLastDocs();
             }
@@ -545,6 +541,7 @@
         // 直播结束
         useMsgServer().$on('live_over', () => {
           console.log('[doc]---直播结束 live_over---');
+          // 设置观众不可见
           this.docServer.state.switchStatus = false;
           if (this.isWatch) {
             useRoomBaseServer().setChangeElement('doc');
@@ -591,14 +588,8 @@
           }
         });
 
-        // 文档容器选择事件
-        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
-
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
-
-        // 文档是否可见状态变化事件
-        this.docServer.$on('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       },
 
       listenKeydown(e) {
@@ -610,35 +601,6 @@
           // 向下翻页
           this.handlePage('nextStep');
         }
-      },
-      /**
-       * 新增文档或白板
-       * @param {*} fileType
-       * @param {*} docId
-       * @param {*} docType
-       */
-      async addNewFile({ fileType, docId, docType, cid }) {
-        const { width, height } = this.getDocViewRect();
-        console.log(
-          '[doc] addNewFile:',
-          JSON.stringify({
-            width,
-            height,
-            fileType,
-            cid,
-            docId,
-            docType
-          })
-        );
-        await this.docServer.addNewDocumentOrBorad({
-          width,
-          height,
-          fileType,
-          cid,
-          docId,
-          docType
-        });
-        this.resize();
       },
       /**
        *  刷新或者退出重进恢复上次的文档
@@ -685,7 +647,7 @@
         });
 
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
-          const fileType = this.docServer.state.currentCid.split('-')[0] || 'document';
+          const fileType = this.currentType || 'document';
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
           );
@@ -697,6 +659,7 @@
        */
       async switchTo(fileType) {
         console.log('[doc] doc-une 切换到。。。:', fileType);
+        this.docServer.setDocLoadComplete(true);
         // 缩略图栏隐藏
         this.thumbnailShow = false;
         if (fileType === 'document') {
@@ -714,7 +677,7 @@
             this.resize();
           } else {
             // 白板不存在自动新建一个
-            this.addNewFile({ fileType: 'board' });
+            this.docServer.addNewFile({ fileType: 'board' });
           }
         }
       },
@@ -756,7 +719,7 @@
           });
         }
         this.docServer.state.containerList = boardItem ? [boardItem] : [];
-        await this.addNewFile({ fileType: 'document', docId, docType });
+        await this.docServer.addNewFile({ fileType: 'document', docId, docType });
       },
       /**
        * 页面操作工具
@@ -815,8 +778,21 @@
             break;
         }
       },
+
+      /**
+       * 画笔工具变更
+       * @param {*} brush
+       */
       changeBrush(brush) {
         this.canMove = brush === 'move';
+      },
+
+      /**
+       * 重新设置当前画笔
+       */
+      resetCurrentBrush() {
+        console.log('---resetCurrentBrush---');
+        this.$refs.docToolbar.resetCurrentBrush();
       },
 
       /**
@@ -903,54 +879,27 @@
           return;
         }
       },
-      // 选中文档容器事件
-      dispatchDocSelectContainer: async function (data) {
-        console.log('[doc] ===========选择容器======', data);
-        if (this.currentCid == data.id) {
-          return;
-        }
-        // 判断容器是否存在
-        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-        if (currentItem) {
-          this.docServer.activeContainer(data.id);
-        } else {
-          const { id: cid, docId } = data;
-          const fileType = cid.split('-')[0];
-          if (fileType === 'document' && !docId) {
-            // 文档id没有
-            console.log('[doc] 文档id没有 cid:', cid);
-            return;
-          }
-          this.addNewFile({ fileType, docId, cid });
-        }
-      },
-      // 文档是否可见状态变化事件
-      dispatchDocSwitchChange: async function (val) {
-        console.log('===[doc]====dispatch_doc_switch_change=============', val);
-        if (val && this.show && this.docLoadComplete) {
-          this.recoverLastDocs();
-        }
-      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
-        this.$message({
-          type: 'error',
-          message: '文档不存在或已删除'
-        });
+        this.$message({ type: 'error', message: '文档不存在或已删除' });
       }
     },
     mounted() {
+      console.log('[doc] doc mounted');
+      // 初始化文档server的getDocViewRect方法
+      this.docServer.getDocViewRect = this.getDocViewRect;
+
       // 初始化事件
       this.initEvents();
-      // 清空
-      // this.docServer.resetContainer();
+
       if (this.webinarType == 1) {
-        // 直播中才执行
-        // 恢复上一次的文档数据;
-        this.recoverLastDocs();
+        // 直播中才执行,恢复上一次的文档数据;
+        this.$nextTick(() => {
+          this.recoverLastDocs();
+        });
       } else {
-        if (this.roleName == 1 && [2, 3].includes(this.webinarType)) {
-          // 主持人，默认选中文档
+        // 非直播状态，主持人默认选中文档
+        if (this.roleName == 1) {
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
           );
@@ -958,9 +907,7 @@
       }
     },
     beforeDestroy() {
-      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
-      this.docServer.$off('dispatch_doc_switch_change', this.dispatchDocSwitchChange);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
@@ -996,12 +943,15 @@
       right: 20px;
       background: transparent;
       border-radius: 97px;
-      border: 1px solid #666;
+      border: 1px solid #dadada;
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
+        color: #fff;
+      }
+      &:focus {
         color: #fff;
       }
     }
@@ -1068,88 +1018,87 @@
         cursor: pointer;
 
         &:hover {
-          color: #fc5659;
+          color: #fb3a32;
         }
       }
       .doc-pagebar__opt {
         padding: 7px 10px;
+        &:hover {
+          color: #fb3a32;
+        }
 
         &.selected {
           color: #fc5659;
         }
       }
-      .doc-pagebar__opt--move {
-        &:hover {
-          color: #fc5659;
+    }
+
+    .vmp-doc-thumbnailbar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: 144px;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        border-radius: 0;
+        background-color: #000 !important;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        height: 60px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        background: #333 !important;
+      }
+
+      li.doc-thumbnailbar__opt {
+        height: 63px;
+        width: 110px;
+        margin-top: 15px;
+        position: relative;
+
+        &.selected {
+          box-shadow: 0 0 0 2px #fb3a32;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
         }
       }
-    }
-  }
-  .vmp-doc-thumbnailbar {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 144px;
-    background-color: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-      border-radius: 0;
-      background-color: #000 !important;
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transpar ent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      height: 60px;
-      border-radius: 10px;
-      border: 1px solid #fff;
-      background: #000 !important;
-    }
-
-    li.doc-thumbnailbar__opt {
-      height: 63px;
-      width: 110px;
-      margin-top: 15px;
-      position: relative;
-
-      &.selected {
-        box-shadow: 0 0 0 2px #f57274;
+      li.doc-thumbnailbar__opt:not(.selected) {
+        &:hover {
+          box-shadow: 0 0 0 2px #f3686b;
+        }
       }
-
-      img {
-        width: 100%;
-        height: 100%;
+      li:last-child {
+        margin-bottom: 20px;
       }
-    }
-    li.doc-thumbnailbar__opt:not(.selected) {
-      &:hover {
-        box-shadow: 0 0 0 2px #f3686b;
+      .doc-thumbnailbar-seq {
+        display: block;
+        min-width: 20px;
+        height: 14px;
+        background: #000;
+        opacity: 0.7;
+        color: #fff;
+        font-size: 12px;
+        line-height: 14px;
+        text-align: center;
+        position: absolute;
+        left: 0;
+        bottom: 0;
       }
-    }
-    li:last-child {
-      margin-bottom: 20px;
-    }
-    .doc-thumbnailbar-seq {
-      display: block;
-      min-width: 20px;
-      height: 14px;
-      background: #000;
-      opacity: 0.7;
-      color: #fff;
-      font-size: 12px;
-      line-height: 14px;
-      text-align: center;
-      position: absolute;
-      left: 0;
-      bottom: 0;
     }
   }
 
@@ -1217,14 +1166,17 @@
       color: #fff;
       cursor: pointer;
       &:hover {
-        background: #fc5659;
-        border-color: #fc5659;
+        background: #fb3a32;
+        border-color: #fb3a32;
         color: #fff;
       }
     }
 
     &.vmp-doc-une--normal.has-stream-list {
       top: 80px;
+    }
+    &.vmp-doc-une--normal.no-delay-layout {
+      top: 0px;
     }
 
     //mini模式

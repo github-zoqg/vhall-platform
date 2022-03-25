@@ -8,22 +8,32 @@
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图 -->
     <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
+
+    <!-- 音频直播的的时候显示流占位图 -->
+    <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
+
+    <!-- 网络异常时占位图，根据是否有streamId判断 -->
+    <section
+      v-if="isShowNetError && !stream.streamId"
+      class="vmp-stream-remote__container__net-error"
+    >
+      <div class="net-error-img"></div>
+    </section>
+
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom" v-show="stream.streamId">
+    <section class="vmp-stream-local__bottom" v-show="stream.streamId">
+      <span class="vmp-stream-local__bottom-nickname">{{ stream.attributes.nickname }}</span>
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName)"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
-      >
-        {{ stream.attributes.roleName | roleFilter }}
-      </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
-      <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
@@ -39,20 +49,26 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import { Toast } from 'vant';
   export default {
     name: 'VmpWapStreamRemote',
     data() {
       return {
         audioLevel: 1,
         networkStatus: 0,
-        isFullScreen: false
+        isFullScreen: false,
+        isShowNetError: false
       };
     },
     props: {
       stream: {
-        require: true
+        require: true,
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     watch: {
@@ -72,12 +88,50 @@
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
+      presentationScreen() {
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        }
+      },
       mainScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
         } else {
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
+      },
+      //显示是否在演示中
+      isShowPresentationScreen() {
+        const { accountId } = this.stream;
+        const sameId = this.presentationScreen === accountId;
+        const groupMode = this.liveMode == 6;
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
+        const allowedUser = inMainRoomUser || inGroupRoomUser;
+
+        console.log('isShowPresentationScreen', {
+          sameId,
+          groupMode,
+          inMainRoomUser,
+          inGroupRoomUser
+        });
+
+        return sameId && groupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -86,10 +140,18 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    filters: {},
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
+    },
+    created() {
+      setTimeout(() => {
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
+      }, 5000);
+
+      this.listenEvents();
     },
     beforeDestroy() {
       // 清空计时器
@@ -99,20 +161,58 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
+
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      listenEvents() {
+        useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+        useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+
+        // 订阅失败
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.stream.streamId) {
+            Toast(this.$t(`interact.interact_1014`, { n: this.stream.nickname }));
+            this.subscribeRemoteStream();
+          }
+        });
+      },
+      // 监听离开加入房间事件，显示网络异常占位图
+      handleUserJoin(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = false;
+        }
+      },
+      handleUserLeave(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = true;
+        }
+      },
       subscribeRemoteStream() {
         console.log('开始订阅', JSON.stringify(this.stream));
+        let videoNode = `stream-${this.stream.streamId}`;
+        document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
-          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.warn('订阅成功---------', e);
+            try {
+              if (document.querySelector(`#stream${e.streamId}`)) {
+                document.querySelector(`#stream${e.streamId}`).play();
+              }
+              if (document.querySelector(`#stream${e.streamId}`)) {
+                document.querySelector(`#stream${e.streamId}`).play();
+              }
+            } catch (error) {
+              console.error('业务自行--- 播放失败----------', error);
+            }
             this.getLevel();
           })
           .catch(e => {
@@ -191,6 +291,29 @@
         display: flex;
       }
     }
+
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     .vmp-stream-remote__container {
       width: 100%;
       height: 100%;
@@ -205,7 +328,39 @@
       width: 100%;
       height: 100%;
     }
-    .vmp-stream-local__bootom {
+    .vmp-stream-remote__container__audio {
+      background-image: url(./img/audio.gif);
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    // 网络异常占位图
+    .vmp-stream-remote__container__net-error {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      .net-error-img {
+        width: 30px;
+        height: 25px;
+        margin-bottom: 1px;
+        background-image: url('./img/net-error.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+    }
+
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -217,31 +372,6 @@
       bottom: 0;
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
-      &-role {
-        border-radius: 8px;
-        padding: 0 6px;
-        vertical-align: top;
-        // 主持人
-        &__1 {
-          background: rgba(251, 58, 50, 0.2);
-          color: #fb3a32;
-        }
-        // 观众
-        &__2 {
-          background: rgba(251, 58, 50, 0.2);
-          color: #fb3a32;
-        }
-        // 助理
-        &__3 {
-          background-color: rgba(53, 98, 250, 0.2);
-          color: #3562fa;
-        }
-        // 嘉宾
-        &__4 {
-          background-color: rgba(53, 98, 250, 0.2);
-          color: #3562fa;
-        }
-      }
       &-nickname {
         display: inline-block;
         width: 80px;

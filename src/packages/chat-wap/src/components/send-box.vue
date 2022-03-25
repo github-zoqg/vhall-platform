@@ -2,7 +2,7 @@
   <div class="vmp-send-box" :class="[className]">
     <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
-      <div class="user-avatar-wrap" v-if="!isEmbed && isShowUser">
+      <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
           <img class="avatar-img" :src="avatar" srcset />
         </div>
@@ -11,7 +11,7 @@
         <template v-if="chatShow">
           <div
             class="content-input__placeholder"
-            v-if="isNeedLogin && !isLogin && !noChatLogin && !isEmbed"
+            v-if="!isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -26,6 +26,7 @@
               {{ $t('chat.chat_1006') }}
             </span>
             <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
+            <span v-else-if="isvod">{{ $t('chat.chat_1079') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>{{ $t('chat.chat_1042') }}</span>
           </div>
@@ -70,7 +71,11 @@
         </div>
       </div>
     </div>
-    <chat-wap-input-modal ref="chatWapInputModal" @sendMsg="sendMessage"></chat-wap-input-modal>
+    <chat-wap-input-modal
+      ref="chatWapInputModal"
+      @sendMsg="sendMessage"
+      :showTabType="currentTab"
+    ></chat-wap-input-modal>
   </div>
 </template>
 
@@ -87,14 +92,10 @@
     useMicServer
   } from 'middle-domain';
   import Handup from './handup.vue';
+  import { browserType } from '@/packages/app-shared/utils/tool';
 
   export default {
     props: {
-      noChatLogin: {
-        // 是否免登陆
-        type: Boolean,
-        default: false
-      },
       currentTab: {
         type: [String, Number],
         default: ''
@@ -130,6 +131,11 @@
             video: false
           };
         }
+      },
+      //当前登录人是否正在上麦
+      onlineMicStatus: {
+        type: Boolean,
+        default: false
       }
     },
     filters: {
@@ -155,18 +161,10 @@
         //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
-        //是否展示用户头像
-        isShowUser: false,
         connectMicShow: false, // 连麦入口按钮
         disabledAll: false, // 全员禁言
         //活动信息
         webinar: {},
-        //是否已经登录
-        isLogin: false,
-        //配置列表
-        configList: {},
-        //用户头像
-        avatar: require('../img/default_avatar.png'),
         handUpStatus: false,
         //只看我的问答
         isShowMyQA: false
@@ -191,13 +189,26 @@
         const { groupInitData = {} } = this.groupServer.state;
         return groupInitData;
       },
-      //是否需要登录
-      isNeedLogin() {
-        let needLogin = true;
-        if (['', null, void 0].includes(this.configList['ui.show_chat_without_login'])) {
-          return needLogin;
+      //是否不需要登录
+      noChatLogin() {
+        let noChatLogin = false;
+        if (browserType()) {
+          /**
+           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
+           */
+          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
+            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+          } else {
+            noChatLogin = true;
+          }
+        } else {
+          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
         }
-        return [0, '0'].includes(this.configList['ui.show_chat_without_login']);
+        return noChatLogin;
+      },
+      //黄金链路配置
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
       },
       isEmbed() {
         // 是不是音视频嵌入
@@ -220,9 +231,25 @@
               !this.isAllBanned &&
               !this.isBanned &&
               !this.groupInitData.isInGroup,
+            this.onlineMicStatus && !this.groupInitData.isInGroup,
             this.groupInitData.isInGroup && !this.isBanned
           ].some(val => !!val)
         );
+      },
+      //是否回放禁言
+      isvod() {
+        return (
+          (this.webinar.type == 5 || this.webinar.type == 4) &&
+          this.configList['ui.watch_record_no_chatting'] == 1
+        );
+      },
+      avatar() {
+        const avatar = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.avatar;
+        return avatar || require('../img/default_avatar.png');
+      },
+      isLogin() {
+        const user_id = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
+        return user_id != 0;
       }
     },
     watch: {
@@ -250,8 +277,6 @@
       this.connectMicShow = this.isHandsUp;
       // 初始全员禁言状态
       this.disabledAll = this.isAllBanned;
-      // 判断登录
-      this.checkIsLogin();
       // eventBus监听
       this.eventListener();
 
@@ -268,6 +293,7 @@
         }
         this.connectMicShow = false;
       });
+      window.chat = this;
     },
     methods: {
       showMyQA() {
@@ -276,24 +302,9 @@
       },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
         this.webinar = webinar;
-        this.configList = configList;
-      },
-      // 判断登录
-      checkIsLogin() {
-        const { userInfo = {} } = this.userServer.state;
-        // 若用户已经登录
-        if (Object.keys(userInfo).length) {
-          this.isLogin = true;
-          // 若用户已经登录过，获取userInfo
-          this.isShowUser = true;
-          this.avatar = userInfo.avatar || require('../img/default_avatar.png');
-        } else {
-          this.isLogin = false;
-          this.isShowUser = false;
-        }
       },
       // eventBus监听
       eventListener() {
@@ -308,15 +319,16 @@
         });
 
         // 头像更新
-        this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
-          this.avatar = avatar;
-        });
+        // this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
+        //   this.avatar = avatar;
+        // });
       },
       saySomething() {
         if (
           (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
-          (this.groupInitData.isBanned && this.groupInitData.isInGroup)
+          (this.groupInitData.isBanned && this.groupInitData.isInGroup) ||
+          this.isvod
         ) {
           return;
         }
@@ -325,10 +337,10 @@
           if (this.waitTimeFlag) {
             this.$refs.chatWapInputModal.openModal();
           } else {
-            this.$message(this.$t('chat.chat_1068', { n: this.waitTime }));
+            this.$toast(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
         } else if (this.currentTab == 'qa' && this.time != 0) {
-          this.$message(this.$t('chat.chat_1080', { n: this.time }));
+          this.$toast(this.$t('chat.chat_1080', { n: this.time }));
         } else {
           this.$refs.chatWapInputModal.openModal();
         }
@@ -373,6 +385,7 @@
         //将文本消息加入消息体
         curmsg.setText(value);
         //发送消息
+        console.log('msg', curmsg);
         chatServer.sendMsg(curmsg);
         //清除当前消息
         chatServer.clearCurMsg();
@@ -493,7 +506,7 @@
         }
       }
       .only-my {
-        color: #fc5659;
+        color: #fb3a32;
       }
     }
   }

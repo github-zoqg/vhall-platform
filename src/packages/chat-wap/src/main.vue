@@ -39,7 +39,6 @@
       :isAllBanned="allBanned"
       :isBanned="isBanned"
       :isHandsUp="isHandsUp"
-      :noChatLogin="noChatLogin"
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
@@ -53,9 +52,9 @@
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
-  import defaultAvatar from './img/default_avatar.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
@@ -87,8 +86,6 @@
         unReadMessageCount: 0,
         //活动信息
         webinar: {},
-        //是否隐藏聊天历史加载记录
-        configList: {},
         //当前页数
         page: 1,
         //是否已经下拉刷新
@@ -125,23 +122,6 @@
       isHandsUp() {
         const { interactToolStatus = {} } = this.roomBaseServer.state;
         return interactToolStatus && !!interactToolStatus['is_handsup'];
-      },
-      //是否不登陆也可以参与聊天
-      noChatLogin() {
-        let noChatLogin = false;
-        if (browserType()) {
-          /**
-           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
-           */
-          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
-            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
-          } else {
-            noChatLogin = true;
-          }
-        } else {
-          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
-        }
-        return noChatLogin;
       },
       // 设备状态
       deviceType() {
@@ -181,24 +161,28 @@
       },
       //是否已上麦
       onlineMicStatus() {
-        const { interactToolStatus = {} } = this.roomBaseServer.state;
-        const { groupInitData = {} } = this.groupServer.state;
-        let isOnMic = false;
-        if (groupInitData && groupInitData.isInGroup) {
-          isOnMic =
-            Array.isArray(groupInitData.speaker_list) &&
-            !groupInitData.speaker_list.some(
-              ele => ele.account_id === this.joinInfo.third_party_user_id
-            );
-        } else {
-          isOnMic =
-            interactToolStatus &&
-            Array.isArray(interactToolStatus.speaker_list) &&
-            !interactToolStatus.speaker_list.some(
-              ele => ele.account_id === this.joinInfo.third_party_user_id
-            );
+        return (useMicServer().state.speakerList || []).some(item => {
+          return (
+            item.account_id == this.joinInfo.third_party_user_id ||
+            item.accountId == this.joinInfo.third_party_user_id
+          );
+        });
+      },
+      // 聊天区欢迎语
+      welcomeText() {
+        if (Array.isArray(this.roomBaseServer.state.customMenu?.list)) {
+          // 获取聊天菜单内容
+          const chatItem = this.roomBaseServer.state.customMenu.list.find(item => {
+            return item.type == 3;
+          });
+          // 返回欢迎语
+          return chatItem?.welcome_content || '';
         }
-        return isOnMic;
+        return '';
+      },
+      //黄金链路配置
+      configList() {
+        return this.roomBaseServer.state.configList;
       }
     },
     beforeCreate() {
@@ -218,19 +202,19 @@
       // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
-      console.log('useChatServer', useChatServer().state);
       this.listenChatServer();
+      this.showWelcomeTxt();
     },
     methods: {
+      showWelcomeTxt() {
+        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+      },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
-        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        const { watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { webinar = {}, interact = {} } = watchInitData;
         const { embed = false } = embedObj;
-        console.log(this.roomBaseServer, 'roomBaseServer');
-        console.log(join_info);
         this.webinar = webinar;
-        this.configList = configList;
         this.roomId = interact.room_id;
         this.isEmbed = embed;
       },
@@ -269,12 +253,15 @@
           this.allBanned = res;
         });
         //监听分组房间变更通知
-        chatServer.$on('changeChannel', () => {
+        // chatServer.$on('changeChannel', () => {
+        //   this.handleChannelChange();
+        // });
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message(this.$t('chat.chat_1007'));
+          this.$toast(this.$t('chat.chat_1007'));
         });
       },
       //处理分组讨论频道变更

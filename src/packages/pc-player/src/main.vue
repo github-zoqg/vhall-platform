@@ -1,11 +1,9 @@
 <template>
   <div
     v-if="!isShowContainer"
-    class="vmp-player"
     :class="[
-      { 'is-watch': isWatch },
-      { 'vmp-player-embed': isEmbedVideo },
-      { 'vmp-player-embedFull': isEmbed },
+      'vmp-player',
+      { 'is-watch': isWatch, 'vmp-player-embed': isEmbedVideo, 'vmp-player-embedFull': isEmbed },
       isSubscribe ? '' : `vmp-player--${displayMode}`
     ]"
     @mousemove="wrapEnter"
@@ -20,11 +18,13 @@
       :element-loading-text="$t('common.common_1001')"
     >
       <template class="vmp-player-living">
+        <!-- 背景图片 -->
         <div
           v-if="isShowPoster"
           class="vmp-player-living-background"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         ></div>
+        <!-- 暖场视频播放按钮 -->
         <div
           v-if="isEmbed && isSubscribe && isWarnPreview && !isPlayering"
           class="vmp-player-living-play"
@@ -33,6 +33,7 @@
             <i class="vh-iconfont vh-line-video-play"></i>
           </div>
         </div>
+        <!-- 直播、回放播放按钮 -->
         <template v-else>
           <div class="vmp-player-living-btn" v-if="!isPlayering && !isVodEnd">
             <div
@@ -65,7 +66,7 @@
             </div>
             <p class="replay-try" @click="replayPlay">
               <i class="vh-iconfont vh-line-refresh-left">
-                <b>{{ $t('appointment.appointment_1014') }}</b>
+                {{ $t('appointment.appointment_1014') }}
               </i>
             </p>
           </div>
@@ -151,11 +152,11 @@
             </div>
             <div class="controller-tools-left-time" v-if="!isLiving">
               <span class="controller-tools-left-time-current">
-                {{ secondToDate(currentTime) }}
+                {{ currentTime | secondToDate }}
               </span>
               <span>/</span>
               <span class="controller-tools-left-time-total">
-                {{ secondToDate(totalTime) }}
+                {{ totalTime | secondToDate }}
               </span>
             </div>
           </div>
@@ -189,7 +190,10 @@
                 </li>
               </ul>
             </div>
-            <div class="controller-tools-right-speed" v-if="!isLiving && !isWarnPreview">
+            <div
+              class="controller-tools-right-speed"
+              v-if="!isLiving && !isWarnPreview && playerOtherOptions.speed"
+            >
               <span>
                 {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
               </span>
@@ -213,7 +217,10 @@
                 <el-slider v-model="voice" vertical height="100px" :show-tooltip="true"></el-slider>
               </div>
             </div>
-            <div class="controller-tools-right-danmuis" v-if="!isWarnPreview">
+            <div
+              class="controller-tools-right-danmuis"
+              v-if="!isWarnPreview && playerOtherOptions.barrage_button"
+            >
               <i
                 :class="`vh-iconfont ${danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'}`"
                 @click="openBarrage"
@@ -265,7 +272,7 @@
         <!-- 断点续播 -->
         <div v-if="isPickupVideo && currentTime > 0">
           <i18n path="player.player_1012">
-            <span place="n" class="red">{{ secondToDate(currentTime) }}</span>
+            <span place="n" class="red">{{ currentTime | secondToDate }}</span>
           </i18n>
           <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
         </div>
@@ -275,7 +282,7 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
-  import { computeRecordTime, secondToDateZH, isIE, windowVersion } from './js/utils';
+  import { computeRecordTime, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -375,7 +382,7 @@
         );
       },
       isVisibleMiniElement() {
-        // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
+        // 添加插播桌面共享后，再添加插播桌面共享场景的处理
         return this.$domainStore.state.docServer.switchStatus;
       },
       isSubscribe() {
@@ -658,12 +665,11 @@
             tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
           })
           .then(res => {
-            if (res.code == 200) {
+            if (res.code === 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
               this.marquee = res.data['screen-config'].data;
               this.water = res.data['water-mark'].data;
               this.playerOtherOptions = res.data['basic-config'].data;
-              console.log(this.marquee, this.water, '??!23221423');
               this.initPlayer();
             }
           });
@@ -677,7 +683,21 @@
       // 切换多语言
       changeLanguage(key) {
         localStorage.setItem('lang', key);
-        window.location.reload();
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
       },
       // 判断是直播还是回放 活动状态
       getWebinerStatus(info) {
@@ -809,9 +829,6 @@
           this.$toast('调整播放时间失败');
         });
         this.playerServer.play();
-      },
-      secondToDate(val) {
-        return secondToDateZH(val);
       }
     }
   };
@@ -1134,7 +1151,8 @@
     }
     &-controller {
       position: absolute;
-      bottom: -48px;
+      bottom: 0;
+      // bottom: -48px;
       z-index: 8;
       width: 100%;
       height: 38px;
@@ -1172,13 +1190,16 @@
           box-shadow: 0 0 10px @bg-error-light;
         }
         &:hover {
-          .el-slider__runway,
-          .el-slider__bar {
-            height: 10px;
-          }
+          // .el-slider__bar {
+          //   height: 9px;
+          // }
+          // .el-slider__runway {
+          //   background: transparent;
+          // }
           .el-slider__button {
-            width: 14px;
-            height: 14px;
+            width: 13px;
+            height: 13px;
+            top: 11px;
             transform: scale(1) !important;
           }
         }
@@ -1349,13 +1370,14 @@
           box-shadow: 0 0 10px @bg-error-light;
         }
         &:hover {
-          .el-slider__runway,
-          .el-slider__bar {
-            height: 5px;
-          }
+          // .el-slider__runway,
+          // .el-slider__bar {
+          //   height: 5px;
+          // }
           .el-slider__button {
             width: 10px;
             height: 10px;
+            // top: -2px;
             transform: scale(1) !important;
           }
         }

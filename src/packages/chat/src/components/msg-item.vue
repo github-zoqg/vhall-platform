@@ -24,11 +24,17 @@
         >
           <template
             v-if="
-              chatOptions && chatOptions.userControlOptions && chatOptions.userControlOptions.enable
+              chatOptions &&
+              chatOptions.userControlOptions &&
+              chatOptions.userControlOptions.enable &&
+              !isSelfMsg(source.sendId)
             "
           >
-            <div class="normal-msg__avatar" @click="setPersonStatus($event, source)">
-              <img class="normal-msg__avatar-img" :src="source.avatar" alt />
+            <div
+              :class="['normal-msg__avatar', 'cur-pointer']"
+              @click="setPersonStatus($event, source)"
+            >
+              <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
               <img
                 v-if="source.client === 'h5_browser'"
                 class="chat-phone"
@@ -41,7 +47,7 @@
           </template>
           <template v-else>
             <div class="normal-msg__avatar">
-              <img class="normal-msg__avatar-img" :src="source.avatar" alt />
+              <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
               <img
                 v-if="source.client === 'h5_browser'"
                 class="chat-phone"
@@ -55,9 +61,25 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
-              <span class="info-wrap__nick-name">
-                {{ source.nickname }}
-              </span>
+              <template>
+                <!-- TODO: 自己不能@自己 -->
+                <span
+                  class="info-wrap__nick-name cur-pointer"
+                  @click="setPersonStatus($event, source)"
+                  v-if="
+                    chatOptions &&
+                    chatOptions.userControlOptions &&
+                    chatOptions.userControlOptions.enable &&
+                    !isSelfMsg(source.sendId)
+                  "
+                >
+                  {{ source.nickname }}
+                </span>
+                <span class="info-wrap__nick-name" v-else>
+                  {{ source.nickname }}
+                </span>
+              </template>
+
               <span
                 v-if="
                   (source.type === 'text' || source.type === 'image' || source.isHistoryMsg) &&
@@ -118,8 +140,11 @@
                 <div
                   v-for="(img, index) in source.replyMsg.content.image_urls"
                   :key="index"
-                  class="reply-wrapper__img-wrapper__img-box reply-msg"
-                  :class="index === 0 ? 'first-child' : ''"
+                  :class="[
+                    'reply-wrapper__img-wrapper__img-box reply-msg',
+                    { 'is-watch': isWatch },
+                    { 'first-child': index === 0 }
+                  ]"
                 >
                   <img
                     class="img-box__content-img"
@@ -157,15 +182,18 @@
               <div
                 v-for="(img, index) in source.content.image_urls"
                 :key="index"
-                class="normal-msg__img-wrapper__img-box"
-                :class="index === 0 ? 'first-child' : ''"
+                :class="[
+                  'normal-msg__img-wrapper__img-box',
+                  { 'is-watch': isWatch },
+                  { 'first-child': index === 0 }
+                ]"
               >
                 <img
                   class="normal-msg__img-wrapper__img-box__content-img"
                   width="34"
                   height="34"
                   :src="img"
-                  alt="$t('chat.chat_1065')"
+                  :alt="$t('chat.chat_1065')"
                   @click="previewImg(index, source.content.image_urls)"
                 />
               </div>
@@ -183,7 +211,7 @@
               v-show="source.nickname && source.roleName != 1"
               class="interact-content__nick-name"
             >
-              {{ source.nickname }}
+              {{ source.nickname | overHidden(8) }}
             </span>
             <span
               v-show="source.roleName"
@@ -245,6 +273,7 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
+  import defaultAvatar from '../img/my-dark@2x.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',
@@ -294,13 +323,19 @@
       emitQuestionnaireEvent: {
         type: Function,
         default: function () {}
+      },
+      // 是否观看端
+      isWatch: {
+        type: Boolean,
+        default: null
       }
     },
     data() {
       return {
         msgContent: '',
         //是否是嵌入端
-        isEmbed: false
+        isEmbed: false,
+        defaultAvatar: defaultAvatar
       };
     },
     computed: {
@@ -315,16 +350,6 @@
       }
     },
     filters: {
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
-      },
       //角色标签样式
       roleClassFilter(value) {
         //主持人
@@ -359,7 +384,6 @@
       this.handleAt();
     },
     methods: {
-      //todo domain负责
       setPersonStatus(event, msg) {
         if (!msg.sendId) {
           return;
@@ -389,6 +413,10 @@
           msg.nickname,
           msg.roleName
         );
+      },
+      // 判断是不是自己的消息
+      isSelfMsg(id) {
+        return this.joinInfo.third_party_user_id == id;
       },
       //todo 信令唤起其他模块 点击查看消息
       clickToView(type, content) {
@@ -431,14 +459,14 @@
                 this.msgContent = this.urlToLink(
                   this.msgContent.replace(
                     userName,
-                    `<span style='color:#4DA1FF'>${userName}</span>`
+                    `<span style='color:#3562fa'>${userName}</span>`
                   )
                 );
               } else {
                 this.msgContent = this.urlToLink(
                   this.source.content.text_content.replace(
                     userName,
-                    `<span style='color:#4DA1FF'>${userName}</span>`
+                    `<span style='color:#3562fa'>${userName}</span>`
                   )
                 );
               }
@@ -645,8 +673,12 @@
           }
           .reply-wrapper__img-wrapper__img-box {
             display: inline-block;
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
+            &.is-watch {
+              width: 60px;
+              height: 60px;
+            }
             border-radius: 4px;
             overflow: hidden;
             background-color: @bg-dark-normal;
@@ -692,8 +724,12 @@
           }
           .normal-msg__img-wrapper__img-box {
             display: inline-block;
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
+            &.is-watch {
+              width: 60px;
+              height: 60px;
+            }
             border-radius: 4px;
             overflow: hidden;
             background-color: @bg-dark-normal;
@@ -752,11 +788,11 @@
           }
           &.assistant {
             background-color: rgba(166, 166, 166, 0.15);
-            color: #a6a6a6;
+            color: #3562fa;
           }
           &.guest {
             background-color: rgba(53, 98, 250, 0.2);
-            color: #3562fa;
+            color: #a6a6a6;
           }
         }
         .interact-content__redpackage-img {
@@ -778,7 +814,7 @@
         display: flex;
         justify-content: center;
         .interact-tools-content {
-          margin-top: 20px;
+          /*  margin-top: 20px; TODO: 注释掉内部20间距，外部有20间距设定 */
           line-height: 20px;
           padding: 5px 16px;
           background-color: #222222;
@@ -787,7 +823,7 @@
           font-size: 14px;
           text-align: center;
           > span {
-            float: left;
+            //float: left;
           }
           &__nick-name {
             color: @font-dark-low;

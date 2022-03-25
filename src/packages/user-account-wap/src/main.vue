@@ -18,12 +18,10 @@
           <span class="user-info-form-label">{{ $t('account.account_1002') }}</span>
           <span
             :class="
-              useUserServer.state.userInfo.phone
-                ? 'user-info-form-ready'
-                : 'user-info-form-no-ready'
+              userServer.state.userInfo.phone ? 'user-info-form-ready' : 'user-info-form-no-ready'
             "
           >
-            {{ useUserServer.state.userInfo.phone || $t('account.account_1003') }}
+            {{ userServer.state.userInfo.phone || $t('account.account_1003') }}
           </span>
         </template>
       </van-cell>
@@ -42,18 +40,18 @@
             :deletable="false"
           >
             <i
-              v-if="!useUserServer.state.userInfo.avatar"
+              v-if="!userServer.state.userInfo.avatar"
               class="vh-iconfont vh-a-line-cloudtoupload"
             ></i>
-            <div class="img-logo" v-if="useUserServer.state.userInfo.avatar">
-              <img :src="useUserServer.state.userInfo.avatar" class="avatar" alt="" />
+            <div class="img-logo" v-if="userServer.state.userInfo.avatar">
+              <img :src="userServer.state.userInfo.avatar" class="avatar" alt="" />
             </div>
           </van-uploader>
         </template>
         <template #right-icon>
           <van-button
             class="user-info-form-btn"
-            v-if="useUserServer.state.userInfo.avatar"
+            v-if="userServer.state.userInfo.avatar"
             @click="removeAvatar"
           >
             {{ $t('account.account_1076') }}
@@ -80,13 +78,13 @@
           <span class="user-info-form-label">{{ $t('account.account_1013') }}</span>
           <span
             :class="
-              useUserServer.state.userInfo.has_password !== 0
+              userServer.state.userInfo.has_password !== 0
                 ? 'user-info-form-ready'
                 : 'user-info-form-no-ready'
             "
           >
             {{
-              useUserServer.state.userInfo.has_password !== 0
+              userServer.state.userInfo.has_password !== 0
                 ? $t('account.account_1014')
                 : $t('account.account_1015')
             }}
@@ -105,7 +103,7 @@
 </template>
 
 <script>
-  import { useUserServer } from 'middle-domain';
+  import { useUserServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import BindPhone from './components/bind-phone';
   import BindPassword from './components/bind-password';
@@ -114,7 +112,7 @@
     components: { BindPhone, BindPassword },
     data() {
       return {
-        useUserServer: {},
+        userServer: {},
         visible: false,
         fileList: [],
         nickName: '',
@@ -131,13 +129,14 @@
       };
     },
     created() {
-      this.useUserServer = useUserServer();
+      this.userServer = useUserServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       // 打开弹窗
       openUserAccountWap() {
         this.visible = true;
-        this.nickName = this.useUserServer.state.userInfo.nick_name;
+        this.nickName = this.userServer.state.userInfo.nick_name;
       },
 
       // 关闭弹窗
@@ -150,9 +149,9 @@
       openPhoneHandler() {
         this.phoneDialog = {
           visible: true,
-          type: this.useUserServer.state.userInfo.phone ? 'edit' : 'add',
+          type: this.userServer.state.userInfo.phone ? 'edit' : 'add',
           step: 1,
-          phone: this.useUserServer.state.userInfo.phone
+          phone: this.userServer.state.userInfo.phone
         };
       },
 
@@ -181,7 +180,7 @@
           resfile: files.file,
           path: 'users/face-imgs'
         };
-        this.useUserServer
+        this.userServer
           .uploadImage(param)
           .then(res => {
             if (res && res.code == 200) {
@@ -189,17 +188,17 @@
               console.log('上传成功后图片地址', res.data.file_url);
               this.changeAvatarSend(res.data.file_url);
             } else {
-              this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1046'));
+              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1046'));
             }
           })
           .catch(err => {
-            this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1046'));
+            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1046'));
           });
       },
 
       // 更换头像接口
       changeAvatarSend(avatar) {
-        this.useUserServer
+        this.userServer
           .changeAvatarSend({ avatar })
           .then(res => {
             if (res && res.code == 200) {
@@ -207,15 +206,17 @@
               if (avatar === '') {
                 this.fileList = [];
               }
-              this.roomBaseServer.setChangeUserInfo(1, { avatar: avatar });
               // 用户信息接口更新
-              this.useUserServer.getUserInfo({ scene_id: 2 });
+              this.userServer.getUserInfo({ scene_id: 2 }).then(res => {
+                const avatarUrl = res.data?.avatar;
+                this.roomBaseServer.setChangeUserInfo(1, { avatar: avatarUrl });
+              });
             } else {
-              this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1048'));
+              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1048'));
             }
           })
           .catch(err => {
-            this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1048'));
+            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1048'));
           });
       },
 
@@ -231,19 +232,19 @@
         } else if (this.nickName.length < 1 || this.nickName.length > 30) {
           this.$toast(this.$t('account.account_1056'));
         } else {
-          this.useUserServer
+          this.userServer
             .editUserNickName({ nick_name: this.nickName })
             .then(res => {
               if (res && res.code == 200) {
                 this.$toast(this.$t('account.account_1057'));
                 this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
-                this.useUserServer.getUserInfo({ scene_id: 2 });
+                this.userServer.getUserInfo({ scene_id: 2 });
               } else {
-                this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1058'));
+                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1058'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1058'));
+              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1058'));
             });
         }
       },
@@ -251,7 +252,7 @@
       // 修改密码
       openPwdHandler() {
         this.pwdData.visible = true;
-        this.pwdData.type = this.useUserServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
+        this.pwdData.type = this.userServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
       }
     }
   };

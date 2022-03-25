@@ -27,7 +27,7 @@
 
     <footer class="vh-media-check-footer">
       <div class="vh-check-tip">
-        <span class="vh-iconfont vh-line-video-camera icon-tip"></span>
+        <span class="vh-iconfont vh-line-detection icon-tip"></span>
         <span>您能看到摄像头画面吗？</span>
       </div>
       <div class="button-container">
@@ -143,6 +143,9 @@
 
 <style lang="less">
   .vh-media-check-video {
+    width: 296px;
+    margin: 0 auto;
+
     // selector
     .vh-media-check-selector {
       display: flex;
@@ -178,7 +181,6 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-content: center;
         align-items: center;
         .preview-video-error__img {
           width: 72px;
@@ -186,7 +188,7 @@
         .preview-video-error__desc {
           padding-top: 10px;
           font-size: 12px;
-          color: #ffffff;
+          color: #fff;
           line-height: 20px;
         }
       }
@@ -194,7 +196,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip

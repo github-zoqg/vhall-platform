@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-chat-input">
     <div
-      class="vmp-chat-input__textarea-box"
+      :class="['vmp-chat-input__textarea-box', { 'is-watch': isWatch }]"
       v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
     >
       <textarea
@@ -30,7 +30,7 @@
 
     <div
       v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
-      class="vmp-chat-input__textarea-placeholder"
+      :class="['vmp-chat-input__textarea-placeholder', { 'is-watch': isWatch }]"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
         <i18n path="chat.chat_1001">
@@ -101,11 +101,13 @@
         //字数限制
         inputMaxLength: 140,
         //显示字数限制提示
-        showWordLimit: true,
+        showWordLimit: false,
         //聊天里临时选择的图片
         imgUrls: [],
         //回复消息
-        replyMsg: {}
+        replyMsg: {},
+        // 聊天输入框的值，是否是从无到有。默认null表示一开始是无内容的，一但有内容了，除非当前inputValue为空，否则不处理
+        isWordNull: null
       };
     },
     computed: {
@@ -124,6 +126,10 @@
       isEmbed() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseState.clientType);
       }
     },
     watch: {
@@ -138,8 +144,15 @@
         }
       },
       inputValue(newValue) {
+        // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
         if (!newValue) {
-          this.replyMsg = {};
+          // console.log('chat input 值发生变化了', newValue);
+          // 输入框内容发生变化，更新滚动条
+          this.$nextTick(() => {
+            this.overlayScrollbar.update();
+            this.inputHandle();
+          });
+          // this.replyMsg = {};
         }
       }
     },
@@ -163,36 +176,38 @@
       },
       //输入框输入事件,改变高度等
       inputHandle() {
-        const chatOldTextareaHeight = this.$refs.chatTextarea.style.height;
+        // const chatOldTextareaHeight = this.$refs.chatTextarea.style.height;
         // 最大字数限制 140
         if (this.inputValue.length > 140) {
           this.inputValue = this.inputValue.substring(0, 140);
         }
-        setTimeout(() => {
-          this.$nextTick(() => {
-            const chatTextareaHeight = this.$refs.chatTextarea.style.height;
-            if (chatOldTextareaHeight !== chatTextareaHeight) {
-              const hostTextarea = document.querySelector(
-                '.vmp-chat-input__textarea-box .os-host-textarea'
-              );
-              const chatTextAreaHeight = parseInt(chatTextareaHeight);
-              if (chatTextAreaHeight <= 60) {
-                // 解决删除文本之后 textarea 高度不会自动减小的问题
-                this.$refs.chatTextarea.style.minHeight = '20px';
-                hostTextarea.style.minHeight = chatTextareaHeight;
-              } else {
-                hostTextarea.style.minHeight = '59px';
-              }
-              // 三行的时候显示字数限制，否则不显示
-              this.showLimit = chatTextAreaHeight > 40;
+        this.$nextTick(() => {
+          const chatTextareaHeight = this.$refs.chatTextarea.style.height;
+          // if (chatOldTextareaHeight !== chatTextareaHeight) {
+          const hostTextarea = document.querySelector(
+            '.vmp-chat-input__textarea-box .os-host-textarea'
+          );
+          const chatTextAreaHeight = parseInt(chatTextareaHeight);
+          if (chatTextAreaHeight <= 60) {
+            // 解决删除文本之后 textarea 高度不会自动减小的问题
+            this.$refs.chatTextarea.style.minHeight = '20px';
+            hostTextarea.style.minHeight = chatTextareaHeight;
+          } else {
+            hostTextarea.style.minHeight = '59px';
+          }
+          // 三行的时候显示字数限制，否则不显示
+          this.showWordLimit = chatTextAreaHeight > 40;
 
-              this.$emit('inputHeightChange');
-            }
+          // 触发父元素绑定的高度发生变化事件
+          setTimeout(() => {
+            this.$emit('chatTextareaHeightChange');
           });
+          // }
         });
       },
       //按下enter键的处理
       onkeydownHandle(event) {
+        console.log('当前按键....', event.keyCode, event, this.inputValue.length);
         if (event.keyCode === 13) {
           this.sendMsgThrottle();
           //阻止默认行为
@@ -243,7 +258,7 @@
         }
       },
       /** 发送聊天消息 */
-      sendMsg(callback) {
+      sendMessage(callback) {
         //是否是聊天禁言状态
         if (this.inputStatus.disable) {
           return;
@@ -275,6 +290,13 @@
         //todo 建议移入domain  清空一下@列表，但是保持引用
         this.atList.splice(0, this.atList.length);
         callback && callback();
+
+        this.$nextTick(() => {
+          // 输入框内容发生变化，更新滚动条
+          this.overlayScrollbar.update();
+
+          this.inputHandle();
+        });
         this.dispatch('VmpChatOperateBar', 'sendEnd');
       },
       /** 发送聊天消息节流 */
@@ -284,7 +306,7 @@
           return;
         }
         if (this.roleName !== 2) {
-          this.sendMsg();
+          this.sendMessage();
           return;
         }
         if (this.chatGap > 0) {
@@ -293,7 +315,7 @@
             this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
           }
         } else {
-          this.sendMsg(() => {
+          this.sendMessage(() => {
             this.chatGapInterval && window.clearInterval(this.chatGapInterval);
             this.lock = sessionStorage.getItem('chatLock');
             this.chatGap = this.delayTime(this.onlineUsers);
@@ -417,6 +439,10 @@
 
     &__textarea-box {
       width: 220px;
+      &.is-watch {
+        width: 264px;
+      }
+      flex: 1;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -471,6 +497,9 @@
 
     &__textarea-placeholder {
       width: 220px;
+      &.is-watch {
+        width: 264px;
+      }
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -499,6 +528,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      margin-left: 8px;
       .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;

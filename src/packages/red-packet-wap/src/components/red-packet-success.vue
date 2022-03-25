@@ -8,7 +8,7 @@
         <p class="vhsaas-gold-title">{{ $t('interact_tools.interact_tools_1033') }}</p>
         <p class="vhsaas-gold-unit">
           <i>￥</i>
-          {{ amount }}
+          <span v-text="amount"></span>
         </p>
       </div>
       <!-- 未抢到金额  -->
@@ -33,7 +33,7 @@
       />
       <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
       <p class="vhsaas-red-packet__name">
-        {{ (redPacketInfo.nickname || '') | splitLenStr(8) }}
+        {{ (redPacketInfo.nickname || '') | overHidden(8) }}
       </p>
       <p class="vhsaas-red-packet__btn" @click="navToList">
         {{ $t('interact_tools.interact_tools_1036') }}
@@ -76,11 +76,6 @@
         default() {
           return 0;
         }
-      }
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
     data() {
@@ -163,7 +158,7 @@
   }
   .vhsaas-gold-title {
     font-size: 24px;
-    font-weight: 400;
+    font-weight: bold;
     color: #ba5003;
     line-height: 34px;
     margin-top: 240px;
@@ -265,11 +260,12 @@
   }
   .vhsaas-red-packet__btn {
     cursor: pointer;
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 400;
     color: #fee4b3;
     line-height: 40px;
     text-align: center;
+    font-weight: bold;
   }
   .vhsaas-red-packet__remark {
     font-size: 24px;

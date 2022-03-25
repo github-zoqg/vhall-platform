@@ -16,7 +16,7 @@
   </aside>
 </template>
 <script>
-  import { useMsgServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import { useMsgServer, useChatServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -30,7 +30,8 @@
         btnText: this.$t('interact.interact_1010'),
         waitTime: 30,
         roleName: this.$t('chat.chat_1022'),
-        senderId: ''
+        senderId: '',
+        waitInterval: null
       };
     },
     computed: {
@@ -56,17 +57,14 @@
           temp.context = JSON.parse(temp.context);
         }
         const { type = '' } = temp.data || {};
+        this.roleName =
+          temp.data.room_role == 20 ? this.$t('chat.chat_1064') : this.$t('chat.chat_1022');
         if (type === 'vrtc_connect_invite') {
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
           }
           this.senderId = temp.sender_id;
-          if (this.isInGroup) {
-            this.roleName = this.$t('chat.chat_1064');
-          } else {
-            this.roleName = this.$t('chat.chat_1022');
-          }
           this.isConfirmVisible = true;
           this.waitTime = 30;
           clearInterval(this.waitInterval);
@@ -83,8 +81,23 @@
           }, 1000);
         }
       });
+
+      //监听禁言通知
+      useChatServer().$on('banned', res => {
+        this.isConfirmVisible && this.clearTime();
+      });
+      //监听全体禁言通知
+      useChatServer().$on('allBanned', res => {
+        this.isConfirmVisible && this.clearTime();
+      });
     },
     methods: {
+      clearTime() {
+        this.waitInterval && clearInterval(this.waitInterval);
+        this.isConfirmVisible = false;
+        this.btnText = this.$t('interact.interact_1010');
+        this.waitTime = 30;
+      },
       // 接受邀请
       confirmSave() {
         useMicServer()

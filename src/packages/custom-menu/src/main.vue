@@ -1,6 +1,6 @@
 <template>
   <section class="vmp-custom-menu" v-show="!loading">
-    <overlay-scrollbars :options="overlayScrollBarsOptions" style="height: 100%">
+    <overlay-scrollbars v-if="!loading" ref="scroll" :options="overlayScrollBarsOptions">
       <div class="vmp-custom-menu-wrapper">
         <component
           v-for="(block, index) in customTabs"
@@ -8,6 +8,7 @@
           :key="index"
           :info="block"
           :room-id="roomId"
+          @send="handleSendEvent"
         />
       </div>
     </overlay-scrollbars>
@@ -15,6 +16,8 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   import ComponentDesimg from './components/component-desimg.vue';
   import ComponentQrcode from './components/component-qrcode.vue';
   import ComponentTitle from './components/component-title.vue';
@@ -62,10 +65,12 @@
       this.customMenuServer = useCustomMenuServer();
     },
     methods: {
+      onScrollStop() {
+        const state = this.$refs.scroll.getState();
+        console.log('state', state);
+      },
       async queryDetail(id) {
-        if (id === undefined || id === null) {
-          return;
-        }
+        if (id === undefined || id === null) return;
 
         this.loading = true;
         await this.$nextTick();
@@ -85,6 +90,9 @@
         } catch (error) {
           this.loading = false;
         }
+      },
+      handleSendEvent(method, args) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, method, args));
       }
     }
   };

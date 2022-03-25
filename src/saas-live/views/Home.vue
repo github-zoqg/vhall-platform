@@ -18,11 +18,13 @@
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
   import {
     Domain,
     useRoomBaseServer,
     useSplitScreenServer,
-    useInteractiveServer
+    useInteractiveServer,
+    useMicServer
   } from 'middle-domain';
   export default {
     name: 'Home',
@@ -39,9 +41,15 @@
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
+        // 检查浏览器版本
+        if (!browserSupport()) {
+          this.state = 3;
+          return;
+        }
         // 初始化直播房间
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
+        const watchInitData = roomBaseServer.state.watchInitData;
         roomBaseServer.startGetDegradationInterval({
           staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
           environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
@@ -65,6 +73,15 @@
             method: 'post' // 上报方式
           }
         );
+        // 产品侧数据埋点初始化（只有发起端用）
+        domain.initVhallReportForProduct({
+          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+          app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
+          pf: 8, // 客户端类型  web 网页端用 8
+          business_uid: watchInitData.join_info.third_party_user_id, // B端客户 id
+          user_id: watchInitData.join_info.third_party_user_id, // C端用户 id（如果是B端用当前用户id）
+          webinar_id: watchInitData.webinar.id // 活动 id
+        });
         window.vhallReport.report('ENTER_WATCH');
         window.vhallLog({
           tag: 'doc', // 日志所属功能模块
@@ -75,13 +92,8 @@
           },
           type: 'log' // log 日志埋点，event 业务数据埋点
         });
-        const res = await roomState();
+        await roomState();
 
-        // 如果浏览器不支持
-        if (res === 'isBrowserNotSupport') {
-          this.state = 3;
-          return;
-        }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         this.addEventListener();
@@ -119,13 +131,15 @@
             webinar_id: id, //活动id
             clientType: 'send', //客户端类型
             nickname,
-            email
+            email,
+            check_online: 0 // 不检查主持人是否在房间
           }
         });
       },
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
         const splitScreenServer = useSplitScreenServer();
+        const micServer = useMicServer();
         const interactiveServer = useInteractiveServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
@@ -137,13 +151,10 @@
         // 关闭分屏模式
         splitScreenServer.$on('SPLIT_SHADOW_DISCONNECT', async () => {
           // 还原流信息
-          interactiveServer.state.localStream = {
-            streamId: null, // 本地流id
-            videoMuted: false,
-            audioMuted: false,
-            attributes: {}
-          };
-          interactiveServer.state.remoteStreams = [];
+          micServer.state.speakerList = micServer.state.speakerList.map(element => ({
+            ...element,
+            streamId: ''
+          }));
           await interactiveServer.init();
           window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
         });
