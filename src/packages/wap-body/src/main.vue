@@ -112,6 +112,8 @@
         // 开启分组讨论
         this.groupServer.$on('GROUP_SWITCH_START', msg => {
           if (this.isInGroup) {
+            // 如果问卷在展开中了，并且进入分组中 mini置为false
+            this.mini = false;
             this.gobackHome(1, this.groupServer.state.groupInitData.name, msg);
           }
         });

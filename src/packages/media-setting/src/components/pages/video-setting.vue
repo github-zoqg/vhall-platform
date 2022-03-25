@@ -12,7 +12,11 @@
       </section>
 
       <section v-show="mediaState.videoType === 'camera'" class="vmp-media-setting-item">
-        <el-select class="vmp-media-setting-item__content" v-model="mediaState.video">
+        <el-select
+          class="vmp-media-setting-item__content"
+          :placeholder="$t('form.form_1018')"
+          v-model="mediaState.video"
+        >
           <el-option
             v-for="item in devices"
             :key="item.deviceId"

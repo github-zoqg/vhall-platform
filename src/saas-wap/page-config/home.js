@@ -15,8 +15,7 @@ const serverConfig = {
       'comAllDialog',
       'comWapRewardEffect',
       'comGoodsDetail',
-      'comUserAccountWap',
-      'comQuestionnaireWap'
+      'comUserAccountWap'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
@@ -55,8 +54,6 @@ const serverConfig = {
       'comScreenPostWap',
       'comUserCenterWap',
       'comCashWap',
-      'comLotteryWap',
-      'comRedPacketWap',
       'comInviteHandup'
     ]
   },
@@ -125,7 +122,13 @@ const serverConfig = {
   },
   comContainerRight: {
     component: 'VmpContainerRightWap',
-    children: ['comSignWap', 'comWatchTimer'],
+    children: [
+      'comSignWap',
+      'comWatchTimer',
+      'comLotteryWap',
+      'comRedPacketWap',
+      'comQuestionnaireWap'
+    ],
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
@@ -136,8 +139,7 @@ const serverConfig = {
     },
     emitOpenRedPacket: {
       cuid: ['comRedPacketWap'],
-      method: 'openRedPacket',
-      args: ['$0']
+      method: 'openRedPacket'
     },
     // 抽奖弹窗
     emitClickLotteryIcon: {

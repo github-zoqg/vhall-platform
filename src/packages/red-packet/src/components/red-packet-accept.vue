@@ -81,6 +81,9 @@
             }, 1000);
           });
         }
+        // 更新领取后的状态
+        this.redPacketServer.setAvailable(false);
+        this.redPacketServer.setDotVisible(false);
       }
     }
   };

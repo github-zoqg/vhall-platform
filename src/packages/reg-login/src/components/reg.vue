@@ -264,7 +264,7 @@
               relt = await this.userServer.handlePassword(this.ruleForm.password);
               if (!relt.pass) {
                 this.$message({
-                  message: this.$te(relt.msg) || this.$t('register.register_1010'),
+                  message: this.$tec(relt.code) || this.$t('register.register_1010'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -287,7 +287,7 @@
             const failure = err => {
               console.log('注册失败', err);
               this.$message({
-                message: this.$te(err.msg) || this.$t('register.register_1010'),
+                message: this.$tec(err.code) || this.$t('register.register_1010'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'

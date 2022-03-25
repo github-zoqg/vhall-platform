@@ -175,13 +175,15 @@
       // 获取签到信息
       getHistorySignInfo() {
         this.sign_id = this.signInfo.id;
-        this.isShowCircle = true;
         this.title = this.$tdefault(this.signInfo.sign_tips);
         const sign_time =
           this.signInfo.is_auto_sign == 1
             ? this.signInfo.auto_sign_time_ttl
             : this.signInfo.sign_time_ttl;
         this.sign_time = Number(sign_time);
+        if (this.sign_time > 0) {
+          this.isShowCircle = true;
+        }
         this.duration = Number(this.signInfo.show_time);
         this.countDownTime();
       },
