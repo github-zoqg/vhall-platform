@@ -1,5 +1,6 @@
 export default {
   600: 'Parameter error',
+  510002: 'Result data error',
   510007: 'No permission',
   510008: 'Not logged in',
   510009: 'User does not exist',
