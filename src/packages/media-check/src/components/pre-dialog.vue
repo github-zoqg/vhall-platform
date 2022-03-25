@@ -47,13 +47,26 @@
       };
     },
     created() {
-      const { watchInitData } = useRoomBaseServer().state;
-      this.liveType = watchInitData?.webinar?.type;
-      if (this.liveType == 1) {
-        this.popAlertCheckVisible = false;
-      }
+      this.setDefaultAlertVisible();
     },
     methods: {
+      setDefaultAlertVisible() {
+        const { watchInitData } = useRoomBaseServer().state;
+        this.liveType = watchInitData?.webinar?.type;
+
+        //用户角色
+        const roleName = watchInitData.join_info.role_name;
+
+        // 助理不展示
+        if (roleName == 3) {
+          this.popAlertCheckVisible = false;
+        }
+
+        // 直播中
+        if (this.liveType == 1) {
+          this.popAlertCheckVisible = false;
+        }
+      },
       show() {
         this.popAlertCheckVisible = true;
       },
