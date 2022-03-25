@@ -523,6 +523,7 @@
       },
       // 全屏
       fullScreen(el) {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120000);
         this.isFullscreen = !this.isFullscreen;
         if (this.isFullscreen) {
           this.enterFullscreen(el);

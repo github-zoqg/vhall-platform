@@ -360,6 +360,7 @@
         }
       },
       goWatchShare() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110115);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShareClick'));
       }
     }

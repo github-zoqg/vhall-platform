@@ -333,7 +333,7 @@
           .pushLottery(params)
           .then(res => {
             if (res.code === 200) {
-              this.report(res.data);
+              this.reportLottery();
               this.$emit('startLottery', res.data);
             }
             this.startButtonDisabled = false;
@@ -345,75 +345,16 @@
           });
       },
       // 大数据上报
-      report(data) {
-        window.vhallReport.report({
-          k: 110029,
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
+      reportLottery() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110029);
         const arrType = [110030, 110031, 110032];
-        window.vhallReport.report({
-          k: this.joinLotteryType == 8 ? 110033 : arrType[this.joinLotteryType - 1],
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
-        if (this.chooseList.length) {
-          window.vhallReport.report({
-            k: 110034,
-            data: {
-              business_uid: data.creator_id,
-              user_id: '',
-              webinar_id: this.$route.params.il_id,
-              refer: '',
-              s: '',
-              report_extra: {},
-              ref_url: '',
-              req_url: ''
-            }
-          });
-        }
-        window.vhallReport.report({
-          k: this.repeatWinning ? 110035 : 110036,
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
-        window.vhallReport.report({
-          k: this.showWinner ? 110037 : 110038,
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
+        let lotteryCode = this.joinLotteryType == 8 ? 110033 : arrType[this.joinLotteryType - 1];
+        window.vhallReportForProduct && window.vhallReportForProduct.report(lotteryCode);
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110034);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.repeatWinning ? 110035 : 110036);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.showWinner ? 110037 : 110038);
       }
     }
   };
