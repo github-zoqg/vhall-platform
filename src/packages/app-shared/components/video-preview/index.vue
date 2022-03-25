@@ -106,7 +106,6 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
-  import moment from 'moment';
   export default {
     name: 'VmpVideoPreview',
     props: {
@@ -385,7 +384,7 @@
          */
         window.addEventListener(
           'fullscreenchange',
-          e => {
+          () => {
             if (document.fullscreenElement) {
               // 进入全屏
             } else {

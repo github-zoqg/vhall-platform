@@ -159,6 +159,7 @@
         });
       },
       handleQAPopup() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110061);
         if (!this.qaVisible && this.isQAEnabled) {
           useQaServer()
             .getCurrentPlayQuestionNum()
@@ -184,6 +185,7 @@
           .qaEnable()
           .then(res => {
             if (res.code == 200) {
+              window.vhallReportForProduct && window.vhallReportForProduct.report(110052);
               this.isQAEnabled = true;
               this.qaVisible = false;
               this.$message({
@@ -208,6 +210,7 @@
             if (res.code == 200) {
               this.isQAEnabled = false;
               this.qaVisible = false;
+              window.vhallReportForProduct && window.vhallReportForProduct.report(110053);
               this.$message({
                 message: '关闭问答成功',
                 type: 'success'
@@ -251,6 +254,7 @@
       },
       // 打开问卷弹窗
       emitOpenQuestionnaire() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110060);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenQuestionnaire'));
       },
       // 打开签到弹窗

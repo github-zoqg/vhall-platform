@@ -37,9 +37,7 @@
           </div>
         </div>
 
-        <template
-          v-if="remoteSpeakers.length && roomBaseServer.state.watchInitData.webinar.type == 1"
-        >
+        <template v-if="isShowRemoteList">
           <!-- 远端流列表 -->
           <div
             v-for="speaker in remoteSpeakers"
@@ -218,6 +216,14 @@
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组 + 无主画面
         return !this.isInGroup && this.isHostInGroup && this.mode == 6 && !this.isShowMainScreen;
+      },
+      // 直播状态 1直播
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      // 是否展示流列表
+      isShowRemoteList() {
+        return this.remoteSpeakers.length && this.liveStatus == 1;
       }
     },
     watch: {
@@ -282,7 +288,6 @@
       });*/
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
-        console.error('EVENT_STREAM_PLAYABORT----自动播放失败-');
         let videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {
@@ -488,6 +493,18 @@
     top: 0;
     width: 360px;
     z-index: 10;
+    .vmp-stream-local__bottom-role {
+      padding: 0 8px;
+    }
+    .vmp-stream-local__bottom-nickname {
+      width: 80px;
+    }
+    .vmp-stream-local__bottom-mic {
+      font-size: 14px;
+    }
+    .vmp-stream-local__bottom-signal {
+      margin-left: 10px;
+    }
   }
 
   .vmp-stream-list {
@@ -538,18 +555,6 @@
           padding: 0 10px;
           height: 28px;
           line-height: 28px;
-        }
-        .vmp-stream-local__bottom-role {
-          padding: 0 8px;
-        }
-        .vmp-stream-local__bottom-nickname {
-          width: 80px;
-        }
-        .vmp-stream-local__bottom-mic {
-          font-size: 14px;
-        }
-        .vmp-stream-local__bottom-signal {
-          margin-left: 10px;
         }
       }
 

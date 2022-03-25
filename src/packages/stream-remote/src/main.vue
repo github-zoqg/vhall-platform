@@ -18,7 +18,7 @@
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
     <section
-      v-if="isShowNetError && !stream.streamId"
+      v-if="isShowNetError && !stream.streamId && isInstanceInit"
       class="vmp-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
@@ -260,6 +260,9 @@
       }
     },
     computed: {
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -375,8 +378,8 @@
         clearInterval(this._netWorkStatusInterval);
       }
 
-      useMsgServer().$offMsg('JOIN', this.handleUserJoin.bind(this));
-      useMsgServer().$offMsg('LEFT', this.handleUserLeave.bind(this));
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
       listenEvents() {
@@ -395,6 +398,18 @@
           },
           true
         );
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.stream.streamId) {
+            this.$message({
+              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            this.subscribeRemoteStream();
+          }
+        });
 
         // 加入房间
         useMsgServer().$onMsg('JOIN', this.handleUserJoin);
@@ -422,10 +437,12 @@
         this.interactiveServer.state.showPlayIcon = false;
       },
       subscribeRemoteStream() {
+        let videoNode = `stream-${this.stream.streamId}`;
+        document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
-          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
 

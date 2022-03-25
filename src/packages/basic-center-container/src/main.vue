@@ -13,6 +13,7 @@
 </template>
 
 <script>
+  import { useInteractiveServer } from 'middle-domain';
   export default {
     name: 'VmpBasicCenterContainer',
     data() {
@@ -38,15 +39,23 @@
       }
     },
     created() {
-      // 如果是当前活动是无延迟直播，后者当前用户在麦上，刷新的时候展示封面图
-      if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar) {
+      useInteractiveServer().$on('EVENT_STREAM_PLAYABORT', () => {
+        this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+        if (this.playboartCount > 1) {
+          return;
+        }
         this.showcoverImg = true;
-      }
+      });
+      // // 如果是当前活动是无延迟直播，后者当前用户在麦上，刷新的时候展示封面图
+      // if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar) {
+      //   this.showcoverImg = true;
+      // }
     },
     methods: {
       handleAllVideoPlay() {
-        document.querySelectorAll('video').forEach(video => video.play());
-        document.querySelectorAll('.vmp-stream-remote audio').forEach(audio => audio.play());
+        // document.querySelectorAll('video').forEach(video => video.play());
+        // document.querySelectorAll('.vmp-stream-remote audio').forEach(audio => audio.play());
+        useInteractiveServer().playAbortStreams();
         this.showcoverImg = false;
       }
     }

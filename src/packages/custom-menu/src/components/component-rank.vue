@@ -1,5 +1,5 @@
 <template>
-  <div class="rank-wrapbox" :class="{ 'rank-preview-box': pagetype == 'subscribe' }">
+  <div class="rank-wrapbox" :class="{ 'rank-preview-box': isSubscribe }">
     <div v-if="info.inSwitch == 1 || info.rewardSwitch == 1" class="rank-previewbox">
       <!-- 顶部区域 -->
       <header class="ranking-title">
@@ -22,8 +22,8 @@
         <div class="rank-rule" @click="changeRulesShow">
           {{ activeTab == 'invite' ? $t('nav.nav_1034') : $t('nav.nav_1035') }}
           <span
-            class="iconfont rank-icon"
-            :class="{ iconjiantou_shouqi: !showRules, iconjiantou_zhankai: showRules }"
+            class="vh-iconfont rank-icon"
+            :class="[showRules ? 'vh-line-arrow-up' : 'vh-line-arrow-down']"
           ></span>
         </div>
       </header>
@@ -117,7 +117,7 @@
               <span class="num">
                 <i18n path="interact_tools.interact_tools_1073">
                   <span style="color: #fb3a32" place="n">
-                    ¥{{item.reward_amount | filterAmount)}}
+                    ¥{{ item.reward_amount | filterAmount }}
                   </span>
                 </i18n>
                 <!-- 打赏
@@ -149,7 +149,7 @@
 </template>
 
 <script>
-  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
+  import { useCustomMenuServer } from 'middle-domain';
 
   export default {
     name: 'component-rank',
@@ -191,6 +191,9 @@
       };
     },
     computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
       isInviteCardMode() {
         return this.$domainStore.state.roomBaseServer.inviteCard.status == '1';
       },
@@ -641,6 +644,7 @@
     }
   }
   .rank-preview-box {
+    width: 480px;
     .ranking-box {
       width: 100%;
       left: 0px;
