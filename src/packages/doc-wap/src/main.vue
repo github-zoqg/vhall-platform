@@ -17,7 +17,7 @@
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ visibility: item.cid == currentCid ? 'visible' : 'hidden' }"
+            :style="{ zIndex: item.cid == currentCid ? '1' : '-1' }"
           ></div>
         </div>
       </div>
@@ -95,6 +95,7 @@
       },
       // 当前文档白板容器id
       currentCid() {
+        // alert(this.docServer.state.currentCid, 'this.docServer.state.currentCid');
         return this.docServer.state.currentCid;
       },
       // 是否观众可见
@@ -167,9 +168,6 @@
 
       // 初始化事件
       initEvents() {
-        // 文档容器选择事件
-        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
-
         // 回放播放时间
         this.docServer.$on('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
 
@@ -219,36 +217,6 @@
         }
         h = (w / 16) * 9;
         return { width: w, height: h };
-      },
-
-      /**
-       * 新增文档或白板
-       * @param {*} fileType
-       * @param {*} docId
-       * @param {*} docType
-       */
-      async addNewFile({ fileType, docId, docType, cid }) {
-        const { width, height } = this.getDocViewRect();
-        console.log(
-          '[doc] addNewFile:',
-          JSON.stringify({
-            width,
-            height,
-            fileType,
-            cid,
-            docId,
-            docType
-          })
-        );
-        await this.docServer.addNewDocumentOrBorad({
-          width,
-          height,
-          fileType,
-          cid,
-          docId,
-          docType
-        });
-        this.resize();
       },
       /**
        *  刷新或者退出重进恢复上次的文档
@@ -303,28 +271,6 @@
           message: '文档不存在或已删除'
         });
       },
-      // 选中文档容器事件
-      dispatchDocSelectContainer: async function (data) {
-        console.log('[doc] ===========选择容器======', data);
-        if (this.currentCid == data.id) {
-          return;
-        }
-        this.docServer.state.currentCid = data.id;
-        // 判断容器是否存在
-        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-        if (currentItem) {
-          this.docServer.activeContainer(data.id);
-        } else {
-          const { id: cid, docId } = data;
-          const fileType = cid.split('-')[0];
-          if (fileType === 'document' && !docId) {
-            // 文档id没有
-            console.log('[doc] 文档id没有 cid:', cid);
-            return;
-          }
-          this.addNewFile({ fileType, docId, cid });
-        }
-      },
       // 回放视频播放更新事件
       dispatchDocVodTimeUpdate({ isChange }) {
         if (isChange) {
@@ -335,7 +281,6 @@
       }
     },
     beforeDestroy() {
-      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
     }

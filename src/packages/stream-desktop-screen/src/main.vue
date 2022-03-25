@@ -377,7 +377,7 @@
                 this.setDesktop('1');
               })
               .catch(error => {
-                console.log(error, '推流失败');
+                console.log(error, this.$t('interact.interact_1021'));
               });
           })
           .catch(error => {
