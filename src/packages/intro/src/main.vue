@@ -111,7 +111,7 @@
           margin-bottom: 8px;
         }
         img {
-          margin: 4px auto;
+          margin: 16px auto;
           display: block;
           max-width: 100%;
         }
