@@ -646,8 +646,10 @@
           const str =
             this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
               ? '主画面'
-              : '主讲人';
-          this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+              : this.$t('interact.interact_1034');
+          this.$message.success(
+            this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str })
+          );
         });
 
         // 房间信令异常断开事件
