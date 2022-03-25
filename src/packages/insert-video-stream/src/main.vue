@@ -173,10 +173,10 @@
     useInteractiveServer,
     useGroupServer,
     useMsgServer,
+    useMicServer,
     useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import moment from 'moment';
   export default {
     name: 'VmpInsertStream',
     data() {
@@ -263,6 +263,17 @@
         handler() {
           this.insertFileStreamVisible =
             this.$domainStore.state.insertFileServer.isInsertFilePushing;
+        }
+      },
+      // 主讲人切换，关闭插播
+      '$domainStore.state.roomBaseServer.interactToolStatus.doc_permission': {
+        handler() {
+          if (
+            this.isCurrentRoleInsert &&
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name != 3
+          ) {
+            this.closeInsertvideoHandler();
+          }
         }
       }
     },
@@ -593,6 +604,7 @@
         this.addSDKEvents();
         // 注册发起端独有的事件
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+          const micServer = useMicServer();
           this.interactiveServer.$on('live_start', () => {
             this.closeInsertvideoHandler(true);
           });
@@ -609,6 +621,16 @@
           groupServer.$on(groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
             if (this.isCurrentRoleInsert) {
               this.closeInsertvideoHandler();
+            }
+          });
+          // 如果是拥有主讲人权限的嘉宾下麦，需要直接设置miniElement
+          micServer.$on('vrtc_disconnect_success', () => {
+            if (
+              this.roomBaseServer.state.interactToolStatus.doc_permission ==
+                this.roomBaseServer.state.watchInitData.join_info.third_party_user_id &&
+              this.isCurrentRoleInsert
+            ) {
+              this.roomBaseServer.setChangeElement('stream-list');
             }
           });
         }

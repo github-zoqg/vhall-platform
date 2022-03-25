@@ -51,6 +51,7 @@
 <script>
   import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import { Toast } from 'vant';
   export default {
     name: 'VmpWapStreamRemote',
     data() {
@@ -149,8 +150,8 @@
           this.isShowNetError = true;
         }
       }, 5000);
-      useMsgServer().$onMsg('JOIN', this.handleUserJoin);
-      useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+
+      this.listenEvents();
     },
     beforeDestroy() {
       // 清空计时器
@@ -165,6 +166,18 @@
       useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      listenEvents() {
+        useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+        useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+
+        // 订阅失败
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.stream.streamId) {
+            Toast(this.$t(`interact.interact_1014`, { n: this.stream.nickname }));
+            this.subscribeRemoteStream();
+          }
+        });
+      },
       // 监听离开加入房间事件，显示网络异常占位图
       handleUserJoin(msg) {
         if (msg.sender_id == this.stream.accountId) {
@@ -178,10 +191,12 @@
       },
       subscribeRemoteStream() {
         console.log('开始订阅', JSON.stringify(this.stream));
+        let videoNode = `stream-${this.stream.streamId}`;
+        document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
-          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
         this.interactiveServer

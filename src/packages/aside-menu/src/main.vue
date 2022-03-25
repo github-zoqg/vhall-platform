@@ -178,6 +178,10 @@
               }
             }
           } else if (vn.kind === 'desktopShare') {
+            if (this.role == 3) {
+              vn.setHiddenState(true);
+              continue;
+            }
             // 桌面共享菜单
             if (this.webinarType != 1) {
               vn.setDisableState(true);

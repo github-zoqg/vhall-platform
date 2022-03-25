@@ -62,20 +62,7 @@
         this.paused = true;
         this.statusText = '暂停';
         this.recording = false;
-        // TODO:数据上报
-        // this.$vhall_paas_port({
-        //   k: 110002,
-        //   data: {
-        //     business_uid: this.$parent.third_party_user_id,
-        //     user_id: '',
-        //     webinar_id: this.$route.params.il_id,
-        //     refer: '',
-        //     s: '',
-        //     report_extra: {},
-        //     ref_url: '',
-        //     req_url: ''
-        //   }
-        // });
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110002);
         useRoomBaseServer().pauseRecordInLive();
       },
 
@@ -83,20 +70,7 @@
         if (!this.recorded) {
           this.recorded = true;
           this.statusText = '录制中';
-          // TODO: 数据上报
-          // this.$vhall_paas_port({
-          //   k: 110001,
-          //   data: {
-          //     business_uid: this.$parent.third_party_user_id,
-          //     user_id: '',
-          //     webinar_id: this.$route.params.il_id,
-          //     refer: '',
-          //     s: '',
-          //     report_extra: {},
-          //     ref_url: '',
-          //     req_url: ''
-          //   }
-          // });
+          window.vhallReportForProduct && window.vhallReportForProduct.report(110001);
           this.recording = true;
           useRoomBaseServer().startRecordInLive();
         }
@@ -106,20 +80,7 @@
         if (!this.recording) return;
         this.recorded = false;
         this.statusText = '录制';
-        // TODO: 数据上报
-        // this.$vhall_paas_port({
-        //   k: 110003,
-        //   data: {
-        //     business_uid: this.$parent.third_party_user_id,
-        //     user_id: '',
-        //     webinar_id: this.$route.params.il_id,
-        //     refer: '',
-        //     s: '',
-        //     report_extra: {},
-        //     ref_url: '',
-        //     req_url: ''
-        //   }
-        // });
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110003);
         this.recording = false;
         if (!isLiveStop) {
           // 增加isLiveStop  是否为结束直播导致停止录制    新版这种情况不掉接口
