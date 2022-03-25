@@ -948,7 +948,7 @@
             margin-bottom: 24px;
           }
           &.is-error {
-            margin-bottom: 24px;
+            margin-bottom: 30px;
           }
           &.vmp-cash-box__msg__error {
             margin-bottom: 24px;
@@ -1036,7 +1036,7 @@
             margin-bottom: 24px;
           }
           &.is-error {
-            margin-bottom: 24px;
+            margin-bottom: 30px;
           }
           &.vmp-cash-box__msg__error {
             margin-bottom: 24px;

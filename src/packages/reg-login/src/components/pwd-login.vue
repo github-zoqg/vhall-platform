@@ -172,7 +172,7 @@
               const failure = err => {
                 console.log('获取账号检测接口结果错误', err);
                 this.$message({
-                  message: this.$te(err.msg) || this.$t('login.login_1021'),
+                  message: this.$tec(err.code) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -248,7 +248,6 @@
                 if (this.captchaIsShow && !this.captchaReady) {
                   this.reloadCaptha();
                 }
-                // console.log(this.$te(res.msg));
                 this.$message({
                   message: this.$tec(res.code) || this.$t('login.login_1021'),
                   showClose: true,

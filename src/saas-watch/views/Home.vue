@@ -191,7 +191,7 @@
             break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
-            this.errorData.errorPageText = err.msg || err.message;
+            this.errorData.errorPageText = this.$tec(err.code) || err.message;
         }
       }
     }
