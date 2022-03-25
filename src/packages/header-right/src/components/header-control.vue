@@ -190,6 +190,7 @@
       },
       roleQuit() {
         // 角色退出
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110142);
         this.useServer.loginRoleOut({ webinar_id: this.webinarInfo.id }).then(res => {
           if (res.code == 200) {
             window.location.href = `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/lives/keylogin/${this.webinarInfo.id}/${this.userInfo.role_name}`;
@@ -205,6 +206,7 @@
           this.$message.warning('请先结束直播');
           return;
         }
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120002);
         this.$emit('thirdPushStream', true);
         // this.thirtPushStreamimg = true;
         this.roomBaseServer.setInavToolStatus('start_type', 4);
@@ -221,6 +223,7 @@
       },
       openVirtualAudience() {
         // 虚拟人数弹窗
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120004);
         this.$emit('openVirtualProple');
       }
     }

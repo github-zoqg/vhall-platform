@@ -291,6 +291,7 @@
           .then(res => {
             this.paying = false;
             if (res.code === 200) {
+              this.reportRedPacket();
               if (this.channel === 'ALIPAY') {
                 window.open(res.data.pay_data);
               } else {
@@ -309,6 +310,13 @@
             this.$message.error(error.msg);
             console.log(error);
           });
+      },
+      reportRedPacket() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110054);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.redcouponType === 1 ? 110055 : 110056);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       changeType(val) {
         this.redcouponType = val;
