@@ -342,6 +342,11 @@
               this.groupMessage('演示权限已变更');
             }
           }
+          if (this.presenterId === this.userId) {
+            // 如果结束后演示者是自己，说明是演示权限回收
+            // 通知文档重设笔刷, 后面可以考虑当前笔刷放到文档server中
+            window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitDocResetBrush'));
+          }
         });
       },
 

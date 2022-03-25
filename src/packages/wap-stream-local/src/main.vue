@@ -220,7 +220,7 @@
               不支持上麦时，确认是否在麦上          
           */
           if (this.mediaCheckServer.state.isBrowserNotSupport) {
-            this.mediaCheckServer.setDevice({ status: 2, send_msg: 0 });
+            this.mediaCheckServer.setDevice({ status: 2 });
             this.$toast('当前设备不支持连麦');
             if (isSpeakOn) {
               await this.speakOff();
