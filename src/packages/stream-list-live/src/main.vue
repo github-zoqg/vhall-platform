@@ -74,19 +74,6 @@
         @click="toggleShrink(false)"
       ></span>
     </div>
-
-    <!-- 异常弹窗 -->
-    <saas-alert
-      :visible="PopAlertOffline.visible"
-      :retry="'点击重试'"
-      :isShowClose="false"
-      @onClose="PopAlertOfflineClose"
-      @onSubmit="PopAlertOfflineConfirm"
-    >
-      <div slot="content">
-        <span>网络异常导致互动房间连接失败</span>
-      </div>
-    </saas-alert>
   </div>
 </template>
 
@@ -98,7 +85,6 @@
     useMsgServer,
     useGroupServer
   } from 'middle-domain';
-  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
   export default {
@@ -111,15 +97,8 @@
         isMainScreenHeightLower: false, // 流列表高度增加时，主画面大屏显示position height是否降低
         remoteMaxLength: 0, //一行最大数
 
-        // 网络异常弹窗状态
-        PopAlertOffline: {
-          visible: false
-        },
         streamInfo
       };
-    },
-    components: {
-      SaasAlert
     },
     computed: {
       // 1直播
@@ -244,37 +223,29 @@
 
       // 监听流列表高度变化
       this.computTop();
-
-      // if (this.liveStatus == 1) {
-      //   this.$alert('您已进入直播房间，马上开始互动吧', '', {
-      //     title: '提示',
-      //     confirmButtonText: '立即开始',
-      //     customClass: 'zdy-message-box',
-      //     cancelButtonClass: 'zdy-confirm-cancel',
-      //     callback: () => {
-      //       const list = document.getElementsByTagName('video');
-      //       for (const item of list) {
-      //         item.play();
-      //       }
-      //     }
-      //   });
-      // }
     },
 
     methods: {
       listenEvents() {
+        // 订阅流播放失败    监听到播放失败, 然后展示按钮
+        this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+          this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+          if (this.playboartCount > 1) {
+            return;
+          }
+          this.$alert('您已进入直播房间，马上开始互动吧', '', {
+            title: '提示',
+            confirmButtonText: '立即开始',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            callback: () => {
+              this.interactiveServer.playAbortStreams();
+            }
+          });
+        });
+
         // 助理等角色监听
         if (this.joinInfo.role_name != 1) {
-          // 订阅流播放失败    监听到播放失败, 然后展示按钮
-          this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
-            let videos = document.querySelectorAll('video');
-            videos.length > 0 &&
-              videos.forEach(video => {
-                video.pause();
-              });
-            this.interactiveServer.state.showPlayIcon = true;
-          });
-
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
             this.$message.warning(this.$t('player.player_1017'));
@@ -301,11 +272,6 @@
             }
           }
         });
-
-        // 房间信令异常断开事件
-        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', () => {
-          this.PopAlertOffline.visible = true;
-        });
       },
 
       toggleShrink(flag) {
@@ -325,12 +291,6 @@
           _this.isMainScreenHeightLower = _this.$refs.streamList.offsetHeight === 160;
         });
         observer.observe(this.$refs.streamList, { childList: true, subtree: true });
-      },
-      PopAlertOfflineClose() {
-        this.PopAlertOffline.visible = false;
-      },
-      PopAlertOfflineConfirm() {
-        window.location.reload();
       }
     }
   };

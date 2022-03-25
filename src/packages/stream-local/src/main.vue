@@ -439,23 +439,10 @@
       this.splitScreenServer = useSplitScreenServer();
     },
     created() {
-      // 房间信令异常断开事件
-      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
-        console.log('网络异常断开', msg);
-        this.PopAlertOffline.visible = true;
-      });
       this.listenEvents();
     },
     async mounted() {
       this.checkStartPush();
-      // 接收设为主讲人消息
-      this.micServer.$on('vrtc_big_screen_set', msg => {
-        const str =
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
-            ? '主画面'
-            : '主讲人';
-        this.$message.success(`${msg.data.nick_name}设置成为${str}`);
-      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -651,6 +638,34 @@
 
               this.micServer.setSpeakerList([]);
             }
+          }
+        });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          const str =
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : '主讲人';
+          this.$message.success(`${msg.data.nick_name}设置成为${str}`);
+        });
+
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+          console.log('网络异常断开', msg);
+          this.PopAlertOffline.visible = true;
+        });
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
+          if (e.data.stream.getID() == this.localStream.streamId) {
+            this.$message({
+              message: this.$t('因网络问题推流失败，正在重新推流'),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            await this.stopPush();
+            this.startPush();
           }
         });
 
@@ -898,7 +913,7 @@
 
       // 结束推流
       stopPush() {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
           if (!this.localSpeaker.streamId) {
             resolve();
@@ -922,18 +937,23 @@
             return;
           }
 
-          this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
-            console.warn('结束推流成功----');
-            clearInterval(this._audioLeveInterval);
+          this.interactiveServer
+            .unpublishStream(this.localSpeaker.streamId)
+            .then(() => {
+              console.warn('结束推流成功----');
+              clearInterval(this._audioLeveInterval);
 
-            // 主持人不在小组中，停止推流触发 直播结束 生成回放
-            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-              );
-            }
-            resolve();
-          });
+              // 主持人不在小组中，停止推流触发 直播结束 生成回放
+              if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+                );
+              }
+              resolve();
+            })
+            .catch(err => {
+              reject(err);
+            });
         });
       },
       // 点击mute按钮事件

@@ -257,6 +257,18 @@
           this.interactiveServer.resetLayout();
         });
 
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+            this.$message({
+              message: this.$t(`interact.interact_1013`),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            this.subscribeStream();
+          }
+        });
+
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 主讲人变更
           if (msg.data.type === 'vrtc_speaker_switch') {
@@ -322,8 +334,10 @@
       },
       // 订阅流
       subscribeStream() {
+        let videoNode = 'vmp-desktop-screen-subscribe';
+        document.getElementById(videoNode).innerHTML = '';
         const opt = {
-          videoNode: 'vmp-desktop-screen-subscribe', // 远端流显示容器，必填
+          videoNode, // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
 

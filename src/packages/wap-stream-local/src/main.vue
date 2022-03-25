@@ -55,7 +55,7 @@
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  import { Dialog } from 'vant';
+  import { Dialog, Toast } from 'vant';
 
   export default {
     name: 'VmpWapStreamLocal',
@@ -161,35 +161,19 @@
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
     },
-    created() {
+    beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
       this.chatServer = useChatServer();
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
       this.mediaCheckServer = useMediaCheckServer();
+    },
+    created() {
       this.listenEvents();
-      // 房间信令异常断开事件
-      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
-        console.log('网络异常断开', msg);
-        Dialog.alert({
-          title: this.$t('account.account_1061'),
-          message: '网络异常导致互动房间连接失败'
-        }).then(() => {
-          window.location.reload();
-        });
-      });
     },
     mounted() {
       this.checkStartPush();
-
-      // 监听设备禁用
-      useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        Dialog.alert({
-          title: this.$t('account.account_1061'),
-          message: this.$t('interact.interact_1011')
-        });
-      });
     },
     async beforeDestroy() {
       // 清空计时器
@@ -215,9 +199,9 @@
         // 检测设备状态
         if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
           const isSpeakOn = this.micServer.getSpeakerStatus();
-          /* 
+          /*
             未检测时，则检测互动SDK的支持情况
-              不支持上麦时，确认是否在麦上          
+              不支持上麦时，确认是否在麦上
           */
           if (this.mediaCheckServer.state.isBrowserNotSupport) {
             this.mediaCheckServer.setDevice({ status: 2 });
@@ -240,6 +224,32 @@
         }
       },
       async listenEvents() {
+        // 监听设备禁用
+        useInteractiveServer().$on('EVENT_STREAM_END', () => {
+          Dialog.alert({
+            title: this.$t('account.account_1061'),
+            message: this.$t('interact.interact_1011')
+          });
+        });
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+          console.log('网络异常断开', msg);
+          Dialog.alert({
+            title: this.$t('account.account_1061'),
+            message: '网络异常导致互动房间连接失败'
+          }).then(() => {
+            window.location.reload();
+          });
+        });
+
+        // 推流失败
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
+          if (e.data.stream.getID() == this.localSpeaker.streamId) {
+            Toast(this.$t('因网络问题推流失败，正在重新推流'));
+            await this.stopPush();
+            this.startPush();
+          }
+        });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
           // live_over 结束直播  停止推流,
           if (msg.data.type == 'live_over') {
