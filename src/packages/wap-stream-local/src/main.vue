@@ -215,13 +215,13 @@
         // 检测设备状态
         if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
           const isSpeakOn = this.micServer.getSpeakerStatus();
-          /* 
+          /*
             未检测时，则检测互动SDK的支持情况
-              不支持上麦时，确认是否在麦上          
+              不支持上麦时，确认是否在麦上
           */
           if (this.mediaCheckServer.state.isBrowserNotSupport) {
             this.mediaCheckServer.setDevice({ status: 2 });
-            this.$toast('当前设备不支持连麦');
+            this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {
               await this.speakOff();
             }
@@ -344,16 +344,16 @@
       async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
-          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
+          this.$message.error(this.$t('interact.interact_1016'));
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'NotAllowed') {
           // 本地流创建失败
-          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
+          this.$message.error(this.$t('interact.interact_1016'));
         } else if (err == 'publishStreamError') {
           // 推流失败
-          this.$message.error('推流失败');
+          this.$message.error(this.$t('interact.interact_1021'));
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑

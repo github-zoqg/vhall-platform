@@ -171,7 +171,7 @@
           .then(res => {
             if (res.code == 200) {
               this.$message({
-                message: '请求协助发送成功',
+                message: this.$t('other.other_1005'),
                 showClose: true,
                 type: 'success',
                 customClass: 'zdy-info-box'

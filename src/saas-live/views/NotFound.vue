@@ -3,7 +3,7 @@
     <div class="left-section">
       <div class="inner-content">
         <h1 class="heading">404</h1>
-        <p class="subheading">页面已失联，攻城狮正在赶来的路上…</p>
+        <p class="subheading">{{ $t('message.message_1013') }}</p>
         <p class="headingNotice">
           无法访问本页的原因：
           <br />
