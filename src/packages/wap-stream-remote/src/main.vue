@@ -14,7 +14,7 @@
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
     <section
-      v-if="isShowNetError && !stream.streamId"
+      v-if="isShowNetError && !stream.streamId && isInstanceInit"
       class="vmp-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
@@ -84,6 +84,9 @@
       }
     },
     computed: {
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;

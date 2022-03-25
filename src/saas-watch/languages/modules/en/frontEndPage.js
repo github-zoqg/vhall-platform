@@ -704,7 +704,7 @@ export default {
     interact_1010: 'Refuse',
     interact_1011:
       'The microphone connection is interrupted due to equipment problems, please check the equipment',
-    interact_1012: '{n} is set to be the presenter',
+    interact_1012: '{n} is set to be the {m}',
     interact_1013:
       'Failed to subscribe to desktop sharing due to network problems. Subscribing again.',
     interact_1014: 'Failed to subscribe to user {n} due to network problems. Subscribing again.',
@@ -726,7 +726,9 @@ export default {
     interact_1028: 'Microphone off success',
     interact_1029: 'The seats are full.Your account supports {n} people to get on the wheat',
     interact_1030: '{n} microphone off',
-    interact_1031: '{n} invites you to open the microphone'
+    interact_1031: '{n} invites you to open the microphone',
+    interact_1033: '主画面',
+    interact_1034: '主讲人'
   },
   doc: {
     doc_1001: 'This documentation is loading',

@@ -483,7 +483,12 @@
             this.userInfo.account_id != this.userId &&
             this.isInGroup &&
             this.userInfo.role_name != 20) ||
-          ([3, '3', 4, '4'].includes(this.roleName) && [2, '2'].includes(this.userInfo.role_name))
+          ([3, '3', 4, '4'].includes(this.roleName) &&
+            [2, '2'].includes(this.userInfo.role_name)) ||
+          (this.roleName == '1' &&
+            this.userInfo.account_id == this.userId &&
+            this.userInfo.is_speak &&
+            this.mainScreen != this.userInfo.account_id)
         );
       },
       //发起端演示的是否是选中的用户
