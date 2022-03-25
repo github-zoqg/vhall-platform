@@ -47,7 +47,7 @@
         ></el-option>
       </el-select>
       <el-tooltip placement="right" class="form-input-tip">
-        <div class="tip-content" slot="content" style="background: #333">
+        <div class="sign-form-wrap-tip" slot="content" style="background: #333">
           <div>
             签到间隔时长：开启自动签到后，设置好每次签到的间隔时间，观众将在指定时间收到签到提示
           </div>
