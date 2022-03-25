@@ -57,7 +57,23 @@
       // click事件
       handleClick: function () {
         if (this.disable) return false;
+        // 数据埋点
+        this._dataReport();
+        // 事件驱动
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClick'));
+      },
+      // 数据埋点
+      _dataReport() {
+        switch (this.kind) {
+          case 'document': {
+            window.vhallReportForProduct?.report(110027);
+            break;
+          }
+          case 'board': {
+            window.vhallReportForProduct?.report(110026);
+            break;
+          }
+        }
       }
     }
   };
