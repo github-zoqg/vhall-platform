@@ -1,0 +1,70 @@
+<mxfile host="65bd71144e">
+    <diagram id="Jz4JlQK4B5a-qAC1iCsH" name="第 1 页">
+        <mxGraphModel dx="585" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" background="#FFFFFF" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="31" value="" style="rounded=0;whiteSpace=wrap;html=1;pointerEvents=0;fontFamily=Helvetica;fontSize=24;fontColor=#FFFFFF;strokeColor=#000000;fillColor=none;gradientColor=none;" vertex="1" parent="1">
+                    <mxGeometry width="980" height="880" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="&lt;font color=&quot;#000000&quot;&gt;&lt;span style=&quot;font-size: 24px&quot;&gt;前端项目&lt;/span&gt;&lt;/font&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;span style=&quot;font-size: 24px&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;strokeColor=#B09500;fontColor=#000000;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="80" width="370" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=18;fontColor=#000000;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1" source="4" target="6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;h1 class=&quot;home-panel-title gl-mt-3 gl-mb-2 gl-font-size-h1 gl-line-height-24 gl-font-weight-bold gl-ml-3&quot; itemprop=&quot;name&quot; style=&quot;box-sizing: border-box ; margin-top: 0.5rem ; margin-bottom: 0.25rem ; line-height: 1.5rem ; font-size: 1.4375rem ; margin-left: 0.5rem ; text-align: left&quot;&gt;vhall-csd-middle-platform&lt;/h1&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=24;fontColor=#ffffff;strokeColor=#006EAF;fillColor=#1ba1e2;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="130" width="370" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontSize=18;fontColor=#000000;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1" source="6" target="8">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="入口文件" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=24;fontFamily=Helvetica;fontColor=#000000;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="14">
+                    <mxGeometry x="0.0657" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;strokeColor=#000000;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="29">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="672.1500000000001" y="307.03999999999996" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="静态资源" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=24;fontFamily=Helvetica;fontColor=#000000;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="20">
+                    <mxGeometry x="-0.0973" y="5" relative="1" as="geometry">
+                        <mxPoint x="-1" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="6" value="灰度环境 jenkins job, 构建" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontSize=18;fontColor=#ffffff;strokeColor=#314354;fillColor=#647687;" vertex="1" parent="1">
+                    <mxGeometry x="125" y="270" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="127.5" y="510" width="275" height="282" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;font style=&quot;font-size: 24px&quot;&gt;nginx&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontSize=18;fontColor=#ffffff;strokeColor=#000000;fillColor=#60a917;" vertex="1" parent="19">
+                    <mxGeometry width="275" height="61" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontSize=18;fontColor=#000000;strokeColor=#000000;fillColor=#f0a30a;" vertex="1" parent="19">
+                    <mxGeometry y="62" width="275" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="" style="group" vertex="1" connectable="0" parent="19">
+                    <mxGeometry x="22.5" y="77" width="230" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="&lt;h1 class=&quot;home-panel-title gl-mt-3 gl-mb-2 gl-font-size-h1 gl-line-height-24 gl-font-weight-bold gl-ml-3&quot; itemprop=&quot;name&quot; style=&quot;box-sizing: border-box ; margin-top: 0.5rem ; margin-bottom: 0.25rem ; line-height: 1.5rem ; font-size: 1.4375rem ; margin-left: 0.5rem ; text-align: left&quot;&gt;saas-live&lt;/h1&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=24;fontColor=#ffffff;strokeColor=#006EAF;fillColor=#1ba1e2;" vertex="1" parent="18">
+                    <mxGeometry y="50" width="230" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;h1 class=&quot;home-panel-title gl-mt-3 gl-mb-2 gl-font-size-h1 gl-line-height-24 gl-font-weight-bold gl-ml-3&quot; itemprop=&quot;name&quot; style=&quot;box-sizing: border-box ; margin-top: 0.5rem ; margin-bottom: 0.25rem ; line-height: 1.5rem ; font-size: 1.4375rem ; margin-left: 0.5rem ; text-align: left&quot;&gt;saas-wap&lt;/h1&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=24;fontColor=#ffffff;strokeColor=#006EAF;fillColor=#1ba1e2;" vertex="1" parent="18">
+                    <mxGeometry y="100" width="230" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;h1 class=&quot;home-panel-title gl-mt-3 gl-mb-2 gl-font-size-h1 gl-line-height-24 gl-font-weight-bold gl-ml-3&quot; itemprop=&quot;name&quot; style=&quot;box-sizing: border-box ; margin-top: 0.5rem ; margin-bottom: 0.25rem ; line-height: 1.5rem ; font-size: 1.4375rem ; margin-left: 0.5rem ; text-align: left&quot;&gt;saas-web&lt;/h1&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=24;fontColor=#ffffff;strokeColor=#006EAF;fillColor=#1ba1e2;" vertex="1" parent="18">
+                    <mxGeometry y="150" width="230" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="&lt;h1 class=&quot;home-panel-title gl-mt-3 gl-mb-2 gl-font-size-h1 gl-line-height-24 gl-font-weight-bold gl-ml-3&quot; itemprop=&quot;name&quot; style=&quot;box-sizing: border-box ; margin-top: 0.5rem ; margin-bottom: 0.25rem ; line-height: 1.5rem ; font-size: 1.4375rem ; margin-left: 0.5rem ; text-align: left&quot;&gt;saas-watch&lt;/h1&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=24;fontColor=#ffffff;strokeColor=#006EAF;fillColor=#1ba1e2;" vertex="1" parent="18">
+                    <mxGeometry width="230" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="&lt;font color=&quot;#000000&quot;&gt;&lt;span style=&quot;font-size: 24px&quot;&gt;阿里云 oss&lt;/span&gt;&lt;/font&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;span style=&quot;font-size: 24px&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;strokeColor=#B09500;fontColor=#000000;" vertex="1" parent="1">
+                    <mxGeometry x="680" y="277.5" width="190" height="55" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
