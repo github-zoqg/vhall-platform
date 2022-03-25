@@ -2,7 +2,7 @@
   <div class="inviteWrap">
     <invitation-Card @changeInvite="changeInvite"></invitation-Card>
     <div @click="toWebinar" class="webinarEntrance">
-      <p class="btnVal">进入活动</p>
+      <p class="btnVal">{{ $t('webinar.webinar_1015') }}</p>
     </div>
   </div>
 </template>
