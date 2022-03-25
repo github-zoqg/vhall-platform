@@ -70,7 +70,7 @@
       :visible="popAlert.visible"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
-      :knowText="'确定'"
+      :knowText="$t('account.account_1062')"
     >
       <main slot="content">{{ popAlert.text }}</main>
     </saas-alert>

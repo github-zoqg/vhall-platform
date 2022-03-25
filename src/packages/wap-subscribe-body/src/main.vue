@@ -41,7 +41,7 @@
         </template>
       </template>
     </div>
-    <template v-if="showBottomBtn && subOption.hide_subscribe">
+    <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
         <div
           class="vmp-subscribe-body-auth-two"
@@ -115,7 +115,8 @@
           is_subscribe: 0,
           actual_start_time: '',
           show: 1,
-          num: 0
+          num: 0,
+          hide_subscribe: 1
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
@@ -297,9 +298,6 @@
             this.authInfo.title = this.$t('appointment.appointment_1032');
             this.authInfo.placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
             this.isSubscribeShow = true;
-            break;
-          case 512526:
-            this.$toast(this.$t('common.common_1007'));
             break;
           case 512523:
             // 付费

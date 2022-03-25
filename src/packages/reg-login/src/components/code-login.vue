@@ -208,7 +208,7 @@
                 window.location.reload();
               } else {
                 this.$message({
-                  message: this.$te(res.msg) || this.$t('login.login_1021'),
+                  message: this.$tec(res.code) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
