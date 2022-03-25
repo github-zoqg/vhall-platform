@@ -466,6 +466,7 @@
             customClass: 'zdy-message-box',
             cancelButtonClass: 'zdy-confirm-cancel'
           });
+
           const result = await this.docServer.delDocList({
             tag: 1,
             ids: row.id,
@@ -473,6 +474,8 @@
             room_id: this.roomBaseServer.state.watchInitData.interact.room_id
           });
           if (result && result.code === 200) {
+            // 数据埋点-文档删除成功
+            window.vhallReportForProduct?.report(110025);
             this.$message({
               message: '删除成功',
               type: 'success'
@@ -632,7 +635,7 @@
             // page: 1
             // size: 362733
             // 上传埋点
-            window.vhallReportForProduct.report(110022, {
+            window.vhallReportForProduct?.report(110022, {
               report_extra: { documentId: res.data.document_id }
             });
             const fuid = file.uid;
