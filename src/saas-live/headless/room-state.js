@@ -29,11 +29,6 @@ export default async function () {
   const desktopShareServer = useDesktopShareServer();
   const splitScreenServer = useSplitScreenServer();
 
-  const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
-  if (!checkSystemResult.result) {
-    return 'isBrowserNotSupport';
-  }
-
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
