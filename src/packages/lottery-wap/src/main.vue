@@ -153,7 +153,9 @@
           this.lotteryView = 'LotteryMiss';
         }
         this.showWinnerList = !!msgData.publish_winner;
+        console.log('  this.popupVisible', this.popupVisible);
         this.popupVisible = true;
+        console.log('  this.popupVisible', this.popupVisible);
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
         useChatServer().addChatToList({
           content: {

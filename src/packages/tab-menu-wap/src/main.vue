@@ -547,15 +547,16 @@
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
+      border-bottom: 1px solid #d4d4d4;
 
-      &::before {
+      /*  &::before {
         content: '';
         position: absolute;
         bottom: 0;
         width: 100%;
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
-      }
+      } */
 
       .vmp-tab-menu-page-btn {
         position: relative;

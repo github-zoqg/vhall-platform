@@ -690,7 +690,7 @@ export default {
     interact_1010: 'Negar',
     interact_1011:
       'La conexión al micrófono se interrumpió debido a un problema con el dispositivo, por favor, verifique el dispositivo',
-    interact_1012: '{n} está configurado como presentador principal',
+    interact_1012: '{n} está configurado como {m}',
     interact_1013:
       'Falló la suscripción de compartir escritorio debido a problemas de red, vuelve a suscribirse',
     interact_1014:

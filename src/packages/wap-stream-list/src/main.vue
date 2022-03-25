@@ -287,7 +287,7 @@
       // 设置主画面
       setBigScreen(msg) {
         const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-        Toast(`${msg.data.nick_name}设置成为${str}`);
+        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
         this.$nextTick(() => {
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
