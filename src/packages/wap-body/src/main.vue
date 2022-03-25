@@ -96,6 +96,7 @@
       ) {
         await Dialog.alert({
           title: this.$t('account.account_1061'),
+          confirm: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
         });
       }
@@ -199,6 +200,7 @@
         } else {
           await Dialog.alert({
             title: this.$t('account.account_1061'),
+            confirm: this.$t('common.common_1010'),
             message: title
           });
         }
