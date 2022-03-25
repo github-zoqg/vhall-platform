@@ -18,6 +18,7 @@
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
   import {
     Domain,
     useRoomBaseServer,
@@ -40,6 +41,11 @@
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
+        // 检查浏览器版本
+        if (!browserSupport()) {
+          this.state = 3;
+          return;
+        }
         // 初始化直播房间
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
@@ -86,13 +92,8 @@
           },
           type: 'log' // log 日志埋点，event 业务数据埋点
         });
-        const res = await roomState();
+        await roomState();
 
-        // 如果浏览器不支持
-        if (res === 'isBrowserNotSupport') {
-          this.state = 3;
-          return;
-        }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         this.addEventListener();

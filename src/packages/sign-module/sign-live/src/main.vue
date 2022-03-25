@@ -184,6 +184,7 @@
               this.totalTime = state.interval;
               window.sessionStorage.setItem('isAutoSign', 'true');
             }
+            this.reportSign(state);
             this.signinDown = true;
             this.signVisible = false;
             this.signId = res.data.id;
@@ -195,6 +196,25 @@
             this.$message.error(res.msg);
           }
         });
+      },
+      // 数据埋点
+      reportSign(state) {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110039);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(state.autoSign ? 110040 : 110041);
+        if (state.signTip != '主持人发起了签到') {
+          window.vhallReportForProduct && window.vhallReportForProduct.report(110042);
+        }
+        const duration = [10, 30, 60, 120, 180];
+        const index = duration.indexOf(state.duration);
+        const signType = [110043, 110044, 110045, 110046, 110047];
+        window.vhallReportForProduct && window.vhallReportForProduct.report(signType[index]);
+        if (state.autoSign) {
+          const interval = [60, 300, 900, 1800];
+          const indexs = interval.indexOf(state.interval);
+          const intervalType = [110048, 110049, 110050, 110051];
+          window.vhallReportForProduct && window.vhallReportForProduct.report(intervalType[indexs]);
+        }
       },
       // 结束签到
       endSignServe() {
