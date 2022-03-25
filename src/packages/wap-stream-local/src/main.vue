@@ -215,13 +215,13 @@
         // 检测设备状态
         if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
           const isSpeakOn = this.micServer.getSpeakerStatus();
-          /* 
+          /*
             未检测时，则检测互动SDK的支持情况
-              不支持上麦时，确认是否在麦上          
+              不支持上麦时，确认是否在麦上
           */
           if (this.mediaCheckServer.state.isBrowserNotSupport) {
             this.mediaCheckServer.setDevice({ status: 2 });
-            this.$toast('当前设备不支持连麦');
+            this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {
               await this.speakOff();
             }
