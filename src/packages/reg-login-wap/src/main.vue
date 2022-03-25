@@ -296,7 +296,7 @@
                 }
               })
               .catch(res => {
-                this.$toast(this.$tec(res.msg) || this.$t('login.login_1029'));
+                this.$toast(this.$tec(res.code) || this.$t('login.login_1029'));
               });
           } else {
             this.errorMsgShow.mobile = true;
@@ -389,7 +389,7 @@
               if (this.showCaptcha && !this.captchaReady) {
                 this.reloadCaptha();
               }
-              this.$toast(this.$tec(res.msg) || this.$t('login.login_1021'));
+              this.$toast(this.$tec(res.code) || this.$t('login.login_1021'));
             }
           });
         };
@@ -403,7 +403,7 @@
           // 如果没有选择过图形码，走账号检测判断
           const failure = err => {
             console.log('获取账号检测接口结果错误', err);
-            this.$toast(this.$tec(err.msg) || this.$t('login.login_1021'));
+            this.$toast(this.$tec(err.code) || this.$t('login.login_1021'));
           };
           this.userServer
             .loginCheck(this.mobile)
@@ -440,7 +440,7 @@
           };
           const relt = await this.userServer.handlePassword(this.password);
           if (!relt.pass) {
-            return this.$toast(this.$tec(relt.msg) || this.$t('register.register_1010'));
+            return this.$toast(this.$t(relt.msg) || this.$t('register.register_1010'));
           }
           const params = {
             source: 2,
