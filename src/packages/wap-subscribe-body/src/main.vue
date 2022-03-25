@@ -41,7 +41,7 @@
         </template>
       </template>
     </div>
-    <template v-if="showBottomBtn">
+    <template v-if="showBottomBtn && subOption.hide_subscribe">
       <div class="vmp-subscribe-body-auth">
         <div
           class="vmp-subscribe-body-auth-two"

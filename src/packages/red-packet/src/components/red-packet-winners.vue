@@ -38,7 +38,7 @@
               }"
             />
             <img v-else src="../images/avatar_default@2x.png" alt="" />
-            <div>
+            <div class="winner-info">
               <p>
                 <span class="vhsaas-red-packet__item__name">
                   {{ item.nickname | overHidden(8) }}
@@ -54,8 +54,8 @@
                   v-if="redPacketInfo.type === 0 && item.amount_ranking == 1"
                   class="vhsaas-red-packet__quean"
                 >
-                  <i></i>
-                  {{ $t('interact_tools.interact_tools_1042') }}
+                  <i />
+                  <span v-text="$t('interact_tools.interact_tools_1042')"></span>
                 </span>
               </p>
             </div>
@@ -140,7 +140,6 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    z-index: 21;
 
     &.other {
       background: transparent;
@@ -153,29 +152,19 @@
   }
 
   .vhsaas-dialog__other {
-    width: 300px;
-    height: 360px;
     background: #ee2121;
     border-radius: 16px;
-    padding: 0 0 12px 0;
-  }
-  .vhsaas-red-packet-cover {
-    width: 294px;
-    height: 331px;
-    background: url(../images/open-bg-cover@2x.png);
-    background-size: 100% 100%;
-    position: absolute;
-    bottom: 12px;
-    left: 83px;
-    z-index: 25;
+    padding: 24px 12px 12px;
+    position: relative;
   }
   .vhsaas-other-return {
     font-size: 11px;
     color: #ffffff;
-    margin-top: 20px;
-    display: block;
-    margin-left: 22px;
+    display: inline-block;
+    left: 22px;
+    line-height: 11px;
     cursor: pointer;
+    position: absolute;
   }
   /* 看看大家的手气 */
   .vhsaas-other-unit {
@@ -230,13 +219,14 @@
     }
   }
   .vhsaas-other__item {
+    margin-top: 15px;
     width: 276px;
     height: 260px;
     background: #ffffff;
-    margin: 15px auto 0 auto;
     border-radius: 4px;
     overflow-y: auto;
     li {
+      height: 52px;
       padding: 9px 16px 8px 16px;
     }
     .nodata {
@@ -262,18 +252,19 @@
         border: 2px solid #ffb21f;
       }
     }
-    div {
+    .winner-info {
       display: inline-block;
       vertical-align: middle;
       width: calc(100% - 34px);
       p {
+        line-height: initial;
         display: flex;
         width: 100%;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: center;
         margin: 0 0 2px 0;
         &:last-child {
-          margin: 0 0;
+          margin: 0;
         }
       }
     }
@@ -297,19 +288,18 @@
       line-height: 17px;
     }
     .vhsaas-red-packet__quean {
-      margin-left: auto;
+      // margin-left: auto;
       height: 17px;
       font-size: 12px;
-      font-weight: 400;
       color: #ffb21f;
       i {
         display: inline-block;
-        width: 16px;
-        height: 16px;
+        width: 15px;
+        height: 15px;
         background: url(../images/tiara@2x.png);
         background-size: 100% 100%;
         vertical-align: bottom;
-        line-height: 17px;
+        line-height: 15px;
         margin-right: 2px;
       }
     }

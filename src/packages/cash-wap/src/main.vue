@@ -225,13 +225,13 @@
       step(val) {
         if (val === 1 || val === 2) {
           defaltCashForm.money =
-            this.useCashServer.state.cashInfo.red_packet_balance * 1 > 800
+            this.useCashServer.state?.cashInfo.red_packet_balance * 1 > 800
               ? 800
-              : this.useCashServer.state.cashInfo.red_packet_balance;
+              : this.useCashServer.state?.cashInfo.red_packet_balance;
           this.cashForm = Object.assign({}, defaltCashForm);
           this.errorTip = Object.assign({}, defaultErrorTip);
           this.initInterval(); // 初始化定时器
-          this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+          this.$refs.NECaptcha?.refreshNECaptha(); // 重置易盾
         }
       }
     },
@@ -292,36 +292,52 @@
           this.step === 1 ? this.cashForm.phone : this.useUserServer.state.userInfo.phone;
         const validate = this.cashForm.imgCode;
         const scene_id = this.cashForm.scene_id;
-        // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回
-        // 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码
-        this.useUserServer
-          .sendPhoneCode({
-            type: 1,
-            scene_id,
-            data,
-            validate
-          })
-          .then(res => {
-            if (res && res.code === 200) {
-              this.initInterval();
-              this.timer = setInterval(() => {
-                this.countTime--;
-                if (this.countTime === 0) {
-                  this.initInterval();
-                }
-              }, 1000);
-            } else {
-              this.$toast(this.$tec(res.code) || res.msg);
-              this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-            }
-          })
-          .catch(err => {
-            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1051'));
-            // 图片验证码重置
-            this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-          });
+        const failure = err => {
+          this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1051'));
+          // 图片验证码重置
+          this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+        };
+        const callback = res => {
+          if (res && res.code === 200) {
+            this.initInterval();
+            this.timer = setInterval(() => {
+              this.countTime--;
+              if (this.countTime === 0) {
+                this.initInterval();
+              }
+            }, 1000);
+          } else {
+            failure(res);
+          }
+        };
+        if (this.step === 1) {
+          this.useUserServer
+            .sendPhoneCode({
+              type: 1,
+              scene_id,
+              data,
+              validate
+            })
+            .then(res => {
+              callback(res);
+            })
+            .catch(err => {
+              failure(err);
+            });
+        } else {
+          this.useCashServer
+            .withdrawSendCode({
+              captcha: validate,
+              user_type: 2
+            })
+            .then(res => {
+              callback(res);
+            })
+            .catch(err => {
+              failure(err);
+            });
+        }
       },
-
       // 校验手机号
       validtorPhone() {
         if (/^1\d{10}$/.test(this.cashForm.phone)) {
@@ -347,13 +363,13 @@
             return false;
           } else if (this.cashForm.money - 800 > 0) {
             this.cashForm.money =
-              this.useCashServer.state.cashInfo.red_packet_balance * 1 > 800
+              this.useCashServer.state?.cashInfo.red_packet_balance * 1 > 800
                 ? 800
-                : this.useCashServer.state.cashInfo.red_packet_balance;
+                : this.useCashServer.state?.cashInfo.red_packet_balance;
             this.errorTip.money = '';
             return true;
           } else if (
-            this.cashForm.money - this.useCashServer.state.cashInfo.red_packet_balance >
+            this.cashForm.money - this.useCashServer.state?.cashInfo.red_packet_balance >
             0
           ) {
             this.errorTip.money = this.$t('cash.cash_1032');

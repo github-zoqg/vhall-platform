@@ -405,7 +405,7 @@
             .needHelp()
             .then(res => {
               if (res.code == 200) {
-                this.groupMessage('请求协助发送成功', { type: 'success' });
+                this.groupMessage(this.$t('other.other_1005'), { type: 'success' });
               }
             })
             .catch(err => {
