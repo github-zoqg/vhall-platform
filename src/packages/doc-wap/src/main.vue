@@ -17,7 +17,7 @@
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ visibility: item.cid == currentCid ? 'visible' : 'hidden' }"
+            :style="{ zIndex: item.cid == currentCid ? '1' : '-1' }"
           ></div>
         </div>
       </div>
@@ -95,6 +95,7 @@
       },
       // 当前文档白板容器id
       currentCid() {
+        // alert(this.docServer.state.currentCid, 'this.docServer.state.currentCid');
         return this.docServer.state.currentCid;
       },
       // 是否观众可见
