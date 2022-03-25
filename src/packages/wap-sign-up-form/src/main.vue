@@ -176,47 +176,54 @@
             </template>
             <!-- 地域选择 -->
             <template v-if="question.type === 5">
-              <!-- 省 -->
-              <div class="select-box">
-                <div class="select-xl">
-                  <select
-                    :ref="question.id"
-                    @change="onValidate(question)"
-                    v-model="province"
-                    class="select-item"
-                  >
-                    <option value disabled selected hidden>{{ $t('form.form_1004') }}</option>
-                    <option v-for="opt in provinces" :key="opt.value" :value="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
-              </div>
-              <!-- 市 -->
-              <div class="select-box" v-if="question.options.show_city == 1">
-                <div class="select-xl">
-                  <select @change="onValidate(question)" v-model="city" class="select-item">
-                    <option value disabled selected hidden>{{ $t('form.form_1005') }}</option>
-                    <option v-for="opt in currentCityList" :key="opt.value" :value="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
-              </div>
-              <!-- 区 -->
-              <div class="select-box" v-if="question.options.show_district == 1">
-                <div class="select-xl">
-                  <select @change="onValidate(question)" v-model="county" class="select-item">
-                    <option value disabled selected hidden>{{ $t('form.form_1006') }}</option>
-                    <option v-for="opt in currentCountyList" :key="opt.value" :value="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
-              </div>
+              <custom-cascade
+                :ref="question.id"
+                v-model="cascadeResultList"
+                @change="handleCascadeChange(question)"
+                :placeholder="$t('form.form_1018')"
+                :options="getCascadeOptions(question)"
+              ></custom-cascade>
+              <!--              &lt;!&ndash; 省 &ndash;&gt;-->
+              <!--              <div class="select-box">-->
+              <!--                <div class="select-xl">-->
+              <!--                  <select-->
+              <!--                    :ref="question.id"-->
+              <!--                    @change="onValidate(question)"-->
+              <!--                    v-model="province"-->
+              <!--                    class="select-item"-->
+              <!--                  >-->
+              <!--                    <option value disabled selected hidden>{{ $t('form.form_1004') }}</option>-->
+              <!--                    <option v-for="opt in provinces" :key="opt.value" :value="opt.value">-->
+              <!--                      {{ opt.label }}-->
+              <!--                    </option>-->
+              <!--                  </select>-->
+              <!--                  <label class="select-arrow"></label>-->
+              <!--                </div>-->
+              <!--              </div>-->
+              <!--              &lt;!&ndash; 市 &ndash;&gt;-->
+              <!--              <div class="select-box" v-if="question.options.show_city == 1">-->
+              <!--                <div class="select-xl">-->
+              <!--                  <select @change="onValidate(question)" v-model="city" class="select-item">-->
+              <!--                    <option value disabled selected hidden>{{ $t('form.form_1005') }}</option>-->
+              <!--                    <option v-for="opt in currentCityList" :key="opt.value" :value="opt.value">-->
+              <!--                      {{ opt.label }}-->
+              <!--                    </option>-->
+              <!--                  </select>-->
+              <!--                  <label class="select-arrow"></label>-->
+              <!--                </div>-->
+              <!--              </div>-->
+              <!--              &lt;!&ndash; 区 &ndash;&gt;-->
+              <!--              <div class="select-box" v-if="question.options.show_district == 1">-->
+              <!--                <div class="select-xl">-->
+              <!--                  <select @change="onValidate(question)" v-model="county" class="select-item">-->
+              <!--                    <option value disabled selected hidden>{{ $t('form.form_1006') }}</option>-->
+              <!--                    <option v-for="opt in currentCountyList" :key="opt.value" :value="opt.value">-->
+              <!--                      {{ opt.label }}-->
+              <!--                    </option>-->
+              <!--                  </select>-->
+              <!--                  <label class="select-arrow"></label>-->
+              <!--                </div>-->
+              <!--              </div>-->
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
               </p>
@@ -342,10 +349,12 @@
   import { useSignUpFormServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
+  import customCascade from './components/customCascade';
   export default {
     name: 'VmpWapSignUpForm',
     components: {
-      customSelectPicker
+      customSelectPicker,
+      customCascade
     },
     data() {
       return {
@@ -361,6 +370,8 @@
         },
         //表单模板
         form: {},
+        //地域的级联选择器保存的值
+        cascadeResultList: [],
         //默认的banner图
         defaultHeader: defaultHeader,
         //初始化的活动类型
@@ -503,23 +514,47 @@
       currentCityList() {
         return this.cityList[this.province];
       },
-      //当前的国家列表
+      //当前的区域列表
       currentCountyList() {
         return this.countyList[this.city];
+      },
+      //获取级联选择器数据
+      getCascadeOptions() {
+        return function (question) {
+          let list = this.provinces || [];
+          const { show_city, show_district } = question?.options || {};
+          if (show_city == 1) {
+            list = (list || []).map(item => {
+              item.children = Array.isArray(this.cityList[item.value])
+                ? this.cityList[item.value]
+                : [];
+              if (show_district == 1) {
+                item.children = (item.children || []).map(cityItem => {
+                  cityItem.children = Array.isArray(this.countyList[cityItem.value])
+                    ? this.countyList[cityItem.value]
+                    : [];
+                  return cityItem;
+                });
+              }
+              return item;
+            });
+            return list;
+          }
+        };
       }
     },
     watch: {
-      province(newVal, oldVal) {
-        if (newVal != oldVal) {
-          this.city = '';
-          this.county = '';
-        }
-      },
-      city(newVal, oldVal) {
-        if (newVal != oldVal) {
-          this.county = '';
-        }
-      },
+      // province(newVal, oldVal) {
+      //   if (newVal != oldVal) {
+      //     this.city = '';
+      //     this.county = '';
+      //   }
+      // },
+      // city(newVal, oldVal) {
+      //   if (newVal != oldVal) {
+      //     this.county = '';
+      //   }
+      // },
       isPhoneValidate: {
         immediate: true,
         handler(newVal) {
@@ -604,6 +639,7 @@
           .then(res => {
             this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
             this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+            this.cascadeResultList = [];
             this.wxShareInfo(res.data.webinar);
           })
           .catch(error => {
@@ -617,7 +653,6 @@
         const params = {
           webinar_id: this.webinar_id
         };
-        console.log(2);
         this.signUpFormServer.getFormBaseInfo(params).then(res => {
           if (res.data.tab_form_title) {
             res.data.tab_form_title =
@@ -709,7 +744,6 @@
         this.signUpFormServer
           .getAreaList()
           .then(res => {
-            console.log(_this.cityList, _this.countyList);
             _this.$set(_this, 'provinces', res.provinces);
             _this.$set(_this, 'cityList', res.cities);
             _this.$set(_this, 'countyList', res.counties);
@@ -791,6 +825,19 @@
         }
 
         this.privacyText = text;
+      },
+      //级联选择器选中处理
+      handleCascadeChange(question) {
+        const { show_city, show_district } = question?.options || {};
+        const list = (this.cascadeResultList || []).map(option => option.value);
+        this.province = list[0] || '';
+        if (show_city == 1) {
+          this.city = list[1] || '';
+        }
+        if (show_district == 1) {
+          this.county = list[2] || '';
+        }
+        this.onValidate(question);
       },
       //提交报名表单
       submit() {
@@ -1139,7 +1186,6 @@
       },
       //表单验证
       onValidate(question, isSubmit = false) {
-        console.log(question);
         // 如果验证的是隐私声明，并且是第一次验证，则直接通过
         if (question.type === 6 && this.isFirstChange && !isSubmit) {
           this.isFirstChange = false;
@@ -1181,7 +1227,6 @@
         } else if (question.type === 2 || question.type === 4) {
           // 单选/下拉
           this.errMsgMap[question.id] = !this.form[question.id] ? this.$t('form.form_1029') : '';
-          console.log(this.form[question.id]);
         } else if (question.type === 3) {
           // 多选
           this.errMsgMap[question.id] = !this.form[question.id].length
@@ -1362,6 +1407,8 @@
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;
+                //清空一下级联的选中的数组
+                this.cascadeResultList = [];
               }
             })
             .catch(err => {

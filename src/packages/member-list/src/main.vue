@@ -1378,7 +1378,7 @@
       updateOnlineUserList: _.throttle(function () {
         this.onlineUsers = [];
         this.getOnlineUserList();
-      }, 1500),
+      }, 2000),
       //获取在线人员列表
       getOnlineUserList(pos) {
         const _this = this;

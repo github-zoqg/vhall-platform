@@ -3,7 +3,11 @@
     <main>
       <!-- 选择录音设备 -->
       <section class="vmp-media-setting-item">
-        <el-select class="vmp-media-setting-item__content" v-model="mediaState.audioInput">
+        <el-select
+          class="vmp-media-setting-item__content"
+          :placeholder="$t('form.form_1018')"
+          v-model="mediaState.audioInput"
+        >
           <el-option
             v-for="item in devices"
             :key="item.deviceId"

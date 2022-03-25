@@ -62,7 +62,7 @@
         }
         const available = this.redPacketServer.state.available;
         if (available) {
-          this.redPacketServer.openRedPacket().fially(() => {
+          this.redPacketServer.openRedPacket().finally(() => {
             this.opened = true;
             const st = setTimeout(() => {
               clearTimeout(st);
