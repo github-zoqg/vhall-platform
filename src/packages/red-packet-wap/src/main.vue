@@ -36,7 +36,7 @@
       return {
         redPacketServerState,
         dialogVisible: false, // 组件显示
-        componentsView: 'RedPacketAccept'
+        componentsView: ''
       };
     },
     beforeCreate() {
@@ -51,6 +51,7 @@
     methods: {
       // 开启红包弹窗
       open(uuid) {
+        if (!uuid) uuid = this.redPacketServer.getLastUUid();
         this.redPacketServer.getRedPacketInfo(uuid).then(res => {
           const data = res.data;
           if (data.status == 1 || data.red_packet.number == data.red_packet.get_user_count) {
