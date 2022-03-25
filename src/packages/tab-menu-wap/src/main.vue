@@ -417,18 +417,6 @@
       },
 
       /**
-       * 切换某个菜单tab的可视性
-       * @param {*} cuid
-       * @param {*} menuId [非必传]
-       * @example toggleVisible('comChatWap','')
-       */
-      toggleVisible({ type, id }) {
-        const tab = this.getItem({ type, id });
-        if (!tab) return;
-
-        tab.visible = !tab.visible;
-      },
-      /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
        * @param {String} cuid cuid
