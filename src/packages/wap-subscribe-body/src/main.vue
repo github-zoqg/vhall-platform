@@ -314,9 +314,7 @@
             break;
           case 512523:
             open_id = sessionStorage.getItem('open_id') || '';
-            userId = sessionStorage.getItem('userInfo')
-              ? JSON.parse(sessionStorage.getItem('userInfo')).user_id
-              : '';
+            userId = this.userInfo ? this.userInfo.user_id : '';
             if (!(open_id && userId)) {
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
               return;
@@ -331,7 +329,6 @@
                 code: open_id
               };
             } else {
-              // const userId = this.userInfo ? this.userInfo.user_id : '';
               params = {
                 webinar_id: this.webinarId,
                 type: 1,
