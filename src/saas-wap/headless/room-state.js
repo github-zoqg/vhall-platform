@@ -9,7 +9,8 @@ import {
   useGroupServer,
   useDesktopShareServer,
   usePlayerServer,
-  useInsertFileServer
+  useInsertFileServer,
+  useVirtualAudienceServer
 } from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
@@ -27,6 +28,7 @@ export default async function () {
   const desktopShareServer = useDesktopShareServer();
   const insertFileServer = useInsertFileServer();
   const playerServer = usePlayerServer();
+  const virtualAudienceServer = useVirtualAudienceServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -92,7 +94,7 @@ export default async function () {
       }),
     roomBaseServer.getCustomRoleName()
   ];
-
+  virtualAudienceServer.init();
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
     await groupServer.init();
