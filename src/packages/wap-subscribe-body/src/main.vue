@@ -89,6 +89,11 @@
       </ul>
       <p class="language-item" @click="isOpenlang = false">{{ $t('account.account_1063') }}</p>
     </van-popup>
+
+    <!-- 邀请卡浮动按钮 -->
+    <button v-if="showInvite" class="vmp-subscribe-body-invite" @click="gotoInvitePage">
+      {{ $t('nav.nav_1015') }}
+    </button>
   </div>
 </template>
 <script>
@@ -150,6 +155,12 @@
           this.roomBaseServer.state.watchInitData.record.preview_paas_record_id &&
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe'
         );
+      },
+      /**
+       * 展示邀请卡入口（无需区分是否预约成功，只要开启邀请卡即在预约页展示该浮动按钮）
+       */
+      showInvite() {
+        return this.$domainStore.state.roomBaseServer.inviteCard.status == 1;
       }
     },
     beforeCreate() {
@@ -491,6 +502,24 @@
         }, 300);
       },
       /**
+       * 前往邀请卡页面
+       */
+      gotoInvitePage() {
+        const activeId = this.$route.params.id;
+        const { join_info } = this.roomBaseServer.state.watchInitData;
+        const joinId = join_info.join_id;
+        const lang = localStorage.getItem('lang');
+
+        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
+
+        const location =
+          window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY;
+
+        const url = `${location}${inviteUrl}`;
+
+        window.location.href = url;
+      },
+      /**
        * 倒计时是否开启
        */
       sureCountDown() {
@@ -682,6 +711,24 @@
           color: #fb2626;
         }
       }
+    }
+    &-invite {
+      position: fixed;
+      z-index: 10;
+      display: block;
+      right: 0;
+      top: 140px;
+      width: 152px;
+      height: 62px;
+      background: linear-gradient(121deg, rgba(246, 208, 63, 1) 0%, rgba(209, 110, 53, 1) 100%);
+      box-shadow: 0px 5px 3px 0px rgba(0, 0, 0, 0.5);
+      border-radius: 35px 0px 0px 35px;
+      font-size: 28px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 1);
+      line-height: 62px;
+      text-align: center;
+      animation-fill-mode: forwards;
     }
   }
 </style>

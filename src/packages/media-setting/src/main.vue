@@ -256,9 +256,11 @@
           await this.updateDeviceSetting();
           this.closeMediaSetting();
           this.sendChangeEvent();
+          this.setReport();
           this.getStateCapture(); // 更新快照
         }
       },
+      setReport() {},
       /**
        * 获得用户更改的字段（diff字段）
        */

@@ -237,7 +237,7 @@
             // 进入主房间
             if (msg.data.isJoinMainRoom) {
               _this.list.push({
-                nickname: msg.data.nickname,
+                nickname: msg.data.nickname || msg.data.nick_name,
                 isBanned: msg.data.isBanned,
                 account_id: msg.data.accountId,
                 role_name: msg.data.role_name == 20 ? 2 : msg.data.role_name,

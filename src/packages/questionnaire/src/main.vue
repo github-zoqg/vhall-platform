@@ -255,7 +255,7 @@
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
           const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
           let text = this.$getRoleName(msg.room_role);
-          if (msg.room_role !== 1) {
+          if (msg.room_role != 1) {
             text = `${text}${msg.nick_name}`;
           }
           useChatServer().addChatToList({
