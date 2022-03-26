@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout" :class="{ 'vmp-basic-layout__noHeader': !showHeader }">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -38,6 +38,26 @@
         state: 0,
         liveErrorTip: ''
       };
+    },
+    computed: {
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      }
     },
     beforeCreate() {
       this.inviteServer = useInviteServer();
