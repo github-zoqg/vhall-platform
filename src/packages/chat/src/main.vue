@@ -118,8 +118,6 @@
         //默认兜底头像
         defaultAvatar,
         /** domain中读取的数据 */
-        //配置列表
-        configList: {},
         //活动id 打开手动过滤地址需要
         webinarId: '',
         //直播的类型，直播，回放
@@ -234,6 +232,12 @@
           return chatItem?.welcome_content || '';
         }
         return '';
+      },
+      configList() {
+        return this.roomBaseServer.state.configList;
+      },
+      noLoginKey() {
+        return this.configList['ui.show_chat_without_login'];
       }
     },
     watch: {
@@ -241,6 +245,10 @@
         if (this.isBottom()) {
           this.scrollBottom();
         }
+      },
+      // 聊天免登录的配置项更改，重新计算是否需要登录聊天
+      noLoginKey() {
+        this.initChatLoginStatus();
       }
     },
     beforeCreate() {
@@ -277,10 +285,9 @@
       },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         this.joinInfo = join_info;
-        this.configList = configList;
         this.webinarId = webinar.id;
         this.playerType = webinar.type;
         this.roomId = interact.room_id;

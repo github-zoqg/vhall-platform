@@ -136,8 +136,13 @@
       isSubscribe() {
         return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       },
+      //是否在小组中
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      //活动信息
+      webinarInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
       }
     },
     watch: {
@@ -224,7 +229,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.embedObj.embed) {
+          if (!this.embedObj.embed && this.webinarInfo.webinar_state == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });
