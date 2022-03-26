@@ -329,19 +329,24 @@
           params.command = this.participationPass;
         }
         this.startButtonDisabled = true;
+        const failure = err => {
+          console.error(err);
+          this.startButtonDisabled = false;
+          this.$message.warning(err.msg);
+        };
         this.lotteryServer
           .pushLottery(params)
           .then(res => {
             if (res.code === 200) {
               this.reportLottery();
               this.$emit('startLottery', res.data);
+              this.startButtonDisabled = false;
+            } else {
+              failure(res);
             }
-            this.startButtonDisabled = false;
           })
           .catch(err => {
-            console.error(err);
-            this.startButtonDisabled = false;
-            this.$message.warning(err.msg);
+            failure(err);
           });
       },
       // 大数据上报
