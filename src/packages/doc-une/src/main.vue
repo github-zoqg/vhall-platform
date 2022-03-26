@@ -237,7 +237,9 @@
         // 1、发起端没有开启桌面共享时展示
         // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
-          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
+          (this.roleName === 1 && !this.desktopShareServer.state.localDesktopStreamId) ||
+          (this.roleName === 3 && this.docServer.state.currentCid) ||
+          (this.roleName === 4 && !this.desktopShareServer.state.localDesktopStreamId) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -348,6 +350,7 @@
           if (newval) {
             useRoomBaseServer().setChangeElement('player');
           } else {
+            // 文档不可见设置小屏''
             useRoomBaseServer().setChangeElement('');
           }
         }
@@ -468,31 +471,42 @@
       getDocViewRect() {
         let rect = { width: 0, height: 0 };
         if (this.isWatch) {
-          console.log('----this.isWatch-----');
+          // 观看端
           if (this.displayMode === 'mini') {
-            console.log('----is mini-----');
+            // 小屏
             rect = {
               width: 360,
               height: 204
             };
           } else {
+            // 大屏
             rect = this.$refs.docWrapper?.getBoundingClientRect();
-            if (rect.width === 0) {
-              const parentNode = this.$refs.docWrapper.parentNode;
-              if (parentNode) {
-                const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
-                rect = {
-                  width: cWidth,
-                  height: (cWidth / 16) * 9
-                };
-              }
-            }
           }
         } else {
-          rect =
-            this.displayMode === 'fullscreen'
-              ? this.$refs.docWrapper?.getBoundingClientRect()
-              : this.$refs.docContent?.getBoundingClientRect();
+          // 发起端
+          if (this.displayMode === 'mini') {
+            // 小屏
+            rect = {
+              width: 309,
+              height: 240
+            };
+          } else {
+            // 大屏
+            rect =
+              this.displayMode === 'fullscreen'
+                ? this.$refs.docWrapper?.getBoundingClientRect()
+                : this.$refs.docContent?.getBoundingClientRect();
+          }
+        }
+        if (rect.width === 0) {
+          const parentNode = this.$refs.docWrapper.parentNode;
+          if (parentNode) {
+            const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
+            rect = {
+              width: cWidth,
+              height: (cWidth / 16) * 9
+            };
+          }
         }
         if (!rect.width || !rect.height) return rect;
         const { width, height } = rect;
