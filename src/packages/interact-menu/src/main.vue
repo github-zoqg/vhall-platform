@@ -185,7 +185,7 @@
           .qaEnable()
           .then(res => {
             if (res.code == 200) {
-              window.vhallReportForProduct && window.vhallReportForProduct.report(110052);
+              window.vhallReportForProduct?.report(110052);
               this.isQAEnabled = true;
               this.qaVisible = false;
               this.$message({
@@ -210,7 +210,7 @@
             if (res.code == 200) {
               this.isQAEnabled = false;
               this.qaVisible = false;
-              window.vhallReportForProduct && window.vhallReportForProduct.report(110053);
+              window.vhallReportForProduct?.report(110053);
               this.$message({
                 message: '关闭问答成功',
                 type: 'success'
