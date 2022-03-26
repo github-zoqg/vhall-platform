@@ -235,11 +235,13 @@
       // 文档是否可见
       show() {
         // 1、发起端没有开启桌面共享时展示
-        // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
+        // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
+        // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
-          (this.roleName === 1 && !this.desktopShareServer.state.localDesktopStreamId) ||
-          (this.roleName === 3 && this.docServer.state.currentCid) ||
-          (this.roleName === 4 && !this.desktopShareServer.state.localDesktopStreamId) ||
+          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
+          (this.roleName === 3 &&
+            this.desktopShareServer.state.localDesktopStreamId &&
+            this.docServer.state.currentCid) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
