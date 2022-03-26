@@ -484,6 +484,7 @@
           .toggleChatAuthStatus(params)
           .then(res => {
             this.enableChatAuth = res.data.switch;
+            this.enableChatAuth && window.vhallReportForProduct?.report(110118);
           })
           .catch(error => {
             const { msg = '' } = error || {};

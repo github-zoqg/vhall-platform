@@ -188,6 +188,7 @@
     methods: {
       // 嘉宾点击申请上麦
       handleApplyClick() {
+        window.vhallReportForProduct?.report(110131);
         useMicServer()
           .userApply()
           .then(res => {
@@ -213,6 +214,7 @@
       },
       // 嘉宾取消申请
       handleApplyCancleClick() {
+        window.vhallReportForProduct?.report(110146);
         useMicServer()
           .userCancelApply()
           .then(() => {
@@ -223,6 +225,7 @@
       },
       // 嘉宾下麦
       async handleSpeakOffClick() {
+        window.vhallReportForProduct?.report(110132);
         // 下麦接口停止推流，成功之后执行下面的逻辑
         const { code, msg } = await useMicServer().speakOff();
         if (parseInt(this.roleName) !== 4) {
@@ -474,6 +477,7 @@
       // 设置默认回放
       async handleSetDefaultRecord() {
         try {
+          window.vhallReportForProduct?.report(110140);
           const res = await this.roomBaseServer.setDefaultRecord({
             webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
             record_id: this.popAlert._recordId,
@@ -490,6 +494,7 @@
       // 关闭弹窗
       closeConfirm() {
         this.popAlert.visible = false;
+        window.vhallReportForProduct?.report(110141);
         // 如果是关闭设置默认回放的弹窗，需要给出暂存时间提示，否则直接return
         if (!this.popAlert.confirm) return;
         const { watchInitData } = this.roomBaseServer.state;

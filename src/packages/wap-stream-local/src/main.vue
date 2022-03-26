@@ -204,7 +204,6 @@
               不支持上麦时，确认是否在麦上
           */
           if (this.mediaCheckServer.state.isBrowserNotSupport) {
-            this.mediaCheckServer.setDevice({ status: 2 });
             this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {
               await this.speakOff();

@@ -27,6 +27,7 @@
       });
     },
     created() {
+      console.log('initIconStatus created');
       this.redPacketServer.initIconStatus();
     },
     methods: {

@@ -1,13 +1,7 @@
 <template>
-  <div id="header" class="vh-header-box" v-if="!embedObj.embed">
+  <div id="header" class="vh-header-box" v-if="showHeader">
     <span class="host-user-info">
-      <img
-        v-if="webinarTag && webinarTag.organizers_status == 1"
-        class="img-box"
-        :src="hostAvatar"
-        @click="skipAction"
-        srcset
-      />
+      <img class="img-box" :src="hostAvatar" @click="skipAction" srcset />
       {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
@@ -62,6 +56,16 @@
     },
     computed: {
       /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      /**
        * 公众号信息
        */
       officicalInfo() {
@@ -73,7 +77,7 @@
       skinInfo() {
         return this.$domainStore.state.roomBaseServer.skinInfo;
       },
-      // 签名信息
+      // 主办方配置
       webinarTag() {
         return this.$domainStore.state.roomBaseServer.webinarTag;
       },
