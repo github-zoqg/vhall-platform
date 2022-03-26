@@ -291,6 +291,11 @@
             }
           } else if (vn.kind === 'interactTool') {
             // 互动工具菜单
+            // 如果当前人所有的互动工具都没有权限，就将互动工具icon隐藏
+            if (this.isAllInteractToolsDisabled()) {
+              vn.setHiddenState(true);
+              continue;
+            }
             if (this.role == 4) {
               if (this.doc_permission == this.userId) {
                 // 如果嘉宾为主讲人: 设置为可用
@@ -366,6 +371,20 @@
       goWatchShare() {
         window.vhallReportForProduct && window.vhallReportForProduct.report(110115);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShareClick'));
+      },
+      // 判断是否是所有的互动工具都被禁用，如果全部被禁用，互动工具icon不显示
+      isAllInteractToolsDisabled() {
+        const configList = this.roomBaseServer.state.configList;
+        const isNoDelay = this.roomBaseServer.state.watchInitData.webinar.no_delay_webinar === 1;
+        return (
+          !configList['ui.hide_lottery'] && // 抽奖
+          !configList['ui.hide_sign_in'] && // 签到
+          !configList['ui.hide_survey'] && // 问卷
+          !configList['ui.is_hide_qa_button'] && // 问答
+          !configList['ui.show_redpacket'] && // 红包
+          !configList['webinar.timer'] && // 计时器
+          (isNoDelay || !configList['rebroadcast']) // 转播
+        );
       }
     }
   };
