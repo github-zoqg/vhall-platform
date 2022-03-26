@@ -79,7 +79,6 @@
           style="width: 280px"
           v-model="prizeNum"
           maxlength="4"
-          oninput="this.value=this.value.replace(/^(0+)|[^\d]+/g,'')"
           placeholder="请输入中奖人数"
         ></el-input>
         <div class="lottery-payment">
@@ -191,6 +190,9 @@
       },
       repeatWinning() {
         this.getLotteryCount();
+      },
+      prizeNum(val) {
+        this.prizeNum = `${val}`.replace(/^(0+)|[^\d]+/g, '');
       }
     },
     methods: {
