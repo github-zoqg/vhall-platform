@@ -836,6 +836,7 @@
           const miniElement = this.miniElement == 'insert-video' ? 'doc' : 'insert-video';
           this.roomBaseServer.setChangeElement(miniElement);
         }
+        window.vhallReportForProduct?.report(110135);
       },
       // video静音
       videoMute() {
