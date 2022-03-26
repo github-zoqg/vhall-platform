@@ -46,12 +46,13 @@
   </section>
 </template>
 <script>
-  import { useRoomBaseServer, useRecommendServer } from 'middle-domain';
+  import { useRoomBaseServer, useRecommendServer, useMenuServer } from 'middle-domain';
 
   export default {
     name: 'VmpRecommend',
     data() {
       return {
+        isActive: false, // 广告是否展示
         loading: false,
         advs: [],
         pos: 0,
@@ -106,10 +107,15 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.recommendServer = useRecommendServer();
+      this.menuServer = useMenuServer();
     },
     mounted() {
       this.setDefaultAdvs();
       this.listenEvents();
+
+      this.menuServer.$on('tab-switched', data => {
+        this.isActive = this.cuid === data.cuid;
+      });
     },
     beforeDestroy() {
       this.removeEvents();
@@ -140,9 +146,12 @@
         this.getAdsInfo();
       },
       onScrollStopForSubscribePage() {
+        if (!this.isActive) return;
         const currentY = document.body.clientHeight + window.scrollY;
         const fullY = document.body.scrollHeight;
-        const hasOverflowY = currentY === fullY;
+        const hasOverflowY = currentY >= fullY;
+
+        console.log('scroll action', currentY, fullY);
 
         if (!hasOverflowY) return;
         if (this.total !== 0 && this.pos >= this.total) return;
