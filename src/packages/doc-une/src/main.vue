@@ -348,7 +348,7 @@
           if (newval) {
             useRoomBaseServer().setChangeElement('player');
           } else {
-            useRoomBaseServer().setChangeElement('doc');
+            useRoomBaseServer().setChangeElement('');
           }
         }
       },
@@ -523,6 +523,7 @@
             console.log('[doc] VhallPlayer.ENDED');
             // 4-点播， 5-回放
             if ([4, 5].includes(this.webinarType)) {
+              // 设置文档不可见
               this.docServer.state.switchStatus = false;
             }
           });
