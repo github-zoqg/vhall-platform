@@ -149,6 +149,7 @@
         });
         // 浏览器或者页面关闭时上报
         window.addEventListener('beforeunload', function (e) {
+          console.log('home beforeunload------->', e);
           // 离开H5观看端页面
           if (/lives\/watch/.test(window.location.pathname)) {
             window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);

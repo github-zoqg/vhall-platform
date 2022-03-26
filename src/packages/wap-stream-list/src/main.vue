@@ -39,6 +39,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
+        v-if="roomBaseServer.state.watchInitData.pv.show"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>

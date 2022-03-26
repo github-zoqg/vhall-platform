@@ -9,6 +9,7 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
+  import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
   export default {
     name: 'Subcribe',
@@ -30,17 +31,18 @@
           clientType = 'embed';
         }
         await this.initReceiveLive(clientType);
+        // 是否跳转预约页
+        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
+          this.goWatchPage(clientType);
+        }
         await subscribeState();
+        bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
-        // 是否跳转预约页
-        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
-          this.goWatchPage(clientType);
-        }
 
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
