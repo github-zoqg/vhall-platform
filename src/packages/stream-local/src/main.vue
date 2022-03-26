@@ -700,7 +700,16 @@
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
         // 图片信息
-        console.warn('useMediaSettingServer', param, useMediaSettingServer().state);
+        console.warn(
+          'useMediaSettingServer',
+          param,
+          useMediaSettingServer().state,
+          this.micServer.getSpeakerStatus()
+        );
+        // 不在麦上直接return
+        if (!this.micServer.getSpeakerStatus()) {
+          return;
+        }
         // 音视频/图片推流 方式变更
         if (param.videoType || param.canvasImgUrl) {
           if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
