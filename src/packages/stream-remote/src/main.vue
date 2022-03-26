@@ -687,7 +687,7 @@
       &-role {
         display: inline-flex;
         height: 14px;
-        margin: 5px 4px 0 0;
+        margin-top: 5px;
         align-items: center;
 
         border-radius: 8px;
