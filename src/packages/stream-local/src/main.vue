@@ -1021,6 +1021,7 @@
           miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         }
         roomBaseServer.setChangeElement(miniElement);
+        window.vhallReportForProduct?.report(110135);
       },
       // 实时获取网路状况和麦克风能量
       getLevel() {
