@@ -371,6 +371,7 @@
         font-size: 14px;
         .el-checkbox__inner {
           background-color: transparent;
+          border: 1px solid #999;
         }
         &.iconfuxuankuang_yixuan {
           color: @font-error;
