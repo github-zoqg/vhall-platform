@@ -121,6 +121,9 @@
       //黄金链路配置
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
+      },
+      noLoginKey() {
+        return this.configList['ui.show_chat_without_login'];
       }
     },
     watch: {
@@ -128,6 +131,10 @@
         if (this.isBottom()) {
           this.scrollBottom();
         }
+      },
+      // 聊天免登录的配置项更改，重新计算是否需要登录聊天
+      noLoginKey() {
+        this.initLoginStatus();
       }
     },
     mounted() {

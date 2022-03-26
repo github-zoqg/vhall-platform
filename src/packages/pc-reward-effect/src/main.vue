@@ -416,7 +416,7 @@
       color: #ffffff;
       line-height: 24px;
       position: absolute;
-      top: 30px;
+      top: 27px;
       left: 55px;
       opacity: 0.8;
       // .ellipsis();
