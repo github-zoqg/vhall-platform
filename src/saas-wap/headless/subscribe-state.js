@@ -1,4 +1,9 @@
-import { useMsgServer, useRoomBaseServer, useUserServer } from 'middle-domain';
+import {
+  useMsgServer,
+  useRoomBaseServer,
+  useUserServer,
+  useVirtualAudienceServer
+} from 'middle-domain';
 import { getQueryString } from '@/packages/app-shared/utils/tool';
 
 export default async function () {
@@ -6,6 +11,7 @@ export default async function () {
   const roomBaseServer = useRoomBaseServer();
   const msgServer = useMsgServer();
   const userServer = useUserServer();
+  const virtualAudienceServer = useVirtualAudienceServer();
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
@@ -55,7 +61,7 @@ export default async function () {
       ]
     })
   ];
-
+  virtualAudienceServer.init();
   await Promise.all(promiseList);
 
   if (window.localStorage.getItem('token')) {

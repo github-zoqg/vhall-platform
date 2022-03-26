@@ -12,6 +12,7 @@
         <el-select
           class="vmp-media-setting-item__content"
           v-model="mediaState.audioOutput"
+          :placeholder="$t('form.form_1018')"
           @change="audioOutputChange"
         >
           <el-option

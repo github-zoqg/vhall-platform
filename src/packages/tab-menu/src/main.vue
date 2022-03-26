@@ -123,6 +123,10 @@
       isEmbed() {
         // 是不是嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      //活动信息
+      webinarInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
       }
     },
     watch: {
@@ -205,7 +209,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.isEmbed) {
+          if (!this.isEmbed && this.webinarInfo.webinar_state == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });

@@ -1,7 +1,7 @@
 <template>
-  <div class="icon-wrap" v-if="showIcon" @click="checkRedPacketIcon">
+  <div class="icon-wrap" v-if="redPacketServerState.iconVisible" @click="checkRedPacketIcon">
     <img src="./images/redPacket.png" alt="" />
-    <i class="dot" v-if="showDot" />
+    <i class="dot" v-if="redPacketServerState.dotVisible" />
   </div>
 </template>
 <script>
@@ -9,49 +9,25 @@
    * @description 红包的图标 + 小红点
    */
   import { useRedPacketServer } from 'middle-domain';
-  const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
     name: 'RedRepacketIcon',
+
     data() {
+      const redPacketServerState = this.redPacketServer.state;
       return {
-        showIcon: false, //显示图标
-        showDot: false, // 显示小红点
-        lastUUID: ''
+        redPacketServerState
       };
     },
     beforeCreate() {
       this.redPacketServer = useRedPacketServer({ mode: 'watch' });
     },
     created() {
-      this.initStatus();
-      this.redPacketServer.$on(RED_ENVELOPE_OK, this.handleNewRedPacket);
-    },
-    destroyed() {
-      this.redPacketServer.$off(RED_ENVELOPE_OK, this.handleNewRedPacket);
+      this.redPacketServer.initIconStatus();
     },
     methods: {
-      initStatus() {
-        const redPacketInfo = this.$domainStore.state.roomBaseServer.redPacket;
-        redPacketInfo.number * 1 == redPacketInfo.get_user_count * 1
-          ? this.redPacketServer.setAvailable(false)
-          : this.redPacketServer.setAvailable(true);
-        if (redPacketInfo.red_packet_uuid) {
-          this.redPacketServer.setUUid(redPacketInfo.red_packet_uuid);
-          this.lastUUID = redPacketInfo.red_packet_uuid;
-        }
-        if (redPacketInfo.status === '1') {
-          this.showIcon = true;
-          this.showDot = true;
-        }
-      },
       checkRedPacketIcon() {
-        this.$emit('clickIcon', this.lastUUID);
-        this.showDot = false;
-      },
-      handleNewRedPacket(msg) {
-        this.lastUUID = msg.red_packet_uuid;
-        this.showIcon = true;
-        this.showDot = true;
+        this.$emit('clickIcon');
+        this.redPacketServer.setDotVisible(false);
       }
     }
   };

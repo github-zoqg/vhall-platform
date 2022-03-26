@@ -245,20 +245,6 @@
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
             );
             break;
-          case 512526:
-            this.$message({
-              message: this.$t('common.common_1007'),
-              showClose: true,
-              // duration: 0,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            // this.chatSDK.destroy();
-            // this.chatSDK = null;
-            // setTimeout(() => {
-            //   window.location.reload();
-            // }, 1500);
-            break;
           case 512523:
             // 付费
             window.$middleEventSdk?.event?.send(

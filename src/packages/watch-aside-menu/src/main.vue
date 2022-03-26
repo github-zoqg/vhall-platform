@@ -231,8 +231,12 @@
         // 接收设为主讲人消息
         this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
           const str =
-            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-          this.groupMessage(`${msg.data.nick_name}设置成为${str}`, { type: 'success' });
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : this.$t('interact.interact_1034');
+          this.groupMessage(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }), {
+            type: 'success'
+          });
         });
 
         // 切换小组,小组人员变动
