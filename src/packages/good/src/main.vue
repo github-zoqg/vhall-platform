@@ -95,7 +95,8 @@
         // if (this.pagetype == 'watch') {
         const wrap = document.querySelector('.vh-goods');
         if (!wrap) return;
-        wrap.addEventListener('scroll', this.scrollLoadGoodsList);
+        console.log('商品.....');
+        window.addEventListener('scroll', this.scrollLoadGoodsList);
         // } else {
         // 分页
         // this.$VhallEventBus.$on(this.$VhallEventType.InteractTools.ROOM_GOODS_TURN_PAGE, () => {
@@ -105,12 +106,24 @@
         // }
       },
       scrollLoadGoodsList: debounce(function (e) {
+        /* console.log('商品滚动看看触发了没');
         const clientHeight = e.target.clientHeight;
         const scrollHeight = e.target.scrollHeight;
         const scrollTop = e.target.scrollTop;
         if (clientHeight + scrollTop >= scrollHeight) {
+          console.log('商品滚动看看触发了没111111');
           this.queryGoodsList();
-        }
+        } else {
+          console.log('商品滚动看看触发了没2222');
+        } */
+        const currentY = document.body.clientHeight + window.scrollY;
+        const fullY = document.body.scrollHeight;
+        const hasOverflowY = Math.floor(currentY) === Math.floor(fullY); // 排除小数位干扰
+        console.log('当前情况', currentY, fullY);
+        if (!hasOverflowY) return;
+        console.log('当前情况2', this.total, this.pos, this.total);
+        if (this.total !== 0 && this.pos >= this.total) return;
+        this.queryGoodsList();
       }, 300),
       filterDiscout(val) {
         if (val.indexOf('.') > -1) {
@@ -211,7 +224,7 @@
       // 移除滚动监听
       const wrap = document.querySelector('.vh-goods');
       if (wrap) {
-        wrap.removeEventListener('scroll', this.scrollLoadGoodsList);
+        window.removeEventListener('scroll', this.scrollLoadGoodsList);
       }
     }
   };

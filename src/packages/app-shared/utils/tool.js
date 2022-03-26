@@ -366,22 +366,19 @@ export const validEmail = (required, value, vueThis) => {
     return true;
   }
 };
-
 /**
- * 数字转成带金钱单位的数值
+ * 转化简介
  * @param {*} value
  * @returns
  */
-export const formatHotNum = value => {
-  value = parseInt(value);
-  let unit = '';
-  const k = 99999;
-  const sizes = ['', '万', '亿', '万亿'];
-  let i;
-  if (value > k) {
-    i = Math.floor(Math.log(value) / Math.log(k));
-    value = (value / Math.pow(k / 10, i)).toFixed(1);
-    unit = sizes[i];
-  }
-  return value + unit;
+export const replaceHtml = str => {
+  let desc = null;
+  desc = str.replace(/&nbsp;/g, '');
+  desc = desc
+    .replace(/<[^<>&]+>/g, '')
+    .replace(/&(lt|gt|nbsp|amp|quot|middot);/gi, '')
+    .replace(/(\r\n)|(\n)/g, '');
+  desc = desc.replace(/<[^>]+>/g, ''); // 截取html标签
+  desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
+  return desc;
 };
