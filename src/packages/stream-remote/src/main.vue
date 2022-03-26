@@ -482,6 +482,10 @@
         this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
+
+        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
+          window.vhallReportForProduct?.report(110133);
+        }
       },
       fullScreen() {
         if (!this.isFullScreen) {
@@ -514,6 +518,7 @@
           miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         }
         roomBaseServer.setChangeElement(miniElement);
+        window.vhallReportForProduct?.report(110135);
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -682,7 +687,7 @@
       &-role {
         display: inline-flex;
         height: 14px;
-        margin: 5px 4px 0 0;
+        margin-top: 5px;
         align-items: center;
 
         border-radius: 8px;

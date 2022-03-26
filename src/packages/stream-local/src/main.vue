@@ -617,7 +617,7 @@
           if (msg.data.type === 'vrtc_definition_set') {
             // 设备断开重连，重新检查device_status状态（主持人）
             if (+this.joinInfo.role_name === 1) {
-              await useMediaCheckServer().getMediaInputPermission();
+              await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: true });
             }
           }
           if (msg.data.event_type === 'group_switch_end') {
@@ -1021,6 +1021,7 @@
           miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         }
         roomBaseServer.setChangeElement(miniElement);
+        window.vhallReportForProduct?.report(110135);
       },
       // 实时获取网路状况和麦克风能量
       getLevel() {
@@ -1245,7 +1246,7 @@
       &-role {
         display: inline-flex;
         height: 14px;
-        margin: 5px 4px 0 0;
+        margin-top: 5px;
         align-items: center;
 
         border-radius: 8px;
