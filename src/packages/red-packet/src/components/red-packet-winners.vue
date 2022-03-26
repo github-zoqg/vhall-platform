@@ -26,7 +26,12 @@
         </span>
       </p>
       <div>
-        <ul ref="packetList" class="vhsaas-other__item">
+        <ul
+          ref="packetList"
+          class="vhsaas-other__item"
+          v-infinite-scroll="getRedPacketWinners"
+          :infinite-scroll-disabled="finished || loading"
+        >
           <li v-for="(item, index) in winners" :key="index">
             <img
               v-if="item.avatar"
@@ -93,16 +98,15 @@
         winners: [],
         queryParams: {
           page: 1,
-          size: 20
+          size: 10
         },
         loading: false,
-        lock: false // 滚动加载锁定(分页加载)
+        finished: false // 滚动加载锁定(分页加载)
       };
     },
     methods: {
       // 获取红包列表
       getRedPacketWinners() {
-        if (this.loading || this.lock) return false;
         this.loading = true;
         this.redPacketServer
           .getRedPacketWinners({
@@ -110,12 +114,13 @@
             limit: this.queryParams.size
           })
           .then(res => {
+            this.queryParams.page++;
             const list = res.data?.list;
             if (list.length) {
               this.winners = this.winners.concat(list);
             }
-            if (!list.length || list.length < this.queryParams.size) {
-              this.lock = true;
+            if (!list.length || this.winners.length >= res.data.count) {
+              this.finished = true;
             }
           })
           .finally(() => {

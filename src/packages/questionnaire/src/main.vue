@@ -255,7 +255,7 @@
         this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
           const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
           let text = this.$getRoleName(msg.room_role);
-          if (msg.room_role !== 1) {
+          if (msg.room_role != 1) {
             text = `${text}${msg.nick_name}`;
           }
           useChatServer().addChatToList({
@@ -352,20 +352,24 @@
           });
         detail.map(item => {
           if (item.style === 'name') {
-            window.vhallReportForProduct.report(110073, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110074 : 110075, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110073, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110074 : 110075, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'sex') {
-            window.vhallReportForProduct.report(110076, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110077 : 110078, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110076, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110077 : 110078, {
+                report_extra: { id: id }
+              });
             let num = 0;
             item.detail.list.forEach(items => {
               if (items.isAdd) {
@@ -373,78 +377,96 @@
               }
             });
             if (num) {
-              window.vhallReportForProduct.report(110079, {
-                report_extra: { id: id, other: num }
-              });
+              window.vhallReportForProduct &&
+                window.vhallReportForProduct.report(110079, {
+                  report_extra: { id: id, other: num }
+                });
             }
           }
           if (item.style === 'email') {
-            window.vhallReportForProduct.report(110080, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110081 : 110082, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110080, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110081 : 110082, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'area') {
-            window.vhallReportForProduct.report(110083, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110084 : 110085, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110083, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110084 : 110085, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'birthday') {
-            window.vhallReportForProduct.report(110092, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110093 : 110094, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110092, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110093 : 110094, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'company') {
-            window.vhallReportForProduct.report(110086, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110087 : 110088, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110086, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110087 : 110088, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'position') {
-            window.vhallReportForProduct.report(110089, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110090 : 110091, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110089, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110090 : 110091, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'industry') {
-            window.vhallReportForProduct.report(110095, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110096 : 110097, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110095, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110096 : 110097, {
+                report_extra: { id: id }
+              });
           }
           if (item.style === 'education') {
-            window.vhallReportForProduct.report(110098, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110099 : 110100, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110098, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110099 : 110100, {
+                report_extra: { id: id }
+              });
           }
           // 单选题
           if (item.type === 'radio') {
-            window.vhallReportForProduct.report(110101, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110104 : 110105, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(110102, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110101, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110104 : 110105, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110102, {
+                report_extra: { id: id }
+              });
             let nums = 0;
             item.detail.list.forEach(items => {
               if (items.isAdd) {
@@ -452,21 +474,25 @@
               }
             });
             if (nums > 0) {
-              window.vhallReportForProduct.report(110103, {
-                report_extra: { id: id, other: nums }
-              });
+              window.vhallReportForProduct &&
+                window.vhallReportForProduct.report(110103, {
+                  report_extra: { id: id, other: nums }
+                });
             }
           }
           if (item.type === 'checkbox') {
-            window.vhallReportForProduct.report(110106, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110109 : 110110, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(110107, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110106, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110109 : 110110, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110107, {
+                report_extra: { id: id }
+              });
             let len = 0;
             item.detail.list.forEach(items => {
               if (items.isAdd) {
@@ -474,24 +500,28 @@
               }
             });
             if (len > 0) {
-              window.vhallReportForProduct.report(110108, {
-                report_extra: { id: id, other: len }
-              });
+              window.vhallReportForProduct &&
+                window.vhallReportForProduct.report(110108, {
+                  report_extra: { id: id, other: len }
+                });
             }
           }
           // 问答
           if (item.type === 'text' && item.style === 'text') {
-            window.vhallReportForProduct.report(110111, {
-              report_extra: { id: id }
-            });
-            window.vhallReportForProduct.report(item.required === 'Y' ? 110112 : 110113, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110111, {
+                report_extra: { id: id }
+              });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(item.required === 'Y' ? 110112 : 110113, {
+                report_extra: { id: id }
+              });
           }
           if (item.type === 'remark') {
-            window.vhallReportForProduct.report(110114, {
-              report_extra: { id: id }
-            });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110114, {
+                report_extra: { id: id }
+              });
           }
         });
       },
@@ -528,8 +558,12 @@
                 customClass: 'zdy-info-box'
               });
             }
+            let questionCode = 110067;
+            if (this.shareQuestionnaire && confirm) {
+              questionCode = 110066;
+            }
             window.vhallReportForProduct &&
-              window.vhallReportForProduct.report(confirm ? 110066 : 110067, {
+              window.vhallReportForProduct.report(questionCode, {
                 report_extra: { id: this.questionnaireCreateInfo.id }
               });
             if (res.code === 200) {

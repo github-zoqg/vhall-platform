@@ -250,7 +250,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="player-encrypt" :style="`backgroundImage: url('${webinarsBgImg}')`">
+      <div class="player-encrypt">
         <div class="player-encrypt_box"></div>
         <img src="./img/jiami.png" alt="" class="player-encrypt_img" />
         <div class="player-encrypt_tip">
@@ -713,7 +713,7 @@
       &_box {
         height: 100%;
         width: 100%;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.8);
       }
       &_img {
         position: absolute;

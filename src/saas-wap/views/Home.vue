@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout" :class="{ 'vmp-basic-layout__noHeader': !showHeader }">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -25,7 +25,8 @@
 <script>
   import { Domain, useRoomBaseServer, useInviteServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
-  import { getVhallReportOs, browserType } from '@/packages/app-shared/utils/tool';
+  import { getVhallReportOs, browserType, replaceHtml } from '@/packages/app-shared/utils/tool';
+  import { initWeChatSdk, initHideChatSdk } from '@/packages/app-shared/utils/wechat';
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -36,8 +37,34 @@
     data() {
       return {
         state: 0,
+        // 分享信息
+        shareInfo: {
+          title: '',
+          img_url: '',
+          introduction: ''
+        },
         liveErrorTip: ''
       };
+    },
+    computed: {
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      }
     },
     beforeCreate() {
       this.inviteServer = useInviteServer();
@@ -65,15 +92,12 @@
         const isWechatBrowser = browserType();
         const isEmbed = clientType === 'embed';
         const hasInviteCode = this.$route.query.invite;
-
-        if (
-          isWechatBrowser &&
-          !isEmbed &&
-          hasInviteCode &&
-          open_id &&
-          roomBaseState.watchInitData.join_info
-        ) {
-          await this.bindInvite(this.$route.query.invite);
+        if (isWechatBrowser && !isEmbed && open_id && roomBaseState.watchInitData.join_info) {
+          if (hasInviteCode) {
+            await this.bindInvite(this.$route.query.invite);
+          } else {
+            await this.getShareSettingInfo();
+          }
         }
 
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
@@ -200,6 +224,55 @@
         return this.inviteServer.bindInvite({
           webinar_id: this.$route.params.id,
           invite: code
+        });
+      },
+      /**
+       * 微信分享信息
+       */
+      getShareSettingInfo() {
+        const roomBaseServer = useRoomBaseServer();
+        return roomBaseServer.getShareSettingInfo().then(res => {
+          if (res.code === 200) {
+            let title = res.data.title;
+            title = title.length - 30 > 0 ? title.substring(0, 30) : title;
+            this.shareInfo = {
+              title: title,
+              img_url: res.data.img_url,
+              introduction: replaceHtml(res.data.introduction)
+            };
+            this.wxShareInfo();
+          }
+        });
+      },
+      wxShareInfo() {
+        const roomBaseServer = useRoomBaseServer();
+        const configList = roomBaseServer.state.configList;
+        const address = location.href.split('#')[0];
+        return roomBaseServer.wechatShare({ wx_url: address }).then(res => {
+          if (res.code == 200 && res.data) {
+            const hideShare = configList ? configList['ui.watch_hide_share'] : 0;
+            const params = {
+              appId: res.data.appId,
+              timestamp: res.data.timestamp,
+              nonceStr: res.data.nonceStr,
+              signature: res.data.signature
+            };
+            const defaultImg =
+              'https://t-alistatic01.e.vhall.com/upload/sys/img_url/11/a9/11a95389258d3eed866fa4c0f189b199.jpg';
+            if (hideShare == 1) {
+              initHideChatSdk({ ...params });
+            } else {
+              initWeChatSdk(
+                { ...params },
+                {
+                  title: this.shareInfo.title,
+                  desc: this.shareInfo.introduction,
+                  link: address,
+                  imgUrl: this.shareInfo.img_url || defaultImg
+                }
+              );
+            }
+          }
         });
       }
     }

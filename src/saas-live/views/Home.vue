@@ -157,14 +157,11 @@
           }));
           await interactiveServer.init();
           window.$middleEventSdk?.event?.send(boxEventOpitons('layerRoot', 'checkStartPush'));
+          this.$message('分屏已关闭');
         });
         // 分屏页面关闭
         splitScreenServer.$on('SPLIT_SHADOW_CLOSE', async () => {
           this.$message('正在与分屏页面建立连接，请稍等...');
-        });
-        // 分屏页面关闭10s未重新连接
-        splitScreenServer.$on('SPLIT_CLOSE_TO_HOST', async () => {
-          this.$message('关闭分屏模式');
         });
         splitScreenServer.$on('SPLIT_CUSTOM_MESSAGE', msg => {
           // 分屏停止推流完成的消息

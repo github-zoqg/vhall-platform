@@ -27,40 +27,42 @@
       </p>
       <div>
         <ul ref="packetList" class="vhsaas-other__item">
-          <li v-for="(item, index) in winners" :key="index">
-            <img
-              v-if="item.avatar"
-              :src="item.avatar"
-              alt=""
-              :class="{
-                'vhall-img-max':
-                  redPacketInfo && redPacketInfo.type === 0 && item.amount_ranking == 1
-              }"
-            />
-            <img v-else src="../images/avatar_default@2x.png" alt="" />
-            <div>
-              <p>
-                <span class="vhsaas-red-packet__item__name">
-                  {{ item.nickname | overHidden(8) }}
-                </span>
-                <span class="vhsaas-red-packet__amount">
-                  <i>￥</i>
-                  {{ item.amount }}
-                </span>
-              </p>
-              <p>
-                <span class="vhsaas-red-packet__time">{{ item.created_at }}</span>
-                <span
-                  v-if="redPacketInfo.type === 0 && item.amount_ranking == 1"
-                  class="vhsaas-red-packet__quean"
-                >
-                  <i></i>
-                  {{ $t('interact_tools.interact_tools_1042') }}
-                </span>
-              </p>
-            </div>
-          </li>
-          <li v-if="winners.length == 0" class="nodata">{{ $t('webinar.webinar_1006') }}~</li>
+          <van-list v-model="loading" :finished="finished" @load="getRedPacketWinners">
+            <li v-for="(item, index) in winners" :key="index">
+              <img
+                v-if="item.avatar"
+                :src="item.avatar"
+                alt=""
+                :class="{
+                  'vhall-img-max':
+                    redPacketInfo && redPacketInfo.type === 0 && item.amount_ranking == 1
+                }"
+              />
+              <img v-else src="../images/avatar_default@2x.png" alt="" />
+              <div class="text-info">
+                <p>
+                  <span class="vhsaas-red-packet__item__name">
+                    {{ item.nickname | overHidden(8) }}
+                  </span>
+                  <span class="vhsaas-red-packet__amount">
+                    <i>￥</i>
+                    {{ item.amount }}
+                  </span>
+                </p>
+                <p>
+                  <span class="vhsaas-red-packet__time">{{ item.created_at }}</span>
+                  <span
+                    v-if="redPacketInfo.type === 0 && item.amount_ranking == 1"
+                    class="vhsaas-red-packet__quean"
+                  >
+                    <i></i>
+                    {{ $t('interact_tools.interact_tools_1042') }}
+                  </span>
+                </p>
+              </div>
+            </li>
+            <li v-if="winners.length == 0" class="nodata">{{ $t('webinar.webinar_1006') }}~</li>
+          </van-list>
         </ul>
       </div>
     </div>
@@ -85,24 +87,20 @@
         }
       }
     },
-    created() {
-      this.getRedPacketWinners();
-    },
     data() {
       return {
         winners: [],
         queryParams: {
           page: 1,
-          size: 20
+          size: 10
         },
         loading: false,
-        lock: false // 滚动加载锁定(分页加载)
+        finished: false // 滚动加载锁定(分页加载)
       };
     },
     methods: {
       // 获取红包列表
       getRedPacketWinners() {
-        if (this.loading || this.lock) return false;
         this.loading = true;
         this.redPacketServer
           .getRedPacketWinners({
@@ -110,12 +108,13 @@
             limit: this.queryParams.size
           })
           .then(res => {
+            this.queryParams.page++;
             const list = res.data?.list;
             if (list.length) {
               this.winners = this.winners.concat(list);
             }
-            if (!list.length || list.length < this.queryParams.size) {
-              this.lock = true;
+            if (!list.length || this.winners.length >= res.data.count) {
+              this.finished = true;
             }
           })
           .finally(() => {
@@ -128,6 +127,7 @@
     }
   };
 </script>
+<style lang="less" scoped></style>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
     width: 920px;
@@ -259,7 +259,7 @@
         border: 4px solid #ffb21f;
       }
     }
-    div {
+    .text-info {
       display: inline-block;
       vertical-align: middle;
       width: calc(100% - 68px);
