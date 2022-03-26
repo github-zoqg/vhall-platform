@@ -470,6 +470,13 @@
           status,
           receive_account_id: this.stream.accountId
         });
+        // 110136关闭    110137 开启
+        if (deviceType == 'video') {
+          window.vhallReportForProduct?.report(status == 1 ? 110137 : 110136);
+        } else {
+          // 110138 关闭    110139 开启
+          window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
+        }
       },
       speakOff() {
         this.micServer.speakOff({
