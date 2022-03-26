@@ -79,7 +79,6 @@
           style="width: 280px"
           v-model="prizeNum"
           maxlength="4"
-          oninput="this.value=this.value.replace(/^(0+)|[^\d]+/g,'')"
           placeholder="请输入中奖人数"
         ></el-input>
         <div class="lottery-payment">
@@ -191,6 +190,9 @@
       },
       repeatWinning() {
         this.getLotteryCount();
+      },
+      prizeNum(val) {
+        this.prizeNum = `${val}`.replace(/^(0+)|[^\d]+/g, '');
       }
     },
     methods: {
@@ -329,19 +331,24 @@
           params.command = this.participationPass;
         }
         this.startButtonDisabled = true;
+        const failure = err => {
+          console.error(err);
+          this.startButtonDisabled = false;
+          this.$message.warning(err.msg);
+        };
         this.lotteryServer
           .pushLottery(params)
           .then(res => {
             if (res.code === 200) {
               this.reportLottery();
               this.$emit('startLottery', res.data);
+              this.startButtonDisabled = false;
+            } else {
+              failure(res);
             }
-            this.startButtonDisabled = false;
           })
           .catch(err => {
-            console.error(err);
-            this.startButtonDisabled = false;
-            this.$message.warning(err.msg);
+            failure(err);
           });
       },
       // 大数据上报

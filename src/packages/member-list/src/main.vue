@@ -753,7 +753,9 @@
                   return;
                 }
                 _this.$message({
-                  message: _this.$t('message.message_1030', { n: msg.context.nickname }),
+                  message: _this.$t('message.message_1030', {
+                    n: msg.context.nickname || msg.context.nick_name
+                  }),
                   showClose: true,
                   // duration: 0,
                   type: 'success',
@@ -817,7 +819,7 @@
                   device_status: context.device_status,
                   device_type: context.device_type,
                   is_banned: Number(context.is_banned),
-                  nickname: context.nickname,
+                  nickname: context.nickname || context.nick_name,
                   role_name: context.role_name,
                   is_speak: speakIndex >= 0 ? 1 : 0,
                   is_apply: 0
@@ -830,7 +832,9 @@
                     return;
                   }
                   _this.$message({
-                    message: _this.$t('message.message_1030', { n: msg.context.nickname }),
+                    message: _this.$t('message.message_1030', {
+                      n: msg.context.nickname || msg.context.nick_name
+                    }),
                     showClose: true,
                     // duration: 0,
                     type: 'success',
@@ -908,7 +912,7 @@
             avatar: msg.data.avatar,
             device_status: msg.data.device_status,
             device_type: msg.data.device_type,
-            nickname: msg.data.nick_name,
+            nickname: msg.data.nick_name || msg.data.nickname,
             role_name: msg.data.room_role
           };
           const { member_info = { is_apply: 1 } } = msg.data;
@@ -1110,7 +1114,7 @@
             const flag = _this.onlineUsers.find(item => item.account_id == msg.sender_id);
             if (flag) return false;
             _this.onlineUsers.push({
-              nickname: msg.data.nickname,
+              nickname: msg.data.nickname || msg.data.nick_name,
               is_banned: msg.data.isBanned,
               account_id: msg.data.accountId,
               role_name: msg.data.role_name == 20 ? 2 : msg.data.role_name,
@@ -1268,7 +1272,7 @@
                     is_banned: msg.data.is_banned,
                     role_name: msg.data.join_role,
                     is_speak: speakIndex >= 0 ? 1 : 0,
-                    nickname: msg.data.nickname,
+                    nickname: msg.data.nickname || msg.data.nick_name,
                     is_apply: 0
                   });
                 }
@@ -1280,7 +1284,7 @@
                 is_banned: msg.data.is_banned,
                 role_name: msg.data.join_role,
                 is_speak: speakIndex >= 0 ? 1 : 0,
-                nickname: msg.data.nickname,
+                nickname: msg.data.nickname || msg.data.nick_name,
                 is_apply: 0
               };
               _this.onlineUsers.push(user);

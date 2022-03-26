@@ -617,7 +617,7 @@
           if (msg.data.type === 'vrtc_definition_set') {
             // 设备断开重连，重新检查device_status状态（主持人）
             if (+this.joinInfo.role_name === 1) {
-              await useMediaCheckServer().getMediaInputPermission();
+              await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: true });
             }
           }
           if (msg.data.event_type === 'group_switch_end') {

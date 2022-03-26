@@ -64,9 +64,11 @@
     },
     methods: {
       accept(msg) {
+        console.log(msg);
+        this.lotteryId = msg.lottery_id;
+        this.showWinnerList = !!msg.publish_winner;
         this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
           if (res.code === 200) {
-            this.showWinnerList = res.data.publish_winner;
             if (res.data.take_award === 0) {
               this.lotteryView = 'LotteryWin';
             } else {
@@ -83,6 +85,7 @@
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
           this.lotteryId = data.id;
+          this.showWinnerList = !!data.publish_winner;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
