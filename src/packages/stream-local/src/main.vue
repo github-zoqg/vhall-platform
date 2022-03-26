@@ -981,6 +981,13 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        // 110136关闭    110137 开启
+        if (deviceType == 'video') {
+          window.vhallReportForProduct?.report(status == 1 ? 110137 : 110136);
+        } else {
+          // 110138 关闭    110139 开启
+          window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
+        }
       },
       // 进入、退出全屏
       fullScreen() {

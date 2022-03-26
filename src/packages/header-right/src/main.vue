@@ -474,6 +474,7 @@
       // 设置默认回放
       async handleSetDefaultRecord() {
         try {
+          window.vhallReportForProduct?.report(110140);
           const res = await this.roomBaseServer.setDefaultRecord({
             webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
             record_id: this.popAlert._recordId,
