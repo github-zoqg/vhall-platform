@@ -71,11 +71,12 @@
         this.popAlertCheckVisible = true;
       },
       popAlertCheckSubmit() {
+        window.vhallReportForProduct?.report(110004); // 埋点:设备检测-立即检测
         this.popAlertCheckVisible = false;
         this.$emit('show');
       },
       async popAlertCheckClose() {
-        window.vhallReportForProduct && window.vhallReportForProduct.report(110005);
+        window.vhallReportForProduct?.report(110005); // 埋点:设备检测-暂不检测
         this.popAlertCheckVisible = false;
         await this.$nextTick();
         this.popAlertCheckConfirmVisible = true;
