@@ -861,7 +861,6 @@
   .new-qa {
     background: #f7f7f7;
     height: 100%;
-    min-height: 780px;
     .fl {
       float: left;
     }
