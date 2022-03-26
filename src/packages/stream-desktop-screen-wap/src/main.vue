@@ -1,5 +1,5 @@
 <template>
-  <div id="vmp-wap-desktop-screen" v-if="isShareScreen" :class="'vmp-wap-destop-screen__hide'">
+  <div id="vmp-wap-desktop-screen" v-show="isShareScreen" :class="'vmp-wap-destop-screen__hide'">
     <!-- 订阅桌面共享容器 -->
   </div>
 </template>
