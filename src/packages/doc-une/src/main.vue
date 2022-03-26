@@ -57,7 +57,7 @@
         <li
           v-if="hasPager"
           data-value="prevStep"
-          title="上一步"
+          :title="$t('account.account_1077')"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
         <li v-if="hasPager || webinarMode == 5" class="page-number">
@@ -68,7 +68,7 @@
         <li
           v-if="hasPager"
           data-value="nextStep"
-          title="下一步"
+          :title="$t('account.account_1036')"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-right"
         ></li>
         <li
@@ -235,9 +235,13 @@
       // 文档是否可见
       show() {
         // 1、发起端没有开启桌面共享时展示
-        // 2、观看端，主持人开启了观众可见或者在小组中或者有演示权限
+        // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
+        // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限
         return (
           (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
+          (this.roleName === 3 &&
+            this.desktopShareServer.state.localDesktopStreamId &&
+            this.docServer.state.currentCid) ||
           (this.isWatch &&
             (this.docServer.state.switchStatus ||
               this.groupServer.state.isInGroup ||
@@ -348,7 +352,8 @@
           if (newval) {
             useRoomBaseServer().setChangeElement('player');
           } else {
-            useRoomBaseServer().setChangeElement('doc');
+            // 文档不可见设置小屏''
+            useRoomBaseServer().setChangeElement('');
           }
         }
       },
@@ -468,31 +473,42 @@
       getDocViewRect() {
         let rect = { width: 0, height: 0 };
         if (this.isWatch) {
-          console.log('----this.isWatch-----');
+          // 观看端
           if (this.displayMode === 'mini') {
-            console.log('----is mini-----');
+            // 小屏
             rect = {
               width: 360,
               height: 204
             };
           } else {
+            // 大屏
             rect = this.$refs.docWrapper?.getBoundingClientRect();
-            if (rect.width === 0) {
-              const parentNode = this.$refs.docWrapper.parentNode;
-              if (parentNode) {
-                const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
-                rect = {
-                  width: cWidth,
-                  height: (cWidth / 16) * 9
-                };
-              }
-            }
           }
         } else {
-          rect =
-            this.displayMode === 'fullscreen'
-              ? this.$refs.docWrapper?.getBoundingClientRect()
-              : this.$refs.docContent?.getBoundingClientRect();
+          // 发起端
+          if (this.displayMode === 'mini') {
+            // 小屏
+            rect = {
+              width: 309,
+              height: 240
+            };
+          } else {
+            // 大屏
+            rect =
+              this.displayMode === 'fullscreen'
+                ? this.$refs.docWrapper?.getBoundingClientRect()
+                : this.$refs.docContent?.getBoundingClientRect();
+          }
+        }
+        if (rect.width === 0) {
+          const parentNode = this.$refs.docWrapper.parentNode;
+          if (parentNode) {
+            const cWidth = parseFloat(window.getComputedStyle(parentNode).width);
+            rect = {
+              width: cWidth,
+              height: (cWidth / 16) * 9
+            };
+          }
         }
         if (!rect.width || !rect.height) return rect;
         const { width, height } = rect;
@@ -523,6 +539,7 @@
             console.log('[doc] VhallPlayer.ENDED');
             // 4-点播， 5-回放
             if ([4, 5].includes(this.webinarType)) {
+              // 设置文档不可见
               this.docServer.state.switchStatus = false;
             }
           });

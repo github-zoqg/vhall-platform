@@ -2,7 +2,7 @@ import { useRoomBaseServer, useInviteServer } from 'middle-domain';
 import { browserType, getQueryString, replaceHtml } from '@/packages/app-shared/utils/tool';
 import { initWeChatSdk, initHideChatSdk } from '@/packages/app-shared/utils/wechat';
 
-export default async function () {
+export default function () {
   const roomBaseServer = useRoomBaseServer();
   const inviteServer = useInviteServer();
   const isEmbed = getQueryString('embedclient');
@@ -10,13 +10,18 @@ export default async function () {
   // 是否绑定邀请卡信息
   const open_id = sessionStorage.getItem('open_id');
   const isWechatBrowser = browserType();
-  const hasInviteCode = getQueryString('invite');
-  if (isWechatBrowser && !isEmbed && open_id && roomBaseServer.state.watchInitData.join_info) {
-    if (hasInviteCode) {
-      bindInvite(hasInviteCode);
-    } else {
-      getShareSettingInfo();
-    }
+  const inviteCode = getQueryString('invite');
+  if (
+    isWechatBrowser &&
+    !isEmbed &&
+    open_id &&
+    roomBaseServer.state.watchInitData.join_info &&
+    inviteCode
+  ) {
+    bindInvite(inviteCode);
+  }
+  if (isWechatBrowser && !isEmbed) {
+    getShareSettingInfo();
   }
 
   function bindInvite(code = '') {

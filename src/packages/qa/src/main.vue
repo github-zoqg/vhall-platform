@@ -153,7 +153,7 @@
             this.scrollBottom();
           } else if (this.roleName != 2 && !this.isBottom()) {
             this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.tipMsg = this.$t('chat.chat_1078');
           }
         });
         //监听问答回复消息
@@ -164,7 +164,7 @@
               msg.data.answer.is_open != '0')
           ) {
             this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.tipMsg = this.$t('chat.chat_1078');
             this.dispatch('VmpTabContainer', 'noticeHint', 'v5');
           }
         });
@@ -192,7 +192,7 @@
         }
         const isVod =
           (this.watchInitData.webinar.type == 5 || this.watchInitData.webinar.type == 4) &&
-          this.watchInitData.paas_record_id;
+          this.configList['ui.watch_record_no_chatting'] == 1;
         // 判断控制台回放禁言状态
         if (isVod) {
           this.inputStatus.disable = true;
