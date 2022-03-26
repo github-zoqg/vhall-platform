@@ -387,6 +387,11 @@
         //发送消息
         console.log('msg', curmsg);
         chatServer.sendMsg(curmsg);
+        //埋点上报
+        window.vhallReport?.report('CHAT', {
+          event: JSON.stringify(curmsg.data),
+          market_tools_id: this.joinInfo.role_name
+        });
         //清除当前消息
         chatServer.clearCurMsg();
         this.$emit('sendEnd');

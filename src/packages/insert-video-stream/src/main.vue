@@ -409,6 +409,8 @@
                 // 更改麦克风状态
                 this.insertFileServer.updateMicMuteStatusByInsert({ isStart: true });
                 interactiveServer.resetLayout();
+                // 设置旁路观看端大小屏
+                this.setDesktop('1');
               })
               .catch(() => {
                 this.$message.warning('插播推送失败，请重新选择');
@@ -542,6 +544,8 @@
           if (isliveStart) return;
           // 更改麦克风状态
           this.insertFileServer.updateMicMuteStatusByInsert({ isStart: false });
+          // 设置旁路观看端大小屏
+          this.setDesktop('0');
         });
       },
       // 销毁插播流
@@ -890,6 +894,12 @@
           document.mozCancelFullScreen();
         } else if (document.msExitFullscreen) {
           document.msExitFullscreen();
+        }
+      },
+      // 开始插播开启并且白板或者文档观众可见状态时观看端视频最大化
+      setDesktop(status) {
+        if (useDocServer().state.switchStatus) {
+          this.interactiveServer.setDesktop({ status });
         }
       }
     }

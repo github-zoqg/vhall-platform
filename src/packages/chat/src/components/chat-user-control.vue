@@ -160,10 +160,7 @@
           room_id: this.roomId
         };
         this.chatServer.setBanned(params);
-        this.buriedPointReport(110122, {
-          business_uid: this.userId,
-          webinar_id: this.$route.params.il_id
-        });
+        window.vhallReportForProduct?.report(110122);
       },
       /**
        * 踢出/取消踢出
@@ -199,10 +196,7 @@
               status: nextStatus
             };
             this.chatServer.setKicked(params).then(() => {
-              this.buriedPointReport(110123, {
-                business_uid: this.userId,
-                webinar_id: this.$route.params.il_id
-              });
+              window.vhallReportForProduct?.report(110123);
               EventBus.$emit('kicked_in_chat', { nextStatus, accountId: this.accountId });
             });
           })

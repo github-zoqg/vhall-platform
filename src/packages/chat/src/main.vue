@@ -15,6 +15,13 @@
       ref="chatContent"
       :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
+      <p
+        v-if="[1, '1'].includes(configList['ui.hide_chat_history']) && !chatList.length"
+        class="chat-content__get-list-btn-container"
+      >
+        <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
+      </p>
+
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
@@ -118,8 +125,6 @@
         //默认兜底头像
         defaultAvatar,
         /** domain中读取的数据 */
-        //配置列表
-        configList: {},
         //活动id 打开手动过滤地址需要
         webinarId: '',
         //直播的类型，直播，回放
@@ -209,6 +214,10 @@
       };
     },
     computed: {
+      //是否开启手动加载聊天历史记录
+      hideChatHistory() {
+        return [1, '1'].includes(this.configList['ui.hide_chat_history']);
+      },
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
@@ -234,6 +243,12 @@
           return chatItem?.welcome_content || '';
         }
         return '';
+      },
+      configList() {
+        return this.roomBaseServer.state.configList;
+      },
+      noLoginKey() {
+        return this.configList['ui.show_chat_without_login'];
       }
     },
     watch: {
@@ -241,6 +256,10 @@
         if (this.isBottom()) {
           this.scrollBottom();
         }
+      },
+      // 聊天免登录的配置项更改，重新计算是否需要登录聊天
+      noLoginKey() {
+        this.initChatLoginStatus();
       }
     },
     beforeCreate() {
@@ -259,7 +278,9 @@
       //初始化聊天区域滚动组件
       // this.initScroll();
       //拉取聊天历史
-      this.getHistoryMsg();
+      if (![1, '1'].includes(this.configList['ui.hide_chat_history'])) {
+        this.getHistoryMsg();
+      }
       //监听domain层chatServer通知
       this.listenChatServer();
 
@@ -277,10 +298,9 @@
       },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
+        const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         this.joinInfo = join_info;
-        this.configList = configList;
         this.webinarId = webinar.id;
         this.playerType = webinar.type;
         this.roomId = interact.room_id;
@@ -512,10 +532,7 @@
       },
       //回复消息
       reply(count) {
-        this.buriedPointReport(110119, {
-          business_uid: this.accountId,
-          webinar_id: this.$route.params.il_id
-        });
+        window.vhallReportForProduct?.report(110119);
         this.$refs.chatOperator.handleReply(count);
       },
       //todo domain负责 删除消息（主持人，助理）
@@ -532,22 +549,15 @@
         useChatServer()
           .deleteMessage(params)
           .then(res => {
-            this.buriedPointReport(110121, {
-              business_uid: this.accountId,
-              webinar_id: this.$route.params.il_id
-            });
+            window.vhallReportForProduct?.report(110121);
             return res;
           });
       },
       //todo domain负责 @用户
       //@用户处理
       atUser(accountId) {
-        //数据上报
-        this.buriedPointReport(110120, {
-          business_uid: this.accountId,
-          webinar_id: this.$route.params.il_id
-        });
         this.$refs.chatOperator.handleAtUser(accountId);
+        window.vhallReportForProduct?.report(110120);
       },
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;

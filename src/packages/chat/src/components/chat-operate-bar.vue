@@ -230,6 +230,7 @@
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         this.$emit('changeAllBanned', val);
+        window.vhallReportForProduct?.report(val ? 110116 : 110117);
       },
       //进入聊天审核
       joinChatAuth() {
