@@ -226,9 +226,9 @@
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {
         handler(newval) {
-          if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
-            return;
-          }
+          // if (this.mode == 3 && this.isNoDelay == 1 && !this.micServer.getSpeakerStatus()) {
+          //   return;
+          // }
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
@@ -245,12 +245,28 @@
     methods: {
       addEvents() {
         this.desktopShareServer.$on('screen_stream_add', () => {
-          this.subscribeStream();
-          this.interactiveServer.resetLayout();
+          this.subscribeStream().then(() => {
+            // 重置布局
+            useDocServer().resetLayoutByMiniElement();
+            // 设置旁路
+            this.interactiveServer.resetLayout();
+          });
         });
         this.desktopShareServer.$on('EVENT_STREAM_END', () => {
           this.setDesktop('0');
           this.interactiveServer.resetLayout();
+        });
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+            this.$message({
+              message: this.$t(`interact.interact_1013`),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            this.subscribeStream();
+          }
         });
 
         useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -318,12 +334,14 @@
       },
       // 订阅流
       subscribeStream() {
+        let videoNode = 'vmp-desktop-screen-subscribe';
+        document.getElementById(videoNode).innerHTML = '';
         const opt = {
-          videoNode: 'vmp-desktop-screen-subscribe', // 远端流显示容器，必填
+          videoNode, // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
 
-        this.desktopShareServer.subscribeDesktopShareStream(opt);
+        return this.desktopShareServer.subscribeDesktopShareStream(opt);
       },
       showConfirm() {
         if (!this.isShareScreen) {
@@ -359,7 +377,7 @@
                 this.setDesktop('1');
               })
               .catch(error => {
-                console.log(error, '推流失败');
+                console.log(error, this.$t('interact.interact_1021'));
               });
           })
           .catch(error => {

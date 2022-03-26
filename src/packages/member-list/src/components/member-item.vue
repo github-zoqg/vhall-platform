@@ -483,7 +483,13 @@
             this.userInfo.account_id != this.userId &&
             this.isInGroup &&
             this.userInfo.role_name != 20) ||
-          ([3, '3', 4, '4'].includes(this.roleName) && [2, '2'].includes(this.userInfo.role_name))
+          ([3, '3', 4, '4'].includes(this.roleName) &&
+            [2, '2'].includes(this.userInfo.role_name)) ||
+          (!this.isInGroup &&
+            this.roleName == '1' &&
+            this.userInfo.account_id == this.userId &&
+            this.userInfo.is_speak &&
+            this.mainScreen != this.userInfo.account_id)
         );
       },
       //发起端演示的是否是选中的用户
@@ -808,7 +814,7 @@
     font-size: 12px;
     overflow-x: hidden;
     &:hover {
-      background-color: #595959;
+      background-color: #333;
       .vmp-member-item__control {
         &__more {
           opacity: 1;
@@ -845,7 +851,7 @@
       vertical-align: middle;
       padding: 0 4px;
       font-size: 10px;
-      border-radius: 10px;
+      border-radius: 8px;
       &.host {
         background-color: rgba(252, 86, 89, 0.15);
         color: #fb3a32;
@@ -855,8 +861,8 @@
         color: #a6a6a6;
       }
       &.guest {
-        background-color: rgba(77, 161, 255, 0.15);
-        color: #4da1ff;
+        background: rgba(10, 127, 245, 0.2);
+        color: #0a7ff5;
       }
       &.leadercol {
         background-color: rgba(77, 161, 255, 0.15);
@@ -904,6 +910,7 @@
         height: 13px;
         vertical-align: middle;
         margin-left: 3px;
+        padding: 2px 4px;
         color: #cccccc;
         font-size: 12px;
         opacity: 0;
@@ -958,7 +965,7 @@
     right: 8px;
     z-index: 2;
     width: 96px;
-    background-color: #fff !important;
+    background: #383838 !important;
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
     box-shadow: 0 1px 9px 0 rgb(0 0 0 / 20%);
@@ -967,16 +974,19 @@
     box-sizing: border-box;
     cursor: pointer;
 
+    .popper__arrow {
+      display: none;
+    }
     .el-dropdown-menu__item {
       height: 28px;
-      color: #666;
+      color: #ccc;
       text-align: center;
       line-height: 28px;
       padding: 0;
       margin: 3px 0;
       &:hover {
-        background-color: #fb3a32;
-        color: #fff;
+        background-color: #444;
+        color: #e6e6e6;
       }
     }
     .is-disabled {

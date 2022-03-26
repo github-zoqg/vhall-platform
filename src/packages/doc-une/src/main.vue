@@ -588,9 +588,6 @@
           }
         });
 
-        // 文档容器选择事件
-        this.docServer.$on('dispatch_doc_select_container', this.dispatchDocSelectContainer);
-
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
       },
@@ -604,35 +601,6 @@
           // 向下翻页
           this.handlePage('nextStep');
         }
-      },
-      /**
-       * 新增文档或白板
-       * @param {*} fileType
-       * @param {*} docId
-       * @param {*} docType
-       */
-      async addNewFile({ fileType, docId, docType, cid }) {
-        const { width, height } = this.getDocViewRect();
-        console.log(
-          '[doc] addNewFile:',
-          JSON.stringify({
-            width,
-            height,
-            fileType,
-            cid,
-            docId,
-            docType
-          })
-        );
-        await this.docServer.addNewDocumentOrBorad({
-          width,
-          height,
-          fileType,
-          cid,
-          docId,
-          docType
-        });
-        this.resize();
       },
       /**
        *  刷新或者退出重进恢复上次的文档
@@ -709,7 +677,7 @@
             this.resize();
           } else {
             // 白板不存在自动新建一个
-            this.addNewFile({ fileType: 'board' });
+            this.docServer.addNewFile({ fileType: 'board' });
           }
         }
       },
@@ -751,7 +719,7 @@
           });
         }
         this.docServer.state.containerList = boardItem ? [boardItem] : [];
-        await this.addNewFile({ fileType: 'document', docId, docType });
+        await this.docServer.addNewFile({ fileType: 'document', docId, docType });
       },
       /**
        * 页面操作工具
@@ -817,6 +785,14 @@
        */
       changeBrush(brush) {
         this.canMove = brush === 'move';
+      },
+
+      /**
+       * 重新设置当前画笔
+       */
+      resetCurrentBrush() {
+        console.log('---resetCurrentBrush---');
+        this.$refs.docToolbar.resetCurrentBrush();
       },
 
       /**
@@ -903,27 +879,6 @@
           return;
         }
       },
-      // 选中文档容器事件
-      dispatchDocSelectContainer: async function (data) {
-        console.log('[doc] ===========选择容器======', data);
-        if (this.currentCid == data.id) {
-          return;
-        }
-        // 判断容器是否存在
-        const currentItem = this.docServer.state.containerList.find(item => item.cid === data.id);
-        if (currentItem) {
-          this.docServer.activeContainer(data.id);
-        } else {
-          const { id: cid, docId } = data;
-          const fileType = this.currentType;
-          if (fileType === 'document' && !docId) {
-            // 文档id没有
-            console.log('[doc] 文档id没有 cid:', cid);
-            return;
-          }
-          this.addNewFile({ fileType, docId, cid });
-        }
-      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
@@ -952,7 +907,6 @@
       }
     },
     beforeDestroy() {
-      this.docServer.$off('dispatch_doc_select_container', this.dispatchDocSelectContainer);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       window.removeEventListener('keydown', this.listenKeydown);
     }

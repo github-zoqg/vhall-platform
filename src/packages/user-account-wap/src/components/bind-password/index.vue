@@ -188,11 +188,11 @@
                 window.location.reload();
               });
             } else {
-              this.$$toast(this.$tes(res.code) || res.msg);
+              this.$toast(this.$tec(res.code) || res.msg);
             }
           })
           .catch(err => {
-            this.$$toast(this.$tes(err.code) || err.msg);
+            this.$toast(this.$tec(err.code) || err.msg);
           });
       }
     }

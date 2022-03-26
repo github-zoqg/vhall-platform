@@ -193,7 +193,6 @@ export default {
     login_1030: 'Consentimiento y cumplimiento',
     login_1031: 'Condiciones de servicio'
   },
-  undefined: {},
   register: {
     register_1001: 'Bienvenida a registrarse Vhall en vivo',
     register_1002: 'Registrar un nuevo usuario',
@@ -479,8 +478,7 @@ export default {
     interact_tools_1069: 'Pago con alipay',
     interact_tools_1070: 'El monto admite hasta dos decimales',
     interact_tools_1071: 'Envía tu clave xxx y participa en el sorteo',
-    interact_tools_1072: 'QR en la imagen',
-    interact_tools_1075: 'Aplaudir'
+    interact_tools_1072: 'QR en la imagen'
   },
   setting: {
     setting_1002: 'Configuración de la vista',
@@ -515,7 +513,7 @@ export default {
   },
   message: {
     message_1001:
-      'El patrocinador ha configurado una función de encriptación de video,\r\nSe recomienda utilizar la última versión del navegador Chrome para ver',
+      'El patrocinador ha configurado una función de encriptación de video,\nSe recomienda utilizar la última versión del navegador Chrome para ver',
     message_1002: 'No se admite la indicación de encriptación de video',
     message_1003: 'La cuenta ha visto esta actividad en otros dispositivos',
     message_1004: '¡Este video está fuera de línea!',
@@ -525,12 +523,12 @@ export default {
     message_1008:
       '¡El sitio de la actividad está demasiado animado y el número de personas ha excedido el límite superior!',
     message_1009:
-      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\r\nSe recomienda borrar las cookies del navegador antes de visitar ~',
+      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\nSe recomienda borrar las cookies del navegador antes de visitar ~',
     message_1010: 'La red se está agotando',
     message_1011:
-      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\r\nversión, se recomienda utilizar el navegador Chrome para ver ~',
+      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\nversión, se recomienda utilizar el navegador Chrome para ver ~',
     message_1012:
-      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\r\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
+      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
     message_1013: 'Falta la página, el ingeniero está en camino ...',
     message_1014: 'Transcodificación de video',
     message_1015: 'Falló la validación del valor K, a punto de saltar',
@@ -692,7 +690,7 @@ export default {
     interact_1010: 'Negar',
     interact_1011:
       'La conexión al micrófono se interrumpió debido a un problema con el dispositivo, por favor, verifique el dispositivo',
-    interact_1012: '{n} está configurado como presentador principal',
+    interact_1012: '{n} está configurado como {m}',
     interact_1013:
       'Falló la suscripción de compartir escritorio debido a problemas de red, vuelve a suscribirse',
     interact_1014:
@@ -713,7 +711,7 @@ export default {
   },
   doc: {
     doc_1001: 'Este documento en carga',
-    doc_1002: 'Presentador sin documentos añadidos',
+    doc_1002: 'Presentador sin documentos añadidos\n\n',
     doc_1003: 'El presentador prepara la documentación',
     doc_1004: 'Este documentación está fuera de línea',
     doc_1005: 'Amplificación',
@@ -768,6 +766,6 @@ export default {
     webinar_1038: 'Compartir el éxito',
     webinar_1039: 'Reserva'
   },
-  color: {},
-  other: {}
+  other: {},
+  undefined: {}
 };

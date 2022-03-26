@@ -446,13 +446,13 @@
       .el-form-item {
         margin-bottom: 16px;
         &.vhsaas-box__msg__error__bottom {
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
         &.is-error {
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
         &.vhsaas-box__msg__error {
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
       }
       @phone-color: #1a1a1a;

@@ -222,6 +222,9 @@
           this.joinInfo.third_party_user_id == this.mainScreen;
         return _flag;
       },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组
@@ -229,7 +232,8 @@
           !this.isInGroup &&
           this.is_host_in_group &&
           this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
-          !this.isShowMainScreen
+          !this.isShowMainScreen &&
+          !this.isShareScreen
         );
       },
       hotNum() {
@@ -283,7 +287,7 @@
       // 设置主画面
       setBigScreen(msg) {
         const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-        Toast(`${msg.data.nick_name}设置成为${str}`);
+        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
         this.$nextTick(() => {
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
@@ -295,7 +299,7 @@
       addSDKEvents() {
         // 监听到自动播放
         this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
-          console.log('自动播放失败------', e);
+          console.warn('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
         });

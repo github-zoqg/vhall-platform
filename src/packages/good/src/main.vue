@@ -464,9 +464,9 @@
             }
           }
           &:hover {
-            .name {
+            /*  .name {
               color: #fb3a32;
-            }
+            } */
             .other-info div .buy {
               background: #fb3a32;
               color: #fff;

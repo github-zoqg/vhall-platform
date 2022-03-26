@@ -422,18 +422,6 @@
       },
 
       /**
-       * 切换某个菜单tab的可视性
-       * @param {*} cuid
-       * @param {*} menuId [非必传]
-       * @example toggleVisible('comChatWap','')
-       */
-      toggleVisible({ type, id }) {
-        const tab = this.getItem({ type, id });
-        if (!tab) return;
-
-        tab.visible = !tab.visible;
-      },
-      /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
        * @param {String} cuid cuid
@@ -564,15 +552,16 @@
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
+      border-bottom: 1px solid #d4d4d4;
 
-      &::before {
+      /*  &::before {
         content: '';
         position: absolute;
         bottom: 0;
         width: 100%;
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
-      }
+      } */
 
       .vmp-tab-menu-page-btn {
         position: relative;

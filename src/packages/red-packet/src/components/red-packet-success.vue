@@ -349,14 +349,6 @@
       }
     }
   }
-  .vhsaas-other-return {
-    font-size: 11px;
-    color: #ffffff;
-    margin-top: 20px;
-    display: block;
-    margin-left: 22px;
-    cursor: pointer;
-  }
   /* 看看大家的手气 */
   .vhsaas-other-unit {
     font-size: 34px;

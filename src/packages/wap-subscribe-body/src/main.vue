@@ -41,7 +41,7 @@
         </template>
       </template>
     </div>
-    <template v-if="showBottomBtn">
+    <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
         <div
           class="vmp-subscribe-body-auth-two"
@@ -115,7 +115,8 @@
           is_subscribe: 0,
           actual_start_time: '',
           show: 1,
-          num: 0
+          num: 0,
+          hide_subscribe: 1
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
@@ -298,9 +299,6 @@
             this.authInfo.placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
             this.isSubscribeShow = true;
             break;
-          case 512526:
-            this.$toast(this.$t('common.common_1007'));
-            break;
           case 512523:
             // 付费
             if (browserType()) {
@@ -329,7 +327,7 @@
             this.handlePay(params);
             break;
           default:
-            this.$toast(this.$tes(code) || msg);
+            this.$toast(this.$tec(code) || msg);
             break;
         }
       },
@@ -399,7 +397,7 @@
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
             window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
           } else {
-            this.$toast(this.$tes(res.code) || res.msg);
+            this.$toast(this.$tec(res.code) || res.msg);
           }
         });
       },

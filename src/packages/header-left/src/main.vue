@@ -41,34 +41,10 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.webinarInfo = watchInitData.webinar;
     },
-    mounted() {
-      // this.initConfig();
-    },
     methods: {
       // 负责roomId
       handleCopy() {
-        window.vhallReportForProduct.report({
-          k: 110000,
-          data: {
-            business_uid: this.webinarInfo.userinfo.user_id,
-            webinar_id: this.webinarInfo.id,
-            user_id: '',
-            report_extra: {}
-          }
-        });
-        // this.$vhall_paas_port({
-        //   k: 110000,
-        //   data: {
-        //     business_uid: this.userInfo.third_party_user_id,
-        //     user_id: '',
-        //     webinar_id: this.webinar_id,
-        //     refer: '',
-        //     s: '',
-        //     report_extra: {},
-        //     ref_url: '',
-        //     req_url: ''
-        //   }
-        // });
+        window.vhallReportForProduct.report(110000);
         const clipboard = new Clipboard('.vhall-room-id-copy');
         clipboard.on('success', () => {
           this.$message({

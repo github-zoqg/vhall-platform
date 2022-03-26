@@ -51,6 +51,7 @@
             v-show="![6, '6'].includes(question.type)"
             v-for="(question, quesIndex) in list"
             :key="question.id"
+            class="tab-content-li"
           >
             <p class="title-text">
               <span v-if="!!question.is_must" class="star" style="font-family: monospace">*</span>
@@ -146,20 +147,28 @@
             <!-- 下拉 -->
             <template v-if="question.type === 4">
               <div class="select-box">
-                <div class="select-xl">
-                  <select
-                    :ref="question.id"
-                    @change="onValidate(question)"
-                    v-model="form[question.id]"
-                    class="select-item"
-                  >
-                    <option value disabled selected hidden>{{ $t('form.form_1018') }}</option>
-                    <option v-for="option in question.items" :key="option.id">
-                      {{ option.subject }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
+                <custom-select-picker
+                  :ref="question.id"
+                  v-model="form[question.id]"
+                  @change="onValidate(question)"
+                  :placeholder="$t('form.form_1018')"
+                  :columns="question.items"
+                  :option="{ label: 'subject', value: 'id' }"
+                ></custom-select-picker>
+                <!--                <div class="select-xl">-->
+                <!--                  <select-->
+                <!--                    :ref="question.id"-->
+                <!--                    @change="onValidate(question)"-->
+                <!--                    v-model="form[question.id]"-->
+                <!--                    class="select-item"-->
+                <!--                  >-->
+                <!--                    <option value disabled selected hidden>{{ $t('form.form_1018') }}</option>-->
+                <!--                    <option v-for="option in question.items" :key="option.id">-->
+                <!--                      {{ option.subject }}-->
+                <!--                    </option>-->
+                <!--                  </select>-->
+                <!--                  <label class="select-arrow"></label>-->
+                <!--                </div>-->
               </div>
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
@@ -167,59 +176,66 @@
             </template>
             <!-- 地域选择 -->
             <template v-if="question.type === 5">
-              <!-- 省 -->
-              <div class="select-box">
-                <div class="select-xl">
-                  <select
-                    :ref="question.id"
-                    @change="onValidate(question)"
-                    v-model="province"
-                    class="select-item"
-                  >
-                    <option value disabled selected hidden>{{ $t('form.form_1004') }}</option>
-                    <option v-for="opt in provinces" :key="opt.value" :value="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
-              </div>
-              <!-- 市 -->
-              <div class="select-box" v-if="question.options.show_city == 1">
-                <div class="select-xl">
-                  <select @change="onValidate(question)" v-model="city" class="select-item">
-                    <option value disabled selected hidden>{{ $t('form.form_1005') }}</option>
-                    <option v-for="opt in currentCityList" :key="opt.value" :value="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
-              </div>
-              <!-- 区 -->
-              <div class="select-box" v-if="question.options.show_district == 1">
-                <div class="select-xl">
-                  <select @change="onValidate(question)" v-model="county" class="select-item">
-                    <option value disabled selected hidden>{{ $t('form.form_1006') }}</option>
-                    <option v-for="opt in currentCountyList" :key="opt.value" :value="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <label class="select-arrow"></label>
-                </div>
-              </div>
+              <custom-cascade
+                :ref="question.id"
+                v-model="cascadeResultList"
+                @change="handleCascadeChange(question)"
+                :placeholder="$t('form.form_1018')"
+                :options="getCascadeOptions(question)"
+              ></custom-cascade>
+              <!--              &lt;!&ndash; 省 &ndash;&gt;-->
+              <!--              <div class="select-box">-->
+              <!--                <div class="select-xl">-->
+              <!--                  <select-->
+              <!--                    :ref="question.id"-->
+              <!--                    @change="onValidate(question)"-->
+              <!--                    v-model="province"-->
+              <!--                    class="select-item"-->
+              <!--                  >-->
+              <!--                    <option value disabled selected hidden>{{ $t('form.form_1004') }}</option>-->
+              <!--                    <option v-for="opt in provinces" :key="opt.value" :value="opt.value">-->
+              <!--                      {{ opt.label }}-->
+              <!--                    </option>-->
+              <!--                  </select>-->
+              <!--                  <label class="select-arrow"></label>-->
+              <!--                </div>-->
+              <!--              </div>-->
+              <!--              &lt;!&ndash; 市 &ndash;&gt;-->
+              <!--              <div class="select-box" v-if="question.options.show_city == 1">-->
+              <!--                <div class="select-xl">-->
+              <!--                  <select @change="onValidate(question)" v-model="city" class="select-item">-->
+              <!--                    <option value disabled selected hidden>{{ $t('form.form_1005') }}</option>-->
+              <!--                    <option v-for="opt in currentCityList" :key="opt.value" :value="opt.value">-->
+              <!--                      {{ opt.label }}-->
+              <!--                    </option>-->
+              <!--                  </select>-->
+              <!--                  <label class="select-arrow"></label>-->
+              <!--                </div>-->
+              <!--              </div>-->
+              <!--              &lt;!&ndash; 区 &ndash;&gt;-->
+              <!--              <div class="select-box" v-if="question.options.show_district == 1">-->
+              <!--                <div class="select-xl">-->
+              <!--                  <select @change="onValidate(question)" v-model="county" class="select-item">-->
+              <!--                    <option value disabled selected hidden>{{ $t('form.form_1006') }}</option>-->
+              <!--                    <option v-for="opt in currentCountyList" :key="opt.value" :value="opt.value">-->
+              <!--                      {{ opt.label }}-->
+              <!--                    </option>-->
+              <!--                  </select>-->
+              <!--                  <label class="select-arrow"></label>-->
+              <!--                </div>-->
+              <!--              </div>-->
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
               </p>
             </template>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div id="setCaptcha1" class="captcha">
               <input v-model.trim="form.imgCode" type="text" />
             </div>
             <p class="err-msg" v-show="errorMsgShow">{{ $t('account.account_1028') }}</p>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div>
               <input
                 type="number"
@@ -242,7 +258,7 @@
             </div>
             <p v-show="!!errMsgMap.code" class="err-msg">{{ errMsgMap.code }}</p>
           </li>
-          <li v-if="privacy">
+          <li v-if="privacy" class="tab-content-li">
             <div class="provicyBox clearfix" @click="handleClickPrivacy(privacy)">
               <i
                 class="privicyitem vh-iconfont vh-line-check"
@@ -252,7 +268,7 @@
             </div>
             <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
           </li>
-          <li>
+          <li class="tab-content-li">
             <button @click="submit" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1019') }}
             </button>
@@ -260,7 +276,7 @@
         </ul>
         <!--验证码表单-->
         <ul v-show="activeTab === 2" class="vmp-wap-sign-up-form__content__tab-content">
-          <li>
+          <li class="tab-content-li">
             <p class="title-text">
               <span class="star" style="font-family: monospace">*</span>
               <span class="label">{{ $t('form.form_1081') }}</span>
@@ -274,13 +290,13 @@
             />
             <p class="err-msg" v-show="errPhone">{{ errPhoneMsg }}</p>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div id="setCaptcha2" class="captcha">
               <input style="margin-top: 0" v-model.trim="verifyForm.imgCode" type="text" />
             </div>
             <p class="err-msg" v-show="errorMsgShow">{{ $t('account.account_1028') }}</p>
           </li>
-          <li v-if="isPhoneValidate">
+          <li v-if="isPhoneValidate" class="tab-content-li">
             <div>
               <input
                 type="number"
@@ -303,7 +319,7 @@
             </div>
             <p v-show="errCode" class="err-msg">{{ errCode }}</p>
           </li>
-          <li>
+          <li class="tab-content-li">
             <button @click="submitVerify" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1082') }}
             </button>
@@ -332,8 +348,14 @@
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
   import { useSignUpFormServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import customSelectPicker from './components/customSelectPicker';
+  import customCascade from './components/customCascade';
   export default {
     name: 'VmpWapSignUpForm',
+    components: {
+      customSelectPicker,
+      customCascade
+    },
     data() {
       return {
         //活动id
@@ -348,6 +370,8 @@
         },
         //表单模板
         form: {},
+        //地域的级联选择器保存的值
+        cascadeResultList: [],
         //默认的banner图
         defaultHeader: defaultHeader,
         //初始化的活动类型
@@ -490,23 +514,47 @@
       currentCityList() {
         return this.cityList[this.province];
       },
-      //当前的国家列表
+      //当前的区域列表
       currentCountyList() {
         return this.countyList[this.city];
+      },
+      //获取级联选择器数据
+      getCascadeOptions() {
+        return function (question) {
+          let list = this.provinces || [];
+          const { show_city, show_district } = question?.options || {};
+          if (show_city == 1) {
+            list = (list || []).map(item => {
+              item.children = Array.isArray(this.cityList[item.value])
+                ? this.cityList[item.value]
+                : [];
+              if (show_district == 1) {
+                item.children = (item.children || []).map(cityItem => {
+                  cityItem.children = Array.isArray(this.countyList[cityItem.value])
+                    ? this.countyList[cityItem.value]
+                    : [];
+                  return cityItem;
+                });
+              }
+              return item;
+            });
+            return list;
+          }
+        };
       }
     },
     watch: {
-      province(newVal, oldVal) {
-        if (newVal != oldVal) {
-          this.city = '';
-          this.county = '';
-        }
-      },
-      city(newVal, oldVal) {
-        if (newVal != oldVal) {
-          this.county = '';
-        }
-      },
+      // province(newVal, oldVal) {
+      //   if (newVal != oldVal) {
+      //     this.city = '';
+      //     this.county = '';
+      //   }
+      // },
+      // city(newVal, oldVal) {
+      //   if (newVal != oldVal) {
+      //     this.county = '';
+      //   }
+      // },
       isPhoneValidate: {
         immediate: true,
         handler(newVal) {
@@ -591,6 +639,7 @@
           .then(res => {
             this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
             this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+            this.cascadeResultList = [];
             this.wxShareInfo(res.data.webinar);
           })
           .catch(error => {
@@ -604,7 +653,6 @@
         const params = {
           webinar_id: this.webinar_id
         };
-        console.log(2);
         this.signUpFormServer.getFormBaseInfo(params).then(res => {
           if (res.data.tab_form_title) {
             res.data.tab_form_title =
@@ -696,7 +744,6 @@
         this.signUpFormServer
           .getAreaList()
           .then(res => {
-            console.log(_this.cityList, _this.countyList);
             _this.$set(_this, 'provinces', res.provinces);
             _this.$set(_this, 'cityList', res.cities);
             _this.$set(_this, 'countyList', res.counties);
@@ -778,6 +825,19 @@
         }
 
         this.privacyText = text;
+      },
+      //级联选择器选中处理
+      handleCascadeChange(question) {
+        const { show_city, show_district } = question?.options || {};
+        const list = (this.cascadeResultList || []).map(option => option.value);
+        this.province = list[0] || '';
+        if (show_city == 1) {
+          this.city = list[1] || '';
+        }
+        if (show_district == 1) {
+          this.county = list[2] || '';
+        }
+        this.onValidate(question);
       },
       //提交报名表单
       submit() {
@@ -880,7 +940,7 @@
                 `/lives/watch/${this.webinar_id}${queryString}`;
               // this.$router.push(`/lives/watch/${this.webinar_id}`)
             } else {
-              this.$toast(this.$tes(err.code) || err.msg);
+              this.$toast(this.$tec(err.code) || err.msg);
             }
           });
       },
@@ -1347,6 +1407,8 @@
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;
+                //清空一下级联的选中的数组
+                this.cascadeResultList = [];
               }
             })
             .catch(err => {
@@ -1491,7 +1553,7 @@
         }
       }
       &__tab-content {
-        li {
+        .tab-content-li {
           margin-top: 0.52rem;
           position: relative;
           margin-bottom: 0.02rem;
@@ -1499,6 +1561,14 @@
             margin-top: 90px;
           }
         }
+        //li {
+        //  margin-top: 0.52rem;
+        //  position: relative;
+        //  margin-bottom: 0.02rem;
+        //  &:last-child {
+        //    margin-top: 90px;
+        //  }
+        //}
         input {
           // line-height: 1.04rem !important;
           height: 1.04rem;

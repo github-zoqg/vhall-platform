@@ -696,7 +696,7 @@ export default {
     interact_1009: '同意',
     interact_1010: '拒绝',
     interact_1011: '因设备问题导致连麦中断，请检查设备',
-    interact_1012: '{n}设置成为主讲人',
+    interact_1012: '{n}设置成为{m}',
     interact_1013: '因网络问题订阅桌面共享失败，正在重新订阅',
     interact_1014: '因网络问题订阅用户{n}失败，正在重新订阅',
     interact_1015: '打开麦克风',
@@ -715,7 +715,9 @@ export default {
     interact_1028: '您已下麦',
     interact_1029: '上麦席位已满员，您的账号支持{n}人上麦',
     interact_1030: '{n}已下麦',
-    interact_1031: '{n}邀请您上麦'
+    interact_1031: '{n}邀请您上麦',
+    interact_1033: '主画面',
+    interact_1034: '主讲人'
   },
   doc: {
     doc_1001: '文档加载中',

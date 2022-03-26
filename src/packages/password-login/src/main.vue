@@ -34,7 +34,7 @@
               v-show="[1, '1'].includes(webinarInfo.webinar_state)"
               class="header-content__tag live"
             >
-              <img src="img/live-white.gif" alt="" />
+              <img src="./img/live-white.gif" alt="" />
               <label>
                 {{ $t('直播')
                 }}{{
@@ -104,7 +104,7 @@
           ]"
         >
           <img v-if="webinarInfo.img_url" :src="webinarInfo.img_url" alt="背景图" />
-          <img v-else src="img/code-login__img.png" alt="背景图" />
+          <img v-else src="./img/code-login__img.png" alt="背景图" />
         </div>
         <div class="vmp-password-login__main-wrap__form">
           <div

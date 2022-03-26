@@ -12,6 +12,7 @@
     useGroupServer,
     useDesktopShareServer
   } from 'middle-domain';
+  import { Toast } from 'vant';
 
   export default {
     name: 'VmpWapDesktopScreen',
@@ -39,8 +40,10 @@
     methods: {
       // 订阅桌面共享流
       subscribeDesktopScreen() {
+        let videoNode = 'vmp-wap-desktop-screen';
+        document.getElementById(videoNode).innerHTML = '';
         const opt = {
-          videoNode: 'vmp-wap-desktop-screen', // 远端流显示容器，必填
+          videoNode, // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
         this.desktopShareServer.subscribeDesktopShareStream(opt);
@@ -53,6 +56,13 @@
         // 监听桌面共享或者插播流离开
         this.desktopShareServer.$on('screen_stream_remove', () => {
           this.desktopShareServer.unSubscribeDesktopShareStream();
+        });
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+            Toast(this.$t(`interact.interact_1013`));
+            this.subscribeDesktopScreen();
+          }
         });
       }
     }

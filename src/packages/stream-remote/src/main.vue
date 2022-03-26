@@ -18,7 +18,7 @@
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
     <section
-      v-if="isShowNetError && !stream.streamId"
+      v-if="isShowNetError && !stream.streamId && isInstanceInit"
       class="vmp-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
@@ -70,7 +70,10 @@
           {{ stream.attributes.roleName | roleFilter }}
         </span>
 
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -82,7 +85,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -121,7 +127,7 @@
         </el-tooltip>
 
         <!-- 主持人和组长不能互相下麦 -->
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             v-if="isShowDownMicBtn"
@@ -136,7 +142,10 @@
         v-if="joinInfo.role_name == 1 || groupRole == 20"
         class="vmp-stream-remote__shadow-first-line"
       >
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -148,7 +157,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -190,7 +202,7 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             v-show="isShowDownMicBtn"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
@@ -248,6 +260,9 @@
       }
     },
     computed: {
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       liveMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -347,6 +362,11 @@
     },
     created() {
       this.listenEvents();
+      setTimeout(() => {
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
+      }, 5000);
     },
     mounted() {},
     beforeDestroy() {
@@ -358,8 +378,8 @@
         clearInterval(this._netWorkStatusInterval);
       }
 
-      useMsgServer().$offMsg('JOIN', this.handleUserJoin.bind(this));
-      useMsgServer().$offMsg('LEFT', this.handleUserLeave.bind(this));
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
       listenEvents() {
@@ -379,18 +399,30 @@
           true
         );
 
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.stream.streamId) {
+            this.$message({
+              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            this.subscribeRemoteStream();
+          }
+        });
+
         // 加入房间
         useMsgServer().$onMsg('JOIN', this.handleUserJoin);
         useMsgServer().$onMsg('LEFT', this.handleUserLeave);
       },
 
+      // 监听离开加入房间事件，显示网络异常占位图
       handleUserJoin(msg) {
         if (msg.sender_id == this.stream.accountId) {
           this.isShowNetError = false;
         }
       },
       handleUserLeave(msg) {
-        console.error('sss', msg);
         if (msg.sender_id == this.stream.accountId) {
           this.isShowNetError = true;
         }
@@ -405,10 +437,12 @@
         this.interactiveServer.state.showPlayIcon = false;
       },
       subscribeRemoteStream() {
+        let videoNode = `stream-${this.stream.streamId}`;
+        document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
-          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
 
@@ -614,10 +648,10 @@
       flex-direction: column;
       .net-error-img {
         width: 25px;
-        height: 18px;
+        height: 19px;
         margin-bottom: 1px;
         background-image: url('./img/net-error.png');
-        background-size: cover;
+        background-size: contain;
         background-repeat: no-repeat;
       }
       & > p {

@@ -124,7 +124,10 @@
       <!--信息面板-->
       <div class="vmp-member-list__operate-container__info-panel">
         <i class="vh-saas-iconfont vh-saas-a-line-Onlinelist"></i>
-        <span class="info-panel__online-num" v-if="isShowBtn(configList['ui.hide_host_nums'])">
+        <span
+          class="info-panel__online-num"
+          v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
+        >
           {{ totalNum | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
@@ -1375,7 +1378,7 @@
       updateOnlineUserList: _.throttle(function () {
         this.onlineUsers = [];
         this.getOnlineUserList();
-      }, 1500),
+      }, 2000),
       //获取在线人员列表
       getOnlineUserList(pos) {
         const _this = this;
@@ -2039,12 +2042,12 @@
           margin-right: 1px;
           & > input:checked + i em {
             border-color: #ff9446;
-            left: 22px;
+            left: 14px;
             transition: all 0.1s ease-in-out;
           }
           & > i {
             display: inline-block;
-            width: 30px;
+            width: 26px;
             height: 14px;
             background-color: #242527;
             border-radius: 100px;

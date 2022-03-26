@@ -231,8 +231,12 @@
         // 接收设为主讲人消息
         this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
           const str =
-            this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-          this.groupMessage(`${msg.data.nick_name}设置成为${str}`, { type: 'success' });
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : this.$t('interact.interact_1034');
+          this.groupMessage(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }), {
+            type: 'success'
+          });
         });
 
         // 切换小组,小组人员变动
@@ -342,6 +346,11 @@
               this.groupMessage('演示权限已变更');
             }
           }
+          if (this.presenterId === this.userId) {
+            // 如果结束后演示者是自己，说明是演示权限回收
+            // 通知文档重设笔刷, 后面可以考虑当前笔刷放到文档server中
+            window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitDocResetBrush'));
+          }
         });
       },
 
@@ -400,7 +409,7 @@
             .needHelp()
             .then(res => {
               if (res.code == 200) {
-                this.groupMessage('请求协助发送成功', { type: 'success' });
+                this.groupMessage(this.$t('other.other_1005'), { type: 'success' });
               }
             })
             .catch(err => {

@@ -105,7 +105,7 @@
         roomBaseServer,
         timerVisible: false,
         time: 0,
-        totleTimeNum: 60,
+        totalTimeNum: 60,
         is_timeout: false,
         is_all_show: false,
         status: 'pause',
@@ -118,24 +118,24 @@
     computed: {
       timeStatus() {
         const timeStr =
-          this.totleTimeNum < 60
-            ? `${this.totleTimeNum}${this.$t('appointment.appointment_1029')}`
-            : `${parseInt(this.totleTimeNum / 60)}${this.$t('appointment.appointment_1028')}${
-                this.totleTimeNum % 60
+          this.totalTimeNum < 60
+            ? `${this.totalTimeNum}${this.$t('appointment.appointment_1029')}`
+            : `${parseInt(this.totalTimeNum / 60)}${this.$t('appointment.appointment_1028')}${
+                this.totalTimeNum % 60
               }${this.$t('appointment.appointment_1029')}`;
         // console.log(timeStr);
         let statusStr = '';
         if (this.status == 'end') {
           // '已结束';
-          statusStr = this.$t('interact_tools.interact_tools_1056');
+          statusStr = this.$t('webinar.webinar_1008');
         } else if (this.status == 'pause') {
           // '已暂停';
-          statusStr = this.$t('interact_tools.interact_tools_1055');
+          statusStr = this.$t('webinar.webinar_1007');
         } else {
           // '进行中...';
-          statusStr = this.$t('interact_tools.interact_tools_1057');
+          statusStr = this.$t('webinar.webinar_1009');
         }
-        return `${timeStr} ${this.$t('interact_tools.interact_tools_1054')} ${statusStr}`;
+        return `${timeStr} ${statusStr}`;
       },
       // 是否为嵌入页
       embedObj() {
@@ -169,7 +169,7 @@
       // 计时器开始
       timer_start(e) {
         this.time = e.data.duration;
-        this.totleTimeNum = e.data.duration || 70;
+        this.totalTimeNum = e.data.duration || 70;
         this.is_timeout = e.data.is_timeout;
         this.is_all_show = e.data.is_all_show;
         this.timeFormat(this.time);
@@ -215,7 +215,7 @@
         if (JSON.stringify(this.timerInfo) != '{}') {
           const resData = this.timerInfo;
           this.time = resData.remain_time;
-          this.totleTimeNum = resData.duration;
+          this.totalTimeNum = resData.duration;
           this.is_timeout = resData.is_timeout;
           this.is_all_show = resData.is_all_show;
           if (resData.duration == -3599) return false;

@@ -237,11 +237,17 @@
       initEvent() {
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.CREATE, data => {
           this.questionnaireCreateInfo = data;
+          this.setReportData(data);
+          window.vhallReportForProduct &&
+            window.vhallReportForProduct.report(110062, {
+              report_extra: { id: data.id }
+            });
           this.saveDialogVisible = true;
           this.shareQuestionnaire = true;
           this.saving = false;
         });
-        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.UPDATE, res => {
+        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.UPDATE, (res, data) => {
+          this.setReportData(data);
           if (res.code === 200) {
             this.initPage();
           }
@@ -319,6 +325,176 @@
         this.prevQuestionnaireId = null;
         this.questionnaireServer.renderCreatQuestionnaire(selector, id);
       },
+      setReportData(data) {
+        const { id, title, description, detail, imgUrl } = data;
+        const playback_filling = JSON.parse(data.extension).playback_filling;
+        if (title !== '问卷标题') {
+          window.vhallReportForProduct &&
+            window.vhallReportForProduct.report(110068, {
+              report_extra: { id: id }
+            });
+        }
+        if (description !== '问卷简介') {
+          window.vhallReportForProduct &&
+            window.vhallReportForProduct.report(110069, {
+              report_extra: { id: id }
+            });
+        }
+        if (imgUrl) {
+          window.vhallReportForProduct &&
+            window.vhallReportForProduct.report(110070, {
+              report_extra: { id: id }
+            });
+        }
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(playback_filling == 1 ? 110071 : 110072, {
+            report_extra: { id: id }
+          });
+        detail.map(item => {
+          if (item.style === 'name') {
+            window.vhallReportForProduct.report(110073, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110074 : 110075, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'sex') {
+            window.vhallReportForProduct.report(110076, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110077 : 110078, {
+              report_extra: { id: id }
+            });
+            let num = 0;
+            item.detail.list.forEach(items => {
+              if (items.isAdd) {
+                num++;
+              }
+            });
+            if (num) {
+              window.vhallReportForProduct.report(110079, {
+                report_extra: { id: id, other: num }
+              });
+            }
+          }
+          if (item.style === 'email') {
+            window.vhallReportForProduct.report(110080, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110081 : 110082, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'area') {
+            window.vhallReportForProduct.report(110083, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110084 : 110085, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'birthday') {
+            window.vhallReportForProduct.report(110092, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110093 : 110094, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'company') {
+            window.vhallReportForProduct.report(110086, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110087 : 110088, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'position') {
+            window.vhallReportForProduct.report(110089, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110090 : 110091, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'industry') {
+            window.vhallReportForProduct.report(110095, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110096 : 110097, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.style === 'education') {
+            window.vhallReportForProduct.report(110098, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110099 : 110100, {
+              report_extra: { id: id }
+            });
+          }
+          // 单选题
+          if (item.type === 'radio') {
+            window.vhallReportForProduct.report(110101, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110104 : 110105, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(110102, {
+              report_extra: { id: id }
+            });
+            let nums = 0;
+            item.detail.list.forEach(items => {
+              if (items.isAdd) {
+                nums++;
+              }
+            });
+            if (nums > 0) {
+              window.vhallReportForProduct.report(110103, {
+                report_extra: { id: id, other: nums }
+              });
+            }
+          }
+          if (item.type === 'checkbox') {
+            window.vhallReportForProduct.report(110106, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110109 : 110110, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(110107, {
+              report_extra: { id: id }
+            });
+            let len = 0;
+            item.detail.list.forEach(items => {
+              if (items.isAdd) {
+                len++;
+              }
+            });
+            if (len > 0) {
+              window.vhallReportForProduct.report(110108, {
+                report_extra: { id: id, other: len }
+              });
+            }
+          }
+          // 问答
+          if (item.type === 'text' && item.style === 'text') {
+            window.vhallReportForProduct.report(110111, {
+              report_extra: { id: id }
+            });
+            window.vhallReportForProduct.report(item.required === 'Y' ? 110112 : 110113, {
+              report_extra: { id: id }
+            });
+          }
+          if (item.type === 'remark') {
+            window.vhallReportForProduct.report(110114, {
+              report_extra: { id: id }
+            });
+          }
+        });
+      },
       /**
        * @description 预览问卷
        */
@@ -326,6 +502,10 @@
         const selector = '#qn-server-box';
         this.showQuestionnaireTable = false;
         this.prevQuestionnaireId = id;
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(110063, {
+            report_extra: { id: id }
+          });
         this.questionnaireServer.renderQuestionnaire4Watch(selector, id);
       },
       /**
@@ -348,6 +528,10 @@
                 customClass: 'zdy-info-box'
               });
             }
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(confirm ? 110066 : 110067, {
+                report_extra: { id: this.questionnaireCreateInfo.id }
+              });
             if (res.code === 200) {
               // 数据有延迟
               const st = setTimeout(() => {
@@ -396,6 +580,10 @@
             type: res.code == 200 ? 'success' : 'error',
             message: res.msg
           });
+          window.vhallReportForProduct &&
+            window.vhallReportForProduct.report(110064, {
+              report_extra: { id: id }
+            });
           if (res.code == 200) {
             this.queryQuestionnaireList(true);
           }
@@ -415,6 +603,10 @@
               type: res.code == 200 ? 'success' : 'error',
               message: res.msg
             });
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110065, {
+                report_extra: { id: id }
+              });
             if (res.code == 200) {
               this.queryQuestionnaireList(true);
             }

@@ -22,7 +22,7 @@
 
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import roomState from '../headless/room-state.js';
+  import roomState, { isMSECanUse } from '../headless/room-state.js';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   export default {
@@ -50,6 +50,13 @@
         }
         const domain = await this.initReceiveLive(this.clientType);
         await roomState();
+        // 是否跳转预约页
+        if (
+          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+        ) {
+          this.goSubscribePage(this.clientType);
+        }
         const roomBaseServer = useRoomBaseServer();
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
@@ -75,14 +82,24 @@
         );
         window.vhallReport.report('ENTER_WATCH');
         console.log('%c---初始化直播房间 完成', 'color:blue');
-        this.state = 1;
-        // 是否跳转预约页
+        // 如果加密状态为 1 或者 2
+        // 并且是点播或者回放
+        // 需要判断当前浏览器是否支持 MSE
         if (
-          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+          roomBaseServer.state.watchInitData.webinar &&
+          (roomBaseServer.state.watchInitData.webinar.type == 4 ||
+            roomBaseServer.state.watchInitData.webinar.type == 5) &&
+          roomBaseServer.state.watchInitData.record.encrypt_status == 2
         ) {
-          this.goSubscribePage(this.clientType);
+          if (!isMSECanUse()) {
+            this.state = 2;
+            this.errorData.errorPageTitle = 'encrypt_error';
+            this.errorData.errorPageText =
+              '主办方设置了视频加密功能，建议使用最新版Chrome浏览器观看';
+            return false;
+          }
         }
+        this.state = 1;
         this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
@@ -97,6 +114,9 @@
         this.state = 2;
         this.errorData.errorPageTitle = 'it_end';
       });
+    },
+    beforeDestroy() {
+      window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
     },
     methods: {
       initReceiveLive(clientType) {
@@ -125,16 +145,39 @@
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
         });
+        // 浏览器或者页面关闭时上报
+        window.addEventListener('beforeunload', function (e) {
+          // 离开H5观看端页面
+          if (/lives\/watch/.test(window.location.pathname)) {
+            window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
+          }
+        });
       },
       handleKickout() {
         this.state = 2;
         this.handleErrorCode({
           code: 512514,
-          msg: '您已被禁止访问当前活动'
+          msg: this.$t('message.message_1007')
         });
       },
       handleErrorCode(err) {
+        let currentQuery = location.search;
         switch (err.code) {
+          case 512534:
+            window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
+            break;
+          case 512502: // 不支持的活动类型（flash）
+          case 512503: // 不支持的活动类型（旧H5）
+            currentQuery =
+              currentQuery.indexOf('nickname=') != -1
+                ? currentQuery.replace('nickname=', 'name=')
+                : currentQuery;
+            currentQuery =
+              currentQuery.indexOf('record_id=') > -1
+                ? currentQuery.replace('record_id=', 'rid=')
+                : currentQuery;
+            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+            break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了
             break;
@@ -164,7 +207,7 @@
             break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
-            this.errorData.errorPageText = err.msg || err.message;
+            this.errorData.errorPageText = this.$tec(err.code) || err.message;
         }
       }
     }

@@ -150,6 +150,13 @@ export const serverConfig = {
         method: 'showConfirm',
         args: ['$0']
       }
+    ],
+    // 触发画笔重置
+    emitDocResetBrush: [
+      {
+        cuid: 'comDocUne',
+        method: 'resetCurrentBrush'
+      }
     ]
   },
   comStreamList: {

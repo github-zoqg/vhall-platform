@@ -12,11 +12,7 @@
       </div>
       <!-- 文案 -->
       <h1>
-        {{
-          (redPacketInfo && redPacketInfo.describe
-            ? $t(redPacketInfo.describe) || $t('interact_tools.interact_tools_1032')
-            : $t('interact_tools.interact_tools_1032')) | overHidden(8)
-        }}
+        {{ $tdefault(redPacketInfo.describe) | overHidden(8) }}
       </h1>
       <img
         v-if="redPacketInfo && redPacketInfo.avatar"
@@ -66,14 +62,12 @@
         }
         const available = this.redPacketServer.state.available;
         if (available) {
-          this.redPacketServer.openRedPacket().then(res => {
-            if (res.code === 200) {
-              this.opened = true;
-              const st = setTimeout(() => {
-                clearTimeout(st);
-                this.$emit('navTo', 'RedPacketSuccess');
-              }, 1000);
-            }
+          this.redPacketServer.openRedPacket().finally(() => {
+            this.opened = true;
+            const st = setTimeout(() => {
+              clearTimeout(st);
+              this.$emit('navTo', 'RedPacketSuccess');
+            }, 1000);
           });
         } else {
           this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {

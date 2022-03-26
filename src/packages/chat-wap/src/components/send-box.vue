@@ -2,7 +2,7 @@
   <div class="vmp-send-box" :class="[className]">
     <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
-      <div class="user-avatar-wrap" v-if="!isEmbed && isShowUser">
+      <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
           <img class="avatar-img" :src="avatar" srcset />
         </div>
@@ -161,16 +161,10 @@
         //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
-        //是否展示用户头像
-        isShowUser: false,
         connectMicShow: false, // 连麦入口按钮
         disabledAll: false, // 全员禁言
         //活动信息
         webinar: {},
-        //是否已经登录
-        isLogin: false,
-        //用户头像
-        avatar: require('../img/default_avatar.png'),
         handUpStatus: false,
         //只看我的问答
         isShowMyQA: false
@@ -248,6 +242,14 @@
           (this.webinar.type == 5 || this.webinar.type == 4) &&
           this.configList['ui.watch_record_no_chatting'] == 1
         );
+      },
+      avatar() {
+        const avatar = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.avatar;
+        return avatar || require('../img/default_avatar.png');
+      },
+      isLogin() {
+        const user_id = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
+        return user_id != 0;
       }
     },
     watch: {
@@ -275,8 +277,6 @@
       this.connectMicShow = this.isHandsUp;
       // 初始全员禁言状态
       this.disabledAll = this.isAllBanned;
-      // 判断登录
-      this.checkIsLogin();
       // eventBus监听
       this.eventListener();
 
@@ -306,20 +306,6 @@
         const { webinar = {} } = watchInitData;
         this.webinar = webinar;
       },
-      // 判断登录
-      checkIsLogin() {
-        const { userInfo = {} } = this.userServer.state;
-        // 若用户已经登录
-        if (Object.keys(userInfo).length) {
-          this.isLogin = true;
-          // 若用户已经登录过，获取userInfo
-          this.isShowUser = true;
-          this.avatar = userInfo.avatar || require('../img/default_avatar.png');
-        } else {
-          this.isLogin = false;
-          this.isShowUser = false;
-        }
-      },
       // eventBus监听
       eventListener() {
         // 直播结束不展示连麦入口
@@ -333,9 +319,9 @@
         });
 
         // 头像更新
-        this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
-          this.avatar = avatar;
-        });
+        // this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
+        //   this.avatar = avatar;
+        // });
       },
       saySomething() {
         if (

@@ -1,5 +1,5 @@
 <template>
-  <div class="base-box" v-if="!groupInitData.isInGroup">
+  <div class="base-box" v-if="!groupInitData.isInGroup && !showDoc">
     <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+  import { useMenuServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import lotteryIcon from './components/lottery-icon/index.vue';
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
@@ -37,7 +38,8 @@
       return {
         showTimer: false,
         timerVisible: true,
-        showSign: false
+        showSign: false,
+        showDoc: false
       };
     },
     computed: {
@@ -54,6 +56,15 @@
         }
       }
     },
+    mounted() {
+      useMenuServer().$on('tab-switched', async data => {
+        if ('comDocWap' === data.cuid) {
+          this.showDoc = true;
+        } else {
+          this.showDoc = false;
+        }
+      });
+    },
     methods: {
       changeStatus(data, status) {
         // console.log(data, status, 'data, status');
@@ -68,10 +79,8 @@
       handleSign() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
-      handleRedPacket(red_packet_uuid) {
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitOpenRedPacket', [red_packet_uuid])
-        );
+      handleRedPacket() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       },
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));

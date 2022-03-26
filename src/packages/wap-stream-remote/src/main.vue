@@ -14,7 +14,7 @@
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
     <section
-      v-if="isShowNetError && !stream.streamId"
+      v-if="isShowNetError && !stream.streamId && isInstanceInit"
       class="vmp-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
@@ -49,8 +49,9 @@
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import { Toast } from 'vant';
   export default {
     name: 'VmpWapStreamRemote',
     data() {
@@ -83,6 +84,9 @@
       }
     },
     computed: {
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -144,10 +148,13 @@
       this.micServer = useMicServer();
     },
     created() {
-      // 上麦后到推流成功有一段时间，此时会根据没有streamId显示网络异常，根据产品需求，暂定延迟3s显示，3s后还没有流就显示网络异常
       setTimeout(() => {
-        this.isShowNetError = true;
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
       }, 5000);
+
+      this.listenEvents();
     },
     beforeDestroy() {
       // 清空计时器
@@ -157,20 +164,58 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
+
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      listenEvents() {
+        useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+        useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+
+        // 订阅失败
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.stream.streamId) {
+            Toast(this.$t(`interact.interact_1014`, { n: this.stream.nickname }));
+            this.subscribeRemoteStream();
+          }
+        });
+      },
+      // 监听离开加入房间事件，显示网络异常占位图
+      handleUserJoin(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = false;
+        }
+      },
+      handleUserLeave(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = true;
+        }
+      },
       subscribeRemoteStream() {
         console.log('开始订阅', JSON.stringify(this.stream));
+        let videoNode = `stream-${this.stream.streamId}`;
+        document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
-          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.warn('订阅成功---------', e);
+            try {
+              if (document.querySelector(`#stream${e.streamId}`)) {
+                document.querySelector(`#stream${e.streamId}`).play();
+              }
+              if (document.querySelector(`#stream${e.streamId}`)) {
+                document.querySelector(`#stream${e.streamId}`).play();
+              }
+            } catch (error) {
+              console.error('业务自行--- 播放失败----------', error);
+            }
             this.getLevel();
           })
           .catch(e => {

@@ -1,6 +1,7 @@
 <template>
-  <div class="rank-wrapbox" :class="{ 'rank-preview-box': pagetype == 'subscribe' }">
+  <div class="rank-wrapbox" :class="{ 'rank-preview-box': isSubscribe }">
     <div v-if="info.inSwitch == 1 || info.rewardSwitch == 1" class="rank-previewbox">
+      <!-- 顶部区域 -->
       <header class="ranking-title">
         <div class="rank-menu">
           <span
@@ -21,13 +22,14 @@
         <div class="rank-rule" @click="changeRulesShow">
           {{ activeTab == 'invite' ? $t('nav.nav_1034') : $t('nav.nav_1035') }}
           <span
-            class="iconfont rank-icon"
-            :class="{ iconjiantou_shouqi: !showRules, iconjiantou_zhankai: showRules }"
+            class="vh-iconfont rank-icon"
+            :class="[showRules ? 'vh-line-arrow-up' : 'vh-line-arrow-down']"
           ></span>
         </div>
       </header>
 
-      <div v-show="showRules" class="ranking-box watch-area">
+      <!-- 规则浮窗 -->
+      <section v-show="showRules" class="ranking-box watch-area">
         <div v-show="activeTab === 'invite'" class="rank-con" v-html="info.inContent"></div>
         <div v-show="activeTab === 'invite' && !info.inContent" class="rank-con center">
           {{ $t('nav.nav_1036') }}
@@ -40,10 +42,17 @@
         <div v-show="activeTab === 'award' && !info.rewardContent" class="rank-con center">
           {{ $t('nav.nav_1036') }}
         </div>
-      </div>
+      </section>
 
-      <div class="rank-band">
-        <div v-show="activeTab === 'invite'" class="band-list">
+      <!-- 正文区域 -->
+      <main
+        class="rank-band"
+        v-loading="loading"
+        element-loading-text="加载中"
+        element-loading-background="rgba(0,0,0,0)"
+      >
+        <!-- 邀请榜 -->
+        <section v-show="activeTab === 'invite'" class="band-list">
           <template v-if="inviteRankList.length > 0">
             <div v-for="(item, index) in inviteRankList" :key="index" class="rank-item">
               <img
@@ -81,12 +90,14 @@
               {{ bottomText }}
             </div>
           </template>
-          <template v-else>
+          <template v-else-if="!loading">
             <img class="default-icon" src="../assets/imgs/empty-pay.png" alt="" />
             <span class="default-tip">{{ $t('nav.nav_1038') }}</span>
           </template>
-        </div>
-        <div v-show="activeTab == 'award'" class="band-list">
+        </section>
+
+        <!-- 打赏榜 -->
+        <section v-show="activeTab == 'award'" class="band-list">
           <template v-if="awardRankList.length > 0">
             <div v-for="(item, index) in awardRankList" :key="index" class="rank-item">
               <img
@@ -106,7 +117,7 @@
               <span class="num">
                 <i18n path="interact_tools.interact_tools_1073">
                   <span style="color: #fb3a32" place="n">
-                    ¥{{item.reward_amount | filterAmount)}}
+                    ¥{{ item.reward_amount | filterAmount }}
                   </span>
                 </i18n>
                 <!-- 打赏
@@ -122,22 +133,23 @@
               {{ bottomText }}
             </div>
           </template>
-          <template v-else>
+          <template v-else-if="!loading">
             <img class="default-icon" src="../assets/imgs/empty-reward.png" alt />
             <span class="default-tip">{{ $t('nav.nav_1041') }}</span>
           </template>
-        </div>
-      </div>
+        </section>
+      </main>
 
-      <div v-if="isInviteCardMode" class="invite-friends">
+      <!-- 邀请观看 -->
+      <aside v-if="isInviteCardMode" class="invite-friends">
         <span @click="showInviteFriends">{{ $t('nav.nav_1042') }}</span>
-      </div>
+      </aside>
     </div>
   </div>
 </template>
 
 <script>
-  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
+  import { useCustomMenuServer } from 'middle-domain';
 
   export default {
     name: 'component-rank',
@@ -157,6 +169,7 @@
         bangdan3: require('../assets/imgs/bangdan-3.png'),
         avatar: require('../assets/imgs/avatar.png'),
 
+        loading: false,
         pageLock: false,
         scrollLock: false,
         showBottom: false,
@@ -178,6 +191,9 @@
       };
     },
     computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      },
       isInviteCardMode() {
         return this.$domainStore.state.roomBaseServer.inviteCard.status == '1';
       },
@@ -239,7 +255,8 @@
           }
         });
       },
-      changeTab(tab = 'invite') {
+      async changeTab(tab = 'invite') {
+        this.loading = true;
         this.activeTab = tab;
 
         this.pageLock = false;
@@ -253,7 +270,7 @@
             total: 0
           };
           this.inviteRankList = [];
-          this.getInviteRankList();
+          await this.getInviteRankList();
         }
 
         if (tab === 'award') {
@@ -263,8 +280,10 @@
             total: 0
           };
           this.awardRankList = [];
-          this.getAwardRankList();
+          await this.getAwardRankList();
         }
+
+        this.loading = false;
       },
       /**
        * 获取邀请列表
@@ -301,6 +320,8 @@
         this.scrollLock = false;
 
         this.clearBottomInfo();
+
+        return true;
       },
       /**
        * 获取打赏列表
@@ -335,6 +356,8 @@
         this.scrollLock = false;
 
         this.clearBottomInfo();
+
+        return true;
       },
       showInviteFriends() {
         this.$emit('send', 'emitOpenShareDialog', 4); // 呼出分享弹窗(4-邀请卡)
@@ -621,6 +644,7 @@
     }
   }
   .rank-preview-box {
+    width: 480px;
     .ranking-box {
       width: 100%;
       left: 0px;

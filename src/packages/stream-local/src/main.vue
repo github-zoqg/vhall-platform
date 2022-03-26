@@ -78,7 +78,9 @@
           {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
-          :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          :content="
+            localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+          "
           placement="top"
         >
           <span
@@ -93,7 +95,9 @@
         </el-tooltip>
 
         <el-tooltip
-          :content="localSpeaker.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          :content="
+            localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+          "
           placement="top"
         >
           <span
@@ -105,7 +109,7 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="top">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="top">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
@@ -141,7 +145,9 @@
     <section v-show="isShowShadowBtn" v-else class="vmp-stream-local__shadow-box">
       <p class="vmp-stream-local__shadow-first-line">
         <el-tooltip
-          :content="localSpeaker.videoMuted ? '打开摄像头' : '关闭摄像头'"
+          :content="
+            localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+          "
           placement="top"
         >
           <span
@@ -155,7 +161,9 @@
           ></span>
         </el-tooltip>
         <el-tooltip
-          :content="localSpeaker.audioMuted ? '打开麦克风' : '关闭麦克风'"
+          :content="
+            localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+          "
           placement="top"
         >
           <span
@@ -166,7 +174,7 @@
             "
           ></span>
         </el-tooltip>
-        <el-tooltip content="下麦" placement="top">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="top">
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
@@ -431,23 +439,10 @@
       this.splitScreenServer = useSplitScreenServer();
     },
     created() {
-      // 房间信令异常断开事件
-      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
-        console.log('网络异常断开', msg);
-        this.PopAlertOffline.visible = true;
-      });
       this.listenEvents();
     },
     async mounted() {
       this.checkStartPush();
-      // 接收设为主讲人消息
-      this.micServer.$on('vrtc_big_screen_set', msg => {
-        const str =
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
-            ? '主画面'
-            : '主讲人';
-        this.$message.success(`${msg.data.nick_name}设置成为${str}`);
-      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -646,6 +641,36 @@
           }
         });
 
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          const str =
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : this.$t('interact.interact_1034');
+          this.$message.success(
+            this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str })
+          );
+        });
+
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+          console.log('网络异常断开', msg);
+          this.PopAlertOffline.visible = true;
+        });
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
+          if (e.data.stream.getID() == this.localStream.streamId) {
+            this.$message({
+              message: this.$t('因网络问题推流失败，正在重新推流'),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            await this.stopPush();
+            this.startPush();
+          }
+        });
+
         // 观众的监听
         if (this.joinInfo.role_name == 2) {
           // 开启摄像头
@@ -741,16 +766,16 @@
       async handleSpeakOnError(err) {
         if (err == 'createLocalStreamError') {
           // 本地流创建失败
-          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
+          this.$message.error(this.$t('interact.interact_1016'));
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'NotAllowed') {
           // 本地流创建失败
-          this.$message.error('初始化本地流失败，请检查设备是否被禁用或者被占用');
+          this.$message.error(this.$t('interact.interact_1016'));
         } else if (err == 'publishStreamError') {
           // 推流失败
-          this.$message.error('推流失败');
+          this.$message.error(this.$t('interact.interact_1021'));
           // 下麦接口
           this.speakOff();
           // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
@@ -890,7 +915,7 @@
 
       // 结束推流
       stopPush() {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
           if (!this.localSpeaker.streamId) {
             resolve();
@@ -914,18 +939,23 @@
             return;
           }
 
-          this.interactiveServer.unpublishStream(this.localSpeaker.streamId).then(() => {
-            console.warn('结束推流成功----');
-            clearInterval(this._audioLeveInterval);
+          this.interactiveServer
+            .unpublishStream(this.localSpeaker.streamId)
+            .then(() => {
+              console.warn('结束推流成功----');
+              clearInterval(this._audioLeveInterval);
 
-            // 主持人不在小组中，停止推流触发 直播结束 生成回放
-            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-              );
-            }
-            resolve();
-          });
+              // 主持人不在小组中，停止推流触发 直播结束 生成回放
+              if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+                );
+              }
+              resolve();
+            })
+            .catch(err => {
+              reject(err);
+            });
         });
       },
       // 点击mute按钮事件
