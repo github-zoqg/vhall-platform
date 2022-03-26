@@ -430,7 +430,7 @@
     left: 0;
     bottom: 0;
     width: 100%;
-    position: fixed;
+    // position: fixed;
     transition: 0.35s all;
     z-index: 22;
     &__content {
