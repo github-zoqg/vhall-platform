@@ -706,10 +706,6 @@
           useMediaSettingServer().state,
           this.micServer.getSpeakerStatus()
         );
-        // 不在麦上直接return
-        if (!this.micServer.getSpeakerStatus()) {
-          return;
-        }
         // 音视频/图片推流 方式变更
         if (param.videoType || param.canvasImgUrl) {
           if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
@@ -721,6 +717,10 @@
             await this.startPush();
           }
         } else {
+          // 不在麦上直接return
+          if (!this.micServer.getSpeakerStatus()) {
+            return;
+          }
           if (param.audioInput) {
             this.interactiveServer
               .switchStream({
