@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-wap-player">
-    <template v-if="!encrypt">
+    <template v-if="encrypt">
       <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
         <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
         <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
