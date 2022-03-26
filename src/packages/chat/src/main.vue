@@ -15,6 +15,13 @@
       ref="chatContent"
       :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
+      <p
+        v-if="[1, '1'].includes(configList['ui.hide_chat_history']) && !chatList.length"
+        class="chat-content__get-list-btn-container"
+      >
+        <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
+      </p>
+
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
@@ -209,6 +216,10 @@
       };
     },
     computed: {
+      //是否开启手动加载聊天历史记录
+      hideChatHistory() {
+        return [1, '1'].includes(this.configList['ui.hide_chat_history']);
+      },
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
@@ -259,7 +270,9 @@
       //初始化聊天区域滚动组件
       // this.initScroll();
       //拉取聊天历史
-      this.getHistoryMsg();
+      if (![1, '1'].includes(this.configList['ui.hide_chat_history'])) {
+        this.getHistoryMsg();
+      }
       //监听domain层chatServer通知
       this.listenChatServer();
 
@@ -512,10 +525,7 @@
       },
       //回复消息
       reply(count) {
-        this.buriedPointReport(110119, {
-          business_uid: this.accountId,
-          webinar_id: this.$route.params.il_id
-        });
+        window.vhallReportForProduct?.report(110119);
         this.$refs.chatOperator.handleReply(count);
       },
       //todo domain负责 删除消息（主持人，助理）
@@ -532,22 +542,15 @@
         useChatServer()
           .deleteMessage(params)
           .then(res => {
-            this.buriedPointReport(110121, {
-              business_uid: this.accountId,
-              webinar_id: this.$route.params.il_id
-            });
+            window.vhallReportForProduct?.report(110121);
             return res;
           });
       },
       //todo domain负责 @用户
       //@用户处理
       atUser(accountId) {
-        //数据上报
-        this.buriedPointReport(110120, {
-          business_uid: this.accountId,
-          webinar_id: this.$route.params.il_id
-        });
         this.$refs.chatOperator.handleAtUser(accountId);
+        window.vhallReportForProduct?.report(110120);
       },
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
