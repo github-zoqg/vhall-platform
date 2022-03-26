@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout" :class="{ 'vmp-basic-layout__noHeader': !showHeader }">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -23,9 +23,10 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer, useInviteServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
-  import { getVhallReportOs, browserType } from '@/packages/app-shared/utils/tool';
+  import bindWeiXin from '../headless/bindWeixin.js';
+  import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -39,8 +40,25 @@
         liveErrorTip: ''
       };
     },
-    beforeCreate() {
-      this.inviteServer = useInviteServer();
+    computed: {
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      }
     },
     async created() {
       try {
@@ -51,7 +69,13 @@
           clientType = 'embed';
         }
         const domain = await this.initReceiveLive(clientType);
+        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          // 是否跳转预约页
+          this.goSubscribePage(clientType);
+          return;
+        }
         await roomState();
+        bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseServer = useRoomBaseServer();
@@ -59,28 +83,6 @@
         document.title = roomBaseState.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
-
-        // 是否绑定邀请卡信息
-        const open_id = sessionStorage.getItem('open_id');
-        const isWechatBrowser = browserType();
-        const isEmbed = clientType === 'embed';
-        const hasInviteCode = this.$route.query.invite;
-
-        if (
-          isWechatBrowser &&
-          !isEmbed &&
-          hasInviteCode &&
-          open_id &&
-          roomBaseState.watchInitData.join_info
-        ) {
-          await this.bindInvite(this.$route.query.invite);
-        }
-
-        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
-          // 是否跳转预约页
-          this.goSubscribePage(clientType);
-          return;
-        }
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
         // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
@@ -191,16 +193,6 @@
           pageUrl = '/embedclient';
         }
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
-      },
-      /**
-       * 绑定邀请卡关系(上报邀请成功数据)
-       * @param {String} code 邀请码
-       */
-      async bindInvite(code = '') {
-        return this.inviteServer.bindInvite({
-          webinar_id: this.$route.params.id,
-          invite: code
-        });
       }
     }
   };
