@@ -57,7 +57,7 @@
         <li
           v-if="hasPager"
           data-value="prevStep"
-          title="上一步"
+          :title="$t('account.account_1077')"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
         <li v-if="hasPager || webinarMode == 5" class="page-number">
@@ -68,7 +68,7 @@
         <li
           v-if="hasPager"
           data-value="nextStep"
-          title="下一步"
+          :title="$t('account.account_1036')"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-right"
         ></li>
         <li
