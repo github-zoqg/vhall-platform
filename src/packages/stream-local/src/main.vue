@@ -595,7 +595,7 @@
           ) {
             return;
           }
-          await this.stopPush();
+          await this.stopPush({ source: 'live_over' });
 
           clearInterval(this._audioLeveInterval);
           clearInterval(this._netWorkStatusInterval);
@@ -614,6 +614,12 @@
         });
         // 结束直播
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
+          if (msg.data.type === 'vrtc_definition_set') {
+            // 设备断开重连，重新检查device_status状态（主持人）
+            if (+this.joinInfo.role_name === 1) {
+              await useMediaCheckServer().getMediaInputPermission();
+            }
+          }
           if (msg.data.event_type === 'group_switch_end') {
             // 如果开启分屏并且是主页面，不需要停止推流
             if (
@@ -914,10 +920,16 @@
       },
 
       // 结束推流
-      stopPush() {
+      stopPush(options) {
         return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
           if (!this.localSpeaker.streamId) {
+            // 设备禁用/主动停止直播作区分，此处为结束直播试触发
+            if (+this.joinInfo.role_name === 1 && options?.source === 'live_over') {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+              );
+            }
             resolve();
             return;
           }
@@ -929,12 +941,9 @@
           ) {
             clearInterval(this._audioLeveInterval);
 
-            // 主持人不在小组中，停止推流触发 直播结束 生成回放
-            if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-              );
-            }
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
             resolve();
             return;
           }
@@ -942,11 +951,8 @@
           this.interactiveServer
             .unpublishStream(this.localSpeaker.streamId)
             .then(() => {
-              console.warn('结束推流成功----');
               clearInterval(this._audioLeveInterval);
-
-              // 主持人不在小组中，停止推流触发 直播结束 生成回放
-              if (this.joinInfo.role_name == 1 && !this.groupServer.state.groupInitData.isInGroup) {
+              if (this.joinInfo.role_name == 1) {
                 window.$middleEventSdk?.event?.send(
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );
