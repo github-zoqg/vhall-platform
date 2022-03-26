@@ -22,6 +22,7 @@
       this.redPacketServer = useRedPacketServer({ mode: 'watch' });
     },
     created() {
+      console.log('initIconStatus created');
       this.redPacketServer.initIconStatus();
     },
     methods: {
