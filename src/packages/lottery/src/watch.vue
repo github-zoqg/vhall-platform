@@ -80,6 +80,7 @@
       accept(msg) {
         this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
           console.log(msg);
+          this.lotteryId = msg.lottery_id;
           this.showWinnerList = !!msg.publish_winner;
           console.log(' this.showWinnerList ', this.showWinnerList);
           if (res.code === 200) {
