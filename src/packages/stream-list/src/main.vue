@@ -302,14 +302,6 @@
     },
 
     methods: {
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
-      },
-
       /**
        * 左右翻页更改streamWrapper的scrollLeft值实现滚动
        */
