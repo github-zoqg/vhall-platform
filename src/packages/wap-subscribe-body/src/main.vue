@@ -262,6 +262,8 @@
       handleAuthErrorCode(code, msg) {
         let params = {};
         let queryString = '';
+        let open_id = '';
+        let userId = '';
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -300,18 +302,25 @@
             this.isSubscribeShow = true;
             break;
           case 512523:
-            // 付费
-            if (browserType()) {
+            open_id = sessionStorage.getItem('open_id') || '';
+            userId = sessionStorage.getItem('userInfo')
+              ? JSON.parse(sessionStorage.getItem('userInfo')).user_id
+              : '';
+            if (!(open_id && userId)) {
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+              return;
+            }
+            if (browserType() && open_id) {
               // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
-              const open_id = sessionStorage.getItem('open_id');
+              // const open_id = sessionStorage.getItem('open_id');
               params = {
-                webinar_id: this.$route.params.id,
+                webinar_id: this.webinarId,
                 type: 2,
                 service_code: 'JSAPI',
                 code: open_id
               };
             } else {
-              const userId = this.userInfo ? this.userInfo.user_id : '';
+              // const userId = this.userInfo ? this.userInfo.user_id : '';
               params = {
                 webinar_id: this.webinarId,
                 type: 1,
