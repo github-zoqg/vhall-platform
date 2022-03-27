@@ -93,9 +93,9 @@
     mounted() {
       this.chatServer = useChatServer();
       this.rewardServer = useWatchRewardServer();
-      // this.rewardServer.$on('reward_pay_ok', msg => {
-      //   this.rewardFn(msg);
-      // });
+      this.rewardServer.$on('reward_pay_ok', msg => {
+        this.rewardFn(msg);
+      });
     },
     beforeDestroy() {
       // EventBus.$off('reward_pay_ok', this.rewardFn);
@@ -104,24 +104,6 @@
       // 打赏成功消息
       rewardFn(msg) {
         console.log('收到打赏成功消息', msg, this.webinarData.join_info.third_party_user_id);
-        // 添加聊天消息
-        const data = {
-          avatar: msg.data.rewarder_avatar,
-          nickname:
-            msg.data.rewarder_nickname.length > 8
-              ? msg.data.rewarder_nickname.substr(0, 8) + '...'
-              : msg.data.rewarder_nickname,
-          type: 'reward_pay_ok',
-          content: {
-            text_content: msg.data.reward_describe ? msg.data.reward_describe : '很精彩，赞一个！',
-            num: msg.data.reward_amount
-          },
-          sendId: this.webinarData.join_info.third_party_user_id,
-          roleName: this.roleName,
-          interactToolsStatus: true
-        };
-        this.chatServer.addChatToList(data);
-
         if (msg.rewarder_id == this.webinarData.join_info.third_party_user_id) {
           console.log('收到打上成功消息，关闭弹窗');
           this.close();
