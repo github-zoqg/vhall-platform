@@ -357,7 +357,14 @@
         // 获取用户的基本信息 如绑定的手机号
         await this.useUserServer.getUserInfo({ scene_id: 2 });
         // 获取微信的绑定信息 返回是否绑定 头像 昵称
-        await this.useCashServer.checkWithDrawal();
+        await this.useCashServer.checkWithDrawal().catch(res => {
+          this.$message({
+            message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        });
         if (!this.useUserServer.state.userInfo.phone) {
           console.log('手机号未绑定进入... ...');
           this.step = 1;
@@ -574,13 +581,27 @@
             console.log('第一次绑定, 当前已经授权过...');
             this.initPollTimer();
             // 获取微信的绑定信息 返回是否绑定 头像 昵称
-            await this.useCashServer.checkWithDrawal();
+            await this.useCashServer.checkWithDrawal().catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
             this.step = 3;
           } else if (type == 2 && bindData.data.is_change == 1) {
             console.log('更换绑定, 当前已经授权过...');
             this.initPollTimer();
             // 获取微信的绑定信息 返回是否绑定 头像 昵称
-            await this.useCashServer.checkWithDrawal();
+            await this.useCashServer.checkWithDrawal().catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
             this.step = 3;
           }
           // v3组件老逻辑 1min 自动重置一次二维码 后续可以改成用户手动
