@@ -89,6 +89,13 @@
       ['isShareScreen']() {
         this.resetMenus();
       },
+      ['roomBaseServer.state.watchInitData.rebroadcast']: {
+        deep: true,
+        immediate: true,
+        handler() {
+          this.resetMenus();
+        }
+      },
       ['roomBaseServer.state.configList']: {
         deep: true,
         immediate: true,
@@ -138,6 +145,15 @@
               vn.setDisableState(true);
               continue;
             }
+
+            // 转播中
+            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+              vn.setHiddenState(true);
+              continue;
+            } else {
+              vn.setHiddenState(false);
+            }
+
             // 文档菜单
             if (this.role == 4) {
               // 嘉宾
@@ -156,6 +172,14 @@
               }
             }
           } else if (vn.kind === 'board') {
+            // 转播中
+            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+              vn.setHiddenState(true);
+              continue;
+            } else {
+              vn.setHiddenState(false);
+            }
+
             // 白板菜单
             if (this.isShareScreen) {
               vn.setDisableState(true);
@@ -178,6 +202,14 @@
               }
             }
           } else if (vn.kind === 'desktopShare') {
+            // 转播中
+            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+              vn.setDisableState(true);
+              continue;
+            } else {
+              vn.setDisableState(false);
+            }
+
             if (this.role == 3) {
               vn.setHiddenState(true);
               continue;
@@ -236,6 +268,14 @@
               continue;
             }
           } else if (vn.kind === 'insertMedia') {
+            // 转播中
+            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+              vn.setDisableState(true);
+              continue;
+            } else {
+              vn.setDisableState(false);
+            }
+
             // 插播文件菜单
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);
