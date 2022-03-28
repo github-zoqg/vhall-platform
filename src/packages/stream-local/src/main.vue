@@ -585,13 +585,18 @@
             useRoomBaseServer().setChangeElement('player');
           }
 
-          if (this.isNoDelay === 1 || [1, 4].includes(+this.joinInfo.role_name)) {
+          if (
+            (this.isNoDelay === 1 && +this.joinInfo.role_name !== 1) ||
+            +this.joinInfo.role_name === 4
+          ) {
             if (this.mode === 6) {
               await this.groupServer.updateGroupInitData();
             }
             //  初始化互动实例
             this.interactiveServer.init();
-          } else {
+          }
+
+          if (this.isNoDelay !== 1 && +this.joinInfo.role_name === 2) {
             // 初始化播放器
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true })

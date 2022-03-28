@@ -16,7 +16,10 @@
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div v-if="searchEmpty" class="empty-container">
+            <div
+              v-if="searchShow && searchUserInput && !onlineUsers.length"
+              class="empty-container"
+            >
               <span class="empty-img">
                 <img src="img/search@2x.png" alt="" />
               </span>
@@ -38,7 +41,7 @@
                   :current-speaker-id="getCurrentSpeakerId"
                   :main-screen="getCurrentMainScreen"
                   :presentation-screen="getCurrentPresentationScreen"
-                  :leader-id="leader_id"
+                  :leader-id="leaderId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -73,7 +76,7 @@
                   :current-speaker-id="getCurrentSpeakerId"
                   :main-screen="getCurrentMainScreen"
                   :presentation-screen="getCurrentPresentationScreen"
-                  :leader-id="leader_id"
+                  :leader-id="leaderId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -107,7 +110,7 @@
                   :current-speaker-id="getCurrentSpeakerId"
                   :main-screen="getCurrentMainScreen"
                   :presentation-screen="getCurrentPresentationScreen"
-                  :leader-id="leader_id"
+                  :leader-id="leaderId"
                   :user-id="userId"
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
@@ -238,11 +241,6 @@
         roleName: '',
         //当前登录的用户
         userId: '',
-        onlineUsers: [],
-        //申请人数
-        applyUsers: [],
-        //受限人数
-        limitedUsers: [],
         //房间号
         roomId: '',
         //mod 6代表分组活动
@@ -259,23 +257,15 @@
         /** 搜索输入框结束 */
         // 容器内边距
         emptyContainerPaddingTop: 10,
-        //组长id
-        leader_id: '',
         //当前的激活的tab
         tabIndex: 1,
-        //总人数
-        totalNum: 0,
         //是否允许举手
         allowRaiseHand: false,
-        // 举手提示
-        raiseHandTip: false,
         //分页配置
         pageConfig: {
           page: 0,
           limit: 100
         },
-        // 举手列表定时器列表
-        handsUpTimerList: {},
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
@@ -316,10 +306,37 @@
       }
     },
     computed: {
+      //在线的成员列表
+      onlineUsers() {
+        return useMemberServer().state.onlineUsers;
+      },
+      //举手的列表
+      applyUsers() {
+        return useMemberServer().state.applyUsers;
+      },
+      //受限的列表
+      limitedUsers() {
+        return useMemberServer().state.limitedUsers;
+      },
+      //举手提示
+      raiseHandTip() {
+        return useMemberServer().state.raiseHandTip || false;
+      },
+      //在线人数
+      totalNum() {
+        return useMemberServer().state.totalNum || 0;
+      },
+      //组长id
+      leaderId() {
+        return useMemberServer().state.leaderId;
+      },
       //是否显示搜索结果图片
       isShowEmptyImg() {
         return [
-          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 1 &&
+            this.searchShow &&
+            this.searchUserInput &&
+            !this.onlineUsers.length,
           this.tabIndex === 2 && !this.applyUsers.length,
           this.tabIndex === 3 && !this.limitedUsers.length
         ].some(item => !!item);
@@ -328,7 +345,7 @@
       isShowBottom() {
         let show = true;
         if (this.isWatch) {
-          return this.isInGroup && this.leader_id == this.userId;
+          return this.isInGroup && this.leaderId == this.userId;
         }
         if (this.isLive) {
           show = true;
@@ -414,9 +431,6 @@
       },
       //初始化房间消息回调监听
       listenEvents() {
-        const _this = this;
-        const { isLive } = this;
-
         //加入房间
         this.memberServer.$on('JOIN', this.handleJoinRoom);
 
@@ -438,7 +452,7 @@
         //互动连麦断开成功
         this.memberServer.$on('vrtc_disconnect_success', this.handleSuccessDisconnect);
 
-        //房间消息结束直播 todo 是否和live_over重复了
+        //房间消息结束直播
         this.memberServer.$on('endLive', this.handleEndLive);
 
         //取消踢出
@@ -490,7 +504,7 @@
         this.memberServer.$off('vrtc_connect_invite_refused', this.handleUserRejectConnect);
         //互动连麦断开成功
         this.memberServer.$off('vrtc_disconnect_success', this.handleSuccessDisconnect);
-        //房间消息结束直播 todo 是否和live_over重复了
+        //房间消息结束直播
         this.memberServer.$off('endLive', this.handleEndLive);
         //取消踢出
         this.memberServer.$off('room_kickout_cancel', this.handleCancelKickedOut);
@@ -616,7 +630,7 @@
       },
       //组长变更
       handleLeaderChange(msg) {
-        this.leader_id = msg.data.account_id;
+        console.log(msg);
         this.updateOnlineUserList();
       },
       //主持人进入、退出小组
@@ -632,7 +646,7 @@
       getOnlineUserList(pos) {
         const params = {
           room_id: this.roomId,
-          pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
+          pos: pos || (this.pageConfig.page <= 0 ? 0 : this.pageConfig.page),
           limit: this.pageConfig.limit
         };
 
@@ -646,12 +660,13 @@
           .then(res => {
             if (res.code === 200) {
               this.$refs.scroll.finishPullUp();
-              this.onlineUsers = this.memberServer.state.onlineUsers || [];
-              if (!this.onlineUsers.length) {
+              this.$refs.scroll.refresh();
+              // this.onlineUsers = this.memberServer.state.onlineUsers || [];
+              if (!res?.data?.list?.length) {
                 this.pageConfig.page--;
               }
               //在线总人数
-              this.totalNum = this.memberServer.state.totalNum;
+              // this.totalNum = this.memberServer.state.totalNum;
             }
             if (![200, '200'].includes(res.code)) {
               this.pageConfig.page--;
@@ -715,8 +730,9 @@
         this.memberServer.updateState('tabIndex', index);
         //清空输入的人员筛选
         this.searchUserInput = '';
+        this.searchShow = false;
         if (index === 2) {
-          this.raiseHandTip = false;
+          // this.raiseHandTip = false;
           this.memberServer.updateState('raiseHandTip', false);
         } else if (index === 3) {
           this.memberServer.getLimitUserList();
@@ -806,7 +822,7 @@
               this.$message.error(res.msg);
               return;
             }
-            this._deleteUser(accountId, this.applyUsers, 'applyUsers');
+            this._deleteUser(accountId, this.memberServer.state.applyUsers, 'applyUsers');
           })
           .catch(err => {
             console.log('allow speak fail ::', err);
@@ -956,7 +972,7 @@
       inviteMic(accountId = '') {
         if (
           this.isWatch &&
-          (accountId === this.leader_id || accountId === this.getCurrentSpeakerId)
+          (accountId === this.leaderId || accountId === this.getCurrentSpeakerId)
         ) {
           return;
         }
@@ -1072,8 +1088,8 @@
               //埋点上报--踢出/取消踢出
               window.vhallReportForProduct?.report(nextStatus ? 110126 : 110146);
               if (nextStatus) {
-                this._deleteUser(accountId, this.onlineUsers, 'onlineUsers');
-                this._deleteUser(accountId, this.applyUsers, 'applyUsers');
+                this._deleteUser(accountId, this.memberServer.state.onlineUsers, 'onlineUsers');
+                this._deleteUser(accountId, this.memberServer.state.applyUsers, 'applyUsers');
               } else {
                 // 取消踢出只能在受限列表操作
                 this.memberServer.getLimitUserList();
@@ -1084,14 +1100,15 @@
       },
       //删除用户
       _deleteUser(accountId, list = [], key = '') {
-        const index = list.findIndex(
-          item => ![null, void 0, ''].includes(accountId) && item.account_id === accountId
-        );
-
-        if (index !== -1) {
-          list.splice(index, 1);
-          this.memberServer.updateState(key, list);
-        }
+        // const index = list.findIndex(
+        //   item => ![null, void 0, ''].includes(accountId) && item.account_id === accountId
+        // );
+        //
+        // if (index !== -1) {
+        //   list.splice(index, 1);
+        //   this.memberServer.updateState(key, list);
+        // }
+        this.memberServer._deleteUser(accountId, list);
       },
       //查找用户在数组的索引号
       _getUserIndex(accountId, list) {
@@ -1101,7 +1118,7 @@
       },
       //加载更多
       loadMore() {
-        this.page++;
+        this.pageConfig.page++;
         this.getOnlineUserList();
       },
       //滚动条位置更新
@@ -1153,6 +1170,7 @@
       }
       .show-empty-img {
         .test_01 {
+          height: 100%;
           display: flex;
           flex: 1;
         }
