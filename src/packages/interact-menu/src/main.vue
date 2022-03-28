@@ -250,6 +250,7 @@
       },
       // 打开抽奖弹窗
       openLottery() {
+        if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenLottery'));
       },
       // 打开问卷弹窗
@@ -264,6 +265,7 @@
       },
       // 打开红包弹窗
       openRedPacket() {
+        if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       }
     }
