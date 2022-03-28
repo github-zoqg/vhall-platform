@@ -76,8 +76,7 @@
         });
 
         msgServer.$onMsg('ROOM_MSG', msg => {
-          if (msg.data.type === 'live_broadcast_stop') {
-            if (this.roleName != 3) return;
+          if (msg.data.type === 'live_over') {
             this.close();
           }
         });
@@ -115,8 +114,6 @@
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {
-        if (this.isShow === false) return;
-
         this.isShow = false;
         this.$refs.videoPreview?.destroy();
         this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
