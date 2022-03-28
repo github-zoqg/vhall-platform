@@ -167,9 +167,19 @@ textarea {
   background-color: #aaa;
   position: relative;
 }
+.vmp-basic-layout__hasBottom {
+  .tab-content {
+    height: calc(100% - 622px);
+  }
+}
 .vmp-basic-layout__noHeader {
   .tab-content {
     height: calc(100% - 422px);
+  }
+  &.vmp-basic-layout__hasBottom {
+    .tab-content {
+      height: calc(100% - 522px);
+    }
   }
 }
 .container-top {
