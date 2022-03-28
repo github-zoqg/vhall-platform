@@ -48,7 +48,7 @@
         const clipboard = new Clipboard('.vhall-room-id-copy');
         clipboard.on('success', () => {
           this.$message({
-            message: this.$t('other.other_1008'),
+            message: this.$t('nav.nav_1024'),
             showClose: true,
             type: 'success',
             customClass: 'zdy-info-box'
@@ -57,7 +57,7 @@
         });
         clipboard.on('error', () => {
           this.$message({
-            message: this.$t('other.other_1009'),
+            message: this.$t('nav.nav_1052'),
             showClose: true,
             type: 'error',
             customClass: 'zdy-info-box'

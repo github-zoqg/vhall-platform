@@ -227,7 +227,7 @@
                 }, 1000);
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg,
+                  message: this.$tec(res.code) || this.$t('account.account_1051'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -237,7 +237,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
+                message: this.$tec(res.code) || this.$t('account.account_1051'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -263,7 +263,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                    message: this.$tec(res.code) || this.$t('account.account_1052'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -272,7 +272,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -305,7 +305,7 @@
                   this.$emit('input', { ...this.phoneData });
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                    message: this.$tec(res.code) || this.$t('account.account_1054'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -314,7 +314,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                  message: this.$tec(res.code) || this.$t('account.account_1054'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -341,7 +341,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                    message: this.$tec(res.code) || this.$t('account.account_1052'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -350,7 +350,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -392,7 +392,7 @@
               }
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                message: this.$tec(res.code) || this.$t('account.account_1054'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -401,7 +401,7 @@
           })
           .catch(res => {
             this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+              message: this.$tec(res.code) || this.$t('account.account_1054'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'

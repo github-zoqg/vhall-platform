@@ -151,8 +151,6 @@
         const fullY = document.body.scrollHeight;
         const hasOverflowY = currentY >= fullY;
 
-        console.log('scroll action', currentY, fullY);
-
         if (!hasOverflowY) return;
         if (this.total !== 0 && this.pos >= this.total) return;
         if (this.loading) return;

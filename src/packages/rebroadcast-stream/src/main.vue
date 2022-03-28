@@ -34,6 +34,9 @@
     computed: {
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
+      },
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.join_info.role_name;
       }
     },
     beforeCreate() {
@@ -45,11 +48,10 @@
       this.listenEvents();
     },
     mounted() {
-      if (
-        this.roomBaseServer.state.watchInitData.rebroadcast.id ||
-        (this.roomBaseServer.state.isThirdStream &&
-          this.roomBaseServer.state.watchInitData.join_info.role_name == 3)
-      ) {
+      const { watchInitData, isThirdStream } = this.roomBaseServer.state;
+      const hasRebroadCast = watchInitData.rebroadcast.id;
+
+      if (hasRebroadCast || (isThirdStream && this.roleName == 3)) {
         this.open();
       }
     },
@@ -57,14 +59,13 @@
       listenEvents() {
         // 只有第三方推流时才会触发这个事件
         this.roomBaseServer.$on('LIVE_START', () => {
-          if (this.roomBaseServer.state.watchInitData.join_info.role_name == 3) {
-            this.open();
-          }
+          if (this.roleName != 3) return;
+          this.open();
         });
+
         this.roomBaseServer.$on('LIVE_OVER', () => {
-          if (this.roomBaseServer.state.watchInitData.join_info.role_name == 3) {
-            this.close();
-          }
+          if (this.roleName != 3) return;
+          this.close();
         });
       },
       async open() {
@@ -78,8 +79,6 @@
         const appId = watchInitData.interact.paas_app_id;
         const accountId = watchInitData.join_info.user_id;
         const roomId = watchInitData.interact.room_id;
-
-        console.log('open rebroadcast stream:', { token, appId, accountId, roomId });
 
         this.videoParam = {
           token,
@@ -95,16 +94,15 @@
         };
         console.log('videoParam:', this.videoParam);
         this.isShow = true;
-        if (this.roomBaseServer.state.isThirdStream) {
-          this.roomBaseServer.setChangeElement('rebroadcast-stream');
-        } else {
-          this.roomBaseServer.setChangeElement('doc');
-        }
+
+        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
+        this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {
-        this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        this.$refs.videoPreview?.destroy();
         this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
         this.isShow = false;
+        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
       },
       exchangeScreen() {
         const miniElement =

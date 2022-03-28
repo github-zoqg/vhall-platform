@@ -190,7 +190,7 @@
               }
             })
             .catch(err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1051'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1051'));
               // 图片验证码重置
               this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
             });
@@ -211,11 +211,11 @@
               if (res && res.code == 200 && res.data.check_result === 1) {
                 this.bindPhoneSave(res.data.key);
               } else {
-                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1052'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1052'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1052'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1052'));
             });
         }
       },
@@ -240,11 +240,11 @@
                 this.phoneDialog.step = 2;
                 this.$emit('input', { ...this.phoneDialog });
               } else {
-                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1054'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1054'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1054'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1054'));
             });
         }
       },
@@ -264,11 +264,11 @@
               if (res && res.code == 200 && res.data.check_result === 1) {
                 this.bindPhoneSave(res.data.key);
               } else {
-                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1052'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1052'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1052'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1052'));
             });
         }
       },
@@ -299,11 +299,11 @@
                 this.$emit('input', { ...this.phoneDialog });
               }
             } else {
-              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1054'));
+              this.$toast(this.$tec(res.code) || this.$t('account.account_1054'));
             }
           })
           .catch(err => {
-            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1054'));
+            this.$toast(this.$tec(err.code) || this.$t('account.account_1054'));
           });
       },
 

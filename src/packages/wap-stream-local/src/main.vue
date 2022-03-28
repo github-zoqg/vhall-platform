@@ -54,7 +54,6 @@
     usePlayerServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import { Dialog, Toast } from 'vant';
 
   export default {
@@ -68,6 +67,9 @@
       };
     },
     computed: {
+      localStreamId() {
+        return this.$domainStore.state.interactiveServer.localStream.streamId;
+      },
       localSpeaker() {
         return (
           this.$domainStore.state.micServer.speakerList.find(
@@ -113,18 +115,11 @@
       //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.localSpeaker;
-        const sameId = this.presentationScreen === accountId;
-        const groupMode = this.mode == 6;
-        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
-        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
-        const allowedUser = inMainRoomUser || inGroupRoomUser;
-
-        console.log('isShowPresentationScreen', {
-          sameId,
-          groupMode,
-          inMainRoomUser,
-          inGroupRoomUser
-        });
+        const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
+        const groupMode = this.mode == 6; // 分组类型
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
+        const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
 
         return sameId && groupMode && allowedUser;
       },
@@ -140,6 +135,7 @@
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
+      // 是否是无延迟直播
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
@@ -147,7 +143,7 @@
       interactToolStatus() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus;
       },
-      // 是否为自动上麦  只有不在麦上才会去设置默认禁音上麦
+      // 是否为自动上麦  只有不在麦上才会去设置默认禁音上麦   补充：开启自动上麦 + 分组 + 非自己主动申请/主持人邀请 + 当前不在上麦列表内
       autoSpeak() {
         return (
           this.interactToolStatus.auto_speak == 1 &&
@@ -192,6 +188,7 @@
     methods: {
       // 检查推流
       async checkStartPush() {
+        // 非直播中，直接返回
         if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
           return;
         }
@@ -251,12 +248,10 @@
         });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
           // live_over 结束直播  停止推流,
-          if (msg.data.type == 'live_over') {
-            if (this.micServer.getSpeakerStatus()) {
-              await this.speakOff();
-              await this.stopPush();
-              this.interactiveServer.destroy();
-            }
+          if (msg.data.type == 'live_over' && this.micServer.getSpeakerStatus()) {
+            await this.speakOff();
+            await this.stopPush();
+            this.interactiveServer.destroy();
           }
         });
 
@@ -299,8 +294,6 @@
           await this.interactiveServer.destroy();
 
           if (this.isNoDelay === 1) {
-            //  初始化互动实例
-
             //后端踢出后会检测有没有在麦上，在麦上会派发下麦消息，下麦消息内的逻辑会比组内踢出消息内的逻辑先执行，所以先调用小组信息接口，避免初始化互动参数房间ID不对。
             if (this.mode === 6) {
               await this.groupServer.updateGroupInitData();
@@ -333,7 +326,6 @@
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
-        console.warn('res----', res);
         if (res.code == 200) {
           // 成功上麦，返回true
           return true;
@@ -453,19 +445,16 @@
       stopPush() {
         return new Promise(resolve => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
-          if (!this.localSpeaker.streamId) {
+          if (!this.localStreamId) {
             resolve();
             return;
           }
           this.interactiveServer
-            .unpublishStream(this.localSpeaker.streamId)
+            .unpublishStream()
             .then(() => {
               this.isStreamPublished = false;
               clearInterval(this._audioLeveInterval);
-
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-              );
+              clearInterval(this._netWorkStatusInterval);
               resolve();
             })
             .catch(e => {});

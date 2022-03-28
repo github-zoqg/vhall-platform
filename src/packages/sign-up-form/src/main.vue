@@ -68,8 +68,9 @@
                     :label="
                       question.subject === '隐私声明'
                         ? ''
-                        : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$tdefault(
-                            question.subject
+                        : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${convertLanguage(
+                            question.subject,
+                            question
                           )}`
                     "
                   >
@@ -410,8 +411,9 @@
                   :label="
                     question.subject === '隐私声明'
                       ? ''
-                      : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${$tdefault(
-                          question.subject
+                      : `${quesIndex < 9 ? `0${quesIndex + 1}` : quesIndex + 1}.${convertLanguage(
+                          question.subject,
+                          question
                         )}`
                   "
                 >
@@ -758,6 +760,40 @@
           },
           6: this.$t('form.form_1020')
         },
+        //题目的类型中文翻译
+        langDefaultZH: [
+          '姓名',
+          '性别',
+          '手机',
+          '邮箱',
+          '地域',
+          '公司',
+          '职务',
+          '隐私声明',
+          '活动报名',
+          '我已报名',
+          '单选题',
+          '多选题',
+          '问答题',
+          '下拉题'
+        ],
+        //题目的类型的英文翻译
+        langDefaultCode: [
+          'form.form_1001',
+          'form.form_1055',
+          'form.form_1064',
+          'form.form_1003',
+          'form.form_1002',
+          'form.form_1054',
+          'form.form_1056',
+          'form.form_1013',
+          'form.form_1025',
+          'form.form_1024',
+          'form.form_1068',
+          'form.form_1069',
+          'form.form_1070',
+          'form.form_1071'
+        ],
         //表单项配置
         list: [],
         //省份
@@ -1436,6 +1472,21 @@
           });
         }
       },
+      //多语言翻译
+      convertLanguage(title, vo) {
+        if (
+          (vo.default_type == 0 && [1, 4, 5, 2, 3].includes(vo.type)) ||
+          (vo.type == 0 && [1, 4, 3, 2].includes(vo.default_type))
+        ) {
+          // 地域 & 公司 & 职务 +  姓名 & 性别 & 邮箱 翻译标题
+          return this.langDefaultZH.indexOf(title) > -1
+            ? this.$t(this.langDefaultCode[this.langDefaultZH.indexOf(title)])
+            : title;
+        } else {
+          // 不翻译
+          return title;
+        }
+      },
       // 倒计时函数
       countDown(isForm) {
         const key = isForm ? 'time' : 'verifyTime';
@@ -1452,7 +1503,7 @@
         }
       },
       /**
-       * 初始化网易易盾图片验证码 todo 待改善
+       * 初始化网易易盾图片验证码
        */
       callCaptcha(id) {
         const captcha = id === '#setCaptcha' ? 'captcha1' : 'captcha2';

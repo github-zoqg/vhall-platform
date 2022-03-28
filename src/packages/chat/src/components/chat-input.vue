@@ -265,6 +265,10 @@
         }
         //获取一下子组件里上传的图片
         this.getUploadImg();
+        // 数据埋点-发送图片
+        if (this.imgUrls && this.imgUrls.length) {
+          window.vhallReportForProduct?.report(110124);
+        }
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {

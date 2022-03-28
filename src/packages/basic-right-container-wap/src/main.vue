@@ -1,5 +1,5 @@
 <template>
-  <div class="base-box" v-show="!groupInitData.isInGroup && !showDoc">
+  <div class="base-box" v-if="!groupInitData.isInGroup" v-show="!showDoc">
     <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
       <div :class="!timerVisible ? 'have' : ''"></div>
       <img src="./image/timer.png" />
