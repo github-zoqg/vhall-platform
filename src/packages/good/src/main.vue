@@ -366,6 +366,10 @@
             }
           }
         }
+        .buy {
+          background: #fb3a32;
+          border: 1px solid #fb3a32;
+        }
       }
     }
 
