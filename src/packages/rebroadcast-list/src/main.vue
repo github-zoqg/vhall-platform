@@ -254,6 +254,8 @@
           });
           if (res.code !== 200) return this.$message.error(`转播失败!`);
 
+          window?.vhallReportForProduct(120001); // 埋点 - 开始转播
+
           this.rebroadcastRoomId = this.currentRoomId; // 记录
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
           this.$message.success(`转播成功！`);
