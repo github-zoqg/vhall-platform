@@ -360,7 +360,6 @@
     // 流列表高度为0
     &-h0 {
       height: 0 !important;
-      position: relative;
       .vmp-stream-list__main-screen {
         top: 0 !important;
       }
