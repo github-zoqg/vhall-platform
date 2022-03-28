@@ -133,7 +133,7 @@
     width: 920px;
     height: 880px;
     background-size: 100% auto;
-    margin-top: 15vh;
+    // margin-top: 15vh;
     margin-left: 50%;
     transform: translate(-50%, 0);
     display: flex;

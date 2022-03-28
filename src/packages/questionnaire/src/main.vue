@@ -212,11 +212,21 @@
         return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info.role_name;
       }
     },
+    beforeCreate() {
+      this.questionnaireServer = useQuestionnaireServer({
+        uploadUrl: process.env.VUE_APP_BASE_URL,
+        creatSelector: '#qs-create-box',
+        mode: 'live'
+      });
+    },
+    created() {
+      this.initEvent();
+    },
     methods: {
       open() {
-        if (!this.questionnaireServer) {
-          this.initSDK();
-        }
+        // if (!this.questionnaireServer) {
+        //   this.initSDK();
+        // }
         this.initPage();
         this.dialogVisible = true;
       },
@@ -225,14 +235,6 @@
         this.showQuestionnaireTable = true;
         this.prevQuestionnaireId = null;
         this.queryQuestionnaireList(true);
-      },
-      initSDK() {
-        this.questionnaireServer = useQuestionnaireServer({
-          uploadUrl: process.env.VUE_APP_BASE_URL,
-          creatSelector: '#qs-create-box',
-          mode: 'live'
-        });
-        this.initEvent();
       },
       initEvent() {
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.CREATE, data => {
