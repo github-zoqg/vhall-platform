@@ -414,7 +414,7 @@
                 }, 1000);
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg,
+                  message: this.$tec(res.code) || this.$t('account.account_1051'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -424,7 +424,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
+                message: this.$tec(res.code) || this.$t('account.account_1051'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -452,7 +452,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('cash.cash_1033'),
+                    message: this.$tec(res.code) || this.$t('cash.cash_1033'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -462,7 +462,7 @@
               .catch(res => {
                 console.log(res);
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -498,7 +498,7 @@
               this.checkPhoneToWx();
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                message: this.$tec(res.code) || this.$t('account.account_1054'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -507,7 +507,7 @@
           })
           .catch(err => {
             this.$message({
-              message: this.$tec(err.code) || err.msg || this.$t('account.account_1054'),
+              message: this.$tec(err.code) || this.$t('account.account_1054'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -541,7 +541,7 @@
               this.startPolling(type);
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || '获取信息失败',
+                message: this.$tec(res.code) || this.$t('message.message_1026'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -550,7 +550,7 @@
           })
           .catch(err => {
             this.$message({
-              message: this.$tec(err.code) || err.msg || '获取信息失败',
+              message: this.$tec(err.code) || this.$t('message.message_1026'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -617,7 +617,7 @@
                   this.closeDialog();
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
+                    message: this.$tec(res.code) || this.$t('cash.cash_1037'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -626,7 +626,7 @@
               })
               .catch(err => {
                 this.$message({
-                  message: this.$tec(err.code) || err.msg || '验证失败，无法操作',
+                  message: this.$tec(err.code) || this.$t('cash.cash_1037'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'

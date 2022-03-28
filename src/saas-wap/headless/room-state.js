@@ -101,17 +101,6 @@ export default async function () {
     console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
   }
 
-  // 判断是否是微信分享来的
-  try {
-    if (getQueryString('shareId') || getQueryString('share_id')) {
-      roomBaseServer.bindShare({
-        share: getQueryString('shareId') || getQueryString('share_id')
-      });
-    }
-  } catch (e) {
-    console.log('微信分享', e);
-  }
-
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
 

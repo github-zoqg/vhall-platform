@@ -185,7 +185,7 @@
         } else if (err.code == 611001) {
           this.liveErrorTip = '互动初始化失败，' + err.message;
         } else {
-          this.liveErrorTip = this.$tec(err.code) || err.msg || err.message;
+          this.liveErrorTip = this.$tec(err.code) || err.message;
         }
       },
       goSubscribePage(clientType) {

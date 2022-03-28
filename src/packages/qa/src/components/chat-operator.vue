@@ -308,7 +308,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('chat.chat_1056'),
+                message: this.$tec(res.code) || this.$t('chat.chat_1056'),
                 showClose: true,
                 // duration: 0,
                 type: 'error',
