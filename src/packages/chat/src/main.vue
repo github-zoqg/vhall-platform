@@ -188,7 +188,7 @@
         //聊天配置
         chatOptions: {},
         //底部操作栏高度
-        operatorHeight: 100,
+        operatorHeight: 90,
         //是否展示礼物特效
         showSpecialEffects: true,
         //礼物特效数组
