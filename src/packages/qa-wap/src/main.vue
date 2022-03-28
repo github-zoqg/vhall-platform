@@ -120,6 +120,10 @@
           this.allBanned = res;
         });
       },
+      //切换到当前tab时
+      switchToBack() {
+        this.scrollBottom();
+      },
       /**
        * 获取历史问答
        */

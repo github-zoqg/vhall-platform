@@ -682,7 +682,7 @@ export default {
     account_1069: 'Please enter a valid phone number',
     account_1070: 'Please enter the dynamic verification code',
     account_1071: 'Please enter the password!',
-    account_1072: '6-30 digit password without spaces and special symbols!',
+    account_1072: '6-30  Characters without spaces or special symbols!',
     account_1073: 'enter the password again!',
     account_1074: 'The two passwords are inconsistent!',
     account_1075: 'Modification of Personal Data',
