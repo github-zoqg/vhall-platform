@@ -153,6 +153,7 @@
         const msgData = msg.data;
         this.setFitment(msgData);
         this.lotteryId = msgData.lottery_id;
+        this.showWinnerList = !!msgData.publish_winner;
         this.setFitment(msgData);
         const winnerList = msgData.lottery_winners.split(',');
         const lotteryResult = winnerList.some(userId => {

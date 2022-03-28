@@ -166,6 +166,7 @@
       // 抽奖结果消息推送
       callBackResultNotice(msg) {
         this.lotteryId = msg.data.lottery_id;
+        this.showWinnerList = !!msg.data.publish_winner;
         this.setFitment(msg.data);
         const winnerList = msg.data.lottery_winners.split(',');
         const lotteryResult = winnerList.some(userId => {
