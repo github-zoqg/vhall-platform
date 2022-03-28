@@ -459,6 +459,25 @@
     .rank-band {
       text-align: center;
       height: 570px;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 0px;
+        height: 0px;
+        border-radius: 0;
+        background-color: rgba(0, 0, 0, 0) !important;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        height: 60px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0);
+        background-color: rgba(0, 0, 0, 0) !important;
+      }
+
       .loading-bottom {
         width: 100%;
         height: 20px;

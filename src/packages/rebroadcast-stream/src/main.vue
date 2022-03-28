@@ -69,10 +69,6 @@
         });
       },
       async open() {
-        if (this.interactiveServer.state.localStream.streamId) {
-          await this.interactiveServer.unpublishStream();
-        }
-
         const { watchInitData } = this.roomBaseServer.state;
 
         const token = watchInitData.interact.paas_access_token;
@@ -95,6 +91,10 @@
         console.log('videoParam:', this.videoParam);
         this.isShow = true;
 
+        if (this.interactiveServer.state.localStream.streamId) {
+          await this.interactiveServer.unpublishStream();
+        }
+
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
@@ -107,7 +107,6 @@
       exchangeScreen() {
         const miniElement =
           this.miniElement === 'rebroadcast-stream' ? 'doc' : 'rebroadcast-stream';
-        console.log('next miniElement', miniElement);
         this.roomBaseServer.setChangeElement(miniElement);
       }
     }
