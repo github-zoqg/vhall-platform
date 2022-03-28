@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
@@ -142,6 +142,11 @@
       },
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
+        //主持人、嘉宾离开房间的提示消息处理
+        useMsgServer().$onMsg('LEFT', msg => {
+          this.handleLeaveRoom(msg);
+        });
+
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
         });
@@ -159,6 +164,19 @@
           code: 512514,
           msg: this.$t('message.message_1007')
         });
+      },
+      //主持人、嘉宾等离开房间的提示处理
+      handleLeaveRoom(msg) {
+        if (msg.context.role_name == 1) {
+          this.$message.warning({ message: this.$t('message.message_1027') });
+        }
+        if (msg.context.role_name == 4) {
+          this.$message.warning({
+            message: this.$t('message.message_1029', {
+              n: msg.context.nickname || msg.context.nick_name
+            })
+          });
+        }
       },
       handleErrorCode(err) {
         let currentQuery = location.search;

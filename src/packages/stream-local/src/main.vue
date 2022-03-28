@@ -294,7 +294,11 @@
           return this.joinInfo.role_name != 2 ? true : this.switchStatus;
         }
       },
+      // 直播类型
       liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
       // 当前人插播的时候，不显示本地流的操作按钮
@@ -344,10 +348,11 @@
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
       },
 
+      // 在小组中
       isInGroup() {
-        // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
+
       mainScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
@@ -355,6 +360,7 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
+      // 文档演示者的ID
       presentationScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
@@ -365,25 +371,23 @@
       //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.localSpeaker;
-        const sameId = this.presentationScreen === accountId;
-        const groupMode = this.liveMode == 6;
-        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
-        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
-        const allowedUser = inMainRoomUser || inGroupRoomUser;
+        const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
+        const groupMode = this.liveMode == 6; // 分组类型
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
+        const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
 
         return sameId && groupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      mode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
+      // 直播状态
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       },
+      // 无延迟直播
       isNoDelay() {
-        // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
