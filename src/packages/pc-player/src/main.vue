@@ -600,7 +600,7 @@
             break;
           case 512532:
             //白名单
-            placeHolder = this.authText || this.$t('common.common_1006');
+            placeHolder = this.authText || this.$t(512532);
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
             );
