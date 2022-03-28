@@ -1028,8 +1028,8 @@
             border-radius: 20px;
             background: #fb3a32;
             display: inline-block;
-            width: 160px;
             height: 40px;
+            padding: 0 10px;
             line-height: 40px;
           }
           p {
