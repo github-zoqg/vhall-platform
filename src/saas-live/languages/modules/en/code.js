@@ -81,7 +81,7 @@ export default {
   512529: 'Wrong invitation code',
   512530: 'The invitation code has been used',
   512531: 'Please enter the invitation code',
-  512532: 'Please enter the whitelist mobile phone number|email|employee number|others',
+  512532: 'Please enter the phone/email/employee ID',
   512535: 'The organizer has set up a verification mechanism for the event',
   512536: 'Playback content does not exist',
   512538:
