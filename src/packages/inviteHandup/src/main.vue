@@ -31,7 +31,7 @@
         refusedText: this.$t('interact.interact_1010'),
         showInviteConnectMic: false, // 邀请上麦弹框展示
         inviteFun: null,
-        roleName: this.$t('chat.chat_1022'),
+        roleName: this.$getRoleName(1),
         isWaitting: false,
         inviteTime: 30,
         senderId: ''
@@ -61,7 +61,7 @@
         }
         const { type = '' } = temp.data || {};
         this.roleName =
-          temp.data.room_role == 20 ? this.$t('chat.chat_1064') : this.$t('chat.chat_1022');
+          temp.data.room_role == 20 ? this.$t('chat.chat_1064') : this.$getRoleName(1);
         if (type === 'vrtc_connect_invite') {
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
