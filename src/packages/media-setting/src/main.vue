@@ -263,6 +263,8 @@
       },
       setReport() {
         const { rate, screenRate, layout } = this.mediaState;
+        const diffOptions = this.getDiffOptions();
+
         /**
          * 埋点 - rate -> 分辨率（仅主持人端上报）
          *  110014-标清 110015-高清 110016-流畅 110147-超清
@@ -288,13 +290,22 @@
          * 埋点 - 推流摄像头
          * 触发条件：保存时+摄像头ID切换时
          */
-        // window?.vhallReport(110143, {});
+        const videoTypeChanged = diffOptions.videoType !== undefined;
+        if (diffOptions.video && !videoTypeChanged) {
+          window?.vhallReport(110143, {
+            report_extra: { dn: diffOptions.video }
+          });
+        }
 
         /**
          * 埋点 - 推流麦克风
          * 触发条件：保存时+麦克风需要重新推流时
          */
-        // window?.vhallReport(110144);
+        if (diffOptions.audioInput) {
+          window?.vhallReport(110144, {
+            report_extra: { dn: diffOptions.audioInput }
+          });
+        }
       },
       /**
        * 获得用户更改的字段（diff字段）
