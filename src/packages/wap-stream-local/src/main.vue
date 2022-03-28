@@ -68,6 +68,9 @@
       };
     },
     computed: {
+      localStreamId() {
+        return this.$domainStore.state.interactiveServer.localStream.streamId;
+      },
       localSpeaker() {
         return (
           this.$domainStore.state.micServer.speakerList.find(
@@ -453,12 +456,12 @@
       stopPush() {
         return new Promise(resolve => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
-          if (!this.localSpeaker.streamId) {
+          if (!this.localStreamId) {
             resolve();
             return;
           }
           this.interactiveServer
-            .unpublishStream(this.localSpeaker.streamId)
+            .unpublishStream()
             .then(() => {
               this.isStreamPublished = false;
               clearInterval(this._audioLeveInterval);

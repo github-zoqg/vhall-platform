@@ -22,7 +22,7 @@
       class="vmp-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
-      <p>对方网络异常</p>
+      <p>{{ $t('interact.interact_1035') }}</p>
     </section>
 
     <!-- 顶部流消息 -->
