@@ -121,6 +121,7 @@
           <van-field
             class="input-base"
             v-model="cashForm.money"
+            type="number"
             name="code"
             :placeholder="$t('cash.cash_1025')"
             autocomplete="off"
@@ -484,6 +485,8 @@
                   if (res && res.code == 200) {
                     this.step = 3;
                     this.drawErrorTip = this.$t('cash.cash_1036');
+                    this.useCashServer.getCashInfo();
+                    this.useCashServer.getCashList();
                   } else {
                     console.log(res);
                     this.step = 4;

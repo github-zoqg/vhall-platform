@@ -51,7 +51,9 @@ export default {
     listenEvent() {
       // 改为飘屏组件监听
       this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
-        this.closeDialog();
+        if (this.watchInitData.join_info.third_party_user_id == rawMsg.data.rewarder_id) {
+          this.closeDialog();
+        }
       });
     },
     /**
