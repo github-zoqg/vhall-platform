@@ -328,6 +328,7 @@
                 service_code: 'JSAPI',
                 code: open_id
               };
+              this.handlePay(params, 1);
             } else {
               params = {
                 webinar_id: this.webinarId,
@@ -335,25 +336,24 @@
                 service_code: 'H5_PAY',
                 user_id: userId,
                 show_url:
-                  window.location.protocol +
-                  process.env.VUE_APP_WATCH_URL +
-                  process.env.VUE_APP_WEB_KEY +
+                  window.location.origin +
+                  process.env.VUE_APP_ROUTER_BASE_URL +
                   `/lives/watch/${this.webinarId}`
               };
+              this.handlePay(params, 2);
             }
-            this.handlePay(params);
             break;
           default:
             this.$toast(this.$tec(code) || msg);
             break;
         }
       },
-      handlePay(params) {
+      handlePay(params, flag) {
         this.subscribeServer
           .payWay({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType()) {
+              if (browserType() && flag == 1) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
@@ -509,8 +509,7 @@
 
         const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
 
-        const location =
-          window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY;
+        const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
 
         const url = `${location}${inviteUrl}`;
 
