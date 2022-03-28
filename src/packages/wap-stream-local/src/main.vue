@@ -113,18 +113,11 @@
       //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.localSpeaker;
-        const sameId = this.presentationScreen === accountId;
-        const groupMode = this.mode == 6;
-        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
-        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
-        const allowedUser = inMainRoomUser || inGroupRoomUser;
-
-        console.log('isShowPresentationScreen', {
-          sameId,
-          groupMode,
-          inMainRoomUser,
-          inGroupRoomUser
-        });
+        const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
+        const groupMode = this.mode == 6; // 分组类型
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
+        const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
 
         return sameId && groupMode && allowedUser;
       },
@@ -140,6 +133,7 @@
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
+      // 是否是无延迟直播
       isNoDelay() {
         // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
