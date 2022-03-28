@@ -55,12 +55,15 @@
         lotteryInfo: {} // 抽奖信息
       };
     },
-    created() {
-      this.initMsgEvent();
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
       this.msgServer = useMsgServer();
+    },
+    created() {
+      this.initMsgEvent();
+    },
+    destroyed() {
+      this.removeMsgEvent();
     },
     methods: {
       accept(msg) {
