@@ -531,16 +531,7 @@
       },
       //离开房间处理
       handleLeaveRoom(msg) {
-        if (msg.context.role_name == 1 && this.roleName != 1) {
-          this.$message.warning({ message: this.$t('message.message_1027') });
-        }
-        if (msg.context.role_name == 4) {
-          this.$message.warning({
-            message: this.$t('message.message_1029', {
-              n: msg.context.nickname || msg.context.nick_name
-            })
-          });
-        }
+        console.log(msg);
       },
       //直播结束处理
       handleEndLive() {
