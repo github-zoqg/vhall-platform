@@ -108,9 +108,7 @@
         if (this.interactiveServer.state.localStream.streamId) {
           await this.interactiveServer.unpublishStream();
         }
-
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
-        this.roomBaseServer.setChangeElement('stream-list');
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {
