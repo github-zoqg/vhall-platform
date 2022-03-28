@@ -270,21 +270,21 @@
          *  110014-标清 110015-高清 110016-流畅 110147-超清
          */
         const rateCode = RATE_REPORT_MAP.get(rate);
-        window?.vhallReportForProduct(rateCode);
+        window?.vhallReportForProduct?.report(rateCode);
 
         /**
          * 埋点 - screenRate -> PPT静态/视频
          *  110017-PPT静态 110018-视频动态
          */
         const screenRateCode = SCREEN_RATE_REPORT_MAP.get(screenRate);
-        window?.vhallReportForProduct(screenRateCode);
+        window?.vhallReportForProduct?.report(screenRateCode);
 
         /**
          * 埋点 - layout -> 观看布局（旁路布局）
          * 110019-主次浮窗 110020-主次平铺 110021-均匀排列
          */
         const layoutCode = LAYOUT_REPORT_MAP.get(layout);
-        window?.vhallReportForProduct(layoutCode);
+        window?.vhallReportForProduct?.report(layoutCode);
 
         /**
          * 埋点 - 推流摄像头
@@ -292,7 +292,7 @@
          */
         const videoTypeChanged = diffOptions.videoType !== undefined;
         if (diffOptions.video && !videoTypeChanged) {
-          window?.vhallReport(110143, {
+          window?.vhallReport.report(110143, {
             report_extra: { dn: diffOptions.video }
           });
         }
@@ -302,7 +302,7 @@
          * 触发条件：保存时+麦克风需要重新推流时
          */
         if (diffOptions.audioInput) {
-          window?.vhallReport(110144, {
+          window?.vhallReport.report(110144, {
             report_extra: { dn: diffOptions.audioInput }
           });
         }

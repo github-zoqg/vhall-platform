@@ -133,14 +133,14 @@
           await this.stopVideoPreview();
         }
 
-        window?.vhallReport(110006, {
+        window?.vhallReport.report(110006, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 摄像头检测成功
 
         this.$emit('next', { result: 'success' });
       },
       fail() {
-        window?.vhallReport(110010, {
+        window?.vhallReport.report(110010, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 摄像头检测失败
 

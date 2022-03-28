@@ -66,14 +66,14 @@
 
         let child = null;
         child = this.getComp(item.cuid);
-
+        console.log(child);
         if (!child) return;
 
         // pre-show
         if (item.type === 1) {
           child.queryDetail(item.id);
         }
-
+        child.switchToBack && child.switchToBack();
         this.curItem = item;
       }
     }
