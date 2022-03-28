@@ -84,9 +84,11 @@
     },
     methods: {
       restart() {
+        window?.vhallReport(120001); // 埋点-重新检测
         this.$emit('next', { result: 'fail' });
       },
       finish() {
+        window?.vhallReport(110009); // 埋点-去直播
         this.$emit('next', { result: 'success' });
       }
     }

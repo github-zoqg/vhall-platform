@@ -360,10 +360,12 @@
         }
       }
       &-disable {
+        pointer-events: none; // 不可点击
         i,
         p {
           color: #777777;
         }
+        pointer-events: none;
       }
     }
   }

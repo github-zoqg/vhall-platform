@@ -95,7 +95,7 @@
     width: 920px;
     height: 880px;
     background-size: 100% auto;
-    margin-top: 15vh;
+    // margin-top: 15vh;
     margin-left: 50%;
     transform: translate(-50%, 0);
     display: flex;
@@ -227,7 +227,7 @@
   }
   .vhsaas-red-packet-line {
     width: 920px;
-    height: 880px;
+    height: 100%;
     background: url(../images/open-cover-caidai@2x.png);
     background-size: 100% 100%;
     position: absolute;

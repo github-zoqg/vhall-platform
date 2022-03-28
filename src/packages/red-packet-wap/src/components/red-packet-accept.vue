@@ -90,7 +90,7 @@
     width: 920px;
     height: 880px;
     background-size: 100% auto;
-    margin-top: 15vh;
+    // margin-top: 15vh;
     margin-left: 50%;
     transform: translate(-50%, 0);
     display: flex;
@@ -98,6 +98,7 @@
     align-items: center;
     position: relative;
     z-index: 21;
+    overflow: visible;
     &.close {
       background: url(../images/close-bg@2x.png);
       background-size: 100% 100%;

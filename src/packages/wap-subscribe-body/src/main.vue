@@ -315,7 +315,7 @@
           case 512523:
             open_id = sessionStorage.getItem('open_id') || '';
             userId = this.userInfo ? this.userInfo.user_id : '';
-            if (!(open_id && userId)) {
+            if (!open_id && !userId) {
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
               return;
             }
@@ -644,11 +644,11 @@
       position: fixed;
       bottom: 0;
       width: 100%;
-      height: 1.333333rem;
-      font-size: 0.48rem;
+      height: 100px;
+      font-size: 36px;
       font-weight: 500;
       color: #fff;
-      line-height: 1.333333rem;
+      line-height: 100px;
       background: #fb3a32;
       text-align: center;
       margin-bottom: env(safe-area-inset-bottom);

@@ -1,5 +1,10 @@
 <template>
-  <div class="vmp-basic-layout" :class="{ 'vmp-basic-layout__noHeader': !showHeader }">
+  <div
+    class="vmp-basic-layout"
+    :class="{
+      'vmp-basic-layout__noHeader': !showHeader
+    }"
+  >
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -185,7 +190,7 @@
         } else if (err.code == 611001) {
           this.liveErrorTip = '互动初始化失败，' + err.message;
         } else {
-          this.liveErrorTip = this.$tec(err.code) || err.msg || err.message;
+          this.liveErrorTip = this.$tec(err.code) || err.message;
         }
       },
       goSubscribePage(clientType) {

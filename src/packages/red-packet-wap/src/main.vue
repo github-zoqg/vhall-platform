@@ -1,7 +1,8 @@
 <!-- 观看页-红包组件（颤动 + 弹出层） -->
 <template>
-  <div class="vhsaas-red-packet" v-if="dialogVisible">
-    <div class="vhsaas-interact-mask">
+  <van-popup class="vmp-red-packet-wap" v-model="dialogVisible" get-container="body">
+    <!-- <div class="vhsaas-red-packet" v-if="dialogVisible"> -->
+    <div class="vmp-red-packet-wap__container">
       <components
         :is="componentsView"
         :amount="redPacketServerState.amount * 1"
@@ -13,7 +14,8 @@
         <i class="vhsaas-red-packet-close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
       </components>
     </div>
-  </div>
+    <!-- </div> -->
+  </van-popup>
 </template>
 <script>
   import { useRedPacketServer, useChatServer, useMsgServer } from 'middle-domain';
@@ -99,19 +101,16 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
+  .vmp-red-packet-wap {
+    background-color: transparent !important; // 默认白色
+    overflow: visible; // 显示关闭图标
+  }
+  .vmp-red-packet-wap__container {
+    height: 100%;
+  }
   .vhsaas-red-packet {
     position: relative;
-  }
-  /* 弹出框自定义弹层 */
-  .vhsaas-interact-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 22;
   }
   .vhsaas-red-packet-close-btn {
     position: absolute;

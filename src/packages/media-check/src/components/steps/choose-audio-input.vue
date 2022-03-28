@@ -80,9 +80,17 @@
       },
 
       success() {
+        window?.vhallReport(110007, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 麦克风设备检测成功
+
         this.$emit('next', { result: 'success' });
       },
       fail() {
+        window?.vhallReport(110011, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 麦克风设备检测失败
+
         this.$emit('next', { result: 'fail' });
       }
     }

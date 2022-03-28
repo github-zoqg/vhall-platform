@@ -274,6 +274,14 @@
       SaasAlert
     },
     computed: {
+      // 主讲人权限
+      doc_permission() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.doc_permission;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.doc_permission;
+        }
+      },
       // 文档是否对观众可见
       switchStatus() {
         return this.$domainStore.state.docServer.switchStatus;
@@ -286,7 +294,11 @@
           return this.joinInfo.role_name != 2 ? true : this.switchStatus;
         }
       },
+      // 直播类型
       liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
       // 当前人插播的时候，不显示本地流的操作按钮
@@ -336,10 +348,11 @@
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
       },
 
+      // 在小组中
       isInGroup() {
-        // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
+
       mainScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
@@ -347,6 +360,7 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
+      // 文档演示者的ID
       presentationScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
@@ -357,25 +371,23 @@
       //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.localSpeaker;
-        const sameId = this.presentationScreen === accountId;
-        const groupMode = this.liveMode == 6;
-        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
-        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
-        const allowedUser = inMainRoomUser || inGroupRoomUser;
+        const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
+        const groupMode = this.liveMode == 6; // 分组类型
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
+        const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
 
         return sameId && groupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      mode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
+      // 直播状态
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       },
+      // 无延迟直播
       isNoDelay() {
-        // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       autoSpeak() {
@@ -415,8 +427,8 @@
         return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
       },
 
-      localStream() {
-        return this.$domainStore.state.interactiveServer.localStream;
+      localStreamId() {
+        return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
@@ -507,10 +519,10 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStream.streamId) {
+            if (this.localStreamId) {
               // 只有主持人使用
               if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
-                await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
+                await this.interactiveServer.unpublishStream(this.localStreamId);
                 this.startPush();
               }
               return;
@@ -665,7 +677,7 @@
         });
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
-          if (e.data.stream.getID() == this.localStream.streamId) {
+          if (e.data.stream.getID() == this.localStreamId) {
             this.$message({
               message: this.$t('因网络问题推流失败，正在重新推流'),
               showClose: true,
@@ -932,7 +944,8 @@
       stopPush(options) {
         return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
-          if (!this.localSpeaker.streamId) {
+          // 此处不能用localSpeaker.streamId，因为下麦时已经从speakerList里删掉了，没有localSpeaker了
+          if (!this.localStreamId) {
             // 设备禁用/主动停止直播作区分，此处为结束直播试触发
             if (+this.joinInfo.role_name === 1 && options?.source === 'live_over') {
               window.$middleEventSdk?.event?.send(
@@ -950,18 +963,21 @@
           ) {
             clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            // );
             resolve();
             return;
           }
 
           this.interactiveServer
-            .unpublishStream(this.localSpeaker.streamId)
+            .unpublishStream()
             .then(() => {
               clearInterval(this._audioLeveInterval);
-              if (this.joinInfo.role_name == 1) {
+              if (
+                this.joinInfo.role_name == 1 &&
+                this.doc_permission == this.joinInfo.third_party_user_id
+              ) {
                 window.$middleEventSdk?.event?.send(
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );

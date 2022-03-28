@@ -209,7 +209,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.isEmbed && this.webinarInfo.webinar_state == 1) {
+          if (!this.isEmbed && this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });
