@@ -220,38 +220,37 @@
           return;
         }
         // 如果开启手动加载历史聊天的配置项，并且是嵌入页面，就不会展示付费礼物，并且免费礼物通过聊天消息发送
-        // 非嵌入页面
-        if (!this.isEmbed) {
-          if (this.selectTimer) clearTimeout(this.selectTimer);
-          this.selectTimer = setTimeout(() => {
-            if (isWechat() && open_id) {
-              params = {
-                gift_id: this.currentGift.id,
-                channel: 'WEIXIN',
-                service_code: 'JSAPI',
-                room_id: this.localRoomInfo.roomId,
-                open_id: open_id
-              };
-              console.log(isWechat(), open_id, params, 'open_id');
-              if (Number(this.currentGift.price) <= 0) {
-                this.payFree(params);
-                return;
-              }
-            } else {
-              params = {
-                gift_id: this.currentGift.id,
-                channel: 'ALIPAY',
-                service_code: 'H5_PAY',
-                room_id: this.localRoomInfo.roomId
-              };
-              if (Number(this.currentGift.price) <= 0) {
-                this.payFree(params);
-                return;
-              }
+
+        if (this.selectTimer) clearTimeout(this.selectTimer);
+        this.selectTimer = setTimeout(() => {
+          if (isWechat() && open_id) {
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'WEIXIN',
+              service_code: 'JSAPI',
+              room_id: this.localRoomInfo.roomId,
+              open_id: open_id
+            };
+            console.log(isWechat(), open_id, params, 'open_id');
+            if (Number(this.currentGift.price) <= 0) {
+              this.payFree(params);
+              return;
             }
-            this.payProcess(params);
-          }, 300);
-        }
+          } else {
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'ALIPAY',
+              service_code: 'H5_PAY',
+              room_id: this.localRoomInfo.roomId
+            };
+            if (Number(this.currentGift.price) <= 0) {
+              this.payFree(params);
+              return;
+            }
+          }
+
+          this.payProcess(params);
+        }, 300);
       },
       close() {
         this.showgiftCard = false;
