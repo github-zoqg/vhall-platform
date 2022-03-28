@@ -111,6 +111,7 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
         }
       },
+      // 主屏ID
       mainScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
@@ -222,6 +223,7 @@
             console.error('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
+      // 用户下麦接口
       speakOff() {
         this.micServer.speakOff({
           receive_account_id: this.stream.accountId
