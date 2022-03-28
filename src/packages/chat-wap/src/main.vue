@@ -195,10 +195,6 @@
     created() {
       this.initViewData();
       this.page = 0;
-      if (!this.hideChatHistory) {
-        this.getHistoryMessage();
-      }
-
       this.imgUrls = [];
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
@@ -206,6 +202,9 @@
     mounted() {
       this.listenChatServer();
       this.showWelcomeTxt();
+      if (!this.hideChatHistory) {
+        this.getHistoryMessage();
+      }
     },
     methods: {
       showWelcomeTxt() {
@@ -299,12 +298,6 @@
           startPosition: index,
           lazyLoad: true
         });
-      },
-      //todo 下拉加载
-      handlePullingDown() {
-        this.page++;
-        this.isPullingDown = true;
-        this.getHistoryMessage();
       },
       //滚动到目标处
       scrollToTarget() {

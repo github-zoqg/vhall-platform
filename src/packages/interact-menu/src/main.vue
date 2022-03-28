@@ -362,6 +362,7 @@
         p {
           color: #777777;
         }
+        pointer-events: none;
       }
     }
   }
