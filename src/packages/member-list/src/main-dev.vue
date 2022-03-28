@@ -1255,7 +1255,7 @@
               box-sizing: border-box;
               position: absolute;
               top: 2px;
-              left: 0px;
+              left: 2px;
               content: '';
               width: 10px;
               height: 10px;

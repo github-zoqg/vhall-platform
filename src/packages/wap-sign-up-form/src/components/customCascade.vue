@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-custom-select-picker">
+  <div class="vmp-custom-cascade">
     <div class="select-xl">
       <input
         v-model="resultLabel"
@@ -19,7 +19,7 @@
         :options="options"
         @close="show = false"
         v-model="currentSelect"
-        active-color="#0A7FF5"
+        active-color="#fb3a32"
         :field-names="{ text: 'label' }"
         @finish="onConfirm"
       />
@@ -126,6 +126,36 @@
 </script>
 
 <style lang="less">
-  .vmp-custom-select-picker {
+  .vmp-custom-cascade {
+    .select-xl {
+      position: relative;
+    }
+    .select-item {
+      appearance: none;
+      -moz-appearance: none;
+      -webkit-appearance: none;
+      display: inline-block;
+      width: 9.07rem;
+      height: 1.07rem;
+      line-height: 1.04rem;
+      padding: 0 0.7rem 0 0.2rem;
+      margin-top: 0.27rem;
+      background-color: #fff;
+      border: 0.02rem solid #d2d2d2;
+      outline: none;
+      color: #1a1a1a;
+      font-size: 0.37rem;
+      border-radius: 0.11rem;
+    }
+    .select-arrow {
+      display: inline-block;
+      position: absolute;
+      width: 0.27rem;
+      height: 0.2rem;
+      top: 0.71rem;
+      right: 0.25rem;
+      background: url(../img/arrow-down-mobile.png) no-repeat scroll right center transparent;
+      background-size: 100%;
+    }
   }
 </style>
