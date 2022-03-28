@@ -91,20 +91,6 @@
       }
     },
     methods: {
-      setBottom() {
-        /**
-         * 显示底部操作按钮 非嵌入方式并且 (预约状态下开启了显示预约按钮 或 直接结束)
-         */
-        if (
-          !this.embedObj.embedVideo &&
-          this.webinarStatus == 'subscribe' &&
-          this.hide_subscribe == 1
-        ) {
-          this.showBottom = true;
-        } else {
-          this.showBottom = false;
-        }
-      },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
@@ -152,6 +138,20 @@
           pageUrl = '/embedclient';
         }
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
+      },
+      setBottom() {
+        /**
+         * 显示底部操作按钮 非嵌入方式并且 (预约状态下开启了显示预约按钮 或 直接结束)
+         */
+        if (
+          !this.embedObj.embedVideo &&
+          this.webinarStatus == 'subscribe' &&
+          this.hide_subscribe == 1
+        ) {
+          this.showBottom = true;
+        } else {
+          this.showBottom = false;
+        }
       }
     }
   };
