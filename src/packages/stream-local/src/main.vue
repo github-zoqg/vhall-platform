@@ -274,6 +274,14 @@
       SaasAlert
     },
     computed: {
+      // 主讲人权限
+      doc_permission() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.doc_permission;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.doc_permission;
+        }
+      },
       // 文档是否对观众可见
       switchStatus() {
         return this.$domainStore.state.docServer.switchStatus;
@@ -419,8 +427,8 @@
         return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
       },
 
-      localStream() {
-        return this.$domainStore.state.interactiveServer.localStream;
+      localStreamId() {
+        return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
@@ -511,10 +519,10 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStream.streamId) {
+            if (this.localStreamId) {
               // 只有主持人使用
               if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
-                await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
+                await this.interactiveServer.unpublishStream(this.localStreamId);
                 this.startPush();
               }
               return;
@@ -669,7 +677,7 @@
         });
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
-          if (e.data.stream.getID() == this.localStream.streamId) {
+          if (e.data.stream.getID() == this.localStreamId) {
             this.$message({
               message: this.$t('因网络问题推流失败，正在重新推流'),
               showClose: true,
@@ -936,7 +944,8 @@
       stopPush(options) {
         return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
-          if (!this.localSpeaker.streamId) {
+          // 此处不能用localSpeaker.streamId，因为下麦时已经从speakerList里删掉了，没有localSpeaker了
+          if (!this.localStreamId) {
             // 设备禁用/主动停止直播作区分，此处为结束直播试触发
             if (+this.joinInfo.role_name === 1 && options?.source === 'live_over') {
               window.$middleEventSdk?.event?.send(
@@ -954,18 +963,21 @@
           ) {
             clearInterval(this._audioLeveInterval);
 
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            // );
             resolve();
             return;
           }
 
           this.interactiveServer
-            .unpublishStream(this.localSpeaker.streamId)
+            .unpublishStream()
             .then(() => {
               clearInterval(this._audioLeveInterval);
-              if (this.joinInfo.role_name == 1) {
+              if (
+                this.joinInfo.role_name == 1 &&
+                this.doc_permission == this.joinInfo.third_party_user_id
+              ) {
                 window.$middleEventSdk?.event?.send(
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );
