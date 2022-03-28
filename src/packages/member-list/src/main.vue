@@ -16,7 +16,10 @@
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div v-if="searchEmpty" class="empty-container">
+            <div
+              v-if="searchShow && searchUserInput && !onlineUsers.length"
+              class="empty-container"
+            >
               <span class="empty-img">
                 <img src="img/search@2x.png" alt="" />
               </span>
@@ -319,7 +322,10 @@
       //是否显示搜索结果图片
       isShowEmptyImg() {
         return [
-          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 1 &&
+            this.searchShow &&
+            this.searchUserInput &&
+            !this.onlineUsers.length,
           this.tabIndex === 2 && !this.applyUsers.length,
           this.tabIndex === 3 && !this.limitedUsers.length
         ].some(item => !!item);
@@ -830,7 +836,6 @@
           const isLive = _this.isLive;
           const isWatch = _this.isWatch;
           if (msg.context.isAuthChat) return; // 如果是聊天审核页面不做任何操作
-          //todo 这里可能会改成，请求一下分组的接口，拿到分组的实际人数
           const groupUserNum =
             _this.groupServer.state.groupedUserList.length >= 1
               ? _this.groupServer.state.groupedUserList.length - 1
@@ -1356,7 +1361,7 @@
         const _this = this;
         const params = {
           room_id: this.roomId,
-          pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
+          pos: pos || (this.pageConfig.page <= 0 ? 0 : this.pageConfig.page),
           limit: this.pageConfig.limit
         };
 
@@ -1386,11 +1391,11 @@
                 }
               });
 
-              if (!this.onlineUsers.length) {
-                this.pageConfig.page--;
+              if (!res?.data?.list?.length) {
+                _this.pageConfig.page--;
               }
               //在线总人数
-              this.totalNum = this.memberServer.state.totalNum;
+              _this.totalNum = _this.memberServer.state.totalNum;
               setTimeout(() => {
                 _this.refresh();
               }, 50);
@@ -1885,7 +1890,7 @@
       },
       //加载更多
       loadMore() {
-        this.page++;
+        this.pageConfig.page++;
         this.getOnlineUserList();
       },
       //滚动条位置更新
