@@ -337,7 +337,7 @@
                 user_id: userId,
                 show_url:
                   window.location.protocol +
-                  process.env.VUE_APP_WATCH_URL +
+                  process.env.VUE_APP_WAP_WATCH +
                   process.env.VUE_APP_WEB_KEY +
                   `/lives/watch/${this.webinarId}`
               };

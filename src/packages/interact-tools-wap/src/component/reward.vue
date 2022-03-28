@@ -158,18 +158,6 @@
         let params = {};
         if (isWechat()) {
           if (!open_id) {
-            // let _search = '';
-            // if (location.search && location.search != '') {
-            //   _search = location.search.split('?')[1];
-            // }
-            // const address =
-            //   window.location.protocol +
-            //   process.env.VUE_APP_WATCH_URL +
-            //   process.env.VUE_APP_WEB_KEY +
-            //   `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
-            // window.location.href = `${
-            //   process.env.VUE_APP_BASE_URL
-            // }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
             authWeixinAjax(this.$route, location.href);
             return;
           }
@@ -221,7 +209,7 @@
                       setTimeout(() => {
                         window.location.href =
                           window.location.protocol +
-                          process.env.VUE_APP_WATCH_URL +
+                          process.env.VUE_APP_WAP_WATCH +
                           process.env.VUE_APP_WEB_KEY +
                           `/lives/watch/${that.$route.params.id}`;
                       }, 1500);
@@ -229,7 +217,7 @@
                   }
                 );
               } else {
-                window.location.href = res.data.pay_data;
+                window.location.href = res.data.pay_data.url;
               }
             } else {
               that.$toast(`${that.$tec(res.code) || res.msg}`);
