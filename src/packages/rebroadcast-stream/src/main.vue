@@ -15,7 +15,13 @@
 
 <script>
   import VideoPreview from '@/packages/app-shared/components/video-preview';
-  import { useRoomBaseServer, useInteractiveServer, useRebroadcastServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useInteractiveServer,
+    useRebroadcastServer,
+    useMsgServer
+  } from 'middle-domain';
+  import { sleep } from '@/packages/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpRebroadcastStream',
@@ -57,6 +63,7 @@
     },
     methods: {
       listenEvents() {
+        const msgServer = useMsgServer();
         // 只有第三方推流时才会触发这个事件
         this.roomBaseServer.$on('LIVE_START', () => {
           if (this.roleName != 3) return;
@@ -67,8 +74,16 @@
           if (this.roleName != 3) return;
           this.close();
         });
+
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type === 'live_broadcast_stop') {
+            if (this.roleName != 3) return;
+            this.close();
+          }
+        });
       },
       async open() {
+        await sleep(1000);
         const { watchInitData } = this.roomBaseServer.state;
 
         const token = watchInitData.interact.paas_access_token;
@@ -96,9 +111,12 @@
         }
 
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
+        this.roomBaseServer.setChangeElement('stream-list');
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {
+        if (this.isShow === false) return;
+
         this.$refs.videoPreview?.destroy();
         this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
         this.isShow = false;
