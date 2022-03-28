@@ -14,7 +14,7 @@ export default {
     common_1003: 'Invite',
     common_1004: 'Q&A',
     common_1005: 'Successful payment',
-    common_1006: 'Please enter your phone number/email/employee ID',
+    common_1006: 'Please enter your phone/email/employee ID',
     common_1007: 'The detection type are inconsistent with the activity viewing restriction type',
     common_1008: 'Private chat',
     common_1009: 'Chinese',
