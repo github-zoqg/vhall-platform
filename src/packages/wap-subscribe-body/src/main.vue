@@ -328,6 +328,7 @@
                 service_code: 'JSAPI',
                 code: open_id
               };
+              this.handlePay(params, 1);
             } else {
               params = {
                 webinar_id: this.webinarId,
@@ -340,20 +341,20 @@
                   process.env.VUE_APP_WEB_KEY +
                   `/lives/watch/${this.webinarId}`
               };
+              this.handlePay(params, 2);
             }
-            this.handlePay(params);
             break;
           default:
             this.$toast(this.$tec(code) || msg);
             break;
         }
       },
-      handlePay(params) {
+      handlePay(params, flag) {
         this.subscribeServer
           .payWay({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType()) {
+              if (browserType() && flag == 1) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
