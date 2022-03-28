@@ -21,7 +21,7 @@
               class="empty-container"
             >
               <span class="empty-img">
-                <img src="img/search@2x.png" alt="" />
+                <img src="./img/search@2x.png" alt="" />
               </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
@@ -56,7 +56,7 @@
           <div class="member-list__apply-tab">
             <div v-if="!applyUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="img/noTop@2x.png" alt="" />
+                <img src="./img/noTop@2x.png" alt="" />
               </span>
               <p>暂无人举手</p>
             </div>
@@ -91,7 +91,7 @@
           <div class="member-list__limit-tab">
             <div v-if="!limitedUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="img/no@2x.png" alt="" />
+                <img src="./img/no@2x.png" alt="" />
               </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
@@ -1371,7 +1371,7 @@
           position: absolute;
           top: 7px;
           right: 55px;
-          background-image: url('img/account-file-close-default.png');
+          background-image: url('./img/account-file-close-default.png');
           background-repeat: no-repeat;
           background-size: 100%;
         }
