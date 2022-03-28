@@ -419,6 +419,7 @@
       right: 0;
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
+      z-index: 3;
 
       .vmp-doc-une__content {
         .vmp-doc-inner {
