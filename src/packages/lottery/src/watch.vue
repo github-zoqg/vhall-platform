@@ -82,6 +82,7 @@
           console.log(msg);
           this.lotteryId = msg.lottery_id;
           this.showWinnerList = !!msg.publish_winner;
+          this.setFitment(msg);
           console.log(' this.showWinnerList ', this.showWinnerList);
           if (res.code === 200) {
             if (res.data.take_award === 0) {

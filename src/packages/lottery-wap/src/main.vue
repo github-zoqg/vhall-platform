@@ -77,6 +77,7 @@
         console.log(msg);
         this.lotteryId = msg.lottery_id;
         this.showWinnerList = !!msg.publish_winner;
+        this.setFitment(msg);
         this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
           if (res.code === 200) {
             if (res.data.take_award === 0) {
