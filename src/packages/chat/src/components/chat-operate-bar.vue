@@ -18,6 +18,7 @@
         <!--只看主办方按钮-->
         <i
           class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
+          :class="{ 'is-filter-show': isFilterShow }"
           @click.stop="onClickFilterSetting"
           v-clickoutside="hidechatOptions"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
@@ -360,6 +361,9 @@
           cursor: pointer;
         }
       }
+      .is-filter-show {
+        color: #ccc;
+      }
       &__left {
         display: flex;
         justify-content: flex-start;
@@ -483,6 +487,10 @@
         .el-checkbox__label {
           font-size: 14px;
           color: #999999;
+        }
+
+        .el-checkbox__inner {
+          border: 1px solid #ccc;
         }
       }
       .vh-iconfont {

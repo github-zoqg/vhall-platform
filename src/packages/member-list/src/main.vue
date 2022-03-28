@@ -1066,7 +1066,7 @@
         //主房间人员变动
         function handleMainRoomJoinChange(msg) {
           //必须在主房间
-          if (!_this.isInGroup) return;
+          if (_this.isInGroup) return;
 
           if (isLive) {
             _this.totalNum = msg.uv - _this.groupServer.state.groupedUserList.length;
@@ -2029,7 +2029,7 @@
             display: inline-block;
             width: 26px;
             height: 14px;
-            background-color: #242527;
+            background-color: #434343;
             border-radius: 100px;
             position: relative;
             margin-left: 5px;
@@ -2039,7 +2039,7 @@
               box-sizing: border-box;
               position: absolute;
               top: 2px;
-              left: 0px;
+              left: 2px;
               content: '';
               width: 10px;
               height: 10px;
