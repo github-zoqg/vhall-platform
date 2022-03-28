@@ -693,7 +693,7 @@
     }
   }
   .questionnaire-dialog {
-    margin-top: calc((100vh - 572px) / 2); // 让弹窗保持居中
+    margin-top: calc((100vh - 572px) / 2) !important; // 让弹窗保持居中
     .el-dialog__body {
       // padding: 10px 20px 20px;
       padding: 0;
