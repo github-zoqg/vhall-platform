@@ -383,6 +383,7 @@
     // 没有远端流的时候高度为0
     &-h0 {
       height: 0;
+      visibility: hidden;
       .vmp-stream-list__main-screen {
         &.vmp-dom__max {
           top: 0;
