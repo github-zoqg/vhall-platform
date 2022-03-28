@@ -294,7 +294,7 @@
         const validate = this.cashForm.imgCode;
         const scene_id = this.cashForm.scene_id;
         const failure = err => {
-          this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1051'));
+          this.$toast(this.$tec(err.code) || this.$t('account.account_1051'));
           // 图片验证码重置
           this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
         };
@@ -432,11 +432,11 @@
               if (res && res.code == 200 && res.data.check_result === 1) {
                 this.bindPhoneSave(res.data.key);
               } else {
-                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1052'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1052'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1052'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1052'));
             });
         }
       },
@@ -457,12 +457,12 @@
               // 关闭当前弹出框
               this.checkPhoneToWx();
             } else {
-              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1054'));
+              this.$toast(this.$tec(res.code) || this.$t('account.account_1054'));
             }
           })
           .catch(err => {
             console.log(err);
-            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1054'));
+            this.$toast(this.$tec(err.code) || this.$t('account.account_1054'));
           });
       },
 
@@ -490,12 +490,12 @@
                   } else {
                     console.log(res);
                     this.step = 4;
-                    this.drawErrorTip = this.$tec(res.code) || res.msg || this.$t('cash.cash_1037');
+                    this.drawErrorTip = this.$tec(res.code) || this.$t('cash.cash_1037');
                   }
                 })
                 .catch(err => {
                   this.step = 4;
-                  this.drawErrorTip = this.$tec(err.code) || err.msg || this.$t('cash.cash_1037');
+                  this.drawErrorTip = this.$tec(err.code) || this.$t('cash.cash_1037');
                 });
           }
         } catch (err) {
@@ -521,12 +521,12 @@
               if (res.code === 200) {
                 resolve(res);
               } else {
-                this.$toast(this.$tec(res.code) || res.msg || this.$t('cash.cash_1040'));
+                this.$toast(this.$tec(res.code) || this.$t('cash.cash_1040'));
                 reject(res);
               }
             },
             err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('cash.cash_1040'));
+              this.$toast(this.$tec(err.code) || this.$t('cash.cash_1040'));
               reject(err);
             }
           );

@@ -315,7 +315,7 @@
           case 512523:
             open_id = sessionStorage.getItem('open_id') || '';
             userId = this.userInfo ? this.userInfo.user_id : '';
-            if (!(open_id && userId)) {
+            if (!open_id && !userId) {
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
               return;
             }
