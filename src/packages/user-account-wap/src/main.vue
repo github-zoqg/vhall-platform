@@ -188,11 +188,11 @@
               console.log('上传成功后图片地址', res.data.file_url);
               this.changeAvatarSend(res.data.file_url);
             } else {
-              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1046'));
+              this.$toast(this.$tec(res.code) || this.$t('account.account_1046'));
             }
           })
           .catch(err => {
-            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1046'));
+            this.$toast(this.$tec(err.code) || this.$t('account.account_1046'));
           });
       },
 
@@ -212,11 +212,11 @@
                 this.roomBaseServer.setChangeUserInfo(1, { avatar: avatarUrl });
               });
             } else {
-              this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1048'));
+              this.$toast(this.$tec(res.code) || this.$t('account.account_1048'));
             }
           })
           .catch(err => {
-            this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1048'));
+            this.$toast(this.$tec(err.code) || this.$t('account.account_1048'));
           });
       },
 
@@ -240,11 +240,11 @@
                 this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
                 this.userServer.getUserInfo({ scene_id: 2 });
               } else {
-                this.$toast(this.$tec(res.code) || res.msg || this.$t('account.account_1058'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1058'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tec(err.code) || err.msg || this.$t('account.account_1058'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1058'));
             });
         }
       },

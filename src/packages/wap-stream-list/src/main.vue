@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop="videoShowIcon">
+  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop.prevent="videoShowIcon">
     <div
       class="vmp-stream-list"
       :class="{
@@ -55,8 +55,11 @@
         </p>
       </div>
       <!-- 多语言入口 -->
-      <div class="vmp-wap-stream-wrap-mask-lang">
-        <span @click="openLanguage" v-if="languageList.length > 1">
+      <div
+        class="vmp-wap-stream-wrap-mask-lang"
+        :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
+      >
+        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
           {{ lang.key == 1 ? '中文' : 'EN' }}
         </span>
       </div>
@@ -393,6 +396,7 @@
 
       videoShowIcon() {
         this.iconShow = true;
+        this.isOpenlang = false;
         this.fiveDown();
       },
       changeLang(key) {
@@ -423,6 +427,7 @@
         clearTimeout(this.setIconTime);
         this.setIconTime = setTimeout(() => {
           this.iconShow = false;
+          this.isOpenlang = false;
         }, 5000);
       }
     }

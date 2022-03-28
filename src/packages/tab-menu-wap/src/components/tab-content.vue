@@ -91,7 +91,7 @@
     .vmp-tab-container-mainarea {
       height: 100%;
       position: relative;
-      overflow: auto;
+      // overflow: auto;
       & > section {
         height: 100%;
       }
