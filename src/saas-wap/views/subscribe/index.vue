@@ -1,5 +1,11 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div
+    class="vmp-basic-layout"
+    :class="{
+      'vmp-basic-layout__noHeader': !showHeader,
+      'vmp-basic-layout__hasBottom': showBottom
+    }"
+  >
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="subcribeRoot"></vmp-air-container>
     </div>
@@ -21,6 +27,47 @@
         state: 0,
         liveErrorTip: ''
       };
+    },
+    computed: {
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
+      },
+      // 预约按钮
+      hide_subscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.hide_subscribe;
+      },
+      /**
+       * 显示底部操作按钮 非嵌入方式并且 (预约状态下开启了显示预约按钮 或 直接结束)
+       */
+      showBottom() {
+        if (
+          !this.embedObj.embedVideo &&
+          ((this.webinarType == 2 && this.hide_subscribe == 1) || this.webinarType == 3)
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     },
     async created() {
       try {
@@ -55,7 +102,6 @@
         this.handleErrorCode(err);
       }
     },
-    mounted() {},
     methods: {
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
