@@ -57,7 +57,7 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
-  import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  // import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'gift',
@@ -160,6 +160,7 @@
       // 支付接口
       payProcess(params) {
         const that = this;
+        const open_id = sessionStorage.getItem('open_id');
         this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.data && res.code == 200) {
             if (res.data.price == 0) {
@@ -167,7 +168,7 @@
               this.close();
               return;
             }
-            if (isWechat()) {
+            if (isWechat() && open_id) {
               WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
                 {
@@ -219,17 +220,10 @@
           return;
         }
         // 如果开启手动加载历史聊天的配置项，并且是嵌入页面，就不会展示付费礼物，并且免费礼物通过聊天消息发送
-        // 所以这里需要判断如果满足这两个条件就不会调转登录
-        if (!this.isEmbed) {
-          if (isWechat() && !open_id) {
-            authWeixinAjax(this.$route, location.href);
-            return;
-          }
-        }
 
         if (this.selectTimer) clearTimeout(this.selectTimer);
         this.selectTimer = setTimeout(() => {
-          if (isWechat()) {
+          if (isWechat() && open_id) {
             params = {
               gift_id: this.currentGift.id,
               channel: 'WEIXIN',
@@ -254,6 +248,7 @@
               return;
             }
           }
+
           this.payProcess(params);
         }, 300);
       },
