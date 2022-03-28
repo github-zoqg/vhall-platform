@@ -16,7 +16,19 @@
         alt
       />
     </div>
-    <span class="vmp-member-item__name">{{ userInfo.nickname }}</span>
+    <span
+      class="vmp-member-item__name"
+      :class="{
+        'vmp-member-item__name-limit':
+          isShowMyPresentation &&
+          tabIndex === 1 &&
+          currentSpeakerId != userInfo.account_id &&
+          userInfo.is_speak &&
+          ![2, '2'].includes(userInfo.device_status)
+      }"
+    >
+      {{ userInfo.nickname }}
+    </span>
     <span
       class="vmp-member-item__role"
       :class="userInfo.role_name | roleClassFilter"
@@ -843,6 +855,9 @@
       white-space: nowrap;
       vertical-align: middle;
       margin-left: 9px;
+    }
+    &__name-limit {
+      max-width: 38px;
     }
     &__role {
       display: inline-block;
