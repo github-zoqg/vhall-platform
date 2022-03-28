@@ -219,7 +219,7 @@
 
       &__content-main {
         padding-bottom: 30px;
-        color: #666666;
+        color: #666;
         word-break: break-all;
         line-height: 1.2;
         p {
@@ -227,6 +227,7 @@
         }
 
         img {
+          margin: 16px 0;
           width: 100%;
         }
         strong {

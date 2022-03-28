@@ -302,14 +302,6 @@
     },
 
     methods: {
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
-        });
-      },
-
       /**
        * 左右翻页更改streamWrapper的scrollLeft值实现滚动
        */
@@ -365,6 +357,14 @@
     background: #000;
     border-bottom: 1px solid #1f1f1f;
 
+    // 流列表高度为0
+    &-h0 {
+      height: 0 !important;
+      .vmp-stream-list__main-screen {
+        top: 0 !important;
+      }
+    }
+
     &__stream-wrapper {
       flex: 1;
       overflow: hidden;
@@ -374,7 +374,66 @@
         justify-content: center;
         min-width: 100%;
         flex: none;
+
+        .vmp-stream-list__local-container {
+          width: 142px;
+        }
+
+        .vmp-stream-list__remote-container {
+          width: 142px;
+          &-h {
+            height: 100%;
+          }
+        }
+
+        // 流列表高度不为0
         .vmp-stream-list__main-screen {
+          position: absolute;
+          top: 80px;
+          width: calc(100% - 380px);
+          .vmp-stream-list__remote-container-h {
+            padding-top: 56.25%;
+          }
+
+          // 主屏在大窗的样式
+          &.vmp-dom__max {
+            position: absolute;
+            left: 0;
+            bottom: 56px;
+            width: calc(100% - 380px);
+            height: auto;
+            min-height: auto;
+          }
+
+          // 主屏在小窗的样式
+          &.vmp-dom__mini {
+            right: 0;
+            top: 0;
+            width: 360px;
+            z-index: 10;
+            .vmp-stream-local__bottom-role {
+              padding: 0 8px;
+            }
+            .vmp-stream-local__bottom-nickname {
+              width: 80px;
+            }
+            .vmp-stream-local__bottom-mic {
+              font-size: 14px;
+            }
+            .vmp-stream-local__bottom-signal {
+              margin-left: 10px;
+            }
+          }
+          // 为了保持16:9的比例，这里需要重写一下stream的样式
+          .vmp-stream-remote {
+            position: absolute;
+            top: 0;
+          }
+          .vmp-stream-local {
+            position: absolute;
+            top: 0;
+          }
+
           .vmp-stream-local__bottom {
             &-role {
               padding: 0 6px;
@@ -388,14 +447,6 @@
       &::-webkit-scrollbar {
         /*隐藏滚轮*/
         display: none;
-      }
-    }
-
-    // 流列表高度为0
-    &-h0 {
-      height: 0 !important;
-      .vmp-stream-list__main-screen {
-        top: 0;
       }
     }
 
@@ -445,68 +496,8 @@
       }
     }
   }
-  .vmp-stream-list__local-container {
-    width: 142px;
-  }
 
-  // 流列表高度不为0
-  .vmp-stream-list__main-screen {
-    position: absolute;
-    top: 80px;
-    width: calc(100% - 380px);
-    .vmp-stream-list__remote-container {
-      &-h {
-        padding-top: 56.25%;
-      }
-    }
-
-    // 主屏在大窗的样式
-    &.vmp-dom__max {
-      position: absolute;
-      left: 0;
-      bottom: 56px;
-      width: calc(100% - 380px);
-      height: auto;
-      min-height: auto;
-    }
-    // 为了保持16:9的比例，这里需要重写一下stream的样式
-    .vmp-stream-remote {
-      position: absolute;
-      top: 0;
-    }
-    .vmp-stream-local {
-      position: absolute;
-      top: 0;
-    }
-  }
-
-  .vmp-stream-list__remote-container {
-    width: 142px;
-    &-h {
-      height: 100%;
-    }
-  }
-
-  // 主屏在小窗的样式
-  .vmp-dom__mini {
-    right: 0;
-    top: 0;
-    width: 360px;
-    z-index: 10;
-    .vmp-stream-local__bottom-role {
-      padding: 0 8px;
-    }
-    .vmp-stream-local__bottom-nickname {
-      width: 80px;
-    }
-    .vmp-stream-local__bottom-mic {
-      font-size: 14px;
-    }
-    .vmp-stream-local__bottom-signal {
-      margin-left: 10px;
-    }
-  }
-
+  // 无延迟互动仿旁路布局
   .vmp-stream-list {
     &.no-delay-layout {
       width: calc(100% - 380px);
@@ -532,6 +523,9 @@
         flex-wrap: wrap;
         align-items: flex-end;
         align-content: flex-end;
+        .vmp-stream-list__remote-container {
+          height: 80px;
+        }
       }
       // 小屏样式
       &.vmp-dom__mini {

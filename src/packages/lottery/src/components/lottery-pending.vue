@@ -6,7 +6,7 @@
     <div class="prize-pending-imgWrap">
       <img v-if="fitment.url" :src="fitment.url" />
     </div>
-    <p class="prize-pending__desc">
+    <p class="prize-pending__desc" v-if="!needJoin">
       {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
     </p>
     <p
@@ -25,9 +25,6 @@
       <!-- {{ $t('interact_tools.interact_tools_1008') }} -->
       <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
     </p>
-    <!-- <button @click="joinLottery">
-      {{ $t('interact_tools.interact_tools_1008') }}
-    </button> -->
     <template v-if="needJoin">
       <p class="lottery-desc">
         <i18n path="interact_tools.interact_tools_1007">

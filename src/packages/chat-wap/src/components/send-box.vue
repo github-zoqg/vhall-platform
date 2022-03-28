@@ -222,6 +222,7 @@
       },
       //是否展示互动上麦按钮
       isShowMicBtn() {
+        console.warn('--------', this.device_status);
         //todo 注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         return (
           this.webinar.type == 1 &&
@@ -387,6 +388,11 @@
         //发送消息
         console.log('msg', curmsg);
         chatServer.sendMsg(curmsg);
+        //埋点上报
+        window.vhallReport?.report('CHAT', {
+          event: JSON.stringify(curmsg.data),
+          market_tools_id: this.joinInfo.role_name
+        });
         //清除当前消息
         chatServer.clearCurMsg();
         this.$emit('sendEnd');
@@ -425,7 +431,7 @@
     left: 0;
     bottom: 0;
     width: 100%;
-    position: fixed;
+    // position: fixed;
     transition: 0.35s all;
     z-index: 22;
     &__content {

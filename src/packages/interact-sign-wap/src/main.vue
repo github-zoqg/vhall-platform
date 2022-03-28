@@ -105,7 +105,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.role_name}${this.$t('chat.chat_1027')}`
+            text_content: `${this.$getRoleName(e.data.role_name)}${this.$t('chat.chat_1027')}`
           },
           type: e.data.type
         };
@@ -154,10 +154,6 @@
       // 初次进入已存在签到计时器
       init() {
         if (this.signinInfo && !this.signinInfo.is_signed && this.signinInfo.id) {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', true])
-          );
-          console.log(this.signinInfo, 'this.signinInfo');
           // this.iconShow = true;
           this.signInVisible = false;
           this.getHistorySignInfo();
@@ -233,6 +229,12 @@
           this.signinInfo.is_auto_sign == 1
             ? this.signinInfo.auto_sign_time_ttl
             : this.signinInfo.sign_time_ttl;
+        if (sign_time > 0) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', true])
+          );
+        }
+        console.log(this.signinInfo, 'this.signinInfo');
         this.openSignIn(this.signinInfo.id, Number(sign_time));
       }
     }

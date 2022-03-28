@@ -95,21 +95,35 @@
         // if (this.pagetype == 'watch') {
         const wrap = document.querySelector('.vh-goods');
         if (!wrap) return;
-        wrap.addEventListener('scroll', this.scrollLoadGoodsList);
-        // } else {
-        // 分页
-        // this.$VhallEventBus.$on(this.$VhallEventType.InteractTools.ROOM_GOODS_TURN_PAGE, () => {
-        //   if (this.pos + this.limit >= this.total) return;
-        //   this.queryGoodsList();
-        // });
-        // }
+        console.log('商品.....');
+        if (this.isSubscribe) {
+          window.addEventListener('scroll', this.scrollLoadGoodsList);
+        } else {
+          wrap.addEventListener('scroll', this.scrollLoadGoodsList);
+        }
       },
       scrollLoadGoodsList: debounce(function (e) {
-        const clientHeight = e.target.clientHeight;
-        const scrollHeight = e.target.scrollHeight;
-        const scrollTop = e.target.scrollTop;
-        if (clientHeight + scrollTop >= scrollHeight) {
+        if (this.isSubscribe) {
+          console.log('预约页，看看商品滚动看看触发了没');
+          const currentY = document.body.clientHeight + window.scrollY;
+          const fullY = document.body.scrollHeight;
+          const hasOverflowY = Math.floor(currentY) === Math.floor(fullY); // 排除小数位干扰
+          // console.log('当前情况', currentY, fullY);
+          if (!hasOverflowY) return;
+          // console.log('当前情况2', this.total, this.pos, this.total);
+          if (this.total !== 0 && this.pos >= this.total) return;
           this.queryGoodsList();
+        } else {
+          console.log('直播页，看看商品滚动看看触发了没');
+          const clientHeight = e.target.clientHeight;
+          const scrollHeight = e.target.scrollHeight;
+          const scrollTop = e.target.scrollTop;
+          if (clientHeight + scrollTop >= scrollHeight) {
+            // console.log('商品滚动看看触发了没111111');
+            this.queryGoodsList();
+          } else {
+            // console.log('商品滚动看看触发了没2222');
+          }
         }
       }, 300),
       filterDiscout(val) {
@@ -207,11 +221,14 @@
     },
     destroyed() {
       console.log('good 组件列表销毁---------->');
-
       // 移除滚动监听
       const wrap = document.querySelector('.vh-goods');
       if (wrap) {
-        wrap.removeEventListener('scroll', this.scrollLoadGoodsList);
+        if (this.isSubscribe) {
+          window.removeEventListener('scroll', this.scrollLoadGoodsList);
+        } else {
+          wrap.removeEventListener('scroll', this.scrollLoadGoodsList);
+        }
       }
     }
   };
@@ -352,6 +369,10 @@
               background: #3c3c3c;
             }
           }
+        }
+        .buy {
+          background: #fb3a32;
+          border: 1px solid #fb3a32;
         }
       }
     }

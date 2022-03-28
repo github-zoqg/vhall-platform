@@ -22,7 +22,7 @@
       class="vmp-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
-      <p>对方网络异常</p>
+      <p>{{ $t('interact.interact_1035') }}</p>
     </section>
 
     <!-- 顶部流消息 -->
@@ -291,6 +291,7 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
+      // 文档演示者的ID
       presentationScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
@@ -301,12 +302,12 @@
       //显示是否在演示中
       isShowPresentationScreen() {
         const { accountId } = this.stream;
-        const sameId = this.presentationScreen === accountId;
-        const groupMode = this.liveMode == 6;
-        const inMainRoomUser = !this.isInGroup && accountId != this.hostId;
-        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId;
-        const allowedUser = inMainRoomUser || inGroupRoomUser;
-        return sameId && groupMode && allowedUser;
+        const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
+        const isGroupMode = this.liveMode == 6; // 分组类型
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
+        const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
+        return sameId && isGroupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -482,6 +483,10 @@
         this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
+
+        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
+          window.vhallReportForProduct?.report(110133);
+        }
       },
       fullScreen() {
         if (!this.isFullScreen) {
@@ -514,6 +519,7 @@
           miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         }
         roomBaseServer.setChangeElement(miniElement);
+        window.vhallReportForProduct?.report(110135);
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -682,7 +688,7 @@
       &-role {
         display: inline-flex;
         height: 14px;
-        margin: 5px 4px 0 0;
+        margin-top: 5px;
         align-items: center;
 
         border-radius: 8px;

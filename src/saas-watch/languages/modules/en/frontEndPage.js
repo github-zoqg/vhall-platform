@@ -728,7 +728,7 @@ export default {
     interact_1030: '{n} microphone off',
     interact_1031: '{n} invites you to open the microphone',
     interact_1033: '主画面',
-    interact_1034: '主讲人'
+    interact_1034: 'presenter'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -752,7 +752,6 @@ export default {
       'If you log in any other way, please log on to e.vhall.com and withdraw your money from revenue Management',
     webinar_1006: 'No data',
     webinar_1007: 'Paused',
-    webinar_1008: 'End of the timing',
     webinar_1009: 'On the clock',
     webinar_1010: 'Send out',
     webinar_1011: 'Please type in what you want to say',

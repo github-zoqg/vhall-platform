@@ -57,7 +57,7 @@
         <li
           v-if="hasPager"
           data-value="prevStep"
-          title="上一步"
+          :title="$t('account.account_1077')"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-left"
         ></li>
         <li v-if="hasPager || webinarMode == 5" class="page-number">
@@ -68,7 +68,7 @@
         <li
           v-if="hasPager"
           data-value="nextStep"
-          title="下一步"
+          :title="$t('account.account_1036')"
           class="doc-pagebar__opt vh-iconfont vh-line-arrow-right"
         ></li>
         <li
@@ -237,16 +237,20 @@
         // 1、发起端没有开启桌面共享时展示
         // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
         // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限
-        return (
-          (!this.isWatch && !this.desktopShareServer.state.localDesktopStreamId) ||
-          (this.roleName === 3 &&
-            this.desktopShareServer.state.localDesktopStreamId &&
-            this.docServer.state.currentCid) ||
-          (this.isWatch &&
-            (this.docServer.state.switchStatus ||
-              this.groupServer.state.isInGroup ||
-              this.hasDocPermission))
-        );
+
+        if (this.isWatch) {
+          return (
+            this.docServer.state.switchStatus ||
+            this.groupServer.state.isInGroup ||
+            this.hasDocPermission
+          );
+        } else {
+          if (this.desktopShareServer.state.localDesktopStreamId) {
+            return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
+          } else {
+            return true;
+          }
+        }
       },
       // 是否文档演示权限
       hasDocPermission() {

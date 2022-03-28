@@ -156,12 +156,21 @@
       // 结束抽奖()
       endLottery() {
         if (!this.lotteryInfoId) return;
-        return this.lotteryServer.endLottery(this.lotteryInfoId).fianlly(res => {
-          if (res.code === 516703) {
-            // 抽奖已结束
-            this.close();
+        const callback = res => {
+          const code = res.code;
+          if (code !== 200) {
+            if (code === 516703) {
+              // 抽奖已结束
+              this.close();
+            } else {
+              this.$message.error(this.$tec(code) || res.msg);
+            }
           }
-        });
+        };
+        return this.lotteryServer
+          .endLottery(this.lotteryInfoId)
+          .then(res => callback(res))
+          .catch(err => callback(err));
       },
       /**
        * @description 重新开始一轮抽奖

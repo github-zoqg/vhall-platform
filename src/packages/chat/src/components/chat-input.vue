@@ -265,6 +265,10 @@
         }
         //获取一下子组件里上传的图片
         this.getUploadImg();
+        // 数据埋点-发送图片
+        if (this.imgUrls && this.imgUrls.length) {
+          window.vhallReportForProduct?.report(110124);
+        }
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
@@ -281,6 +285,15 @@
         curmsg.setAt([].concat(this.atList));
         //发送消息
         useChatServer().sendMsg(curmsg);
+        //埋点上报
+        window.vhallReport?.report('CHAT', {
+          event: JSON.stringify(curmsg.data),
+          market_tools_id: this.roleName
+        });
+        //发送图片埋点上报
+        if (this.imgUrls.length > 0) {
+          window.vhallReportForProduct?.report(110124);
+        }
         //清除发送后的消息
         useChatServer().clearCurMsg();
         //清空一下子组件里上传的图片
@@ -290,7 +303,6 @@
         //todo 建议移入domain  清空一下@列表，但是保持引用
         this.atList.splice(0, this.atList.length);
         callback && callback();
-
         this.$nextTick(() => {
           // 输入框内容发生变化，更新滚动条
           this.overlayScrollbar.update();

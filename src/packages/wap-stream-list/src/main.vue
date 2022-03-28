@@ -39,6 +39,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
+        v-if="roomBaseServer.state.watchInitData.pv.show"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -133,6 +134,7 @@
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
+      // 主屏ID
       mainScreen() {
         if (this.isInGroup) {
           return this.$domainStore.state.groupServer.groupInitData.main_screen;
@@ -140,8 +142,9 @@
           return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
         }
       },
+      // 封面图
       coverImgUrl() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar?.img_url;
       },
       localSpeaker() {
         return (
@@ -203,14 +206,15 @@
           return false;
         }
       },
+      // 只存在订阅一路流的情况下进行铺满
       isStreamListHAll() {
-        // 只存在订阅一路流的情况下进行铺满
         return (
           this.remoteSpeakers.length == 1 &&
           this.remoteSpeakers[0].accountId == this.mainScreen &&
           !this.$domainStore.state.interactiveServer.localStream.streamId
         );
       },
+      // 主持人是否在小组中
       is_host_in_group() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
@@ -227,7 +231,7 @@
       },
       // 小组协作中
       showGroupMask() {
-        // 分组活动 + 自己不在小组 + 主持人不在小组
+        // 分组活动 + 自己不在小组 + 主持人不在小组 + 不存在主画面 + 不存在桌面共享
         return (
           !this.isInGroup &&
           this.is_host_in_group &&
@@ -261,7 +265,7 @@
       this.lang = this.roomBaseServer.state.languages.lang;
 
       if (useMediaCheckServer().state.isBrowserNotSupport) {
-        return Toast(`浏览器不支持互动`);
+        return Toast(this.$t('other.other_1010'));
       }
       this.replayPlay = debounce(this.replayPlay, 500);
     },
@@ -284,7 +288,7 @@
     },
 
     methods: {
-      // 设置主画面
+      // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
         const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
         Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
@@ -320,7 +324,6 @@
         this.$nextTick(() => {
           if (this.scroll) {
             this.scroll.refresh();
-            // this.scroll.destroy();
           } else {
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
               scrollX: true,

@@ -18,7 +18,7 @@
           <div class="member-list__all-tab">
             <div v-if="searchEmpty" class="empty-container">
               <span class="empty-img">
-                <img src="./images/search@2x.png" alt="" />
+                <img src="img/search@2x.png" alt="" />
               </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
@@ -53,7 +53,7 @@
           <div class="member-list__apply-tab">
             <div v-if="!applyUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="./images/noTop@2x.png" alt="" />
+                <img src="img/noTop@2x.png" alt="" />
               </span>
               <p>暂无人举手</p>
             </div>
@@ -88,7 +88,7 @@
           <div class="member-list__limit-tab">
             <div v-if="!limitedUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="./images/no@2x.png" alt="" />
+                <img src="img/no@2x.png" alt="" />
               </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
@@ -531,16 +531,7 @@
       },
       //离开房间处理
       handleLeaveRoom(msg) {
-        if (msg.context.role_name == 1 && this.roleName != 1) {
-          this.$message.warning({ message: this.$t('message.message_1027') });
-        }
-        if (msg.context.role_name == 4) {
-          this.$message.warning({
-            message: this.$t('message.message_1029', {
-              n: msg.context.nickname || msg.context.nick_name
-            })
-          });
-        }
+        console.log(msg);
       },
       //直播结束处理
       handleEndLive() {
@@ -675,6 +666,8 @@
         if (this.tabIndex === 3) {
           this.switchToTab(3);
         }
+        //数据埋点--刷新成员列表
+        window.vhallReportForProduct?.report(110134);
         this.pageConfig.page = 0;
         this.searchUserInput = '';
         this.getOnlineUserList();
@@ -703,7 +696,8 @@
           .setHandsUp(params)
           .then(res => {
             console.log('switch-mic-status', res);
-            //todo 上报埋点
+            //数据埋点--开启/关闭允许举手
+            window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
             this.$message.success({ message: '设置成功' });
           })
           .catch(err => {
@@ -746,7 +740,8 @@
         if (['', null, void 0].includes(this.searchUserInput)) {
           return;
         }
-        //todo 埋点上报
+        // 数据埋点-搜索人员
+        window.vhallReportForProduct?.report(110129);
         this.pageConfig.page = 0;
         this.getOnlineUserList();
       },
@@ -977,6 +972,8 @@
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')
               } else {
+                //数据埋点--邀请上麦
+                window.vhallReportForProduct?.report(110130);
                 this.$message.success(this.$t('message.message_1033'));
               }
             } else {
@@ -1022,7 +1019,8 @@
         };
         mutedUser(params)
           .then(res => {
-            //todo 事件上报
+            //数据埋点--禁言/取消禁言
+            window.vhallReportForProduct?.report(110125);
             console.warn('禁言---res', res);
           })
           .catch(err => {
@@ -1071,7 +1069,8 @@
                 return this.$message.error(msg);
               }
               // 踢出只能在在线和举手列表操作
-              //todo 上报事件
+              //埋点上报--踢出/取消踢出
+              window.vhallReportForProduct?.report(nextStatus ? 110126 : 110146);
               if (nextStatus) {
                 this._deleteUser(accountId, this.onlineUsers, 'onlineUsers');
                 this._deleteUser(accountId, this.applyUsers, 'applyUsers');

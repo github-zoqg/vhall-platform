@@ -1,5 +1,10 @@
 <template>
-  <van-popup v-model="visible" class="vmp-chat-wap-input-modal" get-container="body">
+  <van-popup
+    v-model="visible"
+    class="vmp-chat-wap-input-modal"
+    :overlay-style="{ zIndex: 3000 }"
+    get-container="body"
+  >
     <div class="vmp-chat-wap-input-modal__send-box">
       <div class="send-box__top">
         <span class="send-box__top--cancel-btn" @click="cancel">

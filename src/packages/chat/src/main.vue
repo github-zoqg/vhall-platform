@@ -15,6 +15,14 @@
       ref="chatContent"
       :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
+      <!-- {{ configList['ui.hide_chat_history'] }} -->
+      <p
+        v-if="hideChatHistory && !chatList.length && !historyloaded"
+        class="chat-content__get-list-btn-container"
+      >
+        <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
+      </p>
+
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
@@ -33,10 +41,7 @@
         }"
         @tobottom="tobottom"
       ></virtual-list>
-      <div
-        v-if="![1, '1'].includes(configList['ui.hide_chat_history'])"
-        class="chat-content__tip-box"
-      >
+      <div class="chat-content__tip-box">
         <div
           v-show="
             unReadMessageCount !== 0 &&
@@ -95,7 +100,7 @@
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
   import eventMixin from './mixin/event-mixin';
-  import { sessionOrLocal } from './js/utils';
+  // import { sessionOrLocal } from './js/utils';
   import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
   import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -203,10 +208,16 @@
         joinInfo: {},
 
         // 是否展示欢迎语
-        isShowWelcome: false
+        isShowWelcome: false,
+        //加载聊天历史完成
+        historyloaded: false
       };
     },
     computed: {
+      //是否开启手动加载聊天历史记录
+      hideChatHistory() {
+        return [1, '1'].includes(this.configList['ui.hide_chat_history']);
+      },
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
@@ -267,7 +278,9 @@
       //初始化聊天区域滚动组件
       // this.initScroll();
       //拉取聊天历史
-      this.getHistoryMsg();
+      if (!this.hideChatHistory) {
+        this.getHistoryMsg();
+      }
       //监听domain层chatServer通知
       this.listenChatServer();
 
@@ -423,6 +436,7 @@
           limit: 50
         };
         await useChatServer().getHistoryMsg(params);
+        this.historyloaded = true;
         this.page++;
       },
       //todo domain负责 抽奖情况检查
@@ -457,25 +471,25 @@
       },
       /** 消息区域滚动处理结束 */
       //todo domain负责 获取菜单列表
-      getMenuList(val) {
-        const vo = val;
-        if (this.roleName === 2) {
-          // 嵌入会调用 watchEmbedInit —— 房间初始化；
-          // 用户若已登录，获取userInfo中nick_name；若未登录，获取init房间初始化接口中join
-          const userInfo = sessionOrLocal.get('userInfo')
-            ? JSON.parse(sessionOrLocal.get('userInfo'))
-            : {};
-          const rmJoin = sessionOrLocal.get('v3_rm_join')
-            ? JSON.parse(sessionOrLocal.get('v3_rm_join'))
-            : {};
-          if (userInfo && userInfo.nick_name) {
-            vo.nick_name = userInfo.nick_name;
-          }
-          if (rmJoin && rmJoin.nickname) {
-            vo.nick_name = rmJoin.nickname;
-          }
-        }
-      },
+      // getMenuList(val) {
+      //   const vo = val;
+      //   if (this.roleName === 2) {
+      //     // 嵌入会调用 watchEmbedInit —— 房间初始化；
+      //     // 用户若已登录，获取userInfo中nick_name；若未登录，获取init房间初始化接口中join
+      //     const userInfo = sessionOrLocal.get('userInfo')
+      //       ? JSON.parse(sessionOrLocal.get('userInfo'))
+      //       : {};
+      //     const rmJoin = sessionOrLocal.get('v3_rm_join')
+      //       ? JSON.parse(sessionOrLocal.get('v3_rm_join'))
+      //       : {};
+      //     if (userInfo && userInfo.nick_name) {
+      //       vo.nick_name = userInfo.nick_name;
+      //     }
+      //     if (rmJoin && rmJoin.nickname) {
+      //       vo.nick_name = rmJoin.nickname;
+      //     }
+      //   }
+      // },
       backspace() {
         if (!this.inputValue) {
           this.atList = [];
@@ -519,10 +533,7 @@
       },
       //回复消息
       reply(count) {
-        this.buriedPointReport(110119, {
-          business_uid: this.accountId,
-          webinar_id: this.$route.params.il_id
-        });
+        window.vhallReportForProduct?.report(110119);
         this.$refs.chatOperator.handleReply(count);
       },
       //todo domain负责 删除消息（主持人，助理）
@@ -539,22 +550,15 @@
         useChatServer()
           .deleteMessage(params)
           .then(res => {
-            this.buriedPointReport(110121, {
-              business_uid: this.accountId,
-              webinar_id: this.$route.params.il_id
-            });
+            window.vhallReportForProduct?.report(110121);
             return res;
           });
       },
       //todo domain负责 @用户
       //@用户处理
       atUser(accountId) {
-        //数据上报
-        this.buriedPointReport(110120, {
-          business_uid: this.accountId,
-          webinar_id: this.$route.params.il_id
-        });
         this.$refs.chatOperator.handleAtUser(accountId);
+        window.vhallReportForProduct?.report(110120);
       },
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
