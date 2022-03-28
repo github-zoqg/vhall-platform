@@ -117,9 +117,9 @@
       async close() {
         if (this.isShow === false) return;
 
+        this.isShow = false;
         this.$refs.videoPreview?.destroy();
         this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
-        this.isShow = false;
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
       },
       exchangeScreen() {
