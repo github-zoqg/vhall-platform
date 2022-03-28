@@ -156,11 +156,7 @@
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
-        if (isWechat()) {
-          if (!open_id) {
-            authWeixinAjax(this.$route, location.href);
-            return;
-          }
+        if (isWechat() && open_id) {
           params = {
             room_id: this.localRoomInfo.roomId,
             channel: 'WEIXIN',
@@ -187,11 +183,12 @@
       // 确认支付
       payProcess(params) {
         const that = this;
+        const open_id = sessionStorage.getItem('open_id');
         this.rewardServer
           .createReward({ ...params })
           .then(res => {
             if (res.code == 200) {
-              if (isWechat()) {
+              if (isWechat() && open_id) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
