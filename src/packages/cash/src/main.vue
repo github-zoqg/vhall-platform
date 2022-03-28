@@ -112,7 +112,6 @@
               <el-input
                 v-model.trim="bindForm.money"
                 clearable
-                oninput="this.value=this.value.replace(/[^\d^\.]+/g, '')"
                 :placeholder="$t('cash.cash_1025')"
               ></el-input>
             </el-form-item>
@@ -323,6 +322,12 @@
     beforeDestroy() {
       this.initInterval(); // 初始化定时器
       this.initPollTimer(); // 初始化微信绑定情况的轮询
+    },
+    watch: {
+      'bindForm.money'(val) {
+        // eslint-disable-next-line no-useless-escape
+        this.bindForm.money = `${val}`.replace(/[^\d^\.]+/g, '');
+      }
     },
     methods: {
       // 关闭弹窗初始化事件

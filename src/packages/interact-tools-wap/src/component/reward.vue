@@ -216,14 +216,14 @@
                   },
                   function (res) {
                     if (res.err_msg == 'get_brand_wcpay_request:ok') {
-                      that.$toast(`${this.$t('common.common_1005')}`);
+                      that.$toast(`${that.$t('common.common_1005')}`);
                       that.close();
                       setTimeout(() => {
                         window.location.href =
                           window.location.protocol +
                           process.env.VUE_APP_WATCH_URL +
                           process.env.VUE_APP_WEB_KEY +
-                          `/lives/watch/${this.$route.params.id}`;
+                          `/lives/watch/${that.$route.params.id}`;
                       }, 1500);
                     }
                   }
@@ -232,12 +232,12 @@
                 window.location.href = res.data.pay_data;
               }
             } else {
-              that.$toast(`${this.$tec(res.code) || res.msg}`);
+              that.$toast(`${that.$tec(res.code) || res.msg}`);
             }
           })
           .catch(res => {
             console.log('获取支付信息失败>>>', res);
-            that.$toast(`${this.$tec(res.code) || res.msg}`);
+            that.$toast(`${that.$tec(res.code) || res.msg}`);
           });
       },
       close() {

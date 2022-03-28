@@ -1,6 +1,12 @@
 /* eslint-disable promise/param-names */
 <template>
-  <van-popup v-model="popupVisible" position="bottom" :overlay="false" class="lottery-popup">
+  <van-popup
+    v-model="popupVisible"
+    position="bottom"
+    :overlay="false"
+    class="lottery-popup"
+    get-container="body"
+  >
     <!-- 抽奖标题 -->
     <header class="title-bar">
       {{ $t('interact_tools.interact_tools_1003') }}
@@ -55,12 +61,16 @@
         lotteryInfo: {} // 抽奖信息
       };
     },
-    created() {
-      this.initMsgEvent();
-    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
       this.msgServer = useMsgServer();
+    },
+    created() {
+      this.initMsgEvent();
+    },
+    destroyed() {
+      this.removeMsgEvent();
+      this.popupVisible = false;
     },
     methods: {
       accept(msg) {

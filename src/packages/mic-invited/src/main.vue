@@ -29,7 +29,7 @@
         isConfirmVisible: false,
         btnText: this.$t('interact.interact_1010'),
         waitTime: 30,
-        roleName: this.$t('chat.chat_1022'),
+        roleName: this.$getRoleName(1),
         senderId: '',
         waitInterval: null
       };
@@ -58,7 +58,7 @@
         }
         const { type = '' } = temp.data || {};
         this.roleName =
-          temp.data.room_role == 20 ? this.$t('chat.chat_1064') : this.$t('chat.chat_1022');
+          temp.data.room_role == 20 ? this.$t('chat.chat_1064') : this.$getRoleName(1);
         if (type === 'vrtc_connect_invite') {
           // 是本人的时候，弹出邀请弹框
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
