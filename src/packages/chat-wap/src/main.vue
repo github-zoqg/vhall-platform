@@ -3,7 +3,7 @@
     <div class="vmp-chat-wap__content">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
-        v-if="hideChatHistory && !chatList.length"
+        v-if="hideChatHistory && !chatList.length && !historyloaded"
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
@@ -97,7 +97,9 @@
         //是否是嵌入端
         isEmbed: false,
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
+        allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        //是否加载完聊天历史
+        historyloaded: false
       };
     },
     watch: {
@@ -287,6 +289,7 @@
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
         }
+        this.historyloaded = true;
         this.scrollBottom();
       },
       previewImg(img) {
