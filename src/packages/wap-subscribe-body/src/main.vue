@@ -336,9 +336,8 @@
                 service_code: 'H5_PAY',
                 user_id: userId,
                 show_url:
-                  window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
+                  window.location.origin +
+                  process.env.VUE_APP_ROUTER_BASE_URL +
                   `/lives/watch/${this.webinarId}`
               };
               this.handlePay(params, 2);
@@ -510,8 +509,7 @@
 
         const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
 
-        const location =
-          window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY;
+        const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
 
         const url = `${location}${inviteUrl}`;
 
