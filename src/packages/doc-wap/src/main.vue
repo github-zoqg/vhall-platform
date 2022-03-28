@@ -113,9 +113,16 @@
       pageTotal() {
         return this.docServer.state.pageTotal;
       },
+      // 当前资料类型是文档还是白板
+      currentType() {
+        return this.docServer.state.currentCid.split('-')[0];
+      },
       // 是否有翻页按钮
       hasPager() {
-        return !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc;
+        return (
+          !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
+          this.currentType === 'document'
+        );
       }
     },
     watch: {
