@@ -95,6 +95,7 @@
   import { useMediaSettingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
 
   import mediaSettingConfirm from './js/showConfirm';
+  import { RATE_REPORT_MAP, SCREEN_RATE_REPORT_MAP, LAYOUT_REPORT_MAP } from './js/reportMap';
 
   /**
    * 获取差异obj
@@ -260,7 +261,41 @@
           this.getStateCapture(); // 更新快照
         }
       },
-      setReport() {},
+      setReport() {
+        const { rate, screenRate, layout } = this.mediaState;
+        /**
+         * 埋点 - rate -> 分辨率（仅主持人端上报）
+         *  110014-标清 110015-高清 110016-流畅 110147-超清
+         */
+        const rateCode = RATE_REPORT_MAP.get(rate);
+        window?.vhallReportForProduct(rateCode);
+
+        /**
+         * 埋点 - screenRate -> PPT静态/视频
+         *  110017-PPT静态 110018-视频动态
+         */
+        const screenRateCode = SCREEN_RATE_REPORT_MAP.get(screenRate);
+        window?.vhallReportForProduct(screenRateCode);
+
+        /**
+         * 埋点 - layout -> 观看布局（旁路布局）
+         * 110019-主次浮窗 110020-主次平铺 110021-均匀排列
+         */
+        const layoutCode = LAYOUT_REPORT_MAP.get(layout);
+        window?.vhallReportForProduct(layoutCode);
+
+        /**
+         * 埋点 - 推流摄像头
+         * 触发条件：保存时+摄像头ID切换时
+         */
+        // window?.vhallReport(110143, {});
+
+        /**
+         * 埋点 - 推流麦克风
+         * 触发条件：保存时+麦克风需要重新推流时
+         */
+        // window?.vhallReport(110144);
+      },
       /**
        * 获得用户更改的字段（diff字段）
        */

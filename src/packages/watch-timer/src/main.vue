@@ -77,7 +77,7 @@
       return {
         roomBaseServer,
         timerVisible: false,
-        status: 'kaishi',
+        status: 'start',
         is_all_show: false,
         is_timeout: false,
         time: 0,
@@ -154,7 +154,7 @@
         this.timeFormat(this.time);
         this.timerFun(e.data.duration);
         // 打开计时器组件
-        this.status = 'kaishi';
+        this.status = 'start';
         if (this.is_all_show == 1) {
           // 通知相应组件打开计时器Icon
           this.handleTimer();
@@ -167,12 +167,12 @@
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
         );
         this.timerVisible = false;
-        this.status = 'jieshu';
+        this.status = 'end';
         clearInterval(this.timer);
       },
       // 计时器暂停
       timer_pause(e) {
-        this.status = 'zanting';
+        this.status = 'pause';
         this.timeFormat(Math.abs(e.data.remain_time));
         clearInterval(this.timer);
       },
@@ -180,7 +180,7 @@
       timer_reset() {
         clearInterval(this.timer);
         this.timerVisible = false;
-        this.status = 'kaishi';
+        this.status = 'start';
         // 通知相应组件关闭计时器Icon
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['openTimer', false])
@@ -188,7 +188,7 @@
       },
       // 计时器继续
       timer_resume(e) {
-        this.status = 'kaishi';
+        this.status = 'start';
         this.timerFun(e.data.remain_time);
       },
       init() {
@@ -208,7 +208,7 @@
             this.timerFun(this.time);
           }
           // 打开计时器组件
-          this.status = resData.status == 4 ? 'zanting' : 'kaishi';
+          this.status = resData.status == 4 ? 'pause' : 'start';
           if (this.is_all_show == 1) {
             this.handleTimer();
           }
@@ -243,7 +243,7 @@
         this.timer = setInterval(() => {
           if (this.is_timeout == 0) {
             if (data == 1) {
-              this.status = 'jieshu';
+              this.status = 'end';
             }
             if (data == 0) {
               clearInterval(this.timer);
@@ -260,7 +260,7 @@
             return false;
           }
           if (data < 1) {
-            this.status = 'chaoshi';
+            this.status = 'timeout';
           }
           this.timeFormat(Math.abs(--data));
           this.time = data;

@@ -18,7 +18,7 @@
           <div class="member-list__all-tab">
             <div v-if="searchEmpty" class="empty-container">
               <span class="empty-img">
-                <img src="./images/search@2x.png" alt="" />
+                <img src="img/search@2x.png" alt="" />
               </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
@@ -53,7 +53,7 @@
           <div class="member-list__apply-tab">
             <div v-if="!applyUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="./images/noTop@2x.png" alt="" />
+                <img src="img/noTop@2x.png" alt="" />
               </span>
               <p>暂无人举手</p>
             </div>
@@ -88,7 +88,7 @@
           <div class="member-list__limit-tab">
             <div v-if="!limitedUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="./images/no@2x.png" alt="" />
+                <img src="img/no@2x.png" alt="" />
               </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
@@ -531,16 +531,7 @@
       },
       //离开房间处理
       handleLeaveRoom(msg) {
-        if (msg.context.role_name == 1 && this.roleName != 1) {
-          this.$message.warning({ message: this.$t('message.message_1027') });
-        }
-        if (msg.context.role_name == 4) {
-          this.$message.warning({
-            message: this.$t('message.message_1029', {
-              n: msg.context.nickname || msg.context.nick_name
-            })
-          });
-        }
+        console.log(msg);
       },
       //直播结束处理
       handleEndLive() {

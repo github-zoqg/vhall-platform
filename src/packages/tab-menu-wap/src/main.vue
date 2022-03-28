@@ -229,7 +229,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.embedObj.embed && this.webinarInfo.webinar_state == 1) {
+          if (!this.embedObj.embed && this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });

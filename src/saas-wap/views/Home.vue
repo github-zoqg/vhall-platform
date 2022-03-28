@@ -67,7 +67,7 @@
       },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
-        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar?.type);
       },
       // 预约按钮
       hide_subscribe() {

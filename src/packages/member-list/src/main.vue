@@ -18,7 +18,7 @@
           <div class="member-list__all-tab">
             <div v-if="searchEmpty" class="empty-container">
               <span class="empty-img">
-                <img src="./images/search@2x.png" alt="" />
+                <img src="img/search@2x.png" alt="" />
               </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
@@ -53,7 +53,7 @@
           <div class="member-list__apply-tab">
             <div v-if="!applyUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="./images/noTop@2x.png" alt="" />
+                <img src="img/noTop@2x.png" alt="" />
               </span>
               <p>暂无人举手</p>
             </div>
@@ -88,7 +88,7 @@
           <div class="member-list__limit-tab">
             <div v-if="!limitedUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="./images/no@2x.png" alt="" />
+                <img src="img/no@2x.png" alt="" />
               </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
@@ -517,28 +517,6 @@
         const _this = this;
         const { isLive } = this;
 
-        // this.memberServer.$on('JOIN', msg => {
-        //   _this.$message({
-        //     message: _this.$t('message.message_1030', { n: msg.context.nickname }),
-        //     showClose: true,
-        //     type: 'success',
-        //     customClass: 'zdy-info-box'
-        //   });
-        // });
-        //
-        // this.memberServer.$on('LEFT', msg => {
-        //   if (msg.context.role_name == 1 && _this.roleName != 1) {
-        //     _this.$message.warning({ message: _this.$t('message.message_1027') });
-        //   }
-        //   if (msg.context.role_name == 4) {
-        //     _this.$message.warning({
-        //       message: _this.$t('message.message_1029', {
-        //         n: msg.context.nickname || msg.context.nick_name
-        //       })
-        //     });
-        //   }
-        // });
-
         // 加入房间
         this.msgServer.$onMsg('JOIN', msg => {
           handleUserJoinRoom(msg);
@@ -882,16 +860,6 @@
           setTimeout(() => {
             _this.refresh();
           }, 50);
-          if (msg.context.role_name == 1 && _this.roleName != 1) {
-            _this.$message.warning({ message: _this.$t('message.message_1027') });
-          }
-          if (msg.context.role_name == 4) {
-            _this.$message.warning({
-              message: _this.$t('message.message_1029', {
-                n: msg.context.nickname || msg.context.nick_name
-              })
-            });
-          }
         }
         //用户申请上麦
         function handleApplyConnect(msg) {
