@@ -293,15 +293,15 @@
     methods: {
       // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
-        const str =
-          msg.data.type == 'vrtc_big_screen_set' ? '主画面' : this.$t('interact.interact_1034');
-        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
         this.$nextTick(() => {
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
           }
         });
+        const str =
+          msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
+        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
       },
       // 事件监听
       addSDKEvents() {
