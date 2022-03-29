@@ -203,11 +203,12 @@
       },
       // 是否显示文档翻页相关操作栏
       showPagebar() {
-        // 显示文档资料时 && && (普通模式，或 观看端全屏模式下) && (有演示权限，或是助理和观众)
+        // (普通模式，或 观看端全屏模式下) && (有演示权限，或是观众,或者展示文档时的助理)
         return (
-          this.currentType === 'document' &&
           (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
-          (this.hasDocPermission || [2, 3].includes(this.roleName))
+          (this.hasDocPermission ||
+            this.roleName === 2 ||
+            (this.roleName === 3 && this.currentType === 'document'))
         );
       },
       // 当前用户Id
@@ -319,6 +320,8 @@
       },
       // 是否有翻页操作权限
       hasPager() {
+        // 不是文档，不展示翻页操作按钮
+        if (this.currentType !== 'document') return false;
         // 定时直播所有人都没有翻页权限
         if (this.webinarMode == 5) return false;
         // 有演示权限，或者助理配有翻页权限，或者活动设置了有翻页权限(开发状态下)
