@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import { sessionOrLocal, uuid } from '@/packages/chat/src/js/utils';
+  import { uuid } from '@/packages/app-shared/utils/tool';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatImgUpload',
@@ -61,7 +61,7 @@
         //图片地址列表
         imgUrls: [],
         //上传图片请求的token
-        headToken: sessionOrLocal.get('token', 'localStorage') || '',
+        headToken: localStorage.getItem('token') || '',
         interact_token: '',
         //上传图片地址
         action: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`
@@ -71,14 +71,14 @@
       headersVo: function () {
         const vo = { token: this.headToken, platform: 7, 'request-id': uuid() };
         // 获取参数
-        const wIdIndex0 = window.location.href.lastIndexOf('/');
-        const wIdIndex1 = window.location.href.lastIndexOf('?');
-        const wId = window.location.href.substring(
+        const wIdIndex0 = location.href.lastIndexOf('/');
+        const wIdIndex1 = location.href.lastIndexOf('?');
+        const wId = location.href.substring(
           wIdIndex0 + 1,
-          wIdIndex1 > 0 ? wIdIndex1 : window.location.href.length
+          wIdIndex1 > 0 ? wIdIndex1 : location.href.length
         );
-        if (window.sessionStorage.getItem(`V3_WAP_US_${wId}`)) {
-          vo['gray-id'] = window.sessionStorage.getItem(`V3_WAP_US_${wId}`);
+        if (sessionStorage.getItem(`V3_WAP_US_${wId}`)) {
+          vo['gray-id'] = sessionStorage.getItem(`V3_WAP_US_${wId}`);
         }
         return vo;
       },
@@ -99,21 +99,20 @@
         const { state = {} } = this.roomBaseServer;
         this.interact_token = state.watchInitData.interact.interact_token || '';
       },
-      //todo 可以升级为知客的上传多张 上传图片前置处理
+      //上传图片前置处理
       beforeUpload() {
         if (this.disable) {
           this.$message.error(this.$t('chat.chat_1006'));
           return false;
         }
         if (this.uploadActive >= 4) {
-          this.$message.error('一次最多上传4张图片'); // TODO: 翻译确实
+          this.$message.error('一次最多上传4张图片');
           return false;
         }
         return true;
       },
       //上传图片成功
       uploadSuccess(res) {
-        console.log('======上传成功========', res);
         if (!['200', 200].includes(res.code)) {
           return this.$message.warning(res.msg);
         }
@@ -143,7 +142,7 @@
   .vmp-chat-img-upload-container {
     @active-color: #fb3a32;
     .iconfont {
-      color: #999999;
+      color: #999;
       font-size: 19px;
       cursor: pointer;
       &.active {
