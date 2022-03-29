@@ -293,7 +293,8 @@
     methods: {
       // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
-        const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
+        const str =
+          msg.data.type == 'vrtc_big_screen_set' ? '主画面' : this.$t('interact.interact_1034');
         Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
         this.$nextTick(() => {
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
@@ -311,13 +312,18 @@
           this.showPlayIcon = true;
         });
 
-        // 接收设为主讲人消息  主直播间
+        // 接收设为主画面消息  主直播间
         this.micServer.$on('vrtc_big_screen_set', msg => {
           this.setBigScreen(msg);
         });
 
-        // 接收设为主讲人消息   组内
+        // 接收设为主画面消息   组内
         useGroupServer().$on('VRTC_BIG_SCREEN_SET', msg => {
+          this.setBigScreen(msg);
+        });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_speaker_switch', msg => {
           this.setBigScreen(msg);
         });
       },
