@@ -172,9 +172,8 @@
             };
           } else {
             //重新授权
-            console.log('rewardPay-------->', this.$route, this.$router);
-            const payUrl = buildPayUrl(this.$route);
             payAuthStatus = 1;
+            const payUrl = buildPayUrl(this.$route);
             authWeixinAjax(this.$route, payUrl, () => {});
           }
         } else {
@@ -215,13 +214,13 @@
                     if (res.err_msg == 'get_brand_wcpay_request:ok') {
                       that.$toast(`${that.$t('common.common_1005')}`);
                       that.close();
-                      setTimeout(() => {
-                        window.location.href =
-                          window.location.protocol +
-                          process.env.VUE_APP_WAP_WATCH +
-                          process.env.VUE_APP_WEB_KEY +
-                          `/lives/watch/${that.$route.params.id}`;
-                      }, 1500);
+                      // setTimeout(() => {
+                      //   window.location.href =
+                      //     window.location.protocol +
+                      //     process.env.VUE_APP_WAP_WATCH +
+                      //     process.env.VUE_APP_WEB_KEY +
+                      //     `/lives/watch/${that.$route.params.id}`;
+                      // }, 1500);
                     }
                   }
                 );
@@ -233,7 +232,7 @@
             }
           })
           .catch(res => {
-            console.log('获取支付信息失败>>>', res);
+            console.log('reward 获取支付信息失败---------->', res);
             that.$toast(`${that.$tec(res.code) || res.msg}`);
           });
       },
