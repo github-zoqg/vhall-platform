@@ -58,7 +58,7 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { useWatchRewardServer, useChatServer } from 'middle-domain';
-  import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'reward',
@@ -156,17 +156,27 @@
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
-        if (isWechat() && open_id) {
-          params = {
-            room_id: this.localRoomInfo.roomId,
-            channel: 'WEIXIN',
-            reward_amount: money,
-            service_code: 'JSAPI',
-            describe: this.note
-              ? this.note
-              : `${this.$t('interact_tools.interact_tools_1047')}～～`,
-            open_id: open_id
-          };
+        let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        if (isWechat()) {
+          // 微信正常授权过
+          if (open_id) {
+            params = {
+              room_id: this.localRoomInfo.roomId,
+              channel: 'WEIXIN',
+              reward_amount: money,
+              service_code: 'JSAPI',
+              describe: this.note
+                ? this.note
+                : `${this.$t('interact_tools.interact_tools_1047')}～～`,
+              open_id: open_id
+            };
+          } else {
+            //重新授权
+            console.log('rewardPay-------->', this.$route, this.$router);
+            const payUrl = buildPayUrl(this.$route);
+            payAuthStatus = 1;
+            authWeixinAjax(this.$route, payUrl, () => {});
+          }
         } else {
           params = {
             channel: 'ALIPAY',
@@ -178,17 +188,19 @@
             room_id: this.localRoomInfo.roomId
           };
         }
-        this.payProcess(params);
+
+        if (payAuthStatus == 0) {
+          this.payProcess(params);
+        }
       },
       // 确认支付
       payProcess(params) {
         const that = this;
-        const open_id = sessionStorage.getItem('open_id');
         this.rewardServer
           .createReward({ ...params })
           .then(res => {
             if (res.code == 200) {
-              if (isWechat() && open_id) {
+              if (isWechat()) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
