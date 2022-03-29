@@ -19,7 +19,7 @@
       };
     },
     created() {
-      if (this.$route.query.lang) {
+      if (this.$route.query.lang == 1 || this.$route.query.lang == 2) {
         this.$i18n.locale = parseInt(this.$route.query.lang) == 1 ? 'zh' : 'en';
       } else {
         this.$i18n.locale = 'zh';

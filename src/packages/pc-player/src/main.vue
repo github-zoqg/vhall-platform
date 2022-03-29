@@ -421,8 +421,9 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[player]---大小屏变更miniElement：', newval);
-        this.displayMode = newval === 'player' ? 'mini' : 'normal';
+        if (!this.isEmbedVideo) {
+          this.displayMode = newval === 'player' ? 'mini' : 'normal';
+        }
       }
     },
     created() {
