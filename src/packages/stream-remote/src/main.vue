@@ -37,7 +37,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleFilter }}
+        {{ stream.attributes.roleName | roleFilter(true) }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -67,7 +67,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleFilter }}
+          {{ stream.attributes.roleName | roleFilter(true) }}
         </span>
 
         <el-tooltip
@@ -430,7 +430,7 @@
       },
       // 恢复播放
       replayPlay() {
-        const videos = document.querySelectorAll('video');
+        const videos = document.querySelectorAll('.vmp-stream-remote video');
         videos.length > 0 &&
           videos.forEach(video => {
             video.play();

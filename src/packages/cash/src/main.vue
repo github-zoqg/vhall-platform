@@ -547,7 +547,7 @@
             if (res.code == 200) {
               console.log(res.data);
               const jump_url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/bind/${res.data.mark}`;
-              this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
+              this.qrcode = `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
               console.log(`二维码请求地址: ${this.qrcode}`);
               // 轮询微信扫码绑定情况
               this.startPolling(type);

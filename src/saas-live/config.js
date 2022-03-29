@@ -127,14 +127,6 @@ export const serverConfig = {
   // // 顶部右侧容器
   pannelHeaderRight: {
     component: 'VmpHeaderRight',
-    options: {
-      isShowMediaSetting: true, // 是否展示媒体设置
-      isShowQuit: false, //是否显示退出
-      isShowSupport: false, //是否显示技术支持
-      isShowSplitScreen: true, //是否显示分屏
-      isShowVirtualAudience: true, // 是否显示虚拟人数
-      isShowThirdParty: true // 是否显示三方推流
-    },
     emitVirtualClick: [
       {
         cuid: 'comVirtualPeople',

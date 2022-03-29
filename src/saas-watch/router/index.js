@@ -37,7 +37,7 @@ const routes = [
     path: '/lives/entryform/:id',
     component: entryForm,
     name: 'entryForm',
-    meta: { title: '独立报名表单' }
+    meta: { title: '独立报名表单', grayType: 'webinar' }
   },
   {
     path: '/forgetPwd',

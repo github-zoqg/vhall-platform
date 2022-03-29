@@ -407,34 +407,6 @@
       closeConfirm() {
         this.popAlert.visible = false;
       },
-
-      // 全屏
-      fullScreen(el) {
-        this.isFullscreen = !this.isFullscreen;
-        if (this.isFullscreen) {
-          this.enterFullscreen(el);
-        } else {
-          this.exitFullscreen(el);
-        }
-      },
-      enterFullscreen() {
-        const element = document.querySelector('.vmp-basic-container');
-        if (!this.assistantType) {
-          if (element.requestFullscreen) element.requestFullscreen();
-          else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
-          else if (element.webkitRequestFullscreen) {
-            element.webkitRequestFullscreen();
-          } else if (element.msRequestFullscreen) element.msRequestFullscreen();
-        }
-      },
-      exitFullscreen() {
-        if (!this.assistantType) {
-          if (document.exitFullscreen) document.exitFullscreen();
-          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          else if (document.msExitFullscreen) document.msExitFullscreen();
-        }
-      },
       //结束演示
       handleEndDemonstrate() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndDemonstrate'));
