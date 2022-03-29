@@ -282,7 +282,8 @@
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
-        isWatch: false
+        isWatch: false,
+        timmer: null
       };
     },
     beforeCreate() {
@@ -1009,10 +1010,13 @@
             },
             'onlineUsers'
           );
-
+          console.log('互动连麦成功断开链接', msg);
           //提示语
           if (msg.data.target_id == _this.userId) {
-            _this.$message.success({ message: _this.$t('interact.interact_1028') });
+            this.timmer && clearTimeout(this.timmer);
+            this.timmer = setTimeout(() => {
+              _this.$message.success({ message: _this.$t('interact.interact_1028') });
+            }, 1000);
             return;
           }
 
