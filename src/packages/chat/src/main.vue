@@ -669,7 +669,7 @@
         max-width: 312px;
         background: linear-gradient(90deg, #fb3a32 0%, rgba(255, 172, 44, 0.8) 100%);
         box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-        border-radius: 999999px;
+        border-radius: 100px;
         color: #ffffff;
         font-size: 14px;
         line-height: 20px;
