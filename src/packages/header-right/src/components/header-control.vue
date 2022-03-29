@@ -14,15 +14,12 @@
               {{ userInfo.nickname }}
             </span>
           </div>
-          <div class="header-right_control_wrap-head-right" v-if="isShowQuit" @click="roleQuit">
-            退出
-          </div>
         </div>
         <div class="header-right_control_wrap-container">
           <div
             class="header-right_control_wrap-container-setting"
             :class="{ 'header-right_control_wrap-container-disabled': thirtPushStreamimg }"
-            v-if="isShowMediaSetting && (userInfo.role_name == 1 || userInfo.role_name == 4)"
+            v-if="userInfo.role_name == 1 || userInfo.role_name == 4"
             @click="openMediaSettings"
           >
             <i class="vh-iconfont vh-line-setting"></i>
@@ -33,7 +30,7 @@
             :class="{
               'header-right_control_wrap-container-disabled': !isLiving || isInsertFilePushing
             }"
-            v-if="configList['is_interact'] && isShowSplitScreen && isSupportSplitScreen"
+            v-if="configList['is_interact'] && isSupportSplitScreen"
             @click="handleSplitScreenChange"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
@@ -49,13 +46,7 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="
-              configList['btn_thirdway'] &&
-              isShowThirdParty &&
-              webinarInfo.no_delay_webinar == 0 &&
-              isThirtPushStream &&
-              !thirtPushStreamimg
-            "
+            v-if="isShowThirdPushStream"
             @click="thirdPartyShow"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
@@ -64,23 +55,20 @@
           <div
             class="header-right_control_wrap-container-setting"
             @click="thirdPartyClose"
-            v-if="isShowThirdParty && isThirtPushStream && thirtPushStreamimg"
+            v-if="webinarInfo.mode == 2 && thirtPushStreamimg"
           >
             <i class="vh-saas-iconfont vh-saas-a-color-webpageinitiate1"></i>
             <p>网页发起</p>
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="configList['virtual_user'] && isShowVirtualAudience && webinarInfo.mode != 6"
+            v-if="configList['virtual_user'] && webinarInfo.mode != 6"
             @click="openVirtualAudience"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-dissolutiongrouping"></i>
             <p>虚拟人数</p>
           </div>
-        </div>
-        <div class="header-right_control_wrap-bottom" v-if="isShowSupport">
-          微吼知客提供技术支持
         </div>
       </div>
     </div>
@@ -90,32 +78,6 @@
   import { useRoomBaseServer, useSplitScreenServer, useUserServer } from 'middle-domain';
   export default {
     name: 'HeaderControl',
-    props: {
-      isShowMediaSetting: {
-        default: false,
-        type: Boolean
-      },
-      isShowQuit: {
-        default: false,
-        type: Boolean
-      },
-      isShowSupport: {
-        default: false,
-        type: Boolean
-      },
-      isShowSplitScreen: {
-        default: false,
-        type: Boolean
-      },
-      isShowVirtualAudience: {
-        default: false,
-        type: Boolean
-      },
-      isShowThirdParty: {
-        default: false,
-        type: Boolean
-      }
-    },
     computed: {
       isSupportSplitScreen() {
         return (
@@ -142,13 +104,21 @@
       // 是否正在第三方推流
       thirtPushStreamimg() {
         return this.roomBaseServer.state.isThirdStream;
+      },
+      //是否显示第三方推流组件
+      isShowThirdPushStream() {
+        // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
+        return (
+          this.configList['btn_thirdway'] &&
+          this.webinarInfo.no_delay_webinar == 0 &&
+          this.webinarInfo.mode == 2 &&
+          !this.thirtPushStreamimg
+        );
       }
     },
     data() {
       return {
         roomBaseState: null,
-        isThirtPushStream: false, // 是否支持第三方推流
-        // thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
         webinarInfo: {} //活动下信息
       };
@@ -160,9 +130,6 @@
       this.roomBaseState = this.roomBaseServer.state;
       this.userInfo = this.roomBaseState.watchInitData.join_info;
       this.webinarInfo = this.roomBaseState.watchInitData.webinar;
-      if (this.webinarInfo.mode == 2) {
-        this.isThirtPushStream = true;
-      }
     },
     methods: {
       // 分屏状态更改
@@ -208,7 +175,6 @@
         }
         window.vhallReportForProduct && window.vhallReportForProduct.report(120002);
         this.$emit('thirdPushStream', true);
-        // this.thirtPushStreamimg = true;
         this.roomBaseServer.setInavToolStatus('start_type', 4);
       },
       thirdPartyClose() {
@@ -218,7 +184,6 @@
           return;
         }
         this.$emit('thirdPushStream', false);
-        // this.thirtPushStreamimg = false;
         this.roomBaseServer.setInavToolStatus('start_type', 1);
       },
       openVirtualAudience() {
