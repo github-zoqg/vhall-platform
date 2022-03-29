@@ -3,7 +3,11 @@
     v-if="!isShowContainer"
     :class="[
       'vmp-player',
-      { 'is-watch': isWatch, 'vmp-player-embed': isEmbedVideo, 'vmp-player-embedFull': isEmbed },
+      {
+        'is-watch': isWatch,
+        'vmp-player-embed': isEmbedVideo,
+        'vmp-player-embedFull': isEmbed && !isEmbedVideo
+      },
       isSubscribe ? '' : `vmp-player--${displayMode}`
     ]"
     @mousemove="wrapEnter"
@@ -94,7 +98,7 @@
         <div
           class="vmp-player-living-exchange"
           @click="exchangeVideoDocs"
-          v-if="isVisibleMiniElement && hoveVideo && !isVodEnd"
+          v-if="isVisibleMiniElement && hoveVideo && !isVodEnd && !isEmbedVideo"
         >
           <p>
             <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -421,8 +425,9 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[player]---大小屏变更miniElement：', newval);
-        this.displayMode = newval === 'player' ? 'mini' : 'normal';
+        if (!this.isEmbedVideo) {
+          this.displayMode = newval === 'player' ? 'mini' : 'normal';
+        }
       }
     },
     created() {

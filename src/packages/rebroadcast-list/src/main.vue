@@ -125,9 +125,9 @@
     data() {
       return {
         isShow: false,
-        currentRoomId: '',
-        rebroadcastingRoomId: '',
-        inputVal: '',
+        currentRoomId: '', // 当前选中的ID
+        rebroadcastingRoomId: '', // 当前正在转播的
+        inputVal: '', // 搜索
         loading: false,
         previewLoading: false,
         list: [],
