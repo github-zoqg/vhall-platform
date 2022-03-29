@@ -90,7 +90,7 @@
           />
         </div>
       </li>
-      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0'">
+      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
