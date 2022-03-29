@@ -346,8 +346,7 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
           requestHeaders: {
-            token: localStorage.getItem('token') || '',
-            'gray-id': sessionStorage.getItem('initGrayId')
+            token: localStorage.getItem('token') || ''
           },
           initRoom: params
         });

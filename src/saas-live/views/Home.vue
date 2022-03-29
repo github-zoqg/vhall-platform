@@ -121,8 +121,7 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
-            token: localStorage.getItem('token') || '',
-            'gray-id': sessionStorage.getItem('initGrayId')
+            token: localStorage.getItem('token') || ''
           },
           requestBody: {
             live_token: liveT
