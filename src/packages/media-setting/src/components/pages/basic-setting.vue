@@ -121,6 +121,7 @@
         // 分组、无延迟时，只展示一种布局
         const isGroupLive = this.liveMode === LIVE_MODE_MAP['GROUP'];
 
+        // 分组时，主次布局是颠倒的，更换对应的img图片
         if (isGroupLive) {
           return this.layoutConfig
             .filter(item => item.id === 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE')
@@ -167,11 +168,17 @@
       removeEvents() {
         this.msgServer.$off('live_over', this._onLiveOver);
       },
+      /**
+       * 设置布局(layout)
+       * @param {String} id
+       */
       setLayout(id) {
         if (this.liveStatus === 1) return;
         this.mediaState.layout = id;
       },
-
+      /**
+       * 应用默认选项
+       */
       setDefault() {
         const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
         const saveScreenRate =
@@ -183,7 +190,10 @@
         this.mediaState.screenRate = saveScreenRate;
         this.mediaState.layout = savedLayout;
       },
-
+      /**
+       * 格式化清晰度(rate to text)
+       * @param {String} label
+       */
       formatDefinitionLabel(label) {
         const map = new Map([
           ['RTC_VIDEO_PROFILE_240P_16x9_M', '流畅'],
@@ -197,6 +207,11 @@
         ]);
         return this.$t(map.get(label));
       },
+      /**
+       * 更改清晰度
+       * @notes 如果选择的是超清，会进行弹窗询问，如果取消则会还原选择前的值
+       * @param {String} selected
+       */
       async rateChange(selected) {
         if (selected === 'RTC_VIDEO_PROFILE_720P_16x9_M') {
           const text = '当前设置清晰度对设备硬件性能要求较高，是否继续使用？';
