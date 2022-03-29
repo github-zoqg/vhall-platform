@@ -175,6 +175,10 @@
       };
     },
     computed: {
+      isEmbedVideo() {
+        // 是不是单视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
       },
@@ -237,13 +241,13 @@
       show() {
         // 1、发起端没有开启桌面共享时展示
         // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
-        // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限
-
+        // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限,不能是单视频嵌入页
         if (this.isWatch) {
           return (
-            this.docServer.state.switchStatus ||
-            this.groupServer.state.isInGroup ||
-            this.hasDocPermission
+            (this.docServer.state.switchStatus ||
+              this.groupServer.state.isInGroup ||
+              this.hasDocPermission) &&
+            !this.isEmbedVideo
           );
         } else {
           if (this.desktopShareServer.state.localDesktopStreamId) {
