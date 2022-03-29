@@ -180,7 +180,13 @@ export const serverConfig = {
     emitClickExchangeView: {
       cuid: 'comPcPlayer',
       method: 'exchangeVideoDocs'
-    }
+    },
+    emitClickEndDemonstrate: [
+      {
+        cuid: 'comDocUne',
+        method: 'handleEndDemonstrate'
+      }
+    ]
   },
   // 插播文件
   comInsertStream: {
