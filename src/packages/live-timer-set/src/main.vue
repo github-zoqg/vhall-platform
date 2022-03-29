@@ -11,19 +11,29 @@
         <el-row>
           <!-- 时间增 -->
           <div class="button_top">
-            <img v-if="ten_mon != 5" src="./img/add.png" alt="" @click="add('ten_mon')" />
+            <img
+              v-if="ten_mon != 5"
+              src="./img/add.png"
+              alt=""
+              @click="operationTime('ten_mon', 'add')"
+            />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="mon != 9" src="./img/add.png" alt="" @click="add('mon')" />
+            <img v-if="mon != 9" src="./img/add.png" alt="" @click="operationTime('mon', 'add')" />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
           <div class="ml10 button_top">
-            <img v-if="ten_sec != 5" src="./img/add.png" alt="" @click="add('ten_sec')" />
+            <img
+              v-if="ten_sec != 5"
+              src="./img/add.png"
+              alt=""
+              @click="operationTime('ten_sec', 'add')"
+            />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="sec != 9" src="./img/add.png" alt="" @click="add('sec')" />
+            <img v-if="sec != 9" src="./img/add.png" alt="" @click="operationTime('sec', 'add')" />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
 
@@ -72,19 +82,29 @@
 
           <!-- 时间减 -->
           <div class="button_top">
-            <img v-if="ten_mon != 0" src="./img/down.png" alt="" @click="reduce('ten_mon')" />
+            <img
+              v-if="ten_mon != 0"
+              src="./img/down.png"
+              alt=""
+              @click="operationTime('ten_mon')"
+            />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="mon != 0" src="./img/down.png" alt="" @click="reduce('mon')" />
+            <img v-if="mon != 0" src="./img/down.png" alt="" @click="operationTime('mon')" />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
           <div class="ml10 button_top">
-            <img v-if="ten_sec != 0" src="./img/down.png" alt="" @click="reduce('ten_sec')" />
+            <img
+              v-if="ten_sec != 0"
+              src="./img/down.png"
+              alt=""
+              @click="operationTime('ten_sec')"
+            />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="sec != 0" src="./img/down.png" alt="" @click="reduce('sec')" />
+            <img v-if="sec != 0" src="./img/down.png" alt="" @click="operationTime('sec')" />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
         </el-row>
@@ -229,13 +249,9 @@
           })
           .catch(err => console.log(err));
       },
-      // 时间加
-      add(data) {
-        this[data]++;
-      },
-      // 时间减
-      reduce(data) {
-        this[data]--;
+      // 时间操作
+      operationTime(data, status) {
+        status == 'add' ? this[data]++ : this[data]--;
       },
       // input检查
       testing(data) {
