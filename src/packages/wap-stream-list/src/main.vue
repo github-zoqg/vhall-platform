@@ -119,8 +119,6 @@
     data() {
       return {
         childrenCom: [],
-        miniElement: 'mainScreen',
-        maxElement: '',
         playAbort: [], // 自动播放禁止的stream列表
         showPlayIcon: false, // 是否展示播放按钮
         scroll: null, // BScroll 插件
@@ -243,6 +241,7 @@
           !this.isShareScreen
         );
       },
+      // 热度
       hotNum() {
         return (
           Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
@@ -267,6 +266,7 @@
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
 
+      // 检测是否支持连麦，不支持直接进行提示
       if (useMediaCheckServer().state.isBrowserNotSupport) {
         return Toast(this.$t('other.other_1010'));
       }
