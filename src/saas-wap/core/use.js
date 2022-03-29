@@ -41,7 +41,7 @@ import VmpInteractToolsWap from '@/packages/interact-tools-wap';
 import VmpSignWap from '@/packages/interact-sign-wap';
 
 // 二维码弹框
-import VmpWapQrCode from '@/packages/qrcode-wap';
+import VmpWapQrCode from '@/packages/official-module/official-wap';
 
 // 用来判断显示播放器还是流
 import VmpWapBody from '@/packages/wap-body';

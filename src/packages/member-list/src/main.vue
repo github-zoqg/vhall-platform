@@ -21,7 +21,7 @@
               class="empty-container"
             >
               <span class="empty-img">
-                <img src="img/search@2x.png" alt="" />
+                <img src="./img/search@2x.png" alt="" />
               </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
@@ -56,7 +56,7 @@
           <div class="member-list__apply-tab">
             <div v-if="!applyUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="img/noTop@2x.png" alt="" />
+                <img src="./img/noTop@2x.png" alt="" />
               </span>
               <p>暂无人举手</p>
             </div>
@@ -91,7 +91,7 @@
           <div class="member-list__limit-tab">
             <div v-if="!limitedUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="img/no@2x.png" alt="" />
+                <img src="./img/no@2x.png" alt="" />
               </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
@@ -282,7 +282,8 @@
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
-        isWatch: false
+        isWatch: false,
+        timmer: null
       };
     },
     beforeCreate() {
@@ -299,7 +300,6 @@
       this.initConfig();
       //初始化视图数据
       await this.initViewData();
-      this.isLive && this.handleStartGroup();
       //开始初始化流程
       this.init();
       this.listenEvent();
@@ -418,22 +418,6 @@
       init() {
         this.getOnlineUserList();
       },
-      //开始讨论后的处理（发起端）
-      handleStartGroup() {
-        const _this = this;
-        // 开始讨论后重新初始化页面
-        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          if (type === 'start_discussion') {
-            _this.init();
-          }
-        });
-      },
       listenEvent() {
         const _this = this;
         this.listenRoomMsg();
@@ -546,6 +530,8 @@
             temp.context = JSON.parse(temp.context);
           }
           const { type = '' } = temp.data || {};
+
+          console.log('【成员列表房间消息】', type, temp);
 
           switch (type) {
             case 'vrtc_connect_apply':
@@ -1024,10 +1010,13 @@
             },
             'onlineUsers'
           );
-
+          console.log('互动连麦成功断开链接', msg);
           //提示语
           if (msg.data.target_id == _this.userId) {
-            _this.$message.success({ message: _this.$t('interact.interact_1028') });
+            this.timmer && clearTimeout(this.timmer);
+            this.timmer = setTimeout(() => {
+              _this.$message.success({ message: _this.$t('interact.interact_1028') });
+            }, 1000);
             return;
           }
 
@@ -1145,6 +1134,9 @@
             case 'group_join_change':
               _this.updateOnlineUserList();
               break;
+            case 'group_disband':
+              _this.updateOnlineUserList();
+              break;
             default:
               break;
           }
@@ -1183,9 +1175,9 @@
         });
 
         // 解散分组(主播&观看均更新)
-        this.groupServer.$on('GROUP_DISBAND', () => {
-          this.updateOnlineUserList();
-        });
+        // this.groupServer.$on('GROUP_DISBAND', () => {
+        //   this.updateOnlineUserList();
+        // });
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
@@ -2142,7 +2134,7 @@
           position: absolute;
           top: 7px;
           right: 55px;
-          background-image: url('img/account-file-close-default.png');
+          background-image: url('./img/account-file-close-default.png');
           background-repeat: no-repeat;
           background-size: 100%;
         }
