@@ -82,6 +82,7 @@
           console.log(msg);
           this.lotteryId = msg.lottery_id;
           this.showWinnerList = !!msg.publish_winner;
+          this.setFitment(msg);
           console.log(' this.showWinnerList ', this.showWinnerList);
           if (res.code === 200) {
             if (res.data.take_award === 0) {
@@ -166,6 +167,7 @@
       // 抽奖结果消息推送
       callBackResultNotice(msg) {
         this.lotteryId = msg.data.lottery_id;
+        this.showWinnerList = !!msg.data.publish_winner;
         this.setFitment(msg.data);
         const winnerList = msg.data.lottery_winners.split(',');
         const lotteryResult = winnerList.some(userId => {
@@ -247,6 +249,7 @@
 </script>
 <style lang="less">
   .vhall-lottery-wap {
+    line-height: initial; // 清除父容器的css影响
     .lottery__close-btn {
       position: absolute;
       bottom: -36px;

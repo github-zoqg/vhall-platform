@@ -183,6 +183,7 @@
       return {
         childrenCom: [],
         insertFileStreamVisible: false, // 是否展示插播流组件
+        // 云插播文件参数
         remoteVideoParam: {
           paas_record_id: '',
           file_type: '',
@@ -199,8 +200,9 @@
           sliderVal: 0,
           statePlay: false
         },
+        // 本地插播音量
         voice: 100,
-        streamId: null,
+        // 本地插播全屏
         isFullScreen: false
       };
     },
@@ -395,29 +397,24 @@
         });
       },
       // 推流
-      pushLocalStream() {
+      async pushLocalStream() {
         const interactiveServer = useInteractiveServer();
         const { watchInitData } = useRoomBaseServer().state;
         // 如果未开播，不推流
         if (watchInitData.webinar.type != 1) return;
 
-        this.createLocalStream()
-          .then(res => {
-            this.insertFileServer
-              .publishInsertStream({ streamId: res.streamId })
-              .then(() => {
-                // 更改麦克风状态
-                this.insertFileServer.updateMicMuteStatusByInsert({ isStart: true });
-                interactiveServer.resetLayout();
-                // 设置旁路观看端大小屏
-                this.setDesktop('1');
-              })
-              .catch(() => {
-                this.$message.warning('插播推送失败，请重新选择');
-              });
+        const res = await this.createLocalStream();
+        this.insertFileServer
+          .publishInsertStream({ streamId: res.streamId })
+          .then(() => {
+            // 更改麦克风状态
+            this.insertFileServer.updateMicMuteStatusByInsert({ isStart: true });
+            interactiveServer.resetLayout();
+            // 设置旁路观看端大小屏
+            this.setDesktop('1');
           })
-          .catch(err => {
-            console.log('创建插播流失败', err);
+          .catch(() => {
+            this.$message.warning('插播推送失败，请重新选择');
           });
       },
       // 云插播播放器开始播放
@@ -791,16 +788,21 @@
           this.onmousedownControl = true;
           this.pause();
           // eslint-disable-next-line no-unused-vars
-          document.onmousemove = e => {
+          this._handleDocumentMouseMove = () => {
+            console.log('----insertfile----this----', this);
             this.conctorObj.TimesShow = true;
           };
-          // eslint-disable-next-line no-unused-vars
-          document.onmouseup = e => {
-            document.onmousemove = null;
+          this._handleDocumentMouseUp = () => {
+            console.log('----insertfile----this----', this);
+            document.removeEventListener('mousemove', this._handleDocumentMouseMove);
+            document.removeEventListener('mouseup', this._handleDocumentMouseUp);
             this.onmousedownControl = false;
             this.conctorObj.TimesShow = false;
             innitDom();
           };
+          document.addEventListener('mousemove', this._handleDocumentMouseMove);
+          // eslint-disable-next-line no-unused-vars
+          document.addEventListener('mouseup', this._handleDocumentMouseUp);
         };
         but.onmouseover = e => {
           this.conctorObj.TimesShow = false;

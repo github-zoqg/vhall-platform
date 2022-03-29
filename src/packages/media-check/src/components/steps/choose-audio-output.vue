@@ -157,14 +157,14 @@
         this.speakerReady = true;
       }, 500),
       success() {
-        window?.vhallReport(110008, {
+        window?.vhallReport?.report(110008, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 扬声器设备检测成功
 
         this.$emit('next', { result: 'success' });
       },
       fail() {
-        window?.vhallReport(110012, {
+        window?.vhallReport?.report(110012, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 扬声器设备检测失败
 
