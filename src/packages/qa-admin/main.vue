@@ -566,6 +566,9 @@
         requestBody: {
           live_token: liveT
         },
+        requestHeaders: {
+          'gray-id': sessionStorage.getItem('initGrayId')
+        },
         isNotInitRoom: true
       });
       const watchInitData = await this.qaServer
