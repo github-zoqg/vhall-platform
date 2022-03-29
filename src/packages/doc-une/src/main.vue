@@ -232,6 +232,9 @@
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 文档是否可见
       show() {
         // 1、发起端没有开启桌面共享时展示
@@ -239,13 +242,22 @@
         // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限
 
         if (this.isWatch) {
-          return (
-            this.docServer.state.switchStatus ||
-            this.groupServer.state.isInGroup ||
-            this.hasDocPermission
-          );
+          if (this.hasDocPermission) {
+            return true;
+          } else {
+            if (this.micServer.state.isSpeakOn && this.isShareScreen) {
+              return false;
+            } else {
+              return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+            }
+          }
+          // return (
+          //   this.docServer.state.switchStatus ||
+          //   this.groupServer.state.isInGroup ||
+          //   this.hasDocPermission
+          // );
         } else {
-          if (this.desktopShareServer.state.localDesktopStreamId) {
+          if (this.isShareScreen) {
             return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
           } else {
             return true;
