@@ -133,6 +133,7 @@
       }
     },
     watch: {
+      //观察回复消息，自动调整输入框的值
       replyMsg() {
         if (Object.keys(this.replyMsg || {}).length == 0) {
           this.inputValue = this.trimPlaceHolder('reply');
@@ -143,16 +144,15 @@
             : `${replyText}${this.replyMsg.nickname}: `;
         }
       },
+      //观察输入的值，调整输入框高度
       inputValue(newValue) {
         // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
         if (!newValue) {
-          // console.log('chat input 值发生变化了', newValue);
           // 输入框内容发生变化，更新滚动条
           this.$nextTick(() => {
             this.overlayScrollbar.update();
             this.inputHandle();
           });
-          // this.replyMsg = {};
         }
       }
     },
@@ -176,14 +176,12 @@
       },
       //输入框输入事件,改变高度等
       inputHandle() {
-        // const chatOldTextareaHeight = this.$refs.chatTextarea.style.height;
         // 最大字数限制 140
         if (this.inputValue.length > 140) {
           this.inputValue = this.inputValue.substring(0, 140);
         }
         this.$nextTick(() => {
           const chatTextareaHeight = this.$refs.chatTextarea.style.height;
-          // if (chatOldTextareaHeight !== chatTextareaHeight) {
           const hostTextarea = document.querySelector(
             '.vmp-chat-input__textarea-box .os-host-textarea'
           );
@@ -202,12 +200,10 @@
           setTimeout(() => {
             this.$emit('chatTextareaHeightChange');
           });
-          // }
         });
       },
       //按下enter键的处理
       onkeydownHandle(event) {
-        console.log('当前按键....', event.keyCode, event, this.inputValue.length);
         if (event.keyCode === 13) {
           this.sendMsgThrottle();
           //阻止默认行为
@@ -440,7 +436,7 @@
   .vmp-chat-input {
     @bg-dark-normal: #1a1a1a;
     @font-dark-normal: #e6e6e6;
-    @font-dark-second: #666666;
+    @font-dark-second: #666;
     // 错误提示字体颜色
     @font-error: #fb3a32;
     // 链接字体颜色
