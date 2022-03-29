@@ -422,6 +422,7 @@
     background: #2d2d2d;
     position: relative;
     display: flex;
+    z-index: 3;
     &__tip {
       text-align: center;
       position: absolute;
