@@ -42,12 +42,6 @@
       </template>
       <div class="vmp-header-right_control">
         <headerControl
-          :isShowMediaSetting="isShowMediaSetting"
-          :isShowQuit="isShowQuit"
-          :isShowSupport="isShowSupport"
-          :isShowSplitScreen="isShowSplitScreen"
-          :isShowVirtualAudience="isShowVirtualAudience"
-          :isShowThirdParty="isShowThirdParty"
           @openVirtualProple="openVirtualProple"
           @openMediaSettings="openMediaSettings"
           @thirdPushStream="thirdPushStream"
@@ -107,12 +101,6 @@
         applyTime: 30,
         isFullscreen: false,
         assistantType: this.$route.query.assistantType,
-        isShowMediaSetting: false, // 是否显示媒体设置
-        isShowQuit: false, //是否显示退出
-        isShowSupport: false, //是否显示技术支持
-        isShowSplitScreen: false, //是否显示分屏
-        isShowVirtualAudience: true, // 是否显示虚拟人数
-        isShowThirdParty: true, // 是否显示三方推流
         popAlert: {
           // 设为默认回放的弹窗
           text: '',

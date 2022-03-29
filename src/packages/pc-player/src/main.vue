@@ -391,11 +391,12 @@
           !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         );
       },
+      // 是否是嵌入
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       isEmbedVideo() {
-        // 是不是音视频嵌入
+        // 是不是单视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },

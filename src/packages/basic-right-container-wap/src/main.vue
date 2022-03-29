@@ -1,21 +1,23 @@
 <template>
-  <div class="base-box" v-if="!groupInitData.isInGroup" v-show="!showDoc">
-    <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
-      <div :class="!timerVisible ? 'have' : ''"></div>
-      <img src="./image/timer.png" />
-    </div>
-    <div class="icon-wrap" @click="handleSign" v-show="showSign">
-      <div class="have"></div>
-      <img src="./image/icon.png" />
-    </div>
-    <div class="icon-wrap">
-      <red-packet-icon @clickIcon="handleRedPacket" />
-    </div>
-    <div class="icon-wrap">
-      <lottery-icon @clickIcon="checkLotteryIcon" />
-    </div>
-    <div class="icon-wrap">
-      <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
+  <div class="vmp-container-right-wap">
+    <div class="base-box" v-if="!groupInitData.isInGroup" v-show="!showDoc">
+      <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
+        <div :class="!timerVisible ? 'have' : ''"></div>
+        <img src="./image/timer.png" />
+      </div>
+      <div class="icon-wrap" @click="handleSign" v-show="showSign">
+        <div class="have"></div>
+        <img src="./image/icon.png" />
+      </div>
+      <div class="icon-wrap">
+        <red-packet-icon @clickIcon="handleRedPacket" />
+      </div>
+      <div class="icon-wrap">
+        <lottery-icon @clickIcon="checkLotteryIcon" />
+      </div>
+      <div class="icon-wrap">
+        <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
+      </div>
     </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
@@ -95,35 +97,37 @@
   };
 </script>
 
-<style lang="less" scoped>
-  .base-box {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    display: inline-block;
-    right: 26px;
-    top: 100px;
-    // width: 20px;
-    .icon-wrap {
-      margin-bottom: 10px;
-      max-width: 84px;
-      max-height: 84px;
-      position: relative;
-      background-color: transparent;
-      img {
-        width: 84px;
-        height: 84px;
-      }
-    }
-    .have {
+<style lang="less">
+  .vmp-container-right-wap {
+    .base-box {
+      display: flex;
+      flex-direction: column;
       position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background-color: #ff0005;
-      content: '';
+      display: inline-block;
+      right: 26px;
+      top: 100px;
+      // width: 20px;
+      .icon-wrap {
+        margin-bottom: 10px;
+        max-width: 84px;
+        max-height: 84px;
+        position: relative;
+        background-color: transparent;
+        img {
+          width: 84px;
+          height: 84px;
+        }
+      }
+      .have {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #ff0005;
+        content: '';
+      }
     }
   }
 </style>
