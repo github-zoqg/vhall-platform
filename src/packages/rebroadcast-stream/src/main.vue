@@ -75,12 +75,16 @@
           this.close();
         });
 
+        // 结束直播时关闭
         msgServer.$onMsg('ROOM_MSG', msg => {
           if (msg.data.type === 'live_over') {
             this.close();
           }
         });
       },
+      /**
+       * 调起转播
+       */
       async open() {
         await sleep(1000);
         const { watchInitData } = this.roomBaseServer.state;
@@ -108,9 +112,7 @@
         if (this.interactiveServer.state.localStream.streamId) {
           await this.interactiveServer.unpublishStream();
         }
-
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
-        this.roomBaseServer.setChangeElement('stream-list');
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {

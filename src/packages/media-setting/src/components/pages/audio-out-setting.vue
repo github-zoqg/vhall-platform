@@ -93,6 +93,7 @@
     },
     methods: {
       listenEvents() {
+        // 监听原生的播放、暂停事件
         this.setIsPaused = () => (this.isPaused = true);
         this.setAudioPlay = () => (this.isPaused = false);
 

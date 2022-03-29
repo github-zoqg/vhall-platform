@@ -1733,14 +1733,13 @@
             console.log('setSpeaker failed ::', err);
           });
       },
-      //邀请上麦
+      //邀请演示(注：方法名取名不科学，inviteMic不是指邀请上麦，而是指邀请演示 TODO:需修改)
       inviteMic(accountId = '') {
-        if (
-          this.isWatch &&
-          (accountId === this.leader_id || accountId === this.getCurrentSpeakerId)
-        ) {
-          return;
-        }
+        const isLeader = accountId === this.leader_id;
+        const isSpeaker = accountId === this.getCurrentSpeakerId;
+
+        if (this.isWatch && (isLeader || isSpeaker)) return;
+
         const params = {
           room_id: this.roomId,
           receive_account_id: accountId,
@@ -1755,7 +1754,8 @@
               } else {
                 //数据埋点--邀请上麦
                 window.vhallReportForProduct?.report(110130);
-                this.$message.success(this.$t('message.message_1033'));
+
+                this.$message.success(this.$t('message.message_1034'));
               }
             } else {
               this.$message.error(res.msg);

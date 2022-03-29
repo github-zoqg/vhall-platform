@@ -50,6 +50,9 @@
       this.setDefaultAlertVisible();
     },
     methods: {
+      /**
+       * 判断，并检查默认是否展示
+       */
       setDefaultAlertVisible() {
         const { watchInitData } = useRoomBaseServer().state;
         this.liveType = watchInitData?.webinar?.type;

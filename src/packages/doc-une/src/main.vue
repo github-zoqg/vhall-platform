@@ -887,7 +887,12 @@
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             });
             if (result && result.code == 200) {
-              if (this.groupServer.state.groupInitData.join_role == 2) {
+              const isGroupMember = this.groupServer.state.groupInitData.join_role == 2;
+              const isShowMessageOnGroup = this.isInGroup && isGroupMember;
+
+              const isMainMember = this.roleName == 2;
+              const isShowMessageOnMain = !this.isInGroup && isMainMember;
+              if (isShowMessageOnGroup || isShowMessageOnMain) {
                 // 如果是观众结束了自己的演示
                 this.$message({
                   message: '结束演示',
