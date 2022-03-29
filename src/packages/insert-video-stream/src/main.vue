@@ -62,12 +62,7 @@
     ></div>
 
     <!-- 音频插播封面图 -->
-    <img
-      v-if="isAudio && (!isLiving || mode == 1)"
-      class="vmp-insert-stream-audio-poster"
-      src="./img/video.gif"
-      alt=""
-    />
+    <div v-if="isAudio && (!isLiving || mode == 1)" class="vmp-insert-stream-audio-poster"></div>
 
     <!-- 远端视频插播的播放器容器 -->
     <div id="vmp-insert-remote-stream" class="vmp-insert-remote-stream">
@@ -969,6 +964,10 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      background-image: url(./img/video.gif);
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
       position: absolute;
       left: 0;
       top: 0;

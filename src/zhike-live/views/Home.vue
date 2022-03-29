@@ -97,8 +97,7 @@
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || '',
-            liveToken: liveT,
-            'gray-id': sessionStorage.getItem('initGrayId')
+            liveToken: liveT
           },
           initRoom: {
             webinar_id: id, //活动id
