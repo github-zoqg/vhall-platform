@@ -46,7 +46,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleFilter }}
+        {{ joinInfo.role_name | roleFilter(true) }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -75,7 +75,7 @@
     >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleFilter }}
+          {{ joinInfo.role_name | roleFilter(true) }}
         </span>
         <el-tooltip
           :content="
@@ -664,14 +664,24 @@
           }
         });
 
-        // 接收设为主讲人消息
+        // 接收设为主画面消息
         this.micServer.$on('vrtc_big_screen_set', msg => {
-          const str =
-            this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
-              ? '主画面'
-              : this.$t('interact.interact_1034');
+          // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
+          if (msg.data.is_start_live == 1) return;
           this.$message.success(
-            this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str })
+            this.$t('interact.interact_1012', { n: msg.data.nick_name, m: '主画面' })
+          );
+        });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_speaker_switch', msg => {
+          // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
+          if (msg.data.is_start_live == 1) return;
+          this.$message.success(
+            this.$t('interact.interact_1012', {
+              n: msg.data.nick_name,
+              m: this.$t('interact.interact_1034')
+            })
           );
         });
 
@@ -1037,7 +1047,11 @@
         const roomBaseServer = useRoomBaseServer();
         let miniElement = '';
         if (this.isShareScreen) {
-          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+            miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+          } else {
+            miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+          }
         } else {
           miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         }

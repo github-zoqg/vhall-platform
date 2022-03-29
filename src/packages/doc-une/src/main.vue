@@ -175,6 +175,10 @@
       };
     },
     computed: {
+      isEmbedVideo() {
+        // 是不是单视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
       },
@@ -203,11 +207,12 @@
       },
       // 是否显示文档翻页相关操作栏
       showPagebar() {
-        // 显示文档资料时 && && (普通模式，或 观看端全屏模式下) && (有演示权限，或是助理和观众)
+        // (普通模式，或 观看端全屏模式下) && (有演示权限，或是观众,或者展示文档时的助理)
         return (
-          this.currentType === 'document' &&
           (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
-          (this.hasDocPermission || [2, 3].includes(this.roleName))
+          (this.hasDocPermission ||
+            this.roleName === 2 ||
+            (this.roleName === 3 && this.currentType === 'document'))
         );
       },
       // 当前用户Id
@@ -232,20 +237,35 @@
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 文档是否可见
       show() {
         // 1、发起端没有开启桌面共享时展示
         // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
-        // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限
-
+        // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限,不能是单视频嵌入页
         if (this.isWatch) {
-          return (
-            this.docServer.state.switchStatus ||
-            this.groupServer.state.isInGroup ||
-            this.hasDocPermission
-          );
+          if (!this.isEmbedVideo) {
+            if (this.hasDocPermission) {
+              return true;
+            } else {
+              if (this.micServer.state.isSpeakOn && this.isShareScreen) {
+                return false;
+              } else {
+                return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+              }
+            }
+          } else {
+            return false;
+          }
+          // return (
+          //   this.docServer.state.switchStatus ||
+          //   this.groupServer.state.isInGroup ||
+          //   this.hasDocPermission
+          // );
         } else {
-          if (this.desktopShareServer.state.localDesktopStreamId) {
+          if (this.isShareScreen) {
             return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
           } else {
             return true;
@@ -319,6 +339,8 @@
       },
       // 是否有翻页操作权限
       hasPager() {
+        // 不是文档，不展示翻页操作按钮
+        if (this.currentType !== 'document') return false;
         // 定时直播所有人都没有翻页权限
         if (this.webinarMode == 5) return false;
         // 有演示权限，或者助理配有翻页权限，或者活动设置了有翻页权限(开发状态下)

@@ -83,12 +83,6 @@
         </div>
       </div>
 
-      <officaial-dialog
-        ref="officaialDialog"
-        :officicalInfo="officicalInfo"
-        :screenPosterInfo="screenPosterInfo"
-        v-if="officialImg"
-      ></officaial-dialog>
       <!-- 登录、基础信息 -->
       <div class="right_login">
         <div class="right_login_unuser" @click="goLogin" v-if="!isLogin">
@@ -127,7 +121,6 @@
 <script>
   import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import officaialDialog from './components/officalDialog.vue';
   export default {
     name: 'VmpHeaderWatch',
     data() {
@@ -136,8 +129,6 @@
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识
-        screenPosterInfo: {}, // 开屏海报
-        officicalInfo: {}, //公众号
         officialImg: '',
         themeClass: {
           bgColor: 'light',
@@ -147,9 +138,6 @@
         isAttention: false,
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
-    },
-    components: {
-      officaialDialog
     },
     computed: {
       // 主办方跳转地址
@@ -205,14 +193,11 @@
     },
     methods: {
       getWebinarInfo() {
-        const { watchInitData, skinInfo, webinarTag, officicalInfo, screenPosterInfo } =
-          this.roomBaseServer.state;
+        const { watchInitData, skinInfo, webinarTag, officicalInfo } = this.roomBaseServer.state;
         this.webinarInfo = watchInitData.webinar || {}; //活动基本信息
         this.skinInfo = skinInfo || {}; // 皮肤信息
         this.webinarTag = webinarTag || {}; // 活动标签
-        this.officicalInfo = officicalInfo || {}; // 公众号信息
-        this.screenPosterInfo = screenPosterInfo || {}; //开屏海报
-        this.setOfficicalInfo(this.officicalInfo);
+        this.setOfficicalInfo(officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },
       // 关注状态 从接口拿到是否关注
@@ -362,8 +347,9 @@
       },
       //公众号
       goOfficical() {
-        this.officialImg = this.officicalInfo.img;
-        this.$refs.officaialDialog.officialVisible = true;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
+        // this.officialImg = this.officicalInfo.img;
+        // this.$refs.officaialDialog.officialVisible = true;
       },
       //分享
       goShare() {

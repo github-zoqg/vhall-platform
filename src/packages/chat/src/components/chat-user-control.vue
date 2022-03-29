@@ -33,38 +33,57 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
-  import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
 
   export default {
-    mixins: [dataReportMixin],
     props: {
+      //房间号
       roomId: {
-        required: true
+        type: [String, Number],
+        required: true,
+        default: ''
       },
+      //用户id
       userId: {
-        required: true
+        type: [String, Number],
+        required: true,
+        default: ''
       },
+      //回复选中用户
       reply: {
+        type: Function,
         required: true
       },
+      //@选中用户
       atUser: {
+        type: Function,
         required: true
       },
+      //当前@的人员
       atList: {
-        required: true
+        type: Array,
+        required: true,
+        default: () => {
+          return [];
+        }
       }
     },
     data() {
       return {
+        //是否显示
         isShow: false,
+        //动态的样式
         style: {},
+        //用户状态
         userStatus: {
           is_banned: null,
           is_kicked: null
         },
+        //昵称
         nickname: '',
+        //黄金链路权限
         godMode: false,
+        //助理等参会人权限
         assistantType: ''
       };
     },
@@ -83,7 +102,7 @@
       this.assistantType = this.$route.query.assistantType;
     },
     mounted() {
-      //todo 待改为信令
+      //聊天中更改人员状态
       EventBus.$on('set_person_status_in_chat', async (el, accountId, count, nickname) => {
         const roleName = this.roomBaseServer.state.watchInitData.join_info.role_name;
         if (accountId == this.userId) return; // 不能点击自己
@@ -104,7 +123,6 @@
           this.roleName = roleName;
         }
       });
-      //todo 待改为信令
       // 监听客户端踢出操作
       EventBus.$on('assistantKickoutCallback', msg => {
         if (msg.type == 0) return;
@@ -120,9 +138,11 @@
       });
     },
     methods: {
+      //删除消息
       deleteMsg(count) {
         this.$emit('deleteMsg', count);
       },
+      //计算高度
       calculate(el) {
         const rect = el.getBoundingClientRect();
         const clientHeight = this.getClientHeight();
@@ -140,7 +160,7 @@
         }
       },
       /**
-       * todo domain提供的服务 得到用户状态是否被禁言/踢出
+       * 得到用户状态是否被禁言/踢出
        */
       getUserStatus() {
         return Promise.all([
@@ -150,7 +170,6 @@
       },
       /**
        * 禁言/取消禁言
-       * todo domain提供的服务
        */
       setBanned() {
         const nextStatus = this.userStatus.is_banned ? 0 : 1;
@@ -164,7 +183,6 @@
       },
       /**
        * 踢出/取消踢出
-       * todo domain提供的服务
        */
       setKicked() {
         const nextStatus = this.userStatus.is_kicked ? 0 : 1;
@@ -236,7 +254,7 @@
       position: absolute;
       width: 96px;
       padding: 6px 0;
-      background-color: #ffffff;
+      background-color: #fff;
       border-radius: 4px;
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
       overflow: hidden;
@@ -248,19 +266,18 @@
         color: #666666;
         text-align: left;
         line-height: 28px;
-        padding: 0;
-        padding-left: 10px;
+        padding: 0 0 0 10px;
         user-select: none;
         &.disabled {
           color: #c3c3c3;
           &:hover {
             color: #c3c3c3;
-            background-color: #ffffff;
+            background-color: #fff;
             cursor: not-allowed;
           }
         }
         &:hover {
-          color: #ffffff;
+          color: #fff;
           background-color: #fb3a32;
         }
       }

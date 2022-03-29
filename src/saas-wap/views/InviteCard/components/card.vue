@@ -232,7 +232,7 @@
 
         this.isInviteVisible = parseInt(data.status) === 1 ? true : false;
         this.inited = true;
-        if (this.isInviteVisible === true) {
+        if (this.isInviteVisible) {
           this.$nextTick(() => {
             this.drawCanvas();
           });

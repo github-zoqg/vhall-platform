@@ -278,25 +278,13 @@
       //只看主办方
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
-        this.$message({
-          message: message,
-          showClose: true,
-          // duration: 0,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
+        this.$message.success(message);
         this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
-        this.$message({
-          message: message,
-          showClose: true,
-          // duration: 0,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
+        this.$message.success(message);
         this.$emit('onSwitchShowSpecialEffects', status);
       },
       //点击筛选

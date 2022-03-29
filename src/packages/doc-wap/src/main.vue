@@ -419,7 +419,8 @@
       right: 0;
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
-      z-index: 3;
+      // 播放器的层级是1-12
+      z-index: 15;
 
       .vmp-doc-une__content {
         .vmp-doc-inner {
