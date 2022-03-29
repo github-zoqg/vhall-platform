@@ -377,11 +377,12 @@
             .catch(() => {});
         } else {
           localStorage.setItem('vmp_auth_tag', 'bindQQ');
-
           const hostPath = process.env.VUE_APP_BIND_BASE_URL;
           const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+            `https:${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(
+              jumpUrlPath
+            )}`
           );
         }
       },
@@ -439,7 +440,7 @@
           const hostPath = process.env.VUE_APP_BIND_BASE_URL;
           const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
+            `https:${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
               jumpUrlPath
             )}`
           );
