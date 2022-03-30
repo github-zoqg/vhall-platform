@@ -12,7 +12,6 @@ import {
   useMediaSettingServer,
   useVirtualAudienceServer
 } from 'middle-domain';
-import { getQueryString } from '@/packages/app-shared/utils/tool';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
@@ -31,23 +30,6 @@ export default async function () {
 
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
-  }
-
-  // 判断是否是嵌入/单视频嵌入
-  try {
-    const _param = {
-      isEmbed: false,
-      isEmbedVideo: false
-    };
-    if (location.pathname.indexOf('embedclient') != -1) {
-      _param.isEmbed = true;
-    }
-    if (getQueryString('embed') == 'video') {
-      _param.isEmbedVideo = true;
-    }
-    roomBaseServer.setEmbedObj(_param);
-  } catch (e) {
-    console.log('嵌入', e);
   }
 
   const promiseList = [
