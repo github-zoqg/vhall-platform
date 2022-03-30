@@ -250,8 +250,10 @@
           }
 
           if (msg.data.type === 'live_over') {
-            this.setVisible({ visible: false, type: 'private' }); // private-chat
-            // this.setVisible({ visible: false, type: 'v5' }); // qa
+            this.setVisible({ visible: false, type: 'private' });
+            if (this.roleName != 2) {
+              this.setVisible({ visible: false, type: 'v5' });
+            } // qa
             clientType === 'send' && this.selectDefault();
           }
         });

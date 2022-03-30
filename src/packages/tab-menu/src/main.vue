@@ -127,6 +127,9 @@
       //活动信息
       webinarInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       }
     },
     watch: {
@@ -231,7 +234,9 @@
 
           if (msg.data.type === 'live_over') {
             this.setVisible({ visible: false, type: 'private' }); // private-chat
-            // this.setVisible({ visible: false, type: 'v5' }); // qa
+            if (this.roleName != 2) {
+              this.setVisible({ visible: false, type: 'v5' });
+            } // qa
             clientType === 'send' && this.selectDefault();
           }
         });
