@@ -150,6 +150,10 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
+      // 是否为嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       isTryVideo() {
         return (
           this.roomBaseServer.state.watchInitData.record.preview_paas_record_id &&
@@ -210,6 +214,11 @@
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
         if (webinar.type == 2) {
+          // 嵌入页没有预约页
+          if (this.isEmbed) {
+            this.showBottomBtn = false;
+            return;
+          }
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
