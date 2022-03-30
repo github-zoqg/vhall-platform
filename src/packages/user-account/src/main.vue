@@ -137,7 +137,7 @@
       </div>
 
       <!-- 设置手机号 -->
-      <Phones v-model="phoneData" />
+      <Phones v-model="phoneData" @bound="handleBoundMobile" />
 
       <!-- 设置密码 -->
       <Password v-model="pwdData.visible" :pwdData="pwdData"></Password>
@@ -451,6 +451,11 @@
         this.dialogVisible = true;
         this.isNickNameEdit = false;
         this.nickError = '';
+        this.userServer.getUserInfo({ scene_id: 2 });
+      },
+      // 绑定手机号后的回调
+      handleBoundMobile() {
+        // 重新更新用户信息
         this.userServer.getUserInfo({ scene_id: 2 });
       }
     }

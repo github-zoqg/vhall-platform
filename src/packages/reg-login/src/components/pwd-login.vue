@@ -152,7 +152,7 @@
         this.isMaxHeight = !passwordFlag;
       },
       // 密码登录
-      handlePwdLogin() {
+      async handlePwdLogin() {
         if (this.captchaIsShow && !this.captchaReady) {
           // 开启了图片验证码展示，但是当前未选择图形码
           this.$message({
@@ -163,42 +163,44 @@
           });
         } else if (this.captchaReady) {
           // 如果选择的图形码有值，表示触发了账号锁定，再次登录需要图片验证码逻辑。这个时候直接往下走。
-          this.sendLogin();
+          await this.sendLogin();
         } else {
           // 如果没有选择过图形码，走账号检测判断
-          this.$refs.ruleForm.validate(async valid => {
-            // 表单验证通过，方才检验，减少多余的请求发送
-            if (valid) {
-              const failure = err => {
-                console.log('获取账号检测接口结果错误', err);
-                this.$message({
-                  message: this.$tec(err.code) || this.$t('login.login_1021'),
-                  showClose: true,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
-              };
-              this.userServer
-                .loginCheck(this.ruleForm.account)
-                .then(async res => {
-                  if (res.code == 200 && res.data?.check_result === 1) {
-                    this.captchaIsShow = true;
-                    // 账号被锁定 再次登录需要图片验证)
-                    // 默认图片验证码加载
-                    this.reloadCaptha();
-                  } else if (res.code == 200) {
-                    this.captchaIsShow = false;
-                    // 非异常情况下，触发登录逻辑
-                    this.sendLogin();
-                  } else {
-                    failure(res);
-                  }
-                })
-                .catch(err => {
-                  failure(err);
-                });
-            }
-          });
+          const valid = this.$refs.ruleForm.validate();
+          if (!valid) return false;
+          // this.$refs.ruleForm.validate(async valid => {
+          //   // 表单验证通过，方才检验，减少多余的请求发送
+          //   if (valid) {
+          const failure = err => {
+            console.log('获取账号检测接口结果错误', err);
+            this.$message({
+              message: this.$tec(err.code) || this.$t('login.login_1021'),
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
+            });
+          };
+          this.userServer
+            .loginCheck(this.ruleForm.account)
+            .then(async res => {
+              if (res.code == 200 && res.data?.check_result === 1) {
+                this.captchaIsShow = true;
+                // 账号被锁定 再次登录需要图片验证)
+                // 默认图片验证码加载
+                this.reloadCaptha();
+              } else if (res.code == 200) {
+                this.captchaIsShow = false;
+                // 非异常情况下，触发登录逻辑
+                this.sendLogin();
+              } else {
+                failure(res);
+              }
+            })
+            .catch(err => {
+              failure(err);
+            });
+          // }
+          // });
         }
       },
       reloadCaptha() {
@@ -209,55 +211,49 @@
         }
       },
       // 触发login表单验证，若验证通过，执行登录
-      sendLogin() {
-        this.$refs.ruleForm.validate(async valid => {
-          if (valid) {
-            let relt = await this.userServer.handlePassword(this.ruleForm.password);
-            if (!relt.pass) {
-              this.$message({
-                message: this.$t('register.register_1010'),
-                showClose: true,
-                type: 'error',
-                customClass: 'zdy-info-box'
-              });
-              return false;
-            }
-            const params = {
-              way: 1, // 账号密码登录
-              account: this.ruleForm.account,
-              password: relt.retPassword,
-              remember: this.autoLoginStatus ? 1 : '',
-              uuid: relt.uuid
-            };
-            if (this.captchaIsShow) {
-              params.captcha = this.userServerState.captchaVal;
-              // TODO: zhike有可能是 2 需要看v4对接的情况
-              params.validate_type = 1; // 1=图片交互方式校验|2=点击交互校验，【账号密码方式登录并且账号被锁定情况下校验，默认是图片交互方式】
-            }
-            if (this.visitorId) {
-              params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
-            }
-            this.userServer.userLogin(params).then(res => {
-              if (res.code === 200) {
-                // this.resetForm();
-                this.$emit('handleClose', 'code');
-                // 刷新页面
-                // this.$router.go(0);
-                window.location.reload();
-              } else {
-                if (this.captchaIsShow && !this.captchaReady) {
-                  this.reloadCaptha();
-                }
-                this.$message({
-                  message: this.$tec(res.code) || this.$t('login.login_1021'),
-                  showClose: true,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
-              }
-            });
+      async sendLogin() {
+        const valid = await this.$refs.ruleForm.validate();
+        if (!valid) return false;
+        let relt = await this.userServer.handlePassword(this.ruleForm.password);
+        if (!relt.pass) {
+          this.$message({
+            message: this.$t('register.register_1010'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        }
+        const params = {
+          way: 1, // 账号密码登录
+          account: this.ruleForm.account,
+          password: relt.retPassword,
+          remember: this.autoLoginStatus ? 1 : '',
+          uuid: relt.uuid
+        };
+        if (this.captchaIsShow) {
+          params.captcha = this.userServerState.captchaVal;
+          params.validate_type = 1; // 1=图片交互方式校验|2=点击交互校验，【账号密码方式登录并且账号被锁定情况下校验，默认是图片交互方式】
+        }
+        if (this.visitorId) {
+          params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
+        }
+        const res = await this.userServer.userLogin(params).then();
+        if (res.code === 200) {
+          this.$emit('handleClose', 'code');
+          // 刷新页面
+          window.location.reload();
+        } else {
+          if (this.captchaIsShow && !this.captchaReady) {
+            this.reloadCaptha();
           }
-        });
+          this.$message({
+            message: this.$tec(res.code) || this.$t('login.login_1021'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        }
       }
     },
     created() {
