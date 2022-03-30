@@ -43,6 +43,7 @@
       }
     },
     created() {
+      if (this.embedObj.embedVideo) return;
       this.getOfficialInfo();
     },
     mounted() {
