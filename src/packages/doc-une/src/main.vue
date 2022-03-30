@@ -415,6 +415,10 @@
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
+      },
+      // 演示者变更时,隐藏缩列图列表
+      presenterId() {
+        this.thumbnailShow = false;
       }
     },
     beforeCreate() {
