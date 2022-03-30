@@ -211,11 +211,12 @@
           // 观看端，普通模式或全屏模式下，打开了文档或白板
           return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
         } else {
-          // 发起端，打开了文档，普通模式，主持人或助理
+          // 发起端，打开了文档，普通模式，主持人或助理,非转播状态
           return (
             this.currentType === 'document' &&
             this.displayMode === 'normal' &&
-            [1, 3].includes(this.roleName)
+            [1, 3].includes(this.roleName) &&
+            !this.watchInitData.rebroadcast?.isRebroadcasting
           );
         }
       },
@@ -287,11 +288,12 @@
       },
       // 是否显示文档白板工具栏
       showToolbar() {
-        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
+        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下,非转播状态，显示工具栏
         return (
           this.webinarMode != 5 &&
           (this.hasDocPermission || [3].includes(this.roleName)) &&
-          ['normal', 'fullscreen'].includes(this.displayMode)
+          ['normal', 'fullscreen'].includes(this.displayMode) &&
+          !this.watchInitData.rebroadcast?.isRebroadcasting
         );
       },
       /**
