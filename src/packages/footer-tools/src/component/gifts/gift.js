@@ -24,10 +24,6 @@ export default {
       type: [String, Number],
       require: true
     },
-    source: {
-      type: String,
-      default: 'watch'
-    },
     showGiftCount: {
       type: Number
     }
@@ -42,6 +38,9 @@ export default {
     this.selectPage = 0;
   },
   computed: {
+    source() {
+      return this.$domainStore.state.roomBaseServer.embedObj.embed;
+    }
     // ...mapState('watchBase', ['watchInitData', 'configList'])
   },
   watch: {
@@ -99,7 +98,7 @@ export default {
           if (res.code == 200 && res.data && res.data.list) {
             const data = res.data.list;
             let arr = [];
-            if (this.source == 'embed') {
+            if (this.source) {
               if (data.length > 0) {
                 arr = data.filter(item => {
                   return item.price == 0;
