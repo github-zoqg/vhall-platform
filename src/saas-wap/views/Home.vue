@@ -31,6 +31,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
+  import { getQueryString } from '@/packages/app-shared/utils/tool';
   import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
   import MsgTip from './MsgTip.vue';
 
@@ -70,8 +71,24 @@
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         let clientType = 'standard';
-        if (location.pathname.indexOf('embedclient') != -1) {
-          clientType = 'embed';
+        // 初始化直播房间
+        const roomBaseServer = useRoomBaseServer();
+        // 判断是否是嵌入/单视频嵌入
+        try {
+          const _param = {
+            isEmbed: false,
+            isEmbedVideo: false
+          };
+          if (location.pathname.indexOf('embedclient') != -1) {
+            _param.isEmbed = true;
+            clientType = 'embed';
+          }
+          if (getQueryString('embed') == 'video') {
+            _param.isEmbedVideo = true;
+          }
+          roomBaseServer.setEmbedObj(_param);
+        } catch (e) {
+          console.log('嵌入', e);
         }
         const domain = await this.initReceiveLive(clientType);
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
@@ -83,7 +100,6 @@
         bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
-        const roomBaseServer = useRoomBaseServer();
         const roomBaseState = roomBaseServer.state;
         document.title = roomBaseState.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;

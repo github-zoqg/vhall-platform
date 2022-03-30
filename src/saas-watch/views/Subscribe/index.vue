@@ -16,6 +16,7 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
+  import { getQueryString } from '@/packages/app-shared/utils/tool';
   import ErrorPage from '../ErrorPage';
   export default {
     name: 'vmpSubscribe',
@@ -36,12 +37,26 @@
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        if (location.pathname.indexOf('embedclient') != -1) {
-          this.clientType = 'embed';
+        const roomBaseServer = useRoomBaseServer();
+        // 判断是否是嵌入/单视频嵌入
+        try {
+          const _param = {
+            isEmbed: false,
+            isEmbedVideo: false
+          };
+          if (location.pathname.indexOf('embedclient') != -1) {
+            _param.isEmbed = true;
+            this.clientType = 'embed';
+          }
+          if (getQueryString('embed') == 'video') {
+            _param.isEmbedVideo = true;
+          }
+          roomBaseServer.setEmbedObj(_param);
+        } catch (e) {
+          console.log('嵌入', e);
         }
         await this.initReceiveLive(this.clientType);
         await subscribeState();
-        const roomBaseServer = useRoomBaseServer();
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
