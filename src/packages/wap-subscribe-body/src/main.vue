@@ -45,7 +45,7 @@
       <div class="vmp-subscribe-body-auth">
         <div
           class="vmp-subscribe-body-auth-two"
-          v-if="subOption.verify == 6 && !subOption.is_subscribe"
+          v-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
         >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
@@ -175,9 +175,6 @@
     mounted() {
       this.initPage();
       this.listenEvents();
-      if (this.roomBaseServer.state.embedObj.embedVideo) {
-        this.showBottomBtn = false;
-      }
     },
     methods: {
       listenEvents() {
@@ -483,6 +480,9 @@
           this.sureCountDown();
           this.handlerInitInfo();
         } else if (this.webinarType == 3) {
+          if (this.roomBaseServer.state.embedObj.embedVideo) {
+            this.showBottomBtn = false;
+          }
           this.subscribeText = this.$t('player.player_1017');
           this.countDownTime = 0;
         }
