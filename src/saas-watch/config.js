@@ -635,7 +635,7 @@ export const serverConfig = {
   },
   embedVideoLayerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
-    children: ['comPcPlayer']
+    children: ['comPcPlayer', 'comLivingEnd']
   }
   // *******单视频嵌入页面****结束
 };
