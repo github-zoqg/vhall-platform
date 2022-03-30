@@ -9,7 +9,6 @@
    * @description 红包的图标 + 小红点
    */
   import { useQuestionnaireServer } from 'middle-domain';
-  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 支付成功消息
   export default {
     name: 'QuestionnaireIcon',
     data() {
