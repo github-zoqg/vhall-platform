@@ -616,5 +616,26 @@ export const serverConfig = {
         method: 'updateAutoSpeak'
       }
     ]
+  },
+  // *******单视频嵌入页面****开始
+  // 单视频嵌入页面配置
+  embedVideoLayerRoot: {
+    component: 'VmpAirContainer',
+    children: ['embedVideoLayerBody']
+  },
+  // 中间主区域容器
+  embedVideoLayerBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-bd',
+    children: ['embedVideoLayerBodyCenter']
+  },
+  embedVideoLayerBodyCenter: {
+    component: 'VmpBasicCenterContainer',
+    children: ['embedVideoLayerBodyCenterMain']
+  },
+  embedVideoLayerBodyCenterMain: {
+    component: 'VmpBasicCenterMain',
+    children: ['comPcPlayer']
   }
+  // *******单视频嵌入页面****结束
 };
