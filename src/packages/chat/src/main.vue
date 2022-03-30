@@ -381,7 +381,6 @@
       initInputStatus() {
         let placeholder = this.$t('chat.chat_1021');
         let disable = false;
-
         // 控制台配置回放禁言状态
         if (
           (this.playerType == 5 || this.playerType == 4) &&
