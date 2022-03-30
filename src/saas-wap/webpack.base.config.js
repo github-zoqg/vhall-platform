@@ -17,7 +17,7 @@ const htmlConfig = {
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
 
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
+    MiddleDomain: 'http://172.16.27.238:10001/lib/middle-domain.js',
 
     Vant: '//s1.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
@@ -33,8 +33,9 @@ const htmlConfig = {
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
-    iconfontCommon: '//at.alicdn.com/t/font_3120276_qfwcqqjapv.css',
-    iconfont: '//at.alicdn.com/t/font_3128919_pqiha8yfq2k.css'
+    iconfontCommon:
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.1/iconfont.css',
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.2/iconfont.css'
   },
   // dns-prefetch
   dnsPrefetch: {

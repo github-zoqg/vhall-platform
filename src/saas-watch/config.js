@@ -180,7 +180,13 @@ export const serverConfig = {
     emitClickExchangeView: {
       cuid: 'comPcPlayer',
       method: 'exchangeVideoDocs'
-    }
+    },
+    emitClickEndDemonstrate: [
+      {
+        cuid: 'comDocUne',
+        method: 'handleEndDemonstrate'
+      }
+    ]
   },
   // 插播文件
   comInsertStream: {
@@ -232,7 +238,7 @@ export const serverConfig = {
       //弹出公众号
       {
         cuid: 'comOfficial',
-        method: 'openOfficial'
+        method: 'openOfficialDialog'
       }
     ],
     emitOpenShare: [
@@ -278,6 +284,9 @@ export const serverConfig = {
     options: {
       isInviteShare: true //分享是否展示邀请卡
     }
+  },
+  comOfficial: {
+    component: 'VmpOfficialPc'
   },
   comUserAccount: {
     component: 'VmpUserAccount'

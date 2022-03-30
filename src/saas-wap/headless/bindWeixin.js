@@ -11,6 +11,15 @@ export default function () {
   const open_id = sessionStorage.getItem('open_id');
   const isWechatBrowser = browserType();
   const inviteCode = getQueryString('invite');
+
+  // 判断是否是微信分享来的
+  if (getQueryString('shareId') || getQueryString('share_id')) {
+    roomBaseServer.bindShare({
+      share: getQueryString('shareId') || getQueryString('share_id')
+    });
+  }
+
+  // 判断是否是从邀请卡分享来的
   if (
     isWechatBrowser &&
     !isEmbed &&
@@ -20,6 +29,8 @@ export default function () {
   ) {
     bindInvite(inviteCode);
   }
+
+  // 获取微信分享信息
   if (isWechatBrowser && !isEmbed) {
     getShareSettingInfo();
   }

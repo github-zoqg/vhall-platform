@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop="videoShowIcon">
+  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop.prevent="videoShowIcon">
     <div
       class="vmp-stream-list"
       :class="{
@@ -55,8 +55,11 @@
         </p>
       </div>
       <!-- 多语言入口 -->
-      <div class="vmp-wap-stream-wrap-mask-lang">
-        <span @click="openLanguage" v-if="languageList.length > 1">
+      <div
+        class="vmp-wap-stream-wrap-mask-lang"
+        :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
+      >
+        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
           {{ lang.key == 1 ? '中文' : 'EN' }}
         </span>
       </div>
@@ -116,8 +119,6 @@
     data() {
       return {
         childrenCom: [],
-        miniElement: 'mainScreen',
-        maxElement: '',
         playAbort: [], // 自动播放禁止的stream列表
         showPlayIcon: false, // 是否展示播放按钮
         scroll: null, // BScroll 插件
@@ -240,6 +241,7 @@
           !this.isShareScreen
         );
       },
+      // 热度
       hotNum() {
         return (
           Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
@@ -264,6 +266,7 @@
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
 
+      // 检测是否支持连麦，不支持直接进行提示
       if (useMediaCheckServer().state.isBrowserNotSupport) {
         return Toast(this.$t('other.other_1010'));
       }
@@ -290,14 +293,15 @@
     methods: {
       // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
-        const str = this.roomBaseServer.state.watchInitData.webinar.mode == 6 ? '主画面' : '主讲人';
-        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
         this.$nextTick(() => {
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
           }
         });
+        const str =
+          msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
+        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
       },
       // 事件监听
       addSDKEvents() {
@@ -308,13 +312,18 @@
           this.showPlayIcon = true;
         });
 
-        // 接收设为主讲人消息  主直播间
+        // 接收设为主画面消息  主直播间
         this.micServer.$on('vrtc_big_screen_set', msg => {
           this.setBigScreen(msg);
         });
 
-        // 接收设为主讲人消息   组内
+        // 接收设为主画面消息   组内
         useGroupServer().$on('VRTC_BIG_SCREEN_SET', msg => {
+          this.setBigScreen(msg);
+        });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_speaker_switch', msg => {
           this.setBigScreen(msg);
         });
       },
@@ -393,6 +402,7 @@
 
       videoShowIcon() {
         this.iconShow = true;
+        this.isOpenlang = false;
         this.fiveDown();
       },
       changeLang(key) {
@@ -423,6 +433,7 @@
         clearTimeout(this.setIconTime);
         this.setIconTime = setTimeout(() => {
           this.iconShow = false;
+          this.isOpenlang = false;
         }, 5000);
       }
     }

@@ -5,11 +5,17 @@
         <i class="vh-iconfont vh-line-setting"></i>
         {{ $t('account.account_1005') }}
       </div>
-      <div class="vmp-footer-tools__left-online" v-if="roomBaseState.watchInitData.online.show">
+      <div
+        class="vmp-footer-tools__left-online"
+        v-if="roomBaseState.watchInitData.online.show && !isInGroup"
+      >
         <i class="vh-iconfont vh-line-user"></i>
         {{ onlineNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__left-hot" v-if="roomBaseState.watchInitData.pv.show">
+      <div
+        class="vmp-footer-tools__left-hot"
+        v-if="roomBaseState.watchInitData.pv.show && !isInGroup"
+      >
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
@@ -84,7 +90,7 @@
           />
         </div>
       </li>
-      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0'">
+      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <img src="./img/reward-icon.png" alt="" @click="onClickReward" />

@@ -35,7 +35,7 @@
         ]),
         mediaState: this.mediaSettingServer.state,
         liveMode: 3, // 1-音频 2-视频 3-互动 6-分组
-        roleName: '',
+        roleName: '', // 角色
         LIVE_MODE_MAP
       };
     },
@@ -60,6 +60,9 @@
           return true;
         }
       },
+      /**
+       * 过滤菜单选项(控制其显隐)
+       */
       filterMenuList() {
         return this.menuList.filter(item => {
           // 基础设置显隐
@@ -83,6 +86,9 @@
       this.initViewData();
     },
     methods: {
+      /**
+       * 初始化viewData（判断显隐用）
+       */
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
@@ -97,6 +103,10 @@
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
       },
+      /**
+       * 点击某个选项
+       * @param {Object} item
+       */
       onClickItem(item) {
         this.$emit('change', item.id);
       }

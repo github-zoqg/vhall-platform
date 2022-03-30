@@ -150,20 +150,20 @@
     name: 'VmpInsertVideoList',
     data() {
       return {
-        insertVideoVisible: false,
-        searchKey: '',
-        noVideo: 1,
-        isFetching: false,
+        insertVideoVisible: false, // 弹窗显示隐藏
+        searchKey: '', // 关键字搜索
+        noVideo: 1, // 是否没有插播文件
+        isFetching: false, // 接口加载中
         videoParam: {}, //预览数据
-        tableData: [],
+        tableData: [], // 插播文件列表
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
         },
-        total: 1,
-        totalPages: 0,
-        previewDialog: false
+        total: 1, // 总数
+        totalPages: 0, // 总页数
+        previewDialog: false // 预览弹窗
       };
     },
     computed: {

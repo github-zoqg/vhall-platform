@@ -125,9 +125,9 @@
     data() {
       return {
         isShow: false,
-        currentRoomId: '',
-        rebroadcastingRoomId: '',
-        inputVal: '',
+        currentRoomId: '', // 当前选中的ID
+        rebroadcastingRoomId: '', // 当前正在转播的
+        inputVal: '', // 搜索
         loading: false,
         previewLoading: false,
         list: [],
@@ -254,12 +254,15 @@
           });
           if (res.code !== 200) return this.$message.error(`转播失败!`);
 
+          window?.vhallReportForProduct?.report(120001); // 埋点 - 开始转播
+
           this.rebroadcastRoomId = this.currentRoomId; // 记录
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
           this.$message.success(`转播成功！`);
           this.close();
         } catch (err) {
-          this.$message.error(`转播失败!`);
+          console.warn('转播失败', err);
+          this.$message.error(`转播失败!`, err);
         }
       },
       /**

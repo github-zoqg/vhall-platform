@@ -213,7 +213,7 @@
             content: {
               text_content: rawMsg.data.reward_describe
                 ? rawMsg.data.reward_describe
-                : '很精彩，赞一个！',
+                : this.$t('chat.chat_1037'),
               num: rawMsg.data.reward_amount
             },
             sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,

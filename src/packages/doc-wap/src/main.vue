@@ -113,9 +113,16 @@
       pageTotal() {
         return this.docServer.state.pageTotal;
       },
+      // 当前资料类型是文档还是白板
+      currentType() {
+        return this.docServer.state.currentCid.split('-')[0];
+      },
       // 是否有翻页按钮
       hasPager() {
-        return !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc;
+        return (
+          !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
+          this.currentType === 'document'
+        );
       }
     },
     watch: {
@@ -412,6 +419,8 @@
       right: 0;
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
+      // 播放器的层级是1-12
+      z-index: 15;
 
       .vmp-doc-une__content {
         .vmp-doc-inner {

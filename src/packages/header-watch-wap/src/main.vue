@@ -49,7 +49,6 @@
       // 关注的domain服务
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
-      this.autoShowPublic();
 
       //设置品牌皮肤
       this.setSkinInfo(this.skinInfo);
@@ -107,19 +106,6 @@
       }
     },
     methods: {
-      /**
-       * 自动弹出公众号
-       */
-      autoShowPublic() {
-        console.log('header officicalInfo---->', this.officicalInfo);
-        if (
-          this.officicalInfo &&
-          this.officicalInfo.alert_type == 0 &&
-          this.officicalInfo.status == 0
-        ) {
-          this.showPublic();
-        }
-      },
       /**
        * 设置品牌设置信息
        */

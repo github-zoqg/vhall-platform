@@ -134,7 +134,12 @@
 
         this.subscribeServer.$on('pay_success', data => {
           if (data.target_id == this.userInfo.user_id) {
-            console.log('woshi我是预约页fufei');
+            this.$message({
+              message: this.$t('common.common_1005'),
+              showClose: true,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
             this.feeAuth({ type: 3 });
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickPay', { flag: false })

@@ -357,7 +357,14 @@
         // 获取用户的基本信息 如绑定的手机号
         await this.useUserServer.getUserInfo({ scene_id: 2 });
         // 获取微信的绑定信息 返回是否绑定 头像 昵称
-        await this.useCashServer.checkWithDrawal();
+        await this.useCashServer.checkWithDrawal().catch(res => {
+          this.$message({
+            message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        });
         if (!this.useUserServer.state.userInfo.phone) {
           console.log('手机号未绑定进入... ...');
           this.step = 1;
@@ -419,7 +426,7 @@
                 }, 1000);
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg,
+                  message: this.$tec(res.code) || this.$t('account.account_1051'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -429,7 +436,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
+                message: this.$tec(res.code) || this.$t('account.account_1051'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -457,7 +464,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('cash.cash_1033'),
+                    message: this.$tec(res.code) || this.$t('cash.cash_1033'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -467,7 +474,7 @@
               .catch(res => {
                 console.log(res);
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -503,7 +510,7 @@
               this.checkPhoneToWx();
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                message: this.$tec(res.code) || this.$t('account.account_1054'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -512,7 +519,7 @@
           })
           .catch(err => {
             this.$message({
-              message: this.$tec(err.code) || err.msg || this.$t('account.account_1054'),
+              message: this.$tec(err.code) || this.$t('account.account_1054'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -540,13 +547,13 @@
             if (res.code == 200) {
               console.log(res.data);
               const jump_url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/bind/${res.data.mark}`;
-              this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
+              this.qrcode = `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
               console.log(`二维码请求地址: ${this.qrcode}`);
               // 轮询微信扫码绑定情况
               this.startPolling(type);
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || '获取信息失败',
+                message: this.$tec(res.code) || this.$t('message.message_1026'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -555,7 +562,7 @@
           })
           .catch(err => {
             this.$message({
-              message: this.$tec(err.code) || err.msg || '获取信息失败',
+              message: this.$tec(err.code) || this.$t('message.message_1026'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -574,13 +581,27 @@
             console.log('第一次绑定, 当前已经授权过...');
             this.initPollTimer();
             // 获取微信的绑定信息 返回是否绑定 头像 昵称
-            await this.useCashServer.checkWithDrawal();
+            await this.useCashServer.checkWithDrawal().catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
             this.step = 3;
           } else if (type == 2 && bindData.data.is_change == 1) {
             console.log('更换绑定, 当前已经授权过...');
             this.initPollTimer();
             // 获取微信的绑定信息 返回是否绑定 头像 昵称
-            await this.useCashServer.checkWithDrawal();
+            await this.useCashServer.checkWithDrawal().catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
             this.step = 3;
           }
           // v3组件老逻辑 1min 自动重置一次二维码 后续可以改成用户手动
@@ -622,7 +643,7 @@
                   this.closeDialog();
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
+                    message: this.$tec(res.code) || this.$t('cash.cash_1037'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -631,7 +652,7 @@
               })
               .catch(err => {
                 this.$message({
-                  message: this.$tec(err.code) || err.msg || '验证失败，无法操作',
+                  message: this.$tec(err.code) || this.$t('cash.cash_1037'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'

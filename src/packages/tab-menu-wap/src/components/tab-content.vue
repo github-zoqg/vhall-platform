@@ -66,14 +66,14 @@
 
         let child = null;
         child = this.getComp(item.cuid);
-
+        console.log(child);
         if (!child) return;
 
         // pre-show
         if (item.type === 1) {
           child.queryDetail(item.id);
         }
-
+        child.switchToBack && child.switchToBack();
         this.curItem = item;
       }
     }
@@ -91,7 +91,7 @@
     .vmp-tab-container-mainarea {
       height: 100%;
       position: relative;
-      overflow: auto;
+      // overflow: auto;
       & > section {
         height: 100%;
       }

@@ -16,9 +16,12 @@
         <!--全部成员-->
         <template v-if="tabIndex === 1">
           <div class="member-list__all-tab">
-            <div v-if="searchEmpty" class="empty-container">
+            <div
+              v-if="searchShow && searchUserInput && !onlineUsers.length"
+              class="empty-container"
+            >
               <span class="empty-img">
-                <img src="img/search@2x.png" alt="" />
+                <img src="./img/search@2x.png" alt="" />
               </span>
               <p>很抱歉，没有搜索到您要找的人</p>
             </div>
@@ -53,7 +56,7 @@
           <div class="member-list__apply-tab">
             <div v-if="!applyUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="img/noTop@2x.png" alt="" />
+                <img src="./img/noTop@2x.png" alt="" />
               </span>
               <p>暂无人举手</p>
             </div>
@@ -88,7 +91,7 @@
           <div class="member-list__limit-tab">
             <div v-if="!limitedUsers.length" class="empty-container">
               <span class="empty-img-top">
-                <img src="img/no@2x.png" alt="" />
+                <img src="./img/no@2x.png" alt="" />
               </span>
               <p>没有禁言或者踢出的成员</p>
             </div>
@@ -279,7 +282,8 @@
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
-        isWatch: false
+        isWatch: false,
+        timmer: null
       };
     },
     beforeCreate() {
@@ -296,7 +300,6 @@
       this.initConfig();
       //初始化视图数据
       await this.initViewData();
-      this.isLive && this.handleStartGroup();
       //开始初始化流程
       this.init();
       this.listenEvent();
@@ -319,7 +322,10 @@
       //是否显示搜索结果图片
       isShowEmptyImg() {
         return [
-          this.tabIndex === 1 && this.searchEmpty,
+          this.tabIndex === 1 &&
+            this.searchShow &&
+            this.searchUserInput &&
+            !this.onlineUsers.length,
           this.tabIndex === 2 && !this.applyUsers.length,
           this.tabIndex === 3 && !this.limitedUsers.length
         ].some(item => !!item);
@@ -411,22 +417,6 @@
       //统一初始化方法
       init() {
         this.getOnlineUserList();
-      },
-      //开始讨论后的处理（发起端）
-      handleStartGroup() {
-        const _this = this;
-        // 开始讨论后重新初始化页面
-        this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-          let temp = Object.assign({}, rawMsg);
-          if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
-            temp.data = JSON.parse(temp.data);
-            temp.context = JSON.parse(temp.context);
-          }
-          const { type = '' } = temp.data || {};
-          if (type === 'start_discussion') {
-            _this.init();
-          }
-        });
       },
       listenEvent() {
         const _this = this;
@@ -540,6 +530,8 @@
             temp.context = JSON.parse(temp.context);
           }
           const { type = '' } = temp.data || {};
+
+          console.log('【成员列表房间消息】', type, temp);
 
           switch (type) {
             case 'vrtc_connect_apply':
@@ -830,7 +822,6 @@
           const isLive = _this.isLive;
           const isWatch = _this.isWatch;
           if (msg.context.isAuthChat) return; // 如果是聊天审核页面不做任何操作
-          //todo 这里可能会改成，请求一下分组的接口，拿到分组的实际人数
           const groupUserNum =
             _this.groupServer.state.groupedUserList.length >= 1
               ? _this.groupServer.state.groupedUserList.length - 1
@@ -1019,10 +1010,13 @@
             },
             'onlineUsers'
           );
-
+          console.log('互动连麦成功断开链接', msg);
           //提示语
           if (msg.data.target_id == _this.userId) {
-            _this.$message.success({ message: _this.$t('interact.interact_1028') });
+            this.timmer && clearTimeout(this.timmer);
+            this.timmer = setTimeout(() => {
+              _this.$message.success({ message: _this.$t('interact.interact_1028') });
+            }, 1000);
             return;
           }
 
@@ -1066,7 +1060,7 @@
         //主房间人员变动
         function handleMainRoomJoinChange(msg) {
           //必须在主房间
-          if (!_this.isInGroup) return;
+          if (_this.isInGroup) return;
 
           if (isLive) {
             _this.totalNum = msg.uv - _this.groupServer.state.groupedUserList.length;
@@ -1140,6 +1134,9 @@
             case 'group_join_change':
               _this.updateOnlineUserList();
               break;
+            case 'group_disband':
+              _this.updateOnlineUserList();
+              break;
             default:
               break;
           }
@@ -1178,9 +1175,9 @@
         });
 
         // 解散分组(主播&观看均更新)
-        this.groupServer.$on('GROUP_DISBAND', () => {
-          this.updateOnlineUserList();
-        });
+        // this.groupServer.$on('GROUP_DISBAND', () => {
+        //   this.updateOnlineUserList();
+        // });
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
@@ -1356,7 +1353,7 @@
         const _this = this;
         const params = {
           room_id: this.roomId,
-          pos: pos || (this.pageConfig.page <= 0 ? 0 : 10 * this.pageConfig.page),
+          pos: pos || (this.pageConfig.page <= 0 ? 0 : this.pageConfig.page),
           limit: this.pageConfig.limit
         };
 
@@ -1386,11 +1383,11 @@
                 }
               });
 
-              if (!this.onlineUsers.length) {
-                this.pageConfig.page--;
+              if (!res?.data?.list?.length) {
+                _this.pageConfig.page--;
               }
               //在线总人数
-              this.totalNum = this.memberServer.state.totalNum;
+              _this.totalNum = _this.memberServer.state.totalNum;
               setTimeout(() => {
                 _this.refresh();
               }, 50);
@@ -1736,14 +1733,13 @@
             console.log('setSpeaker failed ::', err);
           });
       },
-      //邀请上麦
+      //邀请演示(注：方法名取名不科学，inviteMic不是指邀请上麦，而是指邀请演示 TODO:需修改)
       inviteMic(accountId = '') {
-        if (
-          this.isWatch &&
-          (accountId === this.leader_id || accountId === this.getCurrentSpeakerId)
-        ) {
-          return;
-        }
+        const isLeader = accountId === this.leader_id;
+        const isSpeaker = accountId === this.getCurrentSpeakerId;
+
+        if (this.isWatch && (isLeader || isSpeaker)) return;
+
         const params = {
           room_id: this.roomId,
           receive_account_id: accountId,
@@ -1758,7 +1754,8 @@
               } else {
                 //数据埋点--邀请上麦
                 window.vhallReportForProduct?.report(110130);
-                this.$message.success(this.$t('message.message_1033'));
+
+                this.$message.success(this.$t('message.message_1034'));
               }
             } else {
               this.$message.error(res.msg);
@@ -1885,7 +1882,7 @@
       },
       //加载更多
       loadMore() {
-        this.page++;
+        this.pageConfig.page++;
         this.getOnlineUserList();
       },
       //滚动条位置更新
@@ -2029,7 +2026,7 @@
             display: inline-block;
             width: 26px;
             height: 14px;
-            background-color: #242527;
+            background-color: #434343;
             border-radius: 100px;
             position: relative;
             margin-left: 5px;
@@ -2039,7 +2036,7 @@
               box-sizing: border-box;
               position: absolute;
               top: 2px;
-              left: 0px;
+              left: 2px;
               content: '';
               width: 10px;
               height: 10px;
@@ -2137,7 +2134,7 @@
           position: absolute;
           top: 7px;
           right: 55px;
-          background-image: url('img/account-file-close-default.png');
+          background-image: url('./img/account-file-close-default.png');
           background-repeat: no-repeat;
           background-size: 100%;
         }

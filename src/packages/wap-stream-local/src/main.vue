@@ -54,7 +54,6 @@
     usePlayerServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import { Dialog, Toast } from 'vant';
 
   export default {

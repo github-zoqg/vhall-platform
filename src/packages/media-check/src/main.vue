@@ -99,7 +99,7 @@
         STEP_OPTS: Object.freeze(STEP_OPTS),
 
         // 步骤控制和检查
-        checkList: getCheckList(),
+        checkList: getCheckList(), // 检查清单
         currentStep: 0, // 当前检测到第几步
         firstStep: 0, // 从第几步骤开始检测
 
@@ -189,6 +189,10 @@
 
         this.currentStep++;
       },
+      /**
+       * 重新检测或关闭弹窗
+       * @param {*} param
+       */
       finish({ result }) {
         if (result === 'fail') {
           this.reset();

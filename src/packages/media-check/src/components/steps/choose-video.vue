@@ -132,9 +132,18 @@
         if (this.localStreamId) {
           await this.stopVideoPreview();
         }
+
+        window?.vhallReport.report(110006, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 摄像头检测成功
+
         this.$emit('next', { result: 'success' });
       },
       fail() {
+        window?.vhallReport.report(110010, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 摄像头检测失败
+
         this.$emit('next', { result: 'fail' });
       }
     }

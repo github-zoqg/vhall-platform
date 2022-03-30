@@ -1,6 +1,12 @@
 /* eslint-disable promise/param-names */
 <template>
-  <van-popup v-model="popupVisible" position="bottom" :overlay="false" class="lottery-popup">
+  <van-popup
+    v-model="popupVisible"
+    position="bottom"
+    :overlay="false"
+    class="lottery-popup"
+    get-container="body"
+  >
     <!-- 抽奖标题 -->
     <header class="title-bar">
       {{ $t('interact_tools.interact_tools_1003') }}
@@ -64,12 +70,14 @@
     },
     destroyed() {
       this.removeMsgEvent();
+      this.popupVisible = false;
     },
     methods: {
       accept(msg) {
         console.log(msg);
         this.lotteryId = msg.lottery_id;
         this.showWinnerList = !!msg.publish_winner;
+        this.setFitment(msg);
         this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
           if (res.code === 200) {
             if (res.data.take_award === 0) {
@@ -146,6 +154,7 @@
         const msgData = msg.data;
         this.setFitment(msgData);
         this.lotteryId = msgData.lottery_id;
+        this.showWinnerList = !!msgData.publish_winner;
         this.setFitment(msgData);
         const winnerList = msgData.lottery_winners.split(',');
         const lotteryResult = winnerList.some(userId => {

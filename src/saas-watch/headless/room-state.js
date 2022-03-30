@@ -93,7 +93,6 @@ export default async function () {
       }),
     roomBaseServer.getCustomRoleName()
   ];
-  virtualAudienceServer.init();
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
     promiseList.push(groupServer.init());
@@ -140,6 +139,8 @@ export default async function () {
 
   await docServer.init();
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
+
+  await virtualAudienceServer.init();
 
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;

@@ -205,7 +205,7 @@
                 this.userServer.getUserInfo({ scene_id: 2 });
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                  message: this.$tec(res.code) || this.$t('account.account_1048'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -214,7 +214,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                message: this.$tec(res.code) || this.$t('account.account_1048'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -281,7 +281,7 @@
               this.userServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                message: this.$tec(res.code) || this.$t('account.account_1048'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -290,7 +290,7 @@
           })
           .catch(res => {
             this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+              message: this.$tec(res.code) || this.$t('account.account_1048'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -336,7 +336,7 @@
                   this.userServer.getUserInfo({ scene_id: 2 });
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                    message: this.$tec(res.code) || this.$t('account.account_1058'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -345,7 +345,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                  message: this.$tec(res.code) || this.$t('account.account_1058'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -377,11 +377,12 @@
             .catch(() => {});
         } else {
           localStorage.setItem('vmp_auth_tag', 'bindQQ');
-
           const hostPath = process.env.VUE_APP_BIND_BASE_URL;
           const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+            `https:${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(
+              jumpUrlPath
+            )}`
           );
         }
       },
@@ -400,7 +401,7 @@
               this.userServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+                message: this.$tec(res.code) || this.$t('account.account_1065'),
                 showClose: true,
                 type: 'success',
                 customClass: 'zdy-info-box'
@@ -410,7 +411,7 @@
           })
           .catch(res => {
             this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+              message: this.$tec(res.code) || this.$t('account.account_1065'),
               showClose: true,
               // duration: 0,
               type: 'error',
@@ -439,7 +440,7 @@
           const hostPath = process.env.VUE_APP_BIND_BASE_URL;
           const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
+            `https:${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
               jumpUrlPath
             )}`
           );

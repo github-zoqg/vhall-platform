@@ -26,6 +26,7 @@ import VmpBasicRightContainer from '@/packages/basic-right-container';
 import VmpBasicCenterContainer from '@/packages/basic-center-container';
 import VmpBasicCenterMain from '@/packages/basic-center-main';
 import VmpShare from '@/packages/share'; // 观看端分享
+import VmpOfficialPc from '@/packages/official-module/official-pc'; //公众号弹窗
 import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公权限验证
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
@@ -96,6 +97,7 @@ export function initUse() {
   Vue.use(VmpBasicCenterContainer);
   Vue.use(VmpBasicCenterMain);
   Vue.use(VmpShare);
+  Vue.use(VmpOfficialPc);
   Vue.use(VmpWatchAuth);
   Vue.use(VmpMemberList);
   Vue.use(VmpWatchPrivateChat);

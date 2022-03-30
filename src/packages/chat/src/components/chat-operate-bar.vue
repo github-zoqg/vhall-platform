@@ -18,6 +18,7 @@
         <!--只看主办方按钮-->
         <i
           class="vh-saas-iconfont vh-saas-a-line-zhikanzhubanfang"
+          :class="{ 'is-filter-show': isFilterShow }"
           @click.stop="onClickFilterSetting"
           v-clickoutside="hidechatOptions"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
@@ -277,25 +278,13 @@
       //只看主办方
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
-        this.$message({
-          message: message,
-          showClose: true,
-          // duration: 0,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
+        this.$message.success(message);
         this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
-        this.$message({
-          message: message,
-          showClose: true,
-          // duration: 0,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
+        this.$message.success(message);
         this.$emit('onSwitchShowSpecialEffects', status);
       },
       //点击筛选
@@ -359,6 +348,9 @@
           color: #ccc;
           cursor: pointer;
         }
+      }
+      .is-filter-show {
+        color: #ccc;
       }
       &__left {
         display: flex;
@@ -483,6 +475,10 @@
         .el-checkbox__label {
           font-size: 14px;
           color: #999999;
+        }
+
+        .el-checkbox__inner {
+          border: 1px solid #ccc;
         }
       }
       .vh-iconfont {
