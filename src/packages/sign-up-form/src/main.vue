@@ -791,20 +791,6 @@
         showCaptcha: false,
         //是否是校验手机
         isValidPhone: false,
-        //已报名的表单
-        verifyRules: {
-          phone: {
-            type: 'number',
-            required: true,
-            message: this.$t('account.account_1069'),
-            trigger: 'blur'
-          },
-          code: {
-            required: true,
-            validator: this.validCode,
-            trigger: 'blur'
-          }
-        },
         //联动选项是第几题
         colNum: '',
         //区域选项
@@ -1053,6 +1039,22 @@
             county: this.$t('form.form_1005')
           },
           6: this.$t('form.form_1020')
+        };
+      },
+      //已报名的表单
+      verifyRules() {
+        return {
+          phone: {
+            type: 'number',
+            required: true,
+            message: this.$t('account.account_1069'),
+            trigger: 'blur'
+          },
+          code: {
+            required: true,
+            validator: this.validCode,
+            trigger: 'blur'
+          }
         };
       }
     },
