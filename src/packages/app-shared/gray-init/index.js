@@ -1,4 +1,4 @@
-import { roomSubjectApi, roomApi } from 'middle-domain';
+import { roomSubjectApi, roomApi, setRequestHeaders } from 'middle-domain';
 
 /**
  * 灰度初始化
@@ -13,11 +13,8 @@ export default function grayInit(options) {
           webinar_id: options.params.id
         })
         .then(res => {
-          if (res.code == 200 && res.data) {
-            window.sessionStorage.setItem('initGrayId', res.data.user_id);
-          } else {
-            window.sessionStorage.setItem('initGrayId', null);
-          }
+          const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
+          setGrayUserId(grayUserId);
           resolve(res);
         })
         .catch(res => {
@@ -32,11 +29,8 @@ export default function grayInit(options) {
           subject_id: options.query.id
         })
         .then(res => {
-          if (res.code == 200 && res.data) {
-            window.sessionStorage.setItem('initGrayId', res.data.user_id);
-          } else {
-            window.sessionStorage.setItem('initGrayId', null);
-          }
+          const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
+          setGrayUserId(grayUserId);
           resolve(res);
         })
         .catch(res => {
@@ -46,14 +40,11 @@ export default function grayInit(options) {
           });
         });
     } else if (options.meta.grayType == 'user') {
-      if (options.params.id) {
-        window.sessionStorage.setItem('initGrayId', options.params.id);
-      } else {
-        window.sessionStorage.setItem('initGrayId', null);
-      }
+      const grayUserId = options.params.id || null;
+      setGrayUserId(grayUserId);
       resolve();
     } else {
-      window.sessionStorage.setItem('initGrayId', null);
+      setGrayUserId(null);
       resolve();
     }
   });
@@ -70,11 +61,8 @@ export function grayInitByMiddle(options) {
           webinar_id: options.params.id
         })
         .then(res => {
-          if (res.code == 200 && res.data) {
-            window.sessionStorage.setItem('initGrayId', res.data.user_id);
-          } else {
-            window.sessionStorage.setItem('initGrayId', null);
-          }
+          const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
+          setGrayUserId(grayUserId);
           resolve(res);
         })
         .catch(res => {
@@ -86,26 +74,32 @@ export function grayInitByMiddle(options) {
           subject_id: options.query.id
         })
         .then(res => {
-          if (res.code == 200 && res.data) {
-            window.sessionStorage.setItem('initGrayId', res.data.user_id);
-          } else {
-            window.sessionStorage.setItem('initGrayId', null);
-          }
+          const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
+          setGrayUserId(grayUserId);
           resolve(res);
         })
         .catch(res => {
           resolve(res);
         });
     } else if (options.meta.grayType == 'user') {
-      if (options.params.id) {
-        window.sessionStorage.setItem('initGrayId', options.params.id);
-      } else {
-        window.sessionStorage.setItem('initGrayId', null);
-      }
+      const grayUserId = options.params.id || null;
+      setGrayUserId(grayUserId);
       resolve();
     } else {
-      window.sessionStorage.setItem('initGrayId', null);
+      setGrayUserId(null);
       resolve();
     }
+  });
+}
+
+/**
+ * 设置灰度id
+ */
+function setGrayUserId(grayUserId) {
+  // 存储到 session
+  window.sessionStorage.setItem('initGrayId', grayUserId);
+  // 设置 domain requestHeader
+  setRequestHeaders({
+    'gray-id': grayUserId
   });
 }

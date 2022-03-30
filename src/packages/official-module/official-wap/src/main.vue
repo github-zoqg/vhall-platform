@@ -33,12 +33,36 @@
        */
       officicalInfo() {
         return this.$domainStore.state.roomBaseServer.officicalInfo;
+      },
+      // 获取嵌入方式
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      isLive() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'live';
       }
+    },
+    created() {
+      this.getOfficialInfo();
     },
     mounted() {
       console.log('roomBaseServer---->', this.officicalInfo);
     },
     methods: {
+      /**
+       * 自动弹出公众号
+       */
+      getOfficialInfo() {
+        if (this.officicalInfo && this.officicalInfo.status == 0 && this.officicalInfo.img) {
+          if (this.embedObj.embed) {
+            if (this.isLive) this.showStatus = true;
+          } else {
+            if (this.officicalInfo.alert_type == 0) {
+              this.showStatus = true;
+            }
+          }
+        }
+      },
       /**
        * 显示二维码
        */

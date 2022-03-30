@@ -20,7 +20,7 @@ const routes = [
     path: '/lives/recordvideo/:id',
     component: () => import('../views/RecordVideo/index.vue'),
     name: 'RecordVideo',
-    meta: { title: '录制视频' }
+    meta: { title: '录制视频', grayType: 'webinar' }
   },
   {
     path: '/lives/keylogin/:id/:role_name',
@@ -50,7 +50,7 @@ const routes = [
     path: '/lives/split-screen/:id',
     name: 'SplitScreen',
     component: () => import('../views/SplitScreen.vue'),
-    meta: { title: '分屏' }
+    meta: { title: '分屏', grayType: 'webinar' }
   },
   {
     // 其它没有匹配到的路由都会跳至此模块(404）

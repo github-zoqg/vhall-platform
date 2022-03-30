@@ -3,7 +3,11 @@
     v-if="!isShowContainer"
     :class="[
       'vmp-player',
-      { 'is-watch': isWatch, 'vmp-player-embed': isEmbedVideo, 'vmp-player-embedFull': isEmbed },
+      {
+        'is-watch': isWatch,
+        'vmp-player-embed': isEmbedVideo,
+        'vmp-player-embedFull': isEmbed && !isEmbedVideo
+      },
       isSubscribe ? '' : `vmp-player--${displayMode}`
     ]"
     @mousemove="wrapEnter"
@@ -94,7 +98,7 @@
         <div
           class="vmp-player-living-exchange"
           @click="exchangeVideoDocs"
-          v-if="isVisibleMiniElement && hoveVideo && !isVodEnd"
+          v-if="isVisibleMiniElement && hoveVideo && !isVodEnd && !isEmbedVideo"
         >
           <p>
             <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -391,11 +395,12 @@
           !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         );
       },
+      // 是否是嵌入
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       isEmbedVideo() {
-        // 是不是音视频嵌入
+        // 是不是单视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
@@ -420,8 +425,9 @@
         }
       },
       ['roomBaseServer.state.miniElement'](newval) {
-        console.log('-[player]---大小屏变更miniElement：', newval);
-        this.displayMode = newval === 'player' ? 'mini' : 'normal';
+        if (!this.isEmbedVideo) {
+          this.displayMode = newval === 'player' ? 'mini' : 'normal';
+        }
       }
     },
     created() {

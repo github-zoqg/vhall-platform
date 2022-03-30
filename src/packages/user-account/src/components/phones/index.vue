@@ -387,8 +387,9 @@
                 });
               } else {
                 // 关闭当前弹出框
-                this.phoneData.visible = false;
-                this.$emit('input', { ...this.phoneData });
+                this.phoneData.dialogShow = false;
+                this.$emit('input', { phone: this.setPhoneForm.phone, ...this.phoneData });
+                this.$emit('bound');
               }
             } else {
               this.$message({

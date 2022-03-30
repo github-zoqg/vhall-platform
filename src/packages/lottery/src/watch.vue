@@ -249,6 +249,7 @@
 </script>
 <style lang="less">
   .vhall-lottery-wap {
+    line-height: initial; // 清除父容器的css影响
     .lottery__close-btn {
       position: absolute;
       bottom: -36px;

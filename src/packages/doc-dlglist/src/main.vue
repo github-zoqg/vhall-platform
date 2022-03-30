@@ -19,7 +19,7 @@
         top="30vh"
         append-to-body
       >
-        <p style="padding-bottom: 10px">上传文档同时共享至资料管理，便于其他活动使用？</p>
+        <p class="tip-text">上传文档同时共享至资料管理，便于其他活动使用？</p>
         <p><el-checkbox v-model="isShare">共享到资料管理</el-checkbox></p>
         <div class="dialog-footer">
           <el-button type="primary" round @click="handleShareSubmit">确 定</el-button>
@@ -36,7 +36,7 @@
       </template>
 
       <!-- 内容区域 -->
-      <div style="height: 480px">
+      <div class="vmp-doc-list__content">
         <!-- 当前直播列表 -->
         <div class="vmp-doc-cur" v-show="mode === 1">
           <!-- 无数据 -->
@@ -112,7 +112,6 @@
               <!-- 搜索框 -->
               <el-input
                 class="input-search"
-                style="float: right"
                 placeholder="请输入文档名称"
                 v-model="docSearchKey"
                 clearable
@@ -219,7 +218,7 @@
               ref="doclibTable"
               :data="doclibList"
               height="350px"
-              style="width: 100%; margin-top: 10px"
+              class="vmp-doc-lib__table"
               @selection-change="handleChangeSelection"
               @select-all="handleChangeSelectall"
             >
@@ -259,7 +258,7 @@
           <div class="vmp-doc-lib__ft">
             <div class="vmp-doc-lib__ft-tip">
               当前选中
-              <span style="color: #fb3a32">{{ selectDocIdList.length }}</span>
+              <span class="select-count">{{ selectDocIdList.length }}</span>
               个文档
             </div>
             <div>
@@ -701,6 +700,10 @@
 </script>
 <style lang="less">
   .vmp-doc-list {
+    &__content {
+      height: 480px;
+    }
+
     .vmp-doc-cur__empty {
       height: 380px;
       display: flex;
@@ -722,6 +725,10 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+
+      .input-search {
+        float: right;
+      }
 
       .vmp-doc-cur__bd {
         padding-top: 10px;
@@ -765,6 +772,11 @@
       flex-direction: column;
       height: 100%;
 
+      &__table {
+        width: 100%;
+        margin-top: 10px;
+      }
+
       .vmp-doc-lib__ft {
         margin: 15px 0 24px 0;
         display: flex;
@@ -772,6 +784,10 @@
         align-items: center;
         .vmp-doc-lib__ft-tip {
           flex: 1;
+
+          .select-count {
+            color: #fb3a32;
+          }
         }
       }
     }
@@ -853,6 +869,9 @@
     position: relative;
     margin-top: -10%;
 
+    .tip-text {
+      padding-bottom: 10px;
+    }
     .el-checkbox {
       font-weight: 400 !important;
     }
