@@ -68,10 +68,9 @@
       return {
         mediaState: this.mediaSettingServer.state,
         videoLoadingImg: videoSwitchImg,
-        isVideoSwitching: false,
-        isVideoError: false,
-        videoTipsText: '设备切换中，请稍后…',
-        videoError: false
+        isVideoSwitching: false, // video正在切换
+        isVideoError: false, // video读取错误
+        videoTipsText: '设备切换中，请稍后…'
       };
     },
     computed: {
@@ -131,7 +130,7 @@
         };
 
         try {
-          this.videoError = false;
+          this.isVideoError = false;
           this.isVideoSwitching = true;
           this.videoLoadingImg = videoSwitchImg;
           await this.mediaSettingServer.startVideoPreview(options);
@@ -139,7 +138,7 @@
         } catch (err) {
           this.isVideoSwitching = false;
           this.videoLoadingImg = videoFailImg;
-          this.videoError = true;
+          this.isVideoError = true;
           this.videoTipsText = this.$t('setting.setting_1010');
           this.$message.error(this.$t('message.message_1031'));
           console.error(this.$t('message.message_1028'), err);

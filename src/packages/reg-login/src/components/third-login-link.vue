@@ -64,10 +64,10 @@
         const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.roomId}`;
         // 第三方登录地址
         this.options.wxPath =
-          `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=` +
+          `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=` +
           encodeURIComponent(jumpUrlPath);
         this.options.qqPath =
-          `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?source=pc&jump_url=` +
+          `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?source=pc&jump_url=` +
           encodeURIComponent(jumpUrlPath);
       }
     },

@@ -205,15 +205,19 @@
       isInGroup() {
         return !!this.groupServer.state.groupInitData?.isInGroup;
       },
-      // 是否显示文档翻页相关操作栏
+      // 是否显示文档白板操作栏(翻页、放大、缩小、还原、拖拽)
       showPagebar() {
-        // (普通模式，或 观看端全屏模式下) && (有演示权限，或是观众,或者展示文档时的助理)
-        return (
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
-          (this.hasDocPermission ||
-            this.roleName === 2 ||
-            (this.roleName === 3 && this.currentType === 'document'))
-        );
+        if (this.isWatch) {
+          // 观看端，普通模式或全屏模式下，打开了文档或白板
+          return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
+        } else {
+          // 发起端，打开了文档，普通模式，主持人或助理
+          return (
+            this.currentType === 'document' &&
+            this.displayMode === 'normal' &&
+            [1, 3].includes(this.roleName)
+          );
+        }
       },
       // 当前用户Id
       userId() {
@@ -237,20 +241,35 @@
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
       // 文档是否可见
       show() {
         // 1、发起端没有开启桌面共享时展示
         // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
         // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限,不能是单视频嵌入页
         if (this.isWatch) {
-          return (
-            (this.docServer.state.switchStatus ||
-              this.groupServer.state.isInGroup ||
-              this.hasDocPermission) &&
-            !this.isEmbedVideo
-          );
+          if (!this.isEmbedVideo) {
+            if (this.hasDocPermission) {
+              return true;
+            } else {
+              if (this.micServer.state.isSpeakOn && this.isShareScreen) {
+                return false;
+              } else {
+                return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+              }
+            }
+          } else {
+            return false;
+          }
+          // return (
+          //   this.docServer.state.switchStatus ||
+          //   this.groupServer.state.isInGroup ||
+          //   this.hasDocPermission
+          // );
         } else {
-          if (this.desktopShareServer.state.localDesktopStreamId) {
+          if (this.isShareScreen) {
             return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
           } else {
             return true;
@@ -872,7 +891,12 @@
               room_id: this.roomBaseServer.state.watchInitData.interact.room_id
             });
             if (result && result.code == 200) {
-              if (this.groupServer.state.groupInitData.join_role == 2) {
+              const isGroupMember = this.groupServer.state.groupInitData.join_role == 2;
+              const isShowMessageOnGroup = this.isInGroup && isGroupMember;
+
+              const isMainMember = this.roleName == 2;
+              const isShowMessageOnMain = !this.isInGroup && isMainMember;
+              if (isShowMessageOnGroup || isShowMessageOnMain) {
                 // 如果是观众结束了自己的演示
                 this.$message({
                   message: '结束演示',
