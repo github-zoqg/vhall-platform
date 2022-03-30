@@ -514,7 +514,11 @@
         const roomBaseServer = useRoomBaseServer();
         let miniElement = '';
         if (this.isShareScreen) {
-          miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+            miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+          } else {
+            miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+          }
         } else {
           miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         }

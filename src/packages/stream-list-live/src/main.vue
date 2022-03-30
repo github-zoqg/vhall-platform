@@ -12,10 +12,10 @@
           'height-lower': isMainScreenHeightLower && !isShrink,
           'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__mini':
-            ['stream-list', 'insert-video'].includes(miniElement) &&
+            ['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
             joinInfo.third_party_user_id == mainScreen,
           'vmp-dom__max':
-            !['stream-list', 'insert-video'].includes(miniElement) &&
+            !['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
             joinInfo.third_party_user_id == mainScreen
         }"
         v-show="localSpeaker.accountId"

@@ -63,6 +63,10 @@
       this.headToken = localStorage.getItem('token');
     },
     methods: {
+      /**
+       * 上传前检查
+       * @param {File} file
+       */
       beforeUpload(file) {
         const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 2;
@@ -75,6 +79,10 @@
         }
         return isJPG && isLt2M;
       },
+      /**
+       * 上传成功时，更新canvasImgUrl
+       * @param {*} res
+       */
       async onUploadSuccess(res) {
         if (res.code == 200) {
           this.showDelImg = true;
