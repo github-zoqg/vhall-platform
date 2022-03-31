@@ -1276,6 +1276,7 @@
           _this.onlineUsers = [];
           _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
           _this.updateOnlineUserList();
+          _this.leader_id = '';
         }
         //重新获取最新的groupInitData
         function changeGroupInitData(msg) {
