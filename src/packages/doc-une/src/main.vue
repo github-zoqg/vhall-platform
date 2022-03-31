@@ -211,11 +211,11 @@
           // 观看端，普通模式或全屏模式下，打开了文档或白板
           return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
         } else {
-          // 发起端，打开了文档，普通模式，主持人或助理,非转播状态
+          // 发起端，打开了文档，普通模式，助理或者有演示权限,非转播状态
           return (
             this.currentType === 'document' &&
             this.displayMode === 'normal' &&
-            [1, 3].includes(this.roleName) &&
+            (this.roleName == 3 || this.hasDocPermission) &&
             !this.watchInitData.rebroadcast?.isRebroadcasting
           );
         }
