@@ -271,7 +271,10 @@
           // );
         } else {
           if (this.isShareScreen) {
-            return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
+            return (
+              (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn) ||
+              this.roleName == 3
+            );
           } else {
             return true;
           }

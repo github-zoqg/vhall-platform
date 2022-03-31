@@ -138,6 +138,7 @@
 
         pushStreamSeperately: false,
         isPushLocalStream: false,
+        isPreviewInit: false,
         isPreviewVisible: false,
         videoParam: {},
         overlayScrollBarsOptions: {
@@ -170,8 +171,9 @@
         this.isShow = false;
         this.reset();
       },
-      reset() {
+      async reset() {
         this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        await this.$nextTick(0);
         this.currentRoomId = '';
         this.rebroadcastingRoomId = '';
         this.pushStreamSeperately = false;
@@ -231,7 +233,6 @@
               roomId
             }
           };
-
           this.isPreviewVisible = true;
           await sleep(600);
           this.previewLoading = false;
@@ -282,9 +283,11 @@
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'stopRebroadcast'));
 
             if (this.isPushLocalStream) {
-              this.interactiveServer.publishStream();
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startPush'));
             }
 
+            this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+            await this.$nextTick(0);
             this.close();
           } else {
             this.$message.error('停止转播失败!');
