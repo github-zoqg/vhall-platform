@@ -35,6 +35,18 @@
       <p>桌面共享中....</p>
     </div>
 
+    <div
+      class="vmp-desktop-screen-exchange"
+      @click="exchangeVideoDocs"
+      v-if="(!isSpeakOn && roleName == 2) || roleName == 3"
+    >
+      <p>
+        <el-tooltip :content="$t('player.player_1008')" placement="top">
+          <i class="vh-saas-iconfont vh-saas-line-switch"></i>
+        </el-tooltip>
+      </p>
+    </div>
+
     <!--没有权限弹窗 -->
     <saas-alert
       :visible="popAlert.visible"
@@ -110,6 +122,9 @@
       },
       isShareScreen() {
         return this.desktopShareServer.state.localDesktopStreamId;
+      },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       },
       presentation_screen() {
         if (this.isInGroup) {
@@ -410,6 +425,13 @@
       //结束演示
       handleEndDemonstrate() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndDemonstrate'));
+      },
+      exchangeVideoDocs() {
+        if (this.miniElement == 'screen') {
+          this.roomBaseServer.setChangeElement('doc');
+        } else {
+          this.roomBaseServer.setChangeElement('screen');
+        }
       }
     }
   };
@@ -453,6 +475,39 @@
       }
     }
 
+    &-exchange {
+      position: absolute;
+      top: 10px;
+      z-index: 9;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.8s;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      cursor: pointer;
+      p {
+        text-align: center;
+      }
+      span {
+        display: inline-block;
+        text-align: right;
+        font-size: 14px;
+      }
+      i {
+        font-size: 16px;
+        color: #e6e6e6;
+        opacity: 1;
+        cursor: pointer;
+        &:hover {
+          color: #fb3a32;
+        }
+      }
+    }
     // 发起端结束演示按钮
     .end-demonstrate {
       position: absolute;
