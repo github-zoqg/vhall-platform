@@ -653,6 +653,12 @@ export const serverConfig = {
         cuid: 'comRebroadcastSteam',
         method: 'close'
       }
+    ],
+    startPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'startPush'
+      }
     ]
   },
   //  转播流

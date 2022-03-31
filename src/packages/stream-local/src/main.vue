@@ -660,10 +660,14 @@
         this.micServer.$on('vrtc_speaker_switch', msg => {
           // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
           if (msg.data.is_start_live == 1) return;
+          const m =
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : this.$t('interact.interact_1034');
           this.$message.success(
             this.$t('interact.interact_1012', {
               n: msg.data.nick_name,
-              m: this.$t('interact.interact_1034')
+              m: m
             })
           );
         });
@@ -1030,7 +1034,10 @@
         const roomBaseServer = useRoomBaseServer();
         let miniElement = '';
         if (this.isShareScreen) {
-          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+          if (
+            this.presentationScreen != this.joinInfo.third_party_user_id ||
+            this.joinInfo.role_name != 2
+          ) {
             miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
           } else {
             miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';

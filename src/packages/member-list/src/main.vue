@@ -349,7 +349,7 @@
         };
       },
       configList() {
-        return this.$domainStore.state.roomBaseServer.configList;
+        return this.$domainStore.state.roomBaseServer.configList || {};
       },
       //是否在分组里
       isInGroup() {

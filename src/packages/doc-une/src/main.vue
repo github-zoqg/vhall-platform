@@ -125,8 +125,8 @@
       </ul>
     </div>
 
-    <!-- 文档加载时的遮罩和进度 -->
-    <div v-show="!docLoadComplete" class="el-loading-mask vmp-doc-mask">
+    <!-- 文档加载时的遮罩和进度,观看端才用 -->
+    <div v-show="isWatch && !docLoadComplete" class="el-loading-mask vmp-doc-mask">
       <div class="el-loading-spinner">
         <svg viewBox="25 25 50 50" class="circular">
           <circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
@@ -271,7 +271,10 @@
           // );
         } else {
           if (this.isShareScreen) {
-            return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
+            return (
+              (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn) ||
+              this.roleName == 3
+            );
           } else {
             return true;
           }
