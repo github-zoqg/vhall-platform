@@ -284,6 +284,9 @@
       },
 
       toggleShrink(flag) {
+        if (this.remoteSpeakers.length <= this.remoteMaxLength) {
+          return;
+        }
         this.isShrink = flag;
       },
       /**
