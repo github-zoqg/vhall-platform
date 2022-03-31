@@ -75,12 +75,12 @@ const routes = [
     component: () => import('../views/InviteCard/main.vue'),
     meta: { title: '邀请卡', grayType: 'webinar' }
   },
-  // {
-  //   path: '/lives/entryform/:id',
-  //   name: 'signup',
-  //   component: () => import('@/packages/wap-sign-up-form'),
-  //   meta: { grayType: 'webinar' }
-  // },
+  {
+    path: '/lives/entryform/:id',
+    name: 'signup',
+    component: () => import('@/packages/wap-sign-up-form'),
+    meta: { grayType: 'webinar' }
+  },
   // 错误页、升级页
   {
     path: '/upgrading',
@@ -95,12 +95,12 @@ const routes = [
     meta: { grayType: '' }
   },
   // 独立报名表单
-  {
-    path: '/lives/entryform/:id',
-    name: 'entryform',
-    component: () => import('../views/entryform/index.vue'),
-    meta: { grayType: 'webinar' }
-  },
+  // {
+  //   path: '/lives/entryform/:id',
+  //   name: 'entryform',
+  //   component: () => import('../views/entryform/index.vue'),
+  //   meta: { grayType: 'webinar' }
+  // },
   {
     path: '/user/home/:id', // 个人主页
     name: 'userHome',

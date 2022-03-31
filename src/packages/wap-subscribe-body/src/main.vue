@@ -51,8 +51,8 @@
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
         </div>
-        <div v-else>
-          <span @click="authCheck(subOption.verify)">{{ subscribeText }}</span>
+        <div v-else @click="authCheck(subOption.verify)">
+          <span>{{ subscribeText }}</span>
         </div>
       </div>
     </template>
