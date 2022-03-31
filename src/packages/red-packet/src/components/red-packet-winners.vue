@@ -20,7 +20,7 @@
         <span class="vhsaas-red-packet__count">
           {{
             $t('interact_tools.interact_tools_1043', {
-              n: redPacketInfo.get_user_count || 0
+              n: `${redPacketInfo.get_user_count}/${redPacketInfo.number}`
             })
           }}
         </span>

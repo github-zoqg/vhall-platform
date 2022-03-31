@@ -225,7 +225,7 @@
                   }
                 );
               } else {
-                window.location.href = res.data.pay_data.url;
+                window.location.href = res.data.pay_data;
               }
             } else {
               that.$toast(`${that.$tec(res.code) || res.msg}`);

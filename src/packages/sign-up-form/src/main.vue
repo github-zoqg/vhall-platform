@@ -719,47 +719,12 @@
         privacy: false,
         //隐私声明文字
         privacyText: '',
-        //tab栏的配置
-        tabConfig: {
-          1: [
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            },
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            }
-          ],
-          2: [
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            },
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            }
-          ]
-        },
         //初始化的活动类型
         isSubscribe: 1,
         //当前激活的tab
         activeTab: 1,
         //报名表单验证
         rules: {},
-        //输入文字提示的map
-        placeholderMap: {
-          1: this.$t('interact_tools.interact_tools_1005'),
-          2: this.$t('account.account_1025'),
-          3: this.$t('form.form_1023'),
-          5: {
-            province: this.$t('form.form_1003'),
-            city: this.$t('form.form_1004'),
-            county: this.$t('form.form_1005')
-          },
-          6: this.$t('form.form_1020')
-        },
         //题目的类型中文翻译
         langDefaultZH: [
           '姓名',
@@ -826,20 +791,6 @@
         showCaptcha: false,
         //是否是校验手机
         isValidPhone: false,
-        //已报名的表单
-        verifyRules: {
-          phone: {
-            type: 'number',
-            required: true,
-            message: this.$t('account.account_1069'),
-            trigger: 'blur'
-          },
-          code: {
-            required: true,
-            validator: this.validCode,
-            trigger: 'blur'
-          }
-        },
         //联动选项是第几题
         colNum: '',
         //区域选项
@@ -1050,13 +1001,68 @@
           return [];
         }
         return this.counties[this.city];
+      },
+      //tab栏的配置
+      tabConfig() {
+        return {
+          1: [
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            },
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            },
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            }
+          ]
+        };
+      },
+      //输入文字提示的map
+      placeholderMap() {
+        return {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1003'),
+            city: this.$t('form.form_1004'),
+            county: this.$t('form.form_1005')
+          },
+          6: this.$t('form.form_1020')
+        };
+      },
+      //已报名的表单
+      verifyRules() {
+        return {
+          phone: {
+            type: 'number',
+            required: true,
+            message: this.$t('account.account_1069'),
+            trigger: 'blur'
+          },
+          code: {
+            required: true,
+            validator: this.validCode,
+            trigger: 'blur'
+          }
+        };
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {
+    async mounted() {
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
       if (this.isEntryForm) {
         this.init();

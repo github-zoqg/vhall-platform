@@ -346,7 +346,7 @@
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
-  import { useSignUpFormServer } from 'middle-domain';
+  import { useSignUpFormServer, useRoomBaseServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
@@ -378,29 +378,6 @@
         isSubscribe: 0,
         //简介文字是否超长
         overflowStatus: false,
-        //tab栏的配置
-        tabConfig: {
-          1: [
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            },
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            }
-          ],
-          2: [
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            },
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            }
-          ]
-        },
         //当前激活的tab
         activeTab: 1,
         // 手机短信验证是都开启
@@ -441,18 +418,6 @@
           'form.form_1070',
           'form.form_1071'
         ],
-        //输入文字提示的map
-        placeholderMap: {
-          1: this.$t('interact_tools.interact_tools_1005'),
-          2: this.$t('account.account_1025'),
-          3: this.$t('form.form_1023'),
-          5: {
-            province: this.$t('form.form_1004'),
-            city: this.$t('form.form_1005'),
-            county: this.$t('form.form_1006')
-          },
-          6: this.$t('form.form_1020')
-        },
         //错误信息的map
         errMsgMap: {},
         //省份
@@ -541,6 +506,45 @@
             return list;
           }
         };
+      },
+      //tab栏的配置
+      tabConfig() {
+        return {
+          1: [
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            },
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            },
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            }
+          ]
+        };
+      },
+      //输入文字提示的map
+      placeholderMap() {
+        return {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1003'),
+            city: this.$t('form.form_1004'),
+            county: this.$t('form.form_1005')
+          },
+          6: this.$t('form.form_1020')
+        };
       }
     },
     watch: {
@@ -609,6 +613,12 @@
     },
     async mounted() {
       await this.getFormLinkStatus();
+      await useRoomBaseServer().getLangList(this.$route.params.id);
+      if (localStorage.getItem('lang')) {
+        this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      } else {
+        this.$i18n.locale = 'zh';
+      }
       this.getWebinarType();
       this.getBaseInfo();
       this.getQuestionList();

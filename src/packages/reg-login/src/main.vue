@@ -110,15 +110,7 @@
     },
     methods: {
       // 打开弹出框
-      open(params = {}) {
-        // this.isMobile =
-        //   /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|wOSBrowser|BrowserNG|WebOS)/i.test(
-        //     navigator.userAgent
-        //   );
-        // this.options = {
-        //   ...this.options,
-        //   ...params
-        // };
+      open() {
         console.log('打开登录&注册弹框，初始预设值为', this.options);
         // 打开弹出框的时候，设定登录&注册默认tab选中状态 & 组件引入
         this.handleChangeTag(this.options.loginType == '0-1' ? 'pwd' : 'code');
@@ -134,11 +126,11 @@
       closeParent() {
         this.visible = false;
       },
-      // handleChangeTag 切换登录-tag选项卡
+      //  切换登录-tag选项卡
       handleChangeTag(type) {
         this.activeTag = type;
       },
-      // emitLinkChange 切换快捷入口组件：去登录 or 去注册
+      //  切换快捷入口组件：去登录 or 去注册
       emitLinkChange(type) {
         // 若跳转为去登录，判断当前组合
         if (type == 'login' && this.options.loginType == '0-1') {

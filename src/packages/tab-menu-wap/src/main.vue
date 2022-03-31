@@ -229,7 +229,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.embedObj.embed && this.webinarInfo.type == 1) {
+          if (this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });
@@ -250,8 +250,10 @@
           }
 
           if (msg.data.type === 'live_over') {
-            this.setVisible({ visible: false, type: 'private' }); // private-chat
-            // this.setVisible({ visible: false, type: 'v5' }); // qa
+            this.setVisible({ visible: false, type: 'private' });
+            if (this.roleName != 2) {
+              this.setVisible({ visible: false, type: 'v5' });
+            } // qa
             clientType === 'send' && this.selectDefault();
           }
         });
