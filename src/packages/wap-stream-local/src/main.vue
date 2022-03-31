@@ -152,7 +152,7 @@
           !this.localSpeaker.accountId
         );
       },
-      // 退出全屏
+      // 退出全屏   原因同wap-stream-remote
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
