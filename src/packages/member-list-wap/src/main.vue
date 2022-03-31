@@ -35,7 +35,7 @@
 </template>
 <script>
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
-  import { uniqBy } from 'lodash';
+  import { uniqBy, throttle } from 'lodash';
   import { useRoomBaseServer, useMemberServer, useGroupServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpMemberListWap',
@@ -48,7 +48,7 @@
         // 分页配置
         pageConfig: {
           page: 0,
-          limit: 10,
+          limit: 100,
           total: 0
         },
         // 默认头像
@@ -133,7 +133,11 @@
           console.log(msg, '离开房间消息');
           this.handleGroupPerson(msg, 'LEFT');
         });
-
+        //直播结束
+        this.msgServer.$on('live_over', () => {
+          console.log('【成员列表消息】结束直播');
+          this.updateOnlineUserList();
+        });
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
           let temp = Object.assign({}, rawMsg);
           if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
@@ -156,7 +160,7 @@
               break;
             case 'group_switch_start':
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
-              _this.initList();
+              _this.updateOnlineUserList();
               break;
             default:
               break;
@@ -170,12 +174,17 @@
         //结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           console.log('结束讨论', msg);
-          _this.initList();
+          this.updateOnlineUserList();
+        });
+        // 主持人进入退出小组 消息监听
+        this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
+          console.log('[成员列表，主持人进出小组]');
+          this.updateOnlineUserList();
         });
         //解散小组
         this.groupServer.$on('GROUP_DISBAND', () => {
           console.log('解散小组');
-          _this.initList();
+          this.updateOnlineUserList();
         });
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
@@ -185,7 +194,7 @@
         //切换频道
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
           console.log('切换频道', msg);
-          _this.initList();
+          this.updateOnlineUserList();
         });
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
@@ -259,6 +268,12 @@
         this.list = [];
         this.getList();
       },
+      //更新列表
+      updateOnlineUserList: throttle(function () {
+        this.pageConfig.page = 0;
+        this.list = [];
+        this.getList();
+      }, 2000),
       // 获取成员列表
       getList() {
         const params = {

@@ -226,8 +226,12 @@
         },
         //是否有表单验证错误
         nameErrorShow: false,
-        //灰度id todo 待移除
-        grayId: ''
+        //灰度id
+        grayId: '',
+        //无延迟图标的地址(注意这是生产环境地址，测试环境地址是阿里的)
+        noDelayIconUrl: `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`,
+        //上传图片地址
+        actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`
       };
     },
     computed: {
@@ -238,14 +242,6 @@
       //图片保存的路径
       pathUrl() {
         return `webinars/join-avatar/${this.$moment().format('YYYYMM')}`;
-      },
-      //上传图片地址
-      actionUrl() {
-        return `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`;
-      },
-      //无延迟图标的地址(注意这是生产环境地址，测试环境地址是阿里的)
-      noDelayIconUrl() {
-        return `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`;
       }
     },
     beforeCreate() {
@@ -257,7 +253,7 @@
       //窗口大小变更监听
       window.addEventListener('resize', this.checkIsMobile, false);
       this.checkIsHost();
-      await this.getGrayConfig();
+      this.grayId = sessionStorage.getItem('initGrayId') || '';
       this.getWebinarInfo();
     },
     beforeDestroy() {
@@ -266,30 +262,6 @@
     },
     mounted() {},
     methods: {
-      //获取灰度配置
-      getGrayConfig() {
-        const _this = this;
-        const params = {
-          webinar_id: this.$route.params.id
-        };
-        return this.roomBaseServer
-          .webinarInitBefore(params)
-          .then(res => {
-            if ([200, '200'].includes(res.code) && res.data) {
-              this.grayId = res.data.user_id;
-            } else {
-              console.log(`观看-灰度ID-获取活动by用户信息失败~${res.msg}`);
-              this.grayId = null;
-            }
-          })
-          .catch(e => {
-            console.log(`观看-灰度ID-获取活动by用户信息失败~${e}`);
-            this.grayId = null;
-          })
-          .finally(() => {
-            _this.keyLoginServer.setHeaders({ 'gray-id': _this.grayId });
-          });
-      },
       //获取活动信息
       getWebinarInfo() {
         const params = {

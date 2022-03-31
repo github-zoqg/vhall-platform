@@ -9,6 +9,7 @@
       'vmp-insert-stream__h0': !insertFileStreamVisible,
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
+      'vmp-insert-stream__is-embed': isEmbed,
       'vmp-insert-stream__has-stream-list': hasStreamList
     }"
   >
@@ -207,6 +208,10 @@
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
         );
+      },
+      // 是否嵌入
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       docSwitchStatus() {
         return this.$domainStore.state.docServer.switchStatus;
@@ -937,6 +942,9 @@
         z-index: 11;
         overflow: hidden;
       }
+    }
+    &__is-embed {
+      width: calc(100% - 360px);
     }
     &__has-stream-list {
       top: 80px;

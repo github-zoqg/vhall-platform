@@ -89,6 +89,10 @@
     &-embed {
       height: 100%;
       width: calc(100% - 360px) !important;
+      .vmp-basic-center__mainscreen-pos {
+        width: 100%;
+        padding-top: 0;
+      }
     }
     &__mainscreen-pos {
       height: 100%;
