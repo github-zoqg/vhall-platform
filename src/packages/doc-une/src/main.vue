@@ -205,15 +205,19 @@
       isInGroup() {
         return !!this.groupServer.state.groupInitData?.isInGroup;
       },
-      // 是否显示文档翻页相关操作栏
+      // 是否显示文档白板操作栏(翻页、放大、缩小、还原、拖拽)
       showPagebar() {
-        // (普通模式，或 观看端全屏模式下) && (有演示权限，或是观众,或者展示文档时的助理)
-        return (
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
-          (this.hasDocPermission ||
-            this.roleName === 2 ||
-            (this.roleName === 3 && this.currentType === 'document'))
-        );
+        if (this.isWatch) {
+          // 观看端，普通模式或全屏模式下，打开了文档或白板
+          return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
+        } else {
+          // 发起端，打开了文档，普通模式，主持人或助理
+          return (
+            this.currentType === 'document' &&
+            this.displayMode === 'normal' &&
+            [1, 3].includes(this.roleName)
+          );
+        }
       },
       // 当前用户Id
       userId() {
@@ -411,6 +415,10 @@
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
+      },
+      // 演示者变更时,隐藏缩列图列表
+      presenterId() {
+        this.thumbnailShow = false;
       }
     },
     beforeCreate() {

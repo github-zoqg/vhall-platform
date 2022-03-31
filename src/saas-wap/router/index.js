@@ -66,12 +66,12 @@ const routes = [
     meta: { grayType: '' }
   },
   // 独立报名表单
-  {
-    path: '/lives/entryform/:id',
-    name: 'entryform',
-    component: () => import('../views/entryform/index.vue'),
-    meta: { grayType: 'webinar' }
-  },
+  // {
+  //   path: '/lives/entryform/:id',
+  //   name: 'entryform',
+  //   component: () => import('../views/entryform/index.vue'),
+  //   meta: { grayType: 'webinar' }
+  // },
   {
     path: '/user/home/:id', // 个人主页
     name: 'userHome',
