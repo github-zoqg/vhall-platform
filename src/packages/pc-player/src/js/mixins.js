@@ -290,6 +290,7 @@ const playerMixins = {
     },
     initSlider() {
       this.playerServer.$on(window.VhallPlayer.TIMEUPDATE, () => {
+        if (this._isSetingCurrentTime) return;
         this.currentTime = this.playerServer.getCurrentTime(() => {
           console.log('获取当前视频播放时间失败----------');
         });
@@ -311,6 +312,7 @@ const playerMixins = {
         });
         console.error('设置当前播放时间失败');
       });
+      this._isSetingCurrentTime = false;
     },
     // 设置静音
     jingYin() {
