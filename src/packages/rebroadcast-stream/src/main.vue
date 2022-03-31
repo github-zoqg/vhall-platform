@@ -86,7 +86,6 @@
        * 调起转播
        */
       async open() {
-        await sleep(1000);
         const { watchInitData } = this.roomBaseServer.state;
 
         const token = watchInitData.interact.paas_access_token;
@@ -118,6 +117,7 @@
       async close() {
         this.isShow = false;
         this.$refs.videoPreview?.destroy();
+        await this.$nextTick(0);
         this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
       },
