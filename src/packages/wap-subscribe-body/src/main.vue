@@ -91,7 +91,7 @@
     </van-popup>
 
     <!-- 邀请卡浮动按钮 -->
-    <button v-if="showInvite" class="vmp-subscribe-body-invite" @click="gotoInvitePage">
+    <button v-if="showInvite && !isEmbed" class="vmp-subscribe-body-invite" @click="gotoInvitePage">
       {{ $t('nav.nav_1015') }}
     </button>
   </div>
