@@ -426,6 +426,14 @@
       background: #2a2a2a;
       margin: 0px auto;
     }
+    .subscribe-img-box-embed {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
   }
   @media screen and (max-width: 1366px) {
     .vmp-subscribe-body-intro,
