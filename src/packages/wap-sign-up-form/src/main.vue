@@ -69,7 +69,7 @@
                 v-model="form[question.id]"
                 :placeholder="placeholderMap[question.default_type] || $t('form.form_1014')"
                 type="text"
-                maxlength="60"
+                :maxlength="getInputLimit(question)"
               />
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
@@ -544,6 +544,18 @@
             county: this.$t('form.form_1005')
           },
           6: this.$t('form.form_1020')
+        };
+      },
+      //计算输入框限制的字数
+      getInputLimit() {
+        return function (question = {}) {
+          let maxLength = '';
+          if (question.default_type == 1) {
+            maxLength = 50;
+          } else {
+            maxLength = question.type == 0 ? '' : 60;
+          }
+          return maxLength;
         };
       }
     },

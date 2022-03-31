@@ -360,7 +360,7 @@
         };
       },
       configList() {
-        return this.$domainStore.state.roomBaseServer.configList;
+        return this.$domainStore.state.roomBaseServer.configList || {};
       },
       //是否在分组里
       isInGroup() {
@@ -616,9 +616,11 @@
       },
       //用户接受演示邀请
       handleUserAgreePresentation(msg) {
-        if (msg.data.extra_params == this.userId) {
-          this.$message.success('对方已接受邀请');
-        }
+        // https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005425
+        // 已和产品确认，接受邀请不提示
+        // if (msg.data.extra_params == this.userId) {
+        //   this.$message.success('对方已接受邀请');
+        // }
       },
       //开始讨论
       handleStartDiscussion() {

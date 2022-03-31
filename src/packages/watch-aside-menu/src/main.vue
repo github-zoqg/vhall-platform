@@ -316,7 +316,13 @@
 
         // 同意演示/我要演示成功
         this.groupServer.$on('VRTC_PRESENTATION_SCREEN_SET', ({ isOldPresenter, isOldLeader }) => {
-          if (isOldLeader || isOldPresenter) {
+          // 主持人演示 上一个演示人提示
+          if (
+            this.isInGroup &&
+            isOldPresenter &&
+            this.presenterId !== this.userId &&
+            this.presenterId == this.userinfoId
+          ) {
             this.groupMessage('演示权限已变更');
           }
         });
