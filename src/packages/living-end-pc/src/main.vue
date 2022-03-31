@@ -78,7 +78,7 @@
     bottom: 56px;
     width: calc(100% - 380px);
     height: calc(100% - 56px);
-    z-index: 100;
+    z-index: 11;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     &-embed {
