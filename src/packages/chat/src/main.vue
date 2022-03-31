@@ -367,6 +367,7 @@
           // live_over 结束直播
           if (msg.data.type == 'live_over') {
             this.allBanned = false;
+            // this.onSwitchShowSponsor(false);
           }
         });
       },
@@ -573,6 +574,9 @@
       //处理只看主办方
       onSwitchShowSponsor(status) {
         this.isOnlyShowSponsor = status;
+        this.$nextTick(() => {
+          this.scrollBottom();
+        });
       },
       //处理全体禁言切换
       handleChangeAllBanned(flag) {
