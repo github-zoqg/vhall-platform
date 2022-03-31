@@ -1148,8 +1148,8 @@
     }
     &-controller {
       position: absolute;
-      bottom: 0;
-      // bottom: -48px;
+      // bottom: 0;
+      bottom: -48px;
       z-index: 8;
       width: 100%;
       height: 38px;
