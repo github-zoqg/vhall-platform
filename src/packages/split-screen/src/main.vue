@@ -22,7 +22,7 @@
         :class="`vmp-split-screen__stream-list__${layoutLevel}`"
       >
         <!-- 本地流 -->
-        <div class="vmp-split-screen__stream-container">
+        <div class="vmp-split-screen__stream-container" v-show="localSpeaker.accountId">
           <div class="vmp-split-screen__stream-container-box">
             <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
           </div>
@@ -58,6 +58,15 @@
       // 远端流列表showPlayIcon
       speakerList() {
         return this.$domainStore.state.micServer.speakerList;
+      },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item =>
+              item.accountId ==
+              this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+          ) || {}
+        );
       },
       remoteSpeakers() {
         return (
