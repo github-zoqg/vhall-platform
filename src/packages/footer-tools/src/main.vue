@@ -70,7 +70,7 @@
         <lottery-icon @clickIcon="checkLotteryIcon" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
-      <li>
+      <li v-if="!isEmbed">
         <red-packet-icon @clickIcon="checkredPacketIcon" />
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
