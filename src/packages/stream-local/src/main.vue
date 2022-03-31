@@ -260,7 +260,6 @@
         isFullScreen: false,
         networkStatus: 2,
         audioLevel: 1,
-        showDownMic: false,
         isNotAutoSpeak: false, // 分组模式下的是否为自动静音上麦自动
 
         // 网络异常弹窗状态
@@ -294,10 +293,7 @@
           return this.joinInfo.role_name != 2 ? true : this.switchStatus;
         }
       },
-      // 直播类型
-      liveMode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
+      // 直播类型 6分组
       mode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -308,10 +304,6 @@
           this.$domainStore.state.insertFileServer.insertStreamInfo.userInfo.accountId !=
             this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
         );
-      },
-      // 是否推流
-      isStreamPublished() {
-        return this.$domainStore.state.interactiveServer.localStream.streamId;
       },
       localSpeaker() {
         console.log('-------localSpeaker更新--------');
@@ -327,9 +319,6 @@
             item => item.accountId != this.joinInfo.third_party_user_id
           ) || []
         );
-      },
-      speakerList() {
-        return this.$domainStore.state.micServer.speakerList;
       },
 
       //默认的主持人id
@@ -372,7 +361,7 @@
       isShowPresentationScreen() {
         const { accountId } = this.localSpeaker;
         const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
-        const groupMode = this.liveMode == 6; // 分组类型
+        const groupMode = this.mode == 6; // 分组类型
         const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
         const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
         const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
@@ -486,15 +475,15 @@
           this.startPush();
         }
       },
-      // 恢复播放
-      replayPlay() {
-        const videos = document.querySelectorAll('video');
-        videos.length > 0 &&
-          videos.forEach(video => {
-            video.play();
-          });
-        this.interactiveServer.state.showPlayIcon = false;
-      },
+      // // 恢复播放
+      // replayPlay() {
+      //   const videos = document.querySelectorAll('video');
+      //   videos.length > 0 &&
+      //     videos.forEach(video => {
+      //       video.play();
+      //     });
+      //   this.interactiveServer.state.showPlayIcon = false;
+      // },
       // 自动上麦禁音条件更新
       updateAutoSpeak() {
         this.isNotAutoSpeak = true;
@@ -532,12 +521,6 @@
               this.speakOff();
               return;
             }
-            // // 更新本地speakerList
-            // if (this.groupServer.state.groupInitData.isInGroup) {
-            //   await this.groupServer.updateGroupInitData();
-            // } else {
-            //   await this.roomBaseServer.getInavToolStatus();
-            // }
 
             console.log('[stream-local] vrtc_connect_success startPush');
 
@@ -677,10 +660,14 @@
         this.micServer.$on('vrtc_speaker_switch', msg => {
           // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
           if (msg.data.is_start_live == 1) return;
+          const m =
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : this.$t('interact.interact_1034');
           this.$message.success(
             this.$t('interact.interact_1012', {
               n: msg.data.nick_name,
-              m: this.$t('interact.interact_1034')
+              m: m
             })
           );
         });
@@ -1105,13 +1092,6 @@
        * @Function void()
        */
       setOwner(accountId, setMainScreen = true) {
-        // if (accountId) {
-        //   const streamInfo = this.getDesktopAndIntercutInfo();
-        //   const users = streamInfo.remoteUsers.concat(streamInfo.localUser);
-        //   const mainScreenUser = users.find(u => u.accountId == accountId) || { streams: [] };
-        //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
-        //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
-        // }
         if (setMainScreen) {
           this.setMainScreen();
         }
