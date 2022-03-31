@@ -8,18 +8,15 @@
         <div class="have"></div>
         <img src="./image/icon.png" />
       </div>
+      <div class="icon-wrap">
+        <lottery-icon @clickIcon="checkLotteryIcon" />
+      </div>
       <!-- 红包 -->
       <template v-if="!isEmbed">
         <div class="icon-wrap">
           <red-packet-icon @clickIcon="handleRedPacket" />
         </div>
       </template>
-      <div class="icon-wrap">
-        <lottery-icon @clickIcon="checkLotteryIcon" />
-      </div>
-      <div class="icon-wrap">
-        <red-packet-icon @clickIcon="handleRedPacket" />
-      </div>
       <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
         <div :class="!timerVisible ? 'have' : ''"></div>
         <img src="./image/timer.png" />
