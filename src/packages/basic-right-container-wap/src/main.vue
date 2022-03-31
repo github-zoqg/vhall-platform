@@ -1,22 +1,22 @@
 <template>
   <div class="vmp-container-right-wap">
     <div class="base-box" v-if="!groupInitData.isInGroup" v-show="!showDoc">
-      <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
-        <div :class="!timerVisible ? 'have' : ''"></div>
-        <img src="./image/timer.png" />
+      <div class="icon-wrap">
+        <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
       </div>
       <div class="icon-wrap" @click="handleSign" v-show="showSign">
         <div class="have"></div>
         <img src="./image/icon.png" />
       </div>
       <div class="icon-wrap">
-        <red-packet-icon @clickIcon="handleRedPacket" />
-      </div>
-      <div class="icon-wrap">
         <lottery-icon @clickIcon="checkLotteryIcon" />
       </div>
       <div class="icon-wrap">
-        <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
+        <red-packet-icon @clickIcon="handleRedPacket" />
+      </div>
+      <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
+        <div :class="!timerVisible ? 'have' : ''"></div>
+        <img src="./image/timer.png" />
       </div>
     </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>

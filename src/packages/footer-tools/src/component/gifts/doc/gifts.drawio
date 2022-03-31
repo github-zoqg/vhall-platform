@@ -1,0 +1,163 @@
+<mxfile host="65bd71144e">
+    <diagram id="QSWu9Wnhy0qAhUBLh6C_" name="第 1 页">
+        <mxGraphModel dx="700" dy="1515" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="10" value="礼物组件主流程图" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;startSize=20;" vertex="1" parent="1">
+                    <mxGeometry x="120" y="-120" width="645" height="600" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="wap" style="swimlane;startSize=20;" vertex="1" parent="10">
+                    <mxGeometry y="20" width="270" height="580" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="11" source="15" target="20">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="开始" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                    <mxGeometry x="40" y="50" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="11" source="20" target="26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="&lt;font style=&quot;font-size: 10px&quot;&gt;点击礼物icon后,选择礼物&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                    <mxGeometry x="40" y="110" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="11" source="26" target="30">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="63" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="11" source="26" target="56">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="是否付费" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="35" y="170" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="11" source="30" target="33">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="是否登陆" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="35" y="240" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" style="edgeStyle=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="11" source="33" target="20">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="25" y="325"/>
+                            <mxPoint x="25" y="270"/>
+                            <mxPoint x="25" y="220"/>
+                            <mxPoint x="25" y="118"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="33" value="&lt;font style=&quot;font-size: 10px&quot;&gt;登陆相关流程&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                    <mxGeometry x="40" y="310" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="登&lt;br&gt;陆&lt;br&gt;成&lt;br&gt;功" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry y="170" width="30" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="是" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="70" y="210" width="30" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="是" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="115" y="240" width="30" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="&lt;font style=&quot;font-size: 10px&quot;&gt;提示失败&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                    <mxGeometry x="40" y="370" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="11" source="50" target="51">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="&lt;font style=&quot;font-size: 10px&quot;&gt;提示成功并关闭礼物面板&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                    <mxGeometry x="40" y="430" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="结束" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                    <mxGeometry x="40" y="490" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="聊天高并发&lt;br&gt;配置" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="145" y="170" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="65" value="未开启" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="220" y="170" width="50" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" value="开启" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="11">
+                    <mxGeometry x="200" y="110" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="66" value="sdk" style="swimlane;startSize=20;" vertex="1" parent="10">
+                    <mxGeometry x="270" y="20" width="120" height="580" as="geometry"/>
+                </mxCell>
+                <mxCell id="67" value="&lt;font style=&quot;font-size: 10px&quot;&gt;发送礼物支付成功消息&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="66">
+                    <mxGeometry x="25" y="110" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="后端" style="swimlane;startSize=20;" vertex="1" parent="10">
+                    <mxGeometry x="390" y="20" width="135" height="580" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="接口调用:" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="12">
+                    <mxGeometry x="20" y="240" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="code&lt;br&gt;!==&lt;br&gt;200" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="12">
+                    <mxGeometry x="55" y="290" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="54" value="成功" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="12">
+                    <mxGeometry x="95" y="240" width="40" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" value="&lt;div style=&quot;color: rgb(212 , 212 , 212) ; background-color: rgb(30 , 30 , 30) ; font-family: &amp;#34;consolas&amp;#34; , &amp;#34;courier new&amp;#34; , monospace ; line-height: 19px&quot;&gt;&lt;span style=&quot;color: rgb(206 , 145 , 120)&quot;&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;gift_send_success&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="12">
+                    <mxGeometry x="20" y="420" width="110" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="pass" style="swimlane;startSize=20;" vertex="1" parent="10">
+                    <mxGeometry x="525" y="20" width="120" height="580" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="&lt;font style=&quot;font-size: 10px&quot;&gt;发送礼物支付成功消息&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="13">
+                    <mxGeometry x="25" y="245" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="" style="edgeStyle=none;html=1;fontSize=10;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#e51400;strokeColor=#B20000;" edge="1" parent="10" source="24" target="18">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="205" y="380" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="450" y="405"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="49" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="10" source="24" target="48">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" value="" style="edgeStyle=none;html=1;fontSize=10;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#008a00;strokeColor=#005700;" edge="1" parent="10" source="48" target="50">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="325" y="470" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="585" y="465"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="45" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontSize=10;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="10" source="30" target="24">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="150.0000000000001" y="279.7931034482758" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="64" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="10" source="56" target="24">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="450" y="210"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="" style="edgeStyle=none;html=1;fontSize=10;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="10" source="56" target="67">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="185" y="110" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="185" y="145"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="70" value="" style="edgeStyle=none;html=1;fontSize=10;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#008a00;strokeColor=#005700;" edge="1" parent="10" source="67" target="50">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="330" y="240" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="330" y="465"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="39" value="否" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="195" y="180" width="30" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
