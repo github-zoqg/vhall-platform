@@ -22,35 +22,36 @@
           @click.stop="onClickFilterSetting"
           v-clickoutside="hidechatOptions"
           v-if="chatOptions && chatOptions.hasChatFilterBtn"
-        ></i>
+        >
+          <!-- 过滤设置 -->
+          <ul
+            v-show="chatOptions && chatOptions.hasChatFilterBtn && isFilterShow"
+            class="operate-container__tool-bar__chat-filter-wrap"
+          >
+            <li class="filter-item">
+              <el-checkbox
+                class="filter-item__checkbox"
+                @change="onClickOnlyShowSponsor"
+                v-model="filterStatus.onlyShowSponsor"
+              >
+                {{ $t('chat.chat_1012') }}
+              </el-checkbox>
+            </li>
+            <li class="filter-item">
+              <el-checkbox
+                class="filter-item__checkbox"
+                @change="onClickShieldingEffects"
+                v-model="filterStatus.isShieldingEffects"
+              >
+                {{ $t('chat.chat_1013') }}
+              </el-checkbox>
+            </li>
+          </ul>
+        </i>
         <!-- 表情选择 -->
         <div class="operate-container__tool-bar__emoji-wrap">
           <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
         </div>
-        <!-- 过滤设置 -->
-        <ul
-          v-show="chatOptions && chatOptions.hasChatFilterBtn && isFilterShow"
-          class="operate-container__tool-bar__chat-filter-wrap"
-        >
-          <li class="filter-item">
-            <el-checkbox
-              class="filter-item__checkbox"
-              @change="onClickOnlyShowSponsor"
-              v-model="filterStatus.onlyShowSponsor"
-            >
-              {{ $t('chat.chat_1012') }}
-            </el-checkbox>
-          </li>
-          <li class="filter-item">
-            <el-checkbox
-              class="filter-item__checkbox"
-              @change="onClickShieldingEffects"
-              v-model="filterStatus.isShieldingEffects"
-            >
-              {{ $t('chat.chat_1013') }}
-            </el-checkbox>
-          </li>
-        </ul>
       </div>
 
       <div class="operate-container__tool-bar__right">
@@ -451,6 +452,7 @@
         border-radius: 4px;
         position: absolute;
         top: -11px;
+        left: 15px;
         transform: translateY(-100%);
         .filter-item {
           height: 40px;
