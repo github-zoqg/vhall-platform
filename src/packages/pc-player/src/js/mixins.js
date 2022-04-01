@@ -2,10 +2,6 @@ import screenfull from 'screenfull';
 const playerMixins = {
   data() {
     return {
-      TimesShow: false,
-      ContorlWidth: '',
-      hoverTime: 0,
-      hoverLeft: 0,
       changeTime: null, // 记录时间
       defaultVoice: 0 // 记录静音之前的声音
     };
@@ -290,6 +286,7 @@ const playerMixins = {
     },
     initSlider() {
       this.playerServer.$on(window.VhallPlayer.TIMEUPDATE, () => {
+        if (this._isSetingCurrentTime) return;
         this.currentTime = this.playerServer.getCurrentTime(() => {
           console.log('获取当前视频播放时间失败----------');
         });
@@ -311,6 +308,7 @@ const playerMixins = {
         });
         console.error('设置当前播放时间失败');
       });
+      this._isSetingCurrentTime = false;
     },
     // 设置静音
     jingYin() {
@@ -339,55 +337,6 @@ const playerMixins = {
         this.isSetSpeed = false;
         this.isSetQuality = false;
       }, 2000);
-    },
-    setTime() {
-      // 拖拽显示时间
-      // const dom = this.$refs.controllerRef.$el;
-      const dom = document.querySelector('.slider_controller');
-      const button = document.querySelector('.controller_slider .el-slider__button-wrapper');
-      const initDom = () => {
-        dom.onmouseover = e => {
-          console.log('dom over', e);
-          this.TimesShow = true;
-          const totalWidth = dom.offsetWidth;
-          this.ContorlWidth = dom.offsetWidth;
-          const lef = e.layerX;
-          this.hoverTime = (lef / totalWidth) * this.totalTime;
-          this.hoverLeft = lef;
-          dom.onmousemove = event => {
-            const lef = event.layerX;
-            this.hoverTime = (lef / totalWidth) * this.totalTime;
-            this.hoverLeft = lef;
-          };
-        };
-        // eslint-disable-next-line no-unused-vars
-        dom.onmouseout = e => {
-          this.TimesShow = false;
-        };
-      };
-      initDom();
-      // eslint-disable-next-line no-unused-vars
-      button.onmousedown = e => {
-        dom.onmouseout = dom.onmousemove = dom.onmousemove = dom.onmouseover = null;
-        this.ContorlWidth = dom.offsetWidth;
-        this.onmousedownControl = true;
-        this.pause();
-        // eslint-disable-next-line no-unused-vars
-        document.onmousemove = e => {
-          this.TimesShow = true;
-        };
-        // eslint-disable-next-line no-unused-vars
-        document.onmouseup = e => {
-          document.onmousemove = null;
-          this.onmousedownControl = false;
-          this.TimesShow = false;
-          initDom();
-        };
-      };
-      button.onmouseover = e => {
-        this.TimesShow = false;
-        e.stopPropagation();
-      };
     },
     formatQualityText(val) {
       let text;
