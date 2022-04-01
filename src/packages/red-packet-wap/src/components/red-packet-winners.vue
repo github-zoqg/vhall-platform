@@ -104,7 +104,7 @@
         this.loading = true;
         this.redPacketServer
           .getRedPacketWinners({
-            pos: (this.queryParams.page - 1) * this.queryParams.size + 1,
+            pos: this.queryParams.page, // pos 参数不是偏移量,就是页码
             limit: this.queryParams.size
           })
           .then(res => {
