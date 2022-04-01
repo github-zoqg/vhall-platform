@@ -184,7 +184,7 @@ const sharedConfig = {
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool: isDev ? '#eval-source-map' : none,
+    devtool: isDev ? '#eval-source-map' : 'none',
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
       hints: isDev ? false : 'warning',
@@ -213,17 +213,19 @@ const sharedConfig = {
 
     if (!isDev) {
       config.optimization.minimize(true);
-      config.devtool(false);   // 这个是把本地的productionSourceMap给关掉了，用下面的，不关的话，会造成，编译好的js有两个sourceMap的指向（需要注意的地方）
+      config.devtool(false); // 这个是把本地的productionSourceMap给关掉了，用下面的，不关的话，会造成，编译好的js有两个sourceMap的指向（需要注意的地方）
       config
         .plugin('SourceMapDevToolPlugin')
         .use(webpack.SourceMapDevToolPlugin)
         .tap(args => {
-          return [{
-            filename: '[file].map',
-            publicPath: `https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/sourcemap/${argv.project}/`,
-            moduleFilenameTemplate: 'source-map'
-          }]
-        })
+          return [
+            {
+              filename: '[file].map',
+              publicPath: `https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/sourcemap/${argv.project}/`,
+              moduleFilenameTemplate: 'source-map'
+            }
+          ];
+        });
     }
 
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
