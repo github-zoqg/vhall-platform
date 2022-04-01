@@ -128,6 +128,7 @@
             v-model="sliderVal"
             :show-tooltip="false"
             @change="changeVideo"
+            @input="inputVideo"
           ></el-slider>
         </div>
         <div
@@ -405,12 +406,6 @@
       }
     },
     watch: {
-      sliderVal(val) {
-        if (this.onmousedownControl) {
-          this.hoverTime = (val / 100) * this.totalTime;
-          this.hoverLeft = (val / 100) * this.ContorlWidth;
-        }
-      },
       voice(newVal) {
         this.playerServer.setVolume(newVal, () => {
           console.log('设置音量失败');
@@ -671,10 +666,15 @@
             }
           });
       },
+      inputVideo() {
+        // 鼠标拖动的时候，阻止slider值更新
+        if (!this._isSetingCurrentTime) {
+          this._isSetingCurrentTime = true;
+        }
+      },
       changeVideo() {
         const time = (this.sliderVal / 100) * this.totalTime; // 快进
         this.setVideoCurrentTime(time);
-        this.setTime();
         this.play();
       },
       // 切换多语言
@@ -1148,8 +1148,8 @@
     }
     &-controller {
       position: absolute;
-      bottom: 0;
-      // bottom: -48px;
+      // bottom: 0;
+      bottom: -48px;
       z-index: 8;
       width: 100%;
       height: 38px;
