@@ -4,14 +4,8 @@
       class="custom-lottery-box"
       :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
     >
-      <!-- <img
-        v-if="prizeInfo && !prizeInfo.image_url"
-        src="../img/default-lottery.png"
-        alt=""
-        class="default-lottery"
-      /> -->
       <div class="custom-lottery">
-        <img :src="prizeInfo ? prizeInfo.image_url : defaultLotteryImg" alt="" />
+        <img :src="prizeInfo.image_url || defaultLotteryImg" alt="" />
       </div>
       <p
         class="custom-lottery__name"
@@ -69,7 +63,10 @@
       },
       // 奖品信息
       prizeInfo: {
-        type: Object
+        type: Object,
+        default() {
+          return {};
+        }
       }
     },
     data() {
