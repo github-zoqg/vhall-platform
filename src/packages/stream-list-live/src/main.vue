@@ -260,10 +260,14 @@
 
           // 接收设为主讲人消息
           this.micServer.$on('vrtc_speaker_switch', msg => {
+            const m =
+              this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+                ? '主画面'
+                : this.$t('interact.interact_1034');
             this.$message.success(
               this.$t('interact.interact_1012', {
                 n: msg.data.nick_name,
-                m: this.$t('interact.interact_1034')
+                m: m
               })
             );
           });
@@ -356,9 +360,9 @@
               }
             }
           }
-          .vmp-stream-local__bottom {
-            bottom: 17px;
-          }
+          // .vmp-stream-local__bottom {
+          //   bottom: 17px;
+          // }
         }
         // 远端流大窗样式
       }
