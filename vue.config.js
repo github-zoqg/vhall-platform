@@ -161,8 +161,12 @@ function getPlugins() {
                 destination: `dist/${argv.project}/cloud/${argv.version}/static`
               },
               {
-                source: `dist/${argv.project}/static/**/*.map`,
-                destination: `dist/${argv.project}/sourcemap`
+                source: `dist/${argv.project}/static/**/*.js.map`,
+                destination: `dist/${argv.project}/sourcemap/static/js`
+              },
+              {
+                source: `dist/${argv.project}/static/**/*.css.map`,
+                destination: `dist/${argv.project}/sourcemap/static/css`
               }
             ],
             delete: [`dist/${argv.project}/static/**/*.map`, `dist/${argv.project}/cloud/**/*.map`]
