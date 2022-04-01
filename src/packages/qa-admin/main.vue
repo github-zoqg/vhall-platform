@@ -691,7 +691,7 @@
             sort_sequence: 1 // 是否按序号正序排列 0 否 1 是
           })
           .catch(err => {
-            this.$message.error(err.msg);
+            // this.$message.error(err.msg);
           });
       },
       setReply(pagePos, keyword) {
@@ -705,11 +705,7 @@
           keyword: keyword || '',
           sort_sequence: 1
         };
-        this.qaServer.getTextReply(data).then(res => {
-          if (res.code != 200) {
-            this.$message.error(res.msg);
-          }
-        });
+        this.qaServer.getTextReply(data);
       },
       // 更多（私聊 & 不处理）: 修复42302-标记为直播中回答时数组移除错误问题后引入的 不处理错误问题。
       replyBut(val) {
