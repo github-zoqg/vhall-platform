@@ -271,10 +271,11 @@
           // );
         } else {
           if (this.isShareScreen) {
-            return (
-              (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn) ||
-              this.roleName == 3
-            );
+            return this.roleName == 3;
+
+            // return (
+            //   (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn)
+            // );
           } else {
             return true;
           }
