@@ -220,7 +220,8 @@
     }
     .winner-info-form {
       max-height: 194px;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       .el-form-item__content {
         line-height: 0;
       }

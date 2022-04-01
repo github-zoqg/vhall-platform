@@ -271,10 +271,11 @@
           // );
         } else {
           if (this.isShareScreen) {
-            return (
-              (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn) ||
-              this.roleName == 3
-            );
+            return this.roleName == 3;
+
+            // return (
+            //   (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn)
+            // );
           } else {
             return true;
           }
@@ -994,6 +995,7 @@
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
+      background-color: #292929;
     }
 
     // 发起端结束演示按钮
