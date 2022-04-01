@@ -97,7 +97,9 @@
         </div>
         <div class="msg-content">
           <!-- 签到消息头部 相类似的可优化 -->
-          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">签到</p>
+          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">
+            {{ $t('interact_tools.interact_tools_1024') }}
+          </p>
           <!-- 正常聊天消息 -->
           <p class="msg-content_name" v-else>
             <span
