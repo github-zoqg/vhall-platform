@@ -58,7 +58,7 @@
     </div>
 
     <!-- 滚动操作 -->
-    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0">
+    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0 && !isStreamListH0">
       <span
         class="vmp-stream-list__folder--up"
         :class="{
