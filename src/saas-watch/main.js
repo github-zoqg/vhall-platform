@@ -18,9 +18,6 @@ initGlobalAPI();
 
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
-Vue.prototype.$tec = function (path) {
-  return this.$te(path) ? this.$t(path) : undefined;
-};
 
 if (process.env.NODE_ENV !== 'development') {
   // Sentry监控探针
