@@ -560,17 +560,7 @@
       }
     },
     watch: {
-      // province(newVal, oldVal) {
-      //   if (newVal != oldVal) {
-      //     this.city = '';
-      //     this.county = '';
-      //   }
-      // },
-      // city(newVal, oldVal) {
-      //   if (newVal != oldVal) {
-      //     this.county = '';
-      //   }
-      // },
+      //是否开启了手机验证码验证
       isPhoneValidate: {
         immediate: true,
         handler(newVal) {
@@ -583,6 +573,7 @@
           }
         }
       },
+      //问题列表
       list: {
         deep: true,
         handler(newList) {
@@ -1507,7 +1498,6 @@
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             overflow: hidden;
-            text-overflow: -o-ellipsis-lastline;
             text-overflow: ellipsis;
           }
           .text-tail {
@@ -1518,7 +1508,7 @@
             background-color: #fff;
             color: #3562fa;
             .is-ellipsis {
-              color: #666666;
+              color: #666;
             }
           }
           .text-tail-2 {
@@ -1583,16 +1573,7 @@
             margin-top: 90px;
           }
         }
-        //li {
-        //  margin-top: 0.52rem;
-        //  position: relative;
-        //  margin-bottom: 0.02rem;
-        //  &:last-child {
-        //    margin-top: 90px;
-        //  }
-        //}
         input {
-          // line-height: 1.04rem !important;
           height: 1.04rem;
           line-height: 0.84rem;
           width: 9.07rem;
@@ -1664,7 +1645,6 @@
     }
     .err-msg {
       position: absolute;
-      /* display: none; */
       bottom: -0.4rem;
       left: 0;
       font-size: 0.32rem;
@@ -1672,9 +1652,7 @@
     }
     .radio-item {
       position: relative;
-      // min-height: 1.067rem;
       padding: 0.267rem 0.2rem 0 0.2rem;
-      // border: 0.02rem solid #d2d2d2;
       border-radius: 0.11rem;
       margin-top: 0.267rem;
       max-width: 9.07rem;
@@ -1764,8 +1742,6 @@
       }
       .select-item {
         appearance: none;
-        -moz-appearance: none;
-        -webkit-appearance: none;
         display: inline-block;
         width: 9.07rem;
         height: 1.07rem;

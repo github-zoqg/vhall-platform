@@ -235,7 +235,7 @@ const playerMixins = {
           return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
         });
       console.log('获取倍速', this.UsableSpeed);
-      if (sessionStorage.getItem('localSpeedValue')) {
+      if (sessionStorage.getItem('localSpeedValue') && this.playerOtherOptions.speed) {
         this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));
