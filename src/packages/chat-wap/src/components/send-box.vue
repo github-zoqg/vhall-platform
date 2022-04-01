@@ -92,7 +92,7 @@
     useMicServer
   } from 'middle-domain';
   import Handup from './handup.vue';
-  import { browserType } from '@/packages/app-shared/utils/tool';
+  import { isWechat } from '@/packages/app-shared/utils/tool';
 
   export default {
     props: {
@@ -192,7 +192,7 @@
       //是否不需要登录
       noChatLogin() {
         let noChatLogin = false;
-        if (browserType()) {
+        if (isWechat()) {
           /**
            * ui.hide_wechat: 0使用微信授权 1不适用微信授权
            */

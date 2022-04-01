@@ -185,7 +185,7 @@
 
 <script>
   import { useUserServer, useCashServer } from 'middle-domain';
-  import { boxEventOpitons, browserType } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool';
   import NECaptcha from './components/NECaptcha';
   const defaltCashForm = {
     phone: '',
@@ -258,7 +258,7 @@
       // 提现按钮
       async checkPhoneToWx() {
         // 当前若非微信内打开，提示用户微信内打开
-        if (!browserType()) {
+        if (!isWechat()) {
           this.$toast(this.$t('cash.cash_1035'));
           return;
         }
