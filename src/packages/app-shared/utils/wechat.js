@@ -312,7 +312,7 @@ export async function wxAuthCheck(to, next) {
       // 判断是否admin开启了微信授权开关
       if (
         roomBaseServer.state.configList &&
-        roomBaseServer.state.configList['ui.hide_wechat'] == '0'
+        roomBaseServer.state.configList['ui.hide_wechat'] == 0
       ) {
         let address = buildLoginAddress(to);
         authWeixinAjax(to, address, _next);
