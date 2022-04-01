@@ -3,7 +3,7 @@
     <div class="vmp-chat-wap__content">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
-        v-if="hideChatHistory && !chatList.length && !historyloaded"
+        v-if="hideChatHistory && !chatList.length && !historyLoaded"
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
@@ -23,7 +23,7 @@
           emitQuestionnaireEvent,
           joinInfo
         }"
-        @tobottom="tobottom"
+        @tobottom="toBottom"
       ></virtual-list>
       <div
         class="vmp-chat-wap__content__new-msg-tips"
@@ -55,7 +55,7 @@
   import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatWap',
@@ -90,16 +90,18 @@
         page: 1,
         //是否已经下拉刷新
         isPullingDown: false,
-        //关键词列表 todo 需要获取设置的关键词
+        //关键词列表
         keywordList: [],
         //房间号
         roomId: '',
         //是否是嵌入端
         isEmbed: false,
-        isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        //true禁言，false未禁言
+        isBanned: useChatServer().state.banned,
+        //true全体禁言，false未禁言
+        allBanned: useChatServer().state.allBanned,
         //是否加载完聊天历史
-        historyloaded: false
+        historyLoaded: false
       };
     },
     watch: {
@@ -288,7 +290,7 @@
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
         }
-        this.historyloaded = true;
+        this.historyLoaded = true;
         this.scrollBottom();
       },
       previewImg(img) {
@@ -315,7 +317,7 @@
         });
       },
       //监听滚动条滚动到底部
-      tobottom() {
+      toBottom() {
         this.unReadMessageCount = 0;
         this.isHasUnreadAtMeMsg = false;
       },
@@ -339,16 +341,14 @@
       sendMsgEnd() {
         this.scrollBottom();
       },
-      //todo domain负责 抽奖情况检查
+      //抽奖情况检查
       emitLotteryEvent(msg) {
-        console.log('emitLotteryEvent', msg);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
         );
       },
-      //todo domain负责 问卷情况检查
+      //问卷情况检查
       emitQuestionnaireEvent(questionnaireId) {
-        console.log('emitQuestionnaireEvent', questionnaireId);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
@@ -368,13 +368,12 @@
       left: 0;
       right: 0;
       bottom: 120px;
-      //overflow: hidden;
       overflow-x: hidden;
       overflow-y: auto;
       &__get-list-btn-container {
         width: 100%;
         text-align: center;
-        color: #666666;
+        color: #666;
         font-size: 28px;
         padding-top: 20px;
       }
@@ -388,7 +387,7 @@
         height: 60px;
         background-color: rgba(255, 233, 233, 0.9);
         border: 1px solid rgba(254, 129, 148, 1);
-        color: #333333;
+        color: #333;
         font-size: 26px;
         display: flex;
         justify-content: center;
