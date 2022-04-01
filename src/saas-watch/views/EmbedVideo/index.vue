@@ -1,16 +1,12 @@
 <template>
   <div
-    class="vmp-basic-layout"
+    class="vmp-embed-video-basic-layout"
     v-loading="state === 0"
     element-loading-text="加载中..."
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
-    <div
-      class="vmp-basic-container"
-      :class="clientType == 'embed' ? 'vmp-basic-container-embed' : 'vmp-basic-container-normarl'"
-      v-if="state === 1"
-    >
-      <vmp-air-container cuid="layerRoot"></vmp-air-container>
+    <div class="vmp-embed-video-basic-container" v-if="state === 1">
+      <vmp-air-container cuid="embedVideoLayerRoot"></vmp-air-container>
     </div>
     <errorPage v-if="state === 2" :prop-type="errorData.errorPageTitle">
       <template v-if="errorData.errorPageText" slot="body">
@@ -22,16 +18,13 @@
 
 <script>
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
-  import roomState, { isMSECanUse } from '../headless/room-state.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
-  import authCheck from '../mixins/chechAuth';
-  import ErrorPage from './ErrorPage';
+  import roomState, { isMSECanUse } from '../../headless/embed-video-state.js';
+  import ErrorPage from '../ErrorPage';
   export default {
     name: 'Home',
     components: {
       ErrorPage
     },
-    mixins: [authCheck],
     data() {
       return {
         state: 0,
@@ -47,23 +40,12 @@
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         const roomBaseServer = useRoomBaseServer();
-        // 判断是否是嵌入/单视频嵌入
-        try {
-          const _param = {
-            isEmbed: false,
-            isEmbedVideo: false
-          };
-          if (location.pathname.indexOf('embedclient') != -1) {
-            _param.isEmbed = true;
-            this.clientType = 'embed';
-          }
-          if (getQueryString('embed') == 'video') {
-            _param.isEmbedVideo = true;
-          }
-          roomBaseServer.setEmbedObj(_param);
-        } catch (e) {
-          console.log('嵌入', e);
-        }
+        // 单视频嵌入
+        this.clientType = 'embed';
+        roomBaseServer.setEmbedObj({
+          isEmbed: true,
+          isEmbedVideo: true
+        });
         const domain = await this.initReceiveLive(this.clientType);
         await roomState();
         // 是否跳转预约页
@@ -73,7 +55,6 @@
         ) {
           this.goSubscribePage(this.clientType);
         }
-        await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
@@ -137,7 +118,7 @@
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
+          plugins: ['chat', 'player'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
@@ -249,57 +230,12 @@
   body {
     overflow: hidden;
   }
-  .vmp-basic-container-embed {
+  .vmp-embed-video-basic-container {
+    width: 100%;
+    height: 100%;
     .vmp-basic-bd {
       max-width: unset;
       height: 100%;
-    }
-  }
-  .vmp-basic-container-normarl {
-    overflow: auto;
-  }
-
-  // 媒体查询分辨率下效果
-  @media screen and (min-width: 1920px) {
-    .vmp-basic-bd {
-      max-width: 1658px;
-    }
-  }
-
-  @media screen and (min-width: 1706px) {
-    .vmp-basic-bd {
-      max-width: 1658px;
-    }
-  }
-
-  @media screen and (min-width: 1388px) and (max-width: 1705px) {
-    .vmp-basic-bd {
-      max-width: 1339px;
-    }
-  }
-
-  @media screen and (max-width: 1387px) {
-    .vmp-basic-bd {
-      max-width: 1339px;
-    }
-  }
-
-  @media screen and (max-width: 1440px) {
-    .vmp-basic-bd {
-      max-width: 1339px;
-    }
-  }
-
-  @media screen and (max-width: 1366px) {
-    .vmp-basic-bd {
-      max-width: 1103px;
-    }
-  }
-
-  @media screen and (max-width: 1151px) {
-    // 浏览器中部最小间距，低于此分辨率1151px滚动条
-    .vmp-basic-bd {
-      max-width: 1103px;
     }
   }
 </style>
