@@ -143,6 +143,9 @@
       //活动信息
       webinarInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       }
     },
     watch: {
