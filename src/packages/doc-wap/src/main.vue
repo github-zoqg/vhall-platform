@@ -20,7 +20,7 @@
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ zIndex: item.cid == currentCid ? '1' : '-1' }"
+            v-show="currentCid == item.cid"
           ></div>
         </div>
       </div>
@@ -98,7 +98,6 @@
       },
       // 当前文档白板容器id
       currentCid() {
-        // alert(this.docServer.state.currentCid, 'this.docServer.state.currentCid');
         return this.docServer.state.currentCid;
       },
       // 是否观众可见
@@ -120,6 +119,7 @@
       // 是否有翻页按钮
       hasPager() {
         return (
+          this.webinarType === 1 &&
           !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
           this.currentType === 'document'
         );
