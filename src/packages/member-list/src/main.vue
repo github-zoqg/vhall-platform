@@ -854,13 +854,6 @@
         }
         //用户申请上麦
         function handleApplyConnect(msg) {
-          if (_this.roleName == 1 && msg.data.member_info.role_name == 4) {
-            _this.$message.success(
-              `收到 ${_this.$getRoleName(4)} [ ${
-                msg.data.nick_name || msg.data.member_info.nickname
-              } ] 的上麦申请`
-            );
-          }
           //举手tab的小红点
           if (_this.tabIndex !== 2) {
             _this.raiseHandTip = true;
@@ -881,6 +874,9 @@
             nickname: msg.data.nick_name || msg.data.nickname,
             role_name: msg.data.room_role
           };
+          if (_this.roleName == 1 && user.role_name == 4) {
+            _this.$message.success(`收到 ${_this.$getRoleName(4)} [ ${user.nickname} ] 的上麦申请`);
+          }
           const { member_info = { is_apply: 1 } } = msg.data;
           user = Object.assign(user, member_info);
           _this.applyUsers.unshift(user);
