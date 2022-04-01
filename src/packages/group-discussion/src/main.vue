@@ -344,14 +344,16 @@
       initEvent() {
         // 发起端收到同意邀约演示
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
-          if (msg.data.extra_params == this.userId) {
-            this.$message({
-              message: '对方已接受邀请',
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-          }
+          // https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005425
+          // 已和产品确认，接受邀请不提示
+          // if (msg.data.extra_params == this.userId) {
+          //   this.$message({
+          //     message: '对方已接受邀请',
+          //     showClose: true,
+          //     type: 'success',
+          //     customClass: 'zdy-info-box'
+          //   });
+          // }
         });
 
         // 发起端收到拒绝邀请演示

@@ -46,7 +46,8 @@
             :class="{
               'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
               'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen,
-              'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen
+              'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen,
+              embed: isEmbed
             }"
           >
             <div class="vmp-stream-list__remote-container-h">
@@ -104,6 +105,12 @@
     },
 
     computed: {
+      isEmbed() {
+        return (
+          this.$domainStore.state.roomBaseServer.embedObj.embed &&
+          !this.$domainStore.state.roomBaseServer.embedObj.embedVideo
+        );
+      },
       // 主持人是否在小组内
       isHostInGroup() {
         return !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group;
@@ -403,6 +410,9 @@
             width: calc(100% - 380px);
             height: auto;
             min-height: auto;
+            &.embed {
+              width: calc(100% - 360px);
+            }
           }
 
           // 主屏在小窗的样式
