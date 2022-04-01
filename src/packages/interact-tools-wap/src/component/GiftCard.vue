@@ -41,7 +41,7 @@
         </van-swipe>
         <footer>
           <button
-            @click="submit"
+            @click="giveGiftSubmit"
             :disabled="btnDisabled || !currentGift.id"
             :class="{ disabledColor: btnDisabled || !currentGift.id }"
           >
@@ -56,8 +56,9 @@
 
 <script>
   // import EventBus from '@/utils/Events';
+  import { debounce } from 'lodash';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
-  // import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'gift',
@@ -70,7 +71,7 @@
         btnDisabled: false,
         timer: 3,
         handlerTimer: null,
-        selectTimer: null,
+        selectTimer: null, //发送礼物用来防抖的定时器
         queryGiftsFlag: false
       };
     },
@@ -160,7 +161,6 @@
       // 支付接口
       payProcess(params) {
         const that = this;
-        const open_id = sessionStorage.getItem('open_id');
         this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.data && res.code == 200) {
             if (res.data.price == 0) {
@@ -168,7 +168,7 @@
               this.close();
               return;
             }
-            if (isWechat() && open_id) {
+            if (isWechat()) {
               WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
                 {
@@ -205,25 +205,29 @@
           }
         });
       },
-      // 赠送礼物
-      submit() {
+      /**
+       * 赠送礼物
+       */
+      giveGiftSubmit: debounce(function () {
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           // EventBus.$emit('showChatLogin');
           return;
         }
-        const open_id = sessionStorage.getItem('open_id');
-        let params = {};
+
         if (!this.currentGift.id) {
           this.$toast(this.$t('interact_tools.interact_tools_1064'));
           return;
         }
         // 如果开启手动加载历史聊天的配置项，并且是嵌入页面，就不会展示付费礼物，并且免费礼物通过聊天消息发送
+        const open_id = sessionStorage.getItem('open_id');
+        let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        let params = {};
 
-        if (this.selectTimer) clearTimeout(this.selectTimer);
-        this.selectTimer = setTimeout(() => {
-          if (isWechat() && open_id) {
+        if (isWechat()) {
+          if (open_id) {
+            // 微信正常授权过
             params = {
               gift_id: this.currentGift.id,
               channel: 'WEIXIN',
@@ -231,27 +235,35 @@
               room_id: this.localRoomInfo.roomId,
               open_id: open_id
             };
-            console.log(isWechat(), open_id, params, 'open_id');
-            if (Number(this.currentGift.price) <= 0) {
-              this.payFree(params);
-              return;
-            }
           } else {
-            params = {
-              gift_id: this.currentGift.id,
-              channel: 'ALIPAY',
-              service_code: 'H5_PAY',
-              room_id: this.localRoomInfo.roomId
-            };
-            if (Number(this.currentGift.price) <= 0) {
-              this.payFree(params);
-              return;
-            }
+            //重新授权
+            payAuthStatus = 1;
+            const payUrl = buildPayUrl(this.$route);
+            authWeixinAjax(this.$route, payUrl, () => {});
           }
+        } else {
+          params = {
+            gift_id: this.currentGift.id,
+            channel: 'ALIPAY',
+            service_code: 'H5_PAY',
+            room_id: this.localRoomInfo.roomId
+          };
+        }
 
-          this.payProcess(params);
-        }, 300);
-      },
+        // 如果不需要经过微信授权
+        if (payAuthStatus == 0) {
+          if (Number(this.currentGift.price) <= 0) {
+            //发送免费礼物
+            this.payFree(params);
+          } else {
+            //发送收费礼物
+            this.payProcess(params);
+          }
+        }
+      }, 300),
+      /**
+       * 关闭礼物弹框
+       */
       close() {
         this.showgiftCard = false;
       },

@@ -100,10 +100,7 @@
       </p>
 
       <p class="vmp-stream-remote__shadow-second-line" v-if="liveMode != 1">
-        <span
-          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
-          class="vmp-stream-local__shadow-label"
-        >
+        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           视图
         </span>
 
@@ -115,7 +112,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
+        <el-tooltip
+          :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          placement="bottom"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             :class="{
@@ -514,7 +514,10 @@
         const roomBaseServer = useRoomBaseServer();
         let miniElement = '';
         if (this.isShareScreen) {
-          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+          if (
+            this.presentationScreen != this.joinInfo.third_party_user_id ||
+            this.joinInfo.role_name != 2
+          ) {
             miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
           } else {
             miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
