@@ -874,6 +874,9 @@
             nickname: msg.data.nick_name || msg.data.nickname,
             role_name: msg.data.room_role
           };
+          if (_this.roleName == 1 && user.role_name == 4) {
+            _this.$message.success(`收到 ${_this.$getRoleName(4)} [ ${user.nickname} ] 的上麦申请`);
+          }
           const { member_info = { is_apply: 1 } } = msg.data;
           user = Object.assign(user, member_info);
           _this.applyUsers.unshift(user);
