@@ -854,7 +854,7 @@
         }
         //用户申请上麦
         function handleApplyConnect(msg) {
-          if (+_this.roleName === 1 && +msg.data.member_info.role_name === 4) {
+          if (_this.roleName == 1 && msg.data.member_info.role_name == 4) {
             _this.$message.success(
               `收到 ${_this.$getRoleName(4)} [ ${
                 msg.data.nick_name || msg.data.member_info.nickname
