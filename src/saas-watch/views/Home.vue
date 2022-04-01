@@ -2,7 +2,7 @@
   <div
     class="vmp-basic-layout"
     v-loading="state === 0"
-    element-loading-text="加载中..."
+    element-loading-text="$t('common.common_1001')"
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
     <div
