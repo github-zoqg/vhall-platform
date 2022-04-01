@@ -406,12 +406,6 @@
       }
     },
     watch: {
-      // sliderVal(val) {
-      //   if (this.onmousedownControl) {
-      //     this.hoverTime = (val / 100) * this.totalTime;
-      //     this.hoverLeft = (val / 100) * this.ContorlWidth;
-      //   }
-      // },
       voice(newVal) {
         this.playerServer.setVolume(newVal, () => {
           console.log('设置音量失败');
