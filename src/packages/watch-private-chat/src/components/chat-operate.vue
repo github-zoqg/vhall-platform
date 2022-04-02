@@ -284,7 +284,7 @@
           this.overlayScrollbar.update();
           this.inputHandle();
           // 更新聊天内容区域滚动条
-          // this.$emit('performScroll');
+          this.$emit('sendMsgEnd');
         });
       },
       //信令唤起登录
