@@ -186,6 +186,7 @@
 <script>
   import { useUserServer, useCashServer } from 'middle-domain';
   import { boxEventOpitons, browserType } from '@/packages/app-shared/utils/tool';
+  import { authWeixinAjax, buildLoginAddress } from '@/packages/app-shared/utils/wechat';
   import NECaptcha from './components/NECaptcha';
   const defaltCashForm = {
     phone: '',
@@ -260,6 +261,14 @@
         // 当前若非微信内打开，提示用户微信内打开
         if (!browserType()) {
           this.$toast(this.$t('cash.cash_1035'));
+          return;
+        }
+        // 校验是否有open_id,若没有重新微信登录授权
+        const open_id = this.getQueryString('open_id') || sessionStorage.getItem('open_id');
+        // 重新微信授权
+        if (!open_id) {
+          const loginAddress = buildLoginAddress(this.$route);
+          authWeixinAjax(this.$route, loginAddress, () => {});
           return;
         }
         try {

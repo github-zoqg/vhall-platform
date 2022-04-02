@@ -6,7 +6,7 @@
           ref="qalist"
           style="height: 100%; overflow: auto"
           :keeps="30"
-          :data-key="'id'"
+          :data-key="'msgId'"
           :data-sources="qaList"
           :data-component="MsgItem"
           @tobottom="tobottom"
