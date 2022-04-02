@@ -70,7 +70,7 @@
         videoLoadingImg: videoSwitchImg,
         isVideoSwitching: false, // video正在切换
         isVideoError: false, // video读取错误
-        videoTipsText: '设备切换中，请稍后…'
+        videoTipsText: this.$t('setting.setting_1008')
       };
     },
     computed: {

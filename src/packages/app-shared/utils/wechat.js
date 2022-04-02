@@ -291,7 +291,7 @@ export async function wxAuthCheck(to, next) {
     handleThirdLoginOrPay(_next);
   } else {
     // 观看页和嵌入页需要微信授权
-    if (!/watch|subscribe/.test(to.path)) {
+    if (!/watch|subscribe/.test(to.path) || /embed/.test(to.path)) {
       // 不是 预约/观看 或者 嵌入情况， 直接进入
       next();
     } else {
