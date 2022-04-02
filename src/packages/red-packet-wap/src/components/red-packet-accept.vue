@@ -58,8 +58,6 @@
       openRedPacket() {
         if (this.opening || this.opened) return; // 红包打开中或已打开则拦截
         console.log('clickopenRedPacket');
-        // if (this.accepted) return;
-        // this.accepted = true;
         if (this.userId == 0) {
           return this.$emit('needLogin');
         }

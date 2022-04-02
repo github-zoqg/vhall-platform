@@ -156,7 +156,6 @@
     }
     .vhall-list-dialog-content {
       height: 100%;
-      overflow-y: scroll;
       ::-webkit-scrollbar {
         width: 5px;
         border-radius: 10px;
@@ -194,5 +193,10 @@
         object-fit: scale-down;
       }
     }
+  }
+  .qs-preview-box-content {
+    height: 100%;
+    overflow-y: scroll;
+    line-height: initial;
   }
 </style>
