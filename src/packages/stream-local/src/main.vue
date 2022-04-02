@@ -864,9 +864,8 @@
             if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
               await this.setBroadCastAdaptiveLayoutMode();
             }
-            if (this.mainScreen == this.joinInfo.third_party_user_id) {
-              await this.setBroadCastScreen();
-            }
+
+            await this.setBroadCastScreen();
           }
           console.log('paltForm 自动静音上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
@@ -931,7 +930,7 @@
 
       // 设置主屏
       async setBroadCastScreen() {
-        await this.interactiveServer.setBroadCastScreen().catch(() => {
+        await this.interactiveServer.resetLayout().catch(() => {
           return Promise.reject('setBroadCastScreenError');
         });
       },
