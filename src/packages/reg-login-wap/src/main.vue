@@ -66,6 +66,7 @@
                   pattern="[0-9]*"
                   :placeholder="$t('form.form_1020')"
                   v-model.trim="smsCode"
+                  oninput="if(value.length>6)value=value.slice(0,6)"
                   maxlength="6"
                 />
               </div>
@@ -482,6 +483,7 @@
 <style lang="less">
   .vh-login-wap {
     .yiyun-vhall {
+      margin-bottom: 32px;
       .yidun_control,
       .yidun_slide_indicator,
       .yidun_tips {
