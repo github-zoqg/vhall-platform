@@ -1025,7 +1025,7 @@
     &-controller {
       position: absolute;
       bottom: -31px;
-      z-index: 20;
+      z-index: 1;
       width: 100%;
       padding: 0px 0 0 23px;
       height: 38px;

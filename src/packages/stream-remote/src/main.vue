@@ -452,6 +452,9 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            if (this.joinInfo.role_name === 1) {
+              this.interactiveServer.resetLayout();
+            }
             setTimeout(() => {
               this.replayPlay();
 
