@@ -107,9 +107,9 @@
               </div>
               <div class="show-middle-box">
                 <div class="show-middle-container">
-                  <div class="show-text">
+                  <div class="show-text" v-if="webinarInfo.title || webinarInfo.desciption">
                     <h1>{{ webinarInfo.title }}</h1>
-                    <p v-if="webinarInfo.desciption">{{ webinarInfo.desciption }}</p>
+                    <p>{{ webinarInfo.desciption }}</p>
                   </div>
                   <div v-if="webinarInfo.date" class="show-time">
                     <p class="top-border"></p>
