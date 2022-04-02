@@ -692,7 +692,7 @@
       return {
         //默认的兜底的banner图
         defaultHeader,
-        //todo 询问下环境变量是否正确
+        //上传的基础地址
         baseUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
         // 是否是独立表单
         isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
@@ -1762,7 +1762,6 @@
       //关闭当前视图
       closePreview() {
         this.handleClose();
-        //todo 发送信令，关闭独立预约页
       }
     }
   };
@@ -1897,12 +1896,12 @@
         transition: all 0.2s linear;
         cursor: pointer;
         &:nth-child(1) {
-          border-right: 0px none;
-          border-radius: 4px 0px 0px 4px;
+          border-right: 0 none;
+          border-radius: 4px 0 0 4px;
         }
         &:nth-child(2) {
-          border-left: 0px none;
-          border-radius: 0px 4px 4px 0px;
+          border-left: 0 none;
+          border-radius: 0 4px 4px 0;
         }
         &.active {
           border: 1px solid @red;
@@ -1959,7 +1958,7 @@
     .verify-code-box {
       .no-border {
         background: #dedede;
-        color: #666666;
+        color: #666;
         cursor: not-allowed;
         &:hover {
           border: 0;
@@ -1970,13 +1969,13 @@
       }
       .isLoginActive {
         background: #fb3a32;
-        color: #ffffff;
+        color: #fff;
         cursor: pointer;
       }
       // 云盾样式重置,注释部分为设计稿样式，暂时不删除，有备无患
       .captcha {
         ::v-deep .yidun_tips {
-          color: #999999 !important;
+          color: #999 !important;
           line-height: 1.05rem !important;
           // .yidun_tips__text {
           // vertical-align: initial!important;

@@ -2,10 +2,6 @@ import { computeRecordTime } from './utils';
 const playerMixins = {
   data() {
     return {
-      TimesShow: false,
-      ContorlWidth: '',
-      hoverTime: 0,
-      hoverLeft: 0,
       changeTime: null, // 记录时间
       defaultVoice: 0 // 记录静音之前的声音
     };
@@ -258,7 +254,7 @@ const playerMixins = {
         UsableSpeed.filter(value => {
           return [2, 1.75, 1.5, 1.25, 1, 0.75].includes(value);
         });
-      if (sessionStorage.getItem('localSpeedValue')) {
+      if (sessionStorage.getItem('localSpeedValue') && this.playerOtherOptions.speed) {
         this.currentSpeed = parseFloat(sessionStorage.getItem('localSpeedValue'));
         let suc = true;
         this.playerServer.setPlaySpeed(this.currentSpeed, () => (suc = false));

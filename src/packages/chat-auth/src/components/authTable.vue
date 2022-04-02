@@ -174,7 +174,7 @@
       //选中的tab
       selectMenuType: {
         type: String,
-        default: () => ''
+        default: ''
       },
       //聊天审核组件的配置
       options: {
@@ -201,6 +201,7 @@
     },
     data() {
       return {
+        //是否正在加载
         loading: false,
         //分页配置
         pageConfig: {
@@ -333,7 +334,6 @@
         width: 120px;
         height: 120px;
         margin: 10px auto;
-        //background: url('../images/no-data.png') no-repeat;
         background-size: cover;
       }
     }
@@ -354,7 +354,6 @@
           }
           .chat-info__time {
             color: #888;
-            // margin-left: 10px;
             position: absolute;
             right: 0;
           }
