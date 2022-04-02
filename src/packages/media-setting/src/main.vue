@@ -136,7 +136,7 @@
         isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
         selectedMenuItem: 'basic-setting',
-        alertText: '修改设置后会导致重新推流，是否继续保存？',
+        alertText: this.$t('setting.setting_1031'),
         popAlert: {
           text: this.$t('interact.interact_1011'),
           visible: false,
@@ -249,7 +249,7 @@
 
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
-          const text = '修改设置后导致重新推流，是否继续保存';
+          const text = this.$t('setting.setting_1031');
           action = await mediaSettingConfirm.show(text);
         }
 
