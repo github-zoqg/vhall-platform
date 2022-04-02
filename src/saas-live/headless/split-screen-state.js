@@ -5,6 +5,7 @@ import {
   useMicServer,
   useMediaCheckServer,
   useMediaSettingServer,
+  useDesktopShareServer,
   useSplitScreenServer
 } from 'middle-domain';
 
@@ -17,6 +18,7 @@ export default async function () {
   const micServer = useMicServer();
   const mediaSettingServer = useMediaSettingServer();
   const splitScreenServer = useSplitScreenServer();
+  const desktopShareServer = useDesktopShareServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -39,6 +41,8 @@ export default async function () {
   await msgServer.initMaintMsg({
     hide: 1
   });
+
+  desktopShareServer.init();
 
   const splitRes = await splitScreenServer.init({
     role: 'splitPage'

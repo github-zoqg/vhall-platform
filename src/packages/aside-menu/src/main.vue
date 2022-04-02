@@ -262,8 +262,8 @@
             } else {
               vn.setHiddenState(true); //隐藏
             }
-            // 如果在插播就禁用
-            if (this.isInsertFilePushing) {
+            // 如果在插播或者分屏就禁用
+            if (this.isInsertFilePushing || this.isOpenSplitScreen) {
               vn.setDisableState(true);
               continue;
             }
