@@ -7,8 +7,8 @@
       <virtual-list
         ref="qalist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
-        :data-key="'id'"
+        :keeps="10"
+        :data-key="'msgId'"
         :data-sources="qaList"
         :data-component="MsgItem"
         :extra-props="{
