@@ -482,6 +482,7 @@
 <style lang="less">
   .vh-login-wap {
     .yiyun-vhall {
+      margin-bottom: 32px;
       .yidun_control,
       .yidun_slide_indicator,
       .yidun_tips {
