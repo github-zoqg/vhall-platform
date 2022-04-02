@@ -11,9 +11,12 @@
       <div class="icon-wrap">
         <lottery-icon @clickIcon="checkLotteryIcon" />
       </div>
-      <div class="icon-wrap">
-        <red-packet-icon @clickIcon="handleRedPacket" />
-      </div>
+      <!-- 红包 -->
+      <template v-if="!isEmbed">
+        <div class="icon-wrap">
+          <red-packet-icon @clickIcon="handleRedPacket" />
+        </div>
+      </template>
       <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
         <div :class="!timerVisible ? 'have' : ''"></div>
         <img src="./image/timer.png" />
@@ -47,6 +50,9 @@
     computed: {
       groupInitData() {
         return this.$domainStore.state.groupServer.groupInitData;
+      },
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {
