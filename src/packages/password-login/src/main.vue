@@ -186,9 +186,8 @@
 </template>
 
 <script>
-  //todo 后续应替换为全局工具服务里的
-  import { uuid } from '@/packages/chat/src/js/utils';
-  const defaultAvatar = require('./img/advatar_default@2x.png');
+  import { uuid } from '@/packages/app-shared/utils/tool';
+  const defaultAvatar = require('@/packages/app-shared/assets/img/my-dark@2x.png');
   import { useRoomBaseServer, useKeyLoginServer } from 'middle-domain';
   export default {
     name: 'VmpPasswordLogin',
@@ -258,7 +257,6 @@
     },
     beforeDestroy() {
       window.removeEventListener('resize', this.checkIsMobile, false);
-      // this.keyLoginServer && this.keyLoginServer.setHeader({ 'gray-id': null });
     },
     mounted() {},
     methods: {
@@ -277,24 +275,12 @@
               this.showDelay = [1, '1'].includes(data.no_delay_webinar);
               return this.getConfigList(data.user_id);
             } else {
-              this.$message({
-                message: msg,
-                showClose: true,
-                // duration: 0,
-                type: 'error',
-                customClass: 'zdy-info-box'
-              });
+              this.$message.error(msg);
             }
           })
           .catch(error => {
             let { msg = '活动信息获取失败' } = error || {};
-            this.$message({
-              message: msg,
-              showClose: true,
-              // duration: 0,
-              type: 'error',
-              customClass: 'zdy-info-box'
-            });
+            this.$message.error(msg);
           });
       },
       //获取配置信息
@@ -326,7 +312,7 @@
         this.nameErrorShow = value === '';
         value === '' ? callback(new Error('参会昵称不能为空')) : callback();
       },
-      //处理进入直播 todo
+      //处理进入直播
       handleEntryLive() {
         const _this = this;
         this.$refs.loginForm.validate(valid => {
@@ -345,24 +331,12 @@
               sessionStorage.setItem('visitorId', res.data.visitor_id);
               this.handleJump(params.type, res.data.live_token);
             } else {
-              this.$message({
-                message: msg,
-                showClose: true,
-                // duration: 0,
-                type: 'error',
-                customClass: 'zdy-info-box'
-              });
+              this.$message.error(msg);
             }
             return res;
           })
           .catch(error => {
-            this.$message({
-              message: error.msg || '口令登录失败',
-              showClose: true,
-              // duration: 0,
-              type: 'error',
-              customClass: 'zdy-info-box'
-            });
+            this.$message.error(error.msg || '口令登录失败');
           });
       },
       //处理口令登录参数
@@ -438,23 +412,11 @@
         const isType = typeList.includes(typeArr[typeArr.length - 1]);
         const isLt2M = file.size / 1024 / 1024 < 1;
         if (!isType) {
-          this.$message({
-            message: `仅支持 ${typeList.join('、')} 格式`,
-            showClose: true,
-            // duration: 0,
-            type: 'error',
-            customClass: 'zdy-info-box'
-          });
+          this.$message.error(`仅支持 ${typeList.join('、')} 格式`);
           return false;
         }
         if (!isLt2M) {
-          this.$message({
-            message: '图片大小超过1M',
-            showClose: true,
-            // duration: 0,
-            type: 'error',
-            customClass: 'zdy-info-box'
-          });
+          this.$message.error('图片大小超过1M');
           return false;
         }
         return isType && isLt2M;
@@ -466,13 +428,7 @@
       //上传出错处理
       uploadError(err, file, fileList) {
         console.log('uploadError', err, file, fileList);
-        this.$message({
-          message: '图片上传失败',
-          showClose: true,
-          // duration: 0,
-          type: 'error',
-          customClass: 'zdy-info-box'
-        });
+        this.$message.error('图片上传失败');
       },
       uploadPreview(file) {
         console.log('图片预览', file);
@@ -488,14 +444,14 @@
     /* 活动状态 */
     @tag-subscribe: #3562fa;
     @tag-live: #fb3a32;
-    @tag-end: #666666;
+    @tag-end: #666;
     @tag-playback: #14ba6a;
     @tag-demand: #fa9a32;
     @font-color-icon: #cccccc; /* 图标 */
     @font-color-icon-hover: #fb3a32; /* 图标悬浮 */
-    @font-user-icon: #666666;
+    @font-user-icon: #666;
     @font-user-icon-hover: #1a1a1a;
-    @font-dark-low: #999999;
+    @font-dark-low: #999;
     width: 100%;
     height: 100vh;
     background: #f2f2f2;
@@ -568,7 +524,7 @@
           height: 16px;
           font-size: 12px;
           font-weight: @font-weight-normal;
-          color: #ffffff;
+          color: #fff;
           line-height: 16px;
           margin: 2px 0 2px 0;
         }
@@ -612,7 +568,7 @@
       align-items: flex-start;
       width: calc(100% - 144px);
       margin: 20px 72px 0 72px;
-      background: #ffffff;
+      background: #fff;
       min-height: 485px;
       height: calc(100% - 151px);
       border-radius: 4px;
@@ -683,7 +639,7 @@
           font-size: 12px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: #ffffff;
+          color: #fff;
         }
         .main-wrap__form__avatar-uploader {
           display: none;
@@ -701,7 +657,7 @@
 
         button.el-button.main-wrap__form__red-button {
           background: #fb3a32;
-          color: #ffffff;
+          color: #fff;
           border: 1px solid #fb3a32;
           &:hover {
             color: #fff;
@@ -738,7 +694,7 @@
         .main-wrap__form__copyright {
           font-size: 12px;
           font-weight: 400;
-          color: #999999;
+          color: #999;
           line-height: 17px;
           margin-top: auto;
           margin-bottom: 20px;

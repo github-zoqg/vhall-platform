@@ -30,7 +30,7 @@
         const id = this.$route.params.id;
         const invite = this.invite;
 
-        this.$router.push(`/lives/watch/${id}?invite=${invite}`);
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}?invite=${invite}`;
       },
       changeInvite(val) {
         this.invite = val;
