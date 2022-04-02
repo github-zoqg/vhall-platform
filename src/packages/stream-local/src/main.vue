@@ -861,7 +861,7 @@
              *  2、     若刷新的话，会初始化实例，则旁路展示正确
              *            不刷新，结束直播后，进行媒体设置更改，再进行开播，则需要手动调用自适应布局方法
              */
-            if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
+            if (sessionStorage.getItem('layout')) {
               await this.setBroadCastAdaptiveLayoutMode();
             }
 
