@@ -66,6 +66,7 @@
                   pattern="[0-9]*"
                   :placeholder="$t('form.form_1020')"
                   v-model.trim="smsCode"
+                  oninput="if(value.length>6)value=value.slice(0,6)"
                   maxlength="6"
                 />
               </div>
