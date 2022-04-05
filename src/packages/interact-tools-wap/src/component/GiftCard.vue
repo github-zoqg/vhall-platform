@@ -336,13 +336,13 @@
           const msgData = {
             type: 'permit',
             event_type: 'free_gift_send',
-            avatar: this.joinInfoInGift.avatar,
+            gift_user_avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
-            nickname: this.joinInfoInGift.nickname,
+            gift_user_nickname: this.joinInfoInGift.nickname,
             role_name: 2,
             gift_name: this.currentGift.name,
-            gift_url: this.currentGift.image_url,
+            gift_image_url: this.currentGift.image_url,
             source_status: this.currentGift.source_status
           };
           const context = {
