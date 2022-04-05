@@ -143,10 +143,10 @@ export default {
           avatar: this.watchInitData.join_info.avatar,
           barrageTxt: '',
           text_content: '',
-          gift_user_nickname: this.watchInitData.join_info.nickname,
+          nickname: this.watchInitData.join_info.nickname,
           role_name: 2,
           gift_name: this.giftInfo.name,
-          gift_image_url: this.giftInfo.image_url,
+          gift_url: this.giftInfo.image_url,
           source_status: this.giftInfo.source_status
         };
         const context = {
