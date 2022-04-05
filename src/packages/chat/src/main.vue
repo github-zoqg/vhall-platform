@@ -178,8 +178,6 @@
             src: 'javascript:;'
           }
         },
-        //是否为嵌入页
-        isEmbed: false,
         //图片预览弹窗是否可见
         imgPreviewVisible: false,
         //聊天配置
@@ -211,6 +209,10 @@
       };
     },
     computed: {
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
@@ -362,7 +364,6 @@
       initInputStatus() {
         let placeholder = this.$t('chat.chat_1021');
         let disable = false;
-
         // 控制台配置回放禁言状态
         if (
           (this.playerType == 5 || this.playerType == 4) &&
@@ -390,7 +391,7 @@
       initChatLoginStatus() {
         if ([0, '0'].includes(this.configList['ui.show_chat_without_login'])) {
           //主持人，这时候在发起端
-          if ([1, '1'].includes(this.roleName)) {
+          if ([1, '1'].includes(this.roleName) || this.isEmbed) {
             // 不需要登录
             this.chatLoginStatus = false;
             return;

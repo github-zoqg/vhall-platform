@@ -236,10 +236,13 @@
               open_id: open_id
             };
           } else {
-            //重新授权
-            payAuthStatus = 1;
-            const payUrl = buildPayUrl(this.$route);
-            authWeixinAjax(this.$route, payUrl, () => {});
+            // 嵌入页不需要授权
+            if (!this.isEmbed) {
+              //重新授权
+              payAuthStatus = 1;
+              const payUrl = buildPayUrl(this.$route);
+              authWeixinAjax(this.$route, payUrl, () => {});
+            }
           }
         } else {
           params = {
@@ -336,10 +339,10 @@
             avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
-            gift_user_nickname: this.joinInfoInGift.nickname,
+            nickname: this.joinInfoInGift.nickname,
             role_name: 2,
             gift_name: this.currentGift.name,
-            gift_image_url: this.currentGift.image_url,
+            gift_url: this.currentGift.image_url,
             source_status: this.currentGift.source_status
           };
           const context = {

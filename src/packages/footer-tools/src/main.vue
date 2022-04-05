@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-footer-tools" v-if="!isEmbedVideo">
+  <div class="vmp-footer-tools">
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
@@ -70,7 +70,7 @@
         <lottery-icon @clickIcon="checkLotteryIcon" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
-      <li>
+      <li v-if="!isEmbed">
         <red-packet-icon @clickIcon="checkredPacketIcon" />
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
@@ -212,10 +212,6 @@
       isEmbed() {
         // 是不是嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
-      },
-      isEmbedVideo() {
-        // 是不是音视频嵌入
-        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
