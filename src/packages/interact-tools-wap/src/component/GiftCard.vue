@@ -339,10 +339,10 @@
             avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
-            gift_user_nickname: this.joinInfoInGift.nickname,
+            nickname: this.joinInfoInGift.nickname,
             role_name: 2,
             gift_name: this.currentGift.name,
-            gift_image_url: this.currentGift.image_url,
+            gift_url: this.currentGift.image_url,
             source_status: this.currentGift.source_status
           };
           const context = {
