@@ -995,6 +995,7 @@
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
+      background-color: #292929;
     }
 
     // 发起端结束演示按钮

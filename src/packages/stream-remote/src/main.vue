@@ -37,7 +37,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleFilter(true) }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -67,7 +67,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleFilter(true) }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip
@@ -100,10 +100,7 @@
       </p>
 
       <p class="vmp-stream-remote__shadow-second-line" v-if="liveMode != 1">
-        <span
-          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
-          class="vmp-stream-local__shadow-label"
-        >
+        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           视图
         </span>
 
@@ -115,7 +112,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
+        <el-tooltip
+          :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          placement="bottom"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             :class="{
@@ -452,6 +452,9 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            if (this.joinInfo.role_name === 1) {
+              this.interactiveServer.resetLayout();
+            }
             setTimeout(() => {
               this.replayPlay();
 

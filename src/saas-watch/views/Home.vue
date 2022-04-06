@@ -2,7 +2,7 @@
   <div
     class="vmp-basic-layout"
     v-loading="state === 0"
-    element-loading-text="加载中..."
+    :element-loading-text="$t('common.common_1001')"
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
     <div
@@ -72,6 +72,7 @@
           !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         ) {
           this.goSubscribePage(this.clientType);
+          return false;
         }
         await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
@@ -143,7 +144,8 @@
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
