@@ -21,7 +21,7 @@
         <!-- 昵称和角色 -->
         <p class="msg-item__content-name clearfix">
           <span class="msg-item_content-name-nick">
-            {{ source.answer.nick_name | overHidden(5) }}
+            {{ source.answer.nick_name }}
           </span>
           <span class="msg-item_content-name-role" :class="source.answer.role_name">
             {{ source.answer.role_name | roleFilter }}
@@ -43,7 +43,7 @@
           <div class="vhsaas-chat-msg-item__content">
             <!-- 昵称和角色 -->
             <p class="msg-item__content-name clearfix">
-              <span class="msg-item_content-name-nick">{{ source.nick_name | overHidden(5) }}</span>
+              <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
               <!-- <span class="msg-item_content-name-role" :class="source.answer.role_name">
                 {{ source.role_name | roleFilter(this) }}
               </span> -->
@@ -66,7 +66,7 @@
       <div class="vhsaas-chat-msg-item__content">
         <!-- 昵称和角色 -->
         <p class="msg-item__content-name clearfix">
-          <span class="msg-item_content-name-nick">{{ source.nick_name | overHidden(5) }}</span>
+          <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
           <!-- <span
             class="msg-item_content-name-role"
             :class="msg.role_name"
@@ -247,7 +247,7 @@
     font-size: 14px;
     color: @font-dark-normal;
     line-height: 20px;
-    word-break: break-word;
+    word-break: break-all;
     &.reply-msg {
       margin-top: 0;
     }
