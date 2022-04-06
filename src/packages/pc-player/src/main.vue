@@ -128,7 +128,7 @@
             v-model="sliderVal"
             :show-tooltip="false"
             @change="changeVideo"
-            @input="inputVideo"
+            @mousedown.native="handleSliderMouseDown"
           ></el-slider>
         </div>
         <div
@@ -666,7 +666,7 @@
             }
           });
       },
-      inputVideo() {
+      handleSliderMouseDown() {
         // 鼠标拖动的时候，阻止slider值更新
         if (!this._isSetingCurrentTime) {
           this._isSetingCurrentTime = true;
@@ -681,6 +681,7 @@
       changeLanguage(key) {
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =

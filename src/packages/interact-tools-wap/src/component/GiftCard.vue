@@ -55,8 +55,7 @@
 </template>
 
 <script>
-  // import EventBus from '@/utils/Events';
-  import { debounce } from 'lodash';
+  // import { debounce } from 'lodash';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer } from 'middle-domain';
@@ -208,7 +207,8 @@
       /**
        * 赠送礼物
        */
-      giveGiftSubmit: debounce(function () {
+      giveGiftSubmit() {
+        this.close();
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
@@ -236,10 +236,13 @@
               open_id: open_id
             };
           } else {
-            //重新授权
-            payAuthStatus = 1;
-            const payUrl = buildPayUrl(this.$route);
-            authWeixinAjax(this.$route, payUrl, () => {});
+            // 嵌入页不需要授权
+            if (!this.isEmbed) {
+              //重新授权
+              payAuthStatus = 1;
+              const payUrl = buildPayUrl(this.$route);
+              authWeixinAjax(this.$route, payUrl, () => {});
+            }
           }
         } else {
           params = {
@@ -260,7 +263,7 @@
             this.payProcess(params);
           }
         }
-      }, 300),
+      },
       /**
        * 关闭礼物弹框
        */
@@ -333,7 +336,7 @@
           const msgData = {
             type: 'permit',
             event_type: 'free_gift_send',
-            avatar: this.joinInfoInGift.avatar,
+            gift_user_avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
             gift_user_nickname: this.joinInfoInGift.nickname,

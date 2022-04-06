@@ -2,7 +2,7 @@
   <div class="vmp-alert-wrap" v-show="visible">
     <div class="popup">
       <div class="recordboxHeader">
-        <span class="header-title">{{ title || '提示' || $t('account.account_1061') }}</span>
+        <span class="header-title">{{ title || $t('account.account_1061') }}</span>
         <a
           href="javascript:;"
           @click="onClose"

@@ -12,7 +12,7 @@
         class="vmp-member-item__avatar-wrapper__phone"
         width="9"
         height="12"
-        src="../img/phone.png"
+        :src="phoneImg"
         alt
       />
     </div>
@@ -276,6 +276,7 @@
 
 <script>
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
   export default {
     name: 'VmpMemberItem',
     filters: {
@@ -379,6 +380,8 @@
       return {
         //默认头像
         defaultAvatar: defaultAvatar,
+        //手机图片标识
+        phoneImg: phoneImg,
         //操作项
         operateList: [
           //设为主讲

@@ -430,10 +430,12 @@
       openLanguage() {
         this.isOpenlang = true;
       },
+      // 切换多语言
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =
@@ -514,9 +516,8 @@
         const activeId = this.$route.params.id;
         const { join_info } = this.roomBaseServer.state.watchInitData;
         const joinId = join_info.join_id;
-        const lang = localStorage.getItem('lang');
 
-        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
+        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}`;
 
         const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
 

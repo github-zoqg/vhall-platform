@@ -7,7 +7,7 @@ import { Toast } from 'vant';
  * @param {*} to
  * @returns
  */
-function buildLoginAddress(to) {
+export function buildLoginAddress(to) {
   //获取地址栏参数、设置请求路径
   let _search = '';
   if (location.search && location.search != '') {
@@ -139,8 +139,8 @@ export function handleAuth(params, path, _next) {
           duration: 0
         });
 
-        //直接进入主页面
-        // _next();
+        //直接进入后续流程路由
+        _next();
       }
     })
     .catch(res => {
@@ -149,9 +149,16 @@ export function handleAuth(params, path, _next) {
         position: 'center',
         duration: 0
       });
+      _next();
     });
 }
 
+/**
+ * 初始化微信sdk, 包括分享设置
+ * @param {*} initData
+ * @param {*} shareData
+ * @returns
+ */
 export function initWeChatSdk(initData = {}, shareData = {}) {
   const configParams = {
     debug: false,
@@ -191,6 +198,11 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
   });
 }
 
+/**
+ * 隐藏微信菜单选项
+ * @param {*} initData
+ * @param {*} failedCb
+ */
 export function initHideChatSdk(initData = {}, failedCb = () => {}) {
   let hideConfigSdk = {
     debug: false,
@@ -265,7 +277,7 @@ export function authWeixinAjax(to, address, _next) {
 }
 
 // init微信授权跳转逻辑
-export async function authCheck(to, next) {
+export async function wxAuthCheck(to, next) {
   let _next = next;
 
   // 若当前用户已登录过，直接进入界面。
@@ -279,13 +291,12 @@ export async function authCheck(to, next) {
     handleThirdLoginOrPay(_next);
   } else {
     // 观看页和嵌入页需要微信授权
-    if (!/watch|subscribe/.test(to.path)) {
+    if (!/watch|subscribe/.test(to.path) || /embed/.test(to.path)) {
       // 不是 预约/观看 或者 嵌入情况， 直接进入
       next();
     } else {
       // 微信登录鉴权
       let roomBaseServer = useRoomBaseServer();
-      console.log('authCheck roomBaseServer-------->', roomBaseServer);
       //获取房间权限配置列表
       await roomBaseServer.getConfigList({
         webinar_id: to.params.id,
@@ -301,7 +312,7 @@ export async function authCheck(to, next) {
       // 判断是否admin开启了微信授权开关
       if (
         roomBaseServer.state.configList &&
-        roomBaseServer.state.configList['ui.hide_wechat'] == '1'
+        roomBaseServer.state.configList['ui.hide_wechat'] == 0
       ) {
         let address = buildLoginAddress(to);
         authWeixinAjax(to, address, _next);

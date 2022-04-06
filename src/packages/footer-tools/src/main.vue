@@ -282,9 +282,11 @@
         this.showPay = true;
         this[data] = url;
       },
+      // 切换语言
       changeLang(key) {
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =

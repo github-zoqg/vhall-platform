@@ -132,14 +132,12 @@
   };
 </script>
 <style lang="less">
-  body {
-    overflow-y: auto;
-  }
   .vmp-subscribe-container {
     .vmp-basic-container {
       width: 100%;
       height: 100%;
       background: #1a1a1a;
+      overflow-y: auto;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;
       .vmp-basic-bd {
@@ -157,8 +155,9 @@
     }
     .vmp-container-embed {
       width: 100%;
-      height: 100%;
+      height: 100vh;
       background: #1a1a1a;
+      overflow: hidden;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;
       .vmp-basic-bd {
