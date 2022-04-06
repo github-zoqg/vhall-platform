@@ -107,7 +107,9 @@
     watch: {
       chatList: function () {
         if (this.isBottom()) {
-          this.scrollBottom();
+          setTimeout(() => {
+            this.scrollBottom();
+          }, 0);
         }
       }
     },
