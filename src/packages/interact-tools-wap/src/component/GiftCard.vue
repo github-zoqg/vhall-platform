@@ -55,8 +55,7 @@
 </template>
 
 <script>
-  // import EventBus from '@/utils/Events';
-  import { debounce } from 'lodash';
+  // import { debounce } from 'lodash';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer } from 'middle-domain';
@@ -208,7 +207,7 @@
       /**
        * 赠送礼物
        */
-      giveGiftSubmit: debounce(function () {
+      giveGiftSubmit() {
         this.close();
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
@@ -264,7 +263,7 @@
             this.payProcess(params);
           }
         }
-      }, 300),
+      },
       /**
        * 关闭礼物弹框
        */
