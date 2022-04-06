@@ -109,6 +109,7 @@
       chatList: function () {
         if (this.isBottom()) {
           this.scrollBottom();
+          this.scrollBottom();
         }
       }
     },
