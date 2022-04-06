@@ -37,22 +37,22 @@
       }
     },
     methods: {
-      getGrayConfig() {
-        return this.roomBaseServer
-          .webinarInitBefore({
-            webinar_id: this.webinar_id
-          })
-          .then(res => {
-            if (res.code == 200 && res.data) {
-              sessionStorage.setItem(`V3_WAP_US_${this.webinar_id}`, res.data.user_id);
-            } else {
-              console.log(`灰度ID-获取活动by用户信息失败~${res.msg}`);
-            }
-          })
-          .catch(e => {
-            console.log(`灰度ID-获取活动by用户信息失败~${e}`);
-          });
-      },
+      // getGrayConfig() {
+      //   return this.roomBaseServer
+      //     .webinarInitBefore({
+      //       webinar_id: this.webinar_id
+      //     })
+      //     .then(res => {
+      //       if (res.code == 200 && res.data) {
+      //         sessionStorage.setItem(`V3_WAP_US_${this.webinar_id}`, res.data.user_id);
+      //       } else {
+      //         console.log(`灰度ID-获取活动by用户信息失败~${res.msg}`);
+      //       }
+      //     })
+      //     .catch(e => {
+      //       console.log(`灰度ID-获取活动by用户信息失败~${e}`);
+      //     });
+      // },
       // 报名表单独立链接是否有效
       getFormOpenLinkStatus() {
         this.entryformServer

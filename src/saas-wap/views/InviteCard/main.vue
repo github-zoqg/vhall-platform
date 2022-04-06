@@ -9,6 +9,7 @@
 
 <script>
   import invitationCard from './components/card.vue';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     components: {
       invitationCard
@@ -18,12 +19,15 @@
         invite: ''
       };
     },
-    created() {
-      if (this.$route.query.lang == 1 || this.$route.query.lang == 2) {
-        this.$i18n.locale = parseInt(this.$route.query.lang) == 1 ? 'zh' : 'en';
-      } else {
-        this.$i18n.locale = 'zh';
-      }
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    async created() {
+      await this.roomBaseServer.getLangList(this.$route.params.id);
+      const roomBaseState = this.roomBaseServer.state;
+      document.title = roomBaseState.languages.curLang.subject;
+      let lang = roomBaseState.languages.lang;
+      this.$i18n.locale = lang.type;
     },
     methods: {
       toWebinar() {

@@ -21,11 +21,18 @@
             <!-- 基础设置 -->
             <basic-setting v-show="selectedMenuItem === 'basic-setting'" />
             <!-- 摄像头 -->
-            <video-setting ref="videoSetting" v-show="selectedMenuItem === 'video-setting'" />
+            <video-setting
+              ref="videoSetting"
+              v-show="selectedMenuItem === 'video-setting'"
+              :selected-item="selectedMenuItem"
+            />
             <!-- 麦克风 -->
             <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
             <!-- 扬声器 -->
-            <audio-out-setting v-show="selectedMenuItem === 'audio-out-setting'" />
+            <audio-out-setting
+              ref="audioOutSetting"
+              v-show="selectedMenuItem === 'audio-out-setting'"
+            />
           </main>
 
           <!-- 底部按钮区域 -->
@@ -193,7 +200,8 @@
        */
       closeMediaSetting() {
         this.isShow = false;
-        this.$refs['videoSetting'].destroyStream();
+        this?.$refs['videoSetting']?.destroyStream();
+        this?.$refs['audioOutSetting']?.pauseAudio();
       },
       /**
        * 点击对话框确认按钮（保存）的回调
@@ -225,7 +233,7 @@
           this.setDefaultVideoType();
           await this.getDevices();
           this.setDefaultSelected();
-          this.$refs['videoSetting'].createPreview();
+          this.selectedMenuItem === 'video-setting' && this.$refs['videoSetting'].createPreview();
           this.getStateCapture();
           this.loading = false;
         } catch (error) {
