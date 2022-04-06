@@ -141,7 +141,7 @@
       </main>
 
       <!-- 邀请观看 -->
-      <aside v-if="isInviteCardMode" class="invite-friends">
+      <aside v-if="isInviteCardMode && !isEmbed" class="invite-friends">
         <span @click="showInviteFriends">{{ $t('nav.nav_1042') }}</span>
       </aside>
     </div>
@@ -196,6 +196,9 @@
       },
       isInviteCardMode() {
         return this.$domainStore.state.roomBaseServer.inviteCard.status == '1';
+      },
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       watchInitData() {
         return this.$domainStore.state.roomBaseServer.watchInitData;

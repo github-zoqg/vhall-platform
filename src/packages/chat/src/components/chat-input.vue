@@ -2,7 +2,7 @@
   <div class="vmp-chat-input">
     <div
       :class="['vmp-chat-input__textarea-box', { 'is-watch': isWatch }]"
-      v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
+      v-show="!inputStatus.disable && (!chatLoginStatus || isEmbed)"
     >
       <textarea
         id="chat-textarea"
@@ -29,10 +29,10 @@
     </div>
 
     <div
-      v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
+      v-show="inputStatus.disable || chatLoginStatus"
       :class="['vmp-chat-input__textarea-placeholder', { 'is-watch': isWatch }]"
     >
-      <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
+      <span v-show="chatLoginStatus && !isEmbed" class="textarea-placeholder_no-login">
         <i18n path="chat.chat_1001">
           <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
         </i18n>

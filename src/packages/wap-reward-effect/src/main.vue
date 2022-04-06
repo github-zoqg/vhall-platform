@@ -30,7 +30,8 @@
             rewardEffectInfo.data.event_type == 'free_gift_send'
           "
         >
-          {{ rewardEffectInfo.data.gift_name }}
+          <!-- 礼物标题 -->
+          送出{{ rewardEffectInfo.data.gift_name }}
           <!-- <span class="count">
               <span class="multiple">x</span>
               {{ rewardEffectInfo.num }}
@@ -118,7 +119,8 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000
+        minTaskTime: 2000,
+        maxQueueLen: 2
       });
 
       //测试数据

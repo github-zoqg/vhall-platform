@@ -140,7 +140,7 @@ export default {
         const msgData = {
           type: 'permit',
           event_type: 'free_gift_send',
-          avatar: this.watchInitData.join_info.avatar,
+          gift_user_avatar: this.watchInitData.join_info.avatar,
           barrageTxt: '',
           text_content: '',
           gift_user_nickname: this.watchInitData.join_info.nickname,

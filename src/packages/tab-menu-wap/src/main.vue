@@ -232,7 +232,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.embedObj.embed && this.webinarInfo.type == 1) {
+          if (this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });
@@ -632,13 +632,14 @@
         }
 
         .tips {
-          display: inline-block;
+          position: absolute;
           width: 4px;
           height: 4px;
           border-radius: 50%;
           background: #ff0005;
           border: 9px solid #ff0005;
-          transform: translate(30%, -100%);
+          right: 18px;
+          top: 10px;
         }
 
         .bottom-line {
