@@ -606,7 +606,7 @@ export const serverConfig = {
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ],
-    openInsertFileDialog: [
+    emitOpenInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
         method: 'openInsertFileDialog',
