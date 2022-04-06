@@ -64,6 +64,12 @@
     components: {
       PictureUploader
     },
+    props: {
+      selectedItem: {
+        type: String,
+        default: 'basic-setting'
+      }
+    },
     data() {
       return {
         mediaState: this.mediaSettingServer.state,
@@ -74,13 +80,25 @@
       };
     },
     computed: {
+      isVideoSettingActive() {
+        return this.selectedItem === 'video-setting';
+      },
       devices() {
         return this.mediaState.devices.videoInputDevices;
       }
     },
     watch: {
+      selectedItem(val) {
+        if (val === undefined || val === '') return;
+        if (val === 'video-setting') {
+          this.createPreview();
+        } else {
+          this.destroyStream();
+        }
+      },
       'mediaState.video'(val) {
         if (val === undefined || val === '') return;
+        if (!this.isVideoSettingActive) return;
         this.createPreview();
       }
     },
