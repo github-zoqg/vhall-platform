@@ -252,7 +252,7 @@
 
 <style lang="less" scoped>
   .lottery-popup {
-    height: calc(100% - 522px);
+    height: calc(100% - 422px);
   }
   .title-bar {
     position: relative;

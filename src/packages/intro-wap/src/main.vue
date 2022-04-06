@@ -29,7 +29,11 @@
         </main>
         <div
           class="vmp-intro-block__auth"
-          v-if="watchInitData.status == 'subscribe' && watchInitData.join_info.is_subscribe != 1"
+          v-if="
+            !isEmbed &&
+            watchInitData.status == 'subscribe' &&
+            watchInitData.join_info.is_subscribe != 1
+          "
         >
           <span>
             {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}
@@ -59,7 +63,6 @@
         <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header>
         <main class="vmp-intro-block__content-main" v-html="content"></main>
       </section>
-
       <aside>
         <a
           class="vmp-intro-link"
@@ -108,6 +111,10 @@
       // 开始时间 Type:String
       startTime() {
         return this?.webinar?.start_time?.substr(0, 16) || '';
+      },
+      // 是否为嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       languagesInfo() {
         return this.$domainStore.state.roomBaseServer.languages.curLang;

@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="vmp-basic-layout"
-    :class="{
-      'vmp-basic-layout__noHeader': !showHeader
-    }"
-  >
+  <div class="vmp-basic-layout">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -21,7 +16,7 @@
       {{ $t('common.common_1001') }}
     </van-loading>
     <div class="vmp-basic-container" v-if="state === 1">
-      <vmp-air-container cuid="layerRoot"></vmp-air-container>
+      <vmp-air-container cuid="embedVideoLayerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
   </div>
@@ -29,11 +24,9 @@
 
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import roomState from '../headless/room-state.js';
-  import bindWeiXin from '../headless/bindWeixin.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import roomState from '../../headless/embed-video-state.js';
   import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
-  import MsgTip from './MsgTip.vue';
+  import MsgTip from '../MsgTip.vue';
 
   export default {
     name: 'Home',
@@ -46,50 +39,19 @@
         liveErrorTip: ''
       };
     },
-    computed: {
-      /**
-       * 是否显示头部
-       */
-      showHeader() {
-        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
-          return false;
-        } else {
-          return true;
-        }
-      },
-      // 是否为嵌入页
-      embedObj() {
-        return this.$domainStore.state.roomBaseServer.embedObj;
-      },
-      // 主办方配置
-      webinarTag() {
-        return this.$domainStore.state.roomBaseServer.webinarTag;
-      }
-    },
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
-        let clientType = 'standard';
+        let clientType = 'embed';
         // 初始化直播房间
         const roomBaseServer = useRoomBaseServer();
-        // 判断是否是嵌入/单视频嵌入
-        try {
-          const _param = {
-            isEmbed: false,
-            isEmbedVideo: false
-          };
-          if (location.pathname.indexOf('embedclient') != -1) {
-            _param.isEmbed = true;
-            clientType = 'embed';
-          }
-          if (getQueryString('embed') == 'video') {
-            _param.isEmbedVideo = true;
-          }
-          roomBaseServer.setEmbedObj(_param);
-        } catch (e) {
-          console.log('嵌入', e);
-        }
+        // 单视频嵌入
+        roomBaseServer.setEmbedObj({
+          isEmbed: true,
+          isEmbedVideo: true
+        });
+
         const domain = await this.initReceiveLive(clientType);
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
           // 是否跳转预约页
@@ -97,7 +59,6 @@
           return;
         }
         await roomState();
-        bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
         const roomBaseState = roomBaseServer.state;
@@ -152,7 +113,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
+          plugins: ['chat', 'player'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
@@ -218,3 +179,10 @@
     }
   };
 </script>
+<style lang="less">
+  .vmp-basic-layout {
+    .vmp-basic-bd {
+      margin-top: 55%;
+    }
+  }
+</style>
