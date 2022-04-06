@@ -505,6 +505,7 @@
             });
             return list;
           }
+          return list;
         };
       },
       //tab栏的配置
@@ -613,15 +614,20 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     async mounted() {
       await this.getFormLinkStatus();
-      await useRoomBaseServer().getLangList(this.$route.params.id);
-      if (localStorage.getItem('lang')) {
-        this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
-      } else {
-        this.$i18n.locale = 'zh';
-      }
+      await this.roomBaseServer.getLangList(this.$route.params.id);
+      const roomBaseState = this.roomBaseServer.state;
+      document.title = roomBaseState.languages.curLang.subject;
+      let lang = roomBaseState.languages.lang;
+      this.$i18n.locale = lang.type;
+      // if (localStorage.getItem('lang')) {
+      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      // } else {
+      //   this.$i18n.locale = 'zh';
+      // }
       this.getWebinarType();
       this.getBaseInfo();
       this.getQuestionList();
