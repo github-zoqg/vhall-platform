@@ -32,14 +32,15 @@
         @click="handleClickItem('desktopShare')"
         class="menu-item"
         :class="[
-          selectedMenu === 'desktopShare' ? 'selected' : '',
-          disableMenus.includes('desktopShare') ? 'disable' : ''
+          disableMenus.includes('desktopShare') ? 'disable' : '',
+          { highlight: isShareScreen }
         ]"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
-        <span>桌面共享</span>
+        <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
       </li>
       <li
+        v-if="isInGroup"
         @click="handleClickItem('assistance')"
         class="menu-item"
         :class="[
@@ -54,134 +55,371 @@
     <span class="menu-fold" v-show="isCollapse" @click="handleToggle()">
       <i class="vh-iconfont vh-line-s-unfold"></i>
     </span>
+
+    <!-- 邀请演示对话框 -->
+    <GroupInvitaion
+      ref="groupInvitaion"
+      :show.sync="dialogVisibleInvite"
+      :senderId="senderId"
+      :inviteName="inviteName"
+      :inviteGroupId="inviteGroupId"
+    ></GroupInvitaion>
   </div>
 </template>
 <script>
-  import { useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import GroupInvitaion from './group-invitation.vue';
 
   export default {
     name: 'VmpWatchAsideMenu',
+    components: {
+      GroupInvitaion
+    },
     data() {
       return {
         isCollapse: true,
         selectedMenu: '',
-        disableMenus: ['document', 'board', 'desktopShare', 'assistance']
+        dialogVisibleInvite: false, //邀请演示对话框是否显示
+        senderId: '', //邀请人id
+        inviteName: '', //邀请人身份
+        inviteGroupId: '' //被邀请时用户所在分组，默认在主直播间，为空
       };
     },
     computed: {
+      currentCid() {
+        return this.docServer.state.currentCid;
+      },
+      disableMenus() {
+        if (this.hasDocPermission) {
+          if (this.isShareScreen) {
+            return ['document', 'board'];
+          }
+          return [];
+        }
+        return ['document', 'board', 'desktopShare'];
+      },
       webinarMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      // 当前用户Id
+      userId() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      // 当前的演示者Id
+      presenterId() {
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      // 是否在小组中，请求协助菜单在小组中才显示
+      isInGroup() {
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
+      // 是否文档演示权限
+      hasDocPermission() {
+        if (this.isWatch && [4, 5].includes(this.webinarType)) {
+          // 对于观看端 && 点播和回放，所有人都没有文档演示权限
+          return false;
+        }
+        // 当前用户是否演示者
+        return this.presenterId == this.userId;
+      },
+      // 是否在桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 主持人ID 分组期间使用
+      userinfoId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
+      }
+    },
+    watch: {
+      // 检测演示人变化
+      ['groupServer.state.groupInitData.presentation_screen'](presenterId) {
+        if (presenterId && presenterId == this.userId) {
+          this.isCollapse = false;
+        } else {
+          this.isCollapse = true;
+        }
+      },
+      // 主房间内检测演示人变化
+      ['roomBaseServer.state.interactToolStatus.presentation_screen'](presenterId) {
+        if (presenterId && presenterId == this.userId) {
+          this.isCollapse = false;
+        } else {
+          this.isCollapse = true;
+        }
+      },
+      ['docServer.state.currentCid'](newval) {
+        if (newval) {
+          const t = newval.split('-')[0];
+          if (t) {
+            this.selectedMenu = t;
+          }
+        }
       }
     },
     beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
       this.groupServer = useGroupServer();
     },
     mounted() {
       this.initEvent();
-      this.resetMenus();
+
+      if (this.presenterId == this.userId) {
+        this.isCollapse = false;
+        if (!this.selectedMenu) {
+          // 默认选中文档文档
+          this.selectedMenu = 'document';
+        }
+      }
     },
     methods: {
       initEvent() {
         // 开启分组讨论
-        this.groupServer.$on('dispatch_group_switch_start', () => {
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
           if (this.groupServer.state.groupInitData.isInGroup) {
-            this.resetMenus();
-            this.gobackHome(1, this.groupServer.state.groupInitData.name);
+            if (this.groupServer.state.groupInitData.join_role == 20) {
+              // 如果是组长，默认展开菜单,选中文档
+              this.isCollapse = false;
+              this.selectedMenu = 'document';
+            }
+            this.grouAlert(
+              `${
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+              }开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
+            );
           }
         });
+
         // 结束分组讨论
-        this.groupServer.$on('dispatch_group_switch_end', () => {
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          // 关闭邀请演示对话框
+          this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
-          this.resetMenus();
-          this.gobackHome(3, this.groupServer.state.groupInitData.name);
+          if (!msg.data.groupToast) {
+            this.grouAlert(
+              `${
+                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+              }结束了分组讨论，您将返回主直播间`
+            );
+          }
         });
 
         // 小组解散
-        this.groupServer.$on('dispatch_group_disband', () => {
+        this.groupServer.$on('GROUP_DISBAND', msg => {
+          // 关闭邀请演示对话框
+          this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
-          this.resetMenus();
-          this.gobackHome(4);
+          this.grouAlert(
+            `${
+              msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
+            }解散了分组，您将返回主直播间`
+          );
+        });
+
+        // 接收设为主讲人消息
+        this.groupServer.$on('VRTC_BIG_SCREEN_SET', msg => {
+          const str =
+            this.roomBaseServer.state.watchInitData.webinar.mode == 6
+              ? '主画面'
+              : this.$t('interact.interact_1034');
+          this.groupMessage(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }), {
+            type: 'success'
+          });
+        });
+
+        // 切换小组,小组人员变动
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, groupJoinChangeInfo) => {
+          if (this.isInGroup) {
+            const { watchInitData } = useRoomBaseServer().state;
+            if (groupJoinChangeInfo && groupJoinChangeInfo.isNeedCare === false) return;
+            const who =
+              msg.sender_id == watchInitData.webinar.userinfo.user_id
+                ? this.$getRoleName(1)
+                : this.$getRoleName(3);
+            this.grouAlert(`${who}已将您分配至${this.groupServer.state.groupInitData.name}`);
+          }
         });
 
         // 本人被踢出来
-        this.groupServer.$on('dispatch_room_group_kickout', () => {
-          this.isCollapse = true;
-          this.resetMenus();
-          this.gobackHome(5, this.groupServer.state.groupInitData.name);
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          const { interactToolStatus, watchInitData } = useRoomBaseServer().state;
+          // 如果已经开启了讨论，而且被踢出的人是自己
+          if (
+            interactToolStatus.is_open_switch == 1 &&
+            msg.data.target_id === watchInitData.join_info.third_party_user_id
+          ) {
+            // 关闭邀请演示对话框
+            this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
+            // 折叠菜单并提示
+            this.isCollapse = true;
+            this.grouAlert('您已被踢出该小组');
+          }
         });
 
         // 组长变更
-        this.groupServer.$on('dispatch_group_leader_change', () => {
-          this.isCollapse = true;
-          this.resetMenus();
-          console.log('[group] 组长变更：', this.groupServer.state.groupInitData.join_role);
-          if (this.groupServer.state.groupInitData.join_role === 20) {
-            this.gobackHome(6);
-          } else {
-            this.gobackHome(7);
+        this.groupServer.$on('GROUP_LEADER_CHANGE', () => {
+          if (this.isInGroup) {
+            if (this.presenterId != this.userId) {
+              //  如果演示者不是自己
+              this.isCollapse = true;
+            }
+            if (this.presenterId == this.userId) {
+              this.isCollapse = false;
+              if (!this.selectedMenu) {
+                // 默认选中文档文档
+                this.selectedMenu = 'document';
+              }
+            }
+
+            if (this.groupServer.state.groupInitData.join_role == 20) {
+              this.grouAlert('您被提升为组长');
+            } else {
+              this.grouAlert('组长身份已变更');
+            }
+          }
+        });
+
+        // 观看端监听到邀请演示的消息处理
+        // (主直播间主持人邀请其它成员演示，小组内组长邀请其它成员演示)
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION', msg => {
+          // 如果是自己被邀请
+          if (this.userId == msg.data.target_id) {
+            this.senderId = msg.sender_id; // 邀请人id
+            // 邀请人身份
+            this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人';
+            // 被邀请人当时所在小组
+            this.inviteGroupId = this.groupServer.state.groupInitData?.group_id;
+            this.dialogVisibleInvite = true;
+          }
+        });
+
+        // 观看端收到拒绝邀请演示，只能是小组内
+        this.groupServer.$on('VRTC_CONNECT_PRESENTATION_REFUSED', msg => {
+          const { join_role, isInGroup } = this.groupServer.state.groupInitData;
+          // 如果是组长，并且在小组内
+          if (join_role == 20 && isInGroup && msg.data.extra_params == this.userId) {
+            this.groupMessage(`观众${msg.data.nick_name}拒绝了你的演示邀请`);
+          }
+        });
+
+        // 同意演示/我要演示成功
+        this.groupServer.$on('VRTC_PRESENTATION_SCREEN_SET', ({ isOldPresenter, isOldLeader }) => {
+          if (isOldLeader || isOldPresenter) {
+            this.groupMessage('演示权限已变更');
+          }
+        });
+
+        // 观看端-结束演示成功
+        // 前置说明: 该组件只在观看端使用，角色只有观众和组长
+        this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
+          if (msg.data.room_role == 1 && msg.sender_id == msg.data.room_join_id) {
+            // 主持人结束了主持人自己的演示
+            this.groupMessage('主持人结束了演示');
+          } else if (
+            msg.data.room_role == 2 &&
+            msg.sender_id == this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id
+          ) {
+            // 主持人结束了观众的演示
+            if (msg.data.room_join_id == this.userId) {
+              this.groupMessage('演示权限已变更');
+            }
+          } else if (msg.data.room_role == 2 && msg.sender_id == msg.data.room_join_id) {
+            // 观众结束了观众自己的演示
+            if (msg.data.room_join_id != this.userId) {
+              this.groupMessage(`观众${msg.data.nick_name}结束了演示`);
+            }
+          } else if (msg.data.room_role == 2) {
+            // 组长结束了观众的演示
+            if (msg.data.room_join_id == this.userId) {
+              this.groupMessage('演示权限已变更');
+            }
+          }
+          if (this.presenterId === this.userId) {
+            // 如果结束后演示者是自己，说明是演示权限回收
+            // 通知文档重设笔刷, 后面可以考虑当前笔刷放到文档server中
+            window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitDocResetBrush'));
           }
         });
       },
-      // 返回主房间提示
-      gobackHome(index, name) {
-        let title = '';
-        switch (index) {
-          case 1:
-            title = '主持人开启了分组讨论，您将进入' + name + '组参与讨论';
-            break;
-          case 2:
-            title = '主持人已将您分配至' + name + '组';
-            break;
-          case 3:
-            title = '主持人结束了分组讨论，您将返回主直播间';
-            break;
-          case 4:
-            title = '主持人解散了分组，您将返回主直播间';
-            break;
-          case 5:
-            title = '您已被踢出该小组';
-            break;
-          case 6:
-            title = '您被提升为组长!';
-            break;
-          case 7:
-            title = '组长身份已变更';
-            break;
-        }
-        this.$alert(title, '提示', {
+
+      /**
+       * 弹窗提示
+       * @param {*} message
+       */
+      grouAlert(message) {
+        this.$alert(message, '提示', {
           confirmButtonText: '我知道了',
-          customClass: 'know-message-box',
+          customClass: 'zdy-message-box',
           lockScroll: false,
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {})
           .catch(() => {});
       },
-      resetMenus() {
-        // if 直播中，在小组中，并且开启讨论
-        // （1）主讲人：全部菜单可用
-        // （2）普通组员：只有请求协助按钮可用
-        // else
-        //  菜单都是禁用状态
-        if (this.docServer.state.hasDocPermission) {
-          this.disableMenus = [];
-          this.selectedMenu = 'document';
-        } else {
-          this.disableMenus = ['document', 'board', 'desktopShare'];
-        }
+
+      /**
+       * message提示
+       * @param {String} message 提示文本
+       */
+      groupMessage(message, options) {
+        this.$message(
+          Object.assign(
+            { message: message, showClose: true, type: 'warning', customClass: 'zdy-info-box' },
+            options
+          )
+        );
       },
+
+      /**
+       * 展开/折叠菜单
+       */
       handleToggle() {
         this.isCollapse = !this.isCollapse;
       },
+
+      /**
+       * 点击菜单事件
+       * @param {String} kind 菜单类型
+       * document - 文档
+       * board - 白板
+       * assistance - 请求协助
+       * desktopShare - 桌面共享
+       */
       handleClickItem(kind) {
         if (this.disableMenus.includes(kind)) return false;
-        this.selectedMenu = kind;
-        if (this.disable) return false;
-
         if (kind === 'document' || kind === 'board') {
+          // 点击文档或白板
+          this.selectedMenu = kind;
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'handleClickDoc', [kind]));
+        } else if (kind === 'assistance') {
+          // 点击请求协助
+          this.groupServer
+            .needHelp()
+            .then(res => {
+              if (res.code == 200) {
+                this.groupMessage(this.$t('other.other_1005'), { type: 'success' });
+              }
+            })
+            .catch(err => {
+              console.info('请求协助发送异常', err);
+            });
+        } else if (kind === 'desktopShare') {
+          // 点击桌面共享
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'handleClickDesktopScreen', [this.isShareScreen])
+          );
         }
       }
     }
@@ -193,7 +431,7 @@
       position: absolute;
       z-index: 6;
       left: 0;
-      bottom: 60%;
+      top: 102px;
       cursor: pointer;
       display: inline-block;
       width: 32px;
@@ -216,6 +454,7 @@
       bottom: 0;
       display: flex;
       width: 60px;
+      height: calc(100% - 56px);
       background: rgba(42, 42, 42, 0.9);
       overflow: hidden;
       border-radius: 4px 0 0 0;
@@ -230,6 +469,16 @@
         padding: 10px 0;
         span {
           user-select: none;
+        }
+
+        &:not(.disable):hover {
+          color: #fb3a32;
+          cursor: pointer;
+        }
+
+        &.highlight {
+          color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {

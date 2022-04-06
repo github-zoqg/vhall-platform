@@ -2,32 +2,39 @@
   <div class="vmp-watch-private-chat-msg-template">
     <!--头像-->
     <div class="msg-item__avatar">
-      <img class="msg-item__avatar__img" :src="msg.context.avatar || defaultAvatar" alt />
+      <img class="msg-item__avatar__img" :src="source.avatar || defaultAvatar" alt />
     </div>
     <!--内容-->
     <div class="msg-item__content">
       <!-- 昵称和角色 -->
       <div class="msg-item__content__name">
         <div class="msg-item__content__info-wrap">
-          <span class="msg-item__content__nick-name">{{ msg.context.nick_name }}</span>
+          <span class="msg-item__content__nick-name">{{ source.nickname }}</span>
           <span
             class="msg-item__content__role-name"
-            :class="msg.context.role_name | roleClassFilter"
-            v-if="showRoleName(msg.context.role_name)"
+            :class="source.roleName | roleClassFilter"
+            v-if="source.roleName && source.roleName != 2"
           >
-            {{ msg.context.role_name | roleFilter }}
+            {{ source.roleName | roleFilter }}
           </span>
         </div>
-        <span class="msg-item__content__time">{{ msg.date_time.slice(-8) }}</span>
+
+        <span class="msg-item__content__time">
+          {{ source.sendTime && source.sendTime.slice(-8) }}
+        </span>
       </div>
       <!-- 文本 -->
-      <p v-if="msg.data" class="msg-item__content__content-text" v-html="messageContent"></p>
+      <p
+        v-if="source.content.text_content"
+        class="msg-item__content__content-text"
+        v-html="messageContent"
+      ></p>
     </div>
   </div>
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/images/my-dark@2x.png';
+  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
   export default {
     name: 'VmpWatchPrivateChatMsgTemplate',
     filters: {
@@ -43,61 +50,15 @@
         }
         //游客
         return 'guest';
-      },
-      //角色转换
-      roleFilter(value) {
-        let ret = '';
-        switch (Number(value)) {
-          case 1:
-            ret = '主持人';
-            break;
-          case 3:
-            ret = '助理';
-            break;
-          case 4:
-            ret = '嘉宾';
-            break;
-          case 20:
-            ret = '组长';
-            break;
-          default:
-            ret = '';
-        }
-        return ret;
       }
     },
     props: {
       //消息信息
-      msg: {
+      source: {
         type: Object,
         default: () => {
           return {};
         }
-      }
-    },
-    computed: {
-      //是否展示用户角色角标
-      showRoleName() {
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = '主持人';
-              break;
-            case 3:
-              ret = '助理';
-              break;
-            case 4:
-              ret = '嘉宾';
-              break;
-            case 20:
-              ret = '组长';
-              break;
-            default:
-              ret = '';
-          }
-          return ret !== '';
-        };
       }
     },
     data() {
@@ -114,8 +75,8 @@
     methods: {
       //处理消息内容
       handleMessageContent() {
-        if (this.msg.data) {
-          this.messageContent = this.urlToLink(this.msg.data);
+        if (this.source.content) {
+          this.messageContent = this.urlToLink(this.source.content.text_content);
         }
       },
       // 将聊天消息中的链接用 a 标签包裹
@@ -130,6 +91,7 @@
         const strArr = str.split(regImg);
         // eslint-disable-next-line no-useless-escape
         const regUrl =
+          // eslint-disable-next-line no-useless-escape
           /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g;
 
         // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹

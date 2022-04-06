@@ -59,20 +59,16 @@
       },
       // 统一默认入口
       init() {
-        console.log('默认第三方请求地址....', this.$route);
-        // TODO: 后端的地址
-        // const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
-        const hostPath = 'https://t-saas-dispatch.vhall.com/v3';
         // 第三方登录后 回调地址 - 待确定如何书写
         // 前端回传地址
-        // const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/middle/${this.$route.params.il_id}?purpose=login`;
-        const jumpUrlPath = `${window.location.origin}/lives/watch/${this.roomId}`;
-        console.log('🚀 ~ file: third-login-link.vue ~ line 70 ~ init ~ jumpUrlPath', jumpUrlPath);
+        const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.roomId}`;
         // 第三方登录地址
         this.options.wxPath =
-          `${hostPath}/commons/auth/weixin?source=pc&jump_url=` + encodeURIComponent(jumpUrlPath);
+          `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=` +
+          encodeURIComponent(jumpUrlPath);
         this.options.qqPath =
-          `${hostPath}/commons/auth/qq?source=pc&jump_url=` + encodeURIComponent(jumpUrlPath);
+          `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?source=pc&jump_url=` +
+          encodeURIComponent(jumpUrlPath);
       }
     },
     created() {
@@ -81,16 +77,12 @@
   };
 </script>
 <style lang="less">
-  @iconpath: '../images';
-  .vmp-third-layout {
-    margin-top: auto;
-  }
   .vmp-third-remark {
     text-align: center;
     height: 17px;
     font-size: 12px;
     font-weight: 400;
-    color: #999999;
+    color: #999;
     line-height: 17px;
     &.height__max {
       padding-top: 8px;
@@ -115,19 +107,19 @@
     }
   }
   .vmp-third__login__qq {
-    background: url('@{iconpath}/qq@2x.png') center center no-repeat;
+    background: url('../images/qq@2x.png') center center no-repeat;
     background-size: 100% 100%;
     margin-right: 16px;
     &:hover {
-      background: url('@{iconpath}/qq_hover@2x.png') center center no-repeat;
+      background: url('../images/qq_hover@2x.png') center center no-repeat;
       background-size: 100% 100%;
     }
   }
   .vmp-third__login__wechat {
-    background: url('@{iconpath}/wechat@2x.png') center center no-repeat;
+    background: url('../images/wechat@2x.png') center center no-repeat;
     background-size: 100% 100%;
     &:hover {
-      background: url('@{iconpath}/wechat_hover@2x.png') center center no-repeat;
+      background: url('../images/wechat_hover@2x.png') center center no-repeat;
       background-size: 100% 100%;
     }
   }

@@ -4,19 +4,19 @@
     <!-- 左: 选择文档等操作 -->
     <div class="vmp-doc-toolbar__hd" v-show="hasDocPermission">
       <div v-show="currentType !== 'board'" class="choose-document" @click="openDocDlglist">
-        {{ $t('usual.chooseDocument') }}
+        {{ $t('doc.doc_1012') }}
       </div>
-
       <!-- 观看端没有观众可见的按钮 -->
-      <div class="audience-visible" v-if="!isWatch">
+      <div class="audience-visible" v-if="!isWatch && !isInGroup">
         <span style="margin-right: 5px">
-          {{ $t('usual.audienceVisible') }}
+          {{ $t('doc.doc_1013') }}
         </span>
         <div class="audience-visible__swith">
           <el-switch
             @click.native="handleSwitchStatus"
             v-model="switchStatus"
-            active-color="#13ce66"
+            active-color="#fb3a32"
+            inactive-color="#cecece"
           ></el-switch>
           <!-- 提示 -->
           <div class="audience-tip" v-show="showAudienceTip">
@@ -36,7 +36,7 @@
         <!-- 选择 -->
         <div
           class="vmp-icon-item"
-          :title="$t('usual.choose')"
+          :title="$t('doc.doc_1016')"
           :class="{ selected: currentBrush === 'select' }"
           @click="handleBoardTool('select')"
         >
@@ -45,7 +45,7 @@
         <!-- 画笔 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.pen')"
+          :title="$t('doc.doc_1018')"
           :class="{ selected: currentBrush === 'pen' }"
           @click="handleBoardTool('pen')"
         >
@@ -55,7 +55,7 @@
         <!-- 荧光笔 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.highlighter')"
+          :title="$t('doc.doc_1019')"
           :class="{ selected: currentBrush === 'highlighter' }"
           @click="handleBoardTool('highlighter')"
         >
@@ -65,7 +65,7 @@
         <!-- 形状 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.shape')"
+          :title="$t('doc.doc_1020')"
           :class="{ selected: currentBrush === 'shape' }"
           @click="handleBoardTool('shape')"
         >
@@ -75,7 +75,7 @@
         <!-- 文本 -->
         <div
           class="vmp-icon-item has-corner"
-          :title="$t('usual.text')"
+          :title="$t('doc.doc_1021')"
           :class="{ selected: currentBrush === 'text' }"
           @click="handleBoardTool('text')"
         >
@@ -85,31 +85,31 @@
         <!-- 橡皮擦 -->
         <div
           class="vmp-icon-item"
-          :title="$t('usual.eraser')"
+          :title="$t('doc.doc_1017')"
           :class="{ selected: currentBrush === 'eraser' }"
           @click="handleBoardTool('eraser')"
         >
           <i class="vh-iconfont vh-line-eraser"></i>
         </div>
         <!-- 清除 -->
-        <div class="vmp-icon-item" :title="$t('usual.clear')" @click="handleBoardTool('clear')">
+        <div class="vmp-icon-item" :title="$t('doc.doc_1022')" @click="handleBoardTool('clear')">
           <i class="vh-iconfont vh-line-delete"></i>
         </div>
 
         <!-- 退出全屏 -->
         <div
           class="vmp-icon-item vmp-icon-item--exitFullscreen"
-          :title="$t('usual.clear')"
+          :title="$t('doc.doc_1009')"
           @click="fullscreen"
         >
-          <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+          <i class="vh-iconfont vh-line-narrow"></i>
         </div>
 
         <!-- 这个章节按钮用于观看端文档显示，主持端章节按钮在最右边 -->
         <div
           v-show="currentType !== 'board' && isWatch"
           class="vmp-icon-item"
-          :title="$t('usual.docThumb')"
+          :title="$t('doc.doc_1014')"
           @click="toggleThumbnail"
         >
           <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
@@ -117,19 +117,37 @@
       </div>
     </div>
     <!-- 右：全屏、文档章节等信息，观看端不显示这一部分功能-->
-    <div class="vmp-doc-toolbar__ft" v-if="!isWatch">
-      <div class="vmp-icon-item" :title="$t('doc.doc_1010')" @click="fullscreen">
-        <i class="vh-iconfont vh-a-line-fullscreen"></i>
+    <div class="vmp-doc-toolbar__ft" v-if="!isWatch && !isInGroup">
+      <div
+        class="vmp-icon-item"
+        :title="$t('doc.doc_1010')"
+        v-if="roleName != 3"
+        @click="fullscreen"
+      >
+        <i class="vh-iconfont vh-line-amplification"></i>
       </div>
       <div
         v-show="currentType !== 'board'"
         class="vmp-icon-item"
-        :title="$t('usual.docThumb')"
+        :title="$t('doc.doc_1014')"
         @click="toggleThumbnail"
       >
         <i class="vh-saas-iconfont vh-saas-a-line-documentthumbnail"></i>
       </div>
     </div>
+    <!-- 清空文档标记的对话框提示,不使用this.$confirm，是因为文档最大化时this.$confirm提示会看不见 -->
+    <saas-alert
+      :visible="isConfirmVisible"
+      :confirm="true"
+      :confirmText="$t('common.common_1010')"
+      :cancelText="$t('account.account_1063')"
+      @onSubmit="confirmSave"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+      style="pointer-events: initial"
+    >
+      <main slot="content">确定要清空文档标记么？</main>
+    </saas-alert>
   </div>
 </template>
 <script>
@@ -138,13 +156,15 @@
   import VmpShapePopup from './shape-popup.vue';
   import VmpTextPopup from './text-popup.vue';
   import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpDocToolbar',
     components: {
       VmpPenPopup,
       VmpHighlighterPopup,
       VmpShapePopup,
-      VmpTextPopup
+      VmpTextPopup,
+      SaasAlert
     },
     provide() {
       return {
@@ -160,7 +180,7 @@
       return {
         showAudienceTip: true,
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
-        currentBrush: 'pen',
+        currentBrush: '',
         // 画笔状态
         pen: {
           size: 7, // 粗细
@@ -180,7 +200,8 @@
         text: {
           size: 18, // 字号
           color: '#FD2C0A' //颜色
-        }
+        },
+        isConfirmVisible: false //清空画板显示弹窗提示
       };
     },
     watch: {
@@ -192,23 +213,54 @@
       }
     },
     computed: {
-      // 是否观看端(send是发起端，其它的都是你观看端)
-      isWatch() {
-        console.log('this.roomBaseServer.state.clientType:', this.roomBaseServer.state.clientType);
-        return this.roomBaseServer.state.clientType !== 'send';
-      },
+      // 是否观众可见
       switchStatus: {
         get() {
           return this.docServer.state.switchStatus;
         },
         set() {}
       },
+      // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
-      // 是否有演示权限
+      watchInitData() {
+        return this.roomBaseServer.state.watchInitData;
+      },
+      // 是否在小组中
+      isInGroup() {
+        return !!this.groupServer.state.groupInitData?.isInGroup;
+      },
+      // 当前用户Id
+      userId() {
+        return this.roomBaseServer.state.watchInitData.join_info.third_party_user_id;
+      },
+      // 当前的演示者Id
+      presenterId() {
+        return this.isInGroup
+          ? this.groupServer.state.groupInitData.presentation_screen
+          : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      // 角色
+      roleName() {
+        return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
+      },
+      // 是否文档演示权限
       hasDocPermission() {
-        return this.docServer.state.hasDocPermission;
+        if (this.isWatch && [4, 5].includes(this.webinarType)) {
+          // 对于观看端 && 点播和回放，所有人都没有文档演示权限
+          return false;
+        }
+        // 当前用户是否演示者
+        return this.presenterId == this.userId;
       },
       // 是否显示画笔工具栏
       showBrushToolbar() {
@@ -229,7 +281,10 @@
        *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
        */
       changeTool(brush, key, value) {
-        if (!this.docServer?.state.currentCid) {
+        if (
+          !this.docServer?.state.currentCid ||
+          !document.getElementById(this.docServer.state.currentCid)
+        ) {
           console.log('容器不存在，不可设置画笔');
           return;
         }
@@ -240,8 +295,10 @@
         if (key) {
           this[brush][key] = value;
         }
-        // 取消缩放、移动模式
-        this.docServer.cancelZoom();
+        if (brush !== 'move') {
+          // 取消缩放、移动模式
+          this.docServer.cancelZoom();
+        }
         switch (brush) {
           // 选择
           case 'select': {
@@ -278,30 +335,46 @@
             this.docServer.setEraser();
             break;
           }
+          case 'move': {
+            this.docServer.move();
+            break;
+          }
         }
+        this.$emit('changeBrush', brush);
+      },
+      // 重设当前画笔
+      resetCurrentBrush() {
+        console.log('---resetCurrentBrush---this.currentBrush:', this.currentBrush);
+        this.changeTool(this.currentBrush);
       },
       /**
        * 切换画板工具
        */
       async handleBoardTool(brush) {
+        if (
+          !this.docServer?.state.currentCid ||
+          !document.getElementById(this.docServer.state.currentCid)
+        ) {
+          console.log('容器不存在，不执行操作');
+          return;
+        }
         if (brush === 'clear') {
-          // TODO 提示文本进行国际化处理
-          try {
-            await this.$confirm('确定要清空白板么？', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            });
-            this.docServer.clear();
-          } catch (err) {
-            console.log(err);
-          }
-          // 还需要重设当前画笔
-          this.changeTool(this.currentBrush);
+          this.isConfirmVisible = true;
           return;
         }
         this.changeTool(brush);
       },
+      // 画布清除确认
+      confirmSave() {
+        this.isConfirmVisible = false;
+        this.docServer.clear();
+        // 还需要重设当前画笔
+        this.changeTool(this.currentBrush);
+      },
+      closeConfirm() {
+        this.isConfirmVisible = false;
+      },
+      // 是否观众可见
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();
       }
@@ -319,6 +392,7 @@
     align-items: center;
     justify-content: space-between;
     z-index: 2;
+    pointer-events: none;
 
     .vmp-doc-toolbar__hd {
       max-width: 250px;
@@ -335,9 +409,12 @@
         text-align: center;
         margin-left: 16px;
         cursor: pointer;
+        pointer-events: initial;
+
         &:hover {
-          background: #fc5659;
-          border-color: #fc5659;
+          background: #fb3a32;
+          border-color: #fb3a32;
+          color: #fff;
         }
       }
       .audience-visible {
@@ -352,18 +429,7 @@
         align-items: center;
         margin-left: 20px;
         position: relative;
-
-        .el-switch .el-switch__core {
-          border-color: #ddd !important;
-          background-color: #2d2d2d !important;
-          &::after {
-            background-color: #ddd;
-          }
-        }
-        .el-switch.is-checked .el-switch__core {
-          border-color: #13ce66 !important;
-          background-color: #13ce66 !important;
-        }
+        pointer-events: initial;
       }
     }
     .vmp-doc-toolbar__bd {
@@ -379,6 +445,7 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
+      pointer-events: initial;
     }
     .vmp-doc-toolbar__ft {
       display: flex;
@@ -397,6 +464,7 @@
       line-height: 36px;
       cursor: pointer;
       z-index: 100;
+      pointer-events: initial;
 
       i {
         font-size: 17px;

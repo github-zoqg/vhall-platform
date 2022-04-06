@@ -26,7 +26,8 @@
       </div>
 
       <div v-if="phoneDialog.type === 'edit' && phoneDialog.step === 1" class="edit-phone">
-        {{ $t('account.account_1002') }}{{ useUserServer.state.userInfo.phone || '' }}
+        {{ $t('account.account_1002')
+        }}{{ (userServer.state.userInfo && userServer.state.userInfo.phone) || '' }}
       </div>
       <div v-if="phoneDialog.type === 'add' || phoneDialog.step === 2" class="vmp-input-base">
         <van-field
@@ -56,6 +57,7 @@
             <van-button
               size="small"
               :class="bindForm.imgCode && !timer ? 'input-button-disable' : 'input-button'"
+              :disabled="bindForm.imgCode === '' || timer != null"
               @click.stop.prevent="getCaptha"
             >
               {{
@@ -124,7 +126,7 @@
     },
     data() {
       return {
-        useUserServer: {},
+        userServer: {},
         bindForm: Object.assign({}, defaltBindForm),
         errorTip: Object.assign({}, defaultErrorTip), // 错误提示
         timer: null,
@@ -142,7 +144,7 @@
       }
     },
     created() {
-      this.useUserServer = useUserServer();
+      this.userServer = useUserServer();
     },
     methods: {
       // 弹窗关闭
@@ -159,14 +161,14 @@
       getCaptha() {
         if (this.checkData()) {
           const data =
-            this.phoneDialog.type === 'edit' && this.phoneDialog.step !== 1
+            this.phoneDialog.type === 'add' || this.phoneDialog.step === 2
               ? this.bindForm.phone
               : this.phoneDialog.phone;
           const validate = this.bindForm.imgCode;
           const scene_id = this.bindForm.scene_id;
           // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回
           // 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码
-          this.useUserServer
+          this.userServer
             .sendPhoneCode({
               type: 1,
               scene_id,
@@ -183,12 +185,12 @@
                   }
                 }, 1000);
               } else {
-                this.$toast(this.$tes(res.code) || res.msg);
+                this.$toast(this.$tec(res.code) || res.msg);
                 this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
               }
             })
             .catch(err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1051'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1051'));
               // 图片验证码重置
               this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
             });
@@ -198,7 +200,7 @@
       // 立即设置
       setPhoneHandler() {
         if (this.validtorPhone() && this.validtorCode()) {
-          this.useUserServer
+          this.userServer
             .codeCheck({
               type: 1,
               data: this.bindForm.phone,
@@ -209,11 +211,11 @@
               if (res && res.code == 200 && res.data.check_result === 1) {
                 this.bindPhoneSave(res.data.key);
               } else {
-                this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1052'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1052'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1052'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1052'));
             });
         }
       },
@@ -227,7 +229,7 @@
             code: this.bindForm.code,
             scene_id: this.bindForm.scene_id
           };
-          this.useUserServer
+          this.userServer
             .codeCheck(params)
             .then(async res => {
               if (res && res.code == 200 && res.data.check_result === 1) {
@@ -238,11 +240,11 @@
                 this.phoneDialog.step = 2;
                 this.$emit('input', { ...this.phoneDialog });
               } else {
-                this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1054'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1054'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1054'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1054'));
             });
         }
       },
@@ -256,24 +258,24 @@
             code: this.bindForm.code,
             scene_id: this.bindForm.scene_id
           };
-          this.useUserServer
+          this.userServer
             .codeCheck(params)
             .then(res => {
               if (res && res.code == 200 && res.data.check_result === 1) {
                 this.bindPhoneSave(res.data.key);
               } else {
-                this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1052'));
+                this.$toast(this.$tec(res.code) || this.$t('account.account_1052'));
               }
             })
             .catch(err => {
-              this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1052'));
+              this.$toast(this.$tec(err.code) || this.$t('account.account_1052'));
             });
         }
       },
 
       // 绑定手机号事件
       bindPhoneSave(key) {
-        this.useUserServer
+        this.userServer
           .bindInfo({
             type: 1,
             account: this.bindForm.phone,
@@ -297,11 +299,11 @@
                 this.$emit('input', { ...this.phoneDialog });
               }
             } else {
-              this.$toast(this.$tes(res.code) || res.msg || this.$t('account.account_1054'));
+              this.$toast(this.$tec(res.code) || this.$t('account.account_1054'));
             }
           })
           .catch(err => {
-            this.$toast(this.$tes(err.code) || err.msg || this.$t('account.account_1054'));
+            this.$toast(this.$tec(err.code) || this.$t('account.account_1054'));
           });
       },
 

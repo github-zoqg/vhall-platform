@@ -33,7 +33,7 @@
           <li :class="['mobile', { li_check_error: errorMsgShow.mobile }]">
             <div>
               <input
-                @blur="checkPh"
+                @blur="checkPhoneNum"
                 v-if="showMobileLogin"
                 type="number"
                 pattern="\d*"
@@ -42,7 +42,7 @@
                 maxlength="11"
               />
               <input
-                @blur="checkPh"
+                @blur="checkPhoneNum"
                 v-else
                 type="text"
                 :placeholder="$t('login.login_1022')"
@@ -51,13 +51,7 @@
               />
             </div>
             <p :class="['error-tip', { error: errorMsgShow.mobile }]">
-              {{
-                errorMsgShow.mobile
-                  ? showMobileLogin
-                    ? $t('account.account_1070')
-                    : $t('login.login_1022')
-                  : ''
-              }}
+              {{ errorMsgShow.mobile ? errorMsgShow.mobileText : '' }}
             </p>
           </li>
           <!-- 图片滑动 -->
@@ -132,7 +126,7 @@
                 :placeholder="$t('account.account_1025')"
                 v-model.trim="mobile"
                 maxlength="11"
-                @blur="checkPh"
+                @blur="checkPhoneNum"
               />
             </div>
             <p :class="['error-tip', { error: errorMsgShow.mobile }]">
@@ -263,7 +257,6 @@
     beforeCreate() {
       this.userServer = useUserServer();
     },
-    async mounted() {},
     methods: {
       // 打开弹窗
       async open() {
@@ -278,7 +271,8 @@
           this.initCaptcha();
         }
       },
-      async checkPh() {
+      // 检查手机号
+      async checkPhoneNum() {
         // showLoginCard 登录
         // showMobileLogin 手机号登录
         if (this.showLoginCard) {
@@ -302,7 +296,7 @@
                 }
               })
               .catch(res => {
-                this.$toast(res.msg || this.$t('login.login_1029'));
+                this.$toast(this.$tec(res.code) || this.$t('login.login_1029'));
               });
           } else {
             this.errorMsgShow.mobile = true;
@@ -314,12 +308,13 @@
        * 校验手机号
        */
       checkMobile() {
+        console.log('checkMobile');
         const valid = /^1[0-9]{10}$/.test(this.mobile);
         if (valid) {
           this.errorMsgShow.mobile = false;
         } else {
           this.errorMsgShow.mobile = true;
-          this.errorMsgShow.mobileText = this.$t('account.account_1069');
+          this.errorMsgShow.mobileText = this.$t('account.account_1025');
         }
         return valid;
       },
@@ -361,7 +356,7 @@
             // 刷新页面
             window.location.reload();
           } else {
-            this.$toast(res.msg || this.$t('login.login_1021'));
+            this.$toast(this.$tec(res.code) || this.$t('login.login_1021'));
           }
         });
       },
@@ -372,7 +367,7 @@
         const snedLogin = async () => {
           let relt = await this.userServer.handlePassword(this.password);
           if (!relt.pass) {
-            this.$toast(relt.msg || this.$t('register.register_1010'));
+            this.$toast(this.$tec(relt.code) || this.$t('register.register_1010'));
             return false;
           }
           const params = {
@@ -394,7 +389,7 @@
               if (this.showCaptcha && !this.captchaReady) {
                 this.reloadCaptha();
               }
-              this.$toast(res.msg || this.$t('login.login_1021'));
+              this.$toast(this.$tec(res.code) || this.$t('login.login_1021'));
             }
           });
         };
@@ -408,7 +403,7 @@
           // 如果没有选择过图形码，走账号检测判断
           const failure = err => {
             console.log('获取账号检测接口结果错误', err);
-            this.$toast(err.msg || this.$t('login.login_1021'));
+            this.$toast(this.$tec(err.code) || this.$t('login.login_1021'));
           };
           this.userServer
             .loginCheck(this.mobile)
@@ -441,11 +436,11 @@
         if (!this.checkPassWord()) return (this.errorMsgShow.password = true);
         if (this.checkMobile()) {
           const failure = err => {
-            this.$toast(err.msg || this.$t('register.register_1010'));
+            this.$toast(this.$tec(err.code) || this.$t('register.register_1010'));
           };
           const relt = await this.userServer.handlePassword(this.password);
           if (!relt.pass) {
-            return this.$toast(relt.msg || this.$t('register.register_1010'));
+            return this.$toast(this.$tec(relt.code) || this.$t('register.register_1010'));
           }
           const params = {
             source: 2,
@@ -678,7 +673,6 @@
         justify-content: space-between;
         > div {
           flex-grow: 1;
-          // @include border-1px-direction("bottom", #979797);
           position: relative;
           border-width: 0;
           input {
@@ -783,9 +777,6 @@
         margin-right: 58px;
       }
     }
-  }
-  .iconqudenglu {
-    font-size: 12px;
   }
   .captcha {
     margin-bottom: 60px;

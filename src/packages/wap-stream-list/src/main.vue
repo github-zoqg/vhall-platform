@@ -1,60 +1,179 @@
 <template>
-  <div class="vmp-stream-list" :class="{ 'vmp-stream-list-h0': isStreamListH0 }">
+  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop.prevent="videoShowIcon">
     <div
-      class="vmp-stream-list__local-container"
+      class="vmp-stream-list"
       :class="{
-        'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
+        'vmp-stream-list-h0': isStreamListH0,
+        'vmp-stream-list-h-all': isStreamListHAll,
+        'vmp-stream-list-no-speack': !micServer.state.isSpeakOn
       }"
     >
-      <div class="vmp-stream-list__remote-container-h">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
-      </div>
-    </div>
-    <template v-if="remoteStreams.length">
       <div
-        v-for="stream in remoteStreams"
-        :key="stream.id"
-        class="vmp-stream-list__remote-container"
+        class="vmp-stream-list__local-container"
         :class="{
-          'vmp-stream-list__main-screen': stream.accountId == mainScreen
+          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
         }"
+        v-show="micServer.state.isSpeakOn"
       >
         <div class="vmp-stream-list__remote-container-h">
-          <vmp-wap-stream-remote :stream="stream"></vmp-wap-stream-remote>
+          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-    </template>
+      <template v-if="remoteSpeakers.length">
+        <div
+          v-for="speaker in remoteSpeakers"
+          :key="speaker.accountId"
+          class="vmp-stream-list__remote-container"
+          :class="{
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
+          }"
+        >
+          <div class="vmp-stream-list__remote-container-h">
+            <vmp-wap-stream-remote :stream="streamInfo(speaker)"></vmp-wap-stream-remote>
+          </div>
+        </div>
+      </template>
+    </div>
+    <!-- wap 蒙层显示信息 -->
+    <div class="vmp-wap-stream-wrap-mask">
+      <!-- 热度 -->
+      <div
+        class="vmp-wap-stream-wrap-mask-heat"
+        v-if="roomBaseServer.state.watchInitData.pv.show"
+        :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
+      >
+        <p>
+          <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+          &nbsp;{{ hotNum | formatHotNum }}
+        </p>
+      </div>
+      <!-- 播放 -->
+      <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
+        <img :src="coverImgUrl" alt />
+        <p @click.stop="replayPlay">
+          <i class="vh-iconfont vh-line-video-play"></i>
+        </p>
+      </div>
+      <!-- 多语言入口 -->
+      <div
+        class="vmp-wap-stream-wrap-mask-lang"
+        :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
+      >
+        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
+          {{ lang.key == 1 ? '中文' : 'EN' }}
+        </span>
+      </div>
+      <!-- 进入全屏 -->
+      <div
+        class="vmp-wap-stream-wrap-mask-screen"
+        :class="[iconShow && isShowMainScreen ? 'opcity-true' : 'opcity-flase']"
+        @click.stop="setFullScreen"
+      >
+        <i class="vh-iconfont vh-a-line-fullscreen"></i>
+      </div>
+      <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
+        <img src="./../img/load.gif" />
+      </div>
+    </div>
+    <!-- 小组协作中 -->
+    <div class="vmp-wap-stream-wrap-group" v-show="showGroupMask">
+      <i class="vh-saas-iconfont vh-saas-a-line-Requestassistance"></i>
+      小组协作中
+    </div>
+    <van-popup
+      v-model="isOpenlang"
+      :overlay="false"
+      position="right"
+      style="z-index: 12"
+      class="vmp-wap-stream-popup"
+    >
+      <ul>
+        <li
+          v-for="(item, index) in languageList"
+          :key="index"
+          :class="{ 'popup-active': item.key == lang.key }"
+          @click="changeLang(item.key)"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
+    </van-popup>
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useRoomBaseServer,
+    useMediaCheckServer,
+    useGroupServer
+  } from 'middle-domain';
+  import { debounce } from 'lodash';
+  import BScroll from '@better-scroll/core';
+  import { Toast } from 'vant';
+  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
   export default {
     name: 'VmpWapStreamList',
 
     data() {
       return {
         childrenCom: [],
-        miniElement: 'mainScreen',
-        maxElement: ''
+        playAbort: [], // 自动播放禁止的stream列表
+        showPlayIcon: false, // 是否展示播放按钮
+        scroll: null, // BScroll 插件
+        mainScreenDom: null, // 主屏Dom
+        iconShow: false, // 5 秒的展示
+        isOpenlang: false,
+        lang: {},
+        languageList: [],
+        streamInfo
       };
     },
-
     computed: {
-      mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
-      remoteStreams() {
-        console.log(
-          '----远端流列表更新----',
-          this.$domainStore.state.interactiveServer.remoteStreams
+      // 主屏ID
+      mainScreen() {
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
+      },
+      // 封面图
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar?.img_url;
+      },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item => item.accountId == this.joinInfo.third_party_user_id
+          ) || {}
         );
-        return this.$domainStore.state.interactiveServer.remoteStreams;
+      },
+      remoteSpeakers() {
+        if (
+          this.micServer.state.isSpeakOn &&
+          useMediaCheckServer().state.deviceInfo.device_status != 2
+        ) {
+          // 远端流个数改变且 在推流 才进行初始化BScroll
+          this.createBScroll();
+        }
+        return (
+          this.$domainStore.state.micServer.speakerList.filter(
+            item => item.accountId != this.joinInfo.third_party_user_id
+          ) || []
+        );
+      },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
-      // 流列表高度是否为 0 的属性(这个属性依赖的场景比较多,后续有人更改,请更新说明注释)
       isStreamListH0() {
         /**
          * 计算方式:
@@ -67,78 +186,462 @@
          *    3) 如果存在本地流,高度不为 0,返回 false
          * 3. 远端流列表长度大于 1
          *    高度不为 0,返回 false
+         * 4. 没有互动实例的时候高度为0
          */
-        if (!this.remoteStreams.length) {
-          return !(
-            this.$domainStore.state.interactiveServer.localStream.streamId &&
-            this.joinInfo.third_party_user_id != this.mainScreen
-          );
-        } else if (this.remoteStreams.length == 1) {
-          if (!this.$domainStore.state.interactiveServer.localStream.streamId) {
-            return this.remoteStreams[0].accountId == this.mainScreen;
+        if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+          return true;
+        }
+        if (!this.remoteSpeakers.length) {
+          if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
+            return false;
+          } else {
+            return true;
+          }
+        } else if (this.remoteSpeakers.length == 1) {
+          if (!this.localSpeaker.accountId) {
+            return this.remoteSpeakers[0].accountId == this.mainScreen;
           } else {
             return false;
           }
         } else {
           return false;
         }
+      },
+      // 只存在订阅一路流的情况下进行铺满
+      isStreamListHAll() {
+        return (
+          this.remoteSpeakers.length == 1 &&
+          this.remoteSpeakers[0].accountId == this.mainScreen &&
+          !this.$domainStore.state.interactiveServer.localStream.streamId
+        );
+      },
+      // 主持人是否在小组中
+      is_host_in_group() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
+      },
+      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
+      isShowMainScreen() {
+        let _flag = false;
+        _flag =
+          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
+          this.joinInfo.third_party_user_id == this.mainScreen;
+        return _flag;
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 小组协作中
+      showGroupMask() {
+        // 分组活动 + 自己不在小组 + 主持人不在小组 + 不存在主画面 + 不存在桌面共享
+        return (
+          !this.isInGroup &&
+          this.is_host_in_group &&
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
+          !this.isShowMainScreen &&
+          !this.isShareScreen
+        );
+      },
+      // 热度
+      hotNum() {
+        return (
+          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
+          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
+          1
+        );
+      },
+      // 开始推流到成功期间展示默认图
+      defaultBg() {
+        return this.interactiveServer.state.defaultStreamBg;
+      }
+    },
+    beforeCreate() {
+      this.interactiveServer = useInteractiveServer();
+      useMediaCheckServer().checkSystemRequirements();
+      this.roomBaseServer = useRoomBaseServer();
+      this.micServer = useMicServer();
+    },
+
+    async created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
+      this.languageList = this.roomBaseServer.state.languages.langList;
+      this.lang = this.roomBaseServer.state.languages.lang;
+
+      // 检测是否支持连麦，不支持直接进行提示
+      if (useMediaCheckServer().state.isBrowserNotSupport) {
+        return Toast(this.$t('other.other_1010'));
+      }
+      this.replayPlay = debounce(this.replayPlay, 500);
+    },
+
+    mounted() {
+      // 在麦上 才存在滑动情况
+      if (this.micServer.getSpeakerStatus()) {
+        if (useMediaCheckServer().state.deviceInfo.device_status != 2) {
+          this.createBScroll();
+        }
+      }
+
+      this.addSDKEvents();
+      this.fiveDown();
+    },
+    beforeDestroy() {
+      if (this.scroll) {
+        this.scroll.destroy();
       }
     },
 
-    beforeCreate() {
-      this.interactiveServer = useInteractiveServer();
-    },
-
-    created() {
-      this.childrenCom = window.$serverConfig[this.cuid].children;
-      console.log(
-        '-- this.childrenCom:',
-        this.childrenCom,
-        this.$domainStore.state.interactiveServer.remoteStreams
-      );
-      // this.getStreamList();
-    },
-
-    mounted() {},
-
     methods: {
-      getStreamList() {
-        this.interactiveServer.getRoomStreams();
-        console.log('------remoteStreams------', this.remoteStreams);
-      },
-      exchange(compName) {
-        window.$middleEventSdk?.event?.send({
-          cuid: 'ps.surface',
-          method: 'exchange',
-          args: [compName, 2]
+      // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
+      setBigScreen(msg) {
+        this.$nextTick(() => {
+          this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+          if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
+            this.mainScreenDom.style.left = `${1.02667}rem`;
+          }
         });
+        const str =
+          msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
+        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
+      },
+      // 事件监听
+      addSDKEvents() {
+        // 监听到自动播放
+        this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+          console.warn('自动播放失败------', e);
+          this.playAbort.push(e.data);
+          this.showPlayIcon = true;
+        });
+
+        // 接收设为主画面消息  主直播间
+        this.micServer.$on('vrtc_big_screen_set', msg => {
+          this.setBigScreen(msg);
+        });
+
+        // 接收设为主画面消息   组内
+        useGroupServer().$on('VRTC_BIG_SCREEN_SET', msg => {
+          this.setBigScreen(msg);
+        });
+
+        // 接收设为主讲人消息
+        this.micServer.$on('vrtc_speaker_switch', msg => {
+          this.setBigScreen(msg);
+        });
+      },
+
+      // 创建betterScroll
+      createBScroll() {
+        this.$nextTick(() => {
+          if (this.scroll) {
+            this.scroll.refresh();
+          } else {
+            this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
+              scrollX: true,
+              click: true,
+              probeType: 3 // listening scroll event
+            });
+          }
+
+          this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
+          if (this.mainScreenDom) {
+            this.mainScreenDom.style.left = `${1.02667}rem`;
+          }
+          this.scroll.on('scroll', ({ x }) => {
+            if (this.mainScreenDom) {
+              this.mainScreenDom.style.left = `${30 + -x}px`;
+            }
+          });
+        });
+      },
+
+      // 恢复播放
+      replayPlay() {
+        this.playAbort.forEach(stream => {
+          this.interactiveServer.setPlay({ streamId: stream.streamId }).then(() => {
+            this.showPlayIcon = false;
+          });
+        });
+        this.playAbort = [];
+      },
+
+      // 全屏
+      setFullScreen() {
+        /*
+         * 布局原因：wap进入全屏仅全屏主屏流
+         *    进入全屏在list内，退出全屏在remote/local内进行退出
+         */
+        let allStream = this.interactiveServer.getRoomStreams();
+        let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
+        if (mainScreenStream) {
+          if (mainScreenStream.streamSource == 'remote') {
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
+          } else {
+            this.interactiveServer
+              .setStreamFullscreen({
+                streamId: mainScreenStream.streamId,
+                vNode: `vmp-stream-local__${mainScreenStream.accountId}`
+              })
+              .then(() => {
+                this.setFullScreenStatus();
+              });
+          }
+        }
+      },
+      setFullScreenStatus() {
+        // 参考player组件内的brower内的ios判断条件
+        if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+          this.interactiveServer.state.fullScreenType = true;
+        }
+      },
+
+      videoShowIcon() {
+        this.iconShow = true;
+        this.isOpenlang = false;
+        this.fiveDown();
+      },
+      changeLang(key) {
+        this.isOpenlang = false;
+        localStorage.setItem('lang', key);
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
+      },
+      openLanguage() {
+        this.iconShow = true;
+        this.isOpenlang = true;
+      },
+      // 5秒后消失
+      fiveDown() {
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.iconShow = false;
+          this.isOpenlang = false;
+        }, 5000);
       }
     }
   };
 </script>
 
 <style lang="less">
+  .vmp-wap-stream-wrap {
+    white-space: nowrap;
+    height: 422px;
+    width: 100%;
+    position: relative;
+    background: #000;
+    // 小组协作中
+    &-group {
+      position: absolute;
+      top: 100px;
+      display: flex;
+      width: 100%;
+      height: 50%;
+      flex-direction: column;
+      justify-content: center;
+      color: #999;
+      background: #000;
+      text-align: center;
+      font-size: 28px;
+      z-index: 1;
+      i {
+        display: block;
+        font-size: 70px;
+        margin-bottom: 14px;
+      }
+    }
+    // 蒙层
+    &-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: flex-start;
+      &-heat {
+        top: 24px;
+        left: 24px;
+        padding: 0 24px;
+        color: #fff;
+        position: absolute;
+        font-size: 28px;
+        z-index: 5;
+        p {
+          border-radius: 44px;
+          height: 48px;
+          line-height: 48px;
+          padding: 0 16px;
+          text-align: center;
+          background: rgba(0, 0, 0, 0.5);
+          i {
+            vertical-align: bottom;
+            font-size: 28px;
+          }
+        }
+      }
+      &-pause {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 7;
+        background: transparent;
+        img {
+          width: 100%;
+          height: 100%;
+        }
+        p {
+          width: 108px;
+          height: 108px;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          i {
+            font-size: 46px;
+            color: #f5f5f5;
+          }
+        }
+      }
+      &-lang {
+        top: 150px;
+        right: 32px;
+        padding: 0 24px;
+        color: #fff;
+        position: absolute;
+        z-index: 5;
+        span {
+          display: block;
+          height: 48px;
+          width: 88px;
+          border-radius: 24px;
+          background: rgba(0, 0, 0, 0.5);
+          text-align: center;
+          line-height: 48px;
+          font-size: 24px;
+          font-family: PingFangSC-Medium, PingFang SC;
+          color: #fff;
+        }
+      }
+      &-screen {
+        width: 64px;
+        height: 64px;
+        line-height: 64px;
+        z-index: 4;
+        background: rgba(0, 0, 0, 0.4);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        text-align: center;
+        transform: translate(-32px, -32px);
+        border-radius: 50%;
+      }
+      &-background {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        background: #000;
+        img {
+          width: 88px;
+          height: 88px;
+        }
+      }
+      .opcity-flase {
+        display: none;
+        transition: all 1s;
+        -webkit-transition: all 1s;
+      }
+      .opcity-true {
+        opacity: 1;
+        transition: all 1s;
+        z-index: 6;
+        -webkit-transition: all 1s;
+        i {
+          color: #fff;
+        }
+      }
+    }
+    .vmp-wap-stream-popup {
+      width: 200px;
+      position: absolute;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      ul {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 30px 0;
+        li {
+          width: 100%;
+          height: 60px;
+          line-height: 60px;
+          font-size: 28px;
+          font-family: PingFangSC-Regular, PingFang SC;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 1);
+          text-align: center;
+          &.popup-active {
+            color: #fb2626;
+          }
+        }
+      }
+    }
+  }
   .vmp-stream-list {
     height: 83px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    .vmp-stream-list__local-container {
+    display: inline-block;
+    &__local-container {
       width: 148px;
+      height: 100%;
+      display: inline-block;
     }
-    .vmp-stream-list__remote-container {
+    &__remote-container {
       width: 148px;
+      height: 100%;
+      display: inline-block;
       &-h {
         height: 100%;
       }
     }
 
     // 流列表高度不为0
-    .vmp-stream-list__main-screen {
+    &__main-screen {
       position: absolute;
       top: 83px;
       width: 597px;
       height: 337px;
+      display: inline-block;
       .vmp-stream-list__remote-container {
         &-h {
           padding-top: 56.25%;
@@ -153,6 +656,19 @@
         position: absolute;
         top: 0;
       }
+      // 主屏下的 后续nick_name 应为全显示
+      .vmp-stream-local__bottom {
+        // 此处不能使用&去代替  由于父级无样式，直接使用&会导致class优先级降低
+        .vmp-stream-local__bottom-nickname {
+          width: 160px;
+        }
+      }
+      .vmp-stream-list__remote-container-h .vmp-stream-remote__container__net-error {
+        .net-error-img {
+          width: 90px;
+          height: 75px;
+        }
+      }
     }
 
     // 流列表高度为0
@@ -160,6 +676,41 @@
       height: 0;
       .vmp-stream-list__main-screen {
         top: 0;
+      }
+    }
+
+    // 未上麦样式进行覆盖
+    &-no-speack {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      align-content: flex-end;
+      height: 422px;
+      .vmp-stream-list__remote-container {
+        // align-items: center;
+        width: 150px;
+        height: 85px;
+      }
+      .vmp-stream-list__local-container {
+        width: 150px;
+        height: 85px;
+      }
+      .vmp-stream-list__main-screen {
+        position: absolute;
+        left: 0 !important;
+        top: 0;
+        width: 100%;
+        height: calc(100% - 85px);
+      }
+    }
+    // 铺满全屏
+    &-h-all {
+      width: 100%;
+      top: 0;
+      .vmp-stream-list__main-screen {
+        top: 0;
+        width: 100%;
+        height: 100%;
       }
     }
   }

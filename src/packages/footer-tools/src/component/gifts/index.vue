@@ -11,14 +11,14 @@
         <img v-if="!giftInfo.hoverImg" class="gift-info-pic" :src="giftInfo.image_url" />
         <img v-else class="gift-info-pic" :src="giftInfo.hoverImg" />
         <div class="gift-info-cont">
-          <span class="name">{{ $t(giftInfo.name) }}</span>
+          <span class="name">{{ $tdefault(giftInfo.name) }}</span>
           <div class="price">
             <span>
               ￥{{
                 giftInfo.price == '0' ? $t('interact_tools.interact_tools_1058') : giftInfo.price
               }}
             </span>
-            <span class="send-btn" :class="{ disable: btnDisabled }" @click="sendGift">
+            <span class="send-btn" :class="{ disable: btnDisabled }" @click="sendGift('WEIXIN')">
               {{ $t('interact_tools.interact_tools_1030') }}{{ btnDisabled ? `(${counter})` : '' }}
             </span>
           </div>
@@ -227,6 +227,10 @@
     height: 208px;
     padding-bottom: 0px;
     padding: 16px 16px 0px 8px;
+    position: absolute;
+    top: -220px;
+    right: -60px;
+    z-index: 12;
   }
   ::v-deep > .el-carousel {
     width: 100%;

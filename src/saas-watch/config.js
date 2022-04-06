@@ -1,6 +1,5 @@
 export const globalConfig = {
-  lang: 'zh',
-  skin: 'new-year'
+  lang: 'zh'
 };
 
 // 服务配置
@@ -9,10 +8,10 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'layerFooter', 'comAllDialog']
+    children: ['comHeaderWatch', 'layerBody', 'layerFooter', 'comAllDialog', 'comGoodsDetailPc']
     // children: ['layerBody']
   },
-  // 顶部header容器
+  // 顶部header 容器嵌入不用这个组件
   layerHeader: {
     component: 'VmpContainer',
     className: 'vmp-basic-hd',
@@ -23,8 +22,6 @@ export const serverConfig = {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['layerBodyCenter', 'layerBodyRight']
-    // children: ['comGoodSaas']
-    // children: ['comDocUne', 'comFooterTools', 'comPcPlayer', 'comChat']
   },
   // 底部主区域容器
   layerFooter: {
@@ -41,7 +38,16 @@ export const serverConfig = {
   },
   layerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
-    children: ['comPcPlayer', 'comWatchAsideMenu', 'comDocUne', 'comFooterTools', 'comNoticeColumn']
+    children: [
+      'comPcPlayer',
+      'comWatchAsideMenu',
+      'comDocUne',
+      'comDesktopScreen',
+      'comInsertStream',
+      'comFooterTools',
+      'comNoticeColumn',
+      'comLivingEnd'
+    ]
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
@@ -58,33 +64,37 @@ export const serverConfig = {
       'comOfficial',
       'comShare',
       'comWatchAuth',
-      // 'comSignUpForm',
+      'comSignUpForm',
       'comUserAccount',
       'comCash',
-      // 'comLottery'
-      'comWatchTimer',
       'comScreenPost',
-      'comMediaSetting'
+      'comMediaSetting',
+      'comWatchPayFee',
+      'comMicInvited'
     ]
   },
 
   comTabMenu: {
     component: 'VmpTabMenu',
     options: {
+      // 是否展示左右按钮
+      isToggleBtnVisible: true,
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
+       * watch观看端tab不展示文档
        */
       menuConfig: [
         { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false }, // 文档(默认隐藏)
         { type: 3, cuid: 'comChat', text: 'menu.menu_1002' }, // 聊天
+        { type: 'private', cuid: 'comWatchPrivateChat', text: 'common.common_1008' }, // 私聊
         { type: 'notice', cuid: 'comNotice', text: '公告' },
         { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
         { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
         { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
-        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
+        { type: 8, cuid: 'comMemberList', text: '成员' }, // 成员
+        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } //问答
       ]
     }
   },
@@ -92,7 +102,12 @@ export const serverConfig = {
   /**** 组件定义 */
   // 自定义菜单
   comCustomMenu: {
-    component: 'VmpCustomMenu'
+    component: 'VmpCustomMenu',
+    emitOpenShareDialog: {
+      cuid: 'comShare',
+      method: 'shareOtherDialog',
+      args: ['$0']
+    }
   },
 
   // 文档白板组件
@@ -128,6 +143,20 @@ export const serverConfig = {
         method: 'switchTo',
         args: ['$0']
       }
+    ],
+    handleClickDesktopScreen: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'showConfirm',
+        args: ['$0']
+      }
+    ],
+    // 触发画笔重置
+    emitDocResetBrush: [
+      {
+        cuid: 'comDocUne',
+        method: 'resetCurrentBrush'
+      }
     ]
   },
   comStreamList: {
@@ -135,19 +164,69 @@ export const serverConfig = {
     children: ['comStreamLocal', 'comStreamRemote']
   },
   comStreamLocal: {
-    component: 'VmpStreamLocal'
+    component: 'VmpStreamLocal',
+    initPlayer: {
+      cuid: 'comPcPlayer',
+      method: 'getWebinerStatus',
+      args: ['$0']
+    }
   },
   comStreamRemote: {
     component: 'VmpStreamRemote'
   },
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen',
+    emitClickExchangeView: {
+      cuid: 'comPcPlayer',
+      method: 'exchangeVideoDocs'
+    },
+    emitClickEndDemonstrate: [
+      {
+        cuid: 'comDocUne',
+        method: 'handleEndDemonstrate'
+      }
+    ]
+  },
+  // 插播文件
+  comInsertStream: {
+    component: 'VmpInsertStream'
+  },
   // 播放器
   comPcPlayer: {
-    component: 'VmpPcPlayer'
+    component: 'VmpPcPlayer',
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
+    ],
+    emitClickPay: [
+      // 权限付费弹窗
+      {
+        cuid: 'comWatchPayFee',
+        method: 'openPayFee',
+        args: ['$0']
+      }
+    ],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
+  },
+  // 结束页面
+  comLivingEnd: {
+    component: 'VmpLivingEnd'
   },
   // 顶部
   comHeaderWatch: {
     component: 'VmpHeaderWatch',
-    children: ['compLanguageChoice', 'comAttention'],
+    children: ['compLanguageChoice'],
     emitClickLogin: [
       //登录弹窗
       {
@@ -159,7 +238,7 @@ export const serverConfig = {
       //弹出公众号
       {
         cuid: 'comOfficial',
-        method: 'openOfficial'
+        method: 'openOfficialDialog'
       }
     ],
     emitOpenShare: [
@@ -177,28 +256,37 @@ export const serverConfig = {
       }
     ],
     emitOpenCash: [
-      //弹出个人资料
+      //弹出提现组件
       {
         cuid: 'comCash',
         method: 'openCashDialog'
       }
     ]
   },
-  comAttention: {
-    component: 'VmpAttention',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLogin',
-        method: 'open'
-      }
-    ]
+  // 语言选择组件
+  compLanguageChoice: {
+    component: 'VmpLanguageChoice',
+    options: {
+      choices: [
+        {
+          value: 'zh',
+          label: 'language_choice.language_choice_1001'
+        },
+        {
+          value: 'en',
+          label: 'language_choice.language_choice_1002'
+        }
+      ]
+    }
   },
   comShare: {
     component: 'VmpShare',
     options: {
       isInviteShare: true //分享是否展示邀请卡
     }
+  },
+  comOfficial: {
+    component: 'VmpOfficialPc'
   },
   comUserAccount: {
     component: 'VmpUserAccount'
@@ -211,16 +299,17 @@ export const serverConfig = {
   },
   // 底部
   comFooter: {
-    component: 'VmpFooter',
-    emitClickMediaCheck: {
-      cuid: 'comMediaCheck',
-      method: 'showSetting'
-    }
+    component: 'VmpFooter'
   },
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    //todo 后续正式的需要调整或移除，此处仅为测试配置
+    //TODO: 后续正式的需要调整或移除，此处仅为测试配置
+    // 打开媒体设置
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
+    },
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
       method: 'openModal'
@@ -234,14 +323,41 @@ export const serverConfig = {
     emitNeedLogin: {
       cuid: ['compRegLogin'],
       method: 'open'
-    }
-    // children: ['comNotice', 'comPraise'] // 登录注册组件，模拟可放入位置添加 , 'compRegLogin'
+    },
+    // 抽奖弹窗
+    emitClickLotteryIcon: {
+      cuid: ['comLottery'],
+      method: 'open'
+    },
+    //红包弹窗
+    emitClickRedPacketIcon: {
+      cuid: ['comRedPacket'],
+      method: 'openRedPacket',
+      args: ['$0']
+    },
+    //问卷弹窗
+    emitClickQuestionIcon: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
+    children: ['comSignWatch', 'comWatchTimer', 'comQuestionnaire', 'comLottery', 'comRedPacket']
+  },
+  comSignWatch: {
+    component: 'VmpSignWatch'
   },
   comNoticeColumn: {
     component: 'VmpNoticeColumn'
   },
   comWatchAuth: {
-    component: 'VmpWatchAuth'
+    component: 'VmpWatchAuth',
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
+  },
+  comWatchPayFee: {
+    component: 'VmpWatchPayFee'
   },
   //聊天组件
   comChat: {
@@ -250,24 +366,56 @@ export const serverConfig = {
       //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
       hasImgUpload: false,
       //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
-      hasChatFilterBtn: false,
+      hasChatFilterBtn: true,
       //是否开启聊天设置功能
       enableChatSetting: false,
       //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】
       userControlOptions: {
         enable: false
       }
+    },
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ],
+    emitClickLotteryChatItem: {
+      cuid: ['comLottery'],
+      method: 'accept',
+      args: ['$0']
+    },
+    emitClickQuestionnaireChatItem: {
+      cuid: ['comQuestionnaire'],
+      method: 'open',
+      args: ['$0']
+    },
+    emitHideEffect: {
+      cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
     }
   },
   //成员列表组件
   comMemberList: {
     component: 'VmpMemberList',
-    options: {}
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'watch'
+    }
   },
   //私聊组件
   comWatchPrivateChat: {
     component: 'VmpWatchPrivateChat',
-    options: {}
+    options: {},
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   //报名表单
   comSignUpForm: {
@@ -289,11 +437,27 @@ export const serverConfig = {
   },
   //商品列表
   comGoodSaas: {
-    component: 'VmpGoodList'
+    component: 'VmpGoodList',
+    emitShowDetail: {
+      cuid: ['comGoodsDetailPc'],
+      method: 'open',
+      args: ['$0']
+    }
+  },
+  //商品详情
+  comGoodsDetailPc: {
+    component: 'VmpGoodDetailPc'
   },
   // 抽奖
   comLottery: {
-    // component: 'VmpLotteryWatch'
+    component: 'VmpLotteryWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   },
   // 开屏页
   comScreenPost: {
@@ -319,6 +483,16 @@ export const serverConfig = {
   comIntro: {
     component: 'VmpIntro'
   },
+  comQa: {
+    component: 'VmpQa',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
+  },
   // 媒体设置
   comMediaSetting: {
     component: 'VmpPcMediaSetting',
@@ -327,6 +501,119 @@ export const serverConfig = {
         cuid: 'comStreamLocal',
         method: 'switchStreamType',
         args: ['$0']
+      }
+    ]
+  },
+
+  // 预约页面配置
+  layerSubscribeRoot: {
+    component: 'VmpAirContainer',
+    children: [
+      'layerSubscribeHeader',
+      'layerSubscribeBody',
+      'layerSubscribeFooter',
+      'comAllDialog',
+      'comGoodsDetailPc'
+    ]
+  },
+  // 顶部header容器
+  layerSubscribeHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-hd',
+    children: ['comHeaderWatch']
+  },
+  // 中间主区域容器
+  layerSubscribeBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-bd',
+    children: ['comVmpSubscribeBody']
+  },
+  // 底部主区域容器
+  layerSubscribeFooter: {
+    component: 'VmpFooter',
+    className: 'vmp-footer'
+  },
+
+  comVmpSubscribeBody: {
+    component: 'VmpSubscribeBody',
+    children: ['comSubscribeTabMenu', 'comPcPlayer'],
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ],
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
+    ],
+    emitClickPay: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchPayFee',
+        method: 'openPayFee',
+        args: ['$0']
+      }
+    ],
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
+  },
+
+  comSubscribeTabMenu: {
+    component: 'VmpTabMenu',
+    options: {
+      // 是否展示左右按钮
+      isToggleBtnVisible: false,
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenu', text: '' }, //自定义菜单
+        { type: 4, cuid: 'comIntro', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' } // 广告、推荐
+      ]
+    }
+  },
+
+  // 问卷
+  comQuestionnaire: {
+    component: 'VmpQuestionnaireWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
+  },
+
+  // 红包
+  comRedPacket: {
+    component: 'VmpRedPacketWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
+  },
+  // 邀请上麦弹窗
+  comMicInvited: {
+    component: 'VmpMicInvited',
+    emitAgreeInvite: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'updateAutoSpeak'
       }
     ]
   }

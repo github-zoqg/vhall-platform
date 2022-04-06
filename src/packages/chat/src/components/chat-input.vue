@@ -1,6 +1,9 @@
 <template>
   <div class="vmp-chat-input">
-    <div class="vmp-chat-input__textarea-box" v-show="!inputStatus.disable && !chatLoginStatus">
+    <div
+      :class="['vmp-chat-input__textarea-box', { 'is-watch': isWatch }]"
+      v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
+    >
       <textarea
         id="chat-textarea"
         ref="chatTextarea"
@@ -26,12 +29,13 @@
     </div>
 
     <div
-      v-show="inputStatus.disable || chatLoginStatus"
-      class="vmp-chat-input__textarea-placeholder"
+      v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
+      :class="['vmp-chat-input__textarea-placeholder', { 'is-watch': isWatch }]"
     >
       <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
-        <span class="chat-login-btn" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
-        {{ $t('chat.chat_1001') }}
+        <i18n path="chat.chat_1001">
+          <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
+        </i18n>
       </span>
       <span v-show="inputStatus.disable && !chatLoginStatus" class="textarea-placeholder_no-login">
         {{ inputStatus.placeholder }}
@@ -49,8 +53,10 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatInput',
+    mixins: [emitter],
     props: {
       //输入框状态
       inputStatus: {
@@ -95,11 +101,13 @@
         //字数限制
         inputMaxLength: 140,
         //显示字数限制提示
-        showWordLimit: true,
+        showWordLimit: false,
         //聊天里临时选择的图片
         imgUrls: [],
         //回复消息
-        replyMsg: {}
+        replyMsg: {},
+        // 聊天输入框的值，是否是从无到有。默认null表示一开始是无内容的，一但有内容了，除非当前inputValue为空，否则不处理
+        isWordNull: null
       };
     },
     computed: {
@@ -114,9 +122,18 @@
       //在线人数
       onlineUsers() {
         return this.roomBaseState.watchInitData.pv.show;
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(this.roomBaseState.clientType);
       }
     },
     watch: {
+      //观察回复消息，自动调整输入框的值
       replyMsg() {
         if (Object.keys(this.replyMsg || {}).length == 0) {
           this.inputValue = this.trimPlaceHolder('reply');
@@ -127,9 +144,15 @@
             : `${replyText}${this.replyMsg.nickname}: `;
         }
       },
+      //观察输入的值，调整输入框高度
       inputValue(newValue) {
+        // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
         if (!newValue) {
-          this.replyMsg = {};
+          // 输入框内容发生变化，更新滚动条
+          this.$nextTick(() => {
+            this.overlayScrollbar.update();
+            this.inputHandle();
+          });
         }
       }
     },
@@ -153,31 +176,29 @@
       },
       //输入框输入事件,改变高度等
       inputHandle() {
-        const chatOldTextareaHeight = this.$refs.chatTextarea.style.height;
         // 最大字数限制 140
         if (this.inputValue.length > 140) {
           this.inputValue = this.inputValue.substring(0, 140);
         }
-        setTimeout(() => {
-          this.$nextTick(() => {
-            const chatTextareaHeight = this.$refs.chatTextarea.style.height;
-            if (chatOldTextareaHeight !== chatTextareaHeight) {
-              const hostTextarea = document.querySelector(
-                '.vmp-chat-input__textarea-box .os-host-textarea'
-              );
-              const chatTextAreaHeight = parseInt(chatTextareaHeight);
-              if (chatTextAreaHeight <= 60) {
-                // 解决删除文本之后 textarea 高度不会自动减小的问题
-                this.$refs.chatTextarea.style.minHeight = '20px';
-                hostTextarea.style.minHeight = chatTextareaHeight;
-              } else {
-                hostTextarea.style.minHeight = '59px';
-              }
-              // 三行的时候显示字数限制，否则不显示
-              this.showLimit = chatTextAreaHeight > 40;
+        this.$nextTick(() => {
+          const chatTextareaHeight = this.$refs.chatTextarea.style.height;
+          const hostTextarea = document.querySelector(
+            '.vmp-chat-input__textarea-box .os-host-textarea'
+          );
+          const chatTextAreaHeight = parseInt(chatTextareaHeight);
+          if (chatTextAreaHeight <= 60) {
+            // 解决删除文本之后 textarea 高度不会自动减小的问题
+            this.$refs.chatTextarea.style.minHeight = '20px';
+            hostTextarea.style.minHeight = chatTextareaHeight;
+          } else {
+            hostTextarea.style.minHeight = '59px';
+          }
+          // 三行的时候显示字数限制，否则不显示
+          this.showWordLimit = chatTextAreaHeight > 40;
 
-              this.$emit('inputHeightChange');
-            }
+          // 触发父元素绑定的高度发生变化事件
+          setTimeout(() => {
+            this.$emit('chatTextareaHeightChange');
           });
         });
       },
@@ -233,13 +254,17 @@
         }
       },
       /** 发送聊天消息 */
-      sendMsg(callback) {
+      sendMessage(callback) {
         //是否是聊天禁言状态
         if (this.inputStatus.disable) {
           return;
         }
         //获取一下子组件里上传的图片
         this.getUploadImg();
+        // 数据埋点-发送图片
+        if (this.imgUrls && this.imgUrls.length) {
+          window.vhallReportForProduct?.report(110124);
+        }
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
@@ -253,9 +278,18 @@
         //将回复消息加入消息体
         curmsg.setReply(this.replyMsg);
         //将@消息加入消息体
-        curmsg.setAt(this.atList);
+        curmsg.setAt([].concat(this.atList));
         //发送消息
         useChatServer().sendMsg(curmsg);
+        //埋点上报
+        window.vhallReport?.report('CHAT', {
+          event: JSON.stringify(curmsg.data),
+          market_tools_id: this.roleName
+        });
+        //发送图片埋点上报
+        if (this.imgUrls.length > 0) {
+          window.vhallReportForProduct?.report(110124);
+        }
         //清除发送后的消息
         useChatServer().clearCurMsg();
         //清空一下子组件里上传的图片
@@ -265,6 +299,13 @@
         //todo 建议移入domain  清空一下@列表，但是保持引用
         this.atList.splice(0, this.atList.length);
         callback && callback();
+        this.$nextTick(() => {
+          // 输入框内容发生变化，更新滚动条
+          this.overlayScrollbar.update();
+
+          this.inputHandle();
+        });
+        this.dispatch('VmpChatOperateBar', 'sendEnd');
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
@@ -273,7 +314,7 @@
           return;
         }
         if (this.roleName !== 2) {
-          this.sendMsg();
+          this.sendMessage();
           return;
         }
         if (this.chatGap > 0) {
@@ -282,7 +323,7 @@
             this.$message.warning(this.$t('chat.chat_1068', this.chatGap));
           }
         } else {
-          this.sendMsg(() => {
+          this.sendMessage(() => {
             this.chatGapInterval && window.clearInterval(this.chatGapInterval);
             this.lock = sessionStorage.getItem('chatLock');
             this.chatGap = this.delayTime(this.onlineUsers);
@@ -306,8 +347,10 @@
       trimPlaceHolder() {
         return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
-      //todo 利用信令 唤起登录
-      callLogin() {},
+      //利用信令 唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      },
       //选择了表情,这个方法是通过ref暴露给父组件使用
       emojiInput(val = '') {
         if (this.inputStatus.disable) {
@@ -393,7 +436,7 @@
   .vmp-chat-input {
     @bg-dark-normal: #1a1a1a;
     @font-dark-normal: #e6e6e6;
-    @font-dark-second: #666666;
+    @font-dark-second: #666;
     // 错误提示字体颜色
     @font-error: #fb3a32;
     // 链接字体颜色
@@ -404,6 +447,10 @@
 
     &__textarea-box {
       width: 220px;
+      &.is-watch {
+        width: 264px;
+      }
+      flex: 1;
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -458,6 +505,9 @@
 
     &__textarea-placeholder {
       width: 220px;
+      &.is-watch {
+        width: 264px;
+      }
       background-color: @bg-dark-normal;
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
@@ -465,7 +515,7 @@
       color: @font-dark-normal;
       line-height: 20px;
       padding: 10px 12px;
-      text-align: center;
+      text-align: left;
       border-radius: 20px;
       .textarea-placeholder_no-login {
         color: #666666;
@@ -486,6 +536,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      margin-left: 8px;
       .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;

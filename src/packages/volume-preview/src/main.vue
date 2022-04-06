@@ -34,7 +34,6 @@
           navigator.requestAnimationFrame =
             navigator.webkitRequestAnimationFrame || navigator.mozRequestAnimationFrame;
         }
-
         navigator.getUserMedia(
           { audio: { deviceId: audioId } },
           stream => {
@@ -83,6 +82,7 @@
         this.analyserNode = null;
         this.zeroGain = null;
         this.stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -5');
           trackInput.stop();
         });
       }

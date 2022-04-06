@@ -49,7 +49,7 @@
             :maxlength="11"
           />
         </el-form-item>
-        <el-form-item id="captcha-box" prop="imgCode">
+        <el-form-item id="captcha-box">
           <NECaptcha ref="NECaptcha" v-model="setPhoneForm.imgCode" />
         </el-form-item>
         <el-form-item prop="code" class="vmp-user-account-wrap__code">
@@ -203,10 +203,9 @@
           validateList.push(valid);
         });
         if (validateList.every(item => item === '')) {
-          const data =
-            this.phoneData.type === 'edit' && this.phoneData.step !== 1
-              ? this.setPhoneForm.phone
-              : this.phoneData.phone;
+          const data = !(this.phoneData.type == 'edit' && this.phoneData.step === 1)
+            ? this.setPhoneForm.phone
+            : this.phoneData.phone;
           const validate = this.setPhoneForm.imgCode;
           const scene_id = this.setPhoneForm.scene_id;
           // scene_id场景ID：1账户信息-修改密码  2账户信息-修改密保手机 3账户信息-修改关联邮箱 4忘记密码-邮箱方式找回 5忘记密码-短信方式找回 6提现绑定时手机号验证 7快捷方式登录（短信验证码登录） 8注册-验证码
@@ -228,7 +227,7 @@
                 }, 1000);
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg,
+                  message: this.$tec(res.code) || this.$t('account.account_1051'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -238,7 +237,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
+                message: this.$tec(res.code) || this.$t('account.account_1051'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -264,7 +263,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                    message: this.$tec(res.code) || this.$t('account.account_1052'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -273,7 +272,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   // duration: 0,
                   type: 'error',
@@ -306,7 +305,7 @@
                   this.$emit('input', { ...this.phoneData });
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                    message: this.$tec(res.code) || this.$t('account.account_1054'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -315,7 +314,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                  message: this.$tec(res.code) || this.$t('account.account_1054'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -342,7 +341,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                    message: this.$tec(res.code) || this.$t('account.account_1052'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -351,7 +350,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -393,7 +392,7 @@
               }
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                message: this.$tec(res.code) || this.$t('account.account_1054'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -402,7 +401,7 @@
           })
           .catch(res => {
             this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+              message: this.$tec(res.code) || this.$t('account.account_1054'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -447,13 +446,13 @@
       .el-form-item {
         margin-bottom: 16px;
         &.vhsaas-box__msg__error__bottom {
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
         &.is-error {
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
         &.vhsaas-box__msg__error {
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
       }
       @phone-color: #1a1a1a;

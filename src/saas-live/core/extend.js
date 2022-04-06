@@ -1,3 +1,5 @@
+// 重制 elementUI 的 message
+import '@/packages/app-shared/utils/message';
 /**
  * Created by yangxy on 2022/01/22.
  * 内置对象扩展

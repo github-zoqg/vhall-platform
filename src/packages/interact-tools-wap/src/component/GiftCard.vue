@@ -14,7 +14,7 @@
         </header>
         <van-swipe
           class="swiper-box"
-          indicator-color="#888888"
+          indicator-color="#888"
           :loop="filterGift.length != 1"
           @change="swiperChange"
         >
@@ -56,9 +56,9 @@
 
 <script>
   // import EventBus from '@/utils/Events';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
+  // import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer } from 'middle-domain';
-  import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
   export default {
     name: 'gift',
     data() {
@@ -160,6 +160,7 @@
       // 支付接口
       payProcess(params) {
         const that = this;
+        const open_id = sessionStorage.getItem('open_id');
         this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.data && res.code == 200) {
             if (res.data.price == 0) {
@@ -167,7 +168,7 @@
               this.close();
               return;
             }
-            if (browserType()) {
+            if (isWechat() && open_id) {
               WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
                 {
@@ -179,6 +180,7 @@
                   paySign: res.data.data.pay_data.paySign // 支付签名
                 },
                 function (res) {
+                  console.log(res, 'getBrandWCPayRequest');
                   if (res.err_msg == 'get_brand_wcpay_request:ok') {
                     that.$toast(this.$t('common.common_1005'));
                     that.btnDisabled = true;
@@ -218,28 +220,10 @@
           return;
         }
         // 如果开启手动加载历史聊天的配置项，并且是嵌入页面，就不会展示付费礼物，并且免费礼物通过聊天消息发送
-        // 所以这里需要判断如果满足这两个条件就不会调转登录
-        if (!this.isEmbed) {
-          if (browserType() && !open_id) {
-            let _search = '';
-            if (location.search && location.search != '') {
-              _search = location.search.split('?')[1];
-            }
-            const address =
-              window.location.protocol +
-              process.env.VUE_APP_WATCH_URL +
-              process.env.VUE_APP_WEB_KEY +
-              `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
-            window.location.href = `${
-              process.env.VUE_APP_BASE_URL
-            }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
-            return;
-          }
-        }
 
         if (this.selectTimer) clearTimeout(this.selectTimer);
         this.selectTimer = setTimeout(() => {
-          if (browserType()) {
+          if (isWechat() && open_id) {
             params = {
               gift_id: this.currentGift.id,
               channel: 'WEIXIN',
@@ -247,6 +231,7 @@
               room_id: this.localRoomInfo.roomId,
               open_id: open_id
             };
+            console.log(isWechat(), open_id, params, 'open_id');
             if (Number(this.currentGift.price) <= 0) {
               this.payFree(params);
               return;
@@ -263,6 +248,7 @@
               return;
             }
           }
+
           this.payProcess(params);
         }, 300);
       },
@@ -275,7 +261,12 @@
       setSetingHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
-        this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
+        let baseHeight = 522;
+        if (this.isEmbed) {
+          baseHeight = 422;
+        }
+        this.popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
         // const headerDom = document.getElementById('header');
         // const interactDoc = document.getElementById('interactBox');
         // if (headerDom) {
@@ -333,17 +324,16 @@
             avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
-            nickname: this.joinInfoInGift.nickname,
+            gift_user_nickname: this.joinInfoInGift.nickname,
             role_name: 2,
             gift_name: this.currentGift.name,
-            gift_url: this.currentGift.image_url,
+            gift_image_url: this.currentGift.image_url,
             source_status: this.currentGift.source_status
           };
           const context = {
             avatar: this.joinInfoInGift.avatar,
             nickname: this.joinInfoInGift.nickname
           };
-          // TODO: 发送什么消息
           if (this.msgServer) {
             this.msgServer.sendChatMsg(msgData, context);
             this.$toast(this.$t('interact_tools.interact_tools_1031'));
@@ -462,7 +452,7 @@
         color: #444;
       }
       &.active {
-        border: 2px solid #fc5659;
+        border: 2px solid #fb3a32;
         border-radius: 12px;
       }
     }

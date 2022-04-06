@@ -1,8 +1,8 @@
 <template>
-  <div class="vmp-footer" v-if="isNotEmbed && webinarTag && webinarTag.reserved_status">
-    <div class="vmp-footer-text">
+  <div class="vmp-footer" v-if="!isEmbed && webinarTag && webinarTag.reserved_status">
+    <div class="vmp-footer_text">
       <a href="https://www.vhall.com/saas" target="_blank">{{ $t('footer.footer_1021') }}</a>
-      <b>|</b>
+      &nbsp;|&nbsp;
       <span @click="openFeedHandler">{{ $t('footer.footer_1001') }}</span>
     </div>
     <!-- 反馈与举报弹出框 -->
@@ -14,7 +14,7 @@
       width="440px"
       @closed="closeFeedHandler"
     >
-      <div class="vmp-footer-main">
+      <div class="vmp-footer_main">
         <el-form ref="feedbackForm" label-width="68px">
           <el-form-item :label="$t('footer.footer_1002')" class="radio-btn">
             <el-radio-group v-model="type" @change="radioChange">
@@ -41,7 +41,7 @@
             ></el-input>
           </el-form-item>
         </el-form>
-        <span slot="footer" class="vmp-footer-main-submit">
+        <span slot="footer" class="vmp-footer_main_submit">
           <el-button type="primary" size="medium" round @click="feedExecuteHandler">
             {{ $t('interact_tools.interact_tools_1019') }}
           </el-button>
@@ -147,10 +147,9 @@
           return this.feedBackOptions;
         }
       },
-      isNotEmbed() {
-        return this.embedObj
-          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
-          : true;
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     beforeCreate() {
@@ -269,12 +268,12 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .vmp-footer {
     color: #666;
     width: 100%;
     padding: 24px 0;
-    &-text {
+    &_text {
       font-size: 14px;
       text-align: center;
       a {
@@ -289,13 +288,9 @@
           color: #3562fa;
         }
       }
-      b {
-        font-weight: normal;
-        padding: 0 6px;
-      }
     }
-    &-main {
-      &-submit {
+    &_main {
+      &_submit {
         display: flex;
         justify-content: center;
         align-items: flex-end;

@@ -193,6 +193,7 @@ export default {
     login_1030: 'Consentimiento y cumplimiento',
     login_1031: 'Condiciones de servicio'
   },
+  undefined: {},
   register: {
     register_1001: 'Bienvenida a registrarse Vhall en vivo',
     register_1002: 'Registrar un nuevo usuario',
@@ -478,7 +479,8 @@ export default {
     interact_tools_1069: 'Pago con alipay',
     interact_tools_1070: 'El monto admite hasta dos decimales',
     interact_tools_1071: 'Envía tu clave xxx y participa en el sorteo',
-    interact_tools_1072: 'QR en la imagen'
+    interact_tools_1072: 'QR en la imagen',
+    interact_tools_1075: 'Aplaudir'
   },
   setting: {
     setting_1002: 'Configuración de la vista',
@@ -690,7 +692,7 @@ export default {
     interact_1010: 'Negar',
     interact_1011:
       'La conexión al micrófono se interrumpió debido a un problema con el dispositivo, por favor, verifique el dispositivo',
-    interact_1012: '{n} está configurado como presentador principal',
+    interact_1012: '{n} está configurado como {m}',
     interact_1013:
       'Falló la suscripción de compartir escritorio debido a problemas de red, vuelve a suscribirse',
     interact_1014:
@@ -707,11 +709,13 @@ export default {
     interact_1023: 'La cámara está apagada, la otra parte no verá tu imagen',
     interact_1024: 'Encender la cámara',
     interact_1025: 'Falta de respuesta prolongada que conduce al fracaso del upper MCT',
-    interact_1026: 'El micrófono está apagado, la otra persona no podrá oírte'
+    interact_1026: 'El micrófono está apagado, la otra persona no podrá oírte',
+    interact_1033: '主画面',
+    interact_1034: 'presentador principal'
   },
   doc: {
     doc_1001: 'Este documento en carga',
-    doc_1002: 'Presentador sin documentos añadidos\n\n',
+    doc_1002: 'Presentador sin documentos añadidos',
     doc_1003: 'El presentador prepara la documentación',
     doc_1004: 'Este documentación está fuera de línea',
     doc_1005: 'Amplificación',
@@ -766,6 +770,6 @@ export default {
     webinar_1038: 'Compartir el éxito',
     webinar_1039: 'Reserva'
   },
-  other: {},
-  undefined: {}
+  color: {},
+  other: {}
 };

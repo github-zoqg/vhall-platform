@@ -1,13 +1,20 @@
 import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-import { useMsgServer, useRoomBaseServer, useWatchRewardServer } from 'middle-domain';
+import {
+  useRoomBaseServer,
+  useWatchRewardServer,
+  useChatServer,
+  useZIndexServer
+} from 'middle-domain';
 import QRcode from 'qrcode';
 // import { mapMutations } from 'vuex';
 export default {
   name: 'reward',
   data() {
     let { watchInitData } = useRoomBaseServer().state;
+    const zIndexServerState = this.zIndexServer.state;
     return {
       watchInitData,
+      zIndexServerState,
       showRewardDialog: false,
       showGiveMoneyQr: false,
       giveMoneyUrl: '',
@@ -27,10 +34,11 @@ export default {
     // }
   },
   beforeCreate() {
+    this.zIndexServer = useZIndexServer();
     this.watchRewardServer = useWatchRewardServer();
-    this.msgServer = useMsgServer();
   },
   created() {
+    this.chatServer = useChatServer();
     this.listenEvent();
   },
   computed: {
@@ -41,31 +49,10 @@ export default {
   methods: {
     // ...mapMutations('watchBase', ['setDialogZIndexQueue', 'setToolsCount']),
     listenEvent() {
-      this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
-        let temp = Object.assign({}, rawMsg);
-
-        if (typeof temp.data !== 'object') {
-          temp.data = JSON.parse(temp.data);
-          temp.context = JSON.parse(temp.context);
-        }
-        console.log(temp, '原始消息');
-        const { type = '' } = temp.data || {};
-        switch (type) {
-          // 支付成功
-          case 'reward_pay_ok':
-            if (this.userId == temp.data.rewarder_id) {
-              this.closeDialog();
-              this.$message({
-                message: this.$t('common.common_1005'),
-                showClose: true,
-                // duration: 0,
-                type: 'success',
-                customClass: 'zdy-info-box'
-              });
-            }
-            break;
-          default:
-            break;
+      // 改为飘屏组件监听
+      this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
+        if (this.watchInitData.join_info.third_party_user_id == rawMsg.data.rewarder_id) {
+          this.closeDialog();
         }
       });
     },
@@ -119,8 +106,8 @@ export default {
     },
     // open支付金额设置弹框
     onClickReward() {
+      this.zIndexServer.setDialogZIndex('reward');
       this.showRewardDialog = true;
-      // this.setDialogZIndexQueue('reward');
     },
     // 选择支付金额
     onClickRewardItem(index) {

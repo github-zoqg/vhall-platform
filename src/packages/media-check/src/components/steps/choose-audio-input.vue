@@ -26,18 +26,8 @@
         <span>对着麦克风讲话，您能看到音量条波动么？</span>
       </div>
       <div class="button-container button-container__microphone">
-        <el-button
-          round
-          class="confirm"
-          type="primary"
-          :class="{ disable: !audioReady }"
-          @click="success"
-        >
-          能看到
-        </el-button>
-        <el-button round class="cancel" :class="{ disable: !audioReady }" @click="fail">
-          看不到
-        </el-button>
+        <el-button round class="confirm" type="primary" @click="success">能看到</el-button>
+        <el-button round class="cancel" @click="fail">看不到</el-button>
       </div>
     </footer>
   </section>
@@ -83,15 +73,24 @@
         const mediaOptions = { audio: { deviceId: this.selectedAudioDeviceId } };
         const stream = await navigator.mediaDevices.getUserMedia(mediaOptions);
         stream.getTracks().forEach(trackInput => {
+          console.log('[interactiveServer]  look stop -3');
           trackInput.stop();
         });
         this.$refs.previewAudio.initAudio(this.selectedId);
       },
 
       success() {
+        window?.vhallReport?.report(110007, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 麦克风设备检测成功
+
         this.$emit('next', { result: 'success' });
       },
       fail() {
+        window?.vhallReport?.report(110011, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 麦克风设备检测失败
+
         this.$emit('next', { result: 'fail' });
       }
     }
@@ -100,11 +99,13 @@
 
 <style lang="less">
   .vh-media-check-audioinput {
+    width: 296px;
+    margin: 0 auto;
+
     // selector
     .vh-media-check-selector {
       display: flex;
       align-items: center;
-      margin-top: 11px;
 
       label {
         flex: 0;
@@ -119,7 +120,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip

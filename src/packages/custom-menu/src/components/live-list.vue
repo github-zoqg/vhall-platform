@@ -16,13 +16,15 @@
                 <img src="../assets/imgs/live.gif" alt="" />
               </label>
               <div class="scale8">
-                <span>{{ item | liveTag }}</span>
-                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">| 无延迟</span>
+                <span>{{ getLiveTag(item) }}</span>
+                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">
+                  | {{ $t('common.common_1023') }}
+                </span>
               </div>
             </span>
           </div>
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <i class="saasicon_redu iconfont iconredu_icon1"></i>
+            <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
         </div>
@@ -39,36 +41,22 @@
   </div>
 </template>
 <script>
-  import { useCustomMenuServer } from 'middle-domain';
+  import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
-    filters: {
-      liveTag(val) {
-        /**
-         * webinar_state  1直播 2预约 3结束 4点播 5回放
-         * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播
-         */
-        const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
-        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播'];
-        let str = liveTypeStr[val.webinar_state];
-        if (val.webinar_state != 4 && val.webinar_type != 5) {
-          str += ` | ${liveStatusStr[val.webinar_type]}`;
-        }
-        return str;
-      }
-    },
     props: ['checkedList', 'pagetype'],
     data() {
       return {
         activeList: [],
-        loading: false,
-        hasDelayPermission: false
+        loading: false
       };
     },
     computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList']),
       userId() {
         return this.watchInitData.join_info.third_party_user_id;
+      },
+      hasDelayPermission() {
+        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
       }
     },
     watch: {
@@ -84,11 +72,41 @@
     },
     beforeCreate() {
       this.customMenuServer = useCustomMenuServer();
-    },
-    mounted() {
-      this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
+      getLiveTag(val) {
+        /**
+         * webinar_state  1直播 2预约 3结束 4点播 5回放
+         * webinar_type  1音频直播 2视频直播 3互动直播 5定时直播 6分组直播
+         */
+        const liveTypeMap = new Map([
+          [0, ''],
+          [1, this.$t('common.common_1018')],
+          [2, this.$t('common.common_1019')],
+          [3, this.$t('common.common_1020')],
+          [4, this.$t('common.common_1024')],
+          [5, this.$t('common.common_1021')]
+        ]);
+
+        const liveStatusStrMap = new Map([
+          [0, ''],
+          [1, this.$t('common.common_1026')],
+          [2, this.$t('common.common_1027')],
+          [3, this.$t('common.common_1028')],
+          [4, ''],
+          [5, ''],
+          [6, this.$t('common.common_1029')]
+        ]);
+
+        let liveType = liveTypeMap.get(val.webinar_state);
+
+        let liveStatus = '';
+        if (val.webinar_state != 4 && val.webinar_type != 5) {
+          liveStatus = ` | ${liveStatusStrMap.get(val.webinar_type)}`;
+        }
+        return `${liveType}${liveStatus}`;
+      },
       gotoRoom(id) {
         this.$emit('link', id);
       },
@@ -139,9 +157,8 @@
     overflow: hidden;
     width: 312px;
     height: 80px;
-    padding: 0px 10px 8px;
+    padding: 8px 10px 8px;
     border-radius: 4px;
-    font-family: PingFangSC-Regular, PingFang SC;
     &:hover {
       background: #383838;
       cursor: pointer;
@@ -214,22 +231,21 @@
         margin: 4px 10px 0px 0px;
       }
     }
-    &__titleInfo {
-      height: 55px;
-    }
     &__title {
-      margin: 10px 0px 4px 0px;
+      margin: 10px 0 4px 0;
       font-size: 14px;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: #e6e6e6;
       line-height: 20px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
-      -webkit-box-orient: vertical;
       text-align: left;
+      /**autoprefixer: ignore next */
+      -webkit-box-orient: vertical;
+      max-height: 200px;
     }
     &__info {
       font-weight: 400;
@@ -243,7 +259,6 @@
     .liveTag {
       color: #fff;
       font-size: 12px;
-      // padding:12px;
       border-radius: 20px;
       position: relative;
       z-index: 2;
@@ -320,6 +335,10 @@
       color: @font-light-normal;
       line-height: 24px;
       margin: 12px 16px 7px 16px;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
     }
     &__info {
       font-size: 14px;

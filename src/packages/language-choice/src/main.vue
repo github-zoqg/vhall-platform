@@ -1,21 +1,21 @@
 <!-- 主题选择组件 -->
 <template>
-  <div class="vmp-language-choice">
-    <el-dropdown @command="handleChangeLang" trigger="click" placement="bottom">
-      <div class="vmp-language-choice-lang">
+  <div class="vmp-language-choice" v-if="mode != 6 && languageList.length > 1">
+    <el-dropdown @command="handleChangeLang" placement="bottom">
+      <div :class="'vmp-language-choice-lang ' + themeClass.iconClass">
         <span class="vmp-language-choice-lang-icon">
           <i
             class="vh-saas-iconfont vh-saas-line-multilingual"
             :style="{ color: themeClass.pageBg }"
           ></i>
         </span>
-        <p :style="{ color: themeClass.pageBg }">简体中文</p>
+        <p :style="{ color: themeClass.pageBg }">{{ lang.label }}</p>
       </div>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item
-          :command="item.type"
+          :command="item.key"
           :key="index"
-          :class="{ active: item.type == lang }"
+          :class="{ active: item.key == lang.key }"
           v-for="(item, index) in languageList"
         >
           {{ item.label }}
@@ -25,59 +25,66 @@
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLanguageChoice',
     data() {
       return {
         themeClass: {
-          pageBg: '#3562fa'
+          bgColor: 'light',
+          pageBg: '#cccccc',
+          iconClass: 'icon-default' // icon默认色
         },
-        label: '',
-        lang: 'zh',
-        languageList: [
-          {
-            type: 'zh',
-            label: '简体中文'
-          },
-          {
-            type: 'cn',
-            label: 'English'
-          }
-        ]
+        mode: 1,
+        lang: {},
+        languageList: []
       };
     },
-    mounted() {
-      this.initConfig();
+    created() {
+      const roomBaseServer = useRoomBaseServer();
+      this.setSkinInfo(roomBaseServer.state.skinInfo);
+      this.mode = roomBaseServer.state.watchInitData.webinar.mode;
+      // 语言列表
+      this.languageList = roomBaseServer.state.languages.langList;
+      // 当前语言
+      this.lang = roomBaseServer.state.languages.lang;
     },
-    watch: {
-      lang(newValue) {
-        localStorage.setItem('lang', newValue);
-      }
-    },
+    watch: {},
     methods: {
-      // 初始化配置
-      initConfig() {
-        const lan = localStorage.getItem('lang');
-        if (lan) {
-          this.lang = lan;
-        }
-        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('choices')) {
-            this.choices = widget.options.choices;
+      // 设置语言
+      handleChangeLang(key) {
+        localStorage.setItem('lang', key);
+        const params = this.$route.query;
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
           }
-          // eslint-disable-next-line
-          if (!this.lang && widget.options.hasOwnProperty('lang')) {
-            this.lang = widget.options.lang;
-          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
         }
-        // if (!this.lang) {
-        //   this.lang = window.$layoutConfig.lang;
-        // }
       },
-      handleChangeLang: function () {
-        window.location.reload();
+      // 设置皮肤
+      setSkinInfo(skin) {
+        if (skin && skin.skin_json_pc && skin.status == 1) {
+          this.$nextTick(() => {
+            const { pageStyle } = JSON.parse(skin.skin_json_pc) || '';
+            this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
+            this.themeClass.pageBg = pageStyle;
+          });
+        } else {
+          this.$nextTick(() => {
+            // 默认皮肤
+            this.themeClass.pageBg = '#cccccc';
+            this.themeClass.iconClass = 'icon-default';
+          });
+        }
       }
     }
   };
@@ -101,11 +108,24 @@
         line-height: 14px;
         padding-top: 5px;
       }
-      &:hover {
-        i,
-        p {
+      &.icon-default {
+        &:hover {
           cursor: pointer;
-          color: @font-high-light-normal !important;
+          i,
+          p {
+            cursor: pointer;
+            color: @font-high-light-normal !important;
+          }
+        }
+      }
+      &.icon-revert {
+        &:hover {
+          cursor: pointer;
+          i,
+          p {
+            cursor: pointer;
+            color: @font-dark-second !important;
+          }
         }
       }
     }

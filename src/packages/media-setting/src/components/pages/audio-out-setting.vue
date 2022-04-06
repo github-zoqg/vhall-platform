@@ -12,6 +12,7 @@
         <el-select
           class="vmp-media-setting-item__content"
           v-model="mediaState.audioOutput"
+          :placeholder="$t('form.form_1018')"
           @change="audioOutputChange"
         >
           <el-option
@@ -66,7 +67,6 @@
       return {
         mediaState: this.mediaSettingServer.state,
         isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
-        speakerReady: false,
         isPaused: true,
         volume: 0.5
       };
@@ -80,13 +80,6 @@
       volume(value) {
         if (!this.$refs.outputAudioPlayer) return;
         this.$refs.outputAudioPlayer.volume = value;
-      },
-      devices(val) {
-        if (val && val.length) {
-          this.mediaState.audioOutput = val[0].deviceId;
-        } else {
-          sessionStorage.removeItem('selectedAudioOutputDeviceId');
-        }
       }
     },
     beforeCreate() {
@@ -100,24 +93,30 @@
     },
     methods: {
       listenEvents() {
-        this.setisPaused = () => (this.isPaused = true);
+        // 监听原生的播放、暂停事件
+        this.setIsPaused = () => (this.isPaused = true);
         this.setAudioPlay = () => (this.isPaused = false);
 
-        this.$refs.outputAudioPlayer.addEventListener('pause', this.setisPaused);
+        this.$refs.outputAudioPlayer.addEventListener('pause', this.setIsPaused);
         this.$refs.outputAudioPlayer.addEventListener('play', this.setAudioPlay);
       },
       removeEvents() {
-        this.$refs.outputAudioPlayer.removeEventListener('pause', this.setisPaused);
+        this.$refs.outputAudioPlayer.removeEventListener('pause', this.setIsPaused);
         this.$refs.outputAudioPlayer.removeEventListener('play', this.setAudioPlay);
       },
+      /**
+       * 试播音频
+       */
       playAudio: debounce(function () {
         if (!this.$refs.outputAudioPlayer) return;
         if (!this.isPaused) return this.$refs.outputAudioPlayer.pause();
         if (!this.mediaState.audioOutput && !this.isSafari)
           return this.$message.warning('无可用的扬声器');
         this.$refs.outputAudioPlayer.play();
-        this.speakerReady = true;
       }, 500),
+      /**
+       * 设备变更
+       */
       audioOutputChange() {
         const audioPlayer = this.$refs.outputAudioPlayer;
         if (!audioPlayer) return;
@@ -126,7 +125,7 @@
           console.warn('Browser does not support output device selection.');
         } else {
           audioPlayer
-            .setSinkId(this.selected.audioOutput)
+            .setSinkId(this.mediaState.audioOutput)
             .then(() => {})
             .catch(error => {
               let errorMessage = error;
@@ -152,20 +151,5 @@
     color: #333;
     font-size: 14px;
     margin-bottom: 14px;
-  }
-
-  .vmp-media-setting-voice-slider {
-    @theme-color: #fb3a32;
-    .el-slider__bar {
-      background-color: @theme-color;
-    }
-
-    .el-slider__button {
-      width: 17px;
-      height: 17px;
-      border: none;
-      background-color: @theme-color;
-      box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
-    }
   }
 </style>

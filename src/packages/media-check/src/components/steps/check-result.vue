@@ -2,43 +2,46 @@
   <section class="check-end">
     <div>
       <div class="check-end-icon success" v-if="isCheckSuccess">
-        <span class="iconfont iconchenggong"></span>
+        <i class="vh-iconfont vh-line-circle-check" />
         <div class="check-end-text">设备检测正常</div>
       </div>
       <div class="check-end-icon fail" v-else>
-        <span class="iconfont iconyichang"></span>
+        <i class="vh-iconfont vh-line-warning-outline" />
         <div class="check-end-text">设备检测异常</div>
       </div>
     </div>
 
     <div class="vh-check-result">
-      <header class="vh-check-result__item">
-        <span>检测项目</span>
-        <span>检测结果</span>
-      </header>
-
-      <main v-for="item of checkList" :key="item.name" class="vh-check-result__item">
-        <span>{{ item.text }}</span>
-        <span :class="item.status">
-          <span>{{ item.status === 'success' ? '正常' : '异常' }}</span>
-        </span>
+      <main>
+        <div class="vh-check-result__item">
+          <span>检测项目</span>
+          <span>检测结果</span>
+        </div>
+        <div v-for="item of checkList" :key="item.name" class="vh-check-result__item">
+          <span>{{ item.text }}</span>
+          <span :class="item.status">
+            <span>{{ item.status === 'success' ? '正常' : '异常' }}</span>
+          </span>
+        </div>
       </main>
+    </div>
 
-      <footer class="vh-footer__result-btn">
+    <footer class="vh-footer">
+      <section class="vh-footer_result-btn">
         <el-button round v-if="!isCheckSuccess" @click="restart" class="confirm">
           重新检测
         </el-button>
-        <el-button
-          round
-          type="primary"
-          v-if="isCheckSuccess"
-          :class="audioOutputStatus != 'success' ? 'cancel' : 'confirm'"
-          @click="finish"
-        >
+        <el-button class="fr" round type="primary" v-if="isCheckSuccess" @click="finish">
           {{ roleName == 1 ? '去直播' : '马上互动' }}
         </el-button>
-      </footer>
-    </div>
+      </section>
+
+      <section v-if="!isCheckSuccess" class="vh-footer_result-help">
+        <a target="_blank" href="https://www.vhall.com/saas/doc/1722.html">
+          {{ $t('setting.setting_1029') }}
+        </a>
+      </section>
+    </footer>
   </section>
 </template>
 
@@ -81,9 +84,11 @@
     },
     methods: {
       restart() {
+        window?.vhallReport?.report(120001); // 埋点-重新检测
         this.$emit('next', { result: 'fail' });
       },
       finish() {
+        window?.vhallReport?.report(110009); // 埋点-去直播
         this.$emit('next', { result: 'success' });
       }
     }
@@ -92,11 +97,14 @@
 
 <style lang="less">
   .check-end {
+    width: 330px;
+    margin: 0 auto;
+
     .check-end-icon {
       display: flex;
       flex-direction: column;
       align-items: center;
-      & > .iconfont {
+      & > .vh-iconfont {
         font-size: 48px;
       }
       & > .check-end-text {
@@ -128,7 +136,7 @@
           background: #e2e2e2;
         }
         &:nth-child(even) {
-          background: #f5f5f5;
+          background: #f7f7f7;
           border-top: 1px solid #ffffff;
         }
         & > span {
@@ -155,6 +163,16 @@
           }
         }
       }
+    }
+    .vh-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-direction: row-reverse;
+      position: absolute;
+      bottom: 16px;
+      width: 330px;
+
       .vh-check-help {
         position: absolute;
         left: 55px;
@@ -164,10 +182,26 @@
         }
       }
 
+      .vh-footer_result-help {
+        a {
+          font-size: 14px;
+          color: #666;
+          &:hover {
+            color: #3562fa;
+          }
+        }
+      }
+
       .vh-footer__result-btn {
         position: absolute;
         bottom: 4px;
         right: 32px;
+      }
+      .vh-footer_result-btn {
+        overflow: hidden;
+        .fr {
+          float: right;
+        }
       }
     }
   }

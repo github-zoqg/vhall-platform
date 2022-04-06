@@ -2,8 +2,8 @@
   <section class="vmp-media-setting-video">
     <main>
       <section class="vmp-media-setting-item">
-        <label class="vmp-media-setting-item__label">{{ $t('setting.setting_1003') }}</label>
-        <section class="vmp-media-setting-item__content">
+        <label class="vmp-media-setting-item__label">{{ $t('setting.setting_1006') }}</label>
+        <section class="vmp-media-setting-item__content vmp-media-setting-item__video-type">
           <el-radio-group v-model="mediaState.videoType" @change="onVideoTypeChange">
             <el-radio label="camera">{{ $t('setting.setting_1003') }}</el-radio>
             <el-radio label="picture">{{ $t('setting.setting_1007') }}</el-radio>
@@ -12,7 +12,11 @@
       </section>
 
       <section v-show="mediaState.videoType === 'camera'" class="vmp-media-setting-item">
-        <el-select class="vmp-media-setting-item__content" v-model="mediaState.video">
+        <el-select
+          class="vmp-media-setting-item__content"
+          :placeholder="$t('form.form_1018')"
+          v-model="mediaState.video"
+        >
           <el-option
             v-for="item in devices"
             :key="item.deviceId"
@@ -23,7 +27,7 @@
       </section>
 
       <section v-show="mediaState.videoType === 'camera'" class="vmp-media-setting-video-canvas">
-        <div id="vmp-media-setting-preview-video" style="height: 100%"></div>
+        <div ref="videoPreviewer" id="vmp-media-setting-preview-video" style="height: 100%"></div>
         <div
           v-show="isVideoSwitching || isVideoError"
           class="vmp-media-setting-preview-loading-container"
@@ -64,12 +68,9 @@
       return {
         mediaState: this.mediaSettingServer.state,
         videoLoadingImg: videoSwitchImg,
-        isVideoSwitching: false,
-        isVideoError: false,
-        videoTipsText: '设备切换中，请稍后…',
-        roomId: null, // TODO:
-        interactToken: null, // TODO:
-        videoError: false
+        isVideoSwitching: false, // video正在切换
+        isVideoError: false, // video读取错误
+        videoTipsText: '设备切换中，请稍后…'
       };
     },
     computed: {
@@ -79,15 +80,8 @@
     },
     watch: {
       'mediaState.video'(val) {
-        this.mediaSettingServer.setState('video', val);
+        if (val === undefined || val === '') return;
         this.createPreview();
-      },
-      devices(val) {
-        if (val && val.length) {
-          this.mediaSettingServer.setState('video', val[0].deviceId);
-        } else {
-          sessionStorage.removeItem('selectedVideoDeviceId');
-        }
       }
     },
     beforeCreate() {
@@ -96,34 +90,35 @@
     created() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
-
-      // this.setDefaultVideoType();
     },
     beforeDestroy() {
-      // this.destroyStream();
+      this.destroyStream();
     },
     methods: {
-      // setDefaultVideoType() {
-      //   let param = JSON.parse(localStorage.getItem(`saveCanvasObj_${this.webinar.id}`));
-      //   if (param && param.flag === true && param.streamUrl !== '') {
-      //     this.mediaState.videoType = 'picture';
-      //     this.mediaState.canvasImgUrl = param.streamUrl;
-      //   }
-      // },
+      /**
+       * 视频设备变更
+       * @param {String} value 视频设备ID
+       */
       async onVideoTypeChange(value) {
         this.mediaSettingServer.setState('videoType', value);
+
         if (value === 'picture') {
           return this.destroyStream();
         }
 
         if (value === 'camera') {
-          await this.destroyStream();
           this.createPreview();
         }
       },
-      // 创建视频流
+      /**
+       * 创建视频预览流
+       */
       async createPreview() {
+        if (this.mediaState.videoType !== 'camera') return;
+
         await this.destroyStream();
+
+        this.$refs['videoPreviewer'].innerHTML = '';
 
         const options = {
           videoNode: 'vmp-media-setting-preview-video',
@@ -135,7 +130,7 @@
         };
 
         try {
-          this.videoError = false;
+          this.isVideoError = false;
           this.isVideoSwitching = true;
           this.videoLoadingImg = videoSwitchImg;
           await this.mediaSettingServer.startVideoPreview(options);
@@ -143,29 +138,34 @@
         } catch (err) {
           this.isVideoSwitching = false;
           this.videoLoadingImg = videoFailImg;
-          this.videoError = true;
+          this.isVideoError = true;
           this.videoTipsText = this.$t('setting.setting_1010');
           this.$message.error(this.$t('message.message_1031'));
           console.error(this.$t('message.message_1028'), err);
         }
       },
+      /**
+       * 销毁预览流
+       */
       async destroyStream() {
-        // if (!this.mediaState.videoPreviewStreamId) return;
         try {
-          await this.mediaSettingServer.stopVideoPreview();
+          return this.mediaSettingServer.stopVideoPreview();
         } catch (err) {
           console.error(`销毁流异常`, err);
         }
-      },
-      //TODO: let stream save
-      saveStream() {},
-      uploadSuccessCanvas() {},
-      updateDeviceSetting() {}
+
+        return true;
+      }
     }
   };
 </script>
 
 <style lang="less">
+  .vmp-media-setting-item__video-type {
+    display: flex;
+    align-items: center;
+  }
+
   .vmp-media-setting-video-canvas {
     height: 166px;
     border-radius: 4px;
@@ -191,7 +191,7 @@
       p {
         padding-top: 10px;
         font-size: 12px;
-        color: #ffffff;
+        color: #fff;
         line-height: 20px;
       }
     }

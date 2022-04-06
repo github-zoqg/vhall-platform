@@ -6,21 +6,23 @@
     <div class="vhall-room-id-container">
       <div class="vhall-room-id-icon">ID</div>
       <div id="vhall-room-id-copy-val" class="vhall-room-id">{{ webinarInfo.id }}</div>
-      <div class="vhall-room-id-copy" @click="handleCopy">
-        <i class="iconfont iconfuzhi"></i>
-        <!-- :data-clipboard-text="id" -->
+      <div class="vhall-room-id-copy" :data-clipboard-text="webinarInfo.id" @click="handleCopy">
+        <i class="vh-iconfont vh-line-copy"></i>
       </div>
     </div>
-    <!---->
+    <!-- 定时直播 -->
+    <div v-if="webinarInfo.mode == 5" class="auto-live-start">定时直播</div>
+    <!--无延迟-->
     <div class="nopdelay-icon" v-if="webinarInfo.no_delay_webinar == 1 && webinarInfo.mode != 6">
       <img
-        src="//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
+        src="//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png"
         alt=""
       />
     </div>
   </div>
 </template>
 <script>
+  import Clipboard from 'clipboard';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpHeaderLeft',
@@ -39,69 +41,29 @@
       const { watchInitData } = useRoomBaseServer().state;
       this.webinarInfo = watchInitData.webinar;
     },
-    mounted() {
-      // this.initConfig();
-    },
     methods: {
-      // 初始化配置
-      initConfig() {
-        const widget = window.$serverConfig && window.$serverConfig[this.cuid];
-        if (widget && widget.options) {
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('className')) {
-            this.className = widget.options.className;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('selected')) {
-            this.selected = widget.options.selected;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('disable')) {
-            this.disable = widget.options.disable;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('icon')) {
-            this.icon = widget.options.icon;
-          }
-          // eslint-disable-next-line
-          if (widget.options.hasOwnProperty('text')) {
-            this.text = widget.options.text;
-          }
-        }
-      },
       // 负责roomId
       handleCopy() {
-        // this.$vhall_paas_port({
-        //   k: 110000,
-        //   data: {
-        //     business_uid: this.userInfo.third_party_user_id,
-        //     user_id: '',
-        //     webinar_id: this.webinar_id,
-        //     refer: '',
-        //     s: '',
-        //     report_extra: {},
-        //     ref_url: '',
-        //     req_url: ''
-        //   }
-        // });
-        const input = document.getElementById('vhall-room-id-copy-val');
-        // input.select();
-        document.execCommand('copy');
-        this.$message({
-          message: '复制成功！',
-          showClose: true,
-          type: 'success',
-          customClass: 'zdy-info-box'
+        window.vhallReportForProduct.report(110000);
+        const clipboard = new Clipboard('.vhall-room-id-copy');
+        clipboard.on('success', () => {
+          this.$message({
+            message: this.$t('nav.nav_1024'),
+            showClose: true,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
+          clipboard.destroy();
         });
-        // const clipboard = new this.$clipboard('.vhall-room-id-copy');
-        // clipboard.on('success', () => {
-        //   this.$message.success(this.$t('usual.copySucceeded'));
-        //   clipboard.destroy();
-        // });
-        // clipboard.on('error', () => {
-        //   this.$message.error(this.$t('usual.copyFailed'));
-        //   clipboard.destroy();
-        // });
+        clipboard.on('error', () => {
+          this.$message({
+            message: this.$t('nav.nav_1052'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          clipboard.destroy();
+        });
       }
     }
   };
@@ -128,15 +90,8 @@
       height: 20px;
       border-radius: 2px;
       border: 1px solid #979797;
-      display: -webkit-box;
-      display: -ms-flexbox;
       display: flex;
-      -webkit-box-orient: horizontal;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: row;
       flex-direction: row;
-      -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
       justify-content: space-between;
       padding-right: 3px;
     }
@@ -167,6 +122,18 @@
       line-height: 20px;
       text-align: center;
       cursor: pointer;
+    }
+    .auto-live-start {
+      display: inline-block;
+      margin-left: 8px;
+      background: #fb3a32;
+      border-radius: 10px;
+      height: 16px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 16px;
     }
     .nopdelay-icon {
       line-height: 34px;

@@ -8,7 +8,13 @@ export const serverConfig = {
   // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
-    children: ['layerHeader', 'layerBody', 'comAllDialog']
+    children: ['layerHeader', 'layerBody', 'comAllDialog'],
+    checkStartPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'checkStartPush'
+      }
+    ]
   },
   // 顶部header容器
   layerHeader: {
@@ -34,11 +40,16 @@ export const serverConfig = {
     className: 'vmp-basic-center',
     children: [
       'comStreamList',
-      'comDocUne',
+      'layerBodyCenterBottom',
       'comGroupDiscussion',
-      'comInsertStream',
-      'comThirdStream'
+      'comThirdStream',
+      'comRebroadcastSteam'
     ]
+  },
+  layerBodyCenterBottom: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-center-bottom',
+    children: ['comInsertStream', 'comDesktopScreen', 'comDocUne']
   },
   layerBodyRight: {
     component: 'VmpContainer',
@@ -55,6 +66,7 @@ export const serverConfig = {
     children: [
       // 'comMemberList'
       // 'comChat',
+      'comPcRewardEffect',
       'comTabMenu'
     ]
   },
@@ -76,7 +88,8 @@ export const serverConfig = {
         { type: 5, cuid: 'comGoodSaas', text: 'menu.menu_1004' }, // 商品
         { type: 6, cuid: 'comRecommend', text: 'menu.menu_1005' }, // 广告、推荐
         { type: 7, cuid: 'comChapter', text: 'menu.menu_1013' }, // 章节
-        { type: 8, cuid: 'comMemberList', text: '成员' } // 成员
+        { type: 8, cuid: 'comMemberList', text: '成员' }, // 成员
+        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } //问答
       ]
     }
   },
@@ -91,10 +104,11 @@ export const serverConfig = {
       'comLivePrivateChat',
       'comMediaSetting',
       'comPcMediaCheck',
-      'comInsertVideo',
       'liveTimerSet',
-      'liveTimer'
-      // 'comRebroadcast'
+      'liveTimer',
+      'comRebroadcast',
+      'comRebroadcastList',
+      'comMicInvited'
     ]
   },
 
@@ -113,11 +127,6 @@ export const serverConfig = {
   // // 顶部右侧容器
   pannelHeaderRight: {
     component: 'VmpHeaderRight',
-    options: {
-      isShowQuit: false, //是否显示退出
-      isShowSupport: false, //是否显示技术支持
-      isShowSplitScreen: true //是否显示分屏
-    },
     emitVirtualClick: [
       {
         cuid: 'comVirtualPeople',
@@ -131,12 +140,12 @@ export const serverConfig = {
         method: 'startPush'
       }
     ],
-    emitClickEndLive: [
-      {
-        cuid: 'comStreamLocal',
-        method: 'stopPush'
-      }
-    ],
+    // emitClickEndLive: [ // 不再派发结束推流事件, 结束推流是监听直播结束消息
+    //   {
+    //     cuid: 'comStreamLocal',
+    //     method: 'stopPush'
+    //   }
+    // ],
     emitMediaSettingClick: [
       {
         cuid: 'comMediaSetting',
@@ -148,6 +157,12 @@ export const serverConfig = {
         cuid: 'comThirdStream',
         method: 'showThirdStream',
         args: ['$0']
+      }
+    ],
+    emitClickCheckStartPush: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'checkStartPush'
       }
     ]
   },
@@ -167,7 +182,10 @@ export const serverConfig = {
       'comGroupMenu',
       'comShareMenu',
       'comExitGroupMenu',
-      'comLottery'
+      'comLottery',
+      'comSignLive',
+      'comQuestionnaire',
+      'comRedPacket'
     ]
   },
   // 语言选择组件
@@ -192,7 +210,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-iconfont vh-line-document',
       text: 'aside_menu.aside_menu_1000',
-      kind: 'document'
+      kind: 'document',
+      auth: 'hide-document'
     },
     handleClick: [
       {
@@ -203,6 +222,11 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
@@ -212,7 +236,8 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-line-whiteboard',
       text: 'aside_menu.aside_menu_1001',
-      kind: 'board'
+      kind: 'board',
+      auth: true
     },
     handleClick: [
       {
@@ -223,17 +248,41 @@ export const serverConfig = {
       {
         cuid: 'comGroupDiscussion',
         method: 'hiddenAll'
+      },
+      // 关闭第三方推流页面
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
       }
     ]
   },
-  // 桌面共享
+  // 桌面共享按钮
   comShareDesktopMenu: {
     component: 'VmpIconText',
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
-      kind: 'desktopShare'
-    }
+      kind: 'desktopShare',
+      auth: true
+    },
+    handleClick: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'showConfirm',
+        args: []
+      }
+    ]
+  },
+
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen',
+    emitClickEndDemonstrate: [
+      {
+        cuid: 'comDocUne',
+        method: 'handleEndDemonstrate'
+      }
+    ]
   },
   // 插播文件
   comMediaPlayMenu: {
@@ -241,12 +290,13 @@ export const serverConfig = {
     options: {
       icon: 'vh-saas-iconfont vh-saas-a-color-Spotfile',
       text: 'aside_menu.aside_menu_1003',
-      kind: 'insertMedia'
+      kind: 'insertMedia',
+      auth: 'waiting.video.file'
     },
     handleClick: [
       {
-        cuid: 'comInsertVideo',
-        method: 'openInserVideoDialog',
+        cuid: 'comInsertVideoList',
+        method: 'openInsertFileDialog',
         args: []
       }
     ]
@@ -268,11 +318,49 @@ export const serverConfig = {
         cuid: ['comLottery'],
         method: 'open'
       }
+    ],
+    emitOpenQuestionnaire: [
+      {
+        cuid: ['comQuestionnaire'],
+        method: 'open'
+      }
+    ],
+    emitOpenSign: [
+      {
+        cuid: ['comSignLive'],
+        method: 'openSign'
+      }
+    ],
+    emitOpenRebroadcast: [
+      {
+        cuid: ['comRebroadcastList'],
+        method: 'open'
+      }
+    ],
+    emitOpenRedPacket: [
+      {
+        cuid: ['comRedPacket'],
+        method: 'open'
+      }
+    ],
+    emitHandleQa: [
+      {
+        cuid: ['comTabMenu'],
+        method: 'setVisible',
+        args: ['$0']
+      }
     ]
   },
   // 互动工具-计时器设置
   liveTimerSet: {
-    component: 'VmpLiveTimerSet'
+    component: 'VmpLiveTimerSet',
+    emitDisTimerIcon: [
+      {
+        cuid: ['comInteractMenu'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
+      }
+    ]
   },
   // 互动工具-计时器
   liveTimer: {
@@ -299,6 +387,7 @@ export const serverConfig = {
       icon: 'vh-iconfont vh-line-group',
       text: 'aside_menu.aside_menu_1008',
       kind: 'group',
+      auth: 'webinar.group',
       disable: true
     },
     handleClick: [
@@ -316,7 +405,8 @@ export const serverConfig = {
       className: 'menu-footer',
       icon: 'vh-iconfont vh-line-share',
       text: '分享',
-      kind: 'share'
+      kind: 'share',
+      auth: 'ui.hide_share'
     },
     handleClick: [
       {
@@ -334,7 +424,8 @@ export const serverConfig = {
       icon: 'vh-iconfont vh-line-exit',
       text: '退出小组',
       kind: 'exitGroup',
-      hidden: true
+      hidden: true,
+      auth: true
     },
     handleClick: [
       {
@@ -369,6 +460,10 @@ export const serverConfig = {
       }
     ]
   },
+  // 礼物动画组件
+  comPcRewardEffect: {
+    component: 'VmpPcRewardEffect'
+  },
   comNotice: {
     component: 'VmpNoticeList'
   },
@@ -386,7 +481,15 @@ export const serverConfig = {
     options: {
       //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
       platformType: 'live'
+    },
+    emitTabTips: {
+      cuid: ['comTabMenu'],
+      method: 'setTipsVisible',
+      args: ['$0']
     }
+  },
+  comQa: {
+    component: 'VmpQa'
   },
   // 文档白板组件
   comDocUne: {
@@ -416,7 +519,7 @@ export const serverConfig = {
   // 上麦流列表
   comStreamList: {
     component: 'VmpStreamListLive',
-    children: ['comStreamLocal', 'comStreamRemote']
+    children: ['comStreamLocal']
   },
   // 远端流
   comStreamRemote: {
@@ -439,7 +542,7 @@ export const serverConfig = {
         kind: 'document'
       },
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         kind: 'insertMedia'
       }
     ],
@@ -470,12 +573,12 @@ export const serverConfig = {
   comThirdStream: {
     component: 'VmpThirdStream'
   },
-  comInsertVideo: {
-    component: 'VmpInsertVideo',
-    emitOnchange: [
+  comInsertVideoList: {
+    component: 'VmpInsertVideoList',
+    emitInsertFileChange: [
       {
         cuid: 'comInsertStream',
-        method: 'openInsertShow',
+        method: 'inertFileChange',
         args: ['$0', '$1']
       }
     ]
@@ -495,25 +598,19 @@ export const serverConfig = {
   },
   comInsertStream: {
     component: 'VmpInsertStream',
-    emitClose: [
+    children: ['comInsertVideoList'],
+    emitCloseInsertFileDialog: [
       {
-        cuid: 'comInsertVideo',
+        cuid: 'comInsertVideoList',
         method: 'closeInserVideoDialog',
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ],
-    emitOpen: [
+    openInsertFileDialog: [
       {
-        cuid: 'comInsertVideo',
-        method: 'openInserVideoDialog',
+        cuid: 'comInsertVideoList',
+        method: 'openInsertFileDialog',
         args: []
-      }
-    ],
-    emitInsertInfo: [
-      {
-        cuid: 'comInsertVideo',
-        method: 'getInsertingInfo',
-        args: ['$0']
       }
     ]
   },
@@ -533,16 +630,264 @@ export const serverConfig = {
         method: 'setSelectedState',
         args: false
       }
+    ],
+    // 触发画笔重置
+    emitDocResetBrush: [
+      {
+        cuid: 'comDocUne',
+        method: 'resetCurrentBrush'
+      }
     ]
   },
-  // 转播
-  comRebroadcast: {
-    component: 'VmpRebroadcast'
+  // 转播列表
+  comRebroadcastList: {
+    component: 'VmpRebroadcastList',
+    startRebroadcast: [
+      {
+        cuid: 'comRebroadcastSteam',
+        method: 'open'
+      }
+    ],
+    stopRebroadcast: [
+      {
+        cuid: 'comRebroadcastSteam',
+        method: 'close'
+      }
+    ]
+  },
+  //  转播流
+  comRebroadcastSteam: {
+    component: 'VmpRebroadcastStream'
   },
   comRecommend: {
     component: 'VmpRecommend'
   },
   comLottery: {
     component: 'VmpLotteryLive'
+  },
+  comQuestionnaire: {
+    component: 'VmpQuestionnaire'
+  },
+  comSignLive: {
+    component: 'VmpSignLive'
+  },
+  // 红包
+  comRedPacket: {
+    component: 'VmpRedPacketLive'
+  },
+
+  // *******录制页面****开始
+  recordVideoRoot: {
+    component: 'VmpAirContainer',
+    children: ['recordLayerHeader', 'recordLayerBody', 'recordComAllDialog']
+  },
+  // 【录制页面】顶部header容器
+  recordLayerHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-hd',
+    children: ['pannelHeaderLeft', 'recordPannelHeaderRight']
+  },
+  // 【录制页面】中间主区域容器
+  recordLayerBody: {
+    component: 'VmpContainer',
+    options: {
+      className: 'vmp-basic-bd'
+    },
+    children: ['recordLayerBodyLeft', 'recordLayerBodyCenter', 'recordLayerBodyRight']
+  },
+  // 【录制页面】 中间左侧
+  recordLayerBodyLeft: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-left',
+    children: ['recordComAsideMenu']
+  },
+  // 【录制页面】 中间容器
+  recordLayerBodyCenter: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-center',
+    children: ['recordComStreamList', 'recordComDocUne', 'recordComRecordVideoSuccess']
+  },
+  // 【录制页面】 中间右侧容器
+  recordLayerBodyRight: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-right',
+    children: ['recordLayerBodyRightHeader', 'recordLayerBodyRightBody']
+  },
+  // 【录制页面】 中间右侧头部
+  recordLayerBodyRightHeader: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-right__hd'
+  },
+  // 【录制页面】 中间右侧body
+  recordLayerBodyRightBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-right__bd'
+  },
+  // 【录制页面】 侧边工具栏
+  recordComAsideMenu: {
+    component: 'VmpAsideMenu',
+    children: ['recordComDocMenu', 'recordComWbMenu']
+  },
+  // 【录制页面】 文档菜单
+  recordComDocMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'vh-iconfont vh-line-document',
+      text: 'aside_menu.aside_menu_1000',
+      kind: 'document',
+      auth: 'hide-document'
+    },
+    handleClick: [
+      {
+        cuid: ['recordComAsideMenu', 'recordComDocUne'],
+        method: 'switchTo',
+        args: 'document'
+      }
+    ]
+  },
+  // 【录制页面】 白板菜单
+  recordComWbMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'vh-saas-iconfont vh-saas-line-whiteboard',
+      text: 'aside_menu.aside_menu_1001',
+      kind: 'board',
+      auth: true
+    },
+    handleClick: [
+      {
+        cuid: ['recordComAsideMenu', 'recordComDocUne'],
+        method: 'switchTo',
+        args: 'board'
+      }
+    ]
+  },
+  // 文档白板组件
+  recordComDocUne: {
+    component: 'VmpDocUne',
+    emitSwitchTo: {
+      cuid: ['recordComAsideMenu'],
+      method: 'switchTo',
+      args: ['$0'] // 获取动态参数的第一个
+    },
+    // 打开对话框
+    emitOpenDocList: {
+      cuid: 'recordDlgDocList',
+      method: 'show'
+    }
+  },
+  //文档列表对话框
+  recordDlgDocList: {
+    component: 'VmpDocDlglist',
+    emitDemonstrateDoc: [
+      {
+        cuid: 'recordComDocUne',
+        method: 'demonstrate',
+        args: ['$0', '$1', '$2']
+      }
+    ]
+  },
+  // 【录制页面】 顶部右侧容器
+  recordPannelHeaderRight: {
+    component: 'VmpHeaderRight',
+    options: {
+      isShowMediaSetting: true, // 是否展示媒体设置
+      isShowQuit: false, //是否显示退出
+      isShowSupport: false, //是否显示技术支持
+      isShowSplitScreen: false, //是否显示分屏
+      isShowVirtualAudience: false, // 是否显示虚拟人数
+      isShowThirdParty: false // 是否显示三方推流
+    },
+    recordVideoSuccess: [
+      {
+        cuid: 'recordComRecordVideoSuccess',
+        method: 'showRecordVideoSuccessComp',
+        args: ['$0'] // 获取动态参数的第一个
+      }
+    ],
+    emitClickStartLive: [
+      {
+        cuid: 'recordComStreamLocal',
+        method: 'startPush'
+      }
+    ],
+    emitMediaSettingClick: [
+      {
+        cuid: 'comMediaSetting',
+        method: 'showMediaSetting'
+      }
+    ]
+  },
+  // 【录制页面】上麦流列表
+  recordComStreamList: {
+    component: 'VmpStreamListLive',
+    children: ['recordComStreamLocal', 'comStreamRemote']
+  },
+  // 【录制页面】本地流
+  recordComStreamLocal: {
+    component: 'VmpStreamLocal',
+    // 推流完成事件
+    emitClickPublishComplate: [
+      {
+        cuid: 'recordPannelHeaderRight',
+        method: 'handlePublishComplate'
+      }
+    ],
+    // 停止推流完成事件
+    emitClickUnpublishComplate: [
+      {
+        cuid: 'recordPannelHeaderRight',
+        method: 'handleUnpublishComplate'
+      }
+    ]
+  },
+  // 【录制页面】录制结束组件
+  recordComRecordVideoSuccess: {
+    component: 'VmpRecordVideoSuccess'
+  },
+  // 【录制页面】所有弹窗集合
+  recordComAllDialog: {
+    component: 'VmpAirContainer',
+    children: ['recordDlgDocList', 'comMediaSetting']
+  },
+  // *******录制页面****结束
+
+  // *******分屏页面****开始
+  // 【分屏页面】根组件
+  splitScreenRoot: {
+    component: 'VmpAirContainer',
+    children: ['splitScreenContainer']
+  },
+  // 【分屏页面】分屏组件
+  splitScreenContainer: {
+    component: 'VmpSplitScreen',
+    children: ['splitScreenStreamLocal']
+  },
+  // 【分屏页面】本地流
+  splitScreenStreamLocal: {
+    component: 'VmpStreamLocal',
+    // 停止推流完成事件
+    emitClickUnpublishComplate: [
+      {
+        cuid: 'splitScreenContainer',
+        method: 'handleUnpublishComplate'
+      }
+    ]
+  },
+  // *******分屏页面****结束
+
+  // 客户端嵌入页组件
+  embedClientRoot: {
+    component: 'VmpEmbedClient',
+    children: ['comDocUne', 'dlgDocList'],
+    emiSwitchTo: {
+      cuid: ['comDocUne'],
+      method: 'switchTo',
+      args: ['$0']
+    }
+  },
+  // 邀请上麦弹窗
+  comMicInvited: {
+    component: 'VmpMicInvited'
   }
 };

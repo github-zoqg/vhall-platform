@@ -1,20 +1,20 @@
 const _ = require('lodash');
 const baseConfig = require('./webpack.base.config');
 
-// 插件配置
-function getPlugins() {
-  const plugins = [];
-  // 构建文件目录
-  // plugins.push();
-  return plugins;
-}
+const htmlConfig = {
+  cdnJs: {
+    vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.js',
+    MiddleEventSdk:
+      '//t-alistatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
+    MiddleDomain:
+      '//t-alistatic01.e.vhall.com/common-static/middle/middle-domain/1.0.14/middle-domain.js'
+  }
+};
 
-module.exports = _.merge(
-  {
-    configureWebpack: {
-      // 插件
-      plugins: getPlugins()
+module.exports = _.merge(baseConfig, {
+  pages: {
+    index: {
+      ...htmlConfig
     }
-  },
-  baseConfig
-);
+  }
+});

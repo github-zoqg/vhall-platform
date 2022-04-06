@@ -57,8 +57,9 @@
 
 <script>
   // import EventBus from '@/utils/Events';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserType } from '@/packages/chat/src/js/utils'; // 判断是否微信 浏览器
+  import { useWatchRewardServer, useChatServer } from 'middle-domain';
+  import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'reward',
     props: {
@@ -84,13 +85,17 @@
         money: '',
         btnMoney: '', // 选中按钮上面的金额
         note: '',
-        btnTxt: browserType()
+        btnTxt: isWechat()
           ? this.$t('interact_tools.interact_tools_1049')
           : this.$t('interact_tools.interact_tools_1069')
       };
     },
     mounted() {
-      // EventBus.$on('reward_pay_ok', this.rewardFn);
+      this.chatServer = useChatServer();
+      this.rewardServer = useWatchRewardServer();
+      this.rewardServer.$on('reward_pay_ok', msg => {
+        this.rewardFn(msg);
+      });
     },
     beforeDestroy() {
       // EventBus.$off('reward_pay_ok', this.rewardFn);
@@ -151,22 +156,7 @@
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
-        if (browserType()) {
-          if (!open_id) {
-            let _search = '';
-            if (location.search && location.search != '') {
-              _search = location.search.split('?')[1];
-            }
-            const address =
-              window.location.protocol +
-              process.env.VUE_APP_WATCH_URL +
-              process.env.VUE_APP_WEB_KEY +
-              `/lives/middle/${this.$route.params.id}?purpose=payAuth&${_search}`;
-            window.location.href = `${
-              process.env.VUE_APP_BASE_URL
-            }/v3/commons/auth/weixin?source=wab&jump_url=${encodeURIComponent(address)}`;
-            return;
-          }
+        if (isWechat() && open_id) {
           params = {
             room_id: this.localRoomInfo.roomId,
             channel: 'WEIXIN',
@@ -193,11 +183,12 @@
       // 确认支付
       payProcess(params) {
         const that = this;
-        this.watchRewardServer
+        const open_id = sessionStorage.getItem('open_id');
+        this.rewardServer
           .createReward({ ...params })
           .then(res => {
-            if (res.data) {
-              if (browserType()) {
+            if (res.code == 200) {
+              if (isWechat() && open_id) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
@@ -210,26 +201,28 @@
                   },
                   function (res) {
                     if (res.err_msg == 'get_brand_wcpay_request:ok') {
-                      that.$toast(`${this.$t('common.common_1005')}`);
+                      that.$toast(`${that.$t('common.common_1005')}`);
                       that.close();
                       setTimeout(() => {
                         window.location.href =
                           window.location.protocol +
-                          process.env.VUE_APP_WATCH_URL +
+                          process.env.VUE_APP_WAP_WATCH +
                           process.env.VUE_APP_WEB_KEY +
-                          `/lives/watch/${this.$route.params.id}`;
+                          `/lives/watch/${that.$route.params.id}`;
                       }, 1500);
                     }
                   }
                 );
               } else {
-                window.location.href = res.data.pay_data;
+                window.location.href = res.data.pay_data.url;
               }
+            } else {
+              that.$toast(`${that.$tec(res.code) || res.msg}`);
             }
           })
-          .catch(e => {
-            console.log('获取支付信息失败>>>', e);
-            that.$toast(`${this.$tes(e.code) || e.msg}`);
+          .catch(res => {
+            console.log('获取支付信息失败>>>', res);
+            that.$toast(`${that.$tec(res.code) || res.msg}`);
           });
       },
       close() {
@@ -242,33 +235,6 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
-        // const headerDom = document.getElementById('header');
-        // const interactDoc = document.getElementById('interactBox');
-        // if (headerDom) {
-        //   if (interactDoc) {
-        //     this.popHeight =
-        //       document.body.clientHeight -
-        //       document.getElementById('interactBox').offsetHeight -
-        //       headerDom.offsetHeight +
-        //       'px';
-        //   } else {
-        //     this.popHeight =
-        //       document.body.clientHeight -
-        //       document.getElementById('videoBox').offsetHeight -
-        //       headerDom.offsetHeight +
-        //       'px';
-        //   }
-        // } else {
-        //   if (interactDoc) {
-        //     this.popHeight =
-        //       document.body.clientHeight -
-        //       document.getElementById('interactBox').offsetHeight +
-        //       'px';
-        //   } else {
-        //     this.popHeight =
-        //       document.body.clientHeight - document.getElementById('videoBox').offsetHeight + 'px';
-        //   }
-        // }
       },
       // 打开打赏弹框
       showReward() {

@@ -25,13 +25,14 @@
       </el-form-item>
       <!-- 请输入登录密码 -->
       <el-form-item prop="password">
-        <el-input
-          type="password"
+        <PwdInput
           v-model.trim="ruleForm.password"
           clearable
           :placeholder="$t('login.login_1011')"
-          @blur="autoLoginSetMargin"
-        ></el-input>
+          :maxlength="30"
+          auto-complete="off"
+          onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
+        ></PwdInput>
       </el-form-item>
       <!-- 其它 -->
       <el-form-item>
@@ -78,12 +79,14 @@
 </template>
 <script>
   import ThirdLoginLink from './third-login-link.vue';
+  import PwdInput from './pwd-input.vue';
   import mixin from '../mixins/mixin';
   export default {
     name: 'VmpPwdLogin',
     mixins: [mixin],
     components: {
-      ThirdLoginLink
+      ThirdLoginLink,
+      PwdInput
     },
     data() {
       const validAccount = (rule, value, callback) => {
@@ -160,7 +163,7 @@
           });
         } else if (this.captchaReady) {
           // 如果选择的图形码有值，表示触发了账号锁定，再次登录需要图片验证码逻辑。这个时候直接往下走。
-          this.snedLogin();
+          this.sendLogin();
         } else {
           // 如果没有选择过图形码，走账号检测判断
           this.$refs.ruleForm.validate(async valid => {
@@ -169,7 +172,7 @@
               const failure = err => {
                 console.log('获取账号检测接口结果错误', err);
                 this.$message({
-                  message: err.msg || this.$t('login.login_1021'),
+                  message: this.$tec(err.code) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -186,7 +189,7 @@
                   } else if (res.code == 200) {
                     this.captchaIsShow = false;
                     // 非异常情况下，触发登录逻辑
-                    this.snedLogin();
+                    this.sendLogin();
                   } else {
                     failure(res);
                   }
@@ -206,13 +209,13 @@
         }
       },
       // 触发login表单验证，若验证通过，执行登录
-      snedLogin() {
+      sendLogin() {
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
             let relt = await this.userServer.handlePassword(this.ruleForm.password);
             if (!relt.pass) {
               this.$message({
-                message: relt.msg || this.$t('register.register_1010'),
+                message: this.$t('register.register_1010'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -246,7 +249,7 @@
                   this.reloadCaptha();
                 }
                 this.$message({
-                  message: res.msg || this.$t('login.login_1021'),
+                  message: this.$tec(res.code) || this.$t('login.login_1021'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -266,6 +269,6 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-pwd-login {
-    padding: 0 32px 24px 32px;
+    padding: 0 32px 24px;
   }
 </style>

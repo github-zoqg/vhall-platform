@@ -17,7 +17,7 @@
           popper-class="transfer-box"
           style="margin-left: 4px"
         >
-          <i class="iconfont iconicon-help" style="color: #999"></i>
+          <i class="vh-iconfont vh-line-question" style="color: #999"></i>
           <div slot="content">
             1、全体参会者：所有参会的观众拥有参与抽奖的资格
             <br />
@@ -64,7 +64,7 @@
           popper-class="transfer-box"
           style="margin-left: 4px"
         >
-          <i class="iconfont iconicon-help" style="margin-left: 4px; color: #999"></i>
+          <i class="vh-iconfont vh-line-question" style="margin-left: 4px; color: #999"></i>
           <div slot="content">
             1、请在控制台-直播管理-抽奖中进行创建
             <br />
@@ -79,7 +79,6 @@
           style="width: 280px"
           v-model="prizeNum"
           maxlength="4"
-          oninput="this.value=this.value.replace(/^(0+)|[^\d]+/g,'')"
           placeholder="请输入中奖人数"
         ></el-input>
         <div class="lottery-payment">
@@ -95,7 +94,7 @@
           class="search-user"
           placeholder="请输入用户名"
         >
-          <span slot="suffix" @click="lotterySearch">搜索</span>
+          <span slot="append" @click="lotterySearch">搜索</span>
         </el-input>
         <ul class="user-list" v-if="userListShow">
           <li v-for="(item, index) in userList" :key="index" @click="selector(item, index)">
@@ -191,6 +190,9 @@
       },
       repeatWinning() {
         this.getLotteryCount();
+      },
+      prizeNum(val) {
+        this.prizeNum = `${val}`.replace(/^(0+)|[^\d]+/g, '');
       }
     },
     methods: {
@@ -329,95 +331,65 @@
           params.command = this.participationPass;
         }
         this.startButtonDisabled = true;
+        const failure = err => {
+          console.error(err);
+          this.startButtonDisabled = false;
+          this.$message.warning(err.msg);
+        };
         this.lotteryServer
           .pushLottery(params)
           .then(res => {
             if (res.code === 200) {
-              this.report(res.data);
+              this.reportLottery();
               this.$emit('startLottery', res.data);
+              this.startButtonDisabled = false;
+            } else {
+              failure(res);
             }
-            this.startButtonDisabled = false;
           })
           .catch(err => {
-            console.error(err);
-            this.startButtonDisabled = false;
-            this.$message.warning(err.msg);
+            failure(err);
           });
       },
       // 大数据上报
-      report(data) {
-        window.vhallReport.report({
-          k: 110029,
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
+      reportLottery() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110029);
         const arrType = [110030, 110031, 110032];
-        window.vhallReport.report({
-          k: this.joinLotteryType == 8 ? 110033 : arrType[this.joinLotteryType - 1],
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
-        if (this.chooseList.length) {
-          window.vhallReport.report({
-            k: 110034,
-            data: {
-              business_uid: data.creator_id,
-              user_id: '',
-              webinar_id: this.$route.params.il_id,
-              refer: '',
-              s: '',
-              report_extra: {},
-              ref_url: '',
-              req_url: ''
-            }
-          });
-        }
-        window.vhallReport.report({
-          k: this.repeatWinning ? 110035 : 110036,
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
-        window.vhallReport.report({
-          k: this.showWinner ? 110037 : 110038,
-          data: {
-            business_uid: data.creator_id,
-            user_id: '',
-            webinar_id: this.$route.params.il_id,
-            refer: '',
-            s: '',
-            report_extra: {},
-            ref_url: '',
-            req_url: ''
-          }
-        });
+        let lotteryCode = this.joinLotteryType == 8 ? 110033 : arrType[this.joinLotteryType - 1];
+        window.vhallReportForProduct && window.vhallReportForProduct.report(lotteryCode);
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110034);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.repeatWinning ? 110035 : 110036);
+        window.vhallReportForProduct &&
+          window.vhallReportForProduct.report(this.showWinner ? 110037 : 110038);
       }
     }
   };
 </script>
+<style lang="less">
+  .repeat-winning {
+    margin-bottom: 12px;
+    .el-switch {
+      margin-right: 5px;
+      width: 28px;
+      height: 16px;
+      line-height: 16px;
+      &__core {
+        width: 100%;
+        height: 16px;
+      }
+      &__core:after {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+  .lottery-dialog-content {
+    .el-switch.is-checked .el-switch__core::after {
+      margin-left: -13px;
+    }
+  }
+</style>
 <style lang="less" scoped>
   .lottery-dialog-content {
     padding: 10px 15px 25px 10px;
@@ -439,9 +411,7 @@
           height: 12px;
         }
       }
-      .el-switch.is-checked .el-switch__core::after {
-        margin-left: -13px;
-      }
+
       span {
         font-size: 14px;
         font-family: @fontRegular;
@@ -467,6 +437,7 @@
     }
     span {
       cursor: pointer;
+      color: #666;
     }
   }
   .lottery-payment {
@@ -590,6 +561,13 @@
       .iconfont:hover {
         color: #fb3a32;
       }
+    }
+  }
+</style>
+<style lang="less">
+  .search-user {
+    .el-input__suffix {
+      right: 0;
     }
   }
 </style>

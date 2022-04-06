@@ -11,12 +11,12 @@
         <div class="vmp-user-account-wrap-item">
           <label>{{ $t('account.account_1002') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ useUserServer.state.userInfo.phone || $t('account.account_1003') }}
+            {{ userServer.state.userInfo.phone || $t('account.account_1003') }}
           </div>
           <div>
             <el-button type="text" @click="openPhoneDialog">
               {{
-                useUserServer.state.userInfo.phone
+                userServer.state.userInfo.phone
                   ? $t('account.account_1004')
                   : $t('account.account_1005')
               }}
@@ -27,7 +27,7 @@
           <label>{{ $t('account.account_1006') }}</label>
           <div class="vmp-user-account-wrap-item__center nick-item">
             <span v-if="!isNickNameEdit">
-              {{ useUserServer.state.userInfo.nick_name | splitLenStr(6) }}
+              {{ userServer.state.userInfo.nick_name | overHidden(6) }}
             </span>
             <el-input
               v-if="isNickNameEdit"
@@ -52,9 +52,9 @@
           <label>{{ $t('account.account_1009') }}</label>
           <div class="vmp-user-account-wrap-item__center upload-zdy">
             <Upload
-              v-model="useUserServer.state.userInfo.avatar"
+              v-model="userServer.state.userInfo.avatar"
               class="upload__avatar"
-              :domain_url="useUserServer.state.userInfo.avatar"
+              :domain_url="userServer.state.userInfo.avatar"
               :saveData="{
                 path: 'users/face-imgs',
                 type: 'image'
@@ -79,7 +79,7 @@
           <label>{{ $t('account.account_1013') }}</label>
           <div class="vmp-user-account-wrap-item__center">
             {{
-              useUserServer.state.userInfo.has_password !== 0
+              userServer.state.userInfo.has_password !== 0
                 ? $t('account.account_1014')
                 : $t('account.account_1015')
             }}
@@ -87,7 +87,7 @@
           <div>
             <el-button type="text" @click="openPwdHandler">
               {{
-                useUserServer.state.userInfo.has_password !== 0
+                userServer.state.userInfo.has_password !== 0
                   ? $t('account.account_1016')
                   : $t('account.account_1017')
               }}
@@ -97,9 +97,9 @@
         <div class="vmp-user-account-wrap-item bind-item">
           <label>{{ $t('account.account_1018') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ useUserServer.state.thirdInfo.QQNickName | splitLenStr(6) }}
+            {{ userServer.state.thirdInfo.QQNickName | overHidden(6) }}
             {{
-              useUserServer.state.thirdInfo.QQNickName
+              userServer.state.thirdInfo.QQNickName
                 ? `（${$t('account.account_1019')}）`
                 : $t('account.account_1020')
             }}
@@ -107,7 +107,7 @@
           <div>
             <el-button type="text" @click="editQQHandler">
               {{
-                useUserServer.state.thirdInfo.QQbind
+                userServer.state.thirdInfo.QQBind
                   ? $t('account.account_1021')
                   : $t('account.account_1022')
               }}
@@ -117,9 +117,9 @@
         <div class="vmp-user-account-wrap-item bind-item">
           <label>{{ $t('account.account_1023') }}</label>
           <div class="vmp-user-account-wrap-item__center">
-            {{ useUserServer.state.thirdInfo.WeixinNickName | splitLenStr(6) }}
+            {{ userServer.state.thirdInfo.WeixinNickName | overHidden(6) }}
             {{
-              useUserServer.state.thirdInfo.WeixinNickName
+              userServer.state.thirdInfo.WeixinNickName
                 ? `（${$t('account.account_1019')}）`
                 : $t('account.account_1020')
             }}
@@ -127,7 +127,7 @@
           <div>
             <el-button type="text" @click="editWXHandler">
               {{
-                useUserServer.state.thirdInfo.WeixinBind
+                userServer.state.thirdInfo.WeixinBind
                   ? $t('account.account_1021')
                   : $t('account.account_1022')
               }}
@@ -148,7 +148,7 @@
   import Upload from './components/upload/upload.vue';
   import Phones from './components/phones/index.vue';
   import Password from './components/password/password.vue';
-  import { useUserServer } from 'middle-domain';
+  import { useUserServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpUserAccount',
     components: {
@@ -164,7 +164,6 @@
         nickError: '',
         avatar: '',
         domain_url: '',
-        useUserServer: {},
         phoneData: {
           dialogShow: false,
           type: 'add',
@@ -178,18 +177,21 @@
       };
     },
     created() {
-      this.useUserServer = useUserServer();
+      this.userServer = useUserServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     methods: {
       // 上传、替换头像
       handleUploadSuccess(res) {
+        console.log('handleUploadSuccess');
+        console.log(res);
         if (res.data) {
           const domain_url = res.data.domain_url || '';
           const file_url = res.data.file_url || '';
           this.avatar = file_url;
           this.domain_url = domain_url;
           // 发送保存头像接口
-          this.useUserServer
+          this.userServer
             .changeAvatarSend({ avatar: file_url })
             .then(res => {
               if (res && res.code === 200) {
@@ -199,10 +201,11 @@
                   type: 'success',
                   customClass: 'zdy-info-box'
                 });
-                this.useUserServer.getUserInfo({ scene_id: 2 });
+                this.roomBaseServer.setChangeUserInfo(1, { avatar: domain_url });
+                this.userServer.getUserInfo({ scene_id: 2 });
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                  message: this.$tec(res.code) || this.$t('account.account_1048'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -211,7 +214,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                message: this.$tec(res.code) || this.$t('account.account_1048'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -264,7 +267,7 @@
       delAvatarHandler() {
         this.avatar = '';
         this.domain_url = '';
-        this.useUserServer
+        this.userServer
           .changeAvatarSend({ avatar: '' })
           .then(res => {
             if (res && res.code === 200) {
@@ -274,10 +277,11 @@
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
-              this.useUserServer.getUserInfo({ scene_id: 2 });
+              this.roomBaseServer.setChangeUserInfo(1, { avatar: '' });
+              this.userServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+                message: this.$tec(res.code) || this.$t('account.account_1048'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -286,7 +290,7 @@
           })
           .catch(res => {
             this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1048'),
+              message: this.$tec(res.code) || this.$t('account.account_1048'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -297,14 +301,14 @@
       // 设置手机号 or 修改手机号
       openPhoneDialog() {
         this.phoneData.dialogShow = true;
-        this.phoneData.type = this.useUserServer.state.userInfo.phone ? 'edit' : 'add';
-        this.phoneData.phone = this.useUserServer.state.userInfo.phone;
+        this.phoneData.type = this.userServer.state.userInfo.phone ? 'edit' : 'add';
+        this.phoneData.phone = this.userServer.state.userInfo.phone;
         this.phoneData.step = 1;
       },
       // 切换昵称为 可修改状态
       changeNickEditStatus() {
         this.isNickNameEdit = true;
-        this.nickName = this.useUserServer.state.userInfo.nick_name;
+        this.nickName = this.userServer.state.userInfo.nick_name;
       },
       // 设置昵称 or 修改昵称
       editNickHandler() {
@@ -315,7 +319,7 @@
             this.nickError = this.$t('account.account_1056');
           } else {
             this.nickError = '';
-            this.useUserServer
+            this.userServer
               .editUserNickName({ nick_name: this.nickName })
               .then(res => {
                 if (res && res.code == 200) {
@@ -327,11 +331,12 @@
                   });
                   // 触发保存接口
                   this.isNickNameEdit = false;
+                  this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
                   // 用户信息接口更新
-                  this.useUserServer.getUserInfo({ scene_id: 2 });
+                  this.userServer.getUserInfo({ scene_id: 2 });
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                    message: this.$tec(res.code) || this.$t('account.account_1058'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -340,7 +345,7 @@
               })
               .catch(res => {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1058'),
+                  message: this.$tec(res.code) || this.$t('account.account_1058'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -352,11 +357,11 @@
       // 设置密码 or 修改密码
       openPwdHandler() {
         this.pwdData.visible = true;
-        this.pwdData.type = this.useUserServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
+        this.pwdData.type = this.userServer.state.userInfo.has_password === 1 ? 'edit' : 'add';
       },
       // QQ绑定 or QQ解绑
       editQQHandler() {
-        if (this.useUserServer.state.thirdInfo.QQBind) {
+        if (this.userServer.state.thirdInfo.QQBind) {
           // 解绑
           this.$confirm(this.$t('account.account_1060'), this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -371,22 +376,18 @@
             })
             .catch(() => {});
         } else {
-          console.log(this.$route);
-          // 绑定
-          // this.$VhallStorage.set('tag', 'bindQQ', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindQQ');
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
-          console.log(jumpUrlPath);
+          localStorage.setItem('vmp_auth_tag', 'bindQQ');
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL;
+          const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/qq?jump_url=${encodeURIComponent(
+            `https:${hostPath}/v3/commons/auth/qq?source=pc&jump_url=${encodeURIComponent(
               jumpUrlPath
-            )}`,
-            '_blank'
+            )}`
           );
         }
       },
       unBindSend(type) {
-        this.useUserServer
+        this.userServer
           .thirdUnbind({ type })
           .then(res => {
             if (res && res.code == 200) {
@@ -397,20 +398,20 @@
                 customClass: 'zdy-info-box'
               });
               // 解绑成功后，刷新页面
-              this.useUserServer.getUserInfo({ scene_id: 2 });
+              this.userServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+                message: this.$tec(res.code) || this.$t('account.account_1065'),
                 showClose: true,
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
-              this.useUserServer.getUserInfo({ scene_id: 2 });
+              this.userServer.getUserInfo({ scene_id: 2 });
             }
           })
           .catch(res => {
             this.$message({
-              message: this.$tec(res.code) || res.msg || this.$t('account.account_1065'),
+              message: this.$tec(res.code) || this.$t('account.account_1065'),
               showClose: true,
               // duration: 0,
               type: 'error',
@@ -420,7 +421,7 @@
       },
       // 微信绑定 or 微信解绑
       editWXHandler() {
-        if (this.useUserServer.state.thirdInfo.WeixinBind) {
+        if (this.userServer.state.thirdInfo.WeixinBind) {
           // 解绑
           this.$confirm(this.$t('account.account_1066'), this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -435,15 +436,14 @@
             .catch(() => {});
         } else {
           // 绑定
-          // this.$VhallStorage.set('tag', 'bindWx', 'local');
-          localStorage.setItem('vhsaas_tag', 'bindWx');
-          const hostPath = process.env.VUE_APP_BIND_BASE_URL + process.env.VUE_APP_WEB_KEY;
-          // 前端回传地址
-          const jumpUrlPath = `${window.location.origin}${process.env.VUE_APP_ROUTE_BASE}/lives/watch/${this.$route.params.id}`;
+          localStorage.setItem('vmp_auth_tag', 'bindWx');
+          const hostPath = process.env.VUE_APP_BIND_BASE_URL;
+          const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
           window.open(
-            `${hostPath}/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(jumpUrlPath)}`
+            `https:${hostPath}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(
+              jumpUrlPath
+            )}`
           );
-          // window.open(`${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=${encodeURIComponent(this.$VhallStorage.get('goHref', 'local'))}`, '_blank');
         }
       },
       // 打开个人资料弹出框
@@ -451,12 +451,7 @@
         this.dialogVisible = true;
         this.isNickNameEdit = false;
         this.nickError = '';
-        this.useUserServer.getUserInfo({ scene_id: 2 });
-      }
-    },
-    filters: {
-      splitLenStr: function (name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
+        this.userServer.getUserInfo({ scene_id: 2 });
       }
     }
   };

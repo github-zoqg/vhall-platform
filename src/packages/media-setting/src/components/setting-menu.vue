@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import { getOptionEntity } from '../js/getOptionEntity';
+  import { LIVE_MODE_MAP } from '../js/liveMap';
   import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
@@ -27,16 +27,23 @@
     data() {
       return {
         isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
-        menuList: getOptionEntity(),
+        menuList: Object.freeze([
+          { id: 'basic-setting', text: '基础设置' },
+          { id: 'video-setting', text: 'setting.setting_1003' },
+          { id: 'audio-in-setting', text: 'setting.setting_1004' },
+          { id: 'audio-out-setting', text: 'setting.setting_1005' }
+        ]),
         mediaState: this.mediaSettingServer.state,
-        liveMode: 3, // 1-音频 2-视频 3-互动
-        roleName: ''
+        liveMode: 3, // 1-音频 2-视频 3-互动 6-分组
+        roleName: '', // 角色
+        LIVE_MODE_MAP
       };
     },
     computed: {
       isShowBasic() {
         // 隐藏基本配置内的不同问题  进行计算
-        const isInteractMode = this.liveMode == 3 || this.liveMode == 6;
+        const isInteractMode =
+          this.liveMode == LIVE_MODE_MAP['INTERACT'] || this.liveMode == LIVE_MODE_MAP['GROUP'];
         const cond1 = !(this.roleName == '1' && this.mediaState.video && this.liveMode != 1);
         const cond2 = !(this.roleName == '1' && this.liveMode != 1);
         const cond3 = !(this.roleName == '1' && this.liveMode != 2 && isInteractMode);
@@ -53,6 +60,9 @@
           return true;
         }
       },
+      /**
+       * 过滤菜单选项(控制其显隐)
+       */
       filterMenuList() {
         return this.menuList.filter(item => {
           // 基础设置显隐
@@ -76,6 +86,9 @@
       this.initViewData();
     },
     methods: {
+      /**
+       * 初始化viewData（判断显隐用）
+       */
       initViewData() {
         const { configList = {}, watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
@@ -90,6 +103,10 @@
         this.roleName = join_info.role_name;
         this.userId = join_info.user_id;
       },
+      /**
+       * 点击某个选项
+       * @param {Object} item
+       */
       onClickItem(item) {
         this.$emit('change', item.id);
       }

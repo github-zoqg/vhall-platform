@@ -1,0 +1,73 @@
+<template>
+  <div id="vmp-wap-insert-file" v-show="isOpenInsertFile">
+    <!-- 订阅桌面共享容器 -->
+  </div>
+</template>
+
+<script>
+  import { useRoomBaseServer, useInsertFileServer } from 'middle-domain';
+
+  export default {
+    name: 'VmpWapInsertFIle',
+
+    computed: {
+      isOpenInsertFile() {
+        return this.insertFileServer.state.insertStreamInfo.streamId;
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      this.insertFileServer = useInsertFileServer();
+    },
+    created() {
+      this.addEvents();
+    },
+    mounted() {
+      if (this.isOpenInsertFile) {
+        this.subscribeInsert();
+      }
+    },
+    methods: {
+      // 订阅插播流
+      subscribeInsert() {
+        const opt = {
+          videoNode: 'vmp-wap-insert-file', // 远端流显示容器，必填
+          mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
+        };
+        this.insertFileServer.subscribeInsertStream(opt);
+      },
+      addEvents() {
+        // 监听插播流加入
+        this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
+          this.subscribeInsert();
+        });
+        // 监听插播流离开
+        this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
+          this.insertFileServer.unsubscribeInsertStream();
+        });
+        // 本地推流或订阅远端流异常断开事件
+        this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
+          this.subscribeInsert();
+        });
+        this.insertFileServer.$on('insert_mic_mute_change', status => {
+          if (status == 'play') {
+            this.$toast(this.$t('interact.interact_1026'));
+          } else {
+            this.$toast('麦克风开启，对方将听到您的声音');
+          }
+        });
+      }
+    }
+  };
+</script>
+
+<style lang="less">
+  #vmp-wap-insert-file {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+</style>

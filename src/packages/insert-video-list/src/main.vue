@@ -20,21 +20,33 @@
                 <br />
                 4.发起端插播文件仅支持本地插播，不会上传到活动下哦！
               </div>
-              <i class="iconfont iconicon_help_m"></i>
+              <i class="vh-iconfont vh-line-question"></i>
             </el-tooltip>
             <el-input
               v-model="searchKey"
               placeholder="请输入音视频文件名称"
               style="width: 220px; float: right"
-              @keyup.enter.native="searchTableList"
-              @clear="searchTableList"
+              @keyup.enter.native="
+                getTableList({
+                  isNeedResetPage: true
+                })
+              "
+              @clear="
+                getTableList({
+                  isNeedResetPage: true
+                })
+              "
               clearable
             >
               <i
                 slot="prefix"
                 class="el-icon-search el-input__icon"
                 style="cursor: pointer; line-height: 36px"
-                @click="searchTableList"
+                @click="
+                  getTableList({
+                    isNeedResetPage: true
+                  })
+                "
               ></i>
             </el-input>
           </div>
@@ -57,17 +69,17 @@
                 <li v-for="video in tableData" :key="video.id">
                   <p class="insert-header-item0">
                     <img
-                      src="./images/playing.gif"
+                      src="./img/playing.gif"
                       alt=""
-                      v-if="playingInsertVideoId == video.id"
+                      v-if="currentRemoteInsertFile.id == video.id"
                     />
                   </p>
                   <p class="insert-header-item">
                     <i
-                      class="iconfont iconyinpinwenjian"
+                      class="vh-iconfont vh-fill-audio"
                       v-if="video.file_type == '.mp3' || video.file_type == '.mav'"
                     ></i>
-                    <i class="iconfont iconshipinwenjian" v-else></i>
+                    <i class="vh-iconfont vh-fill-video" v-else></i>
                     <span>{{ video.name }}</span>
                   </p>
                   <p class="insert-header-item">{{ video.created_at }}</p>
@@ -93,14 +105,14 @@
                 </li>
               </div>
               <div class="insert-list-uncontainer" v-show="!total">
-                <span><img src="./images/no-search.png" alt="" /></span>
+                <span><img src="./img/no-search.png" alt="" /></span>
                 <p>暂未搜索到您想要的内容</p>
               </div>
             </ul>
           </div>
         </div>
         <div class="vmp-insert-video-wrap-null" v-else>
-          <img src="./images/no-create.png" alt="" />
+          <img src="./img/no-create.png" alt="" />
           <p class="vmp-insert-video-wrap-null-text">暂未上传音视频</p>
           <el-button type="primary" round @click="selectlocalVideo">选择文件</el-button>
           <div>
@@ -133,33 +145,32 @@
   import { useInsertFileServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
   import videoPreview from '@/packages/app-shared/components/video-preview';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { debounce } from 'lodash';
   export default {
-    name: 'VmpInsertVideo',
+    name: 'VmpInsertVideoList',
     data() {
       return {
-        insertVideoVisible: false,
-        searchKey: '',
-        noVideo: 1,
-        isFetching: false,
+        insertVideoVisible: false, // 弹窗显示隐藏
+        searchKey: '', // 关键字搜索
+        noVideo: 1, // 是否没有插播文件
+        isFetching: false, // 接口加载中
         videoParam: {}, //预览数据
-        webinarId: '876395481' || this.$route.params.id,
-        playingInsertVideoId: '',
-        isPcStartLive: true, // 是不是网页发起
-        tableData: [],
+        tableData: [], // 插播文件列表
         pageInfo: {
           pos: 0,
           limit: 10,
           pageNum: 1
         },
-        insertVideoObj: {
-          isinsterVideoPushing: false,
-          userInfo: {},
-          insertVideoStatus: false // 是否正在插播
-        },
-        total: 1,
-        totalPages: 0,
-        previewDialog: false
+        total: 1, // 总数
+        totalPages: 0, // 总页数
+        previewDialog: false // 预览弹窗
       };
+    },
+    computed: {
+      // 当前插播中的云插播文件
+      currentRemoteInsertFile() {
+        return this.$domainStore.state.insertFileServer.currentRemoteInsertFile;
+      }
     },
     components: {
       videoPreview
@@ -167,96 +178,66 @@
     beforeCreate() {
       this.insertFileServer = useInsertFileServer();
       this.msgServer = useMsgServer();
-      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.assistantType = this.$route.query.assistantType;
-      this.roomBaseState = this.roomBaseServer.state;
-      this.roleName = this.roomBaseState.watchInitData.join_info.role_name;
-    },
-    mounted() {
-      this.msgServer.$onMsg('live_start', msg => {
-        //  1主持人 2观众 3助理 4嘉宾
-        if (this.roleName == 3 && !this.assistantType) {
-          if (msg.data.switch_type != 1) {
-            // 1为网页发起
-            clearTimeout(this._setTimeoutlive_start);
-            this._setTimeoutlive_start = setTimeout(() => {
-              this.autoPlay();
-            }, 1000);
-            // 当前为助理，并且是由客户端发起的
-            this.isPcStartLive = false; // 是否是网页端发起的直播  助理其他端不支持插播
-          } else {
-            this.isPcStartLive = true;
-          }
-        }
-      });
     },
     methods: {
-      openInserVideoDialog() {
-        console.log('??13243544');
+      // 显示插播列表 dialog
+      openInsertFileDialog() {
         // 检查是否可以插播文件
-        // this.checkCaptureStream();
-        this.insertVideoVisible = true;
-        this.getTableList(false, true);
+        const isCanInsert = this.checkInsertFileProcess();
+        if (isCanInsert) {
+          // 显示插播列表
+          this.insertVideoVisible = true;
+          this.getTableList({
+            isNeedResetPage: true,
+            isInvokeInCreated: true
+          });
+        }
       },
-      checkCaptureStream() {
-        //是否是网页端发起的直播  助理其他端不支持插播 、并且是正在直播
-        const { watchInitData } = this.roomBaseState.state;
-        if (!this.isPcStartLive && watchInitData.webinar.type == 1) {
+
+      // 检测当前用户是否可以插播
+      checkInsertFileProcess() {
+        const insertFileServer = useInsertFileServer();
+        const { watchInitData } = useRoomBaseServer().state;
+        const { isInsertFilePushing, insertStreamInfo } = insertFileServer.state;
+        console.log('---点击插播文件按钮----', insertStreamInfo);
+
+        // 如果是直播状态需要判断当前主持人是否是用网页发起直播
+        if (watchInitData.switch.start_type != 1 && watchInitData.webinar.type == 1) {
           this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
             title: '提示',
             confirmButtonText: '知道了',
             // center: true,
             customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            callback: action => {}
+            cancelButtonClass: 'zdy-confirm-cancel'
           });
           return;
         }
-        const thirdId = watchInitData.join_info.third_party_user_id;
-        const user = this.insertVideoObj.userInfo;
+
+        // 如果在插播中，并且不是当前用户插播，alert提示
         if (
-          this.roleName == 3 &&
-          this.insertVideoObj.insertVideoStatus &&
-          user.accountId != thirdId
+          isInsertFilePushing &&
+          insertStreamInfo.userInfo.accountId != watchInitData.join_info.third_party_user_id
         ) {
-          if (user.role == 4 || user.role_name == 4) {
-            this.$alert(`嘉宾${user.nickname}正在插播文件，请稍后重试`, '', {
+          this.$alert(
+            `${this.$getRoleName(insertStreamInfo.userInfo.role)}${
+              insertStreamInfo.userInfo.role != 1 ? insertStreamInfo.userInfo.nickname : ''
+            }正在插播文件，请稍后重试`,
+            '',
+            {
               title: '提示',
               confirmButtonText: '确定',
               customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel',
-              callback: action => {}
-            });
-            return;
-          }
-          this.$alert('主持人正在插播文件，请稍后重试', '', {
-            title: '提示',
-            confirmButtonText: '确定',
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            // center: true,
-            callback: action => {}
-          });
-          return;
-        } else if (
-          this.insertVideoObj.insertVideoStatus &&
-          user.role == 3 &&
-          user.accountId != thirdId
-        ) {
-          this.$alert(`助理${user.nickname}正在插播文件，请稍后重试`, '', {
-            title: '提示',
-            confirmButtonText: '确定',
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            // center: true,
-            callback: action => {}
-          });
+              cancelButtonClass: 'zdy-confirm-cancel'
+            }
+          );
           return;
         }
-        const v = document.createElement('video');
-        if (typeof v.captureStream !== 'function') {
+
+        // 判断该当前浏览器是否支持插播
+        if (!insertFileServer.isCanUseCaptureStream()) {
           this.$alert(
             '当前浏览器版本不支持插播文件。<br>建议您下载chrome72及以上版本后使用<br>下载<a href="https://www.google.cn/chrome/" target="_blank" style="color: #3562fa">Chrome浏览器</a>',
             '',
@@ -266,34 +247,25 @@
               customClass: 'zdy-message-box',
               cancelButtonClass: 'zdy-confirm-cancel',
               dangerouslyUseHTMLString: true,
-              callback: action => {}
+              callback: () => {}
             }
           );
           return;
         }
-        this.insertVideoVisible = true;
+        return true;
       },
-      closeInserVideoDialog(flag, id) {
-        this.insertVideoObj.insertVideoStatus = flag;
-        this.playingInsertVideoId = id;
+      // 关闭插播列表弹窗
+      closeInserVideoDialog() {
         this.insertVideoVisible = false;
       },
-      // 获取正在插播用户信息
-      getInsertingInfo(obj) {
-        console.log(obj, '====???1zhangxiao-------');
-        this.insertVideoObj.userInfo = obj;
-      },
-      searchTableList() {
-        this.getTableList(false);
-      },
+      // 选择本地文件插播
       selectlocalVideo() {
-        if (!this.insertFileServer.isCanUseCaptureStream()) {
-          this.$message.error('当前浏览器不支持captureStream()方法! 无法使用此功能');
-          return;
-        }
+        const insertFileServer = useInsertFileServer();
+        const { watchInitData } = useRoomBaseServer().state;
         const _this = this;
-        this.insertFileServer.selectLocalFile(e => {
-          if (_this.layout == 1) {
+        insertFileServer.selectLocalFile(e => {
+          // 如果是音频直播
+          if (watchInitData.webinar.mode == 1) {
             const video_ext_type = e.target.files[0].type; // type: "audio/ogg" // video/mp4
             if (!video_ext_type.includes('ogg')) {
               _this.$message.warning('音频直播只支持插播ogg格式的音频');
@@ -311,22 +283,23 @@
               _this.$message.warning('只支持插播MP4、WEBM、OGG格式的视频');
               return;
             }
-            this.initVideo(e.target.files[0]);
+            console.log('本地插播上传的文件', e, e.target.files[0]);
+            this.initLocalVideo(e.target.files[0]);
           }
         });
       },
-      initVideo(File) {
-        this.playingInsertVideoId = null;
+      // 进入本地文件插播
+      initLocalVideo(File) {
+        console.log('本地插播上传的文件', File);
         const isGt5M = File.size / 1024 / 1024 / 1024 > 5;
-        const video_ext_type = File.type; // type: "audio/ogg" // video/mp4
-        console.log(video_ext_type, 'video_ext_type');
-        this.isAudio = video_ext_type.includes('ogg');
+        console.log(File.type, 'File.type');
         if (isGt5M) {
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
+
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitOnchange', [File, 'local'])
+          boxEventOpitons(this.cuid, 'emitInsertFileChange', [File, 'local'])
         );
       },
       moreLoadData() {
@@ -336,10 +309,18 @@
         this.pageInfo.pageNum++;
         this.isFetching = true;
         this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
-        this.getTableList(true);
+        this.getTableList({
+          isNeedResetPage: false
+        });
       },
-      getTableList(flag, isCreated) {
-        if (!flag) {
+      getTableList: debounce(function (
+        options = {
+          isNeedResetPage: false,
+          isInvokeInCreated: false
+        }
+      ) {
+        const { watchInitData } = useRoomBaseServer().state;
+        if (options.isNeedResetPage) {
           this.pageInfo = {
             pos: 0,
             limit: 10,
@@ -350,7 +331,7 @@
         const params = {
           name: this.searchKey,
           get_no_trans: 1,
-          webinar_id: this.webinarId,
+          webinar_id: watchInitData.webinar.id,
           ...this.pageInfo
         };
         this.insertFileServer.getInsertFileList(params).then(res => {
@@ -384,39 +365,47 @@
             this.tableData.push(...res.data.list);
             this.total = res.data.total;
             this.totalPages = Math.ceil(res.data.total / this.pageInfo.limit);
-            if (isCreated) {
+            if (options.isInvokeInCreated) {
               this.noVideo = !res.data.total ? 2 : 1;
             }
           }
         });
-      },
+      }, 300),
+      // 云插播开始播放
       handlePlay(video) {
-        video.isAudio = false;
+        const insertFileServer = useInsertFileServer();
+        const insertFileServerState = insertFileServer.state;
+        const { watchInitData } = useRoomBaseServer().state;
+        let isAudioFile = false;
         const videoType = video.file_type;
         if (
           videoType.toLowerCase() === '.ogg' ||
           videoType.toLowerCase() === '.mp3' ||
           videoType.toLowerCase() === '.mav'
         ) {
-          video.isAudio = true;
+          isAudioFile = true;
         }
+        insertFileServerState.insertStreamInfo.has_video = !isAudioFile;
+
         // 如果当前角色正在进行插播，需要先确认
-        if (this.insertVideoObj.insertVideoStatus) {
+        if (
+          insertFileServerState.isInsertFilePushing &&
+          insertFileServerState.insertStreamInfo.userInfo.accountId ==
+            watchInitData.join_info.third_party_user_id
+        ) {
           this.$confirm('是否中断播放中视频，并替换播放？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             customClass: 'zdy-message-box',
             cancelButtonClass: 'zdy-confirm-cancel'
-          })
-            .then(() => {
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitOnchange', [video, 'remote'])
-              );
-            })
-            .catch(() => {});
+          }).then(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitInsertFileChange', [video, 'remote'])
+            );
+          });
         } else {
           window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitOnchange', [video, 'remote'])
+            boxEventOpitons(this.cuid, 'emitInsertFileChange', [video, 'remote'])
           );
         }
       },
@@ -434,7 +423,9 @@
               })
               .then(res => {
                 if (res.code === 200) {
-                  this.getTableList(false);
+                  this.getTableList({
+                    isNeedResetPage: true
+                  });
                   this.$message({
                     message: '删除成功',
                     showClose: true,
@@ -453,23 +444,6 @@
               });
           })
           .catch(() => {});
-      },
-      autoPlay() {
-        setTimeout(() => {
-          this.$alert('您已进入直播房间，马上开始互动吧', '', {
-            title: '提示',
-            confirmButtonText: '立即开始',
-            // center: true,
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel',
-            callback: () => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
-            }
-          });
-        }, 500);
       },
       // 预览页面
       handlePreview(video) {
@@ -492,7 +466,7 @@
   .vmp-insert-video {
     &-wrap {
       &-search {
-        .iconicon_help_m {
+        .vh-line-question {
           margin-left: 10px;
           color: #999;
         }
@@ -539,13 +513,14 @@
             li {
               border-bottom: 1px solid #e6e6e6;
               .insert-header-item {
-                .iconfont {
-                  margin-right: 12px;
+                .vh-iconfont {
+                  margin-right: 14px;
+                  font-size: 18px;
                 }
-                .iconshipinwenjian {
+                .vh-fill-video {
                   color: #ff733c;
                 }
-                .iconyinpinwenjian {
+                .vh-fill-audio {
                   color: #10d3a8;
                 }
                 .insert-process-icon {
@@ -565,7 +540,7 @@
                   margin-right: 10px;
                   color: #666;
                   &.disable {
-                    color: #666666;
+                    color: #666;
                     pointer-events: none;
                   }
                 }
@@ -580,7 +555,7 @@
             }
           }
           .insert-list-uncontainer {
-            padding: 80px 0 140px 0;
+            padding: 80px 0 140px;
             margin: 0 auto;
             text-align: center;
             p {
@@ -591,7 +566,7 @@
         }
       }
       &-null {
-        padding: 50px 0 100px 0;
+        padding: 50px 0 100px;
         text-align: center;
         &-text {
           margin: 15px 0;

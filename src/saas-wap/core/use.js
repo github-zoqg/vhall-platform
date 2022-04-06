@@ -13,7 +13,7 @@ import VmpRegLoginWap from '@/packages/reg-login-wap';
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
-import VmpWatchPrivateChat from '@/packages/watch-private-chat';
+import VmpWapPrivateChat from '@/packages/wap-private-chat';
 //观看端报名表单
 import VmpSignUpForm from '@/packages/sign-up-form';
 import VmpTabMenuWap from '@/packages/tab-menu-wap';
@@ -33,13 +33,15 @@ import VmpCustomMenuWap from '@/packages/custom-menu-wap';
 // 商品列表
 import VmpGoodListWap from '@/packages/good-wap';
 import VmpChatWap from '@/packages/chat-wap';
+import VmpGoodsDetail from '@/packages/wap-goods-detail';
+
 //wap互动工具box
 import VmpInteractToolsWap from '@/packages/interact-tools-wap';
 // wap互动工具-签到
 import VmpSignWap from '@/packages/interact-sign-wap';
 
 // 二维码弹框
-import VmpWapQrCode from '@/packages/qrcode-wap';
+import VmpWapQrCode from '@/packages/official-module/official-wap';
 
 // 用来判断显示播放器还是流
 import VmpWapBody from '@/packages/wap-body';
@@ -57,6 +59,27 @@ import VmpLotteryWap from '@/packages/lottery-wap';
 // 送礼物飘屏动画
 import VmpWapRewardEffect from '@/packages/wap-reward-effect';
 
+// 章节
+import VmpChapterWap from '@/packages/watch-chapter-wap';
+//问答
+import VmpQaWap from '@/packages/qa-wap/index.js';
+// 问卷
+import VmpQuestionnaireWap from '@/packages/questionnaire-wap';
+// 报名表单
+import VmpWapSignUpForm from '@/packages/wap-sign-up-form';
+
+// 预约页面
+import VmpSubscribeBody from '@/packages/wap-subscribe-body';
+// 红包
+import VmpRedPacketWap from '@/packages/red-packet-wap/index';
+
+import VmpWapDesktopScreen from '@/packages/stream-desktop-screen-wap';
+
+import VmpWapInsertFIle from '@/packages/stream-insert-file-wap';
+
+// 被邀请上麦的弹窗
+import VmpInviteHandup from '@/packages/inviteHandup';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(VmpContainer);
@@ -69,7 +92,7 @@ export function initUse() {
   Vue.use(VmpWapStreamRemote);
   Vue.use(VmpRegLoginWap);
   Vue.use(VmpMemberList);
-  Vue.use(VmpWatchPrivateChat);
+  Vue.use(VmpWapPrivateChat);
   Vue.use(VmpSignUpForm);
   Vue.use(VmpTabMenuWap);
   Vue.use(VmpIntroWap);
@@ -78,6 +101,7 @@ export function initUse() {
   Vue.use(VmpNoticeWap);
   Vue.use(VmpRecommendWap);
   Vue.use(VmpGoodListWap);
+  Vue.use(VmpGoodsDetail);
   Vue.use(VmpWapQrCode);
   Vue.use(VmpInteractToolsWap);
   Vue.use(VmpChatWap);
@@ -91,4 +115,14 @@ export function initUse() {
   Vue.use(VmpUserAccountWap);
   Vue.use(VmpCashWap);
   Vue.use(VmpLotteryWap);
+  Vue.use(VmpChapterWap);
+  Vue.use(VmpQaWap);
+  Vue.use(VmpQuestionnaireWap);
+  Vue.use(VmpRedPacketWap);
+
+  Vue.use(VmpSubscribeBody);
+  Vue.use(VmpWapSignUpForm);
+  Vue.use(VmpWapDesktopScreen);
+  Vue.use(VmpWapInsertFIle);
+  Vue.use(VmpInviteHandup);
 }

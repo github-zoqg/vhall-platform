@@ -15,7 +15,7 @@
           <div>
             <p class="vmp-cash-wrap-top__title">{{ $t('cash.cash_1002') }}</p>
             <p class="vmp-cash-wrap-top__money">
-              ¥{{ useCashServer.state.cashInfo.red_packet_balance || '0.00' }}
+              ¥{{ cashServerState.cashInfo.red_packet_balance || '0.00' }}
             </p>
           </div>
           <div>
@@ -24,19 +24,19 @@
               class="vmp-cash-red-button vmp-cash-length-middle"
               round
               :disabled="
-                useCashServer.state.cashInfo.red_packet_balance < 1 ||
-                useCashServer.state.cashInfo.in_red_withdraw
+                cashServerState.cashInfo.red_packet_balance < 1 ||
+                cashServerState.cashInfo.in_red_withdraw
               "
               :style="{ visibility: step === 0 ? 'visible' : 'hidden' }"
               @click="checkPhoneToWx"
             >
               {{
-                useCashServer.state.cashInfo.in_red_withdraw
+                cashServerState.cashInfo.in_red_withdraw
                   ? $t('cash.cash_1004')
                   : $t('cash.cash_1005')
               }}
               <div
-                v-if="useCashServer.state.cashInfo.red_packet_balance < 1"
+                v-if="cashServerState.cashInfo.red_packet_balance < 1"
                 class="vmp-cash_btn_hover"
               >
                 {{ $t('cash.cash_1006') }}
@@ -77,9 +77,9 @@
 
         <!-- 第二段-00， 200条数据 -->
         <div v-show="step === 0" class="vmp-cash-list-box">
-          <div v-if="useCashServer.state.cashList.length > 0" class="vmp-cash-list">
+          <div v-if="cashServerState.cashList.length > 0" class="vmp-cash-list">
             <ul>
-              <li v-for="(item, index) in useCashServer.state.cashList" :key="index">
+              <li v-for="(item, index) in cashServerState.cashList" :key="index">
                 <div>
                   <p>{{ item.type == 0 ? $t('cash.cash_1019') : $t('cash.cash_1005') }}</p>
                   <p>{{ item.time }}</p>
@@ -112,7 +112,6 @@
               <el-input
                 v-model.trim="bindForm.money"
                 clearable
-                oninput="this.value=this.value.replace(/[^\d^\.]+/g, '')"
                 :placeholder="$t('cash.cash_1025')"
               ></el-input>
             </el-form-item>
@@ -143,24 +142,24 @@
                 <label class="vmp-wrap-cash__title">{{ $t('cash.cash_1026') }}</label>
                 <div class="vmp-wrap-cash__avatar">
                   <img
-                    v-show="!useCashServer.state.wxInfo.wechat_profile"
+                    v-show="!cashServerState.wxInfo.wechat_profile"
                     src="./images/my-dark@2x.png"
                     alt=""
                   />
                   <img
-                    v-show="useCashServer.state.wxInfo.wechat_profile"
-                    :src="useCashServer.state.wxInfo.wechat_profile"
+                    v-show="cashServerState.wxInfo.wechat_profile"
+                    :src="cashServerState.wxInfo.wechat_profile"
                     alt=""
                   />
                 </div>
                 <label class="vmp-wrap-cash__name">
                   {{
-                    (useCashServer.state.wxInfo.wechat_name_wap
-                      ? useCashServer.state.wxInfo.wechat_name_wap
-                      : '') | splitLenStr(6)
+                    (cashServerState.wxInfo.wechat_name_wap
+                      ? cashServerState.wxInfo.wechat_name_wap
+                      : '') | overHidden(6)
                   }}
                   {{
-                    useCashServer.state.wxInfo.wechat_name_wap
+                    cashServerState.wxInfo.wechat_name_wap
                       ? `（${$t('account.account_1019')}）`
                       : `（${$t('account.account_1020')}）`
                   }}
@@ -209,7 +208,7 @@
             <div
               class="vmp-qr-reload"
               v-if="countPoll === 12"
-              @click="goBangWeixin(useCashServer.state.wxInfo.is_oauth === 1)"
+              @click="goBangWeixin(cashServerState.wxInfo.is_oauth === 1 ? 2 : 1)"
             >
               <i class="vh-iconfont vh-a-line-clockwiserotation"></i>
             </div>
@@ -239,7 +238,7 @@
           if (value < 1) {
             this.handleInputChange(value);
             callback(new Error(this.$t('cash.cash_1031')));
-          } else if (value - this.useCashServer.state.cashInfo.red_packet_balance > 0) {
+          } else if (value - this.cashServerState.cashInfo.red_packet_balance > 0) {
             this.handleInputChange(value);
             callback(new Error(this.$t('cash.cash_1032')));
           } else if (value - 800 > 0) {
@@ -285,12 +284,13 @@
         }
       };
 
+      const cashServerState = this.useCashServer.state;
       return {
+        cashServerState,
         dialogVisible: false, // 组件是否显示
-        useUserServer: {}, // 用户相关的接口
-        useCashServer: {}, // 提现相关的接口
+        // useUserServer: {}, // 用户相关的接口
+        // useCashServer: {}, // 提现相关的接口
         step: 0, // 当前步骤
-        cashCaptVo: {}, // 待删除
         bindForm: {
           money: '',
           phone: '',
@@ -315,13 +315,19 @@
         return name && name.length > len ? name.substring(0, len) + '...' : name;
       }
     },
-    created() {
+    beforeCreate() {
       this.useUserServer = useUserServer();
       this.useCashServer = useCashServer();
     },
     beforeDestroy() {
       this.initInterval(); // 初始化定时器
       this.initPollTimer(); // 初始化微信绑定情况的轮询
+    },
+    watch: {
+      'bindForm.money'(val) {
+        // eslint-disable-next-line no-useless-escape
+        this.bindForm.money = `${val}`.replace(/[^\d^\.]+/g, '');
+      }
     },
     methods: {
       // 关闭弹窗初始化事件
@@ -351,14 +357,21 @@
         // 获取用户的基本信息 如绑定的手机号
         await this.useUserServer.getUserInfo({ scene_id: 2 });
         // 获取微信的绑定信息 返回是否绑定 头像 昵称
-        await this.useCashServer.checkWithDrawal();
+        await this.useCashServer.checkWithDrawal().catch(res => {
+          this.$message({
+            message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        });
         if (!this.useUserServer.state.userInfo.phone) {
           console.log('手机号未绑定进入... ...');
           this.step = 1;
-        } else if (this.useCashServer.state.wxInfo.is_oauth === 1) {
+        } else if (this.cashServerState.wxInfo.is_oauth === 1) {
           console.log('手机号已绑定、微信已绑定(昵称和头像都有)进入... ...');
           this.step = 3;
-        } else if (this.useCashServer.state.wxInfo.is_oauth !== 1) {
+        } else if (this.cashServerState.wxInfo.is_oauth !== 1) {
           console.log('手机号已绑定、（微信未绑定or绑定无头像or绑定无昵称）进入... ...');
           await this.goBangWeixin(1);
           this.step = 2;
@@ -413,7 +426,7 @@
                 }, 1000);
               } else {
                 this.$message({
-                  message: this.$tec(res.code) || res.msg,
+                  message: this.$tec(res.code) || this.$t('account.account_1051'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -423,7 +436,7 @@
             })
             .catch(res => {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1051'),
+                message: this.$tec(res.code) || this.$t('account.account_1051'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -451,7 +464,7 @@
                   this.bindPhoneSave(res.data.key);
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || this.$t('cash.cash_1033'),
+                    message: this.$tec(res.code) || this.$t('cash.cash_1033'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -461,7 +474,7 @@
               .catch(res => {
                 console.log(res);
                 this.$message({
-                  message: this.$tec(res.code) || res.msg || this.$t('account.account_1052'),
+                  message: this.$tec(res.code) || this.$t('account.account_1052'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -497,7 +510,7 @@
               this.checkPhoneToWx();
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || this.$t('account.account_1054'),
+                message: this.$tec(res.code) || this.$t('account.account_1054'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -506,7 +519,7 @@
           })
           .catch(err => {
             this.$message({
-              message: this.$tec(err.code) || err.msg || this.$t('account.account_1054'),
+              message: this.$tec(err.code) || this.$t('account.account_1054'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -532,14 +545,15 @@
           .getBindKey()
           .then(res => {
             if (res.code == 200) {
-              const jump_url = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/bind/${res.data.mark}`;
-              this.qrcode = `${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
+              console.log(res.data);
+              const jump_url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/bind/${res.data.mark}`;
+              this.qrcode = `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=wap&jump_url=${jump_url}`;
               console.log(`二维码请求地址: ${this.qrcode}`);
               // 轮询微信扫码绑定情况
               this.startPolling(type);
             } else {
               this.$message({
-                message: this.$tec(res.code) || res.msg || '获取信息失败',
+                message: this.$tec(res.code) || this.$t('message.message_1026'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -548,7 +562,7 @@
           })
           .catch(err => {
             this.$message({
-              message: this.$tec(err.code) || err.msg || '获取信息失败',
+              message: this.$tec(err.code) || this.$t('message.message_1026'),
               showClose: true,
               type: 'error',
               customClass: 'zdy-info-box'
@@ -559,20 +573,35 @@
       // 轮询微信扫码绑定情况
       async startPolling(type) {
         this.initPollTimer();
+        await this.withdrawIsBind(true);
         const pollingFn = async () => {
           // 微信扫码绑定情况
-          const bindData = await this.withdrawIsBind(type);
+          const bindData = await this.withdrawIsBind();
           if (type == 1 && bindData.data.is_bind == 1) {
             console.log('第一次绑定, 当前已经授权过...');
             this.initPollTimer();
             // 获取微信的绑定信息 返回是否绑定 头像 昵称
-            await this.useCashServer.checkWithDrawal();
+            await this.useCashServer.checkWithDrawal().catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
             this.step = 3;
           } else if (type == 2 && bindData.data.is_change == 1) {
             console.log('更换绑定, 当前已经授权过...');
             this.initPollTimer();
             // 获取微信的绑定信息 返回是否绑定 头像 昵称
-            await this.useCashServer.checkWithDrawal();
+            await this.useCashServer.checkWithDrawal().catch(res => {
+              this.$message({
+                message: this.$tec(res.code) || this.$t('cash.cash_1040'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            });
             this.step = 3;
           }
           // v3组件老逻辑 1min 自动重置一次二维码 后续可以改成用户手动
@@ -586,9 +615,9 @@
       },
 
       // 获取当前的微信绑定状态 1初次绑定 2更换绑定
-      withdrawIsBind(type) {
+      withdrawIsBind(isInit = false) {
         const params = {};
-        type === 2 && (params.is_change = 1); // 更换绑定增加参数
+        isInit && (params.is_change = 1); // 告知后端初始化更换状态的查询
         return this.useCashServer.withdrawIsBind(params);
       },
 
@@ -614,7 +643,7 @@
                   this.closeDialog();
                 } else {
                   this.$message({
-                    message: this.$tec(res.code) || res.msg || '验证失败，无法操作',
+                    message: this.$tec(res.code) || this.$t('cash.cash_1037'),
                     showClose: true,
                     type: 'error',
                     customClass: 'zdy-info-box'
@@ -623,17 +652,19 @@
               })
               .catch(err => {
                 this.$message({
-                  message: this.$tec(err.code) || err.msg || '验证失败，无法操作',
+                  message: this.$tec(err.code) || this.$t('cash.cash_1037'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
                 });
+              })
+              .finally(() => {
+                this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
+                this.$refs.bindForm?.resetFields(); // 重置表单
+                this.initInterval(); // 初始化定时器
               });
           }
         });
-        this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
-        this.$refs.bindForm?.resetFields(); // 重置表单
-        this.initInterval(); // 初始化定时器
       },
 
       // 初始化定时器
@@ -716,21 +747,25 @@
         border-radius: 20px;
         text-align: center;
         position: relative;
+        height: 38px;
+        font-weight: 500;
         .vmp-cash_btn_hover {
           display: none;
+          height: 38px;
         }
         &.is-disabled:hover {
+          opacity: 1;
           .vmp-cash_btn_hover {
             display: block;
             position: absolute;
             top: -1px;
             border-radius: 4px;
             word-break: break-all;
-            line-height: 20px;
+            line-height: 38px;
             background: rgba(26, 26, 26, 0.8);
             font-size: 12px;
             color: #fff;
-            padding: 8px 12px;
+            padding: 0 12px;
             text-align: left;
             right: 0;
           }
@@ -842,12 +877,12 @@
           background: rgba(0, 0, 0, 0.9);
           border-radius: 4px;
           padding: 23px 27px;
-          text-align: left;
           overflow-y: auto;
           p {
             font-size: 12px;
             font-weight: 400;
             color: #ffffff;
+            text-align: justify;
             line-height: 17px;
             span {
               font-size: 20px;
@@ -939,7 +974,7 @@
             margin-bottom: 24px;
           }
           &.is-error {
-            margin-bottom: 24px;
+            margin-bottom: 30px;
           }
           &.vmp-cash-box__msg__error {
             margin-bottom: 24px;
@@ -1027,7 +1062,7 @@
             margin-bottom: 24px;
           }
           &.is-error {
-            margin-bottom: 24px;
+            margin-bottom: 30px;
           }
           &.vmp-cash-box__msg__error {
             margin-bottom: 24px;

@@ -1,39 +1,31 @@
 <template>
-  <div class="vmp-header-watch">
-    <div class="vmp-header-watch-left">
+  <!-- 观看端头部信息 -->
+  <div
+    class="vmp-header-watch"
+    :class="embedObj.embed ? 'vmp-basic-hd' : ''"
+    v-if="!embedObj.embed"
+  >
+    <div class="vmp-header-watch_left">
       <!-- 品牌设置-标识图片 -->
-      <div
-        class="vmp-header-watch-left-logo"
-        v-if="webinarTag && webinarTag.view_status == 1"
-        @click="goLogoUrl"
-      >
+      <div class="left_logo" v-if="webinarTag && webinarTag.view_status == 1" @click="goLogoUrl">
         <img
           :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogoUrl"
           alt=""
         />
       </div>
     </div>
-    <div class="vmp-header-watch-center">
-      <div class="vmp-header-watch-center-title">
-        {{ webinarInfo.subject | splitLenStr(40) }}
-        <span
-          v-if="webinarInfo.type != 6"
-          :class="
-            'vmp-header-watch-center-title-tags vmp-header-watch-center-title-tags_' +
-            webinarInfo.type
-          "
-        >
-          <img v-if="webinarInfo.type == 1" src="./images/live-white.gif" alt="" />
-          <label>{{ webinarInfo.type | webinarFilter }}</label>
+    <div class="vmp-header-watch_center">
+      <div class="center_title">
+        {{ languagesInfo.subject | overHidden(40) }}
+        <span :class="'tags tags_' + webinarInfo.type">
+          <img v-if="webinarInfo.type == 1" src="./img/live-white.gif" alt="" />
+          <label>{{ formatType(webinarInfo.type) }}</label>
         </span>
-        <span
-          v-if="webinarInfo.type != 6 && webinarInfo.no_delay_webinar == 1"
-          class="vmp-header-watch-center-title-delay"
-        >
+        <span v-if="webinarInfo.mode != 6 && webinarInfo.no_delay_webinar == 1" class="delay">
           <img :src="noDelayIconUrl" alt="" />
         </span>
       </div>
-      <div class="vmp-header-watch-center-host">
+      <div class="center_host">
         <a
           :href="create_user_url"
           v-if="webinarTag && webinarTag.organizers_status == 1"
@@ -44,14 +36,14 @@
         <span>{{ webinarInfo.start_time }}</span>
       </div>
     </div>
-    <div class="vmp-header-watch-right">
+    <div class="vmp-header-watch_right">
       <!-- 多语言 -->
-      <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+      <vmp-air-container :cuid="cuid"></vmp-air-container>
 
       <!-- 公众号 -->
-      <div class="vmp-header-watch-right-officical" v-if="officialImg">
+      <div class="right_officical" v-if="officialImg">
         <div
-          :class="'vmp-header-watch-right-officical-icon ' + themeClass.iconClass"
+          :class="'right_officical_icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goOfficical"
         >
@@ -62,11 +54,11 @@
 
       <!-- 关注 -->
       <div
-        class="vmp-header-watch-right-attention"
-        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.type != 6"
+        class="right_attention"
+        v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.mode != 6"
       >
         <div
-          :class="'vmp-header-watch-right-attention-icon ' + themeClass.iconClass"
+          :class="'right_attention_icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="attentionHandler"
         >
@@ -75,16 +67,14 @@
               isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
             }`"
           ></i>
-          <!-- <i class="vh-iconfont vh-line-collection vh-a-line-collectionsuccess"></i> -->
           <p>{{ isAttention ? $t('nav.nav_1003') : $t('nav.nav_1004') }}</p>
         </div>
       </div>
-      <!-- <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container> -->
 
       <!-- 分享 -->
-      <div class="vmp-header-watch-right-share">
+      <div class="right_share" v-if="isShowShare">
         <div
-          :class="'vmp-header-watch-right-share-icon ' + themeClass.iconClass"
+          :class="'right_share_icon ' + themeClass.iconClass"
           :style="{ color: themeClass.pageBg }"
           @click="goShare"
         >
@@ -93,26 +83,20 @@
         </div>
       </div>
 
-      <officaial-dialog
-        ref="officaialDialog"
-        :officicalInfo="officicalInfo"
-        :screenPosterInfo="screenPosterInfo"
-        v-if="officialImg"
-      ></officaial-dialog>
       <!-- 登录、基础信息 -->
-      <div class="vmp-header-watch-right-login">
-        <div class="vmp-header-watch-right-login-unuser" @click="goLogin" v-if="!isLogin">
-          <p><img src="./images/my-dark@2x.png" alt="" /></p>
+      <div class="right_login">
+        <div class="right_login_unuser" @click="goLogin" v-if="!isLogin">
+          <p><img src="./img/my-dark@2x.png" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
-        <div class="vmp-header-watch-right-login-user" v-else>
-          <div class="vmp-header-watch-right-login-user-dropdown">
+        <div class="right_login_user" v-else>
+          <div class="right_login_user_dropdown">
             <p>
               <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
-              <img v-else src="./images/my-dark@2x.png" alt="" />
+              <img v-else src="./img/my-dark@2x.png" alt="" />
             </p>
-            <span>{{ userInfo.nick_name | splitLenStr(8) }}</span>
-            <div class="vmp-header-watch-right-login-user-list">
+            <span>{{ userInfo.nick_name | overHidden(8) }}</span>
+            <div class="right_login_user_list">
               <ul>
                 <li @click="goUserInfo">
                   <i class="vh-iconfont vh-line-account"></i>
@@ -137,21 +121,15 @@
 <script>
   import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import officaialDialog from './components/officalDialog.vue';
   export default {
     name: 'VmpHeaderWatch',
     data() {
       return {
-        noDelayIconUrl:
-          '//cnstatic01.e.vhall.com/saas-v3/static/common/img/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png',
-        defaultLogoUrl: require('./images/logo-red@2x.png'),
+        defaultLogoUrl: require('./img/logo-red@2x.png'),
         webinarInfo: {}, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识
-        screenPosterInfo: {}, // 开屏海报
-        officicalInfo: {}, //公众号
         officialImg: '',
-        // userInfo: JSON.parse(window.localStorage.getItem('userInfo')) || {}, // 用户登录之后的信息
         themeClass: {
           bgColor: 'light',
           pageBg: '#cccccc',
@@ -161,28 +139,10 @@
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
     },
-    filters: {
-      webinarFilter(val) {
-        // const webinarArr = [
-        //   this.$t('common.common_1018'),
-        //   this.$t('common.common_1019'),
-        //   this.$t('common.common_1020'),
-        //   this.$t('common.common_1024'),
-        //   this.$t('common.common_1021')
-        // ];
-        const webinarArr = ['直播', '预告', '结束', '点播', '回放'];
-        return webinarArr[val - 1];
-      },
-      splitLenStr(name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
-    },
-    components: {
-      officaialDialog
-    },
     computed: {
+      // 主办方跳转地址
       create_user_url() {
-        const { watchInitData } = this.roomBaseState;
+        const { watchInitData } = this.roomBaseServer.state;
         if (watchInitData && watchInitData.urls && this.webinarInfo) {
           const url = watchInitData.urls.web_url || '';
           if (url.split('')[url.length - 1] == '/') {
@@ -194,13 +154,28 @@
           return 'javascript:void(0);';
         }
       },
-      isNotEmbed() {
-        return this.embedObj
-          ? !!(this.embedObj.embed == false && this.embedObj.embedVideo == false)
-          : true;
+      // 获取嵌入方式
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       },
+      // 获取用户信息
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
+      },
+      // 是否展示分享
+      isShowShare() {
+        return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
+      },
+      // 当前语言
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
+      },
+      // 无延迟图片地址
+      noDelayIconUrl() {
+        const langArr = ['zh-CN', 'en'];
+        const langer = localStorage.getItem('lang') || this.languagesInfo.language_type;
+        const lang = langArr[langer - 1] || 'zh-CN';
+        return `${process.env.VUE_APP_STATIC_BASE}/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_${lang}.png`;
       }
     },
     beforeCreate() {
@@ -209,27 +184,23 @@
       this.userServer = useUserServer();
     },
     async created() {
-      this.childrenComp = window.$serverConfig[this.cuid].children;
-      this.roomBaseState = this.roomBaseServer.state;
-      this.embedObj = this.roomBaseState.embedObj;
-      if (this.isLogin && this.isNotEmbed) {
+      if (this.isLogin && !this.embedObj.embed) {
         // 通过活动ID，获取关注信息
         await this.attentionStatus();
       }
+      // 获取活动信息
       this.getWebinarInfo();
     },
     methods: {
       getWebinarInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
-        this.webinarInfo = webinar || {};
-        this.skinInfo = this.roomBaseState.skinInfo || {};
-        this.webinarTag = this.roomBaseState.webinarTag || {};
-        this.officicalInfo = this.roomBaseState.officicalInfo || {};
-        this.screenPosterInfo = this.roomBaseState.screenPosterInfo || {};
-        this.setOfficicalInfo(this.officicalInfo);
+        const { watchInitData, skinInfo, webinarTag, officicalInfo } = this.roomBaseServer.state;
+        this.webinarInfo = watchInitData.webinar || {}; //活动基本信息
+        this.skinInfo = skinInfo || {}; // 皮肤信息
+        this.webinarTag = webinarTag || {}; // 活动标签
+        this.setOfficicalInfo(officicalInfo);
         this.setSkinInfo(this.skinInfo);
       },
-      // 关注状态
+      // 关注状态 从接口拿到是否关注
       attentionStatus() {
         let params = {
           at_id: this.userInfo.user_id,
@@ -239,6 +210,7 @@
           this.isAttention = Boolean(res.data.result);
         });
       },
+      // 关注 or 取消关注
       attentionHandler() {
         if (!this.isLogin) {
           this.goLogin();
@@ -303,11 +275,13 @@
           }
         }, 300);
       },
+      // 设置关注号信息
       setOfficicalInfo(info) {
         if (info && info.status == 0 && info.img) {
           this.officialImg = info.img;
         }
       },
+      // 设置观看端皮肤样式
       setSkinInfo(skin) {
         if (skin && skin.skin_json_pc && skin.status == 1) {
           this.$nextTick(() => {
@@ -317,6 +291,7 @@
             this.themeClass.bgColor =
               bgColor == '#1a1a1a' ? 'dark' : bgColor == '#F2F2F2' ? 'gray' : 'white';
             const bottomContent = document.querySelector('.vmp-basic-container');
+            if (!bottomContent) return;
             if (bottomContent && background) {
               bottomContent.style.background = `url(${background}) no-repeat`;
               bottomContent.style.backgroundSize = '100% 100%';
@@ -335,6 +310,7 @@
           });
         }
       },
+      // logo跳转
       goLogoUrl() {
         let logoUrl =
           this.webinarTag && this.webinarTag.skip_url
@@ -342,19 +318,44 @@
             : 'https://www.vhall.com/';
         window.open(logoUrl, '_blank');
       },
+      formatType(val) {
+        let text;
+        switch (parseInt(val)) {
+          case 1:
+            text = this.$t('common.common_1018');
+            break;
+          case 2:
+            text = this.$t('common.common_1019');
+            break;
+          case 3:
+            text = this.$t('common.common_1020');
+            break;
+          case 4:
+            text = this.$t('common.common_1024');
+            break;
+          case 5:
+            text = this.$t('common.common_1021');
+            break;
+          default:
+            text = this.$t('common.common_1018');
+        }
+        return text;
+      },
       //登录
       goLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       //公众号
       goOfficical() {
-        this.officialImg = this.officicalInfo.img;
-        this.$refs.officaialDialog.officialVisible = true;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
+        // this.officialImg = this.officicalInfo.img;
+        // this.$refs.officaialDialog.officialVisible = true;
       },
       //分享
       goShare() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
       },
+      // 退出登录
       exitLogin() {
         this.userServer.loginOut().then(res => {
           if (res.code == 200) {
@@ -388,10 +389,15 @@
     justify-content: space-between;
     height: 72px;
     width: 100%;
-    margin: 0 32px 0 8px;
-    &-left {
+    margin-bottom: 20px;
+    background: #2a2a2a;
+    &.vmp-basic-hd {
+      display: none;
+    }
+    &_left {
       margin-right: 7px;
-      &-logo {
+      padding-left: 8px;
+      .left_logo {
         width: 120px;
         height: 44px;
         margin: 14px 0;
@@ -403,13 +409,13 @@
         }
       }
     }
-    &-center {
+    &_center {
       text-align: left;
       flex: 1;
       color: @font-dark-normal;
-      &-title {
+      .center_title {
         font-size: 18px;
-        &-tags {
+        .tags {
           padding: 0 8px;
           height: 20px;
           border-radius: 10px;
@@ -434,22 +440,22 @@
             margin: 2px 0 2px 0;
           }
         }
-        &-tags_1 {
+        .tags_1 {
           background: @bg-error-light;
         }
-        &-tags_2 {
+        .tags_2 {
           background: @bg-subscribe-normal;
         }
-        &-tags_3 {
+        .tags_3 {
           background: @bg-end-normal;
         }
-        &-tags_4 {
+        .tags_4 {
           background: @bg-demand-normal;
         }
-        &-tags_5 {
+        .tags_5 {
           background: @bg-playback-normal;
         }
-        &-delay {
+        .delay {
           display: inline-block;
           width: 66px;
           height: 28px;
@@ -462,7 +468,7 @@
           }
         }
       }
-      &-host {
+      .center_host {
         font-size: 14px;
         color: @font-dark-low;
         a {
@@ -476,16 +482,16 @@
         }
       }
     }
-    &-right {
+    &_right {
       display: flex;
       padding-right: 32px;
       align-items: center;
       justify-content: center;
-      &-officical,
-      &-attention,
-      &-share {
+      .right_officical,
+      .right_attention,
+      .right_share {
         padding-right: 24px;
-        &-icon {
+        &_icon {
           text-align: center;
           cursor: pointer;
           i {
@@ -518,8 +524,8 @@
           }
         }
       }
-      &-login {
-        &-unuser {
+      .right_login {
+        &_unuser {
           text-align: center;
           display: flex;
           cursor: pointer;
@@ -543,10 +549,10 @@
             line-height: 32px;
           }
         }
-        &-user {
+        &_user {
           position: relative;
           height: 100%;
-          &-dropdown {
+          &_dropdown {
             text-align: center;
             display: flex;
             cursor: pointer;
@@ -573,15 +579,15 @@
               line-height: 32px;
             }
             &:hover {
-              .vmp-header-watch-right-login-user-list {
+              .right_login_user_list {
                 display: block;
               }
             }
           }
-          &-list {
+          &_list {
             width: 160px;
             position: absolute;
-            top: 38px;
+            top: 42px;
             right: -6px;
             z-index: 11;
             border-radius: 4px;

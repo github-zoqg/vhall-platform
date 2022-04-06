@@ -11,13 +11,12 @@
         <div class="vh-chose-active-item__cover">
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <!-- <i class="saasicon_redu"></i> -->
-            <i class="saasicon_redu iconfont iconredu_icon1"></i>
+            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
         </div>
         <div class="vh-chose-active-item__titleInfo">
-          <div class="vh-chose-active-item__title">
+          <div class="vh-chose-active-item__title ellipsis">
             {{ item.title }}
           </div>
           <div class="vh-chose-active-item__info">
@@ -40,9 +39,6 @@
         hasDelayPermission: false
       };
     },
-    computed: {
-      // ...mapState('watchBase', ['watchInitData', 'configList'])
-    },
     watch: {
       checkedList: function () {
         this.getActiveList();
@@ -52,12 +48,10 @@
       this.customMenuServer = useCustomMenuServer();
     },
     created() {
-      // this.hasDelayPermission = this.configList['no.delay.webinar'] == 1;
       this.getActiveList();
     },
     methods: {
       linkSubject(id) {
-        // window.open(window.location.protocol + process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY + `/special/detail?id=${id}&delay=${this.hasDelayPermission ? 1 : 0}`)
         window.open(
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
@@ -66,7 +60,7 @@
         );
       },
       async getActiveList() {
-        if (this.checkedList.length == 0) {
+        if (this.checkedList.length === 0) {
           this.activeList = [];
           return;
         }
@@ -97,42 +91,43 @@
     position: relative;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
   }
   .project-check-page {
     justify-content: center;
     align-items: flex-start;
-    margin: 0px 0px 20px;
+    // margin: 0px 0px 20px;
   }
   .vh-chose-active-item {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     overflow: hidden;
-    width: 312px;
-    height: 80px;
-    padding: 0px 10px 8px;
-    font-family: PingFangSC-Regular, PingFang SC;
-    border-radius: 4px;
-    &:hover {
-      background: #383838;
-      cursor: pointer;
-    }
+    width: 300px;
+    height: 266px;
+    margin: 20px 14px;
+    border-radius: 6px;
+    background: #f7f7f7;
+    overflow: hidden;
+
     &__cover {
       position: relative;
-      width: 142px;
-      height: 80px;
-      margin-right: 12px;
+      width: 100%;
+      height: 180px;
       img {
         display: inline-block;
-        width: 142px;
-        height: 80px;
-        border-radius: 4px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
       }
+
       &-status {
         position: absolute;
-        left: 6px;
-        top: 6px;
-        min-width: 98px;
+        left: 10px;
+        top: 15px;
         height: 20px;
         line-height: 20px;
         background: rgba(0, 0, 0, 0.65);
@@ -147,20 +142,21 @@
       }
       &-hots {
         position: absolute;
-        left: 10px;
-        bottom: 4px;
+        left: 12px;
+        bottom: 10px;
         font-size: 12px;
         font-weight: 400;
         color: #ffffff;
         line-height: 20px;
         z-index: 3;
-        .saasicon_redu {
+        .vh-saas-line-heat {
+          font-size: 12px;
+          margin-right: 16px;
+          margin-top: 2px;
           &:before {
             display: inline-block;
             width: 14px !important;
             height: 14px !important;
-            margin-top: 2px;
-            margin-right: 4px;
           }
         }
       }
@@ -188,27 +184,26 @@
       height: 55px;
     }
     &__title {
-      margin: 10px 0px 4px 0px;
-      font-size: 14px;
+      width: 100%;
+      height: 36px;
+      font-size: 28px;
       font-weight: 400;
-      color: @font-dark-normal;
-      line-height: 20px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      text-align: left;
+      color: #1a1a1a;
+      line-height: 36px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      padding: 0px 8px;
+      margin-bottom: 4px;
     }
     &__info {
       font-weight: 400;
       word-break: keep-all;
       white-space: nowrap;
-      font-size: 12px;
+      font-size: 24px;
       color: @font-dark-low;
-      line-height: 16px;
+      line-height: 42px;
       text-align: left;
+      padding: 0px 8px;
     }
     .liveTag {
       color: #fff;
@@ -223,123 +218,6 @@
         height: 8px;
         margin-top: 4px;
         border-radius: 0px;
-      }
-    }
-  }
-  .project-check-page .vh-chose-active-item {
-    flex-direction: column;
-    width: 284px;
-    height: 261px;
-    margin: 0px 8px 8px;
-    border-radius: 4px;
-    padding: 0px;
-    &__cover {
-      width: 100%;
-      height: 160px;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      overflow: hidden;
-      img {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        border-radius: 0px;
-        transition: all 0.3s;
-        &:hover {
-          transform: scale(1.2);
-        }
-      }
-      &-hots {
-        font-size: 14px;
-        left: 12px;
-        bottom: 6px;
-      }
-    }
-    &__titleInfo {
-      height: 100px;
-      background: #fff;
-      &:hover {
-        .vh-chose-active-item__title {
-          color: #fb3a32;
-        }
-      }
-    }
-    &__title {
-      font-size: 16px !important;
-      color: @font-light-normal;
-      line-height: 24px;
-      margin: 12px 16px 7px 16px;
-    }
-    &__info {
-      font-size: 14px;
-      font-weight: 400;
-      color: @font-dark-second;
-      line-height: 17px;
-      margin-left: 16px;
-    }
-    .liveTag {
-      height: 20px;
-      padding: 0px;
-    }
-  }
-
-  @media screen and (max-width: 1366px) {
-    .project-check-page {
-      .vh-chose-active-item {
-        width: 249px;
-        height: 240px;
-        .vh-chose-active-item__cover {
-          height: 140px;
-        }
-        .vh-chose-active-item__titleInfo {
-          height: 100px;
-        }
-      }
-    }
-  }
-
-  @media screen and (min-width: 1367px) and (max-width: 1600px) {
-    .project-check-page {
-      .vh-chose-active-item {
-        width: 284px;
-        height: 261px;
-        .vh-chose-active-item__cover {
-          height: 160px;
-        }
-        .vh-chose-active-item__titleInfo {
-          height: 101px;
-        }
-      }
-    }
-  }
-  @media screen and (min-width: 1601px) and (max-width: 1920px) {
-    .project-check-page {
-      .vh-chose-active-item {
-        width: 358px;
-        height: 302px;
-        .vh-chose-active-item__cover {
-          height: 202px;
-        }
-        .vh-chose-active-item__titleInfo {
-          height: 100px;
-        }
-      }
-    }
-  }
-  @media screen and (min-width: 1921px) {
-    .project-check-page {
-      .vh-chose-active-item {
-        width: 358px;
-        height: 302px;
-        .vh-chose-active-item__cover {
-          height: 202px;
-        }
-        .vh-chose-active-item__titleInfo {
-          height: 100px;
-        }
       }
     }
   }

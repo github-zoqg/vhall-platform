@@ -27,11 +27,18 @@ export default {
       default() {
         return {};
       }
+    },
+    lotteryInfo: {
+      type: Object,
+      default() {
+        return {};
+      }
     }
   },
   data() {
     return {
-      noLotteryImg: require('../img/noWin.png')
+      noLotteryImg: require('../img/noWin.png'),
+      defaultLotteryImg: require('../img/win.png')
     };
   }
 };

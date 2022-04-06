@@ -29,10 +29,20 @@
         screenShow: false
       };
     },
+    computed: {
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
+    },
     created() {
       this.useRoomBaseServer = useRoomBaseServer();
       // status 1 关闭 0 开启
-      this.useRoomBaseServer.state.screenPosterInfo.status === 0 && this.screenPostOpen();
+      if (this.isEmbed) {
+        // 嵌入页没有开屏海报
+        this.screenShow = false;
+      } else {
+        this.useRoomBaseServer.state.screenPosterInfo.status === 0 && this.screenPostOpen();
+      }
     },
     methods: {
       // 链接跳转
@@ -57,8 +67,6 @@
 
       // 关闭事件
       screenPostClose() {
-        if (!this.screenShow) return;
-        this.useRoomBaseServer.screenPostClose();
         this.screenShow = false;
       },
 

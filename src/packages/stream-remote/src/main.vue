@@ -2,39 +2,78 @@
   <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
-    <!-- videoMuted 的时候显示流占位图 -->
-    <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
+    <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
+    <section
+      v-if="stream.videoMuted || isShowSplitScreenPlaceholder"
+      class="vmp-stream-remote__container__placeholder"
+      :class="{
+        'vmp-stream-remote__container__placeholder-spliting': isShowSplitScreenPlaceholder,
+        'vmp-stream-remote__container__placeholder-mute':
+          stream.videoMuted && !isShowSplitScreenPlaceholder
+      }"
+    ></section>
+
+    <!-- 音频直播的的时候显示流占位图 -->
+    <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
+
+    <!-- 网络异常时占位图，根据是否有streamId判断 -->
+    <section
+      v-if="isShowNetError && !stream.streamId && isInstanceInit"
+      class="vmp-stream-remote__container__net-error"
+    >
+      <div class="net-error-img"></div>
+      <p>{{ $t('interact.interact_1035') }}</p>
+    </section>
+
+    <!-- 顶部流消息 -->
+    <section class="vmp-stream-local__top">
+      <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
+    </section>
+
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bootom">
+    <section class="vmp-stream-local__bottom">
       <span
-        v-show="[1, 3, 4].includes(stream.attributes.roleName)"
-        class="vmp-stream-local__bootom-role"
-        :class="`vmp-stream-local__bootom-role__${stream.attributes.roleName}`"
+        v-show="showRole"
+        class="vmp-stream-local__bottom-role"
+        :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleNameFilter }}
+        {{ stream.attributes.roleName | roleFilter(true) }}
       </span>
-      <span class="vmp-stream-local__bootom-nickname">{{ stream.attributes.nickname }}</span>
       <span
-        class="vmp-stream-local__bootom-signal"
-        :class="`vmp-stream-local__bootom-signal__${networkStatus}`"
+        class="vmp-stream-local__bottom-nickname"
+        :class="{
+          'vmp-stream-local__bottom-nickname-width': showRole
+        }"
+      >
+        {{ stream.attributes.nickname }}
+      </span>
+      <span
+        class="vmp-stream-local__bottom-signal"
+        :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
       ></span>
       <span
-        class="vmp-stream-local__bootom-mic vh-iconfont"
+        class="vmp-stream-local__bottom-mic vh-iconfont"
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
-
+    <!-- {{ joinInfo.role_name }} -- {{ groupRole }} -->
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-first-line"
+      >
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleNameFilter }}
+          {{ stream.attributes.roleName | roleFilter(true) }}
         </span>
 
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -46,7 +85,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -57,7 +99,7 @@
         </el-tooltip>
       </p>
 
-      <p class="vmp-stream-remote__shadow-second-line">
+      <p class="vmp-stream-remote__shadow-second-line" v-if="liveMode != 1">
         <span
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
@@ -84,10 +126,11 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="bottom">
+        <!-- 主持人和组长不能互相下麦 -->
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="joinInfo.role_name == 1 && stream.attributes.roleName != 20"
+            v-if="isShowDownMicBtn"
             @click="speakOff"
           ></span>
         </el-tooltip>
@@ -95,8 +138,14 @@
     </section>
 
     <section v-else class="vmp-stream-remote__shadow-box">
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-first-line">
-        <el-tooltip :content="stream.videoMuted ? '打开摄像头' : '关闭摄像头'" placement="top">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-first-line"
+      >
+        <el-tooltip
+          :content="stream.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon"
             @click="handleClickMuteDevice('video')"
@@ -108,7 +157,10 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="stream.audioMuted ? '打开麦克风' : '关闭麦克风'" placement="top">
+        <el-tooltip
+          :content="stream.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+          placement="top"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             @click="handleClickMuteDevice('audio')"
@@ -117,21 +169,26 @@
             "
           ></span>
         </el-tooltip>
-
+        <!--
         <el-tooltip content="下麦" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
             v-if="joinInfo.role_name != 1 && stream.attributes.roleName != 20"
           ></span>
-        </el-tooltip>
+        </el-tooltip> -->
       </p>
 
-      <p v-if="joinInfo.role_name == 1" class="vmp-stream-remote__shadow-second-line">
-        <el-tooltip content="设为主画面" placement="bottom">
+      <p
+        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        class="vmp-stream-remote__shadow-second-line"
+      >
+        <el-tooltip content="设为主讲人" placement="bottom">
           <span
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-show="stream.attributes.roleName == 4 || stream.attributes.roleName == 1"
+            class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
+            v-show="
+              !isInGroup && (stream.attributes.roleName == 4 || stream.attributes.roleName == 1)
+            "
             @click="setOwner(stream.accountId)"
           ></span>
         </el-tooltip>
@@ -139,26 +196,39 @@
         <!-- 设为主画面 -->
         <el-tooltip content="设为主画面" placement="bottom">
           <span
-            v-show="stream.attributes.roleName == 2 || stream.attributes.roleName == 20"
-            @click="setMainScreen()"
-            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            v-show="isShowSetMainScreenBtn"
+            @click="setMainScreen"
+            class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
         </el-tooltip>
 
-        <el-tooltip content="下麦" placement="bottom">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
+            v-show="isShowDownMicBtn"
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="stream.attributes.roleName != 20"
           ></span>
         </el-tooltip>
       </p>
     </section>
+
+    <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
+    <!-- <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
+      <img :src="coverImgUrl" alt />
+      <p @click.stop="replayPlay">
+        <i class="vh-iconfont vh-line-video-play"></i>
+      </p>
+    </section> -->
   </div>
 </template>
 
 <script>
-  import { useInteractiveServer, useMicServer } from 'middle-domain';
+  import {
+    useInteractiveServer,
+    useMicServer,
+    useRoomBaseServer,
+    useMsgServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpStreamRemote',
@@ -166,44 +236,140 @@
       return {
         audioLevel: 1,
         networkStatus: 0,
-        isFullScreen: false
+        isFullScreen: false,
+        isShowNetError: false
       };
     },
     props: {
       stream: {
-        require: true
+        require: true,
+        default: () => {}
+      }
+    },
+    watch: {
+      'stream.streamId': {
+        handler(newval) {
+          console.log('----speaker--- 有流Id了------', newval);
+          if (newval) {
+            this.$nextTick(() => {
+              this.subscribeRemoteStream();
+            });
+          }
+        },
+        immediate: true
       }
     },
     computed: {
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
+      liveMode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      //默认的主持人id
+      hostId() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar?.userinfo?.user_id;
+      },
+      //当前的组长id
+      groupLeaderId() {
+        return this.$domainStore.state.groupServer.groupInitData.doc_permission;
+      },
+      // 小组内角色，20为组长
+      groupRole() {
+        return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       mainScreen() {
-        return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.main_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.main_screen;
+        }
+      },
+      // 文档演示者的ID
+      presentationScreen() {
+        if (this.isInGroup) {
+          return this.$domainStore.state.groupServer.groupInitData.presentation_screen;
+        } else {
+          return this.$domainStore.state.roomBaseServer.interactToolStatus.presentation_screen;
+        }
+      },
+      //显示是否在演示中
+      isShowPresentationScreen() {
+        const { accountId } = this.stream;
+        const sameId = this.presentationScreen === accountId; // 演示者ID为当前流的用户ID
+        const isGroupMode = this.liveMode == 6; // 分组类型
+        const inMainRoomUser = !this.isInGroup && accountId != this.hostId; // 在主房间且不是主持人
+        const inGroupRoomUser = this.isInGroup && accountId != this.groupLeaderId; // 在分组房间且不是组长
+        const allowedUser = inMainRoomUser || inGroupRoomUser; // 普通用户
+        return sameId && isGroupMode && allowedUser;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
-      }
-    },
-    filters: {
-      roleNameFilter(roleName) {
-        const roleNameMap = {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾',
-          20: '组长'
-        };
-        return roleNameMap[roleName];
+      },
+      // 封面图
+      coverImgUrl() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      },
+      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
+      showInterIsPlay() {
+        return (
+          this.mainScreen == this.stream.accountId &&
+          this.interactiveServer.state.showPlayIcon &&
+          this.joinInfo.role_name == 2 &&
+          this.liveMode === 6
+        );
+      },
+      isShowSplitScreenPlaceholder() {
+        return (
+          this.$domainStore.state.splitScreenServer.isOpenSplitScreen &&
+          this.$domainStore.state.splitScreenServer.role == 'hostPage'
+        );
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 主持人、组长是否显示下麦按钮
+      isShowDownMicBtn() {
+        return (
+          (this.joinInfo.role_name == 1 && this.stream.accountId != this.groupLeaderId) ||
+          (this.groupRole == 20 && this.stream.roleName != 1)
+        );
+      },
+      isShowSetMainScreenBtn() {
+        if (this.isInGroup) {
+          return true;
+        } else {
+          return (
+            this.stream.roleName == 2 || (this.joinInfo.role_name == 1 && this.stream.roleName != 4)
+          );
+        }
+      },
+      showRole() {
+        return [1, 3, 4].includes(this.stream.attributes.roleName) && this.isInGroup;
       }
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
     },
-    mounted() {
-      this.subscribeRemoteStream();
+    created() {
+      this.listenEvents();
+      setTimeout(() => {
+        if (!this.stream.streamId) {
+          this.isShowNetError = true;
+        }
+      }, 5000);
     },
+    mounted() {},
     beforeDestroy() {
       // 清空计时器
       if (this._audioLeveInterval) {
@@ -212,27 +378,86 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
+
+      useMsgServer().$offMsg('JOIN', this.handleUserJoin);
+      useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      listenEvents() {
+        this.micServer.$on('live_over', () => {
+          clearInterval(this._audioLeveInterval);
+          clearInterval(this._netWorkStatusInterval);
+        });
+
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              // 离开全屏
+              this.isFullScreen = false;
+            }
+          },
+          true
+        );
+
+        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+          if (e.data.stream.getID() == this.stream.streamId) {
+            this.$message({
+              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            this.subscribeRemoteStream();
+          }
+        });
+
+        // 加入房间
+        useMsgServer().$onMsg('JOIN', this.handleUserJoin);
+        useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+      },
+
+      // 监听离开加入房间事件，显示网络异常占位图
+      handleUserJoin(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = false;
+        }
+      },
+      handleUserLeave(msg) {
+        if (msg.sender_id == this.stream.accountId) {
+          this.isShowNetError = true;
+        }
+      },
+      // 恢复播放
+      replayPlay() {
+        const videos = document.querySelectorAll('.vmp-stream-remote video');
+        videos.length > 0 &&
+          videos.forEach(video => {
+            video.play();
+          });
+        this.interactiveServer.state.showPlayIcon = false;
+      },
       subscribeRemoteStream() {
+        let videoNode = `stream-${this.stream.streamId}`;
+        document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
         const opt = {
           streamId: this.stream.streamId, // 远端流ID，必填
-          videoNode: `stream-${this.stream.streamId}` // 远端流显示容器， 必填
+          videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
+
+        console.log('订阅参数', opt);
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
-            console.log('订阅成功----', e);
-            this.getLevel();
-            // 保证订阅成功后，正确展示画面   有的是订阅成功后在暂停状态显示为黑画面
+            console.log('订阅成功--1--', e);
             setTimeout(() => {
-              const list = document.getElementsByTagName('video');
-              for (const item of list) {
-                item.play();
-              }
+              this.replayPlay();
+
+              // 开始测试100ms，刷新页面还是有订阅流不播放的情况。所以改为和原线上代码一致2s
             }, 2000);
+            this.getLevel();
           })
           .catch(e => {
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
@@ -246,25 +471,65 @@
           status,
           receive_account_id: this.stream.accountId
         });
+        // 110136关闭    110137 开启
+        if (deviceType == 'video') {
+          window.vhallReportForProduct?.report(status == 1 ? 110137 : 110136);
+        } else {
+          // 110138 关闭    110139 开启
+          window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
+        }
       },
       speakOff() {
         this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
+
+        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
+          window.vhallReportForProduct?.report(110133);
+        }
       },
       fullScreen() {
-        this.interactiveServer.setStreamFullscreen({
-          streamId: this.stream.streamId,
-          vNode: `vmp-stream-remote__${this.stream.streamId}`
-        });
+        if (!this.isFullScreen) {
+          this.interactiveServer
+            .setStreamFullscreen({
+              streamId: this.stream.streamId,
+              vNode: `vmp-stream-remote__${this.stream.streamId}`
+            })
+            .then(() => {
+              this.isFullScreen = true;
+            });
+        } else {
+          this.interactiveServer
+            .exitStreamFullscreen({
+              streamId: this.stream.streamId,
+              vNode: `vmp-stream-remote__${this.stream.streamId}`
+            })
+            .then(() => {
+              this.isFullScreen = false;
+            });
+        }
       },
+      // 切换大小窗
       exchange() {
-        this.roomBaseServer.requestChangeMiniElement('stream-list');
+        const roomBaseServer = useRoomBaseServer();
+        let miniElement = '';
+        if (this.isShareScreen) {
+          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+            miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
+          } else {
+            miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+          }
+        } else {
+          miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        }
+        roomBaseServer.setChangeElement(miniElement);
+        window.vhallReportForProduct?.report(110135);
       },
       getLevel() {
         // 麦克风音量查询计时器
         this._audioLeveInterval = setInterval(() => {
-          if (!this.stream.streamId) clearInterval(this._audioLeveInterval);
+          if (!this.stream.streamId || !this.$domainStore.state.interactiveServer.isInstanceInit)
+            return clearInterval(this._audioLeveInterval);
           // 获取音量
           this.interactiveServer
             .getAudioLevel({ streamId: this.stream.streamId })
@@ -279,7 +544,8 @@
 
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
-          if (!this.stream.streamId) clearInterval(this._netWorkStatusInterval);
+          if (!this.stream.streamId || !this.$domainStore.state.interactiveServer.isInstanceInit)
+            return clearInterval(this._netWorkStatusInterval);
           // 获取网络状态
           this.interactiveServer
             .getStreamPacketLoss({ streamId: this.stream.streamId })
@@ -311,7 +577,7 @@
         }
         this.interactiveServer
           .setSpeaker({
-            receive_account_id: accountId || this.joinInfo.third_party_user_id
+            receive_account_id: accountId || this.stream.accountId
           })
           .then(res => {
             console.log('setSpeaker success ::', res);
@@ -325,7 +591,7 @@
       setMainScreen() {
         this.interactiveServer
           .setMainScreen({
-            receive_account_id: this.joinInfo.third_party_user_id
+            receive_account_id: this.stream.accountId
           })
           .then(res => {
             console.log('setmainscreen success ::', res);
@@ -342,7 +608,7 @@
   .vmp-stream-remote {
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: rgba(0, 0, 0, 0.85);
     position: relative;
     &:hover {
       .vmp-stream-remote__shadow-box {
@@ -353,8 +619,30 @@
       width: 100%;
       height: 100%;
     }
-    .vmp-stream-remote__container__mute {
-      background-image: url(./images/no_video_bg.png);
+    .vmp-stream-remote__container__placeholder {
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      &-mute {
+        background-image: url(./img/no_video_bg.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      &-spliting {
+        background-color: #2d2d2d;
+        background-image: url(./img/split.png);
+        background-size: 80px 52px;
+        background-position: center;
+      }
+    }
+
+    .vmp-stream-remote__container__audio {
+      background-image: url(./img/audio.gif);
       background-size: cover;
       background-repeat: no-repeat;
       position: absolute;
@@ -363,7 +651,33 @@
       width: 100%;
       height: 100%;
     }
-    .vmp-stream-local__bootom {
+
+    // 网络异常占位图
+    .vmp-stream-remote__container__net-error {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      .net-error-img {
+        width: 25px;
+        height: 19px;
+        margin-bottom: 1px;
+        background-image: url('./img/net-error.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+      & > p {
+        font-size: 12px;
+        color: #ccc;
+      }
+    }
+
+    .vmp-stream-local__bottom {
       width: 100%;
       height: 24px;
       font-size: 12px;
@@ -376,8 +690,13 @@
       background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
       overflow: hidden;
       &-role {
+        display: inline-flex;
+        height: 14px;
+        margin-top: 5px;
+        align-items: center;
+
         border-radius: 8px;
-        padding: 0 6px;
+        padding: 0 4px;
         vertical-align: top;
         // 主持人
         &__1 {
@@ -406,10 +725,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        &-width {
+          width: 40px;
+        }
       }
       &-mic {
         float: right;
-        font-size: 12px;
+        font-size: 13px;
       }
       &-signal {
         float: right;
@@ -419,18 +741,40 @@
         background-size: contain;
         height: 16px;
         width: 16px;
-        background-image: url(./images/network0.png);
+        background-image: url(./img/network0.png);
         &__0 {
-          background-image: url(./images/network0.png);
+          background-image: url(./img/network0.png);
         }
         &__1 {
-          background-image: url(./images/network1.png);
+          background-image: url(./img/network1.png);
         }
         &__2 {
-          background-image: url(./images/network2.png);
+          background-image: url(./img/network2.png);
         }
       }
     }
+    .vmp-stream-local__top {
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      &-presentation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        color: @font-dark-normal;
+        padding: 0 8px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        margin: 4px 0 0 4px;
+        overflow: hidden;
+        text-align: left;
+      }
+    }
+
     // 遮罩层样式
     .vmp-stream-remote__shadow-box {
       width: 100%;
@@ -469,11 +813,49 @@
         background: hsla(0, 0%, 100%, 0.3);
         border-radius: 100%;
         margin-right: 10px;
+
+        &.vh-line-copy-document {
+          font-size: 14px;
+        }
         &:hover {
-          background-color: #fc5659;
+          background-color: #fb3a32;
         }
         &:last-child {
           margin-right: 0;
+        }
+      }
+    }
+
+    // 暂停按钮
+    &__pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 6;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+      p {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 32px;
+          color: #f5f5f5;
         }
       }
     }

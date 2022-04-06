@@ -26,6 +26,11 @@
       };
     },
     created() {
+      // 是否为嵌入页
+      if (this.$domainStore.state.roomBaseServer.embedObj.embed) {
+        this.screenShow = false;
+        return false;
+      }
       this.useRoomBaseServer = useRoomBaseServer();
       // status 1 关闭 0 开启
       this.useRoomBaseServer.state.screenPosterInfo.status === 0 && this.screenPostOpen();
@@ -54,7 +59,6 @@
       // 关闭事件
       screenPostClose() {
         this.screenShow = false;
-        this.useRoomBaseServer.screenPostClose();
       },
 
       // 开启事件

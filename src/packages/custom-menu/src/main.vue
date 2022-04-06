@@ -1,18 +1,28 @@
 <template>
-  <section class="vmp-custom-menu">
-    <div class="vmp-custom-menu-wrapper">
-      <component
-        v-for="(block, index) in customTabs"
-        :is="block.componentName"
-        :key="index"
-        :info="block"
-        :room-id="roomId"
-      />
-    </div>
+  <section class="vmp-custom-menu" v-show="!loading">
+    <overlay-scrollbars
+      v-if="!loading"
+      ref="scroll"
+      :options="overlayScrollBarsOptions"
+      style="height: 100%"
+    >
+      <div class="vmp-custom-menu-wrapper">
+        <component
+          v-for="(block, index) in customTabs"
+          :is="block.componentName"
+          :key="index"
+          :info="block"
+          :room-id="roomId"
+          @send="handleSendEvent"
+        />
+      </div>
+    </overlay-scrollbars>
   </section>
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   import ComponentDesimg from './components/component-desimg.vue';
   import ComponentQrcode from './components/component-qrcode.vue';
   import ComponentTitle from './components/component-title.vue';
@@ -42,29 +52,52 @@
     },
     data() {
       return {
+        loading: false,
         customTabs: [],
-        roomId: ''
+        roomId: '',
+        overlayScrollBarsOptions: {
+          resize: 'none',
+          paddingAbsolute: true,
+          className: 'os-theme-light os-theme-vhall',
+          scrollbars: {
+            autoHide: 'leave',
+            autoHideDelay: 200
+          }
+        }
       };
     },
     beforeCreate() {
       this.customMenuServer = useCustomMenuServer();
     },
     methods: {
+      onScrollStop() {
+        const state = this.$refs.scroll.getState();
+        console.log('state', state);
+      },
       async queryDetail(id) {
-        if (id === undefined || id === null) {
-          return;
-        }
+        if (id === undefined || id === null) return;
 
-        const res = await this.customMenuServer.getCustomMenuDetail({
-          menu_id: id
-        });
+        this.loading = true;
+        await this.$nextTick();
 
-        if (res.code === 200 && res.data) {
-          this.customTabs = res.data.components.map(menu => {
-            menu.componentName = `component-${componentMap[menu.component_id]}`;
-            return menu;
+        try {
+          const res = await this.customMenuServer.getCustomMenuDetail({
+            menu_id: id
           });
+          this.loading = false;
+
+          if (res.code === 200 && res.data) {
+            this.customTabs = res.data.components.map(menu => {
+              menu.componentName = `component-${componentMap[menu.component_id]}`;
+              return menu;
+            });
+          }
+        } catch (error) {
+          this.loading = false;
         }
+      },
+      handleSendEvent(method, args) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, method, args));
       }
     }
   };
@@ -76,9 +109,9 @@
     width: 100%;
 
     &-wrapper {
-      height: 100%;
+      padding-top: 16px;
+      height: calc(100% - 16px);
       width: 100%;
-      overflow-y: scroll;
     }
   }
 </style>

@@ -14,19 +14,22 @@
         }"
       >
         <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
-        <img
-          class="gift-user-avatar"
-          :src="rewardEffectInfo.data.gift_user_avatar || default_user_avatar"
-        />
+        <img class="gift-user-avatar" :src="gift_user_avatar(rewardEffectInfo)" />
         <span class="nick-name">
-          {{ rewardEffectInfo.data.gift_user_nickname | overHidden(7) }}
+          {{ gift_user_nickname(rewardEffectInfo) | overHidden(7) }}
         </span>
         <!-- <span v-if="rewardEffectInfo.type == 'reward'">
             打赏
             <span class="money">{{ rewardEffectInfo.gift_price }}</span>
             元
           </span> -->
-        <span class="gift-name" v-if="rewardEffectInfo.data.type == 'gift_send_success'">
+        <span
+          class="gift-name"
+          v-if="
+            rewardEffectInfo.data.type == 'gift_send_success' ||
+            rewardEffectInfo.data.event_type == 'free_gift_send'
+          "
+        >
           {{ rewardEffectInfo.data.gift_name }}
           <!-- <span class="count">
               <span class="multiple">x</span>
@@ -34,23 +37,42 @@
             </span> -->
         </span>
         <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
-          {{ rewardEffectInfo.data.text_content }}
+          {{ rewardEffectInfo.data.reward_describe | overHidden(8) }}
         </span>
         <span
+          v-if="
+            rewardEffectInfo.data.type == 'gift_send_success' ||
+            rewardEffectInfo.data.event_type == 'free_gift_send'
+          "
           class="gift-img"
+          :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
           :style="{
-            backgroundImage: `url(${rewardEffectInfo.data.gift_image_url}?x-oss-process=image/resize,m_lfit,w_100)`
+            backgroundImage: `url(${
+              rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url
+            }?x-oss-process=image/resize,m_lfit,w_100)`
           }"
         ></span>
+        <img
+          src="./images/red-package-1.png"
+          alt=""
+          class="gift-img red-package"
+          v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
+        />
       </div>
     </transition-group>
   </div>
 </template>
 
 <script>
-  import { useRoomBaseServer, useGiftsServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useGiftsServer,
+    useChatServer,
+    useWatchRewardServer
+  } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -64,6 +86,8 @@
           666: 'bg-666'
           // 'bg-custom': 'bg-custom' //用户自定义礼物
         },
+        //是否屏蔽特效
+        hideEffect: false,
         rewardEffectList: [],
         // rewardEffectInfo: null,
         taskQueue: null // 飘窗列队
@@ -75,12 +99,14 @@
       },
       // 用户头像
       default_user_avatar() {
-        return require('./images/default_avatar.png');
+        return defaultAvatar;
       }
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
+      this.watchRewardServer = useWatchRewardServer();
       this.giftsServer = useGiftsServer();
+      this.chatServer = useChatServer();
       console.log('wap this.roomBaseServer------->', this.roomBaseServer);
       this.listenServer();
     },
@@ -90,7 +116,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 1000
+        minTaskTime: 2000
       });
 
       //测试数据
@@ -133,8 +159,101 @@
       listenServer() {
         this.giftsServer.$on('gift_send_success', msg => {
           console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
-          this.addRewardEffect(msg);
+          const nickname = msg.data.gift_user_nickname || msg.data.nickname;
+          const data = {
+            nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+            avatar: msg.data.avatar,
+            content: {
+              gift_name: msg.data.gift_name,
+              gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
+              source_status: msg.data.source_status
+            },
+            type: 'gift_send_success',
+            interactToolsStatus: true
+          };
+          this.chatServer.addChatToList(data);
+          !this.hideEffect && this.addRewardEffect(msg);
         });
+        // 打赏消息
+        this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
+          // 添加聊天消息
+          const data = {
+            avatar: rawMsg.data.rewarder_avatar,
+            nickname:
+              rawMsg.data.rewarder_nickname.length > 8
+                ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
+                : rawMsg.data.rewarder_nickname,
+            type: 'reward_pay_ok',
+            content: {
+              text_content: rawMsg.data.reward_describe
+                ? rawMsg.data.reward_describe
+                : this.$t('chat.chat_1037'),
+              num: rawMsg.data.reward_amount
+            },
+            sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
+            roleName: this.roleName,
+            interactToolsStatus: true
+          };
+          this.chatServer.addChatToList(data);
+          !this.hideEffect && this.addRewardEffect(rawMsg);
+
+          if (
+            this.roomBaseServer.state.watchInitData.join_info.third_party_user_id ==
+            rawMsg.data.rewarder_id
+          ) {
+            this.closeDialog();
+            this.$message({
+              message: this.$t('common.common_1005'),
+              showClose: true,
+              // duration: 0,
+              type: 'success',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
+      // 礼物用户头像
+      gift_user_avatar(rewardEffectInfo) {
+        console.log('gift_user_avatar------>', rewardEffectInfo);
+        if (
+          rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.type == 'reward_pay_ok' ||
+          rewardEffectInfo.data.event_type == 'free_gift_send'
+        ) {
+          // 来源于接口消息字段
+          if (rewardEffectInfo.data.gift_user_avatar) {
+            return rewardEffectInfo.data.gift_user_avatar;
+          } else if (rewardEffectInfo.data.rewarder_avatar) {
+            return rewardEffectInfo.data.rewarder_avatar;
+          } else {
+            return this.default_user_avatar;
+          }
+        } else {
+          return this.default_user_avatar;
+        }
+      },
+      // 用户昵称
+      gift_user_nickname(rewardEffectInfo) {
+        if (
+          rewardEffectInfo.data.type == 'gift_send_success' ||
+          rewardEffectInfo.data.type == 'reward_pay_ok' ||
+          rewardEffectInfo.data.event_type == 'free_gift_send'
+        ) {
+          if (rewardEffectInfo.data.gift_user_nickname) {
+            return rewardEffectInfo.data.gift_user_nickname;
+          } else if (rewardEffectInfo.data.rewarder_nickname) {
+            return rewardEffectInfo.data.rewarder_nickname;
+          } else {
+            // 默认返回nickname
+            return rewardEffectInfo.data.nickname;
+          }
+        } else {
+          return rewardEffectInfo.data.nickname;
+        }
+      },
+      //设置是否屏蔽特效
+      setHideEffect(status) {
+        this.hideEffect = status;
       },
       /**
        * 根据消息里的sender_id判断, 是否是自己发送的
@@ -191,7 +310,7 @@
     // .flex();
     position: absolute;
     left: 16px;
-    top: 24px;
+    top: 620px;
     z-index: 100;
     .reward-effect-box {
       width: 480px;
@@ -224,8 +343,11 @@
         width: 80px;
         height: 80px;
         position: absolute;
-        left: 8px;
-        top: 22px;
+        left: 4px;
+        bottom: 4px;
+        background: white;
+        border-radius: 50%;
+        overflow: hidden;
       }
     }
     .money-img {
@@ -245,6 +367,15 @@
       background-position: center;
       background-size: contain;
       z-index: 10;
+    }
+
+    .zdy-gigt-img {
+      width: 80px;
+      height: 80px;
+      background-color: white;
+      border-radius: 50%;
+      top: -10px;
+      right: 20px;
     }
     .nick-name {
       width: 252px;
@@ -275,6 +406,12 @@
     }
     .multiple {
       font-size: 12px;
+    }
+    .red-package {
+      width: 64px;
+      height: auto;
+      top: -2px;
+      right: 32px;
     }
   }
 </style>

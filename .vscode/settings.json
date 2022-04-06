@@ -92,5 +92,7 @@
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "nested",
+  "vue-i18n.i18nPaths": "",
+  "i18n-ally.sourceLanguage": "zh"
 }

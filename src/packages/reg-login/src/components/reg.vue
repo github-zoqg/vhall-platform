@@ -62,11 +62,18 @@
       </el-form-item>
       <el-form-item prop="password" class="vmp-register__pwd__box">
         <el-input
-          type="password"
+          :type="regPwdShow ? 'text' : 'password'"
           v-model.trim="ruleForm.password"
           clearable
           :placeholder="$t('register.register_1007')"
-        ></el-input>
+        >
+          <i
+            slot="suffix"
+            class="vh-iconfont"
+            :class="[regPwdShow ? 'vh-line-view' : 'vh-line-hidden']"
+            @click="passWordType"
+          ></i>
+        </el-input>
         <a
           href="javascript:void(0)"
           class="vmp-register__login__link"
@@ -173,14 +180,22 @@
           captchas: [{ required: true, validator: validateCaptchas, trigger: 'blur' }],
           password: [{ required: false, validator: validRegPwd, trigger: 'blur' }]
         },
-        regPwdShow: true, // 注册 - 密码框的显示
+        regPwdShow: false, // 注册 - 密码框的显示
         agreementChecked: false, // 是否勾选注册协议
         loginKeyVo: null,
         btnDisabled: true // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
       };
     },
     watch: {
+      'ruleForm.password'(val) {
+        console.log(val);
+        this.ruleForm.password = `${val}`.replace(/[\u4E00-\u9FA5]/g, '');
+        console.log(val);
+      },
       'ruleForm.phone': function () {
+        this.codeBtnDisabledCheck();
+      },
+      captchaReady() {
         this.codeBtnDisabledCheck();
       }
     },
@@ -198,19 +213,11 @@
         this.regPwdShow = !this.regPwdShow;
       },
       codeBtnDisabledCheck() {
+        if (!this.captchaReady) return (this.btnDisabled = true);
         if (this.ruleForm.phone) {
-          let phoneFlag = false;
-          this.$refs.ruleForm.validateField('phone', function (res) {
-            phoneFlag = !res;
+          this.$refs.ruleForm.validateField('phone', err => {
+            this.btnDisabled = !!err;
           });
-          if (phoneFlag && this.captchaVal) {
-            // 如果当前手机号验证通过，并且图形验证码已选取，获取验证码按钮可点击
-            this.btnDisabled = false;
-          } else {
-            this.btnDisabled = true; // 获取验证码不可点击
-          }
-        } else {
-          this.btnDisabled = true; // 获取验证码不可点击
         }
       },
       handleSendCode() {
@@ -257,7 +264,7 @@
               relt = await this.userServer.handlePassword(this.ruleForm.password);
               if (!relt.pass) {
                 this.$message({
-                  message: relt.msg || this.$t('register.register_1010'),
+                  message: this.$tec(relt.code) || this.$t('register.register_1010'),
                   showClose: true,
                   type: 'error',
                   customClass: 'zdy-info-box'
@@ -280,7 +287,7 @@
             const failure = err => {
               console.log('注册失败', err);
               this.$message({
-                message: err.msg || this.$t('register.register_1010'),
+                message: this.$tec(err.code) || this.$t('register.register_1010'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -350,7 +357,7 @@
     .el-checkbox__label {
       font-size: 14px;
       font-weight: 400;
-      color: #999999;
+      color: #999;
       line-height: 20px;
     }
     .el-checkbox {

@@ -8,29 +8,33 @@
       width="440px"
     >
       <div class="vmp-share-wrap">
-        <div class="vmp-share-wrap-imgs">
-          <div class="vmp-share-wrap-imgs-chat" @click="shareOtherDialog(1)">
+        <div class="vmp-share-wrap_imgs">
+          <div class="imgs_chat" @click="shareOtherDialog(1)">
             <span></span>
             <p>{{ $t('nav.nav_1016') }}</p>
           </div>
-          <div class="vmp-share-wrap-imgs-qq" @click="shareOtherDialog(2)">
+          <div class="imgs_qq" @click="shareOtherDialog(2)">
             <span></span>
             <p>{{ $t('nav.nav_1018') }}</p>
           </div>
-          <div class="vmp-share-wrap-imgs-weibo" @click="shareOtherDialog(3)">
+          <div class="imgs_weibo" @click="shareOtherDialog(3)">
             <span></span>
             <p>{{ $t('nav.nav_1017') }}</p>
           </div>
-          <div class="vmp-share-wrap-imgs-invite" @click="shareOtherDialog(4)" v-if="isInviteShare">
+          <div
+            class="imgs_invite"
+            @click="shareOtherDialog(4)"
+            v-if="isInviteShare && isWatchInvite"
+          >
             <span></span>
             <p>{{ $t('nav.nav_1015') }}</p>
           </div>
         </div>
-        <div class="vmp-share-wrap-input">
+        <div class="vmp-share-wrap_input">
           <el-input
             id="vmp-share-watch"
             v-model="watchWebUrl"
-            class="vmp-share-wrap-input-width"
+            class="input_width"
             readOnly
           ></el-input>
           <span @click="copy">{{ $t('nav.nav_1014') }}</span>
@@ -43,10 +47,10 @@
       :close-on-click-modal="false"
       width="320px"
     >
-      <div class="vmp-share-other">
+      <div class="vmp-share_other">
         <img :src="shareUrl" alt="" />
       </div>
-      <p class="vmp-share-introduce">
+      <p class="vmp-share_introduce">
         {{ $t('nav.nav_1019') }}
         <br />
         {{ introduceText }}
@@ -62,31 +66,31 @@
       return {
         shareVisible: false,
         shareOtherVisible: false,
-        watchWebUrl: `https://t-webinar.e.vhall.com/v3/lives/watch/${this.$route.params.id}`,
+        watchWebUrl: `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`,
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
-        isInviteShare: false
+        isInviteShare: false,
+        isWatchInvite: false
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
     },
-    mounted() {
-      this.initConfig();
-    },
     created() {
       this.roomBaseState = this.roomBaseServer.state;
     },
     methods: {
-      initConfig() {
-        const widget = window.$serverConfig?.[this.cuid];
-        if (widget && widget.options) {
-          Object.assign(this.$data, widget.options);
-        }
-      },
+      // 事件驱动打开分享弹窗
       openShareDialog() {
         this.shareVisible = true;
+        if (!this.isInviteShare) return; //发起端不用判断是否开启邀请卡
+        if (this.roomBaseState.inviteCard.status == '1') {
+          this.isWatchInvite = true;
+        } else {
+          this.isWatchInvite = false;
+        }
       },
+      // 打开分享弹窗
       shareOtherDialog(index) {
         this.shareUrl = '';
         this.introduceText = '';
@@ -102,12 +106,14 @@
           this.introduceText = this.$t('nav.nav_1023');
         }
       },
+      // 打开微信弹窗
       openWeixinDialog() {
         this.shareOtherVisible = true;
         const shareId = `${this.roomBaseState.watchInitData.share_id}-3`;
         const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
         this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
       },
+      // 打开qq分享
       openQqDialog() {
         const p = {
           /* 获取URL，可加上来自分享到QQ标识，方便统计 */
@@ -134,6 +140,7 @@
         const url = 'http://connect.qq.com/widget/shareqq/index.html?' + s.join('&');
         window.open(url);
       },
+      // 打开微博
       openWeiboDialog() {
         // 微博是 3
         const shareId = `${this.roomBaseState.watchInitData.share_id}-2`;
@@ -150,19 +157,21 @@
         const weiBourl = 'http://service.weibo.com/share/share.php?' + s.join('&');
         window.open(weiBourl);
       },
+      // 打开邀请卡
       openInviteDialog() {
         // 邀请卡分享二维码链接
         this.shareOtherVisible = true;
         const { join_info } = this.roomBaseState.watchInitData;
         if (join_info) {
           const url = encodeURIComponent(
-            `https://t-webinar.e.vhall.com/v3/lives/invite/${this.$route.params.id}?invite_id=${
-              join_info.join_id || ''
-            }`
+            `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/invite/${
+              this.$route.params.id
+            }?invite_id=${join_info.join_id || ''}&lang=${localStorage.getItem('lang')}`
           );
           this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         }
       },
+      // 复制地址
       copy() {
         const input = document.getElementById('vmp-share-watch');
         input.select();
@@ -179,9 +188,11 @@
 </script>
 <style lang="less">
   .vmp-share {
+    .el-dialog__body {
+      padding: 0 32px 24px 32px;
+    }
     &-wrap {
-      padding-bottom: 15px;
-      &-imgs {
+      &_imgs {
         display: flex;
         align-items: center;
         justify-content: space-around;
@@ -203,36 +214,36 @@
             margin-top: 8px;
           }
         }
-        &-chat {
+        .imgs_chat {
           span {
-            background: url('./images/wechat@2x.png') 50% no-repeat;
+            background: url('./img/wechat@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
             color: #05c215;
           }
         }
-        &-qq {
+        .imgs_qq {
           span {
-            background: url('./images/qq@2x.png') 50% no-repeat;
+            background: url('./img/qq@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
             color: #4a9afd;
           }
         }
-        &-weibo {
+        .imgs_weibo {
           span {
-            background: url('./images/weibo@2x.png') 50% no-repeat;
+            background: url('./img/weibo@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
             color: #f8cf29;
           }
         }
-        &-invite {
+        .imgs_invite {
           span {
-            background: url('./images/inv-card@2x.png') 50% no-repeat;
+            background: url('./img/inv-card@2x.png') 50% no-repeat;
             background-size: 100% 100%;
           }
           p:hover {
@@ -240,7 +251,7 @@
           }
         }
       }
-      &-input {
+      &_input {
         height: 40px;
         width: 376px;
         border: 1px solid #ccc;
@@ -272,7 +283,7 @@
         }
       }
     }
-    &-other {
+    &_other {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -282,14 +293,14 @@
         height: 132px;
       }
     }
-    &-introduce {
+    &_introduce {
       font-size: 14px;
       font-weight: 400;
       color: @font-light-low;
       line-height: 20px;
       text-align: center;
       word-break: break-word;
-      padding-bottom: 12px;
+      // padding-bottom: 12px;
     }
   }
 </style>

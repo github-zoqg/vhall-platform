@@ -16,9 +16,11 @@
             :key="group.id"
           >
             <em class="wrap__left-item__news-chat" v-if="group.news"></em>
-            <span class="wrap__left-item__group-name">{{ group.chat_name }}</span>
+            <span class="wrap__left-item__group-avatar_img">
+              <img :src="group.avatar || defaultAvatar" alt="" />
+            </span>
+            <span class="wrap__left-item__group-name">{{ group.nickname }}</span>
             <i
-              v-if="group.type == 1"
               class="el-icon-circle-close wrap__left-item__close-icon"
               @click.stop="delChatItem(index)"
             ></i>
@@ -27,15 +29,23 @@
         <div
           class="wrap__right"
           :class="{
-            'hide-tip': activeGroupIndex !== -1 && chatGroupList[activeGroupIndex].type == 2
+            'hide-tip':
+              activeGroupIndex !== -1 &&
+              chatGroupList[activeGroupIndex] &&
+              chatGroupList[activeGroupIndex].type == 2
           }"
         >
-          <span class="wrap__right__header">提示：如想结束当前聊天，关闭左侧用户窗口即可</span>
+          <span class="wrap__right__header" v-if="currentSelectUser">
+            提示：如想结束当前聊天，关闭左侧用户窗口即可
+          </span>
           <div class="wrap__right__content">
             <chat-list
               @showImg="openImgPreview"
               :role="roleName"
-              :activity-id="webinarId"
+              :webinar-id="webinarId"
+              :login-info="loginInfo"
+              :select-user-id="currentSelectUser"
+              :room-id="roomId"
               ref="chatRef"
             ></chat-list>
           </div>
@@ -72,23 +82,34 @@
             <div class="wrap__right__send-tool">
               <i
                 title="表情"
-                class="iconfont iconbiaoqing icon-emoji"
+                class="vh-iconfont vh-line-expression icon-emoji"
                 @click.stop="openEmojiModal"
               ></i>
-              <i
-                title="上传图片（上限5张）"
-                class="iconfont icontupianliaotian"
-                @click="handleUploadImg"
-              ></i>
+              <!--              <i-->
+              <!--                title="上传图片（上限5张）"-->
+              <!--                class="vh-iconfont vh-line-illustrations"-->
+              <!--                @click="handleUploadImg"-->
+              <!--              ></i>-->
             </div>
             <!--聊天内容输入-->
-            <textarea
+            <!--            <textarea-->
+            <!--              class="wrap__right__private-txt"-->
+            <!--              :placeholder="inputPlaceholder"-->
+            <!--              ref="sendBox"-->
+            <!--              v-model="inputText"-->
+            <!--              maxlength="200"-->
+            <!--              @keydown.prevent.13="sendMessage"-->
+            <!--            ></textarea>-->
+            <el-input
               class="wrap__right__private-txt"
+              type="textarea"
               :placeholder="inputPlaceholder"
-              ref="sendBox"
               v-model="inputText"
-              @keydown.prevent.13="sendMessage"
-            ></textarea>
+              maxlength="200"
+              show-word-limit
+              :row="4"
+              @keyup.enter.native="sendMessage"
+            ></el-input>
             <el-button type="primary" size="small" class="small-button" round @click="sendMessage">
               发送
             </el-button>
@@ -124,6 +145,7 @@
   import chatList from './components/chat-list';
   import comUpload from '@/packages/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
   export default {
     name: 'VmpLivePrivateChat',
     components: {
@@ -134,6 +156,8 @@
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //模态窗是否可见
         visible: false,
         //模态窗标题
@@ -142,15 +166,15 @@
         isWebp: window.webp,
         //已经上传的图片
         imgList: [],
-        //图片上传地址 todo 暂时写死，后续替换
-        actionUrl: 'https://t-saas-dispatch.vhall.com/v3/commons/upload/index',
-        //私聊群组列表 todo 假数据替换
+        //图片上传地址
+        actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`,
+        //私聊群组列表
         chatGroupList: [
-          {
-            id: 0,
-            type: 2,
-            chat_name: '主办方群聊'
-          }
+          // {
+          //   id: 0,
+          //   type: 2,
+          //   chat_name: '主办方群聊'
+          // }
         ],
         //当前选中的私聊群组的index
         activeGroupIndex: -1,
@@ -168,23 +192,80 @@
         previewImgList: [],
         //当前的用户角色
         roleName: '',
-        //当前的活动id
-        webinarId: '',
+
         //当前的登录信息
         loginInfo: {}
       };
     },
+    computed: {
+      //当前选中的人的id
+      currentSelectUser() {
+        let userId = '';
+        if (this.chatGroupList.length && this.activeGroupIndex >= 0) {
+          let temp = this.chatGroupList[this.activeGroupIndex];
+          userId = temp.account_id;
+        }
+        return userId;
+      },
+      roomId() {
+        return this.roomBaseServer.state.watchInitData.interact.room_id;
+      },
+      //当前的活动id
+      webinarId() {
+        return this.roomBaseServer.state.watchInitData.webinar.id;
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      this.chatServer = useChatServer();
     },
     mounted() {
       this.initViewData();
+      this.listenEvents();
+    },
+    destroyed() {
+      this.chatServer.$off('receivePrivateMsg', this.showTip);
     },
     methods: {
+      listenEvents() {
+        this.chatServer.$on('receivePrivateMsg', this.showTip);
+      },
+      showTip(msg) {
+        if (msg.sendId != this.currentSelectUser) {
+          this.chatGroupList.forEach(item => {
+            if (item.account_id == msg.sendId) {
+              this.$set(item, 'news', true);
+            }
+          });
+        }
+      },
       //打开模态窗
-      openModal() {
+      async openModal() {
         console.log('收到打开窗口的信令');
+        await this.getPrivateContactList();
         this.visible = true;
+        this.activeGroupIndex = 0;
+      },
+      //获取私聊联系人列表
+      getPrivateContactList() {
+        const params = {
+          room_id: this.roomId,
+          webinar_id: this.webinarId
+        };
+        return this.chatServer
+          .getPrivateContactList(params)
+          .then(res => {
+            const { code = '', msg = '', data = {} } = res || {};
+            if ([200, '200'].includes(code)) {
+              this.chatGroupList = Array.isArray(data.list) ? data.list : [];
+            } else {
+              this.$message.error(msg);
+            }
+            return res;
+          })
+          .catch(error => {
+            this.$message.error(error.msg);
+          });
       },
       //关闭模态窗
       handleClose() {
@@ -199,13 +280,11 @@
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
         const interact_token = interact.interact_token || '';
-        const roomId = interact.room_id;
-        this.roomId = roomId;
-        this.webinarId = webinar.id;
         this.roleName = join_info.role_name;
         this.loginInfo = join_info;
+        console.log(this.loginInfo, '当前的登录信息');
         this.extraParams = {
-          path: `${roomId}/img`,
+          path: `${this.roomId}/img`,
           type: 'image',
           interact_token
         };
@@ -215,8 +294,13 @@
       //选中某个群组
       selectGroup(index) {
         this.activeGroupIndex = index;
+        this.chatGroupList[index].news = false;
+        this.$refs.chatRef.resetData();
+        this.$nextTick(() => {
+          this.$refs.chatRef.initEvent();
+        });
       },
-      //新建对话
+      //新建对话 暴露给问答管理使用的方法（可以是信令或者ref）
       addChatItem(chatItemInfo) {
         const isExit = this.chatGroupList.some((chatItem, index) => {
           if (chatItemInfo.id == chatItem.id) {
@@ -227,11 +311,19 @@
           }
         });
         if (!isExit) {
-          this.chatGroupList.push(chatItemInfo);
+          const { id, chat_name, account_id, avatar } = chatItemInfo;
+          this.chatGroupList.push({ id: id, nickname: chat_name, account_id, avatar });
           this.selectGroup(this.chatGroupList.length - 1);
+          //将联系人添加到私聊列表存储
+          this.chatServer.addToRankList({
+            room_id: this.roomId,
+            webinar_id: this.webinarId,
+            to: id
+          });
         }
       },
-      //删除某个对话 todo
+      setRankList() {},
+      //删除某个对话
       delChatItem(index) {
         this.chatGroupList.splice(index, 1);
         this.selectGroup(this.activeGroupIndex - 1);
@@ -283,18 +375,37 @@
       },
       //选中表情
       emojiInput(value) {
-        this.inputText += value;
+        const _this = this;
+        console.log(value, '选中了表情------------------');
+        this.$nextTick(() => {
+          _this.inputText += value;
+        });
+        console.log(this.inputText);
       },
       //发送消息
       sendMessage() {
+        //未选中私聊人员
+        if (!this.currentSelectUser) {
+          this.$message.warning('请选择私聊人员');
+          return;
+        }
         //判断是否有输入内容，或者上传图片
         if (
           (!this.inputText || (this.inputText && !this.inputText.trim())) &&
           !this.imgList.length
         ) {
           this.$message.warning('内容不能为空');
+          return;
         }
+
+        if (this.inputText.length > 200) {
+          this.$message.warning('聊天内容不能超过200个字');
+          return;
+        }
+
         const curmsg = useChatServer().createCurMsg();
+        const target = this.chatGroupList[this.activeGroupIndex].account_id;
+        curmsg.setTarget(target);
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
         //将图片消息加入消息体
@@ -305,6 +416,7 @@
         useChatServer().clearCurMsg();
         this.imgList.length = 0;
         this.inputText = '';
+        this.$refs.chatRef.scrollBottom();
       }
     }
   };
@@ -313,11 +425,11 @@
 <style lang="less">
   .vmp-live-private-chat {
     @color-bd: #e2e2e2;
-    @color-red: #fc5659;
+    @color-red: #fb3a32;
     @color-default: #ffd021;
     @color-default-hover: #fdd43f;
 
-    @main-color: #fc5659;
+    @main-color: #fb3a32;
     .el-dialog__body {
       padding: 0;
     }
@@ -350,25 +462,39 @@
       overflow: hidden;
       .wrap__left {
         height: 100%;
-        width: 180px;
+        width: 200px;
         border-right: solid 1px @color-bd;
         overflow: auto;
         user-select: none;
       }
       .wrap__left-item {
         position: relative;
-        display: block;
+        display: flex;
+        align-items: center;
         height: 44px;
         line-height: 44px;
-        padding: 0 10px 0 20px;
+        padding-left: 10px;
         border-bottom: solid 1px @color-bd;
         transition: all 0.2s;
-        .iconfont {
+        .vh-iconfont {
           display: none;
           vertical-align: middle;
           font-size: 18px;
           &:hover {
             color: @color-red;
+          }
+        }
+        &__group-avatar_img {
+          // display: inline-block;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          overflow: hidden;
+          margin-right: 8px;
+          img {
+            display: block;
+            width: 30px;
+            height: 30px;
           }
         }
         &__close-icon {
@@ -377,14 +503,14 @@
         }
         &:hover {
           cursor: pointer;
-          background-color: #f5f5f5;
+          background-color: #f7f7f7;
           .wrap__left-item__close-icon {
             display: inline-block;
           }
         }
         &.active {
           cursor: pointer;
-          background-color: @color-bd;
+          background-color: #f7f7f7;
         }
       }
 
@@ -400,8 +526,7 @@
         background-color: @color-red;
       }
       .wrap__left-item__group-name {
-        display: inline-block;
-        width: calc(100% - 24px);
+        width: 130px;
         vertical-align: middle;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -457,7 +582,7 @@
           height: 34px;
           line-height: 34px;
           padding-left: 10px;
-          .iconfont {
+          .vh-iconfont {
             margin-right: 6px;
             font-size: 18px;
             &:hover {
@@ -468,10 +593,13 @@
         }
         &__private-txt {
           width: 80%;
-          height: 70px;
-          padding: 0 10px 10px 10px;
+          padding: 0 10px 0 10px;
           border: none;
           outline: none;
+          .el-textarea__inner {
+            height: 70px;
+            border: none;
+          }
         }
         .small-button {
           position: absolute;

@@ -1,34 +1,297 @@
 <template>
   <div class="vmp-wap-body">
-    <!-- 播放器 -->
-    <vmp-air-container
-      :cuid="childrenComp[0]"
-      :oneself="true"
-      v-if="!isShowContainer"
-    ></vmp-air-container>
-    <!-- 流列表 -->
-    <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+    <!-- 直播结束 -->
+    <div
+      v-if="isLivingEnd"
+      class="vmp-wap-body-ending"
+      :style="`backgroundImage: url('${webinarsBgImg}')`"
+    >
+      <div class="vmp-wap-body-ending-box">
+        <div class="vmp-wap-body-ending-box-img">
+          <img src="./img/livingEnd@2x.png" alt="" />
+        </div>
+        <h1 class="vmp-wap-body-ending-box-text">{{ $t('player.player_1017') }}</h1>
+      </div>
+    </div>
+    <div
+      :class="[mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl']"
+      @touchstart="touchstart($event)"
+      @touchmove.prevent="touchmove($event)"
+    >
+      <!-- 播放器 -->
+      <vmp-air-container
+        :cuid="childrenComp[0]"
+        :oneself="true"
+        v-if="!isShowContainer && !isLivingEnd"
+      ></vmp-air-container>
+
+      <!-- 流列表 -->
+      <vmp-air-container
+        v-show="isShowContainer && !isLivingEnd"
+        :cuid="childrenComp[1]"
+        :oneself="true"
+      ></vmp-air-container>
+
+      <!-- wap端订阅桌面共享的容器 -->
+      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+
+      <!-- wap端订阅桌面共享的容器 -->
+      <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
+      <!--
+        注意：
+          由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
+            此处不能用v-if
+       -->
+    </div>
+    <masksliding></masksliding>
   </div>
 </template>
 <script>
+  import { useMsgServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
+  import move from './js/move';
+  import { Dialog, Toast } from 'vant';
+  import masksliding from './components/mask.vue';
   export default {
     name: 'VmpWapBody',
+    mixins: [move],
     data() {
       return {
-        childrenComp: []
+        childrenComp: [],
+        isLivingEnd: false,
+        mini: false
       };
     },
     computed: {
+      isInGroup() {
+        // 在小组中
+        return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
       isShowContainer() {
         return (
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-          this.$domainStore.state.micServer.isSpeakOn
+          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+            this.$domainStore.state.micServer.isSpeakOn) &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
         );
+      },
+      webinarsBgImg() {
+        const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url || cover;
+      },
+      // 主持人ID 分组期间使用
+      userinfoId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
       }
     },
-    created() {
+    components: {
+      masksliding
+    },
+    beforeCreate() {
+      this.msgServer = useMsgServer();
+      this.groupServer = useGroupServer();
+    },
+    async created() {
+      if (
+        [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
+        this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
+      ) {
+        await Dialog.alert({
+          title: this.$t('account.account_1061'),
+          confirmButtonText: this.$t('common.common_1010'),
+          message: this.$t('other.other_1009')
+        });
+      }
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
-    methods: {}
+    mounted() {
+      this.listenEvents();
+    },
+    methods: {
+      questionnaireVisible(flag) {
+        this.mini = flag;
+      },
+      listenEvents() {
+        // 开启分组讨论
+        this.groupServer.$on('GROUP_SWITCH_START', msg => {
+          if (this.isInGroup) {
+            // 如果问卷在展开中了，并且进入分组中 mini置为false
+            this.mini = false;
+            this.gobackHome(1, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 切换小组,小组人员变动
+        this.groupServer.$on('GROUP_JOIN_CHANGE', (msg, changeInfo) => {
+          if (changeInfo.isNeedCare && this.isInGroup) {
+            this.gobackHome(2, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 结束分组讨论     groupToast为开发自行增加，为true代表是走到 不提醒 的处理
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          if (!msg.data.groupToast) {
+            this.gobackHome(3, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 小组解散
+        this.groupServer.$on('GROUP_DISBAND', msg => {
+          this.gobackHome(4, '', msg);
+        });
+
+        // 本人被踢出来
+        this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
+          const { interactToolStatus, watchInitData } = useRoomBaseServer().state;
+          // 如果已经开启了讨论，而且被踢出的人是自己
+          if (
+            interactToolStatus.is_open_switch == 1 &&
+            msg.data.target_id === watchInitData.join_info.third_party_user_id
+          ) {
+            this.gobackHome(5, this.groupServer.state.groupInitData.name, msg);
+          }
+        });
+
+        // 组长变更
+        this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
+          this.gobackHome(7, '', msg);
+        });
+
+        // 监听消息移动
+        this.msgServer.$onMsg('ROOM_MSG', msg => {
+          // live_over 结束直播
+          if (msg.data.type == 'live_over') {
+            this.isLivingEnd = true;
+            this.mini = false;
+          }
+          // 分组直播 没有结束讨论 直接结束直播
+          if (msg.data.type == 'group_switch_end') {
+            if (msg.data.over_live) {
+              this.isLivingEnd = true;
+            }
+          }
+        });
+      },
+      // 返回主房间提示
+      async gobackHome(index, name, msg) {
+        // 1 主持人    3 助理
+        const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
+        let title = '';
+        switch (index) {
+          case 1:
+            title = who + '开启了分组讨论，您将进入' + name + '组参与讨论';
+            break;
+          case 2:
+            title = who + '已将您分配至' + name + '组';
+            break;
+          case 3:
+            title = who + '结束了分组讨论，您将返回主直播间';
+            break;
+          case 4:
+            title = who + '解散了分组，您将返回主直播间';
+            break;
+          case 5:
+            title = this.$t('chat.chat_1007');
+            break;
+          case 7:
+            title = '组长身份已变更';
+            break;
+        }
+        if (index == 5 || index == 7) {
+          Toast(title);
+        } else {
+          await Dialog.alert({
+            title: this.$t('account.account_1061'),
+            confirmButtonText: this.$t('common.common_1010'),
+            message: title
+          });
+        }
+      }
+    }
   };
 </script>
+<style lang="less">
+  .vmp-wap-body {
+    position: relative;
+    height: 100%;
+    &-ending {
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      &-box {
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        &-img {
+          width: 141px;
+          height: 104px;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
+        }
+        &-text {
+          font-size: 28px;
+          line-height: 50px;
+          height: 50px;
+          color: #fff;
+          padding-left: 25px;
+          font-weight: 400;
+          padding-top: 30px;
+        }
+      }
+    }
+    &-nomarl {
+      height: 100%;
+      width: 100%;
+    }
+    &-mini {
+      position: fixed;
+      height: 168px;
+      left: 55%;
+      top: 70%;
+      width: 300px;
+      z-index: 5000;
+      overflow: hidden;
+      .vmp-wap-player-header,
+      .vmp-wap-player-footer {
+        display: none;
+      }
+      // 小屏后互动样式
+      .vmp-wap-stream-wrap {
+        height: 100%;
+        .vmp-stream-list {
+          height: 100%;
+          width: 100%;
+        }
+        .vmp-stream-list__main-screen {
+          position: absolute;
+          top: 0;
+          left: 0 !important; // 由于小屏后，和产品沟通，只展示主画面
+          width: 100%;
+          height: 100%;
+          z-index: 7;
+          .vmp-stream-remote-exitscreen {
+            display: none;
+          }
+        }
+        &-group {
+          top: 0;
+          height: 100%;
+        }
+      }
+      .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
+      .vmp-wap-stream-wrap-mask-screen {
+        display: none;
+      }
+    }
+  }
+</style>

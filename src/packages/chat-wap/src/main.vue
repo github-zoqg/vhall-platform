@@ -3,41 +3,34 @@
     <div class="vmp-chat-wap__content">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
-        v-if="hideChatHistory && !chatList.length"
+        v-if="hideChatHistory && !chatList.length && !historyloaded"
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
-      <scroll ref="scroll" @pullingDown="handlePullingDown">
-        <msg-item
-          v-for="msg in chatList"
-          :key="msg.count"
-          :msg="msg"
-          @preview="handlePreview"
-        ></msg-item>
-      </scroll>
+      <virtual-list
+        ref="chatlist"
+        style="height: 100%; overflow: auto"
+        :keeps="30"
+        :data-key="'count'"
+        :data-sources="chatList"
+        :data-component="msgItem"
+        :extra-props="{
+          previewImg: previewImg.bind(this),
+          emitLotteryEvent,
+          emitQuestionnaireEvent,
+          joinInfo
+        }"
+        @tobottom="tobottom"
+      ></virtual-list>
       <div
         class="vmp-chat-wap__content__new-msg-tips"
-        v-show="messageType.atList || messageType.reply || messageType.normal"
-        @click="scrollBottom"
+        v-show="isHasUnreadAtMeMsg"
+        @click="scrollToTarget"
       >
-        <span
-          v-if="
-            (messageType.normal && !messageType.atList && !messageType.reply) ||
-            newMsgNum > 1 ||
-            !((messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal)
-          "
-        >
-          {{ $t('chat.chat_1035', newMsgNum) }}
-        </span>
-        <span
-          v-if="(messageType.atList || messageType.reply) && newMsgNum <= 1 && messageType.noNormal"
-        >
-          {{ $t('chat.chat_1034') }}{{ messageType.atList ? '@' : ''
-          }}{{ messageType.reply ? $t('chat.chat_1036') : '' }} {{ $t('chat.chat_1059') }}
-        </span>
+        <span>{{ tipMsg }}</span>
         <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
@@ -46,33 +39,36 @@
       :isAllBanned="allBanned"
       :isBanned="isBanned"
       :isHandsUp="isHandsUp"
-      :noChatLogin="noChatLogin"
       :deviceType="deviceType"
       :onlineMicStatus="onlineMicStatus"
       @showUserPopup="showUserPopup"
       @login="handleLogin"
+      @sendEnd="sendMsgEnd"
     ></send-box>
   </div>
 </template>
 
 <script>
-  import scroll from './components/scroll';
+  import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
   import { ImagePreview } from 'vant';
-  import defaultAvatar from './images/default_avatar.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatWap',
     components: {
-      scroll,
-      msgItem,
+      VirtualList,
+      // msgItem,
       sendBox
     },
+    mixins: [emitter],
     data() {
       const { chatList } = this.chatServer.state;
       return {
+        msgItem,
         chatList: chatList,
         //新消息信息集合体
         messageType: {
@@ -82,14 +78,14 @@
           id: '',
           noNormal: false
         },
+        //消息提示
+        tipMsg: '',
+        //是否有未读
+        isHasUnreadAtMeMsg: false,
         //新消息数量
-        newMsgNum: 0,
+        unReadMessageCount: 0,
         //活动信息
         webinar: {},
-        //是否隐藏聊天历史加载记录
-        configList: {},
-        //在线的上麦状态 todo 待确认从哪里取全局的speakerList
-        onlineMicStatus: false,
         //当前页数
         page: 1,
         //是否已经下拉刷新
@@ -101,10 +97,18 @@
         //是否是嵌入端
         isEmbed: false,
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
+        allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        //是否加载完聊天历史
+        historyloaded: false
       };
     },
-
+    watch: {
+      chatList: function () {
+        if (this.isBottom()) {
+          this.scrollBottom();
+        }
+      }
+    },
     computed: {
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
@@ -120,23 +124,6 @@
       isHandsUp() {
         const { interactToolStatus = {} } = this.roomBaseServer.state;
         return interactToolStatus && !!interactToolStatus['is_handsup'];
-      },
-      //是否不登陆也可以参与聊天
-      noChatLogin() {
-        let noChatLogin = false;
-        if (browserType()) {
-          /**
-           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
-           */
-          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
-            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
-          } else {
-            noChatLogin = true;
-          }
-        } else {
-          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
-        }
-        return noChatLogin;
       },
       // 设备状态
       deviceType() {
@@ -173,19 +160,31 @@
             video: false
           };
         }
-      }
-    },
-    watch: {
-      async 'chatList.length'(newVal) {
-        console.log(newVal);
-        await this.$nextTick();
-        this.$refs.scroll.refresh();
-        if (this.isPullingDown) {
-          this.$refs.scroll.finishPullDown();
-          this.isPullingDown = false;
-          return;
+      },
+      //是否已上麦
+      onlineMicStatus() {
+        return (useMicServer().state.speakerList || []).some(item => {
+          return (
+            item.account_id == this.joinInfo.third_party_user_id ||
+            item.accountId == this.joinInfo.third_party_user_id
+          );
+        });
+      },
+      // 聊天区欢迎语
+      welcomeText() {
+        if (Array.isArray(this.roomBaseServer.state.customMenu?.list)) {
+          // 获取聊天菜单内容
+          const chatItem = this.roomBaseServer.state.customMenu.list.find(item => {
+            return item.type == 3;
+          });
+          // 返回欢迎语
+          return chatItem?.welcome_content || '';
         }
-        this.$refs.scroll.scrollBottom();
+        return '';
+      },
+      //黄金链路配置
+      configList() {
+        return this.roomBaseServer.state.configList;
       }
     },
     beforeCreate() {
@@ -196,33 +195,56 @@
     created() {
       this.initViewData();
       this.page = 0;
+      this.imgUrls = [];
+      // 给聊天服务保存一份关键词
+      // this.chatServer.setKeywordList(this.keywordList);
+    },
+    mounted() {
+      this.listenChatServer();
+      this.showWelcomeTxt();
       if (!this.hideChatHistory) {
         this.getHistoryMessage();
       }
-
-      this.imgUrls = [];
-      // 给聊天服务保存一份关键词
-      this.chatServer.setKeywordList(this.keywordList);
-    },
-    mounted() {
-      console.log('useChatServer', useChatServer().state);
-      this.listenChatServer();
     },
     methods: {
+      showWelcomeTxt() {
+        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+      },
       //初始化视图数据
       initViewData() {
-        const { configList = {}, watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
-        const { join_info = {}, webinar = {}, interact = {} } = watchInitData;
+        const { watchInitData = {}, embedObj = {} } = this.roomBaseServer.state;
+        const { webinar = {}, interact = {} } = watchInitData;
         const { embed = false } = embedObj;
-        console.log(this.roomBaseServer, 'roomBaseServer');
-        console.log(join_info);
         this.webinar = webinar;
-        this.configList = configList;
         this.roomId = interact.room_id;
         this.isEmbed = embed;
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        // const giftsServer = useGiftsServer();
+        //监听到新消息过来
+        chatServer.$on('receiveMsg', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.unReadMessageCount++;
+            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+          }
+          this.dispatch('TabContent', 'noticeHint', 3);
+        });
+        //监听@我的消息
+        chatServer.$on('atMe', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = this.$t('chat.chat_1075');
+          }
+        });
+        //监听回复我的消息
+        chatServer.$on('replyMe', () => {
+          if (!this.isBottom()) {
+            this.isHasUnreadAtMeMsg = true;
+            this.tipMsg = this.$t('chat.chat_1076');
+          }
+        });
         //监听禁言通知
         chatServer.$on('banned', res => {
           this.isBanned = res;
@@ -232,20 +254,30 @@
           this.allBanned = res;
         });
         //监听分组房间变更通知
-        chatServer.$on('changeChannel', () => {
+        // chatServer.$on('changeChannel', () => {
+        //   this.handleChannelChange();
+        // });
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
         //监听被提出房间消息
         chatServer.$on('roomKickout', () => {
-          this.$message('您已经被踢出房间');
+          this.$toast(this.$t('chat.chat_1007'));
         });
+      },
+      //处理分组讨论频道变更
+      handleChannelChange() {
+        this.page = 0;
+        useChatServer().clearChatMsg();
+        this.getHistoryMessage();
       },
       // 获取历史消息
       async getHistoryMessage() {
         const data = {
           room_id: this.roomId,
+          // webinar_id: this.webinar_id,
           pos: this.page * 10,
-          limit: 10 // 所有端统一显示50条
+          limit: 50 // 所有端统一显示50条
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
@@ -255,12 +287,11 @@
         const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
         if (chatList.length > 0) {
           this.imgUrls = imgUrls;
-        } else {
-          this.$refs.scroll.finishPullDown();
-          this.isPullingDown = false;
         }
+        this.historyloaded = true;
+        this.scrollBottom();
       },
-      handlePreview(img) {
+      previewImg(img) {
         const index = this.imgUrls.findIndex(item => item === img);
         ImagePreview({
           images: this.imgUrls,
@@ -268,23 +299,34 @@
           lazyLoad: true
         });
       },
-      //todo 下拉加载
-      handlePullingDown() {
-        this.page++;
-        this.isPullingDown = true;
-        this.getHistoryMessage();
+      //滚动到目标处
+      scrollToTarget() {
+        const index = this.chatList.length - this.unReadMessageCount;
+        this.$refs.chatlist.scrollToIndex(index);
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
       },
       //滚动到底部
       scrollBottom() {
-        this.$refs.scroll.scrollBottom();
-        this.messageType = {
-          atList: false,
-          reply: false,
-          normal: false,
-          id: '',
-          noNormal: false
-        };
-        this.newMsgNum = 0;
+        this.$nextTick(() => {
+          this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
+          this.unReadMessageCount = 0;
+          this.isHasUnreadAtMeMsg = false;
+        });
+      },
+      //监听滚动条滚动到底部
+      tobottom() {
+        this.unReadMessageCount = 0;
+        this.isHasUnreadAtMeMsg = false;
+      },
+      //滚动条是否在最底部
+      isBottom() {
+        return (
+          this.$refs.chatlist.$el.scrollHeight -
+            this.$refs.chatlist.$el.scrollTop -
+            this.$refs.chatlist.getClientSize() <
+          5
+        );
       },
       showUserPopup() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenUserCenterWap'));
@@ -292,6 +334,24 @@
       //唤起登录弹窗
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      //自己发送消息后的回调
+      sendMsgEnd() {
+        this.scrollBottom();
+      },
+      //todo domain负责 抽奖情况检查
+      emitLotteryEvent(msg) {
+        console.log('emitLotteryEvent', msg);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
+        );
+      },
+      //todo domain负责 问卷情况检查
+      emitQuestionnaireEvent(questionnaireId) {
+        console.log('emitQuestionnaireEvent', questionnaireId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
+        );
       }
     }
   };

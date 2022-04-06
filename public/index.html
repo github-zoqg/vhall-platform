@@ -4,10 +4,11 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="version" content="<%= htmlWebpackPlugin.options.version %>" />
+    <meta name="gitlab-hash" content="<%= htmlWebpackPlugin.options.hash %>" />
     <% if( htmlWebpackPlugin.options && htmlWebpackPlugin.options.isWap){ %>
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=0,shrink-to-fit=no,viewport-fit=cover"
+      content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover"
     />
     <meta name="screen-orientation" content="portrait" />
     <meta name="x5-orientation" content="portrait" />
@@ -22,7 +23,6 @@
       content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
     />
     <% } %>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 
     <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico" /> -->
     <title><%= htmlWebpackPlugin.options.title %></title>
@@ -55,5 +55,6 @@
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <script src="<%= js %>"></script>
     <% } }%>
+    <script></script>
   </body>
 </html>

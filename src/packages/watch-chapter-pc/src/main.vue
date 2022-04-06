@@ -1,5 +1,5 @@
 <template>
-  <div class="vhsaas-chapter-wrap">
+  <div class="vmp-chapter">
     <overlay-scrollbars ref="osComponentRef" :options="osComponentOptions" style="height: 100%">
       <template v-if="chapterInfo.length">
         <template v-for="(item, index) in chapterInfo">
@@ -15,7 +15,7 @@
               <img class="active-img" src="./img/playing.gif" alt="" />
               <span class="title-label">{{ index + 1 }}.{{ item.title }}</span>
             </div>
-            <span class="time">{{ item.createTime | filterTime }}</span>
+            <span class="time">{{ item.createTime | secondToDate(1) }}</span>
           </div>
           <!-- 子章节 -->
           <template v-if="item.sub.length > 0">
@@ -30,7 +30,7 @@
                 <img class="active-img" src="./img/playing.gif" alt="" />
                 <span class="title-label">{{ index + 1 }}-{{ i + 1 }}.{{ sub.title }}</span>
               </div>
-              <span class="time">{{ sub.createTime | filterTime }}</span>
+              <span class="time">{{ sub.createTime | secondToDate(1) }}</span>
             </div>
           </template>
         </template>
@@ -43,7 +43,8 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { usePlayerServer, useDocServer } from 'middle-domain';
+  // import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpChapter',
     data() {
@@ -62,143 +63,25 @@
         }
       };
     },
-    // props: ['chapterInfo'],
-    filters: {
-      filterTime: val => {
-        const result = parseInt(val);
-        let hour = Math.floor(result / 3600);
-        let minute = Math.floor((result / 60) % 60);
-        let second = Math.floor(result % 60);
-        if (hour == 0) {
-          hour = '00';
-        } else if (hour < 10) {
-          hour = '0' + hour;
-        }
-        if (minute == 0) {
-          minute = '00';
-        } else if (minute < 10) {
-          minute = '0' + minute;
-        }
-        if (second == 0) {
-          second = '00';
-        } else if (second < 10) {
-          second = '0' + second;
-        }
-        return hour + ':' + minute + ':' + second;
-      }
-    },
     components: {},
+    beforeCreate() {
+      this.docServer = useDocServer();
+      this.playerServer = usePlayerServer();
+    },
     created() {
-      // this.acceptChapter();
-      // this.$VhallEventBus.$on(this.$VhallEventType.Doc.VOD_CUEPOINT_LOAD_COMPLETE, chapters => {
-      //   this.chapterInfo = chapters;
-      // });
-      // this.$VhallEventBus.$on(this.$VhallEventType.Chapter.PLAYER_TIME_UPDATE, currentTime => {
-      //   if (this.isMyClick) {
-      //     this.isMyClick = false;
-      //     return false;
-      //   }
-      //   const currentNode = this.computeBeforeNode(currentTime);
-      //   if (currentNode) {
-      //     this.select = currentNode.createTime;
-      //   } else {
-      //     this.select = 0;
-      //   }
-      // });
+      // 接受文档server消息 获取章节信息
+      this.docServer.$on('dispatch_doc_vod_cuepoint_load_complate', msg => {
+        this.acceptChapter(msg);
+      });
+      // 接受播放器server消息 更改章节item
+      this.playerServer.$on('chapter_time_update', currentTime => {
+        this.acceptCurrentTime(currentTime);
+      });
     },
     methods: {
       // 接受章节数据
       acceptChapter(chapters) {
-        this.chapterInfo = chapters || [
-          {
-            slideIndex: 1,
-            stepIndex: 0,
-            title: '目录',
-            sub: [],
-            createTime: 8.759,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 2,
-            stepIndex: 0,
-            title: '工作职责\u000b',
-            sub: [],
-            createTime: 8.982,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 3,
-            stepIndex: 0,
-            title: '工作内容（一）\u000b',
-            sub: [],
-            createTime: 9.167,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 4,
-            stepIndex: 0,
-            title: '工作内容（二）\u000b',
-            sub: [],
-            createTime: 9.343,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 5,
-            stepIndex: 0,
-            title: '工作内容（三）\u000b',
-            sub: [],
-            createTime: 9.509,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 6,
-            stepIndex: 0,
-            title: '工作内容（四）\u000b',
-            sub: [],
-            createTime: 9.668,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 7,
-            stepIndex: 0,
-            title: '工作内容（五）\u000b',
-            sub: [],
-            createTime: 9.894,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 8,
-            stepIndex: 0,
-            title: '工作内容（六）\u000b',
-            sub: [],
-            createTime: 10.764,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 9,
-            stepIndex: 0,
-            title: '问题',
-            sub: [],
-            createTime: 11.095,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 10,
-            stepIndex: 0,
-            title: '未来工作规划',
-            sub: [],
-            createTime: 14.335,
-            docId: '0a9798f6'
-          },
-          {
-            slideIndex: 11,
-            stepIndex: 0,
-            title: 'THANKS',
-            sub: [],
-            createTime: 14.796,
-            docId: '0a9798f6'
-          }
-        ];
+        this.chapterInfo = chapters;
       },
       // 接受当前时间
       acceptCurrentTime(currentTime) {
@@ -217,9 +100,7 @@
       changeTime(t) {
         this.isMyClick = true;
         this.select = t;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePlayTime', [t]));
-        // console.log('点击的章节', this.$VhallEventType.Chapter);
-        // this.$VhallEventBus.$emit(this.$VhallEventType.Chapter.CHAPTER_CLICK, t);
+        this.playerServer.setCurrentTime(t);
       },
       computeBeforeNode(currentTime) {
         let beforeNode = null;
@@ -266,8 +147,8 @@
     }
   };
 </script>
-<style lang="less" scoped>
-  .vhsaas-chapter-wrap {
+<style lang="less">
+  .vmp-chapter {
     width: 100%;
     height: 100%;
     background: #2a2a2a;

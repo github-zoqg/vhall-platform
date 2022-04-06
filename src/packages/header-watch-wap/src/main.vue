@@ -1,14 +1,8 @@
 <template>
-  <div id="header" class="vh-header-box">
+  <div id="header" class="vh-header-box" v-if="showHeader">
     <span class="host-user-info">
-      <img
-        v-if="webinarTag && webinarTag.organizers_status == 1"
-        class="img-box"
-        :src="hostAvatar"
-        @click="skipAction"
-        srcset
-      />
-      {{ watchInitData.webinar.userinfo.nickname | splitLenStr(8) }}
+      <img class="img-box" :src="hostAvatar" @click="skipAction" srcset />
+      {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
@@ -33,6 +27,7 @@
 <script>
   import { useAttentionServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
 
   export default {
     name: 'VmpHeaderWatchWap',
@@ -50,32 +45,25 @@
         }
       };
     },
-    filters: {
-      webinarFilter(val) {
-        // const webinarArr = [
-        //   this.$t('common.common_1018'),
-        //   this.$t('common.common_1019'),
-        //   this.$t('common.common_1020'),
-        //   this.$t('common.common_1024'),
-        //   this.$t('common.common_1021')
-        // ];
-        const webinarArr = ['直播', '预告', '结束', '点播', '回放'];
-        return webinarArr[val - 1];
-      },
-      splitLenStr(name, len) {
-        return name && name.length > len ? name.substring(0, len) + '...' : name;
-      }
-    },
     mounted() {
       // 关注的domain服务
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
-      this.autoShowPublic();
 
       //设置品牌皮肤
       this.setSkinInfo(this.skinInfo);
     },
     computed: {
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
       /**
        * 公众号信息
        */
@@ -88,7 +76,7 @@
       skinInfo() {
         return this.$domainStore.state.roomBaseServer.skinInfo;
       },
-      // 签名信息
+      // 主办方配置
       webinarTag() {
         return this.$domainStore.state.roomBaseServer.webinarTag;
       },
@@ -108,25 +96,16 @@
         if (this.watchInitData.webinar && this.watchInitData.webinar.userinfo.avatar) {
           avatar = this.watchInitData.webinar.userinfo.avatar;
         } else {
-          avatar = require('./images/default_avatar.png');
+          avatar = defaultAvatar;
         }
         return avatar;
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
       }
     },
     methods: {
-      /**
-       * 自动弹出公众号
-       */
-      autoShowPublic() {
-        console.log('header officicalInfo---->', this.officicalInfo);
-        if (
-          this.officicalInfo &&
-          this.officicalInfo.alert_type == 0 &&
-          this.officicalInfo.status == 0
-        ) {
-          this.showPublic();
-        }
-      },
       /**
        * 设置品牌设置信息
        */

@@ -11,19 +11,29 @@
         <el-row>
           <!-- 时间增 -->
           <div class="button_top">
-            <img v-if="ten_mon != 5" src="./img/add.png" alt="" @click="add('ten_mon')" />
+            <img
+              v-if="ten_mon != 5"
+              src="./img/add.png"
+              alt=""
+              @click="operationTime('ten_mon', 'add')"
+            />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="mon != 9" src="./img/add.png" alt="" @click="add('mon')" />
+            <img v-if="mon != 9" src="./img/add.png" alt="" @click="operationTime('mon', 'add')" />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
           <div class="ml10 button_top">
-            <img v-if="ten_sec != 5" src="./img/add.png" alt="" @click="add('ten_sec')" />
+            <img
+              v-if="ten_sec != 5"
+              src="./img/add.png"
+              alt=""
+              @click="operationTime('ten_sec', 'add')"
+            />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="sec != 9" src="./img/add.png" alt="" @click="add('sec')" />
+            <img v-if="sec != 9" src="./img/add.png" alt="" @click="operationTime('sec', 'add')" />
             <img v-else src="./img/addDis.png" alt="" />
           </div>
 
@@ -72,19 +82,29 @@
 
           <!-- 时间减 -->
           <div class="button_top">
-            <img v-if="ten_mon != 0" src="./img/down.png" alt="" @click="reduce('ten_mon')" />
+            <img
+              v-if="ten_mon != 0"
+              src="./img/down.png"
+              alt=""
+              @click="operationTime('ten_mon')"
+            />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="mon != 0" src="./img/down.png" alt="" @click="reduce('mon')" />
+            <img v-if="mon != 0" src="./img/down.png" alt="" @click="operationTime('mon')" />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
           <div class="ml10 button_top">
-            <img v-if="ten_sec != 0" src="./img/down.png" alt="" @click="reduce('ten_sec')" />
+            <img
+              v-if="ten_sec != 0"
+              src="./img/down.png"
+              alt=""
+              @click="operationTime('ten_sec')"
+            />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
           <div class="button_top">
-            <img v-if="sec != 0" src="./img/down.png" alt="" @click="reduce('sec')" />
+            <img v-if="sec != 0" src="./img/down.png" alt="" @click="operationTime('sec')" />
             <img v-else src="./img/downDis.png" alt="" />
           </div>
         </el-row>
@@ -100,7 +120,7 @@
                   popper-class="transfer-box"
                   style="margin-left: 4px"
                 >
-                  <i class="iconfont iconicon-help pr5" style="color: #666"></i>
+                  <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
                     1.计时器功能在默认情况下，对观众不可见。（仅对主持人、嘉宾、助理三个身份可见）
                     <br />
@@ -109,7 +129,7 @@
                 </el-tooltip>
               </span>
               <el-switch
-                :width="30"
+                :width="28"
                 v-model="form.is_all_show"
                 @change="changeAllShow"
                 size="mini"
@@ -127,7 +147,7 @@
                   popper-class="transfer-box"
                   style="margin-left: 4px"
                 >
-                  <i class="iconfont iconicon-help pr5" style="color: #666"></i>
+                  <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
                     1.设置可超时后，倒计时结束，变倒计时为从00:00开始的正向计时，记录超时时间
                     <br />
@@ -136,7 +156,7 @@
                 </el-tooltip>
               </span>
               <el-switch
-                :width="30"
+                :width="28"
                 v-model="form.is_timeout"
                 size="mini"
                 active-color="#fb3a32"
@@ -153,7 +173,8 @@
 </template>
 
 <script>
-  import { useTimerServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { useTimerServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',
     data() {
@@ -173,14 +194,14 @@
       this.timerServer = useTimerServer();
     },
     mounted() {
-      this.timerServer.listenMsg();
+      // this.timerServer.listenMsg();
       // 计时器开始
       this.timerServer.$on('timer_start', temp => {
         console.log(temp, '原始消息');
         this.timerVisible = false;
       });
       // 计时器结束
-      this.timerServer.$on('timer_end', temp => {
+      this.timerServer.$on('timer_end', () => {
         console.warn('监听到了计时器结束-------');
         this.form = {
           is_all_show: false,
@@ -197,7 +218,10 @@
         this.timerVisible = true;
       },
       onClose() {
-        this.$emit('disTimer', true);
+        // this.$emit('disTimer', true);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
+        );
         this.timerVisible = false;
       },
       // 表单&时间提交
@@ -225,13 +249,9 @@
           })
           .catch(err => console.log(err));
       },
-      // 时间加
-      add(data) {
-        this[data]++;
-      },
-      // 时间减
-      reduce(data) {
-        this[data]--;
+      // 时间操作
+      operationTime(data, status) {
+        status == 'add' ? this[data]++ : this[data]--;
       },
       // input检查
       testing(data) {
@@ -248,7 +268,7 @@
         this[data] = '';
       },
       changeAllShow() {
-        if (sessionStorage.getItem('delay_status') != 1) {
+        if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar != 1) {
           this.$message({
             type: 'warning',
             message: '当前活动非无延迟模式，不支持此功能'

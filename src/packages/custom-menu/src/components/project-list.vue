@@ -12,11 +12,11 @@
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <!-- <i class="saasicon_redu"></i> -->
-            <i class="saasicon_redu iconfont iconredu_icon1"></i>
+            <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
             <i>{{ item.pv }}</i>
           </div>
         </div>
-        <div class="vh-chose-active-item__titleInfo">
+        <div class="vh-project-list-active-item__titleInfo">
           <div class="vh-chose-active-item__title">
             {{ item.title }}
           </div>
@@ -110,7 +110,7 @@
     overflow: hidden;
     width: 312px;
     height: 80px;
-    padding: 0px 10px 8px;
+    padding: 8px 10px 8px;
     font-family: PingFangSC-Regular, PingFang SC;
     border-radius: 4px;
     &:hover {
@@ -193,13 +193,14 @@
       font-weight: 400;
       color: @font-dark-normal;
       line-height: 20px;
-      overflow: hidden;
-      text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
-      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
       text-align: left;
+      /**autoprefixer: ignore next */
+      -webkit-box-orient: vertical;
     }
     &__info {
       font-weight: 400;
@@ -268,10 +269,18 @@
       }
     }
     &__title {
-      font-size: 16px !important;
-      color: @font-light-normal;
-      line-height: 24px;
-      margin: 12px 16px 7px 16px;
+      margin: 10px 0 4px 0;
+      font-size: 14px;
+      font-weight: 400;
+      color: #e6e6e6;
+      line-height: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      text-align: left;
     }
     &__info {
       font-size: 14px;

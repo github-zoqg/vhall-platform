@@ -11,7 +11,7 @@
         <div class="form-item">
           <input
             type="text"
-            :placeholder="$t(item.placeholder)"
+            :placeholder="$tdefault(item.placeholder)"
             style="line-height: normal"
             autocomplete="off"
             v-model="item.field_value"
@@ -130,6 +130,7 @@
             lottery_id: this.lotteryId
           })
           .then(() => {
+            this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
             this.$toast(this.$t('interact_tools.interact_tools_1067'));
             this.$nextTick(() => {
               this.$emit('navTo', 'LotterySuccess');
@@ -185,7 +186,7 @@
       display: block;
       width: 364px !important;
       height: 90px;
-      background: #fc5659;
+      background: #fb3a32;
       border-radius: 14px;
       color: #fff;
       margin: 56px auto 0px auto;

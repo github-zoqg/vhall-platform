@@ -26,33 +26,34 @@
     </ul>
     <div class="vh-loading" v-if="showLoading">{{ $t('common.common_1001') }}</div>
     <!-- 商品详情 -->
-    <goods-info
+    <!-- <goods-info
       v-if="openGoodInfo && goodItem"
       :info="goodItem"
       @close="openGoodInfo = false"
-    ></goods-info>
+    ></goods-info> -->
   </div>
 </template>
 
 <script>
   import { useRoomBaseServer, useGoodServer, useMenuServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import Pullup from '@better-scroll/pull-up';
   BScroll.use(Pullup);
-  import goodsInfo from './detail';
+  // import goodsInfo from './detail';
 
   export default {
     name: 'VmpGoodListWap',
-    components: {
-      goodsInfo
-    },
+    // components: {
+    //   goodsInfo
+    // },
     data() {
       return {
         goodsList: [],
         scroll: null,
-        openGoodInfo: false,
-        goodItem: null,
+        // openGoodInfo: false,
+        // goodItem: null,
         showLoading: false,
         total: 0,
         limit: 10,
@@ -223,9 +224,13 @@
           this.refreshScroll();
         });
       },
-      showDetailDialog(good) {
-        this.openGoodInfo = true;
-        this.goodItem = good;
+      showDetailDialog(goodsItem) {
+        // this.openGoodInfo = true;
+        // this.goodItem = good;
+
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
+        );
       }
     }
   };
@@ -233,10 +238,8 @@
 
 <style lang="less">
   .vh-goods-wrapper {
-    height: 100%;
     width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
+    height: 100%;
     background: #fff;
     .vh-goods_list {
       display: block;
@@ -250,9 +253,9 @@
           display: inline-block;
           width: calc(100% - 220px);
           padding-left: 25px;
-          font-size: 32px;
+          font-size: 30px;
           .title {
-            line-height: 42px;
+            line-height: 34px;
             color: rgba(34, 34, 34, 1);
           }
           .price {

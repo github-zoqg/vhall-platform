@@ -1,23 +1,34 @@
 <template>
   <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
-    <!-- 发起抽奖 -->
+    <!-- 发起抽奖/问答 -->
     <template
       v-if="
-        msg.type == 'lottery_push' ||
-        msg.type == 'question_answer_open' ||
-        msg.type == 'question_answer_close'
+        source.type == 'lottery_push' ||
+        source.type == 'question_answer_open' ||
+        source.type == 'question_answer_close'
       "
     >
       <div class="msg-item interact">
-        <div class="interact-msg">{{ msg.content.text_content }}</div>
+        <div class="interact-msg">
+          <template
+            v-if="source.type == 'question_answer_open' || source.type == 'question_answer_close'"
+          >
+            {{ source.roleName | roleFilter }}
+          </template>
+          {{ source.content.text_content }}
+        </div>
       </div>
     </template>
     <!-- 抽奖结果 -->
-    <template v-else-if="msg.type == 'lottery_result_notice'">
+    <template v-else-if="source.type == 'lottery_result_notice'">
       <div class="msg-item interact">
-        <div class="interact-msg" @tap="checkLotteryDetail($event, msg)">
-          {{ msg.content.text_content }}
-          <template v-if="msg.content.Show">
+        <div
+          class="interact-msg"
+          @tap="checkLotteryDetail($event, source)"
+          @click="checkLotteryDetail($event, source)"
+        >
+          {{ source.content.text_content }}
+          <template v-if="source.content.Show">
             {{ $t('common.common_1030') }}
             <span class="highlight">{{ $t('chat.chat_1031') }}</span>
           </template>
@@ -25,83 +36,106 @@
       </div>
     </template>
     <!-- 收到问卷 -->
-    <template v-else-if="msg.type == 'questionnaire_push'">
+    <template v-else-if="source.type == 'questionnaire_push'">
       <div class="msg-item interact">
-        <div class="interact-msg" @tap="checkQuestionDetail(msg.content.questionnaire_id)">
-          1{{ msg.content.text_content }},{{ $t('common.common_1030') }}
+        <div
+          class="interact-msg"
+          @tap="checkQuestionDetail(source.content.questionnaire_id)"
+          @click="checkQuestionDetail(source.content.questionnaire_id)"
+        >
+          {{ source.roleName | roleFilter }}{{ source.roleName != 1 ? source.nickname : ''
+          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
     </template>
     <!-- 打赏 -->
-    <template v-else-if="msg.type == 'reward_pay_ok'">
+    <template v-else-if="source.type == 'reward_pay_ok'">
       <div class="msg-item interact new-gift" :class="Math.random() * 10 > 3 ? 'purpose' : 'red'">
         <div class="interact-gift-box">
           <p class="new-gift-name">
-            {{ msg.nickName | textOverflowSlice(10) }}
+            {{ source.nickName | overHidden(10) }}
           </p>
           <p class="new-gift-content">
-            {{ $t('interact_tools.interact_tools_1044') }}{{ msg.content.num
-            }}{{ $t('cash.cash_1003') }},{{ msg.content.text_content | textOverflowSlice(6) }}
+            {{ $t('interact_tools.interact_tools_1044') }}{{ source.content.num
+            }}{{ $t('cash.cash_1003') }},{{ source.content.text_content | overHidden(6) }}
           </p>
         </div>
-        <img class="new-award-img" src="../images/red-package.png" />
+        <img class="new-award-img" src="../img/red-package.png" />
       </div>
     </template>
     <!-- 送礼物 -->
-    <template v-else-if="msg.type == 'gift_send_success' || msg.type == 'free_gift_send'">
+    <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div
-        v-if="msg.content.gift_name"
+        v-if="source.content.gift_name"
         class="msg-item interact new-gift"
         :class="Math.random() * 10 > 3 ? 'purpose' : 'red'"
       >
         <div class="interact-gift-box">
           <p class="new-gift-name">
-            {{ msg.nickName | textOverflowSlice(10) }}
+            {{ source.nickname | overHidden(10) }}
           </p>
           <p class="new-gift-content">
-            {{ $t('chat.chat_1061') }} {{ msg.content.gift_name | textOverflowSlice(10) }}
+            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </p>
         </div>
-        <img class="new-gift-img" :src="msg.content.gift_url" />
+        <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
     </template>
     <!-- 聊天消息 -->
     <template v-else>
-      <div v-if="msg.showTime" class="msg-showtime">{{ msg.showTime }}</div>
+      <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
       <div class="msg-item">
         <div class="avatar-wrap">
-          <img class="chat-avatar" width="35" height="35" :src="msg.avatar" alt />
+          <img
+            class="chat-avatar"
+            width="35"
+            height="35"
+            :src="source.avatar || defaultAvatar"
+            alt
+          />
         </div>
         <div class="msg-content">
-          <p class="msg-content_name">
+          <!-- 签到消息头部 相类似的可优化 -->
+          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">签到</p>
+          <!-- 正常聊天消息 -->
+          <p class="msg-content_name" v-else>
             <span
-              v-if="msg.roleName && msg.roleName != '2'"
+              v-if="source.roleName && source.roleName != '2'"
               class="role"
-              :class="msg.roleName | roleClassFilter"
+              :class="source.roleName | roleClassFilter"
             >
-              {{ roleFilter(msg.roleName) }}
+              {{ source.roleName | roleFilter }}
             </span>
-            <span class="nickname">{{ msg.nickname }}</span>
+            <span class="nickname">
+              {{ source.nickname }}
+            </span>
           </p>
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
-            <template v-if="msg.replyMsg && msg.replyMsg.type && msg.atList.length == 0">
+            <template
+              v-if="
+                source.replyMsg &&
+                source.replyMsg.type &&
+                source.atList &&
+                source.atList.length == 0
+              "
+            >
               <p class="reply-msg">
-                <span v-html="msg.replyMsg.nick_name || msg.replyMsg.nickname" />
+                <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
                 ：
-                <span v-html="msg.replyMsg.content.text_content" />
+                <span v-html="source.replyMsg.content.text_content" />
               </p>
               <div class="msg-content_body">
                 <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
-                <span v-html="msg.content.text_content"></span>
+                <span v-html="source.content.text_content"></span>
                 <img
-                  @tap="$emit('preview', img)"
+                  @click="$emit('preview', img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
-                  v-for="(img, index) in msg.content.image_urls"
+                  v-for="(img, index) in source.content.image_urls"
                   :key="index"
                   :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
                   :alt="$t('chat.chat_1065')"
@@ -110,15 +144,15 @@
               </div>
             </template>
             <!-- @消息 -->
-            <template v-if="msg.atList.length !== 0">
+            <template v-if="source.atList && source.atList.length !== 0">
               <div class="msg-content_body">
                 <span v-html="msgContent"></span>
                 <img
-                  @tap="$emit('preview', img)"
+                  @click="previewImg(img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
-                  v-for="(img, index) in msg.content.image_urls"
+                  v-for="(img, index) in source.content.image_urls"
                   :key="index"
                   :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
                   :alt="$t('chat.chat_1065')"
@@ -127,16 +161,21 @@
               </div>
             </template>
             <!-- 正常消息 -->
-            <template v-if="!Object.keys(msg.replyMsg || {}).length && !msg.atList.length">
+            <template
+              v-if="
+                !Object.keys(source.replyMsg || {}).length &&
+                (!source.atList || !source.atList.length)
+              "
+            >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span v-html="msg.content.text_content" style="display: block"></span>
+                <span v-html="source.content.text_content" style="display: block"></span>
                 <img
-                  @tap="$emit('preview', img)"
+                  @click="previewImg(img)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
-                  v-for="(img, index) in msg.content.image_urls"
+                  v-for="(img, index) in source.content.image_urls"
                   :key="index"
                   :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
                   :alt="$t('chat.chat_1065')"
@@ -151,44 +190,40 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   export default {
     props: {
-      msg: {
+      source: {
         required: true,
         default: () => ({})
+      },
+      // 预览图片
+      previewImg: {
+        type: Function,
+        default: function () {}
+      },
+      emitLotteryEvent: {
+        type: Function,
+        default: function () {}
+      },
+      emitQuestionnaireEvent: {
+        type: Function,
+        default: function () {}
+      },
+      //当前登录人的信息
+      joinInfo: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {
       return {
         msgContent: '',
-        jiantou: require('../images/jiantou.png')
+        defaultAvatar: defaultAvatar,
+        jiantou: require('../img/jiantou.png')
       };
-    },
-    computed: {
-      //角色转换
-      roleFilter() {
-        const _this = this;
-        return function (value) {
-          let ret = '';
-          switch (Number(value)) {
-            case 1:
-              ret = _this.$t('chat.chat_1022');
-              break;
-            case 3:
-              ret = _this.$t('chat.chat_1024');
-              break;
-            case 4:
-              ret = _this.$t('chat.chat_1023');
-              break;
-            case 20:
-              ret = _this.$t('chat.chat_1064');
-              break;
-            default:
-              ret = _this.$t('chat.chat_1062');
-          }
-          return ret;
-        };
-      }
     },
     filters: {
       //角色标签样式
@@ -219,16 +254,6 @@
           return 'guest';
         }
         return '';
-      },
-      //文字过长截取
-      textOverflowSlice(val = '', len = 0) {
-        if (['', void 0, null].includes(val) || ['', void 0, null].includes(len)) {
-          return '';
-        }
-        if (val.length > len) {
-          return val.substring(0, len) + '...';
-        }
-        return val;
       }
     },
     mounted() {
@@ -237,54 +262,57 @@
     methods: {
       // 点击查看抽奖信息
       //todo 信令替代
-      checkLotteryDetail(e, msg) {
-        console.log(e, msg);
-        // EventBus.$emit('checkLotteryDetail', msg);
+      checkLotteryDetail(e, msgData) {
+        console.log('checkLotteryDetail', e, msgData);
+        console.log(this.emitLotteryEvent);
+        this.emitLotteryEvent(msgData?.content?.msg?.data);
       },
       // 点击查看问卷
       //todo 信令替代
       checkQuestionDetail(questionnaire_id) {
         console.log(questionnaire_id);
+        console.log(this.emitQuestionnaireEvent);
+        this.emitQuestionnaireEvent(questionnaire_id);
         // EventBus.$emit('checkQuestionDetail', questionnaire_id);
       },
       //处理@消息
       handleAt() {
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.msg.atList.length) {
-          this.msgContent = this.msg.content.text_content;
-        } else {
+        if (this.source && Array.isArray(this.source.atList) && !this.source.atList.length) {
+          this.msgContent = this.source.content.text_content;
+        } else if (this.source.atList && this.source.atList.length) {
           let at = false;
-          this.msg.atList.forEach(a => {
+          (this.source.atList || []).forEach(a => {
             console.log('atList', a.nick_name);
-            console.log(this.msg.atList.length);
+            console.log(this.source.atList.length);
             const userName = `@${a.nick_name} `;
             const match =
-              this.msg.content &&
-              this.msg.content.text_content &&
-              this.msg.content.text_content.indexOf(userName) != -1;
+              this.source.content &&
+              this.source.content.text_content &&
+              this.source.content.text_content.indexOf(userName) != -1;
             console.log(match);
             if (match) {
               if (at) {
                 this.msgContent = this.msgContent.replace(
                   userName,
-                  `<span style='color:#4DA1FF'>${userName}</span>`
+                  `<span style='color:#3562fa'>${userName}</span>`
                 );
               } else {
-                this.msgContent = this.msg.content.text_content.replace(
+                this.msgContent = this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#4DA1FF'>${userName}</span>`
+                  `<span style='color:#3562fa'>${userName}</span>`
                 );
               }
               at = true;
             } else {
-              this.msgContent = at ? this.msgContent : this.msg.content.text_content;
+              this.msgContent = at ? this.msgContent : this.source.content.text_content;
             }
           });
         }
         if (
-          this.msg.atList &&
-          this.msg.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
-          !this.msg.isHistoryMsg
+          this.source.atList &&
+          this.source.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+          !this.source.isHistoryMsg
         ) {
           this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
           clearTimeout(this.tipTimer);
@@ -292,8 +320,12 @@
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
         }
-        if (this.msg.replyMsg && this.msg.replyMsg.content && !this.msg.isHistoryMsg) {
-          this.$emit('dispatchEvent', { type: 'replyMsg', el: this.$el, msg: this.msg.replyMsg });
+        if (this.source.replyMsg && this.source.replyMsg.content && !this.source.isHistoryMsg) {
+          this.$emit('dispatchEvent', {
+            type: 'replyMsg',
+            el: this.$el,
+            msg: this.source.replyMsg
+          });
           clearTimeout(this.tipTimer);
           this.tipTimer = setTimeout(() => {
             this.$emit('dispatchEvent', { type: 'closeTip' });
@@ -358,7 +390,7 @@
             font-size: 20px;
             &.host {
               background-color: rgba(252, 86, 89, 0.2);
-              color: #fc5659;
+              color: #fb3a32;
             }
             &.assistant {
               background-color: rgba(166, 166, 166, 0.2);
@@ -514,6 +546,16 @@
         background: #f7f7f7;
         object-fit: scale-down;
       }
+    }
+    .margin-top-bottom {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .sign-msg {
+      background: #aaa;
+      display: inline-block;
+      padding: 2px 30px;
+      border-radius: 20px;
     }
   }
 </style>

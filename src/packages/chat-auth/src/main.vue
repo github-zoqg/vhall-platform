@@ -136,6 +136,7 @@
             :select-menu-type="selectMenuType"
             :options="options"
             :list="currentList"
+            :operate-disable="enableChatAuth === 1"
             ref="authTable"
             @cancelMuted="handleCancelMuted"
             @cancelKicked="handleCancelKicked"
@@ -294,7 +295,6 @@
       this.init();
     },
     methods: {
-      //todo 初始化方法
       async init() {
         //提取Url参数
         this.urlParams = this.extractionUrlParams();
@@ -387,6 +387,17 @@
           vc
         });
 
+        const paramKeyList = Object.keys(params);
+
+        //这里兼容一下以前的参数，保证口令登录的情况下，聊天审核也能正常,以前参数附加live_token这一步是在axios封装的方法里实现的
+        if (
+          paramKeyList.includes('liveT') &&
+          (!paramKeyList.includes('live_token') ||
+            ['', null, void 0].includes(params['live_token']))
+        ) {
+          params.live_token = params.liveT;
+        }
+
         return this.chatAuthServer
           .initRoomInfo(params)
           .then(res => {
@@ -473,6 +484,7 @@
           .toggleChatAuthStatus(params)
           .then(res => {
             this.enableChatAuth = res.data.switch;
+            this.enableChatAuth && window.vhallReportForProduct?.report(110118);
           })
           .catch(error => {
             const { msg = '' } = error || {};
@@ -745,7 +757,7 @@
     @color-blue: #4b5afe;
     @color-blue-hover: #5d6afe;
     @color-bd: #e2e2e2;
-    @color-default-hover: #fc5659;
+    @color-default-hover: #fb3a32;
     @color-default-active: #fc5659;
     @color-blue-hover: #5d6afe;
     @color-blue: #4b5afe;
@@ -967,6 +979,16 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+    }
+    .el-button--danger {
+      &:focus,
+      &:hover {
+        background: #fb3a32;
+        border: 1px solid #fb3a32;
+      }
+      &.is-disabled {
+        background: #fb3a32;
+      }
     }
   }
 </style>

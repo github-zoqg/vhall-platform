@@ -8,18 +8,11 @@
         <div class="header-right_control_wrap-head">
           <div class="header-right_control_wrap-head-left">
             <span class="header-right_control_wrap-head-left-role">
-              {{ roleMap[userInfo.role_name] }}
+              {{ userInfo.role_name | roleFilter }}
             </span>
             <span class="header-right_control_wrap-head-left-name">
               {{ userInfo.nickname }}
             </span>
-          </div>
-          <div
-            class="header-right_control_wrap-head-right"
-            v-if="isShowQuit"
-            @click="roleQuit || userInfo.role_name != 1"
-          >
-            退出
           </div>
         </div>
         <div class="header-right_control_wrap-container">
@@ -34,24 +27,26 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
-            v-if="isSupportSplitScreen"
-            @click="splitScreen"
+            :class="{
+              'header-right_control_wrap-container-disabled': !isLiving || isInsertFilePushing
+            }"
+            v-if="configList['is_interact'] && isSupportSplitScreen"
+            @click="handleSplitScreenChange"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-Viewlayout"></i>
-            <p>{{ splitStatus == 2 ? '分屏' : '关闭分屏' }}</p>
+            <p>{{ isOpenSplitScreen ? '关闭分屏' : '分屏' }}</p>
           </div>
-          <!-- <div
+          <div
             class="header-right_control_wrap-container-setting"
             v-if="userInfo.role_name != 1"
             @click="roleQuit"
           >
-            <i class="iconfont iconjiaosetuichu"></i>
+            <i class="vh-iconfont vh-line-exit"></i>
             <p>角色退出</p>
-          </div> -->
+          </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="webinarInfo.no_delay_webinar == 0 && isThirtPushStream && !thirtPushStreamimg"
+            v-if="isShowThirdPushStream"
             @click="thirdPartyShow"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
@@ -60,14 +55,14 @@
           <div
             class="header-right_control_wrap-container-setting"
             @click="thirdPartyClose"
-            v-if="isThirtPushStream && thirtPushStreamimg"
+            v-if="webinarInfo.mode == 2 && thirtPushStreamimg"
           >
             <i class="vh-saas-iconfont vh-saas-a-color-webpageinitiate1"></i>
             <p>网页发起</p>
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="webinarInfo.mode != 6"
+            v-if="configList['virtual_user'] && webinarInfo.mode != 6"
             @click="openVirtualAudience"
             :class="{ 'header-right_control_wrap-container-disabled': !isLiving }"
           >
@@ -75,27 +70,14 @@
             <p>虚拟人数</p>
           </div>
         </div>
-        <div class="header-right_control_wrap-bottom" v-if="isShowSupport">
-          微吼知客提供技术支持
-        </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useSplitScreenServer, useUserServer } from 'middle-domain';
   export default {
     name: 'HeaderControl',
-    props: {
-      isShowQuit: {
-        default: false,
-        type: Boolean
-      },
-      isShowSupport: {
-        default: false,
-        type: Boolean
-      }
-    },
     computed: {
       isSupportSplitScreen() {
         return (
@@ -107,48 +89,82 @@
       isLiving() {
         //是否正在直播  虚拟人数是否可以使用，只有直播的时候可以使用
         return this.webinarInfo.type == 1;
+      },
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是否开启分屏
+      isOpenSplitScreen() {
+        return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
+      },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
+      // 是否正在第三方推流
+      thirtPushStreamimg() {
+        return this.roomBaseServer.state.isThirdStream;
+      },
+      //是否显示第三方推流组件
+      isShowThirdPushStream() {
+        // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
+        return (
+          this.configList['btn_thirdway'] &&
+          this.webinarInfo.no_delay_webinar == 0 &&
+          this.webinarInfo.mode == 2 &&
+          !this.thirtPushStreamimg
+        );
       }
     },
     data() {
       return {
         roomBaseState: null,
-        isThirtPushStream: false, // 是否支持第三方推流
-        thirtPushStreamimg: false, // 是否正在第三方推流
         userInfo: {}, // 用户头图和名称、角色
-        webinarInfo: {}, //活动下信息
-        splitStatus: 2, //分屏状态
-        roleMap: {
-          1: '主持人',
-          2: '观众',
-          3: '助理',
-          4: '嘉宾'
-        }
+        webinarInfo: {} //活动下信息
       };
     },
     created() {
       this.roomBaseServer = useRoomBaseServer();
+      this.splitScreenServer = useSplitScreenServer();
+      this.useServer = useUserServer();
       this.roomBaseState = this.roomBaseServer.state;
       this.userInfo = this.roomBaseState.watchInitData.join_info;
       this.webinarInfo = this.roomBaseState.watchInitData.webinar;
-      if (this.webinarInfo.mode == 2) {
-        this.isThirtPushStream = true;
-      }
     },
     methods: {
+      // 分屏状态更改
+      handleSplitScreenChange() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120003);
+        if (this.isOpenSplitScreen) {
+          this.splitScreenServer.closeSplit();
+        } else {
+          // queryString
+          const search = location.search
+            ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
+            : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+          // location
+          const url =
+            process.env.NODE_ENV === 'development'
+              ? `${window.location.origin}`
+              : `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}`;
+          const retUrl = `${url}/lives/split-screen/${this.$route.params.id}${search}`;
+          this.splitScreenServer.openSplit(retUrl);
+        }
+      },
       openMediaSettings() {
         // TODO 媒体设置弹窗
         this.$emit('openMediaSettings');
       },
-      splitScreen() {
-        //分屏
-        if (this.splitStatus == 2) {
-          this.$emit('startSplit');
-        } else {
-          this.$emit('endSplit');
-        }
-      },
       roleQuit() {
         // 角色退出
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110142);
+        this.useServer.loginRoleOut({ webinar_id: this.webinarInfo.id }).then(res => {
+          if (res.code == 200) {
+            window.location.href = `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/lives/keylogin/${this.webinarInfo.id}/${this.userInfo.role_name}`;
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+          }
+        });
         // 调用退出接口 跳转页面
       },
       thirdPartyShow() {
@@ -157,8 +173,9 @@
           this.$message.warning('请先结束直播');
           return;
         }
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120002);
         this.$emit('thirdPushStream', true);
-        this.thirtPushStreamimg = true;
+        this.roomBaseServer.setInavToolStatus('start_type', 4);
       },
       thirdPartyClose() {
         // 网页发起 第三方发起关闭
@@ -167,10 +184,11 @@
           return;
         }
         this.$emit('thirdPushStream', false);
-        this.thirtPushStreamimg = false;
+        this.roomBaseServer.setInavToolStatus('start_type', 1);
       },
       openVirtualAudience() {
         // 虚拟人数弹窗
+        window.vhallReportForProduct && window.vhallReportForProduct.report(120004);
         this.$emit('openVirtualProple');
       }
     }
@@ -194,7 +212,7 @@
       font-size: 20px;
       cursor: pointer;
       border-radius: 50%;
-      background: url('../images/my-dark@2x.png') no-repeat;
+      background: url('../img/my-dark@2x.png') no-repeat;
       background-size: 100% 100%;
       // background-color: hsla(0, 0%, 88.6%, 0.15);
     }

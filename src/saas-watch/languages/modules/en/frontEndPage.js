@@ -14,7 +14,7 @@ export default {
     common_1003: 'Invite',
     common_1004: 'Q&A',
     common_1005: 'Successful payment',
-    common_1006: 'Please enter your phone number/email/employee ID',
+    common_1006: 'Please enter your phone/email/employee ID',
     common_1007: 'The detection type are inconsistent with the activity viewing restriction type',
     common_1008: 'Private chat',
     common_1009: 'Chinese',
@@ -53,7 +53,7 @@ export default {
     player_1006: 'Audio',
     player_1007: 'Speed',
     player_1008: 'Switch',
-    player_1009: 'Switch for you to ',
+    player_1009: 'Switch for you to',
     player_1010: 'To be presented soon...',
     player_1011: 'You have entered landscape mode',
     player_1012: 'Automatically continue from {n} where you stop last time.',
@@ -137,7 +137,7 @@ export default {
     nav_1028: 'Withdrawal',
     nav_1029: 'Unsubscribe',
     nav_1030: 'Followed',
-    nav_1031: 'Long press and save ',
+    nav_1031: 'Long press and save',
     nav_1032: 'Top Inviters',
     nav_1033: 'Top Spenders',
     nav_1034: 'Rules',
@@ -157,7 +157,8 @@ export default {
     nav_1048: 'Time',
     nav_1049: 'Place',
     nav_1050: "The host hasn't opened the invitation yet",
-    nav_1051: 'Alipay'
+    nav_1051: 'Alipay',
+    nav_1052: 'Copy failed'
   },
   login: {
     login_1001: 'Account login',
@@ -193,6 +194,7 @@ export default {
     login_1031: 'Terms of service',
     login_1032: 'Wechat login'
   },
+  undefined: {},
   register: {
     register_1001: 'Welcome to register for VHALL live-streaming',
     register_1002: 'Register to be a new user',
@@ -265,7 +267,7 @@ export default {
     chat_1031: 'Check the details',
     chat_1032: 'Send out',
     chat_1033: 'Sent a bonus',
-    chat_1034: 'Someone ',
+    chat_1034: 'Someone',
     chat_1035: '{n} unread messages',
     chat_1036: 'replied to',
     chat_1037: 'Impressive, Kudos!',
@@ -432,7 +434,7 @@ export default {
     interact_tools_1020: 'List of winners',
     interact_tools_1021: 'Lottery is in progress',
     interact_tools_1022: 'Unfortunately, you did not win a prize!',
-    interact_tools_1023: 'Congratulations on your winning! ',
+    interact_tools_1023: 'Congratulations on your winning!',
     interact_tools_1024: 'Sign in',
     interact_tools_1025: 'Host initiates sign-in...',
     interact_tools_1026: 'Sign in now',
@@ -485,7 +487,8 @@ export default {
     interact_tools_1071: 'Reward amount exceeds limit',
     interact_tools_1072: 'QR code',
     interact_tools_1073: 'Reward {n}',
-    interact_tools_1074: 'Unfortunately'
+    interact_tools_1074: 'Unfortunately',
+    interact_tools_1075: 'Applaud'
   },
   setting: {
     setting_1002: 'View settings',
@@ -539,7 +542,7 @@ export default {
     message_1015: 'K value verification failed, about to jump',
     message_1016: 'Hosts, guests or assistants are not allowed to enter the viewing terminal',
     message_1017: 'The current version don‘t support viewing. Please use another browser',
-    message_1018: 'The organizer has encrypted the video. ',
+    message_1018: 'The organizer has encrypted the video.',
     message_1019: 'It is recommended to use computer access to watch',
     message_1020: 'This video is currently unavailable.',
     message_1021: 'Unsupp',
@@ -679,7 +682,7 @@ export default {
     account_1069: 'Please enter a valid phone number',
     account_1070: 'Please enter the dynamic verification code',
     account_1071: 'Please enter the password!',
-    account_1072: '6-30 digit password without spaces and special symbols!',
+    account_1072: '6-30  Characters without spaces or special symbols!',
     account_1073: 'enter the password again!',
     account_1074: 'The two passwords are inconsistent!',
     account_1075: 'Modification of Personal Data',
@@ -701,7 +704,7 @@ export default {
     interact_1010: 'Refuse',
     interact_1011:
       'The microphone connection is interrupted due to equipment problems, please check the equipment',
-    interact_1012: '{n} is set to be the presenter',
+    interact_1012: '{n} is set to be the {m}',
     interact_1013:
       'Failed to subscribe to desktop sharing due to network problems. Subscribing again.',
     interact_1014: 'Failed to subscribe to user {n} due to network problems. Subscribing again.',
@@ -722,8 +725,11 @@ export default {
     interact_1027: 'You have cancelled the raise hand',
     interact_1028: 'Microphone off success',
     interact_1029: 'The seats are full.Your account supports {n} people to get on the wheat',
-    interact_1030: '{n} microphone off ',
-    interact_1031: '{n} invites you to open the microphone'
+    interact_1030: '{n} microphone off',
+    interact_1031: '{n} invites you to open the microphone',
+    interact_1033: '主画面',
+    interact_1034: 'presenter',
+    interact_1035: 'Opposite party network exception'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -784,11 +790,27 @@ export default {
     webinar_1040: 'Pay{n}',
     webinar_1041: 'Pay{n}'
   },
+  color: {},
   other: {
     other_1001: 'Preview image',
     other_1002: 'Enter the password!',
     other_1003: 'Enter the invitation code',
-    other_1004: 'Upload image cannot exceed 2M'
-  },
-  undefined: {}
+    other_1004: 'Upload image cannot exceed 2M',
+    other_1006: 'The host rejected you to open the microphone',
+    other_1007: 'Try sliding left and right',
+    other_1008: 'wait',
+    other_1009:
+      'This live supports video connection， recommend allowing system opens corresponding device to use function.',
+    other_1010: 'The current device does not support connection',
+    other_1011: 'Allow “webinar.e.vhall.com” use your camera and Mic',
+    other_1012: 'Refuse',
+    other_1013: 'Allow',
+    other_1014: 'Equipment inspection',
+    other_1015: 'I got it',
+    other_1016: 'K value verification failed',
+    other_1017: 'Agree and continue',
+    other_1018: 'Refuse',
+    other_1019: 'I got it',
+    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+  }
 };

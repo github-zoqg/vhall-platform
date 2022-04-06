@@ -1,0 +1,80 @@
+<template>
+  <div class="icon-wrap" v-if="redPacketServerState.iconVisible" @click="checkRedPacketIcon">
+    <img src="./images/redPacket.png" alt="" />
+    <i class="dot" v-if="redPacketServerState.dotVisible" />
+  </div>
+</template>
+<script>
+  /**
+   * @description 红包的图标 + 小红点
+   */
+  import { useRedPacketServer } from 'middle-domain';
+  export default {
+    name: 'RedRepacketIcon',
+
+    data() {
+      const redPacketServerState = this.redPacketServer.state;
+      return {
+        redPacketServerState
+      };
+    },
+    beforeCreate() {
+      this.redPacketServer = useRedPacketServer({ mode: 'watch' });
+    },
+    created() {
+      console.log('initIconStatus created');
+      this.redPacketServer.initIconStatus();
+    },
+    methods: {
+      checkRedPacketIcon() {
+        this.$emit('clickIcon');
+        this.redPacketServer.setDotVisible(false);
+      }
+    }
+  };
+</script>
+<style lang="less" scoped>
+  .vmp-red-packet-icon {
+    color: #fff;
+    margin-left: 16px;
+    position: relative;
+    .vmp-dot {
+      position: absolute;
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #fb3a32;
+      border: 1px solid #2a2a2a;
+      border-radius: 50%;
+      top: 10px;
+      right: -3px;
+      position: absolute;
+    }
+    img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+  }
+  .icon-wrap {
+    margin-bottom: 10px;
+    width: 84px;
+    height: 84px;
+    position: relative;
+    background-color: transparent;
+    img {
+      width: 84px;
+      height: 84px;
+    }
+    .dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #ff0005;
+      content: '';
+    }
+  }
+</style>

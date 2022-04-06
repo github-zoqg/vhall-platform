@@ -3,7 +3,7 @@
     <main>
       <section
         style="height: 100%"
-        v-for="tab of menu"
+        v-for="tab of filterMenu"
         :key="tab.cuid"
         v-show="curItem.cuid === tab.cuid"
       >
@@ -20,12 +20,45 @@
       menu: {
         type: Array,
         default: () => []
+      },
+      auth: {
+        type: Object,
+        default: () => ({})
       }
     },
     data() {
       return {
         curItem: {}
       };
+    },
+    computed: {
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
+      },
+      filterMenu() {
+        let set = [];
+        for (const item of this.menu) {
+          if (set.every(i => i.cuid !== item.cuid)) {
+            set.push(item);
+          }
+        }
+
+        set = set.filter(item => {
+          if (!this.isWatch) {
+            if (item.type == 8 && !this.auth.member) return false; // 成员
+            if (item.type == 'notice' && !this.auth.notice) return false; // 公告
+          } else {
+            if (item.type == 7 && !this.auth.chapter) return false; // 章节
+          }
+
+          return true;
+        });
+
+        return [...set];
+      }
     },
 
     methods: {

@@ -45,6 +45,7 @@
     },
     data() {
       return {
+        //swiper插件配置
         swiperOptions: {
           pagination: {
             el: '.preview-img__pagination',
@@ -103,12 +104,12 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 11;
+    z-index: 200;
   }
   .preview-img__container {
     width: 800px;
     height: 450px;
-    background-color: #ffffff;
+    background-color: #fff;
     border-radius: 4px;
     position: relative;
   }
@@ -124,14 +125,14 @@
   }
   .preview-img__close-icon {
     font-size: 12px;
-    color: #ffffff;
+    color: #fff;
     position: absolute;
     right: 0;
     top: -22px;
     cursor: pointer;
   }
   .preview-img__pagination {
-    color: #ffffff;
+    color: #fff;
     line-height: 40px;
     font-size: 14px;
     height: 40px;
@@ -152,7 +153,7 @@
     text-align: center;
     margin-top: -16px;
     z-index: 2;
-    color: #ffffff;
+    color: #fff;
     cursor: pointer;
     border-radius: 16px;
     background-color: rgba(0, 0, 0, 0.6);

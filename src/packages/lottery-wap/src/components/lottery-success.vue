@@ -1,12 +1,17 @@
 <template>
   <div class="win-lottery">
     <img class="win-lottery-icon" :src="submitImg" alt="" />
-    <p class="win-lottery-text" v-if="showWinnerList">
+    <template v-if="showWinnerList">
+      <p class="win-lottery-text">
+        {{ $t('interact_tools.interact_tools_1013') }}
+      </p>
+      <button @click="navToWinnerList">
+        {{ $t('interact_tools.interact_tools_1012') }}
+      </button>
+    </template>
+    <span v-else style="display: inline-block; height: 30px; margin-top: 30px">
       {{ $t('interact_tools.interact_tools_1013') }}
-    </p>
-    <button v-if="showWinnerList" @click="navToWinnerList">
-      {{ $t('interact_tools.interact_tools_1012') }}
-    </button>
+    </span>
   </div>
 </template>
 <script>
@@ -49,7 +54,7 @@
       font-size: 32px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: #fc5659;
+      color: #fb3a32;
       line-height: 46px;
       margin-top: 32px;
     }
@@ -57,7 +62,7 @@
       display: inline-block;
       width: 364px;
       height: 90px;
-      background: #fc5659;
+      background: #fb3a32;
       border-radius: 14px;
       margin: 116px auto 0px auto;
       color: #fff;

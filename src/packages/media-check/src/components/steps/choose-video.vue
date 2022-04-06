@@ -27,7 +27,7 @@
 
     <footer class="vh-media-check-footer">
       <div class="vh-check-tip">
-        <span class="vh-iconfont vh-line-video-camera icon-tip"></span>
+        <span class="vh-iconfont vh-line-detection icon-tip"></span>
         <span>您能看到摄像头画面吗？</span>
       </div>
       <div class="button-container">
@@ -127,10 +127,23 @@
           console.error('销毁预览失败', error);
         }
       },
-      success() {
+      async success() {
+        // 释放视频设备权限
+        if (this.localStreamId) {
+          await this.stopVideoPreview();
+        }
+
+        window?.vhallReport.report(110006, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 摄像头检测成功
+
         this.$emit('next', { result: 'success' });
       },
       fail() {
+        window?.vhallReport.report(110010, {
+          report_extra: { dn: this.selectedId }
+        }); // 埋点 - 摄像头检测失败
+
         this.$emit('next', { result: 'fail' });
       }
     }
@@ -139,6 +152,9 @@
 
 <style lang="less">
   .vh-media-check-video {
+    width: 296px;
+    margin: 0 auto;
+
     // selector
     .vh-media-check-selector {
       display: flex;
@@ -174,7 +190,6 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-content: center;
         align-items: center;
         .preview-video-error__img {
           width: 72px;
@@ -182,7 +197,7 @@
         .preview-video-error__desc {
           padding-top: 10px;
           font-size: 12px;
-          color: #ffffff;
+          color: #fff;
           line-height: 20px;
         }
       }
@@ -190,7 +205,7 @@
 
     // footer
     .vh-media-check-footer {
-      margin-top: 32px;
+      margin-top: 40px;
       margin-bottom: 30px;
 
       // tip

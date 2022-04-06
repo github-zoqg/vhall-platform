@@ -1,6 +1,12 @@
 /* eslint-disable promise/param-names */
 <template>
-  <van-popup v-model="popupVisible" position="bottom" :overlay="false" style="height: 80vh">
+  <van-popup
+    v-model="popupVisible"
+    position="bottom"
+    :overlay="false"
+    class="lottery-popup"
+    get-container="body"
+  >
     <!-- 抽奖标题 -->
     <header class="title-bar">
       {{ $t('interact_tools.interact_tools_1003') }}
@@ -14,6 +20,8 @@
         :lotteryId="lotteryId"
         :showWinnerList="showWinnerList"
         :prizeInfo="prizeInfo"
+        :lotteryInfo="lotteryInfo"
+        @needLogin="handleGoLogin"
         @close="close"
         @navTo="changeView"
       />
@@ -22,7 +30,8 @@
 </template>
 
 <script>
-  import { useLotteryServer, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { useLotteryServer, useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
   const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
   const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
   export default {
@@ -48,36 +57,104 @@
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
-        lotteryId: '' // 抽奖的信息id(接口返回)
+        lotteryId: '', // 抽奖的信息id(接口返回)
+        lotteryInfo: {} // 抽奖信息
       };
+    },
+    beforeCreate() {
+      this.lotteryServer = useLotteryServer({ mode: 'watch' });
+      this.msgServer = useMsgServer();
     },
     created() {
       this.initMsgEvent();
     },
-    beforeCreate() {
-      this.lotteryServer = useLotteryServer({ mode: 'watch' });
+    destroyed() {
+      this.removeMsgEvent();
+      this.popupVisible = false;
     },
     methods: {
+      accept(msg) {
+        console.log(msg);
+        this.lotteryId = msg.lottery_id;
+        this.showWinnerList = !!msg.publish_winner;
+        this.setFitment(msg);
+        this.lotteryServer.checkLotteryResult(msg.lottery_id).then(res => {
+          if (res.code === 200) {
+            if (res.data.take_award === 0) {
+              this.lotteryView = 'LotteryWin';
+            } else {
+              this.lotteryView = 'LotterySuccess';
+            }
+            this.popupVisible = true;
+          }
+        });
+      },
+      /**
+       * @description 点开抽奖(按钮或者聊天)
+       */
+      open(uuid = '') {
+        this.lotteryServer.checkLottery(uuid).then(res => {
+          const data = res.data;
+          this.lotteryId = data.id;
+          this.showWinnerList = !!data.publish_winner;
+          if (data.lottery_status === 0) {
+            // 抽奖中
+            // 抽奖进行中
+            this.setFitment(data);
+            this.lotteryView = 'LotteryPending';
+          } else {
+            this.setFitment(data);
+            if (data.win === 1) {
+              // 中奖
+              if (data.take_award) {
+                this.lotteryView = 'LotterySuccess';
+              } else {
+                this.lotteryView = 'LotteryWin';
+              }
+            } else {
+              // 未中奖
+              this.lotteryView = 'LotteryMiss';
+            }
+          }
+          this.popupVisible = true;
+        });
+      },
+
       /**
        * @description 注册事件
        */
       initMsgEvent() {
         this.lotteryServer.$on(LOTTERY_PUSH, this.callBackLotteryPush);
         this.lotteryServer.$on(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        // 直播结束关闭弹窗
+        this.msgServer.$on('live_over', () => {
+          this.popupVisible = false;
+        });
       },
       removeMsgEvent() {
         this.lotteryServer.$off(LOTTERY_PUSH, this.callBackLotteryPush);
         this.lotteryServer.$off(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
       },
       // 抽奖开始消息推送
-      callBackLotteryPush(msgData) {
+      callBackLotteryPush(msg) {
+        const msgData = msg.data;
         this.setFitment(msgData);
         this.lotteryView = 'LotteryPending';
         this.popupVisible = true;
+        useChatServer().addChatToList({
+          content: {
+            text_content: this.$t('interact_tools.interact_tools_1021')
+          },
+          type: msg.data.type,
+          interactStatus: true
+        });
       },
       // 抽奖结果消息推送
-      callBackResultNotice(msgData) {
+      callBackResultNotice(msg) {
+        const msgData = msg.data;
+        this.setFitment(msgData);
         this.lotteryId = msgData.lottery_id;
+        this.showWinnerList = !!msgData.publish_winner;
         this.setFitment(msgData);
         const winnerList = msgData.lottery_winners.split(',');
         const lotteryResult = winnerList.some(userId => {
@@ -91,7 +168,30 @@
           this.lotteryView = 'LotteryMiss';
         }
         this.showWinnerList = !!msgData.publish_winner;
+        console.log('  this.popupVisible', this.popupVisible);
         this.popupVisible = true;
+        console.log('  this.popupVisible', this.popupVisible);
+        const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
+        useChatServer().addChatToList({
+          content: {
+            text_content: lotteryResult
+              ? this.$t('interact_tools.interact_tools_1023')
+              : this.$t('interact_tools.interact_tools_1022'),
+            msg: msg,
+            type: msg.data.type,
+            userId: join_info.user_id || join_info.third_party_user_id,
+            Show: lotteryResult ? true : false
+          },
+          type: msg.data.type,
+          interactStatus: true,
+          isCheck: lotteryResult
+        });
+        // 服务之间传递抽奖结果消息
+        this.lotteryServer.$emit(
+          lotteryResult
+            ? this.lotteryServerthis.Events.LOTTERY_WIN
+            : this.lotteryServerthis.Events.LOTTERY_MISS
+        );
       },
       close() {
         this.popupVisible = false;
@@ -119,6 +219,7 @@
           title: payload.title,
           img_order: payload.img_order
         };
+        this.lotteryInfo = payload;
       },
       /**
        * @description 判断是否是自己
@@ -126,11 +227,11 @@
        */
       isSelf(id) {
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
-        console.log();
+        console.log(join_info);
         if (join_info && typeof join_info === 'object') {
           const userId = join_info.user_id || join_info.third_party_user_id;
           console.log(userId, id);
-          return userId === `${id}`;
+          return `${userId}` === `${id}`;
         }
         return false;
       },
@@ -140,12 +241,19 @@
         this.awardInfo.img = '';
         await this.queryLotteryInfo();
         this.latterPrizeInfo();
+      },
+      handleGoLogin() {
+        this.popupVisible = false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       }
     }
   };
 </script>
 
 <style lang="less" scoped>
+  .lottery-popup {
+    height: calc(100% - 522px);
+  }
   .title-bar {
     position: relative;
     font-size: 32px;

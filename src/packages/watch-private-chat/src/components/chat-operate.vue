@@ -3,7 +3,7 @@
     <div class="private-chat-operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
         <!--表情按钮-->
-        <i class="icon iconfont iconbiaoqing" @click.stop="toggleEmoji"></i>
+        <i class="vh-iconfont vh-line-expression" @click.stop="toggleEmoji"></i>
         <!-- 表情选择 -->
         <div class="operate-container__tool-bar__emoji-wrap">
           <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
@@ -24,7 +24,7 @@
           @keydown.stop="onkeydownHandle($event)"
           @keyup.stop="onKeyUpHandle"
         ></textarea>
-        <span v-show="showLimit" class="input-bar__textarea-box__textarea-show-limit">
+        <span v-show="showWordLimit" class="input-bar__textarea-box__textarea-show-limit">
           <i
             class="textarea-show-limit__current-count"
             :class="{ limited: inputValue.length >= 140 }"
@@ -40,8 +40,11 @@
         class="input-bar__textarea-box__textarea-placeholder"
       >
         <span v-show="chatLoginStatus" class="input-bar__textarea-box__no-login">
-          <span class="input-bar__textarea-box__chat-login-btn" @click="callLogin">登录</span>
-          后参与聊天
+          <i18n path="chat.chat_1001">
+            <span class="input-bar__textarea-box__chat-login-btn" place="n" @click="callLogin">
+              {{ $t('nav.nav_1005') }}
+            </span>
+          </i18n>
         </span>
         <span
           v-show="inputStatus.disable && !chatLoginStatus"
@@ -52,7 +55,7 @@
       </div>
       <div class="input-bar__textarea-box__send-btn-box">
         <div class="input-bar__textarea-box__send-btn" @click="sendMessage">
-          <i class="icon iconfont iconfasong_icon"></i>
+          <i class="vh-iconfont vh-line-send"></i>
         </div>
       </div>
     </div>
@@ -63,7 +66,8 @@
   import OverlayScrollbars from 'overlayscrollbars';
   import Emoji from '@/packages/chat/src/components/emoji';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+  import { useChatServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'vmpWatchPrivateChatOperate',
     components: {
@@ -95,14 +99,23 @@
           noLogin: false,
           placeholder: '参与聊天'
         })
+      },
+      //当前的登录人信息
+      joinInfo: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       }
     },
     data() {
       return {
+        //默认头像
+        defaultAvatar: defaultAvatar,
         //输入框的值
         inputValue: '',
         //是否展示字数限制
-        showLimit: false,
+        showWordLimit: false,
         //保存的滚动条实例
         overlayScrollbar: null,
         //发送私聊消息的间隔
@@ -117,11 +130,20 @@
     watch: {
       inputValue: {
         handler(newValue) {
-          // 输入框内容发生变化，更新滚动条
-          this.overlayScrollbar.update();
-          this.inputHandle();
+          // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
+          if (!newValue) {
+            // console.log('chat input 值发生变化了', newValue);
+            // 输入框内容发生变化，更新滚动条
+            this.$nextTick(() => {
+              this.overlayScrollbar.update();
+              this.inputHandle();
+            });
+          }
         }
       }
+    },
+    beforeCreate() {
+      this.chatServer = useChatServer();
     },
     mounted() {
       this.overlayScrollbarInit();
@@ -150,32 +172,33 @@
       },
       //输入框输入事件,改变高度等
       inputHandle() {
-        const chatOldTextareaHeight = this.$refs.privateChatTextarea.style.height;
+        // const chatOldTextareaHeight = this.$refs.privateChatTextarea.style.height;
         // 最大字数限制 140
         if (this.inputValue.length > 140) {
           this.inputValue = this.inputValue.substring(0, 140);
         }
-        setTimeout(() => {
-          this.$nextTick(() => {
-            const chatTextareaHeight = this.$refs.privateChatTextarea.style.height;
-            if (chatOldTextareaHeight !== chatTextareaHeight) {
-              const hostTextarea = document.querySelector(
-                '.private-chat-operate-container__input-bar .os-host-textarea'
-              );
-              const chatTextAreaHeight = parseInt(chatTextareaHeight);
-              if (chatTextAreaHeight <= 60) {
-                // 解决删除文本之后 textarea 高度不会自动减小的问题
-                this.$refs.privateChatTextarea.style.minHeight = '20px';
-                hostTextarea.style.minHeight = chatTextareaHeight;
-              } else {
-                hostTextarea.style.minHeight = '59px';
-              }
-              // 三行的时候显示字数限制，否则不显示
-              this.showLimit = chatTextAreaHeight > 40;
+        this.$nextTick(() => {
+          const chatTextareaHeight = this.$refs.privateChatTextarea.style.height;
+          // if (chatOldTextareaHeight !== chatTextareaHeight) {
+          const hostTextarea = document.querySelector(
+            '.private-chat-operate-container__input-bar .os-host-textarea'
+          );
+          const chatTextAreaHeight = parseInt(chatTextareaHeight);
+          if (chatTextAreaHeight <= 60) {
+            // 解决删除文本之后 textarea 高度不会自动减小的问题
+            this.$refs.privateChatTextarea.style.minHeight = '20px';
+            hostTextarea.style.minHeight = chatTextareaHeight;
+          } else {
+            hostTextarea.style.minHeight = '59px';
+          }
+          // 三行的时候显示字数限制，否则不显示
+          this.showWordLimit = chatTextAreaHeight > 40;
 
-              this.$emit('inputHeightChange');
-            }
+          // 触发父元素绑定的高度发生变化事件
+          setTimeout(() => {
+            this.$emit('chatTextareaHeightChange');
           });
+          // }
         });
       },
       //按下enter键的处理
@@ -233,19 +256,41 @@
           })
           .join(' ');
       },
-      //todo 发送消息
+      //发送消息
       async sendMessage() {
+        if (this.inputValue.trim() === '') {
+          return this.$message({
+            message: this.$t('chat.chat_1009'),
+            showClose: true,
+            // duration: 0,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        }
+
+        const msg = this.inputValue.trim();
+        const curmsg = useChatServer().createCurMsg();
+        const target = useChatServer().state.curPrivateTargetId;
+        curmsg.setTarget(target);
+        //将文本消息加入消息体
+        curmsg.setText(msg);
+        //发送消息
+        useChatServer().sendMsg(curmsg);
+        //清除发送后的消息
+        useChatServer().clearCurMsg();
         this.inputValue = '';
         this.$nextTick(() => {
           // 输入框内容发生变化，更新滚动条
           this.overlayScrollbar.update();
           this.inputHandle();
           // 更新聊天内容区域滚动条
-          this.$emit('performScroll');
+          // this.$emit('performScroll');
         });
       },
-      //todo 信令唤起登录
-      callLogin() {}
+      //信令唤起登录
+      callLogin() {
+        this.$emit('needLogin');
+      }
     }
   };
 </script>
@@ -259,7 +304,7 @@
     @font-error: #fb3a32;
     // 链接字体颜色
     @font-link: #3562fa;
-    @active-color: #fc5659;
+    @active-color: #fb3a32;
     width: calc(100% - 48px);
     padding: 12px 24px 11px;
     background: #2a2a2a;
@@ -289,7 +334,7 @@
         transform: translateY(-100%);
         left: 0;
       }
-      .iconfont {
+      .vh-iconfont {
         color: #999;
         font-size: 19px;
         cursor: pointer;
@@ -309,7 +354,7 @@
 
         margin-left: 10px;
       }
-      .iconbiaoqing {
+      .vh-line-expression {
         font-size: 19px;
         color: #999;
         margin-left: 0;
@@ -381,12 +426,9 @@
         width: 220px;
         background-color: @bg-dark-normal;
         font-size: 14px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        font-weight: 400;
         color: @font-dark-normal;
         line-height: 20px;
         padding: 10px 12px;
-        text-align: center;
         border-radius: 20px;
       }
       .input-bar__textarea-box__no-login {
@@ -408,7 +450,7 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        .iconfasong_icon {
+        .vh-line-send {
           font-size: 18px;
           color: #e6e6e6;
         }

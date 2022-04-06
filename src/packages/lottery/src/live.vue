@@ -1,10 +1,21 @@
 <template>
   <div class="vhall-lottery" v-if="dialogVisible">
     <!-- 抽奖中 -->
-    <lottery-pending v-if="prizeShow" :fitment="fitment" @close="close" @end="handleEndLottery" />
+    <lottery-pending
+      v-if="prizeShow"
+      mode="live"
+      :fitment="fitment"
+      :prize-info="prizeInfo"
+      :lottery-id="lotteryInfoId"
+      :lottery-info="lotteryInfo"
+      :disabled-time="disabledTime"
+      @close="close"
+      @end="endLottery"
+    />
     <lottery-winner
       mode="live"
       v-else-if="lotteryResultShow"
+      :prize-info="prizeInfo"
       :winner-list="winLotteryUserList"
       @reStart="reStart"
       @close="close"
@@ -15,7 +26,7 @@
         <span class="payment-title--text">抽奖</span>
         <span class="payment-title--close vh-iconfont vh-line-close" @click="close"></span>
       </div>
-      <lottery-form @startLottery="handleStartLottery" />
+      <lottery-form @startLottery="startLottery" />
     </div>
   </div>
 </template>
@@ -27,6 +38,11 @@
   export default {
     components: { lotteryForm, lotteryPending, lotteryWinner },
     name: 'VmpLotteryLive',
+    provide() {
+      return {
+        lotteryServer: this.lotteryServer
+      };
+    },
     data() {
       return {
         dialogVisible: false, // 整个组件的显隐(包括背景遮罩)
@@ -36,18 +52,69 @@
         lotteryResultShow: false, // 抽奖结果
         lotteryInfoId: null, // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
-        prizeInfo: {} // 奖品信息
-      };
-    },
-    provide() {
-      return {
-        lotteryServer: this.lotteryServer
+        prizeInfo: {}, // 奖品信息
+        lotteryInfo: {},
+        disabledTime: 0 // 5秒禁止点击
       };
     },
     beforeCreate() {
-      this.lotteryServer = useLotteryServer();
+      this.lotteryServer = useLotteryServer({
+        mode: 'live'
+      });
+    },
+    created() {
+      this.initMsgEvent();
+    },
+    mounted() {
+      if (this.mode === 'live') {
+        this.coutDown();
+      }
+    },
+    destroyed() {
+      this.removeMsgEvent();
+      this.clearTimer();
     },
     methods: {
+      initMsgEvent() {
+        //监听结束抽奖
+        this.lotteryServer.$on(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
+      },
+      removeMsgEvent() {
+        this.lotteryServer.$off(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
+      },
+      // 抽奖结束(需要同步助理/嘉宾)
+      callBackResultNotice(msg) {
+        const lotteryId = msg.data.lottery_id;
+        this.lotteryServer.getWinnerList(lotteryId).then(res => {
+          this.winLotteryUserList = res.data.list;
+          this.prizeShow = false;
+          this.lotteryResultShow = true;
+        });
+      },
+      // 开始计时
+      coutDown() {
+        this.clearTimer();
+        this.disabledTime = 5;
+        this.timer = setInterval(() => {
+          this.disabledTime--;
+          if (this.disabledTime <= 0) {
+            this.clearTimer();
+          }
+        }, 1000);
+      },
+      // 清除计时
+      clearTimer() {
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
+      },
       /**
        * @description 打开整个抽奖组件
        */
@@ -69,7 +136,7 @@
             if (data.lottery_status === 0) {
               // 抽奖进行中
               this.handleStartLottery(data);
-            } else if (data.lottery_status === 1) {
+            } else {
               // 上一轮抽奖已结束
               this.lotteryContentShow = true;
               this.lotteryInfoId = null;
@@ -86,28 +153,24 @@
         this.prizeShow = false; // 抽奖中
         this.dialogVisible = false;
       },
-      // 结束抽奖
-      handleEndLottery() {
+      // 结束抽奖()
+      endLottery() {
         if (!this.lotteryInfoId) return;
-        return this.lotteryServer.endLottery(this.lotteryInfoId).then(res => {
-          if (res.code === 200) {
-            this.winLotteryUserList = res.data.lottery_users;
-            // console.warn('抽奖完成', res.data, res.data.award_snapshoot);
-            // this.closeShow = true;
-            // this.lotteryResultShow = true;
-            // this.lotteryEndResult = res.data.lottery_users; // 中奖用户人信息列表
-            // this.lotteryResultObj.url =
-            //   res.data.award_snapshoot && res.data.award_snapshoot.image_url
-            //     ? res.data.award_snapshoot.image_url
-            //     : '';
-            // this.lotteryResultObj.text =
-            //   res.data.award_snapshoot && res.data.award_snapshoot.award_name
-            //     ? res.data.award_snapshoot.award_name
-            //     : '';
-            this.prizeShow = false;
-            this.lotteryResultShow = true;
+        const callback = res => {
+          const code = res.code;
+          if (code !== 200) {
+            if (code === 516703) {
+              // 抽奖已结束
+              this.close();
+            } else {
+              this.$message.error(this.$tec(code) || res.msg);
+            }
           }
-        });
+        };
+        return this.lotteryServer
+          .endLottery(this.lotteryInfoId)
+          .then(res => callback(res))
+          .catch(err => callback(err));
       },
       /**
        * @description 重新开始一轮抽奖
@@ -116,6 +179,13 @@
         this.lotteryContentShow = true;
         this.lotteryResultShow = false;
         this.lotteryInfoId = null;
+      },
+      /**
+       * @description 主动发起抽奖(倒计时)
+       */
+      startLottery(payload) {
+        this.coutDown();
+        this.handleStartLottery(payload);
       },
       /**
        * @description 抽奖按钮
@@ -128,25 +198,23 @@
           title: payload.title,
           img_order: payload.img_order
         };
-        this.prizeObj = payload.award_snapshoot;
+        this.prizeInfo = payload.award_snapshoot;
         this.prizeShow = true;
         this.lotteryContentShow = false;
+        this.lotteryInfo = payload;
       }
     }
   };
 </script>
 <style lang="less">
-  @fontRegular: ' PingFangSC-Regular';
-
   .vhall-lottery {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 30;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: 102;
     .el-form-item__label {
       color: #1a1a1a;
     }
@@ -183,7 +251,6 @@
           font-size: 20px;
           font-weight: 600;
           line-height: 56px;
-          // padding-top: 10px;
         }
         &--close {
           position: absolute;
@@ -222,9 +289,8 @@
           }
           p {
             font-size: 14px;
-            font-family: @fontRegular;
             font-weight: 400;
-            color: #222222;
+            color: #222;
             line-height: 22px;
             margin-bottom: 12px;
           }
@@ -255,9 +321,8 @@
             padding-left: 20px;
             line-height: 42px;
             font-size: 14px;
-            font-family: @fontRegular;
             font-weight: 400;
-            color: #222222;
+            color: #222;
             img {
               width: 24px;
               height: 24px;
@@ -280,14 +345,13 @@
             }
             p {
               font-size: 16px;
-              font-family: @fontRegular;
               font-weight: 400;
-              color: #222222;
+              color: #222;
               line-height: 22px;
               margin-bottom: 48px;
             }
             .winning-status {
-              color: #fc5659;
+              color: #fb3a32;
             }
           }
         }
@@ -296,9 +360,8 @@
       .recive-prize {
         .title {
           font-size: 14px;
-          font-family: @fontRegular;
           font-weight: 400;
-          color: #222222;
+          color: #222;
           line-height: 20px;
           margin: 32px auto 14px;
           text-align: left;
@@ -321,16 +384,16 @@
     font-family: PingFangSC-Regular, PingFang SC;
     font-weight: 400;
     line-height: 20px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     padding: 9px 48px;
-    color: #666666;
+    color: #666;
     &:hover {
       color: #fff;
       background: #fb3a32;
       border: 1px solid #fb3a32;
     }
     &:active {
-      color: #ffffff;
+      color: #fff;
       background: #e2332c;
       border: 1px solid #e2332c;
     }

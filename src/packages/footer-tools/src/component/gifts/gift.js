@@ -1,5 +1,5 @@
-import { useGiftsServer, useRoomBaseServer } from 'middle-domain';
-import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+import { useGiftsServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
+// import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 // import { mapState, mapMutations } from 'vuex';
 export default {
   name: 'VhGifts',
@@ -30,9 +30,6 @@ export default {
     },
     showGiftCount: {
       type: Number
-    },
-    cuid: {
-      require: true
     }
   },
   beforeDestroy() {
@@ -59,12 +56,21 @@ export default {
   },
   beforeCreate() {
     this.giftsServer = useGiftsServer();
+    this.msgServer = useMsgServer();
   },
   mounted() {
-    console.log(useRoomBaseServer().state, 'this.roomId');
+    console.log(
+      this.$domainStore.state,
+      this.configList['ui.hide_chat_history'] == '1',
+      'this.roomId'
+    );
     // 赠送礼物成功
-    if (this.configList['ui.hide_chat_history'] == '1') {
-      this.$VhallEventBus.$on(this.$VhallEventType.InteractTools.ROOM_GIFT_SEND_SUCCESS, msg => {
+
+    this.giftsServer.$on('gift_send_success', msg => {
+      // 关闭支付弹框
+      this.$emit('changeShowGift', 'showGift', false);
+      this.$emit('changeShowGift', 'showPay', false);
+      if (this.configList['ui.hide_chat_history'] == '1') {
         if (msg.sender_id != this.watchInitData.join_info.third_party_user_id) return;
         this.btnDisabled = true;
         // 开始限频倒计时
@@ -78,11 +84,12 @@ export default {
           }
           this.counter--;
         }, 1000);
-      });
-    }
+      }
+    });
   },
   methods: {
     // ...mapMutations('watchBase', ['setDialogZIndexQueue', 'setToolsCount']),
+    // 获取礼物列表
     queryAllGift() {
       this.giftsServer
         .queryGiftsList({
@@ -118,35 +125,80 @@ export default {
           }
         });
     },
-    sendGift() {
+    // payType: 支付方式
+    sendGift(payType) {
       // this.$VhallEventBus.$emit(this.$VhallEventType.InteractTools.ROOM_GIFT_SEND, this.giftInfo);
       // this.setDialogZIndexQueue('giftPay');
       // 未登录且礼物金额不为0
       if (this.giftInfo.price != 0 && this.watchInitData.join_info.user_id == 0) {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+        this.$emit('needLogin');
+        // window.$middleEventSdk?.event?.send(boxEventOpitons('comFooterTools', 'emitNeedLogin'));
         return;
       }
+
+      // 开启聊天高并发配置项之后，免费礼物使用聊天消息发送，否则调共享服务
+      if (this.giftInfo.price == 0 && this.configList['ui.hide_chat_history'] == '1') {
+        const msgData = {
+          type: 'permit',
+          event_type: 'free_gift_send',
+          avatar: this.watchInitData.join_info.avatar,
+          barrageTxt: '',
+          text_content: '',
+          gift_user_nickname: this.watchInitData.join_info.nickname,
+          role_name: 2,
+          gift_name: this.giftInfo.name,
+          gift_image_url: this.giftInfo.image_url,
+          source_status: this.giftInfo.source_status
+        };
+        const context = {
+          avatar: this.watchInitData.join_info.avatar,
+          nickname: this.watchInitData.join_info.nickname
+        };
+        if (this.msgServer) {
+          this.msgServer.sendChatMsg(msgData, context);
+        }
+        this.showGift = false;
+        return false;
+      }
+
+      // 获取支付宝支付码
+      if (this.giftInfo.price != 0) {
+        // 微信支付二维码, 组件传递过来的
+        this.apiGetPayQrCode(payType, res => {
+          this.noFreeGiftCallback(payType, res);
+        });
+
+        //支付宝支付二维码
+        setTimeout(() => {
+          this.apiGetPayQrCode('ALIPAY', res => {
+            this.noFreeGiftCallback('ALIPAY', res);
+          });
+        }, 300);
+      } else {
+        this.apiGetPayQrCode('WEIXIN', () => {
+          this.freeGiftCallback();
+        });
+      }
+    },
+    /**
+     *获取支付宝支付码
+     * @param {*} payType 支付类型
+     * @param {*} callback 回调函数
+     */
+    apiGetPayQrCode(payType, callback) {
       this.giftsServer
         .sendGift(
           {
             gift_id: this.giftInfo.id,
-            channel: 'WEIXIN',
-            service_code: 'QR_PAY', //TODO:两种支付方式 - 'ALIPAY'
+            channel: payType || 'WEIXIN',
+            service_code: 'QR_PAY', //两种支付方式 - 'ALIPAY'
             room_id: this.watchInitData.interact.room_id
           },
           this.giftInfo
         )
         .then(res => {
           if (res.code == 200 && res.data) {
-            if (this.giftInfo.price == 0) {
-              this.$emit('changeShowGift', 'showGift', false);
-              return;
-            }
-            this.$emit('changeShowGift', 'showGift', false);
-            const link = encodeURIComponent(res.data.data.pay_data.qr_code);
-            const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
-            this.wxQr = img;
-            this.showPay = true;
+            callback(res);
           }
         })
         .catch(e => {
@@ -159,6 +211,31 @@ export default {
           });
         });
     },
+    /**
+     * 免费礼物回调
+     */
+    freeGiftCallback() {
+      this.$emit('changeShowGift', 'showGift', false);
+    },
+    /**
+     *  收费礼物回调
+     * @param {*} payType 支付方式
+     * @param {*} res 接口响应数据
+     */
+    noFreeGiftCallback(payType, res) {
+      this.$emit('changeShowGift', 'showGift', false);
+      const link = encodeURIComponent(res.data.data.pay_data.qr_code);
+      const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
+      if (payType == 'ALIPAY') {
+        this.$emit('acceptPay', 'zfQr', img);
+      } else {
+        this.$emit('acceptPay', 'wxQr', img);
+      }
+    },
+    /**
+     * 换页
+     * @param {*} page
+     */
     handleChangePage(page) {
       this.selectPage = page;
     },

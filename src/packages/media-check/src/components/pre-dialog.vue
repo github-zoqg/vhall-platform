@@ -35,6 +35,7 @@
 
 <script>
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     components: {
       SaasAlert
@@ -45,19 +46,43 @@
         popAlertCheckConfirmVisible: false
       };
     },
+    created() {
+      this.setDefaultAlertVisible();
+    },
     methods: {
+      /**
+       * 判断，并检查默认是否展示
+       */
+      setDefaultAlertVisible() {
+        const { watchInitData } = useRoomBaseServer().state;
+        this.liveType = watchInitData?.webinar?.type;
+
+        //用户角色
+        const roleName = watchInitData.join_info.role_name;
+
+        // 助理不展示
+        if (roleName == 3) {
+          this.popAlertCheckVisible = false;
+        }
+
+        // 直播中
+        if (this.liveType == 1) {
+          this.popAlertCheckVisible = false;
+        }
+      },
       show() {
         this.popAlertCheckVisible = true;
       },
       popAlertCheckSubmit() {
+        window.vhallReportForProduct?.report(110004); // 埋点:设备检测-立即检测
         this.popAlertCheckVisible = false;
         this.$emit('show');
       },
-      popAlertCheckClose() {
+      async popAlertCheckClose() {
+        window.vhallReportForProduct?.report(110005); // 埋点:设备检测-暂不检测
         this.popAlertCheckVisible = false;
-        this.$nextTick(() => {
-          this.popAlertCheckConfirmVisible = true;
-        });
+        await this.$nextTick();
+        this.popAlertCheckConfirmVisible = true;
       },
       popAlertCheckConfirm() {
         this.popAlertCheckConfirmVisible = false;

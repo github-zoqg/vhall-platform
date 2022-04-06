@@ -2,22 +2,22 @@
   <div class="winner-list">
     <div
       class="custom-lottery-box"
-      :class="prizeObj && !prizeObj.award_name ? 'custom-lottery-box-default' : ''"
+      :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
     >
-      <img
-        v-if="prizeObj && !prizeObj.image_url"
+      <!-- <img
+        v-if="prizeInfo && !prizeInfo.image_url"
         src="../img/default-lottery.png"
         alt=""
         class="default-lottery"
-      />
-      <div v-else class="custom-lottery">
-        <img :src="prizeObj && prizeObj.image_url" alt="" />
+      /> -->
+      <div class="custom-lottery">
+        <img :src="prizeInfo ? prizeInfo.image_url : defaultLotteryImg" alt="" />
       </div>
       <p
         class="custom-lottery__name"
-        :class="prizeObj && !prizeObj.award_name ? 'custom-lottery__name-default' : ''"
+        :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery__name-default' : ''"
       >
-        {{ (prizeObj && prizeObj.award_name) || '奖品' }}
+        {{ (prizeInfo && prizeInfo.award_name) || '奖品' }}
       </p>
     </div>
     <!-- 列表 -->
@@ -32,7 +32,7 @@
           <p class="winner-avatar">
             <img
               class="winner-avatar-img"
-              :src="item.lottery_user_avatar ? item.lottery_user_avatar : defaultAvatarImg"
+              :src="item.lottery_user_avatar || defaultAvatarImg"
               alt=""
             />
           </p>
@@ -64,16 +64,24 @@
         default() {
           return [];
         }
+      },
+      // 奖品信息
+      prizeInfo: {
+        type: Object
       }
     },
     data() {
       return {
-        prizeObj: {}, // 奖品信息
+        // prizeInfo: {}, // 奖品信息
         isScroll: false,
-        defaultAvatarImg: require('../img/avatar.png')
+        defaultAvatarImg: require('../img/avatar.png'),
+        defaultLotteryImg: require('../img/default-lottery.png')
       };
     },
-    created() {},
+    mounted() {},
+    created() {
+      console.log(this.winnerList, 'winnerList');
+    },
     methods: {
       handleScroll(e) {
         // 滚动的像素+容器的高度>可滚动的总高度-100像素
@@ -235,13 +243,11 @@
           display: flex;
           align-items: center;
           .winner-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 15px;
-            overflow: hidden;
             &-img {
-              width: 100%;
-              height: 100%;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              overflow: hidden;
               object-fit: cover;
             }
           }

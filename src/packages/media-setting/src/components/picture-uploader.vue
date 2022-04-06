@@ -12,7 +12,7 @@
         :data="{
           path: `${roomId}/img`,
           type: 'image',
-          interact_token: interact_token
+          interact_token: interactToken
         }"
       >
         <div v-if="canvasImgUrl" class="picture-uploader-view">
@@ -38,6 +38,7 @@
 
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { sleep } from '@/packages/app-shared/utils/tool.js';
   import canvasDefaultImg from '../assets/img/canvasDefault.png';
   export default {
     props: {
@@ -49,7 +50,7 @@
     data() {
       return {
         roomId: null,
-        interact_token: null,
+        interactToken: null,
         baseUrl: process.env.VUE_APP_BASE_URL,
         hasUploadImg: false,
         showDelImg: false
@@ -58,10 +59,14 @@
     created() {
       const { watchInitData } = useRoomBaseServer().state;
       this.roomId = watchInitData?.interact?.room_id;
-      this.interact_token = watchInitData?.interact?.interact_token;
+      this.interactToken = watchInitData?.interact?.interact_token;
       this.headToken = localStorage.getItem('token');
     },
     methods: {
+      /**
+       * 上传前检查
+       * @param {File} file
+       */
       beforeUpload(file) {
         const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 2;
@@ -74,16 +79,19 @@
         }
         return isJPG && isLt2M;
       },
-      onUploadSuccess(res) {
+      /**
+       * 上传成功时，更新canvasImgUrl
+       * @param {*} res
+       */
+      async onUploadSuccess(res) {
         if (res.code == 200) {
           this.showDelImg = true;
           this.$emit('update:canvasImgUrl', res.data.domain_url);
           this.canvasImgUrlChange = true;
 
           // 等待图片更换完毕，一秒再弹出，动画效果较好
-          setTimeout(() => {
-            this.$message.success('上传成功');
-          }, 1000);
+          await sleep(1000);
+          this.$message.success('上传成功');
         } else {
           this.$message.error(res.msg);
         }
@@ -177,7 +185,7 @@
       height: 100%;
       font-size: 14px;
       font-weight: 400;
-      color: #ffffff;
+      color: #fff;
       line-height: 20px;
       background: rgba(0, 0, 0, 0.7);
     }

@@ -1,22 +1,29 @@
 <template>
-  <div class="inviteWrap" style="height: 100%">
-    <!-- <invitation-Card @changeInvite="changeInvite"></invitation-Card> -->
+  <div class="inviteWrap">
+    <invitation-Card @changeInvite="changeInvite"></invitation-Card>
     <div @click="toWebinar" class="webinarEntrance">
-      <p class="btnVal">进入活动</p>
+      <p class="btnVal">{{ $t('webinar.webinar_1015') }}</p>
     </div>
   </div>
 </template>
 
 <script>
-  // import invitationCard from '@/components/invitationCard/index.vue';
+  import invitationCard from './components/card.vue';
   export default {
     components: {
-      // invitationCard
+      invitationCard
     },
     data() {
       return {
         invite: ''
       };
+    },
+    created() {
+      if (this.$route.query.lang == 1 || this.$route.query.lang == 2) {
+        this.$i18n.locale = parseInt(this.$route.query.lang) == 1 ? 'zh' : 'en';
+      } else {
+        this.$i18n.locale = 'zh';
+      }
     },
     methods: {
       toWebinar() {
@@ -35,6 +42,7 @@
 <style lang="less">
   .inviteWrap {
     position: relative;
+    height: 100vh;
     .webinarEntrance {
       position: absolute;
       top: 45px;

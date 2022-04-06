@@ -30,7 +30,8 @@
         )
       })
       return [
-        createElement('div',{class:'vmp-basic-center__mainscreen-pos'}),
+        (<div class='vmp-basic-center__mainscreen-pos'></div>),
+        // createElement('div',{class:'vmp-basic-center__mainscreen-pos'}),
         ...renderList
       ]
     },

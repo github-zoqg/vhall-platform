@@ -287,7 +287,6 @@
               const { person, addCount } = this.virtualAudienceServer.state;
               this.person = person;
               this.addCount = addCount;
-              console.warn('zhangxiaoxuni虚拟人数添加', this.person, this.addCount);
             }
           });
       },
