@@ -208,6 +208,9 @@
       if (!this.hideChatHistory) {
         this.getHistoryMessage();
       }
+      window.aaa = function () {
+        return document.querySelectorAll('.msg-content_body');
+      };
     },
     methods: {
       showWelcomeTxt() {
