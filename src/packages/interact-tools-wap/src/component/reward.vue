@@ -322,9 +322,10 @@
       font-family: PingFangSC;
       font-weight: 400;
       color: rgba(68, 68, 68, 1);
-      height: 80px;
+      height: 90px;
       justify-content: space-between;
       > div {
+        height: 100%;
         flex-grow: 1;
         input {
           width: 100%;

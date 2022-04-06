@@ -342,7 +342,7 @@
           border-radius: 50%;
           display: block;
           border: 2px solid #e3e3e3;
-          object-fit: contain;
+          object-fit: cover;
         }
         .chat-phone {
           position: absolute;
