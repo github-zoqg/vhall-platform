@@ -1,15 +1,9 @@
-import {
-  useMsgServer,
-  useRoomBaseServer,
-  useUserServer,
-  useVirtualAudienceServer
-} from 'middle-domain';
+import { useMsgServer, useRoomBaseServer, useVirtualAudienceServer } from 'middle-domain';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
   const roomBaseServer = useRoomBaseServer();
   const msgServer = useMsgServer();
-  const userServer = useUserServer();
   const virtualAudienceServer = useVirtualAudienceServer();
 
   if (!roomBaseServer) {
@@ -27,35 +21,33 @@ export default async function () {
       });
     }),
     //多语言接口
-    roomBaseServer.getLangList(),
-    // 调用聚合接口
-    roomBaseServer.getCommonConfig({
-      tags: [
-        'skin',
-        'screen-poster',
-        'public-account',
-        'webinar-tag',
-        'menu',
-        'adv-default',
-        'invite-card',
-        'goods-default',
-        'timer'
-      ]
-    })
+    roomBaseServer.getLangList()
   ];
-  virtualAudienceServer.init();
+
   await Promise.all(promiseList);
+  console.log('%c------黄金链路请求配置项完成', 'color:pink');
+  console.log(roomBaseServer.state.configList);
+  console.log('%c------多语言请求配置', 'color:pink');
+  console.log(roomBaseServer.state.languages);
+  // TODO 设置观看端测试权限数据
+  // roomBaseServer.state.configList = {
+  //   hasToolbar: false
+  // };
 
-  if (window.localStorage.getItem('token')) {
-    await userServer.getUserInfo({ scene_id: 2 });
-  }
-
-  await msgServer.initMaintMsg({
-    hide: 1
-  });
+  await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
+
+  await virtualAudienceServer.init();
 
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
+}
+export function isMSECanUse() {
+  let mse = false;
+  VhallPlayer &&
+    VhallPlayer.probe({}, data => {
+      mse = data.MediaSourceExtensions;
+    });
+  return mse;
 }

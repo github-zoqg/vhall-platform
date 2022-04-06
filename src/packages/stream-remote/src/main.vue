@@ -37,7 +37,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleFilter(true) }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -67,7 +67,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleFilter(true) }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip
@@ -452,6 +452,9 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            if (this.joinInfo.role_name === 1) {
+              this.interactiveServer.resetLayout();
+            }
             setTimeout(() => {
               this.replayPlay();
 

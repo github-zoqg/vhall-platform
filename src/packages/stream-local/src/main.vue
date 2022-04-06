@@ -46,7 +46,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleFilter(true) }}
+        {{ joinInfo.role_name | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -75,7 +75,7 @@
     >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleFilter(true) }}
+          {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
           :content="
@@ -861,12 +861,11 @@
              *  2、     若刷新的话，会初始化实例，则旁路展示正确
              *            不刷新，结束直播后，进行媒体设置更改，再进行开播，则需要手动调用自适应布局方法
              */
-            if (sessionStorage.getItem('layout') && this.liveStatus != 1) {
+            if (sessionStorage.getItem('layout')) {
               await this.setBroadCastAdaptiveLayoutMode();
             }
-            if (this.mainScreen == this.joinInfo.third_party_user_id) {
-              await this.setBroadCastScreen();
-            }
+
+            await this.setBroadCastScreen();
           }
           console.log('paltForm 自动静音上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
@@ -931,7 +930,7 @@
 
       // 设置主屏
       async setBroadCastScreen() {
-        await this.interactiveServer.setBroadCastScreen().catch(() => {
+        await this.interactiveServer.resetLayout().catch(() => {
           return Promise.reject('setBroadCastScreenError');
         });
       },

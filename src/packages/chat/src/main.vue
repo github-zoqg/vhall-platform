@@ -39,7 +39,7 @@
           emitLotteryEvent,
           emitQuestionnaireEvent
         }"
-        @tobottom="tobottom"
+        @tobottom="toBottom"
       ></virtual-list>
       <div class="chat-content__tip-box">
         <div
@@ -99,16 +99,13 @@
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
-  import eventMixin from './mixin/event-mixin';
-  // import { sessionOrLocal } from './js/utils';
   import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
-  import dataReportMixin from '@/packages/chat/src/mixin/data-report-mixin';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChat',
-    mixins: [eventMixin, dataReportMixin, emitter],
+    mixins: [emitter],
     components: {
       ImgPreview,
       ChatUserControl,
@@ -154,7 +151,7 @@
         animationRunning: false,
         //是否是助理
         assistantType: this.$route.query.assistantType,
-        //todo 可以放入domain @用户
+        //@用户
         atList: [],
         // 预览图片列表
         previewImgList: [],
@@ -181,8 +178,6 @@
             src: 'javascript:;'
           }
         },
-        //是否为嵌入页
-        isEmbed: false,
         //图片预览弹窗是否可见
         imgPreviewVisible: false,
         //聊天配置
@@ -214,6 +209,10 @@
       };
     },
     computed: {
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       //是否开启手动加载聊天历史记录
       hideChatHistory() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
@@ -264,7 +263,6 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      console.log('roomBaseState', this.roomBaseServer.state);
     },
     mounted() {
       //初始化配置
@@ -272,11 +270,8 @@
       //初始化视图数据，domain里取
       this.initViewData();
       this.initInputStatus();
-      this.init();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
-      //初始化聊天区域滚动组件
-      // this.initScroll();
       //拉取聊天历史
       if (!this.hideChatHistory) {
         this.getHistoryMsg();
@@ -350,10 +345,6 @@
           this.allBanned = res;
           this.initInputStatus();
         });
-        //监听分组房间变更通知
-        // chatServer.$on('changeChannel', () => {
-        //   this.handleChannelChange();
-        // });
         useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
           this.handleChannelChange();
         });
@@ -369,18 +360,10 @@
           }
         });
       },
-      init() {
-        setTimeout(() => {
-          this.chatSDK = window.chatSDK;
-          //todo 替换掉EventBus，拆为全局信令以及父子组件通信事件
-          this.listenEvents();
-        }, 1000);
-      },
       //初始化聊天输入框数据
       initInputStatus() {
         let placeholder = this.$t('chat.chat_1021');
         let disable = false;
-
         // 控制台配置回放禁言状态
         if (
           (this.playerType == 5 || this.playerType == 4) &&
@@ -408,7 +391,7 @@
       initChatLoginStatus() {
         if ([0, '0'].includes(this.configList['ui.show_chat_without_login'])) {
           //主持人，这时候在发起端
-          if ([1, '1'].includes(this.roleName)) {
+          if ([1, '1'].includes(this.roleName) || this.isEmbed) {
             // 不需要登录
             this.chatLoginStatus = false;
             return;
@@ -440,16 +423,14 @@
         this.historyloaded = true;
         this.page++;
       },
-      //todo domain负责 抽奖情况检查
+      //抽奖情况检查
       emitLotteryEvent(msg) {
-        console.log('emitLotteryEvent', msg);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
         );
       },
-      //todo domain负责 问卷情况检查
+      //问卷情况检查
       emitQuestionnaireEvent(questionnaireId) {
-        console.log('emitQuestionnaireEvent', questionnaireId);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
@@ -471,26 +452,6 @@
         this.imgPreviewVisible = false;
       },
       /** 消息区域滚动处理结束 */
-      //todo domain负责 获取菜单列表
-      // getMenuList(val) {
-      //   const vo = val;
-      //   if (this.roleName === 2) {
-      //     // 嵌入会调用 watchEmbedInit —— 房间初始化；
-      //     // 用户若已登录，获取userInfo中nick_name；若未登录，获取init房间初始化接口中join
-      //     const userInfo = sessionOrLocal.get('userInfo')
-      //       ? JSON.parse(sessionOrLocal.get('userInfo'))
-      //       : {};
-      //     const rmJoin = sessionOrLocal.get('v3_rm_join')
-      //       ? JSON.parse(sessionOrLocal.get('v3_rm_join'))
-      //       : {};
-      //     if (userInfo && userInfo.nick_name) {
-      //       vo.nick_name = userInfo.nick_name;
-      //     }
-      //     if (rmJoin && rmJoin.nickname) {
-      //       vo.nick_name = rmJoin.nickname;
-      //     }
-      //   }
-      // },
       backspace() {
         if (!this.inputValue) {
           this.atList = [];
@@ -530,14 +491,14 @@
       },
       //处理聊天内容
       trimPlaceHolder() {
-        return this.inputValue.replace(/^[回复].+[:]\s/, ''); // TODO: 正则用翻译文案
+        return this.inputValue.replace(/^[回复].+[:]\s/, '');
       },
       //回复消息
       reply(count) {
         window.vhallReportForProduct?.report(110119);
         this.$refs.chatOperator.handleReply(count);
       },
-      //todo domain负责 删除消息（主持人，助理）
+      //删除消息（主持人，助理）
       deleteMsg(count) {
         const msgToDelete =
           this.chatList.find(chatMsg => {
@@ -555,12 +516,12 @@
             return res;
           });
       },
-      //todo domain负责 @用户
       //@用户处理
       atUser(accountId) {
         this.$refs.chatOperator.handleAtUser(accountId);
         window.vhallReportForProduct?.report(110120);
       },
+      //聊天区域高度动态改变处理
       chatOperateBarHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
         this.$refs.chatOperator.updateOverlayScrollbar();
@@ -587,10 +548,8 @@
           .setAllBanned(params)
           .then(res => {
             this.allBanned = flag;
-            this.buriedPointReport(flag ? 110116 : 110117, {
-              business_uid: this.accountId,
-              webinar_id: this.webinarId
-            });
+            //数据上报埋点--全体禁言切换
+            window.vhallReportForProduct?.report(flag ? 110116 : 110117);
             return res;
           })
           .catch(error => {
@@ -599,10 +558,6 @@
       },
       //打开私聊模态窗
       openPrivateChatModal() {
-        // window.$middleEventSdk?.event?.send({
-        //   cuid: 'comLivePrivateChat',
-        //   method: 'openModal'
-        // });
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
         );
@@ -620,7 +575,7 @@
         this.$refs.chatlist.scrollToIndex(index);
         this.unReadMessageCount = 0;
       },
-      tobottom() {
+      toBottom() {
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部
@@ -672,13 +627,13 @@
       &__greeting {
         max-width: 312px;
         background: linear-gradient(90deg, #fb3a32 0%, rgba(255, 172, 44, 0.8) 100%);
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
         border-radius: 100px;
         color: #ffffff;
         font-size: 14px;
         line-height: 20px;
         padding: 6px 16px;
-        text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
         text-align: center;
       }
 
@@ -717,22 +672,7 @@
     }
     .chat-content {
       position: relative;
-      /* ::-webkit-scrollbar {
-        width: 6px;
-        height: 10px;
-      }
-      ::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background-color: #666;
-      }
-      ::-webkit-scrollbar-track {
-        border-radius: 4px;
-        background-color: #434343;
-      } */
       .vmp-chat-msg-item {
-        // &:last-child {
-        //   padding-bottom: 20px;
-        // }
       }
       &__get-list-btn-container {
         display: block;
@@ -756,14 +696,12 @@
         line-height: 28px;
         border-radius: 14px;
         background-color: #363636;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
         color: @font-error;
         font-size: 14px;
         cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
+        white-space: nowrap;
         .vh-line-arrow-down {
           font-size: 12px;
           margin-left: 6px;
@@ -778,7 +716,7 @@
         width: 232px;
         height: 40px;
         background: linear-gradient(90deg, #fb3a32 0%, rgba(255, 172, 44, 0.8) 100%);
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
         border-radius: 26px;
         position: absolute;
         left: 0;
@@ -816,7 +754,7 @@
           width: 42px;
           height: 42px;
           border-radius: 21px;
-          background-color: #ffffff;
+          background-color: #fff;
           position: absolute;
           right: 16px;
           top: -1px;
@@ -888,7 +826,7 @@
         float: left;
         margin-left: 6px;
         font-size: 14px;
-        color: #ffffff;
+        color: #fff;
       }
     }
     .tip {

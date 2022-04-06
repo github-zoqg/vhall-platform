@@ -116,7 +116,8 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000
+        minTaskTime: 2000,
+        maxQueueLen: 2
       });
       // setInterval(() => {
       //   this.watchRewardServer.$emit('reward_pay_ok', {
@@ -246,7 +247,9 @@
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           // 来源于接口消息字段
-          if (rewardEffectInfo.data.gift_user_avatar) {
+          if (rewardEffectInfo.data.avatar) {
+            return rewardEffectInfo.data.avatar;
+          } else if (rewardEffectInfo.data.gift_user_avatar) {
             return rewardEffectInfo.data.gift_user_avatar;
           } else if (rewardEffectInfo.data.rewarder_avatar) {
             return rewardEffectInfo.data.rewarder_avatar;
