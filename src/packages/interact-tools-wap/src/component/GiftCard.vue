@@ -336,7 +336,7 @@
           const msgData = {
             type: 'permit',
             event_type: 'free_gift_send',
-            avatar: this.joinInfoInGift.avatar,
+            gift_user_avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
             gift_user_nickname: this.joinInfoInGift.nickname,
