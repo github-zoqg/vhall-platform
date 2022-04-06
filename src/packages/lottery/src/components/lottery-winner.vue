@@ -5,7 +5,7 @@
       :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
     >
       <div class="custom-lottery">
-        <img :src="prizeInfo.image_url || defaultLotteryImg" alt="" />
+        <img :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt="" />
       </div>
       <p
         class="custom-lottery__name"
