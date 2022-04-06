@@ -23,7 +23,6 @@
           emitQuestionnaireEvent,
           joinInfo
         }"
-        @resized="onItemRendered"
         @tobottom="toBottom"
       ></virtual-list>
       <div
@@ -209,9 +208,6 @@
       }
     },
     methods: {
-      onItemRendered() {
-        alert();
-      },
       showWelcomeTxt() {
         this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
       },
