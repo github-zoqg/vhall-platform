@@ -7,8 +7,8 @@
       <virtual-list
         ref="qalist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
-        :data-key="'id'"
+        :keeps="10"
+        :data-key="'msgId'"
         :data-sources="qaList"
         :data-component="MsgItem"
         :extra-props="{
@@ -207,7 +207,7 @@
       initLoginStatus() {
         if (
           [2, '2'].includes(this.roleName) &&
-          !this.Embed &&
+          !this.isEmbed &&
           (!this.userId || this.userId == 0) &&
           this.configList['ui.show_chat_without_login'] != 1
         ) {
