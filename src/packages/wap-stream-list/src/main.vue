@@ -123,7 +123,7 @@
         showPlayIcon: false, // 是否展示播放按钮
         scroll: null, // BScroll 插件
         mainScreenDom: null, // 主屏Dom
-        iconShow: false, // 5 秒的展示
+        iconShow: false, // 5 秒的icon展示
         isOpenlang: false,
         lang: {},
         languageList: [],
