@@ -46,7 +46,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${joinInfo.role_name}`"
       >
-        {{ joinInfo.role_name | roleFilter(true) }}
+        {{ joinInfo.role_name | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -75,7 +75,7 @@
     >
       <p class="vmp-stream-local__shadow-first-line">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
-          {{ joinInfo.role_name | roleFilter(true) }}
+          {{ joinInfo.role_name | roleFilter }}
         </span>
         <el-tooltip
           :content="
