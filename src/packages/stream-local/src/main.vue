@@ -2,7 +2,7 @@
   <div
     :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
     class="vmp-stream-local"
-    :class="{ 'vmp-stream-local__publish': localSpeaker.streamId }"
+    :class="{ 'vmp-stream-local__publish': localSpeaker.streamId, fullscreen: isFullScreen }"
   >
     <!-- 流容器 -->
     <section
@@ -1167,6 +1167,25 @@
       &:hover {
         .vmp-stream-local__shadow-box {
           display: flex;
+        }
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-local__bottom {
+        bottom: 18px;
+      }
+      .vmp-stream-local__shadow-box {
+        display: flex;
+        height: 41px;
+        bottom: 10px;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-local__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
         }
       }
     }
