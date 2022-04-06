@@ -14,6 +14,7 @@
         ref="chatlist"
         style="height: 100%; overflow: auto"
         :keeps="15"
+        :estimate-size="100"
         :data-key="'count'"
         :data-sources="chatList"
         :data-component="msgItem"
@@ -312,7 +313,7 @@
           this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
-        }, 100);
+        });
       },
       //监听滚动条滚动到底部
       toBottom() {
