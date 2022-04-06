@@ -362,6 +362,9 @@
       > div {
         margin-left: 16px;
       }
+      li {
+        line-height: initial; // 防止继承外部属性值
+      }
       li > div > img {
         width: 32px;
         height: 32px;
