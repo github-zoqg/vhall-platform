@@ -325,7 +325,7 @@
   .vmp-footer-tools {
     height: 56px;
     background: @bg-dark-section;
-    // line-height: 56px;
+    line-height: 56px;
     display: flex;
     justify-content: space-between;
     align-items: center;

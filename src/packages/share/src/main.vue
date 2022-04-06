@@ -166,7 +166,7 @@
           const url = encodeURIComponent(
             `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/invite/${
               this.$route.params.id
-            }?invite_id=${join_info.join_id || ''}&lang=${localStorage.getItem('lang')}`
+            }?invite_id=${join_info.join_id || ''}`
           );
           this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         }
