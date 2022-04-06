@@ -29,7 +29,7 @@
       <div v-if="showInviteCard && !localRoomInfo.isEmbed">
         <a
           target="_blank"
-          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}&lang=${lang}`"
+          :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
         >
           <i class="vh-iconfont vh-line-share"></i>
         </a>
@@ -88,8 +88,7 @@
         showInviteCard: roomBaseState.inviteCard.status == '1',
         location:
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
-        qwe: 1,
-        lang: localStorage.getItem('lang')
+        qwe: 1
       };
     },
     created() {
