@@ -107,9 +107,7 @@
     watch: {
       chatList: function () {
         if (this.isBottom()) {
-          setTimeout(() => {
-            this.scrollBottom();
-          }, 0);
+          this.scrollBottom();
         }
       }
     },
@@ -314,7 +312,7 @@
           this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
-        }, 0);
+        }, 100);
       },
       //监听滚动条滚动到底部
       toBottom() {
