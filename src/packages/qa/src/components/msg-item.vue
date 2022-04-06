@@ -2,7 +2,10 @@
   <div
     class="vhsaas-chat-msg-item__wrapper"
     v-if="
-      source.join_id == joinId || (source.answer && source.answer.join_id == joinId) || !isOnlyMine
+      roleName != 2 ||
+      source.join_id == joinId ||
+      (source.answer && source.answer.join_id == joinId) ||
+      !isOnlyMine
     "
   >
     <div v-if="source.answer" class="vhsaas-chat-msg-item clearfix">
@@ -89,7 +92,10 @@
       isOnlyMine: {
         default: false
       },
-      joinId: {}
+      joinId: {},
+      roleName: {
+        require: true
+      }
     },
     data() {
       return {
