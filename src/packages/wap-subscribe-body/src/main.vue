@@ -516,9 +516,8 @@
         const activeId = this.$route.params.id;
         const { join_info } = this.roomBaseServer.state.watchInitData;
         const joinId = join_info.join_id;
-        const lang = localStorage.getItem('lang');
 
-        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
+        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}`;
 
         const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
 
