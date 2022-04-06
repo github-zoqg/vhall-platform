@@ -128,7 +128,7 @@
             v-model="sliderVal"
             :show-tooltip="false"
             @change="changeVideo"
-            @input="inputVideo"
+            @mousedown.native="handleSliderMouseDown"
           ></el-slider>
         </div>
         <div
@@ -666,7 +666,7 @@
             }
           });
       },
-      inputVideo() {
+      handleSliderMouseDown() {
         // 鼠标拖动的时候，阻止slider值更新
         if (!this._isSetingCurrentTime) {
           this._isSetingCurrentTime = true;
