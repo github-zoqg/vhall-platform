@@ -505,6 +505,7 @@
             });
             return list;
           }
+          return list;
         };
       },
       //tab栏的配置

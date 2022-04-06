@@ -5,7 +5,7 @@
         <virtual-list
           ref="chatlist"
           style="height: 100%; overflow: auto"
-          :keeps="30"
+          :keeps="15"
           :data-key="'count'"
           :data-sources="privateChatList"
           :data-component="msgItem"
