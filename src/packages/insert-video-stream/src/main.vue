@@ -993,7 +993,7 @@
       top: 0;
       right: 0;
       background: rgba(0, 0, 0, 0.7);
-      z-index: 5;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: center;
