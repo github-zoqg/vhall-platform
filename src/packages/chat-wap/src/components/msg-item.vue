@@ -167,7 +167,7 @@
                 <span class="reply-color"></span>
                 <span v-html="source.content.text_content" style="display: block"></span>
                 <img
-                  @click="previewImg(img)"
+                  @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -342,7 +342,7 @@
           border-radius: 50%;
           display: block;
           border: 2px solid #e3e3e3;
-          object-fit: contain;
+          object-fit: cover;
         }
         .chat-phone {
           position: absolute;
