@@ -13,10 +13,7 @@
         />
       </div>
       <!-- 打赏 -->
-      <div
-        v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward"
-        auth="{ 'ui.hide_reward': 0 }"
-      >
+      <div v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
         <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
         <RewardCard
           ref="reward"
@@ -36,7 +33,7 @@
       </div>
 
       <!-- 点赞 -->
-      <div auth="{ 'ui.watch_hide_like': 0 }" v-if="localRoomInfo.showLike">
+      <div v-if="localRoomInfo.showLike">
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
         <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
@@ -117,7 +114,7 @@
   .vmp-interact-tools-wap {
     .icon-wrapper {
       display: flex;
-      div {
+      & > div {
         font-size: 43px;
         margin-right: 36px;
         &:last-child {

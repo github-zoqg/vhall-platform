@@ -137,7 +137,7 @@
       },
       // 金额校验
       submit() {
-        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^[0-9]\.[0-9]([0-9])?$)/;
         const fee = this.money || this.btnMoney;
         if (reg.test(fee)) {
           this.rewardPay(fee);
@@ -322,9 +322,10 @@
       font-family: PingFangSC;
       font-weight: 400;
       color: rgba(68, 68, 68, 1);
-      height: 80px;
+      height: 90px;
       justify-content: space-between;
       > div {
+        height: 100%;
         flex-grow: 1;
         input {
           width: 100%;
