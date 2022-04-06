@@ -23,6 +23,7 @@
           emitQuestionnaireEvent,
           joinInfo
         }"
+        @resized="onItemRendered"
         @tobottom="toBottom"
       ></virtual-list>
       <div
@@ -208,6 +209,9 @@
       }
     },
     methods: {
+      onItemRendered() {
+        alert();
+      },
       showWelcomeTxt() {
         this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
       },
@@ -308,11 +312,11 @@
       },
       //滚动到底部
       scrollBottom() {
-        this.$nextTick(() => {
+        setTimeout(() => {
           this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
-        });
+        }, 0);
       },
       //监听滚动条滚动到底部
       toBottom() {
