@@ -89,7 +89,10 @@
       isOnlyMine: {
         default: false
       },
-      joinId: {}
+      joinId: {},
+      roleName: {
+        require: true
+      }
     },
     data() {
       return {

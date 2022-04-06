@@ -13,7 +13,7 @@
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
+        :keeps="10"
         :data-key="'count'"
         :data-sources="chatList"
         :data-component="msgItem"
