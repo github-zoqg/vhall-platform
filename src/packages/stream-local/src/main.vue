@@ -241,7 +241,6 @@
     useMicServer,
     useRoomBaseServer,
     usePlayerServer,
-    useMediaSettingServer,
     useGroupServer,
     useSplitScreenServer,
     useMediaCheckServer,
@@ -479,15 +478,6 @@
           this.startPush();
         }
       },
-      // // 恢复播放
-      // replayPlay() {
-      //   const videos = document.querySelectorAll('video');
-      //   videos.length > 0 &&
-      //     videos.forEach(video => {
-      //       video.play();
-      //     });
-      //   this.interactiveServer.state.showPlayIcon = false;
-      // },
       // 自动上麦禁音条件更新
       updateAutoSpeak() {
         this.isNotAutoSpeak = true;
@@ -717,13 +707,6 @@
       },
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
-        // 图片信息
-        console.warn(
-          'useMediaSettingServer',
-          param,
-          useMediaSettingServer().state,
-          this.micServer.getSpeakerStatus()
-        );
         // 音视频/图片推流 方式变更
         if (param.videoType || param.canvasImgUrl) {
           if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
@@ -739,14 +722,12 @@
           if (!this.micServer.getSpeakerStatus()) {
             return;
           }
+          // 无缝切换音视频
           if (param.audioInput) {
             this.interactiveServer
               .switchStream({
                 streamId: this.localSpeaker.streamId,
                 type: 'audio'
-              })
-              .then(res => {
-                console.log('切换成功---', res);
               })
               .catch(err => {
                 console.error('切换失败', err);
@@ -760,9 +741,6 @@
               .switchStream({
                 streamId: this.localSpeaker.streamId,
                 type: 'video'
-              })
-              .then(res => {
-                console.log('切换成功---', res);
               })
               .catch(err => {
                 console.error('切换失败', err);
@@ -811,7 +789,6 @@
           this.$message.error(this.$t('interact.interact_1021'));
           // 下麦接口
           this.speakOff();
-          // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'noPermission') {
           // 无推流权限
           await this.interactiveServer.destroy();

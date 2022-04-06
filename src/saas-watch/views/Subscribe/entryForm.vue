@@ -30,11 +30,15 @@
       this.getFormOpenLinkStatus();
       //多语言接口
       await this.roomBaseServer.getLangList(this.webinar_id);
-      if (localStorage.getItem('lang')) {
-        this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
-      } else {
-        this.$i18n.locale = 'zh';
-      }
+      const roomBaseState = this.roomBaseServer.state;
+      document.title = roomBaseState.languages.curLang.subject;
+      let lang = roomBaseState.languages.lang;
+      this.$i18n.locale = lang.type;
+      // if (localStorage.getItem('lang')) {
+      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      // } else {
+      //   this.$i18n.locale = 'zh';
+      // }
     },
     methods: {
       // getGrayConfig() {
