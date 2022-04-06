@@ -13,7 +13,7 @@
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
-        :keeps="15"
+        :keeps="10"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="chatList"
