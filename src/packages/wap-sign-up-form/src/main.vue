@@ -873,7 +873,6 @@
           if (this.errMsgMap[item] != '') {
             this.refArr.forEach((refItem, index) => {
               if (refItem == item) {
-                console.log(item, refItem);
                 firstErrIndex == 'first'
                   ? (firstErrIndex = index)
                   : firstErrIndex > index && (firstErrIndex = index);
@@ -886,8 +885,6 @@
         firstErrIndex == 'first' && this.errMsgMap.code && (firstErrIndex = 'code');
 
         if (isValidate) {
-          console.log(this.form);
-          // const refer = this.getQueryVariable('refer')
           this.formHandler();
           this.submitSignUpForm();
         } else {
@@ -1151,8 +1148,6 @@
           `/lives/entryform/${this.webinar_id}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
             const params = {
               appId: res.data.appId,
               timestamp: res.data.timestamp,
@@ -1396,8 +1391,6 @@
           if (sessionStorage.getItem('visitorId')) {
             params.visit_id = sessionStorage.getItem('visitorId');
           }
-
-          console.log(this.signUpFormServer);
 
           this.signUpFormServer
             .checkIsRegistered(params)
