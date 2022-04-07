@@ -391,7 +391,7 @@
       background: #fb3a32;
       border: 1px solid #2a2a2a;
       border-radius: 50%;
-      top: 10px;
+      // top: 10px;
       right: 0px;
       position: absolute;
     }

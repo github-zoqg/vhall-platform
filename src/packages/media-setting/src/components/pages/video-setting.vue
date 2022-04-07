@@ -68,6 +68,10 @@
       selectedItem: {
         type: String,
         default: 'basic-setting'
+      },
+      isShow: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
@@ -89,6 +93,8 @@
     },
     watch: {
       selectedItem(val) {
+        if (!this.isShow) return;
+
         if (val === undefined || val === '') return;
         if (val === 'video-setting') {
           this.createPreview();
@@ -98,6 +104,7 @@
       },
       'mediaState.video'(val) {
         if (val === undefined || val === '') return;
+        if (!this.isShow) return;
         if (!this.isVideoSettingActive) return;
         this.createPreview();
       }

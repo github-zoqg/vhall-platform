@@ -137,7 +137,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPush'
+        method: 'startPushOnce'
       }
     ],
     // emitClickEndLive: [ // 不再派发结束推流事件, 结束推流是监听直播结束消息
@@ -606,7 +606,7 @@ export const serverConfig = {
         args: ['$0', '$1'] //第一个参数表示是否正在插播的状态，第二个参数表示远端插播的id
       }
     ],
-    openInsertFileDialog: [
+    emitOpenInsertFileDialog: [
       {
         cuid: 'comInsertVideoList',
         method: 'openInsertFileDialog',
@@ -814,7 +814,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'recordComStreamLocal',
-        method: 'startPush'
+        method: 'startPushOnce'
       }
     ],
     emitMediaSettingClick: [
