@@ -104,6 +104,24 @@
       // 打赏成功消息
       rewardFn(msg) {
         console.log('收到打赏成功消息', msg, this.webinarData.join_info.third_party_user_id);
+        const data = {
+          avatar: msg.data.rewarder_avatar,
+          nickname:
+            msg.data.rewarder_nickname.length > 8
+              ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+              : msg.data.rewarder_nickname,
+          type: 'reward_pay_ok',
+          content: {
+            text_content: msg.data.reward_describe
+              ? msg.data.reward_describe
+              : this.$t('chat.chat_1037'),
+            num: msg.data.reward_amount
+          },
+          sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
+          roleName: this.roleName,
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
         if (msg.rewarder_id == this.webinarData.join_info.third_party_user_id) {
           console.log('收到打上成功消息，关闭弹窗');
           this.close();
@@ -137,7 +155,7 @@
       },
       // 金额校验
       submit() {
-        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^[0-9]\.[0-9]([0-9])?$)/;
         const fee = this.money || this.btnMoney;
         if (reg.test(fee)) {
           this.rewardPay(fee);
@@ -322,9 +340,10 @@
       font-family: PingFangSC;
       font-weight: 400;
       color: rgba(68, 68, 68, 1);
-      height: 80px;
+      height: 90px;
       justify-content: space-between;
       > div {
+        height: 100%;
         flex-grow: 1;
         input {
           width: 100%;

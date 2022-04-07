@@ -247,9 +247,6 @@
   };
 </script>
 <style lang="less">
-  body {
-    overflow: hidden;
-  }
   .vmp-basic-container-embed {
     .vmp-basic-bd {
       max-width: unset;

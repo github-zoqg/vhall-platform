@@ -306,12 +306,9 @@
       this.listenEvent();
     },
     updated() {
-      const _this = this;
       //hack处理BsScroll不能滚动的问题
       this.$nextTick(() => {
-        if (_this.$refs && _this.$refs.scroll) {
-          _this.$refs.scroll.refresh();
-        }
+        this.refresh();
       });
     },
     watch: {
@@ -630,8 +627,6 @@
         //用户加入房间
         function handleUserJoinRoom(msg) {
           try {
-            console.log('_this.groupServer:', _this.groupServer);
-            console.log('_this.isInGroup:', _this.isInGroup);
             const { isLive, isWatch } = _this;
             const { context } = msg;
 
@@ -1327,6 +1322,7 @@
       },
       //刷新当前列表数据
       updateOnlineUserList: throttle(function () {
+        this.pageConfig.page = 0;
         this.onlineUsers = [];
         this.getOnlineUserList();
       }, 2000),
@@ -1370,9 +1366,6 @@
               }
               //在线总人数
               _this.totalNum = _this.memberServer.state.totalNum;
-              setTimeout(() => {
-                _this.refresh();
-              }, 50);
             }
             if (![200, '200'].includes(res.code)) {
               this.pageConfig.page--;
@@ -1380,6 +1373,9 @@
           })
           .catch(() => {
             this.pageConfig.page--;
+          })
+          .finally(() => {
+            this.refresh();
           });
       },
       /**
@@ -1862,8 +1858,10 @@
       },
       //加载更多
       loadMore() {
-        this.pageConfig.page++;
-        this.getOnlineUserList();
+        if (this.onlineUsers.length >= this.pageConfig.limit) {
+          this.pageConfig.page++;
+          this.getOnlineUserList();
+        }
       },
       //滚动条位置更新
       refresh() {

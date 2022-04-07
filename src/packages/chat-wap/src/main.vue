@@ -13,7 +13,8 @@
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
+        :keeps="10"
+        :estimate-size="100"
         :data-key="'count'"
         :data-sources="chatList"
         :data-component="msgItem"
@@ -108,6 +109,7 @@
       chatList: function () {
         if (this.isBottom()) {
           this.scrollBottom();
+          this.scrollBottom();
         }
       }
     },
@@ -197,7 +199,6 @@
     created() {
       this.initViewData();
       this.page = 0;
-      this.imgUrls = [];
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -285,18 +286,17 @@
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-
-        const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
-        if (chatList.length > 0) {
-          this.imgUrls = imgUrls;
-        }
+        await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
         this.scrollBottom();
       },
-      previewImg(img) {
-        const index = this.imgUrls.findIndex(item => item === img);
+      //图片预览
+      previewImg(img, index = 0, list = []) {
+        if ((Array.isArray(list) && !list.length) || index < 0) {
+          return;
+        }
         ImagePreview({
-          images: this.imgUrls,
+          images: list,
           startPosition: index,
           lazyLoad: true
         });
@@ -310,7 +310,7 @@
       },
       //滚动到底部
       scrollBottom() {
-        this.$nextTick(() => {
+        setTimeout(() => {
           this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
