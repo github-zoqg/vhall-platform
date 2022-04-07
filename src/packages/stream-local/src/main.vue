@@ -455,7 +455,7 @@
     },
     methods: {
       // 检查推流
-      checkStartPush() {
+      async checkStartPush() {
         console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.getSpeakerStatus());
         if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
           return;
@@ -476,6 +476,13 @@
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'splitPage'))
         ) {
           this.startPush();
+        } else if (this.joinInfo.role_name == 1) {
+          // 主持人不在麦上，但是刷新页面也需要设置一下旁路
+          await this.setBroadCastAdaptiveLayoutMode(
+            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
+          );
+
+          await this.setBroadCastScreen();
         }
       },
       // 自动上麦禁音条件更新
@@ -913,9 +920,9 @@
       },
 
       // 设置旁路布局
-      async setBroadCastAdaptiveLayoutMode() {
+      async setBroadCastAdaptiveLayoutMode(layout) {
         const param = {
-          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')]
+          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')] || layout
         };
         await this.interactiveServer.setBroadCastAdaptiveLayoutMode(param).catch(() => {
           return Promise.reject('setBroadCastAdaptiveLayoutModeError');
