@@ -306,13 +306,6 @@ const serverConfig = {
   //wap端文档
   comDocWap: {
     component: 'VmpDocWap',
-    addTab: [
-      {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
-      }
-    ],
     emitShowMenuTab: {
       cuid: ['comTabMenuWap'],
       method: 'changeDocStatus',
