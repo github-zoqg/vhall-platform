@@ -26,7 +26,10 @@ const htmlConfig = {
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
     wx: '//s1.e.vhall.com/common-static/middle/loadjweixin/1.0.0/index.min.js',
     iOSUserScalable: '//s1.e.vhall.com/common-static/middle/iOSUserScalable/1.0.0/index.min.js',
-    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js'
+    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+
+    // 移动端网页调试神器
+    Erdua: '//t-alistatic01.e.vhall.com/common-static/middle/eruda/2.4.1/eruda.js'
   },
   // cdn css
   cdnCss: {
