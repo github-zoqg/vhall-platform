@@ -626,13 +626,10 @@
       }
     }
     &.fullscreen {
-      .vmp-stream-local__bottom {
-        bottom: 18px;
-      }
       .vmp-stream-remote__shadow-box {
         display: flex;
-        height: 41px;
-        bottom: 10px;
+        height: 24px;
+        bottom: 0;
         flex-direction: row;
         top: auto;
         background: rgba(0, 0, 0, 0);
