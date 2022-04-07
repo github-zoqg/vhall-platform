@@ -104,6 +104,24 @@
       // 打赏成功消息
       rewardFn(msg) {
         console.log('收到打赏成功消息', msg, this.webinarData.join_info.third_party_user_id);
+        const data = {
+          avatar: msg.data.rewarder_avatar,
+          nickname:
+            msg.data.rewarder_nickname.length > 8
+              ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+              : msg.data.rewarder_nickname,
+          type: 'reward_pay_ok',
+          content: {
+            text_content: msg.data.reward_describe
+              ? msg.data.reward_describe
+              : this.$t('chat.chat_1037'),
+            num: msg.data.reward_amount
+          },
+          sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
+          roleName: this.roleName,
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
         if (msg.rewarder_id == this.webinarData.join_info.third_party_user_id) {
           console.log('收到打上成功消息，关闭弹窗');
           this.close();
