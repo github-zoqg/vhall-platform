@@ -4,7 +4,7 @@ import Vue from 'vue';
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
 import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
-import VmpWapPlayer from '@/packages/wap-player';
+import VmpWapPlayer from '@/packages/player/wap-player';
 import VmpDocWap from '@/packages/doc-wap';
 import VmpWapStreamList from '@/packages/wap-stream-list';
 import VmpWapStreamLocal from '@/packages/wap-stream-local';
