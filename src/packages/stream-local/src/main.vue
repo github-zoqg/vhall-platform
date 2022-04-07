@@ -820,7 +820,9 @@
           // 推流失败
           this.$message.error(this.$t('interact.interact_1021'));
           // 下麦接口
-          this.speakOff();
+          if (this.micServer.getSpeakerStatus()) {
+            this.speakOff();
+          }
         } else if (err == 'noPermission') {
           // 无推流权限
           await this.interactiveServer.destroy();
