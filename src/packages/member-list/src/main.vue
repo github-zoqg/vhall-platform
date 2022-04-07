@@ -1858,8 +1858,10 @@
       },
       //加载更多
       loadMore() {
-        this.pageConfig.page++;
-        this.getOnlineUserList();
+        if (this.onlineUsers.length >= this.pageConfig.limit) {
+          this.pageConfig.page++;
+          this.getOnlineUserList();
+        }
       },
       //滚动条位置更新
       refresh() {
