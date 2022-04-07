@@ -1267,4 +1267,9 @@
       }
     }
   }
+
+  // 回放有文档时自动生成的div，用于文档sdk存储回放数据
+  #myVodNode {
+    height: 0 !important;
+  }
 </style>

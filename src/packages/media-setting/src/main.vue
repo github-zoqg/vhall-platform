@@ -24,6 +24,7 @@
             <video-setting
               ref="videoSetting"
               v-show="selectedMenuItem === 'video-setting'"
+              :is-show="isShow"
               :selected-item="selectedMenuItem"
             />
             <!-- 麦克风 -->
