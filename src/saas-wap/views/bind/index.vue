@@ -5,6 +5,7 @@
 </template>
 <script>
   import { useUserServer } from 'middle-domain';
+  import { getQueryString } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'bind',
     data() {
@@ -20,9 +21,10 @@
     },
     methods: {
       getUserInfo() {
-        const open_id = this.getQueryString('open_id');
+        const open_id = getQueryString('open_id');
+        const user_auth_key = getQueryString('user_auth_key');
         const params = {
-          key: this.getQueryString('user_auth_key'),
+          key: user_auth_key,
           scene_id: 2,
           // source: 1,
           force: 0, // 是否强制绑定微信，0 不强制 1 强制绑定
@@ -30,6 +32,7 @@
           biz_id: 2,
           channel: 'C'
         };
+        // 如果地址栏存在open_id, 更新本地的值
         if (open_id) {
           sessionStorage.setItem('open_id', open_id);
           params.open_id = open_id;
@@ -58,12 +61,6 @@
             this.bindingText = this.$t('account.account_1054');
             this.isSuccess = false;
           });
-      },
-      getQueryString(name) {
-        const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
-        const r = window.location.search.substr(1).match(reg);
-        if (r != null) return unescape(r[2]);
-        return null;
       }
     }
   };
