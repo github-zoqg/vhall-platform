@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :class="{ fullscreen: isFullScreen }"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
@@ -620,6 +624,22 @@
     &:hover {
       .vmp-stream-remote__shadow-box {
         display: flex;
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-remote__shadow-box {
+        display: flex;
+        height: 24px;
+        bottom: 0;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-remote__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
+        }
       }
     }
     .vmp-stream-remote__container {

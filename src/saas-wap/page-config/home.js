@@ -13,7 +13,6 @@ const serverConfig = {
       'layerBody',
       'layerBodyCenter',
       'comAllDialog',
-      'comWapRewardEffect',
       'comGoodsDetail',
       'comUserAccountWap'
     ]
@@ -312,12 +311,6 @@ const serverConfig = {
       args: ['$0']
     },
     children: ['comInteractToolsWap'],
-    options: {}
-  },
-  // wap礼物飘屏动画
-  comWapRewardEffect: {
-    component: 'VmpWapRewardEffect',
-    children: [],
     options: {}
   },
   // 开屏页

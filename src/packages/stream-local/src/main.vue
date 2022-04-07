@@ -2,7 +2,7 @@
   <div
     :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
     class="vmp-stream-local"
-    :class="{ 'vmp-stream-local__publish': localSpeaker.streamId }"
+    :class="{ 'vmp-stream-local__publish': localSpeaker.streamId, fullscreen: isFullScreen }"
   >
     <!-- 流容器 -->
     <section
@@ -230,7 +230,7 @@
       @onSubmit="PopAlertOfflineConfirm"
     >
       <div slot="content">
-        <span>网络异常导致互动房间连接失败</span>
+        <span>{{ PopAlertOffline.text }}</span>
       </div>
     </saas-alert>
   </div>
@@ -264,7 +264,8 @@
 
         // 网络异常弹窗状态
         PopAlertOffline: {
-          visible: false
+          visible: false,
+          text: ''
         }
       };
     },
@@ -550,7 +551,7 @@
         this.micServer.$on('vrtc_disconnect_success', async () => {
           await this.stopPush();
 
-          if (this.joinInfo.role_name != 1) {
+          if (this.joinInfo.role_name == 2) {
             await this.interactiveServer.destroy();
           }
 
@@ -670,11 +671,13 @@
         // 房间信令异常断开事件
         this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
           console.log('网络异常断开', msg);
+
+          this.PopAlertOffline.text = '网络异常导致互动房间连接失败';
           this.PopAlertOffline.visible = true;
         });
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
-          if (e.data.stream.getID() == this.localStreamId) {
+          if (e.data.accountId == this.joinInfo.third_party_user_id) {
             this.$message({
               message: this.$t('因网络问题推流失败，正在重新推流'),
               showClose: true,
@@ -1145,6 +1148,22 @@
       &:hover {
         .vmp-stream-local__shadow-box {
           display: flex;
+        }
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-local__shadow-box {
+        display: flex;
+        height: 41px;
+        bottom: 10px;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-local__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
         }
       }
     }
