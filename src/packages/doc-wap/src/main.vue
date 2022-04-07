@@ -14,7 +14,6 @@
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
         <div>
-          <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
             :id="item.cid"
@@ -69,6 +68,7 @@
     useDocServer,
     useMsgServer,
     usePlayerServer,
+    useRebroadcastServer,
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -194,6 +194,23 @@
               boxEventOpitons(this.cuid, 'emitShowMenuTab', [false])
             );
           }
+        });
+
+        const reBroadcastServer = useRebroadcastServer();
+        // 转播开始事件
+        reBroadcastServer.$on('live_broadcast_start', () => {
+          this.docServer.setRole(VHDocSDK.RoleType.HOST);
+          this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+          this.recoverLastDocs();
+        });
+        // 转播结束事件
+        reBroadcastServer.$on('live_broadcast_stop', () => {
+          // 如果当前人拥有直播间文档操作权限，设为 host 角色
+          if (this.hasDocPermission) {
+            this.docServer.setRole(VHDocSDK.RoleType.GUEST);
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+          }
+          this.recoverLastDocs();
         });
       },
 

@@ -137,7 +137,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'comStreamLocal',
-        method: 'startPush'
+        method: 'startPushOnce'
       }
     ],
     // emitClickEndLive: [ // 不再派发结束推流事件, 结束推流是监听直播结束消息
@@ -814,7 +814,7 @@ export const serverConfig = {
     emitClickStartLive: [
       {
         cuid: 'recordComStreamLocal',
-        method: 'startPush'
+        method: 'startPushOnce'
       }
     ],
     emitMediaSettingClick: [
