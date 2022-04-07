@@ -1322,6 +1322,7 @@
       },
       //刷新当前列表数据
       updateOnlineUserList: throttle(function () {
+        this.pageConfig.page = 0;
         this.onlineUsers = [];
         this.getOnlineUserList();
       }, 2000),
