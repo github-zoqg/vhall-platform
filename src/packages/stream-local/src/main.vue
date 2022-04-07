@@ -456,6 +456,32 @@
       }
     },
     methods: {
+      /**
+       * 描述
+       * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
+       * 此问题产生原因：由于在频繁上下麦过程中，异步问题
+       *      上麦成功消息 ---> 创建本地流,此时存下streamId ----> 推流
+       *      下麦成功消息 ---> 销毁互动实例 --------> 进而导致上麦未走完的推流报错，互动实例不存在错误
+       *   出现错误后，再执行上麦   --->  上麦成功消息  --->  由于有streamID，直接return     ===> 此逻辑是出现此问题的原因
+       *
+       * 期间更改过上麦方案：  所有创建流、推流、销毁流等都是通过上下麦成功消息处理的
+       *
+       * 问题2： 增加存在StreamId直接return原因是因为: 开始直播 emitClickStartLive[ header-right 组件] -> startPush执行一次 --> 收到上麦成功,再执行一次startpush --> 出现推双流问题。
+       * 此tapd地址：后续由北红补充
+       *
+       * 具体想看产生问题1排查修改记录：可查看文件的git提交历史
+       *
+       * 完全避免上述两者问题方案：
+       *  1、在saas-live 库内进行编排时，执行startPushOnce方法，并在此方法内设置本地属性 startPushStreamOnce 值
+       *  2、在上麦成功消息 监听处，进行判断，存在此值，直接return
+       *  3、return时，进行修改此值为false，防止后续主持人正常上下麦
+       * @date 2022-04-07
+       * @returns {any}
+       */
+      startPushOnce() {
+        this.startPushStreamOnce = true;
+        this.startPush();
+      },
       // 检查推流
       checkStartPush() {
         console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.getSpeakerStatus());
@@ -504,12 +530,14 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async msg => {
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
-            if (this.localStreamId) {
-              // 只有主持人使用
-              if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
-                await this.interactiveServer.unpublishStream(this.localStreamId);
-                this.startPush();
-              }
+            if (this.startPushStreamOnce) {
+              this.startPushStreamOnce = false;
+              return;
+            }
+            // 只有主持人使用
+            if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
+              await this.interactiveServer.unpublishStream(this.localStreamId);
+              this.startPush();
               return;
             }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
