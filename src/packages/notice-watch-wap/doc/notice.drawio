@@ -91,7 +91,7 @@
                         <mxPoint x="-1" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="91" value="监听" style="edgeStyle=none;html=1;" edge="1" parent="1" source="52" target="78">
+                <mxCell id="91" value="监听" style="edgeStyle=none;html=1;" parent="1" source="52" target="78" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="52" value="初始化聊天" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;" parent="1" vertex="1">
@@ -152,7 +152,7 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="92" value="存在公告" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="86">
+                <mxCell id="92" value="存在公告" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="86" vertex="1" connectable="0">
                     <mxGeometry x="0.4375" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
@@ -161,7 +161,7 @@
                     <mxGeometry x="510" y="110" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="93" value="&lt;span&gt;展示公告&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="240" y="300" width="70" height="40" as="geometry"/>
+                    <mxGeometry x="245" y="300" width="70" height="40" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
