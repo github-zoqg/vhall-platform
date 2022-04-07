@@ -135,6 +135,7 @@
               'vh-line-amplification': !isFullScreen,
               'vh-line-narrow': isFullScreen
             }"
+            v-show="localStreamId"
             @click="fullScreen"
           ></span>
         </el-tooltip>
