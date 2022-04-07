@@ -78,6 +78,8 @@ export default class TaskQueue {
       await this.sleep(this.minTaskTime * (this.running || 1));
       await queueTaskItem.removeRewardEffect();
       this.execute();
+    } else {
+      this.running--;
     }
   }
 
