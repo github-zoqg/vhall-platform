@@ -55,7 +55,7 @@ const routes = [
   {
     path: '/lives/video-polling/:id',
     name: 'VideoPolling',
-    component: () => import('../views/VideoPolling.vue'),
+    component: () => import(/* webpackChunkName: "VideoPolling" */ '../views/VideoPolling'),
     meta: { title: '视频轮询', grayType: 'webinar' }
   },
   {
