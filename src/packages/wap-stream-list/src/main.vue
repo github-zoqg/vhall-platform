@@ -229,7 +229,7 @@
           this.joinInfo.third_party_user_id == this.mainScreen;
         return _flag;
       },
-      // 主屏流
+      // 主屏流   和产品佳佳沟通：显示全屏按钮条件： 主画面 + 存在视频流
       mainScreenStream() {
         let allStream = this.interactiveServer.getRoomStreams();
         let stream = allStream.find(stream => stream.accountId == this.mainScreen) || {};
