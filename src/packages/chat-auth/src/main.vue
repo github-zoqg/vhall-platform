@@ -479,7 +479,6 @@
           ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
           switch: this.enableChatAuth
         };
-        console.log(params);
         this.chatAuthServer
           .toggleChatAuthStatus(params)
           .then(res => {

@@ -1142,13 +1142,11 @@
       //邮件验证
       validEmail(rule, value, callback) {
         const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
-        console.log(!reg.test(value));
         if (!value && rule.required) {
           return callback ? callback(new Error(this.$t('form.form_1007'))) : false;
         } else if (value.length > 80) {
           return callback ? callback(new Error(this.$t('form.form_1009'))) : false;
         } else if (value && !reg.test(value)) {
-          console.log('请填写正确的邮箱');
           return callback ? callback(new Error(this.$t('form.form_1010'))) : false;
         } else {
           if (callback) {
@@ -1230,7 +1228,6 @@
           !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
           // 手机号验证开启状态
           const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
-          console.log(phoneItem, 'phoneItem');
           this.isPhoneValidate =
             phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
           // 默认填写手机号
@@ -1534,7 +1531,6 @@
             }
           },
           onload(instance) {
-            console.log('onload', instance);
             that[captcha] = instance;
           }
         });
@@ -1977,9 +1973,6 @@
         ::v-deep .yidun_tips {
           color: #999 !important;
           line-height: 1.05rem !important;
-          // .yidun_tips__text {
-          // vertical-align: initial!important;
-          // }
         }
         ::v-deep .yidun_slide_indicator {
           line-height: 1.07rem !important;
