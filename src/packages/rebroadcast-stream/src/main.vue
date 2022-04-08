@@ -21,7 +21,6 @@
     useRebroadcastServer,
     useMsgServer
   } from 'middle-domain';
-  import { sleep } from '@/packages/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpRebroadcastStream',
@@ -118,8 +117,6 @@
         this.isShow = false;
         this.$refs.videoPreview?.destroy();
         await this.$nextTick(0);
-        // this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
-        // if (this.miniElement === 'doc') this.roomBaseServer.setChangeElement('stream-list');
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
       },
       exchangeScreen() {
