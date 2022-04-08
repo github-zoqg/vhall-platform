@@ -94,6 +94,12 @@ const routes = [
     component: () => import('../views/bind'),
     meta: { grayType: '' }
   },
+  {
+    path: '/lives/bindB/:id',
+    name: 'bind',
+    component: () => import('../views/bind'),
+    meta: { grayType: '' }
+  },
   // 独立报名表单
   // {
   //   path: '/lives/entryform/:id',

@@ -200,19 +200,7 @@ const playerMixins = {
       } else {
         this.qualitysList = qualityList;
       }
-      // 如果过当前有设置过清晰度，就用缓存，否则就有接口返回
-      if (sessionStorage.getItem('localQualityValue')) {
-        this.$nextTick(() => {
-          this.$set(this.currentQualitys, 'def', sessionStorage.getItem('localQualityValue'));
-        });
-      }
-      let exist = false; // 设置变量 查看时候在sdk转码列表内
-      this.playerServer.getQualitys().forEach(ele => {
-        if (ele.def == this.definitionConfig) exist = true;
-      });
-      this.currentQualitys = exist
-        ? { def: this.definitionConfig }
-        : this.playerServer.getCurrentQuality();
+      this.currentQualitys = this.playerServer.getCurrentQuality();
       this.$nextTick(() => {
         if (this.currentQualitys.def == 'a') {
           console.log('音频进入');
@@ -222,7 +210,6 @@ const playerMixins = {
           this.audioStatus = false;
         }
       });
-      console.log(this.qualityList, this.currentQualitys, '?????1111111');
     },
     // 获取倍速列表和当前倍速
     getInitSpeed() {

@@ -360,9 +360,9 @@
               }
             }
           }
-          // .vmp-stream-local__bottom {
-          //   bottom: 17px;
-          // }
+          .vmp-stream-local__bottom {
+            bottom: 18px;
+          }
         }
         // 远端流大窗样式
       }

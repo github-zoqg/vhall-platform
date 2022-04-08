@@ -58,7 +58,7 @@
   // import { debounce } from 'lodash';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import { useGiftsServer, useMsgServer } from 'middle-domain';
+  import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',
     data() {
@@ -109,6 +109,7 @@
     beforeCreate() {
       this.giftsServer = useGiftsServer();
       this.msgServer = useMsgServer();
+      this.chatServer = useChatServer();
     },
     beforeDestroy() {
       this.timer = 3;
@@ -116,6 +117,22 @@
     },
     mounted() {
       // this.showgift();
+      this.giftsServer.$on('gift_send_success', msg => {
+        console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
+        const nickname = msg.data.gift_user_nickname || msg.data.nickname;
+        const data = {
+          nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+          avatar: msg.data.avatar,
+          content: {
+            gift_name: msg.data.gift_name,
+            gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
+            source_status: msg.data.source_status
+          },
+          type: 'gift_send_success',
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
+      });
     },
     methods: {
       // 获取礼物列表
