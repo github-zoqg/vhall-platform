@@ -824,7 +824,11 @@ export default {
     webinar_1039: '预约',
     webinar_1040: '付费{n}预约',
     webinar_1041: '付费{n}观看',
-    webinar_1042: '暂未搜索到您想要的内容'
+    webinar_1042: '暂未搜索到您想要的内容',
+    webinar_1043: '很遗憾无法继续为您提供服务，您可以手动关闭页面',
+    webinar_1044: '同意并继续',
+    webinar_1045: '拒绝',
+    webinar_1046: '我知道了'
   },
   color: {
     color_1001: '白色',

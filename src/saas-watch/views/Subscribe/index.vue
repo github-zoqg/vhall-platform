@@ -61,6 +61,13 @@
         this.handleErrorCode(err);
       }
     },
+    mounted() {
+      const roomBaseServer = useRoomBaseServer();
+      roomBaseServer.$on('VIEW_RESTRICTION_ERROR_PAGE', () => {
+        this.state = 2;
+        this.errorData.errorPageTitle = 'view_restriction';
+      });
+    },
     methods: {
       initReceiveLive(clientType) {
         const { id } = this.$route.params;

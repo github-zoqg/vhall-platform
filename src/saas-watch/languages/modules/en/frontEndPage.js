@@ -788,7 +788,13 @@ export default {
     webinar_1038: 'Share success',
     webinar_1039: 'Make an appointment',
     webinar_1040: 'Pay{n}',
-    webinar_1041: 'Pay{n}'
+    webinar_1041: 'Pay{n}',
+    webinar_1042: 'The content you want has not been searched yet',
+    webinar_1043:
+      'Unfortunately, we can not continue to serve you. You can close the page manually',
+    webinar_1044: 'Agree and continue',
+    webinar_1045: 'Refuse',
+    webinar_1046: 'I got it'
   },
   color: {},
   other: {
