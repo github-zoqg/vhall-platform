@@ -467,7 +467,7 @@
        * 期间更改过上麦方案：  所有创建流、推流、销毁流等都是通过上下麦成功消息处理的
        *
        * 问题2： 增加存在StreamId直接return原因是因为: 开始直播 emitClickStartLive[ header-right 组件] -> startPush执行一次 --> 收到上麦成功,再执行一次startpush --> 出现推双流问题。
-       * 此tapd地址：后续由北红补充
+       * 此tapd地址：https://www.tapd.cn/tapd_fe/58046813/bug/list?page=1&queryToken=b5ef2acbcbdd27b69fe8fcbeeeb61e56&dialog_preview_id=bug_1158046813001005944
        *
        * 具体想看产生问题1排查修改记录：可查看文件的git提交历史
        *

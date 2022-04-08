@@ -1,5 +1,7 @@
 ## 上麦弹窗组件
 
+- [上麦流程](http://wiki.vhallops.com/pages/viewpage.action?pageId=219611642)
+
 ### 输入 api(向其他组件发送的指令)
 
 | 方法名          | 参数 1 | 描述                                                                              | 代码块                                                                               |
