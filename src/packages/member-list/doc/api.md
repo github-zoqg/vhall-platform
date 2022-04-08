@@ -14,3 +14,13 @@
 
 ### 输出 api(暴露给其他组件使用的方法)
 
+### 子组件
+- member-item.vue:成员列表项的组件
+- scroll.vue 封装的滚动组件
+### 依赖服务
+- useMicServer
+- useRoomBaseServer
+- useMemberServer,
+- useInteractiveServer,
+- useMsgServer,
+- useGroupServer
