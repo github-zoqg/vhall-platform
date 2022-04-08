@@ -5,11 +5,11 @@ const htmlConfig = {
   cdnJs: {
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain:
-      '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.2.8/middle-domain.js'
+      '//cnstatic01.e.vhall.com/common-static/middle/middle-domain/1.2.19/middle-domain.js'
   },
   // dns-prefetch
   dnsPrefetch: {
-    open: true, //是否开启dns预解析
+    open: true, //是否开启dns预解
     dns: {
       cnstatic01: 'cnstatic01.e.vhall.com'
     }

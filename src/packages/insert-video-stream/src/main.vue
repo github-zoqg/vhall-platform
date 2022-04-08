@@ -349,10 +349,8 @@
           .catch(err => {
             console.log('初始化本地插播播放器失败', err);
             this.$message.warning('视频分辨率过高，请打开分辨率为1280*720以下的视频');
-            // 关闭插播
-            this.closeInsertvideo({
-              isShowConfirmDialog: false
-            }); // 关闭插播
+            // 关闭插播，传 ture 不需要更改麦克风状态
+            this.closeInsertvideoHandler(true);
           });
       },
       // 本地插播，video成功创建之后的处理逻辑
@@ -476,7 +474,7 @@
       },
       // 打开插播列表dialog
       handleOpenInsertFileDialog() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'openInsertFileDialog'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenInsertFileDialog'));
       },
       /**
        * 关闭插播
@@ -1033,7 +1031,7 @@
     &-controller {
       position: absolute;
       bottom: -31px;
-      z-index: 20;
+      z-index: 6;
       width: 100%;
       padding: 0px 0 0 23px;
       height: 38px;

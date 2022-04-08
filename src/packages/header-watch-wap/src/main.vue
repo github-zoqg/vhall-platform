@@ -169,7 +169,7 @@
         if (this.attentionStatus == 1) {
           this.attentionServer
             .cancelAttention({
-              at_id: this.watchInitData.webinar.userinfo.user_id,
+              at_id: this.$domainStore.state.userServer.userInfo.user_id,
               type: 1
             })
             .then(res => {
@@ -180,7 +180,7 @@
         } else {
           this.attentionServer
             .attention({
-              at_id: this.watchInitData.webinar.userinfo.user_id,
+              at_id: this.$domainStore.state.userServer.userInfo.user_id,
               type: 1
             })
             .then(res => {

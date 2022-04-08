@@ -701,6 +701,7 @@
         font-size: 14px;
         cursor: pointer;
         user-select: none;
+        white-space: nowrap;
         .vh-line-arrow-down {
           font-size: 12px;
           margin-left: 6px;

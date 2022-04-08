@@ -119,7 +119,8 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000
+        minTaskTime: 2000,
+        maxQueueLen: 2
       });
 
       //测试数据

@@ -217,8 +217,8 @@
 <script>
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
-  import * as _ from 'lodash';
-  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
+  import { throttle, uniqBy } from 'lodash';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -283,7 +283,8 @@
         isLive: false,
         //是否是pc观看端功能
         isWatch: false,
-        timmer: null
+        //连麦断开的定时器
+        timer: null
       };
     },
     beforeCreate() {
@@ -305,12 +306,9 @@
       this.listenEvent();
     },
     updated() {
-      const _this = this;
       //hack处理BsScroll不能滚动的问题
       this.$nextTick(() => {
-        if (_this.$refs && _this.$refs.scroll) {
-          _this.$refs.scroll.refresh();
-        }
+        this.refresh();
       });
     },
     watch: {
@@ -629,8 +627,6 @@
         //用户加入房间
         function handleUserJoinRoom(msg) {
           try {
-            console.log('_this.groupServer:', _this.groupServer);
-            console.log('_this.isInGroup:', _this.isInGroup);
             const { isLive, isWatch } = _this;
             const { context } = msg;
 
@@ -881,7 +877,7 @@
           user = Object.assign(user, member_info);
           _this.applyUsers.unshift(user);
 
-          _this.applyUsers = _.uniqBy(_this.applyUsers, 'account_id'); // 去重
+          _this.applyUsers = uniqBy(_this.applyUsers, 'account_id'); // 去重
           _this.changeUserStatus(user.account_id, _this.onlineUsers, member_info, 'onlineUsers');
           // 申请30秒后从列表去掉
           _this.handsUpTimerList[user.account_id] &&
@@ -1016,8 +1012,8 @@
           console.log('互动连麦成功断开链接', msg);
           //提示语
           if (msg.data.target_id == _this.userId) {
-            this.timmer && clearTimeout(this.timmer);
-            this.timmer = setTimeout(() => {
+            this.timer && clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
               _this.$message.success({ message: _this.$t('interact.interact_1028') });
             }, 1000);
             return;
@@ -1166,21 +1162,10 @@
           handleEndGroupDiscuss(msg);
         });
 
-        // 换组
-        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-        //   isLive && this.updateOnlineUserList(msg);
-        //   isWatch && handleGroupChange(msg);
-        // });
-
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
           handleGroupKicked(msg);
         });
-
-        // 解散分组(主播&观看均更新)
-        // this.groupServer.$on('GROUP_DISBAND', () => {
-        //   this.updateOnlineUserList();
-        // });
 
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
@@ -1330,27 +1315,14 @@
             }
           });
         }
-        //切换频道(开始讨论也会调这里)
-        async function handleRoomChannelChange(msg) {
-          console.log(msg);
-          await sleep(1000);
-          _this.onlineUsers = [];
-          _this.getOnlineUserList();
-        }
-        //切换小组
-        async function handleGroupChange(msg) {
-          console.log(msg, '切换小组的msg');
-        }
         //下麦成功
         function handleRoomDisconnectSuccess(msg) {
           console.log(msg);
         }
       },
-      // updateOnlineUserList() {
-      //   this.onlineUsers = [];
-      //   this.getOnlineUserList();
-      // },
-      updateOnlineUserList: _.throttle(function () {
+      //刷新当前列表数据
+      updateOnlineUserList: throttle(function () {
+        this.pageConfig.page = 0;
         this.onlineUsers = [];
         this.getOnlineUserList();
       }, 2000),
@@ -1394,9 +1366,6 @@
               }
               //在线总人数
               _this.totalNum = _this.memberServer.state.totalNum;
-              setTimeout(() => {
-                _this.refresh();
-              }, 50);
             }
             if (![200, '200'].includes(res.code)) {
               this.pageConfig.page--;
@@ -1404,6 +1373,9 @@
           })
           .catch(() => {
             this.pageConfig.page--;
+          })
+          .finally(() => {
+            this.refresh();
           });
       },
       /**
@@ -1739,7 +1711,7 @@
             console.log('setSpeaker failed ::', err);
           });
       },
-      //邀请演示(注：方法名取名不科学，inviteMic不是指邀请上麦，而是指邀请演示 TODO:需修改)
+      //邀请演示
       inviteMic(accountId = '') {
         const isLeader = accountId === this.leader_id;
         const isSpeaker = accountId === this.getCurrentSpeakerId;
@@ -1813,8 +1785,6 @@
           .catch(err => {
             console.warn('禁言---res', err);
           });
-        // “禁言”要关闭当前用户的在麦状态
-        console.log('禁言 -  - 要关闭当前用户的在麦状态 - - - - ', isBanned);
         if (isBanned) {
           return;
         }
@@ -1888,8 +1858,10 @@
       },
       //加载更多
       loadMore() {
-        this.pageConfig.page++;
-        this.getOnlineUserList();
+        if (this.onlineUsers.length >= this.pageConfig.limit) {
+          this.pageConfig.page++;
+          this.getOnlineUserList();
+        }
       },
       //滚动条位置更新
       refresh() {
@@ -1913,12 +1885,7 @@
       align-items: center;
       padding: 18px 20px 5px;
       color: #ccc;
-      i {
-        //vertical-align: bottom;
-      }
       .pr_top {
-        //position: relative;
-        //top: -2px;
         margin-left: 10px;
         font-size: 14px;
       }
@@ -1936,7 +1903,6 @@
         left: 0;
         right: 0;
         bottom: 0;
-        //overflow: hidden;
       }
       .show-empty-img {
         .test_01 {
@@ -1953,7 +1919,6 @@
         align-items: center;
         span {
           display: inline-block;
-          //margin-top: 20%;
           img {
             width: 100%;
             height: 100%;
@@ -1962,7 +1927,7 @@
         }
         p {
           margin-top: 10px;
-          color: #999999;
+          color: #999;
         }
         .empty-img {
           width: 120px;
@@ -2036,7 +2001,6 @@
             border-radius: 100px;
             position: relative;
             margin-left: 5px;
-            position: relative;
             top: 3px;
             & > em {
               box-sizing: border-box;
@@ -2047,7 +2011,7 @@
               width: 10px;
               height: 10px;
               background-color: #242527;
-              border: 2px solid #aaaaaa;
+              border: 2px solid #aaa;
               border-radius: 10px;
               transition: all 0.1s ease-in-out;
               backface-visibility: hidden;
@@ -2099,7 +2063,6 @@
               height: 7px;
               border-radius: 50%;
               background-color: #fb3a32;
-              position: absolute;
             }
           }
         }
@@ -2152,7 +2115,7 @@
           border-radius: 0 4px 4px 0;
           text-align: center;
           background-color: #a6a6a8;
-          color: #ffffff;
+          color: #fff;
           position: absolute;
           top: 0;
           right: 0;

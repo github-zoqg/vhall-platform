@@ -362,6 +362,9 @@
       > div {
         margin-left: 16px;
       }
+      li {
+        line-height: initial; // 防止继承外部属性值
+      }
       li > div > img {
         width: 32px;
         height: 32px;
@@ -388,7 +391,7 @@
       background: #fb3a32;
       border: 1px solid #2a2a2a;
       border-radius: 50%;
-      top: 10px;
+      // top: 10px;
       right: 0px;
       position: absolute;
     }

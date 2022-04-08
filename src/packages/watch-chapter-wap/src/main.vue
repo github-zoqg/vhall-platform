@@ -33,7 +33,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useDocServer, usePlayerServer } from 'middle-domain';
-  import { isMse } from '../../wap-player/src/js/utils';
+  import { isMse } from '../../player/wap-player/src/js/utils';
   export default {
     name: 'VmpChapterWap',
     data() {

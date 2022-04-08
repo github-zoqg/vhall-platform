@@ -185,7 +185,8 @@
 
 <script>
   import { useUserServer, useCashServer } from 'middle-domain';
-  import { boxEventOpitons, browserType } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool';
+  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import NECaptcha from './components/NECaptcha';
   const defaltCashForm = {
     phone: '',
@@ -258,23 +259,42 @@
       // 提现按钮
       async checkPhoneToWx() {
         // 当前若非微信内打开，提示用户微信内打开
-        if (!browserType()) {
+        if (!isWechat()) {
           this.$toast(this.$t('cash.cash_1035'));
           return;
         }
-        try {
-          await this.useUserServer.getUserInfo();
-          if (!this.useUserServer.state.userInfo.phone) {
-            console.log('手机号未绑定进入... ...');
-            this.cashVisible = true;
-            this.step = 1;
+        // 校验是否有open_id,若没有重新微信登录授权
+        // const open_id = this.getQueryString('open_id') || sessionStorage.getItem('open_id');
+        const open_id = sessionStorage.getItem('open_id');
+        let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        // 重新微信授权
+        if (isWechat()) {
+          // 微信正常授权过
+          if (open_id) {
+            console.log('checkPhoneToWx-------->');
           } else {
-            console.log('手机号已绑定进入--- ---');
-            this.cashVisible = true;
-            this.step = 2;
+            //重新授权
+            payAuthStatus = 1;
+            const payUrl = buildPayUrl(this.$route);
+            authWeixinAjax(this.$route, payUrl, () => {});
           }
-        } catch (err) {
-          this.$toast(this.$t('cash.cash_1040'));
+        }
+
+        if (payAuthStatus == 0) {
+          try {
+            await this.useUserServer.getUserInfo();
+            if (!this.useUserServer.state.userInfo.phone) {
+              console.log('手机号未绑定进入... ...');
+              this.cashVisible = true;
+              this.step = 1;
+            } else {
+              console.log('手机号已绑定进入--- ---');
+              this.cashVisible = true;
+              this.step = 2;
+            }
+          } catch (err) {
+            this.$toast(this.$t('cash.cash_1040'));
+          }
         }
       },
 

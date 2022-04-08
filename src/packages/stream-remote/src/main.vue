@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :class="{ fullscreen: isFullScreen }"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
@@ -37,7 +41,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleFilter(true) }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -67,7 +71,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleFilter(true) }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip
@@ -122,6 +126,7 @@
               'vh-line-amplification': !isFullScreen,
               'vh-line-narrow': isFullScreen
             }"
+            v-show="stream.streamId"
             @click="fullScreen"
           ></span>
         </el-tooltip>
@@ -401,14 +406,15 @@
         );
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.stream.streamId) {
-            this.$message({
-              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            this.subscribeRemoteStream();
+          if (e.data.accountId == this.stream.accountId) {
+            this.isShowNetError = true;
+            // this.$message({
+            //   message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+            //   showClose: true,
+            //   type: 'warning',
+            //   customClass: 'zdy-info-box'
+            // });
+            // this.subscribeRemoteStream();
           }
         });
 
@@ -452,6 +458,9 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            if (this.joinInfo.role_name === 1) {
+              this.interactiveServer.resetLayout();
+            }
             setTimeout(() => {
               this.replayPlay();
 
@@ -616,6 +625,22 @@
     &:hover {
       .vmp-stream-remote__shadow-box {
         display: flex;
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-remote__shadow-box {
+        display: flex;
+        height: 24px;
+        bottom: 0;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-remote__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
+        }
       }
     }
     .vmp-stream-remote__container {

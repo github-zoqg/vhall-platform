@@ -486,16 +486,13 @@
         }
       },
       initPage() {
-        if (this.webinarType != 3) {
+        if (this.webinarType == 3) {
+          this.showBottomBtn = false;
+          this.countDownTime = 0;
+        } else {
           // 不是 活动结束 - 就启动倒计时
           this.sureCountDown();
           this.handlerInitInfo();
-        } else if (this.webinarType == 3) {
-          if (this.roomBaseServer.state.embedObj.embedVideo) {
-            this.showBottomBtn = false;
-          }
-          this.subscribeText = this.$t('player.player_1017');
-          this.countDownTime = 0;
         }
       },
       livingStartConfirm() {
@@ -516,9 +513,8 @@
         const activeId = this.$route.params.id;
         const { join_info } = this.roomBaseServer.state.watchInitData;
         const joinId = join_info.join_id;
-        const lang = localStorage.getItem('lang');
 
-        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
+        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}`;
 
         const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
 

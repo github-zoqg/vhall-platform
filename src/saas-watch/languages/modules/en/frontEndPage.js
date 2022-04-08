@@ -519,7 +519,8 @@ export default {
     setting_1027: 'Please increase the speaker volume of the device',
     setting_1028: 'Choose external speakers or replace the computer',
     setting_1029: 'Help and support',
-    setting_1030: 'Setting'
+    setting_1030: 'Setting',
+    setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving'
   },
   message: {
     message_1001: 'The organizer has encrypted the video. Recommend to use the computer to watch',

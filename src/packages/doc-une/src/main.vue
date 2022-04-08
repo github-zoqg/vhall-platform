@@ -645,6 +645,8 @@
           }
         });
 
+        this.docServer.$on('dispatch_doc_page_change', this.dispatchDocPageChange);
+
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
       },
@@ -941,6 +943,17 @@
           return;
         }
       },
+      // 翻页
+      dispatchDocPageChange() {
+        if (!this.isWatch) {
+          if (this.$refs.docToolbar.currentBrush === 'eraser') {
+            // 翻页后sdk会会变橡皮擦设置成move,这个延迟1s重置当前笔刷
+            setTimeout(() => {
+              this.resetCurrentBrush();
+            }, 1000);
+          }
+        }
+      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
@@ -969,6 +982,7 @@
       }
     },
     beforeDestroy() {
+      this.docServer.$off('dispatch_doc_page_change', this.dispatchDocPageChange);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       window.removeEventListener('keydown', this.listenKeydown);
     }
@@ -1088,10 +1102,12 @@
         padding: 7px 10px;
         &:hover {
           color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {
           color: #fc5659;
+          cursor: pointer;
         }
       }
     }
@@ -1266,5 +1282,10 @@
         display: flex;
       }
     }
+  }
+
+  // 回放有文档时自动生成的div，用于文档sdk存储回放数据
+  #myVodNode {
+    height: 0 !important;
   }
 </style>

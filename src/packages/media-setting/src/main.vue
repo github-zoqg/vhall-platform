@@ -21,11 +21,19 @@
             <!-- 基础设置 -->
             <basic-setting v-show="selectedMenuItem === 'basic-setting'" />
             <!-- 摄像头 -->
-            <video-setting ref="videoSetting" v-show="selectedMenuItem === 'video-setting'" />
+            <video-setting
+              ref="videoSetting"
+              v-show="selectedMenuItem === 'video-setting'"
+              :is-show="isShow"
+              :selected-item="selectedMenuItem"
+            />
             <!-- 麦克风 -->
             <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
             <!-- 扬声器 -->
-            <audio-out-setting v-show="selectedMenuItem === 'audio-out-setting'" />
+            <audio-out-setting
+              ref="audioOutSetting"
+              v-show="selectedMenuItem === 'audio-out-setting'"
+            />
           </main>
 
           <!-- 底部按钮区域 -->
@@ -136,7 +144,7 @@
         isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
         selectedMenuItem: 'basic-setting',
-        alertText: '修改设置后会导致重新推流，是否继续保存？',
+        alertText: this.$t('setting.setting_1031'),
         popAlert: {
           text: this.$t('interact.interact_1011'),
           visible: false,
@@ -193,7 +201,8 @@
        */
       closeMediaSetting() {
         this.isShow = false;
-        this.$refs['videoSetting'].destroyStream();
+        this?.$refs['videoSetting']?.destroyStream();
+        this?.$refs['audioOutSetting']?.pauseAudio();
       },
       /**
        * 点击对话框确认按钮（保存）的回调
@@ -225,7 +234,7 @@
           this.setDefaultVideoType();
           await this.getDevices();
           this.setDefaultSelected();
-          this.$refs['videoSetting'].createPreview();
+          this.selectedMenuItem === 'video-setting' && this.$refs['videoSetting'].createPreview();
           this.getStateCapture();
           this.loading = false;
         } catch (error) {
@@ -249,7 +258,7 @@
 
         // 直播中
         if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
-          const text = '修改设置后导致重新推流，是否继续保存';
+          const text = this.$t('setting.setting_1031');
           action = await mediaSettingConfirm.show(text);
         }
 

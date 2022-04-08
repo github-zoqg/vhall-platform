@@ -64,23 +64,48 @@
     components: {
       PictureUploader
     },
+    props: {
+      selectedItem: {
+        type: String,
+        default: 'basic-setting'
+      },
+      isShow: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
         mediaState: this.mediaSettingServer.state,
         videoLoadingImg: videoSwitchImg,
         isVideoSwitching: false, // video正在切换
         isVideoError: false, // video读取错误
-        videoTipsText: '设备切换中，请稍后…'
+        videoTipsText: this.$t('setting.setting_1008')
       };
     },
     computed: {
+      isVideoSettingActive() {
+        return this.selectedItem === 'video-setting';
+      },
       devices() {
         return this.mediaState.devices.videoInputDevices;
       }
     },
     watch: {
+      selectedItem(val) {
+        if (!this.isShow) return;
+
+        if (val === undefined || val === '') return;
+        if (val === 'video-setting') {
+          this.createPreview();
+        } else {
+          this.destroyStream();
+        }
+      },
       'mediaState.video'(val) {
         if (val === undefined || val === '') return;
+        if (!this.isShow) return;
+        if (!this.isVideoSettingActive) return;
         this.createPreview();
       }
     },

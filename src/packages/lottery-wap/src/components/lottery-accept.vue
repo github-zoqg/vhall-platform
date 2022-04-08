@@ -116,6 +116,15 @@
                 }`
               );
               return true;
+            } else if (item.field_key == 'phone') {
+              const phone = item.field_value.replace(/\s/g, '');
+              const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
+              if (!regs.test(phone)) {
+                this.$toast(`手机号格式错误`);
+                return true;
+              } else {
+                return false;
+              }
             } else {
               return false;
             }

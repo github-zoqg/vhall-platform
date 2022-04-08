@@ -140,11 +140,12 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -247,9 +248,6 @@
   };
 </script>
 <style lang="less">
-  body {
-    overflow: hidden;
-  }
   .vmp-basic-container-embed {
     .vmp-basic-bd {
       max-width: unset;

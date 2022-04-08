@@ -120,11 +120,12 @@
         return new Domain({
           plugins: ['chat', 'player'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -227,9 +228,6 @@
   };
 </script>
 <style lang="less">
-  body {
-    overflow: hidden;
-  }
   .vmp-embed-video-basic-container {
     width: 100%;
     height: 100%;

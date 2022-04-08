@@ -51,6 +51,7 @@
       getOfficialInfo() {
         if (this.officicalInfo && this.officicalInfo.status == 0 && this.officicalInfo.img) {
           if (this.embedObj.embed) {
+            // 嵌入页页并且是直播时 才显示公众号，预约页不显示
             if (this.isLive) this.officialVisible = true;
           } else {
             if (this.officicalInfo.alert_type == 0) {

@@ -10,21 +10,27 @@
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
-      <virtual-list
-        ref="chatlist"
-        style="height: 100%; overflow: auto"
-        :keeps="30"
-        :data-key="'count'"
-        :data-sources="chatList"
-        :data-component="msgItem"
-        :extra-props="{
-          previewImg: previewImg.bind(this),
-          emitLotteryEvent,
-          emitQuestionnaireEvent,
-          joinInfo
-        }"
-        @tobottom="toBottom"
-      ></virtual-list>
+      <div ref="chatContent" class="virtual-content">
+        <virtual-list
+          v-if="virtual.showlist"
+          :style="{ height: virtual.contentHeight + 'px' }"
+          ref="chatlist"
+          class="virtual-list"
+          :keeps="20"
+          :estimate-size="100"
+          :data-key="'count'"
+          :data-sources="chatList"
+          :data-component="msgItem"
+          :extra-props="{
+            previewImg: previewImg.bind(this),
+            emitLotteryEvent,
+            emitQuestionnaireEvent,
+            joinInfo
+          }"
+          @tobottom="toBottom"
+        ></virtual-list>
+      </div>
+
       <div
         class="vmp-chat-wap__content__new-msg-tips"
         v-show="isHasUnreadAtMeMsg"
@@ -52,7 +58,13 @@
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
+  import {
+    useChatServer,
+    useRoomBaseServer,
+    useGroupServer,
+    useMicServer,
+    useMenuServer
+  } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -101,7 +113,12 @@
         //true全体禁言，false未禁言
         allBanned: useChatServer().state.allBanned,
         //是否加载完聊天历史
-        historyLoaded: false
+        historyLoaded: false,
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0
+        }
       };
     },
     watch: {
@@ -193,11 +210,11 @@
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
+      this.menuServer = useMenuServer();
     },
     created() {
       this.initViewData();
       this.page = 0;
-      this.imgUrls = [];
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -210,7 +227,12 @@
     },
     methods: {
       showWelcomeTxt() {
-        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+        // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理
+        this.welcomeText &&
+          this.$toast({
+            message: `${this.joinInfo.nickname}${this.welcomeText}`,
+            position: 'bottom'
+          });
       },
       //初始化视图数据
       initViewData() {
@@ -266,6 +288,14 @@
         chatServer.$on('roomKickout', () => {
           this.$toast(this.$t('chat.chat_1007'));
         });
+        //监听切换到当前tab
+        this.menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
+            this.virtual.showlist = data.cuid == this.cuid;
+            this.scrollBottom();
+          });
+        });
       },
       //处理分组讨论频道变更
       handleChannelChange() {
@@ -285,18 +315,17 @@
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-
-        const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
-        if (chatList.length > 0) {
-          this.imgUrls = imgUrls;
-        }
+        await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
         this.scrollBottom();
       },
-      previewImg(img) {
-        const index = this.imgUrls.findIndex(item => item === img);
+      //图片预览
+      previewImg(img, index = 0, list = []) {
+        if ((Array.isArray(list) && !list.length) || index < 0) {
+          return;
+        }
         ImagePreview({
-          images: this.imgUrls,
+          images: list,
           startPosition: index,
           lazyLoad: true
         });
@@ -362,14 +391,17 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    .virtual-content {
+      height: 100%;
+      overflow: hidden;
+      .virtual-list {
+        height: 100%;
+        overflow: auto;
+      }
+    }
     &__content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 120px;
-      overflow-x: hidden;
-      overflow-y: auto;
+      height: calc(100% - 120px);
+      overflow: hidden;
       &__get-list-btn-container {
         width: 100%;
         text-align: center;

@@ -217,8 +217,8 @@
 <script>
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
-  import * as _ from 'lodash';
-  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
+  import { throttle } from 'lodash';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -640,7 +640,7 @@
         ['enter', 'quit'].includes(msg.data.status) && this.updateOnlineUserList();
       },
       //刷新在线的成员列表
-      updateOnlineUserList: _.throttle(function () {
+      updateOnlineUserList: throttle(function () {
         this.pageConfig.page = 0;
         this.getOnlineUserList();
       }, 1500),
@@ -1120,8 +1120,10 @@
       },
       //加载更多
       loadMore() {
-        this.pageConfig.page++;
-        this.getOnlineUserList();
+        if (this.memberServer.state.onlineUsers.length >= this.pageConfig.limit) {
+          this.pageConfig.page++;
+          this.getOnlineUserList();
+        }
       },
       //滚动条位置更新
       refresh() {
@@ -1145,12 +1147,7 @@
       align-items: center;
       padding: 18px 20px 5px;
       color: #ccc;
-      i {
-        //vertical-align: bottom;
-      }
       .pr_top {
-        //position: relative;
-        //top: -2px;
         margin-left: 10px;
         font-size: 14px;
       }
@@ -1168,7 +1165,6 @@
         left: 0;
         right: 0;
         bottom: 0;
-        //overflow: hidden;
       }
       .show-empty-img {
         .test_01 {
@@ -1186,7 +1182,6 @@
         align-items: center;
         span {
           display: inline-block;
-          //margin-top: 20%;
           img {
             width: 100%;
             height: 100%;
@@ -1195,7 +1190,7 @@
         }
         p {
           margin-top: 10px;
-          color: #999999;
+          color: #999;
         }
         .empty-img {
           width: 120px;
@@ -1269,7 +1264,6 @@
             border-radius: 100px;
             position: relative;
             margin-left: 5px;
-            position: relative;
             top: 3px;
             & > em {
               box-sizing: border-box;
@@ -1332,7 +1326,6 @@
               height: 7px;
               border-radius: 50%;
               background-color: #fb3a32;
-              position: absolute;
             }
           }
         }
@@ -1385,7 +1378,7 @@
           border-radius: 0 4px 4px 0;
           text-align: center;
           background-color: #a6a6a8;
-          color: #ffffff;
+          color: #fff;
           position: absolute;
           top: 0;
           right: 0;

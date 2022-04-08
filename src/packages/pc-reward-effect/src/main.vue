@@ -116,15 +116,17 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000
+        minTaskTime: 2000,
+        maxQueueLen: 2
       });
+      // let i = 0;
       // setInterval(() => {
       //   this.watchRewardServer.$emit('reward_pay_ok', {
       //     app_id: 'fd8d3653',
       //     bu: '1',
       //     channel: 'ch_qT76A13e',
       //     date_time: '2022-03-10 10:15:37',
-      //     msg_id: 'msg_8f1218c9470f4aa6bc188d53dc22732c',
+      //     msg_id: 'msg_8f1218c9470f4aa6bc188d53dc22732c' + i++,
       //     msg_source: 'prefix01',
       //     pv: 3,
       //     sender_id: '18200089',
@@ -246,7 +248,9 @@
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           // 来源于接口消息字段
-          if (rewardEffectInfo.data.gift_user_avatar) {
+          if (rewardEffectInfo.data.avatar) {
+            return rewardEffectInfo.data.avatar;
+          } else if (rewardEffectInfo.data.gift_user_avatar) {
             return rewardEffectInfo.data.gift_user_avatar;
           } else if (rewardEffectInfo.data.rewarder_avatar) {
             return rewardEffectInfo.data.rewarder_avatar;

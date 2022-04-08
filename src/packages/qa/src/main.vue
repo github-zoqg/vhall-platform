@@ -7,13 +7,15 @@
       <virtual-list
         ref="qalist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
-        :data-key="'id'"
+        :keeps="15"
+        :estimate-size="100"
+        :data-key="'msgId'"
         :data-sources="qaList"
         :data-component="MsgItem"
         :extra-props="{
           isOnlyMine,
-          joinId
+          joinId,
+          roleName
         }"
         @tobottom="tobottom"
       ></virtual-list>

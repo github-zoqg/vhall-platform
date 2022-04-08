@@ -82,11 +82,12 @@
         return new Domain({
           plugins: ['chat', 'player'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -132,14 +133,12 @@
   };
 </script>
 <style lang="less">
-  body {
-    overflow-y: auto;
-  }
   .vmp-subscribe-container {
     .vmp-basic-container {
       width: 100%;
       height: 100%;
       background: #1a1a1a;
+      overflow-y: auto;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;
       .vmp-basic-bd {
@@ -157,8 +156,9 @@
     }
     .vmp-container-embed {
       width: 100%;
-      height: 100%;
+      height: 100vh;
       background: #1a1a1a;
+      overflow: hidden;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;
       .vmp-basic-bd {

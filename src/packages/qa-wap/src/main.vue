@@ -1,12 +1,15 @@
 <template>
   <div class="qa">
     <div class="qa-content-wrapper">
-      <div class="qa-content">
+      <div class="qa-content" ref="qaContent">
         <virtual-list
+          v-if="virtual.showlist"
+          class="qalist"
           ref="qalist"
-          style="height: 100%; overflow: auto"
-          :keeps="30"
-          :data-key="'id'"
+          :style="{ height: virtual.contentHeight + 'px' }"
+          :keeps="15"
+          :estimate-size="100"
+          :data-key="'msgId'"
           :data-sources="qaList"
           :data-component="MsgItem"
           @tobottom="tobottom"
@@ -36,7 +39,7 @@
 <script>
   import MsgItem from './components/msg-item.vue';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
-  import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
+  import { useRoomBaseServer, useQaServer, useChatServer, useMenuServer } from 'middle-domain';
   import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
@@ -52,7 +55,12 @@
         unReadMessageCount: 0, // 是否点击了只看我的
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
-        watchInitData: useRoomBaseServer().state.watchInitData
+        watchInitData: useRoomBaseServer().state.watchInitData,
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0
+        }
       };
     },
     computed: {
@@ -76,12 +84,19 @@
       }
     },
     components: { SendBox },
+    // watch: {
+    //   qaList: function () {
+    //     this.scrollBottom();
+    //   }
+    // },
     created() {
+      this.menuServer = useMenuServer();
       this.getQAHistroy();
     },
     beforeDestroy() {},
     mounted() {
       this.listenEvents();
+      window.aaaa = this.scrollBottom;
     },
     filters: {
       roleClassFilter(value) {
@@ -119,6 +134,14 @@
         chatServer.$on('allBanned', res => {
           this.allBanned = res;
         });
+        //监听切换到当前tab
+        this.menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            this.virtual.contentHeight = this.$refs.qaContent.offsetHeight;
+            this.virtual.showlist = data.cuid == this.cuid;
+            this.scrollBottom();
+          });
+        });
       },
       //切换到当前tab时
       switchToBack() {
@@ -149,7 +172,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$refs.qalist.scrollToBottom();
+          this.$refs && this.$refs.qalist && this.$refs.qalist.scrollToBottom();
           this.unReadMessageCount = 0;
         });
       },
@@ -184,15 +207,15 @@
     display: flex;
     flex-direction: column;
     .qa-content-wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 120px;
+      height: calc(100% - 120px);
       overflow: hidden;
       .qa-content {
         height: 100%;
-        overflow: auto;
+        overflow: hidden;
+        .qalist {
+          height: 100%;
+          overflow: auto;
+        }
         .qa-item-wrapper {
           padding: 0 30px;
           &.qa-last-ios-progress {

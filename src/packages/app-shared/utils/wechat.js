@@ -7,7 +7,7 @@ import { Toast } from 'vant';
  * @param {*} to
  * @returns
  */
-function buildLoginAddress(to) {
+export function buildLoginAddress(to) {
   //获取地址栏参数、设置请求路径
   let _search = '';
   if (location.search && location.search != '') {

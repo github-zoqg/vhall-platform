@@ -40,7 +40,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../img/phone.png"
+                :src="phoneImg"
                 alt
               />
             </div>
@@ -53,7 +53,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../img/phone.png"
+                :src="phoneImg"
                 alt
               />
             </div>
@@ -62,7 +62,6 @@
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
               <template>
-                <!-- TODO: 自己不能@自己 -->
                 <span
                   class="info-wrap__nick-name cur-pointer"
                   @click="setPersonStatus($event, source)"
@@ -273,7 +272,8 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
-  import defaultAvatar from '../img/my-dark@2x.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',
@@ -332,10 +332,14 @@
     },
     data() {
       return {
+        //消息内容
         msgContent: '',
         //是否是嵌入端
         isEmbed: false,
-        defaultAvatar: defaultAvatar
+        //默认兜底头像
+        defaultAvatar: defaultAvatar,
+        //手机端icon标识
+        phoneImg: phoneImg
       };
     },
     computed: {

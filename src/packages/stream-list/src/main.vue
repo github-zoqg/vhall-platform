@@ -1,6 +1,7 @@
 <template>
   <div
     class="vmp-stream-list"
+    id="vmp-stream-list"
     :class="{
       'vmp-stream-list-h0': isStreamListH0 && !isUseNoDelayLayout,
       'no-delay-layout': isUseNoDelayLayout,
@@ -18,7 +19,7 @@
     </span>
 
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
-    <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
+    <div v-drag ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
         <!-- 本地流容器 -->
         <div
@@ -350,6 +351,24 @@
             this.remoteSpeakers.length * 142 > this.$refs.streamWrapper.clientWidth;
         }
       }
+    },
+    directives: {
+      drag(el, bindings) {
+        el.onmousedown = function (e) {
+          // const boxdom = document.getElementById('vmp-stream-list');
+          let startX = e.pageX;
+          // var disx = e.pageX - el.offsetLeft;
+          // const boxdomScrollLeft = boxdom.scrollLeft;
+          el.onmousemove = function (e) {
+            const l = e.pageX - startX;
+            // boxdom.scrollLeft = boxdomScrollLeft - l * (boxdom.offsetWidth / el.offsetWidth);
+            el.scrollLeft -= l;
+          };
+          el.onmouseup = function (e) {
+            el.onmousemove = null;
+          };
+        };
+      }
     }
   };
 </script>
@@ -376,6 +395,10 @@
       flex: 1;
       overflow: hidden;
       display: flex;
+      display: inherit;
+      cursor: pointer;
+
+      user-select: none;
       &-scroll {
         display: flex;
         justify-content: center;
