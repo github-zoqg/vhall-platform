@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
+import '@/packages/app-shared/utils/vlog';
 import router from './router';
 import { initGlobalAPI, i18n } from './core';
 import domainStore from './domain';
@@ -16,15 +17,6 @@ import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import * as Sentry from '@sentry/vue';
 import { Integrations } from '@sentry/tracing';
 
-// code码相关翻译方法 老代码
-Vue.prototype.$tec = function (path) {
-  return this.$te(path) ? this.$t(path) : undefined;
-};
-try {
-  new window.VConsole();
-} catch (e) {
-  console.log(e);
-}
 // 初始化
 initGlobalAPI();
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用

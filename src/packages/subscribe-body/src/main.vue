@@ -272,9 +272,11 @@
         this.feeAuth({ type: type });
       },
       handlePlay() {},
+      // 切换多语言
       changeLang(key) {
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =
@@ -425,6 +427,14 @@
     &-tab {
       background: #2a2a2a;
       margin: 0px auto;
+    }
+    .subscribe-img-box-embed {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: rgba(0, 0, 0, 0.6);
     }
   }
   @media screen and (max-width: 1366px) {

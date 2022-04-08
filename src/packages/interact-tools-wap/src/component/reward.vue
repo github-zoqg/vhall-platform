@@ -58,7 +58,7 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { useWatchRewardServer, useChatServer } from 'middle-domain';
-  import { authWeixinAjax } from '@/packages/app-shared/utils/wechat';
+  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'reward',
@@ -104,6 +104,24 @@
       // 打赏成功消息
       rewardFn(msg) {
         console.log('收到打赏成功消息', msg, this.webinarData.join_info.third_party_user_id);
+        const data = {
+          avatar: msg.data.rewarder_avatar,
+          nickname:
+            msg.data.rewarder_nickname.length > 8
+              ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+              : msg.data.rewarder_nickname,
+          type: 'reward_pay_ok',
+          content: {
+            text_content: msg.data.reward_describe
+              ? msg.data.reward_describe
+              : this.$t('chat.chat_1037'),
+            num: msg.data.reward_amount
+          },
+          sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
+          roleName: this.roleName,
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
         if (msg.rewarder_id == this.webinarData.join_info.third_party_user_id) {
           console.log('收到打上成功消息，关闭弹窗');
           this.close();
@@ -137,7 +155,7 @@
       },
       // 金额校验
       submit() {
-        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^[0-9]\.[0-9]([0-9])?$)/;
         const fee = this.money || this.btnMoney;
         if (reg.test(fee)) {
           this.rewardPay(fee);
@@ -156,17 +174,26 @@
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
-        if (isWechat() && open_id) {
-          params = {
-            room_id: this.localRoomInfo.roomId,
-            channel: 'WEIXIN',
-            reward_amount: money,
-            service_code: 'JSAPI',
-            describe: this.note
-              ? this.note
-              : `${this.$t('interact_tools.interact_tools_1047')}～～`,
-            open_id: open_id
-          };
+        let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        if (isWechat()) {
+          // 微信正常授权过
+          if (open_id) {
+            params = {
+              room_id: this.localRoomInfo.roomId,
+              channel: 'WEIXIN',
+              reward_amount: money,
+              service_code: 'JSAPI',
+              describe: this.note
+                ? this.note
+                : `${this.$t('interact_tools.interact_tools_1047')}～～`,
+              open_id: open_id
+            };
+          } else {
+            //重新授权
+            payAuthStatus = 1;
+            const payUrl = buildPayUrl(this.$route);
+            authWeixinAjax(this.$route, payUrl, () => {});
+          }
         } else {
           params = {
             channel: 'ALIPAY',
@@ -178,17 +205,19 @@
             room_id: this.localRoomInfo.roomId
           };
         }
-        this.payProcess(params);
+
+        if (payAuthStatus == 0) {
+          this.payProcess(params);
+        }
       },
       // 确认支付
       payProcess(params) {
         const that = this;
-        const open_id = sessionStorage.getItem('open_id');
         this.rewardServer
           .createReward({ ...params })
           .then(res => {
             if (res.code == 200) {
-              if (isWechat() && open_id) {
+              if (isWechat()) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
@@ -203,25 +232,25 @@
                     if (res.err_msg == 'get_brand_wcpay_request:ok') {
                       that.$toast(`${that.$t('common.common_1005')}`);
                       that.close();
-                      setTimeout(() => {
-                        window.location.href =
-                          window.location.protocol +
-                          process.env.VUE_APP_WAP_WATCH +
-                          process.env.VUE_APP_WEB_KEY +
-                          `/lives/watch/${that.$route.params.id}`;
-                      }, 1500);
+                      // setTimeout(() => {
+                      //   window.location.href =
+                      //     window.location.protocol +
+                      //     process.env.VUE_APP_WAP_WATCH +
+                      //     process.env.VUE_APP_WEB_KEY +
+                      //     `/lives/watch/${that.$route.params.id}`;
+                      // }, 1500);
                     }
                   }
                 );
               } else {
-                window.location.href = res.data.pay_data.url;
+                window.location.href = res.data.pay_data;
               }
             } else {
               that.$toast(`${that.$tec(res.code) || res.msg}`);
             }
           })
           .catch(res => {
-            console.log('获取支付信息失败>>>', res);
+            console.log('reward 获取支付信息失败---------->', res);
             that.$toast(`${that.$tec(res.code) || res.msg}`);
           });
       },
@@ -311,9 +340,10 @@
       font-family: PingFangSC;
       font-weight: 400;
       color: rgba(68, 68, 68, 1);
-      height: 80px;
+      height: 90px;
       justify-content: space-between;
       > div {
+        height: 100%;
         flex-grow: 1;
         input {
           width: 100%;

@@ -156,7 +156,7 @@
       initLoginStatus() {
         if (
           [2, '2'].includes(this.roleName) &&
-          !this.Embed &&
+          !this.isEmbed &&
           (!this.userId || this.userId == 0) &&
           this.configList['ui.show_chat_without_login'] != 1
         ) {
@@ -266,6 +266,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        white-space: nowrap;
         .vh-d-arrow-down {
           font-size: 12px;
           margin-left: 6px;

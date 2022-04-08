@@ -69,7 +69,7 @@
                 v-model="form[question.id]"
                 :placeholder="placeholderMap[question.default_type] || $t('form.form_1014')"
                 type="text"
-                maxlength="60"
+                :maxlength="getInputLimit(question)"
               />
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
@@ -346,7 +346,7 @@
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
-  import { useSignUpFormServer } from 'middle-domain';
+  import { useSignUpFormServer, useRoomBaseServer } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
@@ -378,29 +378,6 @@
         isSubscribe: 0,
         //简介文字是否超长
         overflowStatus: false,
-        //tab栏的配置
-        tabConfig: {
-          1: [
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            },
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            }
-          ],
-          2: [
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            },
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            }
-          ]
-        },
         //当前激活的tab
         activeTab: 1,
         // 手机短信验证是都开启
@@ -441,18 +418,6 @@
           'form.form_1070',
           'form.form_1071'
         ],
-        //输入文字提示的map
-        placeholderMap: {
-          1: this.$t('interact_tools.interact_tools_1005'),
-          2: this.$t('account.account_1025'),
-          3: this.$t('form.form_1023'),
-          5: {
-            province: this.$t('form.form_1004'),
-            city: this.$t('form.form_1005'),
-            county: this.$t('form.form_1006')
-          },
-          6: this.$t('form.form_1020')
-        },
         //错误信息的map
         errMsgMap: {},
         //省份
@@ -540,21 +505,63 @@
             });
             return list;
           }
+          return list;
+        };
+      },
+      //tab栏的配置
+      tabConfig() {
+        return {
+          1: [
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            },
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            },
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            }
+          ]
+        };
+      },
+      //输入文字提示的map
+      placeholderMap() {
+        return {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1003'),
+            city: this.$t('form.form_1004'),
+            county: this.$t('form.form_1005')
+          },
+          6: this.$t('form.form_1020')
+        };
+      },
+      //计算输入框限制的字数
+      getInputLimit() {
+        return function (question = {}) {
+          let maxLength = '';
+          if (question.default_type == 1) {
+            maxLength = 50;
+          } else {
+            maxLength = question.type == 0 ? '' : 60;
+          }
+          return maxLength;
         };
       }
     },
     watch: {
-      // province(newVal, oldVal) {
-      //   if (newVal != oldVal) {
-      //     this.city = '';
-      //     this.county = '';
-      //   }
-      // },
-      // city(newVal, oldVal) {
-      //   if (newVal != oldVal) {
-      //     this.county = '';
-      //   }
-      // },
+      //是否开启了手机验证码验证
       isPhoneValidate: {
         immediate: true,
         handler(newVal) {
@@ -567,6 +574,7 @@
           }
         }
       },
+      //问题列表
       list: {
         deep: true,
         handler(newList) {
@@ -606,9 +614,20 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     async mounted() {
       await this.getFormLinkStatus();
+      await this.roomBaseServer.getLangList(this.$route.params.id);
+      const roomBaseState = this.roomBaseServer.state;
+      document.title = roomBaseState.languages.curLang.subject;
+      let lang = roomBaseState.languages.lang;
+      this.$i18n.locale = lang.type;
+      // if (localStorage.getItem('lang')) {
+      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      // } else {
+      //   this.$i18n.locale = 'zh';
+      // }
       this.getWebinarType();
       this.getBaseInfo();
       this.getQuestionList();
@@ -854,7 +873,6 @@
           if (this.errMsgMap[item] != '') {
             this.refArr.forEach((refItem, index) => {
               if (refItem == item) {
-                console.log(item, refItem);
                 firstErrIndex == 'first'
                   ? (firstErrIndex = index)
                   : firstErrIndex > index && (firstErrIndex = index);
@@ -867,8 +885,6 @@
         firstErrIndex == 'first' && this.errMsgMap.code && (firstErrIndex = 'code');
 
         if (isValidate) {
-          console.log(this.form);
-          // const refer = this.getQueryVariable('refer')
           this.formHandler();
           this.submitSignUpForm();
         } else {
@@ -1132,8 +1148,6 @@
           `/lives/entryform/${this.webinar_id}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
             const params = {
               appId: res.data.appId,
               timestamp: res.data.timestamp,
@@ -1378,8 +1392,6 @@
             params.visit_id = sessionStorage.getItem('visitorId');
           }
 
-          console.log(this.signUpFormServer);
-
           this.signUpFormServer
             .checkIsRegistered(params)
             .then(res => {
@@ -1485,7 +1497,6 @@
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             overflow: hidden;
-            text-overflow: -o-ellipsis-lastline;
             text-overflow: ellipsis;
           }
           .text-tail {
@@ -1496,7 +1507,7 @@
             background-color: #fff;
             color: #3562fa;
             .is-ellipsis {
-              color: #666666;
+              color: #666;
             }
           }
           .text-tail-2 {
@@ -1561,16 +1572,7 @@
             margin-top: 90px;
           }
         }
-        //li {
-        //  margin-top: 0.52rem;
-        //  position: relative;
-        //  margin-bottom: 0.02rem;
-        //  &:last-child {
-        //    margin-top: 90px;
-        //  }
-        //}
         input {
-          // line-height: 1.04rem !important;
           height: 1.04rem;
           line-height: 0.84rem;
           width: 9.07rem;
@@ -1642,7 +1644,6 @@
     }
     .err-msg {
       position: absolute;
-      /* display: none; */
       bottom: -0.4rem;
       left: 0;
       font-size: 0.32rem;
@@ -1650,9 +1651,7 @@
     }
     .radio-item {
       position: relative;
-      // min-height: 1.067rem;
       padding: 0.267rem 0.2rem 0 0.2rem;
-      // border: 0.02rem solid #d2d2d2;
       border-radius: 0.11rem;
       margin-top: 0.267rem;
       max-width: 9.07rem;
@@ -1742,8 +1741,6 @@
       }
       .select-item {
         appearance: none;
-        -moz-appearance: none;
-        -webkit-appearance: none;
         display: inline-block;
         width: 9.07rem;
         height: 1.07rem;

@@ -45,14 +45,14 @@
       <div class="vmp-subscribe-body-auth">
         <div
           class="vmp-subscribe-body-auth-two"
-          v-if="subOption.verify == 6 && !subOption.is_subscribe"
+          v-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
         >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
         </div>
-        <div v-else>
-          <span @click="authCheck(subOption.verify)">{{ subscribeText }}</span>
+        <div v-else @click="authCheck(subOption.verify)">
+          <span>{{ subscribeText }}</span>
         </div>
       </div>
     </template>
@@ -91,14 +91,14 @@
     </van-popup>
 
     <!-- 邀请卡浮动按钮 -->
-    <button v-if="showInvite" class="vmp-subscribe-body-invite" @click="gotoInvitePage">
+    <button v-if="showInvite && !isEmbed" class="vmp-subscribe-body-invite" @click="gotoInvitePage">
       {{ $t('nav.nav_1015') }}
     </button>
   </div>
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
-  import { boxEventOpitons, browserType } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   import authBox from './components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
@@ -150,6 +150,10 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
+      // 是否为嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       isTryVideo() {
         return (
           this.roomBaseServer.state.watchInitData.record.preview_paas_record_id &&
@@ -175,9 +179,6 @@
     mounted() {
       this.initPage();
       this.listenEvents();
-      if (this.roomBaseServer.state.embedObj.embedVideo) {
-        this.showBottomBtn = false;
-      }
     },
     methods: {
       listenEvents() {
@@ -213,6 +214,11 @@
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
         if (webinar.type == 2) {
+          // 嵌入页没有预约页
+          if (this.isEmbed) {
+            this.showBottomBtn = false;
+            return;
+          }
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
@@ -319,7 +325,7 @@
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
               return;
             }
-            if (browserType() && open_id) {
+            if (isWechat() && open_id) {
               // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
               // const open_id = sessionStorage.getItem('open_id');
               params = {
@@ -353,7 +359,7 @@
           .payWay({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType() && flag == 1) {
+              if (isWechat() && flag == 1) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
@@ -424,10 +430,12 @@
       openLanguage() {
         this.isOpenlang = true;
       },
+      // 切换多语言
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =
@@ -483,6 +491,9 @@
           this.sureCountDown();
           this.handlerInitInfo();
         } else if (this.webinarType == 3) {
+          if (this.roomBaseServer.state.embedObj.embedVideo) {
+            this.showBottomBtn = false;
+          }
           this.subscribeText = this.$t('player.player_1017');
           this.countDownTime = 0;
         }
@@ -505,9 +516,8 @@
         const activeId = this.$route.params.id;
         const { join_info } = this.roomBaseServer.state.watchInitData;
         const joinId = join_info.join_id;
-        const lang = localStorage.getItem('lang');
 
-        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
+        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}`;
 
         const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
 

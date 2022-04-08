@@ -4,25 +4,21 @@
       class="custom-lottery-box"
       :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
     >
-      <!-- <img
-        v-if="prizeInfo && !prizeInfo.image_url"
-        src="../img/default-lottery.png"
-        alt=""
-        class="default-lottery"
-      /> -->
       <div class="custom-lottery">
-        <img :src="prizeInfo ? prizeInfo.image_url : defaultLotteryImg" alt="" />
+        <img :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt="" />
       </div>
       <p
         class="custom-lottery__name"
         :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery__name-default' : ''"
       >
-        {{ (prizeInfo && prizeInfo.award_name) || '奖品' }}
+        {{ (prizeInfo && prizeInfo.award_name) || $t('interact_tools.interact_tools_1009') }}
       </p>
     </div>
     <!-- 列表 -->
     <div class="lottery-winner-list">
-      <div class="lottery-winner-list__header" :class="{ 'is-scroll': isScroll }">中奖名单</div>
+      <div class="lottery-winner-list__header" :class="{ 'is-scroll': isScroll }">
+        {{ $t('interact_tools.interact_tools_1020') }}
+      </div>
       <ul class="lottery-winner-list__body" @scroll="handleScroll">
         <li
           v-for="item in winnerList"
@@ -67,7 +63,10 @@
       },
       // 奖品信息
       prizeInfo: {
-        type: Object
+        type: Object,
+        default() {
+          return {};
+        }
       }
     },
     data() {

@@ -125,8 +125,8 @@
       </ul>
     </div>
 
-    <!-- 文档加载时的遮罩和进度 -->
-    <div v-show="!docLoadComplete" class="el-loading-mask vmp-doc-mask">
+    <!-- 文档加载时的遮罩和进度,观看端才用 -->
+    <div v-show="isWatch && !docLoadComplete" class="el-loading-mask vmp-doc-mask">
       <div class="el-loading-spinner">
         <svg viewBox="25 25 50 50" class="circular">
           <circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
@@ -205,15 +205,20 @@
       isInGroup() {
         return !!this.groupServer.state.groupInitData?.isInGroup;
       },
-      // 是否显示文档翻页相关操作栏
+      // 是否显示文档白板操作栏(翻页、放大、缩小、还原、拖拽)
       showPagebar() {
-        // (普通模式，或 观看端全屏模式下) && (有演示权限，或是观众,或者展示文档时的助理)
-        return (
-          (this.displayMode === 'normal' || (this.displayMode === 'fullscreen' && this.isWatch)) &&
-          (this.hasDocPermission ||
-            this.roleName === 2 ||
-            (this.roleName === 3 && this.currentType === 'document'))
-        );
+        if (this.isWatch) {
+          // 观看端，普通模式或全屏模式下，打开了文档或白板
+          return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
+        } else {
+          // 发起端，打开了文档，普通模式，助理或者有演示权限,非转播状态
+          return (
+            this.currentType === 'document' &&
+            this.displayMode === 'normal' &&
+            (this.roleName == 3 || this.hasDocPermission) &&
+            !this.watchInitData.rebroadcast?.isRebroadcasting
+          );
+        }
       },
       // 当前用户Id
       userId() {
@@ -266,7 +271,11 @@
           // );
         } else {
           if (this.isShareScreen) {
-            return this.docServer.state.currentCid && !this.micServer.state.isSpeakOn;
+            return this.roleName == 3;
+
+            // return (
+            //   (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn)
+            // );
           } else {
             return true;
           }
@@ -283,11 +292,12 @@
       },
       // 是否显示文档白板工具栏
       showToolbar() {
-        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下显示工具栏
+        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下,非转播状态，显示工具栏
         return (
           this.webinarMode != 5 &&
           (this.hasDocPermission || [3].includes(this.roleName)) &&
-          ['normal', 'fullscreen'].includes(this.displayMode)
+          ['normal', 'fullscreen'].includes(this.displayMode) &&
+          !this.watchInitData.rebroadcast?.isRebroadcasting
         );
       },
       /**
@@ -411,6 +421,10 @@
           this.hasStreamList = newval < 1 ? false : true;
         },
         immediate: true
+      },
+      // 演示者变更时,隐藏缩列图列表
+      presenterId() {
+        this.thumbnailShow = false;
       }
     },
     beforeCreate() {
@@ -630,6 +644,8 @@
             this.displayMode = screenfull.targetMode || 'normal';
           }
         });
+
+        this.docServer.$on('dispatch_doc_page_change', this.dispatchDocPageChange);
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
@@ -927,6 +943,17 @@
           return;
         }
       },
+      // 翻页
+      dispatchDocPageChange() {
+        if (!this.isWatch) {
+          if (this.$refs.docToolbar.currentBrush === 'eraser') {
+            // 翻页后sdk会会变橡皮擦设置成move,这个延迟1s重置当前笔刷
+            setTimeout(() => {
+              this.resetCurrentBrush();
+            }, 1000);
+          }
+        }
+      },
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
@@ -955,6 +982,7 @@
       }
     },
     beforeDestroy() {
+      this.docServer.$off('dispatch_doc_page_change', this.dispatchDocPageChange);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       window.removeEventListener('keydown', this.listenKeydown);
     }
@@ -981,6 +1009,7 @@
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
+      background-color: #292929;
     }
 
     // 发起端结束演示按钮
@@ -1251,5 +1280,10 @@
         display: flex;
       }
     }
+  }
+
+  // 回放有文档时自动生成的div，用于文档sdk存储回放数据
+  #myVodNode {
+    height: 0 !important;
   }
 </style>

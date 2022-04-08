@@ -36,10 +36,10 @@ export function browserDetect() {
   return chromeResult
     ? !(chromeResult.length == 0 || chromeResult[1] < 61)
     : !(
-        !safariResult ||
-        safariResult.length == 0 ||
-        parseInt(safariResult[1].split('.').join('')) < 121
-      );
+      !safariResult ||
+      safariResult.length == 0 ||
+      parseInt(safariResult[1].split('.').join('')) < 121
+    );
 }
 
 // 尺寸重置
@@ -55,9 +55,9 @@ export function resize() {
 }
 
 // 防抖
-export const debounce = (function () {
+export const debounce = (function() {
   let timer = 0;
-  return function (callback, ms) {
+  return function(callback, ms) {
     clearTimeout(timer);
     timer = setTimeout(callback, ms);
   };
@@ -207,7 +207,7 @@ export function checkUploadType(file, that, type = 1) {
   const imgSrc = window.URL.createObjectURL(file);
   const img = new Image();
   img.src = imgSrc;
-  img.onload = function () {
+  img.onload = function() {
     // 我在这里就可以获取到图片的宽度和高度了 img.width 、img.height
     if (img.width !== 1280 && img.height !== 720) {
       that.$message.warning('请上传1280*720尺寸图片!'); // TODO: 缺翻译
@@ -223,20 +223,6 @@ export function getQueryString(name) {
   if (r != null) return unescape(r[2]);
   return null;
 }
-/**
- * @description 区分浏览器类型 是微信还是普通浏览器
- * @returns null
- */
-export const browserType = () => {
-  const ua = window.navigator.userAgent.toLowerCase();
-  // console.log('ua', ua, ua.match(/MicroMessenger/i) == 'micromessenger')
-  if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-    /* 是微信浏览器 */
-    return true;
-  } else {
-    return false;
-  }
-};
 
 /**
  * 计算uuid唯一标识

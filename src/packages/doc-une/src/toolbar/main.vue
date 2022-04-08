@@ -179,7 +179,7 @@
     data() {
       return {
         showAudienceTip: true,
-        // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
+        // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser, move
         currentBrush: '',
         // 画笔状态
         pen: {
@@ -299,6 +299,7 @@
           // 取消缩放、移动模式
           this.docServer.cancelZoom();
         }
+        console.log('changeTool2 brush:', brush, '; key:', key, '; value:', value);
         switch (brush) {
           // 选择
           case 'select': {
@@ -333,13 +334,16 @@
           }
           case 'eraser': {
             this.docServer.setEraser();
+            console.log('changeTool3');
             break;
           }
           case 'move': {
             this.docServer.move();
+            console.log('changeTool4');
             break;
           }
         }
+        console.log('changeTool5');
         this.$emit('changeBrush', brush);
       },
       // 重设当前画笔

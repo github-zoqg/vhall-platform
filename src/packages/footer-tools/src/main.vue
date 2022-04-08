@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-footer-tools" v-if="!isEmbedVideo">
+  <div class="vmp-footer-tools">
     <div class="vmp-footer-tools__left">
       <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
         <i class="vh-iconfont vh-line-setting"></i>
@@ -70,7 +70,7 @@
         <lottery-icon @clickIcon="checkLotteryIcon" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
-      <li>
+      <li v-if="!isEmbed">
         <red-packet-icon @clickIcon="checkredPacketIcon" />
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
@@ -213,10 +213,6 @@
         // 是不是嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
-      isEmbedVideo() {
-        // 是不是音视频嵌入
-        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
-      },
       device_status() {
         // 设备状态  0未检测 1可以上麦 2不可以上麦
         return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
@@ -286,9 +282,11 @@
         this.showPay = true;
         this[data] = url;
       },
+      // 切换语言
       changeLang(key) {
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =
@@ -364,6 +362,9 @@
       > div {
         margin-left: 16px;
       }
+      li {
+        line-height: initial; // 防止继承外部属性值
+      }
       li > div > img {
         width: 32px;
         height: 32px;
@@ -390,7 +391,7 @@
       background: #fb3a32;
       border: 1px solid #2a2a2a;
       border-radius: 50%;
-      top: 10px;
+      // top: 10px;
       right: 0px;
       position: absolute;
     }

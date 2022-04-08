@@ -1,75 +1,81 @@
 <template>
   <section class="vmp-intro">
-    <section class="vmp-intro-block">
-      <header class="vmp-intro-block__headtitle">
-        <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
-          <img :src="noDelayIconUrl" />
-        </i>
-        {{ languagesInfo.subject }}
-      </header>
-      <main class="vmp-intro-block__detail">
-        <p>
-          <i class="vh-iconfont vh-line-time" />
-          {{ $t('common.common_1012') }}:{{ startTime }}
-        </p>
-        <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-          <p v-if="watchInitData.subscribe.show">
-            <i class="vh-iconfont vh-line-user"></i>
-            {{ $t('common.common_1031') }}:{{ watchInitData.subscribe.num }} 人
+    <section class="vmp-intro-main">
+      <section class="vmp-intro-block">
+        <header class="vmp-intro-block__headtitle">
+          <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
+            <img :src="noDelayIconUrl" />
+          </i>
+          {{ languagesInfo.subject }}
+        </header>
+        <main class="vmp-intro-block__detail">
+          <p>
+            <i class="vh-iconfont vh-line-time" />
+            {{ $t('common.common_1012') }}:{{ startTime }}
           </p>
-        </template>
-        <template v-if="watchInitData.status != 'subscribe'">
-          <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-          <p v-if="watchInitData.online.show">
-            <i class="vh-iconfont vh-line-user"></i>
-            {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }} 人
-          </p>
-        </template>
-      </main>
-      <div
-        class="vmp-intro-block__auth"
-        v-if="watchInitData.status == 'subscribe' && watchInitData.join_info.is_subscribe != 1"
-      >
-        <span>
-          {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}
-          {{
-            ((webinar.verify == 4 || webinar.verify == 1) && Number(webinar.reg_form) && '/') || ''
-          }}
-          {{
-            webinar.verify == 0
-              ? ''
-              : webinar.verify == 1
-              ? $t('form.form_1079')
-              : webinar.verify == 2
-              ? $t('appointment.appointment_1032')
-              : webinar.verify == 3
-              ? ''
-              : webinar.verify == 4
-              ? $t('appointment.appointment_1011')
-              : webinar.verify == 5
-              ? $t('form.form_1078')
-              : ''
-          }}
-        </span>
-      </div>
+          <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
+            <p v-if="watchInitData.subscribe.show">
+              <i class="vh-iconfont vh-line-user"></i>
+              {{ $t('common.common_1031') }}:{{ watchInitData.subscribe.num }} 人
+            </p>
+          </template>
+          <template v-if="watchInitData.status != 'subscribe'">
+            <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+            <p v-if="watchInitData.online.show">
+              <i class="vh-iconfont vh-line-user"></i>
+              {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }} 人
+            </p>
+          </template>
+        </main>
+        <div
+          class="vmp-intro-block__auth"
+          v-if="
+            !isEmbed &&
+            watchInitData.status == 'subscribe' &&
+            watchInitData.join_info.is_subscribe != 1
+          "
+        >
+          <span>
+            {{ webinar.verify == 5 ? '' : Number(webinar.reg_form) ? $t('form.form_1078') : '' }}
+            {{
+              ((webinar.verify == 4 || webinar.verify == 1) && Number(webinar.reg_form) && '/') ||
+              ''
+            }}
+            {{
+              webinar.verify == 0
+                ? ''
+                : webinar.verify == 1
+                ? $t('form.form_1079')
+                : webinar.verify == 2
+                ? $t('appointment.appointment_1032')
+                : webinar.verify == 3
+                ? ''
+                : webinar.verify == 4
+                ? $t('appointment.appointment_1011')
+                : webinar.verify == 5
+                ? $t('form.form_1078')
+                : ''
+            }}
+          </span>
+        </div>
+      </section>
+      <section class="vmp-intro-block vmp-intro-block-content">
+        <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header>
+        <main class="vmp-intro-block__content-main" v-html="content"></main>
+      </section>
+      <aside>
+        <a
+          class="vmp-intro-link"
+          v-show="isShowCopyRight"
+          href="https://www.vhall.com/saas"
+          target="_blank"
+        >
+          {{ $t('footer.footer_1021') }}
+        </a>
+        <!-- 暂时借用dom -->
+        <vmp-air-container :cuid="cuid"></vmp-air-container>
+      </aside>
     </section>
-    <section class="vmp-intro-block vmp-intro-block-content">
-      <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header>
-      <main class="vmp-intro-block__content-main" v-html="content"></main>
-    </section>
-
-    <aside>
-      <a
-        class="vmp-intro-link"
-        v-show="isShowCopyRight"
-        href="https://www.vhall.com/saas"
-        target="_blank"
-      >
-        {{ $t('footer.footer_1021') }}
-      </a>
-      <!-- 暂时借用dom -->
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
-    </aside>
   </section>
 </template>
 
@@ -106,6 +112,10 @@
       startTime() {
         return this?.webinar?.start_time?.substr(0, 16) || '';
       },
+      // 是否为嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       languagesInfo() {
         return this.$domainStore.state.roomBaseServer.languages.curLang;
       },
@@ -135,6 +145,7 @@
   .vmp-intro {
     background-color: #f2f2f2;
     height: 100%;
+    overflow-y: auto;
     position: relative;
     display: flex;
     flex-direction: column;

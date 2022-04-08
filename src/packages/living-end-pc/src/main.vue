@@ -1,7 +1,12 @@
 <template>
   <div
-    class="vmp-living-end"
-    :class="isEmbedVideo ? 'vmp-living-end-embed' : ''"
+    :class="[
+      'vmp-living-end',
+      {
+        'vmp-living-end-embedFull': isEmbedVideo,
+        'vmp-living-end-embed': isEmbed && !isEmbedVideo
+      }
+    ]"
     v-if="isLivingEnd"
     :style="`backgroundImage: url('${webinarsBgImg}')`"
   >
@@ -30,8 +35,12 @@
       webinarsType() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       },
+      // 是否是嵌入
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
       isEmbedVideo() {
-        // 是不是音视频嵌入
+        // 是不是单视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       },
       hotNum() {
@@ -78,10 +87,14 @@
     bottom: 56px;
     width: calc(100% - 380px);
     height: calc(100% - 56px);
-    z-index: 100;
+    z-index: 11;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     &-embed {
+      width: calc(100% - 360px);
+      height: calc(100% - 56px);
+    }
+    &-embedFull {
       width: 100%;
       height: 100%;
     }

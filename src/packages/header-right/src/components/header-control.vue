@@ -28,7 +28,8 @@
           <div
             class="header-right_control_wrap-container-setting"
             :class="{
-              'header-right_control_wrap-container-disabled': !isLiving || isInsertFilePushing
+              'header-right_control_wrap-container-disabled':
+                !isLiving || isInsertFilePushing || isCurrentShareScreen
             }"
             v-if="configList['is_interact'] && isSupportSplitScreen"
             @click="handleSplitScreenChange"
@@ -100,6 +101,14 @@
       // 是否开启了插播
       isInsertFilePushing() {
         return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
+      // 是否开启桌面共享
+      isCurrentShareScreen() {
+        return (
+          this.$domainStore.state.desktopShareServer.localDesktopStreamId &&
+          this.$domainStore.state.desktopShareServer.desktopShareInfo.accountId ==
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
       },
       // 是否正在第三方推流
       thirtPushStreamimg() {

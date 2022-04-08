@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :class="{ fullscreen: isFullScreen }"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
@@ -37,7 +41,7 @@
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleFilter(true) }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -67,7 +71,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleFilter(true) }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip
@@ -100,10 +104,7 @@
       </p>
 
       <p class="vmp-stream-remote__shadow-second-line" v-if="liveMode != 1">
-        <span
-          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
-          class="vmp-stream-local__shadow-label"
-        >
+        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           视图
         </span>
 
@@ -115,13 +116,17 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
+        <el-tooltip
+          :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          placement="bottom"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             :class="{
               'vh-line-amplification': !isFullScreen,
               'vh-line-narrow': isFullScreen
             }"
+            v-show="stream.streamId"
             @click="fullScreen"
           ></span>
         </el-tooltip>
@@ -452,6 +457,9 @@
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            if (this.joinInfo.role_name === 1) {
+              this.interactiveServer.resetLayout();
+            }
             setTimeout(() => {
               this.replayPlay();
 
@@ -514,7 +522,10 @@
         const roomBaseServer = useRoomBaseServer();
         let miniElement = '';
         if (this.isShareScreen) {
-          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+          if (
+            this.presentationScreen != this.joinInfo.third_party_user_id ||
+            this.joinInfo.role_name != 2
+          ) {
             miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
           } else {
             miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
@@ -613,6 +624,22 @@
     &:hover {
       .vmp-stream-remote__shadow-box {
         display: flex;
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-remote__shadow-box {
+        display: flex;
+        height: 24px;
+        bottom: 0;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-remote__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
+        }
       }
     }
     .vmp-stream-remote__container {

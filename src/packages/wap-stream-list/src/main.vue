@@ -66,7 +66,9 @@
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && isShowMainScreen ? 'opcity-true' : 'opcity-flase']"
+        :class="[
+          iconShow && isShowMainScreen && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase'
+        ]"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -123,7 +125,7 @@
         showPlayIcon: false, // 是否展示播放按钮
         scroll: null, // BScroll 插件
         mainScreenDom: null, // 主屏Dom
-        iconShow: false, // 5 秒的展示
+        iconShow: false, // 5 秒的icon展示
         isOpenlang: false,
         lang: {},
         languageList: [],
@@ -226,6 +228,12 @@
           this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
           this.joinInfo.third_party_user_id == this.mainScreen;
         return _flag;
+      },
+      // 主屏流   和产品佳佳沟通：显示全屏按钮条件： 主画面 + 存在视频流
+      mainScreenStream() {
+        let allStream = this.interactiveServer.getRoomStreams();
+        let stream = allStream.find(stream => stream.accountId == this.mainScreen) || {};
+        return stream;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
@@ -340,7 +348,7 @@
               probeType: 3 // listening scroll event
             });
           }
-
+          // 在创建时，需获取主屏Dom并设置left值，防止出现布局混乱
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
@@ -366,32 +374,20 @@
       // 全屏
       setFullScreen() {
         /*
-         * 布局原因：wap进入全屏仅全屏主屏流
+         * 布局原因：wap进入全屏仅全屏主屏流， 本地流和远端流都存在被设置为主屏情况
          *    进入全屏在list内，退出全屏在remote/local内进行退出
          */
-        let allStream = this.interactiveServer.getRoomStreams();
-        let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
-        if (mainScreenStream) {
-          if (mainScreenStream.streamSource == 'remote') {
-            this.interactiveServer
-              .setStreamFullscreen({
-                streamId: mainScreenStream.streamId,
-                vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
-              })
-              .then(() => {
-                this.setFullScreenStatus();
-              });
-          } else {
-            this.interactiveServer
-              .setStreamFullscreen({
-                streamId: mainScreenStream.streamId,
-                vNode: `vmp-stream-local__${mainScreenStream.accountId}`
-              })
-              .then(() => {
-                this.setFullScreenStatus();
-              });
-          }
-        }
+        this.interactiveServer
+          .setStreamFullscreen({
+            streamId: this.mainScreenStream.streamId,
+            vNode:
+              this.mainScreenStream.streamSource == 'remote'
+                ? `vmp-stream-remote__${this.mainScreenStream.streamId}`
+                : `vmp-stream-local__${this.mainScreenStream.accountId}`
+          })
+          .then(() => {
+            this.setFullScreenStatus();
+          });
       },
       setFullScreenStatus() {
         // 参考player组件内的brower内的ios判断条件
@@ -405,10 +401,12 @@
         this.isOpenlang = false;
         this.fiveDown();
       },
+      // 切换多语言
       changeLang(key) {
         this.isOpenlang = false;
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =

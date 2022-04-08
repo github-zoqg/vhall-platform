@@ -2,17 +2,11 @@
   <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
     <!-- 发起抽奖/问答 -->
     <template
-      v-if="
-        source.type == 'lottery_push' ||
-        source.type == 'question_answer_open' ||
-        source.type == 'question_answer_close'
-      "
+      v-if="['lottery_push', 'question_answer_open', 'question_answer_close'].includes(source.type)"
     >
       <div class="msg-item interact">
         <div class="interact-msg">
-          <template
-            v-if="source.type == 'question_answer_open' || source.type == 'question_answer_close'"
-          >
+          <template v-if="['question_answer_open', 'question_answer_close'].includes(source.type)">
             {{ source.roleName | roleFilter }}
           </template>
           {{ source.content.text_content }}
@@ -97,7 +91,9 @@
         </div>
         <div class="msg-content">
           <!-- 签到消息头部 相类似的可优化 -->
-          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">签到</p>
+          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">
+            {{ $t('interact_tools.interact_tools_1024') }}
+          </p>
           <!-- 正常聊天消息 -->
           <p class="msg-content_name" v-else>
             <span
@@ -169,9 +165,13 @@
             >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span v-html="source.content.text_content" style="display: block"></span>
+                <span
+                  v-html="source.content.text_content"
+                  style="display: block"
+                  class="aaa"
+                ></span>
                 <img
-                  @click="previewImg(img)"
+                  @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -261,30 +261,21 @@
     },
     methods: {
       // 点击查看抽奖信息
-      //todo 信令替代
       checkLotteryDetail(e, msgData) {
-        console.log('checkLotteryDetail', e, msgData);
-        console.log(this.emitLotteryEvent);
         this.emitLotteryEvent(msgData?.content?.msg?.data);
       },
       // 点击查看问卷
-      //todo 信令替代
       checkQuestionDetail(questionnaire_id) {
-        console.log(questionnaire_id);
-        console.log(this.emitQuestionnaireEvent);
         this.emitQuestionnaireEvent(questionnaire_id);
-        // EventBus.$emit('checkQuestionDetail', questionnaire_id);
       },
       //处理@消息
       handleAt() {
-        //todo 可以考虑domaint提供统一的处理 实现@用户
+        //@用户
         if (this.source && Array.isArray(this.source.atList) && !this.source.atList.length) {
           this.msgContent = this.source.content.text_content;
         } else if (this.source.atList && this.source.atList.length) {
           let at = false;
           (this.source.atList || []).forEach(a => {
-            console.log('atList', a.nick_name);
-            console.log(this.source.atList.length);
             const userName = `@${a.nick_name} `;
             const match =
               this.source.content &&
@@ -310,12 +301,11 @@
           });
         }
         if (
-          this.source.atList &&
-          this.source.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&
+          (this.source.atList || []).find(u => this.joinInfo.third_party_user_id == u.accountId) &&
           !this.source.isHistoryMsg
         ) {
           this.$emit('dispatchEvent', { type: 'scrollElement', el: this.$el });
-          clearTimeout(this.tipTimer);
+          this.tipTimer && clearTimeout(this.tipTimer);
           this.tipTimer = setTimeout(() => {
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
@@ -326,7 +316,7 @@
             el: this.$el,
             msg: this.source.replyMsg
           });
-          clearTimeout(this.tipTimer);
+          this.tipTimer && clearTimeout(this.tipTimer);
           this.tipTimer = setTimeout(() => {
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
@@ -356,7 +346,7 @@
           border-radius: 50%;
           display: block;
           border: 2px solid #e3e3e3;
-          object-fit: contain;
+          object-fit: cover;
         }
         .chat-phone {
           position: absolute;
@@ -378,7 +368,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
-            color: #666666;
+            color: #666;
             max-width: 300px;
             line-height: 34px;
           }
@@ -428,7 +418,7 @@
           margin-top: 5px;
           padding: 18px 20px;
           word-break: break-all;
-          color: #444444;
+          color: #444;
           line-height: 36px;
           background-color: #f7f7f7;
           border-radius: 8px;
@@ -476,7 +466,7 @@
           box-sizing: border-box;
           border-radius: 500px;
         }
-        color: #444444;
+        color: #444;
         p {
           text-align: center;
           line-height: 1;
@@ -517,7 +507,7 @@
         p {
           text-align: left;
           font-weight: 400;
-          color: #ffffff;
+          color: #fff;
         }
         .new-gift-name {
           font-size: 24px;

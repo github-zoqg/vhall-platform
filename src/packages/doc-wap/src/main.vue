@@ -14,13 +14,12 @@
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
         <div>
-          <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
             :id="item.cid"
             :key="item.cid"
             class="doc-box"
-            :style="{ zIndex: item.cid == currentCid ? '1' : '-1' }"
+            v-show="currentCid == item.cid"
           ></div>
         </div>
       </div>
@@ -69,6 +68,7 @@
     useDocServer,
     useMsgServer,
     usePlayerServer,
+    useRebroadcastServer,
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -98,7 +98,6 @@
       },
       // 当前文档白板容器id
       currentCid() {
-        // alert(this.docServer.state.currentCid, 'this.docServer.state.currentCid');
         return this.docServer.state.currentCid;
       },
       // 是否观众可见
@@ -120,6 +119,7 @@
       // 是否有翻页按钮
       hasPager() {
         return (
+          this.webinarType === 1 &&
           !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
           this.currentType === 'document'
         );
@@ -194,6 +194,23 @@
               boxEventOpitons(this.cuid, 'emitShowMenuTab', [false])
             );
           }
+        });
+
+        const reBroadcastServer = useRebroadcastServer();
+        // 转播开始事件
+        reBroadcastServer.$on('live_broadcast_start', () => {
+          this.docServer.setRole(VHDocSDK.RoleType.HOST);
+          this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+          this.recoverLastDocs();
+        });
+        // 转播结束事件
+        reBroadcastServer.$on('live_broadcast_stop', () => {
+          // 如果当前人拥有直播间文档操作权限，设为 host 角色
+          if (this.hasDocPermission) {
+            this.docServer.setRole(VHDocSDK.RoleType.GUEST);
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+          }
+          this.recoverLastDocs();
         });
       },
 

@@ -86,9 +86,9 @@
        * 调起转播
        */
       async open() {
-        await sleep(1000);
-        const { watchInitData } = this.roomBaseServer.state;
+        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
 
+        const { watchInitData } = this.roomBaseServer.state;
         const token = watchInitData.interact.paas_access_token;
         const appId = watchInitData.interact.paas_app_id;
         const accountId = watchInitData.join_info.user_id;
@@ -106,19 +106,20 @@
             roomId
           }
         };
-        console.log('videoParam:', this.videoParam);
         this.isShow = true;
 
         if (this.interactiveServer.state.localStream.streamId) {
-          await this.interactiveServer.unpublishStream();
+          this.interactiveServer.unpublishStream();
         }
-        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
+
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {
         this.isShow = false;
         this.$refs.videoPreview?.destroy();
-        this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
+        await this.$nextTick(0);
+        // this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
+        // if (this.miniElement === 'doc') this.roomBaseServer.setChangeElement('stream-list');
         this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
       },
       exchangeScreen() {

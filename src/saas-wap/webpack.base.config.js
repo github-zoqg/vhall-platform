@@ -17,7 +17,7 @@ const htmlConfig = {
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
 
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    MiddleDomain: 'http://172.16.27.238:10001/lib/middle-domain.js',
+    MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
 
     Vant: '//s1.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
@@ -26,7 +26,10 @@ const htmlConfig = {
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
     wx: '//s1.e.vhall.com/common-static/middle/loadjweixin/1.0.0/index.min.js',
     iOSUserScalable: '//s1.e.vhall.com/common-static/middle/iOSUserScalable/1.0.0/index.min.js',
-    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js'
+    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+
+    // 移动端网页调试神器
+    Erdua: '//t-alistatic01.e.vhall.com/common-static/middle/eruda/2.4.1/eruda.js'
   },
   // cdn css
   cdnCss: {
@@ -34,7 +37,7 @@ const htmlConfig = {
     Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.1/iconfont.css',
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.2/iconfont.css',
     iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.2/iconfont.css'
   },
   // dns-prefetch

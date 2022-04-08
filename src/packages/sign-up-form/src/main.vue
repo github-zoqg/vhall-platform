@@ -692,7 +692,7 @@
       return {
         //默认的兜底的banner图
         defaultHeader,
-        //todo 询问下环境变量是否正确
+        //上传的基础地址
         baseUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
         // 是否是独立表单
         isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
@@ -719,47 +719,12 @@
         privacy: false,
         //隐私声明文字
         privacyText: '',
-        //tab栏的配置
-        tabConfig: {
-          1: [
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            },
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            }
-          ],
-          2: [
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            },
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            }
-          ]
-        },
         //初始化的活动类型
         isSubscribe: 1,
         //当前激活的tab
         activeTab: 1,
         //报名表单验证
         rules: {},
-        //输入文字提示的map
-        placeholderMap: {
-          1: this.$t('interact_tools.interact_tools_1005'),
-          2: this.$t('account.account_1025'),
-          3: this.$t('form.form_1023'),
-          5: {
-            province: this.$t('form.form_1003'),
-            city: this.$t('form.form_1004'),
-            county: this.$t('form.form_1005')
-          },
-          6: this.$t('form.form_1020')
-        },
         //题目的类型中文翻译
         langDefaultZH: [
           '姓名',
@@ -826,20 +791,6 @@
         showCaptcha: false,
         //是否是校验手机
         isValidPhone: false,
-        //已报名的表单
-        verifyRules: {
-          phone: {
-            type: 'number',
-            required: true,
-            message: this.$t('account.account_1069'),
-            trigger: 'blur'
-          },
-          code: {
-            required: true,
-            validator: this.validCode,
-            trigger: 'blur'
-          }
-        },
         //联动选项是第几题
         colNum: '',
         //区域选项
@@ -1050,13 +1001,68 @@
           return [];
         }
         return this.counties[this.city];
+      },
+      //tab栏的配置
+      tabConfig() {
+        return {
+          1: [
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            },
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t('form.form_1024')
+            },
+            {
+              code: 1,
+              text: this.$t('form.form_1025')
+            }
+          ]
+        };
+      },
+      //输入文字提示的map
+      placeholderMap() {
+        return {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1003'),
+            city: this.$t('form.form_1004'),
+            county: this.$t('form.form_1005')
+          },
+          6: this.$t('form.form_1020')
+        };
+      },
+      //已报名的表单
+      verifyRules() {
+        return {
+          phone: {
+            type: 'number',
+            required: true,
+            message: this.$t('account.account_1069'),
+            trigger: 'blur'
+          },
+          code: {
+            required: true,
+            validator: this.validCode,
+            trigger: 'blur'
+          }
+        };
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {
+    async mounted() {
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
       if (this.isEntryForm) {
         this.init();
@@ -1136,13 +1142,11 @@
       //邮件验证
       validEmail(rule, value, callback) {
         const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
-        console.log(!reg.test(value));
         if (!value && rule.required) {
           return callback ? callback(new Error(this.$t('form.form_1007'))) : false;
         } else if (value.length > 80) {
           return callback ? callback(new Error(this.$t('form.form_1009'))) : false;
         } else if (value && !reg.test(value)) {
-          console.log('请填写正确的邮箱');
           return callback ? callback(new Error(this.$t('form.form_1010'))) : false;
         } else {
           if (callback) {
@@ -1224,7 +1228,6 @@
           !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
           // 手机号验证开启状态
           const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
-          console.log(phoneItem, 'phoneItem');
           this.isPhoneValidate =
             phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
           // 默认填写手机号
@@ -1528,7 +1531,6 @@
             }
           },
           onload(instance) {
-            console.log('onload', instance);
             that[captcha] = instance;
           }
         });
@@ -1756,7 +1758,6 @@
       //关闭当前视图
       closePreview() {
         this.handleClose();
-        //todo 发送信令，关闭独立预约页
       }
     }
   };
@@ -1891,12 +1892,12 @@
         transition: all 0.2s linear;
         cursor: pointer;
         &:nth-child(1) {
-          border-right: 0px none;
-          border-radius: 4px 0px 0px 4px;
+          border-right: 0 none;
+          border-radius: 4px 0 0 4px;
         }
         &:nth-child(2) {
-          border-left: 0px none;
-          border-radius: 0px 4px 4px 0px;
+          border-left: 0 none;
+          border-radius: 0 4px 4px 0;
         }
         &.active {
           border: 1px solid @red;
@@ -1953,7 +1954,7 @@
     .verify-code-box {
       .no-border {
         background: #dedede;
-        color: #666666;
+        color: #666;
         cursor: not-allowed;
         &:hover {
           border: 0;
@@ -1964,17 +1965,14 @@
       }
       .isLoginActive {
         background: #fb3a32;
-        color: #ffffff;
+        color: #fff;
         cursor: pointer;
       }
       // 云盾样式重置,注释部分为设计稿样式，暂时不删除，有备无患
       .captcha {
         ::v-deep .yidun_tips {
-          color: #999999 !important;
+          color: #999 !important;
           line-height: 1.05rem !important;
-          // .yidun_tips__text {
-          // vertical-align: initial!important;
-          // }
         }
         ::v-deep .yidun_slide_indicator {
           line-height: 1.07rem !important;

@@ -20,7 +20,7 @@
         <span class="vhsaas-red-packet__count">
           {{
             $t('interact_tools.interact_tools_1043', {
-              n: redPacketInfo.get_user_count || 0
+              n: `${redPacketInfo.get_user_count}/${redPacketInfo.number}`
             })
           }}
         </span>
@@ -98,7 +98,7 @@
         winners: [],
         queryParams: {
           page: 1,
-          size: 10
+          size: 50 // 分页为50
         },
         loading: false,
         finished: false // 滚动加载锁定(分页加载)
@@ -110,7 +110,7 @@
         this.loading = true;
         this.redPacketServer
           .getRedPacketWinners({
-            pos: (this.queryParams.page - 1) * this.queryParams.size + 1,
+            pos: this.queryParams.page, // pos 参数不是偏移量,就是页码
             limit: this.queryParams.size
           })
           .then(res => {
