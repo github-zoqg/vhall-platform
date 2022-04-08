@@ -58,12 +58,12 @@
           this.desktopShareServer.unSubscribeDesktopShareStream();
         });
 
-        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
-            Toast(this.$t(`interact.interact_1013`));
-            this.subscribeDesktopScreen();
-          }
-        });
+        // this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+        //   if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+        //     Toast(this.$t(`interact.interact_1013`));
+        //     this.subscribeDesktopScreen();
+        //   }
+        // });
       }
     }
   };

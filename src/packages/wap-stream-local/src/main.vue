@@ -240,10 +240,16 @@
 
         // 推流失败
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
-          if (e.data.stream.getID() == this.localSpeaker.streamId) {
-            Toast(this.$t('因网络问题推流失败，正在重新推流'));
-            await this.stopPush();
-            this.startPush();
+          if (e.data.accountId == this.joinInfo.third_party_user_id) {
+            Dialog.alert({
+              title: this.$t('account.account_1061'),
+              message: this.$t('interact.interact_1036')
+            }).then(() => {
+              window.location.reload();
+            });
+            // Toast(this.$t('因网络问题推流失败，正在重新推流'));
+            // await this.stopPush();
+            // this.startPush();
           }
         });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
