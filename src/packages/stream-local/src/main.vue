@@ -459,7 +459,7 @@
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
-       * 此问题产生原因：由于在频繁上下麦过程中，异步问题
+       * 此问题产生原因：由于在频繁上下麦过程中，异步问题。为了解决问题2出现的
        *      上麦成功消息 ---> 创建本地流,此时存下streamId ----> 推流
        *      下麦成功消息 ---> 销毁互动实例 --------> 进而导致上麦未走完的推流报错，互动实例不存在错误
        *   出现错误后，再执行上麦   --->  上麦成功消息  --->  由于有streamID，直接return     ===> 此逻辑是出现此问题的原因
@@ -542,8 +542,12 @@
               return;
             }
             // 只有主持人使用
-            if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
-              await this.interactiveServer.unpublishStream(this.localStreamId);
+            if (
+              this.localStreamId &&
+              [1, 4].includes(+this.joinInfo.role_name) &&
+              this.mode === 3
+            ) {
+              await this.interactiveServer.unpublishStream();
               this.startPush();
               return;
             }
