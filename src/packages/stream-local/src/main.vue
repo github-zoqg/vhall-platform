@@ -717,14 +717,16 @@
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
           if (e.data.accountId == this.joinInfo.third_party_user_id) {
-            this.$message({
-              message: this.$t('因网络问题推流失败，正在重新推流'),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            await this.stopPush();
-            this.startPush();
+            this.PopAlertOffline.text = this.$t('interact.interact_1036');
+            this.PopAlertOffline.visible = true;
+            // this.$message({
+            //   message: this.$t('因网络问题推流失败，正在重新推流'),
+            //   showClose: true,
+            //   type: 'warning',
+            //   customClass: 'zdy-info-box'
+            // });
+            // await this.stopPush();
+            // this.startPush();
           }
         });
 
