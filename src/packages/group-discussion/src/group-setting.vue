@@ -118,7 +118,7 @@
       // 取消
       handleClose() {
         this.close();
-        this.$emit('emitCancelGroup');
+        this.$emit('settingCancel');
       },
       close() {
         this.dialogVisible = false;
