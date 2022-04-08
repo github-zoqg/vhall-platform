@@ -1,0 +1,115 @@
+<mxfile host="65bd71144e">
+    <diagram id="Ty2NjuelVkugs8TiWOgl" name="第 1 页">
+        <mxGraphModel dx="705" dy="1764" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" background="#000000" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="179" value="文档组件主流程图" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;startSize=20;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="-261" width="860" height="791" as="geometry"/>
+                </mxCell>
+                <mxCell id="180" value="PC" style="swimlane;startSize=20;rounded=1;strokeWidth=0;" parent="179" vertex="1">
+                    <mxGeometry y="20" width="860" height="771" as="geometry">
+                        <mxRectangle y="20" width="30" height="771" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="181" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="180" source="182" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="210" y="104" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="182" value="开始" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" parent="180" vertex="1">
+                    <mxGeometry x="165" y="40" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="183" value="" style="edgeStyle=none;html=1;fontSize=10;" parent="180" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="210" y="174" as="targetPoint"/>
+                        <mxPoint x="209.67105263157896" y="134" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="185" value="" style="edgeStyle=none;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="180" target="221" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="209" y="242" as="sourcePoint"/>
+                        <mxPoint x="203.54329949423288" y="286.02037623258025" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="198" value="结束" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" parent="180" vertex="1">
+                    <mxGeometry x="164" y="561" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="371" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;strokeWidth=1;" edge="1" parent="180" source="221" target="304">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="221" value="&lt;span style=&quot;font-size: 10px&quot;&gt;获取上一次的文档数据&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="180" vertex="1">
+                    <mxGeometry x="164" y="288" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="290" value="&lt;span style=&quot;font-size: 10px&quot;&gt;mounted&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="180">
+                    <mxGeometry x="165" y="103" width="95" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="302" value="是" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="180" source="291" target="221">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="291" value="&lt;font style=&quot;font-size: 10px&quot;&gt;是否在直播中？&lt;/font&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="180">
+                    <mxGeometry x="160" y="174" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="376" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;strokeWidth=1;" edge="1" parent="180" source="297" target="299">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="297" value="&lt;span style=&quot;font-size: 10px&quot;&gt;是否是主持人？&lt;/span&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="180">
+                    <mxGeometry x="311" y="175" width="89" height="58" as="geometry"/>
+                </mxCell>
+                <mxCell id="299" value="&lt;span style=&quot;font-size: 10px&quot;&gt;菜单组件&lt;/span&gt;&lt;span style=&quot;font-size: 10px&quot;&gt;默认&lt;/span&gt;&lt;span style=&quot;font-size: 10px&quot;&gt;&lt;br&gt;选中文档&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" vertex="1" parent="180">
+                    <mxGeometry x="305" y="288" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="370" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;strokeWidth=1;" edge="1" parent="180" target="331">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="262" y="400.5" as="sourcePoint"/>
+                        <mxPoint x="354" y="471" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="354" y="401"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="372" value="有" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;strokeWidth=1;" edge="1" parent="180" source="304" target="311">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="304" value="&lt;span style=&quot;font-size: 10px&quot;&gt;有无数据？&lt;/span&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="180">
+                    <mxGeometry x="159" y="381" width="100" height="39" as="geometry"/>
+                </mxCell>
+                <mxCell id="373" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;strokeWidth=1;" edge="1" parent="180" source="311" target="198">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="311" value="&lt;span style=&quot;font-size: 10px&quot;&gt;展示激活的文档或白板&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="180">
+                    <mxGeometry x="164" y="471" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="331" value="&lt;span style=&quot;font-size: 10px&quot;&gt;展示空文档占位图&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="180">
+                    <mxGeometry x="309" y="471" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="296" value="否" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="180">
+                    <mxGeometry x="270" y="201" width="30" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="295" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontSize=10;" edge="1" parent="180" source="291" target="297">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="310" y="204" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="369" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontSize=10;strokeWidth=1;" edge="1" parent="180" source="304" target="299">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="350" y="321" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="355" y="401"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="375" value="事件驱动" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="369">
+                    <mxGeometry x="0.7199" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="377" value="无" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="369">
+                    <mxGeometry x="-0.5602" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
