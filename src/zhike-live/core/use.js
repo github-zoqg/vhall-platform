@@ -8,7 +8,7 @@ import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
 import VmpHeaderRight from '@/packages/header-right';
-import VmpPcPlayer from '@/packages/pc-player';
+import VmpPcPlayer from '@/packages/player/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpLivePrivateChat from '@/packages/live-private-chat';
 import VmpDocUne from '@/packages/doc-une';
