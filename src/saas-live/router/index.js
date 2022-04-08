@@ -66,6 +66,11 @@ const routes = [
     component: () => import('@/saas-live/views/clientEmbed/index')
   },
   {
+    path: '/lives/yun/:il_id', // 云导播
+    name: 'yun',
+    component: () => import('@/saas-live/views/yun')
+  },
+  {
     path: '/lives/error/:id/:code', // 统一错误页
     name: 'PageError',
     meta: { title: '系统异常' },

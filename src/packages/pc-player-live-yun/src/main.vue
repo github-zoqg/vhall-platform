@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-pc-player-live-yun">
     <!-- 播放器区域 -->
-    <div id="vmp-player-yun" class="player_box" v-if="roleName == 1"></div>
+    <div id="vmp-player-yun" class="player_box" v-if="roleName == 1 && !pushStream"></div>
     <!-- 本地推流区域 -->
     <div id="stream-yun-box" v-else class="stream_box"></div>
   </div>
@@ -20,7 +20,10 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
       roleName() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.joinInfo;
+        return this.$domainStore.state.roomBaseServer.watchInitData?.join_info?.role_name;
+      },
+      pushStream() {
+        return /lives\/yun/.test(location.pathname);
       }
     },
     watch: {},
@@ -29,17 +32,13 @@
       this.playerServer = usePlayerServer();
       this.interactiveServer = useInteractiveServer();
     },
-    mounted() {
-      console.log(
-        this.roleName,
-        this.mode,
-        'this.$domainStore.state.roomBaseServer.watchInitData.joinInfo'
-      );
+    created() {
+      this.init();
     },
     methods: {
       async init() {
         // 主持人初始化播放器
-        if (this.joinInfo.roleName == 1) {
+        if (this.roleName == 1 && !this.pushStream) {
           this.initPlayer();
         } else {
           // 其他人创建本地流&推流
