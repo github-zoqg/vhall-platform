@@ -486,16 +486,13 @@
         }
       },
       initPage() {
-        if (this.webinarType != 3) {
+        if (this.webinarType == 3) {
+          this.showBottomBtn = false;
+          this.countDownTime = 0;
+        } else {
           // 不是 活动结束 - 就启动倒计时
           this.sureCountDown();
           this.handlerInitInfo();
-        } else if (this.webinarType == 3) {
-          if (this.roomBaseServer.state.embedObj.embedVideo) {
-            this.showBottomBtn = false;
-          }
-          this.subscribeText = this.$t('player.player_1017');
-          this.countDownTime = 0;
         }
       },
       livingStartConfirm() {
