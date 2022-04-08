@@ -51,6 +51,8 @@ import VmpSplitScreen from '@/packages/split-screen';
 import VmpEmbedClient from '@/packages/embed-client-live';
 // 邀请上麦
 import VmpMicInvited from '@/packages/mic-invited/index';
+// 云导播播放器&本地流推送组件
+import VmpPcPlayerLiveYun from '@/packages/pc-player-live-yun';
 
 // 全局注册组件
 export function initUse() {
@@ -103,4 +105,5 @@ export function initUse() {
   Vue.use(VmpStreamDesktopScreen);
   Vue.use(VmpEmbedClient);
   Vue.use(VmpMicInvited);
+  Vue.use(VmpPcPlayerLiveYun);
 }

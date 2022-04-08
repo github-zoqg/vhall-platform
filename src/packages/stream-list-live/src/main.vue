@@ -23,7 +23,7 @@
         <!-- 非云导播活动 -->
         <vmp-air-container :oneself="true" :cuid="childrenCom[0]" v-if="false"></vmp-air-container>
         <!-- 云导播活动 -->
-        <div v-else>123</div>
+        <vmp-air-container :oneself="true" :cuid="childrenCom[1]" v-else></vmp-air-container>
       </div>
 
       <!-- 远端流列表 -->

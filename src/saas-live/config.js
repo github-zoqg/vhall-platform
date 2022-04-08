@@ -519,7 +519,11 @@ export const serverConfig = {
   // 上麦流列表
   comStreamList: {
     component: 'VmpStreamListLive',
-    children: ['comStreamLocal']
+    children: ['comStreamLocal', 'comPcPlayerLiveYun']
+  },
+  // 云导播播放器&本地流推送组件
+  comPcPlayerLiveYun: {
+    component: 'VmpPcPlayerLiveYun'
   },
   // 远端流
   comStreamRemote: {

@@ -1,9 +1,9 @@
 <template>
   <div class="vmp-pc-player-live-yun">
     <!-- 播放器区域 -->
-    <div id="vmp-player-yun"></div>
+    <div id="vmp-player-yun" class="player_box" v-if="roleName == 1"></div>
     <!-- 本地推流区域 -->
-    <div id="stream-yun-box"></div>
+    <div id="stream-yun-box" v-else class="stream_box"></div>
   </div>
 </template>
 
@@ -15,25 +15,41 @@
       return {};
     },
     computed: {
-      joinInfo() {
+      // 直播类型 6分组
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
+      roleName() {
         return this.$domainStore.state.roomBaseServer.watchInitData.joinInfo;
       }
     },
+    watch: {},
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
       this.interactiveServer = useInteractiveServer();
     },
     mounted() {
-      this.init();
+      console.log(
+        this.roleName,
+        this.mode,
+        'this.$domainStore.state.roomBaseServer.watchInitData.joinInfo'
+      );
     },
     methods: {
-      init() {
+      async init() {
         // 主持人初始化播放器
-        // 其他人创建本地流&推流
+        if (this.joinInfo.roleName == 1) {
+          this.initPlayer();
+        } else {
+          // 其他人创建本地流&推流
+          await this.createLocalStream();
+          await this.publishLocalStream();
+        }
       },
       // 初始化播放器
       async initPlayer() {
+        console.log('云导播初始化播放器');
         return this.playerServer
           .init({
             videoNode: 'vmp-player-yun'
@@ -46,7 +62,7 @@
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
           await this.interactiveServer
             .createLocalVideoStream({
-              videoNode: `stream-stream-yun-box`
+              videoNode: `stream-yun-box`
             })
             .catch(e => {
               if (e && e?.name == 'NotAllowed') {
@@ -87,4 +103,14 @@
   };
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+  .vmp-pc-player-live-yun {
+    width: 100%;
+    height: 100%;
+    .player_box,
+    .stream_box {
+      width: 100%;
+      height: 100%;
+    }
+  }
+</style>
