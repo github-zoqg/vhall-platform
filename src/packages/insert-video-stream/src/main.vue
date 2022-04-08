@@ -474,7 +474,7 @@
       },
       // 打开插播列表dialog
       handleOpenInsertFileDialog() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'openInsertFileDialog'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenInsertFileDialog'));
       },
       /**
        * 关闭插播
