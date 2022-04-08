@@ -8,9 +8,9 @@
 
 ### 输入 api(向其他组件发送的指令)
 
-| 方法名           | 参数 1            | 参数 2         | 描述                 | 代码块                                                                                                    |
-| ---------------- | ----------------- | -------------- | -------------------- | --------------------------------------------------------------------------------------------------------- |
-| emitDisTimerIcon | disTimer 字段名称 | false Bloor 值 | 驱动商品详情组件显示 | `window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false]));` |
+| 方法名           | 参数 1            | 参数 2         | 描述       | 代码块                                                                                                    |
+| ---------------- | ----------------- | -------------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| emitDisTimerIcon | disTimer 字段名称 | false Bloor 值 | 禁用计时器 | `window.$middleEventSdk.event.send(boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false]));` |
 
 ### 输出 api(暴露给其他组件使用的方法)
 
