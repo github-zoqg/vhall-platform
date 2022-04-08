@@ -139,7 +139,7 @@
                     <mxGeometry x="81" y="470" width="89" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="58" value="vrtc_disconnect_success" style="swimlane;fontColor=#FFFFFF;dashed=1;startSize=20;" parent="1" vertex="1">
-                    <mxGeometry x="740" y="900" width="380" height="530" as="geometry"/>
+                    <mxGeometry x="750" y="910" width="380" height="530" as="geometry"/>
                 </mxCell>
                 <mxCell id="69" value="停止推流&lt;br&gt;stopPush" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FFFFFF;" parent="58" vertex="1">
                     <mxGeometry x="79.5" y="60" width="107" height="40" as="geometry"/>
@@ -150,14 +150,14 @@
                 <mxCell id="73" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=1 1;fontColor=#FFFFFF;" parent="58" source="71" target="72" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="76" value="" style="edgeStyle=none;html=1;dashed=1;dashPattern=1 1;fontColor=#FFFFFF;" parent="58" source="71" target="75" edge="1">
+                <mxCell id="76" value="" style="edgeStyle=none;html=1;dashed=1;dashPattern=1 1;fontColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="58" source="71" target="75" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="71" value="是否为无延迟" style="rhombus;whiteSpace=wrap;html=1;fontColor=#FFFFFF;" parent="58" vertex="1">
                     <mxGeometry x="74.25" y="219" width="117.5" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="72" value="初始化互动实例" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FFFFFF;" parent="58" vertex="1">
-                    <mxGeometry x="79.5" y="340" width="107" height="40" as="geometry"/>
+                    <mxGeometry x="79.5" y="400" width="107" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="74" value="Y" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontColor=#FFFFFF;" parent="58" vertex="1">
                     <mxGeometry x="70" y="290" width="60" height="30" as="geometry"/>
@@ -166,13 +166,20 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="75" value="是否为分组" style="rhombus;whiteSpace=wrap;html=1;fontColor=#FFFFFF;" parent="58" vertex="1">
-                    <mxGeometry x="240" y="210" width="120" height="80" as="geometry"/>
+                    <mxGeometry x="240" y="200" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="77" value="Y" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontColor=#FFFFFF;" parent="58" vertex="1">
-                    <mxGeometry x="191.75" y="210" width="60" height="30" as="geometry"/>
+                    <mxGeometry x="180" y="210" width="60" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="78" value="Y" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontColor=#FFFFFF;" parent="58" vertex="1">
                     <mxGeometry x="230" y="290" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="82" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="58" source="79" target="72">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="300" y="420"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="79" value="更新小组数据" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FFFFFF;" parent="58" vertex="1">
                     <mxGeometry x="246.5" y="340" width="107" height="40" as="geometry"/>
