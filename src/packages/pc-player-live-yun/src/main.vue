@@ -3,7 +3,9 @@
     <!-- 播放器区域 -->
     <div id="vmp-player-yun" class="player_box" v-if="roleName == 1 && !pushStream"></div>
     <!-- 本地推流区域 -->
-    <div id="stream-yun-box" v-else class="stream_box"></div>
+    <div v-else class="stream_box">
+      <div id="stream-yun-box"></div>
+    </div>
   </div>
 </template>
 
@@ -107,7 +109,8 @@
     width: 100%;
     height: 100%;
     .player_box,
-    .stream_box {
+    .stream_box,
+    #stream-yun-box {
       width: 100%;
       height: 100%;
     }

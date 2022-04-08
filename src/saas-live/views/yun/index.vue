@@ -1,12 +1,21 @@
 <template>
-  <VmpPcPlayerLiveYun></VmpPcPlayerLiveYun>
+  <!-- <div></div> -->
+  <VmpPcPlayerLiveYun v-if="initComplete"></VmpPcPlayerLiveYun>
 </template>
 
 <script>
+  import roomState from '../../headless/room-state.js';
   import { Domain } from 'middle-domain';
   export default {
+    data() {
+      return {
+        initComplete: false
+      };
+    },
     async created() {
       await this.init();
+      await roomState();
+      this.initComplete = true;
       console.log('初始化');
     },
     methods: {
