@@ -542,8 +542,12 @@
               return;
             }
             // 只有主持人使用
-            if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
-              await this.interactiveServer.unpublishStream(this.localStreamId);
+            if (
+              this.localStreamId &&
+              [1, 4].includes(+this.joinInfo.role_name) &&
+              this.mode === 3
+            ) {
+              await this.interactiveServer.unpublishStream();
               this.startPush();
               return;
             }
