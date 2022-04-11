@@ -571,6 +571,12 @@
         .vmp-stream-list__remote-container {
           width: 72px;
           height: 40px;
+
+          &:not(.vmp-stream-list__main-screen) {
+            .vmp-stream-local__bottom-nickname {
+              width: 60px;
+            }
+          }
         }
         .vmp-stream-local__bottom-role {
           display: none;
