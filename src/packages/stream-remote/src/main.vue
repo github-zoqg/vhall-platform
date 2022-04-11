@@ -406,14 +406,15 @@
         );
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.stream.streamId) {
-            this.$message({
-              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            this.subscribeRemoteStream();
+          if (e.data.accountId == this.stream.accountId) {
+            this.isShowNetError = true;
+            // this.$message({
+            //   message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+            //   showClose: true,
+            //   type: 'warning',
+            //   customClass: 'zdy-info-box'
+            // });
+            // this.subscribeRemoteStream();
           }
         });
 
