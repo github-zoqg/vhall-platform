@@ -118,6 +118,7 @@
       },
       // 是否有翻页按钮
       hasPager() {
+        // 直播中 && 开启了文档显示 && 当前展示的是文档
         return (
           this.webinarType === 1 &&
           !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
@@ -134,7 +135,6 @@
             // 初始化事件
             this.initEvents();
             // 恢复上一次的文档数据;
-            console.log('----- recoverLastDocs 频道变更');
             this.recoverLastDocs();
           }
         }

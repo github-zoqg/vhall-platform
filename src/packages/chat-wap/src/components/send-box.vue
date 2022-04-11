@@ -9,9 +9,12 @@
       </div>
       <div class="content-input">
         <template v-if="chatShow">
+          <div class="content-input__placeholder" v-if="liveStatus == 3">
+            <span>{{ $t('chat.chat_1092') }}</span>
+          </div>
           <div
             class="content-input__placeholder"
-            v-if="!isLogin && !noChatLogin && !isEmbed"
+            v-else-if="!isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -258,6 +261,10 @@
       isLogin() {
         const user_id = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
         return user_id != 0;
+      },
+      //当前直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     watch: {

@@ -9,7 +9,7 @@
       <div class="vmp-insert-video-wrap">
         <div v-if="noVideo == 1">
           <div class="vmp-insert-video-wrap-search">
-            <el-button type="primary" round @click="selectlocalVideo">选择文件</el-button>
+            <el-button type="primary" round @click="selectLocalVideo">选择文件</el-button>
             <el-tooltip placement="right">
               <div slot="content">
                 1.视频直播、互动直播支持的文件格式：MP4、WEBM、OGG格式；音频直播支持的文件格式OGG
@@ -114,7 +114,7 @@
         <div class="vmp-insert-video-wrap-null" v-else>
           <img src="./img/no-create.png" alt="" />
           <p class="vmp-insert-video-wrap-null-text">暂未上传音视频</p>
-          <el-button type="primary" round @click="selectlocalVideo">选择文件</el-button>
+          <el-button type="primary" round @click="selectLocalVideo">选择文件</el-button>
           <div>
             1.视频直播、互动直播支持的文件格式：MP4、WEBM、OGG格式；音频直播支持的文件格式OGG
             <br />
@@ -259,7 +259,7 @@
         this.insertVideoVisible = false;
       },
       // 选择本地文件插播
-      selectlocalVideo() {
+      selectLocalVideo() {
         const insertFileServer = useInsertFileServer();
         const { watchInitData } = useRoomBaseServer().state;
         const _this = this;
